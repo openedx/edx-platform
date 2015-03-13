@@ -1,10 +1,10 @@
 // edX: Certificates - View: Valid Certificate
 // ====================
-.view--valid-certificate {
+.view-valid-certificate {
   background: $bg-view;
 
   // layout
-  .wrapper--view {
+  .wrapper-view {
     background: transparent url('../images/bg-paperfibers.png') 0 0 repeat-both;
     padding-bottom: ($baseline-v*3);
 
@@ -17,7 +17,7 @@
     }
   }
 
-  .wrapper--content {
+  .wrapper-content {
     padding: $baseline-v ($baseline-h*2);
 
     @include media($bp-ds) {
@@ -100,7 +100,7 @@
   }
 
   // statement
-  .accomplishment__statement {
+  .accomplishment-statement {
     @extend %trans-size;
     @include span-columns(8 of 12);
     @include pad(0 $baseline-h 0 0);
@@ -124,12 +124,12 @@
       border-right: none;
     }
 
-    [class^="copy__"] {
+    [class^="copy-"] {
       display: block;
       margin-bottom: ($baseline-v);
     }
 
-    .copy__name {
+    .copy-name {
       @extend %t-title-2;
       @extend %t-weight3;
 
@@ -146,7 +146,7 @@
       }
     }
 
-    .copy__course__org {
+    .copy-course-org {
       @extend %t-title-5;
       @extend %t-weight2;
       margin-bottom: 0;
@@ -160,7 +160,7 @@
       }
     }
 
-    .copy__course {
+    .copy-course {
 
       @include media($bp-ds) {
         margin-bottom: ($baseline-v/4);
@@ -171,7 +171,7 @@
       }
     }
 
-    .copy__course__name {
+    .copy-course-name {
       @extend %t-title-2;
       @extend %t-weight3;
       @include lh(36);
@@ -189,11 +189,11 @@
       }
     }
 
-    .copy__recogniton {
+    .copy-recogniton {
       @extend %t-title-2;
     }
 
-    .copy__context {
+    .copy-context {
       @extend %t-copy-lead2;
       color: $gray-l2;
 
@@ -210,7 +210,7 @@
   }
 
   // metadata around accomplishment
-  .accomplishment__details {
+  .accomplishment-details {
     @extend %trans-size;
     @include span-columns(4 of 12);
 
@@ -229,7 +229,7 @@
       @include fill-parent;
     }
 
-    .list--metadata {
+    .list-metadata {
       @extend %ui-no-list;
 
       .item {
@@ -264,7 +264,7 @@
     }
 
     // specific metadata
-    .certificate--type {
+    .certificate-type {
       text-transform: uppercase;
       letter-spacing: 0.1rem;
 
@@ -274,7 +274,7 @@
       }
     }
 
-    .certificate--id {
+    .certificate-id {
 
       .value {
         word-wrap: break-word;
@@ -285,7 +285,7 @@
   // ====================
 
   // supplemental content
-  .content--supplemental {
+  .content-supplemental {
 
     @include media($bp-dm) {
     }
@@ -307,7 +307,7 @@
       color: $gray-l2;
     }
 
-    .list--actions {
+    .list-actions {
       margin-top: ($baseline-v);
 
       .action {
@@ -331,7 +331,7 @@
     }
   }
 
-  .supplemental__how {
+  .content-supplemental-how {
     @extend %trans-size;
     @include span-columns(3 of 12);
 
@@ -350,7 +350,7 @@
     }
   }
 
-  .supplemental__certificates {
+  .content-supplemental-certificates {
     @extend %trans-size;
     @include span-columns(3 of 12);
     @include omega();
@@ -368,7 +368,7 @@
     }
   }
 
-  .supplemental__about {
+  .content-supplemental-about {
     @extend %trans-size;
     @include span-columns(6 of 12);
 
@@ -395,13 +395,9 @@
       background: $edx-blue-l2;
     }
 
-    .certificate--type {
+    .certificate-type {
       color: $edx-blue-l2;
     }
-
-    // .content--supplemental .list--actions .action {
-    //   @extend %btn-secondary;
-    // }
   }
 
   // CASE: verified
@@ -424,11 +420,11 @@
       }
     }
 
-    .certificate--type {
+    .certificate-type {
       color: $edx-blue;
 
 
-      .wrapper--img {
+      .wrapper-img {
         width: 200px;
         border-radius: ($baseline-h*10);
         padding: ($baseline-v/2) ($baseline-h/2);

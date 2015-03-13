@@ -1,10 +1,10 @@
 // edX: Certificates - View: Invalid Certificate
 // ====================
-.view--invalid-certificate {
+.view-invalid-certificate {
   background: $bg-view;
 
   // layout
-  .wrapper--view {
+  .wrapper-view {
     background: transparent url('../images/bg-paperfibers.png') 0 0 repeat-both;
     padding-bottom: ($baseline-v*3);
 
@@ -17,7 +17,7 @@
     }
   }
 
-  .wrapper--content {
+  .wrapper-content {
     padding: $baseline-v ($baseline-h*2);
 
     @include media($bp-ds) {
@@ -100,7 +100,7 @@
     }
   }
 
-  .feedback__lead {
+  .feedback-lead {
     margin-bottom: ($baseline-v);
     padding-bottom: ($baseline-v);
     border-bottom: 1px solid $gray-l5;
@@ -117,7 +117,7 @@
     }
   }
 
-  .feedback__support {
+  .feedback-support {
     @include span-columns(6 of 12);
     margin-bottom: $baseline-v;
 
@@ -140,7 +140,7 @@
     }
   }
 
-  .feedback__warning {
+  .feedback-warning {
     @include span-columns(6 of 12);
     @include omega();
 
@@ -166,7 +166,7 @@
   // ====================
 
   // supplemental content
-  .content--supplemental {
+  .content-supplemental {
 
     @include media($bp-dm) {
     }
@@ -188,7 +188,7 @@
       color: $gray-l2;
     }
 
-    .list--actions {
+    .list-actions {
       margin-top: ($baseline-v);
 
       .action {
@@ -212,7 +212,7 @@
     }
   }
 
-  .supplemental__how {
+  .supplemental-how {
     @extend %trans-size;
     @include span-columns(3 of 12);
 
@@ -231,7 +231,7 @@
     }
   }
 
-  .supplemental__certificates {
+  .supplemental-certificates {
     @extend %trans-size;
     @include span-columns(3 of 12);
     @include omega();
@@ -249,7 +249,7 @@
     }
   }
 
-  .supplemental__about {
+  .supplemental-about {
     @extend %trans-size;
     @include span-columns(6 of 12);
 
@@ -276,13 +276,9 @@
       background: $edx-blue-l2;
     }
 
-    .certificate--type {
+    .certificate-type {
       color: $edx-blue-l2;
     }
-
-    // .content--supplemental .list--actions .action {
-    //   @extend %btn-secondary;
-    // }
   }
 
   // CASE: verified
@@ -305,11 +301,11 @@
       }
     }
 
-    .certificate--type {
+    .certificate-type {
       color: $edx-blue;
 
 
-      .wrapper--img {
+      .wrapper-img {
         width: 200px;
         border-radius: ($baseline-h*10);
         padding: ($baseline-v/2) ($baseline-h/2);

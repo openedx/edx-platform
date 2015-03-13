@@ -4,23 +4,55 @@
   -moz-box-sizing: border-box;
   box-sizing: border-box; }
 
-.view--valid-certificate .accomplishment__details .list--metadata .item:last-child, .view--validate-certificate .list--instructions .item:last-child, .view--validate-certificate .list--instructions .item .instruction__details:last-child {
+.view-valid-certificate .accomplishment-details .list-metadata .item:last-child, .view-validate-certificate .list-instructions .item:last-child, .view-validate-certificate .list-instructions .item .instruction-details:last-child {
   margin-bottom: 0;
   margin-right: 0;
   border: none;
   padding-bottom: 0;
   padding-right: 0; }
 
-.list--actions, .list--docs, .list--steps, .list--controls, .list--fields, .list--help, .nav--wizard, .list--tips, .field--group, .view--valid-certificate .accomplishment__details .list--metadata, .view--validate-certificate .list--requirements, .view--validate-certificate .list--instructions {
+.list-actions,
+.list-docs,
+.list-steps,
+.list-controls,
+.list-fields,
+.list-help,
+.nav-wizard,
+.list-tips,
+.field-group, .view-valid-certificate .accomplishment-details .list-metadata, .view-validate-certificate .list-requirements, .view-validate-certificate .list-instructions {
   list-style: none;
   margin: 0;
   padding: 0;
   text-indent: 0; }
-  .list--actions li, .list--docs li, .list--steps li, .list--controls li, .list--fields li, .list--help li, .nav--wizard li, .list--tips li, .field--group li, .view--valid-certificate .accomplishment__details .list--metadata li, .view--validate-certificate .list--requirements li, .view--validate-certificate .list--instructions li, .list--actions dt, .list--docs dt, .list--steps dt, .list--controls dt, .list--fields dt, .list--help dt, .nav--wizard dt, .list--tips dt, .field--group dt, .view--valid-certificate .accomplishment__details .list--metadata dt, .view--validate-certificate .list--requirements dt, .view--validate-certificate .list--instructions dt, .list--actions dd, .list--docs dd, .list--steps dd, .list--controls dd, .list--fields dd, .list--help dd, .nav--wizard dd, .list--tips dd, .field--group dd, .view--valid-certificate .accomplishment__details .list--metadata dd, .view--validate-certificate .list--requirements dd, .view--validate-certificate .list--instructions dd {
+  .list-actions li,
+  .list-docs li,
+  .list-steps li,
+  .list-controls li,
+  .list-fields li,
+  .list-help li,
+  .nav-wizard li,
+  .list-tips li,
+  .field-group li, .view-valid-certificate .accomplishment-details .list-metadata li, .view-validate-certificate .list-requirements li, .view-validate-certificate .list-instructions li, .list-actions dt,
+  .list-docs dt,
+  .list-steps dt,
+  .list-controls dt,
+  .list-fields dt,
+  .list-help dt,
+  .nav-wizard dt,
+  .list-tips dt,
+  .field-group dt, .view-valid-certificate .accomplishment-details .list-metadata dt, .view-validate-certificate .list-requirements dt, .view-validate-certificate .list-instructions dt, .list-actions dd,
+  .list-docs dd,
+  .list-steps dd,
+  .list-controls dd,
+  .list-fields dd,
+  .list-help dd,
+  .nav-wizard dd,
+  .list-tips dd,
+  .field-group dd, .view-valid-certificate .accomplishment-details .list-metadata dd, .view-validate-certificate .list-requirements dd, .view-validate-certificate .list-instructions dd {
     margin: 0;
     padding: 0; }
 
-.sr, hr.divider, .title--logo .title--sub {
+.sr, hr.divider, .title-logo .title-sub {
   border: 0;
   clip: rect(0 0 0 0);
   height: 1px;
@@ -30,12 +62,12 @@
   position: absolute;
   width: 1px; }
 
-.view--valid-certificate .accomplishment, .view--valid-certificate .accomplishment__statement, .view--valid-certificate .accomplishment__details, .view--valid-certificate .supplemental__how, .view--valid-certificate .supplemental__certificates, .view--valid-certificate .supplemental__about, .view--invalid-certificate .feedback, .view--invalid-certificate .supplemental__how, .view--invalid-certificate .supplemental__certificates, .view--invalid-certificate .supplemental__about {
+.view-valid-certificate .accomplishment, .view-valid-certificate .accomplishment-statement, .view-valid-certificate .accomplishment-details, .view-valid-certificate .content-supplemental-how, .view-valid-certificate .content-supplemental-certificates, .view-valid-certificate .content-supplemental-about, .view-invalid-certificate .feedback, .view-invalid-certificate .supplemental-how, .view-invalid-certificate .supplemental-certificates, .view-invalid-certificate .supplemental-about {
   -webkit-transition: width 0.25s ease-in-out, height 0.25s ease-in-out;
   -moz-transition: width 0.25s ease-in-out, height 0.25s ease-in-out;
   transition: width 0.25s ease-in-out, height 0.25s ease-in-out; }
 
-.wrapper--header, .view--valid-certificate .accomplishment, .view--invalid-certificate .feedback, .view--validate-certificate .instructions {
+.wrapper-header, .view-valid-certificate .accomplishment, .view-invalid-certificate .feedback, .view-validate-certificate .instructions {
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1); }
 
 @-webkit-keyframes fadeIn {
@@ -546,7 +578,7 @@ html {
 [class^="wrapper-"] {
   padding: 0; }
 
-.wrapper--view {
+.wrapper-view {
   background: #f4f5f5; }
 
 html, body, div, span, applet, object, iframe,
@@ -586,82 +618,82 @@ footer, header, hgroup, menu, nav, section, summary,
 time, mark, audio, video {
   font-weight: 400; }
 
-.view--valid-certificate .accomplishment__statement .copy__course__org, .view--valid-certificate .accomplishment__details .value {
+.view-valid-certificate .accomplishment-statement .copy-course-org, .view-valid-certificate .accomplishment-details .value {
   font-weight: 500; }
 
-strong, .view--valid-certificate .content--supplemental .list--actions .action, .view--invalid-certificate .content--supplemental .list--actions .action, .view--validate-certificate .support .list--actions .action, .view--valid-certificate .accomplishment__statement .copy__name, .view--valid-certificate .accomplishment__statement .copy__course__name, .view--valid-certificate .accomplishment__details .label, .view--valid-certificate .content--supplemental .title, .view--invalid-certificate .feedback__lead .title, .view--invalid-certificate .feedback__support .title, .view--invalid-certificate .feedback__warning .title, .view--invalid-certificate .content--supplemental .title, .view--validate-certificate .content .title--lvl1, .view--validate-certificate .content .title--lvl2, .view--validate-certificate .content .title--lvl3, .view--validate-certificate .list--requirements .item:before, .view--validate-certificate .list--requirements .item .requirement__label, .view--validate-certificate .instructions .title {
+strong, .view-valid-certificate .content-supplemental .list-actions .action, .view-invalid-certificate .content-supplemental .list-actions .action, .view-validate-certificate .support .list-actions .action, .view-valid-certificate .accomplishment-statement .copy-name, .view-valid-certificate .accomplishment-statement .copy-course-name, .view-valid-certificate .accomplishment-details .label, .view-valid-certificate .content-supplemental .title, .view-invalid-certificate .feedback-lead .title, .view-invalid-certificate .feedback-support .title, .view-invalid-certificate .feedback-warning .title, .view-invalid-certificate .content-supplemental .title, .view-validate-certificate .content .title-lvl1, .view-validate-certificate .content .title-lvl2, .view-validate-certificate .content .title-lvl3, .view-validate-certificate .list-requirements .item:before, .view-validate-certificate .list-requirements .item .requirement-label, .view-validate-certificate .instructions .title {
   font-weight: 600; }
 
-.view--validate-certificate .list--instructions .item:before {
+.view-validate-certificate .list-instructions .item:before {
   font-weight: 700; }
 
-.view--valid-certificate .accomplishment__statement .copy__name, .view--valid-certificate .accomplishment__statement .copy__course__name, .view--valid-certificate .accomplishment__statement .copy__recogniton, .view--validate-certificate .instructions .title, .view--invalid-certificate .feedback__lead .title, .view--validate-certificate .content .title--lvl1, .title--logo .title--sub, .view--valid-certificate .accomplishment__statement .copy__course__org, .view--validate-certificate .content .title--lvl2, .title--logo .title--sub, .view--valid-certificate .accomplishment__statement .copy__course__org, .view--validate-certificate .content .title--lvl2, .view--valid-certificate .status .title, .view--valid-certificate .accomplishment__details .value, .view--invalid-certificate .status .title, .view--invalid-certificate .feedback__support .title, .view--invalid-certificate .feedback__warning .title, .view--validate-certificate .content .title--lvl3, .view--validate-certificate .list--requirements .item:before, .view--validate-certificate .list--requirements .item .requirement__label, .view--validate-certificate .list--instructions .item:before, .view--valid-certificate .content--supplemental .title, .view--invalid-certificate .content--supplemental .title {
+.view-valid-certificate .accomplishment-statement .copy-name, .view-valid-certificate .accomplishment-statement .copy-course-name, .view-valid-certificate .accomplishment-statement .copy-recogniton, .view-validate-certificate .instructions .title, .view-invalid-certificate .feedback-lead .title, .view-validate-certificate .content .title-lvl1, .title-logo .title-sub, .view-valid-certificate .accomplishment-statement .copy-course-org, .view-validate-certificate .content .title-lvl2, .title-logo .title-sub, .view-valid-certificate .accomplishment-statement .copy-course-org, .view-validate-certificate .content .title-lvl2, .view-valid-certificate .status .title, .view-valid-certificate .accomplishment-details .value, .view-invalid-certificate .status .title, .view-invalid-certificate .feedback-support .title, .view-invalid-certificate .feedback-warning .title, .view-validate-certificate .content .title-lvl3, .view-validate-certificate .list-requirements .item:before, .view-validate-certificate .list-requirements .item .requirement-label, .view-validate-certificate .list-instructions .item:before, .view-valid-certificate .content-supplemental .title, .view-invalid-certificate .content-supplemental .title {
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif; }
 
-.view--valid-certificate .accomplishment__statement .copy__name, .view--valid-certificate .accomplishment__statement .copy__course__name, .view--valid-certificate .accomplishment__statement .copy__recogniton, .view--validate-certificate .instructions .title {
+.view-valid-certificate .accomplishment-statement .copy-name, .view-valid-certificate .accomplishment-statement .copy-course-name, .view-valid-certificate .accomplishment-statement .copy-recogniton, .view-validate-certificate .instructions .title {
   font-size: 48px;
   font-size: 4.8rem;
   line-height: 74.4px;
   line-height: 7.44rem; }
 
-.view--invalid-certificate .feedback__lead .title, .view--validate-certificate .content .title--lvl1 {
+.view-invalid-certificate .feedback-lead .title, .view-validate-certificate .content .title-lvl1 {
   font-size: 36px;
   font-size: 3.6rem;
   line-height: 55.8px;
   line-height: 5.58rem; }
 
-.title--logo .title--sub, .view--valid-certificate .accomplishment__statement .copy__course__org, .view--validate-certificate .content .title--lvl2 {
+.title-logo .title-sub, .view-valid-certificate .accomplishment-statement .copy-course-org, .view-validate-certificate .content .title-lvl2 {
   font-size: 20px;
   font-size: 2rem;
   line-height: 31px;
   line-height: 3.1rem; }
 
-.view--valid-certificate .status .title, .view--valid-certificate .accomplishment__details .value, .view--invalid-certificate .status .title, .view--invalid-certificate .feedback__support .title, .view--invalid-certificate .feedback__warning .title, .view--validate-certificate .content .title--lvl3, .view--validate-certificate .list--requirements .item:before, .view--validate-certificate .list--requirements .item .requirement__label, .view--validate-certificate .list--instructions .item:before {
+.view-valid-certificate .status .title, .view-valid-certificate .accomplishment-details .value, .view-invalid-certificate .status .title, .view-invalid-certificate .feedback-support .title, .view-invalid-certificate .feedback-warning .title, .view-validate-certificate .content .title-lvl3, .view-validate-certificate .list-requirements .item:before, .view-validate-certificate .list-requirements .item .requirement-label, .view-validate-certificate .list-instructions .item:before {
   font-size: 18px;
   font-size: 1.8rem;
   line-height: 27.9px;
   line-height: 2.79rem; }
 
-.view--valid-certificate .content--supplemental .title, .view--invalid-certificate .content--supplemental .title {
+.view-valid-certificate .content-supplemental .title, .view-invalid-certificate .content-supplemental .title {
   font-size: 16px;
   font-size: 1.6rem;
   line-height: 24.8px;
   line-height: 2.48rem; }
 
-body, .view--validate-certificate .list--requirements .item, .view--validate-certificate .list--instructions .item, .view--valid-certificate .accomplishment__statement .copy__context, .view--invalid-certificate .feedback__lead .copy, .footer--app .copyright, .view--valid-certificate .accomplishment__details .explanation, .view--valid-certificate .content--supplemental .copy, .view--valid-certificate .content--supplemental .list--actions .action, .view--invalid-certificate .content--supplemental .copy, .view--invalid-certificate .content--supplemental .list--actions .action, .view--validate-certificate .support .list--actions .action, .view--valid-certificate .accomplishment__details .label {
+body, .view-validate-certificate .list-requirements .item, .view-validate-certificate .list-instructions .item, .view-valid-certificate .accomplishment-statement .copy-context, .view-invalid-certificate .feedback-lead .copy, .footer-app-copyright, .view-valid-certificate .accomplishment-details .explanation, .view-valid-certificate .content-supplemental .copy, .view-valid-certificate .content-supplemental .list-actions .action, .view-invalid-certificate .content-supplemental .copy, .view-invalid-certificate .content-supplemental .list-actions .action, .view-validate-certificate .support .list-actions .action, .view-valid-certificate .accomplishment-details .label {
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif; }
 
-body, .view--validate-certificate .list--requirements .item, .view--validate-certificate .list--instructions .item {
+body, .view-validate-certificate .list-requirements .item, .view-validate-certificate .list-instructions .item {
   font-size: 16px;
   font-size: 1.6rem;
   line-height: 24.8px;
   line-height: 2.48rem; }
 
-.view--valid-certificate .accomplishment__statement .copy__context, .view--invalid-certificate .feedback__lead .copy {
+.view-valid-certificate .accomplishment-statement .copy-context, .view-invalid-certificate .feedback-lead .copy {
   font-size: 20px;
   font-size: 2rem;
   line-height: 31px;
   line-height: 3.1rem; }
 
-.footer--app .copyright, .view--valid-certificate .accomplishment__details .explanation, .view--valid-certificate .content--supplemental .copy, .view--valid-certificate .content--supplemental .list--actions .action, .view--invalid-certificate .content--supplemental .copy, .view--invalid-certificate .content--supplemental .list--actions .action, .view--validate-certificate .support .list--actions .action {
+.footer-app-copyright, .view-valid-certificate .accomplishment-details .explanation, .view-valid-certificate .content-supplemental .copy, .view-valid-certificate .content-supplemental .list-actions .action, .view-invalid-certificate .content-supplemental .copy, .view-invalid-certificate .content-supplemental .list-actions .action, .view-validate-certificate .support .list-actions .action {
   font-size: 14px;
   font-size: 1.4rem;
   line-height: 21.7px;
   line-height: 2.17rem; }
 
-.view--valid-certificate .accomplishment__details .label {
+.view-valid-certificate .accomplishment-details .label {
   font-size: 12px;
   font-size: 1.2rem;
   line-height: 18.6px;
   line-height: 1.86rem; }
 
-.footer--app .nav--footer .nav__item {
+.footer-app-nav .nav-item {
   font-size: 12px;
   font-size: 1.2rem;
   line-height: 18.6px;
   line-height: 1.86rem; }
 
-.view--valid-certificate .content--supplemental .list--actions .action, .view--invalid-certificate .content--supplemental .list--actions .action, .view--validate-certificate .support .list--actions .action {
+.view-valid-certificate .content-supplemental .list-actions .action, .view-invalid-certificate .content-supplemental .list-actions .action, .view-validate-certificate .support .list-actions .action {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -671,208 +703,210 @@ body, .view--validate-certificate .list--requirements .item, .view--validate-cer
   display: inline-block;
   cursor: pointer;
   text-decoration: none; }
-  .view--valid-certificate .content--supplemental .list--actions .action:hover, .view--invalid-certificate .content--supplemental .list--actions .action:hover, .view--validate-certificate .support .list--actions .action:hover, .view--valid-certificate .content--supplemental .list--actions .action:active, .view--invalid-certificate .content--supplemental .list--actions .action:active, .view--validate-certificate .support .list--actions .action:active, .view--valid-certificate .content--supplemental .list--actions .action:focus, .view--invalid-certificate .content--supplemental .list--actions .action:focus, .view--validate-certificate .support .list--actions .action:focus {
+  .view-valid-certificate .content-supplemental .list-actions .action:hover, .view-invalid-certificate .content-supplemental .list-actions .action:hover, .view-validate-certificate .support .list-actions .action:hover, .view-valid-certificate .content-supplemental .list-actions .action:active, .view-invalid-certificate .content-supplemental .list-actions .action:active, .view-validate-certificate .support .list-actions .action:active, .view-valid-certificate .content-supplemental .list-actions .action:focus, .view-invalid-certificate .content-supplemental .list-actions .action:focus, .view-validate-certificate .support .list-actions .action:focus {
     text-decoration: none; }
-  .view--valid-certificate .content--supplemental .list--actions .disabled.action, .view--invalid-certificate .content--supplemental .list--actions .disabled.action, .view--validate-certificate .support .list--actions .disabled.action, .view--valid-certificate .content--supplemental .list--actions [disabled].action, .view--invalid-certificate .content--supplemental .list--actions [disabled].action, .view--validate-certificate .support .list--actions [disabled].action {
+  .view-valid-certificate .content-supplemental .list-actions .disabled.action, .view-invalid-certificate .content-supplemental .list-actions .disabled.action, .view-validate-certificate .support .list-actions .disabled.action, .view-valid-certificate .content-supplemental .list-actions [disabled].action, .view-invalid-certificate .content-supplemental .list-actions [disabled].action, .view-validate-certificate .support .list-actions [disabled].action {
     cursor: default;
     pointer-events: none; }
 
-.view--valid-certificate .content--supplemental .list--actions .action, .view--invalid-certificate .content--supplemental .list--actions .action, .view--validate-certificate .support .list--actions .action {
+.view-valid-certificate .content-supplemental .list-actions .action, .view-invalid-certificate .content-supplemental .list-actions .action, .view-validate-certificate .support .list-actions .action {
   border-radius: 2px; }
 
-.view--valid-certificate .content--supplemental .list--actions .action, .view--invalid-certificate .content--supplemental .list--actions .action, .view--validate-certificate .support .list--actions .action {
+.view-valid-certificate .content-supplemental .list-actions .action, .view-invalid-certificate .content-supplemental .list-actions .action, .view-validate-certificate .support .list-actions .action {
   padding: 10px 20px;
   background: #2e81b3;
   border-color: #1d85c4;
   color: #eaf2f7; }
-  .view--valid-certificate .content--supplemental .list--actions .action:hover, .view--invalid-certificate .content--supplemental .list--actions .action:hover, .view--validate-certificate .support .list--actions .action:hover, .view--valid-certificate .content--supplemental .list--actions .action:active, .view--invalid-certificate .content--supplemental .list--actions .action:active, .view--validate-certificate .support .list--actions .action:active, .view--valid-certificate .content--supplemental .list--actions .action:focus, .view--invalid-certificate .content--supplemental .list--actions .action:focus, .view--validate-certificate .support .list--actions .action:focus {
+  .view-valid-certificate .content-supplemental .list-actions .action:hover, .view-invalid-certificate .content-supplemental .list-actions .action:hover, .view-validate-certificate .support .list-actions .action:hover, .view-valid-certificate .content-supplemental .list-actions .action:active, .view-invalid-certificate .content-supplemental .list-actions .action:active, .view-validate-certificate .support .list-actions .action:active, .view-valid-certificate .content-supplemental .list-actions .action:focus, .view-invalid-certificate .content-supplemental .list-actions .action:focus, .view-validate-certificate .support .list-actions .action:focus {
     background: #078bda;
     border-color: #078bda;
     color: #f4f8fb; }
-  .view--valid-certificate .content--supplemental .list--actions .disabled.action, .view--invalid-certificate .content--supplemental .list--actions .disabled.action, .view--validate-certificate .support .list--actions .disabled.action, .view--valid-certificate .content--supplemental .list--actions .is-disabled.action, .view--invalid-certificate .content--supplemental .list--actions .is-disabled.action, .view--validate-certificate .support .list--actions .is-disabled.action, .view--valid-certificate .content--supplemental .list--actions [disabled].action, .view--invalid-certificate .content--supplemental .list--actions [disabled].action, .view--validate-certificate .support .list--actions [disabled].action {
+  .view-valid-certificate .content-supplemental .list-actions .disabled.action, .view-invalid-certificate .content-supplemental .list-actions .disabled.action, .view-validate-certificate .support .list-actions .disabled.action, .view-valid-certificate .content-supplemental .list-actions .is-disabled.action, .view-invalid-certificate .content-supplemental .list-actions .is-disabled.action, .view-validate-certificate .support .list-actions .is-disabled.action, .view-valid-certificate .content-supplemental .list-actions [disabled].action, .view-invalid-certificate .content-supplemental .list-actions [disabled].action, .view-validate-certificate .support .list-actions [disabled].action {
     opacity: 0.5; }
 
-[class^="content__"] a, [class^="content--"] a, .footer--app a, .view--valid-certificate .content a, .view--invalid-certificate .content a, .view--validate-certificate .content a {
+[class^="content-"] a, .footer-app a, .view-valid-certificate .content a, .view-invalid-certificate .content a, .view-validate-certificate .content a {
   -webkit-transition: color 0.5s ease-in-out, border 0.5s ease-in-out;
   -moz-transition: color 0.5s ease-in-out, border 0.5s ease-in-out;
   transition: color 0.5s ease-in-out, border 0.5s ease-in-out;
   border-bottom: 1px solid transparent;
   color: #2e81b3;
   text-decoration: none; }
-  [class^="content__"] a:hover, [class^="content--"] a:hover, .footer--app a:hover, .view--valid-certificate .content a:hover, .view--invalid-certificate .content a:hover, .view--validate-certificate .content a:hover, [class^="content__"] a:focus, [class^="content--"] a:focus, .footer--app a:focus, .view--valid-certificate .content a:focus, .view--invalid-certificate .content a:focus, .view--validate-certificate .content a:focus, [class^="content__"] a:active, [class^="content--"] a:active, .footer--app a:active, .view--valid-certificate .content a:active, .view--invalid-certificate .content a:active, .view--validate-certificate .content a:active {
+  [class^="content-"] a:hover, .footer-app a:hover, .view-valid-certificate .content a:hover, .view-invalid-certificate .content a:hover, .view-validate-certificate .content a:hover, [class^="content-"] a:focus, .footer-app a:focus, .view-valid-certificate .content a:focus, .view-invalid-certificate .content a:focus, .view-validate-certificate .content a:focus, [class^="content-"] a:active, .footer-app a:active, .view-valid-certificate .content a:active, .view-invalid-certificate .content a:active, .view-validate-certificate .content a:active {
     color: #3aa2e0;
     border-color: #3aa2e0; }
 
-.wrapper--header {
+.wrapper-header {
   margin-bottom: 40px;
   padding: 20px 40px;
   background: white;
   color: #0a0a0a; }
   @media screen and (min-width: 500px) and (max-width: 759px) {
-    .wrapper--header {
+    .wrapper-header {
       padding: 20px 20px; } }
   @media screen and (max-width: 499px) {
-    .wrapper--header {
+    .wrapper-header {
       padding: 20px 20px; } }
 
-.header--app {
+.header-app {
   max-width: 1280px;
   margin-left: auto;
   margin-right: auto; }
-  .header--app:after {
+  .header-app:after {
     content: "";
     display: table;
     clear: both; }
 
-.title--logo {
+.title-logo {
   text-align: center; }
-  .title--logo .logo {
+  .title-logo .logo {
     display: inline-block;
     vertical-align: middle;
     margin-right: 20px; }
-  .title--logo .title--sub {
+  .title-logo .title-sub {
     display: inline-block;
     vertical-align: middle;
     text-transform: uppercase;
     letter-spacing: 0.1rem; }
 
-.wrapper--footer {
+.wrapper-footer {
   padding: 0 40px;
   background: transparent;
   color: #353a3d; }
   @media screen and (min-width: 500px) and (max-width: 759px) {
-    .wrapper--footer {
+    .wrapper-footer {
       padding: 0 20px; } }
   @media screen and (max-width: 499px) {
-    .wrapper--footer {
+    .wrapper-footer {
       padding: 0 20px; } }
 
-.footer--app {
+.footer-app {
   max-width: 1280px;
   margin-left: auto;
   margin-right: auto;
   border-top: 2px solid #eaebeb;
   margin-top: 20px;
   padding-top: 20px; }
-  .footer--app:after {
+  .footer-app:after {
     content: "";
     display: table;
     clear: both; }
-  .footer--app .copyright {
-    float: left;
-    display: block;
-    margin-right: 2.35765%;
-    width: 31.76157%; }
-    .footer--app .copyright:last-child {
-      margin-right: 0; }
-    @media screen and (min-width: 760px) and (max-width: 899px) {
-      .footer--app .copyright {
-        width: 100%;
-        margin-bottom: 20px; } }
-    @media screen and (min-width: 500px) and (max-width: 759px) {
-      .footer--app .copyright {
-        width: 100%;
-        margin-bottom: 20px; } }
-    @media screen and (max-width: 499px) {
-      .footer--app .copyright {
-        width: 100%;
-        margin-bottom: 20px; } }
-  .footer--app .nav--footer {
-    float: left;
-    display: block;
-    margin-right: 2.35765%;
-    width: 65.88078%;
-    margin-right: 0;
-    text-align: right; }
-    .footer--app .nav--footer:last-child {
-      margin-right: 0; }
-    @media screen and (min-width: 760px) and (max-width: 899px) {
-      .footer--app .nav--footer {
-        width: 100%;
-        text-align: left; } }
-    @media screen and (min-width: 500px) and (max-width: 759px) {
-      .footer--app .nav--footer {
-        width: 100%;
-        text-align: left; } }
-    @media screen and (max-width: 499px) {
-      .footer--app .nav--footer {
-        width: 100%;
-        text-align: left; } }
-    .footer--app .nav--footer .list {
-      display: inline-block;
-      vertical-align: middle;
-      margin-right: 40px; }
-      .footer--app .nav--footer .list:last-child {
-        margin-right: 0; }
-      @media screen and (min-width: 760px) and (max-width: 899px) {
-        .footer--app .nav--footer .list {
-          width: 100%;
-          margin: 0 0 20px 0;
-          text-align: left; } }
-      @media screen and (min-width: 500px) and (max-width: 759px) {
-        .footer--app .nav--footer .list {
-          width: 100%;
-          margin: 0 0 20px 0;
-          text-align: left; } }
-      @media screen and (max-width: 499px) {
-        .footer--app .nav--footer .list {
-          width: 100%;
-          margin: 0 0 20px 0;
-          text-align: left; } }
-    .footer--app .nav--footer .nav__item {
-      display: inline-block;
-      margin-right: 10px; }
-      @media screen and (min-width: 760px) and (max-width: 899px) {
-        .footer--app .nav--footer .nav__item {
-          font-size: 14px;
-          font-size: 1.4rem;
-          line-height: 21.7px;
-          line-height: 2.17rem; } }
-      @media screen and (min-width: 500px) and (max-width: 759px) {
-        .footer--app .nav--footer .nav__item {
-          font-size: 14px;
-          font-size: 1.4rem;
-          line-height: 21.7px;
-          line-height: 2.17rem;
-          display: block;
-          margin: 0 0 5px 0; } }
-      @media screen and (max-width: 499px) {
-        .footer--app .nav--footer .nav__item {
-          font-size: 14px;
-          font-size: 1.4rem;
-          line-height: 21.7px;
-          line-height: 2.17rem;
-          display: block;
-          margin: 0 0 5px 0; } }
 
-.view--valid-certificate {
+.footer-app-copyright {
+  float: left;
+  display: block;
+  margin-right: 2.3576515979%;
+  width: 31.7615656014%; }
+  .footer-app-copyright:last-child {
+    margin-right: 0; }
+  @media screen and (min-width: 760px) and (max-width: 899px) {
+    .footer-app-copyright {
+      width: 100%;
+      margin-bottom: 20px; } }
+  @media screen and (min-width: 500px) and (max-width: 759px) {
+    .footer-app-copyright {
+      width: 100%;
+      margin-bottom: 20px; } }
+  @media screen and (max-width: 499px) {
+    .footer-app-copyright {
+      width: 100%;
+      margin-bottom: 20px; } }
+
+.footer-app-nav {
+  float: left;
+  display: block;
+  margin-right: 2.3576515979%;
+  width: 65.8807828007%;
+  margin-right: 0;
+  text-align: right; }
+  .footer-app-nav:last-child {
+    margin-right: 0; }
+  @media screen and (min-width: 760px) and (max-width: 899px) {
+    .footer-app-nav {
+      width: 100%;
+      text-align: left; } }
+  @media screen and (min-width: 500px) and (max-width: 759px) {
+    .footer-app-nav {
+      width: 100%;
+      text-align: left; } }
+  @media screen and (max-width: 499px) {
+    .footer-app-nav {
+      width: 100%;
+      text-align: left; } }
+  .footer-app-nav .list {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 40px; }
+    .footer-app-nav .list:last-child {
+      margin-right: 0; }
+    @media screen and (min-width: 760px) and (max-width: 899px) {
+      .footer-app-nav .list {
+        width: 100%;
+        margin: 0 0 20px 0;
+        text-align: left; } }
+    @media screen and (min-width: 500px) and (max-width: 759px) {
+      .footer-app-nav .list {
+        width: 100%;
+        margin: 0 0 20px 0;
+        text-align: left; } }
+    @media screen and (max-width: 499px) {
+      .footer-app-nav .list {
+        width: 100%;
+        margin: 0 0 20px 0;
+        text-align: left; } }
+  .footer-app-nav .nav-item {
+    display: inline-block;
+    margin-right: 10px; }
+    @media screen and (min-width: 760px) and (max-width: 899px) {
+      .footer-app-nav .nav-item {
+        font-size: 14px;
+        font-size: 1.4rem;
+        line-height: 21.7px;
+        line-height: 2.17rem; } }
+    @media screen and (min-width: 500px) and (max-width: 759px) {
+      .footer-app-nav .nav-item {
+        font-size: 14px;
+        font-size: 1.4rem;
+        line-height: 21.7px;
+        line-height: 2.17rem;
+        display: block;
+        margin: 0 0 5px 0; } }
+    @media screen and (max-width: 499px) {
+      .footer-app-nav .nav-item {
+        font-size: 14px;
+        font-size: 1.4rem;
+        line-height: 21.7px;
+        line-height: 2.17rem;
+        display: block;
+        margin: 0 0 5px 0; } }
+
+.view-valid-certificate {
   background: #f4f5f5; }
-  .view--valid-certificate .wrapper--view {
+  .view-valid-certificate .wrapper-view {
     background: transparent url("../images/bg-paperfibers.png") 0 0 repeat-both;
     padding-bottom: 60px; }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--valid-certificate .wrapper--view {
+      .view-valid-certificate .wrapper-view {
         padding-bottom: 20px; } }
     @media screen and (max-width: 499px) {
-      .view--valid-certificate .wrapper--view {
+      .view-valid-certificate .wrapper-view {
         padding-bottom: 20px; } }
-  .view--valid-certificate .wrapper--content {
+  .view-valid-certificate .wrapper-content {
     padding: 20px 40px; }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--valid-certificate .wrapper--content {
+      .view-valid-certificate .wrapper-content {
         padding: 20px 20px; } }
     @media screen and (max-width: 499px) {
-      .view--valid-certificate .wrapper--content {
+      .view-valid-certificate .wrapper-content {
         padding: 20px 20px; } }
-  .view--valid-certificate .content {
+  .view-valid-certificate .content {
     max-width: 1280px;
     margin-left: auto;
     margin-right: auto; }
-    .view--valid-certificate .content:after {
+    .view-valid-certificate .content:after {
       content: "";
       display: table;
       clear: both; }
-  .view--valid-certificate .status {
+  .view-valid-certificate .status {
     display: block;
     padding: 20px 40px;
     border-top-radius: 2px;
@@ -881,335 +915,335 @@ body, .view--validate-certificate .list--requirements .item, .view--validate-cer
     color: white;
     text-transform: uppercase;
     letter-spacing: 0.1rem; }
-    .view--valid-certificate .status:after {
+    .view-valid-certificate .status:after {
       content: "";
       display: table;
       clear: both; }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--valid-certificate .status {
+      .view-valid-certificate .status {
         padding: 20px 20px; } }
     @media screen and (max-width: 499px) {
-      .view--valid-certificate .status {
+      .view-valid-certificate .status {
         padding: 20px 20px; } }
     @media screen and (min-width: 900px) {
-      .view--valid-certificate .status .title {
+      .view-valid-certificate .status .title {
         float: left;
         display: block;
-        margin-right: 2.35765%;
-        width: 74.41059%; }
-        .view--valid-certificate .status .title:last-child {
+        margin-right: 2.3576515979%;
+        width: 74.4105871005%; }
+        .view-valid-certificate .status .title:last-child {
           margin-right: 0; } }
     @media screen and (min-width: 760px) and (max-width: 899px) {
-      .view--valid-certificate .status .title {
+      .view-valid-certificate .status .title {
         float: left;
         display: block;
-        margin-right: 2.35765%;
-        width: 74.41059%; }
-        .view--valid-certificate .status .title:last-child {
+        margin-right: 2.3576515979%;
+        width: 74.4105871005%; }
+        .view-valid-certificate .status .title:last-child {
           margin-right: 0; } }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--valid-certificate .status .title {
+      .view-valid-certificate .status .title {
         font-size: 14px;
         font-size: 1.4rem;
         line-height: 21.7px;
         line-height: 2.17rem; } }
     @media screen and (max-width: 499px) {
-      .view--valid-certificate .status .title {
+      .view-valid-certificate .status .title {
         font-size: 14px;
         font-size: 1.4rem;
         line-height: 21.7px;
         line-height: 2.17rem; } }
-  .view--valid-certificate .accomplishment {
+  .view-valid-certificate .accomplishment {
     padding: 40px 40px 60px 40px;
     margin-bottom: 40px;
     border-radius: 2px;
     border: 1px solid #eaebeb;
     background: white; }
-    .view--valid-certificate .accomplishment:after {
+    .view-valid-certificate .accomplishment:after {
       content: "";
       display: table;
       clear: both; }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--valid-certificate .accomplishment {
+      .view-valid-certificate .accomplishment {
         padding: 20px 20px; } }
     @media screen and (max-width: 499px) {
-      .view--valid-certificate .accomplishment {
+      .view-valid-certificate .accomplishment {
         padding: 20px 20px; } }
-  .view--valid-certificate .accomplishment__statement {
+  .view-valid-certificate .accomplishment-statement {
     float: left;
     display: block;
-    margin-right: 2.35765%;
-    width: 65.88078%;
+    margin-right: 2.3576515979%;
+    width: 65.8807828007%;
     padding: 0 20px 0 0;
     border-right: 1px solid #eaebeb; }
-    .view--valid-certificate .accomplishment__statement:last-child {
+    .view-valid-certificate .accomplishment-statement:last-child {
       margin-right: 0; }
     @media screen and (min-width: 760px) and (max-width: 899px) {
-      .view--valid-certificate .accomplishment__statement {
+      .view-valid-certificate .accomplishment-statement {
         width: 100%;
         padding: 0;
         border-right: none; } }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--valid-certificate .accomplishment__statement {
+      .view-valid-certificate .accomplishment-statement {
         width: 100%;
         padding: 0;
         border-right: none; } }
     @media screen and (max-width: 499px) {
-      .view--valid-certificate .accomplishment__statement {
+      .view-valid-certificate .accomplishment-statement {
         width: 100%;
         padding: 0;
         border-right: none; } }
-    .view--valid-certificate .accomplishment__statement [class^="copy__"] {
+    .view-valid-certificate .accomplishment-statement [class^="copy-"] {
       display: block;
       margin-bottom: 20px; }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--valid-certificate .accomplishment__statement .copy__name {
+      .view-valid-certificate .accomplishment-statement .copy-name {
         font-size: 36px;
         font-size: 3.6rem;
         line-height: 55.8px;
         line-height: 5.58rem;
         margin: 10px 0 5px 0; } }
     @media screen and (max-width: 499px) {
-      .view--valid-certificate .accomplishment__statement .copy__name {
+      .view-valid-certificate .accomplishment-statement .copy-name {
         font-size: 24px;
         font-size: 2.4rem;
         line-height: 37.2px;
         line-height: 3.72rem;
         margin: 10px 0 5px 0; } }
-    .view--valid-certificate .accomplishment__statement .copy__course__org {
+    .view-valid-certificate .accomplishment-statement .copy-course-org {
       margin-bottom: 0; }
       @media screen and (min-width: 500px) and (max-width: 759px) {
-        .view--valid-certificate .accomplishment__statement .copy__course__org {
+        .view-valid-certificate .accomplishment-statement .copy-course-org {
           margin: 10px 0 0 0; } }
       @media screen and (max-width: 499px) {
-        .view--valid-certificate .accomplishment__statement .copy__course__org {
+        .view-valid-certificate .accomplishment-statement .copy-course-org {
           margin: 10px 0 0 0; } }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--valid-certificate .accomplishment__statement .copy__course {
+      .view-valid-certificate .accomplishment-statement .copy-course {
         margin-bottom: 5px; } }
     @media screen and (max-width: 499px) {
-      .view--valid-certificate .accomplishment__statement .copy__course {
+      .view-valid-certificate .accomplishment-statement .copy-course {
         margin-bottom: 5px; } }
-    .view--valid-certificate .accomplishment__statement .copy__course__name {
+    .view-valid-certificate .accomplishment-statement .copy-course-name {
       line-height: 55.8px;
       line-height: 5.58rem; }
       @media screen and (min-width: 500px) and (max-width: 759px) {
-        .view--valid-certificate .accomplishment__statement .copy__course__name {
+        .view-valid-certificate .accomplishment-statement .copy-course-name {
           font-size: 36px;
           font-size: 3.6rem;
           line-height: 55.8px;
           line-height: 5.58rem;
           margin: 0; } }
       @media screen and (max-width: 499px) {
-        .view--valid-certificate .accomplishment__statement .copy__course__name {
+        .view-valid-certificate .accomplishment-statement .copy-course-name {
           font-size: 24px;
           font-size: 2.4rem;
           line-height: 37.2px;
           line-height: 3.72rem;
           margin: 0; } }
-    .view--valid-certificate .accomplishment__statement .copy__context {
+    .view-valid-certificate .accomplishment-statement .copy-context {
       color: #85888a; }
       @media screen and (min-width: 500px) and (max-width: 759px) {
-        .view--valid-certificate .accomplishment__statement .copy__context {
+        .view-valid-certificate .accomplishment-statement .copy-context {
           font-size: 16px;
           font-size: 1.6rem;
           line-height: 24.8px;
           line-height: 2.48rem; } }
       @media screen and (max-width: 499px) {
-        .view--valid-certificate .accomplishment__statement .copy__context {
+        .view-valid-certificate .accomplishment-statement .copy-context {
           font-size: 16px;
           font-size: 1.6rem;
           line-height: 24.8px;
           line-height: 2.48rem; } }
-  .view--valid-certificate .accomplishment__details {
+  .view-valid-certificate .accomplishment-details {
     float: left;
     display: block;
-    margin-right: 2.35765%;
-    width: 31.76157%; }
-    .view--valid-certificate .accomplishment__details:last-child {
+    margin-right: 2.3576515979%;
+    width: 31.7615656014%; }
+    .view-valid-certificate .accomplishment-details:last-child {
       margin-right: 0; }
     @media screen and (min-width: 760px) and (max-width: 899px) {
-      .view--valid-certificate .accomplishment__details {
+      .view-valid-certificate .accomplishment-details {
         width: 100%;
         margin-top: 20px;
         padding-top: 40px;
         border-top: 1px solid #eaebeb; } }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--valid-certificate .accomplishment__details {
+      .view-valid-certificate .accomplishment-details {
         width: 100%; } }
     @media screen and (max-width: 499px) {
-      .view--valid-certificate .accomplishment__details {
+      .view-valid-certificate .accomplishment-details {
         width: 100%; } }
-    .view--valid-certificate .accomplishment__details .list--metadata .item {
+    .view-valid-certificate .accomplishment-details .list-metadata .item {
       margin-bottom: 20px;
       padding-bottom: 20px;
       border-bottom: 1px solid #eaebeb; }
-    .view--valid-certificate .accomplishment__details .label {
+    .view-valid-certificate .accomplishment-details .label {
       display: block;
       margin-bottom: 5px;
       text-transform: uppercase;
       color: #aeb0b1;
       letter-spacing: 0.1rem; }
-    .view--valid-certificate .accomplishment__details .value {
+    .view-valid-certificate .accomplishment-details .value {
       display: block; }
-    .view--valid-certificate .accomplishment__details .explanation {
+    .view-valid-certificate .accomplishment-details .explanation {
       display: block;
       margin-top: 10px;
       color: #aeb0b1; }
-    .view--valid-certificate .accomplishment__details .certificate--type {
+    .view-valid-certificate .accomplishment-details .certificate-type {
       text-transform: uppercase;
       letter-spacing: 0.1rem; }
-      .view--valid-certificate .accomplishment__details .certificate--type .explanation {
+      .view-valid-certificate .accomplishment-details .certificate-type .explanation {
         text-transform: none;
         letter-spacing: 0; }
-    .view--valid-certificate .accomplishment__details .certificate--id .value {
+    .view-valid-certificate .accomplishment-details .certificate-id .value {
       word-wrap: break-word; }
-  .view--valid-certificate .content--supplemental .title {
+  .view-valid-certificate .content-supplemental .title {
     margin-bottom: 10px; }
-  .view--valid-certificate .content--supplemental .copy {
+  .view-valid-certificate .content-supplemental .copy {
     color: #85888a; }
-  .view--valid-certificate .content--supplemental .list--actions {
+  .view-valid-certificate .content-supplemental .list-actions {
     margin-top: 20px; }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--valid-certificate .content--supplemental .list--actions .action {
+      .view-valid-certificate .content-supplemental .list-actions .action {
         display: block;
         text-align: center; } }
     @media screen and (max-width: 499px) {
-      .view--valid-certificate .content--supplemental .list--actions .action {
+      .view-valid-certificate .content-supplemental .list-actions .action {
         display: block;
         text-align: center; } }
-  .view--valid-certificate .supplemental__how {
+  .view-valid-certificate .content-supplemental-how {
     float: left;
     display: block;
-    margin-right: 2.35765%;
-    width: 23.23176%; }
-    .view--valid-certificate .supplemental__how:last-child {
+    margin-right: 2.3576515979%;
+    width: 23.2317613015%; }
+    .view-valid-certificate .content-supplemental-how:last-child {
       margin-right: 0; }
     @media screen and (min-width: 760px) and (max-width: 899px) {
-      .view--valid-certificate .supplemental__how {
+      .view-valid-certificate .content-supplemental-how {
         float: left;
         display: block;
-        margin-right: 2.35765%;
-        width: 48.82117%; }
-        .view--valid-certificate .supplemental__how:last-child {
+        margin-right: 2.3576515979%;
+        width: 48.821174201%; }
+        .view-valid-certificate .content-supplemental-how:last-child {
           margin-right: 0; } }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--valid-certificate .supplemental__how {
+      .view-valid-certificate .content-supplemental-how {
         width: 100%;
         margin-bottom: 40px; } }
     @media screen and (max-width: 499px) {
-      .view--valid-certificate .supplemental__how {
+      .view-valid-certificate .content-supplemental-how {
         width: 100%;
         margin-bottom: 40px; } }
-  .view--valid-certificate .supplemental__certificates {
+  .view-valid-certificate .content-supplemental-certificates {
     float: left;
     display: block;
-    margin-right: 2.35765%;
-    width: 23.23176%;
+    margin-right: 2.3576515979%;
+    width: 23.2317613015%;
     margin-right: 0; }
-    .view--valid-certificate .supplemental__certificates:last-child {
+    .view-valid-certificate .content-supplemental-certificates:last-child {
       margin-right: 0; }
     @media screen and (min-width: 760px) and (max-width: 899px) {
-      .view--valid-certificate .supplemental__certificates {
+      .view-valid-certificate .content-supplemental-certificates {
         float: left;
         display: block;
-        margin-right: 2.35765%;
-        width: 48.82117%; }
-        .view--valid-certificate .supplemental__certificates:last-child {
+        margin-right: 2.3576515979%;
+        width: 48.821174201%; }
+        .view-valid-certificate .content-supplemental-certificates:last-child {
           margin-right: 0; } }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--valid-certificate .supplemental__certificates {
+      .view-valid-certificate .content-supplemental-certificates {
         width: 100%; } }
     @media screen and (max-width: 499px) {
-      .view--valid-certificate .supplemental__certificates {
+      .view-valid-certificate .content-supplemental-certificates {
         width: 100%; } }
-  .view--valid-certificate .supplemental__about {
+  .view-valid-certificate .content-supplemental-about {
     float: left;
     display: block;
-    margin-right: 2.35765%;
-    width: 48.82117%; }
-    .view--valid-certificate .supplemental__about:last-child {
+    margin-right: 2.3576515979%;
+    width: 48.821174201%; }
+    .view-valid-certificate .content-supplemental-about:last-child {
       margin-right: 0; }
     @media screen and (min-width: 760px) and (max-width: 899px) {
-      .view--valid-certificate .supplemental__about {
+      .view-valid-certificate .content-supplemental-about {
         width: 100%;
         margin-bottom: 40px; } }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--valid-certificate .supplemental__about {
+      .view-valid-certificate .content-supplemental-about {
         width: 100%;
         margin-bottom: 40px; } }
     @media screen and (max-width: 499px) {
-      .view--valid-certificate .supplemental__about {
+      .view-valid-certificate .content-supplemental-about {
         width: 100%;
         margin-bottom: 40px; } }
-  .view--valid-certificate.is-honorcode .status {
+  .view-valid-certificate.is-honorcode .status {
     background: #88c7ec; }
-  .view--valid-certificate.is-honorcode .certificate--type {
+  .view-valid-certificate.is-honorcode .certificate-type {
     color: #88c7ec; }
-  .view--valid-certificate.is-idverified .status {
+  .view-valid-certificate.is-idverified .status {
     background: #3aa2e0; }
-  .view--valid-certificate.is-idverified .accomplishment {
+  .view-valid-certificate.is-idverified .accomplishment {
     background: white url("../images/logo-idverified-cropped.png") bottom left no-repeat;
     background-size: 75%; }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--valid-certificate.is-idverified .accomplishment {
+      .view-valid-certificate.is-idverified .accomplishment {
         background-size: 75%; } }
     @media screen and (max-width: 499px) {
-      .view--valid-certificate.is-idverified .accomplishment {
+      .view-valid-certificate.is-idverified .accomplishment {
         background-size: 100%; } }
-  .view--valid-certificate.is-idverified .certificate--type {
+  .view-valid-certificate.is-idverified .certificate-type {
     color: #3aa2e0; }
-    .view--valid-certificate.is-idverified .certificate--type .wrapper--img {
+    .view-valid-certificate.is-idverified .certificate-type .wrapper-img {
       width: 200px;
       border-radius: 200px;
       padding: 10px 10px;
       background: white;
       margin: -80px auto 0 auto; }
       @media screen and (min-width: 760px) and (max-width: 899px) {
-        .view--valid-certificate.is-idverified .certificate--type .wrapper--img {
+        .view-valid-certificate.is-idverified .certificate-type .wrapper-img {
           float: right;
           margin: 0 0 20px 20px; } }
       @media screen and (min-width: 500px) and (max-width: 759px) {
-        .view--valid-certificate.is-idverified .certificate--type .wrapper--img {
+        .view-valid-certificate.is-idverified .certificate-type .wrapper-img {
           width: 150px;
           float: right;
           margin: 0 0 20px 20px; } }
       @media screen and (max-width: 499px) {
-        .view--valid-certificate.is-idverified .certificate--type .wrapper--img {
+        .view-valid-certificate.is-idverified .certificate-type .wrapper-img {
           width: 100px;
           float: right;
           margin: 0; } }
-      .view--valid-certificate.is-idverified .certificate--type .wrapper--img img {
+      .view-valid-certificate.is-idverified .certificate-type .wrapper-img img {
         width: 100%; }
 
-.view--invalid-certificate {
+.view-invalid-certificate {
   background: #f4f5f5; }
-  .view--invalid-certificate .wrapper--view {
+  .view-invalid-certificate .wrapper-view {
     background: transparent url("../images/bg-paperfibers.png") 0 0 repeat-both;
     padding-bottom: 60px; }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--invalid-certificate .wrapper--view {
+      .view-invalid-certificate .wrapper-view {
         padding-bottom: 20px; } }
     @media screen and (max-width: 499px) {
-      .view--invalid-certificate .wrapper--view {
+      .view-invalid-certificate .wrapper-view {
         padding-bottom: 20px; } }
-  .view--invalid-certificate .wrapper--content {
+  .view-invalid-certificate .wrapper-content {
     padding: 20px 40px; }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--invalid-certificate .wrapper--content {
+      .view-invalid-certificate .wrapper-content {
         padding: 20px 20px; } }
     @media screen and (max-width: 499px) {
-      .view--invalid-certificate .wrapper--content {
+      .view-invalid-certificate .wrapper-content {
         padding: 20px 20px; } }
-  .view--invalid-certificate .content {
+  .view-invalid-certificate .content {
     max-width: 1280px;
     margin-left: auto;
     margin-right: auto; }
-    .view--invalid-certificate .content:after {
+    .view-invalid-certificate .content:after {
       content: "";
       display: table;
       clear: both; }
-  .view--invalid-certificate .status {
+  .view-invalid-certificate .status {
     display: block;
     padding: 20px 40px;
     border-top-radius: 2px;
@@ -1218,311 +1252,311 @@ body, .view--validate-certificate .list--requirements .item, .view--validate-cer
     color: white;
     text-transform: uppercase;
     letter-spacing: 0.1rem; }
-    .view--invalid-certificate .status:after {
+    .view-invalid-certificate .status:after {
       content: "";
       display: table;
       clear: both; }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--invalid-certificate .status {
+      .view-invalid-certificate .status {
         padding: 20px 20px; } }
     @media screen and (max-width: 499px) {
-      .view--invalid-certificate .status {
+      .view-invalid-certificate .status {
         padding: 20px 20px; } }
     @media screen and (min-width: 900px) {
-      .view--invalid-certificate .status .title {
+      .view-invalid-certificate .status .title {
         float: left;
         display: block;
-        margin-right: 2.35765%;
-        width: 74.41059%; }
-        .view--invalid-certificate .status .title:last-child {
+        margin-right: 2.3576515979%;
+        width: 74.4105871005%; }
+        .view-invalid-certificate .status .title:last-child {
           margin-right: 0; } }
     @media screen and (min-width: 760px) and (max-width: 899px) {
-      .view--invalid-certificate .status .title {
+      .view-invalid-certificate .status .title {
         float: left;
         display: block;
-        margin-right: 2.35765%;
-        width: 74.41059%; }
-        .view--invalid-certificate .status .title:last-child {
+        margin-right: 2.3576515979%;
+        width: 74.4105871005%; }
+        .view-invalid-certificate .status .title:last-child {
           margin-right: 0; } }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--invalid-certificate .status .title {
+      .view-invalid-certificate .status .title {
         font-size: 14px;
         font-size: 1.4rem;
         line-height: 21.7px;
         line-height: 2.17rem; } }
     @media screen and (max-width: 499px) {
-      .view--invalid-certificate .status .title {
+      .view-invalid-certificate .status .title {
         font-size: 14px;
         font-size: 1.4rem;
         line-height: 21.7px;
         line-height: 2.17rem; } }
-  .view--invalid-certificate .feedback {
+  .view-invalid-certificate .feedback {
     display: block;
     padding: 40px 40px 60px 40px;
     margin-bottom: 40px;
     border-radius: 2px;
     border: 1px solid #eaebeb;
     background: white; }
-    .view--invalid-certificate .feedback:after {
+    .view-invalid-certificate .feedback:after {
       content: "";
       display: table;
       clear: both; }
-    .view--invalid-certificate .feedback:after {
+    .view-invalid-certificate .feedback:after {
       content: "";
       display: table;
       clear: both; }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--invalid-certificate .feedback {
+      .view-invalid-certificate .feedback {
         padding: 20px 20px; } }
     @media screen and (max-width: 499px) {
-      .view--invalid-certificate .feedback {
+      .view-invalid-certificate .feedback {
         padding: 20px 20px; } }
-  .view--invalid-certificate .feedback__lead {
+  .view-invalid-certificate .feedback-lead {
     margin-bottom: 20px;
     padding-bottom: 20px;
     border-bottom: 1px solid #eaebeb; }
-    .view--invalid-certificate .feedback__lead .title {
+    .view-invalid-certificate .feedback-lead .title {
       margin-bottom: 10px; }
-    .view--invalid-certificate .feedback__lead .copy {
+    .view-invalid-certificate .feedback-lead .copy {
       color: #b62568; }
-  .view--invalid-certificate .feedback__support {
+  .view-invalid-certificate .feedback-support {
     float: left;
     display: block;
-    margin-right: 2.35765%;
-    width: 48.82117%;
+    margin-right: 2.3576515979%;
+    width: 48.821174201%;
     margin-bottom: 20px; }
-    .view--invalid-certificate .feedback__support:last-child {
+    .view-invalid-certificate .feedback-support:last-child {
       margin-right: 0; }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--invalid-certificate .feedback__support {
+      .view-invalid-certificate .feedback-support {
         width: 100%; } }
     @media screen and (max-width: 499px) {
-      .view--invalid-certificate .feedback__support {
+      .view-invalid-certificate .feedback-support {
         width: 100%; } }
-    .view--invalid-certificate .feedback__support .title {
+    .view-invalid-certificate .feedback-support .title {
       margin-bottom: 10px; }
-    .view--invalid-certificate .feedback__support .copy {
+    .view-invalid-certificate .feedback-support .copy {
       color: #85888a; }
-  .view--invalid-certificate .feedback__warning {
+  .view-invalid-certificate .feedback-warning {
     float: left;
     display: block;
-    margin-right: 2.35765%;
-    width: 48.82117%;
+    margin-right: 2.3576515979%;
+    width: 48.821174201%;
     margin-right: 0; }
-    .view--invalid-certificate .feedback__warning:last-child {
+    .view-invalid-certificate .feedback-warning:last-child {
       margin-right: 0; }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--invalid-certificate .feedback__warning {
+      .view-invalid-certificate .feedback-warning {
         width: 100%; } }
     @media screen and (max-width: 499px) {
-      .view--invalid-certificate .feedback__warning {
+      .view-invalid-certificate .feedback-warning {
         width: 100%; } }
-    .view--invalid-certificate .feedback__warning .title {
+    .view-invalid-certificate .feedback-warning .title {
       margin-bottom: 10px; }
-    .view--invalid-certificate .feedback__warning .copy {
+    .view-invalid-certificate .feedback-warning .copy {
       color: #85888a; }
-  .view--invalid-certificate .content--supplemental .title {
+  .view-invalid-certificate .content-supplemental .title {
     margin-bottom: 10px; }
-  .view--invalid-certificate .content--supplemental .copy {
+  .view-invalid-certificate .content-supplemental .copy {
     color: #85888a; }
-  .view--invalid-certificate .content--supplemental .list--actions {
+  .view-invalid-certificate .content-supplemental .list-actions {
     margin-top: 20px; }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--invalid-certificate .content--supplemental .list--actions .action {
+      .view-invalid-certificate .content-supplemental .list-actions .action {
         display: block;
         text-align: center; } }
     @media screen and (max-width: 499px) {
-      .view--invalid-certificate .content--supplemental .list--actions .action {
+      .view-invalid-certificate .content-supplemental .list-actions .action {
         display: block;
         text-align: center; } }
-  .view--invalid-certificate .supplemental__how {
+  .view-invalid-certificate .supplemental-how {
     float: left;
     display: block;
-    margin-right: 2.35765%;
-    width: 23.23176%; }
-    .view--invalid-certificate .supplemental__how:last-child {
+    margin-right: 2.3576515979%;
+    width: 23.2317613015%; }
+    .view-invalid-certificate .supplemental-how:last-child {
       margin-right: 0; }
     @media screen and (min-width: 760px) and (max-width: 899px) {
-      .view--invalid-certificate .supplemental__how {
+      .view-invalid-certificate .supplemental-how {
         float: left;
         display: block;
-        margin-right: 2.35765%;
-        width: 48.82117%; }
-        .view--invalid-certificate .supplemental__how:last-child {
+        margin-right: 2.3576515979%;
+        width: 48.821174201%; }
+        .view-invalid-certificate .supplemental-how:last-child {
           margin-right: 0; } }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--invalid-certificate .supplemental__how {
+      .view-invalid-certificate .supplemental-how {
         width: 100%;
         margin-bottom: 40px; } }
     @media screen and (max-width: 499px) {
-      .view--invalid-certificate .supplemental__how {
+      .view-invalid-certificate .supplemental-how {
         width: 100%;
         margin-bottom: 40px; } }
-  .view--invalid-certificate .supplemental__certificates {
+  .view-invalid-certificate .supplemental-certificates {
     float: left;
     display: block;
-    margin-right: 2.35765%;
-    width: 23.23176%;
+    margin-right: 2.3576515979%;
+    width: 23.2317613015%;
     margin-right: 0; }
-    .view--invalid-certificate .supplemental__certificates:last-child {
+    .view-invalid-certificate .supplemental-certificates:last-child {
       margin-right: 0; }
     @media screen and (min-width: 760px) and (max-width: 899px) {
-      .view--invalid-certificate .supplemental__certificates {
+      .view-invalid-certificate .supplemental-certificates {
         float: left;
         display: block;
-        margin-right: 2.35765%;
-        width: 48.82117%; }
-        .view--invalid-certificate .supplemental__certificates:last-child {
+        margin-right: 2.3576515979%;
+        width: 48.821174201%; }
+        .view-invalid-certificate .supplemental-certificates:last-child {
           margin-right: 0; } }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--invalid-certificate .supplemental__certificates {
+      .view-invalid-certificate .supplemental-certificates {
         width: 100%; } }
     @media screen and (max-width: 499px) {
-      .view--invalid-certificate .supplemental__certificates {
+      .view-invalid-certificate .supplemental-certificates {
         width: 100%; } }
-  .view--invalid-certificate .supplemental__about {
+  .view-invalid-certificate .supplemental-about {
     float: left;
     display: block;
-    margin-right: 2.35765%;
-    width: 48.82117%; }
-    .view--invalid-certificate .supplemental__about:last-child {
+    margin-right: 2.3576515979%;
+    width: 48.821174201%; }
+    .view-invalid-certificate .supplemental-about:last-child {
       margin-right: 0; }
     @media screen and (min-width: 760px) and (max-width: 899px) {
-      .view--invalid-certificate .supplemental__about {
+      .view-invalid-certificate .supplemental-about {
         width: 100%;
         margin-bottom: 40px; } }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--invalid-certificate .supplemental__about {
+      .view-invalid-certificate .supplemental-about {
         width: 100%;
         margin-bottom: 40px; } }
     @media screen and (max-width: 499px) {
-      .view--invalid-certificate .supplemental__about {
+      .view-invalid-certificate .supplemental-about {
         width: 100%;
         margin-bottom: 40px; } }
-  .view--invalid-certificate.is-honorcode .status {
+  .view-invalid-certificate.is-honorcode .status {
     background: #88c7ec; }
-  .view--invalid-certificate.is-honorcode .certificate--type {
+  .view-invalid-certificate.is-honorcode .certificate-type {
     color: #88c7ec; }
-  .view--invalid-certificate.is-idverified .status {
+  .view-invalid-certificate.is-idverified .status {
     background: #3aa2e0; }
-  .view--invalid-certificate.is-idverified .accomplishment {
+  .view-invalid-certificate.is-idverified .accomplishment {
     background: white url("../images/logo-idverified-cropped.png") bottom left no-repeat;
     background-size: 75%; }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--invalid-certificate.is-idverified .accomplishment {
+      .view-invalid-certificate.is-idverified .accomplishment {
         background-size: 75%; } }
     @media screen and (max-width: 499px) {
-      .view--invalid-certificate.is-idverified .accomplishment {
+      .view-invalid-certificate.is-idverified .accomplishment {
         background-size: 100%; } }
-  .view--invalid-certificate.is-idverified .certificate--type {
+  .view-invalid-certificate.is-idverified .certificate-type {
     color: #3aa2e0; }
-    .view--invalid-certificate.is-idverified .certificate--type .wrapper--img {
+    .view-invalid-certificate.is-idverified .certificate-type .wrapper-img {
       width: 200px;
       border-radius: 200px;
       padding: 10px 10px;
       background: white;
       margin: -80px auto 0 auto; }
       @media screen and (min-width: 760px) and (max-width: 899px) {
-        .view--invalid-certificate.is-idverified .certificate--type .wrapper--img {
+        .view-invalid-certificate.is-idverified .certificate-type .wrapper-img {
           float: right;
           margin: 0 0 20px 20px; } }
       @media screen and (min-width: 500px) and (max-width: 759px) {
-        .view--invalid-certificate.is-idverified .certificate--type .wrapper--img {
+        .view-invalid-certificate.is-idverified .certificate-type .wrapper-img {
           width: 150px;
           float: right;
           margin: 0 0 20px 20px; } }
       @media screen and (max-width: 499px) {
-        .view--invalid-certificate.is-idverified .certificate--type .wrapper--img {
+        .view-invalid-certificate.is-idverified .certificate-type .wrapper-img {
           width: 100px;
           float: right;
           margin: 0; } }
-      .view--invalid-certificate.is-idverified .certificate--type .wrapper--img img {
+      .view-invalid-certificate.is-idverified .certificate-type .wrapper-img img {
         width: 100%; }
 
-.view--validate-certificate {
+.view-validate-certificate {
   background: #f4f5f5; }
-  .view--validate-certificate .wrapper--view {
+  .view-validate-certificate .wrapper-view {
     background: transparent url("../images/bg-paperfibers.png") 0 0 repeat-both;
     padding-bottom: 60px; }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--validate-certificate .wrapper--view {
+      .view-validate-certificate .wrapper-view {
         padding-bottom: 20px; } }
     @media screen and (max-width: 499px) {
-      .view--validate-certificate .wrapper--view {
+      .view-validate-certificate .wrapper-view {
         padding-bottom: 20px; } }
-  .view--validate-certificate .wrapper--content {
+  .view-validate-certificate .wrapper-content {
     padding: 20px 40px; }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--validate-certificate .wrapper--content {
+      .view-validate-certificate .wrapper-content {
         padding: 20px 20px; } }
     @media screen and (max-width: 499px) {
-      .view--validate-certificate .wrapper--content {
+      .view-validate-certificate .wrapper-content {
         padding: 20px 20px; } }
-  .view--validate-certificate .content {
+  .view-validate-certificate .content {
     max-width: 1280px;
     margin-left: auto;
     margin-right: auto; }
-    .view--validate-certificate .content:after {
+    .view-validate-certificate .content:after {
       content: "";
       display: table;
       clear: both; }
-    .view--validate-certificate .content .title--lvl1 {
+    .view-validate-certificate .content .title-lvl1 {
       margin-bottom: 20px; }
-    .view--validate-certificate .content .title--lvl2 {
+    .view-validate-certificate .content .title-lvl2 {
       margin-bottom: 10px; }
-    .view--validate-certificate .content .title--lvl3 {
+    .view-validate-certificate .content .title-lvl3 {
       margin-bottom: 10px; }
-  .view--validate-certificate .introduction {
+  .view-validate-certificate .introduction {
     float: left;
     display: block;
-    margin-right: 2.35765%;
-    width: 65.88078%;
-    margin-left: 17.05961%;
+    margin-right: 2.3576515979%;
+    width: 65.8807828007%;
+    margin-left: 17.0596085997%;
     margin-bottom: 40px; }
-    .view--validate-certificate .introduction:last-child {
+    .view-validate-certificate .introduction:last-child {
       margin-right: 0; }
     @media screen and (min-width: 760px) and (max-width: 899px) {
-      .view--validate-certificate .introduction {
+      .view-validate-certificate .introduction {
         width: 100%;
         margin-left: 0%; } }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--validate-certificate .introduction {
+      .view-validate-certificate .introduction {
         width: 100%;
         margin-left: 0%; } }
     @media screen and (max-width: 499px) {
-      .view--validate-certificate .introduction {
+      .view-validate-certificate .introduction {
         width: 100%;
         margin-left: 0%; } }
-  .view--validate-certificate .requirements {
+  .view-validate-certificate .requirements {
     float: left;
     display: block;
-    margin-right: 2.35765%;
-    width: 65.88078%;
-    margin-left: 17.05961%;
+    margin-right: 2.3576515979%;
+    width: 65.8807828007%;
+    margin-left: 17.0596085997%;
     margin-bottom: 40px; }
-    .view--validate-certificate .requirements:last-child {
+    .view-validate-certificate .requirements:last-child {
       margin-right: 0; }
     @media screen and (min-width: 760px) and (max-width: 899px) {
-      .view--validate-certificate .requirements {
+      .view-validate-certificate .requirements {
         width: 100%;
         margin-left: 0%; } }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--validate-certificate .requirements {
+      .view-validate-certificate .requirements {
         width: 100%;
         margin-left: 0%; } }
     @media screen and (max-width: 499px) {
-      .view--validate-certificate .requirements {
+      .view-validate-certificate .requirements {
         width: 100%;
         margin-left: 0%; } }
-  .view--validate-certificate .list--requirements {
+  .view-validate-certificate .list-requirements {
     width: 100%;
-    counter-reset: instructions--counter;
+    counter-reset: instructions-counter;
     margin: 20px 0; }
-    .view--validate-certificate .list--requirements .item {
+    .view-validate-certificate .list-requirements .item {
       float: left;
       display: block;
-      margin-right: 3.57866%;
-      width: 48.21067%;
+      margin-right: 3.5786636068%;
+      width: 48.2106681966%;
       min-height: 160px;
       margin-bottom: 20px;
       border-radius: 2px;
@@ -1530,142 +1564,144 @@ body, .view--validate-certificate .list--requirements .item, .view--validate-cer
       padding: 20px 20px;
       color: #5d6163;
       background: #eaebeb; }
-      .view--validate-certificate .list--requirements .item:last-child {
+      .view-validate-certificate .list-requirements .item:last-child {
         margin-right: 0; }
-      .view--validate-certificate .list--requirements .item:nth-child(2n) {
+      .view-validate-certificate .list-requirements .item:nth-child(2n) {
         margin-right: 0; }
-      .view--validate-certificate .list--requirements .item:nth-child(2n+1) {
+      .view-validate-certificate .list-requirements .item:nth-child(2n+1) {
         clear: left; }
       @media screen and (min-width: 500px) and (max-width: 759px) {
-        .view--validate-certificate .list--requirements .item {
+        .view-validate-certificate .list-requirements .item {
           width: 100%;
           min-height: 0; } }
       @media screen and (max-width: 499px) {
-        .view--validate-certificate .list--requirements .item {
+        .view-validate-certificate .list-requirements .item {
           width: 100%;
           min-height: 0; } }
-      .view--validate-certificate .list--requirements .item:before {
-        content: counter(instructions--counter);
-        counter-increment: instructions--counter;
+      .view-validate-certificate .list-requirements .item:before {
+        content: counter(instructions-counter);
+        counter-increment: instructions-counter;
         display: inline-block;
         vertical-align: top;
         max-width: 10%;
         margin-right: 10px;
         color: #aeb0b1; }
-      .view--validate-certificate .list--requirements .item .requirement__label {
+      .view-validate-certificate .list-requirements .item .requirement-label {
         display: inline-block;
         vertical-align: top;
         margin-bottom: 5px;
         max-width: 85%;
         color: #0a0b0c; }
-      .view--validate-certificate .list--requirements .item .requirement__details {
+      .view-validate-certificate .list-requirements .item .requirement-details {
         display: block; }
         @media screen and (max-width: 499px) {
-          .view--validate-certificate .list--requirements .item .requirement__details {
+          .view-validate-certificate .list-requirements .item .requirement-details {
             font-size: 14px;
             font-size: 1.4rem;
             line-height: 21.7px;
             line-height: 2.17rem; } }
-    .view--validate-certificate .list--requirements .requirement--allitems {
+    .view-validate-certificate .list-requirements .requirement-allitems {
       border-top-color: #b62568; }
-  .view--validate-certificate .instructions {
+  .view-validate-certificate .instructions {
     float: left;
     display: block;
-    margin-right: 2.35765%;
-    width: 65.88078%;
-    margin-left: 17.05961%;
+    margin-right: 2.3576515979%;
+    width: 65.8807828007%;
+    margin-left: 17.0596085997%;
     padding: 20px 20px;
     margin-bottom: 40px;
     border-radius: 2px;
     border: 1px solid #eaebeb;
     background: white; }
-    .view--validate-certificate .instructions:last-child {
+    .view-validate-certificate .instructions:last-child {
       margin-right: 0; }
     @media screen and (min-width: 760px) and (max-width: 899px) {
-      .view--validate-certificate .instructions {
+      .view-validate-certificate .instructions {
         width: 100%;
         margin-left: 0%; } }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--validate-certificate .instructions {
+      .view-validate-certificate .instructions {
         width: 100%;
         margin-left: 0%; } }
     @media screen and (max-width: 499px) {
-      .view--validate-certificate .instructions {
+      .view-validate-certificate .instructions {
         width: 100%;
         margin-left: 0%; } }
-    .view--validate-certificate .instructions .title {
+    .view-validate-certificate .instructions .title {
       margin-bottom: 20px;
       padding-bottom: 10px;
       border-bottom: 3px solid #eaebeb; }
-  .view--validate-certificate .list--instructions {
-    counter-reset: instructions--counter; }
-    .view--validate-certificate .list--instructions .item {
+  .view-validate-certificate .list-instructions {
+    counter-reset: instructions-counter; }
+    .view-validate-certificate .list-instructions .item {
       display: block;
       margin-bottom: 20px;
       padding-bottom: 20px;
       border-bottom: 1px solid #eaebeb;
       color: #5d6163; }
       @media screen and (max-width: 499px) {
-        .view--validate-certificate .list--instructions .item {
+        .view-validate-certificate .list-instructions .item {
           font-size: 16px;
           font-size: 1.6rem;
           line-height: 24.8px;
           line-height: 2.48rem; } }
-      .view--validate-certificate .list--instructions .item:before {
-        content: counter(instructions--counter);
-        counter-increment: instructions--counter;
+      .view-validate-certificate .list-instructions .item:before {
+        content: counter(instructions-counter);
+        counter-increment: instructions-counter;
         display: inline-block;
         vertical-align: top;
         max-width: 10%;
         margin-right: 10px;
         color: #d6d7d8; }
-      .view--validate-certificate .list--instructions .item .instruction__details {
+      .view-validate-certificate .list-instructions .item .instruction-details {
         display: inline-block;
         vertical-align: top;
         margin-bottom: 20px;
         max-width: 85%; }
-      .view--validate-certificate .list--instructions .item .instruction__image {
+      .view-validate-certificate .list-instructions .item .instruction-image {
         width: 100%;
         border-radius: 2px;
         border: 1px solid #eaebeb;
         padding: 10px 10px;
         background: #f4f5f5; }
-        .view--validate-certificate .list--instructions .item .instruction__image img {
+        .view-validate-certificate .list-instructions .item .instruction-image img {
           width: 100%;
           display: block; }
-  .view--validate-certificate .support {
+  .view-validate-certificate .support {
     float: left;
     display: block;
-    margin-right: 2.35765%;
-    width: 65.88078%;
-    margin-left: 17.05961%; }
-    .view--validate-certificate .support:last-child {
+    margin-right: 2.3576515979%;
+    width: 65.8807828007%;
+    margin-left: 17.0596085997%; }
+    .view-validate-certificate .support:last-child {
       margin-right: 0; }
     @media screen and (min-width: 760px) and (max-width: 899px) {
-      .view--validate-certificate .support {
+      .view-validate-certificate .support {
         width: 100%;
         margin-left: 0%; } }
     @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view--validate-certificate .support {
+      .view-validate-certificate .support {
         width: 100%;
         margin-left: 0%; } }
     @media screen and (max-width: 499px) {
-      .view--validate-certificate .support {
+      .view-validate-certificate .support {
         width: 100%;
         margin-left: 0%; } }
     @media screen and (max-width: 499px) {
-      .view--validate-certificate .support .copy {
+      .view-validate-certificate .support .copy {
         font-size: 14px;
         font-size: 1.4rem;
         line-height: 21.7px;
         line-height: 2.17rem; } }
-    .view--validate-certificate .support .list--actions {
+    .view-validate-certificate .support .list-actions {
       margin-top: 20px; }
       @media screen and (min-width: 500px) and (max-width: 759px) {
-        .view--validate-certificate .support .list--actions .action {
+        .view-validate-certificate .support .list-actions .action {
           display: block;
           text-align: center; } }
       @media screen and (max-width: 499px) {
-        .view--validate-certificate .support .list--actions .action {
+        .view-validate-certificate .support .list-actions .action {
           display: block;
           text-align: center; } }
+
+/*# sourceMappingURL=style-application.css.map */

@@ -1,10 +1,10 @@
 // edX: Certificates - View: DIY Validation
 // ====================
-.view--validate-certificate {
+.view-validate-certificate {
   background: $bg-view;
 
   // layout
-  .wrapper--view {
+  .wrapper-view {
     background: transparent url('../images/bg-paperfibers.png') 0 0 repeat-both;
     padding-bottom: ($baseline-v*3);
 
@@ -17,7 +17,7 @@
     }
   }
 
-  .wrapper--content {
+  .wrapper-content {
     padding: $baseline-v ($baseline-h*2);
 
     @include media($bp-ds) {
@@ -37,25 +37,25 @@
       @extend %link-copy;
     }
 
-    .title--lvl1 {
+    .title-lvl1 {
       @extend %t-title-3;
       @extend %t-weight3;
       margin-bottom: $baseline-v;
     }
 
-    .title--lvl2 {
+    .title-lvl2 {
       @extend %t-title-5;
       @extend %t-weight3;
       margin-bottom: ($baseline-v/2);
     }
 
-    .title--lvl3 {
+    .title-lvl3 {
       @extend %t-title-6;
       @extend %t-weight3;
       margin-bottom: ($baseline-v/2);
     }
 
-    .title--lvl4 {
+    .title-lvl4 {
 
     }
   }
@@ -106,10 +106,10 @@
     }
   }
 
-  .list--requirements {
+  .list-requirements {
     @extend %ui-no-list;
     @include fill-parent();
-    counter-reset: instructions--counter;
+    counter-reset: instructions-counter;
     margin: $baseline-v 0;
 
     .item {
@@ -140,8 +140,8 @@
       &:before {
         @extend %t-title-6;
         @extend %t-weight3;
-        content: counter(instructions--counter);
-        counter-increment: instructions--counter;
+        content: counter(instructions-counter);
+        counter-increment: instructions-counter;
         display: inline-block;
         vertical-align: top;
         max-width: 10%;
@@ -149,7 +149,7 @@
         color: $gray-l3;
       }
 
-      .requirement__label {
+      .requirement-label {
         @extend %t-title-6;
         @extend %t-weight3;
         display: inline-block;
@@ -159,7 +159,7 @@
         color: $gray-d4;
       }
 
-      .requirement__details {
+      .requirement-details {
         display: block;
 
         @include media($bp-m) {
@@ -169,7 +169,7 @@
       }
     }
 
-    .requirement--allitems {
+    .requirement-allitems {
       border-top-color: $edx-pink;
     }
   }
@@ -211,9 +211,9 @@
     }
   }
 
-  .list--instructions {
+  .list-instructions {
     @extend %ui-no-list;
-    counter-reset: instructions--counter;
+    counter-reset: instructions-counter;
 
 
     .item {
@@ -233,8 +233,8 @@
       &:before {
         @extend %t-title-6;
         @extend %t-weight4;
-        content: counter(instructions--counter);
-        counter-increment: instructions--counter;
+        content: counter(instructions-counter);
+        counter-increment: instructions-counter;
         display: inline-block;
         vertical-align: top;
         max-width: 10%;
@@ -242,7 +242,7 @@
         color: $gray-l4;
       }
 
-      .instruction__details {
+      .instruction-details {
         @extend %wipe-last-child;
         display: inline-block;
         vertical-align: top;
@@ -250,7 +250,7 @@
         max-width: 85%;
       }
 
-      .instruction__image {
+      .instruction-image {
         @include fill-parent();
         border-radius: ($baseline-v/10);
         border: 1px solid $gray-l5;
@@ -298,7 +298,7 @@
       }
     }
 
-    .list--actions {
+    .list-actions {
       margin-top: ($baseline-v);
 
       .action {

@@ -26,7 +26,10 @@
     </head>
 
     <body class="view-certificate view-valid-certificate ${dir_rtl} ${document_body_class_append}" data-view="valid-certificate">
-        ${self.body()}
+
+        <div class="wrapper-view">
+            ${self.body()}
+        </div>
         <%include file="_assets-secondary.html" />
     </body>
 </html>

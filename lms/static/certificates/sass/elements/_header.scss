@@ -2,7 +2,7 @@
 // ====================
 
 // grid/layout
-.wrapper--header {
+.wrapper-header {
   @extend %ui-shadow-subtle-down;
   margin-bottom: ($baseline-v*2);
   padding: ($baseline-v) ($baseline-h*2);
@@ -18,12 +18,12 @@
   }
 }
 
-.header--app {
+.header-app {
   @include outer-container;
 }
 
 // masthead
-.title--logo {
+.title-logo {
   text-align: center;
 
   .logo {
@@ -32,7 +32,7 @@
     margin-right: ($baseline-h);
   }
 
-  .title--sub {
+  .title-sub {
     @extend %ui-text-sr;
     @extend %t-title-5;
     display: inline-block;

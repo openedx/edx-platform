@@ -8,7 +8,7 @@
     @extend %no-list !optional;
   }
 
-  .nav__item {
+  .nav-item {
 
     .action {
 
@@ -17,10 +17,10 @@
 }
 
 // archetype: nav - horizontal
-%nav--inline {
+%nav-inline {
   @extend %nav  !optional;
 
-  .nav__item, .item {
+  .nav-item, .item {
     display: inline-block;
     vertical-align: middle;
 
@@ -31,10 +31,10 @@
 }
 
 // archetype: nav - vertical
-%nav--blocks {
+%nav-blocks {
   @extend %nav  !optional;
 
-  .nav__item {
+  .nav-item {
     display: block;
 
     .action {
@@ -44,10 +44,10 @@
 }
 
 // archetype: nav - tabs
-%nav--tabs {
+%nav-tabs {
   @extend %nav  !optional;
 
-  .nav__item {
+  .nav-item {
 
     .action {
 
@@ -56,10 +56,10 @@
 }
 
 // archetype: nav - pagination
-%nav--pagination {
+%nav-pagination {
   @extend %nav  !optional;
 
-  .nav__item {
+  .nav-item {
 
     .action {
 
@@ -68,10 +68,10 @@
 }
 
 // archetype: nav - dropdown
-%nav--dropdown {
+%nav-dropdown {
   @extend %nav  !optional;
 
-  .nav__item {
+  .nav-item {
 
     .action {
 
@@ -82,9 +82,9 @@
 // ====================
 
 // application: secondary navigation
-%nav--secondary {
+%nav-secondary {
 
-  .nav__item {
+  .nav-item {
 
     .action {
 

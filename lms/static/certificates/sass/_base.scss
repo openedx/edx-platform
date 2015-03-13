@@ -30,13 +30,13 @@ body {
 // ====================
 
 // base: view
-.wrapper--view {
+.wrapper-view {
   background: $bg-view;
 }
 
 // ====================
 
-[class^="content__"], [class^="content--"] {
+[class^="content-"]{
 
   a {
     @extend %link-copy;
@@ -78,6 +78,14 @@ strong {
 }
 
 //  reset: lists
-.list--actions, .list--docs, .list--steps, .list--controls, .list--fields, .list--help, .nav--wizard, .list--tips, .field--group {
+.list-actions,
+.list-docs,
+.list-steps,
+.list-controls,
+.list-fields,
+.list-help,
+.nav-wizard,
+.list-tips,
+.field-group {
   @extend %ui-no-list;
 }
