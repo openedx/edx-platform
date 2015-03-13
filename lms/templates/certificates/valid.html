@@ -4,16 +4,6 @@
 
 <%inherit file="certificate-base.html" />
 
-<nav class="nav--skip sr">
-  <h2>${_("Skip to This Page's Content")}</h2>
-  <ol>
-    <li class="nav__item"><a class="action" href="#validation-status">${_("Validation Status")}</a></li>
-    <li class="nav__item"><a class="action" href="#validation-accomplishment">${_("Student Accomplishment")}</a></li>
-    <li class="nav__item"><a class="action" href="#validation-info">${_("More Information")}</a></li>
-    <li class="nav__item"><a class="action" href="#company-info">${_("About")} ${platform_name}</a></li>
-  </ol>
-</nav>
-
 <div class="wrapper--view">
   <%include file="_certificate-header.html" />
 
@@ -23,8 +13,12 @@
 
     <section class="content content--main" role="main">
       <div class="status status--valid" id="validation-status">
-        <h2 class="title title--lvl2">${document_banner}<span class="sr">:</span></h2>
+        <h2 class="title title--lvl2">
+          ${document_banner}
+          <span class="sr">:</span>
+        </h2>
       </div>
+
       <article class="accomplishment ${accomplishment_class_append}" id="validation-accomplishment">
         <div class="accomplishment__statement">
           <p class="copy">
@@ -41,7 +35,7 @@
           <h3 class="title title--lvl2 sr">${accomplishment_more_title}</h3>
           <ul class="list list--metadata">
             <li class="item certificate--type">
-              <span class="label">_(Certificate Type)</span>
+              <span class="label">${_("Certificate Type")}</span>
               <span class="value">
                 ${certificate_type_title}
                 <span class="explanation">${certificate_type_description} </span>

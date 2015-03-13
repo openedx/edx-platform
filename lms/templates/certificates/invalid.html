@@ -4,14 +4,6 @@
 
 <%inherit file="certificate-base.html" />
 
-<nav class="nav--skip sr">
-    <h2>${_("Skip to This Page's Content")}</h2>
-    <ol>
-      <li class="nav__item"><a class="action" href="#validation-status">${_("Validation Status")}</a></li>
-      <li class="nav__item"><a class="action" href="#edx-info">${_("About edX")}</a></li>
-    </ol>
-  </nav>
-
   <div class="wrapper--view">
     <%include file="_certificate-header.html" />
 
@@ -21,14 +13,14 @@
 
       <section class="content content--main" role="main">
         <div class="status status--invalid" id="validation-status">
-          <h2 class="title title--lvl2">${_("This is an invalid edX certificate number")}</h2>
+          <h2 class="title title--lvl2">${_("This is an invalid certificate number")}</h2>
         </div>
 
         <div class="feedback">
           <div class="feedback__lead">
-            <h3 class="title">${_("This edX Certificate Does Not Exist")}</h3>
+            <h3 class="title">${_("This Certificate Does Not Exist")}</h3>
             <div class="copy">
-              <p>${_("We cannot find an edX certificate on file that matches this URL or ID number.")}</p>
+              <p>${_("We cannot find a certificate on file that matches this URL or ID number.")}</p>
             </div>
           </div>
 
