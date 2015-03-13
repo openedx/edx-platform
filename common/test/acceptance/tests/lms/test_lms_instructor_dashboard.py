@@ -5,6 +5,8 @@ End-to-end tests for the LMS Instructor Dashboard.
 
 from nose.plugins.attrib import attr
 from bok_choy.promise import EmptyPromise
+from datetime import datetime
+from pytz import UTC, utc
 
 from ..helpers import UniqueCourseTest, get_modal_alert, EventsTestMixin
 from ...pages.common.logout import LogoutPage
@@ -105,6 +107,80 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
         self.auto_enroll_section.upload_non_csv_file()
         self.assertTrue(self.auto_enroll_section.is_notification_displayed(section_type=self.auto_enroll_section.NOTIFICATION_ERROR))
         self.assertEqual(self.auto_enroll_section.first_notification_message(section_type=self.auto_enroll_section.NOTIFICATION_ERROR), "Make sure that the file you upload is in CSV format with no extraneous characters or rows.")
+
+
+@attr('shard_5')
+class CSVReportGeneration(UniqueCourseTest):
+    """
+    Extensible test class for CSV report generation functionality.
+    """
+
+    def setUp(self):
+        super(CSVReportGeneration, self).setUp()
+        self.course_fixture = CourseFixture(**self.course_info).install()
+
+        # login as an instructor
+        AutoAuthPage(self.browser, course_id=self.course_id, staff=True).visit()
+
+        # go to the Data Download page on the instructor dashboard
+        instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
+        instructor_dashboard_page.visit()
+        self.data_download_section = instructor_dashboard_page.select_data_download()
+
+    def verify_report_file_present(self, start_time, base_report_name, extension=".csv"):
+        """
+        Verifies that a report is present in the download table for the most recent task.
+
+        Verifies that the report name is be in the form {course_name}-{base_report_name}-{timestamp}{extension}
+
+        start_time should be a UTC timestamp of when the report was kicked off.
+        set `start_time = datetime.now(UTC)` prior to kicking off the generation task.
+        """
+        EmptyPromise(
+            lambda: 1 == len(self.data_download_section.get_available_reports_for_download()),
+            'Waiting for downloadable report'
+        ).fulfill()
+        full_report_name = self.data_download_section.get_available_reports_for_download()[0]
+
+        self.assertIn("{}_{}".format(
+            '_'.join([self.course_info['org'], self.course_info['number'], self.course_info['run']]),
+            base_report_name
+        ), full_report_name)
+
+        report_datetime = datetime.strptime(
+            full_report_name[full_report_name.index(base_report_name) + len(base_report_name):-len(extension)],
+            "%Y-%m-%d-%H%M"
+        )
+        self.assertLessEqual(start_time.replace(second=0, microsecond=0), utc.localize(report_datetime))
+
+        self.assertEqual(full_report_name[-len(extension):], extension)
+
+    def test_generate_student_responses_report(self):
+        """
+        Scenario: On the Data Download tab of the Instructor Dashboard, instructors can generate a csv report
+           of student responses to all problems in the course.
+
+           Given that I am on the Data Download tab of the instructor dashboard
+           When I click the "Generate Student Responses Report" button
+           Then a message appears letting me know it is being generated
+           And I can download a file with results
+        """
+        # Click the button
+        start_time = datetime.now(UTC)
+        self.data_download_section.student_response_report_button.click()
+
+        # Expect to see a message that grade report is being generated
+        expected_msg = (
+            "Your student responses report is being generated! You can view the status of "
+            "the generation task in the 'Pending Instructor Tasks' section."
+        )
+        actual_msg = self.data_download_section.get_report_generation_msg()
+        self.assertEqual(expected_msg, actual_msg)
+
+        # Inspect the results
+        base_report_name = "responses_report_"
+
+        self.verify_report_file_present(start_time, base_report_name)
 
 
 @attr('shard_5')
