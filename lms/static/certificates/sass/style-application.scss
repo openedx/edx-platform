@@ -1,0 +1,43 @@
+// edX: Certificates - Style Compilation
+// ====================
+
+// BASE - libs and resets *do not edit*
+@import 'utilities/bourbon/bourbon';        // http://bourbon.io
+@import 'utilities/neat/neat';              // http://neat.bourbon.io
+
+
+// Utilities and Assets
+// ====================
+// BASE - utilities
+@import 'utilities/variables';              // settings/values/placeholders
+@import 'utilities/mixins';                 // re-usable utility and non-standalone rules
+
+// BASE - assets
+@import 'assets/fonts';                     // imported/used fonts
+@import 'assets/graphics';                  // sprites, basic img/figure/svg styling
+@import 'assets/anims';                     // css-based animations
+
+
+// General, Elements, and Views
+// ====================
+// BASE - foundation
+@import 'base';
+
+// BASE - elements
+@import 'elements/typography';              // font sizes/scale and applied/canned definitions
+@import 'elements/controls';                // buttons, link styles, sliders, etc.
+@import 'elements/navigation';              // all archetypes of navigation
+@import 'elements/header';                  // view/app headers
+@import 'elements/footer';                  // view/app footers
+
+// BASE - specific views/areas of app
+@import 'views/valid';                      // valid certificate/achievement view
+@import 'views/invalid';                    // invvalid certificate view
+@import 'views/validate';                   // DIY validation
+
+// BASE - contextual
+@import 'contexts/print';                   // basic print styling
+@import 'contexts/ie';                      // ie-specific styling
+
+// BASE - misc.
+@import 'shame';                            // shame file - used for any bad-form/orphaned scss
