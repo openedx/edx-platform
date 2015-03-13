@@ -1,6 +1,7 @@
 import datetime
 
 import pytz
+import logging
 
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
@@ -78,6 +79,30 @@ def user_track(request):
 
     return HttpResponse('success')
 
+perflog = logging.getLogger("perflog")
+def performance_log(request):
+    """
+    Log when POST call to "performance" URL is made by a user.
+    Request should provide "event" and "page" arguments.
+    """
+    page = _get_request_value(request, 'page')
+
+    with eventtracker.get_tracker().context('edx.course.browser', contexts.course_context_from_url(page)):
+        event = {
+            "ip": _get_request_header(request, 'REMOTE_ADDR'),
+            "referer": _get_request_header(request, 'HTTP_REFERER'),
+            "accept_language": _get_request_header(request, 'HTTP_ACCEPT_LANGUAGE'),
+            "event_source": "browser",
+            "event": _get_request_value(request, 'event'),
+            "agent": _get_request_header(request, 'HTTP_USER_AGENT'),
+            "page": page,
+            "time": datetime.datetime.utcnow(),
+            "host": _get_request_header(request, 'SERVER_NAME'),
+        }
+
+    perflog.info(json.dumps(event, cls=DateTimeJSONEncoder))
+
+    return HttpResponse(status=204)
 
 def server_track(request, event_type, event, page=None):
     """
