@@ -544,10 +544,14 @@ def get_module_system_for_user(user, field_data_cache,
     # because it is agnostic to course-hierarchy.
     # NOTE: module_id is empty string here. The 'module_id' will get assigned in the replacement
     # function, we just need to specify something to get the reverse() to work.
+    # As the module id is empty string and and jump_to_id url ends with slash so its took
+    # the form of // at end with module_id empty so replacing  // (double slashes)
+    # with / (single slash).
+    jump_to_id_url = reverse('jump_to_id', kwargs={'course_id': course_id.to_deprecated_string(), 'module_id': ''})[:-1]
     block_wrappers.append(partial(
         replace_jump_to_id_urls,
         course_id,
-        reverse('jump_to_id', kwargs={'course_id': course_id.to_deprecated_string(), 'module_id': ''}),
+        jump_to_id_url,
     ))
 
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):

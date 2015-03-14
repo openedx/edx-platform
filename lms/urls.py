@@ -240,7 +240,7 @@ if settings.COURSEWARE_ENABLED:
     urlpatterns += (
         url(r'^courses/{}/jump_to/(?P<location>.*)$'.format(settings.COURSE_ID_PATTERN),
             'courseware.views.jump_to', name="jump_to"),
-        url(r'^courses/{}/jump_to_id/(?P<module_id>.*)$'.format(settings.COURSE_ID_PATTERN),
+        url(r'^courses/{}/jump_to_id/(?P<module_id>.*)/$'.format(settings.COURSE_ID_PATTERN),
             'courseware.views.jump_to_id', name="jump_to_id"),
         url(r'^courses/{course_key}/xblock/{usage_key}/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$'.format(course_key=settings.COURSE_ID_PATTERN, usage_key=settings.USAGE_ID_PATTERN),
             'courseware.module_render.handle_xblock_callback',
