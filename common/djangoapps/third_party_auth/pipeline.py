@@ -79,6 +79,7 @@ from student.models import (
 )
 
 import student
+from student.models import CourseEnrollment, CourseEnrollmentAllowed
 
 from logging import getLogger
 
@@ -491,6 +492,11 @@ def create_user_from_oauth(strategy, details, user, is_new, *args, **kwargs):
         except Exception:
             log.error("UserProfile creation failed for user {id}.".format(id=user.id))
             raise
+
+        ceas = CourseEnrollmentAllowed.objects.filter(email=user.email)
+        for cea in ceas:
+            if cea.auto_enroll:
+                CourseEnrollment.enroll(user, cea.course_id)
 
         create_comments_service_user(user)
 
