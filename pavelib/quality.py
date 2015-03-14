@@ -179,16 +179,22 @@ def run_pep8(options):
     # Print number of violations to log
     violations_count_str = "Number of pep8 violations: {count}".format(count=count)
     print(violations_count_str)
+    violations = ''
+    with open("{report_dir}/pep8.report".format(report_dir=report_dir), 'r') as f:
+        violations_list = f.readlines()
+        violations_str = '\n'.join(violations_list)
+    print(violations_str)
 
     # Also write the number of violations to a file
     with open(Env.METRICS_DIR / "pep8", "w") as f:
-        f.write(violations_count_str)
+        f.write(violations_count_str + '\n\n')
+        f.write(violations_str)
 
     # Fail if any violations are found
     if count:
         raise Exception(
-            "Too many pep8 violations. Number of violations found: {count}.".format(
-                count=count
+            "Too many pep8 violations. Number of violations found: {count}.\n\n{violations}".format(
+                count=count, violations=violations_str
             )
         )
 
