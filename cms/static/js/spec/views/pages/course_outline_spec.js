@@ -281,7 +281,7 @@ define(["jquery", "sinon", "js/common_helpers/ajax_helpers", "js/views/utils/vie
                     expect($('.wrapper-alert-announcement')).not.toHaveClass('is-hidden');
                     $('.dismiss-button').click();
                     AjaxHelpers.expectJsonRequest(requests, 'DELETE', 'dummy_dismiss_url');
-                    AjaxHelpers.respondToDelete(requests);
+                    AjaxHelpers.respondWithNoContent(requests);
                     expect($('.wrapper-alert-announcement')).toHaveClass('is-hidden');
                 });
             });

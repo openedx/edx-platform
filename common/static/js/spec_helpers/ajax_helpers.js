@@ -1,6 +1,6 @@
 define(['sinon', 'underscore'], function(sinon, _) {
     var fakeServer, fakeRequests, expectRequest, expectJsonRequest,
-        respondWithJson, respondWithError, respondWithTextError, respondToDelete;
+        respondWithJson, respondWithError, respondWithTextError, responseWithNoContent;
 
     /* These utility methods are used by Jasmine tests to create a mock server or
      * get reference to mock requests. In either case, the cleanup (restore) is done with
@@ -109,7 +109,7 @@ define(['sinon', 'underscore'], function(sinon, _) {
         );
     };
 
-    respondToDelete = function(requests, requestIndex) {
+    respondWithNoContent = function(requests, requestIndex) {
         if (_.isUndefined(requestIndex)) {
             requestIndex = requests.length - 1;
         }
@@ -125,6 +125,6 @@ define(['sinon', 'underscore'], function(sinon, _) {
         'respondWithJson': respondWithJson,
         'respondWithError': respondWithError,
         'respondWithTextError': respondWithTextError,
-        'respondToDelete': respondToDelete
+        'respondWithNoContent': respondWithNoContent,
     };
 });

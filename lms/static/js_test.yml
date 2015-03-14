@@ -83,6 +83,7 @@ fixture_paths:
     - templates/instructor/instructor_dashboard_2
     - templates/dashboard
     - templates/edxnotes
+    - templates/fields
     - templates/student_account
     - templates/student_profile
     - templates/verify_student
