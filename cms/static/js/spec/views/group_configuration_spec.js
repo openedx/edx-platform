@@ -123,7 +123,7 @@ define([
 
         patchAndVerifyRequest(requests, url, notificationSpy);
 
-        AjaxHelpers.respondToDelete(requests);
+        AjaxHelpers.respondWithNoContent(requests);
         ViewHelpers.verifyNotificationHidden(notificationSpy);
         expect($(SELECTORS.itemView)).not.toExist();
     };

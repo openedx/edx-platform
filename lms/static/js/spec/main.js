@@ -58,6 +58,7 @@
 
             // Manually specify LMS files that are not converted to RequireJS
             'history': 'js/vendor/history',
+            'js/mustache': 'js/mustache',
             'js/verify_student/photocapture': 'js/verify_student/photocapture',
             'js/staff_debug_actions': 'js/staff_debug_actions',
 
@@ -552,6 +553,9 @@
         'lms/include/js/spec/student_account/enrollment_spec.js',
         'lms/include/js/spec/student_account/emailoptin_spec.js',
         'lms/include/js/spec/student_account/shoppingcart_spec.js',
+        'lms/include/js/spec/student_account/account_settings_fields_spec.js',
+        'lms/include/js/spec/student_account/account_settings_factory_spec.js',
+        'lms/include/js/spec/student_account/account_settings_view_spec.js',
         'lms/include/js/spec/student_profile/profile_spec.js',
         'lms/include/js/spec/verify_student/pay_and_verify_view_spec.js',
         'lms/include/js/spec/verify_student/webcam_photo_view_spec.js',
