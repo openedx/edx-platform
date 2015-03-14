@@ -84,7 +84,7 @@ from shoppingcart.exceptions import (  # pylint: disable=import-error
     ItemAlreadyInCartException,
     AlreadyEnrolledInCourseException
 )
-from student.models import CourseEnrollment, CourseEnrollmentException
+from student.models import CourseEnrollment, CourseEnrollmentException, CourseEnrollmentAllowed
 from course_modes.models import CourseMode
 from opaque_keys.edx.keys import CourseKey
 
@@ -473,6 +473,11 @@ def create_user_from_oauth(strategy, details, user, is_new, *args, **kwargs):
         except Exception:
             log.error("UserProfile creation failed for user {id}.".format(id=user.id))
             raise
+
+        ceas = CourseEnrollmentAllowed.objects.filter(email=user.email)
+        for cea in ceas:
+            if cea.auto_enroll:
+                CourseEnrollment.enroll(user, cea.course_id)
 
         create_comments_service_user(user)
 
