@@ -21,6 +21,7 @@ from courseware import grades
 from courseware.models import StudentModule
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
+from xmodule.capa_base_constants import RANDOMIZATION
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from student.tests.factories import UserFactory
 from student.models import anonymous_id_for_user
@@ -106,6 +107,15 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         return resp
 
+    def look_at_question(self, problem_url_name):
+        """
+        Create state for a problem, but don't answer it
+        """
+        location = self.problem_location(problem_url_name)
+        modx_url = self.modx_url(location, "problem_get")
+        resp = self.client.get(modx_url)
+        return resp
+
     def reset_question_answer(self, problem_url_name):
         """
         Reset specified problem for current user.
@@ -148,7 +158,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
             parent_location=section_location,
             category='problem',
             data=prob_xml,
-            metadata={'rerandomize': 'always'},
+            metadata={'rerandomize': RANDOMIZATION.ALWAYS},
             display_name=name
         )
 
@@ -180,7 +190,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 parent_location=self.chapter.location,
                 display_name=name,
                 category='sequential',
-                rerandomize='always',
+                rerandomize=RANDOMIZATION.ALWAYS,
                 metadata={
                     'graded': True,
                     'format': section_format,
@@ -1252,3 +1262,40 @@ class TestConditionalContent(TestSubmittingProblems):
         homework_1_score = 1.0 / 2
         homework_2_score = 1.0 / 1
         self.check_grade_percent(round((homework_1_score + homework_2_score) / 2, 2))
+
+
+class TestModuleInstantiation(TestSubmittingProblems):
+    """
+    Tests for instantiating xmodules in courseware
+    """
+
+    def test_dont_write_to_csm_if_not_randomized(self):
+        """
+        Don't write to StudentModule if instantiating a capa problem
+        that isn't randomized
+        """
+        problem = ItemFactory.create(category='problem')
+
+        self.look_at_question(problem.url_name)
+        self.assertFalse(
+            StudentModule.objects.filter(
+                module_state_key=self.problem_location(problem.url_name)
+            ).exists()
+        )
+
+    def test_write_to_csm_if_randomized(self):
+        """
+        Do write to StudentModule if instantiating a capa problem
+        that is randomized
+        """
+        problem = ItemFactory.create(
+            category='problem',
+            metadata={'rerandomize': RANDOMIZATION.ALWAYS},
+        )
+
+        self.look_at_question(problem.url_name)
+        self.assertTrue(
+            StudentModule.objects.filter(
+                module_state_key=self.problem_location(problem.url_name)
+            ).exists()
+        )

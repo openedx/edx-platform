@@ -171,7 +171,7 @@ class CapaFields(object):
     input_state = Dict(help=_("Dictionary for maintaining the state of inputtypes"), scope=Scope.user_state)
     student_answers = Dict(help=_("Dictionary with the current student responses"), scope=Scope.user_state)
     done = Boolean(help=_("Whether the student has answered the problem"), scope=Scope.user_state)
-    seed = Integer(help=_("Random seed for this student"), scope=Scope.user_state)
+    seed = Integer(help=_("Random seed for this student"), scope=Scope.user_state, default=1)
     last_submission_time = Date(help=_("Last submission time"), scope=Scope.user_state)
     submission_wait_seconds = Integer(
         display_name=_("Timer Between Attempts"),
@@ -227,7 +227,8 @@ class CapaMixin(CapaFields):
         else:
             self.close_date = due_date
 
-        if self.seed is None:
+        # only choose new seed if the problem should be randomized
+        if self.rerandomize != RANDOMIZATION.NEVER:
             self.choose_new_seed()
 
         # Need the problem location in openendedresponse to send out.  Adding
@@ -288,9 +289,7 @@ class CapaMixin(CapaFields):
         """
         Choose a new seed.
         """
-        if self.rerandomize == RANDOMIZATION.NEVER:
-            self.seed = 1
-        elif self.rerandomize == RANDOMIZATION.PER_STUDENT and hasattr(self.runtime, 'seed'):
+        if self.rerandomize == RANDOMIZATION.PER_STUDENT and hasattr(self.runtime, 'seed'):
             # see comment on randomization_bin
             self.seed = randomization_bin(self.runtime.seed, unicode(self.location).encode('utf-8'))
         else:
