@@ -31,7 +31,7 @@ def create_groups():
         cxfn = path(data_dir) / course_dir / 'course.xml'
         try:
             coursexml = etree.parse(cxfn)
-        except Exception as err:
+        except Exception:  # pylint: disable=broad-except
             print "Oops, cannot read %s, skipping" % cxfn
             continue
         cxmlroot = coursexml.getroot()

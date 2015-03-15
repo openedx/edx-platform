@@ -846,7 +846,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         return score
 
 
-class OpenEndedDescriptor():
+class OpenEndedDescriptor(object):
     """
     Module for adding open ended response questions to courses
     """

@@ -161,7 +161,9 @@ def export_to_git(course_id, repo, user='', rdir=None):
         ident = GIT_EXPORT_DEFAULT_IDENT
     time_stamp = timezone.now()
     cwd = os.path.abspath(rdirp)
-    commit_msg = 'Export from Studio at {1}'.format(user, time_stamp)
+    commit_msg = "Export from Studio at {time_stamp}".format(
+        time_stamp=time_stamp,
+    )
     try:
         cmd_log(['git', 'config', 'user.email', ident['email']], cwd)
         cmd_log(['git', 'config', 'user.name', ident['name']], cwd)

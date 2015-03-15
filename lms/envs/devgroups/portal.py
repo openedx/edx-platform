@@ -7,7 +7,7 @@ get shared sessions)
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
 
-from courses import *
+from lms.envs.devgroups.courses import *
 
 # Move this to a shared file later:
 for class_id, db_name in CLASSES_TO_DBS.items():

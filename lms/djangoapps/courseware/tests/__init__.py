@@ -106,7 +106,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
         # username = robot{0}, password = 'test'
         self.users = [
             UserFactory.create()
-            for i in range(self.USER_COUNT)
+            for dummy0 in range(self.USER_COUNT)
         ]
 
         for user in self.users:

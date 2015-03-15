@@ -177,7 +177,7 @@ class PhotoVerification(StatusModel):
     # capturing it so that we can later query for the common problems.
     error_code = models.CharField(blank=True, max_length=50)
 
-    class Meta:
+    class Meta(object):  # pylint: disable=missing-docstring
         abstract = True
         ordering = ['-created_at']
 

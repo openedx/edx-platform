@@ -46,7 +46,7 @@ class StudentModule(models.Model):
 
     course_id = CourseKeyField(max_length=255, db_index=True)
 
-    class Meta:
+    class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('student', 'module_state_key', 'course_id'),)
 
     ## Internal state of the object
@@ -102,7 +102,7 @@ class StudentModuleHistory(models.Model):
 
     HISTORY_SAVING_TYPES = {'problem'}
 
-    class Meta:
+    class Meta(object):  # pylint: disable=missing-docstring
         get_latest_by = "created"
 
     student_module = models.ForeignKey(StudentModule, db_index=True)
@@ -135,7 +135,7 @@ class XBlockFieldBase(models.Model):
     """
     Base class for all XBlock field storage.
     """
-    class Meta:
+    class Meta(object):  # pylint: disable=missing-docstring
         abstract = True
 
     # The name of the field
@@ -163,7 +163,7 @@ class XModuleUserStateSummaryField(XBlockFieldBase):
     Stores data set in the Scope.user_state_summary scope by an xmodule field
     """
 
-    class Meta:
+    class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('usage_id', 'field_name'),)
 
     # The definition id for the module
@@ -175,7 +175,7 @@ class XModuleStudentPrefsField(XBlockFieldBase):
     Stores data set in the Scope.preferences scope by an xmodule field
     """
 
-    class Meta:  # pylint: disable=missing-docstring
+    class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('student', 'module_type', 'field_name'),)
 
     # The type of the module for these preferences
@@ -189,7 +189,7 @@ class XModuleStudentInfoField(XBlockFieldBase):
     Stores data set in the Scope.preferences scope by an xmodule field
     """
 
-    class Meta:
+    class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('student', 'field_name'),)
 
     student = models.ForeignKey(User, db_index=True)
@@ -207,7 +207,7 @@ class OfflineComputedGrade(models.Model):
 
     gradeset = models.TextField(null=True, blank=True)		# grades, stored as JSON
 
-    class Meta:
+    class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('user', 'course_id'), )
 
     def __unicode__(self):
@@ -219,7 +219,7 @@ class OfflineComputedGradeLog(models.Model):
     Log of when offline grades are computed.
     Use this to be able to show instructor when the last computed grades were done.
     """
-    class Meta:
+    class Meta(object):  # pylint: disable=missing-docstring
         ordering = ["-created"]
         get_latest_by = "created"
 

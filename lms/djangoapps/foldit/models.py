@@ -83,7 +83,7 @@ class PuzzleComplete(models.Model):
     e.g. PuzzleID 1234, set 1, subset 3.  (Sets and subsets correspond to levels
     in the intro puzzles)
     """
-    class Meta:
+    class Meta(object):  # pylint: disable=missing-docstring
         # there should only be one puzzle complete entry for any particular
         # puzzle for any user
         unique_together = ('user', 'puzzle_id', 'puzzle_set', 'puzzle_subset')

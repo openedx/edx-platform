@@ -311,7 +311,7 @@ class TestPhotoVerification(TestCase):
 
         attempt.status = "approved"
         attempt.save()
-        assert_true(SoftwareSecurePhotoVerification.user_is_verified(user), status)
+        assert_true(SoftwareSecurePhotoVerification.user_is_verified(user), attempt.status)
 
     def test_user_has_valid_or_pending(self):
         """
