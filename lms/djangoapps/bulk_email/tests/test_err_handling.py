@@ -58,9 +58,6 @@ class TestEmailErrors(ModuleStoreTestCase):
             'success': True,
         }
 
-    def tearDown(self):
-        patch.stopall()
-
     @patch('bulk_email.tasks.get_connection', autospec=True)
     @patch('bulk_email.tasks.send_course_email.retry')
     def test_data_err_retry(self, retry, get_conn):

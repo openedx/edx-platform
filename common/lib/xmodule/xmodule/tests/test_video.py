@@ -642,6 +642,7 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
         """
         Overrides YOUTUBE and CONTENTSTORE settings
         """
+        super(VideoDescriptorIndexingTestCase, self).setUp()
         self.youtube_setting = getattr(settings, "YOUTUBE", None)
         self.contentstore_setting = getattr(settings, "CONTENTSTORE", None)
         settings.YOUTUBE = {

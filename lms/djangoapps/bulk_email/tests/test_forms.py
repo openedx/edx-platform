@@ -23,12 +23,6 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
         self.course = CourseFactory.create(display_name=course_title)
 
-    def tearDown(self):
-        """
-        Undo all patches.
-        """
-        patch.stopall()
-
     @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_authorize_mongo_course(self):
         # Initially course shouldn't be authorized

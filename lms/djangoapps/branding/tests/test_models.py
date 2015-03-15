@@ -11,6 +11,7 @@ class BrandingInfoConfigTest(TestCase):
     Test the BrandingInfoConfig model.
     """
     def setUp(self):
+        super(BrandingInfoConfigTest, self).setUp()
         self.configuration_string = """{
             "CN": {
                     "url": "http://www.xuetangx.com",

@@ -29,15 +29,12 @@ class MockCommentServiceServerTest(unittest.TestCase):
         self.expected_response = {'username': 'user100', 'external_id': '4'}
         self.server = MockCommentServiceServer(port_num=server_port,
                                                response=self.expected_response)
+        self.addCleanup(self.server.shutdown)
 
         # Start the server in a separate daemon thread
         server_thread = threading.Thread(target=self.server.serve_forever)
         server_thread.daemon = True
         server_thread.start()
-
-    def tearDown(self):
-        # Stop the server, freeing up the port
-        self.server.shutdown()
 
     def test_new_user_request(self):
         """

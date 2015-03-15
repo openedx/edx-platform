@@ -45,6 +45,7 @@ class RefundTests(ModuleStoreTestCase):
     def tearDown(self):
         self.course_mode.delete()
         Order.objects.filter(user=self.student).delete()
+        super(RefundTests, self).tearDown()
 
     def _enroll(self, purchase=True):
         # pylint: disable=missing-docstring

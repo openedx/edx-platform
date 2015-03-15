@@ -4,7 +4,6 @@ Unit tests for Ecommerce feature flag in new instructor dashboard.
 
 import datetime
 
-from mock import patch
 import pytz
 
 from django.core.urlresolvers import reverse
@@ -37,12 +36,6 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         self.e_commerce_link = '<a href="" data-section="e-commerce">E-Commerce</a>'
         CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
-
-    def tearDown(self):
-        """
-        Undo all patches.
-        """
-        patch.stopall()
 
     def test_pass_e_commerce_tab_in_instructor_dashboard(self):
         """

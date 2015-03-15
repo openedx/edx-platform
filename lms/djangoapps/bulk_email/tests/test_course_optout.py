@@ -18,7 +18,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
 class TestOptoutCourseEmails(ModuleStoreTestCase):
-
     """
     Test that optouts are referenced in sending course email.
     """
@@ -41,12 +40,6 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
             'course_id': self.course.id.to_deprecated_string(),
             'success': True,
         }
-
-    def tearDown(self):
-        """
-        Undo all patches.
-        """
-        patch.stopall()
 
     def navigate_to_email_view(self):
         """Navigate to the instructor dash's email view"""

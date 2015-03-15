@@ -176,6 +176,7 @@ class GroupAccessTestCase(ModuleStoreTestCase):
         side-effects in other tests.
         """
         UserPartition.scheme_extensions = None
+        super(GroupAccessTestCase, self).tearDown()
 
     def check_access(self, user, block_location, is_accessible):
         """

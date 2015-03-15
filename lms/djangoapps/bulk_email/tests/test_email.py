@@ -84,12 +84,6 @@ class EmailSendFromDashboardTestCase(ModuleStoreTestCase):
             'success': True,
         }
 
-    def tearDown(self):
-        """
-        Undo all patches.
-        """
-        patch.stopall()
-
 
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))

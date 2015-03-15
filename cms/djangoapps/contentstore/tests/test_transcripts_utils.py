@@ -112,8 +112,9 @@ class TestSaveSubsToStore(ModuleStoreTestCase):
         self.subs_id = str(uuid4())
         filename = 'subs_{0}.srt.sjson'.format(self.subs_id)
         self.content_location = StaticContent.compute_location(self.course.id, filename)
+        self.addCleanup(self.clear_subs_content)
 
-        # incorrect  subs
+        # incorrect subs
         self.unjsonable_subs = set([1])  # set can't be serialized
 
         self.unjsonable_subs_id = str(uuid4())
@@ -149,9 +150,6 @@ class TestSaveSubsToStore(ModuleStoreTestCase):
 
         with self.assertRaises(NotFoundError):
             contentstore().find(self.content_location_unjsonable)
-
-    def tearDown(self):
-        self.clear_subs_content()
 
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)

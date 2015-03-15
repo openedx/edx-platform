@@ -154,6 +154,7 @@ class TestVideo(BaseTestXmodule):
 
     def tearDown(self):
         _clear_assets(self.item_descriptor.location)
+        super(TestVideo, self).tearDown()
 
 
 class TestTranscriptAvailableTranslationsDispatch(TestVideo):
