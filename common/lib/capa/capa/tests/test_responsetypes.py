@@ -41,7 +41,6 @@ from capa.tests.response_xml_factory import (
     TrueFalseResponseXMLFactory,
 )
 from capa.util import convert_files_to_filenames
-from capa.util import compare_with_tolerance
 from capa.xqueue_interface import dateformat
 
 

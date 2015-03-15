@@ -9,10 +9,8 @@ import StringIO
 from textwrap import dedent
 
 from django.conf import settings
-from django.test.utils import override_settings
 
 from course_modes.models import CourseMode
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from shoppingcart.models import (Order, CertificateItem, PaidCourseRegistration, PaidCourseRegistrationAnnotation,
                                  CourseRegCodeItemAnnotation)
 from shoppingcart.views import initialize_report

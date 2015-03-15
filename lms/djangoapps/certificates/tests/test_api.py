@@ -4,7 +4,7 @@ import ddt
 
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
-from mock import patch, Mock
+from mock import patch
 
 from opaque_keys.edx.locator import CourseLocator
 from xmodule.modulestore.tests.factories import CourseFactory

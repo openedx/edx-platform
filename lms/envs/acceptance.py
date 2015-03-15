@@ -24,7 +24,6 @@ logging.getLogger().setLevel(logging.ERROR)
 
 import os
 from random import choice
-import string
 
 
 def seed():

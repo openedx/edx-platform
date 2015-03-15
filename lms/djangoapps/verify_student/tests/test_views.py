@@ -5,7 +5,6 @@ Tests of verify_student views.
 import json
 import mock
 import urllib
-import decimal
 from mock import patch, Mock
 import pytz
 from datetime import timedelta, datetime

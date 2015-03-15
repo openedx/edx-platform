@@ -14,7 +14,6 @@ from django.core.management.base import CommandError
 from django.test.utils import override_settings
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 import dashboard.git_import as git_import
 from dashboard.git_import import GitImportError
 from xmodule.modulestore import ModuleStoreEnum

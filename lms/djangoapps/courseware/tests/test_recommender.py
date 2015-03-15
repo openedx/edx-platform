@@ -8,12 +8,10 @@ import StringIO
 from ddt import ddt, data
 from copy import deepcopy
 
-from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.factories import GlobalStaffFactory

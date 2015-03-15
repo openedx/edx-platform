@@ -4,7 +4,6 @@ Python tests for the Survey models
 
 from collections import OrderedDict
 
-from django.test import TestCase
 from django.test.client import Client
 from django.contrib.auth.models import User
 

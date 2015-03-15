@@ -5,7 +5,6 @@ import unittest
 import ddt
 from mock import patch
 from pytz import UTC
-from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.conf import settings
 

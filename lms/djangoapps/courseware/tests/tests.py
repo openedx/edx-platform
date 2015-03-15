@@ -5,7 +5,6 @@ from textwrap import dedent
 from unittest import TestCase
 
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 import mock
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 

@@ -1,12 +1,11 @@
 """Tests for items views."""
 
-import os
-import json
-import tempfile
-from uuid import uuid4
 import copy
+import json
+import os
+import tempfile
 import textwrap
-from pymongo import MongoClient
+from uuid import uuid4
 
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings

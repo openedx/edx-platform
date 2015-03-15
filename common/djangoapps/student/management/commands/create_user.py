@@ -9,7 +9,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.forms import AccountCreationForm
-from student.models import CourseEnrollment, Registration, create_comments_service_user
+from student.models import CourseEnrollment, create_comments_service_user
 from student.views import _do_create_account, AccountValidationError
 from track.management.tracked_command import TrackedCommand
 

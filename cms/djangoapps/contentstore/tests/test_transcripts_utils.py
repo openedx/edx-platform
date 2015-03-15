@@ -6,8 +6,6 @@ import copy
 import textwrap
 from mock import patch, Mock
 
-from pymongo import MongoClient
-
 from django.test.utils import override_settings
 from django.conf import settings
 from django.utils import translation

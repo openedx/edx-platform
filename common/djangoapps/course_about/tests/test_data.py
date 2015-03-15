@@ -3,13 +3,10 @@ Tests specific to the Data Aggregation Layer of the Course About API.
 
 """
 import unittest
-from django.test.utils import override_settings
 from datetime import datetime
 from django.conf import settings
 from nose.tools import raises
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase, mixed_store_config
-)
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory
 from course_about import data

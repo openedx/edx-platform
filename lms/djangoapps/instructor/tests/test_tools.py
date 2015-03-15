@@ -8,11 +8,9 @@ import mock
 import json
 import unittest
 
-from django.test.utils import override_settings
 from django.utils.timezone import utc
 
 from courseware.models import StudentModule
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from student.tests.factories import UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

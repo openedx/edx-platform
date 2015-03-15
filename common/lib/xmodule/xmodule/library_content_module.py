@@ -4,8 +4,6 @@ LibraryContent: The XBlock used to include blocks from a library in a course.
 """
 import json
 from lxml import etree
-from bson.objectid import ObjectId, InvalidId
-from collections import namedtuple
 from copy import copy
 from capa.responsetypes import registry
 from gettext import ngettext

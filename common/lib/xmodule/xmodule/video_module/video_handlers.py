@@ -4,7 +4,7 @@ Handlers for video module.
 StudentViewHandlers are handlers for video module instance.
 StudioViewHandlers are handlers for video descriptor instance.
 """
-import os
+
 import json
 import logging
 from webob import Response

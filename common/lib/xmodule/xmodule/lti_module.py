@@ -69,7 +69,6 @@ from xml.sax.saxutils import escape
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.x_module import XModule, module_attr
-from xmodule.course_module import CourseDescriptor
 from xmodule.lti_2_util import LTI20ModuleMixin, LTIError
 from pkg_resources import resource_string
 from xblock.core import String, Scope, List, XBlock

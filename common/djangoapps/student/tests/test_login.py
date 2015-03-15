@@ -6,7 +6,6 @@ import unittest
 
 from django.test import TestCase
 from django.test.client import Client
-from django.test.utils import override_settings
 from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse, NoReverseMatch
@@ -20,7 +19,7 @@ from student.tests.factories import UserFactory, RegistrationFactory, UserProfil
 from student.views import login_oauth_token
 
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MOCK_MODULESTORE
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class LoginTest(TestCase):

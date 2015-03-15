@@ -1,9 +1,9 @@
 import json
-from textwrap import dedent
-from xmodule.modulestore.xml import XMLModuleStore
-from xmodule.tests import DATA_DIR, get_test_system
-
 from StringIO import StringIO
+
+from xmodule.modulestore.xml import XMLModuleStore
+from xmodule.tests import DATA_DIR
+
 
 OPEN_ENDED_GRADING_INTERFACE = {
     'url': 'blah/',

@@ -18,8 +18,6 @@ from pytz import UTC
 import uuid
 from collections import defaultdict, OrderedDict
 import dogstats_wrapper as dog_stats_api
-from django.db.models import Q
-import pytz
 from urllib import urlencode
 
 from django.utils.translation import ugettext as _, ugettext_lazy
@@ -28,7 +26,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.signals import user_logged_in, user_logged_out
-from django.db import models, IntegrityError, transaction
+from django.db import models, IntegrityError
 from django.db.models import Count
 from django.dispatch import receiver, Signal
 from django.core.exceptions import ObjectDoesNotExist
@@ -40,8 +38,6 @@ from eventtracking import tracker
 from importlib import import_module
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.modulestore import Location
-from opaque_keys import InvalidKeyError
 
 import lms.lib.comment_client as cc
 from util.query import use_read_replica_if_available
@@ -53,8 +49,6 @@ from functools import total_ordering
 
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
-
-from ratelimitbackend import admin
 
 import analytics
 

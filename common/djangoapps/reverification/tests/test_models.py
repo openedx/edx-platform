@@ -5,9 +5,7 @@ from datetime import timedelta, datetime
 import pytz
 
 from django.core.exceptions import ValidationError
-from django.test.utils import override_settings
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from reverification.models import MidcourseReverificationWindow
 from reverification.tests.factories import MidcourseReverificationWindowFactory
 from xmodule.modulestore.tests.factories import CourseFactory

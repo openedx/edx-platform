@@ -34,7 +34,7 @@ from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.urlresolvers import reverse
 
 from bulk_email.models import (
-    CourseEmail, Optout, CourseEmailTemplate,
+    CourseEmail, Optout,
     SEND_TO_MYSELF, SEND_TO_ALL, TO_OPTIONS,
     SEND_TO_STAFF,
 )

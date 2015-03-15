@@ -3,11 +3,9 @@ E-commerce Tab Instructor Dashboard Coupons Operations views
 """
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q
 from django.views.decorators.http import require_POST
 from django.utils.translation import ugettext as _
 from util.json_request import JsonResponse
-from django.http import HttpResponse, HttpResponseNotFound
 from shoppingcart.models import Coupon, CourseRegistrationCode
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 import datetime

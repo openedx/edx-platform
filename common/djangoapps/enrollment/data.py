@@ -7,11 +7,15 @@ import logging
 from django.contrib.auth.models import User
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
-from enrollment.errors import CourseNotFoundError, CourseEnrollmentClosedError, CourseEnrollmentFullError, \
-    CourseEnrollmentExistsError, UserNotFoundError
+from enrollment.errors import (
+    CourseNotFoundError, CourseEnrollmentClosedError, CourseEnrollmentFullError,
+    CourseEnrollmentExistsError, UserNotFoundError,
+)
 from enrollment.serializers import CourseEnrollmentSerializer, CourseField
-from student.models import CourseEnrollment, NonExistentCourseError, CourseEnrollmentException, EnrollmentClosedError, \
-    CourseFullError, AlreadyEnrolledError
+from student.models import (
+    CourseEnrollment, NonExistentCourseError, EnrollmentClosedError,
+    CourseFullError, AlreadyEnrolledError,
+)
 
 log = logging.getLogger(__name__)
 

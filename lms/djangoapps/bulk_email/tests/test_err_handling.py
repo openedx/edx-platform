@@ -5,7 +5,6 @@ Unit tests for handling email sending errors
 from itertools import cycle
 
 from celery.states import SUCCESS, RETRY
-from django.test.utils import override_settings
 from django.conf import settings
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
@@ -16,7 +15,6 @@ from smtplib import SMTPDataError, SMTPServerDisconnected, SMTPConnectError
 
 from bulk_email.models import CourseEmail, SEND_TO_ALL
 from bulk_email.tasks import perform_delegate_email_batches, send_course_email
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from instructor_task.models import InstructorTask
 from instructor_task.subtasks import (
     initialize_subtask_info,

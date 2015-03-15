@@ -1,15 +1,13 @@
 """
 Test the course_info xblock
 """
-from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 import mock
+
+from django.core.urlresolvers import reverse
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MOCK_MODULESTORE, TEST_DATA_MIXED_CLOSED_MODULESTORE
-)
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_CLOSED_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from .helpers import LoginEnrollmentTestCase

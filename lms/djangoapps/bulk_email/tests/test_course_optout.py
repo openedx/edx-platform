@@ -9,9 +9,7 @@ from django.core import mail
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
 from django.conf import settings
-from django.test.utils import override_settings
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

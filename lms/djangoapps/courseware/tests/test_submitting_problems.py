@@ -10,7 +10,6 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
-from django.test.utils import override_settings
 from mock import patch
 
 from capa.tests.response_xml_factory import (
@@ -20,7 +19,6 @@ from capa.tests.response_xml_factory import (
 from courseware import grades
 from courseware.models import StudentModule
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from student.tests.factories import UserFactory
 from student.models import anonymous_id_for_user

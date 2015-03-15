@@ -1,18 +1,20 @@
 """
 Tests for branding page
 """
+
 import datetime
+
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.http import HttpResponseRedirect
 from django.test.utils import override_settings
 from django.test.client import RequestFactory
+
 from pytz import UTC
 from mock import patch, Mock
 from edxmako.shortcuts import render_to_response
 
 from branding.views import index
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from edxmako.tests import mako_middleware_process_request
 import student.views
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

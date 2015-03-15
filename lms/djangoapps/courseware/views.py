@@ -28,7 +28,6 @@ from edxmako.shortcuts import render_to_response, render_to_string, marketing_li
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.db import transaction
-from functools import wraps
 from markupsafe import escape
 
 from courseware import grades

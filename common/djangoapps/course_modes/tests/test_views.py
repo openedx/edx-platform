@@ -3,14 +3,11 @@ import decimal
 import ddt
 from mock import patch
 from django.conf import settings
-from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from pytz import timezone
 from datetime import datetime
 
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase, mixed_store_config
-)
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from util.date_utils import get_time_display
 from util.testing import UrlResetMixin

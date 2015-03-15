@@ -1,12 +1,13 @@
 # This class gives a common interface for logging into the grading controller
-import json
+
 import logging
+
 import requests
 import dogstats_wrapper as dog_stats_api
+from lxml import etree
 from requests.exceptions import RequestException, ConnectionError, HTTPError
 
 from .combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError
-from lxml import etree
 
 log = logging.getLogger(__name__)
 

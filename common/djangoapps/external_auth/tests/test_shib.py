@@ -21,7 +21,6 @@ from external_auth.views import (
 )
 from mock import patch
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from student.views import create_account, change_enrollment
 from student.models import UserProfile, CourseEnrollment
 from student.tests.factories import UserFactory

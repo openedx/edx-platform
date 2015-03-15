@@ -6,7 +6,6 @@ import ddt
 from mock import Mock
 from xblock.core import XBlock
 
-from django.test import TestCase
 from django.test.client import RequestFactory
 
 from xblock.core import XBlockAside

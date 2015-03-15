@@ -9,12 +9,10 @@ from abc import ABCMeta
 from courseware.models import StudentModule
 from django.conf import settings
 from django.test import TestCase
-from django.test.utils import override_settings
 from django.utils.translation import get_language
 from django.utils.translation import override as override_language
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from instructor.enrollment import (

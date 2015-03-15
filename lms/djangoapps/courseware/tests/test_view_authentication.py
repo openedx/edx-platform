@@ -2,12 +2,10 @@ import datetime
 import pytz
 
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 from mock import patch
 
 from courseware.access import has_access
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from courseware.tests.factories import (
     BetaTesterFactory,
     StaffFactory,
