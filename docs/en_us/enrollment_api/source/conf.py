@@ -7,6 +7,37 @@
 import os
 from path import path
 import sys
+import mock
+
+MOCK_MODULES = [
+    'ipware',
+    'ip',
+    'ipware.ip',
+    'get_ip',
+    'pygeoip',
+    'ipaddr',
+    'django_countries',
+    'fields',
+    'django_countries.fields',
+    'opaque_keys',
+    'opaque_keys.edx',
+    'opaque_keys.edx.keys',
+    'CourseKey',
+    'UsageKey',
+    'BlockTypeKey',
+    'opaque_keys.edx.locations',
+    'SlashSeparatedCourseKey',
+    'Location',
+    'opaque_keys.edx.locator',
+    'Locator',
+    'south',
+    'modelsinspector',
+    'south.modelsinspector',
+    'add_introspection_rules'
+]
+
+for mod_name in MOCK_MODULES:
+    sys.modules[mod_name] = mock.Mock()
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
