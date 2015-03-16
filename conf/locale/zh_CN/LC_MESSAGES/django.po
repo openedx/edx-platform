@@ -213,7 +213,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-03-02 19:02+0000\n"
+"POT-Creation-Date: 2015-03-16 14:11+0000\n"
 "PO-Revision-Date: 2015-01-18 09:50+0000\n"
 "Last-Translator: 汤和果 <hgtang93@163.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)\n"
@@ -270,15 +270,6 @@ msgstr ""
 msgid "Unit"
 msgstr "单元"
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This is the status for a video that the servers have
-#. successfully processed
-#: cms/djangoapps/contentstore/views/videos.py
-#: lms/djangoapps/instructor/views/instructor_task_helpers.py
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid "Complete"
-msgstr "已完成"
-
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/instructor/views/api.py lms/templates/help_modal.html
@@ -300,6 +291,55 @@ msgstr "状态"
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
 msgstr "诚信准则证书"
+
+#: common/djangoapps/course_modes/models.py
+msgid "Your verification is pending"
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid "Verified: Pending Verification"
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid "ID verification pending"
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid "You're enrolled as a verified student"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Verified"
+msgstr "已验证"
+
+#: common/djangoapps/course_modes/models.py
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "ID Verified Ribbon/Badge"
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid "You're enrolled as an honor code student"
+msgstr ""
+
+#: lms/templates/static_templates/honor.html
+msgid "Honor Code"
+msgstr "诚信准则"
+
+#: common/djangoapps/course_modes/models.py
+msgid "You're auditing this course"
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid "Auditing"
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid "You're enrolled as a professional education student"
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid "Professional Ed"
+msgstr ""
 
 #: common/djangoapps/course_modes/views.py
 msgid "Enrollment is closed"
@@ -1075,7 +1115,7 @@ msgid "Maximum upload file size is {file_size} bytes."
 msgstr ""
 
 #: common/djangoapps/util/milestones_helpers.py
-msgid "Course {} requires {}"
+msgid "Course {course_id} requires {prerequisite_course_id}"
 msgstr ""
 
 #: common/djangoapps/util/milestones_helpers.py
@@ -2098,6 +2138,16 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the URL for the official course Facebook group. If you provide a URL, "
+"the mobile app includes a button that students can tap to access the group."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Facebook URL"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Not Graded"
 msgstr ""
 
@@ -2483,6 +2533,20 @@ msgstr ""
 msgid "Certificate Name (Long)"
 msgstr ""
 
+#. Translators: This field is the container for course-specific certifcate
+#. configuration values
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Certificate Web/HTML View Overrides"
+msgstr ""
+
+#. Translators: These overrides allow for an alternative configuration of the
+#. certificate web view
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter course-specific overrides for the Web/HTML template parameters here "
+"(JSON format)"
+msgstr ""
+
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "CSS Class for Course Reruns"
 msgstr ""
@@ -2597,6 +2661,7 @@ msgid "Both"
 msgstr ""
 
 #: lms/templates/footer-edx-new.html lms/templates/footer.html
+#: lms/templates/certificates/valid.html
 #: lms/templates/static_templates/about.html
 msgid "About"
 msgstr "关于我们"
@@ -2802,17 +2867,16 @@ msgid "Any Type"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/library_content_module.py
-msgid "\"{value}\" is not a valid library ID."
+#: cms/templates/widgets/header.html
+msgid "Library"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/library_content_module.py
-#: cms/templates/index.html
-msgid "Libraries"
+msgid "Select the library from which you want to draw content."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/library_content_module.py
-msgid ""
-"Enter a library ID for each library from which you want to draw content."
+msgid "Library Version"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -2857,6 +2921,10 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/library_content_module.py
+msgid "Course does not support Library tools."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/library_content_module.py
 msgid "This component is out of date. The library has new content."
 msgstr ""
 
@@ -2897,9 +2965,8 @@ msgid "Select another problem type."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/library_content_module.py
-msgid "The specified libraries are configured to fetch {count} problem, "
-msgid_plural ""
-"The specified libraries are configured to fetch {count} problems, "
+msgid "The specified library is configured to fetch {count} problem, "
+msgid_plural "The specified library is configured to fetch {count} problems, "
 msgstr[0] ""
 
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -2909,6 +2976,14 @@ msgstr[0] ""
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Edit the library configuration."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid "Invalid Library"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid "No Library Selected"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/library_root_xblock.py
@@ -4038,6 +4113,224 @@ msgstr ""
 msgid "Copyright"
 msgstr "版权"
 
+#: lms/djangoapps/certificates/models.py
+msgid ""
+"A human-readable description of the example certificate.  For example, "
+"'verified' or 'honor' to differentiate between two types of certificates."
+msgstr ""
+
+#: lms/djangoapps/certificates/models.py
+msgid ""
+"A unique identifier for the example certificate.  This is used when we "
+"receive a response from the queue to determine which example certificate was"
+" processed."
+msgstr ""
+
+#: lms/djangoapps/certificates/models.py
+msgid ""
+"An access key for the example certificate.  This is used when we receive a "
+"response from the queue to validate that the sender is the same entity we "
+"asked to generate the certificate."
+msgstr ""
+
+#: lms/djangoapps/certificates/models.py
+msgid "The full name that will appear on the certificate."
+msgstr ""
+
+#: lms/djangoapps/certificates/models.py
+msgid "The template file to use when generating the certificate."
+msgstr ""
+
+#: lms/djangoapps/certificates/models.py
+msgid "The status of the example certificate."
+msgstr ""
+
+#: lms/djangoapps/certificates/models.py
+msgid "The reason an error occurred during certificate generation."
+msgstr ""
+
+#: lms/djangoapps/certificates/models.py
+msgid "The download URL for the generated certificate."
+msgstr ""
+
+#. Translators: This line appears on the certificate after the name of a
+#. course, and provides more
+#. information about the organizations providing the course material to
+#. platform users
+#: lms/djangoapps/certificates/views.py
+msgid "a course of study offered by {partner_name}, through {platform_name}."
+msgstr ""
+
+#: lms/djangoapps/certificates/views.py
+msgid "More Information About {user_name}'s Certificate:"
+msgstr ""
+
+#. Translators:  This line appears on the page just before the generation date
+#. for the certificate
+#: lms/djangoapps/certificates/views.py
+msgid "Issued On:"
+msgstr ""
+
+#. Translators:  The format of the date includes the full name of the month
+#: lms/djangoapps/certificates/views.py
+msgid "{month} {day}, {year}"
+msgstr ""
+
+#. Translators:  The Certificate ID Number is an alphanumeric value unique to
+#. each individual certificate
+#: lms/djangoapps/certificates/views.py
+msgid "Certificate ID Number"
+msgstr ""
+
+#: lms/djangoapps/certificates/views.py
+msgid "About {platform_name} Certificates"
+msgstr ""
+
+#. Translators: This text describes the purpose (and therefore, value) of a
+#. course certificate
+#. 'verifying your identity' refers to the process for establishing the
+#. authenticity of the student
+#: lms/djangoapps/certificates/views.py
+msgid ""
+"{platform_name} acknowledges achievements through certificates, which are "
+"awarded for various activities {platform_name} students complete under the "
+"<a href='{tos_url}'>{platform_name} Honor Code</a>.  Some certificates "
+"require completing additional steps, such as <a href='{verified_cert_url}'> "
+"verifying your identity</a>."
+msgstr ""
+
+#. Translators:  Certificate Types correspond to the different enrollment
+#. options available for a given course
+#: lms/djangoapps/certificates/views.py
+msgid "{certificate_type} Certfificate"
+msgstr ""
+
+#: lms/djangoapps/certificates/views.py
+msgid "How {platform_name} Validates Student Certificates"
+msgstr ""
+
+#. Translators:  This text describes the validation mechanism for a
+#. certificate file (known as GPG security)
+#: lms/djangoapps/certificates/views.py
+msgid ""
+"Certificates issued by {platform_name} are signed by a gpg key so that they "
+"can be validated independently by anyone with the {platform_name} public "
+"key. For independent verification, {platform_name} uses what is called a "
+"\"detached signature\"&quot;\"."
+msgstr ""
+
+#: lms/djangoapps/certificates/views.py
+msgid "Validate this certificate for yourself"
+msgstr ""
+
+#. Translators:  This text describes (at a high level) the mission and charter
+#. the edX platform and organization
+#: lms/djangoapps/certificates/views.py
+msgid ""
+"{platform_name} offers interactive online classes and MOOCs from the world's"
+" best universities, including MIT, Harvard, Berkeley, University of Texas, "
+"and many others.  {platform_name} is a non-profit online initiative created "
+"by founding partners Harvard and MIT."
+msgstr ""
+
+#: lms/djangoapps/certificates/views.py
+msgid "About {platform_name}"
+msgstr ""
+
+#: lms/djangoapps/certificates/views.py
+msgid "Learn more about {platform_name}"
+msgstr ""
+
+#: lms/djangoapps/certificates/views.py
+msgid "Learn with {platform_name}"
+msgstr ""
+
+#: lms/djangoapps/certificates/views.py
+msgid "Work at {platform_name}"
+msgstr ""
+
+#: lms/djangoapps/certificates/views.py
+msgid "Contact {platform_name}"
+msgstr ""
+
+#: cms/templates/widgets/footer.html lms/templates/footer-edx-new.html
+#: lms/templates/footer.html lms/templates/static_templates/privacy.html
+msgid "Privacy Policy"
+msgstr "隐私政策"
+
+#: lms/djangoapps/certificates/views.py
+msgid "Terms of Service &amp; Honor Code"
+msgstr ""
+
+#. Translators:  This text appears near the top of the certficate and
+#. describes the guarantee provided by edX
+#: lms/djangoapps/certificates/views.py
+msgid "{platform_name} acknowledges the following student accomplishment"
+msgstr ""
+
+#: lms/djangoapps/certificates/views.py
+msgid "Certificate Validation"
+msgstr ""
+
+#. Translators:  This text describes the 'Honor' course certificate type.
+#: lms/djangoapps/certificates/views.py
+msgid ""
+"An {cert_type} Certificate signifies that an {platform_name} learner has "
+"agreed to abide by {platform_name}'s honor code and completed all of the "
+"required tasks for this course under its guidelines."
+msgstr ""
+
+#. Translators:  This text describes the 'ID Verified' course certificate
+#. type, which is a higher level of
+#. verification offered by edX.  This type of verification is useful for
+#. professional education/certifications
+#: lms/djangoapps/certificates/views.py
+msgid ""
+"An {cert_type} Certificate signifies that an {platform_name} learner has "
+"agreed to abide by {platform_name}'s honor code and completed all of the "
+"required tasks for this course under its guidelines, as well as having their"
+" photo ID checked to verify their identity."
+msgstr ""
+
+#. Translators:  This text describes the 'XSeries' course certificate type.
+#. An XSeries is a collection of
+#. courses related to each other in a meaningful way, such as a specific topic
+#. or theme, or even an organization
+#: lms/djangoapps/certificates/views.py
+msgid ""
+"An {cert_type} Certificate demonstrates a high level of achievement in a "
+"program of study, and includes verification of the student's identity."
+msgstr ""
+
+#. Translators:  This is the copyright line which appears at the bottom of the
+#. certificate page/screen
+#: lms/djangoapps/certificates/views.py
+msgid "&copy; {year} {platform_name}. All rights reserved."
+msgstr ""
+
+#. Translators:  This text represents the verification of the certificate
+#: lms/djangoapps/certificates/views.py
+msgid ""
+"This is a valid {platform_name} certificate for {user_name}, who "
+"participated in {partner_name} {course_number}"
+msgstr ""
+
+#. Translators:  This text is bound to the HTML 'title' element of the page
+#. and appears in the browser title bar
+#: lms/djangoapps/certificates/views.py
+msgid "Valid {partner_name} {course_number} Certificate | {platform_name}"
+msgstr ""
+
+#. Translators:  This text fragment appears after the student's name
+#. (displayed in a large font) on the certificate
+#. screen.  The text describes the accomplishment represented by the
+#. certificate information displayed to the user
+#: lms/djangoapps/certificates/views.py
+msgid ""
+"successfully completed, received a passing grade, and was awarded a "
+"{platform_name} {certificate_type} Certificate of Completion in "
+msgstr ""
+
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/legacy.py
@@ -4090,8 +4383,8 @@ msgid "Course page automatically created."
 msgstr "课程网页已经自动创建"
 
 #: lms/djangoapps/course_wiki/views.py
-msgid "Welcome to the edX Wiki"
-msgstr "欢迎访问edX Wiki"
+msgid "Welcome to the {platform_name} Wiki"
+msgstr ""
 
 #: lms/djangoapps/course_wiki/views.py
 msgid "Visit a course wiki to add an article."
@@ -4507,6 +4800,22 @@ msgstr ""
 msgid "No endpoint was provided for EdxNotes."
 msgstr ""
 
+#: lms/djangoapps/instructor/tests/test_api.py
+#: lms/djangoapps/instructor/views/instructor_task_helpers.py
+#: lms/templates/verify_student/midcourse_reverify_dash.html
+msgid "Complete"
+msgstr "已完成"
+
+#: lms/djangoapps/instructor/tests/test_api.py
+#: lms/djangoapps/instructor/views/api.py
+msgid "This student (%s) will skip the entrance exam."
+msgstr ""
+
+#: lms/djangoapps/instructor/tests/test_api.py
+#: lms/djangoapps/instructor/views/api.py
+msgid "This student (%s) is already allowed to skip the entrance exam."
+msgstr ""
+
 #: lms/djangoapps/instructor/views/api.py
 msgid "User does not exist."
 msgstr "该用户不存在。"
@@ -4781,6 +5090,10 @@ msgstr ""
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "E-Commerce"
 msgstr ""
+
+#: cms/templates/export.html
+msgid "Certificates"
+msgstr "证书"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Please Enter the numeric value for the course price"
@@ -5111,6 +5424,20 @@ msgid "Problem successfully {action} for student '{student}'"
 msgstr "学生'{student}'的问题{action}成功"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
+#. {student} is a student identifier.
+#: lms/djangoapps/instructor_task/views.py
+msgid ""
+"Unable to find entrance exam submission to be {action} for student "
+"'{student}'"
+msgstr ""
+
+#. Translators: {action} is a past-tense verb that is localized separately.
+#. {student} is a student identifier.
+#: lms/djangoapps/instructor_task/views.py
+msgid "Entrance exam successfully {action} for student '{student}'"
+msgstr ""
+
+#. Translators: {action} is a past-tense verb that is localized separately.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Unable to find any students with submissions to be {action}"
 msgstr "无法找到任何为{action}提交的学生"
@@ -5173,6 +5500,17 @@ msgstr "(忽略 {skipped})"
 #: lms/djangoapps/instructor_task/views.py
 msgid " (out of {total})"
 msgstr "( ／{total}  )"
+
+#: lms/djangoapps/lms_xblock/mixin.py
+msgid "Whether to display this module in the table of contents"
+msgstr ""
+
+#. Translators: "TOC" stands for "Table of Contents"
+#: lms/djangoapps/lms_xblock/mixin.py
+msgid ""
+"What format this module is in (used for deciding which grader to apply, and "
+"what to show in the TOC)"
+msgstr ""
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "Courseware Chrome"
@@ -5410,16 +5748,16 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
-"You have up to two weeks into the course to unenroll from the Verified "
-"Certificate option and receive a full refund. To receive your refund, "
-"contact {billing_email}. Please include your order number in your email. "
-"Please do NOT include your credit card information."
+"If you haven't verified your identity yet, please start the verification "
+"process ({verification_url})."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
-"If you haven't verified your identity yet, please start the verification "
-"process ({verification_url})."
+"You have up to two weeks into the course to unenroll and receive a full "
+"refund.To receive your refund, contact {billing_email}. Please include your "
+"order number in your email. Please do NOT include your credit card "
+"information."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
@@ -6248,8 +6586,8 @@ msgid "Selected price is not valid number."
 msgstr "选择的价格不是有效数字。"
 
 #: lms/djangoapps/verify_student/views.py
-msgid "This course doesn't support verified certificates"
-msgstr "本课程不支持认证证书。"
+msgid "This course doesn't support paid certificates"
+msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
 msgid "No selected price or selected price is below minimum."
@@ -6281,6 +6619,10 @@ msgstr ""
 
 #: lms/envs/common.py
 msgid "Taiwan"
+msgstr ""
+
+#: lms/lib/courseware_search/lms_result_processor.py
+msgid "(Unnamed)"
 msgstr ""
 
 #: lms/templates/main_django.html cms/templates/base.html
@@ -6992,11 +7334,6 @@ msgstr "国家"
 msgid "Please select your Country."
 msgstr ""
 
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/static_templates/honor.html
-msgid "Honor Code"
-msgstr "诚信准则"
-
 #: lms/templates/footer-edx-new.html
 msgid "Terms of Service and Honor Code"
 msgstr "服务条款和诚信准则"
@@ -7014,11 +7351,11 @@ msgstr ""
 msgid "Terms of Service"
 msgstr "服务条款"
 
-#: openedx/core/djangoapps/user_api/accounts/views.py
+#: openedx/core/djangoapps/user_api/accounts/api.py
 msgid "Field '{field_name}' cannot be edited."
 msgstr ""
 
-#: openedx/core/djangoapps/user_api/accounts/views.py
+#: openedx/core/djangoapps/user_api/accounts/api.py
 msgid "Value '{field_value}' is not valid for field '{field_name}'."
 msgstr ""
 
@@ -7181,6 +7518,10 @@ msgstr ""
 msgid "This content group is in use and cannot be deleted."
 msgstr ""
 
+#: cms/djangoapps/contentstore/views/entrance_exam.py
+msgid "Entrance Exam - Subsection"
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
 msgstr "课程成功被导出到Git源"
@@ -7202,8 +7543,8 @@ msgid "File upload corrupted. Please try again"
 msgstr "文件上传失败，请重试。"
 
 #: cms/djangoapps/contentstore/views/import_export.py
-msgid "Could not find the course.xml file in the package."
-msgstr "在包中未找到course.xml文件。"
+msgid "Could not find the {0} file in the package."
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Invalid data"
@@ -7220,6 +7561,10 @@ msgstr "'{0}'副本"
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Duplicate of '{0}'"
 msgstr "'{0}'副本"
+
+#: cms/djangoapps/contentstore/views/item.py
+msgid "Students must score {score}% or higher to access course materials."
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "{section_or_subsection} \"{display_name}\""
@@ -7287,6 +7632,12 @@ msgstr "上传中"
 #. processing
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "In Progress"
+msgstr ""
+
+#. Translators: This is the status for a video that the servers have
+#. successfully processed
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Ready"
 msgstr ""
 
 #: lms/templates/verify_student/midcourse_reverify_dash.html
@@ -7533,10 +7884,9 @@ msgstr "本账号已经被激活"
 msgid "Visit your {link_start}dashboard{link_end} to see your courses."
 msgstr "访问您的{link_start}控制面板{link_end}来查看您的课程。"
 
-#: cms/templates/widgets/footer.html lms/templates/footer-edx-new.html
-#: lms/templates/footer.html lms/templates/static_templates/privacy.html
-msgid "Privacy Policy"
-msgstr "隐私政策"
+#: cms/templates/widgets/header.html lms/templates/courseware/courseware.html
+msgid "Course Navigation"
+msgstr "课程导航"
 
 #: cms/templates/widgets/header.html lms/templates/help_modal.html
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
@@ -7853,6 +8203,7 @@ msgid "Due:"
 msgstr "截止时间："
 
 #: lms/templates/folditbasic.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Status:"
 msgstr "状态："
 
@@ -8882,6 +9233,10 @@ msgid "Textbook Navigation"
 msgstr "课本导航"
 
 #: lms/templates/staticbook.html
+msgid "Page"
+msgstr ""
+
+#: lms/templates/staticbook.html
 msgid "Previous page"
 msgstr "上一页"
 
@@ -9332,6 +9687,37 @@ msgstr "计算"
 msgid "Calculator Output Field"
 msgstr "计算器输出项"
 
+#: lms/templates/certificates/invalid.html
+msgid "This is an invalid edX certificate number"
+msgstr ""
+
+#: lms/templates/certificates/invalid.html
+msgid ""
+"Please check the number to make sure that it is the exact same as on the "
+"certificate."
+msgstr ""
+
+#: lms/templates/certificates/invalid.html
+msgid ""
+"This is an unknown certificate number and therefore is a potential forgery."
+msgstr ""
+
+#: lms/templates/certificates/valid.html
+msgid "Skip to This Page's Content"
+msgstr ""
+
+#: lms/templates/certificates/valid.html
+msgid "Validation Status"
+msgstr ""
+
+#: lms/templates/certificates/valid.html
+msgid "Student Accomplishment"
+msgstr ""
+
+#: lms/templates/certificates/valid.html
+msgid "More Information"
+msgstr ""
+
 #: lms/templates/chat/toggle_chat.html
 msgid "Open Chat"
 msgstr ""
@@ -9564,6 +9950,10 @@ msgid "View About Page in studio"
 msgstr "在职员界面查看课程简介页面"
 
 #: lms/templates/courseware/course_about.html
+msgid "Course About"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
 msgid "Overview"
 msgstr "课程概况"
 
@@ -9716,11 +10106,17 @@ msgid "Clear search"
 msgstr ""
 
 #: lms/templates/courseware/courseware.html
-msgid "Course Navigation"
-msgstr "课程导航"
+msgid "No content has been added to this course"
+msgstr ""
 
 #: lms/templates/courseware/courseware.html
-msgid "No content has been added to this course"
+msgid ""
+"To access course materials, you must score {required_score}% or higher on "
+"this                 exam. Your current score is {current_score}%."
+msgstr ""
+
+#: lms/templates/courseware/courseware.html
+msgid "Your score is {current_score}%. You have passed the entrance exam."
 msgstr ""
 
 #: lms/templates/courseware/courseware.html
@@ -10253,57 +10649,8 @@ msgid "{course_number} {course_name} Cover Image"
 msgstr "{course_number} {course_name} 封面图片"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Your verification is pending"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Enrolled as: "
 msgstr "登记为："
-
-#. Translators: This text describes that the student has enrolled for a
-#. Verified Certificate, but verification of identity is pending.
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "ID verification pending"
-msgstr ""
-
-#. Translators: The student is enrolled for a Verified Certificate, but
-#. verification of identity is pending.
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Verified: Pending Verification"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "You're enrolled as a verified student"
-msgstr "作为一名已认证的学生，你已成功注册。"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "ID Verified Ribbon/Badge"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Verified"
-msgstr "已验证"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "You're enrolled as an honor code student"
-msgstr "您已登记为本课程诚信准则学员"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "You're auditing this course"
-msgstr "你正在旁听这门课程"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Auditing"
-msgstr "旁听"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "You're enrolled as a professional education student"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Professional Ed"
-msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Completed - {end_date}"
@@ -11767,6 +12114,52 @@ msgstr ""
 msgid "Add expiration date"
 msgstr ""
 
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Example Certificates"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Generate example certificates for the course."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Generate Example Certificates"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Generating example {name} certificate"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Error generating example {name} certificate: {error}"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "View {name} certificate"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Refresh Status"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Student-Generated Certificates"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Disable Student-Generated Certificates"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Enable Student-Generated Certificates"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid ""
+"You must successfully generate example certificates before you enable "
+"student-generated certificates."
+msgstr ""
+
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Enrollment Information"
 msgstr "注册信息"
@@ -12850,6 +13243,10 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore All Problems"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Let Student Skip Entrance Exam"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
@@ -13955,6 +14352,11 @@ msgid "Edit your name"
 msgstr "编辑你的名字"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
+#: lms/templates/verify_student/photo_reverification.html
+msgid "Verification"
+msgstr ""
+
+#: lms/templates/verify_student/midcourse_photo_reverification.html
 msgid ""
 "Once you verify your photo looks good and your name is correct, you can "
 "finish your re-verification and return to your course.  <strong>Note: You "
@@ -14441,11 +14843,14 @@ msgid "Content"
 msgstr "内容"
 
 #: cms/templates/asset_index.html cms/templates/container.html
-#: cms/templates/course_info.html cms/templates/course_outline.html
-#: cms/templates/edit-tabs.html cms/templates/index.html
-#: cms/templates/library.html cms/templates/manage_users.html
-#: cms/templates/manage_users_lib.html cms/templates/textbooks.html
-#: cms/templates/videos_index.html
+#: cms/templates/course-create-rerun.html cms/templates/course_info.html
+#: cms/templates/course_outline.html cms/templates/edit-tabs.html
+#: cms/templates/index.html cms/templates/library.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
+#: cms/templates/textbooks.html cms/templates/videos_index.html
+#: cms/templates/ux/reference/container.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/outline.html
 msgid "Page Actions"
 msgstr "页面操作"
 
@@ -15040,8 +15445,25 @@ msgid "Back to dashboard"
 msgstr "回到主页"
 
 #: cms/templates/export.html
+msgid "Library Export"
+msgstr ""
+
+#: cms/templates/export.html
 msgid "Course Export"
 msgstr "导出课程"
+
+#: cms/templates/export.html
+msgid "About Exporting Libraries"
+msgstr ""
+
+#. Translators: ".tar.gz" is a file extension, and should not be translated
+#: cms/templates/export.html
+msgid ""
+"You can export libraries and edit them outside of {studio_name}. The "
+"exported file is a .tar.gz file (that is, a .tar file compressed with GNU "
+"Zip) that contains the library structure and content. You can also re-import"
+" libraries that you've exported."
+msgstr ""
 
 #: cms/templates/export.html
 msgid "About Exporting Courses"
@@ -15066,8 +15488,16 @@ msgid ""
 msgstr ""
 
 #: cms/templates/export.html
+msgid "Export My Library Content"
+msgstr ""
+
+#: cms/templates/export.html
 msgid "Export My Course Content"
 msgstr "导出我的课程内容"
+
+#: cms/templates/export.html
+msgid "Export Library Content"
+msgstr ""
 
 #: cms/templates/export.html
 msgid "Export Course Content"
@@ -15119,8 +15549,32 @@ msgid "Forum/discussion Data"
 msgstr "论坛/讨论数据"
 
 #: cms/templates/export.html
-msgid "Certificates"
-msgstr "证书"
+msgid "Why export a library?"
+msgstr ""
+
+#: cms/templates/export.html
+msgid ""
+"You may want to edit the XML in your library directly, outside of "
+"{studio_name}. You may want to create a backup copy of your library. Or, you"
+" may want to create a copy of your library that you can later import into "
+"another library instance and customize."
+msgstr ""
+
+#: cms/templates/export.html
+msgid "Opening the downloaded file"
+msgstr "打开下载的文件"
+
+#. Translators: ".tar.gz" is a file extension, and should not be translated
+#: cms/templates/export.html
+msgid ""
+"Use an archive program to extract the data from the .tar.gz file. Extracted "
+"data includes the library.xml file, as well as subfolders that contain "
+"library content."
+msgstr ""
+
+#: cms/templates/export.html
+msgid "Learn more about exporting a library"
+msgstr ""
 
 #: cms/templates/export.html
 msgid "Why export a course?"
@@ -15146,10 +15600,6 @@ msgid ""
 "data, grading information, discussion forum data, course settings, and "
 "course team information, is not exported."
 msgstr ""
-
-#: cms/templates/export.html
-msgid "Opening the downloaded file"
-msgstr "打开下载的文件"
 
 #. Translators: ".tar.gz" is a file extension, and should not be translated
 #: cms/templates/export.html
@@ -15506,21 +15956,46 @@ msgid ""
 msgstr "学生无法访问这个组件。请重新编辑您的组件以修复错误。"
 
 #: cms/templates/import.html
+msgid "Library Import"
+msgstr ""
+
+#: cms/templates/import.html
 msgid "Course Import"
 msgstr "课程导入"
 
 #: cms/templates/import.html
 msgid ""
-"Be sure you want to import a course before continuing. Content of the "
-"imported course replaces all the content of this course. {em_start}You "
-"cannot undo a course import{em_end}. We recommend that you first export the "
-"current course, so you have a backup copy of it."
+"Be sure you want to import a library before continuing. The contents of the "
+"imported library will replace the contents of the existing library. "
+"{em_start}You cannot undo a library import{em_end}. Before you proceed, we "
+"recommend that you export the current library, so that you have a backup "
+"copy of it."
 msgstr ""
-"在继续前请确保你想要导入一门课程。当前课程的所有内容会被导入的内容所取代。{em_start} 课程导入无法撤销 "
-"{em_end}。我们建议先将当前课程导出，这样你可以有个备份。"
 
-#. Translators: ".tar.gz" is a file extension, and files with that extension
-#. are called "gzipped tar files": these terms should not be translated
+#: cms/templates/import.html
+msgid ""
+"The library that you import must be in a .tar.gz file (that is, a .tar file "
+"compressed with GNU Zip). This .tar.gz file must contain a library.xml file."
+" It may also contain other files."
+msgstr ""
+
+#: cms/templates/import.html
+msgid ""
+"The import process has five stages. During the first two stages, you must "
+"stay on this page. You can leave this page after the Unpacking stage has "
+"completed. We recommend, however, that you don't make important changes to "
+"your library until the import operation has completed."
+msgstr ""
+
+#: cms/templates/import.html
+msgid ""
+"Be sure you want to import a course before continuing. The contents of the "
+"imported course will replace the contents of the existing course. "
+"{em_start}You cannot undo a course import{em_end}. Before you proceed, we "
+"recommend that you export the current course, so that you have a backup copy"
+" of it."
+msgstr ""
+
 #: cms/templates/import.html
 msgid ""
 "The course that you import must be in a .tar.gz file (that is, a .tar file "
@@ -15539,8 +16014,10 @@ msgid ""
 msgstr ""
 "导入过程有五步。在前两步中，你必须停留在当前页面。而在解压步骤结束后你可以离开当前页面。不过，我们建议在导入操作结束前你都不要对课程做任何更改调整。"
 
-#. Translators: ".tar.gz" is a file extension, and files with that extension
-#. are called "gzipped tar files": these terms should not be translated
+#: cms/templates/import.html
+msgid "Select a .tar.gz File to Replace Your Library Content"
+msgstr ""
+
 #: cms/templates/import.html
 msgid "Select a .tar.gz File to Replace Your Course Content"
 msgstr "选择一个.tar.gz 文件以覆盖当前课程内容"
@@ -15554,8 +16031,16 @@ msgid "File Chosen:"
 msgstr "选中的文件："
 
 #: cms/templates/import.html
-msgid "Replace my course with the one above"
-msgstr "用上面的课程替换我的课程"
+msgid "Replace my library with the selected file"
+msgstr ""
+
+#: cms/templates/import.html
+msgid "Replace my course with the selected file"
+msgstr ""
+
+#: cms/templates/import.html
+msgid "Library Import Status"
+msgstr ""
 
 #: cms/templates/import.html
 msgid "Course Import Status"
@@ -15585,26 +16070,67 @@ msgid "Reviewing semantics, syntax, and required data"
 msgstr "复查语义、语法和必要数据"
 
 #: cms/templates/import.html
+msgid "Updating Library"
+msgstr ""
+
+#: cms/templates/import.html
 msgid "Updating Course"
 msgstr "课程更新中"
 
 #: cms/templates/import.html
 msgid ""
-"Integrating your imported content into this course. This may take a while "
-"with larger courses."
-msgstr "整合你导入的内容到课程，对大的课程这可能花费较多时间。"
+"Integrating your imported content into this library. This process might take"
+" longer with larger libraries."
+msgstr ""
+
+#: cms/templates/import.html
+msgid ""
+"Integrating your imported content into this course. This process might take "
+"longer with larger courses."
+msgstr ""
 
 #: cms/templates/import.html
 msgid "Success"
 msgstr "成功"
 
 #: cms/templates/import.html
+msgid "Your imported content has now been integrated into this library"
+msgstr ""
+
+#: cms/templates/import.html
 msgid "Your imported content has now been integrated into this course"
 msgstr "你导入的内容已经被整合进课程"
 
 #: cms/templates/import.html
+msgid "View Updated Library"
+msgstr ""
+
+#: cms/templates/import.html
 msgid "View Updated Outline"
 msgstr "显示更新后的课程大纲"
+
+#: cms/templates/import.html
+msgid "Why import a library?"
+msgstr ""
+
+#: cms/templates/import.html
+msgid ""
+"You might want to update an existing library to a new version, or replace an"
+" existing library entirely. You might also have developed a library outside "
+"of Studio."
+msgstr ""
+
+#: cms/templates/import.html
+msgid "Note: Library content is not automatically updated in courses"
+msgstr ""
+
+#: cms/templates/import.html
+msgid ""
+"If you change and import a library that is referenced by randomized content "
+"blocks in one or more courses, those courses do not automatically use the "
+"updated content. You must manually refresh the randomized content blocks to "
+"bring them up to date with the latest library content."
+msgstr ""
 
 #: cms/templates/import.html
 msgid "Why import a course?"
@@ -15799,6 +16325,10 @@ msgid ""
 msgstr ""
 
 #: cms/templates/index.html
+msgid "Libraries"
+msgstr ""
+
+#: cms/templates/index.html
 msgid "Re-run Course"
 msgstr ""
 
@@ -15990,21 +16520,6 @@ msgid "Add Component"
 msgstr ""
 
 #: cms/templates/library.html
-msgid "Library ID"
-msgstr ""
-
-#: cms/templates/library.html
-msgid "Tip:"
-msgstr ""
-
-#: cms/templates/library.html
-msgid ""
-"To add content from this library to a course that uses a Randomized Content "
-"Block, copy this ID and enter it in the Libraries field in the Randomized "
-"Content Block settings."
-msgstr ""
-
-#: cms/templates/library.html
 msgid "Adding content to your library"
 msgstr ""
 
@@ -16028,11 +16543,11 @@ msgstr ""
 #: cms/templates/library.html
 msgid ""
 "Use library content in courses by adding the "
-"{em_start}library_content{em_end} policy key to Advanced Settings, then "
-"adding a Randomized Content Block to your courseware. In the settings for "
-"each Randomized Content Block, enter the Library ID for each library from "
-"which you want to draw content, and specify the number of problems to be "
-"randomly selected and displayed to each student."
+"{em_start}library_content{em_end} policy key to the Advanced Module List in "
+"the course's Advanced Settings, then adding a Randomized Content Block to "
+"your courseware. In the settings for each Randomized Content Block, select "
+"this library as the source library, and specify the number of problems to be"
+" randomly selected and displayed to each student."
 msgstr ""
 
 #: cms/templates/library.html
@@ -16794,11 +17309,16 @@ msgstr ""
 msgid ""
 "After a file uploads successfully, automated processing begins. After "
 "automated processing begins for a file it is listed under Previous Uploads "
-"as {em_start}In Progress{em_end}. When the status is "
-"{em_start}Complete{em_end}, edX assigns a unique video ID to the video file "
-"and you can add it to your course. If something goes wrong, the "
-"{em_start}Failed{em_end} status message appears. Check for problems in the "
-"file and upload a replacement."
+"as {em_start}In Progress{em_end}. You can add the video to your course as "
+"soon as it has a unique video ID and the status is {em_start}Ready{em_end}. "
+"Allow 24 hours for file processing at the external video hosting sites to "
+"complete."
+msgstr ""
+
+#: cms/templates/videos_index.html
+msgid ""
+"If something goes wrong, the {em_start}Failed{em_end} status message "
+"appears. Check for problems in your original file and upload a replacement."
 msgstr ""
 
 #: cms/templates/videos_index.html
@@ -16807,10 +17327,14 @@ msgstr ""
 
 #: cms/templates/videos_index.html
 msgid ""
-"After processing is complete for the video file, you copy its unique video "
-"ID. On the Course Outline page, you create or locate a video component to "
-"play this video. Edit the video component to paste the ID into the Advanced "
-"{em_start}EdX Video ID{em_end} field."
+"As soon as the status for a file is {em_start}Ready{em_end}, you can add "
+"that video to a component in your course. Copy the unique video ID. In "
+"another browser window, on the Course Outline page, create or locate a video"
+" component to play this video. Edit the video component to paste the ID into"
+" the Advanced {em_start}EdX Video ID{em_end} field. The video can play in "
+"the LMS as soon as its status is {em_start}Ready{em_end}, although "
+"processing may not be complete for all encodings and all video hosting "
+"sites."
 msgstr ""
 
 #: cms/templates/visibility_editor.html
@@ -16940,10 +17464,6 @@ msgid "Current Course:"
 msgstr "当前课程"
 
 #: cms/templates/widgets/header.html
-msgid "Navigation for {course_name}"
-msgstr ""
-
-#: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "大纲"
 
@@ -16972,12 +17492,12 @@ msgid "Current Library:"
 msgstr ""
 
 #: cms/templates/widgets/header.html
-msgid "Library"
+msgid "Account"
 msgstr ""
 
 #: cms/templates/widgets/header.html
-msgid "Help &amp; Account Navigation"
-msgstr "帮助 &amp; 账户导航"
+msgid "Account Navigation"
+msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Contextual Online Help"
@@ -16990,10 +17510,6 @@ msgstr "当前登录用户："
 #: cms/templates/widgets/header.html
 msgid "Sign Out"
 msgstr "退出"
-
-#: cms/templates/widgets/header.html
-msgid "You're not currently signed in"
-msgstr "您当前没有登录"
 
 #: cms/templates/widgets/metadata-edit.html
 msgid "Launch Latex Source Compiler"

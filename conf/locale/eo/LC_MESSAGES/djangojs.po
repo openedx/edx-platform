@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-03-02 19:13+0000\n"
-"PO-Revision-Date: 2015-03-02 19:14:44.688527\n"
+"POT-Creation-Date: 2015-03-16 14:24+0000\n"
+"PO-Revision-Date: 2015-03-16 14:25:32.444288\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1507,6 +1507,7 @@ msgstr "Vértïçäl späçé Ⱡ'#"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/templates/courseware_search/search_item.underscore
+#: lms/templates/courseware_search/search_item_seq.underscore
 msgid "View"
 msgstr "Vïéw Ⱡ'σяєм#"
 
@@ -2708,6 +2709,27 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
+msgid "Enter a student's username or email address."
+msgstr "Éntér ä stüdént's üsérnämé ör émäïl äddréss. Ⱡ'σяєм ιρѕυм#"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"Do you want to allow this student ('{student_id}') to skip the entrance "
+"exam?"
+msgstr ""
+"Dö ýöü wänt tö ällöw thïs stüdént ('{student_id}') tö skïp thé éntränçé "
+"éxäm? Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"An error occurred. Make sure that the student's username or email address is"
+" correct and try again."
+msgstr ""
+"Àn érrör öççürréd. Mäké süré thät thé stüdént's üsérnämé ör émäïl äddréss ïs"
+" çörréçt änd trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Entrance exam state is being deleted for student '{student_id}'."
 msgstr ""
 "Éntränçé éxäm stäté ïs ßéïng délétéd för stüdént '{student_id}'. Ⱡ'σяєм "
@@ -3284,6 +3306,17 @@ msgstr ""
 "Ýöür fïlé '{file}' häs ßéén üplöädéd. Àllöw ä féw mïnütés för pröçéssïng. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
+#: lms/static/js/instructor_dashboard/certificates.js
+msgid "Allow students to generate certificates for this course?"
+msgstr ""
+"Àllöw stüdénts tö généräté çértïfïçätés för thïs çöürsé? Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/static/js/instructor_dashboard/certificates.js
+msgid "Prevent students from generating certificates in this course?"
+msgstr ""
+"Prévént stüdénts fröm générätïng çértïfïçätés ïn thïs çöürsé? Ⱡ'σяєм ιρѕυм "
+"∂σłσя#"
+
 #: lms/static/js/search/views/search_list_view.js
 msgid "%s result"
 msgid_plural "%s results"
@@ -3546,16 +3579,33 @@ msgstr "Rétürn tö Éxpört Ⱡ'σ#"
 
 #: cms/static/js/factories/export.js
 msgid ""
-"There has been a failure to export your course to XML. Unfortunately, we do "
-"not have specific enough information to assist you in identifying the failed"
-" component. It is recommended that you inspect your courseware to identify "
-"any components in error and try again."
+"Your library could not be exported to XML. There is not enough information "
+"to identify the failed component. Inspect your library to identify any "
+"problematic components and try again."
 msgstr ""
-"Théré häs ßéén ä fäïlüré tö éxpört ýöür çöürsé tö XML. Ûnförtünätélý, wé dö "
-"nöt hävé spéçïfïç énöügh ïnförmätïön tö ässïst ýöü ïn ïdéntïfýïng thé fäïléd"
-" çömpönént. Ìt ïs réçömméndéd thät ýöü ïnspéçt ýöür çöürséwäré tö ïdéntïfý "
-"äný çömpönénts ïn érrör änd trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι#"
+"Ýöür lïßrärý çöüld nöt ßé éxpörtéd tö XML. Théré ïs nöt énöügh ïnförmätïön "
+"tö ïdéntïfý thé fäïléd çömpönént. Ìnspéçt ýöür lïßrärý tö ïdéntïfý äný "
+"prößlémätïç çömpönénts änd trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт,#"
+
+#: cms/static/js/factories/export.js
+msgid "Take me to the main library page"
+msgstr "Täké mé tö thé mäïn lïßrärý pägé Ⱡ'σяєм ι#"
+
+#: cms/static/js/factories/export.js
+msgid ""
+"Your course could not be exported to XML. There is not enough information to"
+" identify the failed component. Inspect your course to identify any "
+"problematic components and try again."
+msgstr ""
+"Ýöür çöürsé çöüld nöt ßé éxpörtéd tö XML. Théré ïs nöt énöügh ïnförmätïön tö"
+" ïdéntïfý thé fäïléd çömpönént. Ìnspéçt ýöür çöürsé tö ïdéntïfý äný "
+"prößlémätïç çömpönénts änd trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт#"
+
+#: cms/static/js/factories/export.js
+msgid "Take me to the main course page"
+msgstr "Täké mé tö thé mäïn çöürsé pägé Ⱡ'σяєм ι#"
 
 #: cms/static/js/factories/export.js
 msgid "The raw error message is:"
@@ -3565,9 +3615,17 @@ msgstr "Thé räw érrör méssägé ïs: Ⱡ'σяєм#"
 msgid "There has been an error with your export."
 msgstr "Théré häs ßéén än érrör wïth ýöür éxpört. Ⱡ'σяєм ιρѕυ#"
 
-#: cms/static/js/factories/export.js
-msgid "Yes, take me to the main course page"
-msgstr "Ýés, täké mé tö thé mäïn çöürsé pägé Ⱡ'σяєм ιρ#"
+#: cms/static/js/factories/import.js
+msgid "There was an error while importing the new library to our database."
+msgstr ""
+"Théré wäs än érrör whïlé ïmpörtïng thé néw lïßrärý tö öür dätäßäsé. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕ#"
+
+#: cms/static/js/factories/import.js
+msgid "There was an error while importing the new course to our database."
+msgstr ""
+"Théré wäs än érrör whïlé ïmpörtïng thé néw çöürsé tö öür dätäßäsé. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
 
 #: cms/static/js/factories/import.js
 msgid "There was an error during the upload process."
@@ -3582,12 +3640,6 @@ msgid "There was an error while verifying the file you submitted."
 msgstr ""
 "Théré wäs än érrör whïlé vérïfýïng thé fïlé ýöü süßmïttéd. Ⱡ'σяєм ιρѕυм "
 "∂σłσ#"
-
-#: cms/static/js/factories/import.js
-msgid "There was an error while importing the new course to our database."
-msgstr ""
-"Théré wäs än érrör whïlé ïmpörtïng thé néw çöürsé tö öür dätäßäsé. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя #"
 
 #: cms/static/js/factories/import.js
 msgid "Your import has failed."
@@ -5003,6 +5055,29 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/verify_student/make_payment_step.underscore
+msgid ""
+"You can pay now even if you don't have the following items available, but "
+"you will need to have these by %(date)s to qualify to earn a Verified "
+"Certificate."
+msgstr ""
+"Ýöü çän päý nöw évén ïf ýöü dön't hävé thé föllöwïng ïtéms äväïläßlé, ßüt "
+"ýöü wïll nééd tö hävé thésé ßý %(date)s tö qüälïfý tö éärn ä Vérïfïéd "
+"Çértïfïçäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕ#"
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid ""
+"You can pay now even if you don't have the following items available, but "
+"you will need to have these to qualify to earn a Verified Certificate."
+msgstr ""
+"Ýöü çän päý nöw évén ïf ýöü dön't hävé thé föllöwïng ïtéms äväïläßlé, ßüt "
+"ýöü wïll nééd tö hävé thésé tö qüälïfý tö éärn ä Vérïfïéd Çértïfïçäté. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιρ#"
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid "Government-Issued Photo ID"
+msgstr "Gövérnmént-Ìssüéd Phötö ÌD Ⱡ'σяєм#"
+
+#: lms/templates/verify_student/make_payment_step.underscore
 msgid "Choose your contribution for your Verified Track upgrade"
 msgstr ""
 "Çhöösé ýöür çöntrïßütïön för ýöür Vérïfïéd Träçk üpgrädé Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -5026,29 +5101,6 @@ msgstr "Ýöür Tötäl Çöntrïßütïön Ⱡ'σяє#"
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "To complete your enrollment, you will need to pay:"
 msgstr "Tö çömplété ýöür énröllmént, ýöü wïll nééd tö päý: Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid ""
-"You can pay now even if you don't have the following items available, but "
-"you will need to have these by %(date)s to qualify to earn a Verified "
-"Certificate."
-msgstr ""
-"Ýöü çän päý nöw évén ïf ýöü dön't hävé thé föllöwïng ïtéms äväïläßlé, ßüt "
-"ýöü wïll nééd tö hävé thésé ßý %(date)s tö qüälïfý tö éärn ä Vérïfïéd "
-"Çértïfïçäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕ#"
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid ""
-"You can pay now even if you don't have the following items available, but "
-"you will need to have these to qualify to earn a Verified Certificate."
-msgstr ""
-"Ýöü çän päý nöw évén ïf ýöü dön't hävé thé föllöwïng ïtéms äväïläßlé, ßüt "
-"ýöü wïll nééd tö hävé thésé tö qüälïfý tö éärn ä Vérïfïéd Çértïfïçäté. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιρ#"
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid "Government-Issued Photo ID"
-msgstr "Gövérnmént-Ìssüéd Phötö ÌD Ⱡ'σяєм#"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "Next: Make payment"

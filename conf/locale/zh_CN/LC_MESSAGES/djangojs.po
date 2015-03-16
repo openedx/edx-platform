@@ -67,6 +67,7 @@
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # Na Liu <nanamadier@gmail.com>, 2014
 # pku9104038 <pku9104038@hotmail.com>, 2014
+# Rom, 2015
 # louyihua <supermouselyh@hotmail.com>, 2014
 # Jianfei Wang <me@thinxer.com>, 2013
 # 沈世奇 <vicapple22@gmail.com>, 2013
@@ -87,6 +88,7 @@
 # Changyue Wang <peterwang.dut@gmail.com>, 2015
 # jsgang <jsgang9@gmail.com>, 2014-2015
 # Lionel Chen <chenlinchuan@me.com>, 2014
+# Rom, 2015
 # louyihua <supermouselyh@hotmail.com>, 2014
 # viztor <viztor@outlook.com>, 2015
 # 张逸涵 <jeanzhang970128@gmail.com>, 2014
@@ -102,15 +104,16 @@
 # GoodLuck <1833447072@qq.com>, 2014
 # jsgang <jsgang9@gmail.com>, 2015
 # peipeixiang <peipei0903@gmail.com>, 2015
+# Rom, 2015
 # louyihua <supermouselyh@hotmail.com>, 2014
 # 竹轩 <fmyzjs@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-03-02 19:01+0000\n"
-"PO-Revision-Date: 2015-02-20 21:40+0000\n"
-"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
+"POT-Creation-Date: 2015-03-16 14:09+0000\n"
+"PO-Revision-Date: 2015-03-15 03:24+0000\n"
+"Last-Translator: Rom\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2552,6 +2555,23 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
+msgid "Enter a student's username or email address."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"Do you want to allow this student ('{student_id}') to skip the entrance "
+"exam?"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"An error occurred. Make sure that the student's username or email address is"
+" correct and try again."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Entrance exam state is being deleted for student '{student_id}'."
 msgstr ""
 
@@ -3082,6 +3102,14 @@ msgid ""
 "Your file '{file}' has been uploaded. Allow a few minutes for processing."
 msgstr "你的文件 '{file}'已经上传。需要几分钟时间进行处理。"
 
+#: lms/static/js/instructor_dashboard/certificates.js
+msgid "Allow students to generate certificates for this course?"
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/certificates.js
+msgid "Prevent students from generating certificates in this course?"
+msgstr ""
+
 #: lms/static/js/search/views/search_list_view.js
 msgid "%s result"
 msgid_plural "%s results"
@@ -3313,10 +3341,24 @@ msgstr ""
 
 #: cms/static/js/factories/export.js
 msgid ""
-"There has been a failure to export your course to XML. Unfortunately, we do "
-"not have specific enough information to assist you in identifying the failed"
-" component. It is recommended that you inspect your courseware to identify "
-"any components in error and try again."
+"Your library could not be exported to XML. There is not enough information "
+"to identify the failed component. Inspect your library to identify any "
+"problematic components and try again."
+msgstr ""
+
+#: cms/static/js/factories/export.js
+msgid "Take me to the main library page"
+msgstr ""
+
+#: cms/static/js/factories/export.js
+msgid ""
+"Your course could not be exported to XML. There is not enough information to"
+" identify the failed component. Inspect your course to identify any "
+"problematic components and try again."
+msgstr ""
+
+#: cms/static/js/factories/export.js
+msgid "Take me to the main course page"
 msgstr ""
 
 #: cms/static/js/factories/export.js
@@ -3327,8 +3369,12 @@ msgstr ""
 msgid "There has been an error with your export."
 msgstr ""
 
-#: cms/static/js/factories/export.js
-msgid "Yes, take me to the main course page"
+#: cms/static/js/factories/import.js
+msgid "There was an error while importing the new library to our database."
+msgstr ""
+
+#: cms/static/js/factories/import.js
+msgid "There was an error while importing the new course to our database."
 msgstr ""
 
 #: cms/static/js/factories/import.js
@@ -3341,10 +3387,6 @@ msgstr ""
 
 #: cms/static/js/factories/import.js
 msgid "There was an error while verifying the file you submitted."
-msgstr ""
-
-#: cms/static/js/factories/import.js
-msgid "There was an error while importing the new course to our database."
 msgstr ""
 
 #: cms/static/js/factories/import.js
@@ -4623,6 +4665,23 @@ msgid ""
 msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore
+msgid ""
+"You can pay now even if you don't have the following items available, but "
+"you will need to have these by %(date)s to qualify to earn a Verified "
+"Certificate."
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid ""
+"You can pay now even if you don't have the following items available, but "
+"you will need to have these to qualify to earn a Verified Certificate."
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid "Government-Issued Photo ID"
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step.underscore
 msgid "Choose your contribution for your Verified Track upgrade"
 msgstr ""
 
@@ -4642,23 +4701,6 @@ msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "To complete your enrollment, you will need to pay:"
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid ""
-"You can pay now even if you don't have the following items available, but "
-"you will need to have these by %(date)s to qualify to earn a Verified "
-"Certificate."
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid ""
-"You can pay now even if you don't have the following items available, but "
-"you will need to have these to qualify to earn a Verified Certificate."
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid "Government-Issued Photo ID"
 msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore

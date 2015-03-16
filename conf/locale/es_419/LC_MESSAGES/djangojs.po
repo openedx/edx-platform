@@ -82,7 +82,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-03-02 19:01+0000\n"
+"POT-Creation-Date: 2015-03-16 14:09+0000\n"
 "PO-Revision-Date: 2015-02-21 07:39+0000\n"
 "Last-Translator: Cristian Salamea <ovnicraft@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
@@ -1560,6 +1560,7 @@ msgstr "Espacio vertical"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/templates/courseware_search/search_item.underscore
+#: lms/templates/courseware_search/search_item_seq.underscore
 msgid "View"
 msgstr "Ver"
 
@@ -2705,6 +2706,8 @@ msgstr ""
 #: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Entrance exam attempts is being reset for student '{student_id}'."
 msgstr ""
+"Intentos para exámen de ingreso esta siendo reiniciado para el estudiante "
+"'{student_id}'"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
@@ -2712,6 +2715,8 @@ msgid ""
 "Error resetting entrance exam attempts for student '{student_id}'. Make sure"
 " student identifier is correct."
 msgstr ""
+"Error reiniciando los intentos de exámen de ingreso para el estudiante "
+"'{student_id}'. Asegúrese que el identificador es correcto."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -2719,6 +2724,9 @@ msgid ""
 "'Show Background Task History for Student' button to see the status of the "
 "task."
 msgstr ""
+"Iniciada tarea de recalificación de exámen de ingreso para estudiante "
+"'{student_id}'. Clic en el botón 'Mostrar historial de tareas para "
+"estudiante' para ver el estado de la tarea."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -2726,23 +2734,54 @@ msgid ""
 "Make sure that entrance exam has problems in it and student identifier is "
 "correct."
 msgstr ""
+"Error iniciando la tarea para recalificar el exámen de ingreso para el "
+"estudiante '{student_id}'. Asegurar que el exámen de ingreso tiene problemas"
+" y el identificador del estudiante es correcto."
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
+msgid "Enter a student's username or email address."
+msgstr "Ingresar un nombre de usuario o email del estudiante."
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"Do you want to allow this student ('{student_id}') to skip the entrance "
+"exam?"
+msgstr ""
+"Desea permitir a este estudiante ('{student_id}') saltar el exámen de "
+"ingreso ?"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"An error occurred. Make sure that the student's username or email address is"
+" correct and try again."
+msgstr ""
+"Un error ha ocurrido. Asegurar que el nombre de usuario o email del "
+"estudiante es correcto e intentar de nuevo."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Entrance exam state is being deleted for student '{student_id}'."
 msgstr ""
+"El estado del exámen de ingreso está siendo borrado para el estudiante "
+"'{student_id}'."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error deleting entrance exam state for student '{student_id}'. Make sure "
 "student identifier is correct."
 msgstr ""
+"Error borrando el estado del exámen de ingreso para el estudiante "
+"'{student_id}'. Asegurar que el identificador del estudiante es correcto."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error getting entrance exam task history for student '{student_id}'. Make "
 "sure student identifier is correct."
 msgstr ""
+"Error obteniendo el historial de tarea para exámen de ingreso para el "
+"estudiante '{student_id}'. Asegurar que el identificador del estudiane es "
+"correcto."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Reset attempts for all students on problem '<%= problem_id %>'?"
@@ -3298,6 +3337,14 @@ msgstr ""
 "El archivo '{file}' ha sido cargado. Espere algunos minutos mientras se "
 "procesa."
 
+#: lms/static/js/instructor_dashboard/certificates.js
+msgid "Allow students to generate certificates for this course?"
+msgstr "Permitir a los estudiantes generar certificados para este curso ?"
+
+#: lms/static/js/instructor_dashboard/certificates.js
+msgid "Prevent students from generating certificates in this course?"
+msgstr "Evitar que estudiantes generen certificados para este curso ?"
+
 #: lms/static/js/search/views/search_list_view.js
 msgid "%s result"
 msgid_plural "%s results"
@@ -3307,19 +3354,27 @@ msgstr[1] "%s resultados"
 #: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Started entrance exam rescore task for student '{student_id}'."
 msgstr ""
+"Iniciado recalificación para exámen de ingreso para estudiante "
+"'{student_id}'"
 
 #: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid ""
 "Error starting a task to rescore entrance exam for student '{student_id}'."
 msgstr ""
+"Error iniciando recalificación de exámen de ingreso para el estudiante "
+"'{student_id}'."
 
 #: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Error deleting entrance exam state for student '{student_id}'. "
 msgstr ""
+"Error borrando estado de exámen de ingreso para el estudiante "
+"'{student_id}'."
 
 #: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Error getting entrance exam task history for student '{student_id}'. "
 msgstr ""
+"Error obteniendo historial de tarea para exámen de ingreso del estudiante "
+"'{student_id}'."
 
 #: lms/static/js/student_account/account.js
 #: lms/static/js/student_profile/profile.js
@@ -3548,15 +3603,31 @@ msgstr "Regresar a exportar"
 
 #: cms/static/js/factories/export.js
 msgid ""
-"There has been a failure to export your course to XML. Unfortunately, we do "
-"not have specific enough information to assist you in identifying the failed"
-" component. It is recommended that you inspect your courseware to identify "
-"any components in error and try again."
+"Your library could not be exported to XML. There is not enough information "
+"to identify the failed component. Inspect your library to identify any "
+"problematic components and try again."
 msgstr ""
-"Ha habido un error exportando el curso a XML. Infortunadamente, no tenemos "
-"suficiente información específica para asistirte a identificar el componente"
-" que falló. Se recomienda revisar el contenido del cursopara identificar si "
-"algún componente tiene errores e intentar de nuevo."
+"Tu librería no puede ser exportada a XML. No ha la suficiente información "
+"para identificar el componente que falló. Revisar tu librería para "
+"identificar algún problema en componentes e intentar de nuevo."
+
+#: cms/static/js/factories/export.js
+msgid "Take me to the main library page"
+msgstr "Ir a la página principal de librería"
+
+#: cms/static/js/factories/export.js
+msgid ""
+"Your course could not be exported to XML. There is not enough information to"
+" identify the failed component. Inspect your course to identify any "
+"problematic components and try again."
+msgstr ""
+"Tu librería no puede ser exportada a XML. No ha la suficiente información "
+"para identificar el componente que falló. Revisar tu librería para "
+"identificar algún problema en componentes e intentar de nuevo."
+
+#: cms/static/js/factories/export.js
+msgid "Take me to the main course page"
+msgstr "Ir a la página principal de librería"
 
 #: cms/static/js/factories/export.js
 msgid "The raw error message is:"
@@ -3566,9 +3637,15 @@ msgstr "El error crudo es:"
 msgid "There has been an error with your export."
 msgstr "Ha habido un error al exportar."
 
-#: cms/static/js/factories/export.js
-msgid "Yes, take me to the main course page"
-msgstr "Si, llevame a la página principal"
+#: cms/static/js/factories/import.js
+msgid "There was an error while importing the new library to our database."
+msgstr ""
+"Hubo un error mientras importabamos la nueva librería a nuestra base de "
+"datos."
+
+#: cms/static/js/factories/import.js
+msgid "There was an error while importing the new course to our database."
+msgstr "Ha habido un error importando el nuevo curso a nuestra base de datos."
 
 #: cms/static/js/factories/import.js
 msgid "There was an error during the upload process."
@@ -3581,10 +3658,6 @@ msgstr "Ha habido un error desempaquetando el archivo"
 #: cms/static/js/factories/import.js
 msgid "There was an error while verifying the file you submitted."
 msgstr "Ha habido un error verificando el archivo que usted ha enviado."
-
-#: cms/static/js/factories/import.js
-msgid "There was an error while importing the new course to our database."
-msgstr "Ha habido un error importando el nuevo curso a nuestra base de datos."
 
 #: cms/static/js/factories/import.js
 msgid "Your import has failed."
@@ -4976,6 +5049,28 @@ msgstr ""
 "Ahora puede agregar su información de pago, y completar su inscripción"
 
 #: lms/templates/verify_student/make_payment_step.underscore
+msgid ""
+"You can pay now even if you don't have the following items available, but "
+"you will need to have these by %(date)s to qualify to earn a Verified "
+"Certificate."
+msgstr ""
+"Puede pagar ahora, incluso si no tiene los siguientes items disponibles, "
+"pero deberá tenerlos antes del %(date)s para calificar para un Certificado "
+"Verificado."
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid ""
+"You can pay now even if you don't have the following items available, but "
+"you will need to have these to qualify to earn a Verified Certificate."
+msgstr ""
+"Puede pagar ahora, incluso si no tiene los siguientes items disponibles, "
+"pero deberá tenerlos para calificar para un Certificado Verificado."
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid "Government-Issued Photo ID"
+msgstr "Foto de documento oficial de identificación"
+
+#: lms/templates/verify_student/make_payment_step.underscore
 msgid "Choose your contribution for your Verified Track upgrade"
 msgstr "Elija su contribución para la actualización de Verified Track"
 
@@ -4998,28 +5093,6 @@ msgstr "Su contribución total"
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "To complete your enrollment, you will need to pay:"
 msgstr "Para completar tu inscripción, necesitas pagar:"
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid ""
-"You can pay now even if you don't have the following items available, but "
-"you will need to have these by %(date)s to qualify to earn a Verified "
-"Certificate."
-msgstr ""
-"Puede pagar ahora, incluso si no tiene los siguientes items disponibles, "
-"pero deberá tenerlos antes del %(date)s para calificar para un Certificado "
-"Verificado."
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid ""
-"You can pay now even if you don't have the following items available, but "
-"you will need to have these to qualify to earn a Verified Certificate."
-msgstr ""
-"Puede pagar ahora, incluso si no tiene los siguientes items disponibles, "
-"pero deberá tenerlos para calificar para un Certificado Verificado."
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid "Government-Issued Photo ID"
-msgstr "Foto de documento oficial de identificación"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "Next: Make payment"
