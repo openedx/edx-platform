@@ -862,6 +862,7 @@ class RegistrationViewTest(ApiTestCase):
         self._assert_reg_field(
             no_extra_fields_setting,
             {
+                u"placeholder": "",
                 u"name": u"password",
                 u"type": u"password",
                 u"required": True,
