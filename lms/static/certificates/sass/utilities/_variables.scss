@@ -1,11 +1,9 @@
-// edX: Certificates - Variables
-// ====================
+// ------------------------------
+// Open edX Certificates: Variables
 
 // units
 $baseline-v: 20px;                                                  // vertical baseline
 $baseline-h: 20px;                                                  // horizontal baseline
-
-// ====================
 
 // colors - basic
 $black: rgb(10,10,10);                                              // system black
@@ -97,14 +95,10 @@ $color-basic-achievement: $blue-l2;
 $color-greater-achievement: $blue;
 $color-greatest-achievement: $blue-s1;
 
-// ====================
-
 // fonts
 $f-serif: 'PT Serif', Cambria, Georgia, 'Times New Roman', Times, serif;
 $f-sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif;
 $f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace;
-
-// ====================
 
 // grid
 @import "neat/neat-helpers";
@@ -120,8 +114,6 @@ $bp-ds: new-breakpoint(min-width 500px max-width 759px 6);          // small dis
 $bp-dm: new-breakpoint(min-width 760px max-width 899px 12);        // medium displays - make grid 12 columns
 $bp-dl: new-breakpoint(min-width 900px 12);                        // large displays - make grid 12 columns
 
-// ====================
-
 // timing - used for animation/transition mixin syncing
 $tmg-s3: 3.0s;
 $tmg-s2: 2.0s;
@@ -130,11 +122,6 @@ $tmg-avg: 0.75s;
 $tmg-f1: 0.50s;
 $tmg-f2: 0.25s;
 $tmg-f3: 0.125s;
-
-// animation-based settings
-$anim-distance-offviewport: ($baseline-h*100);                         // for larger/page-level animations
-
-// ====================
 
 // application: general actions
 $color-primary: $blue-d1;
@@ -163,8 +150,6 @@ $bordercolor-action-secondary-focus: saturate($color-secondary, 35%);
 $color-action-secondary: tint($color-secondary, 90%);
 $color-action-secondary-focus: tint($color-secondary, 95%);
 
-// ====================
-
 // application: copy & headings
 
 $color-heading: $gray-d3;
@@ -175,13 +160,9 @@ $color-copy: $gray-l1;
 $color-copy-lead: $gray-d2;
 $color-copy-supplemental: $gray-l1;
 
-// ====================
-
 // application: states
 $bg-selected: $blue-t1;
 $color-selected: $blue-s1;
-
-// ====================
 
 // application: view elements
 $bg-view: $gray-l6;

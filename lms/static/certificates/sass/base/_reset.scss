@@ -1,7 +1,6 @@
-// edX: Certificates - Base
-// ====================
+// ------------------------------
+// Open edX Certificates: Reset
 
-// basic
 html, body {
   height: 100%;
 }
@@ -15,9 +14,6 @@ body {
   @extend %t-copy-base;
 }
 
-// ====================
-
-// base: layout
 [class^="wrapper-"] {
   @extend %wrapper !optional;
   padding: 0;
@@ -27,14 +23,9 @@ body {
   @extend %ui-text-sr;
 }
 
-// ====================
-
-// base: view
 .wrapper-view {
   background: $bg-view;
 }
-
-// ====================
 
 [class^="content-"]{
 
@@ -43,9 +34,6 @@ body {
   }
 }
 
-// ====================
-
-// base: elements
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,

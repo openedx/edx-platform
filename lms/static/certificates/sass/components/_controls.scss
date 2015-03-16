@@ -1,5 +1,5 @@
-// edX: Certificates - Controls
-// ====================
+// ------------------------------
+// Open edX Certificates: Controls
 
 // archetype: buttons
 %btn {
@@ -90,8 +90,6 @@
   }
 }
 
-// ====================
-
 // links - subtle
 %link-subtle {
   @include transition(color $tmg-f1 ease-in-out);
@@ -115,7 +113,3 @@
     border-color: $color-link-focus;
   }
 }
-
-// ====================
-
-// archetype: modal/dialogue controls

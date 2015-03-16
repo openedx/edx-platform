@@ -1,5 +1,5 @@
-// edX: Certificates - Mixins & Extends
-// ====================
+// ------------------------------
+// Open edX Certificates: Mixins
 
 // utility - font sizing
 @mixin font-size($sizeValue: 16){
@@ -38,16 +38,12 @@
   }
 }
 
-// ====================
-
 //  UI - wrapper elements
 %ui-wrapper {
   @include clearfix();
   box-sizing: border-box;
   width: 100%;
 }
-
-// ====================
 
 // UI - lists
 %ui-no-list {
@@ -99,8 +95,6 @@
   outline: none;
 }
 
-// ====================
-
 // UI - depth levels
 %ui-depth0 { z-index: 0; }
 %ui-depth1 { z-index: 10; }
@@ -108,8 +102,6 @@
 %ui-depth3 { z-index: 1000; }
 %ui-depth4 { z-index: 10000; }
 %ui-depth5 { z-index: 100000; }
-
-// ====================
 
 // UI - transitions
 %trans-size {
@@ -119,8 +111,6 @@
 %trans-color {
   @include transition(color 0.25s ease-in-out);
 }
-
-// ====================
 
 // UI - cosmetics - shadows
 %ui-shadow-up {
