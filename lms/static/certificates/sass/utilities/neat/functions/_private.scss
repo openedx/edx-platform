@@ -1,30 +1,29 @@
-// Checks if a number is even
-@function is-even($int) {
-  @if $int%2 == 0   {
-    @return true;
-  }
-
-  @return false;
+// Not function for Libsass compatibility
+// https://github.com/sass/libsass/issues/368
+@function is-not($value) {
+  @return if($value, false, true);
 }
 
-// Checks if an element belongs to a list
-@function belongs-to($tested-item, $list) {
-  @each $item in $list {
-    @if $item == $tested-item {
-      @return true;
-    }
-  }
+// Checks if a number is even
+@function is-even($int) {
+  @return $int % 2 == 0;
+}
 
-  @return false;
+// Checks if an element belongs to a list or not
+@function belongs-to($tested-item, $list) {
+  @return is-not(not-belongs-to($tested-item, $list));
+}
+
+@function not-belongs-to($tested-item, $list) {
+  @return is-not(index($list, $tested-item));
 }
 
 // Contains display value
 @function contains-display-value($query) {
-  @if belongs-to(table, $query) or belongs-to(block, $query) or belongs-to(inline-block, $query) or belongs-to(inline, $query) {
-    @return true;
-  }
-
-  @return false;
+  @return belongs-to(table, $query)
+       or belongs-to(block, $query)
+       or belongs-to(inline-block, $query)
+       or belongs-to(inline, $query);
 }
 
 // Parses the first argument of span-columns()
@@ -32,39 +31,31 @@
   @if length($span) == 3 {
     $container-columns: nth($span, 3);
     @return $container-columns;
-  }
-
-  @else if length($span) == 2 {
+  } @else if length($span) == 2 {
     $container-columns: nth($span, 2);
     @return $container-columns;
   }
 
-  @else {
-    @return $grid-columns;
-  }
+  @return $grid-columns;
 }
 
 @function container-shift($shift: $shift) {
-  $parent-columns: $grid-columns !global !default;
+  $parent-columns: $grid-columns !default !global;
 
   @if length($shift) == 3 {
     $container-columns: nth($shift, 3);
     @return $container-columns;
-  }
-
-  @else if length($shift) == 2 {
+  } @else if length($shift) == 2 {
     $container-columns: nth($shift, 2);
     @return $container-columns;
   }
 
-  @else {
-    @return $parent-columns;
-  }
+  @return $parent-columns;
 }
 
 // Generates a striped background
 @function gradient-stops($grid-columns, $color: $visual-grid-color) {
-  $transparent: rgba(0,0,0,0);
+  $transparent: transparent;
 
   $column-width: flex-grid(1, $grid-columns);
   $gutter-width: flex-gutter($grid-columns);
@@ -77,9 +68,7 @@
       $values: append($values, $transparent $column-offset, comma);
       $values: append($values, $color $column-offset, comma);
       $column-offset: $column-offset + $column-width;
-    }
-
-    @else {
+    } @else {
       $values: append($values, $color $column-offset, comma);
       $values: append($values, $transparent $column-offset, comma);
       $column-offset: $column-offset + $gutter-width;
@@ -91,9 +80,9 @@
 
 // Layout direction
 @function get-direction($layout, $default) {
-  $direction: nil;
-  
-  @if $layout == LTR or $layout == RTL {
+  $direction: null;
+
+  @if to-upper-case($layout) == "LTR" or to-upper-case($layout) == "RTL" {
     $direction: direction-from-layout($layout);
   } @else {
     $direction: direction-from-layout($default);
@@ -103,9 +92,9 @@
 }
 
 @function direction-from-layout($layout) {
-  $direction: nil;
+  $direction: null;
 
-  @if $layout == LTR {
+  @if to-upper-case($layout) == "LTR" {
     $direction: right;
   } @else {
     $direction: left;
@@ -117,7 +106,7 @@
 @function get-opposite-direction($direction) {
   $opposite-direction: left;
 
-  @if $direction == left {
+  @if $direction == "left" {
     $opposite-direction: right;
   }
 

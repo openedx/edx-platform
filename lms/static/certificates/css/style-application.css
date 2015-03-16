@@ -1,8 +1,9 @@
 @import url(https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700);
-* {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
+html {
   box-sizing: border-box; }
+
+*, *:before, *:after {
+  box-sizing: inherit; }
 
 .view-valid-certificate .accomplishment-details .list-metadata .item:last-child, .view-validate-certificate .list-instructions .item:last-child, .view-validate-certificate .list-instructions .item .instruction-details:last-child {
   margin-bottom: 0;
@@ -694,12 +695,10 @@ body, .view-validate-certificate .list-requirements .item, .view-validate-certif
   line-height: 1.86rem; }
 
 .view-certificate .content-supplemental .list-actions .action, .view-validate-certificate .support .list-actions .action {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
   -webkit-transition: color 0.25s ease-in-out, background 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
   -moz-transition: color 0.25s ease-in-out, background 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
   transition: color 0.25s ease-in-out, background 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
+  box-sizing: border-box;
   display: inline-block;
   cursor: pointer;
   text-decoration: none; }
@@ -751,10 +750,10 @@ body, .view-validate-certificate .list-requirements .item, .view-validate-certif
   max-width: 1280px;
   margin-left: auto;
   margin-right: auto; }
-  .header-app:after {
+  .header-app::after {
+    clear: both;
     content: "";
-    display: table;
-    clear: both; }
+    display: table; }
 
 .title-logo {
   text-align: center; }
@@ -786,10 +785,10 @@ body, .view-validate-certificate .list-requirements .item, .view-validate-certif
   border-top: 2px solid #eaebeb;
   margin-top: 20px;
   padding-top: 20px; }
-  .footer-app:after {
+  .footer-app::after {
+    clear: both;
     content: "";
-    display: table;
-    clear: both; }
+    display: table; }
 
 .footer-app-copyright {
   float: left;
@@ -902,10 +901,10 @@ body, .view-validate-certificate .list-requirements .item, .view-validate-certif
     max-width: 1280px;
     margin-left: auto;
     margin-right: auto; }
-    .view-certificate .content:after {
+    .view-certificate .content::after {
+      clear: both;
       content: "";
-      display: table;
-      clear: both; }
+      display: table; }
   .view-certificate .status {
     display: block;
     padding: 20px 40px;
@@ -915,10 +914,10 @@ body, .view-validate-certificate .list-requirements .item, .view-validate-certif
     color: white;
     text-transform: uppercase;
     letter-spacing: 0.1rem; }
-    .view-certificate .status:after {
+    .view-certificate .status::after {
+      clear: both;
       content: "";
-      display: table;
-      clear: both; }
+      display: table; }
     @media screen and (min-width: 500px) and (max-width: 759px) {
       .view-certificate .status {
         padding: 20px 20px; } }
@@ -1036,7 +1035,7 @@ body, .view-validate-certificate .list-requirements .item, .view-validate-certif
   .view-certificate.is-honorcode .certificate-type {
     color: #88c7ec; }
   .view-certificate.is-idverified .status {
-    background: #88c7ec; }
+    background: #3aa2e0; }
   .view-certificate.is-idverified .accomplishment {
     background: white url("../images/logo-idverified-cropped.png") bottom left no-repeat;
     background-size: 75%; }
@@ -1077,10 +1076,10 @@ body, .view-validate-certificate .list-requirements .item, .view-validate-certif
   border-radius: 2px;
   border: 1px solid #eaebeb;
   background: white; }
-  .view-valid-certificate .accomplishment:after {
+  .view-valid-certificate .accomplishment::after {
+    clear: both;
     content: "";
-    display: table;
-    clear: both; }
+    display: table; }
   @media screen and (min-width: 500px) and (max-width: 759px) {
     .view-valid-certificate .accomplishment {
       padding: 20px 20px; } }
@@ -1224,14 +1223,14 @@ body, .view-validate-certificate .list-requirements .item, .view-validate-certif
   border-radius: 2px;
   border: 1px solid #eaebeb;
   background: white; }
-  .view-invalid-certificate .feedback:after {
+  .view-invalid-certificate .feedback::after {
+    clear: both;
     content: "";
-    display: table;
-    clear: both; }
-  .view-invalid-certificate .feedback:after {
+    display: table; }
+  .view-invalid-certificate .feedback::after {
+    clear: both;
     content: "";
-    display: table;
-    clear: both; }
+    display: table; }
   @media screen and (min-width: 500px) and (max-width: 759px) {
     .view-invalid-certificate .feedback {
       padding: 20px 20px; } }

@@ -43,7 +43,7 @@
 //  UI - wrapper elements
 %ui-wrapper {
   @include clearfix();
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   width: 100%;
 }
 

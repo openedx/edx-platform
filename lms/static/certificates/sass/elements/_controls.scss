@@ -3,8 +3,8 @@
 
 // archetype: buttons
 %btn {
-  @include box-sizing(border-box);
   @include transition(color 0.25s ease-in-out, background 0.25s ease-in-out, box-shadow 0.25s ease-in-out);
+  box-sizing: border-box;
   display: inline-block;
   cursor: pointer;
   text-decoration: none;

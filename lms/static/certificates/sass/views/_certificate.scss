@@ -198,7 +198,7 @@
   &.is-idverified {
 
     .status {
-      background: $color-basic-achievement;
+      background: $color-greater-achievement;
     }
 
     .accomplishment {
@@ -215,7 +215,7 @@
     }
 
     .certificate-type {
-      color: $blue;
+      color: $color-greater-achievement;
 
       .wrapper-img {
         width: 200px;
