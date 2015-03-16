@@ -52,7 +52,7 @@ import json
 
     <script type="text/javascript">
       window.baseUrl = ${json.dumps(settings.STATIC_URL)};
-      window.TENDER_DOMAIN = ${json.dumps(settings.TENDER_DOMAIN)};
+      window.TENDER_SUBDOMAIN = ${json.dumps(settings.TENDER_SUBDOMAIN)};
       var require = {baseUrl: window.baseUrl};
     </script>
     <script type="text/javascript" src="${static.url("js/vendor/require.js")}"></script>

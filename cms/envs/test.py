@@ -91,6 +91,7 @@ STATIC_URL = "/static/"
 PIPELINE_ENABLED = False
 
 TENDER_DOMAIN = "help.edge.edx.org"
+TENDER_SUBDOMAIN = "edxedge"
 
 # Update module store settings per defaults for tests
 update_module_store_settings(

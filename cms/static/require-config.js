@@ -67,9 +67,9 @@ require.config({
 
         // externally hosted files
         "tender": [
-            // if TENDER_DOMAIN is defined, use that; otherwise, use a dummy value
+            // if TENDER_SUBDOMAIN is defined, use that; otherwise, use a dummy value
             // (the application JS will never `require(['tender'])` if it's not defined)
-            "//" + (typeof TENDER_DOMAIN === "string" ? TENDER_DOMAIN : "api.tenderapp.com") + "/tender_widget",
+            "//" + (typeof TENDER_SUBDOMAIN === "string" ? TENDER_SUBDOMAIN : "example") + ".tenderapp.com/tender_widget",
             // if tender fails to load, fallback on a local file
             // so that require doesn't fall over
             "js/src/tender_fallback"
