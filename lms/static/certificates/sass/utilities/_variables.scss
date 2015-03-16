@@ -1,5 +1,5 @@
 // ------------------------------
-// Open edX Certificates: Variables
+// Open edX Certificates: Variables (LTR)
 
 // units
 $baseline-v: 20px;                                                  // vertical baseline
@@ -103,6 +103,7 @@ $f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace;
 // grid
 @import "neat/neat-helpers";
 
+$default-layout-direction: LTR !global;
 $max-width: 1280px;
 $grid-columns: 12;                                                  // make grid 12 columns
 $column: ($baseline-v*4.25);                                               // columns

@@ -59,6 +59,7 @@
 
     .title {
       @extend %t-title-6;
+      @include text-align(left);
 
       @include media($bp-xlarge) {
         @include span-columns(9 of 12);

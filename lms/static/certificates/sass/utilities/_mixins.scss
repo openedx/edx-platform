@@ -19,10 +19,10 @@
 
   &:first-child {
     margin-top: 0;
-    margin-left: 0;
+    @include margin-left(0);
     border: none;
     padding-top: 0;
-    padding-left: 0;
+    @include padding-left(0);
   }
 }
 
@@ -31,10 +31,10 @@
 
   &:last-child {
     margin-bottom: 0;
-    margin-right: 0;
+    @include margin-left(0);
     border: none;
     padding-bottom: 0;
-    padding-right: 0;
+    @include padding-right(0);
   }
 }
 

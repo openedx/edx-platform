@@ -49,55 +49,54 @@
 .footer-app-nav {
   @include span-columns(8 of 12);
   @include omega();
-  text-align: right;
+  @include text-align(right);
 
   @include media($bp-large) {
     @include fill-parent;
-    text-align: left;
+    @include text-align(left);
   }
 
   @include media($bp-medium) {
     @include fill-parent;
-    text-align: left;
+    @include text-align(left);
   }
 
   @include media($bp-small) {
     @include fill-parent;
-    text-align: left;
+    @include text-align(left);
   }
 
   .list {
     display: inline-block;
     vertical-align: middle;
-    margin-right: ($baseline-h*2);
+    @include margin-right($baseline-h*2);
 
     &:last-child {
-      margin-right: 0;
+      @include margin-right(0);
     }
 
     @include media($bp-large) {
       @include fill-parent;
       margin: 0 0 $baseline-v 0;
-      text-align: left;
+      @include text-align(left);
     }
 
     @include media($bp-medium) {
       @include fill-parent;
       margin: 0 0 $baseline-v 0;
-      text-align: left;
+      @include text-align(left);
     }
 
     @include media($bp-small) {
       @include fill-parent;
       margin: 0 0 $baseline-v 0;
-      text-align: left;
-    }
+      @include text-align(left);    }
   }
 
   .nav-item {
     @extend %t-action5;
     display: inline-block;
-    margin-right: ($baseline-h/2);
+    @include margin-right($baseline-h/2);
 
     @include media($bp-large) {
       @include font-size(14);

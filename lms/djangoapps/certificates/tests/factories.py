@@ -32,7 +32,7 @@ class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):
                 "company_privacy_url": "http://www.edx.org/edx-privacy-policy",
                 "company_tos_url": "http://www.edx.org/edx-terms-service",
                 "company_verified_certificate_url": "http://www.edx.org/verified-certificate",
-                "document_stylesheet_url_application": "/static/certificates/css/style-application.css",
+                "document_stylesheet_url_application": "/static/certificates/css/main-ltr.css",
                 "logo_src": "/static/certificates/images/logo-edx.svg",
                 "logo_url": "http://www.edx.org"
             },

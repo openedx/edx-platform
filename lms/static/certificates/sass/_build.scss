@@ -1,19 +1,11 @@
 // ------------------------------
-// Open edX Certificates: Main Style Compile
+// Open edX Certificates: Shared Build Compile
 
-// About: Sass compile for Open edX certificates. This does not contain styles for other Open edX products/experiences (e.g. account/onboarding).
-
-// ------------------------------
-// #VENDOR
-// ------------------------------
-@import '../vendor/bourbon/bourbon';
-@import '../vendor/neat/neat';
 @import '../vendor/normalize/normalize';
 
 // ------------------------------
 // #UTILITIES
 // ------------------------------
-@import 'utilities/variables';
 @import 'utilities/mixins';
 
 // ------------------------------
@@ -51,5 +43,3 @@
 // #SHAME
 // ------------------------------
 @import 'utilities/shame';
-
-

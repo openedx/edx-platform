@@ -29,7 +29,7 @@
   .logo {
     display: inline-block;
     vertical-align: middle;
-    margin-right: ($baseline-h);
+    @include margin-right($baseline-h);
   }
 
   .title-sub {

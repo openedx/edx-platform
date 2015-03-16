@@ -27,25 +27,25 @@
   .accomplishment-statement {
     @extend %trans-size;
     @include span-columns(8 of 12);
-    @include pad(0 $baseline-h 0 0);
-    border-right: 1px solid $gray-l5;
+    @include padding-right($baseline-h);
+    @include border-right(1px solid $gray-l5);
 
     @include media($bp-large) {
       @include fill-parent;
-      @include pad(0);
-      border-right: none;
+      @include padding-right(0);
+      @include border-right(none);
     }
 
     @include media($bp-medium) {
       @include fill-parent;
-      @include pad(0);
-      border-right: none;
+      @include padding-right(0);
+      @include border-right(none);
     }
 
     @include media($bp-small) {
       @include fill-parent;
-      @include pad(0);
-      border-right: none;
+      @include padding-right(0);
+      @include border-right(none);
     }
 
     [class^="copy-"] {

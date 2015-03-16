@@ -114,7 +114,7 @@
         display: inline-block;
         vertical-align: top;
         max-width: 10%;
-        margin-right: ($baseline-h/2);
+        @include margin-right($baseline-h/2);
         color: $gray-l3;
       }
 
@@ -207,7 +207,7 @@
         display: inline-block;
         vertical-align: top;
         max-width: 10%;
-        margin-right: ($baseline-h/2);
+        @include margin-right($baseline-h/2);
         color: $gray-l4;
       }
 
