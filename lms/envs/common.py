@@ -304,7 +304,7 @@ FEATURES = {
     'ENABLE_COURSE_SORTING_BY_START_DATE': False,
 
     # Flag to enable new user account APIs.
-    'ENABLE_USER_REST_API': False,
+    'ENABLE_USER_REST_API': True,
 
     # Expose Mobile REST API. Note that if you use this, you must also set
     # ENABLE_OAUTH2_PROVIDER to True
