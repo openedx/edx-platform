@@ -39,6 +39,10 @@ from courseware.entrance_exams import (
     get_entrance_exam_score,
     user_must_complete_entrance_exam
 )
+from lms_xblock.runtime import (
+    SettingsService,
+)
+from xmodule.services import NotificationsService, CoursewareParentInfoService
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
@@ -650,6 +654,21 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
 
     user_is_staff = has_access(user, u'staff', descriptor.location, course_id)
 
+    services_list = {
+        'i18n': ModuleI18nService(),
+        'fs': FSService(),
+        'field-data': field_data,
+        'settings': SettingsService(),
+        'courseware_parent_info': CoursewareParentInfoService(),
+        "reverification": ReverificationService(),
+        'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
+    }
+
+    if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
+        services_list.update({
+            "notifications": NotificationsService(),
+        })
+
     system = LmsModuleSystem(
         track_function=track_function,
         render_template=render_to_string,
@@ -692,13 +711,7 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
         mixins=descriptor.runtime.mixologist._mixins,  # pylint: disable=protected-access
         wrappers=block_wrappers,
         get_real_user=user_by_anonymous_id,
-        services={
-            'i18n': ModuleI18nService(),
-            'fs': FSService(),
-            'field-data': field_data,
-            'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
-            "reverification": ReverificationService()
-        },
+        services=services_list,
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         rebind_noauth_module_to_user=rebind_noauth_module_to_user,
