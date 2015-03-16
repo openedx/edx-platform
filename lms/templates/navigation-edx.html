@@ -80,6 +80,7 @@ site_status_msg = get_site_status_msg(course_id)
         <ul class="dropdown-menu" aria-label="More Options" role="menu">
           <%block name="navigation_dropdown_menu_links" >
             <li><a href="${reverse('account_settings')}">${_("Account Settings")}</a></li>
+            <li><a href="${reverse('learner_profile', kwargs={'username': user.username})}">${_("My Profile")}</a></li>
           </%block>
           <li><a href="${reverse('logout')}" role="menuitem">${_("Sign out")}</a></li>
         </ul>

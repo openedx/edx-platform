@@ -5,6 +5,32 @@
 .u-field {
     padding: $baseline 0;
     border-bottom: 1px solid $gray-l5;
+    border: 1px dashed transparent;
+
+    &.mode-placeholder:hover {
+        border: 1px dashed $m-blue-d1;
+    }
+
+    &.editable-toggle.mode-display:hover {
+        background-color: $m-blue-hover;
+
+        .message-can-edit {
+            display: inline-block;
+        }
+    }
+
+    &.mode-hidden {
+        display: none;
+    }
+
+    i {
+      color: $gray;
+      vertical-align:text-bottom
+    }
+
+    .message-can-edit {
+        display: none;
+    }
 
     .message-error {
         color: $alert-color;
@@ -31,6 +57,10 @@
         border: none;
         box-shadow: none;
     }
+}
+
+.u-field-icon {
+    width: $baseline;
 }
 
 .u-field-title {

@@ -1,0 +1,43 @@
+<%! import json %>
+<%! from django.core.urlresolvers import reverse %>
+<%! from django.utils.translation import ugettext as _ %>
+
+<!--<%namespace name='static' file='/static_content.html'/>-->
+
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="pagetitle">${_("Learner Profile")}</%block>
+
+<%block name="header_extras">
+    % for template_name in ["field_dropdown", "field_textarea", "field_readonly"]:
+        <script type="text/template" id="${template_name}-tpl">
+            <%static:include path="fields/${template_name}.underscore" />
+        </script>
+    % endfor
+
+    % for template_name in ["learner_profile",]:
+        <script type="text/template" id="${template_name}-tpl">
+            <%static:include path="student_profile/${template_name}.underscore" />
+        </script>
+    % endfor
+</%block>
+
+<div class="wrapper-profile">
+    <div class="ui-loading-indicator">
+        <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">${_("Loading")}</span></p>
+    </div>
+</div>
+<%block name="headextra">
+    <%static:css group='style-course'/>
+
+    <script>
+          (function (require) {
+            require(['js/student_profile/views/learner_profile_factory'], function(setupLearnerProfile) {
+                var options = ${ json.dumps(data) };
+                setupLearnerProfile(options);
+            });
+          }).call(this, require || RequireJS.require);
+    </script>
+
+</%block>

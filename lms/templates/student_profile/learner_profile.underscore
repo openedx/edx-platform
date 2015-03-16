@@ -1,0 +1,25 @@
+<div class="profile <%- ownProfile ? 'profile-self' : 'profile-other' %>">
+    <div class="wrapper-profile-field-account-privacy"></div>
+
+    <div class="wrapper-profile-sections account-settings-container">
+        <div class="wrapper-profile-section-one">
+            <div class="profile-photo">
+                <img src="<%- profilePhoto %>">
+            </div>
+
+            <div class="profile-section-one-fields">
+            </div>
+        </div>
+
+        <div class="wrapper-profile-section-two">
+            <div class="profile-section-two-fields">
+                <% if (!showFullProfile) { %>
+                    <label class="profile-private--message">
+                        <%- gettext('This edX learner is not currently sharing their profile details.') %>
+                    </label>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+</div>

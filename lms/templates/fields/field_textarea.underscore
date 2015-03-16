@@ -1,0 +1,16 @@
+<div class="wrapper-u-field">
+    <div class="u-field-header">
+        <label class="u-field-title" for="u-field-textarea-<%- id %>" aria-describedby="u-field-message-<%- id %>"><%-
+            gettext(title)
+        %></label>
+        <span class="u-field-message" id="u-field-message-<%- id %>"><%- message %></span>
+    </div>
+
+    <div class="u-field-value"><%
+        if (mode === 'edit') {
+        %><textarea id="u-field-textarea-<%- id %>" rows="4"><%- value %></textarea><%
+        } else {
+        %><%- value %><%
+        }
+    %></div>
+</div>

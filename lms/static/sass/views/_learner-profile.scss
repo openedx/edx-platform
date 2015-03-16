@@ -1,0 +1,173 @@
+$profile-photo-dimension: 120px;
+
+.ui-loading-indicator {
+    @extend .ui-loading-base;
+
+    padding-bottom: $baseline;
+
+    // center horizontally
+    @include margin-left(auto);
+    @include margin-right(auto);
+    width: $baseline*5;
+}
+
+.wrapper-profile {
+    min-height: 200px;
+
+    .ui-loading-indicator {
+        margin-top: 100px;
+    }
+}
+
+.profile-self {
+    .wrapper-profile-field-account-privacy {
+      @include clearfix();
+      @include box-sizing(border-box);
+      margin: 0 auto 0;
+      padding: ($baseline*0.75) 0;
+      width: 100%;
+      background-color: $gray-l3;
+
+      .u-field-account_privacy {
+          @extend .container;
+          border: none;
+          box-shadow: none;
+      }
+
+      .u-field-title {
+          width: auto;
+          color: $base-font-color;
+          font-weight: $font-bold;
+      }
+
+      .u-field-value {
+          width: auto;
+          @include margin-left($baseline/2);
+      }
+
+      .u-field-message {
+          @include float(left);
+          width: 100%;
+          padding: 0px;
+          color: $base-font-color;
+      }
+  }
+}
+
+.wrapper-profile-sections {
+    @extend .container;
+}
+
+.wrapper-profile-section-one {
+
+    width: 100%;
+    display: inline-block;
+    margin-top: ($baseline*1.5);
+
+    .profile-photo {
+      @include float(left);
+      height: $profile-photo-dimension;
+      width: $profile-photo-dimension;
+      display: inline-block;
+      vertical-align: top;
+    }
+}
+
+.profile-section-one-fields {
+
+    float: left;
+    width: flex-grid(4, 12);
+    @include margin-left($baseline*1.5);
+
+    .u-field {
+        margin-bottom: ($baseline/4);
+        padding-top: 0;
+        padding-bottom: 0;
+        @include padding-left(3px);
+    }
+
+    .u-field-username {
+        margin-bottom: ($baseline*0.75);
+
+        .u-field-value {
+            font-size: 1.7em;
+            font-weight: $font-bold;
+            line-height: 0.9em;
+        }
+    }
+
+    .u-field-title {
+        width: 0;
+    }
+
+    .u-field-value {
+        width: 200px;
+    }
+
+    select {
+        width: 100%
+    }
+
+    .u-field-message {
+        float: right;
+        width: 20px;
+        margin-top: 2px;
+    }
+}
+
+.wrapper-profile-section-two {
+    width: flex-grid(8, 12);
+    margin-top: ($baseline*1.5);
+}
+
+.profile-section-two-fields {
+
+    .u-field-textarea {
+        margin-bottom: ($baseline/2);
+        padding: ($baseline/4) ($baseline/2) ($baseline/2);
+    }
+
+    .u-field-title {
+        font-size: 1.1em;
+        font-weight: $font-bold;
+        margin-bottom: ($baseline/4);
+    }
+
+    .u-field-value {
+        width: 100%;
+        white-space: pre-line;
+
+        textarea {
+          width: 100%;
+          background-color: transparent;
+        }
+    }
+
+    .u-field-message {
+        float: right;
+        width: auto;
+        padding-top: ($baseline/4);
+    }
+
+    .u-field.mode-placeholder {
+        padding: $baseline;
+        border: 1px dashed $base-font-color;
+
+        .u-field-title {
+            width: 100%;
+            text-align: center;
+        }
+
+        .u-field-value {
+            text-align: center;
+            line-height: 1.3em;
+        }
+    }
+
+    .u-field.mode-placeholder:hover {
+        border: 1px dashed $m-blue-d1;
+        .u-field-title {
+          color: $m-blue-d1;
+        }
+    }
+}
