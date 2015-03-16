@@ -818,7 +818,7 @@ function (HTML5Video, Resizer) {
             endTime = this.videoPlayer.duration(),
             youTubeId;
 
-        if (this.config.endTime !== null) {
+        if (this.config.endTime) {
             endTime = Math.min(this.config.endTime, endTime);
         }
 

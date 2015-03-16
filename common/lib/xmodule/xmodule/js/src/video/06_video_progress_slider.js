@@ -166,7 +166,7 @@ function () {
         var time = ui.value,
             endTime = this.videoPlayer.duration();
 
-        if (this.config.endTime !== null) {
+        if (this.config.endTime) {
             endTime = Math.min(this.config.endTime, endTime);
         }
 
