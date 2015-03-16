@@ -26,7 +26,7 @@ TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().
 
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
-class Basetranscripts(CourseTestCase):
+class BaseTranscripts(CourseTestCase):
     """Base test class for transcripts tests."""
 
     def clear_subs_content(self):
@@ -42,7 +42,7 @@ class Basetranscripts(CourseTestCase):
 
     def setUp(self):
         """Create initial data."""
-        super(Basetranscripts, self).setUp()
+        super(BaseTranscripts, self).setUp()
 
         # Add video module
         data = {
@@ -81,12 +81,12 @@ class Basetranscripts(CourseTestCase):
         }
 
 
-class TestUploadtranscripts(Basetranscripts):
+class TestUploadTranscripts(BaseTranscripts):
     """Tests for '/transcripts/upload' url."""
 
     def setUp(self):
         """Create initial data."""
-        super(TestUploadtranscripts, self).setUp()
+        super(TestUploadTranscripts, self).setUp()
 
         self.good_srt_file = tempfile.NamedTemporaryFile(suffix='.srt')
         self.good_srt_file.write(textwrap.dedent("""
@@ -338,7 +338,7 @@ class TestUploadtranscripts(Basetranscripts):
         self.assertIn("Test ufeff characters", subs_text)
 
     def tearDown(self):
-        super(TestUploadtranscripts, self).tearDown()
+        super(TestUploadTranscripts, self).tearDown()
 
         self.good_srt_file.close()
         self.bad_data_srt_file.close()
@@ -346,7 +346,7 @@ class TestUploadtranscripts(Basetranscripts):
         self.ufeff_srt_file.close()
 
 
-class TestDownloadtranscripts(Basetranscripts):
+class TestDownloadTranscripts(BaseTranscripts):
     """Tests for '/transcripts/download' url."""
 
     def save_subs_to_store(self, subs, subs_id):
@@ -522,7 +522,7 @@ class TestDownloadtranscripts(Basetranscripts):
         self.assertEqual(resp.status_code, 404)
 
 
-class TestChecktranscripts(Basetranscripts):
+class TestCheckTranscripts(BaseTranscripts):
     """Tests for '/transcripts/check' url."""
 
     def save_subs_to_store(self, subs, subs_id):
