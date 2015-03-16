@@ -23,6 +23,10 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from gradebook.models import StudentGradebook, StudentGradebookHistory
 from util.signals import course_deleted
 
+from edx_notifications.lib.consumer import get_notifications_count_for_user
+from edx_notifications.startup import initialize as initialize_notifications
+
+
 @override_settings(STUDENT_GRADEBOOK=True)
 class GradebookTests(ModuleStoreTestCase):
     """ Test suite for Student Gradebook """
@@ -153,6 +157,27 @@ class GradebookTests(ModuleStoreTestCase):
 
         history = StudentGradebookHistory.objects.all()
         self.assertEqual(len(history), 5)
+
+    @patch.dict(settings.FEATURES, {
+                'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
+                'SIGNAL_ON_SCORE_CHANGED': True,
+                'ENABLE_NOTIFICATIONS': True
+    })
+    @patch.dict(settings.FEATURES, {})
+    def test_notifications_publishing(self):
+        initialize_notifications()
+
+        # assert user has no notifications
+        self.assertEqual(get_notifications_count_for_user(self.user.id), 0)
+
+        self._create_course()
+        module = self.get_module_for_user(self.user, self.course, self.problem)
+        grade_dict = {'value': 0.75, 'max_value': 1, 'user_id': self.user.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        # user should have had a notification published as he/her is now in the
+        # leaderboard
+        self.assertEqual(get_notifications_count_for_user(self.user.id), 1)
 
     @patch.dict(settings.FEATURES, {
                 'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,

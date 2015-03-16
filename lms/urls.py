@@ -947,6 +947,18 @@ if 'debug_toolbar' in settings.INSTALLED_APPS:
 handler404 = 'static_template_view.views.render_404'
 handler500 = 'static_template_view.views.render_500'
 
+# display error page templates, for testing purposes
+urlpatterns += (
+    url(r'^404$', handler404),
+    url(r'^500$', handler500),
+)
+
+if settings.FEATURES.get('ENABLE_NOTIFICATIONS'):
+    # include into our URL patterns the HTTP RESTfule API that comes with edx-notifications
+    urlpatterns += (
+        url(r'^api/', include('edx_notifications.server.api.urls')),
+    )
+
 # include into our URL patterns the HTTP REST API that comes with edx-proctoring.
 urlpatterns += (
     url(r'^api/', include('edx_proctoring.urls')),

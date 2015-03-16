@@ -13,7 +13,6 @@ from model_utils.models import TimeStampedModel
 from student.models import CourseEnrollment
 from xmodule_django.models import CourseKeyField
 
-
 class StudentGradebook(TimeStampedModel):
     """
     StudentGradebook is essentiall a container used to cache calculated
@@ -98,23 +97,53 @@ class StudentGradebook(TimeStampedModel):
                     .order_by('-grade', 'modified')[:count]
                 # If a user_id value was provided, we need to provide some additional user-specific data to the caller
                 if user_id:
-                    user_grade = 0
-                    user_time_scored = timezone.now()
-                    try:
-                        user_queryset = StudentGradebook.objects.get(course_id__exact=course_key, user__id=user_id)
-                    except StudentGradebook.DoesNotExist:
-                        user_queryset = None
-                    if user_queryset:
-                        user_grade = user_queryset.grade
-                        user_time_scored = user_queryset.created
-                    users_above = queryset.filter(grade__gte=user_grade)\
-                        .exclude(user__id=user_id)\
-                        .exclude(grade=user_grade, modified__gt=user_time_scored)
-                    data['user_position'] = len(users_above) + 1
-                    data['user_grade'] = user_grade
+                    result = cls.get_user_position(
+                        course_key,
+                        user_id,
+                        queryset=queryset,
+                        exclude_users=exclude_users
+                    )
+                    print 'result = {}'.format(result)
+                    data.update(result)
 
         return data
 
+    @classmethod
+    def get_user_position(cls, course_key, user_id, queryset=None, exclude_users=[]):
+        """
+        Helper method to return the user's position in the leaderboard for Proficiency
+        """
+        data = {'user_position': 0, 'user_grade': 0}
+        user_grade = 0
+        users_above = 0
+        user_time_scored = timezone.now()
+        try:
+            user_queryset = StudentGradebook.objects.get(course_id__exact=course_key, user__id=user_id)
+        except StudentGradebook.DoesNotExist:
+            user_queryset = None
+
+        if user_queryset:
+            user_grade = user_queryset.grade
+            user_time_scored = user_queryset.created
+
+        # if we were not passed in an existing queryset, build it up
+        if not queryset:
+            queryset = StudentGradebook.objects.select_related('user')\
+                .filter(
+                    course_id__exact=course_key,
+                    user__is_active=True,
+                    user__courseenrollment__is_active=True,
+                    user__courseenrollment__course_id__exact=course_key
+                ).exclude(user__in=exclude_users)
+
+        users_above = queryset.filter(grade__gte=user_grade)\
+            .exclude(user__id=user_id)\
+            .exclude(grade=user_grade, modified__gt=user_time_scored)
+
+        data['user_position'] = len(users_above) + 1
+        data['user_grade'] = user_grade
+
+        return data
 
 class StudentGradebookHistory(TimeStampedModel):
     """

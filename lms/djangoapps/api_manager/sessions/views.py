@@ -14,6 +14,7 @@ from api_manager.permissions import SecureAPIView
 from rest_framework import status
 from rest_framework.response import Response
 from django.utils import timezone
+from django.template import RequestContext
 
 
 from util.bad_request_rate_limiter import BadRequestRateLimiter
@@ -119,6 +120,10 @@ class SessionsList(SecureAPIView):
                     response_data['user'] = user_dto.data
                     response_data['uri'] = '{}/{}'.format(base_uri, new_session.session_key)
                     response_status = status.HTTP_201_CREATED
+
+                    # generate a CSRF tokens for any web clients that may need to
+                    # call into the LMS via Ajax (for example Notifications)
+                    response_data['csrftoken'] = RequestContext(request, {}).get('csrf_token')
 
                     # update the last_login fields in the auth_user table for this user
                     user.last_login = timezone.now()

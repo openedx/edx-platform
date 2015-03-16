@@ -11,6 +11,11 @@ from django.test.utils import override_settings
 
 from xblock.runtime import Mixologist
 from xmodule.services import SettingsService
+from xmodule.services import SettingsService, NotificationsService
+
+from edx_notifications.data import (
+    NotificationType
+)
 
 
 class _DummyBlock(object):
@@ -76,3 +81,31 @@ class TestSettingsService(TestCase):
         block = mixologist.mix(_DummyBlock)
         self.assertEqual(settings.XBLOCK_SETTINGS, {"_DummyBlock": [1, 2, 3]})
         self.assertEqual(self.settings_service.get_settings_bucket(block), [1, 2, 3])
+
+
+class TestNotificationsService(TestCase):
+    """ Test SettingsService """
+
+    def setUp(self):
+        """ Setting up tests """
+        super(TestNotificationsService, self).setUp()
+        self.notifications_service = NotificationsService()
+
+    def test_exposed_functions(self):
+        """
+        Make sure the service exposes all of the edx_notifications library functions (that we know about for now)
+        """
+
+        # publisher lib
+        self.assertTrue(hasattr(self.notifications_service, 'register_notification_type'))
+        self.assertTrue(hasattr(self.notifications_service, 'get_notification_type'))
+        self.assertTrue(hasattr(self.notifications_service, 'get_all_notification_types'))
+        self.assertTrue(hasattr(self.notifications_service, 'publish_notification_to_user'))
+        self.assertTrue(hasattr(self.notifications_service, 'bulk_publish_notification_to_users'))
+
+        # consumer lib
+        self.assertTrue(hasattr(self.notifications_service, 'get_notifications_count_for_user'))
+        self.assertTrue(hasattr(self.notifications_service, 'get_notification_for_user'))
+        self.assertTrue(hasattr(self.notifications_service, 'get_notifications_for_user'))
+        self.assertTrue(hasattr(self.notifications_service, 'mark_notification_read'))
+        self.assertTrue(hasattr(self.notifications_service, 'mark_all_user_notification_as_read'))
