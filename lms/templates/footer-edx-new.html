@@ -74,36 +74,18 @@
       <h2 class="footer-follow-title">${_("Follow Us")}</h2>
 
       <div class="footer-follow-links">
-        ## Translators: This is the website name of www.twitter.com. Please
-        ## translate this the way that Twitter advertises in your language.
-        <a href="${settings.PLATFORM_TWITTER_URL}" title="${_("Twitter")}" rel="noreferrer">
-          <i class="icon fa fa-twitter element-invisible"></i>
-          <span class="copy">${_("Twitter")}</span>
+        % for social_name in settings.SOCIAL_MEDIA_FOOTER_NAMES:
+        <%  social_url, social_title, social_icon = (
+              settings.SOCIAL_MEDIA_FOOTER_URLS.get(social_name, "#"),
+              unicode(settings.SOCIAL_MEDIA_FOOTER_DISPLAY.get(social_name, {}).get("title", "")),
+              settings.SOCIAL_MEDIA_FOOTER_DISPLAY.get(social_name).get("icon", "")
+            )
+        %>
+        <a href="${social_url}" title="${social_title}" rel="noreferrer">
+          <i class="icon fa ${social_icon} element-invisible"></i>
+          <span class="copy">${social_title}</span>
         </a>
-        ## Translators: This is the website name of www.facebook.com. Please
-        ## translate this the way that Facebook advertises in your language.
-        <a href="${settings.PLATFORM_FACEBOOK_ACCOUNT}" title="${_("Facebook")}" rel="noreferrer">
-          <i class="icon fa fa-facebook element-invisible"></i>
-          <span class="copy">${_("Facebook")}</span>
-        </a>
-        ## Translators: This is the website name of www.meetup.com. Please
-        ## translate this the way that Meetup advertises in your language.
-        <a href="${settings.PLATFORM_MEETUP_URL}" title="${_("Meetup")}" rel="noreferrer">
-          <i class="icon fa fa-calendar element-invisible"></i>
-          <span class="copy">${_("Meetup")}</span>
-        </a>
-        ## Translators: This is the website name of www.linked.com. Please
-        ## translate this the way that LinkedIn advertises in your language.
-        <a href="${settings.PLATFORM_LINKEDIN_URL}" title="${_("LinkedIn")}" rel="noreferrer">
-          <i class="icon fa fa-linkedin element-invisible"></i>
-          <span class="copy">${_("LinkedIn")}</span>
-        </a>
-        ## Translators: This is the website name of plus.google.com. Please
-        ## translate this the way that Google+ advertises in your language.
-        <a href="${settings.PLATFORM_GOOGLE_PLUS_URL}" title="${_("Google+")}" rel="noreferrer">
-          <i class="icon fa fa-google-plus element-invisible"></i>
-          <span class="copy">${_("Google+")}</span>
-        </a>
+        % endfor
       </div>
 
       % if settings.FEATURES.get('ENABLE_FOOTER_MOBILE_APP_LINKS'):
