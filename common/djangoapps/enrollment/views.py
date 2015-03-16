@@ -14,6 +14,7 @@ from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 from opaque_keys.edx.keys import CourseKey
 from embargo import api as embargo_api
+from cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from util.authentication import SessionAuthenticationAllowInactiveUser, OAuth2AuthenticationAllowInactiveUser
 from util.disable_rate_limit import can_disable_rate_limit
@@ -22,6 +23,11 @@ from enrollment.errors import (
     CourseNotFoundError, CourseEnrollmentError,
     CourseModeNotFoundError, CourseEnrollmentExistsError
 )
+
+
+class EnrollmentCrossDomainSessionAuth(SessionAuthenticationAllowInactiveUser, SessionAuthenticationCrossDomainCsrf):
+    """Session authentication that allows inactive users and cross-domain requests. """
+    pass
 
 
 class EnrollmentUserThrottle(UserRateThrottle):
@@ -267,7 +273,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 * user: The ID of the user.
     """
 
-    authentication_classes = OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser
+    authentication_classes = OAuth2AuthenticationAllowInactiveUser, EnrollmentCrossDomainSessionAuth
     permission_classes = ApiKeyHeaderPermissionIsAuthenticated,
     throttle_classes = EnrollmentUserThrottle,
 
