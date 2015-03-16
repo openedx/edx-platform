@@ -79,26 +79,31 @@ class OrdersView(APIView):
         if not valid:
             return DetailResponse(error, status=HTTP_406_NOT_ACCEPTABLE)
 
+        # Ensure that the course has an honor mode with SKU
+        honor_mode = CourseMode.mode_for_course(course_key, CourseMode.HONOR)
+        course_id = unicode(course_key)
+
+        # If there is no honor course mode, this most likely a Prof-Ed course. Return an error so that the JS
+        # redirects to track selection.
+        if not honor_mode:
+            msg = Messages.NO_HONOR_MODE.format(course_id=course_id)
+            return DetailResponse(msg, status=HTTP_406_NOT_ACCEPTABLE)
+        elif not honor_mode.sku:
+            # If there are no course modes with SKUs, enroll the user without contacting the external API.
+            msg = Messages.NO_SKU_ENROLLED.format(enrollment_mode=CourseMode.HONOR, course_id=course_id,
+                                                  username=user.username)
+            log.debug(msg)
+            self._enroll(course_key, user)
+            return DetailResponse(msg)
+
         # Ensure that the E-Commerce API is setup properly
         ecommerce_api_url = getattr(settings, 'ECOMMERCE_API_URL', None)
         ecommerce_api_signing_key = getattr(settings, 'ECOMMERCE_API_SIGNING_KEY', None)
 
         if not (ecommerce_api_url and ecommerce_api_signing_key):
             self._enroll(course_key, user)
-            msg = Messages.NO_ECOM_API.format(username=user.username, course_id=unicode(course_key))
+            msg = Messages.NO_ECOM_API.format(username=user.username, course_id=course_id)
             log.debug(msg)
-            return DetailResponse(msg)
-
-        # Default to honor mode. In the future we may expand this view to support additional modes.
-        mode = CourseMode.DEFAULT_MODE_SLUG
-        course_modes = CourseMode.objects.filter(course_id=course_key, mode_slug=mode, sku__isnull=False)
-
-        # If there are no course modes with SKUs, enroll the user without contacting the external API.
-        if not course_modes.exists():
-            msg = Messages.NO_SKU_ENROLLED.format(enrollment_mode=mode, course_id=unicode(course_key),
-                                                  username=user.username)
-            log.debug(msg)
-            self._enroll(course_key, user)
             return DetailResponse(msg)
 
         # Contact external API
@@ -111,7 +116,7 @@ class OrdersView(APIView):
 
         try:
             timeout = getattr(settings, 'ECOMMERCE_API_TIMEOUT', 5)
-            response = requests.post(url, data=json.dumps({'sku': course_modes[0].sku}), headers=headers,
+            response = requests.post(url, data=json.dumps({'sku': honor_mode.sku}), headers=headers,
                                      timeout=timeout)
         except Exception as ex:  # pylint: disable=broad-except
             log.exception('Call to E-Commerce API failed: %s.', ex.message)
@@ -143,7 +148,7 @@ class OrdersView(APIView):
                     'status': order_status,
                     'complete_status': OrderStatus.COMPLETE,
                     'username': user.username,
-                    'course_id': unicode(course_key),
+                    'course_id': course_id,
                 }
                 log.error(msg, msg_kwargs)
 
