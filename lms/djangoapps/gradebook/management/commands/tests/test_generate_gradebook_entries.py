@@ -18,6 +18,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
+@patch.dict(settings.FEATURES, {'SIGNAL_ON_SCORE_CHANGED': True})
 class GenerateGradebookEntriesTests(ModuleStoreTestCase):
     """
     Test suite for grade generation script

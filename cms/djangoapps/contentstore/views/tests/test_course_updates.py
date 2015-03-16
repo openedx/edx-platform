@@ -11,9 +11,14 @@ from contentstore.utils import reverse_course_url, reverse_usage_url
 from opaque_keys.edx.keys import UsageKey
 from xmodule.modulestore.django import modulestore
 
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from edx_notifications.lib.consumer import get_notifications_count_for_user
+from mock import patch
 
 class CourseUpdateTest(CourseTestCase):
-
+    """
+    Test for course updates
+    """
     def create_update_url(self, provided_id=None, course_key=None):
         if course_key is None:
             course_key = self.course.id
@@ -124,6 +129,29 @@ class CourseUpdateTest(CourseTestCase):
         resp = self.client.delete(url)
         payload = json.loads(resp.content)
         self.assertTrue(len(payload) == before_delete - 1)
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_NOTIFICATIONS": True})
+    def test_notifications_enabled_when_new_updates_in_course(self):
+        # create new users and enroll them in the course.
+        test_user_1 = UserFactory.create(password='test_pass')
+        CourseEnrollmentFactory(user=test_user_1, course_id=self.course.id)
+        test_user_2 = UserFactory.create(password='test_pass')
+        CourseEnrollmentFactory(user=test_user_2, course_id=self.course.id)
+
+        content = 'Test update'
+        payload = {'content': content, 'date': 'Feb 19, 2015'}
+        url = self.create_update_url()
+
+        resp = self.client.ajax_post(
+            url, payload, REQUEST_METHOD="POST"
+        )
+        self.assertEqual(resp.status_code, 200)
+        self.assertHTMLEqual(content, json.loads(resp.content)['content'])
+
+        # now the enrolled users should get notification about the
+        # course update where they are enrolled as student.
+        self.assertTrue(get_notifications_count_for_user(test_user_1.id), 1)
+        self.assertTrue(get_notifications_count_for_user(test_user_2.id), 1)
 
     def test_course_updates_compatibility(self):
         '''

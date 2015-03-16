@@ -6,7 +6,7 @@ from optparse import make_option
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from django.db.models import Q
+from django.db.models import Q, Min
 
 from progress.models import StudentProgress, CourseModuleCompletion
 from student.models import CourseEnrollment
@@ -69,23 +69,45 @@ class Command(BaseCommand):
 
             # For each user...
             for user in users:
+
                 status = 'skipped'
-                completions = CourseModuleCompletion.objects.filter(course_id=course.id, user_id=user.id)\
+                num_completions = CourseModuleCompletion.objects.filter(course_id=course.id, user_id=user.id)\
                     .exclude(cat_list).count()
-                try:
-                    existing_record = StudentProgress.objects.get(user=user, course_id=course.id)
-                    if existing_record.completions != completions:
-                        existing_record.completions = completions
-                        existing_record.save()
-                        status = 'updated'
-                except StudentProgress.DoesNotExist:
-                    new_record = StudentProgress.objects.create(
-                        user=user,
-                        course_id=course.id,
-                        completions=completions
-                    )
-                    status = 'created'
-                log_msg = 'Progress entry {} -- Course: {}, User: {}  (completions: {})'.format(status, course.id, user.id
-                                                                                                     , completions)
+
+                if num_completions:
+
+                    start_date = CourseModuleCompletion.objects.filter(course_id=course.id, user_id=user.id)\
+                        .exclude(cat_list).aggregate(Min('created'))['created__min']
+
+                    try:
+                        existing_record = StudentProgress.objects.get(user=user, course_id=course.id)
+
+                        if existing_record.completions != num_completions:
+                            existing_record.completions = num_completions
+                            status = 'updated'
+
+                        if existing_record.created != start_date:
+                            existing_record.created = start_date
+                            status = 'updated'
+
+                        if status == 'updated':
+                            existing_record.save()
+
+                    except StudentProgress.DoesNotExist:
+                        StudentProgress.objects.create(
+                            user=user,
+                            course_id=course.id,
+                            completions=num_completions,
+                            created=start_date
+                        )
+                        status = 'created'
+
+                log_msg = 'Progress entry {} -- Course: {}, User: {}  (completions: {})'.format(
+                    status,
+                    course.id,
+                    user.id,
+                    num_completions
+                )
+
                 print log_msg
                 log.info(log_msg)

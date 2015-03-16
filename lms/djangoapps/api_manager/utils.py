@@ -8,6 +8,7 @@ from django.utils.timezone import now
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta, MO
 from django.conf import settings
+from student.roles import CourseRole, CourseObserverRole
 
 
 def address_exists_in_network(ip_address, net_n_bits):
