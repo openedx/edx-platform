@@ -1,15 +1,19 @@
 # -*- coding: utf-8 -*-
 """ Tests for the profile API. """
-from django.contrib.auth.models import User
-
-import ddt
-from django.test.utils import override_settings
-from nose.tools import raises
-from dateutil.parser import parse as parse_datetime
-from pytz import UTC
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 import datetime
+from dateutil.parser import parse as parse_datetime
+import ddt
+from mock import patch
+from nose.tools import raises
+from pytz import UTC
+from unittest import skipUnless
+
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.test.utils import override_settings
+
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..accounts.api import get_account_settings
 from ..api import account as account_api
@@ -18,6 +22,11 @@ from ..models import UserProfile, UserOrgTag
 
 
 @ddt.ddt
+@patch('openedx.core.djangoapps.user_api.accounts.helpers._PROFILE_IMAGE_SIZES', [50, 10])
+@patch.dict(
+    'openedx.core.djangoapps.user_api.accounts.helpers.PROFILE_IMAGE_SIZES_MAP', {'full': 50, 'small': 10}, clear=True
+)
+@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
 class ProfileApiTest(ModuleStoreTestCase):
 
     USERNAME = u'frank-underwood'
@@ -48,7 +57,12 @@ class ProfileApiTest(ModuleStoreTestCase):
             'mailing_address': None,
             'year_of_birth': None,
             'country': None,
-            'bio': None
+            'bio': None,
+            'profile_image': {
+                'has_image': False,
+                'image_url_full': u'http://example-storage.com/profile_images/default_50.jpg',
+                'image_url_small': u'http://example-storage.com/profile_images/default_10.jpg',
+            },
         })
 
     def test_update_and_retrieve_preference_info(self):
