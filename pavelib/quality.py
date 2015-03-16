@@ -100,13 +100,12 @@ def run_complexity():
     Uses radon to examine cyclomatic complexity.
     For additional details on radon, see http://radon.readthedocs.org/
     """
-    system_string = 'cms/ lms/ common/ openedx/'
     print('--> Calculating cyclomatic complexity of files...')
     try:
         shell(
             'radon',
             'cc',
-            system_string,
+            ' '.join(ALL_SERVICES),
             '--total-average',
         )
     except BuildFailure:
