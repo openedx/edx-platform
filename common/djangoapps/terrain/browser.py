@@ -115,7 +115,9 @@ def initial_setup(server):
             # the browser session is invalid, this will
             # raise a WebDriverException
             try:
-                world.browser = Browser(browser_driver, desired_capabilities=desired_capabilities)
+                # world.browser = Browser(browser_driver, desired_capabilities=desired_capabilities)
+                # DO NOT MERGE, temp edit for running lettuce tests on travis
+                world.browser = Browser(browser_driver)
                 world.browser.driver.set_script_timeout(GLOBAL_SCRIPT_TIMEOUT)
                 world.visit('/')
 
@@ -133,7 +135,8 @@ def initial_setup(server):
             raise IOError("Could not acquire valid {driver} browser session.".format(driver=browser_driver))
 
         world.absorb(0, 'IMPLICIT_WAIT')
-        world.browser.driver.set_window_size(1280, 1024)
+        # DO NOT MERGE, temp edit for running lettuce tests on travis
+        # world.browser.driver.set_window_size(1280, 1024)
 
     elif world.LETTUCE_SELENIUM_CLIENT == 'saucelabs':
         config = get_saucelabs_username_and_key()

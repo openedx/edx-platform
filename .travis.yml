@@ -1,0 +1,95 @@
+sudo: true
+
+env:
+  global:
+  - PIP_ACCEL_CONFIG=$TRAVIS_BUILD_DIR/pip-accel.conf
+  - NO_PREREQ_INSTALL=true
+  - LETTUCE_BROWSER=firefox
+  matrix:
+    # These work. Disable while getting the rest of the commands to work also.
+    # - TEST_SUITE=unit-cms
+    # - TEST_SUITE=unit-lib
+    # - TEST_SUITE=unit-js
+
+    # Still working on these.
+    # - TEST_SUITE=quality
+    # - TEST_SUITE=unit-lms
+    # - TEST_SUITE=lettuce-cms
+    # - TEST_SUITE=lettuce-lms
+
+    # Break out the bok-choy for troubleshooting
+    # - TEST_SUITE=bok-1
+    # - TEST_SUITE=bok-2
+    # - TEST_SUITE=bok-3
+    # - TEST_SUITE=bok-4
+    - TEST_SUITE=bok-5
+
+
+language: python
+
+python:
+  - "2.7"
+
+# Cannot use travis dependency caching except in their container infrastructure,
+# but there you cannot use sudo to install packages. Otherwise we would do
+# something like this...
+cache:
+  apt: true
+  directories:
+  - $HOME/.pip/download-cache
+  - $HOME/.pip-accel
+
+services:
+  - mongodb
+  - memcached
+
+jdk:
+  - openjdk7
+
+rvm:
+  - "1.9.3"
+
+before_install:
+  - sudo add-apt-repository ppa:chris-lea/node.js -y
+  - sudo apt-get update -qq
+  - sudo apt-get install gfortran liblapack-dev g++ libxml2-dev libxslt1-dev nodejs gdebi
+
+  # Setup for headless display of browsers
+  - export DISPLAY=:99.0
+  # - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1024x768x24"
+  - sh -e /etc/init.d/xvfb start
+
+  # Get the version of Firefox that the bok-choy tests pass under.
+  # TODO: leave as the default (travis manages), get the tests passing, and keep them passing that way.
+  # - sudo wget -O /tmp/firefox_28.deb https://s3.amazonaws.com/vagrant.testeng.edx.org/firefox_28.0%2Bbuild2-0ubuntu0.12.04.1_amd64.deb
+  # - sudo gdebi -nq /tmp/firefox_28.deb
+
+# command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
+install:
+  # Install pip-accel and other workaround requirements
+  - pip install -r requirements/edx/pip-accel.txt
+
+  # There is a bug in pip 1.4.1 by which --exists-action is broken.
+  # This is fixed in pip 1.5.x, but alas pip-accel is not yet compatible with pip 1.5.x.
+  # Remove when we can upgrade to a version of pip-accel that supports pip 1.5.x.
+  - pip install --upgrade "git+https://github.com/jzoldak/pip.git@v1.4.1patch772#egg=pip"
+
+  # Install the edx-platform requirements
+  - pip-accel install --exists-action=w -r requirements/edx/pre.txt
+  - pip-accel install --exists-action=w -r requirements/edx/github.txt
+  - pip-accel install --exists-action=w -r requirements/edx/base.txt
+  - pip-accel install --exists-action=w -r requirements/edx/post.txt
+  - pip-accel install --exists-action=w -r requirements/edx/paver.txt
+
+  # Install the local requirements
+  - pip-accel install --exists-action=w -r requirements/edx/local.txt
+
+  # Install ruby dependencies
+  - bundle install
+
+  # Install node.js dependencies
+  - npm install
+
+# command to run tests
+script: ./scripts/run-travis-tests.sh
+
