@@ -18,6 +18,10 @@ ALL_SERVICES = [
     'lms',
     'cms',
     'common',
+    'docs',
+    'scripts',
+    'pavelib',
+    'openedx',
 ]
 
 
