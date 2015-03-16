@@ -109,9 +109,9 @@ $f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace;
 // grid
 @import "neat/neat-helpers";
 
-// grid (neat-based)
 $max-width: 1280px;
 $grid-columns: 12;                                                  // make grid 12 columns
+$column: ($baseline-v*4.25);                                               // columns
 $gutter: $baseline-v;                                               // gutter b/t columns
 
 // grid (neat-based) - responsive
