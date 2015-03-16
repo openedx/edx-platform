@@ -1,0 +1,19 @@
+<div class="learner-profile-visibility">
+    <!--Placeholder for profile visibility selector-->
+</div>
+
+<div class="learner-profile-fields">
+
+    <div class="learner-profile-image">
+        <!--Placeholder for profile image-->
+    </div>
+
+    <div class="learner-profile-userinfo">
+        <!--Placeholder for username, country and language-->
+    </div>
+
+    <div class="learner-profile-aboutme">
+        <!--Placeholder for about me-->
+    </div>
+
+</div>
