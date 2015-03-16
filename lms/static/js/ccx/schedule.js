@@ -292,13 +292,13 @@ var edx = edx || {};
 	    var children = self.get_children(row);
 
 	    if (row.is('.expanded')) {
-	      $(this).removeClass('icon-caret-down').addClass('icon-caret-right');
+	      $(this).removeClass('fa-caret-down').addClass('fa-caret-right');
 	      row.removeClass('expanded').addClass('collapsed');
 	      children.hide(); 
 	    }
 
 	    else {
-	      $(this).removeClass('icon-caret-right').addClass('icon-caret-down');
+	      $(this).removeClass('fa-caret-right').addClass('fa-caret-down');
 	      row.removeClass('collapsed').addClass('expanded');
 	      children.filter('.collapsed').each(function() {
 		children = children.not(self.get_children(this));

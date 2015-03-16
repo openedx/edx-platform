@@ -675,12 +675,6 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         request_token (str): A unique token for this request, used to isolate xblock rendering
     """
 
-    # Do not check access when it's a noauth request.
-    if getattr(user, 'known', True):
-        # Short circuit--if the user shouldn't have access, bail without doing any work
-        if not has_access(user, 'load', descriptor, course_id):
-            return None
-
     (system, student_data) = get_module_system_for_user(
         user=user,
         field_data_cache=field_data_cache,  # These have implicit user bindings, the rest of args are considered not to

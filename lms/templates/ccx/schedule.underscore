@@ -5,7 +5,7 @@
         <th><%- gettext('Start Date') %></th>
         <th><%- gettext('Due Date') %></th>
         <th><a href="#" id="remove-all">
-          <i class="icon-remove-sign icon"></i> <%- gettext('remove all') %>
+          <i class="fa fa-remove"></i> <%- gettext('remove all') %>
         </a></th>
       </tr>
     </thead>
@@ -13,26 +13,26 @@
       <% _.each(chapters, function(chapter) { %>
         <tr class="chapter collapsed" data-location="<%= chapter.location %>" data-depth="1">
           <td class="unit">
-            <a href="#"><i class="icon-caret-right icon toggle-collapse"></i></a>
+            <a href="#"><i class="fa fa-caret-right toggle-collapse"></i></a>
             <%= chapter.display_name %>
           </td>
           <td class="date start-date"><a><%= chapter.start %></a></td>
           <td class="date due-date"><a><%= chapter.due %></a></td>
           <td><a href="#" class="remove-unit">
-            <i class="icon-remove-sign icon"></i> <%- gettext('remove') %>
+            <i class="fa fa-remove"></i> <%- gettext('remove') %>
           </a></td>
         </tr>
         <% _.each(chapter.children, function(child) { %>
           <tr class="sequential collapsed" data-depth="2"
               data-location="<%= chapter.location %> <%= child.location %>">
             <td class="unit">
-              <a href="#"><i class="icon-caret-right icon toggle-collapse"></i></a>
+              <a href="#"><i class="fa fa-caret-right toggle-collapse"></i></a>
               <%= child.display_name %>
             </td>
             <td class="date start-date"><a><%= child.start %></a></td>
             <td class="date due-date"><a><%= child.due %></a></td>
             <td><a href="#" class="remove-unit">
-              <i class="icon-remove-sign icon"></i> <%- gettext('remove') %>
+              <i class="fa fa-remove"></i> <%- gettext('remove') %>
             </a></td>
           </tr>
           <% _.each(child.children, function(subchild) { %>
@@ -42,7 +42,7 @@
               <td class="date start-date"><a><%= subchild.start %></a></td>
               <td class="date due-date"><a><%= subchild.due %></a></td>
               <td><a href="#" class="remove-unit">
-                <i class="icon-remove-sign icon"></i> <%- gettext('remove') %>
+                <i class="fa fa-remove"></i> <%- gettext('remove') %>
               </a></td>
           <% }); %>
         <% }); %>
