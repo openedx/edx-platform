@@ -9,11 +9,11 @@
   background: $white-t;
   color: $black;
 
-  @include media($bp-ds) {
+  @include media($bp-medium) {
     padding: ($baseline-v) ($baseline-h);
   }
 
-  @include media($bp-m) {
+  @include media($bp-small) {
     padding: ($baseline-v) ($baseline-h);
   }
 }

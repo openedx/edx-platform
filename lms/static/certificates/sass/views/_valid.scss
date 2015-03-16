@@ -14,11 +14,11 @@
     border: 1px solid $gray-l5;
     background: $white-t;
 
-    @include media($bp-ds) {
+    @include media($bp-medium) {
       padding: ($baseline-v) ($baseline-h);
     }
 
-    @include media($bp-m) {
+    @include media($bp-small) {
       padding: ($baseline-v) ($baseline-h);
     }
   }
@@ -30,19 +30,19 @@
     @include pad(0 $baseline-h 0 0);
     border-right: 1px solid $gray-l5;
 
-    @include media($bp-dm) {
+    @include media($bp-large) {
       @include fill-parent;
       @include pad(0);
       border-right: none;
     }
 
-    @include media($bp-ds) {
+    @include media($bp-medium) {
       @include fill-parent;
       @include pad(0);
       border-right: none;
     }
 
-    @include media($bp-m) {
+    @include media($bp-small) {
       @include fill-parent;
       @include pad(0);
       border-right: none;
@@ -57,13 +57,13 @@
       @extend %t-title-2;
       @extend %t-weight3;
 
-      @include media($bp-ds) {
+      @include media($bp-medium) {
         @include font-size(36); // can't use %t-title-4 for some reason
         @include lh(36);
         margin: ($baseline-v/2) 0 ($baseline-v/4) 0;
       }
 
-      @include media($bp-m) {
+      @include media($bp-small) {
         @include font-size(24);
         @include lh(24);
         margin: ($baseline-v/2) 0 ($baseline-v/4) 0;
@@ -75,21 +75,21 @@
       @extend %t-weight2;
       margin-bottom: 0;
 
-      @include media($bp-ds) {
+      @include media($bp-medium) {
         margin: ($baseline-v/2) 0 0 0;
       }
 
-      @include media($bp-m) {
+      @include media($bp-small) {
         margin: ($baseline-v/2) 0 0 0;
       }
     }
 
     .copy-course {
-      @include media($bp-ds) {
+      @include media($bp-medium) {
         margin-bottom: ($baseline-v/4);
       }
 
-      @include media($bp-m) {
+      @include media($bp-small) {
         margin-bottom: ($baseline-v/4);
       }
     }
@@ -99,13 +99,13 @@
       @extend %t-weight3;
       @include lh(36);
 
-      @include media($bp-ds) {
+      @include media($bp-medium) {
         @include font-size(36); // can't use %t-title-4 for some reason
         @include lh(36);
         margin: 0;
       }
 
-      @include media($bp-m) {
+      @include media($bp-small) {
         @include font-size(24); // can't use %t-title-4 for some reason
         @include lh(24);
         margin: 0;
@@ -120,12 +120,12 @@
       @extend %t-copy-lead2;
       color: $gray-l2;
 
-      @include media($bp-ds) {
+      @include media($bp-medium) {
         @include font-size(16); // can't use %t-copy-base for some reason
         @include lh(16);
       }
 
-      @include media($bp-m) {
+      @include media($bp-small) {
         @include font-size(16); // can't use %t-copy-base for some reason
         @include lh(16);
       }
@@ -137,18 +137,18 @@
     @extend %trans-size;
     @include span-columns(4 of 12);
 
-    @include media($bp-dm) {
+    @include media($bp-large) {
       @include fill-parent;
       margin-top: ($baseline-v);
       padding-top: ($baseline-v*2);
       border-top: 1px solid $gray-l5;
     }
 
-    @include media($bp-ds) {
+    @include media($bp-medium) {
       @include fill-parent;
     }
 
-    @include media($bp-m) {
+    @include media($bp-small) {
       @include fill-parent;
     }
 

@@ -37,17 +37,17 @@
     @include shift(2);
     margin-bottom: ($baseline-v*2);
 
-    @include media($bp-dm) {
+    @include media($bp-large) {
       @include fill-parent();
       @include shift(0);
     }
 
-    @include media($bp-ds) {
+    @include media($bp-medium) {
       @include fill-parent();
       @include shift(0);
     }
 
-    @include media($bp-m) {
+    @include media($bp-small) {
       @include fill-parent();
       @include shift(0);
     }
@@ -59,17 +59,17 @@
     @include shift(2);
     margin-bottom: ($baseline-v*2);
 
-    @include media($bp-dm) {
+    @include media($bp-large) {
       @include fill-parent();
       @include shift(0);
     }
 
-    @include media($bp-ds) {
+    @include media($bp-medium) {
       @include fill-parent();
       @include shift(0);
     }
 
-    @include media($bp-m) {
+    @include media($bp-small) {
       @include fill-parent();
       @include shift(0);
     }
@@ -93,15 +93,15 @@
       color: $gray-l1;
       background: $gray-l5;
 
-      @include media($bp-dm) {
+      @include media($bp-large) {
       }
 
-      @include media($bp-ds) {
+      @include media($bp-medium) {
         @include fill-parent();
         min-height: 0;
       }
 
-      @include media($bp-m) {
+      @include media($bp-small) {
         @include fill-parent();
         min-height: 0;
       }
@@ -131,7 +131,7 @@
       .requirement-details {
         display: block;
 
-        @include media($bp-m) {
+        @include media($bp-small) {
           @include font-size(14); // can't use %t-copy-base for some reason
           @include lh(14);
         }
@@ -156,17 +156,17 @@
     border: 1px solid $gray-l5;
     background: $white-t;
 
-    @include media($bp-dm) {
+    @include media($bp-large) {
       @include fill-parent();
       @include shift(0);
     }
 
-    @include media($bp-ds) {
+    @include media($bp-medium) {
       @include fill-parent();
       @include shift(0);
     }
 
-    @include media($bp-m) {
+    @include media($bp-small) {
       @include fill-parent();
       @include shift(0);
     }
@@ -194,7 +194,7 @@
       border-bottom: 1px solid $gray-l5;
       color: $gray-l1;
 
-      @include media($bp-m) {
+      @include media($bp-small) {
         @include font-size(16); // can't use %t-copy-base for some reason
         @include lh(16);
       }
@@ -244,24 +244,24 @@
     @include span-columns(8 of 12);
     @include shift(2);
 
-    @include media($bp-dm) {
+    @include media($bp-large) {
       @include fill-parent();
       @include shift(0);
     }
 
-    @include media($bp-ds) {
+    @include media($bp-medium) {
       @include fill-parent();
       @include shift(0);
     }
 
-    @include media($bp-m) {
+    @include media($bp-small) {
       @include fill-parent();
       @include shift(0);
     }
 
     .copy {
 
-      @include media($bp-m) {
+      @include media($bp-small) {
         @include font-size(14); // can't use %t-copy-base for some reason
         @include lh(14);
       }
@@ -274,12 +274,12 @@
         @extend %t-copy-sub1;
         @extend %btn-primary;
 
-        @include media($bp-ds) {
+        @include media($bp-medium) {
           display: block;
           text-align: center;
         }
 
-        @include media($bp-m) {
+        @include media($bp-small) {
           display: block;
           text-align: center;
         }

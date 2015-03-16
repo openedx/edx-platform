@@ -9,11 +9,11 @@
     background: transparent url('../images/bg-paperfibers.png') 0 0 repeat-both;
     padding-bottom: ($baseline-v*3);
 
-    @include media($bp-ds) {
+    @include media($bp-medium) {
       padding-bottom: $baseline-h;
     }
 
-    @include media($bp-m) {
+    @include media($bp-small) {
       padding-bottom: $baseline-h;
     }
   }
@@ -21,11 +21,11 @@
   .wrapper-content {
     padding: $baseline-v ($baseline-h*2);
 
-    @include media($bp-ds) {
+    @include media($bp-medium) {
       padding: $baseline-v $baseline-h;
     }
 
-    @include media($bp-m) {
+    @include media($bp-small) {
       padding: $baseline-v $baseline-h;
     }
   }
@@ -49,31 +49,31 @@
     text-transform: uppercase;
     letter-spacing: 0.1rem;
 
-    @include media($bp-ds) {
+    @include media($bp-medium) {
       padding: ($baseline-v) ($baseline-h);
     }
 
-    @include media($bp-m) {
+    @include media($bp-small) {
       padding: ($baseline-v) ($baseline-h);
     }
 
     .title {
       @extend %t-title-6;
 
-      @include media($bp-dl) {
+      @include media($bp-xlarge) {
         @include span-columns(9 of 12);
       }
 
-      @include media($bp-dm) {
+      @include media($bp-large) {
         @include span-columns(9 of 12);
       }
 
-      @include media($bp-ds) {
+      @include media($bp-medium) {
         @include font-size(14); // can't use %t-title-8 for some reason
         @include lh(14);
       }
 
-      @include media($bp-m) {
+      @include media($bp-small) {
         @include font-size(14); // can't use %t-title-8 for some reason
         @include lh(14);
       }
@@ -82,15 +82,6 @@
 
   // supplemental content
   .content-supplemental {
-
-    @include media($bp-dm) {
-    }
-
-    @include media($bp-ds) {
-    }
-
-    @include media($bp-m) {
-    }
 
     .title {
       @extend %t-title-7;
@@ -110,16 +101,12 @@
         @extend %t-copy-sub1;
         @extend %btn-primary;
 
-        @include media($bp-dm) {
-
-        }
-
-        @include media($bp-ds) {
+        @include media($bp-medium) {
           display: block;
           text-align: center;
         }
 
-        @include media($bp-m) {
+        @include media($bp-small) {
           display: block;
           text-align: center;
         }
@@ -131,16 +118,16 @@
     @extend %trans-size;
     @include span-columns(3 of 12);
 
-    @include media($bp-dm) {
+    @include media($bp-large) {
       @include span-columns(6 of 12);
     }
 
-    @include media($bp-ds) {
+    @include media($bp-medium) {
       @include fill-parent;
       margin-bottom: ($baseline-v*2);
     }
 
-    @include media($bp-m) {
+    @include media($bp-small) {
       @include fill-parent;
       margin-bottom: ($baseline-v*2);
     }
@@ -151,15 +138,15 @@
     @include span-columns(3 of 12);
     @include omega();
 
-    @include media($bp-dm) {
+    @include media($bp-large) {
       @include span-columns(6 of 12);
     }
 
-    @include media($bp-ds) {
+    @include media($bp-medium) {
       @include fill-parent;
     }
 
-    @include media($bp-m) {
+    @include media($bp-small) {
       @include fill-parent;
     }
   }
@@ -168,17 +155,17 @@
     @extend %trans-size;
     @include span-columns(6 of 12);
 
-    @include media($bp-dm) {
+    @include media($bp-large) {
       @include fill-parent;
       margin-bottom: ($baseline-v*2);
     }
 
-    @include media($bp-ds) {
+    @include media($bp-medium) {
       @include fill-parent;
       margin-bottom: ($baseline-v*2);
     }
 
-    @include media($bp-m) {
+    @include media($bp-small) {
       @include fill-parent;
       margin-bottom: ($baseline-v*2);
     }
@@ -208,11 +195,11 @@
       background: $white-t url("../images/logo-idverified-cropped.png") bottom left no-repeat;
       background-size: 75%;
 
-      @include media($bp-ds) {
+      @include media($bp-medium) {
         background-size: 75%;
       }
 
-      @include media($bp-m) {
+      @include media($bp-small) {
         background-size: 100%;
       }
     }
@@ -227,18 +214,18 @@
         background: $white-t;
         margin: -($baseline-v*4) auto 0 auto;
 
-        @include media($bp-dm) {
+        @include media($bp-large) {
           float: right;
           margin: 0 0 $baseline-h $baseline-h;
         }
 
-        @include media($bp-ds) {
+        @include media($bp-medium) {
           width: 150px;
           float: right;
           margin: 0 0 $baseline-h $baseline-h;
         }
 
-        @include media($bp-m) {
+        @include media($bp-small) {
           width: 100px;
           float: right;
           margin: 0;

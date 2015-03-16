@@ -109,10 +109,10 @@ $column: ($baseline-v*4.25);                                               // co
 $gutter: $baseline-v;                                               // gutter b/t columns
 
 // grid (neat-based) - responsive
-$bp-m: new-breakpoint(max-width 499px 4);                           // mobile devices - make grid 4 columns
-$bp-ds: new-breakpoint(min-width 500px max-width 759px 6);          // small displays - make grid 6 columns
-$bp-dm: new-breakpoint(min-width 760px max-width 899px 12);        // medium displays - make grid 12 columns
-$bp-dl: new-breakpoint(min-width 900px 12);                        // large displays - make grid 12 columns
+$bp-small: new-breakpoint(max-width 499px 4);                           // mobile devices - make grid 4 columns
+$bp-medium: new-breakpoint(min-width 500px max-width 759px 6);          // small displays - make grid 6 columns
+$bp-large: new-breakpoint(min-width 760px max-width 899px 12);        // medium displays - make grid 12 columns
+$bp-xlarge: new-breakpoint(min-width 900px 12);                        // large displays - make grid 12 columns
 
 // timing - used for animation/transition mixin syncing
 $tmg-s3: 3.0s;

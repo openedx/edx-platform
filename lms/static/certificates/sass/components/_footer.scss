@@ -6,11 +6,11 @@
   background: $bg-footer-main;
   color: $color-footer-main;
 
-  @include media($bp-ds) {
+  @include media($bp-medium) {
     padding: 0 ($baseline-h);
   }
 
-  @include media($bp-m) {
+  @include media($bp-small) {
     padding: 0 ($baseline-h);
   }
 }
@@ -30,17 +30,17 @@
   @extend %t-copy-sub1;
   @include span-columns(4 of 12);
 
-  @include media($bp-dm) {
+  @include media($bp-large) {
     @include fill-parent;
     margin-bottom: ($baseline-v);
   }
 
-  @include media($bp-ds) {
+  @include media($bp-medium) {
     @include fill-parent;
     margin-bottom: ($baseline-v);
   }
 
-  @include media($bp-m) {
+  @include media($bp-small) {
     @include fill-parent;
     margin-bottom: ($baseline-v);
   }
@@ -51,17 +51,17 @@
   @include omega();
   text-align: right;
 
-  @include media($bp-dm) {
+  @include media($bp-large) {
     @include fill-parent;
     text-align: left;
   }
 
-  @include media($bp-ds) {
+  @include media($bp-medium) {
     @include fill-parent;
     text-align: left;
   }
 
-  @include media($bp-m) {
+  @include media($bp-small) {
     @include fill-parent;
     text-align: left;
   }
@@ -75,19 +75,19 @@
       margin-right: 0;
     }
 
-    @include media($bp-dm) {
+    @include media($bp-large) {
       @include fill-parent;
       margin: 0 0 $baseline-v 0;
       text-align: left;
     }
 
-    @include media($bp-ds) {
+    @include media($bp-medium) {
       @include fill-parent;
       margin: 0 0 $baseline-v 0;
       text-align: left;
     }
 
-    @include media($bp-m) {
+    @include media($bp-small) {
       @include fill-parent;
       margin: 0 0 $baseline-v 0;
       text-align: left;
@@ -99,19 +99,19 @@
     display: inline-block;
     margin-right: ($baseline-h/2);
 
-    @include media($bp-dm) {
+    @include media($bp-large) {
       @include font-size(14);
       @include lh(14);
     }
 
-    @include media($bp-ds) {
+    @include media($bp-medium) {
       @include font-size(14);
       @include lh(14);
       display: block;
       margin: 0 0 ($baseline-v/4) 0;
     }
 
-    @include media($bp-m) {
+    @include media($bp-small) {
       @include font-size(14);
       @include lh(14);
       display: block;
