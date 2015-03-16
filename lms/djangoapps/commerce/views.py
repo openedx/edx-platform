@@ -54,17 +54,16 @@ class OrdersView(APIView):
 
         return True, course_key, None
 
-    def _get_jwt(self, user):
+    def _get_jwt(self, user, ecommerce_api_signing_key):
         """
         Returns a JWT object with the specified user's info.
 
-        Raises AttributeError if settings.ECOMMERCE_API_SIGNING_KEY is not set.
         """
         data = {
             'username': user.username,
             'email': user.email
         }
-        return jwt.encode(data, getattr(settings, 'ECOMMERCE_API_SIGNING_KEY'))
+        return jwt.encode(data, ecommerce_api_signing_key)
 
     def _enroll(self, course_key, user):
         """ Enroll the user in the course. """
@@ -104,7 +103,7 @@ class OrdersView(APIView):
         # Contact external API
         headers = {
             'Content-Type': 'application/json',
-            'Authorization': 'JWT {}'.format(self._get_jwt(user))
+            'Authorization': 'JWT {}'.format(self._get_jwt(user, ecommerce_api_signing_key))
         }
 
         url = '{}/orders/'.format(ecommerce_api_url.strip('/'))
