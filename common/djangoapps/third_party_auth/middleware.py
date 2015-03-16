@@ -13,7 +13,6 @@ from social.apps.django_app.default import models
 from social.apps.django_app.middleware import SocialAuthExceptionMiddleware
 
 from . import pipeline
-from . import portal
 
 log = logging.getLogger(__file__)
 
@@ -69,18 +68,18 @@ class PortalSynchronizerMiddleware(object):
                         return logout(request)
 
                 if body:
-                    _id = body['_id']
-                    email = portal.get_primary_email(body['emails'])
+                    id_ = body['id']
+                    email = body['primaryEmail']
                     username = body['username']
                     name = body['name']
 
                     if (user.email != email or user.username != body['username']):
-                        log.info('User {} needs to be updated'.format(_id))
+                        log.info('User {} needs to be updated'.format(id_))
                         user.email = email
                         user.username = username
                         user.save()
 
                     if user.profile.name != body['name']:
-                        log.info('User profile for {} needs to be updated'.format(_id))
+                        log.info('User profile for {} needs to be updated'.format(id_))
                         user.profile.name = name
                         user.profile.save()
