@@ -3,7 +3,6 @@ Student Views
 """
 import datetime
 import logging
-import re
 import uuid
 import time
 import json
@@ -46,7 +45,6 @@ from social.apps.django_app import utils as social_utils
 from social.backends import oauth as social_oauth
 
 from edxmako.shortcuts import render_to_response, render_to_string
-from mako.exceptions import TopLevelLookupException
 
 from course_modes.models import CourseMode
 from shoppingcart.api import order_history
@@ -1154,12 +1152,7 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
     else:
         AUDIT_LOG.warning(u"Login failed - Account not active for user {0}, resending activation".format(username))
 
-    reactivation_email_for_user(user)
-    not_activated_msg = _("This account has not been activated. We have sent another activation message. Please check your email for the activation instructions.")
-    return JsonResponse({
-        "success": False,
-        "value": not_activated_msg,
-    })  # TODO: this should be status code 400  # pylint: disable=fixme
+    return reactivation_response(user)
 
 
 @csrf_exempt
@@ -1512,17 +1505,6 @@ def create_account_with_params(request, params):
 
     create_comments_service_user(user)
 
-    context = {
-        'name': profile.name,
-        'key': registration.activation_key,
-    }
-
-    # composes activation email
-    subject = render_to_string('emails/activation_email_subject.txt', context)
-    # Email subject *must not* contain newlines
-    subject = ''.join(subject.splitlines())
-    message = render_to_string('emails/activation_email.txt', context)
-
     # don't send email if we are doing load testing or random user generation for some reason
     # or external auth with bypass activated
     send_email = (
@@ -1534,6 +1516,7 @@ def create_account_with_params(request, params):
             'email_from_address',
             settings.DEFAULT_FROM_EMAIL
         )
+        subject, message = activation_email(profile.name, registration.activation_key)
         try:
             if settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
                 dest_addr = settings.FEATURES['REROUTE_ACTIVATION_EMAIL']
@@ -1731,36 +1714,31 @@ def auto_auth(request):
 @ensure_csrf_cookie
 def activate_account(request, key):
     """When link in activation e-mail is clicked"""
-    regs = Registration.objects.filter(activation_key=key)
-    if len(regs) == 1:
-        user_logged_in = request.user.is_authenticated()
-        already_active = True
-        if not regs[0].user.is_active:
-            regs[0].activate()
-            already_active = False
-
-        # Enroll student in any pending courses he/she may have if auto_enroll flag is set
-        student = User.objects.filter(id=regs[0].user_id)
-        if student:
-            ceas = CourseEnrollmentAllowed.objects.filter(email=student[0].email)
-            for cea in ceas:
-                if cea.auto_enroll:
-                    CourseEnrollment.enroll(student[0], cea.course_id)
-
-        resp = render_to_response(
-            "registration/activation_complete.html",
-            {
-                'user_logged_in': user_logged_in,
-                'already_active': already_active
-            }
-        )
-        return resp
-    if len(regs) == 0:
+    registrations = Registration.objects.filter(activation_key=key, was_used=False)[:]
+    if not registrations:
         return render_to_response(
             "registration/activation_invalid.html",
             {'csrf': csrf(request)['csrf_token']}
         )
-    return HttpResponse(_("Unknown error. Please e-mail us to let us know how it happened."))
+
+    registration = registrations[0]
+    user_logged_in = request.user.is_authenticated()
+    already_active = True
+    if not registration.user.is_active:
+        registration.activate()
+        already_active = False
+
+    # Enroll student in any pending courses he/she may have if auto_enroll flag is set
+    for cea in CourseEnrollmentAllowed.objects.filter(email=registration.user.email, auto_enroll=True):
+        CourseEnrollment.enroll(registration.user, cea.course_id)
+
+    return render_to_response(
+        "registration/activation_complete.html",
+        {
+            'user_logged_in': user_logged_in,
+            'already_active': already_active
+        }
+    )
 
 
 @csrf_exempt
@@ -1879,34 +1857,59 @@ def password_reset_confirm_wrapper(
             )
 
 
-def reactivation_email_for_user(user):
+def reactivation_response(user):
     try:
-        reg = Registration.objects.get(user=user)
-    except Registration.DoesNotExist:
-        return JsonResponse({
-            "success": False,
-            "error": _('No inactive user with this e-mail exists'),
-        })  # TODO: this should be status code 400  # pylint: disable=fixme
-
-    context = {
-        'name': user.profile.name,
-        'key': reg.activation_key,
-    }
-
-    subject = render_to_string('emails/activation_email_subject.txt', context)
-    subject = ''.join(subject.splitlines())
-    message = render_to_string('emails/activation_email.txt', context)
-
-    try:
-        user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+        success = send_reactivation_email_for_user(user)
     except Exception:  # pylint: disable=broad-except
         log.error(u'Unable to send reactivation email from "%s"', settings.DEFAULT_FROM_EMAIL, exc_info=True)
-        return JsonResponse({
-            "success": False,
-            "error": _('Unable to send reactivation email')
-        })  # TODO: this should be status code 500  # pylint: disable=fixme
+        not_activated_msg = _("This account has not been activated. "
+                              "There was an error on our side and the activation email could not be sent again.")
+        # TODO: this should be status code 500  # pylint: disable=fixme
+    else:
+        if success:
+            not_activated_msg = _("This account has not been activated. We have sent another activation message. "
+                                  "Please check your email for the activation instructions.")
+        else:
+            not_activated_msg = _("No active user account was found for this address.")
+    return JsonResponse({
+        "success": False,
+        "value": not_activated_msg,
+    })  # TODO: this should be status code 400  # pylint: disable=fixme
 
-    return JsonResponse({"success": True})
+
+def send_reactivation_email_for_user(user):
+    try:
+        reg = Registration.objects.get(user=user, was_used=False)
+    except Registration.DoesNotExist:
+        return False
+        #"error": _('No inactive user with this e-mail exists'),
+        # TODO: this should be status code 400  # pylint: disable=fixme
+
+    subject, message = activation_email(user.profile.name, reg.activation_key)
+
+    user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+    return True
+
+
+def activation_email(username, registration_key):
+    """Render the subject and body for the user activation email.
+
+    Arguments:
+        username (str)
+        registration_key (str)
+
+    Returns:
+        subject (str), message(str): rendered email templates.
+    """
+    context = {
+        'name': username,
+        'key': registration_key,
+    }
+    subject = render_to_string('emails/activation_email_subject.txt', context)
+    # Email subject *must not* contain newlines
+    subject = ''.join(subject.splitlines())
+    message = render_to_string('emails/activation_email.txt', context)
+    return subject, message
 
 
 # TODO: delete this method and redirect unit tests to validate_new_email and do_email_change_request

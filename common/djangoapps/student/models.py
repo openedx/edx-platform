@@ -28,7 +28,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.signals import user_logged_in, user_logged_out
-from django.db import models, IntegrityError, transaction
+from django.db import models, IntegrityError
 from django.db.models import Count
 from django.dispatch import receiver, Signal
 from django.core.exceptions import ObjectDoesNotExist
@@ -40,8 +40,6 @@ from eventtracking import tracker
 from importlib import import_module
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.modulestore import Location
-from opaque_keys import InvalidKeyError
 
 import lms.lib.comment_client as cc
 from util.query import use_read_replica_if_available
@@ -53,8 +51,6 @@ from functools import total_ordering
 
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
-
-from ratelimitbackend import admin
 
 import analytics
 
@@ -323,6 +319,7 @@ class Registration(models.Model):
 
     user = models.ForeignKey(User, unique=True)
     activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
+    was_used = models.BooleanField(default=False, db_index=True)
 
     def register(self, user):
         # MINOR TODO: Switch to crypto-secure key
@@ -333,6 +330,8 @@ class Registration(models.Model):
     def activate(self):
         self.user.is_active = True
         self.user.save()
+        self.was_used = True
+        self.save()
 
 
 class PendingNameChange(models.Model):
