@@ -1,6 +1,7 @@
 """
 Helper functions for constructing shell commands.
 """
+from paver.easy import sh
 
 
 def cmd(*args):
@@ -22,3 +23,9 @@ def django_cmd(sys, settings, *args):
     # which calls "studio" "cms"
     sys = 'cms' if sys == 'studio' else sys
     return cmd("python manage.py", sys, "--settings={}".format(settings), *args)
+
+
+def shell(*args):
+    command = cmd(*args)
+    result = sh(command)
+    return result
