@@ -60,6 +60,8 @@ from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 
 from social_engagement.engagement import update_user_engagement_score
 
+from social_engagement.engagement import update_user_engagement_score
+
 log = logging.getLogger(__name__)
 
 TRACKING_MAX_FORUM_BODY = 2000
@@ -475,8 +477,6 @@ def update_thread(request, course_id, thread_id):
         course = get_course_with_access(user, 'load', course_key)
         if thread_context == "course" and not discussion_category_id_access(course, user, commentable_id):
             return JsonError(_("Topic doesn't exist"))
-        else:
-            thread.commentable_id = commentable_id
         else:
             thread.commentable_id = commentable_id
 

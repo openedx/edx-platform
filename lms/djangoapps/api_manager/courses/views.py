@@ -34,11 +34,11 @@ from progress.models import StudentProgress
 from projects.models import Project, Workgroup
 from projects.serializers import ProjectSerializer, BasicWorkgroupSerializer
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
-from student.roles import CourseRole, CourseAccessRole, CourseInstructorRole, CourseStaffRole, CourseObserverRole, CourseAssistantRole, UserBasedRole
+from student.roles import CourseRole, CourseAccessRole, CourseInstructorRole, CourseStaffRole, CourseObserverRole, CourseAssistantRole, UserBasedRole, get_aggregate_exclusion_user_ids
 from xmodule.modulestore.django import modulestore
 
 from api_manager.courseware_access import get_course, get_course_child, get_course_leaf_nodes, get_course_key, \
-    course_exists, get_modulestore, get_course_descriptor, get_aggregate_exclusion_user_ids
+    course_exists, get_modulestore, get_course_descriptor
 from api_manager.models import CourseGroupRelationship, CourseContentGroupRelationship, GroupProfile
 from progress.models import CourseModuleCompletion
 from api_manager.permissions import SecureAPIView, SecureListAPIView

@@ -12,6 +12,7 @@ from django.test.utils import override_settings
 
 from xblock.runtime import Mixologist
 from xmodule.services import SettingsService, NotificationsService, ConfigurationService
+from xmodule.services import SettingsService, NotificationsService
 
 
 class _DummyBlock(object):
