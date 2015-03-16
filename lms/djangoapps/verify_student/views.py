@@ -7,11 +7,9 @@ import logging
 import decimal
 import datetime
 from collections import namedtuple
+
 from pytz import UTC
 from ipware.ip import get_ip
-
-from edxmako.shortcuts import render_to_response, render_to_string
-
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import (
@@ -26,11 +24,16 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
+from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
+from edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings, update_account_settings
 from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
 from openedx.core.djangoapps.user_api.errors import UserNotFound, AccountValidationError
-
+from commerce.api import EcommerceAPI
+from commerce.exceptions import ApiError
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment
 from student.views import reverification_info
@@ -43,16 +46,12 @@ from verify_student.models import (
 )
 from reverification.models import MidcourseReverificationWindow
 import ssencrypt
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from opaque_keys.edx.keys import CourseKey
 from .exceptions import WindowExpiredException
-from xmodule.modulestore.django import modulestore
 from microsite_configuration import microsite
-
 from embargo import api as embargo_api
-
 from util.json_request import JsonResponse
 from util.date_utils import get_default_time_display
+
 
 log = logging.getLogger(__name__)
 
@@ -612,6 +611,21 @@ class PayAndVerifyView(View):
         return (has_paid, bool(is_active))
 
 
+def create_order_with_ecommerce_service(user, course_key, course_mode):     # pylint: disable=invalid-name
+    """ Create a new order using the E-Commerce API. """
+    try:
+        api = EcommerceAPI()
+        # Make an API call to create the order and retrieve the results
+        _order_number, _order_status, data = api.create_order(user, course_mode.sku)
+
+        # Pass the payment parameters directly from the API response.
+        return HttpResponse(json.dumps(data['payment_parameters']), content_type='application/json')
+    except ApiError:
+        params = {'username': user.username, 'mode': course_mode.slug, 'course_id': unicode(course_key)}
+        log.error('Failed to create order for %(username)s %(mode)s mode of %(course_id)s', params)
+        raise
+
+
 @require_POST
 @login_required
 def create_order(request):
@@ -675,6 +689,9 @@ def create_order(request):
 
     if amount < current_mode.min_price:
         return HttpResponseBadRequest(_("No selected price or selected price is below minimum."))
+
+    if current_mode.sku:
+        return create_order_with_ecommerce_service(request.user, course_id, current_mode)
 
     # I know, we should check this is valid. All kinds of stuff missing here
     cart = Order.get_cart_for_user(request.user)
