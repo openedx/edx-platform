@@ -5,6 +5,8 @@ Unit tests for helpers.py.
 from contentstore.tests.utils import CourseTestCase
 from contentstore.views.helpers import xblock_studio_url, xblock_type_display_name
 from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory
+from xmodule.modulestore.xml import XMLModuleStore
+from xmodule.tests import DATA_DIR
 from django.utils import http
 
 
@@ -54,6 +56,17 @@ class HelpersTestCase(CourseTestCase):
         library = LibraryFactory.create()
         expected_url = u'/library/{}'.format(unicode(library.location.library_key))
         self.assertEqual(xblock_studio_url(library), expected_url)
+
+    def test_unicode_xblock_studio_url(self):
+
+        #import unicode course
+        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['2014_Uni'])
+        courses = modulestore.get_courses()
+        course = courses[0]
+
+        # Verify course URL
+        course_url = http.urlquote('/course/{}'.format(course.id))
+        self.assertEqual(xblock_studio_url(course), course_url)
 
     def test_xblock_type_display_name(self):
 
