@@ -4,21 +4,20 @@
 ## These files assume that several libraries are available and bound to
 ## variables in the global context, so we load those libraries with requirejs
 ## and attach them to the global context manually.
-define(["jquery", "underscore", "mathjax", "codemirror", "tinymce",
+define(["jquery", "underscore", "codemirror", "tinymce",
         "jquery.tinymce", "jquery.qtip", "jquery.scrollTo", "jquery.flot",
         "jquery.cookie",
         "utility"],
-       function($, _, MathJax, CodeMirror, tinymce) {
+       function($, _, CodeMirror, tinymce) {
     window.$ = $;
     window._ = _;
-    window.MathJax = MathJax;
+    require(['mathjax']);
     window.CodeMirror = CodeMirror;
     window.RequireJS = {
         'requirejs': requirejs,
         'require': require,
         'define': define
     };
-
     /**
      * Loads all modules one-by-one in exact order.
      * The module should be used until we'll use RequireJS for XModules.
