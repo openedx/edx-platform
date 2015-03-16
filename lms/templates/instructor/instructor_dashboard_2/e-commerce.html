@@ -64,7 +64,7 @@
          <h2>${_("Sales")}</h2>
          <div>
             %if section_data['total_amount'] is not None:
-              <span><strong>${_("Total Credit Card Purchases: ")}</strong></span><span>$${section_data['total_amount']}</span>
+              <span><strong>${_("Total Credit Card Purchases: ")}</strong></span><span>${section_data['currency_symbol']}${section_data['total_amount']}</span>
             %endif
             <span class="csv_tip">
               <div>
