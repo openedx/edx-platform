@@ -6,25 +6,32 @@ import json
 import logging
 import random
 import string  # pylint: disable=deprecated-module
-
-import django.utils
+from bs4 import BeautifulSoup
 import six
-from ccx_keys.locator import CCXLocator
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, Http404
 from django.shortcuts import redirect
+import django.utils
 from django.utils.translation import ugettext as _
+from django.views.decorators.http import require_http_methods, require_GET
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_GET, require_http_methods
+
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 
+from .component import (
+    ADVANCED_COMPONENT_TYPES,
+)
+from .item import create_xblock_info
+from .library import LIBRARIES_ENABLED, get_library_creator_status
+from ccx_keys.locator import CCXLocator
 from contentstore.course_group_config import (
     COHORT_SCHEME,
     ENROLLMENT_SCHEME,
@@ -32,41 +39,51 @@ from contentstore.course_group_config import (
     GroupConfiguration,
     GroupConfigurationsValidationError
 )
-from contentstore.course_info_model import delete_course_update, get_course_updates, update_course_updates
+from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
 from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from contentstore.push_notification import push_notification_enabled
 from contentstore.tasks import rerun_course
 from contentstore.utils import (
     add_instructor,
-    get_lms_link_for_item,
     initialize_permissions,
+    get_lms_link_for_item,
     remove_all_instructors,
     reverse_course_url,
     reverse_library_url,
+    reverse_usage_url,
     reverse_url,
-    reverse_usage_url
 )
-from contentstore.views.entrance_exam import create_entrance_exam, delete_entrance_exam, update_entrance_exam
+from contentstore.views.entrance_exam import (
+    create_entrance_exam,
+    delete_entrance_exam,
+    update_entrance_exam,
+)
 from course_action_state.managers import CourseActionStateItemNotFoundError
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
-from course_creators.views import add_user_with_status_unrequested, get_course_creator_status
+from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 from edxmako.shortcuts import render_to_response
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
 from openedx.core.djangoapps.content.course_structures.api.v0 import api, errors
-from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
+from openedx.core.djangoapps.credit.api import is_credit_course, get_credit_requirements
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.core.lib.courses import course_image_url
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
+from student.tasks import publish_course_notifications_task
+from edx_notifications.data import NotificationMessage
+from edx_notifications.lib.publisher import get_notification_type
 from student import auth
-from student.auth import has_course_author_access, has_studio_read_access, has_studio_write_access
-from student.roles import CourseCreatorRole, CourseInstructorRole, CourseStaffRole, GlobalStaff, UserBasedRole
+from student.auth import has_course_author_access, has_studio_write_access, has_studio_read_access
+from student.roles import (
+    CourseInstructorRole, CourseStaffRole, CourseCreatorRole, GlobalStaff, UserBasedRole
+)
 from util.course import get_link_for_about_page
+from util.html import strip_tags
 from util.date_utils import get_default_time_display
 from util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
 from util.milestones_helpers import (
@@ -75,7 +92,11 @@ from util.milestones_helpers import (
     is_valid_course_key,
     set_prerequisite_courses
 )
-from util.organizations_helpers import add_organization_course, get_organization_by_short_name, organizations_enabled
+from util.organizations_helpers import (
+    add_organization_course,
+    get_organization_by_short_name,
+    organizations_enabled,
+)
 from util.string_utils import _has_non_ascii_characters
 from xblock_django.api import deprecated_xblocks
 from xmodule.contentstore.content import StaticContent
@@ -83,12 +104,9 @@ from xmodule.course_module import DEFAULT_START_DATE, CourseFields
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
 from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException
 
-from .component import ADVANCED_COMPONENT_TYPES
-from .item import create_xblock_info
-from .library import LIBRARIES_ENABLED, get_library_creator_status
 
 log = logging.getLogger(__name__)
 
@@ -959,7 +977,95 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
     # can be either and sometimes django is rewriting one to the other:
     elif request.method in ('POST', 'PUT'):
         try:
-            return JsonResponse(update_course_updates(usage_key, request.json, provided_id, request.user))
+            response = JsonResponse(update_course_updates(usage_key, request.json, provided_id, request.user))
+            if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False) and request.method == 'POST':
+                # only send bulk notifications to users when there is
+                # new update/announcement in the course.
+
+                try:
+                    # get the notification type.
+                    notification_type = get_notification_type(u'open-edx.studio.announcements.new-announcement')
+                    course = modulestore().get_course(course_key, depth=0)
+
+                    excerpt = strip_tags(request.json['content'])
+
+                    excerpt = excerpt.strip()
+                    excerpt = excerpt.replace('\n','').replace('\r','')
+
+                    announcement_date = request.json['date']
+
+                    title = None
+                    try:
+                        # we have to try to parse out a 'title' which
+                        # will be determine through a HTML convention of
+                        # labeling a tag will class 'announcement-title'
+                        parsed_html = BeautifulSoup(request.json['content'])
+
+                        if not parsed_html.body:
+                            # maybe doesn't have <body> outer tags
+                            parsed_html = BeautifulSoup('<body>{}</body>'.format(request.json['content']))
+
+                        if parsed_html.body:
+                            title_tag_name = getattr(settings, 'NOTIFICATIONS_ANNOUNCEMENT_TITLE_TAG', 'p')
+                            title_tag_class = getattr(settings, 'NOTIFICATIONS_ACCOUNCEMENT_TITLE_CLASS', 'announcement-title')
+                            title_tag = parsed_html.body.find(title_tag_name, attrs={'class': title_tag_class})
+
+                            if title_tag:
+                                title = title_tag.text
+
+                            if title:
+                                # remove the title from the excerpt so that it doesn't
+                                # count towards the length limit
+                                excerpt = excerpt.replace(title, '')
+
+                    except Exception, ex:
+                        log.exception(ex)
+
+                    if not title:
+                        # default title, if we could not match the pattern
+                        title = _('Announcement on {date}').format(date=announcement_date)
+
+                    # now we have to truncate the notification excerpt to me
+                    # some max length and append an ellipsis
+                    max_len = getattr(settings, 'NOTIFICATIONS_MAX_EXCERPT_LEN', 65)
+                    if len(excerpt) > max_len:
+                        excerpt = "{}...".format(excerpt[:max_len])
+
+                    notification_msg = NotificationMessage(
+                        msg_type=notification_type,
+                        namespace=unicode(course_key),
+                        payload={
+                            '_schema_version': '1',
+                            'course_name': course.display_name,
+                            'excerpt': excerpt,
+                            'announcement_date': announcement_date,
+                            'title': title,
+                        }
+                    )
+
+                    # add in all the context parameters we'll need to
+                    # generate a URL back to the website that will
+                    # present the new course announcement
+                    #
+                    # IMPORTANT: This can be changed to msg.add_click_link() if we
+                    # have a particular URL that we wish to use. In the initial use case,
+                    # we need to make the link point to a different front end so
+                    # we have to resolve the link when we dispatch the Message
+                    #
+                    notification_msg.add_click_link_params({
+                        'course_id': unicode(course_key),
+                    })
+
+                    # Send the notification_msg to the Celery task
+                    if settings.FEATURES.get('ENABLE_NOTIFICATIONS_CELERY', False):
+                        publish_course_notifications_task.delay(course_key, notification_msg)
+                    else:
+                        publish_course_notifications_task(course_key, notification_msg)
+                except Exception, ex:
+                    # Notifications aren't considered critical, so it's OK to fail
+                    # log and then continue
+                    log.exception(ex)
+            return response
         except:
             return HttpResponseBadRequest(
                 "Failed to save",

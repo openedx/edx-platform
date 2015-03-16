@@ -6,9 +6,6 @@ from __future__ import absolute_import
 import hashlib
 import json
 import logging
-import mimetypes
-
-import static_replace
 
 from datetime import datetime
 from django.utils.timezone import UTC
@@ -25,8 +22,9 @@ from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from edx_proctoring.services import ProctoringService
+from eventtracking import tracker
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from requests.auth import HTTPBasicAuth
 from xblock.core import XBlock
@@ -48,12 +46,11 @@ from courseware.masquerade import (
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from courseware.models import SCORE_CHANGED
 from edxmako.shortcuts import render_to_string
-from eventtracking import tracker
 from lms.djangoapps.grades.signals.signals import SCORE_PUBLISHED
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
-from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
-from lms.djangoapps.verify_student.services import VerificationService
+from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, SettingsService
+from lms.djangoapps.verify_student.services import VerificationService, ReverificationService
 from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
@@ -61,13 +58,13 @@ from openedx.core.djangoapps.monitoring_utils import set_custom_metrics_for_cour
 from openedx.core.djangoapps.util.user_utils import SystemUser
 from openedx.core.lib.license import wrap_with_license
 from openedx.core.lib.url_utils import quote_slashes, unquote_slashes
-from openedx.core.lib.xblock_utils import request_token as xblock_request_token
 from openedx.core.lib.xblock_utils import (
-    add_staff_markup,
     replace_course_urls,
     replace_jump_to_id_urls,
     replace_static_urls,
-    wrap_xblock
+    add_staff_markup,
+    wrap_xblock,
+    request_token as xblock_request_token,
 )
 from student.models import anonymous_id_for_user, user_by_anonymous_id
 from student.roles import CourseBetaTesterRole
@@ -83,8 +80,8 @@ from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.lti_module import LTIModule
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.services import NotificationsService, CoursewareParentInfoService
 from xmodule.x_module import XModuleDescriptor
-
 from .field_overrides import OverrideFieldData
 from progress.models import CourseModuleCompletion
 
@@ -678,6 +675,23 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
 
     user_is_staff = bool(has_access(user, u'staff', descriptor.location, course_id))
 
+    services_list = {
+        'fs': FSService(),
+        'field-data': field_data,
+        'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
+        'verification': VerificationService(),
+        'reverification': ReverificationService(),
+        'proctoring': ProctoringService(),
+        'milestones': milestones_helpers.get_service(),
+        'credit': CreditService(),
+        'bookmarks': BookmarksService(user=user),
+    }
+
+    if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
+        services_list.update({
+            "notifications": NotificationsService(),
+        })
+
     system = LmsModuleSystem(
         track_function=track_function,
         render_template=render_to_string,
@@ -718,16 +732,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         mixins=descriptor.runtime.mixologist._mixins,  # pylint: disable=protected-access
         wrappers=block_wrappers,
         get_real_user=user_by_anonymous_id,
-        services={
-            'fs': FSService(),
-            'field-data': field_data,
-            'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
-            'verification': VerificationService(),
-            'proctoring': ProctoringService(),
-            'milestones': milestones_helpers.get_service(),
-            'credit': CreditService(),
-            'bookmarks': BookmarksService(user=user),
-        },
+        services=services_list,
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         rebind_noauth_module_to_user=rebind_noauth_module_to_user,

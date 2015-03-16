@@ -4,23 +4,12 @@ import logging
 from functools import partial
 
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseBadRequest
+from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext as _
-from opaque_keys.edx.keys import UsageKey
-from xblock.django.request import django_to_webob_request, webob_to_django_response
-from xblock.exceptions import NoSuchHandlerError
-from xblock.fragment import Fragment
-from xblock.runtime import KvsFieldData
-
-import static_replace
-from cms.lib.xblock.field_data import CmsFieldData
-from contentstore.utils import get_visibility_partition_info
-from contentstore.views.access import get_user_role
 from edxmako.shortcuts import render_to_string
-from lms.djangoapps.lms_xblock.field_data import LmsFieldData
-from openedx.core.lib.license import wrap_with_license
+
 from openedx.core.lib.xblock_utils import (
     replace_static_urls,
     request_token,
@@ -29,20 +18,34 @@ from openedx.core.lib.xblock_utils import (
     wrap_xblock_aside,
     xblock_local_resource_url
 )
-from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
-from xblock_config.models import StudioConfig
-from xblock_django.user_service import DjangoXBlockUserService
+from xmodule.x_module import PREVIEW_VIEWS, STUDENT_VIEW, AUTHOR_VIEW, ModuleSystem
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.modulestore.django import ModuleI18nService, modulestore
-from xmodule.partitions.partitions_service import PartitionService
-from xmodule.services import SettingsService
 from xmodule.studio_editable import has_author_view
-from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, ModuleSystem
+from xmodule.partitions.partitions_service import PartitionService
+from xmodule.modulestore.django import modulestore, ModuleI18nService
+from xmodule.mixin import wrap_with_license
+from opaque_keys.edx.keys import UsageKey
+from xmodule.x_module import ModuleSystem
+from xblock.runtime import KvsFieldData
+from xblock.django.request import webob_to_django_response, django_to_webob_request
+from xblock.exceptions import NoSuchHandlerError
+from xblock.fragment import Fragment
+from xblock_django.user_service import DjangoXBlockUserService
+from xmodule.services import SettingsService, NotificationsService, CoursewareParentInfoService
 
-from .helpers import render_from_lms
+from lms.djangoapps.lms_xblock.field_data import LmsFieldData
+from cms.lib.xblock.field_data import CmsFieldData
+
+from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
+
+import static_replace
 from .session_kv_store import SessionKeyValueStore
+from .helpers import render_from_lms
+from contentstore.utils import get_visibility_partition_info
+from contentstore.views.access import get_user_role
+from xblock_config.models import StudioConfig
 
 __all__ = ['preview_handler']
 
@@ -145,6 +148,29 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         return result
 
 
+def get_available_xblock_services(request=None, field_data=None):
+    """
+    Returns a dict of available services for xBlocks
+    """
+
+    services = {
+        "i18n": ModuleI18nService(),
+        "settings": SettingsService(),
+        "courseware_parent_info": CoursewareParentInfoService(),
+        "library_tools": LibraryToolsService(modulestore()),
+    }
+    if request:
+        services['user'] = DjangoXBlockUserService(request.user)
+    if field_data:
+        services['field-data'] = field_data
+
+    if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
+        services.update({
+            "notifications": NotificationsService()
+        })
+
+    return services
+
 def _preview_module_system(request, descriptor, field_data):
     """
     Returns a ModuleSystem for the specified descriptor that is specialized for
@@ -186,6 +212,10 @@ def _preview_module_system(request, descriptor, field_data):
         # stick the license wrapper in front
         wrappers.insert(0, wrap_with_license)
 
+    descriptor.runtime._services['studio_user_permissions'] = StudioPermissionsService(request)  # pylint: disable=protected-access
+
+    services = get_available_xblock_services(request, field_data)
+
     return PreviewModuleSystem(
         static_url=settings.STATIC_URL,
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
@@ -209,13 +239,7 @@ def _preview_module_system(request, descriptor, field_data):
         get_user_role=lambda: get_user_role(request.user, course_id),
         # Get the raw DescriptorSystem, not the CombinedSystem
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
-        services={
-            "field-data": field_data,
-            "i18n": ModuleI18nService,
-            "settings": SettingsService(),
-            "user": DjangoXBlockUserService(request.user),
-            "partitions": StudioPartitionService(course_id=course_id)
-        },
+        services=services,
     )
 
 

@@ -2,9 +2,12 @@
 Module contains various XModule/XBlock services
 """
 import inspect
+import types
 
 from config_models.models import ConfigurationModel
 from django.conf import settings
+
+from xmodule.modulestore.django import modulestore
 
 
 class SettingsService(object):
@@ -93,3 +96,74 @@ class ConfigurationService(object):
             )
 
         self.configuration = configuration_model
+
+
+class NotificationsService(object):
+    """
+    An xBlock service for xBlocks to talk to the Notification subsystem. This class basically introspects
+    and exposes all functions in the Publisher and Consumer libraries, so it is a direct pass through.
+
+    NOTE: This is a Singleton class. We should only have one instance of it!
+    """
+
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        """
+        This is the class factory to make sure this is a Singleton
+        """
+        if not cls._instance:
+            cls._instance = super(NotificationsService, cls).__new__(
+                                cls, *args, **kwargs)
+        return cls._instance
+
+    def __init__(self):
+        """
+        Class initializer, which just inspects the libraries and exposes the same functions
+        as a direct pass through
+        """
+        import edx_notifications.lib.publisher as notifications_publisher_lib
+        import edx_notifications.lib.consumer as notifications_consumer_lib
+        self._bind_to_module_functions(notifications_publisher_lib)
+        self._bind_to_module_functions(notifications_consumer_lib)
+
+    def _bind_to_module_functions(self, module):
+        """
+        """
+        for attr_name in dir(module):
+            attr = getattr(module, attr_name, None)
+            if isinstance(attr, types.FunctionType):
+                if not hasattr(self, attr_name):
+                    setattr(self, attr_name, attr)
+
+
+class CoursewareParentInfoService(object):
+    """
+    An xBlock service that provides information about the courseware parent. This could be
+    used for - say - generating breadcumbs
+    """
+
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        """
+        This is the class factory to make sure this is a Singleton
+        """
+        if not cls._instance:
+            cls._instance = super(CoursewareParentInfoService, cls).__new__(
+                                cls, *args, **kwargs)
+        return cls._instance
+
+    def get_parent_info(self, module):
+        """
+        Returns the location and display name of the parent
+        """
+
+        parent_location = modulestore().get_parent_location(module)
+        parent_module = modulestore().get_item(parent_location)
+
+        return {
+            'location': parent_location,
+            'display_name': parent_module.display_name
+        }
+
