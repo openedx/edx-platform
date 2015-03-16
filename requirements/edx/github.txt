@@ -26,7 +26,7 @@ git+https://github.com/mitocw/django-cas.git@60a5b8e5a62e63e0d5d224a87f0b489201a
 -e git+https://github.com/edx/codejail.git@6b17c33a89bef0ac510926b1d7fea2748b73aadd#egg=codejail
 -e git+https://github.com/edx/js-test-tool.git@v0.1.6#egg=js_test_tool
 -e git+https://github.com/edx/event-tracking.git@0.1.0#egg=event-tracking
--e git+https://github.com/edx/bok-choy.git@94430eb3e50e84330b81a3f5bc0ba4cc0171516f#egg=bok_choy
+-e git+https://github.com/edx/bok-choy.git@d62839324cbea30dda564596f20175f9d5c28516#egg=bok_choy
 -e git+https://github.com/edx-solutions/django-splash.git@7579d052afcf474ece1239153cffe1c89935bc4f#egg=django-splash
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
 -e git+https://github.com/edx/edx-ora2.git@4773573b79bc530f0fe7c8f90a10491e4224dc2d#egg=edx-ora2
