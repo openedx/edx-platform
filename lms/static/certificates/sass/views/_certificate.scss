@@ -181,15 +181,16 @@
     }
   }
 
+  // TODO - Determine what basic types are supported
   // CASE: honor code
   &.is-honorcode {
 
     .status {
-      background: $edx-blue-l2;
+      background: $color-basic-achievement;
     }
 
     .certificate-type {
-      color: $edx-blue-l2;
+      color: $color-basic-achievement;
     }
   }
 
@@ -197,7 +198,7 @@
   &.is-idverified {
 
     .status {
-      background: $edx-blue;
+      background: $color-basic-achievement;
     }
 
     .accomplishment {
@@ -214,7 +215,7 @@
     }
 
     .certificate-type {
-      color: $edx-blue;
+      color: $blue;
 
       .wrapper-img {
         width: 200px;

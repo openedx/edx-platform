@@ -48,49 +48,54 @@ $shadow-d1: rgba($black-t,0.4);
 $shadow-d2: rgba($black-t,0.6);
 
 // colors - default
-$edx-blue: rgb(58, 162, 224);
-$edx-blue-l1: tint($edx-blue,20%);
-$edx-blue-l2: tint($edx-blue,40%);
-$edx-blue-l3: tint($edx-blue,60%);
-$edx-blue-l4: tint($edx-blue,80%);
-$edx-blue-l5: tint($edx-blue,90%);
-$edx-blue-d1: shade($edx-blue,20%);
-$edx-blue-d2: shade($edx-blue,40%);
-$edx-blue-d3: shade($edx-blue,60%);
-$edx-blue-d4: shade($edx-blue,80%);
-$edx-blue-d5: shade($edx-blue,90%);
-$edx-blue-s1: saturate($edx-blue,15%);
-$edx-blue-s2: saturate($edx-blue,30%);
-$edx-blue-s3: saturate($edx-blue,45%);
-$edx-blue-u1: desaturate($edx-blue,15%);
-$edx-blue-u2: desaturate($edx-blue,30%);
-$edx-blue-u3: desaturate($edx-blue,45%);
-$edx-blue-t0: rgba($edx-blue,0.125);
-$edx-blue-t1: rgba($edx-blue,0.25);
-$edx-blue-t2: rgba($edx-blue,0.50);
-$edx-blue-t3: rgba($edx-blue,0.75);
+$blue: rgb(58, 162, 224);
+$blue-l1: tint($blue,20%);
+$blue-l2: tint($blue,40%);
+$blue-l3: tint($blue,60%);
+$blue-l4: tint($blue,80%);
+$blue-l5: tint($blue,90%);
+$blue-d1: shade($blue,20%);
+$blue-d2: shade($blue,40%);
+$blue-d3: shade($blue,60%);
+$blue-d4: shade($blue,80%);
+$blue-d5: shade($blue,90%);
+$blue-s1: saturate($blue,15%);
+$blue-s2: saturate($blue,30%);
+$blue-s3: saturate($blue,45%);
+$blue-u1: desaturate($blue,15%);
+$blue-u2: desaturate($blue,30%);
+$blue-u3: desaturate($blue,45%);
+$blue-t0: rgba($blue,0.125);
+$blue-t1: rgba($blue,0.25);
+$blue-t2: rgba($blue,0.50);
+$blue-t3: rgba($blue,0.75);
 
-$edx-pink: rgb(182,37,104);
-$edx-pink-l1: tint($edx-pink,20%);
-$edx-pink-l2: tint($edx-pink,40%);
-$edx-pink-l3: tint($edx-pink,60%);
-$edx-pink-l4: tint($edx-pink,80%);
-$edx-pink-l5: tint($edx-pink,90%);
-$edx-pink-d1: shade($edx-pink,20%);
-$edx-pink-d2: shade($edx-pink,40%);
-$edx-pink-d3: shade($edx-pink,60%);
-$edx-pink-d4: shade($edx-pink,80%);
-$edx-pink-d5: shade($edx-pink,90%);
-$edx-pink-s1: saturate($edx-pink,15%);
-$edx-pink-s2: saturate($edx-pink,30%);
-$edx-pink-s3: saturate($edx-pink,45%);
-$edx-pink-u1: desaturate($edx-pink,15%);
-$edx-pink-u2: desaturate($edx-pink,30%);
-$edx-pink-u3: desaturate($edx-pink,45%);
-$edx-pink-t0: rgba($edx-pink,0.125);
-$edx-pink-t1: rgba($edx-pink,0.25);
-$edx-pink-t2: rgba($edx-pink,0.50);
-$edx-pink-t3: rgba($edx-pink,0.75);
+$pink: rgb(182,37,104);
+$pink-l1: tint($pink,20%);
+$pink-l2: tint($pink,40%);
+$pink-l3: tint($pink,60%);
+$pink-l4: tint($pink,80%);
+$pink-l5: tint($pink,90%);
+$pink-d1: shade($pink,20%);
+$pink-d2: shade($pink,40%);
+$pink-d3: shade($pink,60%);
+$pink-d4: shade($pink,80%);
+$pink-d5: shade($pink,90%);
+$pink-s1: saturate($pink,15%);
+$pink-s2: saturate($pink,30%);
+$pink-s3: saturate($pink,45%);
+$pink-u1: desaturate($pink,15%);
+$pink-u2: desaturate($pink,30%);
+$pink-u3: desaturate($pink,45%);
+$pink-t0: rgba($pink,0.125);
+$pink-t1: rgba($pink,0.25);
+$pink-t2: rgba($pink,0.50);
+$pink-t3: rgba($pink,0.75);
+
+// colors - achievement branding
+$color-basic-achievement: $blue-l2;
+$color-greater-achievement: $blue;
+$color-greatest-achievement: $blue-s1;
 
 // ====================
 
@@ -132,16 +137,16 @@ $anim-distance-offviewport: ($baseline-h*100);                         // for la
 // ====================
 
 // application: general actions
-$color-primary: $edx-blue-d1;
-$color-secondary: $edx-blue-l1;
+$color-primary: $blue-d1;
+$color-secondary: $blue-l1;
 $color-tertiary: $gray-l1;
 $color-quarternary: $gray-l2;
 
 // application: general links
-$color-link: $edx-blue-d1;
-$color-link-focus: $edx-blue;
-$color-link-active: $edx-blue;
-$color-link-visited: $edx-blue-d2;
+$color-link: $blue-d1;
+$color-link-focus: $blue;
+$color-link-active: $blue;
+$color-link-visited: $blue-d2;
 
 // application: actions & links (button-focused)
 $bg-action-primary: $color-primary;
@@ -173,8 +178,8 @@ $color-copy-supplemental: $gray-l1;
 // ====================
 
 // application: states
-$bg-selected: $edx-blue-t1;
-$color-selected: $edx-blue-s1;
+$bg-selected: $blue-t1;
+$color-selected: $blue-s1;
 
 // ====================
 

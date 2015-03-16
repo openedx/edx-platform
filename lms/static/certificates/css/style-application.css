@@ -1036,7 +1036,7 @@ body, .view-validate-certificate .list-requirements .item, .view-validate-certif
   .view-certificate.is-honorcode .certificate-type {
     color: #88c7ec; }
   .view-certificate.is-idverified .status {
-    background: #3aa2e0; }
+    background: #88c7ec; }
   .view-certificate.is-idverified .accomplishment {
     background: white url("../images/logo-idverified-cropped.png") bottom left no-repeat;
     background-size: 75%; }
