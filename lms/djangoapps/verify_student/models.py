@@ -38,6 +38,8 @@ from reverification.models import MidcourseReverificationWindow
 from xmodule_django.models import CourseKeyField
 log = logging.getLogger(__name__)
 
+from config_models.models import ConfigurationModel
+
 
 def generateUUID():  # pylint: disable=invalid-name
     """ Utility function; generates UUIDs """
@@ -641,6 +643,17 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         query = cls.objects.filter(user=user, window=None).order_by('-updated_at')
         return query[0]
 
+    @classmethod
+    def get_initial_verification(cls, user):
+        """Get initial verification for a user
+        Arguments:
+            user(User): user object
+        Return:
+            SoftwareSecurePhotoVerification (object)
+        """
+        init_verification = cls.objects.filter(user=user, status__in=["submitted", "approved"], window=None)
+        return init_verification.latest('created_at') if init_verification.exists() else None
+
     @status_before_must_be("created")
     def upload_face_image(self, img_data):
         """
@@ -883,6 +896,26 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
         return response
 
+    @classmethod
+    def submit_faceimage(cls, user, face_image, photo_id_key):
+        """Submit the faceimage to SoftwareSecurePhotoVerification
+
+        Arguments:
+            user(User): user object
+            face_image (bytestream): raw bytestream image data
+            photo_id_key (str) : SoftwareSecurePhotoVerification attribute
+        Returns:
+            SoftwareSecurePhotoVerification Object
+        """
+        b64_face_image = face_image.split(",")[1]
+        attempt = SoftwareSecurePhotoVerification(user=user)
+        attempt.upload_face_image(b64_face_image.decode('base64'))
+        attempt.photo_id_key = photo_id_key
+        attempt.mark_ready()
+        attempt.save()
+        attempt.submit()
+        return attempt
+
 
 class VerificationCheckpoint(models.Model):
     """Represents a point at which a user is challenged to reverify his or her identity.
@@ -976,3 +1009,17 @@ class VerificationStatus(models.Model):
         """
         for checkpoint in checkpoints:
             cls.objects.create(checkpoint=checkpoint, user=user, status=status)
+
+
+class InCourseReverificationConfiguration(ConfigurationModel):
+    """Configure in-course re-verification.
+
+    Enable or disable in-course re-verification feature.
+    When this flag is disabled, the "in-course re-verification" feature
+    will be disabled.
+
+    When the flag is enabled, the "in-course re-verification" feature
+    will be enabled.
+
+    """
+    pass
