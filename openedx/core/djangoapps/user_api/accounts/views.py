@@ -70,14 +70,13 @@ class AccountView(APIView):
 
                 * bio: null or textural representation of user biographical information ("about me")
 
-                * profile_image: a dict with the following keys describing the user's profile image
-                    * "has_image": true if the user has a profile image
-                    * "image_url_full": an absolute URL to the user's full profile image
-                    * "image_url_large": an absolute URL to a large thumbnail of the profile image
-                    * "image_url_medium": an absolute URL to a medium thumbnail of the profile image
-                    * "image_url_small": an absolute URL to a small thumbnail of the profile image
+                * is_active: boolean representation of whether a user is active.
 
-                * requires_parental_consent: true if the user is a minor requiring parental consent
+                * profile_image: JSON representation of a user's profile image information.  The keys are:
+                    * "has_image": boolean indicating whether the user has a profile image.
+                    * "image_url_*": absolute URL to various sizes of a user's profile image, where '*' matches a
+                        representation of the corresponding image size such as 'small', 'medium', 'large', and 'full'.
+                        These are configurable via PROFILE_IMAGE_SIZES_MAP.
 
             For all text fields, clients rendering the values should take care to HTML escape them to avoid
             script injections, as the data is stored exactly as specified. The intention is that plain text is
