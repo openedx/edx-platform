@@ -86,6 +86,7 @@ class TestStudentDashboardEmailView(ModuleStoreTestCase):
         # Assert that the URL for the email view is not in the response
         # if this course isn't authorized
         response = self.client.get(self.url)
+        print response.content
         self.assertTrue(self.email_modal_link in response.content)
 
 

@@ -168,7 +168,6 @@
 
               <span class="provider">${state.provider.NAME}</span>
               <span class="control">
-
               % if state.has_account:
                 <form
                   action="${pipeline.get_disconnect_url(state.provider.NAME)}"
@@ -177,20 +176,21 @@
                   <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
 
                   <a href="#" onclick="document.${state.get_unlink_form_name()}.submit()">
-                    ## Translators: clicking on this removes the link between a user's edX account and their account with an external authentication provider (like Google or LinkedIn).
-                    ${_("Unlink")}
+                  ## Translators: clicking on this removes the link between a user's edX account and their account with an external authentication provider (like Google or LinkedIn).
+                  ${_("Unlink")}
                   </a>
-                % else:
+                </form>
+              % else:
                   <a href="${pipeline.get_login_url(state.provider.NAME, pipeline.AUTH_ENTRY_DASHBOARD, redirect_url='/')}">
-                    ## Translators: clicking on this creates a link between a user's edX account and their account with an external authentication provider (like Google or LinkedIn).
-                    ${_("Link")}
+                  ## Translators: clicking on this creates a link between a user's edX account and their account with an external authentication provider (like Google or LinkedIn).
+                  ${_("Link")}
                   </a>
               % endif
-              </form>
-
               </span>
             </div>
             % endfor
+
+            </span>
           </span>
         </li>
         % endif

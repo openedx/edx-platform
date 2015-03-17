@@ -41,11 +41,9 @@ from student.helpers import (
     <% mode_class = '' %>
   % endif
 
-  <article class="course${mode_class}">
+<article class="course${mode_class}">
 
-    <%
-      course_target = reverse('info', args=[course.id.to_deprecated_string()])
-    %>
+    <% course_target = reverse('info', args=[course.id.to_deprecated_string()]) %>
     % if show_courseware_link:
       % if not is_course_blocked:
         <a href="${course_target}" class="cover">
@@ -72,30 +70,31 @@ from student.helpers import (
       </span>
     % endif
 
-    <section class="info">
-      <hgroup>
-        <p class="date-block">
-        % if course.has_ended():
-          ${_("Course Completed - {end_date}").format(end_date=course.end_datetime_text("DATE_TIME"))}
-        % elif course.has_started():
-          ${_("Course Started - {start_date}").format(start_date=course.start_datetime_text("DATE_TIME"))}
-        % elif course.start_date_is_still_default: # Course start date TBD
-          ${_("Course has not yet started")}
-        % else:   # hasn't started yet
-          ${_("Course Starts - {start_date}").format(start_date=course.start_datetime_text("DATE_TIME"))}
-        % endif
-        </p>
-      </hgroup>
-    <section class="details">
+  <section class="info">
+    <hgroup>
+      <p class="date-block">
+      % if course.has_ended():
+        ${_("Course Completed - {end_date}").format(end_date=course.end_datetime_text("DATE_TIME"))}
+      % elif course.has_started():
+        ${_("Course Started - {start_date}").format(start_date=course.start_datetime_text("DATE_TIME"))}
+      % elif course.start_date_is_still_default: # Course start date TBD
+        ${_("Course has not yet started")}
+      % else:   # hasn't started yet
+        ${_("Course Starts - {start_date}").format(start_date=course.start_datetime_text("DATE_TIME"))}
+      % endif
+      </p>
+    </hgroup>
+  </section>
+  <section class="details">
       % if show_courseware_link:
         % if not is_course_blocked:
           <a href="${course_target}" class="cover">
-          <img src="${course_image_url(course)}" alt="${_('{course_number} {course_name} Home Page').format(course_number=course.number, course_name=course.display_name_with_default) |h}" />
-        </a>
-          % else:
+            <img src="${course_image_url(course)}" alt="${_('{course_number} {course_name} Home Page').format(course_number=course.number, course_name=course.display_name_with_default) |h}" />
+          </a>
+        % else:
           <a class="fade-cover">
-          <img src="${course_image_url(course)}" alt="${_('{course_number} {course_name} Cover Image').format(course_number=course.number, course_name=course.display_name_with_default) |h}" />
-        </a>
+            <img src="${course_image_url(course)}" alt="${_('{course_number} {course_name} Cover Image').format(course_number=course.number, course_name=course.display_name_with_default) |h}" />
+          </a>
           % endif
       % else:
         <div class="cover">
@@ -115,9 +114,9 @@ from student.helpers import (
         <h3 class="course-title">
           % if show_courseware_link:
             % if not is_course_blocked:
-            <a href="${course_target}">${course.display_name_with_default}</a>
+              <a href="${course_target}">${course.display_name_with_default}</a>
             % else:
-            <a class="disable-look">${course.display_name_with_default}</a>
+              <a class="disable-look">${course.display_name_with_default}</a>
             % endif
           % else:
             <span>${course.display_name_with_default}</span>
@@ -128,13 +127,13 @@ from student.helpers import (
           <span class="info-course-id">${course.display_number_with_default | h}</span>
           <span class="info-date-block" data-tooltip="Hi">
           % if course.has_ended():
-          ${_("Ended - {end_date}").format(end_date=course.end_datetime_text("SHORT_DATE"))}
+            ${_("Ended - {end_date}").format(end_date=course.end_datetime_text("SHORT_DATE"))}
           % elif course.has_started():
-          ${_("Started - {start_date}").format(start_date=course.start_datetime_text("SHORT_DATE"))}
+            ${_("Started - {start_date}").format(start_date=course.start_datetime_text("SHORT_DATE"))}
           % elif course.start_date_is_still_default: # Course start date TBD
-          ${_("Coming Soon")}
+            ${_("Coming Soon")}
           % else:   # hasn't started yet
-          ${_("Starts - {start_date}").format(start_date=course.start_datetime_text("SHORT_DATE"))}
+            ${_("Starts - {start_date}").format(start_date=course.start_datetime_text("SHORT_DATE"))}
           % endif
           </span>
         </div>
@@ -252,10 +251,6 @@ from student.helpers import (
           </div>
         % endif
       </div>
-
-
-
-
   </section>
   <aside class="wrapper-messages-primary">
     <ul class="messages-list">
@@ -364,10 +359,9 @@ from student.helpers import (
         % endif
     </ul>
   </aside>
-
 </article>
 </li>
- <script>
+<script>
            $( document ).ready(function() {
 
                if("${is_course_blocked}" == "True"){
@@ -376,4 +370,4 @@ from student.helpers import (
                    });
                }
            });
- </script>
+</script>
