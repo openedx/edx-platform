@@ -6,38 +6,33 @@
 ## This enables ASCIIMathJAX, and is used by js_textbox
 
 
-<%def name="mathjaxConfig()">
-  %if mathjax_mode is not Undefined and mathjax_mode == 'wiki':
-    MathJax.Hub.Config({
-      tex2jax: {inlineMath: [ ['$','$'], ["\\(","\\)"]],
-                displayMath: [ ['$$','$$'], ["\\[","\\]"]]}
-    });
-  %else:
-    MathJax.Hub.Config({
-      tex2jax: {
-        inlineMath: [
-          ["\\(","\\)"],
-          ['[mathjaxinline]','[/mathjaxinline]']
-        ],
-        displayMath: [
-          ["\\[","\\]"],
-          ['[mathjax]','[/mathjax]']
-        ]
-      }
-    });
-  %endif
-  MathJax.Hub.Configured();
-  window.HUB = MathJax.Hub;
-</%def>
+%if mathjax_mode is not Undefined and mathjax_mode == 'wiki':
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {inlineMath: [ ['$','$'], ["\\(","\\)"]],
+              displayMath: [ ['$$','$$'], ["\\[","\\]"]]}
+  });
+  HUB = MathJax.Hub
+</script>
+%else:
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [
+        ["\\(","\\)"],
+        ['[mathjaxinline]','[/mathjaxinline]']
+      ],
+      displayMath: [
+        ["\\[","\\]"],
+        ['[mathjax]','[/mathjax]']
+      ]
+    }
+  });
+  HUB = MathJax.Hub
+</script>
+%endif
 
 <!-- This must appear after all mathjax-config blocks, so it is after the imports from the other templates.
      It can't be run through static.url because MathJax uses crazy url introspection to do lazy loading of
      MathJax extension libraries -->
-<script type="text/javascript">
-  ;(function (require) {
-  'use strict';
-  require(['mathjax'], function() {
-      ${mathjaxConfig()}
-  });
-  }).call(this, require || RequireJS.require);
-</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/2.4-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full"></script>
