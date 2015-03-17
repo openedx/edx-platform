@@ -420,7 +420,7 @@ th {
   position: absolute;
   width: 1px; }
 
-.view-certificate .content-supplemental-how, .view-certificate .content-supplemental-certificates, .view-certificate .content-supplemental-about, .view-valid-certificate .accomplishment, .view-valid-certificate .accomplishment-statement, .view-valid-certificate .accomplishment-details, .view-invalid-certificate .feedback {
+.view-valid-certificate .accomplishment, .view-valid-certificate .accomplishment-statement, .view-valid-certificate .accomplishment-details, .view-invalid-certificate .feedback {
   -webkit-transition: width 0.25s ease-in-out, height 0.25s ease-in-out;
   -moz-transition: width 0.25s ease-in-out, height 0.25s ease-in-out;
   transition: width 0.25s ease-in-out, height 0.25s ease-in-out; }
@@ -857,13 +857,13 @@ time, mark, audio, video {
 .view-valid-certificate .accomplishment-statement .copy-course-org, .view-valid-certificate .accomplishment-details .value {
   font-weight: 500; }
 
-strong, .view-certificate .content-supplemental .list-actions .action, .view-validate-certificate .support .list-actions .action, .view-certificate .content-supplemental .title, .view-valid-certificate .accomplishment-statement .copy-name, .view-valid-certificate .accomplishment-statement .copy-course-name, .view-valid-certificate .accomplishment-details .label, .view-invalid-certificate .feedback-lead .title, .view-invalid-certificate .feedback-support .title, .view-invalid-certificate .feedback-warning .title, .view-validate-certificate .content .title-lvl1, .view-validate-certificate .content .title-lvl2, .view-validate-certificate .content .title-lvl3, .view-validate-certificate .list-requirements .item:before, .view-validate-certificate .list-requirements .item .requirement-label, .view-validate-certificate .instructions .title {
+strong, .view-validate-certificate .support .list-actions .action, .view-valid-certificate .accomplishment-statement .copy-name, .view-valid-certificate .accomplishment-statement .copy-course-name, .view-valid-certificate .accomplishment-details .label, .view-invalid-certificate .feedback-lead .title, .view-invalid-certificate .feedback-support .title, .view-invalid-certificate .feedback-warning .title, .view-validate-certificate .content .title-lvl1, .view-validate-certificate .content .title-lvl2, .view-validate-certificate .content .title-lvl3, .view-validate-certificate .list-requirements .item:before, .view-validate-certificate .list-requirements .item .requirement-label, .view-validate-certificate .instructions .title {
   font-weight: 600; }
 
 .view-validate-certificate .list-instructions .item:before {
   font-weight: 700; }
 
-.view-valid-certificate .accomplishment-statement .copy-name, .view-valid-certificate .accomplishment-statement .copy-course-name, .view-valid-certificate .accomplishment-statement .copy-recogniton, .view-validate-certificate .instructions .title, .view-invalid-certificate .feedback-lead .title, .view-validate-certificate .content .title-lvl1, .title-logo .title-sub, .view-valid-certificate .accomplishment-statement .copy-course-org, .view-validate-certificate .content .title-lvl2, .title-logo .title-sub, .view-valid-certificate .accomplishment-statement .copy-course-org, .view-validate-certificate .content .title-lvl2, .view-certificate .status .title, .view-valid-certificate .accomplishment-details .value, .view-invalid-certificate .feedback-support .title, .view-invalid-certificate .feedback-warning .title, .view-validate-certificate .content .title-lvl3, .view-validate-certificate .list-requirements .item:before, .view-validate-certificate .list-requirements .item .requirement-label, .view-validate-certificate .list-instructions .item:before, .view-certificate .content-supplemental .title {
+.view-valid-certificate .accomplishment-statement .copy-name, .view-valid-certificate .accomplishment-statement .copy-course-name, .view-valid-certificate .accomplishment-statement .copy-recogniton, .view-validate-certificate .instructions .title, .view-invalid-certificate .feedback-lead .title, .view-validate-certificate .content .title-lvl1, .title-logo .title-sub, .view-valid-certificate .accomplishment-statement .copy-course-org, .view-validate-certificate .content .title-lvl2, .title-logo .title-sub, .view-valid-certificate .accomplishment-statement .copy-course-org, .view-validate-certificate .content .title-lvl2, .view-certificate .status .title, .view-valid-certificate .accomplishment-details .value, .view-invalid-certificate .feedback-support .title, .view-invalid-certificate .feedback-warning .title, .view-validate-certificate .content .title-lvl3, .view-validate-certificate .list-requirements .item:before, .view-validate-certificate .list-requirements .item .requirement-label, .view-validate-certificate .list-instructions .item:before {
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif; }
 
 .view-valid-certificate .accomplishment-statement .copy-name, .view-valid-certificate .accomplishment-statement .copy-course-name, .view-valid-certificate .accomplishment-statement .copy-recogniton, .view-validate-certificate .instructions .title {
@@ -890,13 +890,7 @@ strong, .view-certificate .content-supplemental .list-actions .action, .view-val
   line-height: 27.9px;
   line-height: 2.79rem; }
 
-.view-certificate .content-supplemental .title {
-  font-size: 16px;
-  font-size: 1.6rem;
-  line-height: 24.8px;
-  line-height: 2.48rem; }
-
-body, .view-validate-certificate .list-requirements .item, .view-validate-certificate .list-instructions .item, .view-valid-certificate .accomplishment-statement .copy-context, .view-invalid-certificate .feedback-lead .copy, .footer-app-copyright, .view-certificate .content-supplemental .copy, .view-certificate .content-supplemental .list-actions .action, .view-valid-certificate .accomplishment-details .explanation, .view-validate-certificate .support .list-actions .action, .view-valid-certificate .accomplishment-details .label {
+body, .view-validate-certificate .list-requirements .item, .view-validate-certificate .list-instructions .item, .view-valid-certificate .accomplishment-statement .copy-context, .view-invalid-certificate .feedback-lead .copy, .footer-app-copyright, .view-valid-certificate .accomplishment-details .explanation, .view-validate-certificate .support .list-actions .action, .view-valid-certificate .accomplishment-details .label {
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif; }
 
 body, .view-validate-certificate .list-requirements .item, .view-validate-certificate .list-instructions .item {
@@ -911,7 +905,7 @@ body, .view-validate-certificate .list-requirements .item, .view-validate-certif
   line-height: 31px;
   line-height: 3.1rem; }
 
-.footer-app-copyright, .view-certificate .content-supplemental .copy, .view-certificate .content-supplemental .list-actions .action, .view-valid-certificate .accomplishment-details .explanation, .view-validate-certificate .support .list-actions .action {
+.footer-app-copyright, .view-valid-certificate .accomplishment-details .explanation, .view-validate-certificate .support .list-actions .action {
   font-size: 14px;
   font-size: 1.4rem;
   line-height: 21.7px;
@@ -965,7 +959,7 @@ abbr[title] {
   text-decoration: none;
   cursor: help; }
 
-.view-certificate .content-supplemental .list-actions .action, .view-validate-certificate .support .list-actions .action {
+.view-validate-certificate .support .list-actions .action {
   -webkit-transition: color 0.25s ease-in-out, background 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
   -moz-transition: color 0.25s ease-in-out, background 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
   transition: color 0.25s ease-in-out, background 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
@@ -973,25 +967,25 @@ abbr[title] {
   display: inline-block;
   cursor: pointer;
   text-decoration: none; }
-  .view-certificate .content-supplemental .list-actions .action:hover, .view-validate-certificate .support .list-actions .action:hover, .view-certificate .content-supplemental .list-actions .action:active, .view-validate-certificate .support .list-actions .action:active, .view-certificate .content-supplemental .list-actions .action:focus, .view-validate-certificate .support .list-actions .action:focus {
+  .view-validate-certificate .support .list-actions .action:hover, .view-validate-certificate .support .list-actions .action:active, .view-validate-certificate .support .list-actions .action:focus {
     text-decoration: none; }
-  .view-certificate .content-supplemental .list-actions .disabled.action, .view-validate-certificate .support .list-actions .disabled.action, .view-certificate .content-supplemental .list-actions [disabled].action, .view-validate-certificate .support .list-actions [disabled].action {
+  .view-validate-certificate .support .list-actions .disabled.action, .view-validate-certificate .support .list-actions [disabled].action {
     cursor: default;
     pointer-events: none; }
 
-.view-certificate .content-supplemental .list-actions .action, .view-validate-certificate .support .list-actions .action {
+.view-validate-certificate .support .list-actions .action {
   border-radius: 2px; }
 
-.view-certificate .content-supplemental .list-actions .action, .view-validate-certificate .support .list-actions .action {
+.view-validate-certificate .support .list-actions .action {
   padding: 10px 20px;
   background: #2e81b3;
   border-color: #1d85c4;
   color: #eaf2f7; }
-  .view-certificate .content-supplemental .list-actions .action:hover, .view-validate-certificate .support .list-actions .action:hover, .view-certificate .content-supplemental .list-actions .action:active, .view-validate-certificate .support .list-actions .action:active, .view-certificate .content-supplemental .list-actions .action:focus, .view-validate-certificate .support .list-actions .action:focus {
+  .view-validate-certificate .support .list-actions .action:hover, .view-validate-certificate .support .list-actions .action:active, .view-validate-certificate .support .list-actions .action:focus {
     background: #078bda;
     border-color: #078bda;
     color: #f4f8fb; }
-  .view-certificate .content-supplemental .list-actions .disabled.action, .view-validate-certificate .support .list-actions .disabled.action, .view-certificate .content-supplemental .list-actions .is-disabled.action, .view-validate-certificate .support .list-actions .is-disabled.action, .view-certificate .content-supplemental .list-actions [disabled].action, .view-validate-certificate .support .list-actions [disabled].action {
+  .view-validate-certificate .support .list-actions .disabled.action, .view-validate-certificate .support .list-actions .is-disabled.action, .view-validate-certificate .support .list-actions [disabled].action {
     opacity: 0.5; }
 
 [class^="content-"] a, .footer-app a, .view-certificate .content a {
@@ -1225,84 +1219,6 @@ abbr[title] {
           font-size: 1.4rem;
           line-height: 21.7px;
           line-height: 2.17rem; } }
-  .view-certificate .content-supplemental .title {
-    margin-bottom: 10px; }
-  .view-certificate .content-supplemental .copy {
-    color: #85888a; }
-  .view-certificate .content-supplemental .list-actions {
-    margin-top: 20px; }
-    @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view-certificate .content-supplemental .list-actions .action {
-        display: block;
-        text-align: center; } }
-    @media screen and (max-width: 499px) {
-      .view-certificate .content-supplemental .list-actions .action {
-        display: block;
-        text-align: center; } }
-  .view-certificate .content-supplemental-how {
-    float: right;
-    display: block;
-    margin-left: 2.3576515979%;
-    width: 23.2317613015%; }
-    .view-certificate .content-supplemental-how:last-child {
-      margin-left: 0; }
-    @media screen and (min-width: 760px) and (max-width: 899px) {
-      .view-certificate .content-supplemental-how {
-        float: right;
-        display: block;
-        margin-left: 2.3576515979%;
-        width: 48.821174201%; }
-        .view-certificate .content-supplemental-how:last-child {
-          margin-left: 0; } }
-    @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view-certificate .content-supplemental-how {
-        width: 100%;
-        margin-bottom: 40px; } }
-    @media screen and (max-width: 499px) {
-      .view-certificate .content-supplemental-how {
-        width: 100%;
-        margin-bottom: 40px; } }
-  .view-certificate .content-supplemental-certificates {
-    float: right;
-    display: block;
-    margin-left: 2.3576515979%;
-    width: 23.2317613015%;
-    margin-left: 0; }
-    .view-certificate .content-supplemental-certificates:last-child {
-      margin-left: 0; }
-    @media screen and (min-width: 760px) and (max-width: 899px) {
-      .view-certificate .content-supplemental-certificates {
-        float: right;
-        display: block;
-        margin-left: 2.3576515979%;
-        width: 48.821174201%; }
-        .view-certificate .content-supplemental-certificates:last-child {
-          margin-left: 0; } }
-    @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view-certificate .content-supplemental-certificates {
-        width: 100%; } }
-    @media screen and (max-width: 499px) {
-      .view-certificate .content-supplemental-certificates {
-        width: 100%; } }
-  .view-certificate .content-supplemental-about {
-    float: right;
-    display: block;
-    margin-left: 2.3576515979%;
-    width: 48.821174201%; }
-    .view-certificate .content-supplemental-about:last-child {
-      margin-left: 0; }
-    @media screen and (min-width: 760px) and (max-width: 899px) {
-      .view-certificate .content-supplemental-about {
-        width: 100%;
-        margin-bottom: 40px; } }
-    @media screen and (min-width: 500px) and (max-width: 759px) {
-      .view-certificate .content-supplemental-about {
-        width: 100%;
-        margin-bottom: 40px; } }
-    @media screen and (max-width: 499px) {
-      .view-certificate .content-supplemental-about {
-        width: 100%;
-        margin-bottom: 40px; } }
   .view-certificate.is-honorcode .status {
     background: #88c7ec; }
   .view-certificate.is-honorcode .certificate-type {
