@@ -186,6 +186,14 @@ class CapaDescriptor(CapaFields, RawDescriptor):
         registered_tags = responsetypes.registry.registered_tags()
         return set([node.tag for node in tree.iter() if node.tag in registered_tags])
 
+    def index_dictionary(self):
+        """
+        Return dictionary prepared with module content and type for indexing.
+        """
+        result = super(CapaDescriptor, self).index_dictionary()
+        result['problem_types'] = self.problem_types
+        return result
+
     # Proxy to CapaModule for access to any of its attributes
     answer_available = module_attr('answer_available')
     check_button_name = module_attr('check_button_name')

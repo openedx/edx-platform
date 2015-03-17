@@ -1678,6 +1678,7 @@ class CapaDescriptorTest(unittest.TestCase):
         xml = "<problem><{response_tag}></{response_tag}></problem>".format(response_tag=response_tag)
         descriptor = self._create_descriptor(xml)
         self.assertEquals(descriptor.problem_types, {response_tag})
+        self.assertEquals(descriptor.index_dictionary(), {'problem_types': {response_tag}})
 
     def test_response_types_ignores_non_response_tags(self):
         xml = textwrap.dedent("""
@@ -1696,6 +1697,7 @@ class CapaDescriptorTest(unittest.TestCase):
         """)
         descriptor = self._create_descriptor(xml)
         self.assertEquals(descriptor.problem_types, {"multiplechoiceresponse"})
+        self.assertEquals(descriptor.index_dictionary(), {'problem_types': {"multiplechoiceresponse"}})
 
     def test_response_types_multiple_tags(self):
         xml = textwrap.dedent("""
@@ -1719,6 +1721,9 @@ class CapaDescriptorTest(unittest.TestCase):
         """)
         descriptor = self._create_descriptor(xml)
         self.assertEquals(descriptor.problem_types, {"multiplechoiceresponse", "optionresponse"})
+        self.assertEquals(
+            descriptor.index_dictionary(), {'problem_types': {"multiplechoiceresponse", "optionresponse"}}
+        )
 
 
 class ComplexEncoderTest(unittest.TestCase):
