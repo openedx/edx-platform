@@ -10,7 +10,7 @@ from courseware.tests.factories import InstructorFactory
 from lang_pref import LANGUAGE_KEY
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-from openedx.core.djangoapps.user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
@@ -29,11 +29,11 @@ class TestInstructorAPIEnrollmentEmailLocalization(ModuleStoreTestCase):
         # French.
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
-        UserPreference.set_preference(self.instructor, LANGUAGE_KEY, 'zh-cn')
+        set_user_preference(self.instructor, LANGUAGE_KEY, 'zh-cn')
         self.client.login(username=self.instructor.username, password='test')
 
         self.student = UserFactory.create()
-        UserPreference.set_preference(self.student, LANGUAGE_KEY, 'fr')
+        set_user_preference(self.student, LANGUAGE_KEY, 'fr')
 
     def update_enrollement(self, action, student_email):
         """

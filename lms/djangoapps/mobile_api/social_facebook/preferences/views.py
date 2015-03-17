@@ -5,7 +5,7 @@ Views for users sharing preferences
 from rest_framework import generics, status
 from rest_framework.response import Response
 
-from openedx.core.djangoapps.user_api.api.profile import preference_info, update_preferences
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences, set_user_preference
 from ...utils import mobile_view
 from . import serializers
 
@@ -42,11 +42,11 @@ class UserSharing(generics.ListCreateAPIView):
         serializer = self.get_serializer(data=request.DATA, files=request.FILES)
         if serializer.is_valid():
             value = serializer.object['share_with_facebook_friends']
-            update_preferences(request.user.username, share_with_facebook_friends=value)
+            set_user_preference(request.user, "share_with_facebook_friends", value)
             return self.get(request, *args, **kwargs)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request, *args, **kwargs):
-        preferences = preference_info(request.user.username)
+        preferences = get_user_preferences(request.user)
         response = {'share_with_facebook_friends': preferences.get('share_with_facebook_friends', 'False')}
         return Response(response)

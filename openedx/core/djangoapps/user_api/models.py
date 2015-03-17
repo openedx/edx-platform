@@ -25,27 +25,26 @@ class UserPreference(models.Model):
         unique_together = ("user", "key")
 
     @classmethod
-    def set_preference(cls, user, preference_key, preference_value):
-        """
-        Sets the user preference for a given key
-        """
-        user_pref, _ = cls.objects.get_or_create(user=user, key=preference_key)
-        user_pref.value = preference_value
-        user_pref.save()
+    def get_value(cls, user, preference_key):
+        """Gets the user preference value for a given key.
 
-    @classmethod
-    def get_preference(cls, user, preference_key, default=None):
-        """
-        Gets the user preference value for a given key
+        Note:
+            This method provides no authorization of access to the user preference.
+            Consider using user_api.preferences.api.get_user_preference instead if
+            this is part of a REST API request.
 
-        Returns the given default if there isn't a preference for the given key
-        """
+        Arguments:
+            user (User): The user whose preference should be set.
+            preference_key (string): The key for the user preference.
 
+        Returns:
+            The user preference value, or None if one is not set.
+        """
         try:
-            user_pref = cls.objects.get(user=user, key=preference_key)
-            return user_pref.value
+            user_preference = cls.objects.get(user=user, key=preference_key)
+            return user_preference.value
         except cls.DoesNotExist:
-            return default
+            return None
 
 
 class UserCourseTag(models.Model):

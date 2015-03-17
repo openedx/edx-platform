@@ -5,6 +5,7 @@ from student.tests.factories import UserFactory
 
 from ..tests.factories import UserPreferenceFactory, UserCourseTagFactory, UserOrgTagFactory
 from ..models import UserPreference
+from ..preferences.api import set_user_preference
 
 
 class UserPreferenceModelTest(ModuleStoreTestCase):
@@ -67,20 +68,18 @@ class UserPreferenceModelTest(ModuleStoreTestCase):
         self.assertEquals(tag.value, "barfoo")
         self.assertNotEqual(original_modified, tag.modified)
 
-    def test_get_set_preference(self):
-        # Checks that you can set a preference and get that preference later
-        # Also, tests that no preference is returned for keys that are not set
+    def test_get_value(self):
+        """Verifies the behavior of get_value."""
 
         user = UserFactory.create()
         key = 'testkey'
         value = 'testvalue'
 
         # does a round trip
-        UserPreference.set_preference(user, key, value)
-        pref = UserPreference.get_preference(user, key)
-
+        set_user_preference(user, key, value)
+        pref = UserPreference.get_value(user, key)
         self.assertEqual(pref, value)
 
         # get preference for key that doesn't exist for user
-        pref = UserPreference.get_preference(user, 'testkey_none')
+        pref = UserPreference.get_value(user, 'testkey_none')
         self.assertIsNone(pref)

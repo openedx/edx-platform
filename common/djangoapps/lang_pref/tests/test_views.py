@@ -4,7 +4,7 @@ Tests for the language setting view
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from student.tests.factories import UserFactory
-from openedx.core.djangoapps.user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from lang_pref import LANGUAGE_KEY
 
 
@@ -20,7 +20,7 @@ class TestLanguageSetting(TestCase):
         response = self.client.post(reverse('lang_pref_set_language'), {'language': lang})
 
         self.assertEquals(response.status_code, 200)
-        user_pref = UserPreference.get_preference(user, LANGUAGE_KEY)
+        user_pref = get_user_preference(user, LANGUAGE_KEY)
         self.assertEqual(user_pref, lang)
 
     def test_set_preference_missing_lang(self):
@@ -31,4 +31,4 @@ class TestLanguageSetting(TestCase):
 
         self.assertEquals(response.status_code, 400)
 
-        self.assertIsNone(UserPreference.get_preference(user, LANGUAGE_KEY))
+        self.assertIsNone(get_user_preference(user, LANGUAGE_KEY))

@@ -1,4 +1,4 @@
-"Tests for account creation"
+"""Tests for account creation"""
 import json
 
 import ddt
@@ -14,7 +14,7 @@ from django.test.utils import override_settings
 
 import mock
 
-from openedx.core.djangoapps.user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from lang_pref import LANGUAGE_KEY
 from notification_prefs import NOTIFICATION_PREF_KEY
 
@@ -42,7 +42,7 @@ TEST_CS_URL = 'https://comments.service.test:123/'
     }
 )
 class TestCreateAccount(TestCase):
-    "Tests for account creation"
+    """Tests for account creation"""
 
     def setUp(self):
         self.username = "test_user"
@@ -63,14 +63,14 @@ class TestCreateAccount(TestCase):
             response = self.client.post(self.url, self.params)
             self.assertEqual(response.status_code, 200)
             user = User.objects.get(username=self.username)
-            self.assertEqual(UserPreference.get_preference(user, LANGUAGE_KEY), lang)
+            self.assertEqual(get_user_preference(user, LANGUAGE_KEY), lang)
 
     @ddt.data("en", "eo")
     def test_header_lang_pref_saved(self, lang):
         response = self.client.post(self.url, self.params, HTTP_ACCEPT_LANGUAGE=lang)
         user = User.objects.get(username=self.username)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(UserPreference.get_preference(user, LANGUAGE_KEY), lang)
+        self.assertEqual(get_user_preference(user, LANGUAGE_KEY), lang)
 
     def create_account_and_fetch_profile(self):
         """
@@ -225,7 +225,7 @@ class TestCreateAccount(TestCase):
             response = self.client.post(self.url, self.params)
             self.assertEqual(response.status_code, 200)
             user = User.objects.get(username=self.username)
-            preference = UserPreference.get_preference(user, NOTIFICATION_PREF_KEY)
+            preference = get_user_preference(user, NOTIFICATION_PREF_KEY)
             if digest_enabled:
                 self.assertIsNotNone(preference)
             else:

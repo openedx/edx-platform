@@ -25,7 +25,10 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from third_party_auth.tests.testutil import simulate_running_pipeline
 
 from ..accounts.api import get_account_settings
-from ..api import account as account_api, profile as profile_api
+from ..accounts import (
+    NAME_MAX_LENGTH, EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH,
+    USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH
+)
 from ..models import UserOrgTag
 from ..tests.factories import UserPreferenceFactory
 from ..tests.test_constants import SORTED_COUNTRIES
@@ -618,8 +621,8 @@ class LoginSessionViewTest(ApiTestCase):
                     platform_name=settings.PLATFORM_NAME
                 ),
                 "restrictions": {
-                    "min_length": account_api.EMAIL_MIN_LENGTH,
-                    "max_length": account_api.EMAIL_MAX_LENGTH
+                    "min_length": EMAIL_MIN_LENGTH,
+                    "max_length": EMAIL_MAX_LENGTH
                 },
                 "errorMessages": {},
             },
@@ -632,8 +635,8 @@ class LoginSessionViewTest(ApiTestCase):
                 "placeholder": "",
                 "instructions": "",
                 "restrictions": {
-                    "min_length": account_api.PASSWORD_MIN_LENGTH,
-                    "max_length": account_api.PASSWORD_MAX_LENGTH
+                    "min_length": PASSWORD_MIN_LENGTH,
+                    "max_length": PASSWORD_MAX_LENGTH
                 },
                 "errorMessages": {},
             }
@@ -769,8 +772,8 @@ class PasswordResetViewTest(ApiTestCase):
                     platform_name=settings.PLATFORM_NAME
                 ),
                 "restrictions": {
-                    "min_length": account_api.EMAIL_MIN_LENGTH,
-                    "max_length": account_api.EMAIL_MAX_LENGTH
+                    "min_length": EMAIL_MIN_LENGTH,
+                    "max_length": EMAIL_MAX_LENGTH
                 },
                 "errorMessages": {},
             }
@@ -827,8 +830,8 @@ class RegistrationViewTest(ApiTestCase):
                 u"label": u"Email",
                 u"placeholder": u"username@domain.com",
                 u"restrictions": {
-                    "min_length": account_api.EMAIL_MIN_LENGTH,
-                    "max_length": account_api.EMAIL_MAX_LENGTH
+                    "min_length": EMAIL_MIN_LENGTH,
+                    "max_length": EMAIL_MAX_LENGTH
                 },
             }
         )
@@ -842,7 +845,7 @@ class RegistrationViewTest(ApiTestCase):
                 u"label": u"Full name",
                 u"instructions": u"The name that will appear on your certificates",
                 u"restrictions": {
-                    "max_length": profile_api.FULL_NAME_MAX_LENGTH,
+                    "max_length": NAME_MAX_LENGTH,
                 },
             }
         )
@@ -856,8 +859,8 @@ class RegistrationViewTest(ApiTestCase):
                 u"label": u"Public username",
                 u"instructions": u"The name that will identify you in your courses",
                 u"restrictions": {
-                    "min_length": account_api.USERNAME_MIN_LENGTH,
-                    "max_length": account_api.USERNAME_MAX_LENGTH
+                    "min_length": USERNAME_MIN_LENGTH,
+                    "max_length": USERNAME_MAX_LENGTH
                 },
             }
         )
@@ -870,8 +873,8 @@ class RegistrationViewTest(ApiTestCase):
                 u"required": True,
                 u"label": u"Password",
                 u"restrictions": {
-                    "min_length": account_api.PASSWORD_MIN_LENGTH,
-                    "max_length": account_api.PASSWORD_MAX_LENGTH
+                    "min_length": PASSWORD_MIN_LENGTH,
+                    "max_length": PASSWORD_MAX_LENGTH
                 },
             }
         )
@@ -905,8 +908,8 @@ class RegistrationViewTest(ApiTestCase):
                     u"label": u"Email",
                     u"placeholder": u"username@domain.com",
                     u"restrictions": {
-                        "min_length": account_api.EMAIL_MIN_LENGTH,
-                        "max_length": account_api.EMAIL_MAX_LENGTH
+                        "min_length": EMAIL_MIN_LENGTH,
+                        "max_length": EMAIL_MAX_LENGTH
                     },
                 }
             )
@@ -922,7 +925,7 @@ class RegistrationViewTest(ApiTestCase):
                     u"label": u"Full name",
                     u"instructions": u"The name that will appear on your certificates",
                     u"restrictions": {
-                        "max_length": profile_api.FULL_NAME_MAX_LENGTH,
+                        "max_length": NAME_MAX_LENGTH,
                     }
                 }
             )
@@ -939,8 +942,8 @@ class RegistrationViewTest(ApiTestCase):
                     u"placeholder": u"",
                     u"instructions": u"The name that will identify you in your courses",
                     u"restrictions": {
-                        "min_length": account_api.USERNAME_MIN_LENGTH,
-                        "max_length": account_api.USERNAME_MAX_LENGTH
+                        "min_length": USERNAME_MIN_LENGTH,
+                        "max_length": USERNAME_MAX_LENGTH
                     }
                 }
             )
@@ -1237,20 +1240,13 @@ class RegistrationViewTest(ApiTestCase):
         self.assertHttpOK(response)
         self.assertIn(settings.EDXMKTG_COOKIE_NAME, self.client.cookies)
 
-        # Verify that the user exists
-        self.assertEqual(
-            account_api.account_info(self.USERNAME),
-            {
-                "username": self.USERNAME,
-                "email": self.EMAIL,
-                "is_active": False
-            }
-        )
-
-        # Verify that the user's full name is set
         user = User.objects.get(username=self.USERNAME)
         account_settings = get_account_settings(user)
-        self.assertEqual(account_settings["name"], self.NAME)
+
+        self.assertEqual(self.USERNAME, account_settings["username"])
+        self.assertEqual(self.EMAIL, account_settings["email"])
+        self.assertFalse(account_settings["is_active"])
+        self.assertEqual(self.NAME, account_settings["name"])
 
         # Verify that we've been logged in
         # by trying to access a page that requires authentication

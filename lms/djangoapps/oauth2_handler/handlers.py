@@ -66,10 +66,10 @@ class ProfileHandler(object):
         """
         Return the locale for the users based on their preferences.
         Does not return a value if the users have not set their locale preferences.
-
         """
 
-        language = UserPreference.get_preference(data['user'], LANGUAGE_KEY)
+        # Calling UserPreference directly because it is not clear which user made the request.
+        language = UserPreference.get_value(data['user'], LANGUAGE_KEY)
 
         # If the user has no language specified, return the default one.
         if not language:
