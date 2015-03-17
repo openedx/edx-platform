@@ -5,7 +5,8 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 
-## class Migration(SchemaMigration):
+class Migration(SchemaMigration):
+    pass
 
 ##     def forwards(self, orm):
 ##         # Deleting field 'UserProfile.city'
