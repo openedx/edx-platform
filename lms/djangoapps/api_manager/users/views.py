@@ -937,7 +937,7 @@ class UsersCoursesGradesList(SecureAPIView):
         response_data = []
         for record in queryset:
             complete_status = False
-            if record.proforma_grade <= record.grade + grade_complete_match_range:
+            if record.grade and (record.proforma_grade <= record.grade + grade_complete_match_range):
                 complete_status = True
             response_data.append(
                 {
