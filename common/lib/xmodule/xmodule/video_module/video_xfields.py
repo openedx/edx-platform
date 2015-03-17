@@ -150,9 +150,9 @@ class VideoFields(object):
         display_name=_("Upload Handout"),
         scope=Scope.settings,
     )
-    unavailable_on_mobile = Boolean(
-        help=_("Whether this video is unavailable from within the mobile apps."),
-        display_name="Unavailable in Mobile Apps",
+    only_on_web = Boolean(
+        help=_("Specifiy whether this video is available only on the web and not other platforms like mobile apps."),
+        display_name="Available Only on Web",
         scope=Scope.settings,
         default=False
     )

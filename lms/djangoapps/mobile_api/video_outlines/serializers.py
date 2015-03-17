@@ -209,6 +209,10 @@ def video_summary(course, course_id, video_descriptor, request, local_cache):
         for lang in transcript_langs
     }
 
+    if video_descriptor.only_on_web:
+        video_url = "Invalid URL"
+        transcripts = {}
+
     return {
         "video_url": video_url,
         "video_thumbnail_url": None,
@@ -218,6 +222,6 @@ def video_summary(course, course_id, video_descriptor, request, local_cache):
         "transcripts": transcripts,
         "language": video_descriptor.get_default_transcript_language(),
         "category": video_descriptor.category,
-        "only_on_web" : video_descriptor.unavailable_on_mobile,
+        "only_on_web": video_descriptor.only_on_web,
         "id": unicode(video_descriptor.scope_ids.usage_id),
     }

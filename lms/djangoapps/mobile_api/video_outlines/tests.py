@@ -367,23 +367,47 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileEnro
 
         course_outline = self.api_response().data
         self.assertEqual(len(course_outline), 0)
+
+        subid = uuid4().hex
+        transcripts_utils.save_subs_to_store(
+            {
+                'start': [100],
+                'end': [200],
+                'text': [
+                    'subs #1',
+                ]
+            },
+            subid,
+            self.course)
+
         ItemFactory.create(
             parent=self.unit,
             category="video",
             display_name=u"test video",
+            subid=subid
         )
 
         ItemFactory.create(
             parent=self.unit,
             category="video",
             display_name=u"test video 2",
-            unavailable_on_mobile=True
+            only_on_web=True,
+            subid=subid
         )
-        course_outline = self.api_response().data
-        self.assertEqual(len(course_outline), 2)
-        self.assertEqual(course_outline[0]["summary"]["only_on_web"], False)
-        self.assertEqual(course_outline[1]["summary"]["only_on_web"], True)
 
+        course_outline = self.api_response().data
+
+        self.assertEqual(len(course_outline), 2)
+
+        self.assertEqual(course_outline[0]["summary"]["name"], "test video")
+        self.assertNotEqual(course_outline[0]["summary"]["video_url"], "Invalid URL")
+        self.assertEqual(len(course_outline[0]["summary"]["transcripts"]), 1)
+        self.assertEqual(course_outline[0]["summary"]["only_on_web"], False)
+
+        self.assertEqual(course_outline[1]["summary"]["name"], "test video 2")
+        self.assertEqual(course_outline[1]["summary"]["video_url"], "Invalid URL")
+        self.assertEqual(len(course_outline[1]["summary"]["transcripts"]), 0)
+        self.assertEqual(course_outline[1]["summary"]["only_on_web"], True)
 
     def test_course_list(self):
         self.login_and_enroll()
