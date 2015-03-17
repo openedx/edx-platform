@@ -7,7 +7,7 @@
   width: 100%;
 
   .course-material{
-    @extend %inner-wrapper; 
+    @extend %inner-wrapper;
   }
 
   ol.course-tabs {
@@ -75,6 +75,14 @@ header.global.slim {
   padding: ($baseline/4) 0 ($baseline/2) 0;
   border-bottom: 1px solid $outer-border-color;
   background: $header-bg;
+
+  .wrapper-header {
+    padding-top: ($baseline/4);
+  }
+
+  .nav-account-management {
+    padding: 0;
+  }
 
   .guest .secondary {
     margin-right: 0;
@@ -147,6 +155,7 @@ header.global.slim {
     }
   }
 
+  .nav-main,
   .nav-global {
     display: none;
   }
