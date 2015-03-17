@@ -151,7 +151,7 @@ class VideoFields(object):
         scope=Scope.settings,
     )
     only_on_web = Boolean(
-        help=_("Specifiy whether this video is available only on the web and not other platforms like mobile apps."),
+        help=_("Specify whether this video is available only on the web and not other platforms like mobile apps."),
         display_name="Available Only on Web",
         scope=Scope.settings,
         default=False
