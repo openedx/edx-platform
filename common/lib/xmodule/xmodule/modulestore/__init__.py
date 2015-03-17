@@ -119,6 +119,7 @@ class BulkOpsRecord(object):
     """
     def __init__(self):
         self._active_count = 0
+        self._publish_items = []
 
     @property
     def active(self):
@@ -138,6 +139,14 @@ class BulkOpsRecord(object):
         Record the completion of a level of nesting of the bulk write operation
         """
         self._active_count -= 1
+
+    def add_publish_item(self, location):
+        self._publish_items.append(location)
+
+    def pull_publish_items(self):
+        publish_items = self._publish_items
+        self._publish_items = []
+        return publish_items
 
     @property
     def is_root(self):
@@ -280,6 +289,12 @@ class BulkOperationsMixin(object):
         Return whether a bulk operation is active on `course_key`.
         """
         return self._get_bulk_ops_record(course_key, ignore_case).active
+
+    def send_bulk_published_signal(self, bulk_ops_record, course_id):
+        publish_items = bulk_ops_record.pull_publish_items()
+        if publish_items:
+            item_keys = [item for item in publish_items if item != course_id]
+            self.signal_handler.send("course_published", course_key=course_id, item_keys=item_keys)
 
 
 class EditInfo(object):
@@ -1294,6 +1309,18 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         parent = self.get_item(parent_usage_key)
         parent.children.append(item.location)
         self.update_item(parent, user_id)
+
+    def _flag_publish_event(self, course_key, location=None):
+        signal_handler = getattr(self, 'signal_handler', None)
+        if signal_handler:
+            bulk_record = self._get_bulk_ops_record(course_key) if isinstance(self, BulkOperationsMixin) else None
+            if bulk_record and bulk_record.active:
+                publish_location = location if location else course_key
+                bulk_record.add_publish_item(publish_location)
+            elif location:
+                signal_handler.send("course_published", course_key=course_key, item_keys=[location])
+            else:
+                signal_handler.send("course_published", course_key=course_key)
 
 
 def only_xmodules(identifier, entry_points):
