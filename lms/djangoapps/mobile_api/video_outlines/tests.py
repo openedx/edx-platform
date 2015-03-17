@@ -429,7 +429,6 @@ class TestVideoSummaryList(
     """
     REVERSE_INFO = {'name': 'video-summary-list', 'params': ['course_id']}
 
-
     def test_only_on_web(self):
         self.login_and_enroll()
 
@@ -514,6 +513,7 @@ class TestVideoSummaryList(
             'transcripts': {
                 'en': 'http://testserver/api/mobile/v0.5/video_outlines/transcripts/{}/testing_mobile_high_video/en'.format(self.course.id)  # pylint: disable=line-too-long
             },
+            'only_on_web': False,
             'encoded_videos': {
                 u'mobile_high': {
                     'url': self.video_url_high,

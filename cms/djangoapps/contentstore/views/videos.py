@@ -341,6 +341,7 @@ def videos_post(course, request):
             "client_video_id": file_name,
             "duration": 0,
             "encoded_videos": [],
+            "courses": [course.id]
         })
 
         resp_files.append({"file_name": file_name, "upload_url": upload_url})

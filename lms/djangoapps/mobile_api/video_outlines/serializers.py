@@ -182,10 +182,6 @@ def video_summary(video_profiles, course_id, video_descriptor, request, local_ca
         ret.update(always_available_data)
         return ret
 
-    # First try to check VAL for the URLs we want.
-    val_video_info = local_cache['course_videos'].get(video_descriptor.edx_video_id, {})
-    if val_video_info:
-        video_url = val_video_info['url']
     # Get encoded videos
     video_data = local_cache['course_videos'].get(video_descriptor.edx_video_id, {})
 
@@ -233,8 +229,6 @@ def video_summary(video_profiles, course_id, video_descriptor, request, local_ca
         "size": size,
         "transcripts": transcripts,
         "language": video_descriptor.get_default_transcript_language(),
-        "category": video_descriptor.category,
-        "id": unicode(video_descriptor.scope_ids.usage_id),
         "encoded_videos": video_data.get('profiles')
     }
     ret.update(always_available_data)
