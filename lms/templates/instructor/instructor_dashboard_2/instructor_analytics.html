@@ -1,28 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%page args="section_data"/>
 
-%if settings.FEATURES['DISPLAY_ANALYTICS_DEMOGRAPHICS']:
-    <div class="profile-distribution-widget-container"
-      data-title="${_("Year of Birth")}"
-      data-feature="year_of_birth"
-      data-endpoint="${ section_data['get_distribution_url'] }"
-    ></div>
-
-    <hr>
-
-    <div class="profile-distribution-widget-container"
-      data-title="${_("Gender Distribution")}"
-      data-feature="gender"
-      data-endpoint="${ section_data['get_distribution_url'] }"
-    ></div>
-
-    <hr>
-
-    <div class="profile-distribution-widget-container"
-      data-title="${_("Level of Education")}"
-      data-feature="level_of_education"
-      data-endpoint="${ section_data['get_distribution_url'] }"
-    ></div>
-%elif section_data['demographic_message']:
-    <p><em>${section_data['demographic_message']}</em></p>
-%endif
+<div>
+  <p><em>${section_data['insights_message']}</em></p>
+</div>
