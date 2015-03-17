@@ -1,6 +1,8 @@
-<%page args="course, enrollment, show_courseware_link, cert_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status, course_requirements, dashboard_index" />
+<%page args="course, enrollment, show_courseware_link, cert_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status, course_requirements, dashboard_index, share_settings" />
 
 <%!
+import urllib
+
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 from django.core.urlresolvers import reverse
@@ -113,6 +115,48 @@ from student.helpers import (
                   <a class="enter-course-blocked">${_('View Course')}<span class="sr">&nbsp;${course.display_name_with_default}</span></a>
                 % endif
               % endif
+
+              % if share_settings:
+                <% share_url = urllib.quote_plus(request.build_absolute_uri(reverse('about_course', args=[unicode(course.id)]))) %>
+                <% share_window_name = 'shareWindow' %>
+                <% share_window_config = 'toolbar=no, location=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=640, height=480' %>
+                % if share_settings.get('FACEBOOK_SHARING', False):
+                  <% facebook_url = 'https://www.facebook.com/sharer/sharer.php?u=' + share_url %>
+                    <a
+                      data-tooltip="${_('Share on Facebook')}"
+                      class="action action-facebook"
+                      aria-haspopup="true"
+                      aria-expanded="false"
+                      href="${facebook_url}"
+                      target="_blank"
+                      title="${_('Share on Facebook')}"
+                      onclick="window.open('${facebook_url}', '${share_window_name}', '${share_window_config}'); return false;">
+                      <span class="sr">${_('Facebook')}</span>
+                      <i class="fa fa-facebook" aria-hidden="true"></i>
+                    </a>
+                % endif
+                % if share_settings.get('TWITTER_SHARING', False):
+                  <% share_text_default = _("I'm learning on {platform_name}:").format(platform_name=settings.PLATFORM_NAME) %>
+                  <% share_text = share_settings.get('TWITTER_SHARING_TEXT', share_text_default) %>
+                  <% twitter_url = 'https://twitter.com/intent/tweet?text=' + share_text + '%20' + share_url %>
+                    <a
+                      data-tooltip="${_('Share on Twitter')}"
+                      class="action action-twitter"
+                      aria-haspopup="true"
+                      aria-expanded="false"
+                      href="${twitter_url}"
+                      target="_blank"
+                      title="${_('Share on Twitter')}"
+                      href="${twitter_url}"
+                      target="_blank"
+                      title="Tweet"
+                      onclick="window.open('${twitter_url}', '${share_window_name}', '${share_window_config}'); return false;">
+                      <span class="sr">${_('Twitter')}</span>
+                      <i class="fa fa-twitter" aria-hidden="true"></i>
+                    </a>
+                % endif
+              % endif
+
               <div class="wrapper-action-more">
                 <a href="#actions-dropdown-${dashboard_index}" class="action action-more" id="actions-dropdown-link-${dashboard_index}" aria-haspopup="true" aria-expanded="false" data-course-number="${course.number | h}" data-dashboard-index="${dashboard_index}">
                   <span class="sr">${_('Course options dropdown')}</span>

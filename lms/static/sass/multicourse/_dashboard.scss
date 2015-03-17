@@ -1,7 +1,7 @@
 // lms - views - user/student dashboard
 // ====================
 
-// Table of Contents 
+// Table of Contents
 // * +Dashboard - Sidebar
 // * +Dashboard - Course Listing
 // * +Dashboard - Course Item
@@ -10,7 +10,7 @@
 
 
 // +Dashboard - Sidebar
-// ==================== 
+// ====================
 .dashboard {
   @include clearfix();
   padding: ($baseline*2) 0 0 0;
@@ -214,7 +214,7 @@
 }
 
 // +Dashboard - Course Listing
-// ==================== 
+// ====================
 .dashboard {
   .my-courses {
     @include float(left);
@@ -289,7 +289,7 @@
 }
 
 // +Dashboard - Course
-// ==================== 
+// ====================
 .dashboard .my-courses {
 
   // UI: individual course item
@@ -409,7 +409,6 @@
       .course-actions {
 
         // UI: course item actions
-
         .action {
           @include box-sizing(border-box);
           @include margin-right($baseline/2);
@@ -419,7 +418,8 @@
           border-radius: 3px;
           padding: 12px;
           border: 1px solid $white;
-          
+          text-align: center;
+
           &:hover, &:focus {
             color: $gray-d3;
             border: 1px solid $gray-l4;
@@ -446,7 +446,6 @@
           display: inline-block;
           position: relative;
           @include float(right);
-
 
           .actions-dropdown {
             @extend %ui-no-list;
@@ -968,7 +967,7 @@
           }
         }
 
-        // TYPE: pre-requisites 
+        // TYPE: pre-requisites
         .prerequisites {
           @include clearfix;
 
@@ -1069,7 +1068,7 @@
 }
 
 // +Misc - Uncategorized
-// ==================== 
+// ====================
 .dashboard .my-courses {
 
   // status - language
@@ -1256,7 +1255,7 @@
     border:0;
     color:white;
     box-shadow:none;
-    
+
     &.archived {
       @include button(simple, $button-archive-color);
       font: normal 15px/1.6rem $sans-serif;
@@ -1279,8 +1278,8 @@
 }
 
 // +Dashboard - Banner
-// ==================== 
-.dashboard .my-courses { 
+// ====================
+.dashboard .my-courses {
   .dashboard-banner {
 
     &:empty {
