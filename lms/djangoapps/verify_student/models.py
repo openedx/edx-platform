@@ -896,7 +896,7 @@ class VerificationCheckpoint(models.Model):
 
     course_id = CourseKeyField(max_length=255, db_index=True)
     checkpoint_name = models.CharField(unique=True, max_length=32, choices=CHECKPOINT_CHOICES)
-    photo_verification = models.ManyToManyField(PhotoVerification)
+    photo_verification = models.ManyToManyField(SoftwareSecurePhotoVerification)
 
     class Meta:
         unique_together = (('course_id', 'checkpoint_name'),)
