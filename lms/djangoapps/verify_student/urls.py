@@ -139,4 +139,9 @@ urlpatterns = patterns(
         views.submit_photos_for_verification,
         name="verify_student_submit_photos"
     ),
+    url(
+        r'^reverify/{course_id}/'.format(course_id=settings.COURSE_ID_PATTERN) + '(?P<checkpoint_name>\w+)/$',
+        views.ICRVReverifyView.as_view(),
+        name="verify_student_icrv_reverify"
+    ),
 )
