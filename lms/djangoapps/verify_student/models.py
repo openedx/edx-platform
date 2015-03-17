@@ -35,6 +35,7 @@ from verify_student.ssencrypt import (
 
 from reverification.models import MidcourseReverificationWindow
 
+from xmodule_django.models import CourseKeyField
 log = logging.getLogger(__name__)
 
 
@@ -881,3 +882,51 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         log.debug("Return message:\n\n{}\n\n".format(response.text))
 
         return response
+
+
+class VerificationCheckpoint(models.Model):
+    """represents a point at which a user is challenged to reverify his or her identity.
+        Each checkpoint is uniquely identified by a (course_id, checkpoint_name) tuple.
+    """
+
+    CHECKPOINT_CHOICES = (
+        ("midterm", "midterm"),
+        ("final", "final"),
+    )
+
+    course_id = CourseKeyField(max_length=255, db_index=True)
+    checkpoint_name = models.CharField(unique=True, max_length=32, choices=CHECKPOINT_CHOICES)
+    photo_verification = models.ManyToManyField(SoftwareSecurePhotoVerification)
+
+    class Meta:
+        unique_together = (('course_id', 'checkpoint_name'),)
+
+
+class VerificationStatus(models.Model):
+    """A verification status represents a user’s progress
+    through the verification process for a particular checkpoint
+    """
+
+    VERIFICATION_STATUS_CHOICES = (
+        ("submitted", "submitted"),
+        ("approved", "approved"),
+        ("denied", "denied"),
+        ("error", "error")
+    )
+
+    checkpoint = models.ForeignKey(VerificationCheckpoint)
+    user = models.ForeignKey(User)
+    status = models.CharField(choices=VERIFICATION_STATUS_CHOICES, db_index=True, max_length=32)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    response = models.TextField(null=True, blank=True)
+    error = models.TextField(null=True, blank=True)
+
+
+class VerificationBlock(models.Model):
+    """it is XBlock (courseware component) responsible for Prompting the user to reverify at particular points.
+       Displaying the verification status for particular checkpoints.
+    """
+
+    start_datetime = models.DateTimeField(null=True, db_index=True)
+    end_datetime = models.DateTimeField(null=True, db_index=True)
+    checkpoint_name = models.CharField(unique=True, max_length=32, choices=VerificationCheckpoint.CHECKPOINT_CHOICES)
