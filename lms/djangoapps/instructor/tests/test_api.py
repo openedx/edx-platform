@@ -61,8 +61,7 @@ import instructor_task.api
 import instructor.views.api
 from instructor.views.api import require_finance_admin
 from instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
-from instructor.views.api import generate_unique_password
-from instructor.views.api import _split_input_list, common_exceptions_400
+from instructor.views.api import _split_input_list, common_exceptions_400, generate_unique_password
 from instructor_task.api_helper import AlreadyRunningError
 
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
@@ -208,14 +207,12 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
              {'identifiers': 'foo@example.org', 'action': 'enroll'}),
             ('get_grading_config', {}),
             ('get_students_features', {}),
-            ('get_distribution', {}),
             ('get_student_progress_url', {'unique_student_identifier': self.user.username}),
             ('reset_student_attempts',
              {'problem_to_reset': self.problem_urlname, 'unique_student_identifier': self.user.email}),
             ('update_forum_role_membership',
              {'unique_student_identifier': self.user.email, 'rolename': 'Moderator', 'action': 'allow'}),
             ('list_forum_members', {'rolename': FORUM_ROLE_COMMUNITY_TA}),
-            ('proxy_legacy_analytics', {'aname': 'ProblemGradeDistribution'}),
             ('send_email', {'send_to': 'staff', 'subject': 'test', 'message': 'asdf'}),
             ('list_instructor_tasks', {}),
             ('list_background_email_tasks', {}),
@@ -291,7 +288,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         for endpoint, args in self.staff_level_endpoints:
             # TODO: make these work
-            if endpoint in ['update_forum_role_membership', 'proxy_legacy_analytics', 'list_forum_members']:
+            if endpoint in ['update_forum_role_membership', 'list_forum_members']:
                 continue
             self._access_endpoint(
                 endpoint,
@@ -320,7 +317,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         for endpoint, args in self.staff_level_endpoints:
             # TODO: make these work
-            if endpoint in ['update_forum_role_membership', 'proxy_legacy_analytics']:
+            if endpoint in ['update_forum_role_membership']:
                 continue
             self._access_endpoint(
                 endpoint,
@@ -1978,7 +1975,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
                              percentage_discount=10, created_by=self.instructor, is_active=True)
         self.coupon.save()
 
-        #create testing invoice 1
+        # Create testing invoice 1
         self.sale_invoice_1 = Invoice.objects.create(
             total_amount=1234.32, company_name='Test1', company_contact_name='TestName', company_contact_email='Test@company.com',
             recipient_name='Testw', recipient_email='test1@test.com', customer_reference_number='2Fwe23S',
@@ -2205,7 +2202,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
             )
             course_registration_code.save()
 
-        #create test invoice 2
+        # Create test invoice 2
         sale_invoice_2 = Invoice.objects.create(
             total_amount=1234.32, company_name='Test1', company_contact_name='TestName', company_contact_email='Test@company.com',
             recipient_name='Testw_2', recipient_email='test2@test.com', customer_reference_number='2Fwe23S',
@@ -2601,46 +2598,6 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
                                  " You will be able to download the" \
                                  " report when it is complete.".format(report_type=report_type)
         self.assertIn(already_running_status, response.content)
-
-    def test_get_distribution_no_feature(self):
-        """
-        Test that get_distribution lists available features
-        when supplied no feature parameter.
-        """
-        url = reverse('get_distribution', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        res_json = json.loads(response.content)
-        self.assertEqual(type(res_json['available_features']), list)
-
-        url = reverse('get_distribution', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url + u'?feature=')
-        self.assertEqual(response.status_code, 200)
-        res_json = json.loads(response.content)
-        self.assertEqual(type(res_json['available_features']), list)
-
-    def test_get_distribution_unavailable_feature(self):
-        """
-        Test that get_distribution fails gracefully with
-            an unavailable feature.
-        """
-        url = reverse('get_distribution', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'feature': 'robot-not-a-real-feature'})
-        self.assertEqual(response.status_code, 400)
-
-    def test_get_distribution_gender(self):
-        """
-        Test that get_distribution fails gracefully with
-            an unavailable feature.
-        """
-        url = reverse('get_distribution', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'feature': 'gender'})
-        self.assertEqual(response.status_code, 200)
-        res_json = json.loads(response.content)
-        self.assertEqual(res_json['feature_results']['data']['m'], 6)
-        self.assertEqual(res_json['feature_results']['choices_display_names']['m'], 'Male')
-        self.assertEqual(res_json['feature_results']['data']['no_data'], 0)
-        self.assertEqual(res_json['feature_results']['choices_display_names']['no_data'], 'No Data')
 
     def test_get_student_progress_url(self):
         """ Test that progress_url is in the successful response. """
@@ -3457,155 +3414,6 @@ class TestInstructorEmailContentList(ModuleStoreTestCase, LoginEnrollmentTestCas
         returned_info = returned_info_list[0]
         expected_info = email_info.to_dict()
         self.assertDictEqual(expected_info, returned_info)
-
-
-@attr('shard_1')
-@ddt.ddt
-@override_settings(ANALYTICS_SERVER_URL="http://robotanalyticsserver.netbot:900/")
-@override_settings(ANALYTICS_API_KEY="robot_api_key")
-class TestInstructorAPIAnalyticsProxy(ModuleStoreTestCase, LoginEnrollmentTestCase):
-    """
-    Test instructor analytics proxy endpoint.
-    """
-
-    class FakeProxyResponse(object):
-        """ Fake successful requests response object. """
-
-        def __init__(self):
-            self.status_code = requests.status_codes.codes.OK
-            self.content = '{"test_content": "robot test content"}'
-
-    class FakeBadProxyResponse(object):
-        """ Fake strange-failed requests response object. """
-
-        def __init__(self):
-            self.status_code = 'notok.'
-            self.content = '{"test_content": "robot test content"}'
-
-    def setUp(self):
-        super(TestInstructorAPIAnalyticsProxy, self).setUp()
-
-        self.course = CourseFactory.create()
-        self.instructor = InstructorFactory(course_key=self.course.id)
-        self.client.login(username=self.instructor.username, password='test')
-
-    @ddt.data((ModuleStoreEnum.Type.mongo, False), (ModuleStoreEnum.Type.split, True))
-    @ddt.unpack
-    @patch.object(instructor.views.api.requests, 'get')
-    def test_analytics_proxy_url(self, store_type, assert_wo_encoding, act):
-        """ Test legacy analytics proxy url generation. """
-        with modulestore().default_store(store_type):
-            course = CourseFactory.create()
-            instructor_local = InstructorFactory(course_key=course.id)
-            self.client.login(username=instructor_local.username, password='test')
-
-            act.return_value = self.FakeProxyResponse()
-
-            url = reverse('proxy_legacy_analytics', kwargs={'course_id': course.id.to_deprecated_string()})
-            response = self.client.get(url, {
-                'aname': 'ProblemGradeDistribution'
-            })
-            self.assertEqual(response.status_code, 200)
-
-            # Make request URL pattern - everything but course id.
-            url_pattern = "{url}get?aname={aname}&course_id={course_id}&apikey={api_key}".format(
-                url="http://robotanalyticsserver.netbot:900/",
-                aname="ProblemGradeDistribution",
-                course_id="{course_id!s}",
-                api_key="robot_api_key",
-            )
-
-            if assert_wo_encoding:
-                # Format url with no URL-encoding of parameters.
-                assert_url = url_pattern.format(course_id=course.id.to_deprecated_string())
-                with self.assertRaises(AssertionError):
-                    act.assert_called_once_with(assert_url)
-
-            # Format url *with* URL-encoding of parameters.
-            expected_url = url_pattern.format(course_id=quote(course.id.to_deprecated_string()))
-            act.assert_called_once_with(expected_url)
-
-    @override_settings(ANALYTICS_SERVER_URL="")
-    @patch.object(instructor.views.api.requests, 'get')
-    def test_analytics_proxy_server_url(self, act):
-        """
-        Test legacy analytics when empty server url.
-        """
-        act.return_value = self.FakeProxyResponse()
-
-        url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
-            'aname': 'ProblemGradeDistribution'
-        })
-        self.assertEqual(response.status_code, 501)
-
-    @override_settings(ANALYTICS_API_KEY="")
-    @patch.object(instructor.views.api.requests, 'get')
-    def test_analytics_proxy_api_key(self, act):
-        """
-        Test legacy analytics when empty server API key.
-        """
-        act.return_value = self.FakeProxyResponse()
-
-        url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
-            'aname': 'ProblemGradeDistribution'
-        })
-        self.assertEqual(response.status_code, 501)
-
-    @override_settings(ANALYTICS_SERVER_URL="")
-    @override_settings(ANALYTICS_API_KEY="")
-    @patch.object(instructor.views.api.requests, 'get')
-    def test_analytics_proxy_empty_url_and_api_key(self, act):
-        """
-        Test legacy analytics when empty server url & API key.
-        """
-        act.return_value = self.FakeProxyResponse()
-
-        url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
-            'aname': 'ProblemGradeDistribution'
-        })
-        self.assertEqual(response.status_code, 501)
-
-    @patch.object(instructor.views.api.requests, 'get')
-    def test_analytics_proxy(self, act):
-        """
-        Test legacy analytics content proxyin, actg.
-        """
-        act.return_value = self.FakeProxyResponse()
-
-        url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
-            'aname': 'ProblemGradeDistribution'
-        })
-        self.assertEqual(response.status_code, 200)
-
-        # check response
-        self.assertTrue(act.called)
-        expected_res = {'test_content': "robot test content"}
-        self.assertEqual(json.loads(response.content), expected_res)
-
-    @patch.object(instructor.views.api.requests, 'get')
-    def test_analytics_proxy_reqfailed(self, act):
-        """ Test proxy when server reponds with failure. """
-        act.return_value = self.FakeBadProxyResponse()
-
-        url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
-            'aname': 'ProblemGradeDistribution'
-        })
-        self.assertEqual(response.status_code, 500)
-
-    @patch.object(instructor.views.api.requests, 'get')
-    def test_analytics_proxy_missing_param(self, act):
-        """ Test proxy when missing the aname query parameter. """
-        act.return_value = self.FakeProxyResponse()
-
-        url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {})
-        self.assertEqual(response.status_code, 400)
-        self.assertFalse(act.called)
 
 
 @attr('shard_1')

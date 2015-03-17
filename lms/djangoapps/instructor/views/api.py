@@ -1647,56 +1647,6 @@ def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
-def get_distribution(request, course_id):
-    """
-    Respond with json of the distribution of students over selected features which have choices.
-
-    Ask for a feature through the `feature` query parameter.
-    If no `feature` is supplied, will return response with an
-        empty response['feature_results'] object.
-    A list of available will be available in the response['available_features']
-    """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    feature = request.GET.get('feature')
-    # alternate notations of None
-    if feature in (None, 'null', ''):
-        feature = None
-    else:
-        feature = str(feature)
-
-    available_features = instructor_analytics.distributions.AVAILABLE_PROFILE_FEATURES
-    # allow None so that requests for no feature can list available features
-    if feature not in available_features + (None,):
-        return HttpResponseBadRequest(strip_tags(
-            "feature '{}' not available.".format(feature)
-        ))
-
-    response_payload = {
-        'course_id': course_id.to_deprecated_string(),
-        'queried_feature': feature,
-        'available_features': available_features,
-        'feature_display_names': instructor_analytics.distributions.DISPLAY_NAMES,
-    }
-
-    p_dist = None
-    if feature is not None:
-        p_dist = instructor_analytics.distributions.profile_distribution(course_id, feature)
-        response_payload['feature_results'] = {
-            'feature': p_dist.feature,
-            'feature_display_name': p_dist.feature_display_name,
-            'data': p_dist.data,
-            'type': p_dist.type,
-        }
-
-        if p_dist.type == 'EASY_CHOICE':
-            response_payload['feature_results']['choices_display_names'] = p_dist.choices_display_names
-
-    return JsonResponse(response_payload)
-
-
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @common_exceptions_400
 @require_level('staff')
 @require_query_params(
@@ -2359,62 +2309,6 @@ def update_forum_role_membership(request, course_id):
         'action': action,
     }
     return JsonResponse(response_payload)
-
-
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
-@require_query_params(
-    aname="name of analytic to query",
-)
-@common_exceptions_400
-def proxy_legacy_analytics(request, course_id):
-    """
-    Proxies to the analytics cron job server.
-
-    `aname` is a query parameter specifying which analytic to query.
-    """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    analytics_name = request.GET.get('aname')
-
-    # abort if misconfigured
-    if not (hasattr(settings, 'ANALYTICS_SERVER_URL') and
-            hasattr(settings, 'ANALYTICS_API_KEY') and
-            settings.ANALYTICS_SERVER_URL and settings.ANALYTICS_API_KEY):
-        return HttpResponse("Analytics service not configured.", status=501)
-
-    url = "{}get?aname={}&course_id={}&apikey={}".format(
-        settings.ANALYTICS_SERVER_URL,
-        analytics_name,
-        urllib.quote(unicode(course_id)),
-        settings.ANALYTICS_API_KEY,
-    )
-
-    try:
-        res = requests.get(url)
-    except Exception:  # pylint: disable=broad-except
-        log.exception(u"Error requesting from analytics server at %s", url)
-        return HttpResponse("Error requesting from analytics server.", status=500)
-
-    if res.status_code is 200:
-        payload = json.loads(res.content)
-        add_block_ids(payload)
-        content = json.dumps(payload)
-        # return the successful request content
-        return HttpResponse(content, content_type="application/json")
-    elif res.status_code is 404:
-        # forward the 404 and content
-        return HttpResponse(res.content, content_type="application/json", status=404)
-    else:
-        # 500 on all other unexpected status codes.
-        log.error(
-            u"Error fetching %s, code: %s, msg: %s",
-            url, res.status_code, res.content
-        )
-        return HttpResponse(
-            "Error from analytics server ({}).".format(res.status_code),
-            status=500
-        )
 
 
 @require_POST

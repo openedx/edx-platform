@@ -1355,40 +1355,6 @@
   }
 }
 
-
-.profile-distribution-widget {
-  margin-bottom: ($baseline * 2);
-
-  .display-graph .graph-placeholder {
-    width: 750px;
-    height: 250px;
-  }
-
-  .display-table {
-    .slickgrid {
-      height: 250px;
-    }
-  }
-}
-
-.grade-distributions-widget {
-  margin-bottom: $baseline * 2;
-
-  .last-updated {
-    line-height: 2.2em;
-    @include font-size(12);
-  }
-
-  .display-graph .graph-placeholder {
-    width: 750px;
-    height: 200px;
-  }
-
-  .display-text {
-    line-height: 2em;
-  }
-}
-
 input[name="subject"] {
   width:600px;
 }
@@ -1873,39 +1839,6 @@ input[name="subject"] {
     width: 75%;
   }
 
-}
-
-.profile-distribution-widget {
-  margin-bottom: ($baseline * 2);
-
-  .display-graph .graph-placeholder {
-    width: 750px;
-    height: 250px;
-  }
-
-  .display-table {
-    .slickgrid {
-      height: 250px;
-    }
-  }
-}
-
-.grade-distributions-widget {
-  margin-bottom: ($baseline * 2);
-
-  .last-updated {
-    line-height: 2.2em;
-    @include font-size(12);
-  }
-
-  .display-graph .graph-placeholder {
-    width: 750px;
-    height: 200px;
-  }
-
-  .display-text {
-    line-height: 2em;
-  }
 }
 
 input[name="subject"] {
