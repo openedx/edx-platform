@@ -32,7 +32,6 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from course_modes.models import CourseMode
 from courseware.models import StudentModule
 from courseware.tests.factories import StaffFactory, InstructorFactory, BetaTesterFactory
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
 from django_comment_common.utils import seed_permissions_roles
@@ -2320,7 +2319,6 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
         self.assertEqual(response.status_code, 400)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch.dict(settings.FEATURES, {'ENTRANCE_EXAMS': True})
 class TestEntranceExamInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -2565,7 +2563,6 @@ class TestEntranceExamInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollm
         self.assertContains(response, message)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):

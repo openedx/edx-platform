@@ -2,7 +2,6 @@ import logging
 import json
 
 from django.test.client import Client, RequestFactory
-from django.test.utils import override_settings
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
@@ -11,7 +10,6 @@ from nose.tools import assert_true, assert_equal  # pylint: disable=no-name-in-m
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from lms.lib.comment_client import Thread
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from django_comment_client.base import views
 from django_comment_client.tests.group_id import CohortedTopicGroupIdTestMixin, NonCohortedTopicGroupIdTestMixin, GroupIdAssertionMixin
 from django_comment_client.tests.utils import CohortedTestCase
@@ -993,7 +991,6 @@ class CreateSubCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, Moc
             del Thread.commentable_id
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class ForumEventTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
     """
     Forum actions are expected to launch analytics events. Test these here.
@@ -1092,7 +1089,6 @@ class ForumEventTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
         self.assertEqual(event['options']['followed'], False)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class UsersEndpointTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
 
     def set_post_counts(self, mock_request, threads_count=1, comments_count=1):
