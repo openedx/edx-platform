@@ -178,6 +178,11 @@ class TestAccountApi(TestCase):
         self.assertEqual(0, len(pending_change))
 
 
+@patch('openedx.core.djangoapps.user_api.accounts.helpers._PROFILE_IMAGE_SIZES', [50, 10])
+@patch.dict(
+    'openedx.core.djangoapps.user_api.accounts.helpers.PROFILE_IMAGE_SIZES_MAP', {'full': 50, 'small': 10}, clear=True
+)
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
 class AccountSettingsOnCreationTest(TestCase):
 
     USERNAME = u'frank-underwood'
@@ -209,6 +214,12 @@ class AccountSettingsOnCreationTest(TestCase):
             'mailing_address': None,
             'year_of_birth': None,
             'country': None,
+            'bio': None,
+            'profile_image': {
+                'has_image': False,
+                'image_url_full': 'http://example-storage.com/profile_images/default_50.jpg',
+                'image_url_small': 'http://example-storage.com/profile_images/default_10.jpg',
+            },
         })
 
 
