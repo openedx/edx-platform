@@ -32,7 +32,7 @@ from lxml import etree
 
 from xmodule.modulestore.xml import XMLModuleStore, LibraryXMLModuleStore, ImportSystem
 from xblock.runtime import KvsFieldData, DictKeyValueStore
-from xmodule.x_module import XModuleDescriptor
+from xmodule.x_module import XModuleDescriptor, XModuleMixin
 from opaque_keys.edx.keys import UsageKey
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xmodule.contentstore.content import StaticContent
@@ -47,6 +47,7 @@ from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.mongo.base import MongoRevisionKey
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.store_utilities import draft_node_constructor, get_draft_subtree_roots
+from xmodule.modulestore.tests.utils import LocationMixin
 
 
 log = logging.getLogger(__name__)
@@ -1031,7 +1032,8 @@ def validate_course_policy(module_store, course_id):
 def perform_xlint(
         data_dir, source_dirs,
         default_class='xmodule.raw_module.RawDescriptor',
-        load_error_modules=True):
+        load_error_modules=True,
+        xblock_mixins=(LocationMixin, XModuleMixin)):
     err_cnt = 0
     warn_cnt = 0
 
@@ -1039,7 +1041,8 @@ def perform_xlint(
         data_dir,
         default_class=default_class,
         source_dirs=source_dirs,
-        load_error_modules=load_error_modules
+        load_error_modules=load_error_modules,
+        xblock_mixins=xblock_mixins
     )
 
     # check all data source path information
