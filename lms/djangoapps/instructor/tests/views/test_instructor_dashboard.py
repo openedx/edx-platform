@@ -25,6 +25,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Set up tests
         """
+        super(TestInstructorDashboard, self).setUp()
         self.course = CourseFactory.create()
 
         self.course_mode = CourseMode(course_id=self.course.id,
@@ -76,7 +77,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
         total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
         response = self.client.get(self.url)
-        self.assertTrue('{currency}{amount}'.format(currency='Rs', amount=total_amount) in response.content)
+        self.assertIn('{currency}{amount}'.format(currency='Rs', amount=total_amount), response.content)
 
     @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_ENROLLMENTS': False})
     @override_settings(ANALYTICS_DASHBOARD_URL='')
