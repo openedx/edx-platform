@@ -12,7 +12,6 @@ not possible to have this LTI multiple times on a single page in LMS.
 from uuid import uuid4
 import textwrap
 import urllib
-import re
 from oauthlib.oauth1.rfc5849 import signature, parameters
 import oauthlib.oauth1
 import hashlib

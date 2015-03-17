@@ -5,8 +5,8 @@ Serve miscellaneous course and student data
 """
 import json
 from shoppingcart.models import (
-    PaidCourseRegistration, CouponRedemption, Invoice, CourseRegCodeItem,
-    OrderTypes, RegistrationCodeRedemption, CourseRegistrationCode, CourseRegistrationCodeInvoiceItem
+    PaidCourseRegistration, CouponRedemption, CourseRegCodeItem,
+    RegistrationCodeRedemption, CourseRegistrationCodeInvoiceItem
 )
 from django.db.models import Q
 from django.conf import settings

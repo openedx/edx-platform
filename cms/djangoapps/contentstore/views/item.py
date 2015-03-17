@@ -24,7 +24,7 @@ from xblock.fields import Scope
 from xblock.fragment import Fragment
 
 import xmodule
-from xmodule.tabs import StaticTab, CourseTabList
+from xmodule.tabs import CourseTabList
 from xmodule.modulestore import ModuleStoreEnum, EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
@@ -47,7 +47,7 @@ from contentstore.views.preview import get_preview_fragment
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
 from cms.lib.xblock.runtime import handler_url, local_resource_url
-from opaque_keys.edx.keys import UsageKey, CourseKey
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryUsageLocator
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
 

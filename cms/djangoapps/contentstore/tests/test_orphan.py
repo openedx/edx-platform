@@ -4,7 +4,6 @@ Test finding orphans via the view and django config
 import json
 from contentstore.tests.utils import CourseTestCase
 from student.models import CourseEnrollment
-from xmodule.modulestore.django import modulestore
 from contentstore.utils import reverse_course_url
 
 

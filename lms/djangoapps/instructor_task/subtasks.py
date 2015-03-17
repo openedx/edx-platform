@@ -4,7 +4,6 @@ This module contains celery task functions for handling the management of subtas
 from time import time
 import json
 from uuid import uuid4
-import math
 import psutil
 from contextlib import contextmanager
 import logging

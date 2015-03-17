@@ -1,7 +1,5 @@
 from factory.django import DjangoModelFactory
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-
 from certificates.models import GeneratedCertificate, CertificateStatuses, CertificateHtmlViewConfiguration
 
 

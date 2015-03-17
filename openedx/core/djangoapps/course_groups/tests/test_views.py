@@ -8,9 +8,7 @@ from collections import namedtuple
 from django.contrib.auth.models import User
 from django.http import Http404
 from django.test.client import RequestFactory
-from django.test.utils import override_settings
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

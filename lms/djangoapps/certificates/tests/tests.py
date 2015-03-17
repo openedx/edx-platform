@@ -4,7 +4,6 @@ Tests for the certificates models.
 
 from mock import patch
 from django.conf import settings
-from django.test import TestCase
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

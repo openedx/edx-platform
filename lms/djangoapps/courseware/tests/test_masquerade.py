@@ -6,7 +6,6 @@ from mock import patch
 from datetime import datetime
 
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 from django.utils.timezone import UTC
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
@@ -15,7 +14,7 @@ from courseware.tests.factories import StaffFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase, get_request_for_user
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MOCK_MODULESTORE
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from xmodule.partitions.partitions import Group, UserPartition
 

@@ -2,13 +2,10 @@
 Integration tests of the payment flow, including course mode selection.
 """
 
-from lxml.html import soupparser
-from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
-from django.conf import settings
 
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from course_modes.tests.factories import CourseModeFactory

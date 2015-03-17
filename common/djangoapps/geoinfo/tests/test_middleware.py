@@ -6,11 +6,9 @@ import pygeoip
 
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
-from django.test.utils import override_settings
 from django.test.client import RequestFactory
 from geoinfo.middleware import CountryMiddleware
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from student.tests.factories import UserFactory, AnonymousUserFactory
 
 

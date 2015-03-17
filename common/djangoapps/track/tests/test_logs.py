@@ -3,7 +3,7 @@ import mock
 import unittest
 
 from django.test import TestCase
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.core.urlresolvers import reverse
 from django.conf import settings
 from track.models import TrackingLog
 from track.views import user_track

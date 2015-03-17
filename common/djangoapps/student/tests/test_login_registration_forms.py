@@ -7,7 +7,6 @@ import ddt
 from mock import patch
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.factories import CourseFactory

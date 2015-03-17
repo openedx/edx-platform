@@ -3,7 +3,6 @@ Student Views
 """
 import datetime
 import logging
-import re
 import uuid
 import time
 import json
@@ -46,7 +45,6 @@ from social.apps.django_app import utils as social_utils
 from social.backends import oauth as social_oauth
 
 from edxmako.shortcuts import render_to_response, render_to_string
-from mako.exceptions import TopLevelLookupException
 
 from course_modes.models import CourseMode
 from shoppingcart.api import order_history

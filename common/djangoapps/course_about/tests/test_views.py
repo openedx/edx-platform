@@ -12,9 +12,7 @@ from rest_framework import status
 from django.conf import settings
 from datetime import datetime
 from mock import patch
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase, mixed_store_config
-)
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, CourseAboutFactory
 from student.tests.factories import UserFactory
 from course_about.serializers import course_image_url

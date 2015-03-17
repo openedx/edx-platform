@@ -6,7 +6,7 @@ import mock
 import unittest
 import json
 import requests
-from ..xqueue import StubXQueueService, StubXQueueHandler
+from ..xqueue import StubXQueueService
 
 
 class FakeTimer(object):

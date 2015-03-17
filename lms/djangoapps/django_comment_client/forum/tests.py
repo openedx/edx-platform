@@ -23,7 +23,6 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
-    TEST_DATA_MOCK_MODULESTORE,
     TEST_DATA_MONGO_MODULESTORE
 )
 from xmodule.modulestore.tests.factories import check_mongo_calls, CourseFactory, ItemFactory

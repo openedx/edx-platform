@@ -2,7 +2,7 @@
 Tests capa util
 """
 import unittest
-import textwrap
+
 from . import test_capa_system
 from capa.util import compare_with_tolerance, sanitize_html
 

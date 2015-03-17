@@ -3,15 +3,11 @@ Tests for Microsite Dashboard with Shopping Cart History
 """
 import mock
 
-from django.conf import settings
-from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 
 from mock import patch
 
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase, mixed_store_config
-)
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from shoppingcart.models import (
     Order, PaidCourseRegistration, CertificateItem, Donation

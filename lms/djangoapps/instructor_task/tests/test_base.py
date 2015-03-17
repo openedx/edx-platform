@@ -13,12 +13,10 @@ from celery.states import SUCCESS, FAILURE
 from django.conf import settings
 from django.test.testcases import TestCase
 from django.contrib.auth.models import User
-from django.test.utils import override_settings
 from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from courseware.model_data import StudentModule
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from courseware.tests.tests import LoginEnrollmentTestCase
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum

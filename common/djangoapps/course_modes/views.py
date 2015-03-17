@@ -6,7 +6,6 @@ import decimal
 from ipware.ip import get_ip
 
 from django.core.urlresolvers import reverse
-from django.conf import settings
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.views.generic.base import View

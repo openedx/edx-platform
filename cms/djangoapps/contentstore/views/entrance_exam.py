@@ -9,7 +9,6 @@ import logging
 from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
 from django.http import HttpResponse, HttpResponseBadRequest
-from django.test import RequestFactory
 
 from contentstore.views.helpers import create_xblock
 from contentstore.views.item import delete_item

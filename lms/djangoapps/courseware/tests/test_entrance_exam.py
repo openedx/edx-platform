@@ -3,16 +3,14 @@ Tests use cases related to LMS Entrance Exam behavior, such as gated content acc
 """
 from django.conf import settings
 from django.test.client import RequestFactory
-from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module, toc_for_course
 from courseware.tests.factories import UserFactory, InstructorFactory
 from courseware.courses import get_entrance_exam_content_info, get_entrance_exam_score
-from milestones.models import MilestoneRelationshipType
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MOCK_MODULESTORE
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from util import milestones_helpers
 from student.models import CourseEnrollment

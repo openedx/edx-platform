@@ -2,12 +2,10 @@
 Test grade calculation.
 """
 from django.http import Http404
-from django.test.utils import override_settings
 from mock import patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.grades import grade, iterate_grades_for
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

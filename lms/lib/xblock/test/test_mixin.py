@@ -2,11 +2,9 @@
 Tests of the LMS XBlock Mixin
 """
 import ddt
-from django.conf import settings
 
 from xblock.validation import ValidationMessage
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.modulestore_settings import update_module_store_settings
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_TOY_MODULESTORE
 from xmodule.partitions.partitions import Group, UserPartition

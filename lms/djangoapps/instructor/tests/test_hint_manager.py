@@ -1,12 +1,10 @@
 import json
 
 from django.test.client import Client, RequestFactory
-from django.test.utils import override_settings
 from mock import patch, MagicMock
 
 from courseware.models import XModuleUserStateSummaryField
 from courseware.tests.factories import UserStateSummaryFactory
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 import instructor.hint_manager as view
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

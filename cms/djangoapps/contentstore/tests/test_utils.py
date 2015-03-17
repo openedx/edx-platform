@@ -16,7 +16,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.locator import CourseLocator
 
 
 class LMSLinksTestCase(TestCase):

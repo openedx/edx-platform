@@ -3,14 +3,12 @@ Tests for courseware middleware
 """
 
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 from django.test.client import RequestFactory
 from django.http import Http404
 from mock import patch
 
 import courseware.courses as courses
 from courseware.middleware import RedirectUnenrolledMiddleware
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

@@ -2,10 +2,8 @@
 Test for split test XModule
 """
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 from mock import MagicMock
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from courseware.module_render import get_module_for_descriptor
 from courseware.model_data import FieldDataCache
 from student.tests.factories import UserFactory, CourseEnrollmentFactory

@@ -13,7 +13,7 @@ from django_future.csrf import csrf_exempt
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
-from util.json_request import expect_json, JsonResponse
+from util.json_request import expect_json
 
 log = logging.getLogger(__name__)
 

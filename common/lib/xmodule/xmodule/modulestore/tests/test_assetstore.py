@@ -15,7 +15,7 @@ from xmodule.modulestore import ModuleStoreEnum, SortedAssetList, IncorrectlySor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.test_cross_modulestore_import_export import (
-    MIXED_MODULESTORE_BOTH_SETUP, MODULESTORE_SETUPS, MongoContentstoreBuilder,
+    MIXED_MODULESTORE_BOTH_SETUP, MODULESTORE_SETUPS,
     XmlModulestoreBuilder, MixedModulestoreBuilder
 )
 
