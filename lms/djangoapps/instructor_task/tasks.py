@@ -19,10 +19,14 @@ a problem URL and optionally a student.  These are used to set up the initial va
 of the query for traversing StudentModule objects.
 
 """
+import logging
+from functools import partial
+
 from django.conf import settings
 from django.utils.translation import ugettext_noop
+
 from celery import task
-from functools import partial
+from bulk_email.tasks import perform_delegate_email_batches
 from instructor_task.tasks_helper import (
     run_main_task,
     BaseInstructorTask,
@@ -34,7 +38,9 @@ from instructor_task.tasks_helper import (
     upload_students_csv,
     cohort_students_and_upload
 )
-from bulk_email.tasks import perform_delegate_email_batches
+
+
+TASK_LOG = logging.getLogger('edx.celery.task')
 
 
 @task(base=BaseInstructorTask)  # pylint: disable=not-callable
@@ -140,6 +146,11 @@ def calculate_grades_csv(entry_id, xmodule_instance_args):
     """
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
     action_name = ugettext_noop('graded')
+    TASK_LOG.info(
+        u"Task: %s, InstructorTask ID: %s, Task type: %s, Preparing for task execution",
+        xmodule_instance_args.get('task_id'), entry_id, action_name
+    )
+
     task_fn = partial(upload_grades_csv, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
 
