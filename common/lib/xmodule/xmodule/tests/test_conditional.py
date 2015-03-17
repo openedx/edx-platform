@@ -206,6 +206,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
                 location = descriptor
                 descriptor = self.modulestore.get_item(location, depth=None)
             descriptor.xmodule_runtime = get_test_system()
+            descriptor.xmodule_runtime.descriptor_runtime = descriptor._runtime  # pylint: disable=protected-access
             descriptor.xmodule_runtime.get_module = inner_get_module
             return descriptor
 

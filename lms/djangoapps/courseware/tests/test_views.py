@@ -3,10 +3,10 @@
 Tests courseware views.py
 """
 import cgi
-from datetime import datetime
-from pytz import UTC
-import unittest
 import ddt
+import json
+import unittest
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
@@ -15,26 +15,31 @@ from django.http import Http404, HttpResponseBadRequest
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from mock import MagicMock, patch, create_autospec, Mock
+from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from pytz import UTC
+from xblock.core import XBlock
+from xblock.fields import String, Scope
+from xblock.fragment import Fragment
+
+import courseware.views as views
+import shoppingcart
 from certificates import api as certs_api
 from certificates.models import CertificateStatuses, CertificateGenerationConfiguration
 from certificates.tests.factories import GeneratedCertificateFactory
+from course_modes.models import CourseMode
+from courseware.tests.factories import StudentModuleFactory
 from edxmako.middleware import MakoMiddleware
 from edxmako.tests import mako_middleware_process_request
-from mock import MagicMock, patch, create_autospec, Mock
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
-
-import courseware.views as views
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
-
-from course_modes.models import CourseMode
-import shoppingcart
 from student.models import CourseEnrollment
-from student.tests.factories import AdminFactory, UserFactory
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from student.tests.factories import AdminFactory, UserFactory, CourseEnrollmentFactory
 from util.tests.test_date_utils import fake_ugettext, fake_pgettext
 from util.views import ensure_valid_course_key
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class TestJumpTo(ModuleStoreTestCase):
@@ -858,3 +863,76 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         self.assertIn("You must be signed in to {platform_name} to create a certificate.".format(
             platform_name=settings.PLATFORM_NAME
         ), resp.content)
+
+
+class ViewCheckerBlock(XBlock):
+    """
+    XBlock for testing user state in views.
+    """
+    has_children = True
+    state = String(scope=Scope.user_state)
+
+    def student_view(self, context):  # pylint: disable=unused-argument
+        """
+        A student_view that asserts that the ``state`` field for this block
+        matches the block's usage_id.
+        """
+        msg = "{} != {}".format(self.state, self.scope_ids.usage_id)
+        assert self.state == unicode(self.scope_ids.usage_id), msg
+        fragments = self.runtime.render_children(self)
+        result = Fragment(
+            content=u"<p>ViewCheckerPassed: {}</p>\n{}".format(
+                unicode(self.scope_ids.usage_id),
+                "\n".join(fragment.content for fragment in fragments),
+            )
+        )
+        return result
+
+
+@ddt.ddt
+class TestIndexView(ModuleStoreTestCase):
+    """
+    Tests of the courseware.index view.
+    """
+
+    @XBlock.register_temp_plugin(ViewCheckerBlock, 'view_checker')
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_student_state(self, default_store):
+        """
+        Verify that saved student state is loaded for xblocks rendered in the index view.
+        """
+        user = UserFactory()
+
+        with modulestore().default_store(default_store):
+            course = CourseFactory.create()
+            chapter = ItemFactory.create(parent=course, category='chapter')
+            section = ItemFactory.create(parent=chapter, category='view_checker', display_name="Sequence Checker")
+            vertical = ItemFactory.create(parent=section, category='view_checker', display_name="Vertical Checker")
+            block = ItemFactory.create(parent=vertical, category='view_checker', display_name="Block Checker")
+
+        for item in (section, vertical, block):
+            StudentModuleFactory.create(
+                student=user,
+                course_id=course.id,
+                module_state_key=item.scope_ids.usage_id,
+                state=json.dumps({'state': unicode(item.scope_ids.usage_id)})
+            )
+
+        CourseEnrollmentFactory(user=user, course_id=course.id)
+
+        request = RequestFactory().get(
+            reverse(
+                'courseware_section',
+                kwargs={
+                    'course_id': unicode(course.id),
+                    'chapter': chapter.url_name,
+                    'section': section.url_name,
+                }
+            )
+        )
+        request.user = user
+        mako_middleware_process_request(request)
+
+        # Trigger the assertions embedded in the ViewCheckerBlocks
+        response = views.index(request, unicode(course.id), chapter=chapter.url_name, section=section.url_name)
+        self.assertEquals(response.content.count("ViewCheckerPassed"), 3)

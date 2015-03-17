@@ -151,12 +151,28 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
         else:
             return False
 
+    def __repr__(self):
+        return "MongoKeyValueStore{!r}<{!r}, {!r}>".format(
+            (self._data, self._parent, self._children, self._metadata),
+            self._fields,
+            self.inherited_settings
+        )
+
 
 class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
     """
     A system that has a cache of module json that it will use to load modules
     from, with a backup of calling to the underlying modulestore for more data
     """
+    def __repr__(self):
+        return "CachingDescriptorSystem{!r}".format((
+            self.modulestore,
+            unicode(self.course_id),
+            [unicode(key) for key in self.module_data.keys()],
+            self.default_class,
+            [unicode(key) for key in self.cached_metadata.keys()],
+        ))
+
     def __init__(self, modulestore, course_key, module_data, default_class, cached_metadata, **kwargs):
         """
         modulestore: the module store that can be used to retrieve additional modules
@@ -202,10 +218,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         assert isinstance(location, UsageKey)
         json_data = self.module_data.get(location)
         if json_data is None:
-            module = self.modulestore.get_item(location)
-            if module is not None:
-                # update our own cache after going to the DB to get cache miss
-                self.module_data.update(module.runtime.module_data)
+            module = self.modulestore.get_item(location, using_descriptor_system=self)
             return module
         else:
             # load the module and apply the inherited metadata
@@ -385,6 +398,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
     def applicable_aside_types(self, block):
         # "old" mongo does support asides yet
         return []
+
+
+new_contract('CachingDescriptorSystem', CachingDescriptorSystem)
 
 
 # The only thing using this w/ wildcards is contentstore.mongo for asset retrieval
@@ -839,9 +855,27 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
         return data
 
-    def _load_item(self, course_key, item, data_cache, apply_cached_metadata=True):
+    @contract(
+        course_key=CourseKey,
+        item=dict,
+        apply_cached_metadata=bool,
+        using_descriptor_system="None|CachingDescriptorSystem"
+    )
+    def _load_item(self, course_key, item, data_cache, apply_cached_metadata=True, using_descriptor_system=None):
         """
         Load an XModuleDescriptor from item, using the children stored in data_cache
+
+        Arguments:
+            course_key (CourseKey): which course to load from
+            item (dict): A dictionary with the following keys:
+                location: The serialized UsageKey for the item to load
+                data_dir (optional): The directory name to use as the root data directory for this XModule
+            data_cache (dict): A dictionary mapping from UsageKeys to xblock field data
+                (this is the xblock data loaded from the database)
+            apply_cached_metadata (bool): Whether to use the cached metadata for inheritance
+                purposes.
+            using_descriptor_system (CachingDescriptorSystem): The existing CachingDescriptorSystem
+                to add data to, and to load the XBlocks from.
         """
         course_key = self.fill_in_run(course_key)
         location = Location._from_deprecated_son(item['location'], course_key.run)
@@ -853,32 +887,38 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         if apply_cached_metadata:
             cached_metadata = self._get_cached_metadata_inheritance_tree(course_key)
 
-        services = {}
-        if self.i18n_service:
-            services["i18n"] = self.i18n_service
+        if using_descriptor_system is None:
+            services = {}
+            if self.i18n_service:
+                services["i18n"] = self.i18n_service
 
-        if self.fs_service:
-            services["fs"] = self.fs_service
+            if self.fs_service:
+                services["fs"] = self.fs_service
 
-        if self.user_service:
-            services["user"] = self.user_service
+            if self.user_service:
+                services["user"] = self.user_service
 
-        system = CachingDescriptorSystem(
-            modulestore=self,
-            course_key=course_key,
-            module_data=data_cache,
-            default_class=self.default_class,
-            resources_fs=resource_fs,
-            error_tracker=self.error_tracker,
-            render_template=self.render_template,
-            cached_metadata=cached_metadata,
-            mixins=self.xblock_mixins,
-            select=self.xblock_select,
-            services=services,
-        )
+            system = CachingDescriptorSystem(
+                modulestore=self,
+                course_key=course_key,
+                module_data=data_cache,
+                default_class=self.default_class,
+                resources_fs=resource_fs,
+                error_tracker=self.error_tracker,
+                render_template=self.render_template,
+                cached_metadata=cached_metadata,
+                mixins=self.xblock_mixins,
+                select=self.xblock_select,
+                services=services,
+            )
+        else:
+            system = using_descriptor_system
+            system.module_data.update(data_cache)
+            system.cached_metadata.update(cached_metadata)
+
         return system.load_item(location)
 
-    def _load_items(self, course_key, items, depth=0):
+    def _load_items(self, course_key, items, depth=0, using_descriptor_system=None):
         """
         Load a list of xmodules from the data in items, with children cached up
         to specified depth
@@ -890,8 +930,11 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # bother with the metadata inheritance
         return [
             self._load_item(
-                course_key, item, data_cache,
-                apply_cached_metadata=(item['location']['category'] != 'course' or depth != 0)
+                course_key,
+                item,
+                data_cache,
+                apply_cached_metadata=(item['location']['category'] != 'course' or depth != 0),
+                using_descriptor_system=using_descriptor_system
             )
             for item in items
         ]
@@ -990,7 +1033,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         except ItemNotFoundError:
             return False
 
-    def get_item(self, usage_key, depth=0):
+    def get_item(self, usage_key, depth=0, using_descriptor_system=None):
         """
         Returns an XModuleDescriptor instance for the item at location.
 
@@ -999,14 +1042,22 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         If no object is found at that location, raises
             xmodule.modulestore.exceptions.ItemNotFoundError
 
-        usage_key: a :class:`.UsageKey` instance
-        depth (int): An argument that some module stores may use to prefetch
-            descendents of the queried modules for more efficient results later
-            in the request. The depth is counted in the number of
-            calls to get_children() to cache. None indicates to cache all descendents.
+        Arguments:
+            usage_key: a :class:`.UsageKey` instance
+            depth (int): An argument that some module stores may use to prefetch
+                descendents of the queried modules for more efficient results later
+                in the request. The depth is counted in the number of
+                calls to get_children() to cache. None indicates to cache all descendents.
+            using_descriptor_system (CachingDescriptorSystem): The existing CachingDescriptorSystem
+                to add data to, and to load the XBlocks from.
         """
         item = self._find_one(usage_key)
-        module = self._load_items(usage_key.course_key, [item], depth)[0]
+        module = self._load_items(
+            usage_key.course_key,
+            [item],
+            depth,
+            using_descriptor_system=using_descriptor_system
+        )[0]
         return module
 
     @staticmethod
@@ -1038,6 +1089,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             content=None,
             key_revision=MongoRevisionKey.published,
             qualifiers=None,
+            using_descriptor_system=None,
             **kwargs
     ):
         """
@@ -1069,6 +1121,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                 For this modulestore, ``name`` is a commonly provided key (Location based stores)
                 This modulestore does not allow searching dates by comparison or edited_by, previous_version,
                 update_version info.
+            using_descriptor_system (CachingDescriptorSystem): The existing CachingDescriptorSystem
+                to add data to, and to load the XBlocks from.
         """
         qualifiers = qualifiers.copy() if qualifiers else {}  # copy the qualifiers (destructively manipulated here)
         query = self._course_key_to_son(course_id)
@@ -1090,7 +1144,11 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             sort=[SORT_REVISION_FAVOR_DRAFT],
         )
 
-        modules = self._load_items(course_id, list(items))
+        modules = self._load_items(
+            course_id,
+            list(items),
+            using_descriptor_system=using_descriptor_system
+        )
         return modules
 
     def create_course(self, org, course, run, user_id, fields=None, **kwargs):

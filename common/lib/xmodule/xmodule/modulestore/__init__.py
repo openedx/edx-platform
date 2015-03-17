@@ -693,7 +693,7 @@ class ModuleStoreRead(ModuleStoreAssetBase):
         pass
 
     @abstractmethod
-    def get_item(self, usage_key, depth=0, **kwargs):
+    def get_item(self, usage_key, depth=0, using_descriptor_system=None, **kwargs):
         """
         Returns an XModuleDescriptor instance for the item at location.
 
