@@ -113,6 +113,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     Module implementing problems in the LON-CAPA format,
     as implemented by capa.capa_problem
     """
+    INDEX_CONTENT_TYPE = 'CAPA'
 
     module_class = CapaModule
 
@@ -185,6 +186,21 @@ class CapaDescriptor(CapaFields, RawDescriptor):
         tree = etree.XML(self.data)  # pylint: disable=no-member
         registered_tags = responsetypes.registry.registered_tags()
         return set([node.tag for node in tree.iter() if node.tag in registered_tags])
+
+    def index_dictionary(self):
+        """
+        Return dictionary prepared with module content and type for indexing.
+        """
+        result = super(CapaDescriptor, self).index_dictionary()
+        if not result:
+            result = {}
+        index = {
+            'content_type': self.INDEX_CONTENT_TYPE,
+            'problem_types': list(self.problem_types),
+            "display_name": self.display_name
+        }
+        result.update(index)
+        return result
 
     # Proxy to CapaModule for access to any of its attributes
     answer_available = module_attr('answer_available')
