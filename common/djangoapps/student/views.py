@@ -1846,6 +1846,7 @@ def password_reset_confirm_wrapper(
             'form': None,
             'title': _('Password reset unsuccessful'),
             'err_msg': err_msg,
+            'platform_name': settings.PLATFORM_NAME,
         }
         return TemplateResponse(request, 'registration/password_reset_confirm.html', context)
     else:
