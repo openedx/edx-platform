@@ -9,7 +9,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 import requests
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_202_ACCEPTED, HTTP_200_OK
+from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_202_ACCEPTED, HTTP_200_OK, HTTP_409_CONFLICT
 from rest_framework.views import APIView
 
 from commerce.constants import OrderStatus, Messages
@@ -17,6 +17,7 @@ from commerce.http import DetailResponse, ApiErrorResponse
 from course_modes.models import CourseMode
 from courseware import courses
 from enrollment.api import add_enrollment
+from student.models import CourseEnrollment
 from util.authentication import SessionAuthenticationAllowInactiveUser
 
 
@@ -78,6 +79,17 @@ class OrdersView(APIView):
         if not valid:
             return DetailResponse(error, status=HTTP_406_NOT_ACCEPTABLE)
 
+        # Ensure that the E-Commerce API is setup properly
+        ecommerce_api_url = getattr(settings, 'ECOMMERCE_API_URL', None)
+        ecommerce_api_signing_key = getattr(settings, 'ECOMMERCE_API_SIGNING_KEY', None)
+        course_id = unicode(course_key)
+
+        # Don't do anything if an enrollment already exists
+        enrollment = CourseEnrollment.get_enrollment(user, course_key)
+        if enrollment and enrollment.is_active:
+            msg = Messages.ENROLLMENT_EXISTS.format(course_id=course_id, username=user.username)
+            return DetailResponse(msg, status=HTTP_409_CONFLICT)
+
         # Ensure that the course has an honor mode with SKU
         honor_mode = CourseMode.mode_for_course(course_key, CourseMode.HONOR)
         course_id = unicode(course_key)
@@ -95,10 +107,7 @@ class OrdersView(APIView):
             self._enroll(course_key, user)
             return DetailResponse(msg)
 
-        # Ensure that the E-Commerce API is setup properly
-        ecommerce_api_url = getattr(settings, 'ECOMMERCE_API_URL', None)
-        ecommerce_api_signing_key = getattr(settings, 'ECOMMERCE_API_SIGNING_KEY', None)
-
+        # If the API is not configured, bypass it.
         if not (ecommerce_api_url and ecommerce_api_signing_key):
             self._enroll(course_key, user)
             msg = Messages.NO_ECOM_API.format(username=user.username, course_id=course_id)
