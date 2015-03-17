@@ -147,7 +147,7 @@ class PipelineEnrollmentTest(UrlResetMixin, ModuleStoreTestCase):
 
         # Simulate completing the pipeline from the student dashboard's
         # "link account" button.
-        result = pipeline.change_enrollment(strategy, 1, user=self.user, is_dashboard=True)  # pylint: disable=assignment-from-no-return,redundant-keyword-arg
+        result = pipeline.change_enrollment(strategy, 1, user=self.user, auth_entry=pipeline.AUTH_ENTRY_DASHBOARD)  # pylint: disable=assignment-from-no-return,redundant-keyword-arg
 
         # Verify that we were NOT enrolled
         self.assertEqual(result, {})
@@ -165,7 +165,7 @@ class PipelineEnrollmentTest(UrlResetMixin, ModuleStoreTestCase):
             details=None,
             response=None,
             uid=None,
-            is_register=True,
+            auth_entry=pipeline.AUTH_ENTRY_REGISTER,
             backend=backend
         )
         self.assertIsNotNone(response)

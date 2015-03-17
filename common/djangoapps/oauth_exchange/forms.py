@@ -57,7 +57,7 @@ class AccessTokenExchangeForm(ScopeMixin, OAuthForm):
                 }
             )
 
-        self.request.session[pipeline.AUTH_ENTRY_KEY] = pipeline.AUTH_ENTRY_API
+        self.request.session[pipeline.AUTH_ENTRY_KEY] = pipeline.AUTH_ENTRY_LOGIN_API
 
         client_id = self.cleaned_data["client_id"]
         try:

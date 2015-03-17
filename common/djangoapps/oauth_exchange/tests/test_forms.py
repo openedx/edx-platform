@@ -12,11 +12,8 @@ from provider import scope
 import social.apps.django_app.utils as social_utils
 
 from oauth_exchange.forms import AccessTokenExchangeForm
-from oauth_exchange.tests.utils import (
-    AccessTokenExchangeTestMixin,
-    AccessTokenExchangeMixinFacebook,
-    AccessTokenExchangeMixinGoogle
-)
+from oauth_exchange.tests.utils import AccessTokenExchangeTestMixin
+from third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 
 
 class AccessTokenExchangeFormTest(AccessTokenExchangeTestMixin):
@@ -50,7 +47,7 @@ class AccessTokenExchangeFormTest(AccessTokenExchangeTestMixin):
 @httpretty.activate
 class AccessTokenExchangeFormTestFacebook(
         AccessTokenExchangeFormTest,
-        AccessTokenExchangeMixinFacebook,
+        ThirdPartyOAuthTestMixinFacebook,
         TestCase
 ):
     """
@@ -64,7 +61,7 @@ class AccessTokenExchangeFormTestFacebook(
 @httpretty.activate
 class AccessTokenExchangeFormTestGoogle(
         AccessTokenExchangeFormTest,
-        AccessTokenExchangeMixinGoogle,
+        ThirdPartyOAuthTestMixinGoogle,
         TestCase
 ):
     """

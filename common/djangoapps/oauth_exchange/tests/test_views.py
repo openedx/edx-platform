@@ -14,11 +14,8 @@ import provider.constants
 from provider import scope
 from provider.oauth2.models import AccessToken
 
-from oauth_exchange.tests.utils import (
-    AccessTokenExchangeTestMixin,
-    AccessTokenExchangeMixinFacebook,
-    AccessTokenExchangeMixinGoogle
-)
+from oauth_exchange.tests.utils import AccessTokenExchangeTestMixin
+from third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 
 
 class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
@@ -95,7 +92,7 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
 @httpretty.activate
 class AccessTokenExchangeViewTestFacebook(
         AccessTokenExchangeViewTest,
-        AccessTokenExchangeMixinFacebook,
+        ThirdPartyOAuthTestMixinFacebook,
         TestCase
 ):
     """
@@ -109,7 +106,7 @@ class AccessTokenExchangeViewTestFacebook(
 @httpretty.activate
 class AccessTokenExchangeViewTestGoogle(
         AccessTokenExchangeViewTest,
-        AccessTokenExchangeMixinGoogle,
+        ThirdPartyOAuthTestMixinGoogle,
         TestCase
 ):
     """

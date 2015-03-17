@@ -6,21 +6,24 @@ import unittest
 
 from django.test import TestCase
 from django.test.client import Client
-from django.test.utils import override_settings
 from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.http import HttpResponseBadRequest, HttpResponse
-from external_auth.models import ExternalAuthMap
 import httpretty
 from mock import patch
 from social.apps.django_app.default.models import UserSocialAuth
 
+from external_auth.models import ExternalAuthMap
 from student.tests.factories import UserFactory, RegistrationFactory, UserProfileFactory
 from student.views import login_oauth_token
-
+from third_party_auth.tests.utils import (
+    ThirdPartyOAuthTestMixin,
+    ThirdPartyOAuthTestMixinFacebook,
+    ThirdPartyOAuthTestMixinGoogle
+)
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MOCK_MODULESTORE
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class LoginTest(TestCase):
@@ -438,7 +441,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
 
 
 @httpretty.activate
-class LoginOAuthTokenMixin(object):
+class LoginOAuthTokenMixin(ThirdPartyOAuthTestMixin):
     """
     Mixin with tests for the login_oauth_token view. A TestCase that includes
     this must define the following:
@@ -449,30 +452,8 @@ class LoginOAuthTokenMixin(object):
     """
 
     def setUp(self):
-        self.client = Client()
+        super(LoginOAuthTokenMixin, self).setUp()
         self.url = reverse(login_oauth_token, kwargs={"backend": self.BACKEND})
-        self.social_uid = "social_uid"
-        self.user = UserFactory()
-        UserSocialAuth.objects.create(user=self.user, provider=self.BACKEND, uid=self.social_uid)
-
-    def _setup_user_response(self, success):
-        """
-        Register a mock response for the third party user information endpoint;
-        success indicates whether the response status code should be 200 or 400
-        """
-        if success:
-            status = 200
-            body = json.dumps({self.UID_FIELD: self.social_uid})
-        else:
-            status = 400
-            body = json.dumps({})
-        httpretty.register_uri(
-            httpretty.GET,
-            self.USER_URL,
-            body=body,
-            status=status,
-            content_type="application/json"
-        )
 
     def _assert_error(self, response, status_code, error):
         """Assert that the given response was a 400 with the given error code"""
@@ -481,13 +462,13 @@ class LoginOAuthTokenMixin(object):
         self.assertNotIn("partial_pipeline", self.client.session)
 
     def test_success(self):
-        self._setup_user_response(success=True)
+        self._setup_provider_response(success=True)
         response = self.client.post(self.url, {"access_token": "dummy"})
         self.assertEqual(response.status_code, 204)
         self.assertEqual(self.client.session['_auth_user_id'], self.user.id)  # pylint: disable=no-member
 
     def test_invalid_token(self):
-        self._setup_user_response(success=False)
+        self._setup_provider_response(success=False)
         response = self.client.post(self.url, {"access_token": "dummy"})
         self._assert_error(response, 401, "invalid_token")
 
@@ -497,7 +478,7 @@ class LoginOAuthTokenMixin(object):
 
     def test_unlinked_user(self):
         UserSocialAuth.objects.all().delete()
-        self._setup_user_response(success=True)
+        self._setup_provider_response(success=True)
         response = self.client.post(self.url, {"access_token": "dummy"})
         self._assert_error(response, 401, "invalid_token")
 
@@ -508,17 +489,13 @@ class LoginOAuthTokenMixin(object):
 
 # This is necessary because cms does not implement third party auth
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
-class LoginOAuthTokenTestFacebook(LoginOAuthTokenMixin, TestCase):
+class LoginOAuthTokenTestFacebook(LoginOAuthTokenMixin, ThirdPartyOAuthTestMixinFacebook, TestCase):
     """Tests login_oauth_token with the Facebook backend"""
-    BACKEND = "facebook"
-    USER_URL = "https://graph.facebook.com/me"
-    UID_FIELD = "id"
+    pass
 
 
 # This is necessary because cms does not implement third party auth
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
-class LoginOAuthTokenTestGoogle(LoginOAuthTokenMixin, TestCase):
+class LoginOAuthTokenTestGoogle(LoginOAuthTokenMixin, ThirdPartyOAuthTestMixinGoogle, TestCase):
     """Tests login_oauth_token with the Google backend"""
-    BACKEND = "google-oauth2"
-    USER_URL = "https://www.googleapis.com/oauth2/v1/userinfo"
-    UID_FIELD = "email"
+    pass

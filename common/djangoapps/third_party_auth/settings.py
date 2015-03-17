@@ -103,6 +103,7 @@ def _set_global_settings(django_settings):
         'social.pipeline.social_auth.social_uid',
         'social.pipeline.social_auth.auth_allowed',
         'social.pipeline.social_auth.social_user',
+        'third_party_auth.pipeline.associate_by_email_if_login_api',
         'social.pipeline.user.get_username',
         'third_party_auth.pipeline.ensure_user_information',
         'social.pipeline.user.create_user',
