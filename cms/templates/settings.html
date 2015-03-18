@@ -286,6 +286,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
               </ol>
             </section>
 
+        % if settings.FEATURES.get('ENABLE_ENROLLMENT_EMAIL'):
         <hr class="divide" />
         <section class="group-settings enrollment-email">
           <header>
@@ -344,6 +345,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
             </section>
           </section>
         </section>
+        % endif
 
           % if about_page_editable:
             <hr class="divide" />
