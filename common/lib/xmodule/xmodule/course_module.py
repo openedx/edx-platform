@@ -20,6 +20,7 @@ import json
 from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
 from .fields import Date
 from django.utils.timezone import UTC
+from django.conf import settings
 
 log = logging.getLogger(__name__)
 
@@ -250,7 +251,10 @@ class CourseFields(object):
         scope=Scope.settings
     )
     display_name = String(
-        help=_("Enter the name of the course as it should appear in the edX.org course list."),
+        help=_(
+            "Enter the name of the course as it should appear in the "
+            "{platform_name} course list."
+        ).format(platform_name=settings.PLATFORM_NAME),
         default="Empty",
         display_name=_("Course Display Name"),
         scope=Scope.settings
@@ -319,9 +323,10 @@ class CourseFields(object):
     is_new = Boolean(
         display_name=_("Course Is New"),
         help=_(
-            "Enter true or false. If true, the course appears in the list of new courses on edx.org, and a New! "
-            "badge temporarily appears next to the course image."
-        ),
+            "Enter true or false. If true, the course appears in the list of "
+            "new courses on {platform_name}, and a New! badge temporarily "
+            "appears next to the course image."
+        ).format(platform_name=settings.PLATFORM_NAME),
         scope=Scope.settings
     )
     mobile_available = Boolean(
@@ -332,7 +337,10 @@ class CourseFields(object):
     )
     video_upload_pipeline = Dict(
         display_name=_("Video Upload Credentials"),
-        help=_("Enter the unique identifier for your course's video files provided by edX."),
+        help=_(
+            "Enter the unique identifier for your course's video files provided "
+            "by {platform_name}."
+        ).format(platform_name=settings.PLATFORM_NAME),
         scope=Scope.settings
     )
     facebook_url = String(
@@ -399,7 +407,7 @@ class CourseFields(object):
         scope=Scope.settings,
         default=[
             {
-                "short_description": _("Getting Started With Studio"),
+                "short_description": _("Getting Started With {studio_name}").format(studio_name=settings.STUDIO_NAME),
                 "items": [
                     {
                         "short_description": _("Add Course Team Members"),
@@ -434,7 +442,7 @@ class CourseFields(object):
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Explore the Other Studio Checklists"),
+                        "short_description": _("Explore the Other {studio_name} Checklists").format(studio_name=settings.STUDIO_NAME),
                         "long_description": _(
                             "Discover other available course authoring tools, and find help when you need it."
                         ),
@@ -519,17 +527,18 @@ class CourseFields(object):
                 ],
             },
             {
-                "short_description": _("Explore edX's Support Tools"),
+                "short_description": _("Explore {platform_name}'s Support Tools").format(platform_name=settings.PLATFORM_NAME),
                 "items": [
                     {
-                        "short_description": _("Explore the Studio Help Forum"),
+                        "short_description": _("Explore the {studio_name} Help Forum").format(studio_name=settings.STUDIO_NAME),
                         "long_description": _(
-                            "Access the Studio Help forum from the menu that appears when you click your user name "
-                            "in the top right corner of Studio."
-                        ),
+                            "Access the {studio_name} Help forum from the menu "
+                            "that appears when you click your user name "
+                            "in the top right corner of {studio_name}."
+                        ).format(studio_name=settings.STUDIO_NAME),
                         "is_checked": False,
-                        "action_url": "http://help.edge.edx.org/",
-                        "action_text": _("Visit Studio Help"),
+                        "action_url": "http://{domain}".format(domain=settings.TENDER_DOMAIN) if settings.TENDER_DOMAIN else "",
+                        "action_text": _("Visit {studio_name} Help").format(studio_name=settings.STUDIO_NAME),
                         "action_external": True,
                     },
                     {
@@ -541,8 +550,8 @@ class CourseFields(object):
                         "action_external": True,
                     },
                     {
-                        "short_description": _("Download the Studio Documentation"),
-                        "long_description": _("Download the searchable Studio reference documentation in PDF form."),
+                        "short_description": _("Download the {studio_name} Documentation").format(studio_name=settings.STUDIO_NAME),
+                        "long_description": _("Download the searchable {studio_name} reference documentation in PDF form.").format(studio_name=settings.STUDIO_NAME),
                         "is_checked": False,
                         "action_url": "http://files.edx.org/Getting_Started_with_Studio.pdf",
                         "action_text": _("Download Documentation"),
@@ -556,9 +565,11 @@ class CourseFields(object):
                     {
                         "short_description": _("Draft a Course Description"),
                         "long_description": _(
-                            "Courses on edX have an About page that includes a course video, description, and more. "
-                            "Draft the text students will read before deciding to enroll in your course."
-                        ),
+                            "Courses on {platform_name} have an About page that "
+                            "includes a course video, description, and more. "
+                            "Draft the text students will read before deciding "
+                            "to enroll in your course."
+                        ).format(platform_name=settings.PLATFORM_NAME),
                         "is_checked": False,
                         "action_url": "SettingsDetails",
                         "action_text": _("Edit Course Schedule &amp; Details"),
@@ -757,9 +768,9 @@ class CourseFields(object):
     allow_public_wiki_access = Boolean(
         display_name=_("Allow Public Wiki Access"),
         help=_(
-            "Enter true or false. If true, edX users can view the course wiki even "
+            "Enter true or false. If true, {platform_name} users can view the course wiki even "
             "if they're not enrolled in the course."
-        ),
+        ).format(platform_name=settings.PLATFORM_NAME),
         default=False,
         scope=Scope.settings
     )
