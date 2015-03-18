@@ -91,7 +91,8 @@ class OrdersView(APIView):
 
         # Default to honor mode. In the future we may expand this view to support additional modes.
         mode = CourseMode.DEFAULT_MODE_SLUG
-        course_modes = CourseMode.objects.filter(course_id=course_key, mode_slug=mode, sku__isnull=False)
+        course_modes = CourseMode.objects.filter(course_id=course_key, mode_slug=mode)\
+            .exclude(sku__isnull=True).exclude(sku__exact='')
 
         # If there are no course modes with SKUs, enroll the user without contacting the external API.
         if not course_modes.exists():
