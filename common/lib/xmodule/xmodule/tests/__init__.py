@@ -238,6 +238,9 @@ class BulkAssertionTest(unittest.TestCase):
     of the assertions.
     """
 
+    # Limit bulk assertions messages/errors to this length.
+    BULK_ASSERT_MSG_LENGTH = 100
+
     def setUp(self, *args, **kwargs):
         super(BulkAssertionTest, self).setUp(*args, **kwargs)
         self._manager = None
@@ -255,8 +258,8 @@ class BulkAssertionTest(unittest.TestCase):
                 self._manager = None
 
     def _shorten(self, s):
-        if len(s) > 100:
-            return s[:97] + '...'
+        if len(s) > self.BULK_ASSERT_MSG_LENGTH:
+            return s[:self.BULK_ASSERT_MSG_LENGTH - 3] + '...'
         else:
             return s
 
