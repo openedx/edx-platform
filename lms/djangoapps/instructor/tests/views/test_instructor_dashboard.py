@@ -156,3 +156,10 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # link to dashboard shown
         expected_message = self.get_dashboard_demographic_message()
         self.assertTrue(expected_message in response.content)
+
+    def test_sudo_required_on_dashboard(self):
+        """
+        Test that sudo_required redirect user to password page.
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)

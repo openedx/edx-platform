@@ -1142,6 +1142,23 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 200)
         return response
 
+    def test_sudo_access_on_change_student_enrollment(self):
+        """
+        Test that on change student enrollment sudo_required redirect user to password page.
+        """
+        url = reverse(
+            'students_update_enrollment',
+            kwargs={'course_id': self.course.id.to_deprecated_string()},
+        )
+        params = {
+            'identifiers': self.enrolled_student.email,
+            'action': 'enroll',
+            'email_students': True,
+        }
+        response = self.client.post(url, params)
+        self.assertEqual(response.status_code, 302)
+
+
 
 @ddt.ddt
 class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
