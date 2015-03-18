@@ -558,7 +558,7 @@ class EnrollmentCrossDomainTest(ModuleStoreTestCase):
 
         # Expect that the request gets through successfully,
         # passing the CSRF checks (including the referer check).
-        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 201)
 
     @cross_domain_config
     def test_cross_domain_missing_csrf(self, *args):  # pylint: disable=unused-argument
