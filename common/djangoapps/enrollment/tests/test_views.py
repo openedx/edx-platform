@@ -12,6 +12,8 @@ from rest_framework import status
 from django.conf import settings
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from course_modes.models import CourseMode
+from util.models import RateLimitConfiguration
 from util.testing import UrlResetMixin
 from enrollment import api
 from enrollment.errors import CourseEnrollmentError
@@ -37,6 +39,11 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
     def setUp(self):
         """ Create a course and user, then log in. """
         super(EnrollmentTest, self).setUp()
+
+        rate_limit_config = RateLimitConfiguration.current()
+        rate_limit_config.enabled = False
+        rate_limit_config.save()
+
         self.course = CourseFactory.create()
         self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         self.other_user = UserFactory.create()
@@ -275,6 +282,35 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("No course ", resp.content)
+
+    def test_enrollment_throttle_for_user(self):
+        """Make sure a user requests do not exceed the maximum number of requests"""
+        rate_limit_config = RateLimitConfiguration.current()
+        rate_limit_config.enabled = True
+        rate_limit_config.save()
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug=CourseMode.HONOR,
+            mode_display_name=CourseMode.HONOR,
+        )
+
+        for attempt in range(0, 50):
+            expected_status = status.HTTP_429_TOO_MANY_REQUESTS if attempt >= 40 else status.HTTP_200_OK
+            self._create_enrollment(expected_status=expected_status)
+
+    def test_enrollment_throttle_for_service(self):
+        """Make sure a service can call the enrollment API as many times as needed. """
+        rate_limit_config = RateLimitConfiguration.current()
+        rate_limit_config.enabled = True
+        rate_limit_config.save()
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug=CourseMode.HONOR,
+            mode_display_name=CourseMode.HONOR,
+        )
+
+        for attempt in range(0, 50):
+            self._create_enrollment(as_server=True)
 
     def _create_enrollment(self, course_id=None, username=None, expected_status=status.HTTP_200_OK, email_opt_in=None, as_server=False):
         """Enroll in the course and verify the URL we are sent to. """
