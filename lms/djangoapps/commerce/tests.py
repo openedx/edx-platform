@@ -203,17 +203,10 @@ class OrdersViewTests(ModuleStoreTestCase):
         # TODO Eventually we should NOT be enrolling users directly from this view.
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
 
-    @httpretty.activate
-    def test_course_without_sku(self):
+    def _test_course_without_sku(self):
         """
-        If the course does NOT have a SKU, the user should be enrolled in the course (under the honor mode) and
-        redirected to the user dashboard.
+        Validates the view bypasses the E-Commerce API when the course has no CourseModes with SKUs.
         """
-        # Remove SKU from all course modes
-        for course_mode in CourseMode.objects.filter(course_id=self.course.id):
-            course_mode.sku = None
-            course_mode.save()
-
         # Place an order
         self._mock_ecommerce_api()
         response = self._post_to_view()
@@ -227,6 +220,19 @@ class OrdersViewTests(ModuleStoreTestCase):
         # The user should be enrolled, and no calls made to the E-Commerce API
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
         self.assertIsInstance(httpretty.last_request(), HTTPrettyRequestEmpty)
+
+    @httpretty.activate
+    def test_course_without_sku(self):
+        """
+        If the course does NOT have a SKU, the user should be enrolled in the course (under the honor mode) and
+        redirected to the user dashboard.
+        """
+        # Remove SKU from all course modes
+        for course_mode in CourseMode.objects.filter(course_id=self.course.id):
+            course_mode.sku = None
+            course_mode.save()
+
+        self._test_course_without_sku()
 
     @httpretty.activate
     @override_settings(ECOMMERCE_API_URL=None, ECOMMERCE_API_SIGNING_KEY=None)
@@ -245,3 +251,13 @@ class OrdersViewTests(ModuleStoreTestCase):
         # Ensure that the user is not enrolled and that no calls were made to the E-Commerce API
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
         self.assertIsInstance(httpretty.last_request(), HTTPrettyRequestEmpty)
+
+    @httpretty.activate
+    def test_empty_sku(self):
+        """ If the CourseMode has an empty string for a SKU, the API should not be used. """
+        # Set SKU to empty string for all modes.
+        for course_mode in CourseMode.objects.filter(course_id=self.course.id):
+            course_mode.sku = ''
+            course_mode.save()
+
+        self._test_course_without_sku()
