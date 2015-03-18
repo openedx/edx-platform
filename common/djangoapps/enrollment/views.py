@@ -24,12 +24,6 @@ from enrollment.errors import (
 )
 
 
-class EnrollmentUserThrottle(UserRateThrottle):
-    """Limit the number of requests users can make to the enrollment API."""
-    # TODO Limit significantly after performance testing.  # pylint: disable=fixme
-    rate = '50/second'
-
-
 class ApiKeyPermissionMixIn(object):
     """
     This mixin is used to provide a convenience function for doing individual permission checks
@@ -47,6 +41,14 @@ class ApiKeyPermissionMixIn(object):
             False otherwise
         """
         return ApiKeyHeaderPermission().has_permission(request, self)
+
+
+class EnrollmentUserThrottle(UserRateThrottle, ApiKeyPermissionMixIn):
+    """Limit the number of requests users can make to the enrollment API."""
+    rate = '40/minute'
+
+    def allow_request(self, request, view):
+        return self.has_api_key_permissions(request) or super(EnrollmentUserThrottle, self).allow_request(request, view)
 
 
 @can_disable_rate_limit
