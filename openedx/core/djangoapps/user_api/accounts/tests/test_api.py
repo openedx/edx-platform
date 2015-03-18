@@ -198,6 +198,7 @@ class TestAccountApi(TestCase):
 )
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
 class AccountSettingsOnCreationTest(TestCase):
+    # pylint: disable=missing-docstring
 
     USERNAME = u'frank-underwood'
     PASSWORD = u'ṕáśśẃőŕd'

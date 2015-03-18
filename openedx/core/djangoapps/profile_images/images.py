@@ -5,30 +5,33 @@ from cStringIO import StringIO
 
 from django.conf import settings
 from django.core.files.base import ContentFile
+from django.utils.translation import ugettext as _, ugettext_noop as _noop
 from PIL import Image
 
 from ..user_api.accounts.api import get_profile_image_storage
 
 
-class DevMsg(object):
-    """
-    Holder for pseudo-constants.
-    """
-    FILE_TOO_LARGE = 'Maximum file size exceeded.'
-    FILE_TOO_SMALL = 'Minimum file size not met.'
-    FILE_BAD_TYPE = 'Unsupported file type.'
-    FILE_BAD_EXT = 'File extension does not match data.'
-    FILE_BAD_MIMETYPE = 'Content-Type header does not match data.'
+FILE_UPLOAD_TOO_LARGE = _noop('Maximum file size exceeded.')
+FILE_UPLOAD_TOO_SMALL = _noop('Minimum file size not met.')
+FILE_UPLOAD_BAD_TYPE = _noop('Unsupported file type.')
+FILE_UPLOAD_BAD_EXT = _noop('File extension does not match data.')
+FILE_UPLOAD_BAD_MIMETYPE = _noop('Content-Type header does not match data.')
 
 
-class ImageFileRejected(Exception):
+class ImageValidationError(Exception):
     """
     Exception to use when the system rejects a user-supplied source image.
     """
-    pass
+    @property
+    def user_message(self):
+        """
+        Translate the developer-facing exception message for API clients.
+        """
+        # pylint: disable=translation-of-non-string
+        return _(self.message)
 
 
-def validate_uploaded_image(image_file, content_type):
+def validate_uploaded_image(uploaded_file):
     """
     Raises ImageFileRejected if the server should refuse to use this
     uploaded file as the source image for a user's profile image.  Otherwise,
@@ -36,8 +39,7 @@ def validate_uploaded_image(image_file, content_type):
     """
     # validation code by @pmitros,
     # adapted from https://github.com/pmitros/ProfileXBlock
-    # TODO: investigate if PIL has builtin methods for this
-
+    # see also: http://en.wikipedia.org/wiki/Magic_number_%28programming%29
     image_types = {
         'jpeg': {
             'extension': [".jpeg", ".jpg"],
@@ -56,28 +58,28 @@ def validate_uploaded_image(image_file, content_type):
         }
     }
 
-    if image_file.size > settings.PROFILE_IMAGE_MAX_BYTES:
-        raise ImageFileRejected(DevMsg.FILE_TOO_LARGE)
-    elif image_file.size < settings.PROFILE_IMAGE_MIN_BYTES:
-        raise ImageFileRejected(DevMsg.FILE_TOO_SMALL)
+    if uploaded_file.size > settings.PROFILE_IMAGE_MAX_BYTES:
+        raise ImageValidationError(FILE_UPLOAD_TOO_LARGE)
+    elif uploaded_file.size < settings.PROFILE_IMAGE_MIN_BYTES:
+        raise ImageValidationError(FILE_UPLOAD_TOO_SMALL)
 
     # check the file extension looks acceptable
-    filename = str(image_file.name).lower()
+    filename = unicode(uploaded_file.name).lower()
     filetype = [ft for ft in image_types if any(filename.endswith(ext) for ext in image_types[ft]['extension'])]
     if not filetype:
-        raise ImageFileRejected(DevMsg.FILE_BAD_TYPE)
+        raise ImageValidationError(FILE_UPLOAD_BAD_TYPE)
     filetype = filetype[0]
 
     # check mimetype matches expected file type
-    if content_type not in image_types[filetype]['mimetypes']:
-        raise ImageFileRejected(DevMsg.FILE_BAD_MIMETYPE)
+    if uploaded_file.content_type not in image_types[filetype]['mimetypes']:
+        raise ImageValidationError(FILE_UPLOAD_BAD_MIMETYPE)
 
-    # check image file headers match expected file type
+    # check magic number matches expected file type
     headers = image_types[filetype]['magic']
-    if image_file.read(len(headers[0]) / 2).encode('hex') not in headers:
-        raise ImageFileRejected(DevMsg.FILE_BAD_EXT)
+    if uploaded_file.read(len(headers[0]) / 2).encode('hex') not in headers:
+        raise ImageValidationError(FILE_UPLOAD_BAD_EXT)
     # avoid unexpected errors from subsequent modules expecting the fp to be at 0
-    image_file.seek(0)
+    uploaded_file.seek(0)
 
 
 def _get_scaled_image_file(image_obj, size):
@@ -88,6 +90,8 @@ def _get_scaled_image_file(image_obj, size):
     Note that the file object returned is a django ContentFile which holds
     data in memory (not on disk).
     """
+    if image_obj.mode != "RGB":
+        image_obj = image_obj.convert("RGB")
     scaled = image_obj.resize((size, size), Image.ANTIALIAS)
     string_io = StringIO()
     scaled.save(string_io, format='JPEG')
@@ -95,7 +99,7 @@ def _get_scaled_image_file(image_obj, size):
     return image_file
 
 
-def generate_profile_images(image_file, profile_image_names):
+def create_profile_images(image_file, profile_image_names):
     """
     Generates a set of image files based on image_file and
     stores them according to the sizes and filenames specified
@@ -113,9 +117,6 @@ def generate_profile_images(image_file, profile_image_names):
     for size, name in profile_image_names.items():
         scaled_image_file = _get_scaled_image_file(image_obj, size)
         # Store the file.
-        # TODO overwrites should be atomic, but FileStorage doesn't support this.
-        if storage.exists(name):
-            storage.delete(name)
         storage.save(name, scaled_image_file)
 
 

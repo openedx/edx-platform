@@ -23,10 +23,9 @@ from . import (
     EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH,
     USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH
 )
-from .helpers import (
-    get_profile_image_names as _get_profile_image_names,
-    get_profile_image_storage as _get_profile_image_storage,
-)
+# the following imports from helpers are used to expose functions to external
+# packages via api.py
+from .helpers import get_profile_image_names, get_profile_image_storage  # pylint: disable=unused-import
 from .serializers import AccountLegacyProfileSerializer, AccountUserSerializer
 
 
@@ -529,6 +528,7 @@ def _validate_email(email):
             u"Email '{email}' format is not valid".format(email=email)
         )
 
+
 def set_has_profile_image(username, has_profile_image=True):
     """
     System (not user-facing) API call used to store whether the user has
@@ -541,24 +541,3 @@ def set_has_profile_image(username, has_profile_image=True):
 
     profile.has_profile_image = has_profile_image
     profile.save()
-
-def get_profile_image_names(username):
-    """
-    System (not user-facing) API call returning a dict {size:filename} for
-    each profile image for a given username.  Used by profile_image API.
-
-    This function just proxies to the helper function.
-    """
-    return _get_profile_image_names(username)
-
-def get_profile_image_storage():
-    """
-    System (not user-facing) API call returning a configured instance of the
-    storage backend.
-
-    This function just proxies to the helper function.
-
-    TODO: this doesn't really belong in the account API, but rather a config
-    module that can be used by both the account API and the profile_image API.
-    """
-    return _get_profile_image_storage()

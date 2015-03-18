@@ -1,7 +1,6 @@
 """
 Tests for helpers.py
 """
-from ddt import ddt, data
 import hashlib
 from mock import patch
 from unittest import skipUnless
@@ -9,61 +8,52 @@ from unittest import skipUnless
 from django.conf import settings
 from django.test import TestCase
 
+from ..helpers import get_profile_image_urls, get_default_profile_image_urls
 from student.tests.factories import UserFactory
 
-from ...models import UserProfile
-from ..helpers import get_profile_image_url_for_user
+TEST_SIZES = {'full': 50, 'small': 10}
 
 
-@ddt
-@patch('openedx.core.djangoapps.user_api.accounts.helpers._PROFILE_IMAGE_SIZES', [50, 10])
-@patch.dict(
-    'openedx.core.djangoapps.user_api.accounts.helpers.PROFILE_IMAGE_SIZES_MAP', {'full': 50, 'small': 10}, clear=True
-)
+@patch.dict('openedx.core.djangoapps.user_api.accounts.helpers.PROFILE_IMAGE_SIZES_MAP', TEST_SIZES, clear=True)
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class ProfileImageUrlTestCase(TestCase):
     """
-    Tests for `get_profile_image_url_for_user`.
+    Tests for profile image URL generation helpers.
     """
     def setUp(self):
         super(ProfileImageUrlTestCase, self).setUp()
         self.user = UserFactory()
-
         # Ensure that parental controls don't apply to this user
         self.user.profile.year_of_birth = 1980
         self.user.profile.save()
 
-    def verify_url(self, user, pixels, filename):
+    def verify_url(self, actual_url, expected_name, expected_pixels):
         """
-        Helper method to verify that we're correctly generating profile
-        image URLs.
+        Verify correct url structure.
         """
         self.assertEqual(
-            get_profile_image_url_for_user(user, pixels),
-            'http://example-storage.com/profile_images/{filename}_{pixels}.jpg'.format(filename=filename, pixels=pixels)
+            actual_url,
+            'http://example-storage.com/profile_images/{0}_{1}.jpg'.format(expected_name, expected_pixels),
         )
 
-    @data(10, 50)
-    def test_profile_image_urls(self, pixels):
+    def verify_urls(self, expected_name, actual_urls):
         """
-        Verify we get the URL to the default image if the user does not
-        have a profile image.
+        Verify correct url dictionary structure.
         """
-        # By default new users will have no profile image.
-        self.verify_url(self.user, pixels, 'default')
-        # A user can add an image, then remove it.  We should get the
-        # default image URL in that case.
-        self.user.profile.has_profile_image = True
-        self.user.profile.save()
-        self.verify_url(self.user, pixels, hashlib.md5('secret' + self.user.username).hexdigest())
-        self.user.profile.has_profile_image = False
-        self.user.profile.save()
-        self.verify_url(self.user, pixels, 'default')
+        self.assertEqual(set(TEST_SIZES.keys()), set(actual_urls.keys()))
+        for size_display_name, url in actual_urls.items():
+            self.verify_url(url, expected_name, TEST_SIZES[size_display_name])
 
-    @data(1, 5000)
-    def test_unsupported_sizes(self, image_size):
+    def test_get_profile_image_urls(self):
         """
-        Verify that we cannot ask for image sizes which are unsupported.
+        Tests `get_profile_image_urls`
         """
-        with self.assertRaises(ValueError):
-            get_profile_image_url_for_user(self.user, image_size)
+        expected_name = hashlib.md5('secret' + self.user.username).hexdigest()
+        actual_urls = get_profile_image_urls(self.user)
+        self.verify_urls(expected_name, actual_urls)
+
+    def test_get_default_profile_image_urls(self):
+        """
+        Tests `get_default_profile_image_urls`
+        """
+        self.verify_urls('default', get_default_profile_image_urls())
