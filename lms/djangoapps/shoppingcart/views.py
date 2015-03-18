@@ -691,6 +691,19 @@ def postpay_callback(request):
         # See if this payment occurred as part of the verification flow process
         # If so, send the user back into the flow so they have the option
         # to continue with verification.
+
+        # Only orders where order_items.count() == 1 might be attempting to upgrade
+        attempting_upgrade = request.session.get('attempting_upgrade', False)
+        if attempting_upgrade:
+            if result['order'].has_items(CertificateItem):
+                course_id = result['order'].orderitem_set.all().select_subclasses("certificateitem")[0].course_id
+                if course_id:
+                    course_enrollment = CourseEnrollment.get_enrollment(request.user, course_id)
+                    if course_enrollment:
+                        course_enrollment.emit_event(EVENT_NAME_USER_UPGRADED)
+
+            request.session['attempting_upgrade'] = False
+
         verify_flow_redirect = _get_verify_flow_redirect(result['order'])
         if verify_flow_redirect is not None:
             return verify_flow_redirect
@@ -698,6 +711,7 @@ def postpay_callback(request):
         # Otherwise, send the user to the receipt page
         return HttpResponseRedirect(reverse('shoppingcart.views.show_receipt', args=[result['order'].id]))
     else:
+        request.session['attempting_upgrade'] = False
         return render_to_response('shoppingcart/error.html', {'order': result['order'],
                                                               'error_html': result['error_html']})
 
@@ -891,13 +905,6 @@ def _show_receipt_html(request, order):
     receipt_template = 'shoppingcart/receipt.html'
     __, instructions = order.generate_receipt_instructions()
     order_type = getattr(order, 'order_type')
-
-    # Only orders where order_items.count() == 1 might be attempting to upgrade
-    attempting_upgrade = request.session.get('attempting_upgrade', False)
-    if attempting_upgrade:
-        course_enrollment = CourseEnrollment.get_or_create_enrollment(request.user, order_items[0].course_id)
-        course_enrollment.emit_event(EVENT_NAME_USER_UPGRADED)
-        request.session['attempting_upgrade'] = False
 
     recipient_list = []
     total_registration_codes = None
