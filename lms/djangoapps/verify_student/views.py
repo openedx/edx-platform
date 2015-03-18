@@ -40,12 +40,14 @@ from shoppingcart.processors import (
 )
 from verify_student.models import (
     SoftwareSecurePhotoVerification,
+    VerificationCheckpoint,
+    VerificationStatus
 )
 from reverification.models import MidcourseReverificationWindow
 import ssencrypt
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from opaque_keys.edx.keys import CourseKey
-from .exceptions import WindowExpiredException
+from .exceptions import WindowExpiredException, VerificationCheckpointException
 from xmodule.modulestore.django import modulestore
 from microsite_configuration import microsite
 
@@ -1068,6 +1070,9 @@ class ICRVReverifyView(View):
         course = modulestore().get_course(course_id)
         if course is None:
             raise Http404
+        checkpoint = VerificationCheckpoint.get_verification_checkpoint(course_id, checkpoint_name)
+        if checkpoint is None:
+            raise Http404
         context = {
             "user_full_name": request.user.profile.name,
             "error": False,
@@ -1075,7 +1080,7 @@ class ICRVReverifyView(View):
             "course_name": course.display_name_with_default,
             "course_org": course.display_org_with_default,
             "course_num": course.display_number_with_default,
-            "reverify_checkpoint": checkpoint_name,
+            "checkpoint_name": checkpoint_name,
         }
 
         return render_to_response("verify_student/incourse_photo_reverification.html", context)
@@ -1086,11 +1091,14 @@ class ICRVReverifyView(View):
         submits the reverification to SoftwareSecure
         """
         try:
+            user = request.user
             now = datetime.datetime.now(UTC)
             course_id = CourseKey.from_string(course_id)
+            checkpoint = VerificationCheckpoint.get_verification_checkpoint(course_id, checkpoint_name)
+            if checkpoint is None:
+                raise VerificationCheckpointException
+            # TODO: How to get this window for new implementation
             window = MidcourseReverificationWindow.get_window(course_id, now)
-            if window is None:
-                raise WindowExpiredException
             attempt = SoftwareSecurePhotoVerification(user=request.user, window=window)
             b64_face_image = request.POST['face_image'].split(",")[1]
 
@@ -1100,9 +1108,9 @@ class ICRVReverifyView(View):
 
             attempt.save()
             attempt.submit()
-            course_enrollment = CourseEnrollment.get_or_create_enrollment(request.user, course_id)
-            course_enrollment.update_enrollment(mode="verified")
-            course_enrollment.emit_event(EVENT_NAME_USER_SUBMITTED_MIDCOURSE_REVERIFY)
+
+            VerificationStatus.objects.create(checkpoint=checkpoint, user=user, status="started")
+
             return HttpResponseRedirect(reverse('verify_student_midcourse_reverification_confirmation'))
 
         except WindowExpiredException:

@@ -901,6 +901,13 @@ class VerificationCheckpoint(models.Model):
     class Meta:
         unique_together = (('course_id', 'checkpoint_name'),)
 
+    @classmethod
+    def get_verification_checkpoint(cls, course_id, checkpoint_name):
+        try:
+            return cls.objects.get(course_id=course_id, checkpoint_name=checkpoint_name)
+        except cls.DoesNotExist:
+            return None
+
 
 class VerificationStatus(models.Model):
     """A verification status represents a user’s progress
