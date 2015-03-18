@@ -8,6 +8,8 @@ from student.views import (
     reactivation_email_for_user, change_email_request, do_email_change_request, confirm_email_change
 )
 from student.models import UserProfile, PendingEmailChange
+from django.core.urlresolvers import reverse
+from django.core import mail
 from django.contrib.auth.models import User, AnonymousUser
 from django.test import TestCase, TransactionTestCase
 from django.test.client import RequestFactory
@@ -60,6 +62,73 @@ class EmailTestMixin(object):
         """ Append hostname to settings.ALLOWED_HOSTS """
         settings.ALLOWED_HOSTS.append(hostname)
         self.addCleanup(settings.ALLOWED_HOSTS.pop)
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class ActivationEmailTests(TestCase):
+    """Test sending of the activation email. """
+
+    ACTIVATION_SUBJECT = "Activate Your edX Account"
+
+    # Text fragments we expect in the body of an email
+    # sent from an OpenEdX installation.
+    OPENEDX_FRAGMENTS = [
+        "Thank you for signing up for {platform}.".format(platform=settings.PLATFORM_NAME),
+        "http://edx.org/activate/",
+        (
+            "if you require assistance, check the help section of the "
+            "{platform} website".format(platform=settings.PLATFORM_NAME)
+        )
+    ]
+
+    # Text fragments we expect in the body of an email
+    # sent from an EdX-controlled domain.
+    EDX_DOMAIN_FRAGMENTS = [
+        "Thank you for signing up for {platform}".format(platform=settings.PLATFORM_NAME),
+        "http://edx.org/activate/",
+        "https://www.edx.org/contact-us",
+        "This email was automatically sent by edx.org"
+    ]
+
+    def setUp(self):
+        super(ActivationEmailTests, self).setUp()
+
+    def test_activation_email(self):
+        self._create_account()
+        self._assert_activation_email(self.ACTIVATION_SUBJECT, self.OPENEDX_FRAGMENTS)
+
+    @patch.dict(settings.FEATURES, {'IS_EDX_DOMAIN': True})
+    def test_activation_email_edx_domain(self):
+        self._create_account()
+        self._assert_activation_email(self.ACTIVATION_SUBJECT, self.EDX_DOMAIN_FRAGMENTS)
+
+    def _create_account(self):
+        """Create an account, triggering the activation email. """
+        url = reverse('create_account')
+        params = {
+            'username': 'test_user',
+            'email': 'test_user@example.com',
+            'password': 'edx',
+            'name': 'Test User',
+            'honor_code': True,
+            'terms_of_service': True
+        }
+        resp = self.client.post(url, params)
+        self.assertEqual(
+            resp.status_code, 200,
+            msg=u"Could not create account (status {status}). The response was {response}".format(
+                status=resp.status_code,
+                response=resp.content
+            )
+        )
+
+    def _assert_activation_email(self, subject, body_fragments):
+        """Verify that the activation email was sent. """
+        self.assertEqual(len(mail.outbox), 1)
+        msg = mail.outbox[0]
+        self.assertEqual(msg.subject, subject)
+        for fragment in body_fragments:
+            self.assertIn(fragment, msg.body)
 
 
 @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
