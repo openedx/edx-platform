@@ -1,17 +1,16 @@
-<div class="account-settings">
-    <div class="account-settings-header">
-        <div class="account-settings-header-title">
+<div class="account-settings-container">
+    <div class="wrapper-header">
+        <div class="header-title">
             <%- gettext("Account Settings") %>
         </div>
-        <small class="account-settings-header-subtitle"><%- gettext("A collection of all your account settings, including basic personalization controls, demographic information, and linked social accounts.") %></small>
+        <small class="header-subtitle"><%- gettext("A collection of all your account settings, including basic personalization controls, demographic information, and linked social accounts.") %></small>
     </div>
 
     <div class="account-settings-sections">
         <% _.each(sections, function(section) { %>
-            <div class="account-settings-section">
-                <div class="account-settings-section-header">
+            <div class="section">
+                <div class="section-header">
                     <%- gettext(section.title) %>
-                    <hr>
                 </div>
                 <div class="account-settings-section-body">
                     <div class="ui-loading-indicator">

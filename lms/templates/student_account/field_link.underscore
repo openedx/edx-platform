@@ -7,4 +7,3 @@
 <span class="account-settings-field-message">
     <%- gettext(message) %>
 </span>
-<hr class="divider">

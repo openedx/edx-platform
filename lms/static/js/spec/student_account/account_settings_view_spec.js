@@ -204,7 +204,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 accountSettingsModel = createMockAccountSettingsModel(data);
                 requests = AjaxHelpers.requests(test);
                 accountSettingsView = new AccountSettingsView({
-                    el: $('.account-settings-container'),
+                    el: $('.wrapper-account-settings'),
                     model: accountSettingsModel,
                     context: {
                         accountSettingsModelUrl: accountSettingsModel.url
@@ -218,7 +218,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             };
 
             beforeEach(function () {
-                setFixtures('<div class="account-settings-container"> </div>');
+                setFixtures('<div class="wrapper-account-settings"> </div>');
                 TemplateHelpers.installTemplate('templates/student_account/account_settings');
                 TemplateHelpers.installTemplate('templates/student_account/field_readonly');
                 TemplateHelpers.installTemplate('templates/student_account/field_dropdown');
@@ -240,13 +240,13 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 sections = createMockAccountSettingsSections(section1Fields, section2Fields, section3Fields);
                 createAccountSettingsView(this, {sections: sections, renderFields: true});
 
-                var sections = accountSettingsView.$('.account-settings-section .account-settings-section-header');
+                var sections = accountSettingsView.$('.section .section-header');
                 expect(sections.length).toBe(3);
                 _.each(sections, function(section, index) {
                     expect($(section).text().trim()).toBe(SECTIONS_TITLES[index]);
                 });
 
-                sections = accountSettingsView.$('.account-settings-section');
+                sections = accountSettingsView.$('.section');
                 _.each(sections, function(section, sectionIndex) {
                     var fields = $(section).find('.account-settings-field');
                     _.each(fields, function(field, fieldIndex) {

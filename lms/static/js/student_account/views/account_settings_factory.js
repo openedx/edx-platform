@@ -9,7 +9,7 @@
 
         var setupAccountSettingsSection = function (fields_data) {
 
-            var accountSettingsElement = $('.account-settings-container');
+            var accountSettingsElement = $('.wrapper-account-settings');
             var accountSettingsModel = new AccountSettingsModel();
             accountSettingsModel.url = accountSettingsElement.data('accounts-api-url');
 

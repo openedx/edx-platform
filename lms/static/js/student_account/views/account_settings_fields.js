@@ -17,7 +17,7 @@
 
             errorMessage: '<i class="fa fa-exclamation-triangle message-error"></i>' + gettext('An error occurred, please try again.'),
             invalidInputMessagePrefix: '<i class="fa fa-exclamation-triangle message-invalid-input"></i>',
-            inProgressMessage: '<i class="fa fa-spinner message-in-progress"></i>' + gettext('Saving...'),
+            inProgressMessage: '<i class="fa fa-spinner fa-pulse message-in-progress"></i>' + gettext('Saving...'),
             successMessagePrefix: '<i class="fa fa-check message-success"></i>',
 
             initialize: function (options) {

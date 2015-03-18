@@ -27,7 +27,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
             };
 
             beforeEach(function () {
-                setFixtures('<div class="account-settings-container"> </div>');
+                setFixtures('<div class="wrapper-account-settings"> </div>');
                 TemplateHelpers.installTemplate('templates/student_account/account_settings');
                 TemplateHelpers.installTemplate('templates/student_account/field_readonly');
                 TemplateHelpers.installTemplate('templates/student_account/field_dropdown');
