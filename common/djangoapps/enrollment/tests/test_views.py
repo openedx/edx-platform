@@ -298,11 +298,7 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
         )
 
         for attempt in xrange(self.rate_limit + 10):
-            expected_status = status.HTTP_200_OK
-            if attempt == 0:
-                expected_status = status.HTTP_201_CREATED
-            elif attempt >= self.rate_limit:
-                expected_status = status.HTTP_429_TOO_MANY_REQUESTS
+            expected_status = status.HTTP_429_TOO_MANY_REQUESTS if attempt >= self.rate_limit else status.HTTP_200_OK
             self._create_enrollment(expected_status=expected_status)
 
     def test_enrollment_throttle_for_service(self):
@@ -316,8 +312,7 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
         )
 
         for attempt in xrange(self.rate_limit + 10):
-            expected_status = status.HTTP_201_CREATED if attempt == 0 else status.HTTP_200_OK
-            self._create_enrollment(as_server=True, expected_status=expected_status)
+            self._create_enrollment(as_server=True)
 
     def test_create_enrollment_with_mode(self):
         """With the right API key, create a new enrollment with a mode set other than the default."""
@@ -415,7 +410,7 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
             self,
             course_id=None,
             username=None,
-            expected_status=status.HTTP_201_CREATED,
+            expected_status=status.HTTP_200_OK,
             email_opt_in=None,
             as_server=False,
             mode=CourseMode.HONOR,
@@ -440,7 +435,7 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
 
         self.assertEqual(resp.status_code, expected_status)
 
-        if expected_status in [status.HTTP_201_CREATED, status.HTTP_200_OK]:
+        if expected_status in [status.HTTP_200_OK, status.HTTP_200_OK]:
             data = json.loads(resp.content)
             self.assertEqual(course_id, data['course_details']['course_id'])
             self.assertEqual(mode, data['mode'])
@@ -499,7 +494,7 @@ class EnrollmentEmbargoTest(UrlResetMixin, ModuleStoreTestCase):
         })
 
         response = self.client.post(url, data, content_type='application/json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # Verify that we were enrolled
         self.assertEqual(len(self._get_enrollments()), 1)

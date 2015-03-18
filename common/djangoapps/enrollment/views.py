@@ -381,15 +381,13 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
             enrollment = api.get_enrollment(user, unicode(course_id))
             if has_api_key_permissions and enrollment and enrollment['mode'] != mode:
                 response = api.update_enrollment(user, unicode(course_id), mode=mode)
-                http_success_status = status.HTTP_200_OK
             else:
                 response = api.add_enrollment(user, unicode(course_id), mode=mode)
-                http_success_status = status.HTTP_201_CREATED
             email_opt_in = request.DATA.get('email_opt_in', None)
             if email_opt_in is not None:
                 org = course_id.org
                 update_email_opt_in(request.user, org, email_opt_in)
-            return Response(response, status=http_success_status)
+            return Response(response)
         except CourseModeNotFoundError as error:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
