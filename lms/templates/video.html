@@ -154,19 +154,17 @@
 </div>
 % if cdn_eval:
 <script>
-  function sendMetricToGraphite(metricName, value) {
-    var url = "${cdn_eval_endpoint}";
-    var request = new XMLHttpRequest();
-    request.open("POST", url, true);  // send asynchronously
-    request.send(metricName + " " + value);
-  };
+  function sendPerformanceBeacon(id, expgroup, value) {
+    var data = {event: "canplaythrough", id: id, expgroup: expgroup, value: value, page: "html5vid"};
+    $.ajax({method: "POST", url: "/performance", data: data});
+  }
   var cdnStartTime, beaconSent = false;
   function initializeCDNExperiment() {
     cdnStartTime = Date.now();
     $("#video_${id}").bind("html5:canplaythrough", null, function() {
       if (!beaconSent) {
         timeElapsed = Date.now() - cdnStartTime;
-        sendMetricToGraphite("videocdnexp.${id}.${cdn_exp_group}.loadtime", timeElapsed);
+        sendPerformanceBeacon("${id}", ${cdn_exp_group}, timeElapsed);
       }
       beaconSent = true;
     });

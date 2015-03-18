@@ -30,7 +30,6 @@ class TestVideoYouTube(TestVideo):
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
             'branding_info': None,
             'cdn_eval': False,
-            'cdn_eval_endpoint': getattr(settings, 'PERFORMANCE_GRAPHITE_URL', ''),
             'cdn_exp_group': None,
             'data_dir': getattr(self, 'data_dir', None),
             'display_name': u'A Name',
@@ -97,7 +96,6 @@ class TestVideoNonYouTube(TestVideo):
             'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
             'branding_info': None,
             'cdn_eval': False,
-            'cdn_eval_endpoint': getattr(settings, 'PERFORMANCE_GRAPHITE_URL', ''),
             'cdn_exp_group': None,
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
@@ -204,7 +202,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
         expected_context = {
             'branding_info': None,
             'cdn_eval': False,
-            'cdn_eval_endpoint': getattr(settings, 'PERFORMANCE_GRAPHITE_URL', ''),
             'cdn_exp_group': None,
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
@@ -324,7 +321,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
         initial_context = {
             'branding_info': None,
             'cdn_eval': False,
-            'cdn_eval_endpoint': getattr(settings, 'PERFORMANCE_GRAPHITE_URL', ''),
             'cdn_exp_group': None,
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
@@ -467,7 +463,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
         initial_context = {
             'branding_info': None,
             'cdn_eval': False,
-            'cdn_eval_endpoint': getattr(settings, 'PERFORMANCE_GRAPHITE_URL', ''),
             'cdn_exp_group': None,
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
@@ -588,7 +583,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
         initial_context = {
             'branding_info': None,
             'cdn_eval': False,
-            'cdn_eval_endpoint': getattr(settings, 'PERFORMANCE_GRAPHITE_URL', ''),
             'cdn_exp_group': None,
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
@@ -710,7 +704,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 'url': 'http://www.xuetangx.com'
             },
             'cdn_eval': False,
-            'cdn_eval_endpoint': getattr(settings, 'PERFORMANCE_GRAPHITE_URL', ''),
             'cdn_exp_group': None,
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
