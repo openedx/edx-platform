@@ -1,17 +1,25 @@
-.account-settings-container {
-    @extend .container;
-    padding-top: $baseline*2;
+// lms - application - account settings
+// ====================
 
-    > div {
-      background-color: transparent;
-      border: none;
-      box-shadow: none;
+// Table of Contents 
+// * +Container - Account Settings
+// * +Main - Header
+// * +Settings Section
+// * +Setting Field
+
+
+// +Container - Account Settings
+.wrapper-account-settings {
+    @extend .container;
+    padding-top: ($baseline*2);
+
+    .account-settings-container {
+        padding: 0; 
     }
 
     .ui-loading-indicator {
          @extend .ui-loading-base;
-
-         padding-bottom: $baseline;
+         padding: ($baseline*3);
 
          // center horizontally
          @include margin-left(auto);
@@ -36,48 +44,54 @@
     }
 }
 
-.account-settings-header {
-    margin: 0 $baseline;
+// +Main - Header
+.wrapper-account-settings {
 
-    .account-settings-header-title {
-        font-size: 1.5em;
-        font-weight: bold;
-        margin-bottom: $baseline/2;
+    .wrapper-header {
+
+        .header-title {
+            @extend %t-title4;
+            margin-bottom: $baseline/2;
+        }
+
+        .header-subtitle {
+            color: $gray-l2;
+        }
+    }
+}
+
+// +Settings Section
+.account-settings-sections {
+
+    .section-header {
+        @extend %t-title6;
+        @extend %t-strong;
+        padding-bottom: ($baseline/2);
+        border-bottom: 1px solid $gray-l4;
     }
 
-    .account-settings-header-subtitle {
-        color: $gray-l2;
+    .section {
+        background-color: $white;
+        padding: $baseline;
+        margin-top: $baseline;
+        border: 1px solid $gray-l4;
+        box-shadow: 0 0 1px 1px $shadow-l2;
+        border-radius: 5px;
     }
 }
 
-.account-settings-section-header {
-    margin: $baseline 0 $baseline/2;
-    font-weight: bold;
-}
-
-.account-settings-section {
-    background-color: $white;
-    padding: 0 $baseline 0 $baseline;
-    margin-top: $baseline;
-    border: 1px solid $border-color-1;
-
-    box-shadow:         0 0 1px 1px $shadow-l2;
-    -moz-box-shadow:    0 0 1px 1px $shadow-l2;
-    -webkit-box-shadow: 0 0 1px 1px $shadow-l2;
-
-    border-radius: 6px;
-    -moz-border-radius: 6px;
-    -webkit-border-radius: 6px;
-}
-
+// +Setting Field
 .account-settings-field {
-    @include margin-right(flex-gutter());
+    padding: $baseline 0;
+    border-bottom: 1px solid $gray-l5;
 }
 
 .account-settings-field-title {
     width: flex-grid(3, 12);
     display: inline-block;
     color: $gray-d2;
+    vertical-align: top;
+    margin-bottom: 0;
 
     label {
         @include margin-left($baseline/2);
@@ -87,6 +101,7 @@
 .account-settings-field-value {
     width: flex-grid(3, 12);
     display: inline-block;
+    vertical-align: top;
 
     select, input {
         width: 100%;
@@ -95,11 +110,11 @@
 
 .account-settings-field-message {
     @extend small;
+    @include padding-left($baseline/2);
     width: flex-grid(6, 12);
     display: inline-block;
+    vertical-align: top;
     color: $gray-l2;
-
-    @include padding-left($baseline/2);
 
     i {
         @include margin-right($baseline/4);

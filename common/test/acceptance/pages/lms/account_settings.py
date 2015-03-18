@@ -78,4 +78,4 @@ class AccountSettingsPage(PageObject):
         """
         Returns list of section names.
         """
-        return self.q(css='.account-settings-section-header').text
+        return self.q(css='.section-header').text
