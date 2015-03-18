@@ -315,6 +315,11 @@ class LazyFormat(object):
     def __repr__(self):
         return unicode(self)
 
+    def __len__(self):
+        return len(unicode(self))
+
+    def __getitem__(self, index):
+        return unicode(self)[index]
 
 class CourseComparisonTest(BulkAssertionTest):
     """
