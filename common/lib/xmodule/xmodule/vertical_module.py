@@ -1,9 +1,11 @@
 """
 VerticalBlock - a pure XBlock.
 """
+import logging
+from lxml import etree
 from xblock.core import XBlock
 from xblock.fragment import Fragment
-from xmodule.x_module import STUDENT_VIEW
+from xmodule.x_module import STUDENT_VIEW, XModuleMixin
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.xml_module import XmlParserMixin
 from xmodule.progress import Progress
@@ -11,13 +13,14 @@ from xmodule.studio_editable import StudioEditableBlock
 from pkg_resources import resource_string
 from copy import copy
 
+log = logging.getLogger(__name__)
 
 # HACK: This shouldn't be hard-coded to two types
 # OBSOLETE: This obsoletes 'type'
 CLASS_PRIORITY = ['video', 'problem']
 
 
-class VerticalBlock(StudioEditableBlock, XmlParserMixin, XBlock):
+class VerticalBlock(StudioEditableBlock, XmlParserMixin, XModuleMixin, XBlock):
     """
     Layout module for laying out submodules vertically.
     """
@@ -75,6 +78,26 @@ class VerticalBlock(StudioEditableBlock, XmlParserMixin, XBlock):
             if higher_class in child_classes:
                 new_class = higher_class
         return new_class
+
+    @classmethod
+    def definition_from_xml(cls, xml_object, system):
+        children = []
+        for child in xml_object:
+            try:
+                child_block = system.process_xml(etree.tostring(child, encoding='unicode'))
+                children.append(child_block.scope_ids.usage_id)
+            except Exception as e:
+                log.exception("Unable to load child when parsing Vertical. Continuing...")
+                if system.error_tracker is not None:
+                    system.error_tracker(u"ERROR: {0}".format(e))
+                continue
+        return {}, children
+
+    def definition_to_xml(self, resource_fs):
+        xml_object = etree.Element('vertical')
+        for child in self.get_children():
+            self.runtime.add_block_as_child_node(child, xml_object)
+        return xml_object
 
     @property
     def non_editable_metadata_fields(self):

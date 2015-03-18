@@ -100,9 +100,26 @@ class XmlParserUtilMixin(object):
     """
     Class containing XML parsing functionality shared between XBlock and XModuleDescriptor.
     """
+    # Extension to append to filename paths
+    filename_extension = 'xml'
 
     xml_attributes = Dict(help="Map of unhandled xml attributes, used only for storage between import and export",
                           default={}, scope=Scope.settings)
+
+    # VS[compat].  Backwards compatibility code that can go away after
+    # importing 2012 courses.
+    # A set of metadata key conversions that we want to make
+    metadata_translations = {
+        'slug': 'url_name',
+        'name': 'display_name',
+    }
+
+    @classmethod
+    def _translate(cls, key):
+        """
+        VS[compat]
+        """
+        return cls.metadata_translations.get(key, key)
 
     # The attributes will be removed from the definition xml passed
     # to definition_from_xml, and from the xml returned by definition_to_xml
@@ -277,7 +294,11 @@ class XmlParserUtilMixin(object):
         system: A DescriptorSystem for interacting with external resources
         """
 
-        xml_object = etree.fromstring(xml_data)
+        if isinstance(xml_data, basestring):
+            xml_object = etree.fromstring(xml_data)
+        else:
+            xml_object = xml_data
+
         # VS[compat] -- just have the url_name lookup, once translation is done
         url_name = xml_object.get('url_name', xml_object.get('slug'))
         def_id = id_generator.create_definition(xml_object.tag, url_name)
@@ -433,13 +454,16 @@ class XmlParserMixin(XmlParserUtilMixin):
     """
     Mixin class for standardized parsing of XBlock xml.
     """
-    pass
+    @classmethod
+    def parse_xml(cls, node, runtime, keys, id_generator):
+        """
+        Interpret the parsed XML in `node`, creating an XModuleDescriptor.
+        """
+        return super(XmlParserMixin, cls).from_xml(node, runtime, id_generator)
 
 
 class XmlDescriptor(XmlParserUtilMixin, XModuleDescriptor):
     """
     Mixin class for standardized parsing of XModule xml.
     """
-    # Extension to append to filename paths
-    filename_extension = 'xml'
-
+    pass
