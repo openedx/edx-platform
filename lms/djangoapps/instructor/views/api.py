@@ -49,7 +49,7 @@ from django_comment_common.models import (
 )
 from edxmako.shortcuts import render_to_response, render_to_string
 from courseware.models import StudentModule
-from sudo.decorators import sudo_required
+from django_sudo.decorators import sudo_required
 from shoppingcart.models import (
     Coupon,
     CourseRegistrationCode,

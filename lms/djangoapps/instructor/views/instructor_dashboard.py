@@ -33,7 +33,7 @@ from courseware.courses import get_course_by_id, get_studio_url
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
-from sudo.decorators import sudo_required
+from django_sudo.decorators import sudo_required
 from shoppingcart.models import Coupon, PaidCourseRegistration
 from course_modes.models import CourseMode, CourseModesArchive
 from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
