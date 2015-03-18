@@ -126,7 +126,7 @@ if Backbone?
     
   class @Thread extends @Content
     urlMappers:
-      'retrieve'    : -> DiscussionUtil.urlFor('retrieve_single_thread', @discussion.id, @id)
+      'retrieve'    : -> DiscussionUtil.urlFor('retrieve_single_thread', @.get('commentable_id'), @id)
       'reply'       : -> DiscussionUtil.urlFor('create_comment', @id)
       'unvote'      : -> DiscussionUtil.urlFor("undo_vote_for_#{@get('type')}", @id)
       'upvote'      : -> DiscussionUtil.urlFor("upvote_#{@get('type')}", @id)
