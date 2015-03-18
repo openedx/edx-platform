@@ -1,4 +1,4 @@
-""" receiver of course_published / item_published events in order to trigger indexing task """
+""" receiver of course_published events in order to trigger indexing task """
 from django.dispatch import receiver
 
 from xmodule.modulestore.django import SignalHandler

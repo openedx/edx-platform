@@ -565,10 +565,6 @@ class DraftModuleStore(MongoModuleStore):
             )
         self._delete_subtree(location, as_functions)
 
-        # Remove this location from the courseware search index so that searches
-        # will refrain from showing it as a result
-        CoursewareSearchIndexer.add_to_search_index(self, location, delete=True)
-
     def _delete_subtree(self, location, as_functions, draft_only=False):
         """
         Internal method for deleting all of the subtree whose revisions match the as_functions
