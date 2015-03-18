@@ -1,0 +1,45 @@
+// ------------------------------
+// Open edX Certificates: Shared Build Compile
+
+@import '../vendor/normalize/normalize';
+
+// ------------------------------
+// #UTILITIES
+// ------------------------------
+@import 'utilities/mixins';
+
+// ------------------------------
+// #BASE
+// ------------------------------
+@import 'base/fonts';
+@import 'base/graphics';
+@import 'base/anims';
+@import 'base/typography';
+@import 'base/reset';
+
+// ------------------------------
+// #COMPONENTS
+// ------------------------------
+@import 'components/controls';
+@import 'components/navigation';
+@import 'components/header';
+@import 'components/footer';
+
+// ------------------------------
+// #VIEWS
+// ------------------------------
+@import 'views/certificate';
+@import 'views/valid';
+@import 'views/invalid';
+@import 'views/validate';
+
+// ------------------------------
+// #CONTEXTS
+// ------------------------------
+@import 'contexts/print';
+@import 'contexts/ie';
+
+// ------------------------------
+// #SHAME
+// ------------------------------
+@import 'utilities/shame';

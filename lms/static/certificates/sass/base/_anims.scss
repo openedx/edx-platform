@@ -1,0 +1,258 @@
+// ------------------------------
+// Open edX Certificates: Animations
+
+// fade in
+@include keyframes(fadeIn) {
+  0% {
+    opacity: 0.0;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1.0;
+  }
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+%anim-fadeIn {
+  @include animation(fadeIn $tmg-f2 linear 1);
+}
+
+// fade in + up
+@include keyframes(fadeInUp) {
+  0% {
+    opacity: 0;
+    transform: translateY($baseline-v);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+%anim-fadeIn {
+  @include animation(fadeInUp $tmg-f2 linear 1);
+}
+
+// fade in + down
+@include keyframes(fadeInDown) {
+  0% {
+    opacity: 0;
+    transform: translateY(-($baseline-v));
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+%anim-fadeInDown {
+  @include animation(fadeInDown $tmg-f2 linear 1);
+}
+
+// fade out
+@include keyframes(fadeOut) {
+  0% {
+    opacity: 1.0;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 0.0;
+  }
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+%anim-fadeOut {
+  @include animation(fadeOut $tmg-f2 linear 1);
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+%anim-slideOutUp {
+  @include animation(slideOutUp $tmg-f2 linear 1);
+}
+
+// rotate up
+@include keyframes(rotateUp) {
+  0% {
+    @include transform(rotate(0deg));
+  }
+
+  50% {
+    @include transform(rotate(-90deg));
+  }
+
+  100% {
+    @include transform(rotate(-180deg));
+  }
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+%anim-rotateUp {
+  @include animation(rotateUp $tmg-f2 ease-in-out 1);
+}
+
+
+// rotate down
+@include keyframes(rotateDown) {
+  0% {
+    @include transform(rotate(0deg));
+  }
+
+  50% {
+    @include transform(rotate(90deg));
+  }
+
+  100% {
+    @include transform(rotate(180deg));
+  }
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+%anim-rotateDown {
+  @include animation(rotateDown $tmg-f2 ease-in-out 1);
+}
+
+
+// rotate clockwise
+@include keyframes(rotateCW) {
+  0% {
+    @include transform(rotate(0deg));
+  }
+
+  50% {
+    @include transform(rotate(180deg));
+  }
+
+  100% {
+    @include transform(rotate(360deg));
+  }
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+%anim-rotateCW {
+  @include animation(rotateCW $tmg-s1 linear infinite);
+}
+
+
+// rotate counter-clockwise
+@include keyframes(rotateCCW) {
+  0% {
+    @include transform(rotate(0deg));
+  }
+
+  50% {
+    @include transform(rotate(-180deg));
+  }
+
+  100% {
+    @include transform(rotate(-360deg));
+  }
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+%anim-rotateCCW {
+  @include animation(rotateCCW $tmg-s1 linear infinite);
+}
+
+// bounce in
+@include keyframes(bounceIn) {
+  0% {
+    opacity: 0.0;
+    @include transform(scale(0.3));
+  }
+
+  50% {
+    opacity: 1.0;
+    @include transform(scale(1.05));
+  }
+
+  100% {
+    @include transform(scale(1));
+  }
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+%anim-bounceIn {
+  @include animation(bounceIn $tmg-f1 ease-in-out 1);
+}
+
+
+// bounce out
+@include keyframes(bounceOut) {
+  0% {
+    @include transform(scale(1));
+  }
+
+  50% {
+    opacity: 1.0;
+    @include transform(scale(1.05));
+  }
+
+  100% {
+    opacity: 0.0;
+    @include transform(scale(0.3));
+  }
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+%anim-bounceOut {
+  @include animation(bounceOut $tmg-f1 ease-in-out 1);
+}
+
+// flash
+@include keyframes(flash) {
+  0%, 50%, 100% {opacity: 1.0;}
+  25%, 75% {opacity: 0;}
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+%anim-flash {
+  @include animation(flash $tmg-f1 ease-in-out 1);
+}
+
+// shake
+@include keyframes(shake) {
+  0%, 100% {transform: translateX(0);}
+  10%, 30%, 50%, 70%, 90% {transform: translateX(-($baseline-h/2));}
+  20%, 40%, 60%, 80% {transform: translateX(($baseline-h/2));}
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+%anim-shake {
+  @include animation(shake $tmg-f1 ease-in-out 1);
+}
+
+// bounce
+@include keyframes(bounce) {
+  0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+  40% {transform: translateY(($baseline-v*1.5));}
+  60% {transform: translateY(($baseline-v*0.75));}
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+%anim-shake {
+  @include animation(shake $tmg-f1 ease-in-out 1);
+}
+
+// bounce
+@include keyframes(bounce) {
+  0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+  40% {transform: translateY(($baseline-v*1.5));}
+  60% {transform: translateY(($baseline-v*0.75));}
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+%anim-shake {
+  @include animation(shake $tmg-f1 ease-in-out 1);
+}

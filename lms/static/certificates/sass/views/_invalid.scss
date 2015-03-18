@@ -1,0 +1,89 @@
+// ------------------------------
+// Open edX Certificates: Invalid Certificate/Achievement View
+
+.view-invalid-certificate {
+
+  // accomplishment
+  .feedback {
+    @extend %ui-shadow-subtle-down;
+    @extend %trans-size;
+    @include clearfix();
+    @include row();
+    @include pad(($baseline-v*2) ($baseline-h*2) ($baseline-v*3) ($baseline-h*2));
+    margin-bottom: ($baseline-v*2);
+    border-radius: ($baseline-v/10);
+    border: 1px solid $gray-l5;
+    background: $white-t;
+
+    @include media($bp-medium) {
+      padding: ($baseline-v) ($baseline-h);
+    }
+
+    @include media($bp-small) {
+      padding: ($baseline-v) ($baseline-h);
+    }
+  }
+
+  .feedback-lead {
+    margin-bottom: ($baseline-v);
+    padding-bottom: ($baseline-v);
+    border-bottom: 1px solid $gray-l5;
+
+    .title {
+      @extend %t-title-3;
+      @extend %t-weight3;
+      margin-bottom: ($baseline-v/2);
+    }
+
+    .copy {
+      @extend %t-copy-lead2;
+      color: $pink;
+    }
+  }
+
+  .feedback-support {
+    @include span-columns(6 of 12);
+    margin-bottom: $baseline-v;
+
+    @include media($bp-medium) {
+      @include fill-parent;
+    }
+
+    @include media($bp-small) {
+      @include fill-parent;
+    }
+
+    .title {
+      @extend %t-title-6;
+      @extend %t-weight3;
+      margin-bottom: ($baseline-v/2);
+    }
+
+    .copy {
+      color: $gray-l2;
+    }
+  }
+
+  .feedback-warning {
+    @include span-columns(6 of 12);
+    @include omega();
+
+    @include media($bp-medium) {
+      @include fill-parent;
+    }
+
+    @include media($bp-small) {
+      @include fill-parent;
+    }
+
+    .title {
+      @extend %t-title-6;
+      @extend %t-weight3;
+      margin-bottom: ($baseline-v/2);
+    }
+
+    .copy {
+      color: $gray-l2;
+    }
+  }
+}

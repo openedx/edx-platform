@@ -1,0 +1,120 @@
+// ------------------------------
+// Open edX Certificates: Footer
+
+.wrapper-footer {
+  padding: 0 ($baseline-h*2);
+  background: $bg-footer-main;
+  color: $color-footer-main;
+
+  @include media($bp-medium) {
+    padding: 0 ($baseline-h);
+  }
+
+  @include media($bp-small) {
+    padding: 0 ($baseline-h);
+  }
+}
+
+.footer-app {
+  @include outer-container;
+  border-top: 2px solid $gray-l5;
+  margin-top: $baseline-v;
+  padding-top: $baseline-v;
+
+  a {
+    @extend %link-copy;
+  }
+}
+
+.footer-app-copyright {
+  @extend %t-copy-sub1;
+  @include span-columns(4 of 12);
+
+  @include media($bp-large) {
+    @include fill-parent;
+    margin-bottom: ($baseline-v);
+  }
+
+  @include media($bp-medium) {
+    @include fill-parent;
+    margin-bottom: ($baseline-v);
+  }
+
+  @include media($bp-small) {
+    @include fill-parent;
+    margin-bottom: ($baseline-v);
+  }
+}
+
+.footer-app-nav {
+  @include span-columns(8 of 12);
+  @include omega();
+  @include text-align(right);
+
+  @include media($bp-large) {
+    @include fill-parent;
+    @include text-align(left);
+  }
+
+  @include media($bp-medium) {
+    @include fill-parent;
+    @include text-align(left);
+  }
+
+  @include media($bp-small) {
+    @include fill-parent;
+    @include text-align(left);
+  }
+
+  .list {
+    display: inline-block;
+    vertical-align: middle;
+    @include margin-right($baseline-h*2);
+
+    &:last-child {
+      @include margin-right(0);
+    }
+
+    @include media($bp-large) {
+      @include fill-parent;
+      margin: 0 0 $baseline-v 0;
+      @include text-align(left);
+    }
+
+    @include media($bp-medium) {
+      @include fill-parent;
+      margin: 0 0 $baseline-v 0;
+      @include text-align(left);
+    }
+
+    @include media($bp-small) {
+      @include fill-parent;
+      margin: 0 0 $baseline-v 0;
+      @include text-align(left);    }
+  }
+
+  .nav-item {
+    @extend %t-action5;
+    display: inline-block;
+    @include margin-right($baseline-h/2);
+
+    @include media($bp-large) {
+      @include font-size(14);
+      @include lh(14);
+    }
+
+    @include media($bp-medium) {
+      @include font-size(14);
+      @include lh(14);
+      display: block;
+      margin: 0 0 ($baseline-v/4) 0;
+    }
+
+    @include media($bp-small) {
+      @include font-size(14);
+      @include lh(14);
+      display: block;
+      margin: 0 0 ($baseline-v/4) 0;
+    }
+  }
+}

@@ -1,0 +1,150 @@
+// ------------------------------
+// Open edX Certificates: General Certificate/Achievement View
+
+.view-certificate {
+  background: $bg-view;
+
+  // layout
+  .wrapper-view {
+    background: transparent url('../images/bg-paperfibers.png') 0 0 repeat-both;
+    padding-bottom: ($baseline-v*3);
+
+    @include media($bp-medium) {
+      padding-bottom: $baseline-h;
+    }
+
+    @include media($bp-small) {
+      padding-bottom: $baseline-h;
+    }
+  }
+
+  .wrapper-content {
+    padding: $baseline-v ($baseline-h*2);
+
+    @include media($bp-medium) {
+      padding: $baseline-v $baseline-h;
+    }
+
+    @include media($bp-small) {
+      padding: $baseline-v $baseline-h;
+    }
+  }
+
+  .content {
+    @include outer-container;
+
+    a {
+      @extend %link-copy;
+    }
+  }
+
+  // status
+  .status {
+    @include row();
+    padding: $baseline-v ($baseline-h*2);
+    border-top-radius: ($baseline-v/10);
+    box-shadow: inset 0 -2px 2px 0 $shadow-l2;
+    background: $gray-l4;
+    color: $white-t;
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+
+    @include media($bp-medium) {
+      padding: ($baseline-v) ($baseline-h);
+    }
+
+    @include media($bp-small) {
+      padding: ($baseline-v) ($baseline-h);
+    }
+
+    .title {
+      @extend %t-title-6;
+      @include text-align(left);
+
+      @include media($bp-xlarge) {
+        @include span-columns(9 of 12);
+      }
+
+      @include media($bp-large) {
+        @include span-columns(9 of 12);
+      }
+
+      @include media($bp-medium) {
+        @include font-size(14); // can't use %t-title-8 for some reason
+        @include lh(14);
+      }
+
+      @include media($bp-small) {
+        @include font-size(14); // can't use %t-title-8 for some reason
+        @include lh(14);
+      }
+    }
+  }
+
+  // TODO - Determine what basic types are supported
+  // CASE: honor code
+  &.is-honorcode {
+
+    .status {
+      background: $color-basic-achievement;
+    }
+
+    .certificate-type {
+      color: $color-basic-achievement;
+    }
+  }
+
+  // CASE: verified
+  &.is-idverified {
+
+    .status {
+      background: $color-greater-achievement;
+    }
+
+    .accomplishment {
+      background: $white-t url("../images/logo-idverified-cropped.png") bottom left no-repeat;
+      background-size: 75%;
+
+      @include media($bp-medium) {
+        background-size: 75%;
+      }
+
+      @include media($bp-small) {
+        background-size: 100%;
+      }
+    }
+
+    .certificate-type {
+      color: $color-greater-achievement;
+
+      .wrapper-img {
+        width: 200px;
+        border-radius: ($baseline-h*10);
+        padding: ($baseline-v/2) ($baseline-h/2);
+        background: $white-t;
+        margin: -($baseline-v*4) auto 0 auto;
+
+        @include media($bp-large) {
+          float: right;
+          margin: 0 0 $baseline-h $baseline-h;
+        }
+
+        @include media($bp-medium) {
+          width: 150px;
+          float: right;
+          margin: 0 0 $baseline-h $baseline-h;
+        }
+
+        @include media($bp-small) {
+          width: 100px;
+          float: right;
+          margin: 0;
+        }
+
+        img {
+          @include fill-parent();
+        }
+      }
+    }
+  }
+}

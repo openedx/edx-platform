@@ -1,0 +1,207 @@
+// ------------------------------
+// Open edX Certificates: Valid Certificate/Achievement View
+
+.view-valid-certificate {
+
+  // accomplishment
+  .accomplishment {
+    @extend %ui-shadow-subtle-down;
+    @extend %trans-size;
+    @include clearfix();
+    @include pad(($baseline-v*2) ($baseline-h*2) ($baseline-v*3) ($baseline-h*2));
+    margin-bottom: ($baseline-v*2);
+    border-radius: ($baseline-v/10);
+    border: 1px solid $gray-l5;
+    background: $white-t;
+
+    @include media($bp-medium) {
+      padding: ($baseline-v) ($baseline-h);
+    }
+
+    @include media($bp-small) {
+      padding: ($baseline-v) ($baseline-h);
+    }
+  }
+
+  // statement
+  .accomplishment-statement {
+    @extend %trans-size;
+    @include span-columns(8 of 12);
+    @include padding-right($baseline-h);
+    @include border-right(1px solid $gray-l5);
+
+    @include media($bp-large) {
+      @include fill-parent;
+      @include padding-right(0);
+      @include border-right(none);
+    }
+
+    @include media($bp-medium) {
+      @include fill-parent;
+      @include padding-right(0);
+      @include border-right(none);
+    }
+
+    @include media($bp-small) {
+      @include fill-parent;
+      @include padding-right(0);
+      @include border-right(none);
+    }
+
+    [class^="copy-"] {
+      display: block;
+      margin-bottom: ($baseline-v);
+    }
+
+    .copy-name {
+      @extend %t-title-2;
+      @extend %t-weight3;
+
+      @include media($bp-medium) {
+        @include font-size(36); // can't use %t-title-4 for some reason
+        @include lh(36);
+        margin: ($baseline-v/2) 0 ($baseline-v/4) 0;
+      }
+
+      @include media($bp-small) {
+        @include font-size(24);
+        @include lh(24);
+        margin: ($baseline-v/2) 0 ($baseline-v/4) 0;
+      }
+    }
+
+    .copy-course-org {
+      @extend %t-title-5;
+      @extend %t-weight2;
+      margin-bottom: 0;
+
+      @include media($bp-medium) {
+        margin: ($baseline-v/2) 0 0 0;
+      }
+
+      @include media($bp-small) {
+        margin: ($baseline-v/2) 0 0 0;
+      }
+    }
+
+    .copy-course {
+      @include media($bp-medium) {
+        margin-bottom: ($baseline-v/4);
+      }
+
+      @include media($bp-small) {
+        margin-bottom: ($baseline-v/4);
+      }
+    }
+
+    .copy-course-name {
+      @extend %t-title-2;
+      @extend %t-weight3;
+      @include lh(36);
+
+      @include media($bp-medium) {
+        @include font-size(36); // can't use %t-title-4 for some reason
+        @include lh(36);
+        margin: 0;
+      }
+
+      @include media($bp-small) {
+        @include font-size(24); // can't use %t-title-4 for some reason
+        @include lh(24);
+        margin: 0;
+      }
+    }
+
+    .copy-recogniton {
+      @extend %t-title-2;
+    }
+
+    .copy-context {
+      @extend %t-copy-lead2;
+      color: $gray-l2;
+
+      @include media($bp-medium) {
+        @include font-size(16); // can't use %t-copy-base for some reason
+        @include lh(16);
+      }
+
+      @include media($bp-small) {
+        @include font-size(16); // can't use %t-copy-base for some reason
+        @include lh(16);
+      }
+    }
+  }
+
+  // metadata around accomplishment
+  .accomplishment-details {
+    @extend %trans-size;
+    @include span-columns(4 of 12);
+
+    @include media($bp-large) {
+      @include fill-parent;
+      margin-top: ($baseline-v);
+      padding-top: ($baseline-v*2);
+      border-top: 1px solid $gray-l5;
+    }
+
+    @include media($bp-medium) {
+      @include fill-parent;
+    }
+
+    @include media($bp-small) {
+      @include fill-parent;
+    }
+
+    .list-metadata {
+      @extend %ui-no-list;
+
+      .item {
+        @extend %wipe-last-child;
+        margin-bottom: ($baseline-v);
+        padding-bottom: ($baseline-v);
+        border-bottom: 1px solid $gray-l5;
+      }
+    }
+
+    .label {
+      @extend %t-copy-sub2;
+      @extend %t-weight3;
+      display: block;
+      margin-bottom: ($baseline-v/4);
+      text-transform: uppercase;
+      color: $gray-l3;
+      letter-spacing: 0.1rem;
+    }
+
+    .value {
+      @extend %t-title-6;
+      @extend %t-weight2;
+      display: block;
+    }
+
+    .explanation {
+      @extend %t-copy-sub1;
+      display: block;
+      margin-top: ($baseline-v/2);
+      color: $gray-l3;
+    }
+
+    // specific metadata
+    .certificate-type {
+      text-transform: uppercase;
+      letter-spacing: 0.1rem;
+
+      .explanation {
+        text-transform: none;
+        letter-spacing: 0;
+      }
+    }
+
+    .certificate-id {
+
+      .value {
+        word-wrap: break-word;
+      }
+    }
+  }
+}

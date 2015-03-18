@@ -1,0 +1,186 @@
+// ------------------------------
+// Open edX Certificates: Typogrpahy
+
+// misc
+%t-weight0 {
+  font-weight: 300;
+}
+
+%t-weight1 {
+  font-weight: 400;
+}
+
+%t-weight2 {
+  font-weight: 500;
+}
+
+%t-weight3 {
+  font-weight: 600;
+}
+
+%t-weight4 {
+  font-weight: 700;
+}
+
+// headings/titles
+%t-title-1, %t-title-2, %t-title-3, %t-title-4, %t-title-5, %t-title-5, %t-title-6, %t-title-7, %t-title-8, %t-title-9 {
+  font-family: $f-sans-serif;
+}
+
+%t-title-0 {
+  @include font-size(72);
+  @include lh(72);
+}
+
+%t-title-1 {
+  @include font-size(60);
+  @include lh(60);
+}
+
+%t-title-2 {
+  @include font-size(48);
+  @include lh(48);
+}
+
+%t-title-3 {
+  @include font-size(36);
+  @include lh(36);
+}
+
+%t-title-4 {
+  @include font-size(24);
+  @include lh(24);
+}
+
+%t-title-5 {
+  @include font-size(20);
+  @include lh(20);
+}
+
+%t-title-6 {
+  @include font-size(18);
+  @include lh(18);
+}
+
+%t-title-7 {
+  @include font-size(16);
+  @include lh(16);
+}
+
+%t-title-8 {
+  @include font-size(14);
+  @include lh(14);
+}
+
+%t-title-9 {
+  @include font-size(12);
+  @include lh(12);
+}
+
+%t-title-10 {
+  @include font-size(10);
+  @include lh(10);
+}
+
+// copy
+%t-copy {
+  font-family: $f-sans-serif;
+}
+
+%t-copy-base {
+  @extend %t-copy;
+  @include font-size(16);
+  @include lh(16);
+}
+
+%t-copy-lead1 {
+  @extend %t-copy;
+  @include font-size(18);
+  @include lh(18);
+}
+
+%t-copy-lead2 {
+  @extend %t-copy;
+  @include font-size(20);
+  @include lh(20);
+}
+
+%t-copy-lead3 {
+  @extend %t-copy;
+  @include font-size(24);
+  @include lh(24);
+}
+
+%t-copy-sub1 {
+  @extend %t-copy;
+  @include font-size(14);
+  @include lh(14);
+}
+
+%t-copy-sub2 {
+  @extend %t-copy;
+  @include font-size(12);
+  @include lh(12);
+}
+
+%t-copy-sub3 {
+  @extend %t-copy;
+  @include font-size(10);
+  @include lh(10);
+}
+
+// code
+%t-code {
+  font-family: $f-monospace;
+}
+
+// actions/labels
+%t-action1 {
+  @include font-size(24);
+  @include lh(24);
+}
+
+%t-action2 {
+  @include font-size(18);
+  @include lh(18);
+}
+
+%t-action3 {
+  @include font-size(16);
+  @include lh(16);
+}
+
+%t-action4 {
+  @include font-size(14);
+  @include lh(14);
+}
+
+%t-action5 {
+  @include font-size(12);
+  @include lh(12);
+}
+
+// icons
+%t-icon {
+
+}
+
+%t-icon-s {
+  @extend %t-icon !optional;
+  @include font-size(12);
+}
+
+%t-icon-m {
+  @extend %t-icon !optional;
+  @include font-size(16);
+}
+
+%t-icon-l {
+  @extend %t-icon !optional;
+  @include font-size(24);
+}
+
+%t-icon-xl {
+  @extend %t-icon !optional;
+  @include font-size(36);
+}

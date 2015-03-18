@@ -1,0 +1,12 @@
+// ------------------------------
+// Open edX Certificates: Fonts
+
+// Open Sans (within the LMS at large)
+@include font-face('Open Sans', '../../fonts/OpenSans/OpenSans-Light-webfont', 300, $file-formats: eot woff ttf svg);
+@include font-face('Open Sans', '../../fonts/OpenSans/OpenSans-LightItalic-webfont', 300, italic, $file-formats: eot woff ttf svg);
+@include font-face('Open Sans', '../../fonts/OpenSans/OpenSans-Regular-webfont', 400, $file-formats: eot woff ttf svg);
+@include font-face('Open Sans', '../../fonts/OpenSans/OpenSans-Italic-webfont', 400, italic, $file-formats: eot woff ttf svg);
+@include font-face('Open Sans', '../../fonts/OpenSans/OpenSans-Semibold-webfont', 600, $file-formats: eot woff ttf svg);
+@include font-face('Open Sans', '../../fonts/OpenSans/OpenSans-SemiboldItalic-webfont', 600, italic, $file-formats: eot woff ttf svg);
+@include font-face('Open Sans', '../../fonts/OpenSans/OpenSans-Bold-webfont', 700, $file-formats: eot woff ttf svg);
+@include font-face('Open Sans', '../../fonts/OpenSans/OpenSans-BoldItalic-webfont', 700, italic, $file-formats: eot woff ttf svg);
