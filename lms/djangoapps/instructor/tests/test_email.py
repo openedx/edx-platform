@@ -33,12 +33,6 @@ class TestNewInstructorDashboardEmailViewMongoBacked(ModuleStoreTestCase):
         # URL for email view
         self.email_link = '<a href="" data-section="send_email">Email</a>'
 
-    def tearDown(self):
-        """
-        Undo all patches.
-        """
-        patch.stopall()
-
     # In order for bulk email to work, we must have both the ENABLE_INSTRUCTOR_EMAIL_FLAG
     # set to True and for the course to be Mongo-backed.
     # The flag is enabled and the course is Mongo-backed (should work)

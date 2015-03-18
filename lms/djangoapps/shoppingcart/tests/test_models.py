@@ -926,6 +926,7 @@ class InvoiceHistoryTest(TestCase):
     }
 
     def setUp(self):
+        super(InvoiceHistoryTest, self).setUp()
         invoice_data = copy.copy(self.INVOICE_INFO)
         invoice_data.update(self.CONTACT_INFO)
         self.invoice = Invoice.objects.create(total_amount="123.45", **invoice_data)

@@ -227,6 +227,7 @@ class ConvertExportFormat(unittest.TestCase):
 
         # Directory for expanding all the test archives
         self.temp_dir = mkdtemp()
+        self.addCleanup(shutil.rmtree, self.temp_dir)
 
         # Directory where new archive will be created
         self.result_dir = path(self.temp_dir) / uuid.uuid4().hex
@@ -283,10 +284,6 @@ class ConvertExportFormat(unittest.TestCase):
         if self._no_version is None:
             self._no_version = self._expand_archive('NoVersionNumber.tar.gz')
         return self._no_version
-
-    def tearDown(self):
-        """ Common cleanup. """
-        shutil.rmtree(self.temp_dir)
 
     def _expand_archive(self, name):
         """ Expand archive into a directory and return the directory. """
