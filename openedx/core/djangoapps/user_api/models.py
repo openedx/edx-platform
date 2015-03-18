@@ -35,7 +35,7 @@ class UserPreference(models.Model):
 
         Arguments:
             user (User): The user whose preference should be set.
-            preference_key (string): The key for the user preference.
+            preference_key (str): The key for the user preference.
 
         Returns:
             The user preference value, or None if one is not set.

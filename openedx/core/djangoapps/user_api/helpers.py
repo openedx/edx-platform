@@ -308,7 +308,7 @@ class FormDescription(object):
         Field properties not in `OVERRIDE_FIELD_PROPERTIES` will be ignored.
 
         Arguments:
-            field_name (string): The name of the field to override.
+            field_name (str): The name of the field to override.
 
         Keyword Args:
             Same as to `add_field()`.
