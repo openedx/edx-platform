@@ -241,13 +241,21 @@ def render_html_view(request):
     This view generates an HTML representation of the specified student's certificate
     If a certificate is not available, we display a "Sorry!" screen instead
     """
+    # Initialize the template context and bootstrap with default values from configuration
+    context = {}
+    configuration = CertificateHtmlViewConfiguration.get_config()
+    context = configuration.get('default', {})
+
     invalid_template_path = 'certificates/invalid.html'
+
+    # Translators:  This text is bound to the HTML 'title' element of the page and appears
+    # in the browser title bar when a requested certificate is not found or recognized
+    context['document_title'] = _("Invalid Certificate")
 
     # Feature Flag check
     if not settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
-        return render_to_response(invalid_template_path)
+        return render_to_response(invalid_template_path, context)
 
-    context = {}
     course_id = request.GET.get('course', None)
     context['course'] = course_id
     if not course_id:
@@ -271,9 +279,6 @@ def render_html_view(request):
     except GeneratedCertificate.DoesNotExist:
         return render_to_response(invalid_template_path, context)
 
-    # Load static output values from configuration,
-    configuration = CertificateHtmlViewConfiguration.get_config()
-    context = configuration.get('default', {})
     # Override the defaults with any mode-specific static values
     context.update(configuration.get(certificate.mode, {}))
     # Override further with any course-specific static values

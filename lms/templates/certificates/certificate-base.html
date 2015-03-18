@@ -6,6 +6,7 @@
     # set doc language direction
     from django.utils.translation import get_language_bidi
     dir_rtl = 'rtl' if get_language_bidi() else 'ltr'
+    document_body_class = document_body_class_append if document_body_class_append else ''
 %>
 
 <!DOCTYPE html>
@@ -20,7 +21,7 @@
         <%include file="_assets-primary.html" />
     </head>
 
-    <body class="view-certificate view-valid-certificate ${dir_rtl} ${document_body_class_append}" data-view="valid-certificate">
+    <body class="view-certificate view-valid-certificate ${dir_rtl} ${document_body_class}" data-view="valid-certificate">
 
         <div class="wrapper-view">
             ${self.body()}
