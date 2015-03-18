@@ -785,6 +785,8 @@ class PasswordResetViewTest(ApiTestCase):
 class RegistrationViewTest(ApiTestCase):
     """Tests for the registration end-points of the User API. """
 
+    maxDiff = None
+
     USERNAME = "bob"
     EMAIL = "bob@example.com"
     PASSWORD = "password"
@@ -843,9 +845,10 @@ class RegistrationViewTest(ApiTestCase):
                 u"type": u"text",
                 u"required": True,
                 u"label": u"Full name",
-                u"instructions": u"The name that will appear on your certificates",
+                u"placeholder": u"Jane Doe",
+                u"instructions": u"Needed for any certificates you may earn",
                 u"restrictions": {
-                    "max_length": NAME_MAX_LENGTH,
+                    "max_length": 255
                 },
             }
         )
@@ -857,7 +860,8 @@ class RegistrationViewTest(ApiTestCase):
                 u"type": u"text",
                 u"required": True,
                 u"label": u"Public username",
-                u"instructions": u"The name that will identify you in your courses",
+                u"placeholder": u"JaneDoe",
+                u"instructions": u"The name that will identify you in your courses - <strong>(cannot be changed later)</strong>",
                 u"restrictions": {
                     "min_length": USERNAME_MIN_LENGTH,
                     "max_length": USERNAME_MAX_LENGTH
@@ -868,13 +872,16 @@ class RegistrationViewTest(ApiTestCase):
         self._assert_reg_field(
             no_extra_fields_setting,
             {
+                u"placeholder": "",
                 u"name": u"password",
                 u"type": u"password",
                 u"required": True,
                 u"label": u"Password",
                 u"restrictions": {
-                    "min_length": PASSWORD_MIN_LENGTH,
-                    "max_length": PASSWORD_MAX_LENGTH
+                    'min_length': PASSWORD_MIN_LENGTH,
+                    'max_length': PASSWORD_MAX_LENGTH
+                    # 'min_length': account_api.PASSWORD_MIN_LENGTH,
+                    # 'max_length': account_api.PASSWORD_MAX_LENGTH
                 },
             }
         )
@@ -923,7 +930,8 @@ class RegistrationViewTest(ApiTestCase):
                     u"type": u"text",
                     u"required": True,
                     u"label": u"Full name",
-                    u"instructions": u"The name that will appear on your certificates",
+                    u"placeholder": u"Jane Doe",
+                    u"instructions": u"Needed for any certificates you may earn",
                     u"restrictions": {
                         "max_length": NAME_MAX_LENGTH,
                     }
@@ -939,8 +947,8 @@ class RegistrationViewTest(ApiTestCase):
                     u"type": u"text",
                     u"required": True,
                     u"label": u"Public username",
-                    u"placeholder": u"",
-                    u"instructions": u"The name that will identify you in your courses",
+                    u"placeholder": u"JaneDoe",
+                    u"instructions": u"The name that will identify you in your courses - <strong>(cannot be changed later)</strong>",
                     u"restrictions": {
                         "min_length": USERNAME_MIN_LENGTH,
                         "max_length": USERNAME_MAX_LENGTH
@@ -1514,7 +1522,28 @@ class RegistrationViewTest(ApiTestCase):
 
         # Verify that the form description matches what we'd expect
         form_desc = json.loads(response.content)
-        self.assertIn(expected_field, form_desc["fields"])
+
+        # Search the form for this field
+        actual_field = None
+        for field in form_desc["fields"]:
+            if field["name"] == expected_field["name"]:
+                actual_field = field
+                break
+
+        self.assertIsNot(
+            actual_field, None,
+            msg="Could not find field {name}".format(name=expected_field["name"])
+        )
+
+        for key, value in expected_field.iteritems():
+            self.assertEqual(
+                expected_field[key], actual_field[key],
+                msg=u"Expected {expected} for {key} but got {actual} instead".format(
+                    key=key,
+                    expected=expected_field[key],
+                    actual=actual_field[key]
+                )
+            )
 
 
 @ddt.ddt
