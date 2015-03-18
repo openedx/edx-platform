@@ -1,5 +1,12 @@
 <%inherit file="base.html" />
-<%def name="online_help_token()"><% return "import" %></%def>
+<%def name="online_help_token()">
+<% 
+if library:
+    return "import_library" 
+else:
+    return "import_course"
+%>
+</%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
   from django.utils.translation import ugettext as _
@@ -198,6 +205,9 @@
           <h3 class="title-3">${_("Note: Library content is not automatically updated in courses")}</h3>
           <p>${_("If you change and import a library that is referenced by randomized content blocks in one or more courses, those courses do not automatically use the updated content. You must manually refresh the randomized content blocks to bring them up to date with the latest library content.")}</p>
       </div>
+      <div class="bit external-help">
+          <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about importing a library")}</a>
+      </div>      
     </aside>
   %else:
     <aside class="content-supplementary" role="complementary">
@@ -215,6 +225,9 @@
         <h3 class="title-3">${_("Warning: Importing while a course is running")}</h3>
         <p>${_("If you perform an import while your course is running, and you change the URL names (or url_name nodes) of any Problem components, the student data associated with those Problem components may be lost. This data includes students' problem scores.")}</p>
       </div>
+      <div class="bit external-help">
+          <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about importing a course")}</a>
+      </div>      
     </aside>
   %endif
   </section>
