@@ -5,7 +5,7 @@ Module for the dual-branch fall-back Draft->Published Versioning ModuleStore
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore, EXCLUDE_ALL
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.courseware_index import get_indexer_for_location
+from xmodule.modulestore.search_index import get_indexer_for_location
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, ItemNotFoundError
 from xmodule.modulestore.draft_and_published import (
     ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES, UnsupportedRevisionError
@@ -210,12 +210,6 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                     ]
                 )
 
-            # Remove this location from the search index so that searches
-            # will refrain from showing it as a result
-            indexer = get_indexer_for_location(location)
-            if indexer.index_on_delete:
-                indexer.add_to_search_index(self, location, delete=True)
-
             for branch in branches_to_delete:
                 branched_location = location.for_branch(branch)
                 parent_loc = self.get_parent_location(branched_location)
@@ -223,6 +217,12 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 # publish parent w/o child if deleted element is direct only (not based on type of parent)
                 if branch == ModuleStoreEnum.BranchName.draft and branched_location.block_type in DIRECT_ONLY_CATEGORIES:
                     self.publish(parent_loc.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
+
+        # Remove this location from the search index so that searches
+        # will refrain from showing it as a result
+        indexer = get_indexer_for_location(location)
+        if indexer.index_on_delete:
+            indexer.add_to_search_index(self, location, delete=True)
 
     def _map_revision_to_branch(self, key, revision=None):
         """

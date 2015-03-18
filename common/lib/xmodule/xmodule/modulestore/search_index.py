@@ -20,9 +20,9 @@ log = logging.getLogger('edx.modulestore')
 
 def get_indexer_for_location(locator):
     if isinstance(locator, CourseLocator):
-        return CoursewareSearchIndexer
+        return CoursewareSearchIndexer()
     elif isinstance(locator, LibraryLocator):
-        return LibrarySearchIndexer
+        return LibrarySearchIndexer()
     return get_indexer_for_location(locator.course_key)
 
 
@@ -46,32 +46,19 @@ class SearchIndexerBase(object):
     index_on_delete = True
     index_on_publish = True
 
-    @classmethod
-    def _get_structure_key(cls, location):
+    def _get_structure_key(self, location):
         """ Gets structure key from location """
         return location.course_key
 
-    @classmethod
-    def _get_location_info(cls, structure_key):
+    def _get_location_info(self, structure_key):
         """ Builds location info dictionary """
         return {"course": unicode(structure_key)}
 
-    @classmethod
-    def _fetch_item(cls, modulestore, item_location):
+    def _fetch_item(self, modulestore, item_location):
         """ Fetch the item from the modulestore location, log if not found, but continue """
-        try:
-            if isinstance(item_location, CourseLocator):
-                item = modulestore.get_course(item_location)
-            else:
-                item = modulestore.get_item(item_location, revision=ModuleStoreEnum.RevisionOption.published_only)
-        except ItemNotFoundError:
-            log.warning('Cannot find: %s', item_location)
-            return None
+        raise NotImplemented
 
-        return item
-
-    @classmethod
-    def _id_modifier(cls, usage_id):
+    def _id_modifier(self, usage_id):
         """ Modifies usage_id to submit to index """
         return usage_id
     
@@ -79,6 +66,7 @@ class SearchIndexerBase(object):
     def _track_index_request(cls, event_name, indexed_count, location=None):
         """Track content index requests.
 
+    def add_to_search_index(self, modulestore, location, delete=False, raise_on_error=False):
         Arguments:
             location (str): The ID of content to be indexed.
             event_name (str):  Name of the event to be logged.
@@ -99,24 +87,23 @@ class SearchIndexerBase(object):
             data
         )
 
-    @classmethod
-    def add_to_search_index(cls, modulestore, location, delete=False, raise_on_error=False):
+    def add_to_search_index(self, modulestore, location, delete=False, raise_on_error=False):
         """
         Add to courseware search index from given location and its children
         """
         error_list = []
         indexed_count = 0
         # TODO - inline for now, need to move this out to a celery task
-        searcher = SearchEngine.get_search_engine(cls.INDEX_NAME)
+        searcher = SearchEngine.get_search_engine(self.INDEX_NAME)
         if not searcher:
             return
 
-        structure_key = cls._get_structure_key(location)
-        location_info = cls._get_location_info(structure_key)
+        structure_key = self._get_structure_key(location)
+        location_info = self._get_location_info(structure_key)
 
         def index_item_location(item_location, current_start_date):
             """ add this item to the search index """
-            item = cls._fetch_item(modulestore, item_location)
+            item = self._fetch_item(modulestore, item_location)
             if not item:
                 return
 
@@ -141,11 +128,11 @@ class SearchIndexerBase(object):
                 try:
                     item_index.update(location_info)
                     item_index.update(item_index_dictionary)
-                    item_index['id'] = unicode(cls._id_modifier(item.scope_ids.usage_id))
+                    item_index['id'] = unicode(self._id_modifier(item.scope_ids.usage_id))
                     if current_start_date:
                         item_index['start_date'] = current_start_date
 
-                    searcher.index(cls.DOCUMENT_TYPE, item_index)
+                    searcher.index(self.DOCUMENT_TYPE, item_index)
                 except Exception as err:  # pylint: disable=broad-except
                     # broad exception so that index operation does not fail on one item of many
                     log.warning('Could not index item: %s - %s', item_location, unicode(err))
@@ -153,13 +140,13 @@ class SearchIndexerBase(object):
 
         def remove_index_item_location(item_location):
             """ remove this item from the search index """
-            item = cls._fetch_item(modulestore, item_location)
+            item = self._fetch_item(modulestore, item_location)
             if item:
                 if item.has_children:
                     for child_loc in item.children:
                         remove_index_item_location(child_loc)
 
-            searcher.remove(cls.DOCUMENT_TYPE, unicode(cls._id_modifier(item.scope_ids.usage_id)))
+            searcher.remove(self.DOCUMENT_TYPE, unicode(self._id_modifier(item.scope_ids.usage_id)))
 
         try:
             if delete:
@@ -192,8 +179,7 @@ class CoursewareSearchIndexer(SearchIndexerBase):
     index_on_create = False
     index_on_update = False
 
-    @classmethod
-    def _get_structure_key(cls, location):
+    def _get_structure_key(self, location):
         """ Gets structure key from location """
         if isinstance(location, CourseLocator):
             course_key = location
@@ -201,34 +187,44 @@ class CoursewareSearchIndexer(SearchIndexerBase):
             course_key = location.course_key
         return course_key
 
-    @classmethod
-    def do_publish_index(cls, modulestore, location, delete=False, raise_on_error=False):
+    def _fetch_item(self, modulestore, item_location):
+        """ Fetch the item from the modulestore location, log if not found, but continue """
+        try:
+            if isinstance(item_location, CourseLocator):
+                item = modulestore.get_course(item_location)
+            else:
+                item = modulestore.get_item(item_location, revision=ModuleStoreEnum.RevisionOption.published_only)
+        except ItemNotFoundError:
+            log.warning('Cannot find: %s', item_location)
+            return None
+
+        return item
+
+    def do_publish_index(self, modulestore, location, delete=False, raise_on_error=False):
         """
         Add to courseware search index published section and children
         """
-        indexed_count = cls.add_to_search_index(modulestore, location, delete, raise_on_error)
-        cls._track_index_request('edx.course.index.published', indexed_count, str(location))
+        indexed_count = self.add_to_search_index(modulestore, location, delete, raise_on_error)
+        self._track_index_request('edx.course.index.published', indexed_count, str(location))
         return indexed_count
 
-    @classmethod
-    def do_course_reindex(cls, modulestore, course_key):
+    def do_course_reindex(self, modulestore, course_key):
         """
         (Re)index all content within the given course
         """
-        indexed_count = cls.add_to_search_index(modulestore, course_key, delete=False, raise_on_error=True)
-        cls._track_index_request('edx.course.index.reindexed', indexed_count)
+        indexed_count = self.add_to_search_index(modulestore, course_key, delete=False, raise_on_error=True)
+        self._track_index_request('edx.course.index.reindexed', indexed_count)
         return indexed_count
 
 
 class LibrarySearchIndexer(SearchIndexerBase):
     """
-    Class to perform indexing for courseware search from different modulestores
+    Class to perform indexing for library search from different modulestores
     """
     INDEX_NAME = "library_index"
     DOCUMENT_TYPE = "library_content"
 
-    @classmethod
-    def _get_structure_key(cls, location):
+    def _get_structure_key(self, location):
         """ Gets structure key from location """
         if isinstance(location, LibraryLocator):
             course_key = location
@@ -236,19 +232,15 @@ class LibrarySearchIndexer(SearchIndexerBase):
             course_key = location.course_key.replace(version_guid=None, branch=None)
         return course_key
 
-    @classmethod
-    def _get_location_info(cls, structure_key):
+    def _get_location_info(self, structure_key):
         """ Builds location info dictionary """
         return {"library": unicode(structure_key)}
 
-    @classmethod
-    def _id_modifier(cls, usage_id):
+    def _id_modifier(self, usage_id):
         """ Modifies usage_id to submit to index """
-        id_agnostic_library_key = usage_id.library_key.replace(version_guid=None, branch=None)
-        return usage_id.replace(library_key=id_agnostic_library_key)
+        return usage_id.replace(library_key=(usage_id.library_key.replace(version_guid=None, branch=None)))
 
-    @classmethod
-    def _fetch_item(cls, modulestore, item_location):
+    def _fetch_item(self, modulestore, item_location):
         """ Fetch the item from the modulestore location, log if not found, but continue """
         try:
             if isinstance(item_location, CourseLocator):

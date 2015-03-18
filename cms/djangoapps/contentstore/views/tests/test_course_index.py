@@ -15,7 +15,7 @@ from contentstore.views.item import create_xblock_info, VisibilityState
 from course_action_state.models import CourseRerunState
 from util.date_utils import get_default_time_display
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.courseware_index import CoursewareSearchIndexer
+from xmodule.modulestore.search_index import get_indexer_for_location, SearchIndexingError
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
@@ -393,6 +393,10 @@ class TestCourseReIndex(CourseTestCase):
             from_=0,
             course_id=unicode(self.course.id))
 
+    def _do_reindex(self):
+        indexer = get_indexer_for_location(self.course.id)
+        return indexer.do_course_reindex(modulestore(), self.course.id)
+
     def test_reindex_course(self):
         """
         Verify that course gets reindexed.
@@ -549,13 +553,13 @@ class TestCourseReIndex(CourseTestCase):
         self.assertEqual(response['results'], [])
 
         # Start manual reindex
-        CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
+        self._do_reindex()
 
         self.html.display_name = "My expanded HTML"
         modulestore().update_item(self.html, ModuleStoreEnum.UserID.test)
 
         # Start manual reindex
-        CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
+        self._do_reindex()
 
         # Check results indexed now
         response = self._perform_search()
@@ -571,12 +575,11 @@ class TestCourseReIndex(CourseTestCase):
         self.assertEqual(response['results'], [])
 
         # set mocked exception response
-        err = Exception
-        mock_index_dictionary.return_value = err
+        mock_index_dictionary.return_value = Exception
 
         # Start manual reindex and check error in response
         with self.assertRaises(SearchIndexingError):
-            CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
+            self._do_reindex()
 
     @mock.patch('xmodule.html_module.HtmlDescriptor.index_dictionary')
     def test_indexing_html_error_responses(self, mock_index_dictionary):
@@ -588,12 +591,11 @@ class TestCourseReIndex(CourseTestCase):
         self.assertEqual(response['results'], [])
 
         # set mocked exception response
-        err = Exception
-        mock_index_dictionary.return_value = err
+        mock_index_dictionary.return_value = Exception
 
         # Start manual reindex and check error in response
         with self.assertRaises(SearchIndexingError):
-            CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
+            self._do_reindex()
 
     @mock.patch('xmodule.seq_module.SequenceDescriptor.index_dictionary')
     def test_indexing_seq_error_responses(self, mock_index_dictionary):
@@ -605,12 +607,11 @@ class TestCourseReIndex(CourseTestCase):
         self.assertEqual(response['results'], [])
 
         # set mocked exception response
-        err = Exception
-        mock_index_dictionary.return_value = err
+        mock_index_dictionary.return_value = Exception
 
         # Start manual reindex and check error in response
         with self.assertRaises(SearchIndexingError):
-            CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
+            self._do_reindex()
 
     @mock.patch('xmodule.modulestore.mongo.base.MongoModuleStore.get_course')
     def test_indexing_no_item(self, mock_get_course):
@@ -618,9 +619,8 @@ class TestCourseReIndex(CourseTestCase):
         Test system logs an error if no item found.
         """
         # set mocked exception response
-        err = ItemNotFoundError
-        mock_get_course.return_value = err
+        mock_get_course.return_value = ItemNotFoundError
 
         # Start manual reindex and check error in response
         with self.assertRaises(SearchIndexingError):
-            CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
+            self._do_reindex()
