@@ -28,6 +28,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models, IntegrityError
 from django.db.models import Count
+from django.db.models.signals import pre_save
 from django.dispatch import receiver, Signal
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_noop
@@ -277,6 +278,50 @@ class UserProfile(models.Model):
         meta['session_id'] = session_id
         self.set_meta(meta)
         self.save()
+
+    def requires_parental_consent(self, date=None, age_limit=None, default_requires_consent=True):
+        """Returns true if this user requires parental consent.
+
+        Args:
+            date (Date): The date for which consent needs to be tested (defaults to now).
+            age_limit (int): The age limit at which parental consent is no longer required.
+                This defaults to the value of the setting 'PARENTAL_CONTROL_AGE_LIMIT'.
+            default_requires_consent (bool): True if users require parental consent if they
+                have no specified year of birth (default is True).
+
+        Returns:
+             True if the user requires parental consent.
+        """
+        if age_limit is None:
+            age_limit = getattr(settings, 'PARENTAL_CONSENT_AGE_LIMIT', None)
+            if age_limit is None:
+                return False
+
+        # Return True if either:
+        # a) The user has a year of birth specified and that year is fewer years in the past than the limit.
+        # b) The user has no year of birth specified and the default is to require consent.
+        #
+        # Note: we have to be conservative using the user's year of birth as their birth date could be
+        # December 31st. This means that if the number of years since their birth year is exactly equal
+        # to the age limit then we have to assume that they might still not be old enough.
+        year_of_birth = self.year_of_birth
+        if year_of_birth is None:
+            return default_requires_consent
+        if date is None:
+            date = datetime.now(UTC)
+        return date.year - year_of_birth <= age_limit    # pylint: disable=maybe-no-member
+
+
+@receiver(pre_save, sender=UserProfile)
+def user_profile_pre_save_callback(sender, **kwargs):
+    """
+    Ensure consistency of a user profile before saving it.
+    """
+    user_profile = kwargs['instance']
+
+    # Remove profile images for users who require parental consent
+    if user_profile.requires_parental_consent() and user_profile.has_profile_image:
+        user_profile.has_profile_image = False
 
 
 class UserSignupSource(models.Model):

@@ -104,7 +104,7 @@ def update_account_settings(requesting_user, update, username=None):
         requesting_user (User): The user requesting to modify account information. Only the user with username
             'username' has permissions to modify account information.
         update (dict): The updated account field values.
-        username (string): Optional username specifying which account should be updated. If not specified,
+        username (str): Optional username specifying which account should be updated. If not specified,
             `requesting_user.username` is assumed.
 
     Raises:
@@ -372,9 +372,9 @@ def request_password_change(email, orig_host, is_secure):
     Users must confirm the password change before we update their information.
 
     Args:
-        email (string): An email address
-        orig_host (string): An originating host, extracted from a request with get_host
-        is_secure (Boolean): Whether the request was made with HTTPS
+        email (str): An email address
+        orig_host (str): An originating host, extracted from a request with get_host
+        is_secure (bool): Whether the request was made with HTTPS
 
     Returns:
         None

@@ -309,7 +309,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a field on the registration form
@@ -339,7 +339,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a field on the registration form
@@ -372,7 +372,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a field on the registration form
@@ -409,7 +409,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a field on the registration form
@@ -434,7 +434,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a dropdown menu on the registration
@@ -457,7 +457,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a dropdown menu on the registration
@@ -480,7 +480,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a dropdown menu on the registration
@@ -504,7 +504,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a field on the registration form
@@ -525,7 +525,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This phrase appears above a field on the registration form
@@ -548,7 +548,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a field on the registration form
@@ -568,7 +568,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a dropdown menu on the registration
@@ -604,7 +604,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Separate terms of service and honor code checkboxes
@@ -658,7 +658,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This is a legal document users must agree to
