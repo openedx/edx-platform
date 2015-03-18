@@ -57,6 +57,12 @@
                             span_start='<span class="context">',
                             span_end='</span>'
                         )}
+                    % elif reverify_checkpoint:
+                        ${_("{span_start}Re-verifying for:{span_end} {reverify_checkpoint}").format(
+                            span_start='<span class="context">',
+                            span_end='</span>',
+                            reverify_checkpoint=reverify_checkpoint
+                        )}
                     % else:
                         ${_("{span_start}Enrolling as:{span_end} Verified").format(
                             span_start='<span class="context">',

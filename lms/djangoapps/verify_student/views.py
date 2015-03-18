@@ -1047,3 +1047,76 @@ def reverification_window_expired(_request):
     """
     # TODO need someone to review the copy for this template
     return render_to_response("verify_student/reverification_window_expired.html")
+
+
+class ICRVReverifyView(View):
+    """
+    The in-course reverification view.
+    Needs to perform these functions:
+        - take new face photo
+        - retrieve the old id photo
+        - submit these photos to photo verification service
+
+    Does not need to worry about pricing
+    """
+    @method_decorator(login_required)
+    def get(self, request, course_id, checkpoint_name):
+        """
+        display this view
+        """
+        course_id = CourseKey.from_string(course_id)
+        course = modulestore().get_course(course_id)
+        if course is None:
+            raise Http404
+        context = {
+            "user_full_name": request.user.profile.name,
+            "error": False,
+            "course_id": course_id.to_deprecated_string(),
+            "course_name": course.display_name_with_default,
+            "course_org": course.display_org_with_default,
+            "course_num": course.display_number_with_default,
+            "reverify_checkpoint": checkpoint_name,
+        }
+
+        return render_to_response("verify_student/incourse_photo_reverification.html", context)
+
+    @method_decorator(login_required)
+    def post(self, request, course_id, checkpoint_name):
+        """
+        submits the reverification to SoftwareSecure
+        """
+        try:
+            now = datetime.datetime.now(UTC)
+            course_id = CourseKey.from_string(course_id)
+            window = MidcourseReverificationWindow.get_window(course_id, now)
+            if window is None:
+                raise WindowExpiredException
+            attempt = SoftwareSecurePhotoVerification(user=request.user, window=window)
+            b64_face_image = request.POST['face_image'].split(",")[1]
+
+            attempt.upload_face_image(b64_face_image.decode('base64'))
+            attempt.fetch_photo_id_image()
+            attempt.mark_ready()
+
+            attempt.save()
+            attempt.submit()
+            course_enrollment = CourseEnrollment.get_or_create_enrollment(request.user, course_id)
+            course_enrollment.update_enrollment(mode="verified")
+            course_enrollment.emit_event(EVENT_NAME_USER_SUBMITTED_MIDCOURSE_REVERIFY)
+            return HttpResponseRedirect(reverse('verify_student_midcourse_reverification_confirmation'))
+
+        except WindowExpiredException:
+            log.exception(
+                "User {} attempted to re-verify, but the window expired before the attempt".format(request.user.id)
+            )
+            return HttpResponseRedirect(reverse('verify_student_reverification_window_expired'))
+
+        except Exception:
+            log.exception(
+                "Could not submit verification attempt for user {}".format(request.user.id)
+            )
+            context = {
+                "user_full_name": request.user.profile.name,
+                "error": True,
+            }
+            return render_to_response("verify_student/midcourse_photo_reverification.html", context)
