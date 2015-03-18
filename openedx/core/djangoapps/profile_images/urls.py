@@ -1,7 +1,6 @@
 """
 Defines the URL routes for this app.
 """
-
 from .views import ProfileImageUploadView, ProfileImageRemoveView
 
 from django.conf.urls import patterns, url

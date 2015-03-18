@@ -6,16 +6,20 @@ consist primarily of authentication, request validation, and serialization.
 from ipware.ip import get_ip
 from django.utils.decorators import method_decorator
 from opaque_keys import InvalidKeyError
-from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
-from openedx.core.lib.api.permissions import ApiKeyHeaderPermission, ApiKeyHeaderPermissionIsAuthenticated
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 from opaque_keys.edx.keys import CourseKey
+
+from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
+from openedx.core.lib.api.authentication import (
+    SessionAuthenticationAllowInactiveUser,
+    OAuth2AuthenticationAllowInactiveUser,
+)
+from openedx.core.lib.api.permissions import ApiKeyHeaderPermission, ApiKeyHeaderPermissionIsAuthenticated
 from embargo import api as embargo_api
 from cors_csrf.decorators import ensure_csrf_cookie_cross_domain
-from util.authentication import SessionAuthenticationAllowInactiveUser, OAuth2AuthenticationAllowInactiveUser
 from util.disable_rate_limit import can_disable_rate_limit
 from enrollment import api
 from enrollment.errors import (

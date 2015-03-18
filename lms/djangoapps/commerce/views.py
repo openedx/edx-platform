@@ -2,7 +2,6 @@
 import json
 import logging
 from simplejson import JSONDecodeError
-
 from django.conf import settings
 import jwt
 from opaque_keys import InvalidKeyError
@@ -17,7 +16,7 @@ from commerce.http import DetailResponse, ApiErrorResponse
 from course_modes.models import CourseMode
 from courseware import courses
 from enrollment.api import add_enrollment
-from util.authentication import SessionAuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
 
 
 log = logging.getLogger(__name__)

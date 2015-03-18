@@ -61,9 +61,6 @@ urlpatterns = (
 
     url(r'^heartbeat$', include('heartbeat.urls')),
 
-    # TODO jimabramson: put this in the right place
-    url(r'^api/profile_images/', include('openedx.core.djangoapps.profile_images.urls')),
-
     # Note: these are older versions of the User API that will eventually be
     # subsumed by api/user listed below.
     url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
@@ -93,6 +90,7 @@ urlpatterns = (
 if settings.FEATURES["ENABLE_USER_REST_API"]:
     urlpatterns += (
         url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
+        url(r'^api/profile_images/', include('openedx.core.djangoapps.profile_images.urls')),
     )
 
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
