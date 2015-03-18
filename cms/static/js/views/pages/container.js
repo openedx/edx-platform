@@ -140,8 +140,8 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 return this.xblockView.model.urlRoot;
             },
 
-            onXBlockRefresh: function(xblockView, block_added) {
-                this.xblockView.refresh(block_added);
+            onXBlockRefresh: function(xblockView, block_added, is_duplicate) {
+                this.xblockView.refresh(xblockView, block_added, is_duplicate);
                 // Update publish and last modified information from the server.
                 this.model.fetch();
             },
@@ -214,7 +214,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                         parent_locator: parentLocator
                     });
                 return $.postJSON(this.getURLRoot() + '/', requestData,
-                    _.bind(this.onNewXBlock, this, placeholderElement, scrollOffset))
+                    _.bind(this.onNewXBlock, this, placeholderElement, scrollOffset, false))
                     .fail(function() {
                         // Remove the placeholder if the update failed
                         placeholderElement.remove();
@@ -237,7 +237,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                                 parent_locator: parentElement.data('locator')
                             };
                         return $.postJSON(self.getURLRoot() + '/', requestData,
-                            _.bind(self.onNewXBlock, self, placeholderElement, scrollOffset))
+                            _.bind(self.onNewXBlock, self, placeholderElement, scrollOffset, true))
                             .fail(function() {
                                 // Remove the placeholder if the update failed
                                 placeholderElement.remove();
@@ -269,10 +269,10 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 this.model.fetch();
             },
 
-            onNewXBlock: function(xblockElement, scrollOffset, data) {
+            onNewXBlock: function(xblockElement, scrollOffset, is_duplicate, data) {
                 ViewUtils.setScrollOffset(xblockElement, scrollOffset);
                 xblockElement.data('locator', data.locator);
-                return this.refreshXBlock(xblockElement, true);
+                return this.refreshXBlock(xblockElement, true, is_duplicate);
             },
 
             /**
@@ -282,14 +282,14 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
              * @param element An element representing the xblock to be refreshed.
              * @param block_added Flag to indicate that new block has been just added.
              */
-            refreshXBlock: function(element, block_added) {
+            refreshXBlock: function(element, block_added, is_duplicate) {
                 var xblockElement = this.findXBlockElement(element),
                     parentElement = xblockElement.parent(),
                     rootLocator = this.xblockView.model.id;
                 if (xblockElement.length === 0 || xblockElement.data('locator') === rootLocator) {
                     this.render({refresh: true, block_added: block_added});
                 } else if (parentElement.hasClass('reorderable-container')) {
-                    this.refreshChildXBlock(xblockElement, block_added);
+                    this.refreshChildXBlock(xblockElement, block_added, is_duplicate);
                 } else {
                     this.refreshXBlock(this.findXBlockElement(parentElement));
                 }
@@ -303,7 +303,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
              * refreshing.
              * @returns {jQuery promise} A promise representing the complete operation.
              */
-            refreshChildXBlock: function(xblockElement, block_added) {
+            refreshChildXBlock: function(xblockElement, block_added, is_duplicate) {
                 var self = this,
                     xblockInfo,
                     TemporaryXBlockView,
@@ -329,7 +329,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 });
                 return temporaryView.render({
                     success: function() {
-                        self.onXBlockRefresh(temporaryView, block_added);
+                        self.onXBlockRefresh(temporaryView, block_added, is_duplicate);
                         temporaryView.unbind();  // Remove the temporary view
                     }
                 });

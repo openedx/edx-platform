@@ -69,6 +69,25 @@ class LibraryEditPage(LibraryPage, PaginatedMixin):
         """
         return self._get_xblocks()
 
+    def are_previews_showing(self):
+        """
+        Determines whether or not previews are showing for XBlocks
+        """
+        return all([not xblock.is_placeholder() for xblock in self.xblocks])
+
+    def toggle_previews(self):
+        """
+        Clicks the preview toggling button and waits for the previews to appear or disappear.
+        """
+        toggle = not self.are_previews_showing()
+        self.q(css='.toggle-preview-button').click()
+        EmptyPromise(
+            lambda: self.are_previews_showing() == toggle,
+            'Preview is visible: %s' % toggle,
+            timeout=30
+        ).fulfill()
+        self.wait_until_ready()
+
     def click_duplicate_button(self, xblock_id):
         """
         Click on the duplicate button for the given XBlock

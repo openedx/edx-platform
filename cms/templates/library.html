@@ -27,7 +27,8 @@ from django.utils.translation import ugettext as _
             {
                 isUnitPage: false,
                 page_size: 10,
-                canEdit: ${"true" if can_edit else "false"}
+                canEdit: ${"true" if can_edit else "false"},
+                showChildrenPreviews: ${'true' if show_children_previews else 'false'}
             }
         );
     });
@@ -53,7 +54,13 @@ from django.utils.translation import ugettext as _
                     <a href="#" class="button new-button new-component-button">
                         <i class="icon fa fa-plus icon-inline"></i> <span class="action-button-text">${_("Add Component")}</span>
                     </a>
-              </li>
+                </li>
+                <li class="action-item action-toggle-preview nav-item">
+                    <a href="#" class="button button-toggle-preview action-button toggle-preview-button is-hidden">
+                        <i class="icon fa fa-refresh"></i>
+                        <span class="action-button-text preview-text"></span>
+                    </a>
+                </li>
             </ul>
         </nav>
     </header>

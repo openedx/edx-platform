@@ -16,6 +16,7 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                     mockXBlockEditorHtml = readFixtures('mock/mock-xblock-editor.underscore'),
                     mockXBlockVisibilityEditorHtml = readFixtures('mock/mock-xblock-visibility-editor.underscore'),
                     PageClass = fixtures.page,
+                    pagedSpecificTests = fixtures.paged_specific_tests,
                     hasVisibilityEditor = fixtures.has_visibility_editor;
 
                 beforeEach(function () {
@@ -305,13 +306,9 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                             }
                         );
 
-                    paginated = function () {
-                        return containerPage instanceof PagedContainerPage;
-                    };
-
                     getDeleteOffset = function () {
                         // Paginated containers will make an additional AJAX request.
-                        return paginated() ? 3 : 2;
+                        return pagedSpecificTests ? 3 : 2;
                     };
 
                     getGroupElement = function () {
@@ -509,6 +506,48 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                         });
                     });
 
+                    describe("Previews", function () {
+
+                        var getButtonIcon, getButtonText;
+
+                        getButtonIcon = function (containerPage) {
+                            return containerPage.$('.action-toggle-preview i');
+                        };
+
+                        getButtonText = function (containerPage) {
+                            return containerPage.$('.action-toggle-preview .preview-text').text().trim();
+                        };
+
+                        if (pagedSpecificTests) {
+                            it('has no text on the preview button to start with', function () {
+                                containerPage = getContainerPage();
+                                expect(getButtonIcon(containerPage)).toHaveClass('fa-refresh');
+                                expect(getButtonIcon(containerPage).parent()).toHaveClass('is-hidden');
+                                expect(getButtonText(containerPage)).toBe("");
+                            });
+
+                            function updatePreviewButtonTest(show_previews, expected_text) {
+                                it('can set preview button to "' + expected_text + '"', function () {
+                                    containerPage = getContainerPage();
+                                    containerPage.updatePreviewButton(show_previews);
+                                    expect(getButtonText(containerPage)).toBe(expected_text);
+                                });
+                            }
+
+                            updatePreviewButtonTest(true, 'Hide Previews');
+                            updatePreviewButtonTest(false, 'Show Previews');
+
+                            it('triggers underlying view togglePreviews when preview button clicked', function () {
+                                containerPage = getContainerPage();
+                                containerPage.render();
+                                spyOn(containerPage.xblockView, 'togglePreviews');
+
+                                containerPage.$('.toggle-preview-button').click();
+                                expect(containerPage.xblockView.togglePreviews).toHaveBeenCalled();
+                            });
+                        }
+                    });
+
                     describe('createNewComponent ', function () {
                         var clickNewComponent;
 
@@ -591,6 +630,7 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                         });
                     });
                 });
+
             });
         }
 
@@ -601,7 +641,8 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                 page: ContainerPage,
                 initial: 'mock/mock-container-xblock.underscore',
                 add_response: 'mock/mock-xblock.underscore',
-                has_visibility_editor: true
+                has_visibility_editor: true,
+                paged_specific_tests: false
             }
         );
 
@@ -612,7 +653,8 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                 page: PagedContainerPage,
                 initial: 'mock/mock-container-paged-xblock.underscore',
                 add_response: 'mock/mock-xblock-paged.underscore',
-                has_visibility_editor: false
+                has_visibility_editor: false,
+                paged_specific_tests: true
             }
         );
     });
