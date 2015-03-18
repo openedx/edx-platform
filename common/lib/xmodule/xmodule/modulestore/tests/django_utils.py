@@ -196,11 +196,6 @@ TEST_DATA_SPLIT_MODULESTORE = mixed_store_config(
     store_order=[StoreConstructors.split, StoreConstructors.draft]
 )
 
-# Unit tests that are not specifically testing the modulestore implementation but just need course context can use a mocked modulestore.
-# Use this modulestore if you do not care about the underlying implementation.
-# TODO: acutally mock out the modulestore for this in a subsequent PR.
-TEST_DATA_MOCK_MODULESTORE = mixed_store_config(mkdtemp(), {}, include_xml=False)
-
 
 class ModuleStoreTestCase(TestCase):
     """
@@ -240,7 +235,7 @@ class ModuleStoreTestCase(TestCase):
           your `setUp()` method.
     """
 
-    MODULESTORE = TEST_DATA_MOCK_MODULESTORE
+    MODULESTORE = mixed_store_config(mkdtemp(), {}, include_xml=False)
 
     def setUp(self, **kwargs):
         """

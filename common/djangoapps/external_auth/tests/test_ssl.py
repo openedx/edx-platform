@@ -21,7 +21,6 @@ from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory
 
 FEATURES_WITH_SSL_AUTH = settings.FEATURES.copy()
@@ -319,8 +318,7 @@ class SSLClientTest(ModuleStoreTestCase):
         self.assertTrue(self.mock.called)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_AUTO_ACTIVATE,
-                       MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+    @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_AUTO_ACTIVATE)
     def test_ssl_lms_redirection(self):
         """
         Auto signup auth user and ensure they return to the original

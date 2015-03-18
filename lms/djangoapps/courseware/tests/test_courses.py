@@ -24,9 +24,7 @@ from xmodule.modulestore.django import _get_modulestore_branch_setting, modulest
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MOCK_MODULESTORE, TEST_DATA_MIXED_TOY_MODULESTORE
-)
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.tests.xml import factories as xml
 from xmodule.tests.xml import XModuleXmlImportTest
@@ -39,9 +37,7 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 class CoursesTest(ModuleStoreTestCase):
     """Test methods related to fetching courses."""
 
-    @override_settings(
-        MODULESTORE=TEST_DATA_MOCK_MODULESTORE, CMS_BASE=CMS_BASE_TEST
-    )
+    @override_settings(CMS_BASE=CMS_BASE_TEST)
     def test_get_cms_course_block_link(self):
         """
         Tests that get_cms_course_link_by_id and get_cms_block_link_by_id return the right thing
@@ -81,9 +77,7 @@ class ModuleStoreBranchSettingTest(ModuleStoreTestCase):
         self.assertEqual(_get_modulestore_branch_setting(), 'fake_default_branch')
 
 
-@override_settings(
-    MODULESTORE=TEST_DATA_MOCK_MODULESTORE, CMS_BASE=CMS_BASE_TEST
-)
+@override_settings(CMS_BASE=CMS_BASE_TEST)
 class MongoCourseImageTestCase(ModuleStoreTestCase):
     """Tests for course image URLs when using a mongo modulestore."""
 
