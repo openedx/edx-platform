@@ -927,13 +927,3 @@ class VerificationStatus(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     response = models.TextField(null=True, blank=True)
     error = models.TextField(null=True, blank=True)
-
-
-class VerificationBlock(models.Model):
-    """it is XBlock (courseware component) responsible for Prompting the user to reverify at particular points.
-       Displaying the verification status for particular checkpoints.
-    """
-
-    start_datetime = models.DateTimeField(null=True, db_index=True)
-    end_datetime = models.DateTimeField(null=True, db_index=True)
-    checkpoint_name = models.CharField(unique=True, max_length=32, choices=VerificationCheckpoint.CHECKPOINT_CHOICES)
