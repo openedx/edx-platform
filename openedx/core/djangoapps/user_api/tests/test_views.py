@@ -878,8 +878,10 @@ class RegistrationViewTest(ApiTestCase):
                 u"required": True,
                 u"label": u"Password",
                 u"restrictions": {
-                    'min_length': account_api.PASSWORD_MIN_LENGTH,
-                    'max_length': account_api.PASSWORD_MAX_LENGTH
+                    'min_length': PASSWORD_MIN_LENGTH,
+                    'max_length': PASSWORD_MAX_LENGTH
+                    # 'min_length': account_api.PASSWORD_MIN_LENGTH,
+                    # 'max_length': account_api.PASSWORD_MAX_LENGTH
                 },
             }
         )
