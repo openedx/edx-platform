@@ -14,6 +14,7 @@ from .mako_module import MakoModuleDescriptor
 from .progress import Progress
 from .x_module import XModule, STUDENT_VIEW
 from .xml_module import XmlDescriptor
+from .util.xml_utils import filter_invalid_xml_chars
 
 log = logging.getLogger(__name__)
 
@@ -174,7 +175,9 @@ class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
         children = []
         for child in xml_object:
             try:
-                child_block = system.process_xml(etree.tostring(child, encoding='unicode'))
+                child_block = system.process_xml(
+                    filter_invalid_xml_chars(etree.tostring(child, encoding='unicode'))
+                )
                 children.append(child_block.scope_ids.usage_id)
             except Exception as e:
                 log.exception("Unable to load child when parsing Sequence. Continuing...")

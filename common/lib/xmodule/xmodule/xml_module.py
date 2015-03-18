@@ -9,6 +9,7 @@ from xblock.fields import Dict, Scope, ScopeIds
 from xmodule.x_module import XModuleDescriptor
 from xmodule.modulestore.inheritance import own_metadata, InheritanceKeyValueStore
 from xmodule.modulestore import EdxJSONEncoder
+from xmodule.util.xml_utils import filter_invalid_xml_chars
 from xblock.runtime import KvsFieldData
 
 log = logging.getLogger(__name__)
@@ -16,7 +17,7 @@ log = logging.getLogger(__name__)
 # assume all XML files are persisted as utf-8.
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
                                  remove_comments=True, remove_blank_text=True,
-                                 encoding='utf-8')
+                                 encoding='utf-8', recover=True)
 
 
 def name_to_pathname(name):
@@ -161,7 +162,7 @@ class XmlDescriptor(XModuleDescriptor):
 
         Returns an lxml Element
         """
-        return etree.parse(file_object, parser=edx_xml_parser).getroot()
+        return etree.fromstring(filter_invalid_xml_chars(file_object.read()), parser=edx_xml_parser)
 
     @classmethod
     def load_file(cls, filepath, fs, def_id):  # pylint: disable=invalid-name
@@ -279,7 +280,7 @@ class XmlDescriptor(XModuleDescriptor):
         system: A DescriptorSystem for interacting with external resources
         """
 
-        xml_object = etree.fromstring(xml_data)
+        xml_object = etree.fromstring(filter_invalid_xml_chars(xml_data))
         # VS[compat] -- just have the url_name lookup, once translation is done
         url_name = xml_object.get('url_name', xml_object.get('slug'))
         def_id = id_generator.create_definition(xml_object.tag, url_name)
@@ -383,7 +384,7 @@ class XmlDescriptor(XModuleDescriptor):
             if attr not in self.metadata_to_strip and attr not in self.metadata_to_export_to_policy:
                 val = serialize_field(self._field_data.get(self, attr))
                 try:
-                    xml_object.set(attr, val)
+                    xml_object.set(attr, filter_invalid_xml_chars(val))
                 except Exception:
                     logging.exception(
                         u'Failed to serialize metadata attribute %s with value %s in module %s. This could mean data loss!!!',
