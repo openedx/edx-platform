@@ -254,20 +254,42 @@ class BulkAssertionTest(unittest.TestCase):
                 self._manager.run_assertions()
                 self._manager = None
 
+    def _shorten(self, s):
+        if len(s) > 100:
+            return s[:97] + '...'
+        else:
+            return s
+
+    def _append_error(self, message, error):
+        exc_stack = inspect.stack()[2]
+        err = self._shorten(unicode(error))
+        if message is not None:
+            message = self._shorten(message)
+            msg = '{} -> {}:{} -> {}'.format(message, exc_stack[1], exc_stack[2], err)
+        else:
+            msg = '{}:{} -> {}'.format(exc_stack[1], exc_stack[2], err)
+        self._manager._equal_assertions.append(msg)  # pylint: disable=protected-access
+
     def assertEqual(self, expected, actual, message=None):
         if self._manager is not None:
             try:
                 super(BulkAssertionTest, self).assertEqual(expected, actual, message)
             except Exception as error:  # pylint: disable=broad-except
-                exc_stack = inspect.stack()[1]
-                if message is not None:
-                    msg = '{} -> {}:{} -> {}'.format(message, exc_stack[1], exc_stack[2], unicode(error))
-                else:
-                    msg = '{}:{} -> {}'.format(exc_stack[1], exc_stack[2], unicode(error))
-                self._manager._equal_assertions.append(msg)  # pylint: disable=protected-access
+                self._append_error(message, error)
         else:
             super(BulkAssertionTest, self).assertEqual(expected, actual, message)
     assertEquals = assertEqual
+
+    def assertIsNotNone(self, expr, message=None):
+        if self._manager is not None:
+            try:
+                super(BulkAssertionTest, self).assertIsNotNone(expr, message)
+            except Exception as error:  # pylint: disable=broad-except
+                self._append_error(message, error)
+        else:
+            super(BulkAssertionTest, self).assertIsNotNone(expr, message)
+    assertIsNotNone = assertIsNotNone
+
 
 
 class LazyFormat(object):
