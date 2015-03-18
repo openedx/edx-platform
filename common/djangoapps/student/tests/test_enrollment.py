@@ -194,7 +194,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase):
         """Change the student's enrollment status in a course.
 
         Args:
-            action (string): The action to perform (either "enroll" or "unenroll")
+            action (str): The action to perform (either "enroll" or "unenroll")
 
         Keyword Args:
             course_id (unicode): If provided, use this course ID.  Otherwise, use the

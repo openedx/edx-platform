@@ -9,8 +9,10 @@ from unittest import skipUnless
 from django.conf import settings
 from django.test import TestCase
 
-from openedx.core.djangoapps.user_api.accounts.helpers import get_profile_image_url_for_user
 from student.tests.factories import UserFactory
+
+from ...models import UserProfile
+from ..helpers import get_profile_image_url_for_user
 
 
 @ddt
@@ -26,6 +28,10 @@ class ProfileImageUrlTestCase(TestCase):
     def setUp(self):
         super(ProfileImageUrlTestCase, self).setUp()
         self.user = UserFactory()
+
+        # Ensure that parental controls don't apply to this user
+        self.user.profile.year_of_birth = 1980
+        self.user.profile.save()
 
     def verify_url(self, user, pixels, filename):
         """
