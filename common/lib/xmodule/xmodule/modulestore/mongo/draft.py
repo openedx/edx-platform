@@ -12,7 +12,7 @@ import logging
 from opaque_keys.edx.locations import Location
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.courseware_index import CoursewareSearchIndexer
+from xmodule.modulestore.courseware_index import get_indexer_for_location
 from xmodule.modulestore.exceptions import (
     ItemNotFoundError, DuplicateItemError, DuplicateCourseError, InvalidBranchSetting
 )
@@ -469,6 +469,11 @@ class DraftModuleStore(MongoModuleStore):
 
         xblock.location = draft_loc
         super(DraftModuleStore, self).update_item(xblock, user_id, allow_not_found, isPublish=isPublish)
+
+        indexer = get_indexer_for_location(xblock.location)
+        if indexer.index_on_update:
+            indexer.add_to_search_index(self, xblock.location)
+
         return wrap_draft(xblock)
 
     def delete_item(self, location, user_id, revision=None, **kwargs):
@@ -552,7 +557,9 @@ class DraftModuleStore(MongoModuleStore):
 
         # Remove this location from the courseware search index so that searches
         # will refrain from showing it as a result
-        CoursewareSearchIndexer.add_to_search_index(self, location, delete=True)
+        indexer = get_indexer_for_location(location)
+        if indexer.index_on_delete:
+            indexer.add_to_search_index(self, location, delete=True)
 
     def _delete_subtree(self, location, as_functions, draft_only=False):
         """
@@ -732,7 +739,9 @@ class DraftModuleStore(MongoModuleStore):
             self.signal_handler.send("course_published", course_key=course_key)
 
         # Now it's been published, add the object to the courseware search index so that it appears in search results
-        CoursewareSearchIndexer.do_publish_index(self, location)
+        indexer = get_indexer_for_location(location)
+        if indexer.index_on_publish:
+            indexer.do_publish_index(self, location)
 
         return self.get_item(as_published(location))
 

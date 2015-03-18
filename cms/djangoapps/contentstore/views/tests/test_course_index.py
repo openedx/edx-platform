@@ -382,8 +382,16 @@ class TestCourseReIndex(CourseTestCase):
         # create test file in which index for this test will live
         with open(self.TEST_INDEX_FILENAME, "w+") as index_file:
             json.dump({}, index_file)
-
+            
         self.addCleanup(os.remove, self.TEST_INDEX_FILENAME)
+
+    def _perform_search(self):
+        return perform_search(
+            "unique",
+            user=self.user,
+            size=10,
+            from_=0,
+            course_id=unicode(self.course.id))
 
     def test_reindex_course(self):
         """
@@ -446,12 +454,7 @@ class TestCourseReIndex(CourseTestCase):
         Test json response with real data
         """
         # Check results not indexed
-        response = perform_search(
-            "unique",
-            user=self.user,
-            size=10,
-            from_=0,
-            course_id=unicode(self.course.id))
+        response = self._perform_search()
         self.assertEqual(response['results'], [])
 
         # Start manual reindex
@@ -464,12 +467,7 @@ class TestCourseReIndex(CourseTestCase):
         reindex_course_and_check_access(self.course.id, self.user)
 
         # Check results indexed now
-        response = perform_search(
-            "unique",
-            user=self.user,
-            size=10,
-            from_=0,
-            course_id=unicode(self.course.id))
+        response = self._perform_search()
         self.assertEqual(response['total'], 1)
 
     @mock.patch('xmodule.video_module.VideoDescriptor.index_dictionary')
@@ -478,12 +476,7 @@ class TestCourseReIndex(CourseTestCase):
         Test json response with mocked error data for video
         """
         # Check results not indexed
-        response = perform_search(
-            "unique",
-            user=self.user,
-            size=10,
-            from_=0,
-            course_id=unicode(self.course.id))
+        response = self._perform_search()
         self.assertEqual(response['results'], [])
 
         # set mocked exception response
@@ -500,12 +493,7 @@ class TestCourseReIndex(CourseTestCase):
         Test json response with mocked error data for html
         """
         # Check results not indexed
-        response = perform_search(
-            "unique",
-            user=self.user,
-            size=10,
-            from_=0,
-            course_id=unicode(self.course.id))
+        response = self._perform_search()
         self.assertEqual(response['results'], [])
 
         # set mocked exception response
@@ -522,12 +510,7 @@ class TestCourseReIndex(CourseTestCase):
         Test json response with mocked error data for sequence
         """
         # Check results not indexed
-        response = perform_search(
-            "unique",
-            user=self.user,
-            size=10,
-            from_=0,
-            course_id=unicode(self.course.id))
+        response = self._perform_search()
         self.assertEqual(response['results'], [])
 
         # set mocked exception response
@@ -562,12 +545,7 @@ class TestCourseReIndex(CourseTestCase):
         Test add_to_search_index response with real data
         """
         # Check results not indexed
-        response = perform_search(
-            "unique",
-            user=self.user,
-            size=10,
-            from_=0,
-            course_id=unicode(self.course.id))
+        response = self._perform_search()
         self.assertEqual(response['results'], [])
 
         # Start manual reindex
@@ -580,12 +558,7 @@ class TestCourseReIndex(CourseTestCase):
         CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
 
         # Check results indexed now
-        response = perform_search(
-            "unique",
-            user=self.user,
-            size=10,
-            from_=0,
-            course_id=unicode(self.course.id))
+        response = self._perform_search()
         self.assertEqual(response['total'], 1)
 
     @mock.patch('xmodule.video_module.VideoDescriptor.index_dictionary')
@@ -594,12 +567,7 @@ class TestCourseReIndex(CourseTestCase):
         Test add_to_search_index response with mocked error data for video
         """
         # Check results not indexed
-        response = perform_search(
-            "unique",
-            user=self.user,
-            size=10,
-            from_=0,
-            course_id=unicode(self.course.id))
+        response = self._perform_search()
         self.assertEqual(response['results'], [])
 
         # set mocked exception response
@@ -616,12 +584,7 @@ class TestCourseReIndex(CourseTestCase):
         Test add_to_search_index response with mocked error data for html
         """
         # Check results not indexed
-        response = perform_search(
-            "unique",
-            user=self.user,
-            size=10,
-            from_=0,
-            course_id=unicode(self.course.id))
+        response = self._perform_search()
         self.assertEqual(response['results'], [])
 
         # set mocked exception response
@@ -638,12 +601,7 @@ class TestCourseReIndex(CourseTestCase):
         Test add_to_search_index response with mocked error data for sequence
         """
         # Check results not indexed
-        response = perform_search(
-            "unique",
-            user=self.user,
-            size=10,
-            from_=0,
-            course_id=unicode(self.course.id))
+        response = self._perform_search()
         self.assertEqual(response['results'], [])
 
         # set mocked exception response
