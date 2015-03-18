@@ -1083,7 +1083,7 @@ class ICRVReverifyView(View):
             "checkpoint_name": checkpoint_name,
         }
 
-        return render_to_response("verify_student/incourse_photo_reverification.html", context)
+        return render_to_response("verify_student/midcourse_photo_reverification.html", context)
 
     @method_decorator(login_required)
     def post(self, request, course_id, checkpoint_name):
