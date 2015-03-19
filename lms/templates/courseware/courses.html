@@ -11,9 +11,9 @@
   platform_name = microsite.get_value('platform_name', settings.PLATFORM_NAME)
 
   if self.stanford_theme_enabled():
-    course_index_overlay_text = _("Explore free courses from {university_name}.").format(university_name="Stanford University")
+    course_index_overlay_text = _("Explore free courses from {university_name}.").format(university_name="FORMAx CECEP")
     logo_file = static.url('themes/stanford/images/seal.png')
-    logo_alt_text = "Stanford Seal Logo"
+    logo_alt_text = "formaX Logo"
 
   else:
     course_index_overlay_text = microsite.get_value('course_index_overlay_text', _("Explore courses from {platform_name}.").format(platform_name=platform_name))
@@ -37,7 +37,7 @@
     <div class="inner-wrapper main-search">
       <hgroup>
         <div class="logo">
-          <img src="${logo_file}" alt="${logo_alt_text}" />
+          <img src="${static.url('themes/stanford/images/seal.png')}" alt="${logo_alt_text}" />
         </div>
         <h2>${course_index_overlay_text}</h2>
       </hgroup>
