@@ -21,15 +21,17 @@
       background: $dashboard-profile-color;
 
       .user-name {
+        display: block;
         overflow: hidden;
         margin: 0;
-        padding: ($baseline*0.75) ($baseline/2);
+        padding: ($baseline*0.75) ($baseline/2) 0;
         color: $base-font-color;
         text-transform: none;
         text-wrap: nowrap;
         text-overflow: ellipsis;
         text-align: center;
-        font: 700 1.2em/1.2em $sans-serif;
+        font-weight: 700;
+        line-height: 1.2em;
       }
     }
 
