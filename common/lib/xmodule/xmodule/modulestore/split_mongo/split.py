@@ -2286,9 +2286,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             new_block_info.fields = existing_block_info.fields  # Preserve any existing overrides
             if 'children' in new_block_info.defaults:
                 del new_block_info.defaults['children']  # Will be set later
-            # ALERT! Why was this 'block_id' stored here? Nothing else stores block_id
-            # in the block data. Was this a harmless error?
-            #new_block_info['block_id'] = new_block_key.id
+
             new_block_info.edit_info = existing_block_info.edit_info
             new_block_info.edit_info.previous_version = new_block_info.edit_info.update_version
             new_block_info.edit_info.update_version = dest_structure['_id']
@@ -2922,6 +2920,10 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 raw=True,
                 block_defaults=new_block.defaults
             )
+            # Extend the block's new edit_info with any extra edit_info fields from the source (e.g. original_usage):
+            for key, val in new_block.edit_info.to_storable().iteritems():
+                if getattr(destination_block.edit_info, key) is None:
+                    setattr(destination_block.edit_info, key, val)
 
         # introduce new edit info field for tracing where copied/published blocks came
         destination_block.edit_info.source_version = new_block.edit_info.update_version

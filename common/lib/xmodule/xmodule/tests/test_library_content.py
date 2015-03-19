@@ -12,6 +12,7 @@ from xblock.runtime import Runtime as VanillaRuntime
 
 from xmodule.library_content_module import ANY_CAPA_TYPE_VALUE, LibraryContentDescriptor
 from xmodule.library_tools import LibraryToolsService
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import LibraryFactory, CourseFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 from xmodule.tests import get_test_system
@@ -49,13 +50,13 @@ class LibraryContentTest(MixedSplitTestCase):
         """
         Bind a module (part of self.course) so we can access student-specific data.
         """
-        module_system = get_test_system(course_id=self.course.location.course_key)
+        module_system = get_test_system(course_id=module.location.course_key)
         module_system.descriptor_runtime = module.runtime._descriptor_system  # pylint: disable=protected-access
         module_system._services['library_tools'] = self.tools  # pylint: disable=protected-access
 
         def get_module(descriptor):
             """Mocks module_system get_module function"""
-            sub_module_system = get_test_system(course_id=self.course.location.course_key)
+            sub_module_system = get_test_system(course_id=module.location.course_key)
             sub_module_system.get_module = get_module
             sub_module_system.descriptor_runtime = descriptor._runtime  # pylint: disable=protected-access
             descriptor.bind_for_student(sub_module_system, descriptor._field_data, self.user_id)  # pylint: disable=protected-access
@@ -323,6 +324,17 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         self.assertEqual(len(event_data["result"]), 2)
         self.assertEqual(event_data["previous_count"], 1)
         self.assertEqual(event_data["max_count"], 2)
+
+    def test_assigned_event_published(self):
+        """
+        Same as test_assigned_event but uses the published branch
+        """
+        self.store.publish(self.course.location, self.user_id)
+        with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
+            self.lc_block = self.store.get_item(self.lc_block.location)
+            self._bind_course_module(self.lc_block)
+            self.lc_block.xmodule_runtime.publish = self.publisher
+            self.test_assigned_event()
 
     def test_assigned_descendants(self):
         """
