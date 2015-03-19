@@ -901,6 +901,9 @@ class VerificationCheckpoint(models.Model):
     class Meta:
         unique_together = (('course_id', 'checkpoint_name'),)
 
+    def add_verification_attempt(self, verification_attempt):
+        self.photo_verification.add(verification_attempt)
+
     @classmethod
     def get_verification_checkpoint(cls, course_id, checkpoint_name):
         try:

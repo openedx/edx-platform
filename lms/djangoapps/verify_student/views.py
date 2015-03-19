@@ -1051,6 +1051,14 @@ def reverification_window_expired(_request):
     return render_to_response("verify_student/reverification_window_expired.html")
 
 
+@login_required
+def incourse_reverification_confirmation(_request):  # pylint: disable=invalid-name
+    """
+    Shows the user a confirmation page if the submission to SoftwareSecure was successful
+    """
+    return render_to_response("verify_student/incourse_reverification_confirmation.html")
+
+
 class ICRVReverifyView(View):
     """
     The in-course reverification view.
@@ -1103,11 +1111,13 @@ class ICRVReverifyView(View):
             checkpoint = VerificationCheckpoint.get_verification_checkpoint(course_id, checkpoint_name)
             if checkpoint is None:
                 raise VerificationCheckpointException
-            # TODO: How to get this window for new implementation. I think window is in VerificationBlock
-            window = MidcourseReverificationWindow.get_window(course_id, now)
-            attempt = SoftwareSecurePhotoVerification(user=request.user, window=window)
+
             b64_face_image = request.POST['face_image'].split(",")[1]
 
+            # TODO: How to get this window for new implementation. I think window is in VerificationBlock
+            window = MidcourseReverificationWindow.get_window(course_id, now)
+
+            attempt = SoftwareSecurePhotoVerification(user=request.user, window=window)
             attempt.upload_face_image(b64_face_image.decode('base64'))
             attempt.fetch_photo_id_image()
             attempt.mark_ready()
@@ -1116,8 +1126,9 @@ class ICRVReverifyView(View):
             attempt.submit()
 
             VerificationStatus.objects.create(checkpoint=checkpoint, user=user, status="started")
+            checkpoint.add_verification_attempt(attempt)
 
-            return HttpResponseRedirect(reverse('verify_student_midcourse_reverification_confirmation'))
+            return HttpResponseRedirect(reverse('verify_student_incourse_reverification_confirmation'))
 
         except Exception:
             log.exception(

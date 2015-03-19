@@ -144,4 +144,9 @@ urlpatterns = patterns(
         views.ICRVReverifyView.as_view(),
         name="verify_student_icrv_reverify"
     ),
+    url(
+        r'^incourse_reverification_confirmation$',
+        views.incourse_reverification_confirmation,
+        name="verify_student_incourse_reverification_confirmation"
+    ),
 )
