@@ -15,7 +15,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from commerce.constants import OrderStatus, Messages
 from course_modes.models import CourseMode
-from enrollment.api import add_enrollment
+from enrollment.api import get_enrollment
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory, CourseModeFactory
 from student.tests.tests import EnrollmentEventTestMixin
@@ -166,31 +166,17 @@ class OrdersViewTests(EnrollmentEventTestMixin, ModuleStoreTestCase):
         self.assertValidEcommerceApiErrorResponse(response)
         self.assertUserNotEnrolled()
 
-    @data(True, False)
-    @httpretty.activate
-    def test_course_with_honor_seat_sku(self, user_is_active):
+    def _test_successful_ecommerce_api_call(self):
         """
-        If the course has a SKU, the view should get authorization from the E-Commerce API before enrolling
-        the user in the course. If authorization is approved, the user should be redirected to the user dashboard.
+        Verifies that the view contacts the E-Commerce API with the correct data and headers.
         """
-
-        # Set user's active flag
-        self.user.is_active = user_is_active
-        self.user.save()  # pylint: disable=no-member
-
-        def request_callback(_method, _uri, headers):
-            """ Mock the E-Commerce API's call to the enrollment API. """
-            add_enrollment(self.user.username, unicode(self.course.id), 'honor')
-            return 200, headers, ECOMMERCE_API_SUCCESSFUL_BODY
-
-        self._mock_ecommerce_api(body=request_callback)
+        self._mock_ecommerce_api(body=ECOMMERCE_API_SUCCESSFUL_BODY)
         response = self._post_to_view()
 
         # Validate the response content
         msg = Messages.ORDER_COMPLETED.format(order_number=ORDER_NUMBER)
         self.assertResponseMessage(response, msg)
-
-        self.assertUserEnrolled()
+        self.assertEqual(response.status_code, 200)
 
         # Verify the correct information was passed to the E-Commerce API
         request = httpretty.last_request()
@@ -202,6 +188,19 @@ class OrdersViewTests(EnrollmentEventTestMixin, ModuleStoreTestCase):
         expected_jwt = jwt.encode({'username': self.user.username, 'email': self.user.email},
                                   ECOMMERCE_API_SIGNING_KEY)
         self.assertEqual(request.headers['Authorization'], 'JWT {}'.format(expected_jwt))
+
+    @data(True, False)
+    @httpretty.activate
+    def test_course_with_honor_seat_sku(self, user_is_active):
+        """
+        If the course has a SKU for honor mode, the view should get authorization from the E-Commerce API before
+        enrolling the user in the course.
+        """
+        # Set user's active flag
+        self.user.is_active = user_is_active
+        self.user.save()  # pylint: disable=no-member
+
+        self._test_successful_ecommerce_api_call()
 
     @httpretty.activate
     def test_order_not_complete(self):
@@ -297,3 +296,29 @@ class OrdersViewTests(EnrollmentEventTestMixin, ModuleStoreTestCase):
         the E-Commerce API is not configured.
         """
         self._test_professional_mode_only()
+
+    def test_existing_active_enrollment(self):
+        """ The view should respond with HTTP 409 if the user has an existing active enrollment for the course. """
+
+        # Enroll user in the course
+        CourseEnrollment.enroll(self.user, self.course.id)
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
+
+        response = self._post_to_view()
+        self.assertEqual(response.status_code, 409)
+        msg = Messages.ENROLLMENT_EXISTS.format(username=self.user.username, course_id=self.course.id)
+        self.assertResponseMessage(response, msg)
+
+    @httpretty.activate
+    def test_existing_inactive_enrollment(self):
+        """
+        If the user has an inactive enrollment for the course, the view should behave as if the
+        user has no enrollment.
+        """
+        # Create an inactive enrollment
+        CourseEnrollment.enroll(self.user, self.course.id)
+        CourseEnrollment.unenroll(self.user, self.course.id, True)
+        self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
+        self.assertIsNotNone(get_enrollment(self.user.username, unicode(self.course.id)))
+
+        self._test_successful_ecommerce_api_call()
