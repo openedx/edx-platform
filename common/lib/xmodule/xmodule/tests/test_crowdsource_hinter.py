@@ -203,7 +203,7 @@ class VerticalWithModulesFactory(object):
         """Make a vertical."""
         field_data = {'data': VerticalWithModulesFactory.sample_problem_xml}
         system = get_test_system()
-        descriptor = VerticalBlock.from_xml(VerticalWithModulesFactory.sample_problem_xml, system)
+        descriptor = VerticalBlock.parse_xml(VerticalWithModulesFactory.sample_problem_xml, system)
         module = VerticalBlock(system, descriptor, field_data)
 
         return module
