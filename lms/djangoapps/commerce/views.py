@@ -79,23 +79,6 @@ class OrdersView(APIView):
         if not valid:
             return DetailResponse(error, status=HTTP_406_NOT_ACCEPTABLE)
 
-        # Ensure that the course has an honor mode with SKU
-        honor_mode = CourseMode.mode_for_course(course_key, CourseMode.HONOR)
-        course_id = unicode(course_key)
-
-        # If there is no honor course mode, this most likely a Prof-Ed course. Return an error so that the JS
-        # redirects to track selection.
-        if not honor_mode:
-            msg = Messages.NO_HONOR_MODE.format(course_id=course_id)
-            return DetailResponse(msg, status=HTTP_406_NOT_ACCEPTABLE)
-        elif not honor_mode.sku:
-            # If there are no course modes with SKUs, enroll the user without contacting the external API.
-            msg = Messages.NO_SKU_ENROLLED.format(enrollment_mode=CourseMode.HONOR, course_id=course_id,
-                                                  username=user.username)
-            log.debug(msg)
-            self._enroll(course_key, user)
-            return DetailResponse(msg)
-
         # Ensure that the E-Commerce API is setup properly
         ecommerce_api_url = getattr(settings, 'ECOMMERCE_API_URL', None)
         ecommerce_api_signing_key = getattr(settings, 'ECOMMERCE_API_SIGNING_KEY', None)
