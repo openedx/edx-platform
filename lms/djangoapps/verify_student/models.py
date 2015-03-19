@@ -646,7 +646,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         try:
             init_verification = cls.objects.order_by("-created_at").get(
                 user=user, status__in=["submitted", "approved"],
-                windows=None
+                window=None
             )
         except cls.DoesNotExist:
             init_verification = None

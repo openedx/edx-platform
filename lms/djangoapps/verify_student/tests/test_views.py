@@ -1651,12 +1651,17 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
 
         self.user = UserFactory.create(username="rusty", password="test")
         self.client.login(username="rusty", password="test")
+
         self.course_key = SlashSeparatedCourseKey("Robot", "999", "Test_Course")
         CourseFactory.create(org='Robot', number='999', display_name='Test Course')
 
-        # patcher = patch('student.models.tracker')
-        # self.mock_tracker = patcher.start()
-        # self.addCleanup(patcher.stop)
+        # Create the course modes
+        for mode in ('audit', 'honor', 'verified'):
+            min_price = 0 if mode in ["honor", "audit"] else 1
+            CourseModeFactory(mode_slug=mode, course_id=self.course_key, min_price=min_price)
+
+        # Enroll the user in the default mode (honor) to emulate
+        CourseEnrollment.enroll(self.user, self.course_key, mode="verified")
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_incourse_reverify_invalid_course_get(self):
@@ -1681,15 +1686,16 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
                       kwargs={"course_id": unicode(self.course_key), "checkpoint_name": "midterm"})
         response = self.client.get(url)
         url = reverse('verify_student_verify_later',
-                      kwargs={"course": unicode(self.course_key)})
+                      kwargs={"course_id": unicode(self.course_key)})
         self.assertRedirects(response, url)
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_incourse_reverify_get(self):
         self._create_checkpoint()
         attempt = SoftwareSecurePhotoVerification(user=self.user)
-        attempt.submit()
+        attempt.mark_ready()
         attempt.save()
+        attempt.submit()
         url = reverse('verify_student_incourse_reverify',
                       kwargs={"course_id": unicode(self.course_key), "checkpoint_name": "midterm"})
         response = self.client.get(url)
