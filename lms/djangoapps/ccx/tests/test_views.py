@@ -21,6 +21,7 @@ from student.tests.factories import (  # pylint: disable=import-error
     UserFactory,
 )
 
+from xmodule.x_module import XModuleMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import (
     CourseFactory,
@@ -418,8 +419,20 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
 
+original_get_children = XModuleMixin.get_children
+def patched_get_children(self, usage_key_filter=None):  # pylint: disable=missing-docstring
+    def iter_children():  # pylint: disable=missing-docstring
+        print self.__dict__
+        for child in original_get_children(self, usage_key_filter=usage_key_filter):
+            child._field_data_cache = {}  # pylint: disable=protected-access
+            if not child.visible_to_staff_only:
+                yield child
+    return list(iter_children())
+
+
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
     'ccx.overrides.CustomCoursesForEdxOverrideProvider',))
+@patch('xmodule.x_module.XModuleMixin.get_children', patched_get_children, spec=True)
 class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Tests for Custom Courses views.
@@ -479,8 +492,7 @@ class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
         for block in iter_blocks(course):
             block._field_data = OverrideFieldData.wrap(   # pylint: disable=protected-access
                 coach, block._field_data)   # pylint: disable=protected-access
-            block._field_data_cache = {}  # pylint: disable=protected-access
-            visible_children(block)
+            block._field_data_cache = {'tabs':[],'discussion_topics':[]}  # pylint: disable=protected-access
 
         def cleanup_provider_classes():
             """
@@ -759,19 +771,3 @@ def iter_blocks(course):
             for descendant in visit(child):  # wish they'd backport yield from
                 yield descendant
     return visit(course)
-
-
-def visible_children(block):
-    """
-    Return only visible children
-    """
-    block_get_children = block.get_children
-
-    def get_children():  # pylint: disable=missing-docstring
-        def iter_children():  # pylint: disable=missing-docstring
-            for child in block_get_children():
-                child._field_data_cache = {}  # pylint: disable=protected-access
-                if not child.visible_to_staff_only:
-                    yield child
-        return list(iter_children())
-    block.get_children = get_children

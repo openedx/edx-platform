@@ -691,7 +691,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     )
 
     authored_data = OverrideFieldData.wrap(user, descriptor._field_data)  # pylint: disable=protected-access
-    descriptor.bind_for_student(system, LmsFieldData(authored_data, field_data), user.id)
+    descriptor.bind_for_student(system, LmsFieldData(authored_data, student_data), user.id)
     descriptor.scope_ids = descriptor.scope_ids._replace(user_id=user.id)  # pylint: disable=protected-access
 
     # Do not check access when it's a noauth request.

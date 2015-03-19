@@ -835,8 +835,16 @@ class CourseFields(object):
     )
 
 
+class CourseModule(CourseFields, SequenceModule):
+    """
+    The CourseDescriptor needs its module_class to be a SequenceModule, but some code that
+    expects a CourseDescriptor to have all its fields can fail if it gets a SequenceModule instead.
+    This class is to make sure that all the fields are present in all cases.
+    """
+
+
 class CourseDescriptor(CourseFields, SequenceDescriptor):
-    module_class = SequenceModule
+    module_class = CourseModule
 
     def __init__(self, *args, **kwargs):
         """
