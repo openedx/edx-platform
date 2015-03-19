@@ -406,8 +406,6 @@ class XmlParserUtilMixin(object):
             url_path = name_to_pathname(self.url_name)
             filepath = self._format_filepath(self.category, url_path)
             self.runtime.export_fs.makedir(os.path.dirname(filepath), recursive=True, allow_recreate=True)
-            if self.category == 'course':
-                print filepath, self.runtime.export_fs.getsyspath(filepath)
             with self.runtime.export_fs.open(filepath, 'w') as fileobj:
                 fileobj.write(etree.tostring(xml_object, pretty_print=True, encoding='utf-8'))
         else:
