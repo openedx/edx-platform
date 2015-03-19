@@ -1,7 +1,7 @@
 """ Tests for tab functions (just primitive). """
 
 import json
-from contentstore.views import tabs
+from xmodule.tabs import primitive_insert, primitive_delete
 from contentstore.tests.utils import CourseTestCase
 from django.test import TestCase
 from xmodule.x_module import STUDENT_VIEW
@@ -199,12 +199,12 @@ class PrimitiveTabEdit(TestCase):
         """Test primitive tab deletion."""
         course = CourseFactory.create()
         with self.assertRaises(ValueError):
-            tabs.primitive_delete(course, 0)
+            primitive_delete(course, 0)
         with self.assertRaises(ValueError):
-            tabs.primitive_delete(course, 1)
+            primitive_delete(course, 1)
         with self.assertRaises(IndexError):
-            tabs.primitive_delete(course, 6)
-        tabs.primitive_delete(course, 2)
+            primitive_delete(course, 6)
+        primitive_delete(course, 2)
         self.assertFalse({u'type': u'textbooks'} in course.tabs)
         # Check that discussion has shifted up
         self.assertEquals(course.tabs[2], {'type': 'discussion', 'name': 'Discussion'})
@@ -212,16 +212,16 @@ class PrimitiveTabEdit(TestCase):
     def test_insert(self):
         """Test primitive tab insertion."""
         course = CourseFactory.create()
-        tabs.primitive_insert(course, 2, 'notes', 'aname')
+        primitive_insert(course, 2, 'notes', 'aname')
         self.assertEquals(course.tabs[2], {'type': 'notes', 'name': 'aname'})
         with self.assertRaises(ValueError):
-            tabs.primitive_insert(course, 0, 'notes', 'aname')
+            primitive_insert(course, 0, 'notes', 'aname')
         with self.assertRaises(ValueError):
-            tabs.primitive_insert(course, 3, 'static_tab', 'aname')
+            primitive_insert(course, 3, 'static_tab', 'aname')
 
     def test_save(self):
         """Test course saving."""
         course = CourseFactory.create()
-        tabs.primitive_insert(course, 3, 'notes', 'aname')
+        primitive_insert(course, 3, 'notes', 'aname')
         course2 = modulestore().get_course(course.id)
         self.assertEquals(course2.tabs[3], {'type': 'notes', 'name': 'aname'})
