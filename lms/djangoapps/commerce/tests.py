@@ -254,7 +254,6 @@ class OrdersViewTests(EnrollmentEventTestMixin, ModuleStoreTestCase):
         response = self._post_to_view()
 
         # Validate the response
-        self._mock_ecommerce_api()
         self.assertEqual(response.status_code, 200)
         msg = Messages.NO_ECOM_API.format(username=self.user.username, course_id=self.course.id)
         self.assertResponseMessage(response, msg)
@@ -272,3 +271,29 @@ class OrdersViewTests(EnrollmentEventTestMixin, ModuleStoreTestCase):
             course_mode.save()
 
         self._test_course_without_sku()
+
+    def _test_professional_mode_only(self):
+        """ Verifies that the view behaves appropriately when the course only has a professional mode. """
+        CourseMode.objects.filter(course_id=self.course.id).delete()
+        mode = 'no-id-professional'
+        CourseModeFactory.create(course_id=self.course.id, mode_slug=mode, mode_display_name=mode,
+                                 sku=uuid4().hex.decode('ascii'))
+        self._mock_ecommerce_api()
+        response = self._post_to_view()
+        self.assertEqual(response.status_code, 406)
+        msg = Messages.NO_HONOR_MODE.format(course_id=self.course.id)
+        self.assertResponseMessage(response, msg)
+
+    @httpretty.activate
+    def test_course_with_professional_mode_only(self):
+        """ Verifies that the view behaves appropriately when the course only has a professional mode. """
+        self._test_professional_mode_only()
+
+    @httpretty.activate
+    @override_settings(ECOMMERCE_API_URL=None, ECOMMERCE_API_SIGNING_KEY=None)
+    def test_no_settings_and_professional_mode_only(self):
+        """
+        Verifies that the view behaves appropriately when the course only has a professional mode and
+        the E-Commerce API is not configured.
+        """
+        self._test_professional_mode_only()

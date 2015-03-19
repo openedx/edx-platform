@@ -6,6 +6,8 @@ import json
 import unittest
 
 from mock import patch
+from django.test import Client
+from django.core.handlers.wsgi import WSGIRequest
 from django.core.urlresolvers import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
@@ -504,3 +506,81 @@ class EnrollmentEmbargoTest(UrlResetMixin, ModuleStoreTestCase):
         url = reverse('courseenrollments')
         resp = self.client.get(url)
         return json.loads(resp.content)
+
+
+def cross_domain_config(func):
+    """Decorator for configuring a cross-domain request. """
+    feature_flag_decorator = patch.dict(settings.FEATURES, {
+        'ENABLE_CORS_HEADERS': True,
+        'ENABLE_CROSS_DOMAIN_CSRF_COOKIE': True
+    })
+    settings_decorator = override_settings(
+        CORS_ORIGIN_WHITELIST=["www.edx.org"],
+        CROSS_DOMAIN_CSRF_COOKIE_NAME="prod-edx-csrftoken",
+        CROSS_DOMAIN_CSRF_COOKIE_DOMAIN=".edx.org"
+    )
+    is_secure_decorator = patch.object(WSGIRequest, 'is_secure', return_value=True)
+
+    return feature_flag_decorator(
+        settings_decorator(
+            is_secure_decorator(func)
+        )
+    )
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class EnrollmentCrossDomainTest(ModuleStoreTestCase):
+    """Test cross-domain calls to the enrollment end-points. """
+
+    USERNAME = "Bob"
+    EMAIL = "bob@example.com"
+    PASSWORD = "edx"
+    REFERER = "https://www.edx.org"
+
+    def setUp(self):
+        """ Create a course and user, then log in. """
+        super(EnrollmentCrossDomainTest, self).setUp()
+        self.course = CourseFactory.create()
+        self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
+
+        self.client = Client(enforce_csrf_checks=True)
+        self.client.login(username=self.USERNAME, password=self.PASSWORD)
+
+    @cross_domain_config
+    def test_cross_domain_change_enrollment(self, *args):  # pylint: disable=unused-argument
+        csrf_cookie = self._get_csrf_cookie()
+        resp = self._cross_domain_post(csrf_cookie)
+
+        # Expect that the request gets through successfully,
+        # passing the CSRF checks (including the referer check).
+        self.assertEqual(resp.status_code, 200)
+
+    @cross_domain_config
+    def test_cross_domain_missing_csrf(self, *args):  # pylint: disable=unused-argument
+        resp = self._cross_domain_post('invalid_csrf_token')
+        self.assertEqual(resp.status_code, 401)
+
+    def _get_csrf_cookie(self):
+        """Retrieve the cross-domain CSRF cookie. """
+        url = reverse('courseenrollment', kwargs={
+            'course_id': unicode(self.course.id)
+        })
+        resp = self.client.get(url, HTTP_REFERER=self.REFERER)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('prod-edx-csrftoken', resp.cookies)  # pylint: disable=no-member
+        return resp.cookies['prod-edx-csrftoken'].value  # pylint: disable=no-member
+
+    def _cross_domain_post(self, csrf_cookie):
+        """Perform a cross-domain POST request. """
+        url = reverse('courseenrollments')
+        params = json.dumps({
+            'course_details': {
+                'course_id': unicode(self.course.id),
+            },
+            'user': self.user.username
+        })
+        return self.client.post(
+            url, params, content_type='application/json',
+            HTTP_REFERER=self.REFERER,
+            HTTP_X_CSRFTOKEN=csrf_cookie
+        )
