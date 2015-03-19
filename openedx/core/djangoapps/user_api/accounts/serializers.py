@@ -3,10 +3,32 @@ from django.contrib.auth.models import User
 from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
 from openedx.core.djangoapps.user_api.serializers import ReadOnlyFieldsSerializerMixin
 
-from student.models import UserProfile
+from student.models import UserProfile, LanguageProficiency
 from .helpers import get_profile_image_url_for_user, PROFILE_IMAGE_SIZES_MAP
 
 PROFILE_IMAGE_KEY_PREFIX = 'image_url'
+
+
+class LanguageProficiencySerializer(serializers.ModelSerializer):
+    """
+    Class that serializes the LanguageProficiency model for account
+    information.
+    """
+    class Meta:
+        model = LanguageProficiency
+        fields = ("code",)
+
+    def get_identity(self, data):
+        """
+        This is used in bulk updates to determine the identity of an object.
+        The default is to use the id of an object, but we want to override that
+        and consider the language code to be the canonical identity of a
+        LanguageProficiency model.
+        """
+        try:
+            return data.get('code', None)
+        except AttributeError:
+            return None
 
 
 class AccountUserSerializer(serializers.HyperlinkedModelSerializer, ReadOnlyFieldsSerializerMixin):
@@ -26,12 +48,13 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
     """
     profile_image = serializers.SerializerMethodField("get_profile_image")
     requires_parental_consent = serializers.SerializerMethodField("get_requires_parental_consent")
+    language_proficiencies = LanguageProficiencySerializer(many=True, allow_add_remove=True, required=False)
 
     class Meta:
         model = UserProfile
         fields = (
-            "name", "gender", "goals", "year_of_birth", "level_of_education", "language", "country",
-            "mailing_address", "bio", "profile_image", "requires_parental_consent",
+            "name", "gender", "goals", "year_of_birth", "level_of_education", "country",
+            "mailing_address", "bio", "profile_image", "requires_parental_consent", "language_proficiencies"
         )
         # Currently no read-only field, but keep this so view code doesn't need to know.
         read_only_fields = ()
@@ -47,6 +70,14 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
                 )
             attrs[source] = new_name
 
+        return attrs
+
+    def validate_language_proficiencies(self, attrs, source):
+        """ Enforce all languages are unique. """
+        language_proficiencies = [language for language in attrs.get(source, [])]
+        unique_language_proficiencies = set(language.code for language in language_proficiencies)
+        if len(language_proficiencies) != len(unique_language_proficiencies):
+            raise serializers.ValidationError("The language_proficiencies field must consist of unique languages")
         return attrs
 
     def transform_gender(self, user_profile, value):
