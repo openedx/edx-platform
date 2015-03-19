@@ -139,6 +139,9 @@ class XmlParserUtilMixin(object):
 
     @staticmethod
     def _get_metadata_from_xml(xml_object, remove=True):
+        """
+        Extract the metadata from the XML.
+        """
         meta = xml_object.find('meta')
         if meta is None:
             return ''
@@ -284,7 +287,7 @@ class XmlParserUtilMixin(object):
                 metadata[attr] = value
 
     @classmethod
-    def parse_xml(cls, node, runtime, keys, id_generator):
+    def parse_xml(cls, node, runtime, keys, id_generator):  # pylint: disable=unused-argument
         """
         Use `node` to construct a new block.
 
@@ -319,7 +322,8 @@ class XmlParserUtilMixin(object):
             definition_xml = node
             filepath = None
 
-        definition, children = cls.load_definition(definition_xml, runtime, def_id, id_generator)  # note this removes metadata
+        # Note: removes metadata.
+        definition, children = cls.load_definition(definition_xml, runtime, def_id, id_generator)
 
         # VS[compat] -- make Ike's github preview links work in both old and
         # new file layouts
@@ -433,6 +437,9 @@ class XmlParserUtilMixin(object):
 
     @property
     def non_editable_metadata_fields(self):
+        """
+        Return a list of all metadata fields that cannot be edited.
+        """
         non_editable_fields = super(XmlParserUtilMixin, self).non_editable_metadata_fields
         non_editable_fields.append(XmlParserUtilMixin.xml_attributes)
         return non_editable_fields

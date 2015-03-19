@@ -86,10 +86,10 @@ class VerticalBlock(StudioEditableBlock, XmlParserMixin, XBlock):
             try:
                 child_block = system.process_xml(etree.tostring(child, encoding='unicode'))
                 children.append(child_block.scope_ids.usage_id)
-            except Exception as e:
+            except Exception as exc:  # pylint: disable=broad-except
                 log.exception("Unable to load child when parsing Vertical. Continuing...")
                 if system.error_tracker is not None:
-                    system.error_tracker(u"ERROR: {0}".format(e))
+                    system.error_tracker(u"ERROR: {0}".format(exc))
                 continue
         return {}, children
 
