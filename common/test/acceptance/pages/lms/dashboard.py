@@ -64,7 +64,7 @@ class DashboardPage(PageObject):
     @property
     def username(self):
         """Return the displayed value for the user's username"""
-        return self.q(css='h1.user-name').text[0]
+        return self.q(css='.user-name').text[0]
 
     def get_enrollment_mode(self, course_name):
         """Get the enrollment mode for a given course on the dashboard.

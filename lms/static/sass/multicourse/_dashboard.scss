@@ -20,7 +20,7 @@
       width: flex-grid(12);
       background: $dashboard-profile-color;
 
-      h1.user-name {
+      h2.user-name {
         overflow: hidden;
         margin: 0;
         padding: ($baseline*0.75) ($baseline/2);
@@ -28,6 +28,7 @@
         text-transform: none;
         text-wrap: nowrap;
         text-overflow: ellipsis;
+        text-align: center;
         font: 700 1.2em/1.2em $sans-serif;
       }
     }
