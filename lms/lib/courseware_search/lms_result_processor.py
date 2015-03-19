@@ -9,7 +9,7 @@ from django.utils.translation import ugettext as _
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from search.result_processor import SearchResultProcessor
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.search import path_to_location
+from xmodule.modulestore.search import path_to_location, navigation_index
 
 from courseware.access import has_access
 
@@ -77,10 +77,10 @@ class LmsSearchResultProcessor(SearchResultProcessor):
 
         def get_position_name(section, position):
             """ helper to fetch name corresponding to the position therein """
-            pos = int(position)
-            section_item = self.get_item(course_key.make_usage_key("sequential", section))
-            if section_item.has_children and len(section_item.children) >= pos:
-                return get_display_name(section_item.children[pos - 1])
+            if position:
+                section_item = self.get_item(course_key.make_usage_key("sequential", section))
+                if section_item.has_children and len(section_item.children) >= position:
+                    return get_display_name(section_item.children[position - 1])
             return None
 
         location_description = []
@@ -89,7 +89,10 @@ class LmsSearchResultProcessor(SearchResultProcessor):
         if section:
             location_description.append(get_display_name(course_key.make_usage_key("sequential", section)))
         if position:
-            location_description.append(get_position_name(section, position))
+            # We're only wanting to show the first vertical, so we use the
+            # navigation_index function to display the same location to which one
+            # would be sent if navigating
+            location_description.append(get_position_name(section, navigation_index(position)))
 
         return location_description
 

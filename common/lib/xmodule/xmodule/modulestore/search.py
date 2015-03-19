@@ -1,4 +1,9 @@
+''' useful functions for finding content and its position '''
+from logging import getLogger
+
 from .exceptions import (ItemNotFoundError, NoPathToItem)
+
+LOGGER = getLogger(__name__)
 
 
 def path_to_location(modulestore, usage_key):
@@ -105,3 +110,30 @@ def path_to_location(modulestore, usage_key):
             position = "_".join(position_list)
 
         return (course_id, chapter, section, position)
+
+
+def navigation_index(position):
+    """
+    Get the navigation index from the position argument (where the position argument was recieved from a call to
+    path_to_location)
+
+    Argument:
+    position - result of position returned from call to path_to_location. This is an underscore (_) separated string of
+    vertical 1-indexed positions. If the course is built in Studio then you'll never see verticals as children of
+    verticals, and so extremely often one will only see the first vertical as an integer position. This specific action
+    is to allow navigation / breadcrumbs to locate the topmost item because this is the location actually required by
+    the LMS code
+
+    Returns:
+    1-based integer of the position of the desired item within the vertical
+    """
+    if position is None:
+        return None
+
+    try:
+        navigation_position = int(position.split('_', 1)[0])
+    except (ValueError, TypeError):
+        LOGGER.exception(u'Bad position %r passed to navigation_index, will assume first position', position)
+        navigation_position = 1
+
+    return navigation_position

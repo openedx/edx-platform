@@ -76,6 +76,85 @@ class TestJumpTo(ModuleStoreTestCase):
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
+    def test_jumpto_from_section(self):
+        course = CourseFactory.create()
+        chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+        section = ItemFactory.create(category='sequential', parent_location=chapter.location)
+        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/'.format(
+            course_id=unicode(course.id),
+            chapter_id=chapter.url_name,
+            section_id=section.url_name,
+        )
+        jumpto_url = '{0}/{1}/jump_to/{2}'.format(
+            '/courses',
+            unicode(course.id),
+            unicode(section.location),
+        )
+        response = self.client.get(jumpto_url)
+        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+
+    def test_jumpto_from_module(self):
+        course = CourseFactory.create()
+        chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+        section = ItemFactory.create(category='sequential', parent_location=chapter.location)
+        vertical1 = ItemFactory.create(category='vertical', parent_location=section.location)
+        vertical2 = ItemFactory.create(category='vertical', parent_location=section.location)
+        module1 = ItemFactory.create(category='html', parent_location=vertical1.location)
+        module2 = ItemFactory.create(category='html', parent_location=vertical2.location)
+
+        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/1'.format(
+            course_id=unicode(course.id),
+            chapter_id=chapter.url_name,
+            section_id=section.url_name,
+        )
+        jumpto_url = '{0}/{1}/jump_to/{2}'.format(
+            '/courses',
+            unicode(course.id),
+            unicode(module1.location),
+        )
+        response = self.client.get(jumpto_url)
+        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+
+        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/2'.format(
+            course_id=unicode(course.id),
+            chapter_id=chapter.url_name,
+            section_id=section.url_name,
+        )
+        jumpto_url = '{0}/{1}/jump_to/{2}'.format(
+            '/courses',
+            unicode(course.id),
+            unicode(module2.location),
+        )
+        response = self.client.get(jumpto_url)
+        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+
+    def test_jumpto_from_nested_module(self):
+        course = CourseFactory.create()
+        chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+        section = ItemFactory.create(category='sequential', parent_location=chapter.location)
+        vertical = ItemFactory.create(category='vertical', parent_location=section.location)
+        nested_section = ItemFactory.create(category='sequential', parent_location=vertical.location)
+        nested_vertical1 = ItemFactory.create(category='vertical', parent_location=nested_section.location)
+        # put a module into nested_vertical1 for completeness
+        ItemFactory.create(category='html', parent_location=nested_vertical1.location)
+        nested_vertical2 = ItemFactory.create(category='vertical', parent_location=nested_section.location)
+        module2 = ItemFactory.create(category='html', parent_location=nested_vertical2.location)
+
+        # internal position of module2 will be 1_2 (2nd item withing 1st item)
+
+        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/1'.format(
+            course_id=unicode(course.id),
+            chapter_id=chapter.url_name,
+            section_id=section.url_name,
+        )
+        jumpto_url = '{0}/{1}/jump_to/{2}'.format(
+            '/courses',
+            unicode(course.id),
+            unicode(module2.location),
+        )
+        response = self.client.get(jumpto_url)
+        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+
     def test_jumpto_id_invalid_location(self):
         location = Location('edX', 'toy', 'NoSuchPlace', None, None, None)
         jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', self.course_key.to_deprecated_string(), location.to_deprecated_string())
