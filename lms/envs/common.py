@@ -1915,6 +1915,8 @@ TIME_ZONE_DISPLAYED_FOR_DEADLINES = 'UTC'
 
 # Source:
 # http://loc.gov/standards/iso639-2/ISO-639-2_utf-8.txt according to http://en.wikipedia.org/wiki/ISO_639-1
+# Note that this is used as the set of choices to the `code` field of the
+# `LanguageProficiency` model.
 ALL_LANGUAGES = (
     [u"aa", u"Afar"],
     [u"ab", u"Abkhazian"],
@@ -2220,7 +2222,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         'profile_image',
         'country',
         'time_zone',
-        'languages',
+        'language_proficiencies',
         'bio',
     ],
 

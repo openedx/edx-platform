@@ -47,18 +47,16 @@ class AccountView(APIView):
                     format provided by datetime.
                     For example, "2014-08-26T17:52:11Z".
 
-                * gender: One of the fullowing values:
-
-                  * "m"
-                  * "f"
-                  * "o"
-                  * null
+                * gender: One of the following values:
+                    * "m"
+                    * "f"
+                    * "o"
+                    * null
 
                 * year_of_birth: The year the user was born, as an integer, or
-                  null.
+                    null.
 
                 * level_of_education: One of the following values:
-
                     * "p": PhD or Doctorate
                     * "m": Master's or professional degree
                     * "b": Bachelor's degree
@@ -72,10 +70,13 @@ class AccountView(APIView):
 
                 * language: The user's preferred language, or null.
 
+                * country: null (not set), or a Country corresponding to one of
+                    the ISO 3166-1 countries.
+
                 * country: A ISO 3166 country code or null.
 
                 * mailing_address: The textual representation of the user's
-                  mailing address, or null.
+                    mailing address, or null.
 
                 * goals: The textual representation of the user's goals, or null.
 
@@ -97,6 +98,10 @@ class AccountView(APIView):
 
                 * requires_parental_consent: true if the user is a minor
                     requiring parental consent.
+
+                * language_proficiencies: array of language preferences.
+                    Each preference is a JSON object with the following keys:
+                    * "code": string ISO 639-1 language code e.g. "en".
 
             For all text fields, clients rendering the values should take care
             to HTML escape them to avoid script injections, as the data is
