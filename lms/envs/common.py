@@ -974,6 +974,12 @@ EDXNOTES_INTERFACE = {
     'url': 'http://localhost:8120/api/v1',
 }
 
+########################## Parental controls config  #######################
+
+# The age at which a learner no longer requires parental consent, or None
+# if parental consent is never required.
+PARENTAL_CONSENT_AGE_LIMIT = 13
+
 ################################# Jasmine ##################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
 
@@ -1502,7 +1508,7 @@ BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS = 0.02
 ############################# Email Opt In ####################################
 
 # Minimum age for organization-wide email opt in
-EMAIL_OPTIN_MINIMUM_AGE = 13
+EMAIL_OPTIN_MINIMUM_AGE = PARENTAL_CONSENT_AGE_LIMIT
 
 ############################## Video ##########################################
 
