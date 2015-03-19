@@ -1059,7 +1059,7 @@ def incourse_reverification_confirmation(_request):  # pylint: disable=invalid-n
     return render_to_response("verify_student/incourse_reverification_confirmation.html")
 
 
-class ICRVReverifyView(View):
+class InCourseReverifyView(View):
     """
     The in-course reverification view.
     Needs to perform these functions:
@@ -1082,15 +1082,13 @@ class ICRVReverifyView(View):
         checkpoint = VerificationCheckpoint.get_verification_checkpoint(course_id, checkpoint_name)
         if checkpoint is None:
             raise Http404
-        try:
-            SoftwareSecurePhotoVerification.original_verification(user)
-        except IndexError:
-            path = reverse('verify_student_verify_later', kwargs={'course_id': unicode(course_id)})
-            return redirect(path)
+        init_verification = SoftwareSecurePhotoVerification.get_initial_verification(user)
+        if not init_verification:
+            return redirect(reverse('verify_student_verify_later', kwargs={'course_id': unicode(course_id)}))
         context = {
             "user_full_name": request.user.profile.name,
             "error": False,
-            "course_id": course_id.to_deprecated_string(),
+            "course_id": unicode(course_id),
             "course_name": course.display_name_with_default,
             "course_org": course.display_org_with_default,
             "course_num": course.display_number_with_default,
@@ -1106,18 +1104,15 @@ class ICRVReverifyView(View):
         """
         try:
             user = request.user
-            now = datetime.datetime.now(UTC)
             course_id = CourseKey.from_string(course_id)
             checkpoint = VerificationCheckpoint.get_verification_checkpoint(course_id, checkpoint_name)
             if checkpoint is None:
                 raise VerificationCheckpointException
-
+            init_verification = SoftwareSecurePhotoVerification.get_initial_verification(user)
+            if not init_verification:
+                return redirect(reverse('verify_student_verify_later', kwargs={'course_id': unicode(course_id)}))
             b64_face_image = request.POST['face_image'].split(",")[1]
-
-            # TODO: How to get this window for new implementation. I think window is in VerificationBlock
-            window = MidcourseReverificationWindow.get_window(course_id, now)
-
-            attempt = SoftwareSecurePhotoVerification(user=request.user, window=window)
+            attempt = SoftwareSecurePhotoVerification(user=request.user)
             attempt.upload_face_image(b64_face_image.decode('base64'))
             attempt.fetch_photo_id_image()
             attempt.mark_ready()
@@ -1125,8 +1120,9 @@ class ICRVReverifyView(View):
             attempt.save()
             attempt.submit()
 
-            VerificationStatus.objects.create(checkpoint=checkpoint, user=user, status="started")
             checkpoint.add_verification_attempt(attempt)
+
+            VerificationStatus.add_verification_status(checkpoint, user, "submitted")
 
             return HttpResponseRedirect(reverse('verify_student_incourse_reverification_confirmation'))
 

@@ -34,7 +34,7 @@ from shoppingcart.models import Order, CertificateItem
 from embargo.test_utils import restrict_course
 from util.testing import UrlResetMixin
 from verify_student.views import render_to_response, PayAndVerifyView
-from verify_student.models import SoftwareSecurePhotoVerification
+from verify_student.models import SoftwareSecurePhotoVerification, VerificationCheckpoint
 from reverification.tests.factories import MidcourseReverificationWindowFactory
 
 
@@ -1640,3 +1640,62 @@ class TestReverificationBanner(ModuleStoreTestCase):
         self.client.post(reverse('verify_student_toggle_failed_banner_off'))
         photo_verification = SoftwareSecurePhotoVerification.objects.get(user=self.user, window=self.window)
         self.assertFalse(photo_verification.display)
+
+
+class TestInCourseReverifyView(ModuleStoreTestCase):
+    """
+    Tests for the incourse reverification views.
+    """
+    def setUp(self):
+        super(TestInCourseReverifyView, self).setUp()
+
+        self.user = UserFactory.create(username="rusty", password="test")
+        self.client.login(username="rusty", password="test")
+        self.course_key = SlashSeparatedCourseKey("Robot", "999", "Test_Course")
+        CourseFactory.create(org='Robot', number='999', display_name='Test Course')
+
+        # patcher = patch('student.models.tracker')
+        # self.mock_tracker = patcher.start()
+        # self.addCleanup(patcher.stop)
+
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+    def test_incourse_reverify_invalid_course_get(self):
+        url = reverse('verify_student_incourse_reverify',
+                      kwargs={"course_id": "invalid/course/key", "checkpoint_name": "midterm"})
+        response = self.client.get(url)
+
+        self.assertEquals(response.status_code, 404)
+
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+    def test_incourse_reverify_invalid_checkpoint_get(self):
+        url = reverse('verify_student_incourse_reverify',
+                      kwargs={"course_id": "invalid/course/key", "checkpoint_name": "midterm"})
+        response = self.client.get(url)
+
+        self.assertEquals(response.status_code, 404)
+
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+    def test_incourse_reverify_initial_redirect_get(self):
+        self._create_checkpoint()
+        url = reverse('verify_student_incourse_reverify',
+                      kwargs={"course_id": unicode(self.course_key), "checkpoint_name": "midterm"})
+        response = self.client.get(url)
+        url = reverse('verify_student_verify_later',
+                      kwargs={"course": unicode(self.course_key)})
+        self.assertRedirects(response, url)
+
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+    def test_incourse_reverify_get(self):
+        self._create_checkpoint()
+        attempt = SoftwareSecurePhotoVerification(user=self.user)
+        attempt.submit()
+        attempt.save()
+        url = reverse('verify_student_incourse_reverify',
+                      kwargs={"course_id": unicode(self.course_key), "checkpoint_name": "midterm"})
+        response = self.client.get(url)
+
+        self.assertEquals(response.status_code, 200)
+
+    def _create_checkpoint(self):
+        checkpoint = VerificationCheckpoint(course_id=self.course_key, checkpoint_name="midterm")
+        checkpoint.save()

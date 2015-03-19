@@ -641,6 +641,17 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         query = cls.objects.filter(user=user, window=None).order_by('-updated_at')
         return query[0]
 
+    @classmethod
+    def get_initial_verification(cls, user):
+        try:
+            init_verification = cls.objects.order_by("-created_at").get(
+                user=user, status__in=["submitted", "approved"],
+                windows=None
+            )
+        except cls.DoesNotExist:
+            init_verification = None
+        return init_verification
+
     @status_before_must_be("created")
     def upload_face_image(self, img_data):
         """
@@ -930,3 +941,7 @@ class VerificationStatus(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     response = models.TextField(null=True, blank=True)
     error = models.TextField(null=True, blank=True)
+
+    @classmethod
+    def add_verification_status(cls, checkpoint, user, status):
+        cls.objects.create(checkpoint=checkpoint, user=user, status=status)
