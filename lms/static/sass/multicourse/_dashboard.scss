@@ -20,7 +20,7 @@
       width: flex-grid(12);
       background: $dashboard-profile-color;
 
-      h2.user-name {
+      .user-name {
         overflow: hidden;
         margin: 0;
         padding: ($baseline*0.75) ($baseline/2);
