@@ -52,7 +52,8 @@
       width: flex-grid(10,12);
     }
 
-    .nav-actions {
+    .nav-actions,
+    .msg-actions {
       width: flex-grid(2,12);
       display: inline-block;
       vertical-align: middle;
