@@ -23,6 +23,7 @@ from unittest.case import SkipTest, TestCase
 
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
+from xblock.core import XBlock
 
 from opaque_keys.edx.locations import Location
 
@@ -329,7 +330,12 @@ class TestStudentView(XBlockWrapperTestMixin, TestCase):
     This tests that student_view and XModule.get_html produce the same results.
     """
     def skip_if_invalid(self, descriptor_cls):
-        if descriptor_cls.module_class.student_view != XModule.student_view:
+        pure_xblock_class = issubclass(descriptor_cls, XBlock) and not issubclass(descriptor_cls, XModuleDescriptor)
+        if pure_xblock_class:
+            student_view = descriptor_cls.student_view
+        else:
+            student_view = descriptor_cls.module_class.student_view
+        if student_view != XModule.student_view:
             raise SkipTest(descriptor_cls.__name__ + " implements student_view")
 
     def check_property(self, descriptor):
@@ -350,7 +356,10 @@ class TestStudioView(XBlockWrapperTestMixin, TestCase):
         if descriptor_cls in NOT_STUDIO_EDITABLE:
             raise SkipTest(descriptor_cls.__name__ + " is not editable in studio")
 
-        if descriptor_cls.studio_view != XModuleDescriptor.studio_view:
+        pure_xblock_class = issubclass(descriptor_cls, XBlock) and not issubclass(descriptor_cls, XModuleDescriptor)
+        if pure_xblock_class:
+            raise SkipTest(descriptor_cls.__name__ + " is a pure XBlock and implements studio_view")
+        elif descriptor_cls.studio_view != XModuleDescriptor.studio_view:
             raise SkipTest(descriptor_cls.__name__ + " implements studio_view")
 
     def check_property(self, descriptor):
