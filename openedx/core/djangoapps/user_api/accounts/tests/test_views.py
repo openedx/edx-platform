@@ -13,7 +13,7 @@ from django.test.utils import override_settings
 from rest_framework.test import APITestCase, APIClient
 
 from student.tests.factories import UserFactory
-from student.models import UserProfile, PendingEmailChange
+from student.models import UserProfile, LanguageProficiency, PendingEmailChange
 from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KEY
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from .. import PRIVATE_VISIBILITY, ALL_USERS_VISIBILITY
@@ -91,6 +91,7 @@ class UserAPITestCase(APITestCase):
         legacy_profile.gender = "f"
         legacy_profile.bio = "Tired mother of twins"
         legacy_profile.has_profile_image = True
+        legacy_profile.language_proficiencies.add(LanguageProficiency(code='en'))
         legacy_profile.save()
 
 
@@ -138,7 +139,7 @@ class TestAccountAPI(UserAPITestCase):
         self.assertEqual("US", data["country"])
         self._verify_profile_image_data(data, True)
         self.assertIsNone(data["time_zone"])
-        self.assertIsNone(data["languages"])
+        self.assertEqual([{"code": "en"}], data["language_proficiencies"])
         self.assertEqual("Tired mother of twins", data["bio"])
 
     def _verify_private_account_response(self, response, requires_parental_consent=False):
@@ -159,7 +160,6 @@ class TestAccountAPI(UserAPITestCase):
         self.assertEqual(self.user.username, data["username"])
         self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
         self.assertEqual("US", data["country"])
-        self.assertEqual("", data["language"])
         self.assertEqual("f", data["gender"])
         self.assertEqual(2000, data["year_of_birth"])
         self.assertEqual("m", data["level_of_education"])
@@ -171,6 +171,7 @@ class TestAccountAPI(UserAPITestCase):
         self.assertEqual("Tired mother of twins", data["bio"])
         self._verify_profile_image_data(data, not requires_parental_consent)
         self.assertEquals(requires_parental_consent, data["requires_parental_consent"])
+        self.assertEqual([{"code": "en"}], data["language_proficiencies"])
 
     def test_anonymous_access(self):
         """
@@ -279,7 +280,6 @@ class TestAccountAPI(UserAPITestCase):
                 self.assertIsNone(data[empty_field])
             self.assertIsNone(data["country"])
             # TODO: what should the format of this be?
-            self.assertEqual("", data["language"])
             self.assertEqual("m", data["gender"])
             self.assertEqual("Learn a lot", data["goals"])
             self.assertEqual(self.user.email, data["email"])
@@ -287,6 +287,7 @@ class TestAccountAPI(UserAPITestCase):
             self.assertEqual(self.user.is_active, data["is_active"])
             self._verify_profile_image_data(data, False)
             self.assertTrue(data["requires_parental_consent"])
+            self.assertEqual([], data["language_proficiencies"])
 
         self.client.login(username=self.user.username, password=self.test_password)
         verify_get_own_information()
@@ -347,7 +348,6 @@ class TestAccountAPI(UserAPITestCase):
         ("year_of_birth", 2009, "not_an_int", u"Enter a whole number."),
         ("name", "bob", "z" * 256, u"Ensure this value has at most 255 characters (it has 256)."),
         ("name", u"ȻħȺɍłɇs", "z   ", u"The name field must be at least 2 characters long."),
-        ("language", "Creole"),
         ("goals", "Smell the roses"),
         ("mailing_address", "Sesame Street"),
         ("bio", "Lacrosse-playing superhero"),
@@ -355,6 +355,7 @@ class TestAccountAPI(UserAPITestCase):
         # Note that we store the raw data, so it is up to client to escape the HTML.
         ("bio", "<html>fancy text</html>"),
         # Note that email is tested below, as it is not immediately updated.
+        # Note that language_proficiencies is tested below as there are multiple error and success conditions.
     )
     @ddt.unpack
     def test_patch_account(self, field, value, fails_validation_value=None, developer_validation_message=None):
@@ -535,6 +536,42 @@ class TestAccountAPI(UserAPITestCase):
         )
         self.assertEqual("Valid e-mail address required.", field_errors["email"]["user_message"])
 
+    def test_patch_language_proficiencies(self):
+        """
+        Verify that patching the language_proficiencies field of the user
+        profile completely overwrites the previous value.
+        """
+        client = self.login_client("client", "user")
+
+        # Patching language_proficiencies exercises the
+        # `LanguageProficiencySerializer.get_identity` method, which compares
+        # identifies language proficiencies based on their language code rather
+        # than django model id.
+        for proficiencies in ([{"code": "en"}, {"code": "fr"}, {"code": "es"}], [{"code": "fr"}], [{"code": "aa"}], []):
+            self.send_patch(client, {"language_proficiencies": proficiencies})
+            response = self.send_get(client)
+            self.assertItemsEqual(response.data["language_proficiencies"], proficiencies)
+
+    @ddt.data(
+        (u"not_a_list", [{u'non_field_errors': [u'Expected a list of items.']}]),
+        ([u"not_a_JSON_object"], [{u'non_field_errors': [u'Invalid data']}]),
+        ([{}], [{"code": [u"This field is required."]}]),
+        ([{u"code": u"invalid_language_code"}], [{'code': [u'Select a valid choice. invalid_language_code is not one of the available choices.']}]),
+        ([{u"code": u"kw"}, {u"code": u"el"}, {u"code": u"kw"}], [u'The language_proficiencies field must consist of unique languages']),
+    )
+    @ddt.unpack
+    def test_patch_invalid_language_proficiencies(self, patch_value, expected_error_message):
+        """
+        Verify we handle error cases when patching the language_proficiencies
+        field.
+        """
+        client = self.login_client("client", "user")
+        response = self.send_patch(client, {"language_proficiencies": patch_value}, expected_status=400)
+        self.assertEqual(
+            response.data["field_errors"]["language_proficiencies"]["developer_message"],
+            u"Value '{patch_value}' is not valid for field 'language_proficiencies': {error_message}".format(patch_value=patch_value, error_message=expected_error_message)
+        )
+
     @patch('openedx.core.djangoapps.user_api.accounts.serializers.AccountUserSerializer.save')
     def test_patch_serializer_save_fails(self, serializer_save):
         """
@@ -566,10 +603,53 @@ class TestAccountAPI(UserAPITestCase):
                 "image_url_full": "http://testserver/profile_images/default_50.jpg",
                 "image_url_small": "http://testserver/profile_images/default_10.jpg"
             }
-        )     
+        )
 
+    @ddt.data(
+        ("client", "user", True),
+        ("different_client", "different_user", False),
+        ("staff_client", "staff_user", True),
+    )
+    @ddt.unpack
+    def test_parental_consent(self, api_client, requesting_username, has_full_access):
+        """
+        Verifies that under thirteens never return a public profile.
+        """
+        client = self.login_client(api_client, requesting_username)
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+        # Set the user to be ten years old with a public profile
+        legacy_profile = UserProfile.objects.get(id=self.user.id)
+        current_year = datetime.datetime.now().year
+        legacy_profile.year_of_birth = current_year - 10
+        legacy_profile.save()
+        set_user_preference(self.user, ACCOUNT_VISIBILITY_PREF_KEY, ALL_USERS_VISIBILITY)
+
+        # Verify that the default view is still private (except for clients with full access)
+        response = self.send_get(client)
+        if has_full_access:
+            data = response.data
+            self.assertEqual(15, len(data))
+            self.assertEqual(self.user.username, data["username"])
+            self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
+            self.assertEqual(self.user.email, data["email"])
+            self.assertEqual(current_year - 10, data["year_of_birth"])
+            for empty_field in ("country", "level_of_education", "mailing_address", "bio"):
+                self.assertIsNone(data[empty_field])
+            self.assertEqual("m", data["gender"])
+            self.assertEqual("Learn a lot", data["goals"])
+            self.assertTrue(data["is_active"])
+            self.assertIsNotNone(data["date_joined"])
+            self._verify_profile_image_data(data, False)
+            self.assertTrue(data["requires_parental_consent"])
+        else:
+            self._verify_private_account_response(response, requires_parental_consent=True)
+
+        # Verify that the shared view is still private
+        response = self.send_get(client, query_parameters='view=shared')
+        self._verify_private_account_response(response, requires_parental_consent=True)
+
+        
+ @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestAccountAPITransactions(TransactionTestCase):
     """
     Tests the transactional behavior of the account API
