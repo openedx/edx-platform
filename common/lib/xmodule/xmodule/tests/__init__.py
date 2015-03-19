@@ -273,13 +273,19 @@ class BulkAssertionTest(unittest.TestCase):
                 self._manager.run_assertions()
                 self._manager = None
 
-    def _shorten(self, s):
-        if len(s) > self.BULK_ASSERT_MSG_LENGTH:
-            return s[:self.BULK_ASSERT_MSG_LENGTH - 3] + '...'
+    def _shorten(self, message):
+        """
+        Limit a message to a particular length.
+        """
+        if len(message) > self.BULK_ASSERT_MSG_LENGTH:
+            return message[:self.BULK_ASSERT_MSG_LENGTH - 3] + '...'
         else:
-            return s
+            return message
 
     def _append_error(self, message, error):
+        """
+        Appends the current exception to a list.
+        """
         exc_stack = inspect.stack()[2]
         err = self._shorten(unicode(error))
         if message is not None:
