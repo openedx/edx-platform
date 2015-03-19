@@ -123,6 +123,20 @@ class TestAccountApi(TestCase):
                 {"profile_image": {"has_image": "not_allowed", "image_url": "not_allowed"}}
             )
 
+        # Check the various language_proficiencies validation failures.
+        # language_proficiencies must be a list of dicts, each containing a
+        # unique 'code' key representing the language code.
+        with self.assertRaises(AccountValidationError):
+            update_account_settings(
+                self.user,
+                {"language_proficiencies": "not_a_list"}
+            )
+        with self.assertRaises(AccountValidationError):
+            update_account_settings(
+                self.user,
+                {"language_proficiencies": [{}]}
+            )
+
     def test_update_multiple_validation_errors(self):
         """Test that all validation errors are built up and returned at once"""
         # Send a read-only error, serializer error, and email validation error.
@@ -207,7 +221,6 @@ class AccountSettingsOnCreationTest(TestCase):
             'email': self.EMAIL,
             'name': u'',
             'gender': None,
-            'language': u'',
             'goals': None,
             'is_active': False,
             'level_of_education': None,
@@ -221,6 +234,7 @@ class AccountSettingsOnCreationTest(TestCase):
                 'image_url_small': 'http://example-storage.com/profile_images/default_10.jpg',
             },
             'requires_parental_consent': True,
+            'language_proficiencies': [],
         })
 
 

@@ -1589,3 +1589,19 @@ class EntranceExamConfiguration(models.Model):
             except EntranceExamConfiguration.DoesNotExist:
                 can_skip = False
         return can_skip
+
+
+class LanguageProficiency(models.Model):
+    """
+    Represents a user's language proficiency.
+    """
+    class Meta:
+        unique_together = (('code', 'user_profile'),)
+
+    user_profile = models.ForeignKey(UserProfile, db_index=True, related_name='language_proficiencies')
+    code = models.CharField(
+        max_length=16,
+        blank=False,
+        choices=settings.ALL_LANGUAGES,
+        help_text=ugettext_lazy("The ISO 639-1 language code for this language.")
+    )

@@ -59,8 +59,6 @@ class AccountView(APIView):
                     * "none" signifying "None"
                     * "o" signifying "Other"
 
-                * language: null or name of preferred language
-
                 * country: null (not set), or a Country corresponding to one of the ISO 3166-1 countries
 
                 * mailing_address: null or textual representation of mailing address
@@ -76,6 +74,12 @@ class AccountView(APIView):
                     * "image_url_*": absolute URL to various sizes of a user's profile image, where '*' matches a
                         representation of the corresponding image size such as 'small', 'medium', 'large', and 'full'.
                         These are configurable via PROFILE_IMAGE_SIZES_MAP.
+
+                * requires_parental_consent: true if the user is a minor requiring parental consent
+
+                * language_proficiencies: array of language preferences.  Each preference is a JSON object with the
+                    following keys:
+                    * "code": string ISO 639-1 language code e.g. "en".
 
             For all text fields, clients rendering the values should take care to HTML escape them to avoid
             script injections, as the data is stored exactly as specified. The intention is that plain text is
