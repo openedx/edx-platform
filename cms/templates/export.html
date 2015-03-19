@@ -1,5 +1,12 @@
 <%inherit file="base.html" />
-<%def name="online_help_token()"><% return "export" %></%def>
+<%def name="online_help_token()">
+<% 
+if library:
+    return "export_library" 
+else:
+    return "export_course"
+%>
+</%def>
 <%namespace name='static' file='static_content.html'/>
 
 <%!
