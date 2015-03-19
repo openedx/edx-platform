@@ -226,39 +226,40 @@ def run_main_task(entry_id, task_fcn, action_name):
 
     """
 
-    # get the InstructorTask to be updated.  If this fails, then let the exception return to Celery.
+    # Get the InstructorTask to be updated. If this fails then let the exception return to Celery.
     # There's no point in catching it here.
     entry = InstructorTask.objects.get(pk=entry_id)
+    entry.task_state = PROGRESS
+    entry.save_now()
 
-    # get inputs to use in this task from the entry:
+    # Get inputs to use in this task from the entry
     task_id = entry.task_id
     course_id = entry.course_id
     task_input = json.loads(entry.task_input)
 
-    # construct log message:
-    fmt = u'task "{task_id}": course "{course_id}" input "{task_input}"'
-    task_info_string = fmt.format(task_id=task_id, course_id=course_id, task_input=task_input)
-
-    TASK_LOG.info('Starting update (nothing %s yet): %s', action_name, task_info_string)
+    # Construct log message
+    fmt = u'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
+    task_info_string = fmt.format(task_id=task_id, entry_id=entry_id, course_id=course_id, task_input=task_input)
+    TASK_LOG.info(u'%s, Starting update (nothing %s yet)', task_info_string, action_name)
 
     # Check that the task_id submitted in the InstructorTask matches the current task
     # that is running.
     request_task_id = _get_current_task().request.id
     if task_id != request_task_id:
-        fmt = u'Requested task did not match actual task "{actual_id}": {task_info}'
-        message = fmt.format(actual_id=request_task_id, task_info=task_info_string)
+        fmt = u'{task_info}, Requested task did not match actual task "{actual_id}"'
+        message = fmt.format(task_info=task_info_string, actual_id=request_task_id)
         TASK_LOG.error(message)
         raise ValueError(message)
 
-    # Now do the work:
+    # Now do the work
     with dog_stats_api.timer('instructor_tasks.time.overall', tags=[u'action:{name}'.format(name=action_name)]):
         task_progress = task_fcn(entry_id, course_id, task_input, action_name)
 
-    # Release any queries that the connection has been hanging onto:
+    # Release any queries that the connection has been hanging onto
     reset_queries()
 
-    # log and exit, returning task_progress info as task result:
-    TASK_LOG.info('Finishing %s: final: %s', task_info_string, task_progress)
+    # Log and exit, returning task_progress info as task result
+    TASK_LOG.info(u'%s, Task type: %s, Finishing task: %s', task_info_string, action_name, task_progress)
     return task_progress
 
 
@@ -567,6 +568,15 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
     enrolled_students = CourseEnrollment.users_enrolled_in(course_id)
     task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 
+    fmt = u'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
+    task_info_string = fmt.format(
+        task_id=_xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None,
+        entry_id=_entry_id,
+        course_id=course_id,
+        task_input=_task_input
+    )
+    TASK_LOG.info(u'%s, Task type: %s, Starting task execution', task_info_string, action_name)
+
     course = get_course_by_id(course_id)
     cohorts_header = ['Cohort Name'] if course.is_cohorted else []
 
@@ -578,11 +588,33 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
     rows = []
     err_rows = [["id", "username", "error_msg"]]
     current_step = {'step': 'Calculating Grades'}
+
+    total_enrolled_students = enrolled_students.count()
+    student_counter = 0
+    TASK_LOG.info(
+        u'%s, Task type: %s, Current step: %s, Starting grade calculation for total students: %s',
+        task_info_string,
+        action_name,
+        current_step,
+        total_enrolled_students
+    )
     for student, gradeset, err_msg in iterate_grades_for(course_id, enrolled_students):
         # Periodically update task status (this is a cache write)
         if task_progress.attempted % status_interval == 0:
             task_progress.update_task_state(extra_meta=current_step)
         task_progress.attempted += 1
+
+        # Now add a log entry after certain intervals to get a hint that task is in progress
+        student_counter += 1
+        if student_counter % 1000 == 0:
+            TASK_LOG.info(
+                u'%s, Task type: %s, Current step: %s, Grade calculation in-progress for students: %s/%s',
+                task_info_string,
+                action_name,
+                current_step,
+                student_counter,
+                total_enrolled_students
+            )
 
         if gradeset:
             # We were able to successfully grade this student for this course.
@@ -625,9 +657,19 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
             task_progress.failed += 1
             err_rows.append([student.id, student.username, err_msg])
 
+    TASK_LOG.info(
+        u'%s, Task type: %s, Current step: %s, Grade calculation completed for students: %s/%s',
+        task_info_string,
+        action_name,
+        current_step,
+        student_counter,
+        total_enrolled_students
+    )
+
     # By this point, we've got the rows we're going to stuff into our CSV files.
     current_step = {'step': 'Uploading CSVs'}
     task_progress.update_task_state(extra_meta=current_step)
+    TASK_LOG.info(u'%s, Task type: %s, Current step: %s', task_info_string, action_name, current_step)
 
     # Perform the actual upload
     upload_csv_to_report_store(rows, 'grade_report', course_id, start_date)
@@ -637,6 +679,7 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
         upload_csv_to_report_store(err_rows, 'grade_report_err', course_id, start_date)
 
     # One last update before we close out...
+    TASK_LOG.info(u'%s, Task type: %s, Finalizing grade task', task_info_string, action_name)
     return task_progress.update_task_state(extra_meta=current_step)
 
 
