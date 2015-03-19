@@ -1066,6 +1066,7 @@ class ICRVReverifyView(View):
         """
         display this view
         """
+        user = request.user
         course_id = CourseKey.from_string(course_id)
         course = modulestore().get_course(course_id)
         if course is None:
@@ -1073,6 +1074,11 @@ class ICRVReverifyView(View):
         checkpoint = VerificationCheckpoint.get_verification_checkpoint(course_id, checkpoint_name)
         if checkpoint is None:
             raise Http404
+        try:
+            SoftwareSecurePhotoVerification.original_verification(user)
+        except IndexError:
+            path = reverse('verify_student_verify_later', kwargs={'course_id': unicode(course_id)})
+            return redirect(path)
         context = {
             "user_full_name": request.user.profile.name,
             "error": False,
@@ -1097,7 +1103,7 @@ class ICRVReverifyView(View):
             checkpoint = VerificationCheckpoint.get_verification_checkpoint(course_id, checkpoint_name)
             if checkpoint is None:
                 raise VerificationCheckpointException
-            # TODO: How to get this window for new implementation
+            # TODO: How to get this window for new implementation. I think window is in VerificationBlock
             window = MidcourseReverificationWindow.get_window(course_id, now)
             attempt = SoftwareSecurePhotoVerification(user=request.user, window=window)
             b64_face_image = request.POST['face_image'].split(",")[1]
@@ -1112,12 +1118,6 @@ class ICRVReverifyView(View):
             VerificationStatus.objects.create(checkpoint=checkpoint, user=user, status="started")
 
             return HttpResponseRedirect(reverse('verify_student_midcourse_reverification_confirmation'))
-
-        except WindowExpiredException:
-            log.exception(
-                "User {} attempted to re-verify, but the window expired before the attempt".format(request.user.id)
-            )
-            return HttpResponseRedirect(reverse('verify_student_reverification_window_expired'))
 
         except Exception:
             log.exception(
