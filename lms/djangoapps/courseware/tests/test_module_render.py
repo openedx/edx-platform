@@ -16,10 +16,12 @@ from django.contrib.auth.models import AnonymousUser
 from mock import MagicMock, patch, Mock
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from courseware.module_render import hash_resource
 from xblock.field_data import FieldData
 from xblock.runtime import Runtime
 from xblock.fields import ScopeIds
 from xblock.core import XBlock
+from xblock.fragment import Fragment
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from courseware import module_render as render
@@ -658,6 +660,53 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             ),
             result_fragment.content
         )
+
+
+class XBlockWithJsonInitData(XBlock):
+    """
+    Pure XBlock to use in tests, with JSON init data.
+    """
+    the_json_data = None
+
+    def student_view(self, context=None):       # pylint: disable=unused-argument
+        """
+        A simple view that returns just enough to test.
+        """
+        frag = Fragment(u"Hello there!")
+        frag.add_javascript(u'alert("Hi!");')
+        frag.initialize_js('ThumbsBlock', self.the_json_data)
+        return frag
+
+
+@ddt.ddt
+class JsonInitDataTest(ModuleStoreTestCase):
+    """Tests for JSON data injected into the JS init function."""
+
+    @ddt.data(
+        ({'a': 17}, '''{"a": 17}'''),
+        ({'xss': '</script>alert("XSS")'}, r'''{"xss": "<\/script>alert(\"XSS\")"}'''),
+    )
+    @ddt.unpack
+    @XBlock.register_temp_plugin(XBlockWithJsonInitData, identifier='withjson')
+    def test_json_init_data(self, json_data, json_output):
+        XBlockWithJsonInitData.the_json_data = json_data
+        mock_user = UserFactory()
+        mock_request = MagicMock()
+        mock_request.user = mock_user
+        course = CourseFactory()
+        descriptor = ItemFactory(category='withjson', parent=course)
+        field_data_cache = FieldDataCache([course, descriptor], course.id, mock_user)   # pylint: disable=no-member
+        module = render.get_module_for_descriptor(
+            mock_user,
+            mock_request,
+            descriptor,
+            field_data_cache,
+            course.id,                          # pylint: disable=no-member
+        )
+        html = module.render(STUDENT_VIEW).content
+        self.assertIn(json_output, html)
+        # No matter what data goes in, there should only be one close-script tag.
+        self.assertEqual(html.count("</script>"), 1)
 
 
 class ViewInStudioTest(ModuleStoreTestCase):
