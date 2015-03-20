@@ -139,7 +139,7 @@ def manage_modulestores(request, reload_dir=None, commit_id=None):
         for field in dumpfields:
             data = getattr(course, field, None)
             html += '<h3>%s</h3>' % field
-            if type(data) == dict:
+            if isinstance(data, dict):
                 html += '<ul>'
                 for k, v in data.items():
                     html += '<li>%s:%s</li>' % (escape(k), escape(v))

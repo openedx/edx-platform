@@ -37,7 +37,7 @@ class CoursesWithFriends(generics.ListAPIView):
 
         # Get friends from Facebook
         result = get_friends_from_facebook(serializer)
-        if type(result) != list:
+        if not isinstance(result, list):
             return result
 
         friends_that_are_edx_users = get_linked_edx_accounts(result)

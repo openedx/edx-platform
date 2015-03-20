@@ -46,7 +46,7 @@ class FriendsInCourse(generics.ListAPIView):
 
         # Get all the user's FB friends
         result = get_friends_from_facebook(serializer)
-        if type(result) != list:
+        if not isinstance(result, list):
             return result
 
         def is_member(friend, course_key):
