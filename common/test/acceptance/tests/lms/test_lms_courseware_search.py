@@ -4,6 +4,8 @@ Test courseware search
 import os
 import json
 
+from flaky import flaky
+
 from ..helpers import UniqueCourseTest
 from ...pages.common.logout import LogoutPage
 from ...pages.studio.utils import add_html_component, click_css, type_in_codemirror
@@ -165,6 +167,7 @@ class CoursewareSearchTest(UniqueCourseTest):
         self.courseware_search_page.search_for_term(self.SEARCH_STRING)
         assert self.SEARCH_STRING in self.courseware_search_page.search_results.html[0]
 
+    @flaky  # TODO fix this, see SOL-336
     def test_reindex(self):
         """
         Make sure new content gets reindexed on button press.
