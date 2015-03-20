@@ -9,6 +9,7 @@ import uuid
 import mock
 from urllib import urlencode
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.test import Client
@@ -16,11 +17,13 @@ from django.test.utils import override_settings
 
 from gradebook.models import StudentGradebook
 from student.models import UserProfile
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 TEST_API_KEY = str(uuid.uuid4())
 
+TEST_API_KEY = str(uuid.uuid4())
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
 class SecureClient(Client):
 
@@ -32,6 +35,7 @@ class SecureClient(Client):
         super(SecureClient, self).__init__(*args, **kwargs)
 
 
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @override_settings(EDX_API_KEY=TEST_API_KEY)
 @mock.patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': False,
                                                    'ADVANCED_SECURITY': False,
@@ -440,6 +444,10 @@ class OrganizationsApiTests(ModuleStoreTestCase):
 
     def test_organizations_metrics_get_courses_filter(self):
         users = []
+        course1 = CourseFactory.create(display_name="COURSE1", org="CRS1", run="RUN1")
+        course2 = CourseFactory.create(display_name="COURSE2", org="CRS2", run="RUN2")
+        course3 = CourseFactory.create(display_name="COURSE3", org="CRS3", run="RUN3")
+
         for i in xrange(1, 12):
             data = {
                 'email': 'test{}@example.com'.format(i),
@@ -454,9 +462,6 @@ class OrganizationsApiTests(ModuleStoreTestCase):
             user_id = response.data['id']
             user = User.objects.get(pk=user_id)
             users.append(user_id)
-            course1 = CourseFactory.create(display_name="COURSE1", org="CRS1", run="RUN1")
-            course2 = CourseFactory.create(display_name="COURSE2", org="CRS2", run="RUN2")
-            course3 = CourseFactory.create(display_name="COURSE3", org="CRS3", run="RUN3")
 
             # first six users are enrolled in course1, course2 and course3
             if i < 7:

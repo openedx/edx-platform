@@ -555,6 +555,14 @@ def get_course_cohort_settings(course_key):
         course_cohort_settings = migrate_cohort_settings(course)
     return course_cohort_settings
 
+
+class CohortConflict(Exception):
+    """
+    Raised when user to be added is already in another cohort in same course.
+    """
+    pass
+
+
 def get_course_cohort_names(course_key):
     """
     Return a list of the cohort names in a course.

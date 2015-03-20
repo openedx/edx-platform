@@ -9,6 +9,22 @@ from progress.models import CourseModuleCompletion
 from api_manager.management.commands import migrate_stage_prefix
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
+from django.conf import settings
+from django.contrib.auth.models import Group, User
+from django.test import TestCase
+from django.test.utils import override_settings
+
+from progress.models import CourseModuleCompletion
+from api_manager.management.commands import migrate_stage_prefix
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+
+from django.db import connection
+
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
+
+
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class MigrateCourseIdsTests(ModuleStoreTestCase):
     """
     Test suite for data migration script

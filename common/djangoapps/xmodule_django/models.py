@@ -105,7 +105,7 @@ class OpaqueKeyField(models.CharField):
             return None
 
         if isinstance(value, basestring):
-            return SlashSeparatedCourseKey.from_deprecated_string(value)
+            return self.KEY_CLASS.from_string(value)
         else:
             return value
 

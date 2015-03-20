@@ -2,14 +2,23 @@
 Run these tests @ Devstack:
     rake fasttest_lms[common/djangoapps/api_manager/management/commands/tests/test_migrate_orgdata.py]
 """
+from datetime import datetime
+import uuid
+
+from django.conf import settings
+from django.contrib.auth.models import Group, User
+from django.test import TestCase
+from django.test.utils import override_settings
 
 from django.contrib.auth.models import User
 from projects.management.commands import migrate_project_courseids_v2
 from projects.models import Project, Workgroup, WorkgroupReview, WorkgroupPeerReview, WorkgroupSubmission, WorkgroupSubmissionReview
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 
 
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class MigrateCourseIdsTests(ModuleStoreTestCase):
     """
     Test suite for data migration script

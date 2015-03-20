@@ -142,7 +142,7 @@ if FEATURES.get('DEBUG_TOOLBAR'):
     INSTALLED_APPS += (
         # Mongo perf stats
         'debug_toolbar_mongo',
-        )
+    )
 
 
 ########################### PIPELINE #################################
