@@ -3,7 +3,9 @@ Run these tests @ Devstack:
     rake fasttest_lms[common/djangoapps/api_manager/management/commands/tests/test_migrate_orgdata.py]
 """
 from datetime import datetime
+from django.test.utils import override_settings
 from mock import MagicMock, patch
+from unittest import skip
 import uuid
 
 from django.conf import settings
@@ -14,11 +16,15 @@ from courseware.model_data import FieldDataCache
 from gradebook.management.commands import generate_gradebook_entries
 from gradebook.models import StudentGradebook, StudentGradebookHistory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
 @patch.dict(settings.FEATURES, {'SIGNAL_ON_SCORE_CHANGED': True})
+
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
+@patch.dict("django.conf.settings.FEATURES", {'SIGNAL_ON_SCORE_CHANGED': False})
 class GenerateGradebookEntriesTests(ModuleStoreTestCase):
     """
     Test suite for grade generation script
@@ -27,7 +33,7 @@ class GenerateGradebookEntriesTests(ModuleStoreTestCase):
     def setUp(self):
 
         # Turn off the signalling mechanism temporarily
-        settings._wrapped.default_settings.FEATURES['SIGNAL_ON_SCORE_CHANGED'] = False
+        #settings._wrapped.default_settings.FEATURES['SIGNAL_ON_SCORE_CHANGED'] = False
 
         # Create a couple courses to work with
         self.course = CourseFactory.create(

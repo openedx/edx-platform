@@ -12,17 +12,19 @@ import json
 import mock
 from urllib import urlencode
 
+from django.conf import settings
 from django.core.cache import cache
 from django.test import Client
 from django.test.utils import override_settings
 from django.utils import timezone
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from api_manager.models import GroupRelationship, GroupProfile
 from organizations.models import Organization
 from projects.models import Project
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 TEST_API_KEY = str(uuid.uuid4())
 
 
@@ -34,6 +36,7 @@ class SecureClient(Client):
         super(SecureClient, self).__init__(*args, **kwargs)
 
 
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @override_settings(EDX_API_KEY=TEST_API_KEY)
 @mock.patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': False,
                                                    'ADVANCED_SECURITY': False,
@@ -970,7 +973,7 @@ class GroupsApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_group_courses_detail_delete_invalid_group(self):
-        test_uri = self.base_groups_uri + '/123987102/courses/123124'
+        test_uri = self.base_groups_uri + '/123987102/courses/org.invalid/course_000/Run_000'
         response = self.do_delete(test_uri)
         self.assertEqual(response.status_code, 204)
 
@@ -978,7 +981,7 @@ class GroupsApiTests(ModuleStoreTestCase):
         data = {'name': self.test_group_name, 'type': 'test'}
         response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(response.status_code, 201)
-        test_uri = response.data['uri'] + '/courses/123124'
+        test_uri = response.data['uri'] + '/courses/org.invalid/course_000/Run_000'
         response = self.do_delete(test_uri)
         self.assertEqual(response.status_code, 204)
 

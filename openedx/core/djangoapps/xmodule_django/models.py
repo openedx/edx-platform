@@ -12,6 +12,8 @@ from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
+log = logging.getLogger(__name__)
+
 
 class NoneToEmptyManager(models.Manager):
     """
