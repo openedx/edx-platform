@@ -295,13 +295,20 @@ class BulkAssertionTest(unittest.TestCase):
 
     def _wrap_assertion(self, assertion):
         @wraps(assertion)
+        @contextmanager
         def assert_(*args, **kwargs):
             try:
                 # Only wrap the first layer of assert functions by stashing away the manager
                 # before executing the assertion.
                 manager = self._manager
                 self._manager = None
-                assertion(*args, **kwargs)
+                context = assertion(*args, **kwargs)
+
+                # Handle the assertRaises family of functions by using a context manager,
+                # if one is returned without an exception being thrown.
+                if context is not None:
+                    with context:
+                        yield
             except AssertionError:  # pylint: disable=broad-except
                 if manager is not None:
                     # Reconstruct the stack in which the error was thrown (so that the traceback)
