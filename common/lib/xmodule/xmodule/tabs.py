@@ -126,7 +126,7 @@ class CourseTab(object):
         was implemented).
         """
 
-        if type(other) is dict and not self.validate(other, raise_error=False):
+        if isinstance(other, dict) and not self.validate(other, raise_error=False):
             # 'other' is a dict-type tab and did not validate
             return False
 

@@ -1560,7 +1560,7 @@ class AnnotationInput(InputTypeBase):
     def _unpack(self, json_value):
         """ Unpacks the json input state into a dict. """
         d = json.loads(json_value)
-        if type(d) != dict:
+        if not isinstance(d, dict):
             d = {}
 
         comment_value = d.get('comment', '')

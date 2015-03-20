@@ -30,7 +30,7 @@ class Note(models.Model):
             raise ValidationError('Note must have a body.')
 
         body = json.loads(json_body)
-        if not type(body) is dict:
+        if not isinstance(body, dict):
             raise ValidationError('Note body must be a dictionary.')
 
         # NOTE: all three of these fields should be considered user input

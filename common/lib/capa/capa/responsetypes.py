@@ -2505,7 +2505,7 @@ class FormulaResponse(LoncapaResponse):
         converted to float. Used so we can safely use Python contexts.
         """
         inp_d = dict([(k, numpy.complex(inp_d[k]))
-                      for k in inp_d if type(k) == str and
+                      for k in inp_d if isinstance(k, str) and
                       k.isalnum() and
                       isinstance(inp_d[k], numbers.Number)])
         return inp_d
@@ -2683,7 +2683,7 @@ class ImageResponse(LoncapaResponse):
             if correct_map[aid]['correctness'] != 'correct' and regions[aid]:
                 parsed_region = json.loads(regions[aid])
                 if parsed_region:
-                    if type(parsed_region[0][0]) != list:
+                    if not isinstance(parsed_region[0][0], list):
                         # we have [[1,2],[3,4],[5,6]] - single region
                         # instead of [[[1,2],[3,4],[5,6], [[1,2],[3,4],[5,6]]]
                         # or [[[1,2],[3,4],[5,6]]] - multiple regions syntax
@@ -2833,7 +2833,7 @@ class AnnotationResponse(LoncapaResponse):
     def _unpack(self, json_value):
         """Unpacks a student response value submitted as JSON."""
         json_d = json.loads(json_value)
-        if type(json_d) != dict:
+        if not isinstance(json_d, dict):
             json_d = {}
 
         comment_value = json_d.get('comment', '')

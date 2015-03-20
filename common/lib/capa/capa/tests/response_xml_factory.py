@@ -823,7 +823,7 @@ class ChoiceTextResponseXMLFactory(ResponseXMLFactory):
         choice_inputs = []
         # Ensure that the first element of choices is an ordered
         # collection. It will start as a list, a tuple, or not a Container.
-        if type(choices[0]) not in [list, tuple]:
+        if not isinstance(choices[0], (list, tuple)):
             choices = [choices]
 
         for choice in choices:
@@ -838,7 +838,7 @@ class ChoiceTextResponseXMLFactory(ResponseXMLFactory):
 
                 # Make sure that `answers` is an ordered collection for
                 # convenience.
-                if type(answers) not in [list, tuple]:
+                if not isinstance(answers, (list, tuple)):
                     answers = [answers]
 
                 numtolerance_inputs = [
