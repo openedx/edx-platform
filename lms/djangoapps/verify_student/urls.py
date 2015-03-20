@@ -145,7 +145,7 @@ urlpatterns = patterns(
         name="verify_student_incourse_reverify"
     ),
     url(
-        r'^incourse_reverification_confirmation$',
+        r'^incourse_reverification_confirmation/$',
         views.incourse_reverification_confirmation,
         name="verify_student_incourse_reverification_confirmation"
     ),

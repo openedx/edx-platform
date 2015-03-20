@@ -34,6 +34,7 @@ var edx = edx || {};
         errorModel: errorView.model,
         displaySteps: el.data('display-steps'),
         currentStep: el.data('current-step'),
+        photossubmiturl: el.data('photos-submit-url'),
         stepInfo: {
             'intro-step': {
                 courseName: el.data('course-name'),

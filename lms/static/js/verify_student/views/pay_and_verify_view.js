@@ -26,6 +26,7 @@ var edx = edx || {};
 
         initialize: function( obj ) {
             this.errorModel = obj.errorModel || null;
+            this.photosubmit_url = obj.photossubmiturl || null;
             this.displaySteps = obj.displaySteps || [];
             this.initializeStepViews( obj.stepInfo || {} );
             this.currentStepIndex = _.indexOf(
@@ -62,6 +63,7 @@ var edx = edx || {};
             // one step to save photos and another step
             // to submit them.
             verificationModel = new edx.verify_student.VerificationModel();
+            verificationModel.set('submit_url', this.photosubmit_url);
 
             for ( i = 0; i < this.displaySteps.length; i++ ) {
                 stepName = this.displaySteps[i].name;
