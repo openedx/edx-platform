@@ -1,6 +1,6 @@
 """ HTTP-related entities. """
 
-from rest_framework.status import HTTP_503_SERVICE_UNAVAILABLE, HTTP_200_OK
+from rest_framework.status import HTTP_500_INTERNAL_SERVER_ERROR, HTTP_200_OK
 
 from util.json_request import JsonResponse
 
@@ -13,9 +13,13 @@ class DetailResponse(JsonResponse):
         super(DetailResponse, self).__init__(object=data, status=status)
 
 
-class ApiErrorResponse(DetailResponse):
-    """ Response returned when calls to the E-Commerce API fail or the returned data is invalid. """
+class InternalRequestErrorResponse(DetailResponse):
+    """ Response returned when an internal service request fails. """
 
-    def __init__(self):
-        message = 'Call to E-Commerce API failed. Order creation failed.'
-        super(ApiErrorResponse, self).__init__(message=message, status=HTTP_503_SERVICE_UNAVAILABLE)
+    def __init__(self, internal_message, internal_status):
+        message = (
+            'Call to E-Commerce API failed. Internal Request Status Code: '
+            '[{internal_status}], Internal Service Message: [{internal_message}]'
+            .format(internal_status=internal_status, internal_message=internal_message)
+        )
+        super(InternalRequestErrorResponse, self).__init__(message=message, status=HTTP_500_INTERNAL_SERVER_ERROR)

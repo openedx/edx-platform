@@ -48,10 +48,12 @@ class OrdersViewTests(EnrollmentEventTestMixin, EcommerceApiTestMixin, ModuleSto
         actual = json.loads(response.content)['detail']
         self.assertEqual(actual, expected_msg)
 
-    def assertValidEcommerceApiErrorResponse(self, response):
+    def assertValidEcommerceInternalRequestErrorResponse(self, response, internal_status):
         """ Asserts the response is a valid response sent when the E-Commerce API is unavailable. """
-        self.assertEqual(response.status_code, 503)
-        self.assertResponseMessage(response, 'Call to E-Commerce API failed. Order creation failed.')
+        self.assertEqual(response.status_code, 500)
+        actual = json.loads(response.content)['detail']
+        self.assertIn('Call to E-Commerce API failed', actual)
+        self.assertIn(str(internal_status), actual)
 
     def assertUserNotEnrolled(self):
         """ Asserts that the user is NOT enrolled in the course, and that an enrollment event was NOT fired. """
@@ -112,7 +114,7 @@ class OrdersViewTests(EnrollmentEventTestMixin, EcommerceApiTestMixin, ModuleSto
         with self.mock_create_order(side_effect=TimeoutError):
             response = self._post_to_view()
 
-        self.assertValidEcommerceApiErrorResponse(response)
+        self.assertValidEcommerceInternalRequestErrorResponse(response, 408)
         self.assertUserNotEnrolled()
 
     def test_ecommerce_api_error(self):
@@ -122,7 +124,7 @@ class OrdersViewTests(EnrollmentEventTestMixin, EcommerceApiTestMixin, ModuleSto
         with self.mock_create_order(side_effect=ApiError):
             response = self._post_to_view()
 
-        self.assertValidEcommerceApiErrorResponse(response)
+        self.assertValidEcommerceInternalRequestErrorResponse(response, 500)
         self.assertUserNotEnrolled()
 
     def _test_successful_ecommerce_api_call(self):
