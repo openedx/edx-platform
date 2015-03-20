@@ -56,7 +56,7 @@ def find_fixme(options):
         num_fixme += _count_pylint_violations(
             "{report_dir}/pylint_fixme.report".format(report_dir=report_dir))
 
-    print("Number of pylint fixmes: " + str(num_fixme))
+    print "Number of pylint fixmes: " + str(num_fixme)
 
 
 @task
@@ -75,7 +75,7 @@ def run_pylint(options):
     violations_limit = int(getattr(options, 'limit', -1))
     errors = getattr(options, 'errors', False)
     systems = getattr(options, 'system', ALL_SYSTEMS).split(',')
-    
+
     # Make sure the metrics subdirectory exists
     Env.METRICS_DIR.makedirs_p()
 
@@ -119,7 +119,7 @@ def run_pylint(options):
 
     # Print number of violations to log
     violations_count_str = "Number of pylint violations: " + str(num_violations)
-    print(violations_count_str)
+    print violations_count_str
 
     # Also write the number of violations to a file
     with open(Env.METRICS_DIR / "pylint", "w") as f:
@@ -139,7 +139,7 @@ def _count_pylint_violations(report_file):
     # An example string:
     # common/lib/xmodule/xmodule/tests/test_conditional.py:21: [C0111(missing-docstring), DummySystem] Missing docstring
     # More examples can be found in the unit tests for this method
-    pylint_pattern = re.compile(".(\d+):\ \[(\D\d+.+\]).")
+    pylint_pattern = re.compile(r".(\d+):\ \[(\D\d+.+\]).")
 
     for line in open(report_file):
         violation_list_for_line = pylint_pattern.split(line)
@@ -161,7 +161,7 @@ def _get_pep8_violations():
     report_dir = (Env.REPORT_DIR / 'pep8')
     report_dir.rmtree(ignore_errors=True)
     report_dir.makedirs_p()
-    
+
     # Make sure the metrics subdirectory exists
     Env.METRICS_DIR.makedirs_p()
 
@@ -191,31 +191,29 @@ def _pep8_violations(report_file):
 @cmdopts([
     ("system=", "s", "System to act on"),
 ])
-def run_pep8(options):
+def run_pep8(options):  # pylint: disable=unused-argument
     """
     Run pep8 on system code.
     Fail the task if any violations are found.
     """
     (count, violations_list) = _get_pep8_violations()
-    violations_str = ''.join(violations_list)
+    violations_list = ''.join(violations_list)
 
     # Print number of violations to log
     violations_count_str = "Number of pep8 violations: {count}".format(count=count)
-    print(violations_count_str)
-    print(violations_str)
+    print violations_count_str
+    print violations_list
 
     # Also write the number of violations to a file
     with open(Env.METRICS_DIR / "pep8", "w") as f:
         f.write(violations_count_str + '\n\n')
-        f.write(violations_str)
+        f.write(violations_list)
 
     # Fail if any violations are found
     if count:
-        raise Exception(
-            "Too many pep8 violations. Number of violations found: {count}.\n\n{violations}".format(
-                count=count, violations=violations_str
-            )
-        )
+        failure_string = "Too many pep8 violations. " + violations_count_str
+        failure_string += "\n\nViolations:\n{violations_list}".format(violations_list=violations_list)
+        raise Exception(failure_string)
 
 
 @task
@@ -257,9 +255,11 @@ def run_quality(options):
     dquality_dir = (Env.REPORT_DIR / "diff_quality").makedirs_p()
     diff_quality_percentage_failure = False
 
-    # Run pep8 directly since we have 0 violations on master
     def _pep8_output(count, violations_list, is_html=False):
-
+        """
+        Given a count & list of pep8 violations, pretty-print the pep8 output.
+        If `is_html`, will print out with HTML markup.
+        """
         if is_html:
             lines = ['<body>\n']
             sep = '-------------<br/>\n'
@@ -290,6 +290,7 @@ def run_quality(options):
 
         return ''.join(lines)
 
+    # Run pep8 directly since we have 0 violations on master
     (count, violations_list) = _get_pep8_violations()
 
     # Print number of violations to log
