@@ -7,13 +7,16 @@ Run like this:
 
 """
 
+import inspect
 import json
 import os
 import pprint
+import sys
+import traceback
 import unittest
-import inspect
 
 from contextlib import contextmanager
+from functools import wraps
 from lazy import lazy
 from mock import Mock
 from operator import attrgetter
@@ -239,12 +242,17 @@ class BulkAssertionManager(object):
     the failures at once, rather than only seeing single failures.
     """
     def __init__(self, test_case):
-        self._equal_assertions = []
+        self._assertion_errors = []
         self._test_case = test_case
 
+    def log_error(self, formatted_exc):
+        self._assertion_errors.append(formatted_exc)
+
     def run_assertions(self):
-        if len(self._equal_assertions) > 0:
-            raise AssertionError(self._equal_assertions)
+        if self._assertion_errors:
+            raise AssertionError("The following assertions were raised:\n{}".format(
+                "\n\n".join(self._assertion_errors)
+            ))
 
 
 class BulkAssertionTest(unittest.TestCase):
@@ -269,9 +277,12 @@ class BulkAssertionTest(unittest.TestCase):
             try:
                 self._manager = BulkAssertionManager(self)
                 yield
-            finally:
-                self._manager.run_assertions()
+            except Exception:
+                raise
+            else:
+                manager = self._manager
                 self._manager = None
+                manager.run_assertions()
 
     def _shorten(self, message):
         """
@@ -282,39 +293,56 @@ class BulkAssertionTest(unittest.TestCase):
         else:
             return message
 
-    def _append_error(self, message, error):
-        """
-        Appends the current exception to a list.
-        """
-        exc_stack = inspect.stack()[2]
-        err = self._shorten(unicode(error))
-        if message is not None:
-            message = self._shorten(message)
-            msg = '{} -> {}:{} -> {}'.format(message, exc_stack[1], exc_stack[2], err)
-        else:
-            msg = '{}:{} -> {}'.format(exc_stack[1], exc_stack[2], err)
-        self._manager._equal_assertions.append(msg)  # pylint: disable=protected-access
-
-    def assertEqual(self, expected, actual, message=None):
-        if self._manager is not None:
+    def _wrap_assertion(self, assertion):
+        @wraps(assertion)
+        def assert_(*args, **kwargs):
             try:
-                super(BulkAssertionTest, self).assertEqual(expected, actual, message)
-            except Exception as error:  # pylint: disable=broad-except
-                self._append_error(message, error)
-        else:
-            super(BulkAssertionTest, self).assertEqual(expected, actual, message)
-    assertEquals = assertEqual
+                # Only wrap the first layer of assert functions by stashing away the manager
+                # before executing the assertion.
+                manager = self._manager
+                self._manager = None
+                assertion(*args, **kwargs)
+            except AssertionError:  # pylint: disable=broad-except
+                if manager is not None:
+                    # Reconstruct the stack in which the error was thrown (so that the traceback)
+                    # isn't cut off at `assertion(*args, **kwargs)`.
+                    type, value, tb = sys.exc_info()
 
-    def assertIsNotNone(self, expr, message=None):
-        if self._manager is not None:
-            try:
-                super(BulkAssertionTest, self).assertIsNotNone(expr, message)
-            except Exception as error:  # pylint: disable=broad-except
-                self._append_error(message, error)
-        else:
-            super(BulkAssertionTest, self).assertIsNotNone(expr, message)
-    assertIsNotNone = assertIsNotNone
+                    # Count the number of stack frames before you get to a
+                    # unittest context (walking up the stack from here).
+                    relevant_frames = 0
+                    for frame_record in inspect.stack():
+                        # This is the same criterion used by unittest to decide if a
+                        # stack frame is relevant to exception printing.
+                        frame = frame_record[0]
+                        if '__unittest' in frame.f_globals:
+                            break
+                        relevant_frames += 1
 
+                    stack_above = traceback.extract_stack()[-relevant_frames:-1]
+
+                    stack_below = traceback.extract_tb(tb)
+                    formatted_stack = traceback.format_list(stack_above + stack_below)
+                    formatted_exc = traceback.format_exception_only(type, value)
+                    manager.log_error(
+                        "".join(formatted_stack + formatted_exc)
+                    )
+                else:
+                    raise
+            finally:
+                self._manager = manager
+        return assert_
+
+    def __getattribute__(self, name):
+        """
+        Wrap all assert* methods of this class using self._wrap_assertion,
+        to capture all assertion errors in bulk.
+        """
+        base_attr = super(BulkAssertionTest, self).__getattribute__(name)
+        if name.startswith('assert'):
+            return self._wrap_assertion(base_attr)
+        else:
+            return base_attr
 
 
 class LazyFormat(object):
@@ -477,6 +505,13 @@ class CourseComparisonTest(BulkAssertionTest):
                 for item in actual_items
             }
 
+            # Split Mongo and Old-Mongo disagree about what the block_id of courses is, so skip those in
+            # this comparison
+            self.assertItemsEqual(
+                [map_key(item.location) for item in expected_items if item.scope_ids.block_type != 'course'],
+                [key for key in actual_item_map.keys() if key[0] != 'course'],
+            )
+
             for expected_item in expected_items:
                 actual_item_location = actual_course_key.make_usage_key(expected_item.category, expected_item.location.block_id)
                 # split and old mongo use different names for the course root but we don't know which
@@ -490,7 +525,10 @@ class CourseComparisonTest(BulkAssertionTest):
                     actual_item = actual_item_map.get(map_key(actual_item_location))
 
                 # Formatting the message slows down tests of large courses significantly, so only do it if it would be used
-                self.assertIsNotNone(actual_item, LazyFormat(u'cannot find {} in {}', map_key(actual_item_location), actual_item_map))
+                self.assertIn(map_key(actual_item_location), actual_item_map.keys())
+
+                if actual_item is None:
+                    continue
 
                 # compare fields
                 self.assertEqual(expected_item.fields, actual_item.fields)
