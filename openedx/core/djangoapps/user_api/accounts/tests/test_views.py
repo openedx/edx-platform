@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 import ddt
 import hashlib
 import json
@@ -84,9 +85,10 @@ class UserAPITestCase(APITestCase):
         legacy_profile = UserProfile.objects.get(id=user.id)
         legacy_profile.country = "US"
         legacy_profile.level_of_education = "m"
-        legacy_profile.year_of_birth = 1900
+        legacy_profile.year_of_birth = 2000
         legacy_profile.goals = "world peace"
         legacy_profile.mailing_address = "Park Ave"
+        legacy_profile.gender = "f"
         legacy_profile.bio = "Tired mother of twins"
         legacy_profile.has_profile_image = True
         legacy_profile.save()
@@ -139,27 +141,27 @@ class TestAccountAPI(UserAPITestCase):
         self.assertIsNone(data["languages"])
         self.assertEqual("Tired mother of twins", data["bio"])
 
-    def _verify_private_account_response(self, response):
+    def _verify_private_account_response(self, response, requires_parental_consent=False):
         """
         Verify that only the public fields are returned if a user does not want to share account fields
         """
         data = response.data
         self.assertEqual(2, len(data))
         self.assertEqual(self.user.username, data["username"])
-        self._verify_profile_image_data(data, True)
+        self._verify_profile_image_data(data, not requires_parental_consent)
 
-    def _verify_full_account_response(self, response):
+    def _verify_full_account_response(self, response, requires_parental_consent=False):
         """
         Verify that all account fields are returned (even those that are not shareable).
         """
         data = response.data
-        self.assertEqual(14, len(data))
+        self.assertEqual(15, len(data))
         self.assertEqual(self.user.username, data["username"])
         self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
         self.assertEqual("US", data["country"])
         self.assertEqual("", data["language"])
-        self.assertEqual("m", data["gender"])
-        self.assertEqual(1900, data["year_of_birth"])
+        self.assertEqual("f", data["gender"])
+        self.assertEqual(2000, data["year_of_birth"])
         self.assertEqual("m", data["level_of_education"])
         self.assertEqual("world peace", data["goals"])
         self.assertEqual("Park Ave", data['mailing_address'])
@@ -167,7 +169,8 @@ class TestAccountAPI(UserAPITestCase):
         self.assertTrue(data["is_active"])
         self.assertIsNotNone(data["date_joined"])
         self.assertEqual("Tired mother of twins", data["bio"])
-        self._verify_profile_image_data(data, True)
+        self._verify_profile_image_data(data, not requires_parental_consent)
+        self.assertEquals(requires_parental_consent, data["requires_parental_consent"])
 
     def test_anonymous_access(self):
         """
@@ -269,7 +272,7 @@ class TestAccountAPI(UserAPITestCase):
         def verify_get_own_information():
             response = self.send_get(self.client)
             data = response.data
-            self.assertEqual(14, len(data))
+            self.assertEqual(15, len(data))
             self.assertEqual(self.user.username, data["username"])
             self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
             for empty_field in ("year_of_birth", "level_of_education", "mailing_address", "bio"):
@@ -283,6 +286,7 @@ class TestAccountAPI(UserAPITestCase):
             self.assertIsNotNone(data["date_joined"])
             self.assertEqual(self.user.is_active, data["is_active"])
             self._verify_profile_image_data(data, False)
+            self.assertTrue(data["requires_parental_consent"])
 
         self.client.login(username=self.user.username, password=self.test_password)
         verify_get_own_information()
@@ -406,8 +410,8 @@ class TestAccountAPI(UserAPITestCase):
                 "Field '{0}' cannot be edited.".format(field_name), data["field_errors"][field_name]["user_message"]
             )
 
-        for field_name in ["username", "date_joined", "is_active"]:
-            response = self.send_patch(client, {field_name: "will_error", "gender": "f"}, expected_status=400)
+        for field_name in ["username", "date_joined", "is_active", "profile_image", "requires_parental_consent"]:
+            response = self.send_patch(client, {field_name: "will_error", "gender": "o"}, expected_status=400)
             verify_error_response(field_name, response.data)
 
         # Make sure that gender did not change.
