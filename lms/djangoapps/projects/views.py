@@ -23,7 +23,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 from xmodule.modulestore import Location, InvalidLocationError
 from xmodule.modulestore.django import modulestore
 from openedx.core.djangoapps.course_groups.cohorts import (
-    add_cohort, add_user_to_cohort, get_cohort_by_name, remove_user_from_cohort
+    add_cohort, add_user_to_cohort, get_cohort_by_name, remove_user_from_cohort,
 )
 
 from .models import Project, Workgroup, WorkgroupSubmission

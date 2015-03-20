@@ -7,6 +7,7 @@ Run these tests @ Devstack:
 import json
 import uuid
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.test import Client
@@ -16,7 +17,9 @@ from projects.models import Project, Workgroup, WorkgroupSubmission
 from student.models import anonymous_id_for_user
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 TEST_API_KEY = str(uuid.uuid4())
 
 
@@ -30,6 +33,7 @@ class SecureClient(Client):
         super(SecureClient, self).__init__(*args, **kwargs)
 
 
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @override_settings(EDX_API_KEY=TEST_API_KEY)
 class SubmissionReviewsApiTests(ModuleStoreTestCase):
 

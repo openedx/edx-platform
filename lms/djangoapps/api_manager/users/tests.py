@@ -16,6 +16,7 @@ from edx_notifications.lib.consumer import get_notifications_count_for_user
 from edx_notifications.lib.publisher import register_notification_type, publish_notification_to_user
 import mock
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
@@ -27,6 +28,7 @@ from django.utils.translation import ugettext as _
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware import module_render
 from courseware.model_data import FieldDataCache
+from courseware.tests.factories import StudentModuleFactory
 from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
 from instructor.access import allow_access
 from notification_prefs import NOTIFICATION_PREF_KEY
@@ -39,8 +41,15 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from django.contrib.auth.models import User
 from openedx.core.djangoapps.user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.models import UserPreference
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
+from xmodule.modulestore import Location
+
+from django.contrib.auth.models import User
 from notification_prefs import NOTIFICATION_PREF_KEY
 
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 TEST_API_KEY = str(uuid.uuid4())
 
 
@@ -71,6 +80,7 @@ class SecureClient(Client):
 
 
 @override_settings(DEBUG=True)
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @override_settings(EDX_API_KEY=TEST_API_KEY)
 @override_settings(PASSWORD_MIN_LENGTH=4)
 @override_settings(API_PAGE_SIZE=10)
@@ -1247,7 +1257,7 @@ class UsersApiTests(ModuleStoreTestCase):
     def test_user_courses_grades_list_get(self):
         user_id = self.user.id
 
-        course = CourseFactory.create(org='TUCGLG', run='TUCGLG1')
+        course = CourseFactory.create(org='TUCGLG', run='TUCGLG1', display_name="Robot Super Course")
         test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
         chapter1 = ItemFactory.create(
             category="chapter",

@@ -133,7 +133,7 @@ if FEATURES.get('DEBUG_TOOLBAR'):
     INSTALLED_APPS += (
         # Mongo perf stats
         'debug_toolbar_mongo',
-        )
+    )
 
 
 ########################### PIPELINE #################################
@@ -154,14 +154,6 @@ CC_PROCESSOR = {
         "PROFILE_ID": 'edx',
     }
 }
-
-########################### EDX API #################################
-
-FEATURES['API'] = True
-
-########################## USER API ########################
-EDX_API_KEY = None
-
 
 ########################### External REST APIs #################################
 FEATURES['ENABLE_OAUTH2_PROVIDER'] = True

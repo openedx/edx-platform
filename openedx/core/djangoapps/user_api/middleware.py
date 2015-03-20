@@ -7,9 +7,8 @@ from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from track.contexts import COURSE_REGEX
-
 from .models import UserCourseTag
+from util.request import COURSE_REGEX
 
 
 class UserTagsEventContextMiddleware(object):

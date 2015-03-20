@@ -6,6 +6,8 @@ from datetime import datetime
 import uuid
 import time
 
+from django.conf import settings
+from django.test.utils import override_settings
 from django.db.models.signals import post_save
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
@@ -13,11 +15,14 @@ from progress.management.commands import generate_progress_entries
 from progress.models import StudentProgress, StudentProgressHistory, CourseModuleCompletion
 from progress.signals import handle_cmc_post_save_signal
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from api_manager.models import CourseModuleCompletion
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+import progress.signals
+
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
 
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class GenerateProgressEntriesTests(ModuleStoreTestCase):
     """
     Test suite for progress generation script
