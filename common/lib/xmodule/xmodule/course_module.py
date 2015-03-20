@@ -399,44 +399,47 @@ class CourseFields(object):
         scope=Scope.settings,
         default=[
             {
-                "short_description": _("Getting Started With Studio"),
+                "short_description": _("Course Introduction"),
                 "items": [
                     {
-                        "short_description": _("Add Course Team Members"),
+                        "short_description": _("Provide a welcome message"),
                         "long_description": _(
-                            "Grant your collaborators permission to edit your course so you can work together."
+                            "Welcome learners with a message on the Course Info page, the first page "
+                            "shown when your course is accessed."
                         ),
                         "is_checked": False,
-                        "action_url": "ManageUsers",
-                        "action_text": _("Edit Course Team"),
+                        "action_url": "CourseUpdates",
+                        "action_text": _("View Course Updates"),
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Set Important Dates for Your Course"),
+                        "short_description": _("Direct learners to edX DemoX"),
                         "long_description": _(
-                            "Establish your course's student enrollment and launch dates on the Schedule and Details "
-                            "page."
+                            "Include a link to edX DemoX, the online course that introduces learners to the edX system, "
+                            "in the first week of the course."
                         ),
                         "is_checked": False,
-                        "action_url": "SettingsDetails",
-                        "action_text": _("Edit Course Details &amp; Schedule"),
+                        "action_url": "https://www.edx.org/course/demox-edx-demox-1",
+                        "action_text": "Go to edX DemoX",
+                        "action_external": True,
+                    },
+                    {
+                        "short_description": _("Prompt learners to begin"),
+                        "long_description": _(
+                            "Guide learners to the Courseware tab by adding a prompt to the Course Info page. "
+                            "For example, \"To get started, click \"Courseware\" at the top of the page.\""
+                        ),
+                        "is_checked": False,
+                        "action_url": "CourseUpdates",
+                        "action_text": _("View Course Updates"),
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Draft Your Course's Grading Policy"),
+                        "short_description": _("Tell learners how to get help"),
                         "long_description": _(
-                            "Set up your assignment types and grading policy even if you haven't created all your "
-                            "assignments."
-                        ),
-                        "is_checked": False,
-                        "action_url": "SettingsGrading",
-                        "action_text": _("Edit Grading Settings"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Explore the Other Studio Checklists"),
-                        "long_description": _(
-                            "Discover other available course authoring tools, and find help when you need it."
+                            "Provide your learners with information about ways to get help. For example, on the Course Info page "
+                            "include \"To get help with the course, click the Discussion tab and post a question. To get help "
+                            "with a technical problem, click FAQ at the bottom of the page.\""
                         ),
                         "is_checked": False,
                         "action_url": "",
@@ -446,152 +449,309 @@ class CourseFields(object):
                 ],
             },
             {
-                "short_description": _("Draft a Rough Course Outline"),
+                "short_description": _("Course Syllabus"),
                 "items": [
                     {
-                        "short_description": _("Create Your First Section and Subsection"),
-                        "long_description": _("Use your course outline to build your first Section and Subsection."),
-                        "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Set Section Release Dates"),
+                        "short_description": _("Identify course pre-requisites"),
                         "long_description": _(
-                            "Specify the release dates for each Section in your course. Sections become visible to "
-                            "students on their release dates."
+                            "State course prerequisites clearly in the syllabus."
                         ),
                         "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
+                        "action_url": "",
+                        "action_text": "",
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Designate a Subsection as Graded"),
+                        "short_description": _("Explain time commitments"),
                         "long_description": _(
-                            "Set a Subsection to be graded as a specific assignment type. Assignments within graded "
-                            "Subsections count toward a student's final grade."
+                            "Include an estimate of the time commitment needed for the course."
                         ),
                         "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
+                        "action_url": "",
+                        "action_text": "",
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Reordering Course Content"),
-                        "long_description": _("Use drag and drop to reorder the content in your course."),
-                        "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Renaming Sections"),
-                        "long_description": _("Rename Sections by clicking the Section name from the Course Outline."),
-                        "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Deleting Course Content"),
+                        "short_description": _("Explain course deadlines"),
                         "long_description": _(
-                            "Delete Sections, Subsections, or Units you don't need anymore. Be careful, as there is "
-                            "no Undo function."
+                            "Provide all course deadlines and due dates, and include an explanation of time "
+                            "zone differences."
                         ),
                         "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
+                        "action_url": "",
+                        "action_text": "",
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Add an Instructor-Only Section to Your Outline"),
+                        "short_description": _("Explain the grading policy"),
                         "long_description": _(
-                            "Some course authors find using a section for unsorted, in-progress work useful. To do "
-                            "this, create a section and set the release date to the distant future."
+                            "Describe the course grading policy including the grade needed to receive a certificate."
                         ),
                         "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
+                        "action_url": "",
+                        "action_text": "",
+                        "action_external": False,
+                    },
+                    {
+                        "short_description": _("Explain learning objectives"),
+                        "long_description": _(
+                            "State the learning objectives, the course goals, and the outcomes that learners can expect."
+                        ),
+                        "is_checked": False,
+                        "action_url": "",
+                        "action_text": "",
+                        "action_external": False,
+                    },
+                    {
+                        "short_description": _("Explain academic policy"),
+                        "long_description": _(
+                            "Describe the academic policy for the course."
+                        ),
+                        "is_checked": False,
+                        "action_url": "",
+                        "action_text": "",
+                        "action_external": False,
+                    },
+                    {
+                        "short_description": _("Explain expectations for participation"),
+                        "long_description": _(
+                            "Describe how learners participate in course discussions, and how participation affects the course experience."
+                        ),
+                        "is_checked": False,
+                        "action_url": "",
+                        "action_text": "",
+                        "action_external": False,
+                    },
+                    {
+                        "short_description": _("Provide discussion etiquette guidelines"),
+                        "long_description": _(
+                            "Provide guidelines for forum use and etiquette."
+                        ),
+                        "is_checked": False,
+                        "action_url": "",
+                        "action_text": "",
+                        "action_external": False,
+                    },
+                    {
+                        "short_description": _("Explain instructor/TA involvement"),
+                        "long_description": _(
+                            "Explain the roles of the instructors and teaching assistants, and estimate their level of involvement."
+                        ),
+                        "is_checked": False,
+                        "action_url": "",
+                        "action_text": "",
+                        "action_external": False,
+                    },
+                    {
+                        "short_description": _("Explain release schedule for course content"),
+                        "long_description": _(
+                            "Describe the schedule for releasing course content, and the expected frequency of course updates."
+                        ),
+                        "is_checked": False,
+                        "action_url": "",
+                        "action_text": "",
+                        "action_external": False,
+                    },
+                    {
+                        "short_description": _("Explain communication methods for course changes"),
+                        "long_description": _(
+                            "Identify how and when you will communicate changes that affect released course content to learners."
+                        ),
+                        "is_checked": False,
+                        "action_url": "",
+                        "action_text": "",
+                        "action_external": False,
+                    },
+                    {
+                        "short_description": _("Include a detailed course syllabus"),
+                        "long_description": _(
+                            "Upload a PDF and then create a page for it or add it as a course handout."
+                        ),
+                        "is_checked": False,
+                        "action_url": "CourseUpdates",
+                        "action_text": "View Course Updates",
                         "action_external": False,
                     },
                 ],
             },
             {
-                "short_description": _("Explore edX's Support Tools"),
+                "short_description": _("Course Structure and Design"),
                 "items": [
                     {
-                        "short_description": _("Explore the Studio Help Forum"),
+                        "short_description": _("Distribute exercises and instructional content"),
                         "long_description": _(
-                            "Access the Studio Help forum from the menu that appears when you click your user name "
-                            "in the top right corner of Studio."
+                            "Verify that the course design intersperses instructional content such as videos and text with exercises."
                         ),
                         "is_checked": False,
-                        "action_url": "http://help.edge.edx.org/",
-                        "action_text": _("Visit Studio Help"),
-                        "action_external": True,
+                        "action_url": "CourseOutline",
+                        "action_text": _("View Course Outline"),
+                        "action_external": False,
                     },
                     {
-                        "short_description": _("Enroll in edX 101"),
-                        "long_description": _("Register for edX 101, edX's primer for course creation."),
+                        "short_description": _("Review assignment questions"),
+                        "long_description": _(
+                            "Verify that the questions and prompts in assignment problems are articulated clearly."
+                        ),
                         "is_checked": False,
-                        "action_url": "https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about",
-                        "action_text": _("Register for edX 101"),
-                        "action_external": True,
+                        "action_url": "CourseOutline",
+                        "action_text": _("View Course Outline"),
+                        "action_external": False,
                     },
                     {
-                        "short_description": _("Download the Studio Documentation"),
-                        "long_description": _("Download the searchable Studio reference documentation in PDF form."),
+                        "short_description": _("Review assignment text for deadlines"),
+                        "long_description": _(
+                            "Verify that the text for every assignment includes the date that it is due."
+                        ),
                         "is_checked": False,
-                        "action_url": "http://files.edx.org/Getting_Started_with_Studio.pdf",
-                        "action_text": _("Download Documentation"),
-                        "action_external": True,
+                        "action_url": "CourseOutline",
+                        "action_text": _("View Course Outline"),
+                        "action_external": False,
                     },
                 ],
             },
             {
-                "short_description": _("Draft Your Course About Page"),
+                "short_description": _("Course Videos"),
                 "items": [
                     {
-                        "short_description": _("Draft a Course Description"),
+                        "short_description": _("Include videos"),
                         "long_description": _(
-                            "Courses on edX have an About page that includes a course video, description, and more. "
-                            "Draft the text students will read before deciding to enroll in your course."
+                            "Verify that your course includes video components."
                         ),
                         "is_checked": False,
-                        "action_url": "SettingsDetails",
-                        "action_text": _("Edit Course Schedule &amp; Details"),
+                        "action_url": "CourseOutline",
+                        "action_text": _("View Course Outline"),
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Add Staff Bios"),
+                        "short_description": _("Verify video quality"),
                         "long_description": _(
-                            "Showing prospective students who their instructor will be is helpful. "
-                            "Include staff bios on the course About page."
+                            "Use the Preview option to play course videos. Verify that video quality is consistent, "
+                            "and that audio levels are adequate and consistent."
                         ),
                         "is_checked": False,
-                        "action_url": "SettingsDetails",
-                        "action_text": _("Edit Course Schedule &amp; Details"),
+                        "action_url": "CourseOutline",
+                        "action_text": _("View Course Outline"),
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Add Course FAQs"),
-                        "long_description": _("Include a short list of frequently asked questions about your course."),
+                        "short_description": _("Provide transcripts"),
+                        "long_description": _(
+                            "Use the Preview option to play course videos. Verify that transcript files are available for every video "
+                            "file to describe all video and audio content."
+                        ),
                         "is_checked": False,
-                        "action_url": "SettingsDetails",
-                        "action_text": _("Edit Course Schedule &amp; Details"),
+                        "action_url": "CourseOutline",
+                        "action_text": _("View Course Outline"),
+                        "action_external": False,
+                    },
+                ],
+            },
+            {
+                "short_description": _("Other Instructional Material"),
+                "items": [
+                    {
+                        "short_description": _("Verify third-party material is freely available"),
+                        "long_description": _(
+                            "Verify that all content from third-party sources is integrated into the course material rather than linked "
+                            "to another site off-platform. In addition, verify that all content is freely available to leaners, for "
+                            "example, it is open source, in the public domain, or cleared or paid for by your organization."
+                        ),
+                        "is_checked": False,
+                        "action_url": "CourseOutline",
+                        "action_text": _("View Course Outline"),
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Add Course Prerequisites"),
+                        "short_description": _("Verify presentation of paid content (if applicable)"),
                         "long_description": _(
-                            "Let students know what knowledge and/or skills they should have before "
-                            "they enroll in your course."
+                            "If your course offers material that requires payment by leaners, verify that the paid material is not required "
+                            "to achieve learning goals and clearly marked as paid content."
                         ),
                         "is_checked": False,
-                        "action_url": "SettingsDetails",
-                        "action_text": _("Edit Course Schedule &amp; Details"),
+                        "action_url": "CourseOutline",
+                        "action_text": _("View Course Outline"),
+                        "action_external": False,
+                    },
+                    {
+                        "short_description": _("Clearly indicate off-platform content (if applicable)"),
+                        "long_description": _(
+                            "If your course includes a link to a third-party tool, verify that it is clear that the link will take learners "
+                            "to a site outside of your course and the edX platform, and that any terms of service required by that third party apply."
+                        ),
+                        "is_checked": False,
+                        "action_url": "CourseOutline",
+                        "action_text": _("View Course Outline"),
+                        "action_external": False,
+                    },
+                ],
+            },
+            {
+                "short_description": _("Learner Engagement"),
+                "items": [
+                    {
+                        "short_description": _("Send welcome email"),
+                        "long_description": _(
+                            "On the course start date, you agree to send a welcome email messages to learners."
+                        ),
+                        "is_checked": False,
+                        "action_url": "",
+                        "action_text": "",
+                        "action_external": False,
+                    },
+                    {
+                        "short_description": _("Encourage learners to introduce themselves"),
+                        "long_description": _(
+                            "On the Course Info page or in a course discussion post, ask learners to provide pertinent information about themselves."
+                        ),
+                        "is_checked": False,
+                        "action_url": "",
+                        "action_text": "",
+                        "action_external": False,
+                    },
+                    {
+                        "short_description": _("Send emails throughout course run"),
+                        "long_description": _(
+                            "At intervals throughout the course (once a week is recommended), you agree to send email messages to learners to "
+                            "communicate the release of new content, provide updates on course events, and so on."
+                        ),
+                        "is_checked": False,
+                        "action_url": "",
+                        "action_text": "",
+                        "action_external": False,
+                    },
+                    {
+                        "short_description": _("Send closing email"),
+                        "long_description": _(
+                            "Near the end date of the course, you agree to send a closing email message to learners with final course details."
+                        ),
+                        "is_checked": False,
+                        "action_url": "",
+                        "action_text": _(""),
+                        "action_external": False,
+                    },
+                ],
+            },
+             {
+                "short_description": _("Re-runs, reusability, and licensing"),
+                "items": [
+                    {
+                        "short_description": _("Clear IP issues"),
+                        "long_description": _(
+                            "All IP issues are cleared for the course and clearly documented."
+                        ),
+                        "is_checked": False,
+                        "action_url": "",
+                        "action_text": "",
+                        "action_external": False,
+                    },
+                    {
+                        "short_description": _("Complete Course Details worksheet"),
+                        "long_description": _(
+                            "Complete the Course Details worksheet which documents any IP issues or uses of third-party content or tools."
+                        ),
+                        "is_checked": False,
+                        "action_url": "",
+                        "action_text": "",
                         "action_external": False,
                     },
                 ],

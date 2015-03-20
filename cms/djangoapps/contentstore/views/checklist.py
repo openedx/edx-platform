@@ -115,6 +115,7 @@ def expand_checklist_action_url(course_module, checklist):
         "CourseOutline": "course_handler",
         "SettingsDetails": "settings_handler",
         "SettingsGrading": "grading_handler",
+        "CourseUpdates": "course_info_handler",
     }
 
     for item in expanded_checklist.get('items'):
