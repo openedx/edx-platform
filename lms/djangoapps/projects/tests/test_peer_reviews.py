@@ -8,17 +8,19 @@ import json
 import uuid
 from urllib import urlencode
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.test import TestCase, Client
 from django.test.utils import override_settings
 
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from projects.models import Project, Workgroup
 from student.models import anonymous_id_for_user
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 
 TEST_API_KEY = str(uuid.uuid4())
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
 
 class SecureClient(Client):
@@ -31,9 +33,9 @@ class SecureClient(Client):
         super(SecureClient, self).__init__(*args, **kwargs)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @override_settings(EDX_API_KEY=TEST_API_KEY)
-class PeerReviewsApiTests(TestCase):
+class PeerReviewsApiTests(ModuleStoreTestCase):
 
     """ Test suite for Users API views """
 

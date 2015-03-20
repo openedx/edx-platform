@@ -649,10 +649,11 @@ VIRTUAL_UNIVERSITIES = []
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore import prefer_xmodules
 from xmodule.x_module import XModuleMixin
+from xmodule.modulestore.edit_info import EditInfoMixin
 
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
-XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin)
+XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin, EditInfoMixin)
 
 # Allow any XBlock in the LMS
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
@@ -1995,6 +1996,9 @@ OPTIONAL_APPS = (
 
     # milestones
     'milestones',
+
+    'projects',
+    'organizations',
 )
 
 for app_name in OPTIONAL_APPS:

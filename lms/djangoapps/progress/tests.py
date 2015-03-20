@@ -13,16 +13,15 @@ from mock import MagicMock, patch
 from datetime import datetime
 from django.utils.timezone import UTC
 
-from django.test import TestCase
 from django.test.utils import override_settings
 from django.conf import settings
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from student.tests.factories import UserFactory, AdminFactory
 from courseware.tests.factories import StaffFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from progress.models import CourseModuleCompletion, StudentProgress, StudentProgressHistory
 from courseware.model_data import FieldDataCache
 from courseware import module_render
@@ -31,10 +30,13 @@ from util.signals import course_deleted
 from edx_notifications.startup import initialize as initialize_notifications
 from edx_notifications.lib.consumer import get_notifications_count_for_user
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
+
+
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @override_settings(STUDENT_GRADEBOOK=True)
 @patch.dict(settings.FEATURES, {'ENABLE_NOTIFICATIONS': True})
-class CourseModuleCompletionTests(TestCase):
+class CourseModuleCompletionTests(ModuleStoreTestCase):
     """ Test suite for CourseModuleCompletion """
 
     def get_module_for_user(self, user, course, problem):

@@ -8,7 +8,7 @@ from south.v2 import SchemaMigration
 from django.db import connection, models, transaction, IntegrityError
 
 from api_manager.models import GroupProfile
-from user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.models import UserPreference
 
 log = logging.getLogger(__name__)
 

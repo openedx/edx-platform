@@ -106,7 +106,7 @@ class OpaqueKeyField(models.CharField):
             return None
 
         if isinstance(value, basestring):
-            return SlashSeparatedCourseKey.from_deprecated_string(value)
+            return self.KEY_CLASS.from_string(value)
         else:
             return value
 
@@ -168,12 +168,15 @@ class LocationKeyField(UsageKeyField):
         super(LocationKeyField, self).__init__(*args, **kwargs)
 
 
-        if isinstance(value, basestring):
-            return Location.from_deprecated_string(value)
-        else:
-            return value
+class BlockTypeKeyField(OpaqueKeyField):
+    """
+    A django Field that stores a BlockTypeKey object as a string.
+    """
+    description = "A BlockTypeKey object, saved to the DB in the form of a string."
+    KEY_CLASS = BlockTypeKey
 
 
 add_introspection_rules([], [r"^xmodule_django\.models\.CourseKeyField"])
 add_introspection_rules([], [r"^xmodule_django\.models\.LocationKeyField"])
 add_introspection_rules([], [r"^xmodule_django\.models\.UsageKeyField"])
+add_introspection_rules([], [r"^xmodule_django\.models\.BlockTypeKeyField"])

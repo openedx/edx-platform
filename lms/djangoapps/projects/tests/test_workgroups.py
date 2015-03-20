@@ -9,20 +9,26 @@ import json
 import uuid
 from urllib import urlencode
 
+from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.core.cache import cache
 from django.test import TestCase, Client
 from django.test.utils import override_settings
 
 from api_manager.models import GroupProfile
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from projects.models import Project, Workgroup
 from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from course_groups.cohorts import (get_cohort_by_name, remove_user_from_cohort,
-                                   delete_empty_cohort, is_user_in_cohort, get_course_cohort_names)
-from course_groups.models import CourseUserGroup
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
+from openedx.core.djangoapps.course_groups.cohorts import (
+    get_cohort_by_name,
+    remove_user_from_cohort,
+    delete_empty_cohort,
+    is_user_in_cohort,
+    get_course_cohort_names,
+)
 
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 TEST_API_KEY = str(uuid.uuid4())
 
 
@@ -41,9 +47,9 @@ class SecureClient(Client):
         return super(SecureClient, self).put(*args, **kwargs)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @override_settings(EDX_API_KEY=TEST_API_KEY)
-class WorkgroupsApiTests(TestCase):
+class WorkgroupsApiTests(ModuleStoreTestCase):
 
     """ Test suite for Users API views """
 
