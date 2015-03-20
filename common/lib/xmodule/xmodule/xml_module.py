@@ -385,7 +385,8 @@ class XmlParserUtilMixin(object):
         xml_object = self.definition_to_xml(self.runtime.export_fs)
         self.clean_metadata_from_xml(xml_object)
 
-        # Set the tag so we get the file path right
+        # Set the tag on both nodes so we get the file path right.
+        xml_object.tag = self.category
         node.tag = self.category
 
         # Add the non-inherited metadata
@@ -415,6 +416,7 @@ class XmlParserUtilMixin(object):
         else:
             # Write all attributes from xml_object onto node
             node.clear()
+            node.tag = xml_object.tag
             node.text = xml_object.text
             node.tail = xml_object.tail
             node.attrib = xml_object.attrib
