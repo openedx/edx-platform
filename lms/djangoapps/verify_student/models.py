@@ -643,14 +643,9 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
     @classmethod
     def get_initial_verification(cls, user):
-        try:
-            init_verification = cls.objects.order_by("-created_at").get(
-                user=user, status__in=["submitted", "approved"],
-                window=None
-            )
-        except cls.DoesNotExist:
-            init_verification = None
-        return init_verification
+        init_verification = cls.objects.filter(user=user, status__in=["submitted", "approved"], window=None).\
+            order_by("-created_at")[0:1]
+        return init_verification[0] if init_verification else None
 
     @status_before_must_be("created")
     def upload_face_image(self, img_data):
@@ -945,3 +940,8 @@ class VerificationStatus(models.Model):
     @classmethod
     def add_verification_status(cls, checkpoint, user, status):
         cls.objects.create(checkpoint=checkpoint, user=user, status=status)
+
+    @classmethod
+    def add_status_from_checkpoints(cls, checkpoints, user, status):
+        for checkpoint in checkpoints:
+            cls.objects.create(checkpoint=checkpoint, user=user, status=status)
