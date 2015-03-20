@@ -458,4 +458,75 @@ class XmlDescriptor(XmlParserUtilMixin, XModuleDescriptor):
     """
     Mixin class for standardized parsing of XModule xml.
     """
-    pass
+
+    @classmethod
+    def from_xml(cls, xml_data, system, id_generator):
+        """
+        Creates an instance of this descriptor from the supplied xml_data.
+        This may be overridden by subclasses.
+
+        Args:
+            xml_data (str): A string of xml that will be translated into data and children
+                for this module
+
+            system (:class:`.XMLParsingSystem):
+
+            id_generator (:class:`xblock.runtime.IdGenerator`): Used to generate the
+                usage_ids and definition_ids when loading this xml
+
+        """
+        # Shim from from_xml to the parse_xml defined in XmlParserUtilMixin.
+        # This only exists to satisfy subclasses that both:
+        #    a) define from_xml themselves
+        #    b) call super(..).from_xml(..)
+        return super(XmlDescriptor, cls).parse_xml(
+            etree.fromstring(xml_data),
+            system,
+            None,  # This is ignored by XmlParserUtilMixin
+            id_generator,
+        )
+
+    @classmethod
+    def parse_xml(cls, node, runtime, keys, id_generator):
+        """
+        Interpret the parsed XML in `node`, creating an XModuleDescriptor.
+        """
+        if cls.from_xml != XmlDescriptor.from_xml:
+            # Skip the parse_xml from XmlParserUtilMixin to get
+            # the shim parse_xml from XModuleDescriptor which actually calls `from_xml`
+            return super(XmlParserUtilMixin, cls).parse_xml(node, runtime, keys, id_generator)
+        else:
+            return super(XmlDescriptor, cls).parse_xml(node, runtime, keys, id_generator)
+
+    def export_to_xml(self, resource_fs):
+        """
+        Returns an xml string representing this module, and all modules
+        underneath it.  May also write required resources out to resource_fs.
+
+        Assumes that modules have single parentage (that no module appears twice
+        in the same course), and that it is thus safe to nest modules as xml
+        children as appropriate.
+
+        The returned XML should be able to be parsed back into an identical
+        XModuleDescriptor using the from_xml method with the same system, org,
+        and course
+        """
+        # Shim from export_to_xml to the add_xml_to_node defined in XmlParserUtilMixin.
+        # This only exists to satisfy subclasses that both:
+        #    a) define export_to_xml themselves
+        #    b) call super(..).export_to_xml(..)
+        node = lxml.etree.Element(self.category)
+        super(XmlDescriptor, self).add_xml_to_node(node)
+        return node
+
+    def add_xml_to_node(self, node):
+        """
+        Export this :class:`XModuleDescriptor` as XML, by setting attributes on the provided
+        `node`.
+        """
+        if cls.export_to_xml != XmlDescriptor.export_to_xml:
+            # Skip the add_xml_to_node from XmlParserUtilMixin to get
+            # the shim add_xml_to_node from XModuleDescriptor which actually calls `export_to_xml`
+            super(XmlParserUtilMixin, self).add_xml_to_node(node)
+        else:
+            super(XmlDescriptor, self).add_xml_to_node(node)
