@@ -6,6 +6,7 @@ import logging
 import uuid
 import time
 import json
+import warnings
 from collections import defaultdict
 from pytz import UTC
 from ipware.ip import get_ip
@@ -43,6 +44,7 @@ from requests import HTTPError
 
 from social.apps.django_app import utils as social_utils
 from social.backends import oauth as social_oauth
+from social.exceptions import AuthException, AuthAlreadyAssociated
 
 from edxmako.shortcuts import render_to_response, render_to_string
 
@@ -1168,11 +1170,13 @@ def login_oauth_token(request, backend):
     retrieve information from a third party and matching that information to an
     existing user.
     """
+    warnings.warn("Please use AccessTokenExchangeView instead.", DeprecationWarning)
+
     backend = request.social_strategy.backend
     if isinstance(backend, social_oauth.BaseOAuth1) or isinstance(backend, social_oauth.BaseOAuth2):
         if "access_token" in request.POST:
             # Tell third party auth pipeline that this is an API call
-            request.session[pipeline.AUTH_ENTRY_KEY] = pipeline.AUTH_ENTRY_API
+            request.session[pipeline.AUTH_ENTRY_KEY] = pipeline.AUTH_ENTRY_LOGIN_API
             user = None
             try:
                 user = backend.do_auth(request.POST["access_token"])
@@ -1417,7 +1421,14 @@ def create_account_with_params(request, params):
         getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
     )
 
-    if third_party_auth.is_enabled() and pipeline.running(request):
+    # Boolean of whether a 3rd party auth provider and credentials were provided in
+    # the API so the newly created account can link with the 3rd party account.
+    #
+    # Note: this is orthogonal to the 3rd party authentication pipeline that occurs
+    # when the account is created via the browser and redirect URLs.
+    should_link_with_social_auth = third_party_auth.is_enabled() and 'provider' in params
+
+    if should_link_with_social_auth or (third_party_auth.is_enabled() and pipeline.running(request)):
         params["password"] = pipeline.make_random_password()
 
     # if doing signup for an external authorization, then get email, password, name from the eamap
@@ -1458,13 +1469,38 @@ def create_account_with_params(request, params):
         extended_profile_fields=extended_profile_fields,
         enforce_username_neq_password=True,
         enforce_password_policy=enforce_password_policy,
-        tos_required=tos_required
+        tos_required=tos_required,
     )
 
     with transaction.commit_on_success():
-        ret = _do_create_account(form)
+        # first, create the account
+        (user, profile, registration) = _do_create_account(form)
 
-    (user, profile, registration) = ret
+        # next, link the account with social auth, if provided
+        if should_link_with_social_auth:
+            request.social_strategy = social_utils.load_strategy(backend=params['provider'], request=request)
+            social_access_token = params.get('access_token')
+            if not social_access_token:
+                raise ValidationError({
+                    'access_token': [
+                        _("An access_token is required when passing value ({}) for provider.").format(
+                            params['provider']
+                        )
+                    ]
+                })
+            request.session[pipeline.AUTH_ENTRY_KEY] = pipeline.AUTH_ENTRY_REGISTER_API
+            pipeline_user = None
+            error_message = ""
+            try:
+                pipeline_user = request.social_strategy.backend.do_auth(social_access_token, user=user)
+            except AuthAlreadyAssociated:
+                error_message = _("The provided access_token is already associated with another user.")
+            except (HTTPError, AuthException):
+                error_message = _("The provided access_token is not valid.")
+            if not pipeline_user or not isinstance(pipeline_user, User):
+                # Ensure user does not re-enter the pipeline
+                request.social_strategy.clean_partial_pipeline()
+                raise ValidationError({'access_token': [error_message]})
 
     if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
         try:
@@ -1598,6 +1634,8 @@ def create_account(request, post_override=None):
     JSON call to create new edX account.
     Used by form in signup_modal.html, which is included into navigation.html
     """
+    warnings.warn("Please use RegistrationView instead.", DeprecationWarning)
+
     try:
         create_account_with_params(request, post_override or request.POST)
     except AccountValidationError as exc:

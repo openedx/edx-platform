@@ -4,26 +4,33 @@ import datetime
 import base64
 import json
 import re
+from unittest import skipUnless, SkipTest
+
+import ddt
+import httpretty
+from pytz import UTC
+import mock
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core import mail
 from django.contrib.auth.models import User
 from django.test import TestCase
+from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
-from unittest import skipUnless
-import ddt
-from pytz import UTC
-import mock
+
+from social.apps.django_app.default.models import UserSocialAuth
+
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from django_comment_common import models
+from student.tests.factories import UserFactory
+from third_party_auth.tests.testutil import simulate_running_pipeline
+from third_party_auth.tests.utils import (
+    ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
+)
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
-from student.tests.factories import UserFactory
-from unittest import SkipTest
-from django_comment_common import models
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from third_party_auth.tests.testutil import simulate_running_pipeline
-
 from ..accounts.api import get_account_settings
 from ..accounts import (
     NAME_MAX_LENGTH, EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH,
@@ -1544,6 +1551,148 @@ class RegistrationViewTest(ApiTestCase):
                     actual=actual_field[key]
                 )
             )
+
+
+@httpretty.activate
+@ddt.ddt
+class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin):
+    """
+    Tests for the User API registration endpoint with 3rd party authentication.
+    """
+    def setUp(self):
+        super(ThirdPartyRegistrationTestMixin, self).setUp(create_user=False)
+        self.url = reverse('user_api_registration')
+
+    def data(self, user=None):
+        """Returns the request data for the endpoint."""
+        return {
+            "provider": self.BACKEND,
+            "access_token": self.access_token,
+            "client_id": self.client_id,
+            "honor_code": "true",
+            "country": "US",
+            "username": user.username if user else "test_username",
+            "name": user.first_name if user else "test name",
+            "email": user.email if user else "test@test.com",
+        }
+
+    def _assert_existing_user_error(self, response):
+        """Assert that the given response was an error with the given status_code and error code."""
+        self.assertEqual(response.status_code, 409)
+        errors = json.loads(response.content)
+        for conflict_attribute in ["username", "email"]:
+            self.assertIn(conflict_attribute, errors)
+            self.assertIn("belongs to an existing account", errors[conflict_attribute][0]["user_message"])
+        self.assertNotIn("partial_pipeline", self.client.session)
+
+    def _assert_access_token_error(self, response, expected_error_message):
+        """Assert that the given response was an error for the access_token field with the given error message."""
+        self.assertEqual(response.status_code, 400)
+        response_json = json.loads(response.content)
+        self.assertEqual(
+            response_json,
+            {"access_token": [{"user_message": expected_error_message}]}
+        )
+        self.assertNotIn("partial_pipeline", self.client.session)
+
+    def _verify_user_existence(self, user_exists, social_link_exists, user_is_active=None, username=None):
+        """Verifies whether the user object exists."""
+        users = User.objects.filter(username=(username if username else "test_username"))
+        self.assertEquals(users.exists(), user_exists)
+        if user_exists:
+            self.assertEquals(users[0].is_active, user_is_active)
+            self.assertEqual(
+                UserSocialAuth.objects.filter(user=users[0], provider=self.BACKEND).exists(),
+                social_link_exists
+            )
+        else:
+            self.assertEquals(UserSocialAuth.objects.count(), 0)
+
+    def test_success(self):
+        self._verify_user_existence(user_exists=False, social_link_exists=False)
+
+        self._setup_provider_response(success=True)
+        response = self.client.post(self.url, self.data())
+        self.assertEqual(response.status_code, 200)
+
+        self._verify_user_existence(user_exists=True, social_link_exists=True, user_is_active=False)
+
+    def test_unlinked_active_user(self):
+        user = UserFactory()
+        response = self.client.post(self.url, self.data(user))
+        self._assert_existing_user_error(response)
+        self._verify_user_existence(
+            user_exists=True, social_link_exists=False, user_is_active=True, username=user.username
+        )
+
+    def test_unlinked_inactive_user(self):
+        user = UserFactory(is_active=False)
+        response = self.client.post(self.url, self.data(user))
+        self._assert_existing_user_error(response)
+        self._verify_user_existence(
+            user_exists=True, social_link_exists=False, user_is_active=False, username=user.username
+        )
+
+    def test_user_already_registered(self):
+        self._setup_provider_response(success=True)
+        user = UserFactory()
+        UserSocialAuth.objects.create(user=user, provider=self.BACKEND, uid=self.social_uid)
+        response = self.client.post(self.url, self.data(user))
+        self._assert_existing_user_error(response)
+        self._verify_user_existence(
+            user_exists=True, social_link_exists=True, user_is_active=True, username=user.username
+        )
+
+    def test_social_user_conflict(self):
+        self._setup_provider_response(success=True)
+        user = UserFactory()
+        UserSocialAuth.objects.create(user=user, provider=self.BACKEND, uid=self.social_uid)
+        response = self.client.post(self.url, self.data())
+        self._assert_access_token_error(response, "The provided access_token is already associated with another user.")
+        self._verify_user_existence(
+            user_exists=True, social_link_exists=True, user_is_active=True, username=user.username
+        )
+
+    def test_invalid_token(self):
+        self._setup_provider_response(success=False)
+        response = self.client.post(self.url, self.data())
+        self._assert_access_token_error(response, "The provided access_token is not valid.")
+        self._verify_user_existence(user_exists=False, social_link_exists=False)
+
+    def test_missing_token(self):
+        data = self.data()
+        data.pop("access_token")
+        response = self.client.post(self.url, data)
+        self._assert_access_token_error(
+            response,
+            "An access_token is required when passing value ({}) for provider.".format(self.BACKEND)
+        )
+        self._verify_user_existence(user_exists=False, social_link_exists=False)
+
+
+@skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
+class TestFacebookRegistrationView(
+    ThirdPartyRegistrationTestMixin, ThirdPartyOAuthTestMixinFacebook, TransactionTestCase
+):
+    """Tests the User API registration endpoint with Facebook authentication."""
+    def test_social_auth_exception(self):
+        """
+        According to the do_auth method in social.backends.facebook.py,
+        the Facebook API sometimes responds back a JSON with just False as value.
+        """
+        self._setup_provider_response_with_body(200, json.dumps("false"))
+        response = self.client.post(self.url, self.data())
+        self._assert_access_token_error(response, "The provided access_token is not valid.")
+        self._verify_user_existence(user_exists=False, social_link_exists=False)
+
+
+
+@skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
+class TestGoogleRegistrationView(
+    ThirdPartyRegistrationTestMixin, ThirdPartyOAuthTestMixinGoogle, TransactionTestCase
+):
+    """Tests the User API registration endpoint with Google authentication."""
+    pass
 
 
 @ddt.ddt

@@ -72,6 +72,7 @@ from django.shortcuts import redirect
 from social.apps.django_app.default import models
 from social.exceptions import AuthException
 from social.pipeline import partial
+from social.pipeline.social_auth import associate_by_email
 
 import student
 from embargo import api as embargo_api
@@ -111,6 +112,8 @@ AUTH_REDIRECT_KEY = 'next'
 AUTH_ENROLL_COURSE_ID_KEY = 'enroll_course_id'
 AUTH_EMAIL_OPT_IN_KEY = 'email_opt_in'
 
+
+# The following are various possible values for the AUTH_ENTRY_KEY.
 AUTH_ENTRY_DASHBOARD = 'dashboard'
 AUTH_ENTRY_LOGIN = 'login'
 AUTH_ENTRY_REGISTER = 'register'
@@ -122,7 +125,14 @@ AUTH_ENTRY_REGISTER = 'register'
 AUTH_ENTRY_LOGIN_2 = 'account_login'
 AUTH_ENTRY_REGISTER_2 = 'account_register'
 
-AUTH_ENTRY_API = 'api'
+# Entry modes into the authentication process by a remote API call (as opposed to a browser session).
+AUTH_ENTRY_LOGIN_API = 'login_api'
+AUTH_ENTRY_REGISTER_API = 'register_api'
+
+
+def is_api(auth_entry):
+    """Returns whether the auth entry point is via an API call."""
+    return (auth_entry == AUTH_ENTRY_LOGIN_API) or (auth_entry == AUTH_ENTRY_REGISTER_API)
 
 # URLs associated with auth entry points
 # These are used to request additional user information
@@ -157,7 +167,8 @@ _AUTH_ENTRY_CHOICES = frozenset([
     AUTH_ENTRY_LOGIN_2,
     AUTH_ENTRY_REGISTER_2,
 
-    AUTH_ENTRY_API,
+    AUTH_ENTRY_LOGIN_API,
+    AUTH_ENTRY_REGISTER_API,
 ])
 
 _DEFAULT_RANDOM_PASSWORD_LENGTH = 12
@@ -436,39 +447,11 @@ def parse_query_params(strategy, response, *args, **kwargs):
     if not (auth_entry and auth_entry in _AUTH_ENTRY_CHOICES):
         raise AuthEntryError(strategy.backend, 'auth_entry missing or invalid')
 
-    # Note: We expect only one member of this dictionary to be `True` at any
-    # given time. If something changes this convention in the future, please look
-    # at the `login_analytics` function in this file as well to ensure logging
-    # is still done properly
-    return {
-        # Whether the auth pipeline entered from /dashboard.
-        'is_dashboard': auth_entry == AUTH_ENTRY_DASHBOARD,
-        # Whether the auth pipeline entered from /login.
-        'is_login': auth_entry in [AUTH_ENTRY_LOGIN, AUTH_ENTRY_LOGIN_2],
-        # Whether the auth pipeline entered from /register.
-        'is_register': auth_entry in [AUTH_ENTRY_REGISTER, AUTH_ENTRY_REGISTER_2],
-        # Whether the auth pipeline entered from an API
-        'is_api': auth_entry == AUTH_ENTRY_API,
-    }
+    return {'auth_entry': auth_entry}
 
 
 @partial.partial
-def ensure_user_information(
-    strategy,
-    details,
-    response,
-    uid,
-    is_dashboard=None,
-    is_login=None,
-    is_profile=None,
-    is_register=None,
-    is_login_2=None,
-    is_register_2=None,
-    is_api=None,
-    user=None,
-    *args,
-    **kwargs
-):
+def ensure_user_information(strategy, auth_entry, user=None, *args, **kwargs):
     """
     Ensure that we have the necessary information about a user (either an
     existing account or registration data) to proceed with the pipeline.
@@ -485,32 +468,32 @@ def ensure_user_information(
     # It is important that we always execute the entire pipeline. Even if
     # behavior appears correct without executing a step, it means important
     # invariants have been violated and future misbehavior is likely.
-    user_inactive = user and not user.is_active
-    user_unset = user is None
-
-    dispatch_to_login = (
-        ((is_login or is_login_2) and (user_unset or user_inactive))
-        or
-        ((is_register or is_register_2) and user_inactive)
-    )
-    dispatch_to_register = (is_register or is_register_2) and user_unset
-    reject_api_request = is_api and (user_unset or user_inactive)
-
-    if reject_api_request:
-        # Content doesn't matter; we just want to exit the pipeline
-        return HttpResponseBadRequest()
-
-    if is_dashboard or is_profile:
-        return
-
-    # If the user has a linked account, but has not yet activated
-    # we should send them to the login page. The login page
-    # will tell them that they need to activate their account.
-    if dispatch_to_login:
+    def dispatch_to_login():
+        """Redirects to the login page."""
         return redirect(_create_redirect_url(AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN], strategy))
 
-    if dispatch_to_register:
+    def dispatch_to_register():
+        """Redirects to the registration page."""
         return redirect(_create_redirect_url(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER], strategy))
+
+    user_inactive = user and not user.is_active
+
+    if auth_entry in [AUTH_ENTRY_LOGIN_API, AUTH_ENTRY_REGISTER_API]:
+        if not user:
+            return HttpResponseBadRequest()
+
+    elif auth_entry in [AUTH_ENTRY_LOGIN, AUTH_ENTRY_LOGIN_2]:
+        if not user or user_inactive:
+            return dispatch_to_login()
+
+    elif auth_entry in [AUTH_ENTRY_REGISTER, AUTH_ENTRY_REGISTER_2]:
+        if not user:
+            return dispatch_to_register()
+        elif user_inactive:
+            # If the user has a linked account, but has not yet activated
+            # we should send them to the login page. The login page
+            # will tell them that they need to activate their account.
+            return dispatch_to_login()
 
 
 def _create_redirect_url(url, strategy):
@@ -543,7 +526,7 @@ def _create_redirect_url(url, strategy):
 
 
 @partial.partial
-def set_logged_in_cookie(backend=None, user=None, request=None, is_api=None, *args, **kwargs):
+def set_logged_in_cookie(backend=None, user=None, request=None, auth_entry=None, *args, **kwargs):
     """This pipeline step sets the "logged in" cookie for authenticated users.
 
     Some installations have a marketing site front-end separate from
@@ -568,7 +551,7 @@ def set_logged_in_cookie(backend=None, user=None, request=None, is_api=None, *ar
     to the next pipeline step.
 
     """
-    if user is not None and user.is_authenticated() and not is_api:
+    if not is_api(auth_entry) and user is not None and user.is_authenticated():
         if request is not None:
             # Check that the cookie isn't already set.
             # This ensures that we allow the user to continue to the next
@@ -588,27 +571,14 @@ def set_logged_in_cookie(backend=None, user=None, request=None, is_api=None, *ar
 
 
 @partial.partial
-def login_analytics(strategy, *args, **kwargs):
+def login_analytics(strategy, auth_entry, *args, **kwargs):
     """ Sends login info to Segment.io """
+
     event_name = None
-
-    action_to_event_name = {
-        'is_login': 'edx.bi.user.account.authenticated',
-        'is_dashboard': 'edx.bi.user.account.linked',
-        'is_profile': 'edx.bi.user.account.linked',
-
-        # Backwards compatibility: during an A/B test for the combined
-        # login/registration form, we introduced a new login end-point.
-        # Since users may continue to have this in their sessions after
-        # the test concludes, we need to continue accepting this action.
-        'is_login_2': 'edx.bi.user.account.authenticated',
-    }
-
-    # Note: we assume only one of the `action` kwargs (is_dashboard, is_login) to be
-    # `True` at any given time
-    for action in action_to_event_name.keys():
-        if kwargs.get(action):
-            event_name = action_to_event_name[action]
+    if auth_entry in [AUTH_ENTRY_LOGIN, AUTH_ENTRY_LOGIN_2]:
+        event_name = 'edx.bi.user.account.authenticated'
+    elif auth_entry in [AUTH_ENTRY_DASHBOARD]:
+        event_name = 'edx.bi.user.account.linked'
 
     if event_name is not None:
         tracking_context = tracker.get_tracker().resolve_context()
@@ -629,7 +599,7 @@ def login_analytics(strategy, *args, **kwargs):
 
 
 @partial.partial
-def change_enrollment(strategy, user=None, is_dashboard=False, *args, **kwargs):
+def change_enrollment(strategy, auth_entry=None, user=None, *args, **kwargs):
     """Enroll a user in a course.
 
     If a user entered the authentication flow when trying to enroll
@@ -649,10 +619,8 @@ def change_enrollment(strategy, user=None, is_dashboard=False, *args, **kwargs):
     (configured using the ?next parameter to the third party auth login url).
 
     Keyword Arguments:
+        auth_entry: The entry mode into the pipeline.
         user (User): The user being authenticated.
-        is_dashboard (boolean): Whether the user entered the authentication
-            pipeline from the "link account" button on the student dashboard.
-
     """
     # We skip enrollment if the user entered the flow from the "link account"
     # button on the student dashboard.  At this point, either:
@@ -665,7 +633,7 @@ def change_enrollment(strategy, user=None, is_dashboard=False, *args, **kwargs):
     # args when sending users to this page, successfully authenticating through this page
     # would also enroll the student in the course.
     enroll_course_id = strategy.session_get('enroll_course_id')
-    if enroll_course_id and not is_dashboard:
+    if enroll_course_id and auth_entry != AUTH_ENTRY_DASHBOARD:
         course_id = CourseKey.from_string(enroll_course_id)
         modes = CourseMode.modes_for_course_dict(course_id)
 
@@ -713,11 +681,34 @@ def change_enrollment(strategy, user=None, is_dashboard=False, *args, **kwargs):
             except (
                 CourseDoesNotExistException,
                 ItemAlreadyInCartException,
-                AlreadyEnrolledInCourseException
+                AlreadyEnrolledInCourseException,
             ):
                 pass
             # It's more important to complete login than to
             # ensure that the course was added to the shopping cart.
             # Log errors, but don't stop the authentication pipeline.
-            except Exception as ex:
+            except Exception as ex:  # pylint: disable=broad-except
                 logger.exception(ex)
+
+
+@partial.partial
+def associate_by_email_if_login_api(auth_entry, strategy, details, user, *args, **kwargs):
+    """
+    This pipeline step associates the current social auth with the user with the
+    same email address in the database.  It defers to the social library's associate_by_email
+    implementation, which verifies that only a single database user is associated with the email.
+
+    This association is done ONLY if the user entered the pipeline through a LOGIN API.
+    """
+    if auth_entry == AUTH_ENTRY_LOGIN_API:
+        association_response = associate_by_email(strategy, details, user, *args, **kwargs)
+        if (
+            association_response and
+            association_response.get('user') and
+            association_response['user'].is_active
+        ):
+            # Only return the user matched by email if their email has been activated.
+            # Otherwise, an illegitimate user can create an account with another user's
+            # email address and the legitimate user would now login to the illegitimate
+            # account.
+            return association_response
