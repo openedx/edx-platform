@@ -411,7 +411,7 @@ class XmlParserUtilMixin(object):
             filepath = self._format_filepath(self.category, url_path)
             self.runtime.export_fs.makedir(os.path.dirname(filepath), recursive=True, allow_recreate=True)
             with self.runtime.export_fs.open(filepath, 'w') as fileobj:
-                fileobj.write(etree.tostring(xml_object, pretty_print=True, encoding='utf-8'))
+                etree.ElementTree(xml_object).write(fileobj, pretty_print=True, encoding='utf-8')
         else:
             # Write all attributes from xml_object onto node
             node.clear()
