@@ -4,7 +4,6 @@ Test cases for the HTTP endpoints of the profile image api.
 from contextlib import closing
 import unittest
 
-import ddt
 from django.conf import settings
 from django.core.urlresolvers import reverse
 import mock
@@ -18,6 +17,7 @@ from student.tests.factories import UserFactory
 from ...user_api.accounts.api import set_has_profile_image, get_profile_image_names
 from ...user_api.accounts.helpers import get_profile_image_storage
 from ..images import create_profile_images, ImageValidationError
+from ..views import LOG_MESSAGE_CREATE, LOG_MESSAGE_DELETE
 from .helpers import make_image_file
 
 TEST_PASSWORD = "test"
@@ -91,15 +91,15 @@ class ProfileImageEndpointTestCase(APITestCase):
         self.assertEqual(profile.has_profile_image, has_profile_image)
 
 
-@ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
+@mock.patch('openedx.core.djangoapps.profile_images.views.log')
 class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
     """
     Tests for the profile_image upload endpoint.
     """
     _view_name = "profile_image_upload"
 
-    def test_unsupported_methods(self):
+    def test_unsupported_methods(self, mock_log):
         """
         Test that GET, PUT, PATCH, and DELETE are not supported.
         """
@@ -107,16 +107,18 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
         self.assertEqual(405, self.client.put(self.url).status_code)
         self.assertEqual(405, self.client.patch(self.url).status_code)
         self.assertEqual(405, self.client.delete(self.url).status_code)
+        self.assertFalse(mock_log.info.called)
 
-    def test_anonymous_access(self):
+    def test_anonymous_access(self, mock_log):
         """
         Test that an anonymous client (not logged in) cannot POST.
         """
         anonymous_client = APIClient()
         response = anonymous_client.post(self.url)
         self.assertEqual(401, response.status_code)
+        self.assertFalse(mock_log.info.called)
 
-    def test_upload_self(self):
+    def test_upload_self(self, mock_log):
         """
         Test that an authenticated user can POST to their own upload endpoint.
         """
@@ -125,8 +127,12 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
             self.check_response(response, 204)
             self.check_images()
             self.check_has_profile_image()
+        mock_log.info.assert_called_once_with(
+            LOG_MESSAGE_CREATE,
+            {'image_names': get_profile_image_names(self.user.username).values(), 'user_id': self.user.id}
+        )
 
-    def test_upload_other(self):
+    def test_upload_other(self, mock_log):
         """
         Test that an authenticated user cannot POST to another user's upload endpoint.
         """
@@ -138,8 +144,9 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
             self.check_response(response, 404)
             self.check_images(False)
             self.check_has_profile_image(False)
+        self.assertFalse(mock_log.info.called)
 
-    def test_upload_staff(self):
+    def test_upload_staff(self, mock_log):
         """
         Test that an authenticated staff cannot POST to another user's upload endpoint.
         """
@@ -151,8 +158,9 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
             self.check_response(response, 403)
             self.check_images(False)
             self.check_has_profile_image(False)
+        self.assertFalse(mock_log.info.called)
 
-    def test_upload_missing_file(self):
+    def test_upload_missing_file(self, mock_log):
         """
         Test that omitting the file entirely from the POST results in HTTP 400.
         """
@@ -164,8 +172,9 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
         )
         self.check_images(False)
         self.check_has_profile_image(False)
+        self.assertFalse(mock_log.info.called)
 
-    def test_upload_not_a_file(self):
+    def test_upload_not_a_file(self, mock_log):
         """
         Test that sending unexpected data that isn't a file results in HTTP
         400.
@@ -178,8 +187,9 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
         )
         self.check_images(False)
         self.check_has_profile_image(False)
+        self.assertFalse(mock_log.info.called)
 
-    def test_upload_validation(self):
+    def test_upload_validation(self, mock_log):
         """
         Test that when upload validation fails, the proper HTTP response and
         messages are returned.
@@ -197,9 +207,10 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
                 )
                 self.check_images(False)
                 self.check_has_profile_image(False)
+        self.assertFalse(mock_log.info.called)
 
     @patch('PIL.Image.open')
-    def test_upload_failure(self, image_open):
+    def test_upload_failure(self, image_open, mock_log):
         """
         Test that when upload validation fails, the proper HTTP response and
         messages are returned.
@@ -214,9 +225,11 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
             )
             self.check_images(False)
             self.check_has_profile_image(False)
+        self.assertFalse(mock_log.info.called)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
+@mock.patch('openedx.core.djangoapps.profile_images.views.log')
 class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
     """
     Tests for the profile_image remove endpoint.
@@ -230,7 +243,7 @@ class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
             self.check_images()
             set_has_profile_image(self.user.username, True)
 
-    def test_unsupported_methods(self):
+    def test_unsupported_methods(self, mock_log):
         """
         Test that GET, PUT, PATCH, and DELETE are not supported.
         """
@@ -238,8 +251,9 @@ class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
         self.assertEqual(405, self.client.put(self.url).status_code)
         self.assertEqual(405, self.client.patch(self.url).status_code)
         self.assertEqual(405, self.client.delete(self.url).status_code)
+        self.assertFalse(mock_log.info.called)
 
-    def test_anonymous_access(self):
+    def test_anonymous_access(self, mock_log):
         """
         Test that an anonymous client (not logged in) cannot call GET or POST.
         """
@@ -247,8 +261,9 @@ class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
         for request in (anonymous_client.get, anonymous_client.post):
             response = request(self.url)
             self.assertEqual(401, response.status_code)
+        self.assertFalse(mock_log.info.called)
 
-    def test_remove_self(self):
+    def test_remove_self(self, mock_log):
         """
         Test that an authenticated user can POST to remove their own profile
         images.
@@ -257,8 +272,12 @@ class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
         self.check_response(response, 204)
         self.check_images(False)
         self.check_has_profile_image(False)
+        mock_log.info.assert_called_once_with(
+            LOG_MESSAGE_DELETE,
+            {'image_names': get_profile_image_names(self.user.username).values(), 'user_id': self.user.id}
+        )
 
-    def test_remove_other(self):
+    def test_remove_other(self, mock_log):
         """
         Test that an authenticated user cannot POST to remove another user's
         profile images.
@@ -270,8 +289,9 @@ class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
         self.check_response(response, 404)
         self.check_images(True)  # thumbnails should remain intact.
         self.check_has_profile_image(True)
+        self.assertFalse(mock_log.info.called)
 
-    def test_remove_staff(self):
+    def test_remove_staff(self, mock_log):
         """
         Test that an authenticated staff user can POST to remove another user's
         profile images.
@@ -283,9 +303,13 @@ class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
         self.check_response(response, 204)
         self.check_images(False)
         self.check_has_profile_image(False)
+        mock_log.info.assert_called_once_with(
+            LOG_MESSAGE_DELETE,
+            {'image_names': get_profile_image_names(self.user.username).values(), 'user_id': self.user.id}
+        )
 
     @patch('student.models.UserProfile.save')
-    def test_remove_failure(self, user_profile_save):
+    def test_remove_failure(self, user_profile_save, mock_log):
         """
         Test that when upload validation fails, the proper HTTP response and
         messages are returned.
@@ -299,3 +323,4 @@ class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
         )
         self.check_images(True)  # thumbnails should remain intact.
         self.check_has_profile_image(True)
+        self.assertFalse(mock_log.info.called)
