@@ -35,7 +35,7 @@ git+https://github.com/mitocw/django-cas.git@60a5b8e5a62e63e0d5d224a87f0b489201a
 -e git+https://github.com/edx/ease.git@97de68448e5495385ba043d3091f570a699d5b5f#egg=ease
 -e git+https://github.com/edx/i18n-tools.git@193cebd9aa784f8899ef496f2aa050b08eff402b#egg=i18n-tools
 -e git+https://github.com/edx/edx-oauth2-provider.git@0.4.2#egg=oauth2-provider
--e git+https://github.com/edx/edx-val.git@fbec6efc86abb36f55de947baacc2092881dcde2#egg=edx-val
+-e git+https://github.com/edx/edx-val.git@64aa7637e3459fb3000a85a9e156880a40307dd1#egg=edx-val
 -e git+https://github.com/pmitros/RecommenderXBlock.git@9b07e807c89ba5761827d0387177f71aa57ef056#egg=recommender-xblock
 -e git+https://github.com/edx/edx-milestones.git@547f2250ee49e73ce8d7ff4e78ecf1b049892510#egg=edx-milestones
 -e git+https://github.com/edx/edx-search.git@264bb3317f98e9cb22b932aa11b89d0651fd741c#egg=edx-search
