@@ -36,6 +36,7 @@
     var input_id = input_id.replace("input_", "");
     this.setAttribute('id', input_id + '_mathjax');
     this.setAttribute('tabindex', '0');
+    this.setAttribute('aria-live', 'off');
     this.removeAttribute('role');
     this.removeAttribute('aria-readonly');
     });
