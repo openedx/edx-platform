@@ -2,6 +2,6 @@
 Paver==1.2.1
 psutil==1.2.1
 lazy==1.1
-path.py==3.0.1
+path.py==7.2
 watchdog==0.7.1
 python-memcached
