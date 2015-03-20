@@ -3,6 +3,7 @@
 """
 Acceptance tests for CMS Video Editor.
 """
+from flaky import flaky
 from nose.plugins.attrib import attr
 from .test_studio_video_module import CMSVideoBaseTest
 
@@ -40,6 +41,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.edit_component()
         self.assertTrue(self.video.verify_settings())
 
+    @flaky  # TODO fix this, see TNL-1750
     def test_modify_video_display_name(self):
         """
         Scenario: User can modify Video display name
