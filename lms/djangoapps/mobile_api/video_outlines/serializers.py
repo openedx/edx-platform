@@ -10,7 +10,7 @@ from courseware.module_render import get_module_for_descriptor
 from util.module_utils import get_dynamic_descriptor_children
 
 from edxval.api import (
-    get_video_info_for_course_and_profile, ValInternalError
+    get_video_info_for_course_and_profiles, ValInternalError
 )
 
 
@@ -18,7 +18,7 @@ class BlockOutline(object):
     """
     Serializes course videos, pulling data from VAL and the video modules.
     """
-    def __init__(self, course_id, start_block, block_types, request):
+    def __init__(self, course_id, start_block, block_types, request, video_profiles):
         """Create a BlockOutline using `start_block` as a starting point."""
         self.start_block = start_block
         self.block_types = block_types
@@ -26,8 +26,8 @@ class BlockOutline(object):
         self.request = request  # needed for making full URLS
         self.local_cache = {}
         try:
-            self.local_cache['course_videos'] = get_video_info_for_course_and_profile(
-                unicode(course_id), "mobile_low"
+            self.local_cache['course_videos'] = get_video_info_for_course_and_profiles(
+                unicode(course_id), video_profiles
             )
         except ValInternalError:  # pragma: nocover
             self.local_cache['course_videos'] = {}
@@ -159,7 +159,7 @@ def find_urls(course_id, block, child_to_parent, request):
     return unit_url, section_url
 
 
-def video_summary(course, course_id, video_descriptor, request, local_cache):
+def video_summary(video_profiles, course_id, video_descriptor, request, local_cache):
     """
     returns summary dict for the given video module
     """
@@ -186,15 +186,29 @@ def video_summary(course, course_id, video_descriptor, request, local_cache):
     val_video_info = local_cache['course_videos'].get(video_descriptor.edx_video_id, {})
     if val_video_info:
         video_url = val_video_info['url']
+    # Get encoded videos
+    video_data = local_cache['course_videos'].get(video_descriptor.edx_video_id, {})
+
+    # Get highest priority video to populate backwards compatible field
+    default_encoded_video = {}
+
+    if video_data:
+        for profile in video_profiles:
+            default_encoded_video = video_data['profiles'].get(profile, {})
+            if default_encoded_video:
+                break
+
+    if default_encoded_video:
+        video_url = default_encoded_video['url']
     # Then fall back to VideoDescriptor fields for video URLs
     elif video_descriptor.html5_sources:
         video_url = video_descriptor.html5_sources[0]
     else:
         video_url = video_descriptor.source
 
-    # If we have the video information from VAL, we also have duration and size.
-    duration = val_video_info.get('duration', None)
-    size = val_video_info.get('file_size', 0)
+    # Get duration/size, else default
+    duration = video_data.get('duration', None)
+    size = default_encoded_video.get('file_size', 0)
 
     # Transcripts...
     transcript_langs = video_descriptor.available_translations(verify_assets=False)
@@ -219,6 +233,9 @@ def video_summary(course, course_id, video_descriptor, request, local_cache):
         "size": size,
         "transcripts": transcripts,
         "language": video_descriptor.get_default_transcript_language(),
+        "category": video_descriptor.category,
+        "id": unicode(video_descriptor.scope_ids.usage_id),
+        "encoded_videos": video_data.get('profiles')
     }
     ret.update(always_available_data)
     return ret
