@@ -1097,18 +1097,6 @@ class InCourseReverifyView(View):
         current_step = display_steps[0]['name']
         expired_verified_course_mode, unexpired_paid_course_mode = PayAndVerifyView()._get_expired_verified_and_paid_mode(course_key)
 
-        # context = {
-        #     "user_full_name": request.user.profile.name,
-        #     "error": False,
-        #     "course_id": unicode(course_key),
-        #     "course_name": course.display_name_with_default,
-        #     "course_org": course.display_org_with_default,
-        #     "course_num": course.display_number_with_default,
-        #     "checkpoint_name": checkpoint_name,
-        # }
-        #
-        # return render_to_response("verify_student/midcourse_photo_reverification.html", context)
-
         context = {
             'contribution_amount': 10000,
             'course': course,
