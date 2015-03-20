@@ -92,7 +92,7 @@ def check_problem(step):
     # first scroll down so the loading mathjax button does not
     # cover up the Check button
     world.browser.execute_script("window.scrollTo(0,1024)")
-    world.css_click("input.check")
+    world.css_click("button.check")
 
     # Wait for the problem to finish re-rendering
     world.wait_for_ajax_complete()
@@ -115,7 +115,7 @@ def assert_problem_has_answer(step, problem_type, answer_class):
 
 @step(u'I reset the problem')
 def reset_problem(_step):
-    world.css_click('input.reset')
+    world.css_click('button.reset')
 
     # Wait for the problem to finish re-rendering
     world.wait_for_ajax_complete()
@@ -131,7 +131,7 @@ def press_the_button_with_label(_step, buttonname):
 
 @step(u'The "([^"]*)" button does( not)? appear')
 def action_button_present(_step, buttonname, doesnt_appear):
-    button_css = 'div.action input[value*="%s"]' % buttonname
+    button_css = 'div.action button[data-value*="%s"]' % buttonname
     if bool(doesnt_appear):
         assert world.is_css_not_present(button_css)
     else:
