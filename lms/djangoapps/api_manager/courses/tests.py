@@ -13,6 +13,7 @@ from urllib import urlencode
 from freezegun import freeze_time
 from dateutil.relativedelta import relativedelta
 
+from django.conf import settings
 from django.contrib.auth.models import Group
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
@@ -23,16 +24,22 @@ from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware import module_render
 from courseware.tests.factories import StudentModuleFactory
 from courseware.model_data import FieldDataCache
+from courseware.models import StudentModule
 from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
 from gradebook.models import StudentGradebook
 from instructor.access import allow_access
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from student.models import CourseEnrollment
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
+from xmodule.modulestore import ModuleStoreEnum
+from api_manager.courseware_access import get_course_key
 
 from .content import TEST_COURSE_OVERVIEW_CONTENT, TEST_COURSE_UPDATES_CONTENT, TEST_COURSE_UPDATES_CONTENT_LEGACY
 from .content import TEST_STATIC_TAB1_CONTENT, TEST_STATIC_TAB2_CONTENT
 
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 TEST_API_KEY = str(uuid.uuid4())
 USER_COUNT = 6
 SAMPLE_GRADE_DATA_COUNT = 4
@@ -45,14 +52,15 @@ class SecureClient(Client):
         kwargs.update({'SERVER_PORT': 443, 'wsgi.url_scheme': 'https'})
         super(SecureClient, self).__init__(*args, **kwargs)
 
+
 def _fake_get_course_social_stats(course_id, end_date=None):
     if end_date:
         raise Exception("Expected None for end_date parameter")
 
-    return {
-        '1': {'foo':'bar'},
-        '2': {'one': 'two'}
-    }
+    course_key = get_course_key(course_id)
+    users = CourseEnrollment.users_enrolled_in(course_key)
+    return {str(user.id):  {user.first_name: user.last_name} for user in users}
+
 
 def _fake_get_course_social_stats_date_expected(course_id, end_date=None):
     if not end_date:
@@ -71,6 +79,7 @@ def _fake_get_course_thread_stats(course_id):
 
 
 @mock.patch("api_manager.courses.views.get_course_thread_stats", _fake_get_course_thread_stats)
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @override_settings(EDX_API_KEY=TEST_API_KEY)
 @mock.patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': False,
                                                    'ADVANCED_SECURITY': False,
@@ -110,7 +119,7 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.course_end_date = timezone.now() + relativedelta(days=60)
         self.course = CourseFactory.create(
             start=self.course_start_date,
-            end=self.course_end_date
+            end=self.course_end_date,
         )
         self.test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
 
@@ -119,7 +128,7 @@ class CoursesApiTests(ModuleStoreTestCase):
             parent_location=self.course.location,
             data=self.test_data,
             due=self.course_end_date,
-            display_name="Overview"
+            display_name="Overview",
         )
 
         self.course_project = ItemFactory.create(
@@ -140,7 +149,7 @@ class CoursesApiTests(ModuleStoreTestCase):
             category="videosequence",
             parent_location=self.chapter.location,
             data=self.test_data,
-            display_name="Video_Sequence"
+            display_name="Video_Sequence",
         )
 
         self.course_content2 = ItemFactory.create(
@@ -492,7 +501,7 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(response.data), 0)
         self.assertIsNotNone(response.data['course_edit_method'])
-        self.assertIsNotNone(response.data['edited_by'])
+        self.assertEqual(response.data['edited_by'], ModuleStoreEnum.UserID.test)
 
     def test_course_content_detail_get_dashed_id(self):
         test_content_id = unicode(self.dash_unit.scope_ids.usage_id)
@@ -1628,13 +1637,19 @@ class CoursesApiTests(ModuleStoreTestCase):
         course = CourseFactory.create(
             start=datetime(2014, 6, 16, 14, 30)
         )
-        test_uri = '{}/{}/metrics/social/'.format(self.base_courses_uri, unicode(self.course.id))
+        USER_COUNT = 2
+        users = [UserFactory.create(username="coursesmetrics_user" + str(__), profile='test') for __ in xrange(USER_COUNT)]
+        for user in users:
+            CourseEnrollmentFactory.create(user=user, course_id=course.id)
+
+        test_uri = '{}/{}/metrics/social/'.format(self.base_courses_uri, unicode(course.id))
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(len(response.data.keys()), 2)
-        users = response.data['users']
-        self.assertTrue(users.get('1'))
-        self.assertTrue(users.get('2'))
+        result_users = response.data['users']
+        # expect all users are in result set
+        for user in users:
+            self.assertTrue(result_users.get(str(user.id)))
 
     def test_courses_metrics_grades_leaders_list_get(self):
         # make the last user an observer to asset that its content is being filtered out from
@@ -1758,7 +1773,7 @@ class CoursesApiTests(ModuleStoreTestCase):
             number='4033',
             name='leaders_by_completions',
             start=datetime(2014, 9, 16, 14, 30),
-            end=datetime(2020, 1, 16)
+            end=datetime(2015, 1, 16)
         )
 
         chapter = ItemFactory.create(
@@ -2085,7 +2100,7 @@ class CoursesApiTests(ModuleStoreTestCase):
 
         item2 = ItemFactory.create(
             parent_location=unit.location,
-            category='problem 2',
+            category='problem',
             data=StringResponseXMLFactory().build_xml(answer='bar'),
             display_name='Problem 2 for test timeseries',
             metadata={'rerandomize': 'always', 'graded': True, 'format': 'Final Exam'}
@@ -2128,7 +2143,7 @@ class CoursesApiTests(ModuleStoreTestCase):
                 # Last 2 users as those who have completed
                 if j >= USER_COUNT - 2:
                     second_module = self.get_module_for_user(user, course, item2)
-                    module.system.publish(second_module, 'grade', grade_dict)
+                    second_module.system.publish(second_module, 'grade', grade_dict)
                     try:
                         sg_entry = StudentGradebook.objects.get(user=user, course_id=course.id)
                         sg_entry.grade = 0.9

@@ -1,6 +1,7 @@
 """ API implementation for user-oriented interactions. """
 
 import logging
+from edx_notifications.lib.consumer import mark_notification_read
 from requests.exceptions import ConnectionError
 
 from django.contrib.auth.models import Group
@@ -17,6 +18,7 @@ from rest_framework.response import Response
 
 from courseware import grades, module_render
 from courseware.model_data import FieldDataCache
+from courseware.views import get_module_for_descriptor, save_child_position, get_current_child
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.course_groups.cohorts import (
     get_cohort_by_name,
@@ -39,6 +41,7 @@ from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 from student.models import CourseEnrollment, PasswordHistory, UserProfile
 from openedx.core.djangoapps.user_api.models import UserPreference
 from student.roles import CourseAccessRole, CourseInstructorRole, CourseObserverRole, CourseStaffRole, CourseAssistantRole, UserBasedRole
+from openedx.core.djangoapps.user_api.models import UserPreference
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.password_policy_validators import (
     validate_password_length, validate_password_complexity,

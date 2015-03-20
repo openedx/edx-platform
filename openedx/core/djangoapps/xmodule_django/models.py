@@ -10,6 +10,8 @@ from opaque_keys.edx.keys import CourseKey, UsageKey, BlockTypeKey
 
 log = logging.getLogger(__name__)
 
+log = logging.getLogger(__name__)
+
 
 class NoneToEmptyManager(models.Manager):
     """

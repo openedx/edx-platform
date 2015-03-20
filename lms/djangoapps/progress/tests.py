@@ -20,7 +20,7 @@ from capa.tests.response_xml_factory import StringResponseXMLFactory
 
 from student.tests.factories import UserFactory, AdminFactory
 from courseware.tests.factories import StaffFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from progress.models import CourseModuleCompletion, StudentProgress, StudentProgressHistory
 from courseware.model_data import FieldDataCache
@@ -31,6 +31,10 @@ from edx_notifications.startup import initialize as initialize_notifications
 from edx_notifications.lib.consumer import get_notifications_count_for_user
 
 
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
+
+
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @override_settings(STUDENT_GRADEBOOK=True)
 @patch.dict(settings.FEATURES, {'ENABLE_NOTIFICATIONS': True})
 class CourseModuleCompletionTests(ModuleStoreTestCase):
