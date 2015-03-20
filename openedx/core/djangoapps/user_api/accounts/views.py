@@ -69,6 +69,15 @@ class AccountView(APIView):
 
                 * bio: null or textural representation of user biographical information ("about me")
 
+                * profile_image: a dict with the following keys describing the user's profile image
+                    * "has_image": true if the user has a profile image
+                    * "image_url_full": an absolute URL to the user's full profile image
+                    * "image_url_large": an absolute URL to a large thumbnail of the profile image
+                    * "image_url_medium": an absolute URL to a medium thumbnail of the profile image
+                    * "image_url_small": an absolute URL to a small thumbnail of the profile image
+
+                * requires_parental_consent: true if the user is a minor requiring parental consent
+
             For all text fields, clients rendering the values should take care to HTML escape them to avoid
             script injections, as the data is stored exactly as specified. The intention is that plain text is
             supported, not HTML.

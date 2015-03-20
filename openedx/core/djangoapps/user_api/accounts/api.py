@@ -19,7 +19,7 @@ from ..helpers import intercept_errors
 from ..models import UserPreference
 
 from . import (
-    ACCOUNT_VISIBILITY_PREF_KEY, ALL_USERS_VISIBILITY,
+    ACCOUNT_VISIBILITY_PREF_KEY, ALL_USERS_VISIBILITY, PRIVATE_VISIBILITY,
     EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH,
     USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH
 )
@@ -76,12 +76,8 @@ def get_account_settings(requesting_user, username=None, configuration=None, vie
 
     visible_settings = {}
 
-    # Calling UserPreference directly because the requesting user may be different from existing_user
-    # (and does not have to be is_staff).
-    profile_privacy = UserPreference.get_value(existing_user, ACCOUNT_VISIBILITY_PREF_KEY)
-    privacy_setting = profile_privacy if profile_privacy else configuration.get('default_visibility')
-
-    if privacy_setting == ALL_USERS_VISIBILITY:
+    profile_visibility = _get_profile_visibility(existing_user_profile, configuration)
+    if profile_visibility == ALL_USERS_VISIBILITY:
         field_names = configuration.get('shareable_fields')
     else:
         field_names = configuration.get('public_fields')
@@ -90,6 +86,17 @@ def get_account_settings(requesting_user, username=None, configuration=None, vie
         visible_settings[field_name] = account_settings.get(field_name, None)
 
     return visible_settings
+
+
+def _get_profile_visibility(user_profile, configuration):
+    """Returns the visibility level for the specified user profile."""
+    if user_profile.requires_parental_consent():
+        return PRIVATE_VISIBILITY
+
+    # Calling UserPreference directly because the requesting user may be different from existing_user
+    # (and does not have to be is_staff).
+    profile_privacy = UserPreference.get_value(user_profile.user, ACCOUNT_VISIBILITY_PREF_KEY)
+    return profile_privacy if profile_privacy else configuration.get('default_visibility')
 
 
 @transaction.commit_on_success
