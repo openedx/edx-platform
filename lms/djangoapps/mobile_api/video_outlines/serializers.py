@@ -210,7 +210,7 @@ def video_summary(course, course_id, video_descriptor, request, local_cache):
     }
 
     if video_descriptor.only_on_web:
-        video_url = "Invalid URL"
+        video_url = None
         transcripts = {}
 
     return {

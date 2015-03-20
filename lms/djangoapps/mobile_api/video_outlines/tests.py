@@ -400,14 +400,14 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileEnro
         self.assertEqual(len(course_outline), 2)
 
         self.assertEqual(course_outline[0]["summary"]["name"], "test video")
-        self.assertNotEqual(course_outline[0]["summary"]["video_url"], "Invalid URL")
+        self.assertIsNotNone(course_outline[0]["summary"]["video_url"])
         self.assertEqual(len(course_outline[0]["summary"]["transcripts"]), 1)
-        self.assertEqual(course_outline[0]["summary"]["only_on_web"], False)
+        self.assertFalse(course_outline[0]["summary"]["only_on_web"])
 
         self.assertEqual(course_outline[1]["summary"]["name"], "test video 2")
-        self.assertEqual(course_outline[1]["summary"]["video_url"], "Invalid URL")
+        self.assertIsNone(course_outline[1]["summary"]["video_url"])
         self.assertEqual(len(course_outline[1]["summary"]["transcripts"]), 0)
-        self.assertEqual(course_outline[1]["summary"]["only_on_web"], True)
+        self.assertTrue(course_outline[1]["summary"]["only_on_web"])
 
     def test_course_list(self):
         self.login_and_enroll()
