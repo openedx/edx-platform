@@ -382,7 +382,7 @@ class XmlParserUtilMixin(object):
         For exporting, set data on `node` from ourselves.
         """
         # Get the definition
-        xml_object = self.definition_to_xml(self.runtime.resources_fs)
+        xml_object = self.definition_to_xml(self.runtime.export_fs)
         self.clean_metadata_from_xml(xml_object)
 
         # Set the tag so we get the file path right
