@@ -11,7 +11,7 @@ from django.core.management.base import BaseCommand, CommandError
 from tempfile import mkdtemp
 import tarfile
 import shutil
-from extract_tar import safetar_extractall
+from misc.extract_tar import safetar_extractall
 
 from xmodule.modulestore.xml_exporter import convert_between_versions
 
