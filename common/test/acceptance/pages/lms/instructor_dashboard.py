@@ -308,6 +308,15 @@ class MembershipPageCohortManagementSection(PageObject):
             return None
         return get_selected_option_text(self.q(css=self._bounded_selector(self.content_group_selector_css)))
 
+    def get_cohort_associated_assignment_type(self):
+        """
+        Returns the assignment type associated with the cohort currently being edited.
+        """
+        self.select_cohort_settings()
+        css_selector = self._bounded_selector(self.assignment_type_buttons_css)
+        radio_button = self.q(css=css_selector).filter(lambda el: el.is_selected()).results[0]
+        return radio_button.get_attribute('value')
+
     def set_cohort_associated_content_group(self, content_group=None, select_settings=True):
         """
         Sets the content group associated with the cohort currently being edited.
