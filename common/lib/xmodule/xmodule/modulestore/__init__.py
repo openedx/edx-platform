@@ -327,6 +327,8 @@ class EditInfo(object):
         # User ID which changed this XBlock last.
         self.edited_by = edit_info.get('edited_by', None)
 
+        # If this block has been copied from a library using copy_from_template,
+        # these fields point to the original block in the library, for analytics.
         self.original_usage = edit_info.get('original_usage', None)
         self.original_usage_version = edit_info.get('original_usage_version', None)
 
