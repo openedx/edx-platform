@@ -321,6 +321,13 @@ class S3ReportStore(ReportStore):
 
         self.store(course_id, filename, output_buffer)
 
+    def delete_file(self, course_id, filename):
+        """
+        Given the `course_id` and `filename` for the report, this method deletes the report
+        """
+        key = self.key_for(course_id, filename)
+        self.bucket.delete_key(key)
+
     def links_for(self, course_id):
         """
         For a given `course_id`, return a list of `(filename, url)` tuples. `url`
@@ -403,6 +410,13 @@ class LocalFSReportStore(ReportStore):
         csvwriter.writerows(self._get_utf8_encoded_rows(rows))
 
         self.store(course_id, filename, output_buffer)
+
+    def delete_file(self, course_id, filename):
+        """
+        Given the `course_id` and `filename` for the report, this method deletes the report
+        """
+        path = self.path_to(course_id, filename)
+        os.remove(path)
 
     def links_for(self, course_id):
         """

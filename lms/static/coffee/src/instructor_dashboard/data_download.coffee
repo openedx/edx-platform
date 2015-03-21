@@ -159,6 +159,9 @@ class ReportDownloads
   constructor: (@$section) ->
 
     @$report_downloads_table = @$section.find ".report-downloads-table"
+    reports = @$section.find '.reports-download-container'
+    @$reports_request_response = reports.find '.request-response'
+    @$reports_request_response_error = reports.find '.request-response-error'
 
     POLL_INTERVAL = 20000 # 20 seconds, just like the "pending instructor tasks" table
     @downloads_poller = new window.InstructorDashboard.util.IntervalManager(
@@ -187,21 +190,67 @@ class ReportDownloads
       forceFitColumns: true
 
     columns = [
-      id: 'link'
-      field: 'link'
-      name: gettext('File Name')
-      toolTip: gettext("Links are generated on demand and expire within 5 minutes due to the sensitive nature of student information.")
-      sortable: false
-      minWidth: 150
-      cssClass: "file-download-link"
-      formatter: (row, cell, value, columnDef, dataContext) ->
-        '<a href="' + dataContext['url'] + '">' + dataContext['name'] + '</a>'
+        id: 'link'
+        field: 'link'
+        name: gettext('File Name')
+        toolTip: gettext("Links are generated on demand and expire within 5 minutes due to the sensitive nature of student information.")
+        sortable: false
+        minWidth: 150
+        cssClass: "file-download-link"
+        formatter: (row, cell, value, columnDef, dataContext) ->
+          '<a class="course-forums-data" href="' + dataContext['url'] + '">' + dataContext['name'] + '</a> <span class="delete-report"><i class="icon-remove-sign"></i> Delete Report</span>'
     ]
 
     $table_placeholder = $ '<div/>', class: 'slickgrid'
     @$report_downloads_table.append $table_placeholder
     grid = new Slick.Grid($table_placeholder, report_downloads_data, columns, options)
     grid.autosizeColumns()
+
+    $delete_btns = @$section.find('.delete-report')
+    $delete_btns.click (e) =>
+      table_row = jQuery(e.target.parentElement.parentElement)
+      filename_cell = table_row.find('.course-forums-data')
+      file_to_delete = filename_cell.text()
+      if confirm gettext 'Are you sure you want to delete the file ' + file_to_delete + '? This cannot be undone.'
+        @$delete_element = @$section.find '.report-downloads-delete'
+        @$delete_endpoint = @$delete_element.data 'endpoint'
+        success_cb = =>
+          @remove_row_from_ui table_row
+          @display_file_delete_success file_to_delete
+        failure_cb = =>
+          @display_file_delete_failure file_to_delete
+        @delete_report(file_to_delete, success_cb, failure_cb)
+
+  remove_row_from_ui: (row) ->
+    row_height = row.height()
+    rows_after = row.nextAll()
+    row.remove()
+    for sib_row in rows_after
+      $sib_row = jQuery(sib_row)
+      currX = $sib_row.offset().left
+      currY = $sib_row.offset().top
+      $sib_row.offset(top: currY - row_height, left: currX)
+
+  display_file_delete_success: (file_to_delete) ->
+    @$reports_request_response.text gettext('The file ' + file_to_delete + ' was successfully deleted.')
+    @$reports_request_response.css({'display': 'block'})
+    @$reports_request_response_error.css({'display': 'none'})
+
+  display_file_delete_failure: (file_to_delete) ->
+    @$reports_request_response_error.text gettext('Error deleting the file ' + file_to_delete + '. Please try again.')
+    @$reports_request_response_error.css({'display': 'block'})
+    @$reports_request_response.css({'display': 'none'})
+
+  delete_report: (file_to_delete, success_cb, failure_cb) ->
+    $.ajax
+      url: @$delete_endpoint
+      type: 'POST'
+      data: 'filename': file_to_delete
+      dataType: 'json'
+      success: (data) ->
+        success_cb()
+      error: (std_ajax_err) =>
+        failure_cb()
 
 
 # export for use

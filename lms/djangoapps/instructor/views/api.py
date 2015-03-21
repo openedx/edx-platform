@@ -2067,6 +2067,23 @@ def list_forum_members(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
+def delete_report_download(request, course_id):
+    """
+    Deletes a downloaded report that was previously generated from the Instructor Dashboard
+    """
+    course_id = SlashSeparatedCourseKey.from_string(course_id)
+    filename = request.POST.get('filename')
+    report_store = ReportStore.from_config()
+    report_store.delete_file(course_id, filename)
+    message = {
+        'status': _('The report was successfully deleted!'),
+    }
+    return JsonResponse(message)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
 def get_student_forums_usage(request, course_id):
     """
     Pushes a Celery task which will aggregate student forums usage statistics for a course into a .csv

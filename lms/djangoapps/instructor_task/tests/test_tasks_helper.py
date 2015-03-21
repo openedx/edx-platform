@@ -93,6 +93,23 @@ class TestReportStore(TestReportMixin, InstructorTaskCourseTestCase):
     def setUp(self):
         self.course = CourseFactory.create()
 
+    def test_delete_report(self):
+        report_store = ReportStore.from_config()
+        task_input = {'features': []}
+
+        links = report_store.links_for(self.course.id)
+        self.assertEquals(len(links), 0)
+        with patch('instructor_task.tasks_helper._get_current_task'):
+            upload_students_csv(None, None, self.course.id, task_input, 'calculated')
+        links = report_store.links_for(self.course.id)
+        self.assertEquals(len(links), 1)
+
+        filename = links[0][0]
+        report_store.delete_file(self.course.id, filename)
+
+        links = report_store.links_for(self.course.id)
+        self.assertEquals(len(links), 0)
+
     def test_reports_rev_chronologically_sorted(self):
         report_store = ReportStore.from_config()
         test_rows = [['row1_field1', 'row1_field2', 'row1_field3'], ['row2_field1', 'row2_field2', 'row2_field3']]

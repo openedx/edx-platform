@@ -1164,7 +1164,21 @@ section.instructor-dashboard-content-2 {
         overflow-x: hidden !important;
       }
     }
+
+    .delete-report{
+      float: right;
+      margin-right: 10px;
+      text-decoration: underline;
+      color: $blue;
+    }
+
+    .delete-report:hover{
+      cursor: pointer;
+      text-decoration: none;
+    }
+
   }
+
 }
 
 // view - metrics
