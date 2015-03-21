@@ -323,6 +323,7 @@ def _section_data_download(course, access):
         'access': access,
         'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': course_key.to_deprecated_string()}),
         'get_students_features_url': reverse('get_students_features', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'delete_report_download_url': reverse('delete_report_download', kwargs={'course_id': unicode(course_key)}),
         'get_anon_ids_url': reverse('get_anon_ids', kwargs={'course_id': course_key.to_deprecated_string()}),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_key.to_deprecated_string()}),
         'list_report_downloads_url': reverse('list_report_downloads', kwargs={'course_id': course_key.to_deprecated_string()}),

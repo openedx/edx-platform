@@ -87,6 +87,54 @@ class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
 
 
 @ddt.ddt
+class TestReportStore(TestReportMixin, InstructorTaskCourseTestCase):
+    """Tests for the ReportStore model"""
+
+    def setUp(self):
+        self.course = CourseFactory.create()
+
+    def test_delete_report(self):
+        report_store = ReportStore.from_config()
+        task_input = {'features': []}
+
+        links = report_store.links_for(self.course.id)
+        self.assertEquals(len(links), 0)
+        with patch('instructor_task.tasks_helper._get_current_task'):
+            upload_students_csv(None, None, self.course.id, task_input, 'calculated')
+        links = report_store.links_for(self.course.id)
+        self.assertEquals(len(links), 1)
+
+        filename = links[0][0]
+        report_store.delete_file(self.course.id, filename)
+
+        links = report_store.links_for(self.course.id)
+        self.assertEquals(len(links), 0)
+
+    def test_reports_rev_chronologically_sorted(self):
+        report_store = ReportStore.from_config()
+        test_rows = [['row1_field1', 'row1_field2', 'row1_field3'], ['row2_field1', 'row2_field2', 'row2_field3']]
+        rev_chronological_filenames = [
+            'filename4_2015-03-10-0024.csv',
+            'filename3_2015-03-10-0023.csv',
+            'filename2_2015-03-10-0022.csv',
+            'filename1_2015-03-10-0021.csv',
+        ]
+
+        links = report_store.links_for(self.course.id)
+        self.assertEquals(len(links), 0)
+
+        report_store.store_rows(self.course.id, rev_chronological_filenames[1], test_rows)
+        report_store.store_rows(self.course.id, rev_chronological_filenames[3], test_rows)
+        report_store.store_rows(self.course.id, rev_chronological_filenames[0], test_rows)
+        report_store.store_rows(self.course.id, rev_chronological_filenames[2], test_rows)
+
+        links = report_store.links_for(self.course.id)
+        self.assertEquals(len(links), 4)
+        filenames = [link[0] for link in links]
+        self.assertEquals(filenames, rev_chronological_filenames)
+
+
+@ddt.ddt
 class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
     """
     Tests that CSV student profile report generation works.
