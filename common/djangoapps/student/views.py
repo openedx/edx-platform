@@ -1392,8 +1392,6 @@ def _do_create_account(form):
         log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
         raise
 
-    preferences_api.set_user_preference(user, LANGUAGE_KEY, get_language())
-
     return (user, profile, registration)
 
 
@@ -1472,6 +1470,7 @@ def create_account_with_params(request, params):
         tos_required=tos_required,
     )
 
+    # Perform operations within a transaction that are critical to account creation
     with transaction.commit_on_success():
         # first, create the account
         (user, profile, registration) = _do_create_account(form)
@@ -1501,6 +1500,9 @@ def create_account_with_params(request, params):
                 # Ensure user does not re-enter the pipeline
                 request.social_strategy.clean_partial_pipeline()
                 raise ValidationError({'access_token': [error_message]})
+
+    # Perform operations that are non-critical parts of account creation
+    preferences_api.set_user_preference(user, LANGUAGE_KEY, get_language())
 
     if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
         try:
