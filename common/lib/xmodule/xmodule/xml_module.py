@@ -515,16 +515,16 @@ class XmlDescriptor(XmlParserUtilMixin, XModuleDescriptor):
         # This only exists to satisfy subclasses that both:
         #    a) define export_to_xml themselves
         #    b) call super(..).export_to_xml(..)
-        node = lxml.etree.Element(self.category)
+        node = etree.Element(self.category)
         super(XmlDescriptor, self).add_xml_to_node(node)
-        return node
+        return etree.tostring(node)
 
     def add_xml_to_node(self, node):
         """
         Export this :class:`XModuleDescriptor` as XML, by setting attributes on the provided
         `node`.
         """
-        if cls.export_to_xml != XmlDescriptor.export_to_xml:
+        if self.export_to_xml != XmlDescriptor.export_to_xml:
             # Skip the add_xml_to_node from XmlParserUtilMixin to get
             # the shim add_xml_to_node from XModuleDescriptor which actually calls `export_to_xml`
             super(XmlParserUtilMixin, self).add_xml_to_node(node)
