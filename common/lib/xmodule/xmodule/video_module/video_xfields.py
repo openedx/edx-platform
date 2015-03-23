@@ -150,6 +150,15 @@ class VideoFields(object):
         display_name=_("Upload Handout"),
         scope=Scope.settings,
     )
+    only_on_web = Boolean(
+        help=_(
+            "Specify whether access to this video is limited to browsers only, or if it can be "
+            "accessed from other applications including mobile apps."
+        ),
+        display_name="Video Available on Web Only",
+        scope=Scope.settings,
+        default=False
+    )
     edx_video_id = String(
         help=_("If you were assigned a Video ID by edX for the video to play in this component, enter the ID here. In this case, do not enter values in the Default Video URL, the Video File URLs, and the YouTube ID fields. If you were not assigned an edX Video ID, enter values in those other fields and ignore this field."),
         display_name=_("EdX Video ID"),

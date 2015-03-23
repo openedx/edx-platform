@@ -152,6 +152,7 @@ def correct_video_settings(_step):
         ['Show Transcript', 'True', False],
         ['Transcript Languages', '', False],
         ['Upload Handout', '', False],
+        ['Video Available on Web Only', 'False', False],
         ['Video Download Allowed', 'False', False],
         ['Video File URLs', '', False],
         ['Video Start Time', '00:00:00', False],
