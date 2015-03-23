@@ -220,6 +220,7 @@ class AccountSettingsOnCreationTest(TestCase):
                 'image_url_full': 'http://example-storage.com/profile_images/default_50.jpg',
                 'image_url_small': 'http://example-storage.com/profile_images/default_10.jpg',
             },
+            'requires_parental_consent': True,
         })
 
 
