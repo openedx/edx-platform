@@ -1,3 +1,8 @@
+"""
+Django models related to course groups functionality.
+"""
+
+import json
 import logging
 
 from django.contrib.auth.models import User
@@ -81,10 +86,20 @@ class CourseCohortsSettings(models.Model):
         help_text="Which course are these settings associated with?",
     )
 
-    cohorted_discussions = models.TextField(null=True, blank=True)  # JSON list
+    _cohorted_discussions = models.TextField(db_column='cohorted_discussions', null=True, blank=True)  # JSON list
 
     # pylint: disable=invalid-name
     always_cohort_inline_discussions = models.BooleanField(default=True)
+
+    @property
+    def cohorted_discussions(self):
+        """Jsonify the cohorted_discussions"""
+        return json.loads(self._cohorted_discussions)
+
+    @cohorted_discussions.setter
+    def cohorted_discussions(self, value):
+        """Un-Jsonify the cohorted_discussions"""
+        self._cohorted_discussions = json.dumps(value)
 
 
 class CourseCohort(models.Model):

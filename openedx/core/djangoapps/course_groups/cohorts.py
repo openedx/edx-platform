@@ -5,7 +5,6 @@ forums, and to the cohort admin views.
 
 import logging
 import random
-import json
 
 from django.db import transaction
 from django.db.models.signals import post_save, m2m_changed
@@ -15,7 +14,9 @@ from django.utils.translation import ugettext as _
 
 from courseware import courses
 from eventtracking import tracker
+from request_cache.middleware import RequestCache
 from student.models import get_user_by_username_or_email
+
 from .models import CourseUserGroup, CourseCohort, CourseCohortsSettings, CourseUserGroupPartitionGroup
 
 
@@ -72,12 +73,9 @@ def _cohort_membership_changed(sender, **kwargs):
         tracker.emit(event_name, event)
 
 
-# A 'default cohort' is an auto-cohort that is automatically created for a course if no auto_cohort_groups have been
-# specified. It is intended to be used in a cohorted-course for users who have yet to be assigned to a cohort.
-# Note 1: If an administrator chooses to configure a cohort with the same name, the said cohort will be used as
-#         the "default cohort".
-# Note 2: If auto_cohort_groups are configured after the 'default cohort' has been created and populated, the
-#         stagnant 'default cohort' will still remain (now as a manual cohort) with its previously assigned students.
+# A 'default cohort' is an auto-cohort that is automatically created for a course if no cohort with automatic
+# assignment have been specified. It is intended to be used in a cohorted-course for users who have yet to be assigned
+# to a cohort.
 # Translation Note: We are NOT translating this string since it is the constant identifier for the "default group"
 #                   and needed across product boundaries.
 DEFAULT_COHORT_NAME = "Default Group"
@@ -111,15 +109,15 @@ def is_course_cohorted(course_key):
     Raises:
        Http404 if the course doesn't exist.
     """
-    return courses.get_course_by_id(course_key).is_cohorted
+    return get_course_cohort_settings(course_key).is_cohorted
 
 
-def get_cohort_id(user, course_key):
+def get_cohort_id(user, course_key, use_cached=False):
     """
     Given a course key and a user, return the id of the cohort that user is
     assigned to in that course.  If they don't have a cohort, return None.
     """
-    cohort = get_cohort(user, course_key)
+    cohort = get_cohort(user, course_key, use_cached=use_cached)
     return None if cohort is None else cohort.id
 
 
@@ -136,18 +134,19 @@ def is_commentable_cohorted(course_key, commentable_id):
         Http404 if the course doesn't exist.
     """
     course = courses.get_course_by_id(course_key)
+    course_cohort_settings = get_course_cohort_settings(course_key)
 
-    if not course.is_cohorted:
+    if not course_cohort_settings.is_cohorted:
         # this is the easy case :)
         ans = False
     elif (
             commentable_id in course.top_level_discussion_topic_ids or
-            course.always_cohort_inline_discussions is False
+            course_cohort_settings.always_cohort_inline_discussions is False
     ):
         # top level discussions have to be manually configured as cohorted
         # (default is not).
         # Same thing for inline discussions if the default is explicitly set to False in settings
-        ans = commentable_id in course.cohorted_discussions
+        ans = commentable_id in course_cohort_settings.cohorted_discussions
     else:
         # inline discussions are cohorted by default
         ans = True
@@ -163,27 +162,32 @@ def get_cohorted_commentables(course_key):
     Given a course_key return a set of strings representing cohorted commentables.
     """
 
-    course = courses.get_course_by_id(course_key)
+    course_cohort_settings = get_course_cohort_settings(course_key)
 
-    if not course.is_cohorted:
+    if not course_cohort_settings.is_cohorted:
         # this is the easy case :)
         ans = set()
     else:
-        ans = course.cohorted_discussions
+        ans = set(course_cohort_settings.cohorted_discussions)
 
     return ans
 
 
 @transaction.commit_on_success
-def get_cohort(user, course_key, assign=True):
+def get_cohort(user, course_key, assign=True, use_cached=False):
     """
     Given a Django user and a CourseKey, return the user's cohort in that
     cohort.
+
+    The cohort for the user is cached for the duration of a request. Pass
+    use_cached=True to use the cached value instead of fetching from the
+    database.
 
     Arguments:
         user: a Django User object.
         course_key: CourseKey
         assign (bool): if False then we don't assign a group to user
+        use_cached (bool): Whether to use the cached value or fetch from database.
 
     Returns:
         A CourseUserGroup object if the course is cohorted and the User has a
@@ -192,27 +196,37 @@ def get_cohort(user, course_key, assign=True):
     Raises:
        ValueError if the CourseKey doesn't exist.
     """
+    request_cache = RequestCache.get_request_cache()
+    cache_key = u"cohorts.get_cohort.{}.{}".format(user.id, course_key)
+
+    if use_cached and cache_key in request_cache.data:
+        return request_cache.data[cache_key]
+
+    request_cache.data.pop(cache_key, None)
+
     # First check whether the course is cohorted (users shouldn't be in a cohort
     # in non-cohorted courses, but settings can change after course starts)
-    try:
-        course = courses.get_course_by_id(course_key)
-    except Http404:
-        raise ValueError("Invalid course_key")
+    course_cohort_settings = get_course_cohort_settings(course_key)
+    if not course_cohort_settings.is_cohorted:
+        return request_cache.data.setdefault(cache_key, None)
 
-    if not course.is_cohorted:
-        return None
-
+    # If course is cohorted, check if the user already has a cohort.
     try:
-        return CourseUserGroup.objects.get(
+        cohort = CourseUserGroup.objects.get(
             course_id=course_key,
             group_type=CourseUserGroup.COHORT,
             users__id=user.id,
         )
+        return request_cache.data.setdefault(cache_key, cohort)
     except CourseUserGroup.DoesNotExist:
-        # Didn't find the group.  We'll go on to create one if needed.
+        # Didn't find the group. If we do not want to assign, return here.
         if not assign:
+            # Do not cache the cohort here, because in the next call assign
+            # may be True, and we will have to assign the user a cohort.
             return None
 
+    # Otherwise assign the user a cohort.
+    course = courses.get_course(course_key)
     cohorts = get_course_cohorts(course, assignment_type=CourseCohort.RANDOM)
     if cohorts:
         cohort = local_random().choice(cohorts)
@@ -225,7 +239,7 @@ def get_cohort(user, course_key, assign=True):
 
     user.course_groups.add(cohort)
 
-    return cohort
+    return request_cache.data.setdefault(cache_key, cohort)
 
 
 def migrate_cohort_settings(course):
@@ -233,12 +247,11 @@ def migrate_cohort_settings(course):
     Migrate all the cohort settings associated with this course from modulestore to mysql.
     After that we will never touch modulestore for any cohort related settings.
     """
-    course_id = course.location.course_key
     cohort_settings, created = CourseCohortsSettings.objects.get_or_create(
-        course_id=course_id,
+        course_id=course.id,
         defaults={
             'is_cohorted': course.is_cohorted,
-            'cohorted_discussions': json.dumps(list(course.cohorted_discussions)),
+            'cohorted_discussions': list(course.cohorted_discussions),
             'always_cohort_inline_discussions': course.always_cohort_inline_discussions
         }
     )
@@ -247,14 +260,14 @@ def migrate_cohort_settings(course):
     if created:
         # Update the manual cohorts already present in CourseUserGroup
         manual_cohorts = CourseUserGroup.objects.filter(
-            course_id=course_id,
+            course_id=course.id,
             group_type=CourseUserGroup.COHORT
         ).exclude(name__in=course.auto_cohort_groups)
         for cohort in manual_cohorts:
             CourseCohort.create(course_user_group=cohort)
 
         for group_name in course.auto_cohort_groups:
-            CourseCohort.create(cohort_name=group_name, course_id=course_id, assignment_type=CourseCohort.RANDOM)
+            CourseCohort.create(cohort_name=group_name, course_id=course.id, assignment_type=CourseCohort.RANDOM)
 
     return cohort_settings
 
@@ -324,7 +337,8 @@ def add_cohort(course_key, name, assignment_type):
         raise ValueError("Invalid course_key")
 
     cohort = CourseCohort.create(
-        cohort_name=name, course_id=course.id,
+        cohort_name=name,
+        course_id=course.id,
         assignment_type=assignment_type
     ).course_user_group
 
@@ -392,18 +406,33 @@ def add_user_to_cohort(cohort, username_or_email):
     return (user, previous_cohort_name)
 
 
-def get_group_info_for_cohort(cohort):
+def get_group_info_for_cohort(cohort, use_cached=False):
     """
     Get the ids of the group and partition to which this cohort has been linked
     as a tuple of (int, int).
 
     If the cohort has not been linked to any group/partition, both values in the
     tuple will be None.
+
+    The partition group info is cached for the duration of a request. Pass
+    use_cached=True to use the cached value instead of fetching from the
+    database.
     """
-    res = CourseUserGroupPartitionGroup.objects.filter(course_user_group=cohort)
-    if len(res):
-        return res[0].group_id, res[0].partition_id
-    return None, None
+    request_cache = RequestCache.get_request_cache()
+    cache_key = u"cohorts.get_group_info_for_cohort.{}".format(cohort.id)
+
+    if use_cached and cache_key in request_cache.data:
+        return request_cache.data[cache_key]
+
+    request_cache.data.pop(cache_key, None)
+
+    try:
+        partition_group = CourseUserGroupPartitionGroup.objects.get(course_user_group=cohort)
+        return request_cache.data.setdefault(cache_key, (partition_group.group_id, partition_group.partition_id))
+    except CourseUserGroupPartitionGroup.DoesNotExist:
+        pass
+
+    return request_cache.data.setdefault(cache_key, (None, None))
 
 
 def set_assignment_type(user_group, assignment_type):
@@ -413,7 +442,7 @@ def set_assignment_type(user_group, assignment_type):
     course_cohort = user_group.cohort
 
     if is_default_cohort(user_group) and course_cohort.assignment_type != assignment_type:
-        raise ValueError(_("There must be one cohort to which students can be randomly assigned."))
+        raise ValueError(_("There must be one cohort to which students can automatically be assigned."))
 
     course_cohort.assignment_type = assignment_type
     course_cohort.save()
@@ -438,3 +467,51 @@ def is_default_cohort(user_group):
     )
 
     return len(random_cohorts) == 1 and random_cohorts[0].name == user_group.name
+
+
+def set_course_cohort_settings(course_key, **kwargs):
+    """
+    Set cohort settings for a course.
+
+    Arguments:
+        course_key: CourseKey
+        is_cohorted (bool): If the course should be cohorted.
+        always_cohort_inline_discussions (bool): If inline discussions should always be cohorted.
+        cohorted_discussions (list): List of discussion ids.
+
+    Returns:
+        A CourseCohortSettings object.
+
+    Raises:
+        Http404 if course_key is invalid.
+    """
+    fields = {'is_cohorted': bool, 'always_cohort_inline_discussions': bool, 'cohorted_discussions': list}
+    course_cohort_settings = get_course_cohort_settings(course_key)
+    for field, field_type in fields.items():
+        if field in kwargs:
+            if not isinstance(kwargs[field], field_type):
+                raise ValueError("Incorrect field type for `{}`. Type must be `{}`".format(field, field_type.__name__))
+            setattr(course_cohort_settings, field, kwargs[field])
+    course_cohort_settings.save()
+    return course_cohort_settings
+
+
+def get_course_cohort_settings(course_key):
+    """
+    Return cohort settings for a course.
+
+    Arguments:
+        course_key: CourseKey
+
+    Returns:
+        A CourseCohortSettings object.
+
+    Raises:
+        Http404 if course_key is invalid.
+    """
+    try:
+        course_cohort_settings = CourseCohortsSettings.objects.get(course_id=course_key)
+    except CourseCohortsSettings.DoesNotExist:
+        course = courses.get_course_by_id(course_key)
+        course_cohort_settings = migrate_cohort_settings(course)
+    return course_cohort_settings

@@ -65,9 +65,7 @@ def instructor_dashboard_2(request, course_id):
         'finance_admin': CourseFinanceAdminRole(course_key).has_user(request.user),
         'sales_admin': CourseSalesAdminRole(course_key).has_user(request.user),
         'staff': has_access(request.user, 'staff', course),
-        'forum_admin': has_forum_access(
-            request.user, course_key, FORUM_ROLE_ADMINISTRATOR
-        ),
+        'forum_admin': has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR),
     }
 
     if not access['staff']:
@@ -76,6 +74,7 @@ def instructor_dashboard_2(request, course_id):
     sections = [
         _section_course_info(course, access),
         _section_membership(course, access),
+        _section_cohort_management(course, access),
         _section_student_admin(course, access),
         _section_data_download(course, access),
         _section_analytics(course, access),
@@ -330,9 +329,24 @@ def _section_membership(course, access):
         'modify_access_url': reverse('modify_access', kwargs={'course_id': unicode(course_key)}),
         'list_forum_members_url': reverse('list_forum_members', kwargs={'course_id': unicode(course_key)}),
         'update_forum_role_membership_url': reverse('update_forum_role_membership', kwargs={'course_id': unicode(course_key)}),
-        'cohorts_ajax_url': reverse('cohorts', kwargs={'course_key_string': unicode(course_key)}),
-        'advanced_settings_url': get_studio_url(course, 'settings/advanced'),
+    }
+    return section_data
+
+
+def _section_cohort_management(course, access):
+    """ Provide data for the corresponding cohort management section """
+    course_key = course.id
+    section_data = {
+        'section_key': 'cohort_management',
+        'section_display_name': _('Cohorts'),
+        'access': access,
+        'course_cohort_settings_url': reverse(
+            'course_cohort_settings',
+            kwargs={'course_key_string': unicode(course_key)}
+        ),
+        'cohorts_url': reverse('cohorts', kwargs={'course_key_string': unicode(course_key)}),
         'upload_cohorts_csv_url': reverse('add_users_to_cohorts', kwargs={'course_id': unicode(course_key)}),
+        'discussion_topics_url': reverse('cohort_discussion_topics', kwargs={'course_key_string': unicode(course_key)}),
     }
     return section_data
 

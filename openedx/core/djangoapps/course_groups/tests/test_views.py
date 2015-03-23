@@ -3,30 +3,36 @@ Tests for course group views
 """
 # pylint: disable=attribute-defined-outside-init
 # pylint: disable=no-member
-from collections import namedtuple
 import json
 
 from collections import namedtuple
+from datetime import datetime
+from unittest import skipUnless
+
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import Http404
 from django.test.client import RequestFactory
-
+import django_test_client_utils  # monkey-patch for PATCH request method.
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.tests.factories import ItemFactory
 
 from ..models import CourseUserGroup, CourseCohort
 from ..views import (
-    cohort_handler, users_in_cohort, add_users_to_cohort, remove_user_from_cohort, link_cohort_to_partition_group
+    course_cohort_settings_handler, cohort_handler, users_in_cohort, add_users_to_cohort, remove_user_from_cohort,
+    link_cohort_to_partition_group, cohort_discussion_topics
 )
 from ..cohorts import (
     get_cohort, get_cohort_by_name, get_cohort_by_id,
     DEFAULT_COHORT_NAME, get_group_info_for_cohort
 )
-from .helpers import config_course_cohorts, CohortFactory, CourseCohortFactory
+from .helpers import (
+    config_course_cohorts, config_course_cohorts_legacy, CohortFactory, CourseCohortFactory, topic_name_to_id
+)
 
 
 class CohortViewsTestCase(ModuleStoreTestCase):
@@ -90,49 +96,241 @@ class CohortViewsTestCase(ModuleStoreTestCase):
         view_args.insert(0, request)
         self.assertRaises(Http404, view, *view_args)
 
+    def create_cohorted_discussions(self):
+        cohorted_inline_discussions = ['Topic A']
+        cohorted_course_wide_discussions = ["Topic B"]
+        cohorted_discussions = cohorted_inline_discussions + cohorted_course_wide_discussions
 
-class CohortHandlerTestCase(CohortViewsTestCase):
-    """
-    Tests the `cohort_handler` view.
-    """
-    def get_cohort_handler(self, course, cohort=None):
+        # inline discussion
+        ItemFactory.create(
+            parent_location=self.course.location,
+            category="discussion",
+            discussion_id=topic_name_to_id(self.course, "Topic A"),
+            discussion_category="Chapter",
+            discussion_target="Discussion",
+            start=datetime.now()
+        )
+        # course-wide discussion
+        discussion_topics = {
+            "Topic B": {"id": "Topic B"},
+        }
+
+        config_course_cohorts(
+            self.course,
+            is_cohorted=True,
+            discussion_topics=discussion_topics,
+            cohorted_discussions=cohorted_discussions
+        )
+        return cohorted_inline_discussions, cohorted_course_wide_discussions
+
+    def get_handler(self, course, cohort=None, expected_response_code=200, handler=cohort_handler):
         """
-        Call a GET on `cohort_handler` for a given `course` and return its response as a
-        dict. If `cohort` is specified, only information for that specific cohort is returned.
+        Call a GET on `handler` for a given `course` and return its response as a dict.
+        Raise an exception if response status code is not as expected.
         """
         request = RequestFactory().get("dummy_url")
         request.user = self.staff_user
         if cohort:
-            response = cohort_handler(request, unicode(course.id), cohort.id)
+            response = handler(request, unicode(course.id), cohort.id)
         else:
-            response = cohort_handler(request, unicode(course.id))
-        self.assertEqual(response.status_code, 200)
+            response = handler(request, unicode(course.id))
+        self.assertEqual(response.status_code, expected_response_code)
         return json.loads(response.content)
 
-    def put_cohort_handler(self, course, cohort=None, data=None, expected_response_code=200):
+    def put_handler(self, course, cohort=None, data=None, expected_response_code=200, handler=cohort_handler):
         """
-        Call a PUT on `cohort_handler` for a given `course` and return its response as a
-        dict. If `cohort` is not specified, a new cohort is created. If `cohort` is specified,
-        the existing cohort is updated.
+        Call a PUT on `handler` for a given `course` and return its response as a dict.
+        Raise an exception if response status code is not as expected.
         """
         if not isinstance(data, basestring):
             data = json.dumps(data or {})
         request = RequestFactory().put(path="dummy path", data=data, content_type="application/json")
         request.user = self.staff_user
         if cohort:
-            response = cohort_handler(request, unicode(course.id), cohort.id)
+            response = handler(request, unicode(course.id), cohort.id)
         else:
-            response = cohort_handler(request, unicode(course.id))
+            response = handler(request, unicode(course.id))
         self.assertEqual(response.status_code, expected_response_code)
         return json.loads(response.content)
 
+    def patch_handler(self, course, cohort=None, data=None, expected_response_code=200, handler=cohort_handler):
+        """
+        Call a PATCH on `handler` for a given `course` and return its response as a dict.
+        Raise an exception if response status code is not as expected.
+        """
+        if not isinstance(data, basestring):
+            data = json.dumps(data or {})
+
+        request = RequestFactory().patch(path="dummy path", data=data, content_type="application/json")
+        request.user = self.staff_user
+        if cohort:
+            response = handler(request, unicode(course.id), cohort.id)
+        else:
+            response = handler(request, unicode(course.id))
+        self.assertEqual(response.status_code, expected_response_code)
+        return json.loads(response.content)
+
+
+class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
+    """
+    Tests the `course_cohort_settings_handler` view.
+    """
+
+    def get_expected_response(self):
+        """
+        Returns the static response dict.
+        """
+        return {
+            'is_cohorted': True,
+            'always_cohort_inline_discussions': True,
+            'cohorted_inline_discussions': [],
+            'cohorted_course_wide_discussions': [],
+            'id': 1
+        }
+
+    def test_non_staff(self):
+        """
+        Verify that we cannot access course_cohort_settings_handler if we're a non-staff user.
+        """
+        self._verify_non_staff_cannot_access(course_cohort_settings_handler, "GET", [unicode(self.course.id)])
+        self._verify_non_staff_cannot_access(course_cohort_settings_handler, "PATCH", [unicode(self.course.id)])
+
+    def test_get_settings(self):
+        """
+        Verify that course_cohort_settings_handler is working for HTTP GET.
+        """
+        cohorted_inline_discussions, cohorted_course_wide_discussions = self.create_cohorted_discussions()
+
+        response = self.get_handler(self.course, handler=course_cohort_settings_handler)
+        expected_response = self.get_expected_response()
+
+        expected_response['cohorted_inline_discussions'] = [topic_name_to_id(self.course, name)
+                                                            for name in cohorted_inline_discussions]
+        expected_response['cohorted_course_wide_discussions'] = [topic_name_to_id(self.course, name)
+                                                                 for name in cohorted_course_wide_discussions]
+
+        self.assertEqual(response, expected_response)
+
+    def test_update_is_cohorted_settings(self):
+        """
+        Verify that course_cohort_settings_handler is working for is_cohorted via HTTP PATCH.
+        """
+        config_course_cohorts(self.course, is_cohorted=True)
+
+        response = self.get_handler(self.course, handler=course_cohort_settings_handler)
+
+        expected_response = self.get_expected_response()
+
+        self.assertEqual(response, expected_response)
+
+        expected_response['is_cohorted'] = False
+        response = self.patch_handler(self.course, data=expected_response, handler=course_cohort_settings_handler)
+
+        self.assertEqual(response, expected_response)
+
+    def test_update_always_cohort_inline_discussion_settings(self):
+        """
+        Verify that course_cohort_settings_handler is working for always_cohort_inline_discussions via HTTP PATCH.
+        """
+        config_course_cohorts(self.course, is_cohorted=True)
+
+        response = self.get_handler(self.course, handler=course_cohort_settings_handler)
+
+        expected_response = self.get_expected_response()
+
+        self.assertEqual(response, expected_response)
+
+        expected_response['always_cohort_inline_discussions'] = False
+        response = self.patch_handler(self.course, data=expected_response, handler=course_cohort_settings_handler)
+
+        self.assertEqual(response, expected_response)
+
+    def test_update_course_wide_discussion_settings(self):
+        """
+        Verify that course_cohort_settings_handler is working for cohorted_course_wide_discussions via HTTP PATCH.
+        """
+        # course-wide discussion
+        discussion_topics = {
+            "Topic B": {"id": "Topic B"},
+        }
+
+        config_course_cohorts(self.course, is_cohorted=True, discussion_topics=discussion_topics)
+
+        response = self.get_handler(self.course, handler=course_cohort_settings_handler)
+
+        expected_response = self.get_expected_response()
+        self.assertEqual(response, expected_response)
+
+        expected_response['cohorted_course_wide_discussions'] = [topic_name_to_id(self.course, "Topic B")]
+        response = self.patch_handler(self.course, data=expected_response, handler=course_cohort_settings_handler)
+
+        self.assertEqual(response, expected_response)
+
+    def test_update_inline_discussion_settings(self):
+        """
+        Verify that course_cohort_settings_handler is working for cohorted_inline_discussions via HTTP PATCH.
+        """
+        config_course_cohorts(self.course, is_cohorted=True)
+
+        response = self.get_handler(self.course, handler=course_cohort_settings_handler)
+
+        expected_response = self.get_expected_response()
+        self.assertEqual(response, expected_response)
+
+        now = datetime.now()
+        # inline discussion
+        ItemFactory.create(
+            parent_location=self.course.location,
+            category="discussion",
+            discussion_id="Topic_A",
+            discussion_category="Chapter",
+            discussion_target="Discussion",
+            start=now
+        )
+
+        expected_response['cohorted_inline_discussions'] = ["Topic_A"]
+        response = self.patch_handler(self.course, data=expected_response, handler=course_cohort_settings_handler)
+
+        self.assertEqual(response, expected_response)
+
+    def test_update_settings_with_missing_field(self):
+        """
+        Verify that course_cohort_settings_handler return HTTP 400 if required data field is missing from post data.
+        """
+        config_course_cohorts(self.course, is_cohorted=True)
+
+        response = self.patch_handler(self.course, expected_response_code=400, handler=course_cohort_settings_handler)
+        self.assertEqual("Bad Request", response.get("error"))
+
+    def test_update_settings_with_invalid_field_data_type(self):
+        """
+        Verify that course_cohort_settings_handler return HTTP 400 if field data type is incorrect.
+        """
+        config_course_cohorts(self.course, is_cohorted=True)
+
+        response = self.patch_handler(
+            self.course,
+            data={'is_cohorted': ''},
+            expected_response_code=400,
+            handler=course_cohort_settings_handler
+        )
+        self.assertEqual(
+            "Incorrect field type for `{}`. Type must be `{}`".format('is_cohorted', bool.__name__),
+            response.get("error")
+        )
+
+
+class CohortHandlerTestCase(CohortViewsTestCase):
+    """
+    Tests the `cohort_handler` view.
+    """
     def verify_lists_expected_cohorts(self, expected_cohorts, response_dict=None):
         """
         Verify that the server response contains the expected_cohorts.
         If response_dict is None, the list of cohorts is requested from the server.
         """
         if response_dict is None:
-            response_dict = self.get_cohort_handler(self.course)
+            response_dict = self.get_handler(self.course)
 
         self.assertEqual(
             response_dict.get("cohorts"),
@@ -191,23 +389,21 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         """
         Verify that auto cohorts are included in the response.
         """
-        config_course_cohorts(self.course, [], cohorted=True,
-                              auto_cohort_groups=["AutoGroup1", "AutoGroup2"])
+        config_course_cohorts(self.course, is_cohorted=True, auto_cohorts=["AutoGroup1", "AutoGroup2"])
 
-        # Will create cohort1, cohort2, and cohort3. Auto cohorts remain uncreated.
+        # Will create manual cohorts cohort1, cohort2, and cohort3.
         self._create_cohorts()
-        # Get the cohorts from the course, which will cause auto cohorts to be created.
-        actual_cohorts = self.get_cohort_handler(self.course)
+        actual_cohorts = self.get_handler(self.course)
         # Get references to the created auto cohorts.
         auto_cohort_1 = get_cohort_by_name(self.course.id, "AutoGroup1")
         auto_cohort_2 = get_cohort_by_name(self.course.id, "AutoGroup2")
         expected_cohorts = [
+            CohortHandlerTestCase.create_expected_cohort(auto_cohort_1, 0, CourseCohort.RANDOM),
+            CohortHandlerTestCase.create_expected_cohort(auto_cohort_2, 0, CourseCohort.RANDOM),
             CohortHandlerTestCase.create_expected_cohort(self.cohort1, 3, CourseCohort.MANUAL),
             CohortHandlerTestCase.create_expected_cohort(self.cohort2, 2, CourseCohort.MANUAL),
             CohortHandlerTestCase.create_expected_cohort(self.cohort3, 2, CourseCohort.MANUAL),
             CohortHandlerTestCase.create_expected_cohort(self.cohort4, 2, CourseCohort.RANDOM),
-            CohortHandlerTestCase.create_expected_cohort(auto_cohort_1, 0, CourseCohort.RANDOM),
-            CohortHandlerTestCase.create_expected_cohort(auto_cohort_2, 0, CourseCohort.RANDOM),
         ]
         self.verify_lists_expected_cohorts(expected_cohorts, actual_cohorts)
 
@@ -218,8 +414,8 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         # verify the default cohort is not created when the course is not cohorted
         self.verify_lists_expected_cohorts([])
 
-        # create a cohorted course without any auto_cohort_groups
-        config_course_cohorts(self.course, [], cohorted=True)
+        # create a cohorted course without any auto_cohorts
+        config_course_cohorts(self.course, is_cohorted=True)
 
         # verify the default cohort is not yet created until a user is assigned
         self.verify_lists_expected_cohorts([])
@@ -235,7 +431,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
 
         # verify the default cohort is automatically created
         default_cohort = get_cohort_by_name(self.course.id, DEFAULT_COHORT_NAME)
-        actual_cohorts = self.get_cohort_handler(self.course)
+        actual_cohorts = self.get_handler(self.course)
         self.verify_lists_expected_cohorts(
             [CohortHandlerTestCase.create_expected_cohort(default_cohort, len(users), CourseCohort.RANDOM)],
             actual_cohorts,
@@ -243,7 +439,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
 
         # set auto_cohort_groups
         # these cohort config will have not effect on lms side as we are already done with migrations
-        config_course_cohorts(self.course, [], cohorted=True, auto_cohort_groups=["AutoGroup"])
+        config_course_cohorts_legacy(self.course, [], cohorted=True, auto_cohort_groups=["AutoGroup"])
 
         # We should expect the DoesNotExist exception because above cohort config have
         # no effect on lms side so as a result there will be no AutoGroup cohort present
@@ -255,7 +451,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         Tests that information for just a single cohort can be requested.
         """
         self._create_cohorts()
-        response_dict = self.get_cohort_handler(self.course, self.cohort2)
+        response_dict = self.get_handler(self.course, self.cohort2)
         self.assertEqual(
             response_dict,
             {
@@ -298,7 +494,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         """
         new_cohort_name = "New cohort unassociated to content groups"
         request_data = {'name': new_cohort_name, 'assignment_type': CourseCohort.RANDOM}
-        response_dict = self.put_cohort_handler(self.course, data=request_data)
+        response_dict = self.put_handler(self.course, data=request_data)
         self.verify_contains_added_cohort(response_dict, new_cohort_name, assignment_type=CourseCohort.RANDOM)
 
         new_cohort_name = "New cohort linked to group"
@@ -308,7 +504,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
             'user_partition_id': 1,
             'group_id': 2
         }
-        response_dict = self.put_cohort_handler(self.course, data=data)
+        response_dict = self.put_handler(self.course, data=data)
         self.verify_contains_added_cohort(
             response_dict,
             new_cohort_name,
@@ -320,14 +516,14 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         """
         Verify that we cannot create a cohort without specifying a name.
         """
-        response_dict = self.put_cohort_handler(self.course, expected_response_code=400)
+        response_dict = self.put_handler(self.course, expected_response_code=400)
         self.assertEqual("Cohort name must be specified.", response_dict.get("error"))
 
     def test_create_new_cohort_missing_assignment_type(self):
         """
         Verify that we cannot create a cohort without specifying an assignment type.
         """
-        response_dict = self.put_cohort_handler(self.course, data={'name': 'COHORT NAME'}, expected_response_code=400)
+        response_dict = self.put_handler(self.course, data={'name': 'COHORT NAME'}, expected_response_code=400)
         self.assertEqual("Assignment type must be specified.", response_dict.get("error"))
 
     def test_create_new_cohort_existing_name(self):
@@ -335,7 +531,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         Verify that we cannot add a cohort with the same name as an existing cohort.
         """
         self._create_cohorts()
-        response_dict = self.put_cohort_handler(
+        response_dict = self.put_handler(
             self.course, data={'name': self.cohort1.name, 'assignment_type': CourseCohort.MANUAL},
             expected_response_code=400
         )
@@ -346,7 +542,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         Verify that we cannot create a cohort with a group_id if the user_partition_id is not also specified.
         """
         data = {'name': "Cohort missing user_partition_id", 'assignment_type': CourseCohort.MANUAL, 'group_id': 2}
-        response_dict = self.put_cohort_handler(self.course, data=data, expected_response_code=400)
+        response_dict = self.put_handler(self.course, data=data, expected_response_code=400)
         self.assertEqual(
             "If group_id is specified, user_partition_id must also be specified.", response_dict.get("error")
         )
@@ -360,7 +556,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         self._create_cohorts()
         updated_name = self.cohort1.name + "_updated"
         data = {'name': updated_name, 'assignment_type': CourseCohort.MANUAL}
-        response_dict = self.put_cohort_handler(self.course, self.cohort1, data=data)
+        response_dict = self.put_handler(self.course, self.cohort1, data=data)
         self.assertEqual(updated_name, get_cohort_by_id(self.course.id, self.cohort1.id).name)
         self.assertEqual(updated_name, response_dict.get("name"))
         self.assertEqual(CourseCohort.MANUAL, response_dict.get("assignment_type"))
@@ -372,7 +568,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         # Create a new cohort with random assignment
         cohort_name = 'I AM A RANDOM COHORT'
         data = {'name': cohort_name, 'assignment_type': CourseCohort.RANDOM}
-        response_dict = self.put_cohort_handler(self.course, data=data)
+        response_dict = self.put_handler(self.course, data=data)
 
         self.assertEqual(cohort_name, response_dict.get("name"))
         self.assertEqual(CourseCohort.RANDOM, response_dict.get("assignment_type"))
@@ -381,7 +577,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         newly_created_cohort = get_cohort_by_name(self.course.id, cohort_name)
         cohort_name = 'I AM AN UPDATED RANDOM COHORT'
         data = {'name': cohort_name, 'assignment_type': CourseCohort.RANDOM}
-        response_dict = self.put_cohort_handler(self.course, newly_created_cohort, data=data)
+        response_dict = self.put_handler(self.course, newly_created_cohort, data=data)
 
         self.assertEqual(cohort_name, get_cohort_by_id(self.course.id, newly_created_cohort.id).name)
         self.assertEqual(cohort_name, response_dict.get("name"))
@@ -394,7 +590,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         # Create a new cohort with random assignment
         cohort_name = 'I AM A RANDOM COHORT'
         data = {'name': cohort_name, 'assignment_type': CourseCohort.RANDOM}
-        response_dict = self.put_cohort_handler(self.course, data=data)
+        response_dict = self.put_handler(self.course, data=data)
 
         self.assertEqual(cohort_name, response_dict.get("name"))
         self.assertEqual(CourseCohort.RANDOM, response_dict.get("assignment_type"))
@@ -402,9 +598,9 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         # Try to update the assignment type of newly created random cohort
         cohort = get_cohort_by_name(self.course.id, cohort_name)
         data = {'name': cohort_name, 'assignment_type': CourseCohort.MANUAL}
-        response_dict = self.put_cohort_handler(self.course, cohort, data=data, expected_response_code=400)
+        response_dict = self.put_handler(self.course, cohort, data=data, expected_response_code=400)
         self.assertEqual(
-            'There must be one cohort to which students can be randomly assigned.', response_dict.get("error")
+            'There must be one cohort to which students can automatically be assigned.', response_dict.get("error")
         )
 
     def test_update_cohort_group_id(self):
@@ -419,7 +615,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
             'group_id': 2,
             'user_partition_id': 3
         }
-        response_dict = self.put_cohort_handler(self.course, self.cohort1, data=data)
+        response_dict = self.put_handler(self.course, self.cohort1, data=data)
         self.assertEqual((2, 3), get_group_info_for_cohort(self.cohort1))
         self.assertEqual(2, response_dict.get("group_id"))
         self.assertEqual(3, response_dict.get("user_partition_id"))
@@ -434,7 +630,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         link_cohort_to_partition_group(self.cohort1, 5, 0)
         self.assertEqual((0, 5), get_group_info_for_cohort(self.cohort1))
         data = {'name': self.cohort1.name, 'assignment_type': CourseCohort.RANDOM, 'group_id': None}
-        response_dict = self.put_cohort_handler(self.course, self.cohort1, data=data)
+        response_dict = self.put_handler(self.course, self.cohort1, data=data)
         self.assertEqual((None, None), get_group_info_for_cohort(self.cohort1))
         self.assertIsNone(response_dict.get("group_id"))
         self.assertIsNone(response_dict.get("user_partition_id"))
@@ -452,7 +648,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
             'group_id': 2,
             'user_partition_id': 3
         }
-        self.put_cohort_handler(self.course, self.cohort4, data=data)
+        self.put_handler(self.course, self.cohort4, data=data)
         self.assertEqual((2, 3), get_group_info_for_cohort(self.cohort4))
 
         data = {
@@ -461,7 +657,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
             'group_id': 1,
             'user_partition_id': 3
         }
-        self.put_cohort_handler(self.course, self.cohort4, data=data)
+        self.put_handler(self.course, self.cohort4, data=data)
         self.assertEqual((1, 3), get_group_info_for_cohort(self.cohort4))
 
     def test_update_cohort_missing_user_partition_id(self):
@@ -470,7 +666,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         """
         self._create_cohorts()
         data = {'name': self.cohort1.name, 'assignment_type': CourseCohort.RANDOM, 'group_id': 2}
-        response_dict = self.put_cohort_handler(self.course, self.cohort1, data=data, expected_response_code=400)
+        response_dict = self.put_handler(self.course, self.cohort1, data=data, expected_response_code=400)
         self.assertEqual(
             "If group_id is specified, user_partition_id must also be specified.", response_dict.get("error")
         )
@@ -998,3 +1194,59 @@ class RemoveUserFromCohortTestCase(CohortViewsTestCase):
         cohort = CohortFactory(course_id=self.course.id, users=[user])
         response_dict = self.request_remove_user_from_cohort(user.username, cohort)
         self.verify_removed_user_from_cohort(user.username, response_dict, cohort)
+
+
+@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in LMS')
+class CourseCohortDiscussionTopicsTestCase(CohortViewsTestCase):
+    """
+    Tests the `cohort_discussion_topics` view.
+    """
+
+    def test_non_staff(self):
+        """
+        Verify that we cannot access cohort_discussion_topics if we're a non-staff user.
+        """
+        self._verify_non_staff_cannot_access(cohort_discussion_topics, "GET", [unicode(self.course.id)])
+
+    def test_get_discussion_topics(self):
+        """
+        Verify that course_cohort_settings_handler is working for HTTP GET.
+        """
+        # create inline & course-wide discussion to verify the different map.
+        self.create_cohorted_discussions()
+
+        response = self.get_handler(self.course, handler=cohort_discussion_topics)
+        start_date = response['inline_discussions']['subcategories']['Chapter']['start_date']
+        expected_response = {
+            "course_wide_discussions": {
+                'children': ['Topic B'],
+                'entries': {
+                    'Topic B': {
+                        'sort_key': 'A',
+                        'is_cohorted': True,
+                        'id': topic_name_to_id(self.course, "Topic B"),
+                        'start_date': response['course_wide_discussions']['entries']['Topic B']['start_date']
+                    }
+                }
+            },
+            "inline_discussions": {
+                'subcategories': {
+                    'Chapter': {
+                        'subcategories': {},
+                        'children': ['Discussion'],
+                        'entries': {
+                            'Discussion': {
+                                'sort_key': None,
+                                'is_cohorted': True,
+                                'id': topic_name_to_id(self.course, "Topic A"),
+                                'start_date': start_date
+                            }
+                        },
+                        'sort_key': 'Chapter',
+                        'start_date': start_date
+                    }
+                },
+                'children': ['Chapter']
+            }
+        }
+        self.assertEqual(response, expected_response)

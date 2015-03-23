@@ -44,8 +44,7 @@ var edx = edx || {};
 
         renderGroupHeader: function() {
             this.$('.cohort-management-group-header').html(this.groupHeaderTemplate({
-                cohort: this.model,
-                studioAdvancedSettingsUrl: this.context.studioAdvancedSettingsUrl
+                cohort: this.model
             }));
         },
 
