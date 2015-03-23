@@ -15,7 +15,7 @@ import sys
 import traceback
 import unittest
 
-from contextlib import contextmanager
+from contextlib import contextmanager, nested
 from functools import wraps
 from lazy import lazy
 from mock import Mock
@@ -140,7 +140,7 @@ def get_test_system(course_id=SlashSeparatedCourseKey('org', 'course', 'run')):
         render_template=mock_render_template,
         replace_urls=str,
         user=user,
-        get_real_user=lambda(__): user,
+        get_real_user=lambda __: user,
         filestore=Mock(name='get_test_system.filestore'),
         debug=True,
         hostname="edx.org",
@@ -293,51 +293,59 @@ class BulkAssertionTest(unittest.TestCase):
         else:
             return message
 
+    @contextmanager
+    def _capture_assertion_errors(self):
+        try:
+            # Only wrap the first layer of assert functions by stashing away the manager
+            # before executing the assertion.
+            manager = self._manager
+            self._manager = None
+            yield
+        except AssertionError:  # pylint: disable=broad-except
+            if manager is not None:
+                # Reconstruct the stack in which the error was thrown (so that the traceback)
+                # isn't cut off at `assertion(*args, **kwargs)`.
+                type, value, tb = sys.exc_info()
+
+                # Count the number of stack frames before you get to a
+                # unittest context (walking up the stack from here).
+                relevant_frames = 0
+                for frame_record in inspect.stack():
+                    # This is the same criterion used by unittest to decide if a
+                    # stack frame is relevant to exception printing.
+                    frame = frame_record[0]
+                    if '__unittest' in frame.f_globals:
+                        break
+                    relevant_frames += 1
+
+                stack_above = traceback.extract_stack()[-relevant_frames:-1]
+
+                stack_below = traceback.extract_tb(tb)
+                formatted_stack = traceback.format_list(stack_above + stack_below)
+                formatted_exc = traceback.format_exception_only(type, value)
+                manager.log_error(
+                    "".join(formatted_stack + formatted_exc)
+                )
+            else:
+                raise
+        finally:
+            self._manager = manager
+
     def _wrap_assertion(self, assertion):
         @wraps(assertion)
-        @contextmanager
         def assert_(*args, **kwargs):
-            try:
-                # Only wrap the first layer of assert functions by stashing away the manager
-                # before executing the assertion.
-                manager = self._manager
-                self._manager = None
+            context = None
+
+            # Run the assertion, and capture any raised assertionErrors
+            with self._capture_assertion_errors():
                 context = assertion(*args, **kwargs)
 
-                # Handle the assertRaises family of functions by using a context manager,
-                # if one is returned without an exception being thrown.
-                if context is not None:
-                    with context:
-                        yield
-            except AssertionError:  # pylint: disable=broad-except
-                if manager is not None:
-                    # Reconstruct the stack in which the error was thrown (so that the traceback)
-                    # isn't cut off at `assertion(*args, **kwargs)`.
-                    type, value, tb = sys.exc_info()
+            # Handle the assertRaises family of functions by returning
+            # a context manager that surrounds the assertRaises
+            # with our assertion capturing context manager.
+            if context is not None:
+                return nested(self._capture_assertion_errors(), context)
 
-                    # Count the number of stack frames before you get to a
-                    # unittest context (walking up the stack from here).
-                    relevant_frames = 0
-                    for frame_record in inspect.stack():
-                        # This is the same criterion used by unittest to decide if a
-                        # stack frame is relevant to exception printing.
-                        frame = frame_record[0]
-                        if '__unittest' in frame.f_globals:
-                            break
-                        relevant_frames += 1
-
-                    stack_above = traceback.extract_stack()[-relevant_frames:-1]
-
-                    stack_below = traceback.extract_tb(tb)
-                    formatted_stack = traceback.format_list(stack_above + stack_below)
-                    formatted_exc = traceback.format_exception_only(type, value)
-                    manager.log_error(
-                        "".join(formatted_stack + formatted_exc)
-                    )
-                else:
-                    raise
-            finally:
-                self._manager = manager
         return assert_
 
     def __getattribute__(self, name):
