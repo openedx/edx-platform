@@ -1,4 +1,6 @@
 $(document).ready(function() {
+    'use strict';
+
     $("#btn_generate_cert").click(function(e){
         e.preventDefault();
         var post_url = $("#btn_generate_cert").data("endpoint");

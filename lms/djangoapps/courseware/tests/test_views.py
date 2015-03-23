@@ -876,7 +876,6 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             mock_send_to_queue.return_value = (0, "Successfully queued")
             resp = self.client.post(self.url)
             self.assertEqual(resp.status_code, 200)
-            self.assertIn("Creating certificate", resp.content)
 
             #Verify Google Analytics event fired after generating certificate
             mock_tracker.track.assert_called_once_with(  # pylint: disable=no-member
@@ -906,7 +905,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         )
         resp = self.client.post(self.url)
         self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-        self.assertIn("Creating certificate", resp.content)
+        self.assertIn("Certificate is already being created.", resp.content)
 
     @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
     def test_user_with_passing_existing_downloadable_cert(self):
@@ -920,7 +919,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         )
         resp = self.client.post(self.url)
         self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-        self.assertIn("Creating certificate", resp.content)
+        self.assertIn("Certificate has already been created.", resp.content)
 
     def test_user_with_non_existing_course(self):
         # If try to access a course with valid key pattern then it will return
