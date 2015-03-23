@@ -1,3 +1,5 @@
+"""Get log settings."""
+
 import os
 import platform
 import sys
@@ -18,7 +20,6 @@ def get_logger_config(log_dir,
                       service_variant=None):
 
     """
-
     Return the appropriate logging config dictionary. You should assign the
     result of this to the LOGGING var in your settings. The reason it's done
     this way instead of registering directly is because I didn't want to worry
