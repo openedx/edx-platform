@@ -15,7 +15,7 @@ from openedx.core.lib.api.authentication import (
     SessionAuthenticationAllowInactiveUser,
 )
 from openedx.core.lib.api.permissions import IsUserInUrl, IsUserInUrlOrStaff
-from ..user_api.accounts.api import set_has_profile_image, get_profile_image_names
+from openedx.core.djangoapps.user_api.accounts.api import set_has_profile_image, get_profile_image_names
 from .images import validate_uploaded_image, create_profile_images, remove_profile_images, ImageValidationError
 
 

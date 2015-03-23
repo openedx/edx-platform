@@ -8,7 +8,7 @@ from django.core.files.base import ContentFile
 from django.utils.translation import ugettext as _, ugettext_noop as _noop
 from PIL import Image
 
-from ..user_api.accounts.api import get_profile_image_storage
+from openedx.core.djangoapps.user_api.accounts.api import get_profile_image_storage
 
 
 FILE_UPLOAD_TOO_LARGE = _noop('Maximum file size exceeded.')
@@ -33,7 +33,7 @@ class ImageValidationError(Exception):
 
 def validate_uploaded_image(uploaded_file):
     """
-    Raises ImageFileRejected if the server should refuse to use this
+    Raises ImageValidationError if the server should refuse to use this
     uploaded file as the source image for a user's profile image.  Otherwise,
     returns nothing.
     """
@@ -117,7 +117,10 @@ def create_profile_images(image_file, profile_image_names):
     for size, name in profile_image_names.items():
         scaled_image_file = _get_scaled_image_file(image_obj, size)
         # Store the file.
-        storage.save(name, scaled_image_file)
+        try:
+            storage.save(name, scaled_image_file)
+        finally:
+            scaled_image_file.close()
 
 
 def remove_profile_images(profile_image_names):
