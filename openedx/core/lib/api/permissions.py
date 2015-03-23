@@ -52,9 +52,12 @@ class IsUserInUrl(permissions.BasePermission):
     Permission that checks to see if the request user matches the user in the URL.
     """
     def has_permission(self, request, view):
-        # Unless requesting user has staff privileges, Return a 404 instead of
-        # a 403 (Unauthorized). If one user is looking up other users, do not
-        # let them deduce the existence of an account.
+        """
+        Returns true if the current request is by the user themselves.
+
+        Note: a 404 is returned for non-staff instead of a 403. This is to prevent
+        users from being able to detect the existence of accounts.
+        """
         url_username = request.parser_context.get('kwargs', {}).get('username', '')
         if request.user.username.lower() != url_username.lower():
             if request.user.is_staff:

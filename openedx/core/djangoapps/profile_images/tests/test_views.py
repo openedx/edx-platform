@@ -8,6 +8,8 @@ import ddt
 from django.conf import settings
 from django.core.urlresolvers import reverse
 import mock
+from mock import patch
+
 from PIL import Image
 from rest_framework.test import APITestCase, APIClient
 
@@ -63,7 +65,7 @@ class ProfileImageEndpointTestCase(APITestCase):
             else:
                 self.assertFalse(self.storage.exists(name))
 
-    def check_response(self, response, expected_code, expected_message=None):
+    def check_response(self, response, expected_code, expected_developer_message=None, expected_user_message=None):
         """
         Make sure the response has the expected code, and if that isn't 200,
         optionally check the correctness of a developer-facing message.
@@ -71,8 +73,11 @@ class ProfileImageEndpointTestCase(APITestCase):
         self.assertEqual(expected_code, response.status_code)
         if expected_code == 204:
             self.assertIsNone(response.data)
-        elif expected_message is not None:
-            self.assertEqual(response.data.get('developer_message'), expected_message)
+        else:
+            if expected_developer_message is not None:
+                self.assertEqual(response.data.get('developer_message'), expected_developer_message)
+            if expected_user_message is not None:
+                self.assertEqual(response.data.get('user_message'), expected_user_message)
 
     def check_has_profile_image(self, has_profile_image=True):
         """
@@ -92,6 +97,15 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
     Tests for the profile_image upload endpoint.
     """
     _view_name = "profile_image_upload"
+
+    def test_unsupported_methods(self):
+        """
+        Test that GET, PUT, PATCH, and DELETE are not supported.
+        """
+        self.assertEqual(405, self.client.get(self.url).status_code)
+        self.assertEqual(405, self.client.put(self.url).status_code)
+        self.assertEqual(405, self.client.patch(self.url).status_code)
+        self.assertEqual(405, self.client.delete(self.url).status_code)
 
     def test_anonymous_access(self):
         """
@@ -142,7 +156,11 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
         Test that omitting the file entirely from the POST results in HTTP 400.
         """
         response = self.client.post(self.url, {}, format='multipart')
-        self.check_response(response, 400)
+        self.check_response(
+            response, 400,
+            expected_developer_message=u"No file provided for profile image",
+            expected_user_message=u"No file provided for profile image",
+        )
         self.check_images(False)
         self.check_has_profile_image(False)
 
@@ -152,24 +170,49 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
         400.
         """
         response = self.client.post(self.url, {'file': 'not a file'}, format='multipart')
-        self.check_response(response, 400)
+        self.check_response(
+            response, 400,
+            expected_developer_message=u"No file provided for profile image",
+            expected_user_message=u"No file provided for profile image",
+        )
         self.check_images(False)
         self.check_has_profile_image(False)
 
     def test_upload_validation(self):
         """
         Test that when upload validation fails, the proper HTTP response and
-        message are returned.
+        messages are returned.
         """
         with make_image_file() as image_file:
             with mock.patch(
                 'openedx.core.djangoapps.profile_images.views.validate_uploaded_image',
-                side_effect=ImageValidationError("test error message")
+                side_effect=ImageValidationError(u"test error message")
             ):
                 response = self.client.post(self.url, {'file': image_file}, format='multipart')
-                self.check_response(response, 400, "test error message")
+                self.check_response(
+                    response, 400,
+                    expected_developer_message=u"test error message",
+                    expected_user_message=u"test error message",
+                )
                 self.check_images(False)
                 self.check_has_profile_image(False)
+
+    @patch('PIL.Image.open')
+    def test_upload_failure(self, image_open):
+        """
+        Test that when upload validation fails, the proper HTTP response and
+        messages are returned.
+        """
+        image_open.side_effect = [Exception(u"whoops"), None]
+        with make_image_file() as image_file:
+            response = self.client.post(self.url, {'file': image_file}, format='multipart')
+            self.check_response(
+                response, 400,
+                expected_developer_message=u"Upload failed for profile image: whoops",
+                expected_user_message=u"Upload failed for profile image",
+            )
+            self.check_images(False)
+            self.check_has_profile_image(False)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
@@ -185,6 +228,15 @@ class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
             create_profile_images(image_file, get_profile_image_names(self.user.username))
             self.check_images()
             set_has_profile_image(self.user.username, True)
+
+    def test_unsupported_methods(self):
+        """
+        Test that GET, PUT, PATCH, and DELETE are not supported.
+        """
+        self.assertEqual(405, self.client.get(self.url).status_code)
+        self.assertEqual(405, self.client.put(self.url).status_code)
+        self.assertEqual(405, self.client.patch(self.url).status_code)
+        self.assertEqual(405, self.client.delete(self.url).status_code)
 
     def test_anonymous_access(self):
         """
@@ -230,3 +282,19 @@ class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
         self.check_response(response, 204)
         self.check_images(False)
         self.check_has_profile_image(False)
+
+    @patch('student.models.UserProfile.save')
+    def test_remove_failure(self, user_profile_save):
+        """
+        Test that when upload validation fails, the proper HTTP response and
+        messages are returned.
+        """
+        user_profile_save.side_effect = [Exception(u"whoops"), None]
+        response = self.client.post(self.url)
+        self.check_response(
+            response, 400,
+            expected_developer_message=u"Delete failed for profile image: whoops",
+            expected_user_message=u"Delete failed for profile image",
+        )
+        self.check_images(True)  # thumbnails should remain intact.
+        self.check_has_profile_image(True)
