@@ -4,6 +4,7 @@ NOTE: this API is WIP and has not yet been approved. Do not use this API without
 For more information, see:
 https://openedx.atlassian.net/wiki/display/TNL/User+API
 """
+from django.db import transaction
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -117,7 +118,8 @@ class AccountView(APIView):
         else an error response with status code 415 will be returned.
         """
         try:
-            update_account_settings(request.user, request.DATA, username=username)
+            with transaction.commit_on_success():
+                update_account_settings(request.user, request.DATA, username=username)
         except (UserNotFound, UserNotAuthorized):
             return Response(status=status.HTTP_404_NOT_FOUND)
         except AccountValidationError as err:

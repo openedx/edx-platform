@@ -6,6 +6,7 @@ from mock import patch
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.test.testcases import TransactionTestCase
 from rest_framework.test import APITestCase, APIClient
 
 from student.tests.factories import UserFactory
@@ -509,3 +510,39 @@ class TestAccountAPI(UserAPITestCase):
             error_response.data["developer_message"]
         )
         self.assertIsNone(error_response.data["user_message"])
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class TestAccountAPITransactions(TransactionTestCase):
+    """
+    Tests the transactional behavior of the account API
+    """
+    test_password = "test"
+
+    def setUp(self):
+        super(TestAccountAPITransactions, self).setUp()
+        self.client = APIClient()
+        self.user = UserFactory.create(password=self.test_password)
+        self.url = reverse("accounts_api", kwargs={'username': self.user.username})
+
+    @patch('student.views.do_email_change_request')
+    def test_update_account_settings_rollback(self, mock_email_change):
+        """
+        Verify that updating account settings is transactional when a failure happens.
+        """
+        # Send a PATCH request with updates to both profile information and email.
+        # Throw an error from the method that is used to process the email change request
+        # (this is the last thing done in the api method). Verify that the profile did not change.
+        mock_email_change.side_effect = [ValueError, "mock value error thrown"]
+        self.client.login(username=self.user.username, password=self.test_password)
+        old_email = self.user.email
+
+        json_data = {"email": "foo@bar.com", "gender": "o"}
+        response = self.client.patch(self.url, data=json.dumps(json_data), content_type="application/merge-patch+json")
+        self.assertEqual(400, response.status_code)
+
+        # Verify that GET returns the original preferences
+        response = self.client.get(self.url)
+        data = response.data
+        self.assertEqual(old_email, data["email"])
+        self.assertEqual(u"m", data["gender"])

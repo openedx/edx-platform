@@ -175,9 +175,7 @@ def get_cohorted_commentables(course_key):
 
 @transaction.commit_on_success
 def get_cohort(user, course_key, assign=True, use_cached=False):
-    """
-    Given a Django user and a CourseKey, return the user's cohort in that
-    cohort.
+    """Returns the user's cohort for the specified course.
 
     The cohort for the user is cached for the duration of a request. Pass
     use_cached=True to use the cached value instead of fetching from the
