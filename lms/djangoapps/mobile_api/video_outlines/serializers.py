@@ -179,6 +179,20 @@ def video_summary(course, course_id, video_descriptor, request, local_cache):
     """
     returns summary dict for the given video module
     """
+    if video_descriptor.only_on_web:
+        return {
+            "video_url": None,
+            "video_thumbnail_url": None,
+            "duration": 0,
+            "size": 0,
+            "name": video_descriptor.display_name,
+            "transcripts": {},
+            "language": None,
+            "category": video_descriptor.category,
+            "only_on_web": True,
+            "id": unicode(video_descriptor.scope_ids.usage_id),
+        }
+
     # First try to check VAL for the URLs we want.
     val_video_info = local_cache['course_videos'].get(video_descriptor.edx_video_id, {})
     if val_video_info:
@@ -208,10 +222,6 @@ def video_summary(course, course_id, video_descriptor, request, local_cache):
         )
         for lang in transcript_langs
     }
-
-    if video_descriptor.only_on_web:
-        video_url = None
-        transcripts = {}
 
     return {
         "video_url": video_url,
