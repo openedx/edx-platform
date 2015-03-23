@@ -7,6 +7,9 @@ import json
 
 from collections import namedtuple
 from datetime import datetime
+from unittest import skipUnless
+
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import Http404
 from django.test.client import RequestFactory
@@ -1193,6 +1196,7 @@ class RemoveUserFromCohortTestCase(CohortViewsTestCase):
         self.verify_removed_user_from_cohort(user.username, response_dict, cohort)
 
 
+@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in LMS')
 class CourseCohortDiscussionTopicsTestCase(CohortViewsTestCase):
     """
     Tests the `cohort_discussion_topics` view.

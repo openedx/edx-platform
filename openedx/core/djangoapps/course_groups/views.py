@@ -103,7 +103,7 @@ def get_cohorted_discussions(course, course_settings):
     cohorted_inline_discussions = []
 
     course_wide_discussions = [topic['id'] for __, topic in course.discussion_topics.items()]
-    all_discussions = get_discussion_categories_ids(course, include_all=True)
+    all_discussions = get_discussion_categories_ids(course, None, include_all=True)
 
     for cohorted_discussion_id in course_settings.cohorted_discussions:
         if cohorted_discussion_id in course_wide_discussions:
@@ -462,7 +462,9 @@ def cohort_discussion_topics(request, course_key_string):
     course = get_course_with_access(request.user, 'staff', course_key)
 
     discussion_topics = {}
-    discussion_category_map = get_discussion_category_map(course, cohorted_if_in_list=True, exclude_unstarted=False)
+    discussion_category_map = get_discussion_category_map(
+        course, request.user, cohorted_if_in_list=True, exclude_unstarted=False
+    )
 
     # We extract the data for the course wide discussions from the category map.
     course_wide_entries = discussion_category_map.pop('entries')

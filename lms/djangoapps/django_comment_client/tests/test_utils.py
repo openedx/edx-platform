@@ -17,6 +17,7 @@ from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_client.tests.utils import ContentGroupTestCase
 import django_comment_client.utils as utils
 
+from courseware.tests.factories import InstructorFactory
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -186,6 +187,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.course.discussion_topics = {}
         self.course.save()
         self.discussion_num = 0
+        self.instructor = InstructorFactory(course_key=self.course.id)
         self.maxDiff = None  # pylint: disable=invalid-name
 
     def create_discussion(self, discussion_category, discussion_target, **kwargs):
@@ -199,12 +201,12 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             **kwargs
         )
 
-    def assert_category_map_equals(self, expected, cohorted_if_in_list=False, exclude_unstarted=True):
+    def assert_category_map_equals(self, expected, cohorted_if_in_list=False, exclude_unstarted=True):  # pylint: disable=arguments-differ
         """
         Asserts the expected map with the map returned by get_discussion_category_map method.
         """
         self.assertEqual(
-            utils.get_discussion_category_map(self.course, cohorted_if_in_list, exclude_unstarted),
+            utils.get_discussion_category_map(self.course, self.instructor, cohorted_if_in_list, exclude_unstarted),
             expected
         )
 
