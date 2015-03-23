@@ -13,7 +13,7 @@ sessions. Assumes structure:
 # pylint: disable=wildcard-import, unused-wildcard-import
 
 from .common import *
-from logsettings import get_logger_config
+from openedx.core.lib.logsettings import get_logger_config
 
 STATIC_GRAB = True
 

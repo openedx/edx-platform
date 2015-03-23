@@ -159,7 +159,6 @@ GITHUB_REPO_ROOT = ENV_ROOT / "data"
 sys.path.append(REPO_ROOT)
 sys.path.append(PROJECT_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'djangoapps')
-sys.path.append(COMMON_ROOT / 'lib')
 
 # For geolocation ip database
 GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoIP.dat"
@@ -416,7 +415,7 @@ EMBARGO_SITE_REDIRECT_URL = None
 ############################### Pipeline #######################################
 STATICFILES_STORAGE = 'cms.lib.django_require.staticstorage.OptimizedCachedRequireJsStorage'
 
-from rooted_paths import rooted_glob
+from openedx.core.lib.rooted_paths import rooted_glob
 
 PIPELINE_CSS = {
     'style-vendor': {

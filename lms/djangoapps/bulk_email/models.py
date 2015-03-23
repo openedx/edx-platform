@@ -16,8 +16,8 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models, transaction
 
-from html_to_text import html_to_text
-from mail_utils import wrap_message
+from openedx.core.lib.html_to_text import html_to_text
+from openedx.core.lib.mail_utils import wrap_message
 
 from xmodule_django.models import CourseKeyField
 from util.keyword_substitution import substitute_keywords_with_data

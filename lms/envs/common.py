@@ -389,7 +389,6 @@ DATA_DIR = COURSES_ROOT
 sys.path.append(REPO_ROOT)
 sys.path.append(PROJECT_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'djangoapps')
-sys.path.append(COMMON_ROOT / 'lib')
 
 # For Node.js
 
@@ -1070,7 +1069,7 @@ X_FRAME_OPTIONS = 'ALLOW'
 
 STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 
-from rooted_paths import rooted_glob
+from openedx.core.lib.rooted_paths import rooted_glob
 
 courseware_js = (
     [

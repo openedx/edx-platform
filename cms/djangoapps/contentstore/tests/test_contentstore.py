@@ -10,7 +10,6 @@ from datetime import timedelta
 from fs.osfs import OSFS
 from json import loads
 from path import path
-from tempdir import mkdtemp_clean
 from textwrap import dedent
 from uuid import uuid4
 from functools import wraps
@@ -21,6 +20,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.utils import override_settings
 
+from openedx.core.lib.tempdir import mkdtemp_clean
 from contentstore.tests.utils import parse_json, AjaxEnabledTestClient, CourseTestCase
 from contentstore.views.component import ADVANCED_COMPONENT_TYPES
 
