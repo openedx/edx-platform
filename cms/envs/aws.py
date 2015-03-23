@@ -15,7 +15,7 @@ import json
 
 from .common import *
 
-from logsettings import get_logger_config
+from openedx.core.lib.logsettings import get_logger_config
 import os
 
 from path import path

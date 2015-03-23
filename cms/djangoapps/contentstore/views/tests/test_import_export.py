@@ -23,7 +23,7 @@ from contentstore.utils import reverse_course_url
 from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory
 
 from contentstore.tests.utils import CourseTestCase
-from extract_tar import safetar_extractall
+from openedx.core.lib.extract_tar import safetar_extractall
 from student import auth
 from student.roles import CourseInstructorRole, CourseStaffRole
 

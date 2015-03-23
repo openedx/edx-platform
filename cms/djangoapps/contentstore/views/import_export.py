@@ -33,7 +33,7 @@ from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT
 
 from student.auth import has_course_author_access
 
-from extract_tar import safetar_extractall
+from openedx.core.lib.extract_tar import safetar_extractall
 from util.json_request import JsonResponse
 from util.views import ensure_valid_course_key
 

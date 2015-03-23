@@ -13,7 +13,10 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import Http404
 from django.test.client import RequestFactory
-import django_test_client_utils  # monkey-patch for PATCH request method.
+
+# monkey-patch for PATCH request method.
+import openedx.core.lib.django_test_client_utils    # pylint: disable=unused-import
+
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

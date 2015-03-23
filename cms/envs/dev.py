@@ -6,7 +6,7 @@ This config file runs the simplest dev environment"""
 # pylint: disable=wildcard-import, unused-wildcard-import
 
 from .common import *
-from logsettings import get_logger_config
+from openedx.core.lib.logsettings import get_logger_config
 
 # import settings from LMS for consistent behavior with CMS
 from lms.envs.dev import (WIKI_ENABLED)
