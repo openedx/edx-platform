@@ -16,10 +16,9 @@ class DetailResponse(JsonResponse):
 class InternalRequestErrorResponse(DetailResponse):
     """ Response returned when an internal service request fails. """
 
-    def __init__(self, internal_message, internal_status):
+    def __init__(self, internal_message):
         message = (
-            'Call to E-Commerce API failed. Internal Request Status Code: '
-            '[{internal_status}], Internal Service Message: [{internal_message}]'
-            .format(internal_status=internal_status, internal_message=internal_message)
+            'Call to E-Commerce API failed. Internal Service Message: [{internal_message}]'
+            .format(internal_message=internal_message)
         )
         super(InternalRequestErrorResponse, self).__init__(message=message, status=HTTP_500_INTERNAL_SERVER_ERROR)
