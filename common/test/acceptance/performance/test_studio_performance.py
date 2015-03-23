@@ -44,7 +44,7 @@ class StudioPagePerformanceTest(WebAppTest):
         Produce a HAR for loading a unit page.
         """
         course_outline_page = CourseOutlinePage(self.browser, self.course_org, self.course_num, self.course_run).visit()
-        course_outline_unit = course_outline_page.section(section_title).subsection(subsection_title).toggle_expand().unit(unit_title)
+        course_outline_unit = course_outline_page.section(section_title).subsection(subsection_title).expand_subsection().unit(unit_title)
         har_name = 'UnitPage_{org}_{course}'.format(
             org=self.course_org,
             course=self.course_num

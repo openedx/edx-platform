@@ -40,7 +40,7 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
 
         self.outline.visit()
         subsection = self.outline.section(SECTION_NAME).subsection(SUBSECTION_NAME)
-        self.unit_page = subsection.toggle_expand().unit(UNIT_NAME).go_to()
+        self.unit_page = subsection.expand_subsection().unit(UNIT_NAME).go_to()
 
     def populate_library_fixture(self, library_fixture):
         """

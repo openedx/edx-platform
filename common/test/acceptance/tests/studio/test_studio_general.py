@@ -131,7 +131,7 @@ class DiscussionPreviewTest(StudioCourseTest):
             self.course_info['run']
         )
         cop.visit()
-        self.unit = cop.section('Test Section').subsection('Test Subsection').toggle_expand().unit('Test Unit')
+        self.unit = cop.section('Test Section').subsection('Test Subsection').expand_subsection().unit('Test Unit')
         self.unit.go_to()
 
     def populate_course_fixture(self, course_fixture):

@@ -119,7 +119,7 @@ class LibraryContentTestBase(UniqueCourseTest):
             self._auto_auth(self.STAFF_USERNAME, self.STAFF_EMAIL, True)
         self.course_outline.visit()
         subsection = self.course_outline.section(SECTION_NAME).subsection(SUBSECTION_NAME)
-        return subsection.toggle_expand().unit(UNIT_NAME).go_to()
+        return subsection.expand_subsection().unit(UNIT_NAME).go_to()
 
     def _goto_library_block_page(self, block_id=None):
         """

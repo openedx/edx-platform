@@ -53,7 +53,7 @@ class ORAComponentTest(StudioCourseTest):
     def _go_to_unit_page(self, section_name='Test Section', subsection_name='Test Subsection', unit_name='Test Unit'):
         self.course_outline_page.visit()
         subsection = self.course_outline_page.section(section_name).subsection(subsection_name)
-        return subsection.toggle_expand().unit(unit_name).go_to()
+        return subsection.expand_subsection().unit(unit_name).go_to()
 
     def test_edit_save_and_export(self):
         """
