@@ -4,6 +4,7 @@
 Acceptance tests for CMS Video Editor.
 """
 from nose.plugins.attrib import attr
+from flaky import flaky
 from .test_studio_video_module import CMSVideoBaseTest
 
 
@@ -416,6 +417,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         unicode_text = "Привіт, edX вітає вас.".decode('utf-8')
         self.assertIn(unicode_text, self.video.captions_text)
 
+    @flaky  # TODO: TNL-1770
     def test_translation_upload_remove_upload(self):
         """
         Scenario: Upload "zh" file "A" -> Remove "zh" -> Upload "zh" file "B"
