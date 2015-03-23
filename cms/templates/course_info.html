@@ -48,6 +48,10 @@
     <section class="content">
       <div class="introduction">
         <p clas="copy">${_('Use course updates to notify students of important dates or exams, highlight particular discussions in the forums, announce schedule changes, and respond to student questions. You add or edit updates in HTML.')}</p>
+        <p><strong>${_('Updates support {link_start}keyword substitution{link_end}.').format(
+          link_start='<a rel="modal" href="#keyword-sub-modal">',
+          link_end='</a>')}</strong>
+        </p>
       </div>
     </section>
   </div>
@@ -64,4 +68,6 @@
       </div>
     </div>
   </div>
+
+<%include file='keyword_sub_modal.html' args="keywords_supported=keywords_supported, content_type=_('update')"/>
 </%block>

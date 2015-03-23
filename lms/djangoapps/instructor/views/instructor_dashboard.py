@@ -18,7 +18,7 @@ from django.utils.html import escape
 from django.http import Http404
 from django.conf import settings
 from util.json_request import JsonResponse
-from util import keyword_substitution
+from util.keyword_substitution import get_keywords_supported
 
 from lms.lib.xblock.runtime import quote_slashes
 from xmodule_modifiers import wrap_xblock
@@ -359,7 +359,7 @@ def _section_send_email(course, access):
     section_data = {
         'section_key': 'send_email',
         'section_display_name': _('Email'),
-        'keywords_supported': [{'name':keyword, 'desc': value.desc} for keyword, value in keyword_substitution.KEYWORD_FUNCTION_MAP.iteritems()],
+        'keywords_supported': get_keywords_supported(),
         'access': access,
         'send_email': reverse('send_email', kwargs={'course_id': course_key.to_deprecated_string()}),
         'editor': email_editor,

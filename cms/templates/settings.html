@@ -294,8 +294,15 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
             <span class="tip">${_("Settings for emails that students receive upon course enrollment")}</span>
           </header>
           <section class="group-settings">
-            <p><strong>By default, this feature is disabled.</strong> You can either use the default email content or create your own.<br />
-              Students enrolling right on the start date will receive the post-course-start email.<br />
+            <p>${_("{strong_start}By default, this feature is disabled.{strong_end} You can either use the default email content or create your own. "
+            "Students enrolling right on the start date will receive the post-course-start email. "
+            "{strong_start}Email bodies support {link_start}keyword substitution{link_end}.{strong_end}").format(
+                strong_start="<strong>",
+                strong_end="</strong>",
+                link_start="<a rel='modal' href='#keyword-sub-modal'>",
+                link_end="</a>"
+              )}
+              <br />
             </p>
             <input type="checkbox" id="enable-enrollment-email"/><!-- IMPORTANT -->
             <label for="enable-enrollment-email">${_("Enable enrollment emails")}</label>
@@ -400,4 +407,6 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
   <div id="default_pre_enrollment_email_template" style="display:none;">${default_pre_template}</div>
   <div id="default_post_enrollment_email_template" style="display:none;">${default_post_template}</div>
 </div>
+
+<%include file='keyword_sub_modal.html' args="keywords_supported=keywords_supported, content_type=_('email body')"/>
 </%block>

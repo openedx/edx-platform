@@ -685,9 +685,6 @@ hr.divider {
 
 // ====================
 
-// js dependant
-body.js {
-
   // lean/simple modal window
   .content-modal {
     @include border-bottom-radius(2px);
@@ -746,5 +743,19 @@ body.js {
       margin-top: ($baseline/2);
       color: $gray-l1;
     }
+
+    table {
+      table-layout: fixed;
+      width: 100%;
+      td {
+        border: 1px solid black;
+        padding: $baseline/2;
+        vertical-align: middle;
+
+        input {
+          width: 100%;
+        }
+      }
+    }
   }
-}
+

@@ -48,7 +48,7 @@ from models.settings.course_details import CourseDetails, CourseSettingsEncoder
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from util.json_request import expect_json
-from util.keyword_substitution import substitute_keywords_with_data
+from util.keyword_substitution import get_keywords_supported, substitute_keywords_with_data
 from util.string_utils import _has_non_ascii_characters
 from .access import has_course_access
 from .component import (
@@ -668,7 +668,8 @@ def course_info_handler(request, course_key_string):
                     'context_course': course_module,
                     'updates_url': reverse_course_url('course_info_update_handler', course_key),
                     'handouts_locator': course_key.make_usage_key('course_info', 'handouts'),
-                    'base_asset_url': StaticContent.get_base_url_path_for_course_assets(course_module.id)
+                    'base_asset_url': StaticContent.get_base_url_path_for_course_assets(course_module.id),
+                    'keywords_supported': get_keywords_supported(),
                 }
             )
         else:
@@ -792,6 +793,7 @@ def settings_handler(request, course_key_string):
                 'test_email_url': reverse_course_url('send_test_enrollment_email', course_key),
                 'default_pre_template': default_enroll_email_template_pre,
                 'default_post_template': default_enroll_email_template_post,
+                'keywords_supported': get_keywords_supported(),
             })
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':
