@@ -156,8 +156,6 @@ def _get_pep8_violations():
     where violations_string is a string of all pep8 violations found, separated
     by new lines.
     """
-    systems = ALL_SYSTEMS.split(',')
-
     report_dir = (Env.REPORT_DIR / 'pep8')
     report_dir.rmtree(ignore_errors=True)
     report_dir.makedirs_p()
@@ -165,8 +163,7 @@ def _get_pep8_violations():
     # Make sure the metrics subdirectory exists
     Env.METRICS_DIR.makedirs_p()
 
-    for system in systems:
-        sh('pep8 {system} | tee {report_dir}/pep8.report -a'.format(system=system, report_dir=report_dir))
+    sh('pep8 . | tee {report_dir}/pep8.report -a'.format(report_dir=report_dir))
 
     count, violations_list = _pep8_violations(
         "{report_dir}/pep8.report".format(report_dir=report_dir)

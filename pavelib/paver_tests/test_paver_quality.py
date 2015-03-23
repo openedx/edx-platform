@@ -96,12 +96,16 @@ class TestPaverRunQuality(unittest.TestCase):
 
         # Underlying sh call must fail when it is running the pylint diff-quality task
         self._mock_paver_sh.side_effect = CustomShMock().fail_on_pylint
-        with self.assertRaises(SystemExit):
-            pavelib.quality.run_quality("")
-            self.assertRaises(BuildFailure)
+        _mock_pep8_violations = MagicMock(return_value=(0, []))
+        with patch('pavelib.quality._get_pep8_violations', _mock_pep8_violations):
+            with self.assertRaises(SystemExit):
+                pavelib.quality.run_quality("")
+                self.assertRaises(BuildFailure)
         # Test that both pep8 and pylint were called by counting the calls
-        # Pep8 is called twice (for lms and cms), then pylint is called an additional time.
-        self.assertEqual(self._mock_paver_sh.call_count, 3)
+        # Assert that _get_pep8_violations (which calls "pep8") is called once
+        self.assertEqual(_mock_pep8_violations.call_count, 1)
+        # And assert that sh was called once (for the call to "pylint")
+        self.assertEqual(self._mock_paver_sh.call_count, 1)
 
     def test_other_exception(self):
         """

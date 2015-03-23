@@ -1686,7 +1686,6 @@ class TestFacebookRegistrationView(
         self._verify_user_existence(user_exists=False, social_link_exists=False)
 
 
-
 @skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
 class TestGoogleRegistrationView(
     ThirdPartyRegistrationTestMixin, ThirdPartyOAuthTestMixinGoogle, TransactionTestCase
