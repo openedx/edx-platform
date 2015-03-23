@@ -530,7 +530,7 @@ def set_has_profile_image(username, has_profile_image=True):
     try:
         profile = UserProfile.objects.get(user__username=username)
     except ObjectDoesNotExist:
-        raise AccountUsernameInvalid()
+        raise UserNotFound()
 
     profile.has_profile_image = has_profile_image
     profile.save()

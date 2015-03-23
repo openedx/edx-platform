@@ -195,7 +195,7 @@ class TestAccountAPI(UserAPITestCase):
         """
         client = self.login_client(api_client, user)
         response = client.get(reverse("accounts_api", kwargs={'username': "does_not_exist"}))
-        self.assertEqual(404, response.status_code)
+        self.assertEqual(403 if user == "staff_user" else 404, response.status_code)
 
     # Note: using getattr so that the patching works even if there is no configuration.
     # This is needed when testing CMS as the patching is still executed even though the
@@ -317,7 +317,7 @@ class TestAccountAPI(UserAPITestCase):
         is_staff access).
         """
         client = self.login_client(api_client, user)
-        self.send_patch(client, {}, expected_status=404)
+        self.send_patch(client, {}, expected_status=403 if user == "staff_user" else 404)
 
     @ddt.data(
         ("client", "user"),
