@@ -617,6 +617,23 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(course.edited_by, "testassist@edx.org")
         self.assertDictEqual(course.grade_cutoffs, {"Pass": 0.45})
 
+    def test_get_org_courses(self):
+        courses = modulestore().get_courses(branch=BRANCH_NAME_DRAFT, org='guestx')
+
+        # should have gotten 1 draft courses
+        self.assertEqual(len(courses), 1)
+
+        courses = modulestore().get_courses(branch=BRANCH_NAME_DRAFT, org='testx')
+
+        # should have gotten 2 draft courses
+        self.assertEqual(len(courses), 2)
+
+        # although this is already covered in other tests, let's
+        # also not pass in org= parameter to make sure we get back
+        # 3 courses
+        courses = modulestore().get_courses(branch=BRANCH_NAME_DRAFT)
+        self.assertEqual(len(courses), 3)
+
     def test_branch_requests(self):
         # query w/ branch qualifier (both draft and published)
         def _verify_published_course(courses_published):
@@ -1231,6 +1248,37 @@ class TestItemCrud(SplitModuleTest):
             self.assertIn(new_ele.location.version_agnostic(), version_agnostic(refetch_course.children))
             self.assertEqual(refetch_course.previous_version, course_block_update_version)
             self.assertEqual(refetch_course.update_version, transaction_guid)
+
+    def test_bulk_ops_org_filtering(self):
+        """
+        Make sure of proper filtering when using bulk operations and
+        calling get_courses with an 'org' filter
+        """
+
+        # start transaction w/ simple creation
+        user = random.getrandbits(32)
+        course_key = CourseLocator('test_org', 'test_transaction', 'test_run')
+        with modulestore().bulk_operations(course_key):
+            modulestore().create_course('test_org', 'test_transaction', 'test_run', user, BRANCH_NAME_DRAFT)
+
+            courses = modulestore().get_courses(branch=BRANCH_NAME_DRAFT, org='test_org')
+            self.assertEqual(len(courses), 1)
+            self.assertEqual(courses[0].id.org, course_key.org)
+            self.assertEqual(courses[0].id.course, course_key.course)
+            self.assertEqual(courses[0].id.run, course_key.run)
+
+            courses = modulestore().get_courses(branch=BRANCH_NAME_DRAFT, org='other_org')
+            self.assertEqual(len(courses), 0)
+
+        # re-assert after the end of the with scope
+        courses = modulestore().get_courses(branch=BRANCH_NAME_DRAFT, org='test_org')
+        self.assertEqual(len(courses), 1)
+        self.assertEqual(courses[0].id.org, course_key.org)
+        self.assertEqual(courses[0].id.course, course_key.course)
+        self.assertEqual(courses[0].id.run, course_key.run)
+
+        courses = modulestore().get_courses(branch=BRANCH_NAME_DRAFT, org='other_org')
+        self.assertEqual(len(courses), 0)
 
     def test_update_metadata(self):
         """

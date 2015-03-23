@@ -274,9 +274,10 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
     def test_no_bulk_find_matching_course_indexes(self):
         branch = Mock(name='branch')
         search_targets = MagicMock(name='search_targets')
+        org_targets = None
         self.conn.find_matching_course_indexes.return_value = [Mock(name='result')]
         result = self.bulk.find_matching_course_indexes(branch, search_targets)
-        self.assertConnCalls(call.find_matching_course_indexes(branch, search_targets))
+        self.assertConnCalls(call.find_matching_course_indexes(branch, search_targets, org_targets))
         self.assertEqual(result, self.conn.find_matching_course_indexes.return_value)
         self.assertCacheNotCleared()
 
