@@ -33,6 +33,7 @@
 # Sebastien Vigneau <sebastien.vigneau@gmail.com>, 2014-2015
 # Sebastien Vigneau <sebastien.vigneau@gmail.com>, 2015
 # SLOG90 <slog90@gmail.com>, 2014
+# Tahar <taharbrahmi@hotmail.fr>, 2015
 # Xavier Antoviaque <xavier@antoviaque.org>, 2014
 # yepelboin <yves.epelboin@impmc.upmc.fr>, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
@@ -95,8 +96,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-03-16 14:09+0000\n"
-"PO-Revision-Date: 2015-02-20 21:40+0000\n"
+"POT-Creation-Date: 2015-03-23 14:24+0000\n"
+"PO-Revision-Date: 2015-03-21 23:40+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -276,10 +277,6 @@ msgstr "Masquer la réponse"
 #. student must solve.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Show Answer"
-msgstr "Afficher la réponse"
-
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "Reveal Answer"
 msgstr "Afficher la réponse"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
@@ -4297,6 +4294,14 @@ msgstr ""
 
 #: cms/static/js/views/pages/course_outline.js
 msgid "There were errors reindexing course."
+msgstr ""
+
+#: cms/static/js/views/pages/paged_container.js
+msgid "Hide Previews"
+msgstr ""
+
+#: cms/static/js/views/pages/paged_container.js
+msgid "Show Previews"
 msgstr ""
 
 #: cms/static/js/views/settings/advanced.js

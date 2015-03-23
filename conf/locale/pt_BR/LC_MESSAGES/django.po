@@ -5,6 +5,7 @@
 # 
 # Translators:
 # Álex Filipe <alexfilipe@outlook.com>, 2014
+# Allan Melo <allmelo@gmail.com>, 2015
 # Antonio M. <toinho@gmail.com>, 2014
 # brk0_0, 2013
 # brunojm <brunojm@gmail.com>, 2014
@@ -202,7 +203,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-03-16 14:11+0000\n"
+"POT-Creation-Date: 2015-03-23 14:26+0000\n"
 "PO-Revision-Date: 2014-12-30 16:21+0000\n"
 "Last-Translator: javiercencig <javier@jecnet.com.br>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/edx-platform/language/pt_BR/)\n"
@@ -691,6 +692,18 @@ msgstr "Já existe uma conta com o nome de usuário público '{username}'."
 #: common/djangoapps/student/views.py
 msgid "An account with the Email '{email}' already exists."
 msgstr "Já existe uma conta com o e-mail '{email}'."
+
+#: common/djangoapps/student/views.py
+msgid "An access_token is required when passing value ({}) for provider."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "The provided access_token is already associated with another user."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "The provided access_token is not valid."
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Unknown error. Please e-mail us to let us know how it happened."
@@ -2785,7 +2798,6 @@ msgid "Both"
 msgstr ""
 
 #: lms/templates/footer-edx-new.html lms/templates/footer.html
-#: lms/templates/certificates/valid.html
 #: lms/templates/static_templates/about.html
 msgid "About"
 msgstr "Sobre"
@@ -4407,6 +4419,14 @@ msgstr ""
 
 #: lms/djangoapps/certificates/models.py
 msgid "The download URL for the generated certificate."
+msgstr ""
+
+#. Translators:  This text is bound to the HTML 'title' element of the page
+#. and appears
+#. in the browser title bar when a requested certificate is not found or
+#. recognized
+#: lms/djangoapps/certificates/views.py
+msgid "Invalid Certificate"
 msgstr ""
 
 #. Translators: This line appears on the certificate after the name of a
@@ -6984,6 +7004,54 @@ msgstr ""
 msgid "Verification photos received"
 msgstr ""
 
+#. Translators: This is the website name of www.facebook.com.  Please
+#. translate this the way that Facebook advertises in your language.
+#: lms/envs/common.py
+msgid "Facebook"
+msgstr ""
+
+#. Translators: This is the website name of www.twitter.com.  Please
+#. translate this the way that Twitter advertises in your language.
+#: lms/envs/common.py
+msgid "Twitter"
+msgstr ""
+
+#. Translators: This is the website name of www.linkedin.com.  Please
+#. translate this the way that LinkedIn advertises in your language.
+#: lms/envs/common.py
+msgid "LinkedIn"
+msgstr ""
+
+#. Translators: This is the website name of plus.google.com.  Please
+#. translate this the way that Google+ advertises in your language.
+#: lms/envs/common.py
+msgid "Google+"
+msgstr ""
+
+#. Translators: This is the website name of www.tumblr.com.  Please
+#. translate this the way that Tumblr advertises in your language.
+#: lms/envs/common.py
+msgid "Tumblr"
+msgstr ""
+
+#. Translators: This is the website name of www.meetup.com.  Please
+#. translate this the way that MeetUp advertises in your language.
+#: lms/envs/common.py
+msgid "Meetup"
+msgstr ""
+
+#. Translators: This is the website name of www.reddit.com.  Please
+#. translate this the way that Reddit advertises in your language.
+#: lms/envs/common.py
+msgid "Reddit"
+msgstr ""
+
+#. Translators: This is the website name of www.youtube.com.  Please
+#. translate this the way that YouTube advertises in your language.
+#: lms/envs/common.py
+msgid "Youtube"
+msgstr ""
+
 #: lms/envs/common.py
 msgid "Taiwan"
 msgstr ""
@@ -7673,12 +7741,15 @@ msgid ""
 "different username."
 msgstr ""
 
-#. Translators: These instructions appear on the registration form,
-#. immediately
-#. below a field meant to hold the user's full name.
+#. Translators: This example name is used as a placeholder in
+#. a field on the registration form meant to hold the user's name.
 #: openedx/core/djangoapps/user_api/views.py
-msgid "The name that will appear on your certificates"
+msgid "Jane Doe"
 msgstr ""
+
+#: lms/templates/register.html
+msgid "Needed for any certificates you may earn"
+msgstr "Necessário para todos os certificados que você obtiver"
 
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's public username.
@@ -7687,7 +7758,15 @@ msgid "Public username"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/views.py
-msgid "The name that will identify you in your courses"
+msgid ""
+"The name that will identify you in your courses - {bold_start}(cannot be "
+"changed later){bold_end}"
+msgstr ""
+
+#. Translators: This example username is used as a placeholder in
+#. a field on the registration form meant to hold the user's username.
+#: openedx/core/djangoapps/user_api/views.py
+msgid "JaneDoe"
 msgstr ""
 
 #. Translators: This label appears above a dropdown menu on the registration
@@ -7747,6 +7826,32 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
 msgid "Value '{field_value}' is not valid for field '{field_name}'."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Delete failed for user preference '{preference_key}'."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Preference '{preference_key}' cannot be set to an empty value."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Invalid user preference key '{preference_key}'."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid ""
+"Value '{preference_value}' is not valid for user preference "
+"'{preference_key}'."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Save failed for user preference '{key}' with value '{value}'."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/views.py
+msgid "No data provided for user preference update"
 msgstr ""
 
 #: cms/djangoapps/contentstore/course_info_model.py
@@ -8710,36 +8815,6 @@ msgstr ""
 msgid "Follow Us"
 msgstr ""
 
-#. Translators: This is the website name of www.twitter.com. Please
-#. translate this the way that Twitter advertises in your language.
-#: lms/templates/footer-edx-new.html
-msgid "Twitter"
-msgstr ""
-
-#. Translators: This is the website name of www.facebook.com. Please
-#. translate this the way that Facebook advertises in your language.
-#: lms/templates/footer-edx-new.html
-msgid "Facebook"
-msgstr ""
-
-#. Translators: This is the website name of www.meetup.com. Please
-#. translate this the way that Meetup advertises in your language.
-#: lms/templates/footer-edx-new.html
-msgid "Meetup"
-msgstr ""
-
-#. Translators: This is the website name of www.linked.com. Please
-#. translate this the way that LinkedIn advertises in your language.
-#: lms/templates/footer-edx-new.html
-msgid "LinkedIn"
-msgstr ""
-
-#. Translators: This is the website name of plus.google.com. Please
-#. translate this the way that Google+ advertises in your language.
-#: lms/templates/footer-edx-new.html
-msgid "Google+"
-msgstr ""
-
 #: lms/templates/footer-edx-new.html
 msgid "Mobile Apps"
 msgstr ""
@@ -9272,6 +9347,10 @@ msgid "You do not have any notes."
 msgstr "Você não possui nenhuma anotação. "
 
 #: lms/templates/problem.html
+msgid "your answer"
+msgstr ""
+
+#: lms/templates/problem.html
 msgid "Reset"
 msgstr "Redefinir"
 
@@ -9281,10 +9360,6 @@ msgstr "Redefinir"
 #: lms/templates/verify_student/face_upload.html
 msgid "Save"
 msgstr "Salvar"
-
-#: lms/templates/problem.html
-msgid "Reveal Answer"
-msgstr "Revelar resposta"
 
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} submissions"
@@ -9482,10 +9557,6 @@ msgstr ""
 #: lms/templates/register.html
 msgid "Please complete the following fields to register for an account. "
 msgstr "Por favor, preencha os campos abaixo para registrar uma conta."
-
-#: lms/templates/register.html
-msgid "Needed for any certificates you may earn"
-msgstr "Necessário para todos os certificados que você obtiver"
 
 #: lms/templates/register.html
 msgid "cannot be changed later"
@@ -10169,34 +10240,36 @@ msgid "Calculator Output Field"
 msgstr "Calculadora de campo de saída"
 
 #: lms/templates/certificates/invalid.html
-msgid "This is an invalid edX certificate number"
+msgid "This is an invalid certificate number"
+msgstr ""
+
+#: lms/templates/certificates/invalid.html
+msgid "This Certificate Does Not Exist"
 msgstr ""
 
 #: lms/templates/certificates/invalid.html
 msgid ""
-"Please check the number to make sure that it is the exact same as on the "
-"certificate."
+"We cannot find a certificate on file that matches this URL or ID number."
+msgstr ""
+
+#: lms/templates/certificates/invalid.html
+msgid "Looking for a Particular Certificate?"
 msgstr ""
 
 #: lms/templates/certificates/invalid.html
 msgid ""
-"This is an unknown certificate number and therefore is a potential forgery."
+"Ensure that the ID number is an exact match of the ID number on the PDF or "
+"print certificate you are referencing."
+msgstr ""
+
+#: lms/templates/certificates/invalid.html
+msgid ""
+"If you are trying to validate a certificate with this ID number, it may be a"
+" forgery."
 msgstr ""
 
 #: lms/templates/certificates/valid.html
-msgid "Skip to This Page's Content"
-msgstr ""
-
-#: lms/templates/certificates/valid.html
-msgid "Validation Status"
-msgstr ""
-
-#: lms/templates/certificates/valid.html
-msgid "Student Accomplishment"
-msgstr ""
-
-#: lms/templates/certificates/valid.html
-msgid "More Information"
+msgid "Certificate Type"
 msgstr ""
 
 #: lms/templates/chat/toggle_chat.html
@@ -11993,15 +12066,21 @@ msgstr ""
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
-"To get started, please activate your account by clicking on the link below "
-"(you may also copy and paste the link into your browser's address bar)."
+"Change your life and start learning today by activating your {platform_name}"
+" account. Click on the link below or copy and paste it into your browser's "
+"address bar."
 msgstr ""
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
-"Activation ensures that you can register for {platform_name} courses and "
-"access the courseware. If you require assistance, please use our web form at"
-" {contact_us} or email {info_address}."
+"After you activate your account, you can sign up for and take any of the "
+"hundreds of courses {platform_name} offers."
+msgstr ""
+
+#: lms/templates/emails/activation_email.txt
+msgid ""
+"If you need help, please use our web form at {contact_us_url} or email "
+"{info_email_address}."
 msgstr ""
 
 #: lms/templates/emails/activation_email.txt
@@ -12016,9 +12095,7 @@ msgstr ""
 #: lms/templates/emails/activation_email.txt
 msgid ""
 "This email was automatically sent by {site_name} because someone attempted "
-"to create an {platform_name} account using this email address. If you did "
-"not attempt to create this account and do not activate the account, you will"
-" no longer receive emails from {platform_name}."
+"to create an {platform_name} account using this email address."
 msgstr ""
 
 #: lms/templates/emails/activation_email.txt
@@ -16958,6 +17035,10 @@ msgid ""
 msgstr ""
 
 #: cms/templates/import.html
+msgid "Learn more about importing a library"
+msgstr ""
+
+#: cms/templates/import.html
 msgid "Why import a course?"
 msgstr "Por que importar um curso?"
 
@@ -16990,6 +17071,10 @@ msgid ""
 "URL names (or url_name nodes) of any Problem components, the student data "
 "associated with those Problem components may be lost. This data includes "
 "students' problem scores."
+msgstr ""
+
+#: cms/templates/import.html
+msgid "Learn more about importing a course"
 msgstr ""
 
 #: cms/templates/index.html cms/templates/widgets/header.html

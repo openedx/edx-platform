@@ -8,7 +8,7 @@
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
 # jeon <bluerespect@nate.com>, 2014-2015
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
-# Kevin Min <candyson1@naver.com>, 2015
+# Kevin Min <gr326887@graded.br>, 2015
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2015 EdX
@@ -30,7 +30,7 @@
 # bossnm11 <bossnm11@gmail.com>, 2014
 # jeon <bluerespect@nate.com>, 2014
 # Jong-Dae Park <jdpark7@gmail.com>, 2015
-# Kevin Min <candyson1@naver.com>, 2015
+# Kevin Min <gr326887@graded.br>, 2015
 # LEE SI HYEONG <super2451894@gmail.com>, 2014
 # Seo. Junmin <sof.midnight@live.co.kr>, 2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
@@ -40,15 +40,15 @@
 # 
 # Translators:
 # jeon <bluerespect@nate.com>, 2014-2015
-# Kevin Min <candyson1@naver.com>, 2015
+# Kevin Min <gr326887@graded.br>, 2015
 # Kunwoo Kim <crazyabtmath@naver.com>, 2015
 # Sam Ryoo <samryoo@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-03-16 14:09+0000\n"
-"PO-Revision-Date: 2015-02-20 21:40+0000\n"
+"POT-Creation-Date: 2015-03-23 14:24+0000\n"
+"PO-Revision-Date: 2015-03-21 23:40+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/projects/p/edx-platform/language/ko_KR/)\n"
 "MIME-Version: 1.0\n"
@@ -197,10 +197,6 @@ msgstr ""
 #. student must solve.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Show Answer"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "Reveal Answer"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
@@ -3943,6 +3939,14 @@ msgstr ""
 
 #: cms/static/js/views/pages/course_outline.js
 msgid "There were errors reindexing course."
+msgstr ""
+
+#: cms/static/js/views/pages/paged_container.js
+msgid "Hide Previews"
+msgstr ""
+
+#: cms/static/js/views/pages/paged_container.js
+msgid "Show Previews"
 msgstr ""
 
 #: cms/static/js/views/settings/advanced.js
