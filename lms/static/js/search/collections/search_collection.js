@@ -62,7 +62,10 @@ define([
                 },
                 error: function (self, xhr) {
                     self.trigger('error');
-                }
+                },
+                add: true,
+                reset: false,
+                remove: false
             });
         },
 

@@ -571,15 +571,13 @@ class TestCourseReIndex(CourseTestCase):
         self.assertEqual(response['results'], [])
 
         # Start manual reindex
-        errors = CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
-        self.assertEqual(errors, None)
+        CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
 
         self.html.display_name = "My expanded HTML"
         modulestore().update_item(self.html, ModuleStoreEnum.UserID.test)
 
         # Start manual reindex
-        errors = CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
-        self.assertEqual(errors, None)
+        CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
 
         # Check results indexed now
         response = perform_search(
