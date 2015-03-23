@@ -2,6 +2,9 @@
 This file includes the monkey-patch for requests' PATCH method, as we are using
 older version of django that does not contains the PATCH method in its test client.
 """
+
+# pylint: disable=protected-access
+
 from __future__ import unicode_literals
 
 from urlparse import urlparse
@@ -13,11 +16,13 @@ BOUNDARY = 'BoUnDaRyStRiNg'
 MULTIPART_CONTENT = 'multipart/form-data; boundary=%s' % BOUNDARY
 
 
-def request_factory_patch(self, path, data={}, content_type=MULTIPART_CONTENT, **extra):
+def request_factory_patch(self, path, data=None, content_type=MULTIPART_CONTENT, **extra):
     """
     Construct a PATCH request.
     """
-    patch_data = self._encode_data(data, content_type)
+    # pylint: disable=invalid-name
+
+    patch_data = self._encode_data(data or {}, content_type)
 
     parsed = urlparse(path)
     r = {
@@ -32,11 +37,11 @@ def request_factory_patch(self, path, data={}, content_type=MULTIPART_CONTENT, *
     return self.request(**r)
 
 
-def client_patch(self, path, data={}, content_type=MULTIPART_CONTENT, follow=False, **extra):
+def client_patch(self, path, data=None, content_type=MULTIPART_CONTENT, follow=False, **extra):
     """
     Send a resource to the server using PATCH.
     """
-    response = super(Client, self).patch(path, data=data, content_type=content_type, **extra)
+    response = super(Client, self).patch(path, data=data or {}, content_type=content_type, **extra)
     if follow:
         response = self._handle_redirects(response, **extra)
     return response

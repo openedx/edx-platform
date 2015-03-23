@@ -1,3 +1,5 @@
+"""Get log settings."""
+
 import os
 import platform
 import sys
