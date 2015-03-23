@@ -17,8 +17,8 @@
             init: function() {
                 _fn.$header = $( _fn.header );
                 _fn.$footer = $( _fn.footer );
-                _fn.$nav = _fn.$header.find('nav');
-                _fn.$globalNav = _fn.$nav.find('.nav-global');
+                _fn.$navContainer = _fn.$header.find('.nav-container');
+                _fn.$globalNav = _fn.$header.find('.nav-global');
 
                 _fn.add.elements();
                 _fn.add.classes();
@@ -38,7 +38,7 @@
                 },
 
                 burger: function() {
-                    _fn.$nav.prepend([
+                    _fn.$navContainer.prepend([
                         '<a href="#" class="mobile-menu-button" aria-label="menu">',
                             '<i class="icon fa fa-bars" aria-hidden="true"></i>',
                         '</a>'
@@ -46,7 +46,7 @@
                 },
 
                 registerLink: function() {
-                    var $register = _fn.$nav.find('.cta-register'),
+                    var $register = _fn.$header.find('.cta-register'),
                         $li = {},
                         $a = {},
                         count = 0;
@@ -77,7 +77,7 @@
 
                 click: function() {
                     // Toggle menu
-                    _fn.$nav.on( 'click', '.mobile-menu-button', _fn.toggleMenu );
+                    _fn.$header.on( 'click', '.mobile-menu-button', _fn.toggleMenu );
                 }
             },
 

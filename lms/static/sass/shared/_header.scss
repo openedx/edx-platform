@@ -10,13 +10,13 @@ header.global {
   position: relative;
   width: 100%;
 
-  nav {
+  .wrapper-header {
     @include clearfix();
     height: 40px;
     margin: 0 auto;
     padding: 18px ($baseline/2) 0;
     max-width: grid-width(12);
-    min-width: 760px;
+    width: 100%;
   }
 
   h1.logo {
@@ -27,6 +27,15 @@ header.global {
     a {
       display: block;
     }
+  }
+
+  nav {
+    @include clearfix();
+    height: 40px;
+    margin: 0 auto;
+    padding: 18px ($baseline/2) 0;
+    max-width: grid-width(12);
+    min-width: 760px;
   }
 
   .left {
@@ -119,6 +128,7 @@ header.global {
       > a {
         margin: 0;
         @include border-right-radius(0px);
+        background-image: none;
       }
 
       &:last-child {
@@ -148,7 +158,7 @@ header.global {
       .icon {
         display: inline-block;
         @include float(left);
-        margin: 3px 0 -3px 0;
+        @include margin(2px, 6px, -3px, 3px);
         font-size: 1.2em;
         color: $m-gray;
       }
@@ -191,6 +201,7 @@ header.global {
       box-shadow: 0 2px 24px 0 rgba(0,0,0, 0.3);
       border: 1px solid $border-color-3;
       display: none;
+      margin-top: 0;
       padding: 5px 10px;
       position: absolute;
       @include right(0px);
@@ -216,7 +227,7 @@ header.global {
         height: 0px;
         position: absolute;
         @include transform(rotate(-45deg));
-        @include right(12px);
+        @include right(7px);
         top: -6px;
         width: 0px;
       }
@@ -349,13 +360,17 @@ header.global-new {
   box-shadow: 0 1px 5px 0 $shadow-l1;
   background: $header-bg;
 
-  nav {
+  .wrapper-header {
     @include clearfix();
     @include box-sizing(border-box);
-    width: grid-width(12);
     height: 74px;
     margin: 0 auto;
     padding: 17px 0;
+    max-width: grid-width(12);
+
+    &:not(.rwd) {
+      min-width: grid-width(9);
+    }
   }
 
   h1.logo {
@@ -370,6 +385,10 @@ header.global-new {
 
   .nav-global {
     @include float(left);
+  }
+
+  .nav-account-management {
+    margin: 0 auto;
   }
 
   .guest {
@@ -455,6 +474,7 @@ header.global-new {
       > a {
         margin: 0;
         @include border-right-radius(0);
+        background-image: none;
       }
 
       &:last-child {
@@ -483,7 +503,7 @@ header.global-new {
       .icon {
         display: inline-block;
         @include float(left);
-        margin: 3px 0 -3px 0;
+        @include margin(2px, 6px, -3px, 3px);
         font-size: 1.2em;
         color: $m-gray;
       }
@@ -526,6 +546,7 @@ header.global-new {
       box-shadow: 0 2px 24px 0 rgba(0,0,0, 0.3);
       border: 1px solid $border-color-3;
       display: none;
+      margin-top: 0;
       padding: 5px 10px;
       position: absolute;
       @include right(0);
@@ -551,7 +572,7 @@ header.global-new {
         height: 0px;
         position: absolute;
         @include transform(rotate(-45deg));
-        @include right(12px);
+        @include right(7px);
         top: -6px;
         width: 0px;
       }
@@ -607,7 +628,7 @@ header.global-new {
         padding: 3px 10px;
         font-size: 18px;
         line-height: 24px;
-        font-weight: 500;
+        font-weight: 600;
         font-family: $header-sans-serif;
         color: $courseware-navigation-color;
 
@@ -657,14 +678,13 @@ header.global-new {
   }
 
   &.rwd {
-    nav {
-      max-width: 1180px;
+    .wrapper-header {
       width: 320px;
     }
 
     .mobile-menu-button {
+      @include float(left);
       display: inline;
-      float: left;
       text-decoration: none;
       color: $m-gray;
       font-size: 18px;
@@ -679,9 +699,9 @@ header.global-new {
 
     .logo {
       position: absolute;
-      width: 54px;
-      left: calc( 50% - 90px );
       top: 20px;
+      @include left(calc(50% - 90px));
+      width: 54px;
 
       img {
         width: 54px;
@@ -721,7 +741,7 @@ header.global-new {
       a {
         color: white;
         padding: 10px;
-        font-weight: 300;
+        font-weight: 400;
 
         &:hover,
         &:focus {
@@ -746,8 +766,9 @@ header.global-new {
     }
 
     @include media( $desktop ) {
-      nav {
+      .wrapper-header {
         width: 100%;
+        min-width: 800px;
       }
 
       .mobile-menu-button {
@@ -756,10 +777,9 @@ header.global-new {
 
       .logo {
         position: relative;
+        top: 0;
+        @include left(0);
         width: auto;
-        top: inherit;
-        left: inherit;
-        margin-left: ($baseline/2);
 
         img {
           width: auto;
@@ -778,7 +798,7 @@ header.global-new {
         a {
           color: $courseware-navigation-color;
           padding: 3px 10px;
-          font-weight: 500;
+          font-weight: 600;
 
           &:hover,
           &:focus {
@@ -809,8 +829,8 @@ header.global-new {
     }
 
     @include media( $xl-desktop ) {
-      nav {
-        padding: 17px 10px;
+      .wrapper-header {
+        padding: 17px 0;
       }
 
       .nav-global,
@@ -818,10 +838,6 @@ header.global-new {
         a {
           font-size: 18px;
         }
-      }
-
-      .logo {
-        margin-left: 0;
       }
     }
   }
