@@ -85,7 +85,7 @@ class TestValidateUploadedImage(TestCase):
         Ensure that validation fails when the file extension does not match the
         file data.
         """
-        # make a bmp, try to fool the function into thinking its a jpeg
+        # make a bmp, try to fool the function into thinking it's a jpeg
         with make_image_file(extension=".bmp") as bmp_file:
             with closing(NamedTemporaryFile(suffix=".jpeg")) as fake_jpeg_file:
                 fake_jpeg_file.write(bmp_file.read())

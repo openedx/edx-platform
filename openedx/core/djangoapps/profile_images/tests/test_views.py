@@ -46,6 +46,7 @@ class ProfileImageEndpointTestCase(APITestCase):
         self.assertFalse(self.user.profile.has_profile_image)
 
     def tearDown(self):
+        super(ProfileImageEndpointTestCase, self).tearDown()
         for name in get_profile_image_names(self.user.username).values():
             self.storage.delete(name)
 
@@ -67,7 +68,7 @@ class ProfileImageEndpointTestCase(APITestCase):
 
     def check_response(self, response, expected_code, expected_developer_message=None, expected_user_message=None):
         """
-        Make sure the response has the expected code, and if that isn't 200,
+        Make sure the response has the expected code, and if that isn't 204,
         optionally check the correctness of a developer-facing message.
         """
         self.assertEqual(expected_code, response.status_code)

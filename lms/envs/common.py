@@ -2193,10 +2193,11 @@ ECOMMERCE_API_TIMEOUT = 5
 # PROFILE IMAGE CONFIG
 # TODO: add these settings to aws.py as well
 # WARNING: Certain django storage backends do not support atomic
-# file overwrites (including the default, specified below).  This
-# introduces the risk of a race condition occurring when a user
-# uploads a new profile image to replace an earlier one (the file
-# will temporarily be deleted).
+# file overwrites (including the default, specified below) - instead
+# there are separate calls to delete and then write a new file in the
+# storage backend.  This introduces the risk of a race condition
+# occurring when a user uploads a new profile image to replace an
+# earlier one (the file will temporarily be deleted).
 PROFILE_IMAGE_BACKEND = 'storages.backends.overwrite.OverwriteStorage'
 # PROFILE_IMAGE_DOMAIN points to the domain from which we serve image
 # files from.  When this is '/', it refers to the same domain as the
