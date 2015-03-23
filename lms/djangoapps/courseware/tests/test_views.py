@@ -763,17 +763,17 @@ class ProgressPageTests(ModuleStoreTestCase):
 
     def test_generate_cert_config(self):
         resp = views.progress(self.request, course_id=unicode(self.course.id))
-        self.assertNotContains(resp, 'Create Your Certificate')
+        self.assertNotContains(resp, 'Request Certificate')
 
         # Enable the feature, but do not enable it for this course
         CertificateGenerationConfiguration(enabled=True).save()
         resp = views.progress(self.request, course_id=unicode(self.course.id))
-        self.assertNotContains(resp, 'Create Your Certificate')
+        self.assertNotContains(resp, 'Request Certificate')
 
         # Enable certificate generation for this course
         certs_api.set_cert_generation_enabled(self.course.id, True)
         resp = views.progress(self.request, course_id=unicode(self.course.id))
-        self.assertContains(resp, 'Create Your Certificate')
+        self.assertNotContains(resp, 'Request Certificate')
 
 
 class VerifyCourseKeyDecoratorTests(TestCase):
