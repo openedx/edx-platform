@@ -152,7 +152,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-03-16 14:11+0000\n"
+"POT-Creation-Date: 2015-03-23 14:26+0000\n"
 "PO-Revision-Date: 2015-01-05 17:31+0000\n"
 "Last-Translator: Mariangeles Fernandez <mariangelesfm@gmail.com>\n"
 "Language-Team: Spanish (Spain) (http://www.transifex.com/projects/p/edx-platform/language/es_ES/)\n"
@@ -246,31 +246,33 @@ msgstr "Certificado de Código de Honor"
 
 #: common/djangoapps/course_modes/models.py
 msgid "Your verification is pending"
-msgstr ""
+msgstr "Tu verificación está pendiente"
 
 #: common/djangoapps/course_modes/models.py
 msgid "Verified: Pending Verification"
-msgstr ""
+msgstr "Verificado: Pendiente de verificación"
 
 #: common/djangoapps/course_modes/models.py
 msgid "ID verification pending"
-msgstr ""
+msgstr "Verificación de identidad pendiente"
 
 #: common/djangoapps/course_modes/models.py
 msgid "You're enrolled as a verified student"
-msgstr ""
+msgstr "Estás inscrito como alumno verificado"
 
+#: common/djangoapps/course_modes/models.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Verified"
 msgstr "Verificado"
 
+#: common/djangoapps/course_modes/models.py
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "ID Verified Ribbon/Badge"
 msgstr "Cinta/insignia verificada por ID"
 
 #: common/djangoapps/course_modes/models.py
 msgid "You're enrolled as an honor code student"
-msgstr ""
+msgstr "Te has apuntado a este curso como alumno Código de Honor"
 
 #: common/djangoapps/course_modes/models.py
 #: openedx/core/djangoapps/user_api/views.py
@@ -280,19 +282,19 @@ msgstr "Código de Honor"
 
 #: common/djangoapps/course_modes/models.py
 msgid "You're auditing this course"
-msgstr ""
+msgstr "Estás en este curso como oyente"
 
 #: common/djangoapps/course_modes/models.py
 msgid "Auditing"
-msgstr ""
+msgstr "Oyente"
 
 #: common/djangoapps/course_modes/models.py
 msgid "You're enrolled as a professional education student"
-msgstr ""
+msgstr "Te has inscrito como alumno profesional de educación"
 
 #: common/djangoapps/course_modes/models.py
 msgid "Professional Ed"
-msgstr ""
+msgstr "Ed profesional"
 
 #: common/djangoapps/course_modes/views.py
 msgid "Enrollment is closed"
@@ -673,6 +675,18 @@ msgstr "Ya existe una cuenta con el nombre '{username}'."
 #: common/djangoapps/student/views.py
 msgid "An account with the Email '{email}' already exists."
 msgstr "Ya existe una cuenta con el e-mail  '{email}'."
+
+#: common/djangoapps/student/views.py
+msgid "An access_token is required when passing value ({}) for provider."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "The provided access_token is already associated with another user."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "The provided access_token is not valid."
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Unknown error. Please e-mail us to let us know how it happened."
@@ -2892,7 +2906,6 @@ msgstr "Ambos"
 
 #: common/lib/xmodule/xmodule/course_module.py
 #: lms/templates/footer-edx-new.html lms/templates/footer.html
-#: lms/templates/certificates/valid.html
 #: lms/templates/static_templates/about.html
 msgid "About"
 msgstr "Acerca de"
@@ -4583,6 +4596,14 @@ msgstr ""
 msgid "The download URL for the generated certificate."
 msgstr ""
 
+#. Translators:  This text is bound to the HTML 'title' element of the page
+#. and appears
+#. in the browser title bar when a requested certificate is not found or
+#. recognized
+#: lms/djangoapps/certificates/views.py
+msgid "Invalid Certificate"
+msgstr ""
+
 #. Translators: This line appears on the certificate after the name of a
 #. course, and provides more
 #. information about the organizations providing the course material to
@@ -4683,8 +4704,9 @@ msgstr ""
 msgid "Contact {platform_name}"
 msgstr ""
 
-#: cms/templates/widgets/footer.html lms/templates/footer-edx-new.html
-#: lms/templates/footer.html lms/templates/static_templates/privacy.html
+#: lms/djangoapps/certificates/views.py cms/templates/widgets/footer.html
+#: lms/templates/footer-edx-new.html lms/templates/footer.html
+#: lms/templates/static_templates/privacy.html
 msgid "Privacy Policy"
 msgstr "Política de privacidad"
 
@@ -5611,6 +5633,7 @@ msgstr ""
 msgid "E-Commerce"
 msgstr "Comercio electrónico"
 
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: cms/templates/export.html
 msgid "Certificates"
 msgstr "Certificados"
@@ -7311,6 +7334,54 @@ msgstr "Archivo de imagen no es válido"
 msgid "Verification photos received"
 msgstr "Verficación de fotos recibida"
 
+#. Translators: This is the website name of www.facebook.com.  Please
+#. translate this the way that Facebook advertises in your language.
+#: lms/envs/common.py
+msgid "Facebook"
+msgstr ""
+
+#. Translators: This is the website name of www.twitter.com.  Please
+#. translate this the way that Twitter advertises in your language.
+#: lms/envs/common.py
+msgid "Twitter"
+msgstr ""
+
+#. Translators: This is the website name of www.linkedin.com.  Please
+#. translate this the way that LinkedIn advertises in your language.
+#: lms/envs/common.py
+msgid "LinkedIn"
+msgstr ""
+
+#. Translators: This is the website name of plus.google.com.  Please
+#. translate this the way that Google+ advertises in your language.
+#: lms/envs/common.py
+msgid "Google+"
+msgstr ""
+
+#. Translators: This is the website name of www.tumblr.com.  Please
+#. translate this the way that Tumblr advertises in your language.
+#: lms/envs/common.py
+msgid "Tumblr"
+msgstr ""
+
+#. Translators: This is the website name of www.meetup.com.  Please
+#. translate this the way that MeetUp advertises in your language.
+#: lms/envs/common.py
+msgid "Meetup"
+msgstr ""
+
+#. Translators: This is the website name of www.reddit.com.  Please
+#. translate this the way that Reddit advertises in your language.
+#: lms/envs/common.py
+msgid "Reddit"
+msgstr ""
+
+#. Translators: This is the website name of www.youtube.com.  Please
+#. translate this the way that YouTube advertises in your language.
+#: lms/envs/common.py
+msgid "Youtube"
+msgstr ""
+
 #: lms/envs/common.py
 msgid "Taiwan"
 msgstr "Taiwan"
@@ -8030,12 +8101,15 @@ msgstr ""
 "Parece que {username} pertenece a una cuenta ya existente. Inténtalo de "
 "nuevo con un usuario diferente."
 
-#. Translators: These instructions appear on the registration form,
-#. immediately
-#. below a field meant to hold the user's full name.
+#. Translators: This example name is used as a placeholder in
+#. a field on the registration form meant to hold the user's name.
 #: openedx/core/djangoapps/user_api/views.py
-msgid "The name that will appear on your certificates"
-msgstr "Nombre que aparecerá en tus certificados"
+msgid "Jane Doe"
+msgstr ""
+
+#: lms/templates/register.html
+msgid "Needed for any certificates you may earn"
+msgstr "Se requiere para cualquier certificado que puedas obtener"
 
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's public username.
@@ -8044,8 +8118,16 @@ msgid "Public username"
 msgstr "Nombre público de usuario"
 
 #: openedx/core/djangoapps/user_api/views.py
-msgid "The name that will identify you in your courses"
-msgstr "Nombre que te identificará en tus cursos"
+msgid ""
+"The name that will identify you in your courses - {bold_start}(cannot be "
+"changed later){bold_end}"
+msgstr ""
+
+#. Translators: This example username is used as a placeholder in
+#. a field on the registration form meant to hold the user's username.
+#: openedx/core/djangoapps/user_api/views.py
+msgid "JaneDoe"
+msgstr ""
 
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's highest completed level of education.
@@ -8132,6 +8214,32 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
 msgid "Value '{field_value}' is not valid for field '{field_name}'."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Delete failed for user preference '{preference_key}'."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Preference '{preference_key}' cannot be set to an empty value."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Invalid user preference key '{preference_key}'."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid ""
+"Value '{preference_value}' is not valid for user preference "
+"'{preference_key}'."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Save failed for user preference '{key}' with value '{value}'."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/views.py
+msgid "No data provided for user preference update"
 msgstr ""
 
 #: cms/djangoapps/contentstore/course_info_model.py
@@ -8252,7 +8360,7 @@ msgstr "Vacío"
 #: cms/djangoapps/contentstore/views/course.py
 #: cms/djangoapps/contentstore/views/tests/test_course_index.py
 msgid "Course has been successfully reindexed."
-msgstr ""
+msgstr "El curso se ha reindexado con éxito."
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Unscheduled"
@@ -8292,7 +8400,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Invalid prerequisite course key"
-msgstr ""
+msgstr "Clave de curso pre-requisito no válida"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "invalid JSON"
@@ -8308,15 +8416,15 @@ msgstr "Debe tener por lo menos un grupo"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "This group configuration is in use and cannot be deleted."
-msgstr ""
+msgstr "Esta configuración está en uso y no puede ser eliminada."
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "This content group is in use and cannot be deleted."
-msgstr ""
+msgstr "Este grupo de contenidos está en uso y no se puede eliminar."
 
 #: cms/djangoapps/contentstore/views/entrance_exam.py
 msgid "Entrance Exam - Subsection"
-msgstr ""
+msgstr "Examen de ingreso - Subsección"
 
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
@@ -8340,7 +8448,7 @@ msgstr "Archivo subido dañado. Por favor, inténtalo de nuevo"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "Could not find the {0} file in the package."
-msgstr ""
+msgstr "No se encuentra el archivo {0} en el paquete."
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Invalid data"
@@ -8361,6 +8469,8 @@ msgstr "Duplicado de '{0}'"
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Students must score {score}% or higher to access course materials."
 msgstr ""
+"Los alumnos tienen que puntuar {score}% o más para acceder a los materiales "
+"del curso."
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "{section_or_subsection} \"{display_name}\""
@@ -8443,7 +8553,7 @@ msgstr "En progreso"
 #. successfully processed
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Ready"
-msgstr ""
+msgstr "Listo"
 
 #. #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the status for a video that the servers have failed to
@@ -9147,36 +9257,6 @@ msgstr "Trabajos en edX"
 msgid "Follow Us"
 msgstr "Síguenos"
 
-#. Translators: This is the website name of www.twitter.com. Please
-#. translate this the way that Twitter advertises in your language.
-#: lms/templates/footer-edx-new.html
-msgid "Twitter"
-msgstr "Twitter"
-
-#. Translators: This is the website name of www.facebook.com. Please
-#. translate this the way that Facebook advertises in your language.
-#: lms/templates/footer-edx-new.html
-msgid "Facebook"
-msgstr "Facebook"
-
-#. Translators: This is the website name of www.meetup.com. Please
-#. translate this the way that Meetup advertises in your language.
-#: lms/templates/footer-edx-new.html
-msgid "Meetup"
-msgstr "Meetup"
-
-#. Translators: This is the website name of www.linked.com. Please
-#. translate this the way that LinkedIn advertises in your language.
-#: lms/templates/footer-edx-new.html
-msgid "LinkedIn"
-msgstr "LinkedIn"
-
-#. Translators: This is the website name of plus.google.com. Please
-#. translate this the way that Google+ advertises in your language.
-#: lms/templates/footer-edx-new.html
-msgid "Google+"
-msgstr "Google+"
-
 #: lms/templates/footer-edx-new.html
 msgid "Mobile Apps"
 msgstr "Aplicaciones móviles"
@@ -9721,6 +9801,10 @@ msgid "You do not have any notes."
 msgstr "No tienes ninguna anotación."
 
 #: lms/templates/problem.html
+msgid "your answer"
+msgstr ""
+
+#: lms/templates/problem.html
 msgid "Reset"
 msgstr "Reiniciar"
 
@@ -9730,10 +9814,6 @@ msgstr "Reiniciar"
 #: lms/templates/verify_student/face_upload.html
 msgid "Save"
 msgstr "Guardar"
-
-#: lms/templates/problem.html
-msgid "Reveal Answer"
-msgstr "Revelar respuesta"
 
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} submissions"
@@ -9935,10 +10015,6 @@ msgstr ""
 #: lms/templates/register.html
 msgid "Please complete the following fields to register for an account. "
 msgstr "Por favor completa los siguientes campos para crear tu cuenta."
-
-#: lms/templates/register.html
-msgid "Needed for any certificates you may earn"
-msgstr "Se requiere para cualquier certificado que puedas obtener"
 
 #: lms/templates/register.html
 msgid "cannot be changed later"
@@ -10629,34 +10705,36 @@ msgid "Calculator Output Field"
 msgstr "Campo de salida de la calculadora"
 
 #: lms/templates/certificates/invalid.html
-msgid "This is an invalid edX certificate number"
+msgid "This is an invalid certificate number"
+msgstr ""
+
+#: lms/templates/certificates/invalid.html
+msgid "This Certificate Does Not Exist"
 msgstr ""
 
 #: lms/templates/certificates/invalid.html
 msgid ""
-"Please check the number to make sure that it is the exact same as on the "
-"certificate."
+"We cannot find a certificate on file that matches this URL or ID number."
+msgstr ""
+
+#: lms/templates/certificates/invalid.html
+msgid "Looking for a Particular Certificate?"
 msgstr ""
 
 #: lms/templates/certificates/invalid.html
 msgid ""
-"This is an unknown certificate number and therefore is a potential forgery."
+"Ensure that the ID number is an exact match of the ID number on the PDF or "
+"print certificate you are referencing."
+msgstr ""
+
+#: lms/templates/certificates/invalid.html
+msgid ""
+"If you are trying to validate a certificate with this ID number, it may be a"
+" forgery."
 msgstr ""
 
 #: lms/templates/certificates/valid.html
-msgid "Skip to This Page's Content"
-msgstr ""
-
-#: lms/templates/certificates/valid.html
-msgid "Validation Status"
-msgstr ""
-
-#: lms/templates/certificates/valid.html
-msgid "Student Accomplishment"
-msgstr ""
-
-#: lms/templates/certificates/valid.html
-msgid "More Information"
+msgid "Certificate Type"
 msgstr ""
 
 #: lms/templates/chat/toggle_chat.html
@@ -11889,7 +11967,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Resubmit Verification"
-msgstr ""
+msgstr "Volver a entregar la verificación"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
@@ -12507,23 +12585,22 @@ msgstr "Gracias por inscribirte en {platform_name}"
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
-"To get started, please activate your account by clicking on the link below "
-"(you may also copy and paste the link into your browser's address bar)."
+"Change your life and start learning today by activating your {platform_name}"
+" account. Click on the link below or copy and paste it into your browser's "
+"address bar."
 msgstr ""
-"Para comenzar, por favor, activa tu cuenta haciendo clic en el enlace de más"
-" abajo (también puedes copiar y pegar el enlace en la barra de navegación de"
-" tu navegador)."
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
-"Activation ensures that you can register for {platform_name} courses and "
-"access the courseware. If you require assistance, please use our web form at"
-" {contact_us} or email {info_address}."
+"After you activate your account, you can sign up for and take any of the "
+"hundreds of courses {platform_name} offers."
 msgstr ""
-"Con la activación te aseguras de que puedes registrarte para los cursos de "
-"{platform_name} y acceder a los contenidos. Si necesitas ayuda, utiliza por "
-"favor nuestro formulario web en {contact_us} o el correo electrónico "
-"{info_address}"
+
+#: lms/templates/emails/activation_email.txt
+msgid ""
+"If you need help, please use our web form at {contact_us_url} or email "
+"{info_email_address}."
+msgstr ""
 
 #: lms/templates/emails/activation_email.txt
 msgid "We hope you enjoy learning with {platform_name}!"
@@ -12537,15 +12614,8 @@ msgstr "El Equipo de {platform_name}"
 #: lms/templates/emails/activation_email.txt
 msgid ""
 "This email was automatically sent by {site_name} because someone attempted "
-"to create an {platform_name} account using this email address. If you did "
-"not attempt to create this account and do not activate the account, you will"
-" no longer receive emails from {platform_name}."
+"to create an {platform_name} account using this email address."
 msgstr ""
-"Este correo electrónico ha sido enviado automáticamente por {site_name} "
-"porque alguien ha intentado crear una cuenta en {platform_name} utilizando "
-"esta dirección de correo electrónico. Si no has intentado crear esta cuenta "
-"y no la has activado, no volverás a recibir correos electrónicos de "
-"{platform_name}"
 
 #: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/email_change.txt
@@ -13001,7 +13071,7 @@ msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid "HTML link from the attached CSV file"
-msgstr ""
+msgstr "Enlace HTML del archivo CSV adjunto"
 
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid ""
@@ -13020,6 +13090,8 @@ msgid ""
 "Sincerely,\n"
 "[[Your Signature]]"
 msgstr ""
+"Atentamente, \n"
+"[[Tu firma]]"
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "INVOICE"
@@ -17065,7 +17137,7 @@ msgstr "Volver al panel de control"
 
 #: cms/templates/export.html
 msgid "Library Export"
-msgstr ""
+msgstr "Exportar biblioteca"
 
 #: cms/templates/export.html
 msgid "Course Export"
@@ -17073,7 +17145,7 @@ msgstr "Exportar curso"
 
 #: cms/templates/export.html
 msgid "About Exporting Libraries"
-msgstr ""
+msgstr "Acerca de la exportación de bibliotecas"
 
 #. Translators: ".tar.gz" is a file extension, and should not be translated
 #: cms/templates/export.html
@@ -17117,7 +17189,7 @@ msgstr ""
 
 #: cms/templates/export.html
 msgid "Export My Library Content"
-msgstr ""
+msgstr "Exportar el contenido de Mi Biblioteca"
 
 #: cms/templates/export.html
 msgid "Export My Course Content"
@@ -17125,7 +17197,7 @@ msgstr "Exportar el contenido de mi curso"
 
 #: cms/templates/export.html
 msgid "Export Library Content"
-msgstr ""
+msgstr "Exportar el contenido de Biblioteca"
 
 #: cms/templates/export.html
 msgid "Export Course Content"
@@ -17180,7 +17252,7 @@ msgstr "Datos del foro/discusiones"
 
 #: cms/templates/export.html
 msgid "Why export a library?"
-msgstr ""
+msgstr "¿Por qué exportar una biblioteca?"
 
 #: cms/templates/export.html
 msgid ""
@@ -17204,7 +17276,7 @@ msgstr ""
 
 #: cms/templates/export.html
 msgid "Learn more about exporting a library"
-msgstr ""
+msgstr "Saber más sobre exportar una biblioteca"
 
 #: cms/templates/export.html
 msgid "Why export a course?"
@@ -17665,7 +17737,7 @@ msgstr ""
 
 #: cms/templates/import.html
 msgid "Library Import"
-msgstr ""
+msgstr "Importar biblioteca"
 
 #: cms/templates/import.html
 msgid "Course Import"
@@ -17730,6 +17802,7 @@ msgstr ""
 #: cms/templates/import.html
 msgid "Select a .tar.gz File to Replace Your Library Content"
 msgstr ""
+"Selecciona un archivo tar.gz para reemplazar el contenido de tu biblioteca"
 
 #: cms/templates/import.html
 msgid "Select a .tar.gz File to Replace Your Course Content"
@@ -17746,15 +17819,15 @@ msgstr "Archivo seleccionado:"
 
 #: cms/templates/import.html
 msgid "Replace my library with the selected file"
-msgstr ""
+msgstr "Reemplazar mi biblioteca con el archivo seleccionado"
 
 #: cms/templates/import.html
 msgid "Replace my course with the selected file"
-msgstr ""
+msgstr "Reemplazar mi curso con el archivo seleccionado"
 
 #: cms/templates/import.html
 msgid "Library Import Status"
-msgstr ""
+msgstr "Estado de importación de Biblioteca"
 
 #: cms/templates/import.html
 msgid "Course Import Status"
@@ -17788,7 +17861,7 @@ msgstr "Revisando semántica, sintaxis y datos requeridos"
 
 #: cms/templates/import.html
 msgid "Updating Library"
-msgstr ""
+msgstr "Actualizando Biblioteca"
 
 #: cms/templates/import.html
 msgid "Updating Course"
@@ -17799,6 +17872,8 @@ msgid ""
 "Integrating your imported content into this library. This process might take"
 " longer with larger libraries."
 msgstr ""
+"Integrando tu contenido importado en esta biblioteca. Este proceso podría "
+"durar más con bibliotecas más grandes."
 
 #: cms/templates/import.html
 msgid ""
@@ -17812,7 +17887,7 @@ msgstr "Terminación exitosa"
 
 #: cms/templates/import.html
 msgid "Your imported content has now been integrated into this library"
-msgstr ""
+msgstr "Tu contenido importado está ahora integrado en esta biblioteca."
 
 #: cms/templates/import.html
 msgid "Your imported content has now been integrated into this course"
@@ -17820,7 +17895,7 @@ msgstr "Tu curso importado ahora ha sido integrado en este curso"
 
 #: cms/templates/import.html
 msgid "View Updated Library"
-msgstr ""
+msgstr "Ver la biblioteca actualizada"
 
 #: cms/templates/import.html
 msgid "View Updated Outline"
@@ -17828,7 +17903,7 @@ msgstr "Ver la estructura actualizada"
 
 #: cms/templates/import.html
 msgid "Why import a library?"
-msgstr ""
+msgstr "¿Por qué importar una biblioteca?"
 
 #: cms/templates/import.html
 msgid ""
@@ -17840,6 +17915,8 @@ msgstr ""
 #: cms/templates/import.html
 msgid "Note: Library content is not automatically updated in courses"
 msgstr ""
+"Aviso: El contenido de la biblioteca no se actualiza automáticamente en los "
+"cursos"
 
 #: cms/templates/import.html
 msgid ""
@@ -17847,6 +17924,10 @@ msgid ""
 "blocks in one or more courses, those courses do not automatically use the "
 "updated content. You must manually refresh the randomized content blocks to "
 "bring them up to date with the latest library content."
+msgstr ""
+
+#: cms/templates/import.html
+msgid "Learn more about importing a library"
 msgstr ""
 
 #: cms/templates/import.html
@@ -17895,6 +17976,10 @@ msgstr ""
 "los nombres de las URL (o los nodos url_name) de cualquier ejercicio, los "
 "datos de los alumnos asociados con esos ejercicios se perderán. Estos datos "
 "incluyen las puntuaciones de los alumnos en esos ejercicios."
+
+#: cms/templates/import.html
+msgid "Learn more about importing a course"
+msgstr ""
 
 #: cms/templates/index.html cms/templates/widgets/header.html
 msgid "{studio_name} Home"

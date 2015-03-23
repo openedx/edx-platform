@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-03-16 14:25+0000\n"
-"PO-Revision-Date: 2015-03-16 14:25:32.061720\n"
+"POT-Creation-Date: 2015-03-23 14:39+0000\n"
+"PO-Revision-Date: 2015-03-23 14:39:08.960523\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -568,6 +568,22 @@ msgstr ""
 #: common/djangoapps/student/views.py
 msgid "An account with the Email '{email}' already exists."
 msgstr "Àn äççöünt wïth thé Émäïl '{email}' älréädý éxïsts. Ⱡ'σяєм ιρѕυм #"
+
+#: common/djangoapps/student/views.py
+msgid "An access_token is required when passing value ({}) for provider."
+msgstr ""
+"Àn äççéss_tökén ïs réqüïréd whén pässïng välüé ({}) för prövïdér. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
+
+#: common/djangoapps/student/views.py
+msgid "The provided access_token is already associated with another user."
+msgstr ""
+"Thé prövïdéd äççéss_tökén ïs älréädý ässöçïätéd wïth änöthér üsér. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
+
+#: common/djangoapps/student/views.py
+msgid "The provided access_token is not valid."
+msgstr "Thé prövïdéd äççéss_tökén ïs nöt välïd. Ⱡ'σяєм ιρѕ#"
 
 #: common/djangoapps/student/views.py
 msgid "Unknown error. Please e-mail us to let us know how it happened."
@@ -2872,7 +2888,6 @@ msgstr "Böth Ⱡ'σяєм#"
 
 #: common/lib/xmodule/xmodule/course_module.py
 #: lms/templates/footer-edx-new.html lms/templates/footer.html
-#: lms/templates/certificates/valid.html
 #: lms/templates/static_templates/about.html
 msgid "About"
 msgstr "Àßöüt Ⱡ'σяєм ι#"
@@ -4667,6 +4682,14 @@ msgstr ""
 #: lms/djangoapps/certificates/models.py
 msgid "The download URL for the generated certificate."
 msgstr "Thé döwnlöäd ÛRL för thé générätéd çértïfïçäté. Ⱡ'σяєм ιρѕυм #"
+
+#. Translators:  This text is bound to the HTML 'title' element of the page
+#. and appears
+#. in the browser title bar when a requested certificate is not found or
+#. recognized
+#: lms/djangoapps/certificates/views.py
+msgid "Invalid Certificate"
+msgstr "Ìnvälïd Çértïfïçäté Ⱡ'σя#"
 
 #. Translators: This line appears on the certificate after the name of a
 #. course, and provides more
@@ -7531,6 +7554,54 @@ msgstr "Ìmägé dätä ïs nöt välïd. Ⱡ'σяє#"
 msgid "Verification photos received"
 msgstr "Vérïfïçätïön phötös réçéïvéd Ⱡ'σяєм #"
 
+#. Translators: This is the website name of www.facebook.com.  Please
+#. translate this the way that Facebook advertises in your language.
+#: lms/envs/common.py
+msgid "Facebook"
+msgstr "Fäçéßöök #"
+
+#. Translators: This is the website name of www.twitter.com.  Please
+#. translate this the way that Twitter advertises in your language.
+#: lms/envs/common.py
+msgid "Twitter"
+msgstr "Twïttér #"
+
+#. Translators: This is the website name of www.linkedin.com.  Please
+#. translate this the way that LinkedIn advertises in your language.
+#: lms/envs/common.py
+msgid "LinkedIn"
+msgstr "LïnkédÌn #"
+
+#. Translators: This is the website name of plus.google.com.  Please
+#. translate this the way that Google+ advertises in your language.
+#: lms/envs/common.py
+msgid "Google+"
+msgstr "Gööglé+ #"
+
+#. Translators: This is the website name of www.tumblr.com.  Please
+#. translate this the way that Tumblr advertises in your language.
+#: lms/envs/common.py
+msgid "Tumblr"
+msgstr "Tümßlr Ⱡ'σяєм ιρѕ#"
+
+#. Translators: This is the website name of www.meetup.com.  Please
+#. translate this the way that MeetUp advertises in your language.
+#: lms/envs/common.py
+msgid "Meetup"
+msgstr "Méétüp Ⱡ'σяєм ιρѕ#"
+
+#. Translators: This is the website name of www.reddit.com.  Please
+#. translate this the way that Reddit advertises in your language.
+#: lms/envs/common.py
+msgid "Reddit"
+msgstr "Réddït Ⱡ'σяєм ιρѕ#"
+
+#. Translators: This is the website name of www.youtube.com.  Please
+#. translate this the way that YouTube advertises in your language.
+#: lms/envs/common.py
+msgid "Youtube"
+msgstr "Ýöütüßé #"
+
 #: lms/envs/common.py
 msgid "Taiwan"
 msgstr "Täïwän Ⱡ'σяєм ιρѕ#"
@@ -8252,12 +8323,19 @@ msgstr ""
 "Ìt lööks lïké {username} ßélöngs tö än éxïstïng äççöünt. Trý ägäïn wïth ä "
 "dïfférént üsérnämé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
+#. Translators: This example name is used as a placeholder in
+#. a field on the registration form meant to hold the user's name.
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Jane Doe"
+msgstr "Jäné Döé #"
+
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's full name.
-#: openedx/core/djangoapps/user_api/views.py
-msgid "The name that will appear on your certificates"
-msgstr "Thé nämé thät wïll äppéär ön ýöür çértïfïçätés Ⱡ'σяєм ιρѕυм #"
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
+msgid "Needed for any certificates you may earn"
+msgstr "Néédéd för äný çértïfïçätés ýöü mäý éärn Ⱡ'σяєм ιρѕυ#"
 
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's public username.
@@ -8266,8 +8344,18 @@ msgid "Public username"
 msgstr "Püßlïç üsérnämé Ⱡ'#"
 
 #: openedx/core/djangoapps/user_api/views.py
-msgid "The name that will identify you in your courses"
-msgstr "Thé nämé thät wïll ïdéntïfý ýöü ïn ýöür çöürsés Ⱡ'σяєм ιρѕυм #"
+msgid ""
+"The name that will identify you in your courses - {bold_start}(cannot be "
+"changed later){bold_end}"
+msgstr ""
+"Thé nämé thät wïll ïdéntïfý ýöü ïn ýöür çöürsés - {bold_start}(çännöt ßé "
+"çhängéd lätér){bold_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#. Translators: This example username is used as a placeholder in
+#. a field on the registration form meant to hold the user's username.
+#: openedx/core/djangoapps/user_api/views.py
+msgid "JaneDoe"
+msgstr "JänéDöé #"
 
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's highest completed level of education.
@@ -8346,6 +8434,38 @@ msgstr "Fïéld '{field_name}' çännöt ßé édïtéd. Ⱡ'σяєм #"
 msgid "Value '{field_value}' is not valid for field '{field_name}'."
 msgstr ""
 "Välüé '{field_value}' ïs nöt välïd för fïéld '{field_name}'. Ⱡ'σяєм ιρѕυ#"
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Delete failed for user preference '{preference_key}'."
+msgstr "Délété fäïléd för üsér préférénçé '{preference_key}'. Ⱡ'σяєм ιρѕυ#"
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Preference '{preference_key}' cannot be set to an empty value."
+msgstr ""
+"Préférénçé '{preference_key}' çännöt ßé sét tö än émptý välüé. Ⱡ'σяєм ιρѕυм "
+"∂#"
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Invalid user preference key '{preference_key}'."
+msgstr "Ìnvälïd üsér préférénçé kéý '{preference_key}'. Ⱡ'σяєм ιρ#"
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid ""
+"Value '{preference_value}' is not valid for user preference "
+"'{preference_key}'."
+msgstr ""
+"Välüé '{preference_value}' ïs nöt välïd för üsér préférénçé "
+"'{preference_key}'. Ⱡ'σяєм ιρѕυм ∂#"
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Save failed for user preference '{key}' with value '{value}'."
+msgstr ""
+"Sävé fäïléd för üsér préférénçé '{key}' wïth välüé '{value}'. Ⱡ'σяєм ιρѕυм "
+"∂σł#"
+
+#: openedx/core/djangoapps/user_api/preferences/views.py
+msgid "No data provided for user preference update"
+msgstr "Nö dätä prövïdéd för üsér préférénçé üpdäté Ⱡ'σяєм ιρѕυм#"
 
 #: cms/djangoapps/contentstore/course_info_model.py
 msgid "Invalid course update id."
@@ -9373,36 +9493,6 @@ msgstr "Jößs ät édX Ⱡ#"
 msgid "Follow Us"
 msgstr "Föllöw Ûs #"
 
-#. Translators: This is the website name of www.twitter.com. Please
-#. translate this the way that Twitter advertises in your language.
-#: lms/templates/footer-edx-new.html
-msgid "Twitter"
-msgstr "Twïttér #"
-
-#. Translators: This is the website name of www.facebook.com. Please
-#. translate this the way that Facebook advertises in your language.
-#: lms/templates/footer-edx-new.html
-msgid "Facebook"
-msgstr "Fäçéßöök #"
-
-#. Translators: This is the website name of www.meetup.com. Please
-#. translate this the way that Meetup advertises in your language.
-#: lms/templates/footer-edx-new.html
-msgid "Meetup"
-msgstr "Méétüp Ⱡ'σяєм ιρѕ#"
-
-#. Translators: This is the website name of www.linked.com. Please
-#. translate this the way that LinkedIn advertises in your language.
-#: lms/templates/footer-edx-new.html
-msgid "LinkedIn"
-msgstr "LïnkédÌn #"
-
-#. Translators: This is the website name of plus.google.com. Please
-#. translate this the way that Google+ advertises in your language.
-#: lms/templates/footer-edx-new.html
-msgid "Google+"
-msgstr "Gööglé+ #"
-
 #: lms/templates/footer-edx-new.html
 msgid "Mobile Apps"
 msgstr "Mößïlé Àpps Ⱡ#"
@@ -9961,6 +10051,10 @@ msgid "You do not have any notes."
 msgstr "Ýöü dö nöt hävé äný nötés. Ⱡ'σяєм#"
 
 #: lms/templates/problem.html
+msgid "your answer"
+msgstr "ýöür änswér Ⱡ#"
+
+#: lms/templates/problem.html
 msgid "Reset"
 msgstr "Rését Ⱡ'σяєм ι#"
 
@@ -9970,10 +10064,6 @@ msgstr "Rését Ⱡ'σяєм ι#"
 #: lms/templates/verify_student/face_upload.html
 msgid "Save"
 msgstr "Sävé Ⱡ'σяєм#"
-
-#: lms/templates/problem.html
-msgid "Reveal Answer"
-msgstr "Révéäl Ànswér Ⱡ'#"
 
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} submissions"
@@ -10178,10 +10268,6 @@ msgid "Please complete the following fields to register for an account. "
 msgstr ""
 "Pléäsé çömplété thé föllöwïng fïélds tö régïstér för än äççöünt.  Ⱡ'σяєм "
 "ιρѕυм ∂σłσя #"
-
-#: lms/templates/register.html
-msgid "Needed for any certificates you may earn"
-msgstr "Néédéd för äný çértïfïçätés ýöü mäý éärn Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/register.html
 msgid "cannot be changed later"
@@ -10886,39 +10972,43 @@ msgid "Calculator Output Field"
 msgstr "Çälçülätör Öütpüt Fïéld Ⱡ'σяє#"
 
 #: lms/templates/certificates/invalid.html
-msgid "This is an invalid edX certificate number"
-msgstr "Thïs ïs än ïnvälïd édX çértïfïçäté nümßér Ⱡ'σяєм ιρѕυ#"
+msgid "This is an invalid certificate number"
+msgstr "Thïs ïs än ïnvälïd çértïfïçäté nümßér Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/certificates/invalid.html
+msgid "This Certificate Does Not Exist"
+msgstr "Thïs Çértïfïçäté Döés Nöt Éxïst Ⱡ'σяєм ι#"
 
 #: lms/templates/certificates/invalid.html
 msgid ""
-"Please check the number to make sure that it is the exact same as on the "
-"certificate."
+"We cannot find a certificate on file that matches this URL or ID number."
 msgstr ""
-"Pléäsé çhéçk thé nümßér tö mäké süré thät ït ïs thé éxäçt sämé äs ön thé "
-"çértïfïçäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+"Wé çännöt fïnd ä çértïfïçäté ön fïlé thät mätçhés thïs ÛRL ör ÌD nümßér. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/templates/certificates/invalid.html
+msgid "Looking for a Particular Certificate?"
+msgstr "Löökïng för ä Pärtïçülär Çértïfïçäté? Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/certificates/invalid.html
 msgid ""
-"This is an unknown certificate number and therefore is a potential forgery."
+"Ensure that the ID number is an exact match of the ID number on the PDF or "
+"print certificate you are referencing."
 msgstr ""
-"Thïs ïs än ünknöwn çértïfïçäté nümßér änd théréföré ïs ä pöténtïäl förgérý. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+"Énsüré thät thé ÌD nümßér ïs än éxäçt mätçh öf thé ÌD nümßér ön thé PDF ör "
+"prïnt çértïfïçäté ýöü äré référénçïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/templates/certificates/invalid.html
+msgid ""
+"If you are trying to validate a certificate with this ID number, it may be a"
+" forgery."
+msgstr ""
+"Ìf ýöü äré trýïng tö välïdäté ä çértïfïçäté wïth thïs ÌD nümßér, ït mäý ßé ä"
+" förgérý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/certificates/valid.html
-msgid "Skip to This Page's Content"
-msgstr "Skïp tö Thïs Pägé's Çöntént Ⱡ'σяєм#"
-
-#: lms/templates/certificates/valid.html
-msgid "Validation Status"
-msgstr "Välïdätïön Stätüs Ⱡ'σ#"
-
-#: lms/templates/certificates/valid.html
-msgid "Student Accomplishment"
-msgstr "Stüdént Àççömplïshmént Ⱡ'σяє#"
-
-#: lms/templates/certificates/valid.html
-msgid "More Information"
-msgstr "Möré Ìnförmätïön Ⱡ'σ#"
+msgid "Certificate Type"
+msgstr "Çértïfïçäté Týpé Ⱡ'σ#"
 
 #: lms/templates/chat/toggle_chat.html
 msgid "Open Chat"
@@ -12811,23 +12901,30 @@ msgstr "Thänk ýöü för sïgnïng üp för {platform_name}. Ⱡ'σяєм ι#"
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
-"To get started, please activate your account by clicking on the link below "
-"(you may also copy and paste the link into your browser's address bar)."
+"Change your life and start learning today by activating your {platform_name}"
+" account. Click on the link below or copy and paste it into your browser's "
+"address bar."
 msgstr ""
-"Tö gét stärtéd, pléäsé äçtïväté ýöür äççöünt ßý çlïçkïng ön thé lïnk ßélöw "
-"(ýöü mäý älsö çöpý änd pästé thé lïnk ïntö ýöür ßröwsér's äddréss ßär). "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιρι#"
+"Çhängé ýöür lïfé änd stärt léärnïng tödäý ßý äçtïvätïng ýöür {platform_name}"
+" äççöünt. Çlïçk ön thé lïnk ßélöw ör çöpý änd pästé ït ïntö ýöür ßröwsér's "
+"äddréss ßär. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕ#"
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
-"Activation ensures that you can register for {platform_name} courses and "
-"access the courseware. If you require assistance, please use our web form at"
-" {contact_us} or email {info_address}."
+"After you activate your account, you can sign up for and take any of the "
+"hundreds of courses {platform_name} offers."
 msgstr ""
-"Àçtïvätïön énsürés thät ýöü çän régïstér för {platform_name} çöürsés änd "
-"äççéss thé çöürséwäré. Ìf ýöü réqüïré ässïstänçé, pléäsé üsé öür wéß förm ät"
-" {contact_us} ör émäïl {info_address}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢#"
+"Àftér ýöü äçtïväté ýöür äççöünt, ýöü çän sïgn üp för änd täké äný öf thé "
+"hündréds öf çöürsés {platform_name} öfférs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢ση#"
+
+#: lms/templates/emails/activation_email.txt
+msgid ""
+"If you need help, please use our web form at {contact_us_url} or email "
+"{info_email_address}."
+msgstr ""
+"Ìf ýöü nééd hélp, pléäsé üsé öür wéß förm ät {contact_us_url} ör émäïl "
+"{info_email_address}. Ⱡ'σяєм ιρѕυм ∂σłσя#"
 
 #: lms/templates/emails/activation_email.txt
 msgid "We hope you enjoy learning with {platform_name}!"
@@ -12841,15 +12938,11 @@ msgstr "Thé {platform_name} Téäm Ⱡ#"
 #: lms/templates/emails/activation_email.txt
 msgid ""
 "This email was automatically sent by {site_name} because someone attempted "
-"to create an {platform_name} account using this email address. If you did "
-"not attempt to create this account and do not activate the account, you will"
-" no longer receive emails from {platform_name}."
+"to create an {platform_name} account using this email address."
 msgstr ""
 "Thïs émäïl wäs äütömätïçällý sént ßý {site_name} ßéçäüsé söméöné ättémptéd "
-"tö çréäté än {platform_name} äççöünt üsïng thïs émäïl äddréss. Ìf ýöü dïd "
-"nöt ättémpt tö çréäté thïs äççöünt änd dö nöt äçtïväté thé äççöünt, ýöü wïll"
-" nö löngér réçéïvé émäïls fröm {platform_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
-" ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тєм#"
+"tö çréäté än {platform_name} äççöünt üsïng thïs émäïl äddréss. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/email_change.txt
@@ -18371,6 +18464,10 @@ msgstr ""
 "ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υη#"
 
 #: cms/templates/import.html
+msgid "Learn more about importing a library"
+msgstr "Léärn möré äßöüt ïmpörtïng ä lïßrärý Ⱡ'σяєм ιρ#"
+
+#: cms/templates/import.html
 msgid "Why import a course?"
 msgstr "Whý ïmpört ä çöürsé? Ⱡ'σя#"
 
@@ -18418,6 +18515,10 @@ msgstr ""
 "ässöçïätéd wïth thösé Prößlém çömpönénts mäý ßé löst. Thïs dätä ïnçlüdés "
 "stüdénts' prößlém sçörés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
 "α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσ#"
+
+#: cms/templates/import.html
+msgid "Learn more about importing a course"
+msgstr "Léärn möré äßöüt ïmpörtïng ä çöürsé Ⱡ'σяєм ιρ#"
 
 #: cms/templates/index.html cms/templates/widgets/header.html
 msgid "{studio_name} Home"
