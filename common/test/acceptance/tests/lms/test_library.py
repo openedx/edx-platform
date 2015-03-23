@@ -6,7 +6,7 @@ import ddt
 import textwrap
 
 from nose.plugins.attrib import attr
-from ..helpers import UniqueCourseTest
+from ..helpers import UniqueCourseTest, TestWithSearchIndexMixin
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.studio.overview import CourseOutlinePage
 from ...pages.studio.library import StudioLibraryContentEditor, StudioLibraryContainerXBlockWrapper
@@ -196,10 +196,19 @@ class LibraryContentTest(LibraryContentTestBase):
 
 @ddt.ddt
 @attr('shard_3')
-class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase):
+class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase, TestWithSearchIndexMixin):
     """
     Test Library Content block in LMS
     """
+    def setUp(self):
+        """ SetUp method """
+        self._create_search_index()
+        super(StudioLibraryContainerCapaFilterTest, self).setUp()
+
+    def tearDown(self):
+        self._cleanup_index_file()
+        super(StudioLibraryContainerCapaFilterTest, self).tearDown()
+
     def _get_problem_choice_group_text(self, name, items):
         """ Generates Choice Group CAPA problem XML """
         items_text = "\n".join([
@@ -231,7 +240,7 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase):
         """
         Populates library fixture with XBlock Fixtures
         """
-        library_fixture.add_children(
+        items = (
             XBlockFixtureDesc(
                 "problem", "Problem Choice Group 1",
                 data=self._get_problem_choice_group_text("Problem Choice Group 1 Text", [("1", False), ('2', True)])
@@ -249,6 +258,7 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase):
                 data=self._get_problem_select_text("Problem Select 2 Text", ["Option 3", "Option 4"], "Option 4")
             ),
         )
+        library_fixture.add_children(*items)
 
     @property
     def _problem_headers(self):

@@ -382,18 +382,20 @@ class TestCourseReIndex(CourseTestCase):
         # create test file in which index for this test will live
         with open(self.TEST_INDEX_FILENAME, "w+") as index_file:
             json.dump({}, index_file)
-            
+
         self.addCleanup(os.remove, self.TEST_INDEX_FILENAME)
 
-    def _perform_search(self):
+    def _perform_search(self, query="unique"):
+        """ Performs search """
         return perform_search(
-            "unique",
+            query,
             user=self.user,
             size=10,
             from_=0,
             course_id=unicode(self.course.id))
 
     def _do_reindex(self):
+        """ Reindexes course """
         indexer = get_indexer_for_location(self.course.id)
         return indexer.do_course_reindex(modulestore(), self.course.id)
 

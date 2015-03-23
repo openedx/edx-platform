@@ -19,6 +19,12 @@ log = logging.getLogger('edx.modulestore')
 
 
 def get_indexer_for_location(locator):
+    """
+    Initializes correct indexer for given location.
+
+    Arguments:
+        locator BlockLocatorBase: XBlock locator
+    """
     if isinstance(locator, CourseLocator):
         return CoursewareSearchIndexer()
     elif isinstance(locator, LibraryLocator):
@@ -54,14 +60,14 @@ class SearchIndexerBase(object):
         """ Builds location info dictionary """
         return {"course": unicode(structure_key)}
 
-    def _fetch_item(self, modulestore, item_location):
+    def _fetch_item(self, modulestore, item_location):  # pylint: disable=unused-argument
         """ Fetch the item from the modulestore location, log if not found, but continue """
-        raise NotImplemented
+        raise NotImplementedError()
 
     def _id_modifier(self, usage_id):
         """ Modifies usage_id to submit to index """
         return usage_id
-    
+
     @classmethod
     def _track_index_request(cls, event_name, indexed_count, location=None):
         """Track content index requests.
@@ -86,6 +92,14 @@ class SearchIndexerBase(object):
             event_name,
             data
         )
+
+    def do_publish_index(self, modulestore, location, delete=False, raise_on_error=False):
+        """
+        Add to search index published section and children
+        """
+        indexed_count = self.add_to_search_index(modulestore, location, delete, raise_on_error)
+        self._track_index_request('edx.course.index.published', indexed_count, str(location))
+        return indexed_count
 
     def add_to_search_index(self, modulestore, location, delete=False, raise_on_error=False):
         """
@@ -165,7 +179,7 @@ class SearchIndexerBase(object):
 
         if raise_on_error and error_list:
             raise SearchIndexingError(_('Error(s) present during indexing'), error_list)
-        
+
         return indexed_count
 
 
@@ -199,14 +213,6 @@ class CoursewareSearchIndexer(SearchIndexerBase):
             return None
 
         return item
-
-    def do_publish_index(self, modulestore, location, delete=False, raise_on_error=False):
-        """
-        Add to courseware search index published section and children
-        """
-        indexed_count = self.add_to_search_index(modulestore, location, delete, raise_on_error)
-        self._track_index_request('edx.course.index.published', indexed_count, str(location))
-        return indexed_count
 
     def do_course_reindex(self, modulestore, course_key):
         """

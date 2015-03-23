@@ -13,7 +13,6 @@ from unittest import TestCase
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator, BlockUsageLocator, LibraryUsageLocator
 
 from xmodule.modulestore import ModuleStoreWriteBase
-from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.search_index import get_indexer_for_location, CoursewareSearchIndexer, LibrarySearchIndexer
 
 
@@ -43,14 +42,13 @@ class TestIndexerForLocation(TestCase):
 
 
 class SearchIndexerBaseTestMixin(object):
-    """ COmmon features for search indexers tests"""
+    """ Common features for search indexers tests"""
     ROOT_ID = None
     TEST_INDEX_FILENAME = "test_root/index_file.dat"
     modulestore = None
 
     def setUp(self):
         """
-        SetUp method. Sincerely yours, CO.
         Setting up mock search indexer backing file as prescribed by MOCK_SEARCH_BACKING_FILE setting
         """
         super(SearchIndexerBaseTestMixin, self).setUp()
@@ -63,24 +61,23 @@ class SearchIndexerBaseTestMixin(object):
 
     def tearDown(self):
         """
-        TearDown method. Sincerely yours, CO.
         Removing backing file created in set up
         """
         super(SearchIndexerBaseTestMixin, self).tearDown()
         os.remove(self.TEST_INDEX_FILENAME)
 
-    def _make_location(self, block_type, course_id=ROOT_ID):
+    def _make_location(self, block_type, course_id=ROOT_ID):  # pylint: disable=unused-argument
         """ Builds xblock location for specified block type and course id """
-        raise NotImplemented()
+        raise NotImplementedError()
 
-    def _process_index_id(self, location):
+    def _process_index_id(self, location):  # pylint: disable=unused-argument
         """ Transforms block location to build correct index id """
-        raise NotImplemented()
+        raise NotImplementedError()
 
     @lazy
     def indexer(self):
         """ Indexer under test instantiation """
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def _make_item(self, block_type, index_dictionary, course_id=None, start=None, children=None):
         """ Builds XBlock mock with specified block_type, index disctionary, children, etc."""
@@ -103,7 +100,8 @@ class SearchIndexerBaseTestMixin(object):
         """
         Sets up mock modulestore get_item method to return only items listed in `items` parameter at specified locations
         """
-        def side_effect(loc, **kwargs):
+        def side_effect(loc, **kwargs):  # pylint: disable=unused-argument
+            """ Side-effect method for mock - gets item by location """
             return items.get(loc, None)
         self.modulestore.get_item = mock.Mock(side_effect=side_effect)
 
@@ -124,7 +122,7 @@ class SearchIndexerBaseTestMixin(object):
     def test_no_searcher_does_nothing(self, search_engine, index, remove):
         """ Tests that does indexer does nothing if no search engine is available """
         search_engine.return_value = None
-        item, location = self._make_item('html', {'item': 'value'})
+        _, location = self._make_item('html', {'item': 'value'})
         self.indexer.add_to_search_index(self.modulestore, location)
         search_engine.assert_called_with(self.indexer.INDEX_NAME)
         index.assert_not_called()
@@ -177,24 +175,24 @@ class SearchIndexerBaseTestMixin(object):
         self.indexer.add_to_search_index(self.modulestore, location)
 
         calls = patched_index.call_args_list
-        args, kwargs = calls[0]
+        args, _ = calls[0]
         self.assertEqual(args, (
             self.indexer.DOCUMENT_TYPE,
             self._make_index_entry(index_dict_child1, child_loc1, start_date=start_date)
         ))
-        args, kwargs = calls[1]
+        args, _ = calls[1]
         self.assertEqual(args, (
             self.indexer.DOCUMENT_TYPE,
             self._make_index_entry(index_dict_child2, child_loc2, start_date=start_date)
         ))
-        args, kwargs = calls[2]
+        args, _ = calls[2]
         self.assertEqual(args, (
             self.indexer.DOCUMENT_TYPE,
             self._make_index_entry(index_dict, location, start_date=start_date)
         ))
 
     @mock.patch('search.tests.mock_search_engine.MockSearchEngine.remove')
-    def test_add_to_index_with_chidlren_adds_all_to_index(self, patched_remove):
+    def test_remove_from_index_with_chidlren_removes_all_from_index(self, patched_remove):
         """ Tests that indexer removes XBlock with children from index (both Xblock and all of its children)"""
         index_dict_child1, index_dict_child2 = {'child': 'child1'}, {'child': 'child2'}
         child1, child_loc1 = self._make_item('text', index_dict_child1)
@@ -207,11 +205,11 @@ class SearchIndexerBaseTestMixin(object):
         self.indexer.add_to_search_index(self.modulestore, location, delete=True)
 
         calls = patched_remove.call_args_list
-        args, kwargs = calls[0]
+        args, _ = calls[0]
         self.assertEqual(args, (self.indexer.DOCUMENT_TYPE, self._process_index_id(child_loc1)))
-        args, kwargs = calls[1]
+        args, _ = calls[1]
         self.assertEqual(args, (self.indexer.DOCUMENT_TYPE, self._process_index_id(child_loc2)))
-        args, kwargs = calls[2]
+        args, _ = calls[2]
         self.assertEqual(args, (self.indexer.DOCUMENT_TYPE, self._process_index_id(location)))
 
 
