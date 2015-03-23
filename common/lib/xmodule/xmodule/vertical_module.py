@@ -10,6 +10,7 @@ from xmodule.seq_module import SequenceDescriptor
 from xmodule.xml_module import XmlParserMixin
 from xmodule.progress import Progress
 from xmodule.studio_editable import StudioEditableBlock
+from xmodule.mako_module import MakoTemplateBlock
 from pkg_resources import resource_string
 from copy import copy
 
@@ -20,10 +21,11 @@ log = logging.getLogger(__name__)
 CLASS_PRIORITY = ['video', 'problem']
 
 
-class VerticalBlock(StudioEditableBlock, XmlParserMixin, XBlock):
+class VerticalBlock(StudioEditableBlock, XmlParserMixin, MakoTemplateBlock, XBlock):
     """
     Layout module for laying out submodules vertically.
     """
+    mako_template = 'widgets/sequence-edit.html'
 
     has_children = True
 

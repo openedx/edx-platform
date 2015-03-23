@@ -8,7 +8,7 @@ class MakoDescriptorSystem(DescriptorSystem):
         self.render_template = render_template
 
 
-class MakoModuleDescriptor(XModuleDescriptor):
+class MakoTemplateBlock(object):
     """
     Module descriptor intended as a mixin that uses a mako template
     to specify the module html.
@@ -17,11 +17,11 @@ class MakoModuleDescriptor(XModuleDescriptor):
     with the name of the template to render, and it will pass
     the descriptor as the `module` parameter to that template
 
-    MakoModuleDescriptor.__init__ takes the same arguments as xmodule.x_module:XModuleDescriptor.__init__
+    MakoTemplateBlock.__init__ takes the same arguments as xmodule.x_module:XModuleDescriptor.__init__
     """
 
     def __init__(self, *args, **kwargs):
-        super(MakoModuleDescriptor, self).__init__(*args, **kwargs)
+        super(MakoTemplateBlock, self).__init__(*args, **kwargs)
         if getattr(self.runtime, 'render_template', None) is None:
             raise TypeError(
                 '{runtime} must have a render_template function'
@@ -39,6 +39,9 @@ class MakoModuleDescriptor(XModuleDescriptor):
             'editable_metadata_fields': self.editable_metadata_fields
         }
 
-    def get_html(self):
+    def studio_view(self, context):
         return self.system.render_template(
             self.mako_template, self.get_context())
+
+
+MakoModuleDescriptor = MakoTemplateBlock
