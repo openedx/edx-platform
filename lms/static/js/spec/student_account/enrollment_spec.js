@@ -19,7 +19,7 @@ define(['js/common_helpers/ajax_helpers', 'js/student_account/enrollment'],
                 var requests = AjaxHelpers.requests( this );
 
                 // Attempt to enroll the user
-                EnrollmentInterface.enroll( COURSE_KEY );
+                EnrollmentInterface.enroll( COURSE_KEY, FORWARD_URL );
 
                 // Expect that the correct request was made to the server
                 AjaxHelpers.expectRequest(
@@ -41,7 +41,7 @@ define(['js/common_helpers/ajax_helpers', 'js/student_account/enrollment'],
                 var requests = AjaxHelpers.requests( this );
 
                 // Attempt to enroll the user
-                EnrollmentInterface.enroll( COURSE_KEY );
+                EnrollmentInterface.enroll( COURSE_KEY, FORWARD_URL );
 
                 // Simulate an error response from the server
                 AjaxHelpers.respondWithError(requests);
@@ -55,7 +55,7 @@ define(['js/common_helpers/ajax_helpers', 'js/student_account/enrollment'],
                 var requests = AjaxHelpers.requests( this );
 
                 // Attempt to enroll the user
-                EnrollmentInterface.enroll( COURSE_KEY );
+                EnrollmentInterface.enroll( COURSE_KEY, FORWARD_URL );
 
                 // Simulate an error response (403) from the server
                 // with a "user_message_url" parameter for the redirect.

@@ -166,7 +166,52 @@ define([
                 view.subview.login.trigger('auth-complete');
 
                 // Expect that the view tried to enroll the student
-                expect( EnrollmentInterface.enroll ).toHaveBeenCalledWith( COURSE_KEY );
+                expect( EnrollmentInterface.enroll ).toHaveBeenCalledWith(
+                    COURSE_KEY,
+                    '/course_modes/choose/' + COURSE_KEY + '/'
+                );
+            });
+
+            it('sends the user to the payment flow when the course mode is not honor', function() {
+                ajaxSpyAndInitialize(this, 'login');
+
+                // Simulate providing enrollment query string params
+                // AND specifying a course mode.
+                setFakeQueryParams({
+                    '?enrollment_action': 'enroll',
+                    '?course_id': COURSE_KEY,
+                    '?course_mode': 'verified'
+                });
+
+                // Trigger auth complete on the login view
+                view.subview.login.trigger('auth-complete');
+
+                // Expect that the view tried to auto-enroll the student
+                // with a redirect into the payment flow.
+                expect( EnrollmentInterface.enroll ).toHaveBeenCalledWith(
+                    COURSE_KEY,
+                    '/verify_student/start-flow/' + COURSE_KEY + '/'
+                );
+            });
+
+            it('sends the user to the student dashboard when the course mode is honor', function() {
+                ajaxSpyAndInitialize(this, 'login');
+
+                // Simulate providing enrollment query string params
+                // AND specifying a course mode.
+                setFakeQueryParams({
+                    '?enrollment_action': 'enroll',
+                    '?course_id': COURSE_KEY,
+                    '?course_mode': 'honor'
+                });
+
+                // Trigger auth complete on the login view
+                view.subview.login.trigger('auth-complete');
+
+                // Expect that the view tried auto-enrolled the student
+                // and sent the student to the dashboard
+                // (skipping the payment flow).
+                expect( EnrollmentInterface.enroll ).toHaveBeenCalledWith(COURSE_KEY, '/dashboard');
             });
 
             it('adds a white-label course to the shopping cart on auth complete', function() {
