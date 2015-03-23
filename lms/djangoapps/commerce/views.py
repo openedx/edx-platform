@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from commerce.api import EcommerceAPI
 from commerce.constants import OrderStatus, Messages
 from commerce.exceptions import ApiError, InvalidConfigurationError
-from commerce.http import DetailResponse, ApiErrorResponse
+from commerce.http import DetailResponse, InternalRequestErrorResponse
 from course_modes.models import CourseMode
 from courseware import courses
 from enrollment.api import add_enrollment
@@ -120,6 +120,6 @@ class OrdersView(APIView):
 
                 msg = Messages.ORDER_INCOMPLETE_ENROLLED.format(order_number=order_number)
                 return DetailResponse(msg, status=HTTP_202_ACCEPTED)
-        except ApiError:
+        except ApiError as err:
             # The API will handle logging of the error.
-            return ApiErrorResponse()
+            return InternalRequestErrorResponse(err.message)
