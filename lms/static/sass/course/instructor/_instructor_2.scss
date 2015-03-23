@@ -435,300 +435,6 @@
     }
   }
 
-  // cohort management
-  %cohort-management-form {
-
-    .form-fields {
-
-      .label,
-      .form-label,
-      .input,
-      .tip {
-        display: block;
-      }
-
-      .label,
-      .form-label {
-        @extend %t-title7;
-        @extend %t-weight4;
-        margin-bottom: ($baseline/2);
-      }
-
-      .tip {
-        @extend %t-copy-sub1;
-        margin-top: ($baseline/4);
-        color: $gray-l2;
-      }
-
-      .field-text {
-
-        // needed to reset poor input styling
-        input[type="text"] {
-          height: auto;
-        }
-
-        .input {
-          width: 100%;
-          padding: ($baseline/2) ($baseline*0.75);
-        }
-      }
-
-      .input-file {
-        margin-bottom: ($baseline/2);
-      }
-    }
-
-    .form-submit, .form-cancel {
-      display: inline-block;
-      vertical-align: middle;
-    }
-
-    .form-submit {
-      @include idashbutton($blue);
-      @include font-size(14);
-      @include line-height(14);
-      margin-right: ($baseline/2);
-      margin-bottom: 0;
-      text-shadow: none;
-    }
-
-    .form-cancel {
-      @extend %t-copy-sub1;
-    }
-  }
-
-  .cohort-management-nav {
-    @include clearfix();
-
-    .cohort-management-nav-form {
-      width: 60%;
-      @include float(left);
-    }
-
-    .cohort-select {
-      width: 100%;
-      margin-top: ($baseline/4);
-    }
-
-    .action-create {
-      @include idashbutton($blue);
-      @extend %t-weight4;
-      @include float(right);
-      @include text-align(right);
-      text-shadow: none;
-    }
-
-    // STATE: is disabled
-    &.is-disabled {
-
-
-      .cohort-select {
-        opacity: 0.25;
-      }
-
-      .action-create {
-        opacity: 0.50;
-      }
-    }
-  }
-
-  .cohort-management {
-
-    // specific message actions
-    .message .action-create {
-      @include idashbutton($blue);
-    }
-  }
-
-  // create or edit cohort
-  .cohort-management-settings,
-  .cohort-management-edit {
-    @extend %cohort-management-form;
-    margin-bottom: $baseline;
-
-    .form-title {
-      @extend %t-title5;
-      @extend %t-weight4;
-      padding: $baseline;
-      background: $gray-l5;
-      border-bottom: ($baseline/10) solid $gray-l4;
-    }
-
-    .form-field {
-      // padding: $baseline;
-    }
-
-    .form-actions {
-      padding: $baseline 0;
-
-      &.new-cohort-form {
-        padding: $baseline;
-      }
-    }
-  }
-
-  // cohort
-  .cohort-management-group-header {
-    padding: $baseline;
-    border-bottom: ($baseline/10) solid $gray-l4;
-    background: $gray-l5;
-
-    .group-header-title {
-      margin-bottom: ($baseline/2);
-      padding-bottom: ($baseline/2);
-      border-bottom: 1px solid $gray-l4;
-
-      &:hover, &:active, &:focus {
-
-        .action-edit-name {
-          opacity: 1.0;
-          pointer-events: auto;
-        }
-      }
-    }
-
-    .title-value, .group-count, .action-edit {
-      display: inline-block;
-      vertical-align: middle;
-    }
-
-    .title-value {
-      @extend %t-title5;
-      @extend %t-weight4;
-      @include margin-right($baseline/4);
-    }
-
-    .group-count {
-      @extend %t-title7;
-      @extend %t-weight4;
-    }
-
-    .action-edit-name {
-      @include idashbutton($gray-l3);
-      @include transition(opacity $tmg-f2 ease-in-out);
-      @include font-size(14);
-      @include line-height(14);
-      @include margin-left($baseline/2);
-      padding: ($baseline/4) ($baseline/2);
-      margin-bottom: 0;
-      opacity: 0.0;
-      pointer-events: none;
-    }
-  }
-
-  .cohort-management-group-setup {
-    @include clearfix();
-    @extend %t-copy-sub1;
-    color: $gray-l2;
-
-    .setup-value {
-      @include float(left);
-      @include margin-right(5%);
-      width: 70%;
-    }
-
-    .setup-actions {
-      @include float(right);
-      @include text-align(right);
-      width: 20%;
-    }
-  }
-
-  .cohort-management-group-add {
-    @extend %cohort-management-form;
-    border: 1px solid $gray-l5;
-
-    .message-title {
-      @extend %t-title7;
-    }
-
-    .form-title {
-      @extend %t-title6;
-      @extend %t-weight4;
-      margin-bottom: ($baseline/4);
-      padding: 0;
-      border: none;
-      background: transparent;
-    }
-
-    .form-introduction {
-      @extend %t-copy-sub1;
-      margin-bottom: $baseline;
-
-      p {
-        color: $gray-l1;
-      }
-    }
-
-    .form-fields {
-      padding: $baseline 0;
-    }
-
-    .form-actions {
-      padding: 0 0 $baseline 0;
-    }
-
-    .cohort-management-group-add-students {
-      min-height: ($baseline*10);
-      width: 100%;
-      padding: ($baseline/2) ($baseline*0.75);
-    }
-  }
-
-  // CSV-based file upload for auto cohort assigning
-  .toggle-cohort-management-secondary {
-    @extend %t-copy-sub1;
-  }
-
-  .cohort-management-file-upload {
-
-    .message-title {
-      @extend %t-title7;
-    }
-
-    .form-introduction {
-      @extend %t-copy-sub1;
-      margin-bottom: $baseline;
-
-      p {
-        color: $gray-l1;
-      }
-    }
-  }
-
-  .file-upload-form {
-    @extend %cohort-management-form;
-
-    .form-fields {
-      margin-bottom: $baseline;
-    }
-
-    .action-submit {
-      @include idashbutton($blue);
-      // needed to override very poor specificity and base rules for blue button
-      @include font-size(14);
-      margin-bottom: 0;
-      font-weight: 700;
-      text-shadow: none;
-    }
-  }
-
-  .cohort-management-supplemental {
-    @extend %t-copy-sub1;
-    margin-top: $baseline;
-    padding: ($baseline/2) $baseline;
-    background: $gray-l5;
-    border-radius: ($baseline/10);
-
-
-    .icon {
-      @include margin-right($baseline/4);
-      color: $gray-l1;
-    }
-  }
-
-
-
   .batch-enrollment, .batch-beta-testers {
     textarea {
       margin-top: 0.2em;
@@ -843,7 +549,6 @@
     width: 30%;
     display: block;
   }
-
 
   label[for="email-students"]:hover + .email-students-hint {
     display: block;
@@ -965,6 +670,311 @@
       }
     }
   }
+}
+
+
+// view - cohort management
+// --------------------
+.instructor-dashboard-wrapper-2 section.idash-section#cohort_management {
+
+  // cohort management
+  %cohort-management-form {
+
+    .form-fields {
+
+      .label,
+      .form-label,
+      .input,
+      .tip {
+        display: block;
+      }
+
+      .label,
+      .form-label {
+        @extend %t-title7;
+        @extend %t-weight4;
+        margin-bottom: ($baseline/2);
+      }
+
+      .tip {
+        @extend %t-copy-sub1;
+        margin-top: ($baseline/4);
+        color: $gray-l2;
+      }
+
+      .field-text {
+
+        // needed to reset poor input styling
+        input[type="text"] {
+          height: auto;
+        }
+
+        .input {
+          width: 100%;
+          padding: ($baseline/2) ($baseline*0.75);
+        }
+      }
+
+      .input-file {
+        margin-bottom: ($baseline/2);
+      }
+    }
+
+    .form-submit, .form-cancel {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .form-cancel {
+      @extend %t-copy-sub1;
+    }
+  }
+  .form-submit {
+    @include idashbutton($blue);
+    @include font-size(14);
+    @include line-height(14);
+    margin-right: ($baseline/2);
+    margin-bottom: 0;
+    text-shadow: none;
+  }
+
+  .cohort-management-nav {
+    @include clearfix();
+
+    .cohort-management-nav-form {
+      width: 60%;
+      @include float(left);
+    }
+
+    .cohort-select {
+      width: 100%;
+      margin-top: ($baseline/4);
+    }
+
+    .action-create {
+      @include idashbutton($blue);
+      @extend %t-weight4;
+      @include float(right);
+      @include text-align(right);
+      text-shadow: none;
+    }
+
+    // STATE: is disabled
+    &.is-disabled {
+
+
+      .cohort-select {
+        opacity: 0.25;
+      }
+
+      .action-create {
+        opacity: 0.50;
+      }
+    }
+  }
+
+  .cohort-management {
+
+    // specific message actions
+    .message .action-create {
+      @include idashbutton($blue);
+    }
+  }
+
+  // create or edit cohort
+  .cohort-management-settings,
+  .cohort-management-edit {
+    @extend %cohort-management-form;
+    margin-bottom: $baseline;
+
+    .form-title {
+      @extend %t-title5;
+      @extend %t-weight4;
+      padding: $baseline;
+      background: $gray-l5;
+      border-bottom: ($baseline/10) solid $gray-l4;
+    }
+
+    .form-field {
+      // padding: $baseline;
+    }
+
+    .form-actions {
+      padding: $baseline 0;
+
+      &.new-cohort-form {
+        padding: $baseline;
+      }
+    }
+  }
+
+  .cohort-management-assignment-type-settings,
+  .cohorts-state-section {
+     &.is-disabled {
+        opacity: 0.25;
+      }
+  }
+
+  // cohort
+  .cohort-management-group-header {
+    padding: $baseline;
+    border-bottom: ($baseline/10) solid $gray-l4;
+    background: $gray-l5;
+
+    .group-header-title {
+      margin-bottom: ($baseline/2);
+      padding-bottom: ($baseline/2);
+      border-bottom: 1px solid $gray-l4;
+
+      &:hover, &:active, &:focus {
+
+        .action-edit-name {
+          opacity: 1.0;
+          pointer-events: auto;
+        }
+      }
+    }
+
+    .title-value, .group-count, .action-edit {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .title-value {
+      @extend %t-title5;
+      @extend %t-weight4;
+      @include margin-right($baseline/4);
+    }
+
+    .group-count {
+      @extend %t-title7;
+      @extend %t-weight4;
+    }
+
+    .action-edit-name {
+      @include idashbutton($gray-l3);
+      @include transition(opacity $tmg-f2 ease-in-out);
+      @include font-size(14);
+      @include line-height(14);
+      @include margin-left($baseline/2);
+      padding: ($baseline/4) ($baseline/2);
+      margin-bottom: 0;
+      opacity: 0.0;
+      pointer-events: none;
+    }
+  }
+
+  .cohort-management-group-setup {
+    @include clearfix();
+    @extend %t-copy-sub1;
+    color: $gray-l2;
+
+    .setup-value {
+      @include float(left);
+      @include margin-right(5%);
+      width: 70%;
+    }
+
+    .setup-actions {
+      @include float(right);
+      @include text-align(right);
+      width: 20%;
+    }
+  }
+
+  .cohort-management-group-add {
+    @extend %cohort-management-form;
+    border: 1px solid $gray-l5;
+
+    .message-title {
+      @extend %t-title7;
+    }
+
+    .form-title {
+      @extend %t-title6;
+      @extend %t-weight4;
+      margin-bottom: ($baseline/4);
+      padding: 0;
+      border: none;
+      background: transparent;
+    }
+
+    .form-introduction {
+      @extend %t-copy-sub1;
+      margin-bottom: $baseline;
+
+      p {
+        color: $gray-l1;
+      }
+    }
+
+    .form-fields {
+      padding: $baseline 0;
+    }
+
+    .form-actions {
+      padding: 0 0 $baseline 0;
+    }
+
+    .cohort-management-group-add-students {
+      min-height: ($baseline*10);
+      width: 100%;
+      padding: ($baseline/2) ($baseline*0.75);
+    }
+  }
+
+  // CSV-based file upload for auto cohort assigning and
+  // cohort the discussion topics.
+  .toggle-cohort-management-secondary, .toggle-cohort-management-discussions {
+    @extend %t-copy-sub1;
+  }
+
+  .cohort-management-file-upload {
+
+    .message-title {
+      @extend %t-title7;
+    }
+
+    .form-introduction {
+      @extend %t-copy-sub1;
+      margin-bottom: $baseline;
+
+      p {
+        color: $gray-l1;
+      }
+    }
+  }
+
+  .file-upload-form {
+    @extend %cohort-management-form;
+
+    .form-fields {
+      margin-bottom: $baseline;
+    }
+
+    .action-submit {
+      @include idashbutton($blue);
+      // needed to override very poor specificity and base rules for blue button
+      @include font-size(14);
+      margin-bottom: 0;
+      font-weight: 700;
+      text-shadow: none;
+    }
+  }
+
+  .cohort-management-supplemental {
+    @extend %t-copy-sub1;
+    margin-top: $baseline;
+    padding: ($baseline/2) $baseline;
+    background: $gray-l5;
+    border-radius: ($baseline/10);
+
+
+    .icon {
+      @include margin-right($baseline/4);
+      color: $gray-l1;
+    }
+  }
 
   .has-other-input-text { // Given to groups which have an 'other' input that appears when needed
     display: inline-block;
@@ -1061,6 +1071,49 @@
     }
   }
 
+  // cohort discussions interface.
+  .cohort-discussions-nav {
+
+    .cohort-course-wide-discussions-form {
+
+      .form-actions {
+        padding-top: ($baseline/2);
+      }
+    }
+
+    .category-title,
+    .topic-name,
+    .all-inline-discussions,
+    .always_cohort_inline_discussions,
+    .cohort_inline_discussions {
+      padding-left: ($baseline/2);
+    }
+
+    .always_cohort_inline_discussions,
+    .cohort_inline_discussions {
+      padding-top: ($baseline/2);
+    }
+
+    .category-item,
+    .subcategory-item {
+      padding-top: ($baseline/2);
+    }
+
+    .cohorted-text {
+      color: $link-color;
+    }
+
+    .discussions-wrapper {
+      @extend %ui-no-list;
+      padding: 0 ($baseline/2);
+
+      .subcategories {
+        padding: 0 ($baseline*1.5);
+      }
+    }
+  }
+
+
   .wrapper-tabs { // This applies to the tab-like interface that toggles between the student management and the group settings
     @extend %ui-no-list;
     @extend %ui-depth1;
@@ -1111,6 +1164,7 @@
     }
   }
 }
+
 
 // view - student admin
 // --------------------

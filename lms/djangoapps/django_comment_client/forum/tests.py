@@ -309,18 +309,18 @@ class SingleThreadTestCase(ModuleStoreTestCase):
 @patch('requests.request')
 class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
     """
-    Ensures the number of modulestore queries is deterministic based on the
-    number of responses retrieved for a given discussion thread.
+    Ensures the number of modulestore queries and number of sql queries are
+    independent of the number of responses retrieved for a given discussion thread.
     """
     MODULESTORE = TEST_DATA_MONGO_MODULESTORE
 
     @ddt.data(
-        # old mongo with cache: number of responses plus 17.  TODO: O(n)!
-        (ModuleStoreEnum.Type.mongo, 1, 23, 18),
-        (ModuleStoreEnum.Type.mongo, 50, 366, 67),
+        # old mongo with cache: 15
+        (ModuleStoreEnum.Type.mongo, 1, 21, 15, 40, 27),
+        (ModuleStoreEnum.Type.mongo, 50, 315, 15, 628, 27),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, 1, 3, 3),
-        (ModuleStoreEnum.Type.split, 50, 3, 3),
+        (ModuleStoreEnum.Type.split, 1, 3, 3, 40, 27),
+        (ModuleStoreEnum.Type.split, 50, 3, 3, 628, 27),
     )
     @ddt.unpack
     def test_number_of_mongo_queries(
@@ -329,6 +329,8 @@ class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
             num_thread_responses,
             num_uncached_mongo_calls,
             num_cached_mongo_calls,
+            num_uncached_sql_queries,
+            num_cached_sql_queries,
             mock_request
     ):
         with modulestore().default_store(default_store):
@@ -370,15 +372,16 @@ class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
             backend='django.core.cache.backends.dummy.DummyCache',
             LOCATION='single_thread_local_cache'
         )
-        cached_calls = {
-            single_thread_dummy_cache: num_uncached_mongo_calls,
-            single_thread_local_cache: num_cached_mongo_calls
-        }
-        for single_thread_cache, expected_calls in cached_calls.items():
+        cached_calls = [
+            [single_thread_dummy_cache, num_uncached_mongo_calls, num_uncached_sql_queries],
+            [single_thread_local_cache, num_cached_mongo_calls, num_cached_sql_queries]
+        ]
+        for single_thread_cache, expected_mongo_calls, expected_sql_queries in cached_calls:
             single_thread_cache.clear()
             with patch("django_comment_client.permissions.CACHE", single_thread_cache):
-                with check_mongo_calls(expected_calls):
-                    call_single_thread()
+                with self.assertNumQueries(expected_sql_queries):
+                    with check_mongo_calls(expected_mongo_calls):
+                        call_single_thread()
             single_thread_cache.clear()
 
 

@@ -36,10 +36,10 @@ class TestMultipleCohortUsers(ModuleStoreTestCase):
         """
         # set two auto_cohort_groups for both courses
         config_course_cohorts(
-            self.course1, [], cohorted=True, auto_cohort_groups=["Course1AutoGroup1", "Course1AutoGroup2"]
+            self.course1, is_cohorted=True, auto_cohorts=["Course1AutoGroup1", "Course1AutoGroup2"]
         )
         config_course_cohorts(
-            self.course2, [], cohorted=True, auto_cohort_groups=["Course2AutoGroup1", "Course2AutoGroup2"]
+            self.course2, is_cohorted=True, auto_cohorts=["Course2AutoGroup1", "Course2AutoGroup2"]
         )
 
         # get the cohorts from the courses, which will cause auto cohorts to be created

@@ -2,7 +2,7 @@
 'use strict';
 define([
     'jquery', 'underscore', 'backbone', 'gettext',
-    'annotator_1.2.9', 'js/edxnotes/views/visibility_decorator'
+    'annotator_1.2.9', 'js/edxnotes/views/visibility_decorator', 'js/utils/animation'
 ], function($, _, Backbone, gettext, Annotator, EdxnotesVisibilityDecorator) {
     var ToggleNotesView = Backbone.View.extend({
         events: {
@@ -31,7 +31,7 @@ define([
         toggleHandler: function (event) {
             event.preventDefault();
             this.visibility = !this.visibility;
-            this.showActionMessage();
+            AnimationUtil.triggerAnimation(this.actionToggleMessage);
             this.toggleNotes(this.visibility);
         },
 
@@ -49,13 +49,6 @@ define([
                 this.disableNotes();
             }
             this.sendRequest();
-        },
-
-        showActionMessage: function () {
-            // The following lines are necessary to re-trigger the CSS animation on span.action-toggle-message
-            this.actionToggleMessage.removeClass('is-fleeting');
-            this.actionToggleMessage.offset().width = this.actionToggleMessage.offset().width;
-            this.actionToggleMessage.addClass('is-fleeting');
         },
 
         enableNotes: function () {
