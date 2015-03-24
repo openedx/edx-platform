@@ -15,8 +15,10 @@ from django.utils.translation import ugettext as _
 from edxmako.shortcuts import render_to_string, render_to_response
 from opaque_keys.edx.keys import UsageKey
 from xblock.core import XBlock
+import dogstats_wrapper as dog_stats_api
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import StaticTab
+from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
 
 from contentstore.utils import reverse_course_url, reverse_library_url, reverse_usage_url
 from models.settings.course_grading import CourseGradingModel
@@ -251,6 +253,15 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
         # if we add one then we need to also add it to the policy information (i.e. metadata)
         # we should remove this once we can break this reference from the course to static tabs
         if category == 'static_tab':
+
+            dog_stats_api.increment(
+                DEPRECATION_VSCOMPAT_EVENT,
+                tags=(
+                    "location:create_xblock_static_tab",
+                    u"course:{}".format(unicode(dest_usage_key.course_key)),
+                )
+            )
+
             display_name = display_name or _("Empty")  # Prevent name being None
             course = store.get_course(dest_usage_key.course_key)
             course.tabs.append(

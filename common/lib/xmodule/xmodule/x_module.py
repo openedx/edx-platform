@@ -38,6 +38,9 @@ log = logging.getLogger(__name__)
 
 XMODULE_METRIC_NAME = 'edxapp.xmodule'
 
+# Stats event sent to DataDog in order to determine if old XML parsing can be deprecated.
+DEPRECATION_VSCOMPAT_EVENT = 'deprecation.vscompat'
+
 # xblock view names
 
 # This is the view that will be rendered to display the XBlock in the LMS.
@@ -860,6 +863,11 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
     @classmethod
     def _translate(cls, key):
         'VS[compat]'
+        if key in cls.metadata_translations:
+            dog_stats_api.increment(
+                DEPRECATION_VSCOMPAT_EVENT,
+                tags=["location:xmodule_descriptor_translate"]
+            )
         return cls.metadata_translations.get(key, key)
 
     # ================================= XML PARSING ============================

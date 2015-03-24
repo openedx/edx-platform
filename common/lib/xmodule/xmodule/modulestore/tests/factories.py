@@ -1,21 +1,22 @@
 import pprint
+import threading
+from uuid import uuid4
+from decorator import contextmanager
 import pymongo.message
 
-from factory import Factory, lazy_attribute_sequence, lazy_attribute
+from factory import Factory, Sequence, lazy_attribute_sequence, lazy_attribute
 from factory.containers import CyclicDefinitionError
-from uuid import uuid4
+from mock import Mock, patch
+from nose.tools import assert_less_equal, assert_greater_equal
+import dogstats_wrapper as dog_stats_api
 
-from xmodule.modulestore import prefer_xmodules, ModuleStoreEnum
 from opaque_keys.edx.locations import Location
 from opaque_keys.edx.keys import UsageKey
 from xblock.core import XBlock
 from xmodule.tabs import StaticTab
-from decorator import contextmanager
-from mock import Mock, patch
-from nose.tools import assert_less_equal, assert_greater_equal
-import factory
-import threading
+from xmodule.modulestore import prefer_xmodules, ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
 
 
 class Dummy(object):
@@ -86,9 +87,9 @@ class CourseFactory(XModuleFactory):
     """
     Factory for XModule courses.
     """
-    org = factory.Sequence(lambda n: 'org.%d' % n)
-    number = factory.Sequence(lambda n: 'course_%d' % n)
-    display_name = factory.Sequence(lambda n: 'Run %d' % n)
+    org = Sequence('org.{}'.format)
+    number = Sequence('course_{}'.format)
+    display_name = Sequence('Run {}'.format)
 
     # pylint: disable=unused-argument
     @classmethod
@@ -124,9 +125,9 @@ class LibraryFactory(XModuleFactory):
     """
     Factory for creating a content library
     """
-    org = factory.Sequence('org{}'.format)
-    library = factory.Sequence('lib{}'.format)
-    display_name = factory.Sequence('Test Library {}'.format)
+    org = Sequence('org{}'.format)
+    library = Sequence('lib{}'.format)
+    display_name = Sequence('Test Library {}'.format)
 
     # pylint: disable=unused-argument
     @classmethod
@@ -267,6 +268,14 @@ class ItemFactory(XModuleFactory):
             # if we add one then we need to also add it to the policy information (i.e. metadata)
             # we should remove this once we can break this reference from the course to static tabs
             if category == 'static_tab':
+                dog_stats_api.increment(
+                    DEPRECATION_VSCOMPAT_EVENT,
+                    tags=(
+                        "location:itemfactory_create_static_tab",
+                        u"block:{}".format(location.block_type),
+                    )
+                )
+
                 course = store.get_course(location.course_key)
                 course.tabs.append(
                     StaticTab(
