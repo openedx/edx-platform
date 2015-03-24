@@ -80,7 +80,7 @@ DELAY = 0.5
 
 
 @js_defined('window.Video', 'window.RequireJS.require', 'window.jQuery', 'window.XModule', 'window.XBlock',
-            'window.MathJax.isReady')
+            'window.MathJax', 'window.MathJax.isReady')
 class VideoComponentPage(VideoPage):
     """
     CMS Video Component Page
