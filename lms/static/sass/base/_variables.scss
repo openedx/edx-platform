@@ -139,7 +139,7 @@ $facebook-blue: #3B5998;
 $linkedin-blue: #0077B5;
 
 // TODO: both blue and yellow variables differ from CMS rgb value, need to confirm change to CMS variable is ok in current platform uses before switching.
-$blue: rgb(29,157,217);
+$blue: rgb(0, 120, 176);
 $yellow: rgb(255, 252, 221);
 
 // COLORS: old variables
@@ -183,7 +183,7 @@ $m-blue-l4: tint($m-blue,90%);
 $m-blue-l5: tint($m-blue,95%);
 $m-blue-l6: #4bb4fb;
 $m-blue-d1: rgb(23,144,199); // #1790C7
-$m-blue-d2: rgb(21,128,176); // #1580B0
+$m-blue-d2: $blue;
 $m-blue-d3: rgb(18,111,154); // #126F9A
 $m-blue-d4: rgb(10,74,103); // #0A4A67
 $m-blue-d5: rgb(0,158,231); // #009EE7
@@ -252,7 +252,7 @@ $courseware-footer-margin: 0px;
 $courseware-border-bottom-color: rgb(68,162,222); // #44a2de
 $courseware-button-border-color: rgb(230,230,230); // #e6e6e6
 $courseware-hover-color: rgb(51,52,53); // #333435
-$courseware-navigation-color: rgb(0,158,231); // #009ee7
+$courseware-navigation-color: $blue;
 
 // ====================
 
@@ -386,7 +386,7 @@ $border-color-l4: $m-gray-l4;
 
 // MISC: links and buttons
 $link-color: $blue;
-$link-color-d1: $m-blue-d2;
+$link-color-d1: $blue;
 $link-hover: $pink;
 $site-status-color: $pink;
 $button-color: $blue;

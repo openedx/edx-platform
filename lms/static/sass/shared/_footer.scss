@@ -35,7 +35,6 @@
 
       &:hover, &:focus, &:active {
         border-bottom: 1px dotted $link-color;
-        color: $link-color;
       }
     }
 
@@ -208,7 +207,7 @@
 // edX theme: LMS Footer
 // ====================
 $edx-footer-spacing: ($baseline*0.75);
-$edx-footer-link-color: rgb(0, 158, 231);
+$edx-footer-link-color: $link-color;
 $edx-footer-bg-color: rgb(252,252,252);
 
 %edx-footer-reset {

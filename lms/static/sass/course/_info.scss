@@ -84,6 +84,10 @@ div.info-wrapper {
     box-shadow: none;
     font-size: 14px;
 
+    a {
+      color: $link-color;
+    }
+
     &:after {
       left: -1px;
       right: auto;
@@ -104,6 +108,7 @@ div.info-wrapper {
         a {
           display: block;
           padding: 0;
+          color: $link-color;
 
           &:hover, &:focus {
             background: transparent;
