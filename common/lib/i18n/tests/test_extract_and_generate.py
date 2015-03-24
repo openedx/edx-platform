@@ -3,12 +3,13 @@ This test tests that i18n extraction (`paver i18n_extract -v`) works properly.
 """
 from datetime import datetime, timedelta
 import os
-import sys
-import string  # pylint: disable=deprecated-module
 import random
 import re
-
+import sys
+import string
+import subprocess
 from unittest import TestCase
+
 from mock import patch
 from polib import pofile
 from pytz import UTC
@@ -40,6 +41,16 @@ class TestGenerate(TestCase):
         sys.stderr.flush()
         extract.main(verbosity=0)
         dummy.main(verbosity=0)
+
+    @classmethod
+    def tearDownClass(cls):
+        # Clear the Esperanto directory of any test artifacts
+        cmd = "git checkout conf/locale/eo"
+        sys.stderr.write("Cleaning up eo: " + cmd)
+        sys.stderr.flush()
+        returncode = subprocess.call(cmd, shell=True)
+        assert returncode == 0
+        super(TestGenerate, cls).tearDownClass()
 
     def setUp(self):
         # Subtract 1 second to help comparisons with file-modify time succeed,

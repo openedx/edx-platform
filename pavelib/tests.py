@@ -115,9 +115,6 @@ def test_lib(options):
     test_suite = suites.PythonTestSuite('python tests', subsuites=lib_tests, **opts)
     test_suite.run()
 
-    # Clear the Esperanto directory of any test artifacts
-    sh('git checkout conf/locale/eo')
-
 
 @task
 @needs(
