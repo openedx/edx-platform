@@ -13,7 +13,6 @@ from lms import startup
 
 from django_comment_client.base import views
 from django_comment_client.tests.group_id import CohortedTopicGroupIdTestMixin, NonCohortedTopicGroupIdTestMixin, GroupIdAssertionMixin
-from django_comment_client.tests.utils import CohortedTestCase
 from django_comment_client.tests.utils import CohortedContentTestCase
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_common.models import Role
@@ -49,7 +48,7 @@ class MockRequestSetupMixin(object):
 @patch('lms.lib.comment_client.utils.requests.request')
 class CreateThreadGroupIdTestCase(
         MockRequestSetupMixin,
-        CohortedTestCase,
+        CohortedContentTestCase,
         CohortedTopicGroupIdTestMixin,
         NonCohortedTopicGroupIdTestMixin
 ):
@@ -84,7 +83,7 @@ class CreateThreadGroupIdTestCase(
 @patch('lms.lib.comment_client.utils.requests.request')
 class ThreadActionGroupIdTestCase(
         MockRequestSetupMixin,
-        CohortedTestCase,
+        CohortedContentTestCase,
         GroupIdAssertionMixin
 ):
     def call_view(
