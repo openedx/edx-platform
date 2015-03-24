@@ -29,8 +29,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     title: 'edX learners can see my:',
                     valueAttribute: "account_privacy",
                     options: [
-                        ['private', gettext('Limited Profile')],
-                        ['all_users', gettext('Full Profile')]
+                        ['private', 'Limited Profile'],
+                        ['all_users', 'Full Profile']
                     ],
                     helpMessage: '',
                     accountSettingsPageUrl: '/account/settings/'
@@ -51,7 +51,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                         iconName: 'fa-map-marker',
                         placeholderValue: 'Add country',
                         valueAttribute: "country",
-                        options: options['country_options'],
+                        options: Helpers.FIELD_OPTIONS,
                         helpMessage: ''
                     }),
 
@@ -73,8 +73,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                         model: accountSettingsModel,
                         editable: editable,
                         showMessages: false,
-                        title: gettext('About me'),
-                        placeholderValue: gettext("Tell other edX learners a little about yourself, where you're from, what your interests are, why you joined edX, what you hope to learn..."),
+                        title: 'About me',
+                        placeholderValue: "Tell other edX learners a little about yourself, where you're from, what your interests are, why you joined edX, what you hope to learn...",
                         valueAttribute: "bio",
                         helpMessage: ''
                     })
@@ -104,19 +104,64 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 TemplateHelpers.installTemplate('templates/student_profile/learner_profile');
             });
 
+
+            var expectProfileSectionsButNotFieldsToBeRendered = function (learnerProfileView) {
+                expectProfileSectionsAndFieldsToBeRendered(learnerProfileView, false)
+            };
+
+            var expectProfileSectionsAndFieldsToBeRendered = function (learnerProfileView, fieldsAreRendered) {
+                var accountPrivacyElement = learnerProfileView.$('.wrapper-profile-field-account-privacy');
+
+                var privacyFieldElement  = $(accountPrivacyElement).find('u-field');
+                if (fieldsAreRendered === false) {
+                    expect(privacyFieldElement.length).toBe(0);
+                } else {
+                    expect(privacyFieldElement.length).toBe(1);
+
+                    var fieldTitle = $(privacyFieldElement).find('.u-field-title').text().trim(),
+                        view = learnerProfileView.options.accountPrivacyFieldView;
+
+                    expect(fieldTitle).toBe(view.options.title);
+
+                    if ('fieldValue' in view) {
+                        expect(view.model.get(view.options.valueAttribute)).toBeTruthy();
+                        expect(view.fieldValue()).toBe(view.modelValue());
+                    }
+                }
+
+                var sectionElements = learnerProfileView.$('.section');
+                var sectionsData = learnerProfileView.options.sectionsData;
+
+                _.each(sectionElements, function(sectionElement, sectionIndex) {
+                    expect($(sectionElement).find('.section-header').text().trim()).toBe(sectionsData[sectionIndex].title);
+
+                    var sectionFieldElements = $(sectionElement).find('.u-field');
+
+                    if (fieldsAreRendered === false) {
+                        expect(sectionFieldElements.length).toBe(0);
+                    } else {
+                        expect(sectionFieldElements.length).toBe(sectionsData[sectionIndex].fields.length);
+
+                        _.each(sectionFieldElements, function (sectionFieldElement, fieldIndex) {
+                            expectElementContainsField(sectionFieldElement, sectionsData[sectionIndex].fields[fieldIndex]);
+                        });
+                    }
+                });
+            };
+
             it("shows loading error correctly", function() {
 
-                var accountSettingsView = createLearnerProfileView();
+                var learnerProfileView = createLearnerProfileView();
 
-                accountSettingsView.render();
-                Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, true);
-                Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
-                Helpers.expectSettingsSectionsButNotFieldsToBeRendered(accountSettingsView);
+                learnerProfileView.render();
+                Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
+                Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
+                expectProfileSectionsButNotFieldsToBeRendered(learnerProfileView);
 
-                accountSettingsView.showLoadingError();
-                Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, false);
-                Helpers.expectLoadingErrorIsVisible(accountSettingsView, true);
-                Helpers.expectSettingsSectionsButNotFieldsToBeRendered(accountSettingsView);
+                learnerProfileView.showLoadingError();
+                Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, false);
+                Helpers.expectLoadingErrorIsVisible(learnerProfileView, true);
+                expectProfileSectionsButNotFieldsToBeRendered(learnerProfileView);
             });
 
             it("renders all fields as expected", function() {
@@ -126,12 +171,12 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 accountSettingsView.render();
                 Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, true);
                 Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
-                Helpers.expectSettingsSectionsButNotFieldsToBeRendered(accountSettingsView);
+                expectProfileSectionsButNotFieldsToBeRendered(accountSettingsView);
 
                 accountSettingsView.renderFields();
                 Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, false);
                 Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
-                Helpers.expectSettingsSectionsAndFieldsToBeRendered(accountSettingsView)
+                expectProfileSectionsAndFieldsToBeRendered(accountSettingsView)
             });
 
         });

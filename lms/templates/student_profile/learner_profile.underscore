@@ -1,7 +1,7 @@
 <div class="profile <%- ownProfile ? 'profile-self' : 'profile-other' %>">
     <div class="wrapper-profile-field-account-privacy"></div>
 
-    <div class="wrapper-profile-sections account-settings-container">
+    <div class="section wrapper-profile-sections account-settings-container">
         <div class="wrapper-profile-section-one">
             <div class="profile-photo">
                 <img src="<%- profilePhoto %>">
@@ -11,7 +11,7 @@
             </div>
         </div>
 
-        <div class="wrapper-profile-section-two">
+        <div class="section wrapper-profile-section-two">
             <div class="profile-section-two-fields">
                 <% if (!showFullProfile) { %>
                     <label class="profile-private--message">

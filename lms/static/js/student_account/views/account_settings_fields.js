@@ -315,7 +315,12 @@
             },
 
             modelValueIsSet: function() {
-                return (this.modelValue() && this.optionForValue(this.modelValue())) == true;
+                var value = this.modelValue();
+                if (_.isUndefined(value) || _.isNull(value) || value == '') {
+                    return false;
+                } else {
+                    return !(_.isUndefined(this.optionForValue(value)))
+                }
             },
 
             optionForValue: function(value) {
