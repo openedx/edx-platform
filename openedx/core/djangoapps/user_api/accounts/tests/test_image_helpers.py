@@ -34,7 +34,7 @@ class ProfileImageUrlTestCase(TestCase):
         """
         self.assertEqual(
             actual_url,
-            'http://example-storage.com/profile_images/{name}_{size}.jpg'.format(
+            'http://example-storage.com/profile-images/{name}_{size}.jpg'.format(
                 name=expected_name, size=expected_pixels
             )
         )
