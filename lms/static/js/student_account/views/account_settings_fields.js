@@ -341,18 +341,15 @@
             },
 
             updateValueInField: function () {
-                var value = this.modelValue();
                 if (this.mode === 'display') {
-                    if (_.isUndefined(value) || _.isNull(value)) {
+                    var value = this.displayValue(this.modelValue() || '');
+                    if (this.modelValueIsSet() === false) {
                         value = this.options.placeholderValue || '';
                     }
-                    this.$('.u-field-value').html(Mustache.escapeHtml(this.displayValue(value)));
+                    this.$('.u-field-value').html(Mustache.escapeHtml(value));
                     this.showDisplayMode(false);
                 } else {
-                    if (_.isUndefined(value) || _.isNull(value)) {
-                        value = '';
-                    }
-                    this.$('.u-field-value select').val(Mustache.escapeHtml(value));
+                    this.$('.u-field-value select').val(this.modelValue() || '');
                 }
             },
 
