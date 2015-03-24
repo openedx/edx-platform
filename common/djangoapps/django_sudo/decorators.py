@@ -27,15 +27,18 @@ def sudo_required(func_or_region):
     def wrapper(func):
         @wraps(func)
         def inner(request, *args, **kwargs):
-            course_id = kwargs.get("course_id")
+            course_region = kwargs.get('course_id')
+            if 'course_key_string' in kwargs:
+                course_region = kwargs.get('course_key_string')
+            if course_region:
+                course_region = course_region.replace('i4x://', '').replace('/', '_')
             # N.B. region is captured from the enclosing sudo_required function
-            # if None use course_id as region for course specific sudo access.
-            if not request.is_sudo(region=region or course_id):
-                return redirect_to_sudo(request.get_full_path(), region=region or course_id)
+            if not request.is_sudo(region=region or course_region):
+                return redirect_to_sudo(request.get_full_path(), region=region or course_region)
 
             if RESET_TOKEN is True:
                 # Provide new sudo token content and reset timeout on activity
-                new_sudo_token_on_activity(request, region=region or course_id)
+                new_sudo_token_on_activity(request, region=region or course_region)
 
             return func(request, *args, **kwargs)
         return inner
