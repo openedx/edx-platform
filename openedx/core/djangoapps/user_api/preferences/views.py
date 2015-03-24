@@ -15,6 +15,7 @@ from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
 )
 from openedx.core.lib.api.parsers import MergePatchParser
+from openedx.core.lib.api.permissions import IsUserInUrlOrStaff
 from ..errors import UserNotFound, UserNotAuthorized, PreferenceValidationError, PreferenceUpdateError
 from .api import (
     get_user_preference, get_user_preferences, set_user_preference, update_user_preferences, delete_user_preference
@@ -63,7 +64,7 @@ class PreferencesView(APIView):
 
     """
     authentication_classes = (OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated, IsUserInUrlOrStaff)
     parser_classes = (MergePatchParser,)
 
     def get(self, request, username):
@@ -73,7 +74,7 @@ class PreferencesView(APIView):
         try:
             user_preferences = get_user_preferences(request.user, username=username)
         except UserNotAuthorized:
-            return Response(status=status.HTTP_403_FORBIDDEN if request.user.is_staff else status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_403_FORBIDDEN)
         except UserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -95,7 +96,7 @@ class PreferencesView(APIView):
         try:
             update_user_preferences(request.user, request.DATA, username=username)
         except UserNotAuthorized:
-            return Response(status=status.HTTP_403_FORBIDDEN if request.user.is_staff else status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_403_FORBIDDEN)
         except UserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
         except PreferenceValidationError as error:
@@ -159,7 +160,7 @@ class PreferencesDetailView(APIView):
 
     """
     authentication_classes = (OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated, IsUserInUrlOrStaff)
 
     def get(self, request, username, preference_key):
         """
@@ -171,7 +172,7 @@ class PreferencesDetailView(APIView):
             if value is None:
                 return Response(status=status.HTTP_404_NOT_FOUND)
         except UserNotAuthorized:
-            return Response(status=status.HTTP_403_FORBIDDEN if request.user.is_staff else status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_403_FORBIDDEN)
         except UserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(value)
@@ -183,7 +184,7 @@ class PreferencesDetailView(APIView):
         try:
             set_user_preference(request.user, preference_key, request.DATA, username=username)
         except UserNotAuthorized:
-            return Response(status=status.HTTP_403_FORBIDDEN if request.user.is_staff else status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_403_FORBIDDEN)
         except UserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
         except PreferenceValidationError as error:
@@ -211,7 +212,7 @@ class PreferencesDetailView(APIView):
         try:
             preference_existed = delete_user_preference(request.user, preference_key, username=username)
         except UserNotAuthorized:
-            return Response(status=status.HTTP_403_FORBIDDEN if request.user.is_staff else status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_403_FORBIDDEN)
         except UserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
         except PreferenceUpdateError as error:
