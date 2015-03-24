@@ -61,6 +61,16 @@ def course_team_handler(request, course_key_string=None, email=None):
         return HttpResponseNotFound()
 
 
+def user_with_role(user, role):
+    """ Build user representation with attached role """
+    return {
+        'id': user.id,
+        'username': user.username,
+        'email': user.email,
+        'role': role
+    }
+
+
 def _manage_users(request, course_key):
     """
     This view will return all CMS users who are editors for the specified course
@@ -71,14 +81,20 @@ def _manage_users(request, course_key):
         raise PermissionDenied()
 
     course_module = modulestore().get_course(course_key)
-    instructors = CourseInstructorRole(course_key).users_with_role()
+    instructors = set(CourseInstructorRole(course_key).users_with_role())
     # the page only lists staff and assumes they're a superset of instructors. Do a union to ensure.
     staff = set(CourseStaffRole(course_key).users_with_role()).union(instructors)
 
+    formatted_users = []
+    for user in instructors:
+        formatted_users.append(user_with_role(user, 'instructor'))
+    for user in staff - instructors:
+        formatted_users.append(user_with_role(user, 'staff'))
+
     return render_to_response('manage_users.html', {
         'context_course': course_module,
-        'staff': staff,
-        'instructors': instructors,
+        'show_transfer_ownership_hint': request.user in instructors and len(instructors) == 1,
+        'users': formatted_users,
         'allow_actions': bool(user_perms & STUDIO_EDIT_ROLES),
     })
 

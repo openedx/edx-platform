@@ -84,6 +84,23 @@ class DashboardPage(PageObject):
         """
         self.q(css='.wrapper-create-library .new-library-save').click()
 
+    def list_courses(self):
+        """
+        List all the courses found on the page's list of libraries.
+        """
+        # Workaround Selenium/Firefox bug: `.text` property is broken on invisible elements
+        course_tab_link = self.q(css='#course-index-tabs .courses-tab a')
+        if course_tab_link:
+            course_tab_link.click()
+        div2info = lambda element: {
+            'name': element.find_element_by_css_selector('.course-title').text,
+            'org': element.find_element_by_css_selector('.course-org .value').text,
+            'number': element.find_element_by_css_selector('.course-num .value').text,
+            'run': element.find_element_by_css_selector('.course-run .value').text,
+            'url': element.find_element_by_css_selector('a.course-link').get_attribute('href'),
+        }
+        return self.q(css='.courses li.course-item').map(div2info).results
+
     def list_libraries(self):
         """
         Click the tab to display the available libraries, and return detail of them.

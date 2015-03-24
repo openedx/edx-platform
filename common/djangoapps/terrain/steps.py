@@ -233,3 +233,11 @@ def run_ipdb(_step):
     import ipdb
     ipdb.set_trace()
     assert True
+
+
+@step(u'(I am viewing|s?he views) the course team settings$')
+def view_course_team_settings(_step, whom):
+    """ navigates to course team settings page """
+    world.click_course_settings()
+    link_css = 'li.nav-course-settings-team a'
+    world.css_click(link_css)
