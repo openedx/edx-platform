@@ -364,7 +364,6 @@
 
             showEditMode: function(render) {
                 this._super(render);
-                this.$('.u-field-value select').focus();
             },
 
             showSuccessMessage: function() {

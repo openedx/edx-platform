@@ -28,9 +28,9 @@ define(['underscore'], function(_) {
 
     var expectLoadingIndicatorIsVisible = function (view, visible) {
         if (visible) {
-            expect(view.$('.ui-loading-indicator')).not.toHaveClass('is-hidden');
+            expect($('.ui-loading-indicator')).not.toHaveClass('is-hidden');
         } else {
-            expect(view.$('.ui-loading-indicator')).toHaveClass('is-hidden');
+            expect($('.ui-loading-indicator')).toHaveClass('is-hidden');
         }
     };
 

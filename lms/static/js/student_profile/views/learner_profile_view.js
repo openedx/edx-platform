@@ -8,7 +8,7 @@
 
             initialize: function (options) {
                 this.template = _.template($('#learner_profile-tpl').text());
-                _.bindAll(this, 'showFullProfile', 'render', 'renderFields');
+                _.bindAll(this, 'showFullProfile', 'render', 'renderFields', 'showLoadingError');
                 this.listenTo(this.options.preferencesModel, "change:" + 'account_privacy', this.render);
             },
 
@@ -57,6 +57,10 @@
                     });
                 }
             },
+            showLoadingError: function () {
+                this.$('.ui-loading-indicator').addClass('is-hidden');
+                this.$('.ui-loading-error').removeClass('is-hidden');
+            }
         });
 
         return LearnerProfileView;

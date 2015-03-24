@@ -3,7 +3,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
         'js/student_account/views/account_settings_fields',
         'js/student_account/models/user_account_model',
         'js/student_account/models/user_preferences_model',
-        'js/student_profile/learner_profile_view'
+        'js/student_profile/views/learner_profile_view'
        ],
     function (Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, FieldViews, UserAccountModel,
                 AccountPreferencesModel, LearnerProfileView) {
@@ -17,6 +17,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 accountSettingsModel.set(Helpers.USER_ACCOUNTS_DATA);
 
                 var accountPreferencesModel = new AccountPreferencesModel();
+                accountPreferencesModel.set({account_privacy: 'all_users'});
+
                 accountPreferencesModel.url = Helpers.USER_PREFERENCES_API_URL;
 
                 var editable = ownProfile ? 'toggle' : 'never';
@@ -29,8 +31,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     title: 'edX learners can see my:',
                     valueAttribute: "account_privacy",
                     options: [
-                        ['private', 'Limited Profile'],
-                        ['all_users', 'Full Profile']
+                        ['all_users', 'Full Profile'],
+                        ['private', 'Limited Profile']
                     ],
                     helpMessage: '',
                     accountSettingsPageUrl: '/account/settings/'
@@ -43,6 +45,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 });
 
                 var sectionOneFieldViews = [
+                    usernameFieldView,
                     new FieldViews.DropdownFieldView({
                         model: accountSettingsModel,
                         required: false,
@@ -61,9 +64,9 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                         editable: editable,
                         showMessages: false,
                         iconName: 'fa-comment fa-flip-horizontal',
-                        placeholderValue: gettext('Add language'),
+                        placeholderValue: 'Add language',
                         valueAttribute: "language",
-                        options: options['language_options'],
+                        options: Helpers.FIELD_OPTIONS,
                         helpMessage: ''
                     })
                 ];
@@ -96,52 +99,73 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             };
 
             beforeEach(function () {
-                setFixtures('<div class="wrapper-profile"></div>');
+                setFixtures('<div class="wrapper-profile"><div class="ui-loading-indicator"><p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">Loading</span></p></div><div class="ui-loading-error is-hidden"><i class="fa fa-exclamation-triangle message-error" aria-hidden=true></i><span class="copy">An error occurred. Please reload the page.</span></div></div>'
+                );
                 TemplateHelpers.installTemplate('templates/fields/field_readonly');
                 TemplateHelpers.installTemplate('templates/fields/field_dropdown');
                 TemplateHelpers.installTemplate('templates/fields/field_textarea');
                 TemplateHelpers.installTemplate('templates/student_profile/learner_profile');
             });
 
+            var expectElementContainsField = function(element, view) {
+                var fieldTitle = $(element).find('.u-field-title').text().trim();
 
-            var expectProfileSectionsButNotFieldsToBeRendered = function (learnerProfileView) {
-                expectProfileSectionsAndFieldsToBeRendered(learnerProfileView, false)
-            };
-
-            var expectAccountPrivacyFieldTobeRendered = function(learnerProfileView, fieldIsRendered) {
-                var accountPrivacyElement = learnerProfileView.$('.wrapper-profile-field-account-privacy');
-
-                var privacyFieldElement  = $(accountPrivacyElement).find('u-field');
-                if (fieldIsRendered === false) {
-                    expect(privacyFieldElement.length).toBe(0);
-                } else {
-                    expect(privacyFieldElement.length).toBe(1);
-
-                    var fieldTitle = $(privacyFieldElement).find('.u-field-title').text().trim(),
-                        view = learnerProfileView.options.accountPrivacyFieldView;
-
-                    expect(fieldTitle).toBe(view.options.title);
-
-                    if ('fieldValue' in view) {
-                        expect(view.model.get(view.options.valueAttribute)).toBeTruthy();
-                        expect(view.fieldValue()).toBe(view.modelValue());
+                if (!_.isUndefined(view.options.title)) {
+                    if (view.modelValue()) {
+                        expect(fieldTitle).toBe(view.options.title);
+                    } else {
+                        expect(fieldTitle).toBe('+' + view.options.title);
                     }
+                }
+
+                if ('fieldValue' in view) {
+                    expect(view.model.get(view.options.valueAttribute)).toBeTruthy();
+                    if (view.fieldValue()){
+                        expect(view.fieldValue()).toBe(view.modelValue());
+                    } else {
+                        expect($($(element).find('.u-field-value')[0]).text()).toBe(view.modelValue());
+                    }
+                } else {
+                    throw new Error('Unexpected field type: ' + view.fieldType);
                 }
             };
 
-            var expectProfileSectionsAndFieldsToBeRendered = function (learnerProfileView, fieldsAreRendered) {
-                expectAccountPrivacyFieldTobeRendered(learnerProfileView, fieldsAreRendered);
+            var expectProfilePrivacyFieldTobeRendered = function(learnerProfileView) {
 
-                var sectionOneElement = learnerProfileView.$('.wrapper-profile-section-one');
-                var sectionOneFieldElements = $(sectionOneElement).find('.u-field');
-                expect(sectionOneFieldElements.length).toBe(3);
+                var accountPrivacyElement = learnerProfileView.$('.wrapper-profile-field-account-privacy');
+                var privacyFieldElement  = $(accountPrivacyElement).find('.u-field');
 
+                expect(privacyFieldElement.length).toBe(1);
+                expectElementContainsField(privacyFieldElement, learnerProfileView.options.accountPrivacyFieldView)
+            };
+
+            var expectSectionOneTobeRendered = function(learnerProfileView) {
+
+                var sectionOneFieldElements = $(learnerProfileView.$('.wrapper-profile-section-one')).find('.u-field');
+
+                // rendered section-1 contains additional username field.
+                expect(sectionOneFieldElements.length).toBe(learnerProfileView.options.sectionOneFieldViews.length);
+
+                _.each(sectionOneFieldElements, function (sectionFieldElement, fieldIndex) {
+                    expectElementContainsField(sectionFieldElement, learnerProfileView.options.sectionOneFieldViews[fieldIndex]);
+                });
+            };
+
+            var expectSectionTwoTobeRendered = function(learnerProfileView) {
 
                 var sectionTwoElement = learnerProfileView.$('.wrapper-profile-section-two');
                 var sectionTwoFieldElements = $(sectionTwoElement).find('.u-field');
 
-                expect(sectionTwoFieldElements.length).toBe(1);
+                expect(sectionTwoFieldElements.length).toBe(learnerProfileView.options.sectionTwoFieldViews.length);
 
+                 _.each(sectionTwoFieldElements, function (sectionFieldElement, fieldIndex) {
+                    expectElementContainsField(sectionFieldElement, learnerProfileView.options.sectionTwoFieldViews[fieldIndex]);
+                });
+            };
+            var expectProfileSectionsAndFieldsToBeRendered = function (learnerProfileView) {
+                expectProfilePrivacyFieldTobeRendered(learnerProfileView);
+                expectSectionOneTobeRendered(learnerProfileView);
+                expectSectionTwoTobeRendered(learnerProfileView);
             };
 
             it("shows loading error correctly", function() {
@@ -152,27 +176,25 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
                 expectAccountPrivacyFieldTobeRendered(learnerProfileView, fieldsAreRendered);
-                Helpers.expectSettingsSectionsButNotFieldsToBeRendered(learnerProfileView);
+                expectProfileSectionsAndFieldsToBeRendered(learnerProfileView);
 
                 learnerProfileView.showLoadingError();
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, false);
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, true);
-                Helpers.expectSettingsSectionsButNotFieldsToBeRendered(learnerProfileView);
+                expectProfileSectionsAndFieldsToBeRendered(learnerProfileView);
             });
 
             it("renders all fields as expected", function() {
 
-                var accountSettingsView = createLearnerProfileView();
+                var learnerProfileView = createLearnerProfileView(true);
 
-                accountSettingsView.render();
-                Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, true);
-                Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
-                Helpers.expectSettingsSectionsButNotFieldsToBeRendered(accountSettingsView);
+                Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
+                Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
 
-                accountSettingsView.renderFields();
-                Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, false);
-                Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
-                expectProfileSectionsAndFieldsToBeRendered(accountSettingsView)
+                learnerProfileView.render();
+
+                Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
+                expectProfileSectionsAndFieldsToBeRendered(learnerProfileView)
             });
 
         });

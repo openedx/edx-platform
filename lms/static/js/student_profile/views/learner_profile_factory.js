@@ -37,14 +37,14 @@
                 helpMessage: '',
                 accountSettingsPageUrl: options['account_settings_page_url']
             });
-
             var usernameFieldView = new AccountSettingsFieldViews.ReadonlyFieldView({
                     model: accountSettingsModel,
                     valueAttribute: "username",
                     helpMessage: ""
             });
-
             var sectionOneFieldViews = [
+                usernameFieldView,
+
                 new AccountSettingsFieldViews.DropdownFieldView({
                     model: accountSettingsModel,
                     required: false,
@@ -82,21 +82,40 @@
                 })
             ];
 
-            accountSettingsModel.fetch().done(function () {
-                accountPreferencesModel.fetch({complete: function () {
-                    new LearnerProfileEditView({
-                        el: learnerProfileElement,
-                        own_profile: options['own_profile'],
-                        has_preferences_access: options['has_preferences_access'],
-                        accountSettingsModel: accountSettingsModel,
-                        preferencesModel: accountPreferencesModel,
-                        accountPrivacyFieldView: accountPrivacyFieldView,
-                        usernameFieldView: usernameFieldView,
-                        sectionOneFieldViews: sectionOneFieldViews,
-                        sectionTwoFieldViews: sectionTwoFieldViews
-                    }).render();
-                }});
+
+            var learnerProfileView = new LearnerProfileEditView({
+                el: learnerProfileElement,
+                own_profile: options['own_profile'],
+                has_preferences_access: options['has_preferences_access'],
+                accountSettingsModel: accountSettingsModel,
+                preferencesModel: accountPreferencesModel,
+                accountPrivacyFieldView: accountPrivacyFieldView,
+                usernameFieldView: usernameFieldView,
+                sectionOneFieldViews: sectionOneFieldViews,
+                sectionTwoFieldViews: sectionTwoFieldViews
             });
+
+            var showLoadingError = function () {
+                learnerProfileView.showLoadingError();
+            };
+
+            accountSettingsModel.fetch({
+                success: function () {
+                    accountPreferencesModel.fetch({
+                        success: function () {
+                            learnerProfileView.render();
+                        },
+                        error: showLoadingError
+                    })
+                },
+                error: showLoadingError
+            });
+
+            return {
+                accountSettingsModel: accountSettingsModel,
+                accountPreferencesModel: accountPreferencesModel,
+                learnerProfileView: learnerProfileView
+            };
         };
 
         return setupLearnerProfile;
