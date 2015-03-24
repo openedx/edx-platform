@@ -7,6 +7,7 @@ from __future__ import absolute_import
 from uuid import uuid4
 import urllib
 
+import dogstats_wrapper as dog_stats_api
 from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import redirect
@@ -251,6 +252,11 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
         # if we add one then we need to also add it to the policy information (i.e. metadata)
         # we should remove this once we can break this reference from the course to static tabs
         if category == 'static_tab':
+
+            tags = [ "action:{}".format(unicode(dest_usage_key.course_key)) ]
+            tags.append("location:create_xblock_static_tab")
+            dog_stats_api.increment('vscompat.deprecation', tags=tags)
+
             display_name = display_name or _("Empty")  # Prevent name being None
             course = store.get_course(dest_usage_key.course_key)
             course.tabs.append(

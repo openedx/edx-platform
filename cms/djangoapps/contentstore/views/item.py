@@ -13,6 +13,7 @@ from functools import partial
 from static_replace import replace_static_urls
 from xmodule_modifiers import wrap_xblock, request_token
 
+import dogstats_wrapper as dog_stats_api
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
@@ -637,6 +638,11 @@ def _delete_item(usage_key, user):
         # if we add one then we need to also add it to the policy information (i.e. metadata)
         # we should remove this once we can break this reference from the course to static tabs
         if usage_key.category == 'static_tab':
+
+            tags = [ "action:{}".format(unicode(dest_usage_key.course_key)) ]
+            tags.append("location:_delete_item_static_tab")
+            dog_stats_api.increment('vscompat.deprecation', tags=tags)
+
             course = store.get_course(usage_key.course_key)
             existing_tabs = course.tabs or []
             course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != usage_key.name]

@@ -6,6 +6,7 @@ from lxml import etree
 
 from pkg_resources import resource_string
 
+import dogstats_wrapper as dog_stats_api
 from .capa_base import CapaMixin, CapaFields, ComplexEncoder
 from capa import responsetypes
 from .progress import Progress
@@ -156,6 +157,8 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     # edited in the cms
     @classmethod
     def backcompat_paths(cls, path):
+        tags = [ "location:capa_descriptor_backcompat_paths" ]
+        dog_stats_api.increment('vscompat.deprecation', tags=tags)
         return [
             'problems/' + path[8:],
             path[8:],

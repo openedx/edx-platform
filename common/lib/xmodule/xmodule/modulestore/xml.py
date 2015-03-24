@@ -27,12 +27,13 @@ from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 
 from xblock.field_data import DictFieldData
 from xblock.runtime import DictKeyValueStore
+from xblock.fields import ScopeIds
 
+import dogstats_wrapper as dog_stats_api
 
 from .exceptions import ItemNotFoundError
 from .inheritance import compute_inherited_metadata, inheriting_field_data, InheritanceKeyValueStore
 
-from xblock.fields import ScopeIds
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
                                  remove_comments=True, remove_blank_text=True)
@@ -46,8 +47,13 @@ log = logging.getLogger(__name__)
 # TODO (cpennington): Remove this once all fall 2012 courses have been imported
 # into the cms from xml
 def clean_out_mako_templating(xml_string):
+    orig_xml = xml_string
     xml_string = xml_string.replace('%include', 'include')
     xml_string = re.sub(r"(?m)^\s*%.*$", '', xml_string)
+    if orig_xml != xml_string:
+        tags = [ "action:{}".format(orig_xml) ]
+        tags.append("location:xml_clean_out_mako_templating")
+        dog_stats_api.increment('vscompat.deprecation', tags=tags)
     return xml_string
 
 
@@ -114,6 +120,10 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 def fallback_name(orig_name=None):
                     """Return the fallback name for this module.  This is a function instead of a variable
                     because we want it to be lazy."""
+                    tags = [ "action:{}".format(orig_name) ]
+                    tags.append("location:import_system_fallback_name")
+                    dog_stats_api.increment('vscompat.deprecation', tags=tags)
+
                     if looks_like_fallback(orig_name):
                         # We're about to re-hash, in case something changed, so get rid of the tag_ and hash
                         orig_name = orig_name[len(tag) + 1:-12]
@@ -468,12 +478,22 @@ class XMLModuleStore(ModuleStoreReadBase):
 
                 # VS[compat]: remove once courses use the policy dirs.
                 if policy == {}:
+
+                    tags = [ "action:{}".format(course) ]
+                    tags.append("location:xml_load_course_policy_dir")
+                    dog_stats_api.increment('vscompat.deprecation', tags=tags)
+
                     old_policy_path = self.data_dir / course_dir / 'policies' / '{0}.json'.format(url_name)
                     policy = self.load_policy(old_policy_path, tracker)
             else:
                 policy = {}
                 # VS[compat] : 'name' is deprecated, but support it for now...
                 if course_data.get('name'):
+
+                    tags = [ "action:{}".format(course_data.get('name')) ]
+                    tags.append("location:xml_load_course_course_data_name")
+                    dog_stats_api.increment('vscompat.deprecation', tags=tags)
+
                     url_name = Location.clean(course_data.get('name'))
                     tracker("'name' is deprecated for module xml.  Please use "
                             "display_name and url_name.")
@@ -660,6 +680,10 @@ class XMLModuleStore(ModuleStoreReadBase):
                         # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)
                         # from the course policy
                         if category == "static_tab":
+                            tags = [ "action:{}".format(course_dir) ]
+                            tags.append("location:xml_load_extra_content_static_tab")
+                            dog_stats_api.increment('vscompat.deprecation', tags=tags)
+
                             tab = CourseTabList.get_tab_by_slug(tab_list=course_descriptor.tabs, url_slug=slug)
                             if tab:
                                 module.display_name = tab.name

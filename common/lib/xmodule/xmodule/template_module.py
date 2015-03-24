@@ -2,6 +2,7 @@ from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from lxml import etree
 from mako.template import Template
+import dogstats_wrapper as dog_stats_api
 
 
 class CustomTagModule(XModule):
@@ -42,6 +43,9 @@ class CustomTagDescriptor(RawDescriptor):
             template_name = xmltree.attrib['impl']
         else:
             # VS[compat]  backwards compatibility with old nested customtag structure
+            tags = [ "location:customtag_descriptor_render_template" ]
+            dog_stats_api.increment('vscompat.deprecation', tags=tags)
+
             child_impl = xmltree.find('impl')
             if child_impl is not None:
                 template_name = child_impl.text

@@ -1,24 +1,25 @@
-import copy
-from fs.errors import ResourceNotFoundError
-import logging
 import os
 import sys
+import re
+import copy
+import logging
+import textwrap
 from lxml import etree
 from path import path
-
+from fs.errors import ResourceNotFoundError
 from pkg_resources import resource_string
-from xblock.fields import Scope, String, Boolean, List
+
+import dogstats_wrapper as dog_stats_api
+from xmodule.annotator_mixin import html_to_text
+from xmodule.contentstore.content import StaticContent
 from xmodule.editing_module import EditingDescriptor
+from xmodule.edxnotes_utils import edxnotes
 from xmodule.html_checker import check_html
 from xmodule.stringify import stringify_children
 from xmodule.x_module import XModule
 from xmodule.xml_module import XmlDescriptor, name_to_pathname
-import textwrap
-from xmodule.contentstore.content import StaticContent
 from xblock.core import XBlock
-from xmodule.edxnotes_utils import edxnotes
-from xmodule.annotator_mixin import html_to_text
-import re
+from xblock.fields import Scope, String, Boolean, List
 
 log = logging.getLogger("edx.courseware")
 
@@ -103,6 +104,10 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
     # are being edited in the cms
     @classmethod
     def backcompat_paths(cls, path):
+
+        tags = [ "location:html_descriptor_backcompat_paths" ]
+        dog_stats_api.increment('vscompat.deprecation', tags=tags)
+
         if path.endswith('.html.xml'):
             path = path[:-9] + '.html'  # backcompat--look for html instead of xml
         if path.endswith('.html.html'):
@@ -192,6 +197,10 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
             # again in the correct format.  This should go away once the CMS is
             # online and has imported all current (fall 2012) courses from xml
             if not system.resources_fs.exists(filepath):
+
+                tags = [ "location:html_descriptor_load_definition" ]
+                dog_stats_api.increment('vscompat.deprecation', tags=tags)
+
                 candidates = cls.backcompat_paths(filepath)
                 # log.debug("candidates = {0}".format(candidates))
                 for candidate in candidates:
