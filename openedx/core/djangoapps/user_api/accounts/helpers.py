@@ -20,8 +20,9 @@ def get_profile_image_storage():
     Configures and returns a django Storage instance that can be used
     to physically locate, read and write profile images.
     """
-    storage_class = get_storage_class(settings.PROFILE_IMAGE_BACKEND)
-    return storage_class(base_url=(settings.PROFILE_IMAGE_DOMAIN + settings.PROFILE_IMAGE_URL_PATH))
+    config = settings.PROFILE_IMAGE_BACKEND_CONFIG
+    storage_class = get_storage_class(config['storage_class'])
+    return storage_class(**config['storage_kwargs'])
 
 
 def _make_name(username):
@@ -69,7 +70,7 @@ def get_profile_image_urls(user):
     callers will use `get_default_profile_image_urls` instead to provide
     a set of urls that point to placeholder images, when there are no user-
     submitted images.
-      - based on the value of django.conf.settings.PROFILE_IMAGE_DOMAIN,
+      - based on the value of django.conf.settings.PROFILE_IMAGE_BACKEND_CONFIG,
     the URL may be relative, and in that case the caller is responsible for
     constructing the full URL if needed.
 
