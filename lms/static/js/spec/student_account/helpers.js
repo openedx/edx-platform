@@ -13,7 +13,8 @@ define(['underscore'], function(_) {
         gender: '2',
         year_of_birth: '3',
         country: '1',
-        language: '2'
+        language: '2',
+        bio: "About the student"
     };
 
     var USER_PREFERENCES_DATA = {

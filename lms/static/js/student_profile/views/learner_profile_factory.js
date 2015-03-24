@@ -7,9 +7,9 @@
         'js/student_account/views/account_settings_fields',
         'js/student_profile/views/learner_profile_view'
     ], function (gettext, $, _, Backbone, AccountSettingsModel, AccountPreferencesModel, AccountSettingsFieldViews,
-                 LearnerProfileEditView) {
+                 LearnerProfileView) {
 
-        var setupLearnerProfile = function (options) {
+        return function (options) {
 
             var learnerProfileElement = $('.wrapper-profile');
 
@@ -66,7 +66,7 @@
                     placeholderValue: gettext('Add language'),
                     valueAttribute: "language",
                     options: options['language_options'],
-                    helpMessage: '',
+                    helpMessage: ''
                 })
             ];
 
@@ -83,7 +83,7 @@
             ];
 
 
-            var learnerProfileView = new LearnerProfileEditView({
+            var learnerProfileView = new LearnerProfileView({
                 el: learnerProfileElement,
                 own_profile: options['own_profile'],
                 has_preferences_access: options['has_preferences_access'],
@@ -117,7 +117,5 @@
                 learnerProfileView: learnerProfileView
             };
         };
-
-        return setupLearnerProfile;
     })
 }).call(this, define || RequireJS.define);

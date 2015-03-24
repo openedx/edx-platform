@@ -17,9 +17,7 @@
         <div class="section wrapper-profile-section-two">
             <div class="profile-section-two-fields">
                 <% if (!showFullProfile) { %>
-                    <label class="profile-private--message">
-                        <%- gettext('This edX learner is not currently sharing their profile details.') %>
-                    </label>
+                    <span class="profile-private--message"><%- gettext('This edX learner is not currently sharing their profile details.') %></span>
                 <% } %>
             </div>
         </div>

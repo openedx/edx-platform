@@ -448,7 +448,7 @@
             },
 
             fieldValue: function () {
-                return this.$('.u-field-value textarea').val().trim();
+                return this.$('.u-field-value textarea').val();
             },
 
             saveValue: function () {

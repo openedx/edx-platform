@@ -16,7 +16,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             var requests;
 
             beforeEach(function () {
-                setFixtures('<div class="wrapper-profile"></div>');
+                setFixtures('<div class="wrapper-profile"><div class="ui-loading-indicator"><p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">Loading</span></p></div><div class="ui-loading-error is-hidden"><i class="fa fa-exclamation-triangle message-error" aria-hidden=true></i><span class="copy">An error occurred. Please reload the page.</span></div></div>');
                 TemplateHelpers.installTemplate('templates/fields/field_readonly');
                 TemplateHelpers.installTemplate('templates/fields/field_dropdown');
                 TemplateHelpers.installTemplate('templates/fields/field_textarea');
@@ -37,7 +37,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     'has_preferences_access': true
                 });
 
-                var learnerProfileView = context.LearnerProfileView;
+                var learnerProfileView = context.learnerProfileView;
 
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
@@ -67,29 +67,29 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     'language_options': Helpers.FIELD_OPTIONS,
                     'has_preferences_access': true
                 });
-                var accountSettingsView = context.accountSettingsView;
+                var learnerProfileView = context.learnerProfileView;
 
-                Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, true);
-                Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
-                Helpers.expectSettingsSectionsButNotFieldsToBeRendered(accountSettingsView);
+                Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
+                Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
+                Helpers.expectSettingsSectionsButNotFieldsToBeRendered(learnerProfileView);
 
                 var request = requests[0];
                 expect(request.method).toBe('GET');
                 expect(request.url).toBe(Helpers.USER_ACCOUNTS_API_URL);
 
                 AjaxHelpers.respondWithJson(requests, Helpers.USER_ACCOUNTS_DATA);
-                Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, true);
-                Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
-                Helpers.expectSettingsSectionsButNotFieldsToBeRendered(accountSettingsView);
+                Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
+                Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
+                Helpers.expectSettingsSectionsButNotFieldsToBeRendered(learnerProfileView);
 
                 var request = requests[1];
                 expect(request.method).toBe('GET');
                 expect(request.url).toBe(Helpers.USER_PREFERENCES_API_URL);
 
                 AjaxHelpers.respondWithError(requests, 500);
-                Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, false);
-                Helpers.expectLoadingErrorIsVisible(accountSettingsView, true);
-                Helpers.expectSettingsSectionsButNotFieldsToBeRendered(accountSettingsView);
+                Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, false);
+                Helpers.expectLoadingErrorIsVisible(learnerProfileView, true);
+                Helpers.expectSettingsSectionsButNotFieldsToBeRendered(learnerProfileView);
             });
 
             it("renders fields after the models are successfully fetched", function() {
@@ -106,7 +106,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     'has_preferences_access': true
                 });
 
-                var learnerProfileView = context.accountSettingsView;
+                var learnerProfileView = context.learnerProfileView;
 
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
