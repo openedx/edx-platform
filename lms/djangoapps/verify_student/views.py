@@ -844,7 +844,7 @@ def results_callback(request):
     elif result == "SYSTEM FAIL":
         log.debug("System failure for {} -- resetting to must_retry".format(receipt_id))
         attempt.system_error(json.dumps(reason), error_code=error_code)
-        status = "must_retry"
+        status = "error"
         log.error("Software Secure callback attempt for %s failed: %s", receipt_id, reason)
     else:
         log.error("Software Secure returned unknown result {}".format(result))
@@ -1125,17 +1125,25 @@ class InCourseReverifyView(View):
         """
         try:
             user = request.user
-            course_id = CourseKey.from_string(course_id)
-            checkpoint = VerificationCheckpoint.get_verification_checkpoint(course_id, checkpoint_name)
+            course_key = CourseKey.from_string(course_id)
+            checkpoint = VerificationCheckpoint.get_verification_checkpoint(course_key, checkpoint_name)
             if checkpoint is None:
-                raise VerificationCheckpointException
+                log.exception("Checkpoint is not defined. Could not submit verification attempt for user {}".format(
+                    request.user.id)
+                )
+                context = {
+                    "user_full_name": request.user.profile.name,
+                    "error": True
+                }
+                return render_to_response("verify_student/incourse_reverify.html", context)
             init_verification = SoftwareSecurePhotoVerification.get_initial_verification(user)
             if not init_verification:
-                raise SoftwareSecurePhotoVerification.DoesNotExist
+                log.exception("Could not submit verification attempt for user {}".format(request.user.id))
+                return redirect(reverse('verify_student_verify_later', kwargs={'course_id': unicode(course_key)}))
             b64_face_image = request.POST['face_image'].split(",")[1]
             attempt = SoftwareSecurePhotoVerification(user=request.user)
             attempt.upload_face_image(b64_face_image.decode('base64'))
-            attempt.fetch_photo_id_image()
+            attempt.photo_id_key = init_verification.photo_id_key
             attempt.mark_ready()
 
             attempt.save()
@@ -1146,25 +1154,6 @@ class InCourseReverifyView(View):
             VerificationStatus.add_verification_status(checkpoint, user, "submitted")
 
             return HttpResponseRedirect(reverse('verify_student_incourse_reverification_confirmation'))
-
-        except VerificationCheckpointException:
-            log.exception(
-                "Could not submit verification attempt for user {}".format(request.user.id)
-            )
-            context = {
-                "user_full_name": request.user.profile.name,
-                "error": True,
-            }
-            return render_to_response("verify_student/midcourse_photo_reverification.html", context)
-        except SoftwareSecurePhotoVerification.DoesNotExist:
-            log.exception(
-                "Could not submit verification attempt for user {}".format(request.user.id)
-            )
-            context = {
-                "user_full_name": request.user.profile.name,
-                "error": True,
-            }
-            return render_to_response("verify_student/midcourse_photo_reverification.html", context)
         except Exception:
             log.exception(
                 "Could not submit verification attempt for user {}".format(request.user.id)
@@ -1173,7 +1162,7 @@ class InCourseReverifyView(View):
                 "user_full_name": request.user.profile.name,
                 "error": True,
             }
-            return render_to_response("verify_student/midcourse_photo_reverification.html", context)
+            return render_to_response("verify_student/incourse_reverify.html", context)
 
     def _display_steps(self):
         """Determine which steps to display to the user.
