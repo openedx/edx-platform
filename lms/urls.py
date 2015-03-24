@@ -619,7 +619,7 @@ urlpatterns = patterns(*urlpatterns)
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(
-        settings.PROFILE_IMAGE_DOMAIN + settings.PROFILE_IMAGE_URL_PATH, document_root=settings.MEDIA_ROOT
+        settings.PROFILE_IMAGE_BACKEND_CONFIG['base_url'], document_root=settings.MEDIA_ROOT
     )
 
     # in debug mode, allow any template to be rendered (most useful for UX reference templates)
