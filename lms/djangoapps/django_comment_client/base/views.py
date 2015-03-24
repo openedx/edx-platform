@@ -24,9 +24,9 @@ from edx_notifications.lib.publisher import (
 )
 from edx_notifications.data import NotificationMessage
 from courseware.courses import get_course_with_access, get_course_by_id
-from course_groups.cohorts import get_cohort_id, is_commentable_cohorted, get_cohort_by_id
-from course_groups.tasks import publish_course_group_notification_task
-from course_groups.models import CourseUserGroup
+from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id, is_commentable_cohorted, get_cohort_by_id
+from openedx.core.djangoapps.course_groups.tasks import publish_course_group_notification_task
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 import django_comment_client.settings as cc_settings
 from django_comment_client.utils import (
     add_courseware_context,
