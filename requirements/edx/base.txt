@@ -50,7 +50,7 @@ httpretty==0.8.3
 lazy==1.1
 lxml==3.3.6
 mako==0.9.1
-Markdown==2.2.1
+Markdown==2.6.1
 --allow-external meliae
 --allow-unverified meliae
 meliae==0.4.0

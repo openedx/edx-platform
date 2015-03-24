@@ -36,7 +36,7 @@ GitPython==0.3.2.RC1
 glob2==0.3
 lxml==3.3.6
 mako==0.7.3
-Markdown==2.2.1
+Markdown==2.6.1
 mock==1.0.1
 networkx==1.7
 nltk==2.0.4
