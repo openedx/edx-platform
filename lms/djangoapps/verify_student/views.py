@@ -47,7 +47,7 @@ from reverification.models import MidcourseReverificationWindow
 import ssencrypt
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from opaque_keys.edx.keys import CourseKey
-from .exceptions import WindowExpiredException, VerificationCheckpointException
+from .exceptions import WindowExpiredException
 from xmodule.modulestore.django import modulestore
 from microsite_configuration import microsite
 
@@ -392,7 +392,6 @@ class PayAndVerifyView(View):
                 get_default_time_display(unexpired_paid_course_mode.expiration_datetime)
                 if unexpired_paid_course_mode.expiration_datetime else ""
             ),
-            'submit_photos_url': reverse('verify_student_submit_photos'),
         }
         return render_to_response("verify_student/pay_and_verify.html", context)
 
@@ -1112,12 +1111,7 @@ class InCourseReverifyView(View):
             'purchase_endpoint': get_purchase_endpoint(),
             'requirements': requirements,
             'user_full_name': request.user.profile.name,
-            'verification_deadline': "",
-            'submit_photos_url': reverse('verify_student_incourse_reverify', kwargs={
-                "course_id": unicode(course_key),
-                "checkpoint_name": checkpoint_name
-            })
-
+            'verification_deadline': ""
         }
         return render_to_response("verify_student/incourse_reverify.html", context)
 
