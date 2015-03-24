@@ -8,7 +8,7 @@ import uuid
 import mock
 from nose.plugins.attrib import attr
 
-from xblock.fields import Reference, ReferenceList, ReferenceValueDict
+from xblock.fields import Reference, ReferenceList, ReferenceValueDict, UNIQUE_ID
 from xmodule.modulestore.split_migrator import SplitMigrator
 from xmodule.modulestore.tests.test_split_w_old_mongo import SplitWMongoCourseBoostrapper
 
@@ -164,7 +164,14 @@ class TestMigration(SplitWMongoCourseBoostrapper):
             self.assertEqual(presplit_dag_root.location.block_id, split_dag_root.location.block_id)
         # compare all fields but references
         for name, field in presplit_dag_root.fields.iteritems():
-            if not isinstance(field, (Reference, ReferenceList, ReferenceValueDict)):
+            # fields generated from UNIQUE_IDs are unique to an XBlock's scope,
+            # so if such a field is unset on an XBlock, we don't expect it
+            # to persist across courses
+            field_generated_from_unique_id = not field.is_set_on(presplit_dag_root) and field.default == UNIQUE_ID
+            should_check_field = not (
+                field_generated_from_unique_id or isinstance(field, (Reference, ReferenceList, ReferenceValueDict))
+            )
+            if should_check_field:
                 self.assertEqual(
                     getattr(presplit_dag_root, name),
                     getattr(split_dag_root, name),
