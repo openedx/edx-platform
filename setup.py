@@ -7,7 +7,7 @@ from setuptools import setup
 setup(
     name="Open edX",
     version="0.2",
-    install_requires=['distribute'],
+    install_requires=['setuptools'],
     requires=[],
     # NOTE: These are not the names we should be installing.  This tree should
     # be reorganized to be a more conventional Python tree.
