@@ -18,12 +18,10 @@
         defaults: {
             fullName: null,
             faceImage: "",
-            identificationImage: "",
-            submit_url: ""
+            identificationImage: ""
         },
 
         sync: function( method, model ) {
-            var submit_url = model.get('submit_url');
             var headers = { 'X-CSRFToken': $.cookie( 'csrftoken' ) },
                 data = {
                     face_image: model.get( 'faceImage' ),
@@ -44,7 +42,7 @@
             // Submit the request to the server,
             // triggering events on success and error.
             $.ajax({
-                url: submit_url,
+                url: '/verify_student/submit-photos/',
                 type: 'POST',
                 data: data,
                 headers: headers,

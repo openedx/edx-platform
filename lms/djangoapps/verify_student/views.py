@@ -47,7 +47,7 @@ from reverification.models import MidcourseReverificationWindow
 import ssencrypt
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from opaque_keys.edx.keys import CourseKey
-from .exceptions import WindowExpiredException, VerificationCheckpointException
+from .exceptions import WindowExpiredException
 from xmodule.modulestore.django import modulestore
 from microsite_configuration import microsite
 
@@ -392,7 +392,6 @@ class PayAndVerifyView(View):
                 get_default_time_display(unexpired_paid_course_mode.expiration_datetime)
                 if unexpired_paid_course_mode.expiration_datetime else ""
             ),
-            'submit_photos_url': reverse('verify_student_submit_photos'),
         }
         return render_to_response("verify_student/pay_and_verify.html", context)
 
@@ -1112,122 +1111,6 @@ class InCourseReverifyView(View):
             'purchase_endpoint': get_purchase_endpoint(),
             'requirements': requirements,
             'user_full_name': request.user.profile.name,
-            'verification_deadline': "",
-            'submit_photos_url': reverse('verify_student_incourse_reverify', kwargs={
-                "course_id": unicode(course_key),
-                "checkpoint_name": checkpoint_name
-            })
-
+            'verification_deadline': ""
         }
         return render_to_response("verify_student/incourse_reverify.html", context)
-
-    @method_decorator(login_required)
-    def post(self, request, course_id, checkpoint_name):
-        """
-        submits the reverification to SoftwareSecure
-        """
-        try:
-            user = request.user
-            course_key = CourseKey.from_string(course_id)
-            checkpoint = VerificationCheckpoint.get_verification_checkpoint(course_key, checkpoint_name)
-            if checkpoint is None:
-                log.exception("Checkpoint is not defined. Could not submit verification attempt for user {}".format(
-                    request.user.id)
-                )
-                context = {
-                    "user_full_name": request.user.profile.name,
-                    "error": True
-                }
-                return render_to_response("verify_student/incourse_reverify.html", context)
-            init_verification = SoftwareSecurePhotoVerification.get_initial_verification(user)
-            if not init_verification:
-                log.exception("Could not submit verification attempt for user {}".format(request.user.id))
-                return redirect(reverse('verify_student_verify_later', kwargs={'course_id': unicode(course_key)}))
-            b64_face_image = request.POST['face_image'].split(",")[1]
-            attempt = SoftwareSecurePhotoVerification(user=request.user)
-            attempt.upload_face_image(b64_face_image.decode('base64'))
-            attempt.photo_id_key = init_verification.photo_id_key
-            attempt.mark_ready()
-
-            attempt.save()
-            attempt.submit()
-
-            checkpoint.add_verification_attempt(attempt)
-
-            VerificationStatus.add_verification_status(checkpoint, user, "submitted")
-
-            return HttpResponseRedirect(reverse('verify_student_incourse_reverification_confirmation'))
-        except Exception:
-            log.exception(
-                "Could not submit verification attempt for user {}".format(request.user.id)
-            )
-            context = {
-                "user_full_name": request.user.profile.name,
-                "error": True,
-            }
-            return render_to_response("verify_student/incourse_reverify.html", context)
-
-    def _display_steps(self):
-        """Determine which steps to display to the user.
-
-        Includes all steps by default, but removes steps
-        if the user has already completed them.
-
-        Arguments:
-
-            always_show_payment (bool): If True, display the payment steps
-                even if the user has already paid.
-
-            already_verified (bool): Whether the user has submitted
-                a verification request recently.
-
-            already_paid (bool): Whether the user is enrolled in a paid
-                course mode.
-
-        Returns:
-            list
-
-        """
-        display_steps = PayAndVerifyView.VERIFICATION_STEPS
-        remove_steps = set()
-        remove_steps |= set([PayAndVerifyView.ID_PHOTO_STEP])
-        return [
-            {
-                'name': step,
-                'title': unicode(PayAndVerifyView.STEP_INFO[step].title),
-                'templateName': PayAndVerifyView.STEP_INFO[step].template_name
-            }
-            for step in display_steps
-            if step not in remove_steps
-        ]
-
-    def _requirements(self, display_steps, is_active):
-        """Determine which requirements to show the user.
-
-        For example, if the user needs to submit a photo
-        verification, tell the user that she will need
-        a photo ID and a webcam.
-
-        Arguments:
-            display_steps (list): The steps to display to the user.
-            is_active (bool): If False, adds a requirement to activate the user account.
-
-        Returns:
-            dict: Keys are requirement names, values are booleans
-                indicating whether to show the requirement.
-
-        """
-        all_requirements = {
-            PayAndVerifyView.ACCOUNT_ACTIVATION_REQ: not is_active,
-            PayAndVerifyView.PHOTO_ID_REQ: False,
-            PayAndVerifyView.WEBCAM_REQ: False,
-        }
-
-        display_steps = set(step['name'] for step in display_steps)
-
-        for step, step_requirements in PayAndVerifyView.STEP_REQUIREMENTS.iteritems():
-            if step in display_steps:
-                for requirement in step_requirements:
-                    all_requirements[requirement] = True
-
-        return all_requirements
