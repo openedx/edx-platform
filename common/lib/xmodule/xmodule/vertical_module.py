@@ -108,6 +108,6 @@ class VerticalBlock(StudioEditableBlock, XmlParserMixin, MakoTemplateBlock, XBlo
         """
         non_editable_fields = super(VerticalBlock, self).non_editable_metadata_fields
         non_editable_fields.extend([
-            VerticalBlock.due,
+            self.fields['due'],
         ])
         return non_editable_fields

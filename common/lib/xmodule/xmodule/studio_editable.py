@@ -63,7 +63,6 @@ class StudioEditableBlock(object):
 
     This class is only intended to be used with an XBlock!
     """
-    author_view = module_attr(AUTHOR_VIEW)
     has_author_view = True
 
     def render_children(self, context, fragment, can_reorder=False, can_add=False):

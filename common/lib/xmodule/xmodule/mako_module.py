@@ -1,4 +1,5 @@
 from .x_module import XModuleDescriptor, DescriptorSystem
+from xblock.fragment import Fragment
 
 
 class MakoDescriptorSystem(DescriptorSystem):
@@ -40,8 +41,12 @@ class MakoTemplateBlock(object):
         }
 
     def studio_view(self, context):
-        return self.system.render_template(
-            self.mako_template, self.get_context())
+        import pudb; pu.db
+        return Fragment(
+            self.system.render_template(self.mako_template, self.get_context())
+        )
 
 
-MakoModuleDescriptor = MakoTemplateBlock
+class MakoModuleDescriptor(MakoTemplateBlock, XModuleDescriptor):
+    def get_html(self):
+        return self.studio_view(None).content
