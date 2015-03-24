@@ -1113,7 +1113,10 @@ class InCourseReverifyView(View):
             'requirements': requirements,
             'user_full_name': request.user.profile.name,
             'verification_deadline': "",
-            'submit_photos_url': reverse('verify_student_incourse_reverification_confirmation')
+            'submit_photos_url': reverse('verify_student_incourse_reverify', kwargs={
+                "course_id": unicode(course_key),
+                "checkpoint_name": checkpoint_name
+            })
 
         }
         return render_to_response("verify_student/incourse_reverify.html", context)
