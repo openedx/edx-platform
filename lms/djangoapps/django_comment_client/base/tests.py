@@ -17,7 +17,7 @@ from opaque_keys.edx.keys import CourseKey
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from django_comment_client.base import views
 from django_comment_client.tests.group_id import CohortedTopicGroupIdTestMixin, NonCohortedTopicGroupIdTestMixin, GroupIdAssertionMixin
-from django_comment_client.tests.utils import CohortedContentTestCase
+from django_comment_client.tests.utils import CohortedContentTestCase, ForumsEnableMixin
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_client.tests.utils import CohortedTestCase, ForumsEnableMixin
 from django_comment_common.models import Role
@@ -59,7 +59,7 @@ class MockRequestSetupMixin(object):
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class CreateThreadGroupIdTestCase(
         MockRequestSetupMixin,
-        CohortedTestCase,
+        CohortedContentTestCase,
         CohortedTopicGroupIdTestMixin,
         NonCohortedTopicGroupIdTestMixin
 ):
@@ -98,7 +98,7 @@ class CreateThreadGroupIdTestCase(
 @disable_signal(views, 'thread_deleted')
 class ThreadActionGroupIdTestCase(
         MockRequestSetupMixin,
-        CohortedTestCase,
+        CohortedContentTestCase,
         GroupIdAssertionMixin
 ):
     def call_view(
