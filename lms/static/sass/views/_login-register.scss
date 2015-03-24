@@ -147,6 +147,10 @@ $sm-btn-linkedin: #0077b5;
             @include clearfix();
             clear: both;
         }
+
+        .login-providers {
+            text-align: center;
+        }
     }
 
     .login-form {
