@@ -282,6 +282,9 @@ MIDDLEWARE_CLASSES = (
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
     'ratelimitbackend.middleware.RateLimitMiddleware',
 
+    # force re-authentication before activating administrative functions
+    'sudo.middleware.SudoMiddleware',
+
     # for expiring inactive sessions
     'session_inactivity_timeout.middleware.SessionInactivityTimeout',
 
@@ -727,6 +730,9 @@ INSTALLED_APPS = (
 
     # Additional problem types
     'edx_jsme',    # Molecular Structure
+
+    # Allows sudo-mode
+    'sudo',
 
     'openedx.core.djangoapps.content.course_structures',
 )

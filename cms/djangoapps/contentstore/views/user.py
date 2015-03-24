@@ -11,6 +11,7 @@ from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 from util.json_request import JsonResponse, expect_json
+from django_sudo.decorators import sudo_required
 from student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
 from course_creators.views import user_requested_access
 
@@ -37,6 +38,7 @@ def request_course_creator(request):
 # pylint: disable=unused-argument
 @login_required
 @ensure_csrf_cookie
+@sudo_required
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
 def course_team_handler(request, course_key_string=None, email=None):
     """

@@ -51,6 +51,7 @@ urlpatterns = patterns(
 
     url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
     url(r'^lang_pref/', include('lang_pref.urls')),
+    url(r'^sudo/$', 'sudo.views.sudo'),
 )
 
 # User creation and updating views
