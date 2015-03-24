@@ -204,5 +204,5 @@ class PreferencesDetailView(APIView):
 
         if not preference_existed:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        
+
         return Response(status=status.HTTP_204_NO_CONTENT)

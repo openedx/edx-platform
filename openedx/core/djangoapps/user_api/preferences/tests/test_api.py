@@ -204,7 +204,7 @@ class TestPreferenceAPI(TestCase):
 
         too_long_key = "x" * 256
         with self.assertRaises(PreferenceValidationError) as context_manager:
-            update_user_preferences(self.user, { too_long_key: "new_value"})
+            update_user_preferences(self.user, {too_long_key: "new_value"})
         errors = context_manager.exception.preference_errors
         self.assertEqual(len(errors.keys()), 1)
         self.assertEqual(
@@ -217,7 +217,7 @@ class TestPreferenceAPI(TestCase):
 
         for empty_value in ("", "   "):
             with self.assertRaises(PreferenceValidationError) as context_manager:
-                update_user_preferences(self.user, { self.test_preference_key: empty_value})
+                update_user_preferences(self.user, {self.test_preference_key: empty_value})
             errors = context_manager.exception.preference_errors
             self.assertEqual(len(errors.keys()), 1)
             self.assertEqual(
@@ -230,7 +230,7 @@ class TestPreferenceAPI(TestCase):
 
         user_preference_save.side_effect = [Exception, None]
         with self.assertRaises(PreferenceUpdateError) as context_manager:
-            update_user_preferences(self.user, { self.test_preference_key: "new_value"})
+            update_user_preferences(self.user, {self.test_preference_key: "new_value"})
         self.assertEqual(
             context_manager.exception.developer_message,
             u"Save failed for user preference 'test_key' with value 'new_value': "

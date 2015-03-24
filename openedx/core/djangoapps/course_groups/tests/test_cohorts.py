@@ -24,6 +24,7 @@ from ..tests.helpers import (
     CohortFactory, CourseCohortFactory, CourseCohortSettingsFactory
 )
 
+
 @patch("openedx.core.djangoapps.course_groups.cohorts.tracker")
 class TestCohortSignals(TestCase):
     def setUp(self):
@@ -404,7 +405,6 @@ class TestCohorts(ModuleStoreTestCase):
             cohorts.get_cohort_by_name(course.id, cohorts.DEFAULT_COHORT_NAME).id,
             "No groups->default cohort for user2"
         )
-
 
     def test_auto_cohorting_randomization(self):
         """

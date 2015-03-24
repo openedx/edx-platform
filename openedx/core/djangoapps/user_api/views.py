@@ -382,8 +382,9 @@ class RegistrationView(APIView):
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's public username.
         username_instructions = _(
-            u"The name that will identify you in your courses - {bold_start}(cannot be changed later){bold_end}").format(bold_start=u'<strong>', bold_end=u'</strong>'
-        )
+            u"The name that will identify you in your courses - "
+            "{bold_start}(cannot be changed later){bold_end}"
+        ).format(bold_start=u'<strong>', bold_end=u'</strong>')
 
         # Translators: This example username is used as a placeholder in
         # a field on the registration form meant to hold the user's username.
