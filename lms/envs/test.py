@@ -474,9 +474,13 @@ FACEBOOK_API_VERSION = "v2.2"
 FEATURES['CERTIFICATES_HTML_VIEW'] = True
 
 # Set dummy values for profile image settings.
-PROFILE_IMAGE_BACKEND = 'django.core.files.storage.FileSystemStorage'
-PROFILE_IMAGE_DOMAIN = 'http://example-storage.com/'
-PROFILE_IMAGE_URL_PATH = 'profile_images/'
+PROFILE_IMAGE_BACKEND = {
+    'class': 'storages.backends.overwrite.OverwriteStorage',
+    'options': {
+        'location': MEDIA_ROOT,
+        'base_url': 'http://example-storage.com/profile-images/',
+    },
+}
 PROFILE_IMAGE_DEFAULT_FILENAME = 'default'
 PROFILE_IMAGE_DEFAULT_FILE_EXTENSION = 'png'
 PROFILE_IMAGE_SECRET_KEY = 'secret'
