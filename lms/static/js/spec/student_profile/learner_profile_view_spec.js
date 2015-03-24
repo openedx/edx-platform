@@ -80,7 +80,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     })
                 ];
 
-                var learnerProfileView = new LearnerProfileView(
+                return new LearnerProfileView(
                     {
                         el: $('.wrapper-profile'),
                         own_profile: ownProfile,
@@ -93,7 +93,6 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                         sectionTwoFieldViews: sectionTwoFieldViews
                     });
 
-                return learnerProfileView;
             };
 
             beforeEach(function () {
@@ -109,11 +108,11 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 expectProfileSectionsAndFieldsToBeRendered(learnerProfileView, false)
             };
 
-            var expectProfileSectionsAndFieldsToBeRendered = function (learnerProfileView, fieldsAreRendered) {
+            var expectAccountPrivacyFieldTobeRendered = function(learnerProfileView, fieldIsRendered) {
                 var accountPrivacyElement = learnerProfileView.$('.wrapper-profile-field-account-privacy');
 
                 var privacyFieldElement  = $(accountPrivacyElement).find('u-field');
-                if (fieldsAreRendered === false) {
+                if (fieldIsRendered === false) {
                     expect(privacyFieldElement.length).toBe(0);
                 } else {
                     expect(privacyFieldElement.length).toBe(1);
@@ -128,25 +127,21 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                         expect(view.fieldValue()).toBe(view.modelValue());
                     }
                 }
+            };
 
-                var sectionElements = learnerProfileView.$('.section');
-                var sectionsData = learnerProfileView.options.sectionsData;
+            var expectProfileSectionsAndFieldsToBeRendered = function (learnerProfileView, fieldsAreRendered) {
+                expectAccountPrivacyFieldTobeRendered(learnerProfileView, fieldsAreRendered);
 
-                _.each(sectionElements, function(sectionElement, sectionIndex) {
-                    expect($(sectionElement).find('.section-header').text().trim()).toBe(sectionsData[sectionIndex].title);
+                var sectionOneElement = learnerProfileView.$('.wrapper-profile-section-one');
+                var sectionOneFieldElements = $(sectionOneElement).find('.u-field');
+                expect(sectionOneFieldElements.length).toBe(3);
 
-                    var sectionFieldElements = $(sectionElement).find('.u-field');
 
-                    if (fieldsAreRendered === false) {
-                        expect(sectionFieldElements.length).toBe(0);
-                    } else {
-                        expect(sectionFieldElements.length).toBe(sectionsData[sectionIndex].fields.length);
+                var sectionTwoElement = learnerProfileView.$('.wrapper-profile-section-two');
+                var sectionTwoFieldElements = $(sectionTwoElement).find('.u-field');
 
-                        _.each(sectionFieldElements, function (sectionFieldElement, fieldIndex) {
-                            expectElementContainsField(sectionFieldElement, sectionsData[sectionIndex].fields[fieldIndex]);
-                        });
-                    }
-                });
+                expect(sectionTwoFieldElements.length).toBe(1);
+
             };
 
             it("shows loading error correctly", function() {
@@ -156,12 +151,13 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 learnerProfileView.render();
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
-                expectProfileSectionsButNotFieldsToBeRendered(learnerProfileView);
+                expectAccountPrivacyFieldTobeRendered(learnerProfileView, fieldsAreRendered);
+                Helpers.expectSettingsSectionsButNotFieldsToBeRendered(learnerProfileView);
 
                 learnerProfileView.showLoadingError();
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, false);
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, true);
-                expectProfileSectionsButNotFieldsToBeRendered(learnerProfileView);
+                Helpers.expectSettingsSectionsButNotFieldsToBeRendered(learnerProfileView);
             });
 
             it("renders all fields as expected", function() {
@@ -171,7 +167,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 accountSettingsView.render();
                 Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, true);
                 Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
-                expectProfileSectionsButNotFieldsToBeRendered(accountSettingsView);
+                Helpers.expectSettingsSectionsButNotFieldsToBeRendered(accountSettingsView);
 
                 accountSettingsView.renderFields();
                 Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, false);
