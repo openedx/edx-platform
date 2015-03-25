@@ -10,7 +10,7 @@
     ], function (gettext, $, _, Backbone, FieldViews, UserAccountModel, UserPreferencesModel,
                  AccountSettingsFieldViews, AccountSettingsView) {
 
-        return function (fieldsData, userAccountsApiUrl, userPreferencesApiUrl) {
+        return function (fieldsData, authData, userAccountsApiUrl, userPreferencesApiUrl) {
 
             var accountSettingsElement = $('.wrapper-account-settings');
 
@@ -117,30 +117,26 @@
                         }
                     ]
                 },
-                {
+            ];
+
+            if (_.isArray(authData.providers)) {
+                var accountsSectionData = {
                     title: gettext('Connected Accounts'),
-                    fields: [
-                        {
-                            view: new FieldViews.LinkFieldView({
-                                model: userAccountModel,
-                                title: gettext('Facebook'),
-                                valueAttribute: 'auth-facebook',
-                                linkTitle: gettext('Link'),
-                                helpMessage: gettext('Coming soon')
-                            })
-                        },
-                        {
-                            view: new FieldViews.LinkFieldView({
-                                model: userAccountModel,
-                                title: gettext('Google'),
-                                valueAttribute: 'auth-google',
-                                linkTitle: gettext('Link'),
-                                helpMessage: gettext('Coming soon')
+                    fields: _.map(authData.providers, function(provider) {
+                        return {
+                            'view': new AccountSettingsFieldViews.AuthFieldView({
+                                title: provider['name'],
+                                valueAttribute: 'auth-' + provider['name'].toLowerCase(),
+                                helpMessage: '',
+                                connected: provider['connected'],
+                                connectUrl: provider['connect_url'],
+                                disconnectUrl: provider['disconnect_url']
                             })
                         }
-                    ]
-                }
-            ];
+                    })
+                };
+                sectionsData.push(accountsSectionData);
+            }
 
             var accountSettingsView = new AccountSettingsView({
                 el: accountSettingsElement,

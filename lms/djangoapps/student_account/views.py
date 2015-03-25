@@ -5,6 +5,7 @@ import json
 from ipware.ip import get_ip
 
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import (
     HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
@@ -35,6 +36,7 @@ from student.views import (
 )
 from student_account.helpers import auth_pipeline_urls
 import third_party_auth
+from third_party_auth import pipeline
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 
 from openedx.core.djangoapps.user_api.accounts.api import request_password_change
@@ -321,19 +323,21 @@ def account_settings(request):
         GET /account/settings
 
     """
-    return render_to_response('student_account/account_settings.html', account_settings_context(request.user))
+    return render_to_response('student_account/account_settings.html', account_settings_context(request))
 
 
-def account_settings_context(user):
+def account_settings_context(request):
     """ Context for the account settings page.
 
     Args:
-        user (User): The user for whom the context is required.
+        request: The request object.
 
     Returns:
         dict
 
     """
+    user = request.user
+
     country_options = [
         (country_code, unicode(country_name))
         for country_code, country_name in sorted(
@@ -344,8 +348,8 @@ def account_settings_context(user):
     year_of_birth_options = [(unicode(year), unicode(year)) for year in UserProfile.VALID_YEARS]
 
     context = {
-        'user_accounts_api_url': reverse("accounts_api", kwargs={'username': user.username}),
-        'user_preferences_api_url': reverse('preferences_api', kwargs={'username': user.username}),
+        'auth': {},
+        'duplicate_provider': None,
         'fields': {
             'country': {
                 'options': country_options,
@@ -362,7 +366,33 @@ def account_settings_context(user):
             }, 'preferred_language': {
                 'options': settings.ALL_LANGUAGES,
             }
-        }
+        },
+        'platform_name': settings.PLATFORM_NAME,
+        'user_accounts_api_url': reverse("accounts_api", kwargs={'username': user.username}),
+        'user_preferences_api_url': reverse('preferences_api', kwargs={'username': user.username}),
     }
+
+    if third_party_auth.is_enabled():
+        # If the account on the third party provider is already connected with another edX account,
+        # we display a message to the user.
+        context['duplicate_provider'] = pipeline.get_duplicate_provider(messages.get_messages(request))
+
+        auth_states = pipeline.get_provider_user_states(user)
+
+        context['auth']['providers'] = [{
+            'name': state.provider.NAME,  # The name of the provider e.g. Facebook
+            'connected': state.has_account,  # Whether the user's edX account is connected with the provider.
+            # If the user is not connected, they should be directed to this page to authenticate
+            # with the particular provider.
+            'connect_url': pipeline.get_login_url(
+                state.provider.NAME,
+                pipeline.AUTH_ENTRY_ACCOUNT_SETTINGS,
+                # The url the user should be directed to after the auth process has completed.
+                redirect_url=reverse('account_settings'),
+            ),
+            # If the user is connected, sending a POST request to this url removes the connection
+            # information for this provider from their edX account.
+            'disconnect_url': pipeline.get_disconnect_url(state.provider.NAME),
+        } for state in auth_states]
 
     return context
