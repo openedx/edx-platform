@@ -1,20 +1,20 @@
 """ Code to allow module store to interface with courseware index """
 from __future__ import absolute_import
 
+from datetime import timedelta
 import logging
 
 from django.utils.translation import ugettext as _
-from opaque_keys.edx.locator import CourseLocator
 from search.search_engine_base import SearchEngine
 from eventtracking import tracker
 
 from . import ModuleStoreEnum
-from .exceptions import ItemNotFoundError
 
 
 # Use default index and document names for now
 INDEX_NAME = "courseware_index"
 DOCUMENT_TYPE = "courseware_content"
+REINDEX_AGE = timedelta(0, 60)
 
 log = logging.getLogger('edx.modulestore')
 
@@ -33,57 +33,74 @@ class CoursewareSearchIndexer(object):
     """
 
     @staticmethod
-    def add_to_search_index(modulestore, location, delete=False, raise_on_error=False):
+    def index_course(modulestore, course_key, triggered_at=None):
         """
-        Add to courseware search index from given location and its children
+        Process course for indexing
+
+        Arguments:
+        course_key (CourseKey) - course identifier
+
+        triggered_at (datetime) - provides time at which indexing was triggered;
+            useful for index updates - only things changed recently from that date
+            (within REINDEX_AGE above ^^) will have their index updated, others skip
+            updating their index but are still walked through in order to identify
+            which items may need to be removed from the index
+            If None, then a full reindex takes place
+
+        Returns:
+        Number of items that have been added to the index
         """
         error_list = []
         indexed_count = 0
-        # TODO - inline for now, need to move this out to a celery task
         searcher = SearchEngine.get_search_engine(INDEX_NAME)
         if not searcher:
             return
-
-        if isinstance(location, CourseLocator):
-            course_key = location
-        else:
-            course_key = location.course_key
 
         location_info = {
             "course": unicode(course_key),
         }
 
-        def _fetch_item(item_location):
-            """ Fetch the item from the modulestore location, log if not found, but continue """
-            try:
-                if isinstance(item_location, CourseLocator):
-                    item = modulestore.get_course(item_location)
-                else:
-                    item = modulestore.get_item(item_location, revision=ModuleStoreEnum.RevisionOption.published_only)
-            except ItemNotFoundError:
-                log.warning('Cannot find: %s', item_location)
-                return None
+        indexed_items = set()
 
-            return item
+        course = modulestore.get_course(course_key, depth=None, revision=ModuleStoreEnum.RevisionOption.published_only)
 
-        def index_item_location(item_location, current_start_date):
-            """ add this item to the search index """
-            item = _fetch_item(item_location)
-            if not item:
-                return
+        def index_item(item, current_start_date, skip_index=False):
+            """
+            Add this item to the search index and indexed_items list
 
+            Arguments:
+            item - item to add to index, its children will be processed recursively
+
+            current_start_date - the startdate with which to associate the item,
+            this will apply downwards until overridden while recursively processing
+            the children
+
+            skip_index - simply walk the children in the tree, the content change is
+            older than the REINDEX_AGE window and would have been already indexed.
+            This should really only be passed from the recursive child calls when
+            this method has determined that it is safe to do so
+            """
             is_indexable = hasattr(item, "index_dictionary")
             # if it's not indexable and it does not have children, then ignore
             if not is_indexable and not item.has_children:
                 return
+
+            item_id = unicode(item.scope_ids.usage_id)
+            indexed_items.add(item_id)
 
             # if it has a defined start, then apply it and to it's children
             if item.start and (not current_start_date or item.start > current_start_date):
                 current_start_date = item.start
 
             if item.has_children:
-                for child_loc in item.children:
-                    index_item_location(child_loc, current_start_date)
+                # determine if it's okay to skip adding the children herein based upon how recently any may have changed
+                skip_child_index = skip_index or \
+                    (triggered_at is not None and (triggered_at - item.subtree_edited_on) > REINDEX_AGE)
+                for child_item in item.get_children():
+                    index_item(child_item, current_start_date, skip_index=skip_child_index)
+
+            if skip_index:
+                return
 
             item_index = {}
             item_index_dictionary = item.index_dictionary() if is_indexable else None
@@ -93,61 +110,54 @@ class CoursewareSearchIndexer(object):
                 try:
                     item_index.update(location_info)
                     item_index.update(item_index_dictionary)
-                    item_index['id'] = unicode(item.scope_ids.usage_id)
+                    item_index['id'] = item_id
                     if current_start_date:
                         item_index['start_date'] = current_start_date
 
                     searcher.index(DOCUMENT_TYPE, item_index)
                 except Exception as err:  # pylint: disable=broad-except
                     # broad exception so that index operation does not fail on one item of many
-                    log.warning('Could not index item: %s - %s', item_location, unicode(err))
-                    error_list.append(_('Could not index item: {}').format(item_location))
+                    log.warning('Could not index item: %s - %r', item.location, err)
+                    error_list.append(_('Could not index item: {}').format(item.location))
 
-        def remove_index_item_location(item_location):
-            """ remove this item from the search index """
-            item = _fetch_item(item_location)
-            if item:
-                if item.has_children:
-                    for child_loc in item.children:
-                        remove_index_item_location(child_loc)
-
-                searcher.remove(DOCUMENT_TYPE, unicode(item.scope_ids.usage_id))
+        def remove_deleted_items():
+            """
+            remove any item that is present in the search index that is not present in updated list of indexed items
+            as we find items we can shorten the set of items to keep
+            """
+            response = searcher.search(
+                doc_type=DOCUMENT_TYPE,
+                field_dictionary={"course": unicode(course_key)},
+                exclude_ids=indexed_items
+            )
+            result_ids = [result["data"]["id"] for result in response["results"]]
+            for result_id in result_ids:
+                searcher.remove(DOCUMENT_TYPE, result_id)
 
         try:
-            if delete:
-                remove_index_item_location(location)
-            else:
-                index_item_location(location, None)
-            indexed_count += 1
+            for item in course.get_children():
+                index_item(item, course.start)
+            remove_deleted_items()
         except Exception as err:  # pylint: disable=broad-except
             # broad exception so that index operation does not prevent the rest of the application from working
             log.exception(
-                "Indexing error encountered, courseware index may be out of date %s - %s",
+                "Indexing error encountered, courseware index may be out of date %s - %r",
                 course_key,
-                unicode(err)
+                err
             )
             error_list.append(_('General indexing error occurred'))
 
-        if raise_on_error and error_list:
+        if error_list:
             raise SearchIndexingError(_('Error(s) present during indexing'), error_list)
 
         return indexed_count
 
     @classmethod
-    def do_publish_index(cls, modulestore, location, delete=False, raise_on_error=False):
-        """
-        Add to courseware search index published section and children
-        """
-        indexed_count = cls.add_to_search_index(modulestore, location, delete, raise_on_error)
-        cls._track_index_request('edx.course.index.published', indexed_count, str(location))
-        return indexed_count
-
-    @classmethod
     def do_course_reindex(cls, modulestore, course_key):
         """
-        (Re)index all content within the given course
+        (Re)index all content within the given course, tracking the fact that a full reindex has taking place
         """
-        indexed_count = cls.add_to_search_index(modulestore, course_key, delete=False, raise_on_error=True)
+        indexed_count = cls.index_course(modulestore, course_key)
         cls._track_index_request('edx.course.index.reindexed', indexed_count)
         return indexed_count
 

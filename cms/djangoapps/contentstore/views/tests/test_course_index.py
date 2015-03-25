@@ -559,7 +559,7 @@ class TestCourseReIndex(CourseTestCase):
 
     def test_indexing_responses(self):
         """
-        Test add_to_search_index response with real data
+        Test do_course_reindex response with real data
         """
         # Check results not indexed
         response = perform_search(
@@ -591,7 +591,7 @@ class TestCourseReIndex(CourseTestCase):
     @mock.patch('xmodule.video_module.VideoDescriptor.index_dictionary')
     def test_indexing_video_error_responses(self, mock_index_dictionary):
         """
-        Test add_to_search_index response with mocked error data for video
+        Test do_course_reindex response with mocked error data for video
         """
         # Check results not indexed
         response = perform_search(
@@ -613,7 +613,7 @@ class TestCourseReIndex(CourseTestCase):
     @mock.patch('xmodule.html_module.HtmlDescriptor.index_dictionary')
     def test_indexing_html_error_responses(self, mock_index_dictionary):
         """
-        Test add_to_search_index response with mocked error data for html
+        Test do_course_reindex response with mocked error data for html
         """
         # Check results not indexed
         response = perform_search(
@@ -635,7 +635,7 @@ class TestCourseReIndex(CourseTestCase):
     @mock.patch('xmodule.seq_module.SequenceDescriptor.index_dictionary')
     def test_indexing_seq_error_responses(self, mock_index_dictionary):
         """
-        Test add_to_search_index response with mocked error data for sequence
+        Test do_course_reindex response with mocked error data for sequence
         """
         # Check results not indexed
         response = perform_search(
