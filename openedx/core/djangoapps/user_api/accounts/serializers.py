@@ -3,13 +3,9 @@ from django.contrib.auth.models import User
 from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
 from openedx.core.djangoapps.user_api.serializers import ReadOnlyFieldsSerializerMixin
 
-<<<<<<< HEAD
 from student.models import UserProfile, LanguageProficiency
-from .helpers import get_profile_image_url_for_user, PROFILE_IMAGE_SIZES_MAP
-=======
-from student.models import UserProfile
 from .helpers import get_profile_image_urls, get_default_profile_image_urls
->>>>>>> fixup! Implement profile_image upload and remove endpoints
+
 
 PROFILE_IMAGE_KEY_PREFIX = 'image_url'
 
