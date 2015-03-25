@@ -1,6 +1,4 @@
-""" Views for a student's account information. """
-
-import logging
+""" Views for a student's profile information. """
 
 from django.conf import settings
 from django_countries import countries
@@ -8,14 +6,7 @@ from django_countries import countries
 from django.core.urlresolvers import reverse, resolve
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
-
-from dark_lang.models import DarkLangConfig
 from edxmako.shortcuts import render_to_response, render_to_string
-
-from student.models import UserProfile
-import openedx.core.djangoapps.user_api.preferences.api as perf_api
-import openedx.core.djangoapps.user_api.preferences.api as account_api
-
 
 
 @login_required
