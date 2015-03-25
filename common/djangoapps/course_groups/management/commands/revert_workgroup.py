@@ -6,8 +6,8 @@ from django.contrib.auth.models import User
 
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
-from course_groups.models import CourseUserGroup
-from course_groups.cohorts import (
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup
+from openedx.core.djangoapps.course_groups.cohorts import (
     get_cohort,
     get_cohort_by_name,
     add_cohort,

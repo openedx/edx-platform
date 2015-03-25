@@ -384,7 +384,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
             'sort_preference': cc_user.default_sort_key,
             'category_map': course_settings["category_map"],
             'course_settings': _attr_safe_json(course_settings),
-            'cohorted_commentables': (get_cohorted_commentables(course_id))
+            'cohorted_commentables': (get_cohorted_commentables(course_key))
         }
         return render_to_response('discussion/index.html', context)
 
@@ -419,7 +419,7 @@ def user_profile(request, course_key, user_id):
             profiled_user = cc.User(id=user_id, course_id=course_key)
 
         threads, page, num_pages = profiled_user.active_threads(query_params)
-        threads = _set_group_names(course_id, threads)
+        threads = _set_group_names(course_key, threads)
         query_params['page'] = page
         query_params['num_pages'] = num_pages
         user_info = cc.User.from_django_user(request.user).to_dict()
@@ -499,7 +499,7 @@ def followed_threads(request, course_key, user_id):
             query_params['group_id'] = group_id
 
         threads, page, num_pages = profiled_user.subscribed_threads(query_params)
-        threads = _set_group_names(course_id, threads)
+        threads = _set_group_names(course_key, threads)
         query_params['page'] = page
         query_params['num_pages'] = num_pages
         user_info = cc.User.from_django_user(request.user).to_dict()

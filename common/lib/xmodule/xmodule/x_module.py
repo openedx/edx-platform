@@ -1462,7 +1462,7 @@ class DiscussionService(object):
         from django_comment_client.forum.views import get_threads, make_course_settings
         from django_comment_client.permissions import cached_has_permission
         import django_comment_client.utils as utils
-        from course_groups.cohorts import (
+        from openedx.core.djangoapps.course_groups.cohorts import (
             is_course_cohorted,
             get_cohort_id,
             get_cohorted_commentables,
@@ -1480,7 +1480,7 @@ class DiscussionService(object):
         user_cohort_id = get_cohort_id(user, course_id)
 
         unsafethreads, query_params = get_threads(request, course_id)
-        threads = [utils.safe_content(thread, course_id) for thread in unsafethreads]
+        threads = [utils.prepare_content(thread, course_id) for thread in unsafethreads]
         utils.add_courseware_context(threads, course)
 
         flag_moderator = cached_has_permission(user, 'openclose_thread', course_id) or has_access(user, 'staff', course)
