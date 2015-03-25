@@ -16,16 +16,21 @@ class LibraryToolsService(object):
     def __init__(self, modulestore):
         self.store = modulestore
 
-    def _get_library(self, library_key):
+    def _get_library(self, library_key, version=None):
         """
         Given a library key like "library-v1:ProblemX+PR0B", return the
         'library' XBlock with meta-information about the library.
+
+        A specific version may be specified.
 
         Returns None on error.
         """
         if not isinstance(library_key, LibraryLocator):
             library_key = LibraryLocator.from_string(library_key)
-        assert library_key.version_guid is None
+
+        library_key = LibraryLocator(
+            org=library_key.org, library=library_key.library, branch=library_key.branch, version_guid=version
+        )
 
         try:
             return self.store.get_library(library_key, remove_version=False, remove_branch=False)
@@ -102,7 +107,7 @@ class LibraryToolsService(object):
         """
         return self.store.check_supports(block.location.course_key, 'copy_from_template')
 
-    def update_children(self, dest_block, user_id, user_perms=None):
+    def update_children(self, dest_block, user_id, user_perms=None, version=None):
         """
         This method is to be used when the library that a LibraryContentModule
         references has been updated. It will re-fetch all matching blocks from
@@ -123,7 +128,7 @@ class LibraryToolsService(object):
 
         source_blocks = []
         library_key = dest_block.source_library_key
-        library = self._get_library(library_key)
+        library = self._get_library(library_key, version=version)
         if library is None:
             raise ValueError("Requested library not found.")
         if user_perms and not user_perms.can_read(library_key):

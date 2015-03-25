@@ -306,6 +306,29 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         non_editable_fields.extend([LibraryContentFields.mode, LibraryContentFields.source_library_version])
         return non_editable_fields
 
+    def get_tools(self):
+        """
+        Grab the library tools service or raise an error.
+        """
+        lib_tools = self.runtime.service(self, 'library_tools')
+        if not lib_tools:
+            # This error is diagnostic. The user won't see it, but it may be helpful
+            # during debugging.
+            return Response(_(u"Course does not support Library tools."), status=400)
+        return lib_tools
+
+    def get_user_id(self):
+        """
+        Get the ID of the current user.
+        """
+        user_service = self.runtime.service(self, 'user')
+        if user_service:
+            # May be None when creating bok choy test fixtures
+            user_id = user_service.get_current_user().opt_attrs.get('edx-platform.user_id', None)
+        else:
+            user_id = None
+        return user_id
+
     @XBlock.handler
     def refresh_children(self, request=None, suffix=None):  # pylint: disable=unused-argument
         """
@@ -320,20 +343,49 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         the version number of the libraries used, so we easily determine if
         this block is up to date or not.
         """
-        lib_tools = self.runtime.service(self, 'library_tools')
-        if not lib_tools:
-            # This error is diagnostic. The user won't see it, but it may be helpful
-            # during debugging.
-            return Response(_(u"Course does not support Library tools."), status=400)
-        user_service = self.runtime.service(self, 'user')
+        lib_tools = self.get_tools()
         user_perms = self.runtime.service(self, 'studio_user_permissions')
-        if user_service:
-            # May be None when creating bok choy test fixtures
-            user_id = user_service.get_current_user().opt_attrs.get('edx-platform.user_id', None)
-        else:
-            user_id = None
+        user_id = self.get_user_id()
         lib_tools.update_children(self, user_id, user_perms)
         return Response()
+
+    # pylint: disable=unused-argument
+    def studio_post_duplicate(self, store, parent_usage_key, source_block):
+        """
+        Used by the studio after basic duplication of a source block. We handle the children
+        ourselves, because we have to properly reference the library upstream and set the overrides.
+
+        Otherwise we'll end up losing data on the next refresh.
+        """
+        # The first task will be to refresh our copy of the library to generate the children.
+        # We must do this at the currently set version of the library block. Otherwise we may not have
+        # exactly the same children-- someone may be duplicating an out of date block, after all.
+        lib_tools = self.get_tools()
+        user_id = self.get_user_id()
+        user_perms = self.runtime.service(self, 'studio_user_permissions')
+        # pylint: disable=no-member
+        lib_tools.update_children(self, user_id, user_perms, version=self.source_library_version)
+
+        # Copy over any overridden settings the course author may have applied to the blocks.
+        def copy_overrides(source, dest):
+            """
+            Copy any overrides the user has made on blocks in this library.
+            """
+            for field_name in source.fields.keys():
+                field = dest.fields[field_name]
+                if field.scope == Scope.settings and field.is_set_on(source):
+                    setattr(dest, field_name, getattr(source, field_name))
+            if source.has_children:
+                source_children = [store.get_item(source_key) for source_key in source.children]
+                dest_children = [store.get_item(dest_key) for dest_key in dest.children]
+                for source_child, dest_child in zip(source_children, dest_children):
+                    copy_overrides(source_child, dest_child)
+            store.update_item(dest, user_id)
+
+        copy_overrides(source_block, self)
+
+        # Don't handle children. Handle parenting.
+        return False, True
 
     def _validate_library_version(self, validation, lib_tools, version, library_key):
         """

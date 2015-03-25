@@ -593,17 +593,27 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
             runtime=source_item.runtime,
         )
 
+        handle_children = True
+        handle_parenting = True
+
+        if hasattr(dest_module, 'studio_post_duplicate'):
+            # Allow an XBlock to do anything fancy it may need to when duplicated from another block.
+            # These blocks may handle their own children or parenting if needed. Let them return booleans to
+            # let us know if we need to handle these or not.
+            handle_children, handle_parenting = dest_module.studio_post_duplicate(store, parent_usage_key, source_item)
+
         # Children are not automatically copied over (and not all xblocks have a 'children' attribute).
         # Because DAGs are not fully supported, we need to actually duplicate each child as well.
-        if source_item.has_children:
-            dest_module.children = []
+        if source_item.has_children and handle_children:
+            dest_module.children = dest_module.children or []
             for child in source_item.children:
                 dupe = _duplicate_item(dest_module.location, child, user=user)
                 if dupe not in dest_module.children:  # _duplicate_item may add the child for us.
                     dest_module.children.append(dupe)
             store.update_item(dest_module, user.id)
 
-        if 'detached' not in source_item.runtime.load_block_type(category)._class_tags:
+        # pylint: disable=protected-access
+        if ('detached' not in source_item.runtime.load_block_type(category)._class_tags) and handle_parenting:
             parent = store.get_item(parent_usage_key)
             # If source was already a child of the parent, add duplicate immediately afterward.
             # Otherwise, add child to end.
