@@ -47,7 +47,7 @@
 
                 new AccountSettingsFieldViews.DropdownFieldView({
                     model: accountSettingsModel,
-                    required: false,
+                    required: true,
                     editable: editable,
                     showMessages: false,
                     iconName: 'fa-map-marker',

@@ -361,6 +361,9 @@
 
             showEditMode: function(render) {
                 this._super(render);
+                if (this.editable === 'toggle') {
+                    this.$('.u-field-value select').focus();
+                }
             },
 
             showSuccessMessage: function() {
