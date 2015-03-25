@@ -22,6 +22,12 @@
     % endfor
 </%block>
 
+% if duplicate_provider:
+    <section>
+        <%include file='/dashboard/_dashboard_third_party_error.html' />
+    </section>
+% endif
+
 <div class="wrapper-account-settings"></div>
 
 <%block name="headextra">
@@ -30,8 +36,13 @@
     <script>
           (function (require) {
             require(['js/student_account/views/account_settings_factory'], function(setupAccountSettingsSection) {
+
                 var fieldsData = ${ json.dumps(fields) };
-                setupAccountSettingsSection(fieldsData, '${user_accounts_api_url}', '${user_preferences_api_url}');
+                var authData = ${ json.dumps(auth) };
+
+                setupAccountSettingsSection(
+                        fieldsData, authData, '${user_accounts_api_url}', '${user_preferences_api_url}'
+                );
             });
           }).call(this, require || RequireJS.require);
     </script>
