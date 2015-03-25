@@ -324,11 +324,11 @@ $edx-footer-bg-color: rgb(252,252,252);
   }
 
   .footer-about-logo {
-    float: left;
+    @include float(left);
   }
 
   .footer-about-openedx-logo {
-    float: right;
+    @include float(right);
   }
 
   .footer-about-copy {

@@ -23,7 +23,7 @@
     .colophon {
       width: flex-grid(4, 12);
       @include float(left);
-      margin-right: flex-gutter(2);
+      @include margin-right(flex-gutter(2));
     }
 
     a {
@@ -57,7 +57,7 @@
             @extend %t-action3;
             display: inline-block;
             vertical-align: middle;
-            margin-right: ($baseline/4);
+            @include margin-right($baseline/4);
           }
         }
       }
@@ -77,7 +77,7 @@
     .footer-about-copyright {
       width: flex-grid(4, 12);
       @include float(left);
-      margin-right: flex-gutter(2);
+      @include margin-right(flex-gutter(2));
     }
 
     // platform Open edX logo and link
