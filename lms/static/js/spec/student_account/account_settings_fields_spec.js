@@ -1,10 +1,12 @@
 define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
         'js/views/fields',
         'js/spec/views/fields_helpers',
+        'js/spec/student_account/account_settings_fields_helpers',
         'js/student_account/views/account_settings_fields',
         'js/student_account/models/user_account_model',
         'string_utils'],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpecHelpers, AccountSettingsFieldViews, UserAccountModel) {
+    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpecHelpers,
+              AccountSettingsFieldViewSpecHelpers, AccountSettingsFieldViews, UserAccountModel) {
         'use strict';
 
         describe("edx.AccountSettingsFieldViews", function () {
@@ -91,6 +93,22 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 view.$(selector).val(FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]).change();
                 FieldViewsSpecHelpers.expectAjaxRequestWithData(requests, data);
                 AjaxHelpers.respondWithNoContent(requests);
+            });
+
+            it("correctly links and unlinks from AuthFieldView", function() {
+                requests = AjaxHelpers.requests(this);
+
+                var fieldData = FieldViewsSpecHelpers.createFieldData(FieldViews.LinkFieldView, {
+                    title: 'Yet another social network',
+                    helpMessage: '',
+                    valueAttribute: 'auth-yet-another',
+                    connected: true,
+                    connectUrl: 'yetanother.com/auth/connect',
+                    disconnectUrl: 'yetanother.com/auth/disconnect'
+                });
+                var view = new AccountSettingsFieldViews.AuthFieldView(fieldData).render();
+
+                AccountSettingsFieldViewSpecHelpers.verifyAuthField(view, fieldData, requests);
             });
         });
     });
