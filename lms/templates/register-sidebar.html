@@ -2,7 +2,7 @@
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 %>
-<%namespace file='main.html' import="login_query"/>
+<%namespace file='main.html' import="login_query, theme_enabled, is_microsite"/>
 <%namespace name='static' file='static_content.html'/>
 
 
@@ -28,7 +28,9 @@ from django.core.urlresolvers import reverse
 
 ## TODO: This is hardcoded here because it doesn't inherit main.html right now.
 <%
-  register_sidebar_extra_file = 'theme-register_sidebar.html'
+  register_sidebar_extra_file = None
+  if theme_enabled() and not is_microsite():
+    register_sidebar_extra_file = 'theme-register_sidebar.html'
 %>
 
 % if register_sidebar_extra_file:
