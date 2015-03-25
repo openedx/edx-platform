@@ -649,7 +649,7 @@ class TestAccountAPI(UserAPITestCase):
         self._verify_private_account_response(response, requires_parental_consent=True)
 
         
- @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestAccountAPITransactions(TransactionTestCase):
     """
     Tests the transactional behavior of the account API
