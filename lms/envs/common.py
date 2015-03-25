@@ -1996,3 +1996,6 @@ FORUM_MONGO_PARAMS = {
 ################### branding - for database driven tiles ##################
 INSTALLED_APPS += ('branding_stanford',)
 DISPLAY_COURSE_TILES = True
+
+ # Set to True for systems where students are auto-registered on login
+DISABLE_REGISTER_BUTTON = False
