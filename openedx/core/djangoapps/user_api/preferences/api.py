@@ -258,7 +258,6 @@ def update_email_opt_in(user, org, opt_in):
         log.warn(u"Could not update organization wide preference due to IntegrityError: {}".format(err.message))
 
 
-
 def _track_update_email_opt_in(user_id, organization, opt_in):
     """Track an email opt-in preference change.
 
