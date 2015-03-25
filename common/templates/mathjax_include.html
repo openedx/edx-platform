@@ -32,9 +32,6 @@
     });
   function set_mathjax_display_div_settings() {
   $('.MathJax_Display').each(function( index ) {
-    var input_id = this.parentElement.id.replace("_preview", "");
-    var input_id = input_id.replace("input_", "");
-    this.setAttribute('id', input_id + '_mathjax');
     this.setAttribute('tabindex', '0');
     this.setAttribute('aria-live', 'off');
     this.removeAttribute('role');
