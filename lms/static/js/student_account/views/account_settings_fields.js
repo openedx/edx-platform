@@ -99,6 +99,74 @@
                 attributes[this.options.valueAttribute] = value;
                 this.saveAttributes(attributes);
             }
+
+        });
+
+        AccountSettingsFieldViews.AuthFieldView = FieldViews.LinkFieldView.extend({
+
+            initialize: function (options) {
+                this._super(options);
+                _.bindAll(this, 'redirect_to', 'disconnect', 'successMessage', 'inProgressMessage');
+            },
+
+            render: function () {
+                this.$el.html(this.template({
+                    id: this.options.valueAttribute,
+                    title: this.options.title,
+                    linkTitle: this.options.connected ? gettext('Unlink') : gettext('Link'),
+                    linkHref: '',
+                    message: this.helpMessage
+                }));
+                return this;
+            },
+
+            linkClicked: function (event) {
+                event.preventDefault();
+
+                this.showInProgressMessage();
+
+                if (this.options.connected) {
+                    this.disconnect();
+                } else {
+                    // Direct the user to the providers site to start the authentication process.
+                    // See python-social-auth docs for more information.
+                    this.redirect_to(this.options.connectUrl);
+                }
+            },
+
+            redirect_to: function (url) {
+                window.location.href = url;
+            },
+
+            disconnect: function () {
+                var data = {};
+
+                // Disconnects the provider from the user's edX account.
+                // See python-social-auth docs for more information.
+                var view = this;
+                $.ajax({
+                    type: 'POST',
+                    url: this.options.disconnectUrl,
+                    data: data,
+                    dataType: 'html',
+                    success: function (data, status, xhr) {
+                        view.options.connected = false;
+                        view.render();
+                        view.showSuccessMessage();
+                    },
+                    error: function (xhr, status, error) {
+                        view.showErrorMessage(xhr);
+                    }
+                });
+            },
+
+            inProgressMessage: function() {
+                return this.indicators['inProgress'] + (this.options.connected ? gettext('Unlinking') : gettext('Linking'));
+            },
+
+            successMessage: function() {
+                return this.indicators['success'] + gettext('Successfully unlinked.');
+            },
         });
 
         return AccountSettingsFieldViews;
