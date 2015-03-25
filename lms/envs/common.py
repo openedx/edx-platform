@@ -2151,8 +2151,8 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
         'cors_csrf.middleware.CorsCSRFMiddleware',
     ) + MIDDLEWARE_CLASSES
     CORS_ALLOW_CREDENTIALS = True
-    CORS_ORIGIN_WHITELIST = ('devstack.local', 'apros.devstack.local')
-    CORS_ORIGIN_REGEX_WHITELIST = ('^http?://(\w+\.)?devstack\.local$',)
+    CORS_ORIGIN_WHITELIST = ()
+    CORS_ORIGIN_ALLOW_ALL = False
 
 ###################### Registration ##################################
 
