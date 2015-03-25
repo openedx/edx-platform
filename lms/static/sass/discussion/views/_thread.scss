@@ -39,11 +39,13 @@ body.discussion, .discussion-module {
     .response-header-content {
       display: inline-block;
       vertical-align: top;
-      width: flex-grid(9,12);
+      width: flex-grid(11,12);
     }
 
     .response-header-actions {
-      width: flex-grid(3,12);
+      position: absolute;
+      right: ($baseline);
+      top: ($baseline);
       @include float(right);
     }
   }
