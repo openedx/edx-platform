@@ -393,6 +393,7 @@ def signin_user(request):
             'platform_name',
             settings.PLATFORM_NAME
         ),
+        'account_name': settings.ACCOUNT_NAME,
     }
 
     return render_to_response('login.html', context)
@@ -426,6 +427,7 @@ def register_user(request, extra_context=None):
             'platform_name',
             settings.PLATFORM_NAME
         ),
+        'account_name': settings.ACCOUNT_NAME,
         'selected_provider': '',
         'username': '',
     }
