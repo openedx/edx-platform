@@ -76,7 +76,7 @@
                     editable: editable,
                     showMessages: false,
                     title: gettext('About me'),
-                    placeholderValue: gettext("Tell other edX learners a little about yourself, where you're from, what your interests are, why you joined edX, what you hope to learn..."),
+                    placeholderValue: gettext("Tell other edX learners a little about yourself: where you live, what your interests are, why you’re taking courses on edX, or what you hope to learn."),
                     valueAttribute: "bio",
                     helpMessage: ''
                 })
@@ -99,14 +99,21 @@
                 learnerProfileView.showLoadingError();
             };
 
+            var renderLearnerProfileView = function() {
+                learnerProfileView.render();
+            };
+
             accountSettingsModel.fetch({
                 success: function () {
-                    accountPreferencesModel.fetch({
-                        success: function () {
-                            learnerProfileView.render();
-                        },
-                        error: showLoadingError
-                    })
+                    if (options['has_preferences_access']) {
+                        accountPreferencesModel.fetch({
+                            success: renderLearnerProfileView,
+                            error: showLoadingError
+                        });
+                    }
+                    else {
+                        renderLearnerProfileView();
+                    }
                 },
                 error: showLoadingError
             });

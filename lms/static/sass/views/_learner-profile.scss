@@ -1,3 +1,11 @@
+// lms - application - learner profile
+// ====================
+
+// Table of Contents
+// * +Container - Learner Profile
+// * +Main - Header
+// * +Settings Section
+
 $profile-photo-dimension: 120px;
 
 .ui-loading-indicator {
@@ -13,6 +21,7 @@ $profile-photo-dimension: 120px;
 
 .wrapper-profile {
     min-height: 200px;
+    background-color: $white;
 
     .ui-loading-indicator {
         margin-top: 100px;
@@ -21,37 +30,38 @@ $profile-photo-dimension: 120px;
 
 .profile-self {
     .wrapper-profile-field-account-privacy {
-      @include clearfix();
-      @include box-sizing(border-box);
-      margin: 0 auto 0;
-      padding: ($baseline*0.75) 0;
-      width: 100%;
-      background-color: $gray-l3;
+        @include clearfix();
+        @include box-sizing(border-box);
+        margin: 0 auto 0;
+        padding: ($baseline*0.75) 0;
+        width: 100%;
+        background-color: $gray-l3;
 
-      .u-field-account_privacy {
-          @extend .container;
-          border: none;
-          box-shadow: none;
-      }
+        .u-field-account_privacy {
+            @extend .container;
+            border: none;
+            box-shadow: none;
+        }
 
-      .u-field-title {
-          width: auto;
-          color: $base-font-color;
-          font-weight: $font-bold;
-      }
+        .u-field-title {
+            width: auto;
+            color: $base-font-color;
+            font-weight: $font-bold;
+            cursor: text;
+        }
 
-      .u-field-value {
-          width: auto;
-          @include margin-left($baseline/2);
-      }
+        .u-field-value {
+            width: auto;
+            @include margin-left($baseline/2);
+        }
 
-      .u-field-message {
-          @include float(left);
-          width: 100%;
-          padding: 0px;
-          color: $base-font-color;
-      }
-  }
+        .u-field-message {
+            @include float(left);
+            width: 100%;
+            padding: 0;
+            color: $base-font-color;
+        }
+    }
 }
 
 .wrapper-profile-sections {
@@ -65,11 +75,11 @@ $profile-photo-dimension: 120px;
     margin-top: ($baseline*1.5);
 
     .profile-photo {
-      @include float(left);
-      height: $profile-photo-dimension;
-      width: $profile-photo-dimension;
-      display: inline-block;
-      vertical-align: top;
+        @include float(left);
+        height: $profile-photo-dimension;
+        width: $profile-photo-dimension;
+        display: inline-block;
+        vertical-align: top;
     }
 }
 

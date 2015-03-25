@@ -1,7 +1,7 @@
 <div class="profile <%- ownProfile ? 'profile-self' : 'profile-other' %>">
     <div class="wrapper-profile-field-account-privacy"></div>
 
-    <div class="section wrapper-profile-sections account-settings-container">
+    <div class="view-profile wrapper-profile-sections account-settings-container">
         <div class="wrapper-profile-section-one">
             <div class="profile-photo">
                 <img src="<%- profilePhoto %>">
@@ -14,7 +14,7 @@
             <i class="fa fa-exclamation-triangle message-error" aria-hidden=true></i>
             <span class="copy"><%- gettext("An error occurred. Please reload the page.") %></span>
         </div>
-        <div class="section wrapper-profile-section-two">
+        <div class="wrapper-profile-section-two">
             <div class="profile-section-two-fields">
                 <% if (!showFullProfile) { %>
                     <span class="profile-private--message"><%- gettext('This edX learner is not currently sharing their profile details.') %></span>

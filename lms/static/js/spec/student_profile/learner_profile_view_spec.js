@@ -78,7 +78,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                         editable: editable,
                         showMessages: false,
                         title: 'About me',
-                        placeholderValue: "Tell other edX learners a little about yourself, where you're from, what your interests are, why you joined edX, what you hope to learn...",
+                        placeholderValue: "Tell other edX learners a little about yourself: where you live, what your interests are, why you’re taking courses on edX, or what you hope to learn.",
                         valueAttribute: "bio",
                         helpMessage: ''
                     })
@@ -107,89 +107,6 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 TemplateHelpers.installTemplate('templates/student_profile/learner_profile');
             });
 
-            var expectElementContainsField = function(element, view) {
-                var $element = $(element);
-                var fieldTitle = $element.find('.u-field-title').text().trim();
-
-                if (!_.isUndefined(view.options.title)) {
-                    if (view.modelValue()) {
-                        expect(fieldTitle).toBe(view.options.title);
-                    } else {
-                        expect(fieldTitle).toBe('+ ' + view.options.title);
-                    }
-                }
-
-                if ('fieldValue' in view) {
-                    expect(view.model.get(view.options.valueAttribute)).toBeTruthy();
-
-                    if (view.fieldValue()) {
-                        expect(view.fieldValue()).toBe(view.modelValue());
-
-                    } else if ('optionForValue' in view) {
-                        expect($($element.find('.u-field-value')[0]).text()).toBe(view.optionForValue(view.modelValue())[1]);
-
-                    }else {
-                        expect($($element.find('.u-field-value')[0]).text()).toBe(view.modelValue());
-                    }
-                } else {
-                    throw new Error('Unexpected field type: ' + view.fieldType);
-                }
-            };
-
-            var expectProfilePrivacyFieldTobeRendered = function(learnerProfileView, othersProfile) {
-
-                var accountPrivacyElement = learnerProfileView.$('.wrapper-profile-field-account-privacy');
-                var privacyFieldElement = $(accountPrivacyElement).find('.u-field');
-
-                if (othersProfile) {
-                    expect(privacyFieldElement.length).toBe(0);
-                } else {
-                    expect(privacyFieldElement.length).toBe(1);
-                    expectElementContainsField(privacyFieldElement, learnerProfileView.options.accountPrivacyFieldView)
-                }
-            };
-
-            var expectSectionOneTobeRendered = function(learnerProfileView) {
-
-                var sectionOneFieldElements = $(learnerProfileView.$('.wrapper-profile-section-one')).find('.u-field');
-
-                expect(sectionOneFieldElements.length).toBe(learnerProfileView.options.sectionOneFieldViews.length);
-
-                _.each(sectionOneFieldElements, function (sectionFieldElement, fieldIndex) {
-                    expectElementContainsField(sectionFieldElement, learnerProfileView.options.sectionOneFieldViews[fieldIndex]);
-                });
-            };
-
-            var expectSectionTwoTobeRendered = function(learnerProfileView) {
-
-                var sectionTwoElement = learnerProfileView.$('.wrapper-profile-section-two');
-                var sectionTwoFieldElements = $(sectionTwoElement).find('.u-field');
-
-                expect(sectionTwoFieldElements.length).toBe(learnerProfileView.options.sectionTwoFieldViews.length);
-
-                 _.each(sectionTwoFieldElements, function (sectionFieldElement, fieldIndex) {
-                    expectElementContainsField(sectionFieldElement, learnerProfileView.options.sectionTwoFieldViews[fieldIndex]);
-                });
-            };
-            var expectProfileSectionsAndFieldsToBeRendered = function (learnerProfileView, othersProfile) {
-                expectProfilePrivacyFieldTobeRendered(learnerProfileView, othersProfile);
-                expectSectionOneTobeRendered(learnerProfileView);
-                expectSectionTwoTobeRendered(learnerProfileView);
-            };
-
-            var expectLimitedProfileSectionsAndFieldsToBeRendered = function (learnerProfileView, othersProfile) {
-                expectProfilePrivacyFieldTobeRendered(learnerProfileView, othersProfile);
-
-                var sectionOneFieldElements = $(learnerProfileView.$('.wrapper-profile-section-one')).find('.u-field');
-
-                expect(sectionOneFieldElements.length).toBe(1);
-                _.each(sectionOneFieldElements, function (sectionFieldElement, fieldIndex) {
-                    expectElementContainsField(sectionFieldElement, learnerProfileView.options.sectionOneFieldViews[fieldIndex]);
-                });
-
-                expect($('.profile-private--message').text()).toBe('This edX learner is not currently sharing their profile details.')
-            };
-
             it("shows loading error correctly", function() {
 
                 var learnerProfileView = createLearnerProfileView(false, 'all_users');
@@ -213,7 +130,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 learnerProfileView.render();
 
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
-                expectProfileSectionsAndFieldsToBeRendered(learnerProfileView);
+                Helpers.expectProfileSectionsAndFieldsToBeRendered(learnerProfileView);
             });
 
             it("renders all fields as expected for self with limited access", function() {
@@ -226,7 +143,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 learnerProfileView.render();
 
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
-                expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView);
+                Helpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView);
             });
 
             it("renders the fields as expected for others with full access", function() {
@@ -239,7 +156,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 learnerProfileView.render();
 
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
-                expectProfileSectionsAndFieldsToBeRendered(learnerProfileView, true)
+                Helpers.expectProfileSectionsAndFieldsToBeRendered(learnerProfileView, true)
             });
 
             it("renders the fields as expected for others with limited access", function() {
@@ -252,8 +169,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 learnerProfileView.render();
 
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
-                expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView, true);
+                Helpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView, true);
             });
-
         });
     });
