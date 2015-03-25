@@ -168,9 +168,7 @@ class TestMigration(SplitWMongoCourseBoostrapper):
             # so if such a field is unset on an XBlock, we don't expect it
             # to persist across courses
             field_generated_from_unique_id = not field.is_set_on(presplit_dag_root) and field.default == UNIQUE_ID
-            if not (
-                isinstance(field, (Reference, ReferenceList, ReferenceValueDict)) or field_generated_from_unique_id
-            ):
+            if not (isinstance(field, (Reference, ReferenceList, ReferenceValueDict)) or field_generated_from_unique_id):
                 self.assertEqual(
                     getattr(presplit_dag_root, name),
                     getattr(split_dag_root, name),
