@@ -191,7 +191,7 @@ class MongoConnection(object):
             }
         return self.course_index.find_one(query)
 
-    def find_matching_course_indexes(self, branch=None, search_targets=None):
+    def find_matching_course_indexes(self, branch=None, search_targets=None, org_target=None):
         """
         Find the course_index matching particular conditions.
 
@@ -199,6 +199,8 @@ class MongoConnection(object):
             branch: If specified, this branch must exist in the returned courses
             search_targets: If specified, this must be a dictionary specifying field values
                 that must exist in the search_targets of the returned courses
+            org_target: If specified, this is an ORG filter so that only course_indexs are
+                returned for the specified ORG
         """
         query = {}
         if branch is not None:
@@ -207,6 +209,9 @@ class MongoConnection(object):
         if search_targets:
             for key, value in search_targets.iteritems():
                 query['search_targets.{}'.format(key)] = value
+
+        if org_target:
+            query['org'] = org_target
 
         return self.course_index.find(query)
 

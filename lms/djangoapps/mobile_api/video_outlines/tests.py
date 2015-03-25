@@ -410,6 +410,46 @@ class TestVideoSummaryList(
     """
     REVERSE_INFO = {'name': 'video-summary-list', 'params': ['course_id']}
 
+    def test_only_on_web(self):
+        self.login_and_enroll()
+
+        course_outline = self.api_response().data
+        self.assertEqual(len(course_outline), 0)
+
+        subid = uuid4().hex
+        transcripts_utils.save_subs_to_store(
+            {
+                'start': [100],
+                'end': [200],
+                'text': [
+                    'subs #1',
+                ]
+            },
+            subid,
+            self.course)
+
+        ItemFactory.create(
+            parent=self.unit,
+            category="video",
+            display_name=u"test video",
+            only_on_web=True,
+            subid=subid
+        )
+
+        course_outline = self.api_response().data
+
+        self.assertEqual(len(course_outline), 1)
+
+        self.assertIsNone(course_outline[0]["summary"]["video_url"])
+        self.assertIsNone(course_outline[0]["summary"]["video_thumbnail_url"])
+        self.assertEqual(course_outline[0]["summary"]["duration"], 0)
+        self.assertEqual(course_outline[0]["summary"]["size"], 0)
+        self.assertEqual(course_outline[0]["summary"]["name"], "test video")
+        self.assertEqual(course_outline[0]["summary"]["transcripts"], {})
+        self.assertIsNone(course_outline[0]["summary"]["language"])
+        self.assertEqual(course_outline[0]["summary"]["category"], "video")
+        self.assertTrue(course_outline[0]["summary"]["only_on_web"])
+
     def test_course_list(self):
         self.login_and_enroll()
         self._create_video_with_subs()
@@ -442,13 +482,16 @@ class TestVideoSummaryList(
         self.assertEqual(vid['summary']['video_url'], self.video_url)
         self.assertEqual(vid['summary']['size'], 12345)
         self.assertTrue('en' in vid['summary']['transcripts'])
+        self.assertFalse(vid['summary']['only_on_web'])
         self.assertEqual(course_outline[1]['summary']['video_url'], self.html5_video_url)
         self.assertEqual(course_outline[1]['summary']['size'], 0)
+        self.assertFalse(course_outline[1]['summary']['only_on_web'])
         self.assertEqual(course_outline[1]['path'][2]['name'], self.other_unit.display_name)
         self.assertEqual(course_outline[1]['path'][2]['id'], unicode(self.other_unit.location))
 
         self.assertEqual(course_outline[2]['summary']['video_url'], self.html5_video_url)
         self.assertEqual(course_outline[2]['summary']['size'], 0)
+        self.assertFalse(course_outline[2]['summary']['only_on_web'])
 
     def test_with_nameless_unit(self):
         self.login_and_enroll()

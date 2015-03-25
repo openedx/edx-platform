@@ -74,6 +74,8 @@ BLOCK_TYPES_WITH_CHILDREN = list(set(
 # at module level, cache one instance of OSFS per filesystem root.
 _OSFS_INSTANCE = {}
 
+_DETACHED_CATEGORIES = [name for name, __ in XBlock.load_tagged_classes("detached")]
+
 
 class MongoRevisionKey(object):
     """
@@ -933,17 +935,36 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                 course_key,
                 item,
                 data_cache,
-                apply_cached_metadata=(item['location']['category'] != 'course' or depth != 0),
-                using_descriptor_system=using_descriptor_system
+                using_descriptor_system=using_descriptor_system,
+                apply_cached_metadata=self._should_apply_cached_metadata(item, depth)
             )
             for item in items
         ]
 
+    def _should_apply_cached_metadata(self, item, depth):
+        """
+        Returns a boolean whether a particular query should trigger an application
+        of inherited metadata onto the item
+        """
+        category = item['location']['category']
+        apply_cached_metadata = category not in _DETACHED_CATEGORIES and \
+            not (category == 'course' and depth == 0)
+        return apply_cached_metadata
+
     @autoretry_read()
     def get_courses(self, **kwargs):
         '''
-        Returns a list of course descriptors.
+        Returns a list of course descriptors. This accepts an optional parameter of 'org' which
+        will apply an efficient filter to only get courses with the specified ORG
         '''
+
+        course_org_filter = kwargs.get('org')
+
+        if course_org_filter:
+            course_records = self.collection.find({'_id.category': 'course', '_id.org': course_org_filter})
+        else:
+            course_records = self.collection.find({'_id.category': 'course'})
+
         base_list = sum(
             [
                 self._load_items(
@@ -953,7 +974,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                 for course
                 # I tried to add '$and': [{'_id.org': {'$ne': 'edx'}}, {'_id.course': {'$ne': 'templates'}}]
                 # but it didn't do the right thing (it filtered all edx and all templates out)
-                in self.collection.find({'_id.category': 'course'})
+                in course_records
                 if not (  # TODO kill this
                     course['_id']['org'] == 'edx' and
                     course['_id']['course'] == 'templates'

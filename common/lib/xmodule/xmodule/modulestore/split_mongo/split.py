@@ -486,14 +486,16 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
             block_data.edit_info.original_usage = original_usage
             block_data.edit_info.original_usage_version = original_usage_version
 
-    def find_matching_course_indexes(self, branch=None, search_targets=None):
+    def find_matching_course_indexes(self, branch=None, search_targets=None, org_target=None):
         """
-        Find the course_indexes which have the specified branch and search_targets.
+        Find the course_indexes which have the specified branch and search_targets. An optional org_target
+        can be specified to apply an ORG filter to return only the courses that are part of
+        that ORG.
 
         Returns:
             a Cursor if there are no changes in flight or a list if some have changed in current bulk op
         """
-        indexes = self.db_connection.find_matching_course_indexes(branch, search_targets)
+        indexes = self.db_connection.find_matching_course_indexes(branch, search_targets, org_target)
 
         def _replace_or_append_index(altered_index):
             """
@@ -517,6 +519,13 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
                     record.index['search_targets'][field] != value
                     for field, value in search_targets.iteritems()
                 ):
+                    continue
+
+            # if we've specified a filter by org,
+            # make sure we've honored that filter when
+            # integrating in-transit records
+            if org_target:
+                if record.index['org'] != org_target:
                     continue
 
             if not hasattr(indexes, 'append'):  # Just in time conversion to list from cursor
@@ -830,11 +839,20 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # add it in the envelope for the structure.
         return CourseEnvelope(course_key.replace(version_guid=version_guid), entry)
 
-    def _get_structures_for_branch(self, branch):
+    def _get_structures_for_branch(self, branch, **kwargs):
         """
         Internal generator for fetching lists of courses, libraries, etc.
         """
-        matching_indexes = self.find_matching_course_indexes(branch)
+
+        # if we pass in a 'org' parameter that means to
+        # only get the course which match the passed in
+        # ORG
+
+        matching_indexes = self.find_matching_course_indexes(
+            branch,
+            search_targets=None,
+            org_target=kwargs.get('org')
+        )
 
         # collect ids and then query for those
         version_guids = []
@@ -858,7 +876,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         :param type locator_factory: Factory to create locator from structure info and branch
         """
         result = []
-        for entry, structure_info in self._get_structures_for_branch(branch):
+        for entry, structure_info in self._get_structures_for_branch(branch, **kwargs):
             locator = locator_factory(structure_info, branch)
             envelope = CourseEnvelope(locator, entry)
             root = entry['root']
