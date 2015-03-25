@@ -173,9 +173,13 @@
 </html>
 
 <%def name="login_query()">${
-  u"?course_id={0}&enrollment_action={1}{email_opt_in}".format(
+  u"?course_id={0}&enrollment_action={1}{course_mode}{email_opt_in}".format(
     urlquote_plus(course_id),
     urlquote_plus(enrollment_action),
+    course_mode=(
+      u"&course_mode=" + urlquote_plus(course_mode)
+      if course_mode else ""
+    ),
     email_opt_in=(
       u"&email_opt_in=" + urlquote_plus(email_opt_in)
       if email_opt_in else ""

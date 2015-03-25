@@ -246,12 +246,25 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
             'course_id': 'edX/DemoX/Demo_Course'
         }
 
+        # The response should have a "Sign In" button with the URL
+        # that preserves the querystring params
+        with mock.patch.dict(settings.FEATURES, {'IS_EDX_DOMAIN': is_edx_domain}):
+            response = self.client.get(reverse(url_name), params)
+        self.assertContains(response, "login?course_id=edX%2FDemoX%2FDemo_Course&enrollment_action=enroll")
+
+        # Add an additional "course mode" parameter
+        params['course_mode'] = 'honor'
+
+        # Verify that this parameter is also preserved
         with mock.patch.dict(settings.FEATURES, {'IS_EDX_DOMAIN': is_edx_domain}):
             response = self.client.get(reverse(url_name), params)
 
-        # The response should have a "Sign In" button with the URL
-        # that preserves the querystring params
-        self.assertContains(response, "login?course_id=edX%2FDemoX%2FDemo_Course&enrollment_action=enroll")
+        expected_url = (
+            "login?course_id=edX%2FDemoX%2FDemo_Course"
+            "&enrollment_action=enroll"
+            "&course_mode=honor"
+        )
+        self.assertContains(response, expected_url)
 
     @mock.patch.dict(settings.FEATURES, {"ENABLE_THIRD_PARTY_AUTH": False})
     @ddt.data("account_login", "account_register")

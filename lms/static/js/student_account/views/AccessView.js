@@ -29,6 +29,12 @@ var edx = edx || {};
             passwordHelp: {}
         },
 
+        urls: {
+            dashboard: '/dashboard',
+            payment: '/verify_student/start-flow/',
+            trackSelection: '/course_modes/choose/'
+        },
+
         // The form currently loaded
         activeForm: '',
 
@@ -243,15 +249,37 @@ var edx = edx || {};
         enrollment: function() {
             var enrollment = edx.student.account.EnrollmentInterface,
                 shoppingcart = edx.student.account.ShoppingCartInterface,
-                redirectUrl = '/dashboard',
+                redirectUrl = this.urls.dashboard,
                 queryParams = this.queryParams();
 
-            if ( queryParams.enrollmentAction === 'enroll' && queryParams.courseId) {
-                /*
-                If we need to enroll in a course, mark as enrolled.
-                The enrollment interface will redirect the student once enrollment completes.
-                */
-                enrollment.enroll( decodeURIComponent( queryParams.courseId ) );
+            if ( queryParams.enrollmentAction === 'enroll' && queryParams.courseId ) {
+                var courseId = decodeURIComponent( queryParams.courseId );
+
+                // Determine where to redirect the user after auto-enrollment.
+                if ( !queryParams.courseMode ) {
+                    /* Backwards compatibility with the original course details page.
+                    The old implementation did not specify the course mode for enrollment,
+                    so we'd always send the user to the "track selection" page.
+                    The track selection page would allow the user to select the course mode
+                    ("verified", "honor", etc.) -- or, if the only course mode was "honor",
+                    it would redirect the user to the dashboard. */
+                    redirectUrl = this.urls.trackSelection + courseId + '/';
+                } else if ( queryParams.courseMode === 'honor' || queryParams.courseMode === 'audit' ) {
+                    /* The newer version of the course details page allows the user
+                    to specify which course mode to enroll as.  If the student has
+                    chosen "honor", we send them immediately to the dashboard
+                    rather than the payment flow.  The user may decide to upgrade
+                    from the dashboard later. */
+                    redirectUrl = this.urls.dashboard;
+                } else {
+                    /* If the user selected any other kind of course mode, send them
+                    to the payment/verification flow. */
+                    redirectUrl = this.urls.payment + courseId + '/';
+                }
+
+                /* Attempt to auto-enroll the user in a free mode of the course,
+                then redirect to the next location. */
+                enrollment.enroll( courseId, redirectUrl );
             } else if ( queryParams.enrollmentAction === 'add_to_cart' && queryParams.courseId) {
                 /*
                 If this is a paid course, add it to the shopping cart and redirect
@@ -298,6 +326,7 @@ var edx = edx || {};
                 next: $.url( '?next' ),
                 enrollmentAction: $.url( '?enrollment_action' ),
                 courseId: $.url( '?course_id' ),
+                courseMode: $.url( '?course_mode' ),
                 emailOptIn: $.url( '?email_opt_in')
             };
         },
