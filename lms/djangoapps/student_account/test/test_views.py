@@ -9,11 +9,14 @@ import json
 import mock
 import ddt
 import markupsafe
-from django.test import TestCase
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core import mail
+from django.contrib import messages
+from django.contrib.messages.middleware import MessageMiddleware
+from django.test import TestCase
 from django.test.utils import override_settings
+from django.test.client import RequestFactory
 
 from embargo.test_utils import restrict_course
 from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
@@ -517,14 +520,24 @@ class AccountSettingsViewTest(TestCase):
         'preferred_language',
     ]
 
+    @mock.patch("django.conf.settings.MESSAGE_STORAGE", 'django.contrib.messages.storage.cookie.CookieStorage')
     def setUp(self):
         super(AccountSettingsViewTest, self).setUp()
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
 
+        self.request = RequestFactory()
+        self.request.user = self.user
+
+        # Python-social saves auth failure notifcations in Django messages.
+        # See pipeline.get_duplicate_provider() for details.
+        self.request.COOKIES = {}
+        MessageMiddleware().process_request(self.request)
+        messages.error(self.request, 'Facebook is already in use.', extra_tags='Auth facebook')
+
     def test_context(self):
 
-        context = account_settings_context(self.user)
+        context = account_settings_context(self.request)
 
         user_accounts_api_url = reverse("accounts_api", kwargs={'username': self.user.username})
         self.assertEqual(context['user_accounts_api_url'], user_accounts_api_url)
@@ -534,6 +547,17 @@ class AccountSettingsViewTest(TestCase):
 
         for attribute in self.FIELDS:
             self.assertIn(attribute, context['fields'])
+
+        self.assertEqual(
+            context['user_accounts_api_url'], reverse("accounts_api", kwargs={'username': self.user.username})
+        )
+        self.assertEqual(
+            context['user_preferences_api_url'], reverse('preferences_api', kwargs={'username': self.user.username})
+        )
+
+        self.assertEqual(context['duplicate_provider'].BACKEND_CLASS.name, 'facebook')
+        self.assertEqual(context['auth']['providers'][0]['name'], 'Facebook')
+        self.assertEqual(context['auth']['providers'][1]['name'], 'Google')
 
     def test_view(self):
 
