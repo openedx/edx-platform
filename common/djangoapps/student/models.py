@@ -257,7 +257,7 @@ class UserProfile(models.Model):
     city = models.ForeignKey('cities.City', default=None, blank=True, null=True)
 
     GRADO_CHOICES = (
-        ('none', 'Ninguno'),
+        ('none', 'OTRO'),
         ('sps1', 'SERVIDOR PUBLICO DE SERVICIOS 1'),
         ('sps2', 'SERVIDOR PUBLICO DE SERVICIOS 2'),
         ('spa1', 'SERVIDOR PUBLICO DE APOYO 1'),
@@ -1226,6 +1226,22 @@ class CourseEnrollment(models.Model):
     @property
     def course(self):
         return modulestore().get_course(self.course_id)
+
+
+class CourseAllowUnenroll(models.Model):
+    """
+    Table of courses what are not allowed to unenroll users
+    """
+    course_id = CourseKeyField(max_length=255, db_index=True)
+
+    class Meta:
+        unique_together = (('course_id',),)
+
+    def __unicode__(self):
+        return "[CourseUnenrollmentNotAllowed] {0}".format(self.course_id)
+
+    def allow_unenroll(self):
+        return self.allow_unenroll
 
 
 class CourseEnrollmentAllowed(models.Model):

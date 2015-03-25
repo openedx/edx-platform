@@ -1,4 +1,4 @@
-<%page args="course, enrollment, show_courseware_link, cert_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status, course_requirements" />
+<%page args="course, enrollment, show_courseware_link, cert_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status, course_requirements, course_allow_unenroll" />
 
 <%!
 from django.utils.translation import ugettext as _
@@ -248,6 +248,7 @@ from student.helpers import (
         % endif
       % endif
 
+      % if not course_allow_unenroll:
       % if is_paid_course and show_refund_option:
         ## Translators: The course's name will be added to the end of this sentence.
         % if not is_course_blocked:
@@ -312,7 +313,7 @@ from student.helpers import (
         </a>
         % endif
       % endif
-
+      % endif
 % if show_email_settings:
         % if not is_course_blocked:
         <a href="#email-settings-modal" class="email-settings" rel="leanModal" data-course-id="${course.id | h}" data-course-number="${course.number | h}" data-optout="${unicode(course.id) in course_optouts}">${_('Email Settings')}</a>
