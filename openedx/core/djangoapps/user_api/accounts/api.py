@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core.validators import validate_email, validate_slug, ValidationError
 
 from student.models import User, UserProfile, Registration
-from student.views import validate_new_email, do_email_change_request
+from student import views as student_views
 
 from ..errors import (
     AccountUpdateError, AccountValidationError, AccountUsernameInvalid, AccountPasswordInvalid,
@@ -92,7 +92,6 @@ def get_account_settings(requesting_user, username=None, configuration=None, vie
     return visible_settings
 
 
-@transaction.commit_on_success
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
 def update_account_settings(requesting_user, update, username=None):
     """Update user account information.
@@ -154,7 +153,7 @@ def update_account_settings(requesting_user, update, username=None):
     if read_only_fields:
         for read_only_field in read_only_fields:
             field_errors[read_only_field] = {
-                "developer_message": "This field is not editable via this API",
+                "developer_message": u"This field is not editable via this API",
                 "user_message": _(u"Field '{field_name}' cannot be edited.").format(field_name=read_only_field)
             }
             del update[read_only_field]
@@ -168,7 +167,7 @@ def update_account_settings(requesting_user, update, username=None):
     # If the user asked to change email, validate it.
     if changing_email:
         try:
-            validate_new_email(existing_user, new_email)
+            student_views.validate_new_email(existing_user, new_email)
         except ValueError as err:
             field_errors["email"] = {
                 "developer_message": u"Error thrown from validate_new_email: '{}'".format(err.message),
@@ -206,7 +205,7 @@ def update_account_settings(requesting_user, update, username=None):
     # And try to send the email change request if necessary.
     if changing_email:
         try:
-            do_email_change_request(existing_user, new_email)
+            student_views.do_email_change_request(existing_user, new_email)
         except ValueError as err:
             raise AccountUpdateError(
                 u"Error thrown from do_email_change_request: '{}'".format(err.message),

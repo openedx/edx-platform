@@ -10,6 +10,7 @@ from rest_framework import status
 from util.authentication import SessionAuthenticationAllowInactiveUser, OAuth2AuthenticationAllowInactiveUser
 from rest_framework import permissions
 
+from django.db import transaction
 from django.utils.translation import ugettext as _
 
 from openedx.core.lib.api.parsers import MergePatchParser
@@ -88,7 +89,8 @@ class PreferencesView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         try:
-            update_user_preferences(request.user, request.DATA, username=username)
+            with transaction.commit_on_success():
+                update_user_preferences(request.user, request.DATA, username=username)
         except (UserNotFound, UserNotAuthorized):
             return Response(status=status.HTTP_404_NOT_FOUND)
         except PreferenceValidationError as error:
