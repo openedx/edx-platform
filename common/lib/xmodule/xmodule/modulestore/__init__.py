@@ -829,7 +829,9 @@ class ModuleStoreRead(ModuleStoreAssetBase):
     def get_courses(self, **kwargs):
         '''
         Returns a list containing the top level XModuleDescriptors of the courses
-        in this modulestore.
+        in this modulestore. This method can take an optional argument 'org' which
+        will efficiently apply a filter so that only the courses of the specified
+        ORG in the CourseKey will be fetched.
         '''
         pass
 
