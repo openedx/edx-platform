@@ -1,4 +1,4 @@
-<%namespace file="../main.html" import="stanford_theme_enabled" />
+<%namespace file="../main.html" import="is_non_microsite_theme" />
 <%! from django.utils.translation import ugettext as _ %>
 ${_("Thank you for signing up for {platform_name}.").format(platform_name=settings.PLATFORM_NAME)}
 
@@ -36,7 +36,7 @@ ${_("This email was automatically sent by {site_name} because someone "
 	site_name=settings.SITE_NAME
 )}
 
-% elif stanford_theme_enabled():  ## Temporary hack until we develop a better way to adjust language
+% elif is_non_microsite_theme():  ## Temporary hack until we develop a better way to adjust language
 ${_("If you didn't request this, you don't need to do anything; you won't "
       "receive any more email from us. Please do not reply to this e-mail; "
       "if you require assistance, check the about section of the "
