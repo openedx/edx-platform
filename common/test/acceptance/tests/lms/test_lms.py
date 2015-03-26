@@ -456,6 +456,10 @@ class CourseWikiTest(UniqueCourseTest):
         self.course_info_page.visit()
         self.tab_nav.go_to_tab('Wiki')
 
+    def _open_editor(self):
+        self.course_wiki_page.open_editor()
+        self.course_wiki_edit_page.wait_for_page()
+
     def test_edit_course_wiki(self):
         """
         Wiki page by default is editable for students.
@@ -466,8 +470,7 @@ class CourseWikiTest(UniqueCourseTest):
 
         """
         content = "hello"
-        self.course_wiki_page.open_editor()
-        self.course_wiki_edit_page.wait_for_page()
+        self._open_editor()
         self.course_wiki_edit_page.replace_wiki_content(content)
         self.course_wiki_edit_page.save_wiki_content()
         actual_content = unicode(self.course_wiki_page.q(css='.wiki-article p').text[0])
