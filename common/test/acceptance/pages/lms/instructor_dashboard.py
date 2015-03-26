@@ -400,7 +400,7 @@ class CohortManagementSection(PageObject):
         """
         if wait_for_messages:
             EmptyPromise(
-                lambda: self.q(css=self._bounded_selector(title_css)).results != 0,
+                lambda: len(self.q(css=self._bounded_selector(title_css)).results) != 0,
                 "Waiting for messages to appear"
             ).fulfill()
         message_title = self.q(css=self._bounded_selector(title_css))
