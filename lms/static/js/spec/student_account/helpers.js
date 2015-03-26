@@ -9,11 +9,13 @@ define(['underscore'], function(_) {
         name: 'Student',
         email: 'student@edx.org',
 
-        level_of_education: '1',
-        gender: '2',
-        year_of_birth: '3',
-        country: '1',
-        language: '2'
+        level_of_education: '0',
+        gender: '0',
+        year_of_birth: '0',
+        country: '0',
+        language: '0',
+        bio: "About the student",
+        language_proficiencies: [{code: '1'}]
     };
 
     var USER_PREFERENCES_DATA = {
@@ -21,6 +23,7 @@ define(['underscore'], function(_) {
     };
 
     var FIELD_OPTIONS = [
+        ['0', 'Option 0'],
         ['1', 'Option 1'],
         ['2', 'Option 2'],
         ['3', 'Option 3'],
@@ -28,9 +31,9 @@ define(['underscore'], function(_) {
 
     var expectLoadingIndicatorIsVisible = function (view, visible) {
         if (visible) {
-            expect(view.$('.ui-loading-indicator')).not.toHaveClass('is-hidden');
+            expect($('.ui-loading-indicator')).not.toHaveClass('is-hidden');
         } else {
-            expect(view.$('.ui-loading-indicator')).toHaveClass('is-hidden');
+            expect($('.ui-loading-indicator')).toHaveClass('is-hidden');
         }
     };
 
@@ -95,6 +98,6 @@ define(['underscore'], function(_) {
         expectLoadingErrorIsVisible: expectLoadingErrorIsVisible,
         expectElementContainsField: expectElementContainsField,
         expectSettingsSectionsButNotFieldsToBeRendered: expectSettingsSectionsButNotFieldsToBeRendered,
-        expectSettingsSectionsAndFieldsToBeRendered: expectSettingsSectionsAndFieldsToBeRendered
+        expectSettingsSectionsAndFieldsToBeRendered: expectSettingsSectionsAndFieldsToBeRendered,
     };
 });
