@@ -7,6 +7,8 @@
 
 <%block name="pagetitle">${_("Learner Profile")}</%block>
 
+<%block name="bodyclass">view-profile</%block>
+
 <%block name="header_extras">
     % for template_name in ["field_dropdown", "field_textarea", "field_readonly"]:
         <script type="text/template" id="${template_name}-tpl">

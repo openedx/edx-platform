@@ -229,7 +229,7 @@
             }
         });
 
-        FieldViews.TextFieldView = FieldViews.FieldView.extend({
+        FieldViews.TextFieldView = FieldViews.EditableFieldView.extend({
 
             fieldType: 'text',
 
@@ -271,7 +271,7 @@
             }
         });
 
-        FieldViews.DropdownFieldView = FieldViews.FieldView.extend({
+        FieldViews.DropdownFieldView = FieldViews.EditableFieldView.extend({
 
             fieldType: 'dropdown',
 

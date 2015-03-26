@@ -6,10 +6,22 @@
     padding: $baseline 0;
     border-bottom: 1px solid $gray-l5;
     border: 1px dashed transparent;
-    border-radius: 3px;
 
-    &.mode-placeholder:hover {
-        border: 2px dashed $link-color;
+    &.mode-placeholder {
+        border: 2px dashed transparent;
+        border-radius: 3px;
+
+        span {
+            color: $gray-l3;
+        }
+
+        &:hover {
+            border: 2px dashed $link-color;
+
+            span {
+                color: $link-color;
+            }
+        }
     }
 
     &.editable-toggle.mode-display:hover {
