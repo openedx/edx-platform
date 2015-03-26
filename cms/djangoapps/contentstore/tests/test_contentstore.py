@@ -5,6 +5,7 @@ import mock
 from mock import patch
 import shutil
 import lxml.html
+import ddt
 
 from datetime import timedelta
 from fs.osfs import OSFS
@@ -976,6 +977,7 @@ class MiscCourseTests(ContentStoreTestCase):
             self.assertEqual(resp.status_code, 200)
 
 
+@ddt.ddt
 class ContentStoreTest(ContentStoreTestCase):
     """
     Tests for the CMS ContentStore application.
@@ -1433,13 +1435,29 @@ class ContentStoreTest(ContentStoreTestCase):
         # make sure we found the item (e.g. it didn't error while loading)
         self.assertTrue(did_load_item)
 
-    def test_forum_id_generation(self):
-        course = CourseFactory.create()
+    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    def test_forum_id_generation(self, default_store):
+        """
+        Test that a discussion item, even if it doesn't set its discussion_id,
+        consistently generates the same one
+        """
+        course = CourseFactory.create(default_store=default_store)
 
-        # crate a new module and add it as a child to a vertical
-        new_discussion_item = self.store.create_item(self.user.id, course.id, 'discussion', 'new_component')
+        # create a discussion item
+        discussion_item = self.store.create_item(self.user.id, course.id, 'discussion', 'new_component')
 
-        self.assertNotEquals(new_discussion_item.discussion_id, '$$GUID$$')
+        # now fetch it from the modulestore to instantiate its descriptor
+        fetched = self.store.get_item(discussion_item.location)
+
+        # refetch it to be safe
+        refetched = self.store.get_item(discussion_item.location)
+
+        # and make sure the same discussion items have the same discussion ids
+        self.assertEqual(fetched.discussion_id, discussion_item.discussion_id)
+        self.assertEqual(fetched.discussion_id, refetched.discussion_id)
+
+        # and make sure that the id isn't the old "$$GUID$$"
+        self.assertNotEqual(discussion_item.discussion_id, '$$GUID$$')
 
     def test_metadata_inheritance(self):
         course_items = import_course_from_xml(
