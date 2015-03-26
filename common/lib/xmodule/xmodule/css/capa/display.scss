@@ -634,6 +634,11 @@ div.problem {
       @extend .blue-button !optional;
     }
 
+    .button-label{
+      font-weight: 600;
+      font-size: 1.0em;
+    }
+
     .show {
 
       .show-label {
