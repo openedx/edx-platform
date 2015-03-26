@@ -584,7 +584,7 @@ class TestAccountAPI(UserAPITestCase):
             error_response.data["developer_message"]
         )
         self.assertIsNone(error_response.data["user_message"])
-        
+
     @override_settings(PROFILE_IMAGE_DOMAIN='/')
     def test_convert_relative_profile_url(self):
         """
@@ -647,7 +647,7 @@ class TestAccountAPI(UserAPITestCase):
         response = self.send_get(client, query_parameters='view=shared')
         self._verify_private_account_response(response, requires_parental_consent=True)
 
-        
+
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestAccountAPITransactions(TransactionTestCase):
     """
