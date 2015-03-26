@@ -10,4 +10,3 @@ class Command(BaseCommand):
             raise CommandError("restore_asset_from_trashcan requires one argument: <location>")
 
         restore_asset_from_trashcan(args[0])
-

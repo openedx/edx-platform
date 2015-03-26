@@ -1,9 +1,11 @@
+// lms - base
+// ====================
+
 // html {
 //   overflow-y: scroll;
 // }
 
 html, body {
-  background: $body-bg;
   font-family: $sans-serif;
   font-size: 1em;
   font-style: normal;
@@ -11,17 +13,25 @@ html, body {
   //-webkit-font-smoothing: antialiased;
 }
 
+html{
+  background: white;
+}
+
+body {
+  background: $body-bg;
+}
+
 h1, h2, h3, h4, h5, h6 {
   color: $base-font-color;
   font: normal 1.2em/1.2em $serif;
-  margin: 0px;
+  margin: 0;
 }
 
 h1 {
   color: $base-font-color;
   font: normal 2em/1.4em $sans-serif;
   letter-spacing: 1px;
-  margin-bottom: 30px;
+  margin-bottom: ($baseline*1.5);
   text-align: center;
   //text-transform: uppercase;
 }
@@ -30,19 +40,19 @@ h2 {
   color: $lighter-base-font-color;
   font: normal 1.2em/1.2em $serif;
   letter-spacing: 1px;
-  margin-bottom: 15px;
+  margin-bottom: ($baseline*0.75);
   text-transform: uppercase;
   -webkit-font-smoothing: antialiased;
 }
 
 p + h2, ul + h2, ol + h2 {
-  margin-top: 40px;
+  margin-top: ($baseline*2);
 }
 
 p {
   color: $base-font-color;
   font: normal 1em/1.6em $serif;
-  margin: 0px;
+  margin: 0;
 }
 
 span {
@@ -55,8 +65,17 @@ span {
   font: inherit;
 }
 
+.text-center {
+  text-align: center;
+}
+
+.text-dark-grey {
+  color: $dark-gray1;
+  font-size: 24px;
+}
+
 p + p, ul + p, ol + p {
-  margin-top: 20px;
+  margin-top: $baseline;
 }
 
 p {
@@ -84,7 +103,7 @@ a:link, a:visited {
   }
 
   &:disabled, &.is-disabled, &.disabled {
-    pointer-events: none;
+    @extend %ui-disabled;
     opacity: 0.5;
     cursor: not-allowed;
   }
@@ -106,9 +125,10 @@ a:focus {
 }
 
 .container {
-  @include clearfix;
+  @include clearfix();
+  @include box-sizing(border-box);
   margin: 0 auto 0;
-  padding: 0px 30px;
+  padding: 0 ($baseline*1.5);
   max-width: grid-width(12);
   min-width: 760px;
   width: flex-grid(12);
@@ -120,10 +140,10 @@ span.edx {
 }
 
 .static-container {
-  @include clearfix;
+  @include clearfix();
   margin: 0 auto 0;
   max-width: 1200px;
-  padding: 60px 0px 120px;
+  padding: ($baseline*3) 0 ($baseline*6);
   width: flex-grid(12);
 
   .inner-wrapper {
@@ -137,24 +157,24 @@ span.edx {
     li {
       color: $base-font-color;
       font: normal 1em/1.4em $serif;
-      margin: 0px;
+      margin: 0;
     }
   }
 
   h1 {
-    margin-bottom: 30px;
+    margin-bottom: ($baseline*1.5);
   }
 
   h1 + hr {
-    margin-bottom: 60px;
+    margin-bottom: ($baseline*3);
   }
 
   p + h2, ul + h2, ol + h2 {
-    margin-top: 40px;
+    margin-top: ($baseline*2);
   }
 
   ul + p, ol + p {
-    margin-top: 20px;
+    margin-top: $baseline;
   }
 }
 
@@ -163,7 +183,7 @@ span.edx {
   left: 50%;
   width: 20px;
   height: 20px;
-  margin-left: -10px;
+  margin-left: -($baseline/2);
   background: url(../images/spinner.gif) no-repeat;
 }
 
@@ -176,8 +196,8 @@ mark {
 
 .site-status {
   display: none;
-  padding: 10px;
-  @include linear-gradient(top, rgba(0, 0, 0, .1), rgba(0, 0, 0, .0));
+  padding: ($baseline/2);
+  @include linear-gradient(top, $shadow-l1, rgba(0, 0, 0, .0));
   background-color: $site-status-color;
   box-shadow: 0 -1px 0 rgba(0, 0, 0, .3) inset;
   font-size: 14px;
@@ -189,7 +209,7 @@ mark {
     display: block;
     width: 27px;
     height: 24px;
-    margin-right: 15px;
+    margin-right: ($baseline*0.75);
     background: url(../images/large-white-error-icon.png) no-repeat;
   }
 
@@ -201,7 +221,7 @@ mark {
 
   p {
     line-height: 1.3;
-    color: #fff;
+    color: $white;
   }
 }
 
@@ -213,7 +233,7 @@ mark {
   border-radius: 0 0 3px 3px;
   background: #f4f4e0;
   color: #3c3c3c;
-  padding: 5px 20px 8px;
+  padding: ($baseline/4) $baseline 8px;
   font-size: 13px;
   text-align: center;
 
@@ -225,17 +245,17 @@ mark {
 .help-tab {
   @include transform(rotate(-90deg));
   @include transform-origin(0 0);
+  @extend %ui-depth2;
   top: 250px;
   left: 0;
   position: fixed;
-  z-index: 99;
 
   a:link, a:visited {
     cursor: pointer;
-    border: 1px solid #ccc;
+    border: 1px solid $gray-l3;
     border-top-style: none;
-    border-radius: 0px 0px 10px 10px;
-    background: transparentize(#fff, 0.25);
+    border-radius: 0 0 ($baseline/2) ($baseline/2);
+    background: transparentize($white, 0.25);
     color: transparentize(#333, 0.25);
     font-weight: bold;
     text-decoration: none;
@@ -243,36 +263,36 @@ mark {
     display: inline-block;
 
     &:hover, &:focus {
-      color: #fff;
+      color: $white;
       background: $link-color;
     }
   }
 }
 
 .help-buttons {
-  padding: 10px 50px;
+  padding: ($baseline/2) ($baseline*2.5);
 
   a:link, a:visited {
-    padding: 15px 0px;
+    padding: ($baseline*0.75) 0;
     text-align: center;
     cursor: pointer;
-    background: #fff;
+    background: $white;
     text-decoration: none;
     display: block;
-    border: 1px solid #ccc;
+    border: 1px solid $gray-l3;
 
     &#feedback_link_problem {
       border-bottom-style: none;
-      border-radius: 10px 10px 0px 0px;
+      border-radius: ($baseline/2) ($baseline/2) 0 0;
     }
 
     &#feedback_link_question {
       border-top-style: none;
-      border-radius: 0px 0px 10px 10px;
+      border-radius: 0 0 ($baseline/2) ($baseline/2);
     }
 
     &:hover, &:focus {
-      color: #fff;
+      color: $white;
       background: $link-color;
     }
   }
@@ -289,7 +309,7 @@ mark {
 
 #feedback_success_wrapper {
   p {
-    padding: 0 20px 20px 20px;
+    padding: 0 $baseline $baseline $baseline;
   }
 }
 
@@ -298,6 +318,16 @@ mark {
 // UI - disabled state
 .is-disabled {
   @extend %ui-disabled;
+}
+
+// UI - is hidden
+.is-hidden {
+  display: none;
+}
+
+// UI - is deprecated
+.is-deprecated {
+  @extend %ui-deprecated;
 }
 
 // UI - semantically hide text
@@ -309,8 +339,8 @@ mark {
 .nav-skip {
   display: block;
   position: absolute;
-  left: 0px;
-  top:- ($baseline*30);
+  left: 0;
+  top: -($baseline*30);
   width: 1px;
   height: 1px;
   overflow: hidden;

@@ -6,16 +6,14 @@
   // UI: basic layout
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
-    float: left;
   }
 
   .content-primary {
-    width: flex-grid(9,12);
-    margin-right: flex-gutter();
+    @extend .ui-col-wide;
   }
 
   .content-supplementary {
-    width: flex-grid(3,12);
+    @extend .ui-col-narrow;
   }
 
 
@@ -47,7 +45,7 @@
 
     .action {
 
-      [class^="icon"] {
+      .icon {
         @extend %t-icon2;
         display: inline-block;
         vertical-align: middle;
@@ -98,7 +96,7 @@
     h2 {
       @extend %t-title5;
       @extend %t-strong;
-      margin-bottom: 20px;
+      margin-bottom: $baseline;
     }
 
     strong {
@@ -106,7 +104,7 @@
     }
 
     p + p {
-      margin-top: 20px;
+      margin-top: $baseline;
     }
 
     ul {
@@ -134,13 +132,13 @@
       h2 {
         @extend %t-title4;
         @extend %t-light;
-        margin-bottom: 30px;
+        margin-bottom: ($baseline*1.5);
       }
 
       .error-block {
         @extend %t-copy-sub1;
         display: none;
-        margin-bottom: 15px;
+        margin-bottom: ($baseline*0.75);
       }
 
       .error-block {
@@ -155,7 +153,7 @@
 
       .message-status {
         @extend %t-copy-sub2;
-        margin-top: 10px;
+        margin-top: ($baseline/2);
       }
 
       .progress-bar {
@@ -178,7 +176,7 @@
         width: 0%;
         height: 30px;
         background: $blue;
-        color: #fff;
+        color: $white;
         line-height: 48px;
       }
     }

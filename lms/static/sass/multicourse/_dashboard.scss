@@ -2,33 +2,13 @@
 // ====================
 
 .dashboard {
-  @include clearfix;
+  @include clearfix();
   padding: ($baseline*2) 0 0 0;
 
-  .dashboard-banner {
-    background: $yellow;
-    border: 1px solid rgb(200,200,200);
-    box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
-    padding: 10px;
-    margin-bottom: 30px;
-
-    &:empty {
-      display: none;
-      background-color: #FFF;
-    }
-
-    h2 {
-      margin-bottom: 0;
-    }
-
-    p {
-      margin-bottom: 0;
-    }
-  }
-
   .profile-sidebar {
-    float: left;
-    margin-right: flex-gutter();
+    background: transparent;
+    @include float(left);
+    @include margin-right(flex-gutter());
     width: flex-grid(3);
     background: transparent;
     box-shadow: 0 0 1px $shadow-l1;
@@ -42,8 +22,8 @@
 
       h1.user-name {
         overflow: hidden;
-        margin: 0px;
-        padding: ($baseline*.75) ($baseline/2);
+        margin: 0;
+        padding: ($baseline*0.75) ($baseline/2);
         color: $base-font-color;
         text-transform: none;
         text-wrap: nowrap;
@@ -53,12 +33,12 @@
     }
 
     .user-info {
-      @include clearfix;
+      @include clearfix();
 
       > ul {
         @include box-sizing(border-box);
-        @include clearfix;
-        margin: 0px;
+        @include clearfix();
+        margin: 0;
         border: 1px solid $border-color-2;
         border-top: none;
         border-radius: 0 0 ($baseline/4) ($baseline/4);
@@ -67,10 +47,10 @@
         background: $white;
 
         li {
-          @include clearfix;
+          @include clearfix();
           border-bottom: 1px dotted $border-color-2;
           list-style: none;
-          margin-bottom: 15px;
+          margin-bottom: ($baseline*0.75);
           padding-bottom: 17px;
 
           &:last-child {
@@ -122,7 +102,7 @@
                 display: inline-block;
                 color: $gray-l2;
 
-                .icon-link {
+                .fa-link {
                   color: $base-font-color;
                 }
 
@@ -148,6 +128,13 @@
             }
           }
         }
+
+        li.order-history {
+          span a {
+            font-size: 13px;
+            line-height: 20px;
+          }
+        }
       }
 
       .reverify-status-list {
@@ -160,25 +147,25 @@
           border-bottom: 0;
           padding: 0;
 
-          [class^="icon-"] {
+          .icon {
             display: inline-block;
             vertical-align: top;
             margin: ($baseline/10) ($baseline/4) 0 0;
           }
 
-          &.is-open [class^="icon-"] {
+          &.is-open .icon {
             color: $action-primary-bg;
           }
 
-          &.is-pending [class^="icon-"] {
+          &.is-pending .icon {
             color: $warning-color;
           }
 
-          &.is-approved [class^="icon-"] {
+          &.is-approved .icon {
             color: $success-color;
           }
 
-          &.is-denied [class^="icon-"] {
+          &.is-denied .icon {
             color: $alert-color;
           }
 
@@ -198,7 +185,7 @@
     }
 
     .news-carousel {
-      @include clearfix;
+      @include clearfix();
       margin: 30px 10px 0;
       border: 1px solid $border-color-2;
       background: $dashboard-profile-color;
@@ -209,7 +196,7 @@
       }
 
       header {
-        @include clearfix;
+        @include clearfix();
         height: 50px;
       }
 
@@ -241,7 +228,7 @@
 
       h4 {
         float: left;
-        margin-left: 15px;
+        margin-left: ($baseline*0.75);
         font-size: 15px;
         line-height: 48px;
         font-weight: 700;
@@ -269,7 +256,7 @@
 
       .news-image {
         height: 180px;
-        margin-bottom: 15px;
+        margin-bottom: ($baseline*0.75);
 
         img {
           width: 100%;
@@ -279,7 +266,7 @@
 
       h5 {
         margin-bottom: 8px;
-        margin-left: 5px;
+        margin-left: ($baseline/4);
 
         a {
           font-size: 16px;
@@ -288,7 +275,7 @@
       }
 
       .excerpt {
-        margin-left: 5px;
+        margin-left: ($baseline/4);
         font-size: 13px;
         padding-bottom: 40px;
       }
@@ -299,13 +286,13 @@
 
   // course listings
   .my-courses {
-    float: left;
-    margin: 0px;
+    @include float(left);
+    margin: 0;
     width: flex-grid(9);
 
     > header {
       border-bottom: 1px solid $border-color-2;
-      margin-bottom: 30px;
+      margin-bottom: ($baseline*1.5);
     }
 
     .empty-dashboard-message {
@@ -315,7 +302,7 @@
       p {
         color: $lighter-base-font-color;
         font-style: italic;
-        margin-bottom: 20px;
+        margin-bottom: $baseline;
         text-shadow: 0 1px rgba(255,255,255, 0.6);
       }
 
@@ -325,13 +312,13 @@
         background-color: $button-bg-color;
         border: 1px solid $border-color-2;
         border-radius: 4px;
-        box-shadow: 0 1px 8px 0 rgba(0,0,0, 0.1);
+        box-shadow: 0 1px 8px 0 $shadow-l1;
         @include box-sizing(border-box);
         color: $base-font-color;
         font-family: $sans-serif;
         display: inline-block;
         letter-spacing: 1px;
-        margin-left: 5px;
+        margin-left: ($baseline/4);
         padding: 5px 10px;
         text-shadow: 0 1px rgba(255,255,255, 0.6);
 
@@ -376,12 +363,12 @@
         @include transition(all 0.15s linear 0s);
         overflow: hidden;
         position: relative;
-        float: left;
+        @include float(left);
         height: 100%;
         max-height: 100%;
         width: 200px;
         height: 120px;
-        margin: 0px;
+        margin: 0;
         border-radius: ($baseline/10);
         border: 1px solid $dashboard-course-cover-border;
         border-bottom: 4px solid $dashboard-course-cover-border;
@@ -394,8 +381,8 @@
       }
 
       .info {
-        @include clearfix;
-        padding: 0 10px 0 230px;
+        @include clearfix();
+        @include padding(0, 10px, 0, 230px);
 
         > hgroup {
           padding: 0;
@@ -414,7 +401,7 @@
           .date-block {
             position: absolute;
             top: 0;
-            right: 0;
+            @include right(0);
             font-family: $sans-serif;
             font-size: 13px;
             font-style: italic;
@@ -423,7 +410,7 @@
 
           h3 a, h3 span {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: ($baseline/2);
             font-family: $sans-serif;
             font-size: 34px;
             line-height: 42px;
@@ -441,7 +428,7 @@
           box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
           margin-top: 17px;
           margin-right: flex-gutter();
-          padding: 5px;
+          padding: ($baseline/4);
           width: flex-grid(8);
           float: left;
           @include box-sizing(border-box);
@@ -455,7 +442,7 @@
         }
 
         .course-status-completed {
-          background: #ccc;
+          background: $gray-l3;
           color: $very-light-text;
 
           p {
@@ -472,7 +459,7 @@
           @include box-sizing(border-box);
           border-radius: 3px;
           display: block;
-          float: left;
+          @include float(left);
           font: normal 15px/1.6rem $sans-serif;
           letter-spacing: 0;
           padding: 6px 32px 7px;
@@ -495,11 +482,22 @@
         }
       }
 
+      .prerequisites {
+        @include clearfix;
+
+        .tip {
+          font-family: $sans-serif;
+          font-size: 1em;
+          color: $lighter-base-font-color;
+          margin-top: ($baseline/2);
+        }
+      }
+
       // "enrolled as" status
       .sts-enrollment {
         position: absolute;
         top: 105px;
-        left: 0;
+        @include left(0);
         display: inline-block;
         text-align: center;
         width: 200px;
@@ -508,11 +506,21 @@
           @extend %text-sr;
         }
 
+        .deco-graphic {
+          position: absolute;
+          top: -5px;
+          right: -8px;
+        }
+
         .sts-enrollment-value {
           @extend %ui-depth1;
           @extend %copy-badge;
+          font-size: 0.6em;
+          line-height: 1.5em;
+          font-weight: 600;
           border-radius: 0;
-          padding: ($baseline/4) ($baseline/2) ($baseline/4) ($baseline/2);
+          padding: 1px ($baseline/2);
+          color: white;
         }
       }
 
@@ -529,10 +537,6 @@
 
         // course enrollment status message
         .sts-enrollment {
-          position: absolute;
-          left: 30px;
-          width: auto;
-
           .label {
             @extend %text-sr;
           }
@@ -540,7 +544,6 @@
           // status message
           .sts-enrollment-value {
             background: $professional-color-lvl3;
-            color: tint($professional-color-lvl1, 95%);
           }
         }
       }
@@ -550,16 +553,12 @@
 
         // changes to cover
         .cover {
-          border-color: $verified-color-lvl3;
+          border-color: $verified-color-lvl1;
           padding: ($baseline/10);
         }
 
         // course enrollment status message
         .sts-enrollment {
-          position: absolute;
-          left: 55px;
-          width: auto;
-
           .label {
             @extend %text-sr;
           }
@@ -568,15 +567,13 @@
             @extend %ui-depth3;
             width: 40px;
             position: absolute;
-            left: -30px;
-            top: -10px;
+            top: -4px;
+            right: -6px;
           }
 
           // status message
           .sts-enrollment-value {
-            padding: ($baseline/4) ($baseline/2) ($baseline/4) $baseline;
-            background: $verified-color-lvl3;
-            color: tint($verified-color-lvl1, 85%);
+            background: $verified-color-lvl1;
           }
         }
       }
@@ -593,7 +590,6 @@
         // status message
         .sts-enrollment-value {
           background: $honorcode-color-lvl1;
-          color: tint($honorcode-color-lvl1, 85%);
         }
       }
 
@@ -609,7 +605,6 @@
         // status message
         .sts-enrollment-value {
           background: $audit-color-lvl1;
-          color: shade($audit-color-lvl1, 33%);
         }
       }
     }
@@ -618,15 +613,15 @@
 
     // UI: message
     .message {
-      @include clearfix;
+      @include clearfix();
       border-radius: 3px;
       display: none;
       z-index: 10;
       margin: $baseline 0 ($baseline/2) 0;
-      padding: ($baseline*0.75) $baseline;
+      padding: ($baseline*0.5) $baseline;
       font-family: $sans-serif;
       background: tint($yellow,70%);
-      border: 1px solid #ccc;
+      border: 1px solid $gray-l3;
 
       // STATE: shown
       &.is-shown {
@@ -646,7 +641,7 @@
       }
 
       .actions {
-        @include clearfix;
+        @include clearfix();
         list-style: none;
         margin: 0;
         padding: 0;
@@ -654,8 +649,9 @@
 
       .message-title,
       .message-copy .title {
-        @extend %t-title5;
+        @extend %t-title6;
         @extend %t-weight4;
+        line-height: 1em;
         margin-bottom: ($baseline/4);
       }
 
@@ -675,7 +671,7 @@
           }
 
           .message-title .value, .message-copy {
-            @include transition(color 0.25s ease-in-out 0s);
+            @include transition(color $tmg-f2 ease-in-out 0s);
           }
 
           // STATE: hover
@@ -689,7 +685,7 @@
         }
 
         .wrapper-extended {
-          @include transition(opacity 0.25s ease-in-out 0);
+          @include transition(opacity $tmg-f2 ease-in-out 0);
           display: none;
           opacity: 0.0;
         }
@@ -721,13 +717,20 @@
         }
 
         .ui-toggle-expansion {
-          @include transition(all 0.25s ease-in-out 0s);
-          @include transform(rotate(-90deg));
+          @include transition(all $tmg-f2 ease-in-out 0s);
           @include transform-origin(50% 50%);
           @include font-size(21);
           display: inline-block;
           vertical-align: middle;
           margin-right: ($baseline/4);
+
+          @include rtl {
+            @include transform(rotate(90deg));
+          }
+
+          @include ltr {
+            @include transform(rotate(-90deg));
+          }
         }
 
         .message-copy {
@@ -782,7 +785,7 @@
     // TYPE: status
     .message-status {
       background: tint($yellow,70%);
-      border-color: #ccc;
+      border-color: $gray-l3;
 
       .message-copy {
         @extend %t-copy-sub1;
@@ -849,14 +852,14 @@
       &.exam-register {
 
         .message-copy {
-          margin-top: 5px;
+          margin-top: ($baseline/4);
           width: 55%;
         }
       }
 
       &.exam-schedule {
         .exam-button {
-          margin-top: 5px;
+          margin-top: ($baseline/4);
         }
       }
 
@@ -872,7 +875,7 @@
 
       .button {
         display: inline-block;
-        margin-top: 10px;
+        margin-top: ($baseline/2);
         padding: 9px 18px 10px;
         font-size: 13px;
         font-weight: bold;
@@ -906,10 +909,34 @@
           }
         }
       }
+
+      .verification-reminder {
+        width: flex-grid(8, 12);
+        position: relative;
+        float: left;
+      }
+
+      .verification-cta {
+        width: flex-grid(4, 12);
+        position: relative;
+        float: left;
+
+        .cta {
+          @include button(simple, $green-d1);
+          @include box-sizing(border-box);
+          @include float(right);
+          border-radius: 3px;
+          display: block;
+          font: normal 15px/1.6rem $sans-serif;
+          letter-spacing: 0;
+          padding: 6px 32px 7px;
+          text-align: center;
+        }
+      }
     }
 
     a.unenroll {
-      float: right;
+      @include float(right);
       display: block;
       font-style: italic;
       color: $lighter-base-font-color;
@@ -924,7 +951,7 @@
 
     a.email-settings {
       @extend a.unenroll;
-      margin-right: 10px;
+      @include margin-right(10px);
     }
   }
 
@@ -1111,7 +1138,7 @@
    p.course-block{
     border-style: solid;
     border-color: #E3DC86;
-    padding: 5px;
+    padding: ($baseline/4);
     border-width: 1px;
     background: #FDFBE4;
 
@@ -1157,7 +1184,7 @@
   }
   a.disable-look-settings{
     @extend a.disable-look-unregister;
-      margin-right: 10px;
+      margin-right: ($baseline/2);
     }
 
   }
@@ -1165,4 +1192,79 @@
     @extend .cover;
     opacity: 0.5;
   }
+
+.dashboard-banner {
+
+  &:empty {
+    display: none;
+  }
+
+  .wrapper-msg {
+    padding-bottom: 0;
+
+    .msg {
+      @include clearfix();
+      font-family: $sans-serif;
+      padding-bottom: $baseline;
+      border-bottom: thin solid $gray;
+
+      &.title {
+        @extend %t-title5;
+        @extend %t-weight4;
+        font-family: $f-sans-serif;
+
+        // Overriding Platform h2 styles
+        text-transform: none;
+        letter-spacing: 0;
+      }
+
+      &.has-actions {
+
+        .donate-content {
+          width: flex-grid(8, 12);
+        }
+
+        .donate-actions {
+          width: flex-grid(4, 12);
+          vertical-align: bottom;
+          display: inline-block;
+
+          .monetary-symbol {
+            vertical-align: middle;
+            color: $white;
+            font-weight: 600;
+          }
+
+          .amount {
+            height: 40px;
+            width: 80px;
+            vertical-align: middle;
+            text-align: left;
+            border: 2px solid $white;
+
+            &.validation-error {
+              border: 2px solid $error-color;
+            }
+          }
+
+          .action-donate {
+            @extend %btn-primary-blue;
+            vertical-align: middle;
+            padding-top: ($baseline/2);
+            padding-bottom: ($baseline/2);
+            text-shadow: none;
+            text-transform: none;
+            letter-spacing: 0;
+            color: $white;
+            font-weight: 600;
+          }
+
+          .donation-error-msg {
+            padding: ($baseline/2) 0;
+          }
+        }
+      }
+    }
+  }
+}
 

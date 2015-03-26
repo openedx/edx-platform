@@ -17,7 +17,7 @@ body.discussion, .discussion-module {
 
     .post-header-actions {
       display: inline-block;
-      float: right;
+      @include float(right);
       vertical-align: middle;
       width: flex-grid(3,12);
     }
@@ -44,7 +44,7 @@ body.discussion, .discussion-module {
 
     .response-header-actions {
       width: flex-grid(3,12);
-      float: right;
+      @include float(right);
     }
   }
 
@@ -69,7 +69,7 @@ body.discussion, .discussion-module {
     }
 
     .comment-form {
-      @include clearfix;
+      @include clearfix();
 
       .comment-form-input {
         padding: ($baseline/4) ($baseline/2);

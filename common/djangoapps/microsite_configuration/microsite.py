@@ -47,6 +47,15 @@ def get_value(val_name, default=None):
     return configuration.get(val_name, default)
 
 
+def has_override_value(val_name):
+    """
+    Returns True/False whether a Microsite has a definition for the
+    specified named value
+    """
+    configuration = get_configuration()
+    return val_name in configuration
+
+
 def get_template_path(relative_path):
     """
     Returns a path (string) to a Mako template, which can either be in
@@ -63,7 +72,7 @@ def get_template_path(relative_path):
         search_path = os.path.join(microsite_template_path, relative_path)
 
         if os.path.isfile(search_path):
-            path = '{0}/templates/{1}'.format(
+            path = '/{0}/templates/{1}'.format(
                 get_value('microsite_name'),
                 relative_path
             )

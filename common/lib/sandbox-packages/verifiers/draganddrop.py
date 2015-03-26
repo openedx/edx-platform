@@ -21,7 +21,7 @@ or:
         { "molecule": "[100, 200]"  },
                 ]
 }
-values are (x,y) coordinates of centers of dragged images.
+values are (x, y) coordinates of centers of dragged images.
 """
 
 import json
@@ -77,7 +77,7 @@ class PositionsCompare(list):
                 list or string::
                     "abc" - target
                     [10, 20] - list of integers
-                    [[10,20], 200] list of list and integer
+                    [[10, 20], 200] list of list and integer
 
     """
     def __eq__(self, other):
@@ -98,7 +98,7 @@ class PositionsCompare(list):
             return False
 
         if (isinstance(self[0], (list, int, float)) and
-            isinstance(other[0], (list, int, float))):
+                isinstance(other[0], (list, int, float))):
             return self.coordinate_positions_compare(other)
 
         elif (isinstance(self[0], (unicode, str)) and
@@ -191,7 +191,7 @@ class DragAndDrop(object):
                             self.user_positions[index]['user'], flag=rule):
                         return False
             if not rules_executed:  # no correct rules for current group
-            # probably xml content mistake - wrong rules names
+                # probably xml content mistake - wrong rules names
                 return False
 
         return True
@@ -223,10 +223,10 @@ class DragAndDrop(object):
                 Examples:
 
                      - many draggables per position:
-                    user ['1','2','2','2'] is 'anyof' equal to ['1', '2', '3']
+                    user ['1', '2', '2', '2'] is 'anyof' equal to ['1', '2', '3']
 
                      - draggables can be placed in any order:
-                    user ['1','2','3','4'] is 'anyof' equal to ['4', '2', '1', 3']
+                    user ['1', '2', '3', '4'] is 'anyof' equal to ['4', '2', '1', 3']
 
             'unordered_equal' is same as 'exact' but disregards on order
 
@@ -235,7 +235,7 @@ class DragAndDrop(object):
         Equality functon depends on type of element. They declared in
         PositionsCompare class. For position like targets
         ids ("t1", "t2", etc..) it is string equality function. For coordinate
-        positions ([1,2] or [[1,2], 15]) it is coordinate_positions_compare
+        positions ([1, 2] or [[1, 2], 15]) it is coordinate_positions_compare
         function (see docstrings in PositionsCompare class)
 
         Args:
@@ -352,8 +352,10 @@ class DragAndDrop(object):
         # correct_answer entries.  If the draggable is mentioned in at least one
         # correct_answer entry, the value is False.
         # default to consider every user answer excess until proven otherwise.
-        self.excess_draggables = dict((users_draggable.keys()[0],True)
-            for users_draggable in user_answer)
+        self.excess_draggables = dict(
+            (users_draggable.keys()[0], True)
+            for users_draggable in user_answer
+        )
 
         # Convert nested `user_answer` to flat format.
         user_answer = flat_user_answer(user_answer)
@@ -368,7 +370,8 @@ class DragAndDrop(object):
                 if draggable_name in answer['draggables']:
                     user_groups_data.append(draggable_name)
                     user_positions_data.append(
-                                            draggable_dict[draggable_name])
+                        draggable_dict[draggable_name]
+                    )
                     # proved that this is not excess
                     self.excess_draggables[draggable_name] = False
 
@@ -414,8 +417,8 @@ def grade(user_input, correct_answer):
                         'rule': 'anyof'
                     },
                     {
-                        'draggables': ['l1_c','l8_c'],
-                        'targets': ['t5_c','t6_c'],
+                        'draggables': ['l1_c', 'l8_c'],
+                        'targets': ['t5_c', 't6_c'],
                         'rule': 'anyof'
                     }
                     ]

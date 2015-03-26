@@ -44,9 +44,9 @@ class InternationalizationTest(ModuleStoreTestCase):
         self.client = AjaxEnabledTestClient()
         self.client.login(username=self.uname, password=self.password)
 
-        resp = self.client.get_html('/course/')
+        resp = self.client.get_html('/home/')
         self.assertContains(resp,
-                            '<h1 class="page-header">My Courses</h1>',
+                            '<h1 class="page-header">Studio Home</h1>',
                             status_code=200,
                             html=True)
 
@@ -55,13 +55,14 @@ class InternationalizationTest(ModuleStoreTestCase):
         self.client = AjaxEnabledTestClient()
         self.client.login(username=self.uname, password=self.password)
 
-        resp = self.client.get_html('/course/',
-                               {},
-                               HTTP_ACCEPT_LANGUAGE='en'
-                               )
+        resp = self.client.get_html(
+            '/home/',
+            {},
+            HTTP_ACCEPT_LANGUAGE='en',
+        )
 
         self.assertContains(resp,
-                            '<h1 class="page-header">My Courses</h1>',
+                            '<h1 class="page-header">Studio Home</h1>',
                             status_code=200,
                             html=True)
 
@@ -80,7 +81,7 @@ class InternationalizationTest(ModuleStoreTestCase):
         self.client.login(username=self.uname, password=self.password)
 
         resp = self.client.get_html(
-            '/course/',
+            '/home/',
             {},
             HTTP_ACCEPT_LANGUAGE='eo'
         )

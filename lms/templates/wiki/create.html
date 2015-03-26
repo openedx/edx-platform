@@ -7,7 +7,7 @@
 {% block wiki_contents %}
 
   {% addtoblock "js" %}
-  <script type="text/javascript" src="{{ STATIC_URL }}admin/js/urlify.js "></script>
+  <script type="text/javascript" src="{{ STATIC_URL }}js/vendor/urlify.js "></script>
   <script type="text/javascript">
   //<![CDATA[
   (function($) {
@@ -33,12 +33,12 @@
       {% wiki_form create_form %}
       <div class="form-actions">
           <button type="submit" name="save_changes" class="btn btn-primary btn-large">
-            <i class="icon-plus"></i>
+            <i class="icon fa fa-plus"></i>
             {% trans "Create article" %}
           </button>
 
           <a href="{% url 'wiki:get' path=parent_urlpath.path %}" class="btn btn-large back">
-            <i class="icon-circle-arrow-left"></i>
+            <i class="icon fa fa-circle-arrow-left"></i>
             {% trans "Go back" %}
           </a>
       </div>

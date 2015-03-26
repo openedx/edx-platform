@@ -60,7 +60,12 @@ var ValidatingView = BaseView.extend({
         // Set model field and return the new value.
         this.clearValidationErrors();
         var field = this.selectorToField[event.currentTarget.id];
-        var newVal = $(event.currentTarget).val();
+        var newVal = ''
+        if(event.currentTarget.type == 'checkbox'){
+            newVal = $(event.currentTarget).is(":checked").toString();
+        }else{
+            newVal = $(event.currentTarget).val();
+        }
         this.model.set(field, newVal);
         this.model.isValid();
         return newVal;

@@ -2,7 +2,7 @@
 [run]
 data_file = reports/lms/.coverage
 source = lms,common/djangoapps
-omit = lms/envs/*, common/djangoapps/terrain/*, common/djangoapps/*/migrations/*
+omit = lms/envs/*, common/djangoapps/terrain/*, common/djangoapps/*/migrations/*, openedx/core/djangoapps/*/migrations/*
 
 [report]
 ignore_errors = True

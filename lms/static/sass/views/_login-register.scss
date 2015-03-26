@@ -1,0 +1,532 @@
+// lms - views - login/register view
+// ====================
+@import '../base/grid-settings';
+@import "neat/neat"; // lib - Neat
+
+%heading-4 {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0 !important;
+    color: $m-gray-d2;
+}
+
+%body-text {
+    font-size: 15px;
+    margin: 0 0 $baseline 0;
+    color: $base-font-color;
+    line-height: lh(1);
+}
+
+$sm-btn-google: #dd4b39;
+$sm-btn-facebook: #3b5998;
+$sm-btn-linkedin: #0077b5;
+
+.section-bkg-wrapper {
+    background: $m-gray-l4;
+}
+
+.login-register {
+    @include box-sizing(border-box);
+    @include outer-container;
+    $grid-columns: 12;
+    background: white;
+    min-height: 100%;
+    width: 100%;
+
+    h2 {
+        line-height: 16px;
+        margin: 0;
+        font-family: $sans-serif;
+    }
+
+    /* Temp. fix until applied globally */
+    > {
+        @include box-sizing(border-box);
+    }
+
+
+    /* Remove autocomplete yellow background */
+    input:-webkit-autofill {
+        -webkit-box-shadow:0 0 0 50px white inset;
+        -webkit-text-fill-color: #333;
+    }
+
+    input:-webkit-autofill:focus {
+        -webkit-box-shadow: white, 0 0 0 50px white inset;
+        -webkit-text-fill-color: #333;
+    }
+
+    .header {
+        @include outer-container;
+        border-bottom: 1px solid $gray-l4;
+        width: 100%;
+        padding-top: 35px;
+        padding-bottom: 35px;
+        overflow: hidden;
+
+        .headline {
+            @include box-sizing(border-box);
+            @include font-size(35);
+            padding: 0 10px;
+            font-family: $sans-serif;
+            font-weight: $font-semibold;
+            text-align: left;
+            margin-bottom: 0;
+            color: $m-blue-d5;
+        }
+
+        .tagline {
+            @include box-sizing(border-box);
+            @include font-size(24);
+            padding: 0 10px;
+            font-family: $sans-serif;
+            font-weight: $font-regular;
+        }
+    }
+
+    form {
+        border: 1px solid $gray-l4;
+        border-radius: 5px;
+        padding: 0 25px;
+    }
+
+    .section-title {
+        position: relative;
+        height: 16px;
+        margin: 20px 0 10px;
+
+        &.lines {
+            margin-bottom: 20px;
+
+            &:after {
+                content: '';
+                width: 100%;
+                height: 1px;
+                background: $gray-l4;
+                position: absolute;
+                left: 0;
+                top: 12px;
+                z-index: 5;
+            }
+        }
+
+        h2 {
+            text-align: center;
+
+            .text {
+                position: relative;
+                background: white;
+                padding: 0 10px;
+                z-index: 6;
+                text-transform: none;
+                font-size: 0.7em;
+                font-weight: 600;
+            }
+        }
+    }
+
+    .nav-btn {
+        margin: 0 28px;
+        padding: 7px 0;
+        width: calc( 100% - 56px );
+        border: 3px solid $m-blue-d5;
+        border-radius: 5px;
+        color: $m-blue-d5;
+        box-shadow: none;
+        text-shadow: none;
+        text-transform: none;
+        background: white;
+
+        &:hover {
+            background: white;
+            border-color: $m-blue-d6;
+            color: $m-blue-d6;
+        }
+
+        &:active {
+            box-shadow: none;
+        }
+    }
+
+    .form-type {
+        @include box-sizing(border-box);
+        width: 330px;
+        margin: 0 auto;
+    }
+
+    .note {
+        @extend %t-copy-sub2;
+        display: block;
+        font-weight: normal;
+        color: $gray;
+        margin: 10px;
+        color: $m-gray-l1;
+        text-align: center;
+    }
+
+
+    /** The forms **/
+    .form-wrapper {
+        padding-top: 25px;
+
+        form {
+            @include clearfix();
+            clear: both;
+        }
+    }
+
+    .login-form {
+        margin-bottom: $baseline;
+    }
+
+    .password-reset-form {
+        padding-bottom: 25px;
+    }
+
+    %bold-label {
+        @include font-size(16);
+        font-family: $sans-serif;
+        font-weight: $font-semibold;
+        font-style: normal;
+        text-transform: none;
+    }
+
+    .form-label {
+        @extend %bold-label;
+        padding: 0 0 0 5px;
+        letter-spacing: 1px;
+    }
+
+    .action-label {
+        @include font-size(13);
+        font-family: $sans-serif;
+        font-weight: regular;
+        font-style: normal;
+        text-transform: none;
+    }
+
+    .form-field {
+        @include clearfix();
+        clear: both;
+        position: relative;
+        width: 100%;
+        margin: 0 0 5px 0;
+
+        &.select-gender {
+            margin-right: 20px;
+        }
+
+        &.select-gender,
+        &.select-year_of_birth {
+            width: calc( 50% - 10px );
+            float: left;
+            clear: none;
+        }
+
+        /** FROM _accounts.scss - start **/
+        label,
+        input,
+        textarea {
+            border-radius: 0;
+            height: auto;
+            font-family: $sans-serif;
+            font-style: normal;
+            font-weight: 500;
+            font-size: 0.8em;
+            line-height: 1.5em;
+            color: $base-font-color;
+        }
+
+        label {
+            @include transition(color 0.15s ease-in-out 0s);
+            margin: 0 0 6px 0;
+            color: tint($black, 20%);
+            font-weight: $font-semibold;
+
+            &.inline {
+                display: inline;
+            }
+
+            &.error {
+                color: $red;
+            }
+
+            &[for="register-honor_code"] {
+                display: block;
+                margin: -30px 5% 15px;
+                width: 90%;
+                text-align: center;
+            }
+
+            a {
+                font-family: $sans-serif;
+            }
+        }
+
+        .field-link {
+            position: absolute;
+            top: 0;
+            right: 0;
+            color: $m-blue-d5;
+            font-weight: $font-regular;
+            text-decoration: none !important; // needed but nasty
+            font-family: $sans-serif;
+            font-size: 0.8em;
+            padding-top: 7px;
+        }
+
+        input,
+        textarea {
+            display: block;
+            width: 100%;
+            margin: 0 0 ($baseline/4);
+            padding: 0 ($baseline/2);
+
+            &.long {
+                width: 100%;
+            }
+
+            &.short {
+                width: 25%;
+            }
+
+            &.checkbox {
+                display: inline;
+                width: auto;
+                margin-right: ($baseline/4);
+            }
+
+            &.error {
+                border-color: tint($red,50%);
+            }
+        }
+
+        input {
+            height: 32px;
+        }
+
+        textarea {
+            resize: none;
+
+            &.long {
+                height: ($baseline*5);
+            }
+        }
+
+        select {
+            width: 100%;
+
+            &.error {
+                border-color: tint($red,50%);
+            }
+        }
+        /** FROM _accounts.scss - end **/
+    }
+
+    .input-block {
+        width: 100%;
+    }
+
+    .input-inline {
+        display: inline;
+    }
+
+    .desc {
+        @include transition(color 0.15s ease-in-out 0s);
+        display: block;
+        margin-top: ($baseline/4);
+        color: $lighter-base-font-color;
+        font-size: em(13);
+    }
+
+    .action-primary {
+        width: 100%;
+        height: 38px;
+        text-transform: none;
+        color: white;
+        background: $m-blue-d5;
+        border: 3px solid $m-blue-d6;
+        border-radius: 5px;
+        box-shadow: none;
+        font-weight: 600;
+        text-shadow: none;
+
+        &:hover,
+        &:focus {
+            background: $m-blue-l6;
+        }
+
+        &:active {
+            box-shadow: none;
+        }
+    }
+
+    .login-provider {
+        @extend %btn-secondary-grey-outline;
+        width: 130px;
+        padding: 0 0 0 ($baseline*2);
+        height: 34px;
+        text-align: left;
+        text-shadow: none;
+        text-transform: none;
+        position: relative;
+        font-size: 0.8em;
+        border-color: $lightGrey1;
+
+        &:nth-of-type(odd) {
+            margin-right: 13px;
+        }
+
+        .icon {
+            color: white;
+            position: absolute;
+            top: -1px;
+            left: 0;
+            width: 30px;
+            height: 34px;
+            line-height: 34px;
+            text-align: center;
+        }
+
+        &:hover,
+        &:focus {
+            .icon {
+                height: 32px;
+                line-height: 32px;
+                top: 0;
+            }
+        }
+
+        &:last-child {
+            margin-bottom: $baseline;
+        }
+
+        &.button-Google {
+            color: $sm-btn-google;
+
+            .icon {
+                background: $sm-btn-google;
+            }
+
+            &:hover,
+            &:focus {
+                background-color: $sm-btn-google;
+                border: 1px solid #A5382B;
+                color: white;
+            }
+
+            &:hover {
+                box-shadow: 0 2px 1px 0 #8D3024;
+            }
+        }
+
+        &.button-Facebook {
+            color: $sm-btn-facebook;
+
+            .icon {
+                background: $sm-btn-facebook;
+            }
+
+            &:hover,
+            &:focus {
+                background-color: $sm-btn-facebook;
+                border: 1px solid #263A62;
+                color: white;
+            }
+
+            &:hover {
+                box-shadow: 0 2px 1px 0 #30487C;
+            }
+        }
+
+        &.button-LinkedIn {
+            color: $sm-btn-linkedin;
+
+            .icon {
+                background: $sm-btn-linkedin;
+            }
+
+            &:hover,
+            &:focus {
+                background-color: $sm-btn-linkedin;
+                border: 1px solid #06527D;
+                color: white;
+            }
+
+            &:hover {
+                box-shadow: 0 2px 1px 0 #005D8E;
+            }
+        }
+
+    }
+
+    /** Error Container - from _account.scss **/
+    .status {
+        @include box-sizing(border-box);
+        margin: 0 0 25px 0;
+        border-bottom: 3px solid shade($yellow, 10%);
+        padding: 25px;
+        background: tint($yellow,20%);
+
+        .message-title {
+            @extend %heading-4;
+            font-family: $sans-serif;
+            margin: 0 0 ($baseline/4) 0;
+            font-size: em(14);
+            font-weight: 600;
+        }
+
+        .message-copy,
+        .message-copy p {
+            @extend %body-text;
+            font-family: $sans-serif;
+            margin: 0 !important;
+            padding: 0;
+
+            li {
+                margin: 0 0 ($baseline/4) $baseline;
+            }
+        }
+    }
+
+    .submission-error, .system-error {
+        box-shadow: inset 0 -1px 2px 0 tint($red, 85%);
+        border-bottom: 3px solid shade($red, 10%);
+        background: tint($red,95%);
+
+        .message-title {
+            color: shade($red, 10%) !important;
+        }
+
+        .message-copy {
+
+        }
+    }
+
+    .submission-success {
+        box-shadow: inset 0 -1px 2px 0 tint($green, 85%);
+        border-bottom: 3px solid shade($green, 10%);
+        background: tint($green, 95%);
+
+        .message-title {
+            color: shade($green, 10%) !important;
+        }
+
+        .message-copy {
+
+        }
+    }
+
+    @include media( max-width 330px) {
+        .form-type {
+            width: 98%;
+            margin: 0 1%;
+        }
+
+        .login-provider {
+            width: 100%;
+            margin: 10px 0;
+        }
+    }
+}

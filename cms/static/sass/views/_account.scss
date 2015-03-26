@@ -37,7 +37,7 @@
       .action {
         @extend %t-action3;
         position: absolute;
-        right: 0;
+        @include right(0);
         top: 40%;
       }
     }
@@ -50,12 +50,10 @@
 
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
-    float: left;
   }
 
   .content-primary {
-    width: flex-grid(8, 12);
-    margin-right: flex-gutter();
+    @extend .ui-col-wide;
 
     form {
       @include box-sizing(border-box);
@@ -82,9 +80,7 @@
       }
 
       .list-input {
-        margin: 0;
-        padding: 0;
-        list-style: none;
+        @extend %cont-no-list;
 
         .field {
           margin: 0 0 ($baseline*0.75) 0;
@@ -211,7 +207,7 @@
   }
 
   .content-supplementary {
-    width: flex-grid(4, 12);
+    @extend .ui-col-narrow;
 
     .bit {
       @extend %t-copy-sub1;
@@ -243,7 +239,7 @@
       @extend %t-action3;
       position: absolute;
       top: 0;
-      right: 0;
+      @include right(0);
     }
   }
 }

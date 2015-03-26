@@ -12,15 +12,15 @@ from django.utils.translation import ugettext as _
 <div class="wrapper-content wrapper">
   <section class="content">
     <header>
-      <h1 class="title title-1">${_("Sign In to edX Studio")}</h1>
-      <a href="${reverse('signup')}" class="action action-signin">${_("Don't have a Studio Account? Sign up!")}</a>
+      <h1 class="title title-1">${_("Sign In to {studio_name}").format(studio_name=settings.STUDIO_NAME)}</h1>
+      <a href="${reverse('signup')}" class="action action-signin">${_("Don't have a {studio_name} Account? Sign up!").format(studio_name=settings.STUDIO_SHORT_NAME)}</a>
     </header>
 
     <article class="content-primary" role="main">
       <form id="login_form" method="post" action="login_post">
 
         <fieldset>
-          <legend class="sr">${_("Required Information to Sign In to edX Studio")}</legend>
+          <legend class="sr">${_("Required Information to Sign In to {studio_name}").format(studio_name=settings.STUDIO_NAME)}</legend>
 
           <ol class="list-input">
             <li class="field text required" id="field-email">
@@ -37,7 +37,7 @@ from django.utils.translation import ugettext as _
         </fieldset>
 
         <div class="form-actions">
-          <button type="submit" id="submit" name="submit" class="action action-primary">${_("Sign In to edX Studio")}</button>
+          <button type="submit" id="submit" name="submit" class="action action-primary">${_("Sign In to {studio_name}").format(studio_name=settings.STUDIO_NAME)}</button>
         </div>
 
         <!-- no honor code for CMS, but need it because we're using the lms student object -->
@@ -45,54 +45,25 @@ from django.utils.translation import ugettext as _
       </form>
     </article>
 
-    <aside class="content-supplementary" role="complimentary">
-      <h2 class="sr">${_("Studio Support")}</h2>
+    % if settings.TENDER_DOMAIN:
+      <aside class="content-supplementary" role="complementary">
+        <h2 class="sr">${_("{studio_name} Support").format(studio_name=settings.STUDIO_SHORT_NAME)}</h2>
 
-      <div class="bit">
-        <h3 class="title-3">${_("Need Help?")}</h3>
-        <p>${_('Having trouble with your account? Use {link_start}our support center{link_end} to look over self help steps, find solutions others have found to the same problem, or let us know of your issue.').format(link_start='<a href="http://help.edge.edx.org" rel="external">', link_end='</a>')}</p>
-      </div>
-    </aside>
+        <div class="bit">
+          <h3 class="title-3">${_("Need Help?")}</h3>
+          <p>${_('Having trouble with your account? Use {link_start}our support center{link_end} to look over self help steps, find solutions others have found to the same problem, or let us know of your issue.').format(
+              link_start='<a href="http://{domain}" rel="external">'.format(domain=settings.TENDER_DOMAIN),
+              link_end='</a>',
+            )}</p>
+        </div>
+      </aside>
+    % endif
   </section>
 </div>
 </%block>
 
-<%block name="jsextra">
-<script type="text/javascript">
-require(["jquery", "jquery.cookie", "utility"], function($) {
-  function postJSON(url, data, callback) {
-    $.ajax({type:'POST',
-      url: url,
-      dataType: 'json',
-      data: data,
-      success: callback,
-      headers : {'X-CSRFToken':$.cookie('csrftoken')}
-    });
-  }
-
-  $('form#login_form').submit(function(e) {
-    e.preventDefault();
-    var submit_data = $('#login_form').serialize();
-
-    postJSON('/login_post',
-      submit_data,
-      function(json) {
-        if(json.success) {
-          var next = /next=([^&]*)/g.exec(decodeURIComponent(window.location.search));
-          if (next && next.length > 1 && !isExternal(next[1])) {
-            location.href = next[1];
-          }
-          else location.href = "${reverse('homepage')}";
-        } else if($('#login_error').length == 0) {
-          $('#login_form').prepend('<div id="login_error" class="message message-status error">' + json.value + '</span></div>');
-          $('#login_error').addClass('is-shown');
-        } else {
-          $('#login_error').stop().addClass('is-shown');
-          $('#login_error').html(json.value);
-        }
-      }
-    );
+<%block name="requirejs">
+  require(["js/factories/login"], function(LoginFactory) {
+      LoginFactory("${reverse('homepage')}");
   });
-});
-</script>
 </%block>

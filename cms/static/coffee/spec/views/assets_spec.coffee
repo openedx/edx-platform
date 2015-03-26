@@ -1,5 +1,5 @@
-define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
-($, jasmine, create_sinon, Squire) ->
+define ["jquery", "jasmine", "js/common_helpers/ajax_helpers", "squire"],
+($, jasmine, AjaxHelpers, Squire) ->
 
     feedbackTpl = readFixtures('system-feedback.underscore')
     assetLibraryTpl = readFixtures('asset-library.underscore')
@@ -48,9 +48,12 @@ define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
 
                     @collection = new AssetCollection([@model])
                     @collection.url = "assets-url"
-                    @view = new AssetView({model: @model})
+                    @createAssetView = (test) =>
+                        view = new AssetView({model: @model})
+                        requests = if test then AjaxHelpers["requests"](test) else null
+                        return {view: view, requests: requests}
 
-            waitsFor (=> @view), "AssetView was not created", 1000
+            waitsFor (=> @createAssetView), "AssetsView Creation function was not initialized", 1000
 
         afterEach ->
             @injector.clean()
@@ -58,10 +61,12 @@ define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
 
         describe "Basic", ->
             it "should render properly", ->
+                {view: @view, requests: requests} = @createAssetView()
                 @view.render()
                 expect(@view.$el).toContainText("test asset")
 
             it "should pop a delete confirmation when the delete button is clicked", ->
+                {view: @view, requests: requests} = @createAssetView()
                 @view.render().$(".remove-asset-button").click()
                 expect(@promptSpies.constructor).toHaveBeenCalled()
                 ctorOptions = @promptSpies.constructor.mostRecentCall.args[0]
@@ -72,7 +77,7 @@ define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
 
         describe "AJAX", ->
             it "should destroy itself on confirmation", ->
-                requests = create_sinon["requests"](this)
+                {view: @view, requests: requests} = @createAssetView(this)
 
                 @view.render().$(".remove-asset-button").click()
                 ctorOptions = @promptSpies.constructor.mostRecentCall.args[0]
@@ -92,7 +97,7 @@ define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
                 expect(@collection.contains(@model)).toBeFalsy()
 
             it "should not destroy itself if server errors", ->
-                requests = create_sinon["requests"](this)
+                {view: @view, requests: requests} = @createAssetView(this)
 
                 @view.render().$(".remove-asset-button").click()
                 ctorOptions = @promptSpies.constructor.mostRecentCall.args[0]
@@ -106,7 +111,7 @@ define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
                 expect(@collection.contains(@model)).toBeTruthy()
 
             it "should lock the asset on confirmation", ->
-                requests = create_sinon["requests"](this)
+                {view: @view, requests: requests} = @createAssetView(this)
 
                 @view.render().$(".lock-checkbox").click()
                 # AJAX request has been sent, but not yet returned
@@ -115,7 +120,7 @@ define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
                 expect(@savingSpies.constructor).toHaveBeenCalled()
                 expect(@savingSpies.show).toHaveBeenCalled()
                 savingOptions = @savingSpies.constructor.mostRecentCall.args[0]
-                expect(savingOptions.title).toMatch("Saving...")
+                expect(savingOptions.title).toMatch("Saving")
                 expect(@model.get("locked")).toBeFalsy()
                 # return a success response
                 requests[0].respond(200)
@@ -123,7 +128,7 @@ define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
                 expect(@model.get("locked")).toBeTruthy()
 
             it "should not lock the asset if server errors", ->
-                requests = create_sinon["requests"](this)
+                {view: @view, requests: requests} = @createAssetView(this)
 
                 @view.render().$(".lock-checkbox").click()
                 # return an error response
@@ -138,6 +143,7 @@ define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
             appendSetFixtures($("<script>", {id: "asset-tpl", type: "text/template"}).text(assetTpl))
             appendSetFixtures($("<script>", {id: "paging-header-tpl", type: "text/template"}).text(pagingHeaderTpl))
             appendSetFixtures($("<script>", {id: "paging-footer-tpl", type: "text/template"}).text(pagingFooterTpl))
+            appendSetFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(feedbackTpl))
             window.analytics = jasmine.createSpyObj('analytics', ['track'])
             window.course_location_analytics = jasmine.createSpy()
             appendSetFixtures(sandbox({id: "asset_table_body"}))
@@ -182,12 +188,16 @@ define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
                     @AssetModel = AssetModel
                     @collection = new AssetCollection();
                     @collection.url = "assets-url"
-                    @view = new AssetsView
-                        collection: @collection
-                        el: $('#asset_table_body')
-                    @view.render()
+                    @createAssetsView = (test) =>
+                        requests = AjaxHelpers.requests(test)
+                        view = new AssetsView
+                            collection: @collection
+                            el: $('#asset_table_body')
+                        view.render()
+                        return {view: view, requests: requests}
 
-            waitsFor (=> @view), "AssetsView was not created", 1000
+
+            waitsFor (=> @createAssetsView), "AssetsView Creation function was not initialized", 2000
 
             $.ajax()
 
@@ -207,7 +217,7 @@ define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
                 thumbnail: null
                 id: 'idx'
             @view.addAsset(model)
-            create_sinon.respondWithJson(requests,
+            AjaxHelpers.respondWithJson(requests,
                 {
                     assets: [
                         @mockAsset1, @mockAsset2,
@@ -230,11 +240,9 @@ define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
 
         describe "Basic", ->
             # Separate setup method to work-around mis-parenting of beforeEach methods
-            setup = ->
-                requests = create_sinon.requests(this)
+            setup = (requests) ->
                 @view.setPage(0)
-                create_sinon.respondWithJson(requests, @mockAssetsResponse)
-                return requests
+                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
 
             $.fn.fileupload = ->
                 return ''
@@ -243,56 +251,63 @@ define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
                 $(html_selector).click()
 
             it "should show upload modal on clicking upload asset button", ->
+                {view: @view, requests: requests} = @createAssetsView(this)
                 spyOn(@view, "showUploadModal")
-                setup.call(this)
+                setup.call(this, requests)
                 expect(@view.showUploadModal).not.toHaveBeenCalled()
                 @view.showUploadModal(clickEvent(".upload-button"))
                 expect(@view.showUploadModal).toHaveBeenCalled()
 
             it "should show file selection menu on choose file button", ->
+                {view: @view, requests: requests} = @createAssetsView(this)
                 spyOn(@view, "showFileSelectionMenu")
-                setup.call(this)
+                setup.call(this, requests)
                 expect(@view.showFileSelectionMenu).not.toHaveBeenCalled()
                 @view.showFileSelectionMenu(clickEvent(".choose-file-button"))
                 expect(@view.showFileSelectionMenu).toHaveBeenCalled()
 
             it "should hide upload modal on clicking close button", ->
+                {view: @view, requests: requests} = @createAssetsView(this)
                 spyOn(@view, "hideModal")
-                setup.call(this)
+                setup.call(this, requests)
                 expect(@view.hideModal).not.toHaveBeenCalled()
                 @view.hideModal(clickEvent(".close-button"))
                 expect(@view.hideModal).toHaveBeenCalled()
 
             it "should show a status indicator while loading", ->
+                {view: @view, requests: requests} = @createAssetsView(this)
                 appendSetFixtures('<div class="ui-loading"/>')
                 expect($('.ui-loading').is(':visible')).toBe(true)
-                setup.call(this)
+                setup.call(this, requests)
                 expect($('.ui-loading').is(':visible')).toBe(false)
 
             it "should hide the status indicator if an error occurs while loading", ->
-                requests = create_sinon.requests(this)
+                {view: @view, requests: requests} = @createAssetsView(this)
                 appendSetFixtures('<div class="ui-loading"/>')
                 expect($('.ui-loading').is(':visible')).toBe(true)
                 @view.setPage(0)
-                create_sinon.respondWithError(requests)
+                AjaxHelpers.respondWithError(requests)
                 expect($('.ui-loading').is(':visible')).toBe(false)
 
             it "should render both assets", ->
-                requests = setup.call(this)
+                {view: @view, requests: requests} = @createAssetsView(this)
+                setup.call(this, requests)
                 expect(@view.$el).toContainText("test asset 1")
                 expect(@view.$el).toContainText("test asset 2")
 
             it "should remove the deleted asset from the view", ->
-                requests = setup.call(this)
+                {view: @view, requests: requests} = @createAssetsView(this)
+                setup.call(this, requests)
                 # Delete the 2nd asset with success from server.
                 @view.$(".remove-asset-button")[1].click()
                 @promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(@promptSpies)
-                req.respond(200) for req in requests
+                req.respond(200) for req in requests.slice(1)
                 expect(@view.$el).toContainText("test asset 1")
                 expect(@view.$el).not.toContainText("test asset 2")
 
             it "does not remove asset if deletion failed", ->
-                requests = setup.call(this)
+                {view: @view, requests: requests} = @createAssetsView(this)
+                setup.call(this, requests)
                 # Delete the 2nd asset, but mimic a failure from the server.
                 @view.$(".remove-asset-button")[1].click()
                 @promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(@promptSpies)
@@ -301,13 +316,15 @@ define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
                 expect(@view.$el).toContainText("test asset 2")
 
             it "adds an asset if asset does not already exist", ->
-                requests = setup.call(this)
+                {view: @view, requests: requests} = @createAssetsView(this)
+                setup.call(this, requests)
                 addMockAsset.call(this, requests)
                 expect(@view.$el).toContainText("new asset")
                 expect(@collection.models.length).toBe(3)
 
             it "does not add an asset if asset already exists", ->
-                setup.call(this)
+                {view: @view, requests: requests} = @createAssetsView(this)
+                setup.call(this, requests)
                 spyOn(@collection, "add").andCallThrough()
                 model = @collection.models[1]
                 @view.addAsset(model)
@@ -315,46 +332,48 @@ define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
 
         describe "Sorting", ->
             # Separate setup method to work-around mis-parenting of beforeEach methods
-            setup = ->
-                requests = create_sinon.requests(this)
+            setup = (requests) ->
                 @view.setPage(0)
-                create_sinon.respondWithJson(requests, @mockAssetsResponse)
-                return requests
+                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
 
             it "should have the correct default sort order", ->
-                requests = setup.call(this)
+                {view: @view, requests: requests} = @createAssetsView(this)
+                setup.call(this, requests)
                 expect(@view.sortDisplayName()).toBe("Date Added")
                 expect(@view.collection.sortDirection).toBe("desc")
 
             it "should toggle the sort order when clicking on the currently sorted column", ->
-                requests = setup.call(this)
+                {view: @view, requests: requests} = @createAssetsView(this)
+                setup.call(this, requests)
                 expect(@view.sortDisplayName()).toBe("Date Added")
                 expect(@view.collection.sortDirection).toBe("desc")
                 @view.$("#js-asset-date-col").click()
-                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
                 expect(@view.sortDisplayName()).toBe("Date Added")
                 expect(@view.collection.sortDirection).toBe("asc")
                 @view.$("#js-asset-date-col").click()
-                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
                 expect(@view.sortDisplayName()).toBe("Date Added")
                 expect(@view.collection.sortDirection).toBe("desc")
 
             it "should switch the sort order when clicking on a different column", ->
-                requests = setup.call(this)
+                {view: @view, requests: requests} = @createAssetsView(this)
+                setup.call(this, requests)
                 @view.$("#js-asset-name-col").click()
-                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
                 expect(@view.sortDisplayName()).toBe("Name")
                 expect(@view.collection.sortDirection).toBe("asc")
                 @view.$("#js-asset-name-col").click()
-                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
                 expect(@view.sortDisplayName()).toBe("Name")
                 expect(@view.collection.sortDirection).toBe("desc")
 
             it "should switch sort to most recent date added when a new asset is added", ->
-                requests = setup.call(this)
+                {view: @view, requests: requests} = @createAssetsView(this)
+                setup.call(this, requests)
                 @view.$("#js-asset-name-col").click()
-                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
                 addMockAsset.call(this, requests)
-                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
                 expect(@view.sortDisplayName()).toBe("Date Added")
                 expect(@view.collection.sortDirection).toBe("desc")

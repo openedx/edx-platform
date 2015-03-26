@@ -36,7 +36,7 @@ class UtilTest(unittest.TestCase):
         self.assertTrue(result)
         result = compare_with_tolerance(110.1, 100.0, '10.0', False)
         self.assertFalse(result)
-         # Test relative tolerance (string)
+        # Test relative tolerance (string)
         result = compare_with_tolerance(111.0, 100.0, '0.1', True)
         self.assertTrue(result)
         result = compare_with_tolerance(112.0, 100.0, '0.1', True)
@@ -46,7 +46,7 @@ class UtilTest(unittest.TestCase):
         self.assertTrue(result)
         result = compare_with_tolerance(110.1, 100.0, 10.0, False)
         self.assertFalse(result)
-         # Test relative tolerance (float)
+        # Test relative tolerance (float)
         result = compare_with_tolerance(111.0, 100.0, 0.1, True)
         self.assertTrue(result)
         result = compare_with_tolerance(112.0, 100.0, 0.1, True)
@@ -81,7 +81,6 @@ class UtilTest(unittest.TestCase):
         self.assertFalse(result)
         result = compare_with_tolerance(infinity, infinity, '1.0', False)
         self.assertTrue(result)
-
 
     def test_sanitize_html(self):
         """

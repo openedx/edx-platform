@@ -1,4 +1,4 @@
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 
 from lettuce import step
 from lettuce import world
@@ -34,6 +34,12 @@ def reset_captured_events(_scenario):
 @before.outline
 def reset_between_outline_scenarios(_scenario, order, outline, reasons_to_fail):
     world.event_collection.drop()
+
+
+@step(r'[aA]n? course url "(.*)" event is emitted$')
+def course_url_event_is_emitted(_step, url_regex):
+    event_type = url_regex.format(world.scenario_dict['COURSE'].id)
+    n_events_are_emitted(_step, 1, event_type, "server")
 
 
 @step(r'([aA]n?|\d+) "(.*)" (server|browser) events? is emitted$')

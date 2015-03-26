@@ -122,7 +122,7 @@ class CorrectMap(object):
             return npoints
         elif self.is_correct(answer_id):
             return 1
-         # if not correct and no points have been assigned, return 0
+        # if not correct and no points have been assigned, return 0
         return 0
 
     def set_property(self, answer_id, property, value):
@@ -164,7 +164,6 @@ class CorrectMap(object):
             raise Exception('CorrectMap.update called with invalid argument %s' % other_cmap)
         self.cmap.update(other_cmap.get_dict())
         self.set_overall_message(other_cmap.get_overall_message())
-
 
     def set_overall_message(self, message_str):
         """ Set a message that applies to the question as a whole,

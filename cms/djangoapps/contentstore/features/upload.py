@@ -1,5 +1,5 @@
-# pylint: disable=C0111
-# pylint: disable=W0621
+# pylint: disable=missing-docstring
+# pylint: disable=redefined-outer-name
 
 from lettuce import world, step
 from lettuce.django import django_url
@@ -10,7 +10,7 @@ import random
 import os
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment
-from nose.tools import assert_equal, assert_not_equal  # pylint: disable=E0611
+from nose.tools import assert_equal, assert_not_equal  # pylint: disable=no-name-in-module
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 ASSET_NAMES_CSS = 'td.name-col > span.title > a.filename'
@@ -185,7 +185,13 @@ def open_course_with_locked(step, lock_state):
 
 @step(u'Then the asset is (viewable|protected)$')
 def view_asset(_step, status):
-    url = django_url('/c4x/MITx/999/asset/asset.html')
+    asset_loc = world.scenario_dict['COURSE'].id.make_asset_key(asset_type='asset', path='asset.html')
+    svr_loc = django_url()
+    asset_url = unicode(asset_loc)
+    divider = '/'
+    if asset_url[0] == '/':
+        divider = ''
+    url = '{}{}{}'.format(svr_loc, divider, asset_url)
     if status == 'viewable':
         expected_text = 'test file'
     else:

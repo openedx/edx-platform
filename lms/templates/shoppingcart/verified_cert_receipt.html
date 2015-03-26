@@ -13,23 +13,21 @@
 % endif
 
 <div class="container">
-  <section class="wrapper cart-list">
+  <section class="wrapper">
 
     <header class="page-header">
       <h2 class="title">
-        <span class="sts-label">${_("You are now registered for: ")}</span>
 
         <span class="wrapper-sts">
-          <span class="sts-course">
-            <span class="sts-course-org">${course_org}</span>
-            <span class="sts-course-number">${course_num}</span>
-            <span class="sts-course-name">${course_name}</span>
-          </span>
+          <span class="sts-label">${_("You are now registered for: ")}</span>
+          <span class="sts-course-org">${course_org}</span>
+          <span class="sts-course-number">${course_num}</span>
+          <span class="sts-course-name">${course_name}</span>
+        </span>
 
-          <span class="sts-track">
-            <span class="sts-track-value">
-              <span class="context">${_("Registered as: ")}</span> ${_("ID Verified")}
-            </span>
+        <span class="sts-track">
+          <span class="sts-track-value">
+            <span class="context">${_("Registered as: ")}</span> ${_("ID Verified")}
           </span>
         </span>
       </h2>
@@ -67,7 +65,7 @@
 
           <li class="progress-step progress-step-icon" id="progress-step5">
             <span class="wrapper-step-number"><span class="step-number">
-              <i class="icon-ok"></i>
+              <i class="icon fa fa-check-square-o"></i>
             </span></span>
             <span class="step-name"><span class="sr">${_("Current Step: ")}</span>${_("Confirmation")}</span>
           </li>
@@ -103,7 +101,7 @@
                 </thead>
 
                 <tbody>
-                  % for item in order_items:
+                  % for item, course in shoppingcart_items:
                   <tr>
                     <td>${item.line_desc}</td>
                     <td>
@@ -158,7 +156,7 @@
                 </thead>
 
                 <tbody>
-                  % for item in order_items:
+                  % for item, course in shoppingcart_items:
                   <tr>
                     % if item.status == "purchased":
                     <td>${order.id}</td>

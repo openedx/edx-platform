@@ -35,7 +35,7 @@ describe "XBlock", ->
       window.initFnZ = jasmine.createSpy()
 
       @fakeChildren = ['list', 'of', 'children']
-      spyOn(XBlock, 'initializeBlocks').andReturn(@fakeChildren)
+      spyOn(XBlock, 'initializeXBlocks').andReturn(@fakeChildren)
 
       @vANode = $('#vA')[0]
       @vZNode = $('#vZ')[0]
@@ -50,8 +50,8 @@ describe "XBlock", ->
       expect(TestRuntime.vZ).toHaveBeenCalledWith()
 
     it "loads the right init function", ->
-      expect(window.initFnA).toHaveBeenCalledWith(@runtimeA, @vANode)
-      expect(window.initFnZ).toHaveBeenCalledWith(@runtimeZ, @vZNode)
+      expect(window.initFnA).toHaveBeenCalledWith(@runtimeA, @vANode, {})
+      expect(window.initFnZ).toHaveBeenCalledWith(@runtimeZ, @vZNode, {})
 
     it "loads when missing versions", ->
       expect(@missingVersionBlock.element).toBe($('#missing-version'))
@@ -74,8 +74,8 @@ describe "XBlock", ->
       expect(@missingInitBlock.element).toBe($('#missing-init')[0])
 
     it "passes through the request token", ->
-      expect(XBlock.initializeBlocks).toHaveBeenCalledWith($(@vANode), 'req-token-a')
-      expect(XBlock.initializeBlocks).toHaveBeenCalledWith($(@vZNode), 'req-token-z')
+      expect(XBlock.initializeXBlocks).toHaveBeenCalledWith($(@vANode), 'req-token-a')
+      expect(XBlock.initializeXBlocks).toHaveBeenCalledWith($(@vZNode), 'req-token-z')
 
 
   describe "initializeBlocks", ->

@@ -16,10 +16,12 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from static_replace import replace_static_urls
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.x_module import STUDENT_VIEW
+from microsite_configuration import microsite
 
 from courseware.access import has_access
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
+from student.models import CourseEnrollment
 import branding
 
 log = logging.getLogger(__name__)
@@ -65,14 +67,21 @@ def get_course_by_id(course_key, depth=0):
 
     depth: The number of levels of children for the modulestore to cache. None means infinite depth
     """
-    course = modulestore().get_course(course_key, depth=depth)
+    with modulestore().bulk_operations(course_key):
+        course = modulestore().get_course(course_key, depth=depth)
     if course:
         return course
     else:
         raise Http404("Course not found.")
 
 
-def get_course_with_access(user, action, course_key, depth=0):
+class UserNotEnrolled(Http404):
+    def __init__(self, course_key):
+        super(UserNotEnrolled, self).__init__()
+        self.course_key = course_key
+
+
+def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=False):
     """
     Given a course_key, look up the corresponding course descriptor,
     check that the user has the access to perform the specified action
@@ -86,6 +95,11 @@ def get_course_with_access(user, action, course_key, depth=0):
     course = get_course_by_id(course_key, depth=depth)
 
     if not has_access(user, action, course, course_key):
+        if check_if_enrolled and not CourseEnrollment.is_enrolled(user, course_key):
+            # If user is not enrolled, raise UserNotEnrolled exception that will
+            # be caught by middleware
+            raise UserNotEnrolled(course_key)
+
         # Deliberately return a non-specific error message to avoid
         # leaking info about access control settings
         raise Http404("Course not found.")
@@ -220,10 +234,9 @@ def get_course_about_section(course, section_key):
     raise KeyError("Invalid about key " + str(section_key))
 
 
-def get_course_info_section(request, course, section_key):
+def get_course_info_section_module(request, course, section_key):
     """
-    This returns the snippet of html to be rendered on the course info page,
-    given the key for the section.
+    This returns the course info module for a given section_key.
 
     Valid keys:
     - handouts
@@ -235,7 +248,8 @@ def get_course_info_section(request, course, section_key):
 
     # Use an empty cache
     field_data_cache = FieldDataCache([], course.id, request.user)
-    info_module = get_module(
+
+    return get_module(
         request.user,
         request,
         usage_key,
@@ -245,8 +259,21 @@ def get_course_info_section(request, course, section_key):
         static_asset_path=course.static_asset_path
     )
 
-    html = ''
 
+def get_course_info_section(request, course, section_key):
+    """
+    This returns the snippet of html to be rendered on the course info page,
+    given the key for the section.
+
+    Valid keys:
+    - handouts
+    - guest_handouts
+    - updates
+    - guest_updates
+    """
+    info_module = get_course_info_section_module(request, course, section_key)
+
+    html = ''
     if info_module is not None:
         try:
             html = info_module.render(STUDENT_VIEW).content
@@ -320,7 +347,13 @@ def get_courses(user, domain=None):
     Returns a list of courses available, sorted by course.number
     '''
     courses = branding.get_visible_courses()
-    courses = [c for c in courses if has_access(user, 'see_exists', c)]
+
+    permission_name = microsite.get_value(
+        'COURSE_CATALOG_VISIBILITY_PERMISSION',
+        settings.COURSE_CATALOG_VISIBILITY_PERMISSION
+    )
+
+    courses = [c for c in courses if has_access(user, permission_name, c)]
 
     courses = sorted(courses, key=lambda course: course.number)
 
@@ -336,6 +369,15 @@ def sort_by_announcement(courses):
     # Sort courses by how far are they from they start day
     key = lambda course: course.sorting_score
     courses = sorted(courses, key=key)
+
+    return courses
+
+
+def sort_by_start_date(courses):
+    """
+    Returns a list of courses sorted by their start date, latest first.
+    """
+    courses = sorted(courses, key=lambda course: (course.start is None, course.start), reverse=False)
 
     return courses
 

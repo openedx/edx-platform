@@ -1,15 +1,15 @@
 .highlighted-courses, .find-courses {
   .courses {
-    @include clearfix;
-    padding: 40px 0px 15px;
+    @include clearfix();
+    padding: ($baseline*2) 0 ($baseline*0.75) ;
 
     .university-column {
       width: flex-grid(4);
-      margin-right: flex-gutter();
+      @include margin-right(flex-gutter());
       float: left;
 
       &:nth-child(3n+3) {
-        margin-right: 0;
+        @include margin-right(0);
       }
     }
 
@@ -21,11 +21,11 @@
 
       .courses-listing-item {
         width: flex-grid(4);
-        margin-right: flex-gutter();
-        float: left;
+        @include margin-right(flex-gutter());
+        @include float(left);
 
         &:nth-child(3n+3) {
-          margin-right: 0;
+          @include margin-right(0);
         }
       }
     }
@@ -36,22 +36,22 @@
       border-radius: 2px;
       @include box-sizing(border-box);
       box-shadow: 0 1px 10px 0 rgba(0,0,0, 0.15), inset 0 0 0 1px rgba(255,255,255, 0.9);
-      margin-bottom: 30px;
+      margin-bottom: ($baseline*1.5);
       position: relative;
       width: 100%;
       @include transition(all 0.15s linear 0s);
 
       .status {
+        @extend %ui-depth3;
         background: $link-color;
         color: white;
         font-size: 10px;
         left: 10px;
-        padding: 2px 10px;
+        padding: 2px ($baseline/2);
         border-radius: 2px;
         position: absolute;
         text-transform: uppercase;
         top: -6px;
-        z-index: 100;
       }
 
       .status:after {
@@ -81,7 +81,7 @@
         border: 1px solid rgba(0,0,0, 0.5);
         @include border-right-radius(2px);
         box-shadow: 0 1px 5px 0 rgba(0,0,0, 0.15);
-        @include clearfix;
+        @include clearfix();
         position: absolute;
         right: -4px;
         @include transition(all 0.15s linear 0s);
@@ -167,7 +167,7 @@
             font: bold 1.6em/1.2em $sans-serif;
             height: 100%;
             opacity: 0.6;
-            padding-top: 10px;
+            padding-top: ($baseline/2);
             position: absolute;
             right: 0px;
             text-align: center;
@@ -213,7 +213,7 @@
           section {
             color: $base-font-color;
             font: normal 1em/1.6em $serif;
-            margin: 0px;
+            margin: 0;
             height: 100%;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -232,8 +232,8 @@
 
           .start-date  {
             border-left: 1px solid $border-color-2;
-            margin-left: 5px;
-            padding-left: 10px;
+            margin-left: ($baseline/4);
+            padding-left: ($baseline/2);
             color: $lighter-base-font-color;
             letter-spacing: 1px;
           }

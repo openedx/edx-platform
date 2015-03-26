@@ -1,0 +1,52 @@
+<div class="status submission-error hidden" aria-live="polite">
+    <h4 class="message-title"><%- gettext("We couldn't create your account.") %></h4>
+    <ul class="message-copy"></ul>
+</div>
+
+<form id="register" autocomplete="off">
+    <% if (context.currentProvider) { %>
+        <div class="status" aria-hidden="false">
+            <p class="message-copy">
+                <%- _.sprintf( gettext("You've successfully signed into %(currentProvider)s."), context ) %>
+                <%- _.sprintf( gettext("We just need a little more information before you start learning with %(platformName)s."), context ) %>
+            </p>
+        </div>
+    <% } else {  %>
+        <div class="login-providers">
+            <div class="section-title lines">
+                <h2>
+                    <span class="text"><%- gettext("Create an account using") %></span>
+                </h2>
+            </div>
+            <%
+            _.each( context.providers, function( provider) {
+                if ( provider.registerUrl ) { %>
+                    <button type="button" class="button button-primary button-<%- provider.name %> login-provider register-<%- provider.name %>" data-provider-url="<%- provider.registerUrl %>">
+                        <span class="icon fa <%- provider.iconClass %>" aria-hidden="true"></span>
+                        <%- provider.name %>
+                    </button>
+            <%  }
+            }); %>
+        </div>
+    <% } %>
+
+    <div class="section-title lines">
+        <h2>
+            <span class="text"><%- gettext("or create a new one here") %></span>
+        </h2>
+    </div>
+
+    <%= context.fields %>
+
+    <button type="submit" class="action action-primary action-update js-register register-button"><%- gettext("Create your account") %></button>
+    <p class="note">* <%- gettext("Required field") %></p>
+</form>
+
+<div class="toggle-form">
+    <div class="section-title">
+        <h2>
+            <span class="text"><%- gettext("Already have an account?") %></span>
+        </h2>
+    </div>
+    <button class="nav-btn form-toggle" data-type="login"><%- gettext("Sign in") %></button>
+</div>

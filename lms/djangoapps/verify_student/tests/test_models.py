@@ -1,27 +1,29 @@
 # -*- coding: utf-8 -*-
 from datetime import timedelta, datetime
 import json
-from xmodule.modulestore.tests.factories import CourseFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false
-from mock import patch
-import pytz
-from django.test import TestCase
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from django.test.utils import override_settings
-from django.conf import settings
-import requests
 import requests.exceptions
+import pytz
 
+from django.conf import settings
+from django.test import TestCase
+from django.test.utils import override_settings
+from mock import patch
+from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false  # pylint: disable=E0611
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
+from reverification.tests.factories import MidcourseReverificationWindowFactory
 from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+
 from verify_student.models import (
     SoftwareSecurePhotoVerification, VerificationException,
 )
-from reverification.tests.factories import MidcourseReverificationWindowFactory
 
 FAKE_SETTINGS = {
     "SOFTWARE_SECURE": {
-        "FACE_IMAGE_AES_KEY" : "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "FACE_IMAGE_AES_KEY": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
         "API_ACCESS_KEY": "BBBBBBBBBBBBBBBBBBBB",
         "API_SECRET_KEY": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
         "RSA_PUBLIC_KEY": """-----BEGIN PUBLIC KEY-----
@@ -75,6 +77,7 @@ class MockS3Connection(object):
     def get_bucket(self, bucket_name):
         return MockBucket(bucket_name)
 
+
 def mock_software_secure_post(url, headers=None, data=None, **kwargs):
     """
     Mocks our interface when we post to Software Secure. Does basic assertions
@@ -103,6 +106,7 @@ def mock_software_secure_post(url, headers=None, data=None, **kwargs):
 
     return response
 
+
 def mock_software_secure_post_error(url, headers=None, data=None, **kwargs):
     """
     Simulates what happens if our post to Software Secure is rejected, for
@@ -111,6 +115,7 @@ def mock_software_secure_post_error(url, headers=None, data=None, **kwargs):
     response = requests.Response()
     response.status_code = 400
     return response
+
 
 def mock_software_secure_post_unavailable(url, headers=None, data=None, **kwargs):
     """Simulates a connection failure when we try to submit to Software Secure."""
@@ -188,7 +193,7 @@ class TestPhotoVerification(TestCase):
         was when you submitted it.
         """
         user = UserFactory.create()
-        user.profile.name = u"Jack \u01B4" # gratuious non-ASCII char to test encodings
+        user.profile.name = u"Jack \u01B4"  # gratuious non-ASCII char to test encodings
 
         attempt = SoftwareSecurePhotoVerification(user=user)
         user.profile.name = u"Clyde \u01B4"
@@ -377,6 +382,14 @@ class TestPhotoVerification(TestCase):
         reverify_status = SoftwareSecurePhotoVerification.user_status(user=user, window=window)
         self.assertEquals(reverify_status, ('denied', ''))
 
+        reverify_attempt.status = 'approved'
+        # pylint: disable=protected-access
+        reverify_attempt.created_at = SoftwareSecurePhotoVerification._earliest_allowed_date() + timedelta(days=-1)
+        reverify_attempt.save()
+        reverify_status = SoftwareSecurePhotoVerification.user_status(user=user, window=window)
+        message = 'Your {platform_name} verification has expired.'.format(platform_name=settings.PLATFORM_NAME)
+        self.assertEquals(reverify_status, ('expired', message))
+
     def test_display(self):
         user = UserFactory.create()
         window = MidcourseReverificationWindowFactory()
@@ -414,16 +427,95 @@ class TestPhotoVerification(TestCase):
             parsed_error_msg = attempt.parsed_error_msg()
             self.assertEquals(parsed_error_msg, "There was an error verifying your ID photos.")
 
+    def test_active_at_datetime(self):
+        user = UserFactory.create()
+        attempt = SoftwareSecurePhotoVerification.objects.create(user=user)
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+        # Not active before the created date
+        before = attempt.created_at - timedelta(seconds=1)
+        self.assertFalse(attempt.active_at_datetime(before))
+
+        # Active immediately after created date
+        after_created = attempt.created_at + timedelta(seconds=1)
+        self.assertTrue(attempt.active_at_datetime(after_created))
+
+        # Active immediately before expiration date
+        expiration = attempt.created_at + timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+        before_expiration = expiration - timedelta(seconds=1)
+        self.assertTrue(attempt.active_at_datetime(before_expiration))
+
+        # Not active after the expiration date
+        after = expiration + timedelta(seconds=1)
+        self.assertFalse(attempt.active_at_datetime(after))
+
+    def test_verification_for_datetime(self):
+        user = UserFactory.create()
+        now = datetime.now(pytz.UTC)
+
+        # No attempts in the query set, so should return None
+        query = SoftwareSecurePhotoVerification.objects.filter(user=user)
+        result = SoftwareSecurePhotoVerification.verification_for_datetime(now, query)
+        self.assertIs(result, None)
+
+        # Should also return None if no deadline specified
+        query = SoftwareSecurePhotoVerification.objects.filter(user=user)
+        result = SoftwareSecurePhotoVerification.verification_for_datetime(None, query)
+        self.assertIs(result, None)
+
+        # Make an attempt
+        attempt = SoftwareSecurePhotoVerification.objects.create(user=user)
+
+        # Before the created date, should get no results
+        before = attempt.created_at - timedelta(seconds=1)
+        query = SoftwareSecurePhotoVerification.objects.filter(user=user)
+        result = SoftwareSecurePhotoVerification.verification_for_datetime(before, query)
+        self.assertIs(result, None)
+
+        # Immediately after the created date, should get the attempt
+        after_created = attempt.created_at + timedelta(seconds=1)
+        query = SoftwareSecurePhotoVerification.objects.filter(user=user)
+        result = SoftwareSecurePhotoVerification.verification_for_datetime(after_created, query)
+        self.assertEqual(result, attempt)
+
+        # If no deadline specified, should return first available
+        query = SoftwareSecurePhotoVerification.objects.filter(user=user)
+        result = SoftwareSecurePhotoVerification.verification_for_datetime(None, query)
+        self.assertEqual(result, attempt)
+
+        # Immediately before the expiration date, should get the attempt
+        expiration = attempt.created_at + timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+        before_expiration = expiration - timedelta(seconds=1)
+        query = SoftwareSecurePhotoVerification.objects.filter(user=user)
+        result = SoftwareSecurePhotoVerification.verification_for_datetime(before_expiration, query)
+        self.assertEqual(result, attempt)
+
+        # Immediately after the expiration date, should not get the attempt
+        after = expiration + timedelta(seconds=1)
+        query = SoftwareSecurePhotoVerification.objects.filter(user=user)
+        result = SoftwareSecurePhotoVerification.verification_for_datetime(after, query)
+        self.assertIs(result, None)
+
+        # Create a second attempt in the same window
+        second_attempt = SoftwareSecurePhotoVerification.objects.create(user=user)
+
+        # Now we should get the newer attempt
+        deadline = second_attempt.created_at + timedelta(days=1)
+        query = SoftwareSecurePhotoVerification.objects.filter(user=user)
+        result = SoftwareSecurePhotoVerification.verification_for_datetime(deadline, query)
+        self.assertEqual(result, second_attempt)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @patch('verify_student.models.S3Connection', new=MockS3Connection)
 @patch('verify_student.models.Key', new=MockKey)
 @patch('verify_student.models.requests.post', new=mock_software_secure_post)
-class TestMidcourseReverification(TestCase):
+class TestMidcourseReverification(ModuleStoreTestCase):
     """ Tests for methods that are specific to midcourse SoftwareSecurePhotoVerification objects """
+
     def setUp(self):
-        self.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
+        super(TestMidcourseReverification, self).setUp()
+        self.course = CourseFactory.create()
         self.user = UserFactory.create()
 
     def test_user_is_reverified_for_all(self):

@@ -2,12 +2,12 @@
 Define steps for bulk email acceptance test.
 """
 
-# pylint: disable=C0111
-# pylint: disable=W0621
+# pylint: disable=missing-docstring
+# pylint: disable=redefined-outer-name
 
 from lettuce import world, step
 from lettuce.django import mail
-from nose.tools import assert_in, assert_true, assert_equal  # pylint: disable=E0611
+from nose.tools import assert_in, assert_equal  # pylint: disable=no-name-in-module
 from django.core.management import call_command
 from django.conf import settings
 
@@ -106,8 +106,8 @@ def when_i_send_an_email(step, recipient):  # pylint: disable=unused-argument
     )
 
     # Clear the queue of existing emails
-    while not mail.queue.empty():  # pylint: disable=E1101
-        mail.queue.get()  # pylint: disable=E1101
+    while not mail.queue.empty():  # pylint: disable=no-member
+        mail.queue.get()  # pylint: disable=no-member
 
     # Because we flush the database before each run,
     # we need to ensure that the email template fixture
@@ -115,8 +115,9 @@ def when_i_send_an_email(step, recipient):  # pylint: disable=unused-argument
     call_command('loaddata', 'course_email_template.json')
 
     # Go to the email section of the instructor dash
-    world.visit('/courses/edx/888/Bulk_Email_Test_Course')
-    world.css_click('a[href="/courses/edx/888/Bulk_Email_Test_Course/instructor"]')
+    url = '/courses/{}'.format(world.bulk_email_course_key)
+    world.visit(url)
+    world.css_click('a[href="{}/instructor"]'.format(url))
     world.css_click('a[data-section="send_email"]')
 
     # Select the recipient
@@ -155,8 +156,8 @@ def then_the_email_is_sent(step, recipient):  # pylint: disable=unused-argument
     # Retrieve messages.  Because we are using celery in "always eager"
     # mode, we expect all messages to be sent by this point.
     messages = []
-    while not mail.queue.empty():  # pylint: disable=E1101
-        messages.append(mail.queue.get())  # pylint: disable=E1101
+    while not mail.queue.empty():  # pylint: disable=no-member
+        messages.append(mail.queue.get())  # pylint: disable=no-member
 
     # Check that we got the right number of messages
     assert_equal(

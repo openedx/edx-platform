@@ -40,8 +40,11 @@ class StaticContent(object):
 
     @staticmethod
     def generate_thumbnail_name(original_name):
+        name_root, ext = os.path.splitext(original_name)
+        if not ext == XASSET_THUMBNAIL_TAIL_NAME:
+            name_root = name_root + ext.replace(u'.', u'-')
         return u"{name_root}{extension}".format(
-            name_root=os.path.splitext(original_name)[0],
+            name_root=name_root,
             extension=XASSET_THUMBNAIL_TAIL_NAME,)
 
     @staticmethod
@@ -217,7 +220,7 @@ class ContentStore(object):
     def find(self, filename):
         raise NotImplementedError
 
-    def get_all_content_for_course(self, course_key, start=0, maxresults=-1, sort=None):
+    def get_all_content_for_course(self, course_key, start=0, maxresults=-1, sort=None, filter_params=None):
         '''
         Returns a list of static assets for a course, followed by the total number of assets.
         By default all assets are returned, but start and maxresults can be provided to limit the query.
@@ -287,3 +290,10 @@ class ContentStore(object):
                 logging.exception(u"Failed to generate thumbnail for {0}. Exception: {1}".format(content.location, str(e)))
 
         return thumbnail_content, thumbnail_file_location
+
+    def ensure_indexes(self):
+        """
+        Ensure that all appropriate indexes are created that are needed by this modulestore, or raise
+        an exception if unable to.
+        """
+        pass

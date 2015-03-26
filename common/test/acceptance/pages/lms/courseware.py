@@ -3,6 +3,7 @@ Courseware page.
 """
 
 from .course_page import CoursePage
+from selenium.webdriver.common.action_chains import ActionChains
 
 
 class CoursewarePage(CoursePage):
@@ -33,11 +34,18 @@ class CoursewarePage(CoursePage):
         return len(self.q(css=self.subsection_selector))
 
     @property
+    def xblock_components(self):
+        """
+        Return the xblock components within the unit on the page.
+        """
+        return self.q(css=self.xblock_component_selector)
+
+    @property
     def num_xblock_components(self):
         """
         Return the number of rendered xblocks within the unit on the page
         """
-        return len(self.q(css=self.xblock_component_selector))
+        return len(self.xblock_components)
 
     def xblock_component_type(self, index=0):
         """
@@ -60,4 +68,22 @@ class CoursewarePage(CoursePage):
                 (default is 0)
 
         """
-        return self.q(css=self.xblock_component_selector).attrs('innerHTML')[index].strip()
+        # When Student Notes feature is enabled, it looks for the content inside
+        # `.edx-notes-wrapper-content` element (Otherwise, you will get an
+        # additional html related to Student Notes).
+        element = self.q(css='{} .edx-notes-wrapper-content'.format(self.xblock_component_selector))
+        if element.first:
+            return element.attrs('innerHTML')[index].strip()
+        else:
+            return self.q(css=self.xblock_component_selector).attrs('innerHTML')[index].strip()
+
+    def tooltips_displayed(self):
+        """
+        Verify if sequence navigation bar tooltips are being displayed upon mouse hover.
+        """
+        for index, tab in enumerate(self.q(css='#sequence-list > li')):
+            ActionChains(self.browser).move_to_element(tab).perform()
+            if not self.q(css='#tab_{index} > p'.format(index=index)).visible:
+                return False
+
+        return True

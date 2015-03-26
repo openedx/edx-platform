@@ -5,14 +5,14 @@
             ## There is no whitespace between these because the front-end JS code
             ## needs to precisely compute the available width for forum-nav-
             ## browse-current in order to do truncation of topic names.
-            <i class="icon icon-reorder"></i><span class="sr">${_("Discussion topics; current selection is: ")}</span><span class="forum-nav-browse-current">${_("All Discussions")}</span><span class="forum-nav-browse-drop-arrow">▾</span>
+            <i class="icon fa fa-reorder"></i><span class="sr">${_("Discussion topics; current selection is: ")}</span><span class="forum-nav-browse-current">${_("All Discussions")}</span><span class="forum-nav-browse-drop-arrow">▾</span>
         </a>
         <form class="forum-nav-search">
             <div class="forum-nav-search-ff-position-fix">
                 <label>
                     <span class="sr">${_("Search")}</span>
                     <input class="forum-nav-search-input" type="text" placeholder="${_("Search all posts")}">
-                    <i class="icon icon-search"></i>
+                    <i class="icon fa fa-search"></i>
                 </label>
             </div>
         </form>
@@ -37,22 +37,16 @@
                         <option value="flagged">${_("Flagged")}</option>
                     %endif
                 </select>
-            </label>\
-            %if is_course_cohorted and is_moderator:
-## Lack of indentation is intentional to avoid whitespace between this and siblings
-<label class="forum-nav-filter-cohort">
+            </label>${"<% if (isCohorted && isPrivilegedUser) { %>"}<label class="forum-nav-filter-cohort">
                 ## Translators: This labels a cohort menu in forum navigation
                 <span class="sr">${_("Cohort:")}</span>
                 <select class="forum-nav-filter-cohort-control">
-                    <option value="all">${_("in all cohorts")}</option>
+                    <option value="">${_("in all cohorts")}</option>
                         %for c in cohorts:
                             <option value="${c['id']}">${c['name']}</option>
                         %endfor
                 </select>
-            </label>\
-            %endif
-## Lack of indentation is intentional to avoid whitespace between this and siblings
-<label class="forum-nav-sort">
+            </label>${"<% } %>"}<label class="forum-nav-sort">
                 ## Translators: This labels a sort menu in forum navigation
                 <span class="sr">${_("Sort:")}</span>
                 <select class="forum-nav-sort-control">

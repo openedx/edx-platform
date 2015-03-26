@@ -1,6 +1,6 @@
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=W0401, W0614
+# pylint: disable=wildcard-import, unused-wildcard-import
 
 # Settings for edx4edx production instance
 from .aws import *
@@ -16,15 +16,17 @@ PIPELINE_CSS_COMPRESSOR = None
 PIPELINE_JS_COMPRESSOR = None
 
 COURSE_DEFAULT = 'edx4edx'
-COURSE_SETTINGS =  {'edx4edx': {'number' : 'edX.01',
-                                    'title': 'edx4edx: edX Author Course',
-                                    'xmlpath': '/edx4edx/',
-                                    'github_url': 'https://github.com/MITx/edx4edx',
-                                    'active': True,
-                                    'default_chapter': 'Introduction',
-                                    'default_section': 'edx4edx_Course',
-                                    },
-                    }
+COURSE_SETTINGS = {
+    'edx4edx': {
+        'number': 'edX.01',
+        'title': 'edx4edx: edX Author Course',
+        'xmlpath': '/edx4edx/',
+        'github_url': 'https://github.com/MITx/edx4edx',
+        'active': True,
+        'default_chapter': 'Introduction',
+        'default_section': 'edx4edx_Course',
+    },
+}
 
 STATICFILES_DIRS = [
     PROJECT_ROOT / "static",
@@ -33,8 +35,8 @@ STATICFILES_DIRS = [
     ("handouts", DATA_DIR / "handouts"),
     ("subs", DATA_DIR / "subs"),
 
-# This is how you would use the textbook images locally
-#    ("book", ENV_ROOT / "book_images"),
+    # This is how you would use the textbook images locally
+    # ("book", ENV_ROOT / "book_images"),
 ]
 
 MAKO_TEMPLATES['course'] = [DATA_DIR, EDX4EDX_ROOT]

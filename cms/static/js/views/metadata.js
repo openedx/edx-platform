@@ -49,7 +49,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, V
         },
 
         /**
-         * Returns the just the modified metadata values, in the format used to persist to the server.
+         * Returns just the modified metadata values, in the format used to persist to the server.
          */
         getModifiedMetadataValues: function () {
             var modified_values = {};
@@ -104,7 +104,8 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, V
             if (this.model.get('non_editable')) {
                 this.$el.find('#' + this.uniqueId)
                     .prop('readonly', true)
-                    .addClass('is-disabled');
+                    .addClass('is-disabled')
+                    .attr('aria-disabled', true);
             }
         },
 
@@ -285,7 +286,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, V
                 var template = _.template(
                     '<li class="list-settings-item">' +
                         '<input type="text" class="input" value="<%= ele %>">' +
-                        '<a href="#" class="remove-action remove-setting" data-index="<%= index %>"><i class="icon-remove-sign"></i><span class="sr">Remove</span></a>' +
+                        '<a href="#" class="remove-action remove-setting" data-index="<%= index %>"><i class="icon fa fa-remove-sign"></i><span class="sr">Remove</span></a>' +
                     '</li>'
                 );
                 list.append($(template({'ele': ele, 'index': index})));
@@ -298,7 +299,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, V
             // change event
             var list = this.model.get('value') || [];
             this.setValueInEditor(list.concat(['']));
-            this.$el.find('.create-setting').addClass('is-disabled');
+            this.$el.find('.create-setting').addClass('is-disabled').attr('aria-disabled', true);
         },
 
         removeEntry: function(event) {
@@ -306,17 +307,17 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, V
             var entry = $(event.currentTarget).siblings().val();
             this.setValueInEditor(_.without(this.model.get('value'), entry));
             this.updateModel();
-            this.$el.find('.create-setting').removeClass('is-disabled');
+            this.$el.find('.create-setting').removeClass('is-disabled').attr('aria-disabled', false);
         },
 
         enableAdd: function() {
-            this.$el.find('.create-setting').removeClass('is-disabled');
+            this.$el.find('.create-setting').removeClass('is-disabled').attr('aria-disabled', false);
         },
 
         clear: function() {
             AbstractEditor.prototype.clear.apply(this, arguments);
             if (_.isNull(this.model.getValue())) {
-                this.$el.find('.create-setting').removeClass('is-disabled');
+                this.$el.find('.create-setting').removeClass('is-disabled').attr('aria-disabled', false);
             }
         }
     });
@@ -452,7 +453,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, V
                     '<li class="list-settings-item">' +
                         '<input type="text" class="input input-key" value="<%= key %>">' +
                         '<input type="text" class="input input-value" value="<%= value %>">' +
-                        '<a href="#" class="remove-action remove-setting" data-value="<%= value %>"><i class="icon-remove-sign"></i><span class="sr">Remove</span></a>' +
+                        '<a href="#" class="remove-action remove-setting" data-value="<%= value %>"><i class="icon fa fa-remove-sign"></i><span class="sr">Remove</span></a>' +
                     '</li>'
                 );
 
@@ -469,7 +470,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, V
             var dict = $.extend(true, {}, this.model.get('value')) || {};
             dict[''] = '';
             this.setValueInEditor(dict);
-            this.$el.find('.create-setting').addClass('is-disabled');
+            this.$el.find('.create-setting').addClass('is-disabled').attr('aria-disabled', true);
         },
 
         removeEntry: function(event) {
@@ -477,17 +478,17 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, V
             var entry = $(event.currentTarget).siblings('.input-key').val();
             this.setValueInEditor(_.omit(this.model.get('value'), entry));
             this.updateModel();
-            this.$el.find('.create-setting').removeClass('is-disabled');
+            this.$el.find('.create-setting').removeClass('is-disabled').attr('aria-disabled', false);
         },
 
         enableAdd: function() {
-            this.$el.find('.create-setting').removeClass('is-disabled');
+            this.$el.find('.create-setting').removeClass('is-disabled').attr('aria-disabled', false);
         },
 
         clear: function() {
             AbstractEditor.prototype.clear.apply(this, arguments);
             if (_.isNull(this.model.getValue())) {
-                this.$el.find('.create-setting').removeClass('is-disabled');
+                this.$el.find('.create-setting').removeClass('is-disabled').attr('aria-disabled', false);
             }
         }
     });

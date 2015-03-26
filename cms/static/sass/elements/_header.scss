@@ -27,14 +27,14 @@
   }
 
   .wrapper-l {
-    float: left;
+    @include float(left);
     width: flex-grid(7,12);
   }
 
   .wrapper-r {
-    float: right;
+    @include float(right);
     width: flex-grid(4,12);
-    text-align: right;
+    @include text-align(right);
   }
 
   .branding, .info-course, .nav-course, .nav-account, .nav-pitch {
@@ -78,7 +78,7 @@
       @extend %ui-btn-dd-nav-primary;
       @include transition(all $tmg-f2 ease-in-out 0s);
 
-      .label, .icon-caret-down {
+      .label, .fa-caret-down {
 
       }
 
@@ -86,20 +86,20 @@
 
       }
 
-      .icon-caret-down {
+      .fa-caret-down {
         opacity: 0.25;
       }
 
       &:hover {
 
-        .icon-caret-down {
+        .fa-caret-down {
           opacity: 1.0;
         }
       }
 
       .nav-sub .nav-item {
 
-        [class^="icon-"] {
+        .icon {
           display: inline-block;
           vertical-align: middle;
           margin-right: ($baseline/4);
@@ -118,7 +118,7 @@
       display: block;
 
       img {
-        width: 100%;
+        max-height: ($baseline*2);
         display: block;
       }
     }
@@ -128,8 +128,8 @@
 
   // specific elements - course name/info
   .info-course {
-    margin-right: flex-gutter();
-    border-right: 1px solid $gray-l4;
+    @include margin-right(flex-gutter());
+    @include border-right(1px solid $gray-l4);
     padding: ($baseline*0.75) flex-gutter() ($baseline*0.75) 0;
 
     .course-org, .course-number {
@@ -144,7 +144,7 @@
     }
 
     .course-org {
-      margin-right: ($baseline/4);
+      @include margin-right($baseline/4);
     }
 
     .course-title {
@@ -184,7 +184,7 @@
     padding: ($baseline*0.75) 0;
 
     .nav-sub {
-      text-align: left;
+      @include text-align(left);
     }
 
     .nav-account-help {
@@ -201,7 +201,7 @@
 
         > .label {
           display: inline-block;
-          max-width: 85%;
+          max-width: 84%;
           overflow: hidden;
           white-space: nowrap;
           text-overflow: ellipsis;
@@ -237,8 +237,7 @@
   }
 
   .branding {
-    width: 20%;
-    margin-right: 2%;
+    @include margin-right(2%);
   }
 
   .nav-account {
@@ -262,8 +261,7 @@
     }
 
     .branding {
-      width: 20%;
-      margin-right: 2%;
+      @include margin-right(2%);
     }
 
     .info-course {

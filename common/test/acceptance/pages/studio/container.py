@@ -6,7 +6,7 @@ from bok_choy.page_object import PageObject
 from bok_choy.promise import Promise, EmptyPromise
 from . import BASE_URL
 
-from utils import click_css, confirm_prompt
+from .utils import click_css, confirm_prompt, type_in_codemirror
 
 
 class ContainerPage(PageObject):
@@ -16,6 +16,7 @@ class ContainerPage(PageObject):
     NAME_SELECTOR = '.page-header-title'
     NAME_INPUT_SELECTOR = '.page-header .xblock-field-input'
     NAME_FIELD_WRAPPER_SELECTOR = '.page-header .wrapper-xblock-field'
+    ADD_MISSING_GROUPS_SELECTOR = '.notification-action-button[data-notification-action="add-missing-groups"]'
 
     def __init__(self, browser, locator):
         super(ContainerPage, self).__init__(browser)
@@ -50,7 +51,7 @@ class ContainerPage(PageObject):
                 num_wrappers = len(self.q(css='{} [data-request-token="{}"]'.format(XBlockWrapper.BODY_SELECTOR, request_token)).results)
                 # Wait until all components have been loaded and marked as either initialized or failed.
                 # See:
-                #   - common/static/coffee/src/xblock/core.coffee which adds the class "xblock-initialized"
+                #   - common/static/js/xblock/core.js which adds the class "xblock-initialized"
                 #     at the end of initializeBlock.
                 #   - common/static/js/views/xblock.js which adds the class "xblock-initialization-failed"
                 #     if the xblock threw an error while initializing.
@@ -152,6 +153,13 @@ class ContainerPage(PageObject):
         return self.q(css='.bit-publishing .wrapper-visibility .copy .inherited-from').visible
 
     @property
+    def sidebar_visibility_message(self):
+        """
+        Returns the text within the sidebar visibility section.
+        """
+        return self.q(css='.bit-publishing .wrapper-visibility').first.text[0]
+
+    @property
     def publish_action(self):
         """
         Returns the link for publishing a unit.
@@ -169,7 +177,10 @@ class ContainerPage(PageObject):
     @property
     def is_staff_locked(self):
         """ Returns True if staff lock is currently enabled, False otherwise """
-        return 'icon-check' in self.q(css='a.action-staff-lock>i').attrs('class')
+        for attr in self.q(css='a.action-staff-lock>i').attrs('class'):
+            if 'fa-check-square-o' in attr:
+                return True
+        return False
 
     def toggle_staff_lock(self, inherits_staff_lock=False):
         """
@@ -239,21 +250,24 @@ class ContainerPage(PageObject):
         """
         Clicks the "edit" button for the first component on the page.
         """
-        return _click_edit(self)
+        return _click_edit(self, '.edit-button', '.xblock-studio_view')
 
     def add_missing_groups(self):
         """
         Click the "add missing groups" link.
         Note that this does an ajax call.
         """
-        self.q(css='.add-missing-groups-button').first.click()
+        self.q(css=self.ADD_MISSING_GROUPS_SELECTOR).first.click()
+        self.wait_for_ajax()
+
+        # Wait until all xblocks rendered.
         self.wait_for_page()
 
     def missing_groups_button_present(self):
         """
         Returns True if the "add missing groups" button is present.
         """
-        return self.q(css='.add-missing-groups-button').present
+        return self.q(css=self.ADD_MISSING_GROUPS_SELECTOR).present
 
     def get_xblock_information_message(self):
         """
@@ -275,9 +289,11 @@ class XBlockWrapper(PageObject):
     url = None
     BODY_SELECTOR = '.studio-xblock-wrapper'
     NAME_SELECTOR = '.xblock-display-name'
+    VALIDATION_SELECTOR = '.xblock-message.validation'
     COMPONENT_BUTTONS = {
         'basic_tab': '.editor-tabs li.inner_tab_wrap:nth-child(1) > a',
         'advanced_tab': '.editor-tabs li.inner_tab_wrap:nth-child(2) > a',
+        'settings_tab': '.editor-modes .settings-button',
         'save_settings': '.action-save',
     }
 
@@ -306,6 +322,14 @@ class XBlockWrapper(PageObject):
         return self.q(css=self._bounded_selector('.xblock-student_view'))[0].text
 
     @property
+    def author_content(self):
+        """
+        Returns the text content of the xblock as displayed on the container page.
+        (For blocks which implement a distinct author_view).
+        """
+        return self.q(css=self._bounded_selector('.xblock-author_view'))[0].text
+
+    @property
     def name(self):
         titles = self.q(css=self._bounded_selector(self.NAME_SELECTOR)).text
         if titles:
@@ -327,11 +351,68 @@ class XBlockWrapper(PageObject):
             grandkids.extend(descendant.children)
 
         grand_locators = [grandkid.locator for grandkid in grandkids]
-        return [descendant for descendant in descendants if not descendant.locator in grand_locators]
+        return [descendant for descendant in descendants if descendant.locator not in grand_locators]
+
+    @property
+    def has_validation_message(self):
+        """ Is a validation warning/error/message shown? """
+        return self.q(css=self._bounded_selector(self.VALIDATION_SELECTOR)).present
+
+    def _validation_paragraph(self, css_class):
+        """ Helper method to return the <p> element of a validation warning """
+        return self.q(css=self._bounded_selector('{} p.{}'.format(self.VALIDATION_SELECTOR, css_class)))
+
+    @property
+    def has_validation_warning(self):
+        """ Is a validation warning shown? """
+        return self._validation_paragraph('warning').present
+
+    @property
+    def has_validation_error(self):
+        """ Is a validation error shown? """
+        return self._validation_paragraph('error').present
+
+    @property
+    # pylint: disable=invalid-name
+    def has_validation_not_configured_warning(self):
+        """ Is a validation "not configured" message shown? """
+        return self._validation_paragraph('not-configured').present
+
+    @property
+    def validation_warning_text(self):
+        """ Get the text of the validation warning. """
+        return self._validation_paragraph('warning').text[0]
+
+    @property
+    def validation_error_text(self):
+        """ Get the text of the validation error. """
+        return self._validation_paragraph('error').text[0]
+
+    @property
+    def validation_error_messages(self):
+        return self.q(css=self._bounded_selector('{} .xblock-message-item.error'.format(self.VALIDATION_SELECTOR))).text
+
+    @property
+    # pylint: disable=invalid-name
+    def validation_not_configured_warning_text(self):
+        """ Get the text of the validation "not configured" message. """
+        return self._validation_paragraph('not-configured').text[0]
 
     @property
     def preview_selector(self):
         return self._bounded_selector('.xblock-student_view,.xblock-author_view')
+
+    @property
+    def has_group_visibility_set(self):
+        return self.q(css=self._bounded_selector('.wrapper-xblock.has-group-visibility-set')).is_present()
+
+    @property
+    def has_edit_visibility_button(self):
+        """
+        Returns true if this xblock has an 'edit visibility' button
+        :return:
+        """
+        return self.q(css=self._bounded_selector('.visibility-button')).is_present()
 
     def go_to_container(self):
         """
@@ -344,7 +425,13 @@ class XBlockWrapper(PageObject):
         """
         Clicks the "edit" button for this xblock.
         """
-        return _click_edit(self, self._bounded_selector)
+        return _click_edit(self, '.edit-button', '.xblock-studio_view', self._bounded_selector)
+
+    def edit_visibility(self):
+        """
+        Clicks the edit visibility button for this xblock.
+        """
+        return _click_edit(self, '.visibility-button', '.xblock-visibility_view', self._bounded_selector)
 
     def open_advanced_tab(self):
         """
@@ -357,6 +444,34 @@ class XBlockWrapper(PageObject):
         Click on Basic Tab.
         """
         self._click_button('basic_tab')
+
+    def open_settings_tab(self):
+        """
+        If editing, click on the "Settings" tab
+        """
+        self._click_button('settings_tab')
+
+    def set_field_val(self, field_display_name, field_value):
+        """
+        If editing, set the value of a field.
+        """
+        selector = '{} li.field label:contains("{}") + input'.format(self.editor_selector, field_display_name)
+        script = "$(arguments[0]).val(arguments[1]).change();"
+        self.browser.execute_script(script, selector, field_value)
+
+    def reset_field_val(self, field_display_name):
+        """
+        If editing, reset the value of a field to its default.
+        """
+        scope = '{} li.field label:contains("{}")'.format(self.editor_selector, field_display_name)
+        script = "$(arguments[0]).siblings('.setting-clear').click();"
+        self.browser.execute_script(script, scope)
+
+    def set_codemirror_text(self, text, index=0):
+        """
+        Set the text of a CodeMirror editor that is part of this xblock's settings.
+        """
+        type_in_codemirror(self, index, text, find_prefix='$("{}").find'.format(self.editor_selector))
 
     def save_settings(self):
         """
@@ -393,13 +508,13 @@ class XBlockWrapper(PageObject):
         return self.q(css=self._bounded_selector('span.message-text a')).first.text[0]
 
 
-def _click_edit(page_object, bounded_selector=lambda(x): x):
+def _click_edit(page_object, button_css, view_css, bounded_selector=lambda(x): x):
     """
-    Click on the first edit button found and wait for the Studio editor to be present.
+    Click on the first editing button found and wait for the Studio editor to be present.
     """
-    page_object.q(css=bounded_selector('.edit-button')).first.click()
+    page_object.q(css=bounded_selector(button_css)).first.click()
     EmptyPromise(
-        lambda: page_object.q(css='.xblock-studio_view').present,
+        lambda: page_object.q(css=view_css).present,
         'Wait for the Studio editor to be present'
     ).fulfill()
 

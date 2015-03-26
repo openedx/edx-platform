@@ -1,7 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
-<!--TODO replace this with something a clever deisgn person approves of-->
-<!--TODO replace this with a shiny loopy thing to actually print out all courses-->
+## TODO replace this with something a clever deisgn person approves of
+## TODO replace this with a shiny loopy thing to actually print out all courses
 
 % if reverifications["must_reverify"] or reverifications["pending"] or reverifications["denied"] or reverifications["approved"]:
 <li class="status status-verification is-accepted">
@@ -11,25 +11,25 @@
 
     % if reverifications["must_reverify"]:
         % for item in reverifications["must_reverify"]:
-            <li class="status-item is-open"><i class="icon-circle-blank"></i><span class="label">${_('Re-verify now:')}</span> <span class="course-name"><a href="${reverse('verify_student_midcourse_reverify_dash')}">${item.course_name}</span></a></li>
+            <li class="status-item is-open"><i class="icon fa fa-circle-blank"></i><span class="label">${_('Re-verify now:')}</span> <span class="course-name"><a href="${reverse('verify_student_midcourse_reverify_dash')}">${item.course_name}</span></a></li>
         % endfor
     %endif
 
     % if reverifications["pending"]:
         % for item in reverifications["pending"]:
-            <li class="status-item is-pending"><i class="icon-circle-blank"></i><span class="label">${_('Pending:')}</span> <span class="course-name"><a href="${reverse('verify_student_midcourse_reverify_dash')}">${item.course_name}</span></a></li>
+            <li class="status-item is-pending"><i class="icon fa fa-circle-blank"></i><span class="label">${_('Pending:')}</span> <span class="course-name"><a href="${reverse('verify_student_midcourse_reverify_dash')}">${item.course_name}</span></a></li>
         % endfor
     %endif
 
     % if reverifications["denied"]:
         % for item in reverifications["denied"]:
-            <li class="status-item is-denied"><i class="icon-remove-sign"></i><span class="label">${_('Denied:')}</span> <span class="course-name"><a href="${reverse('verify_student_midcourse_reverify_dash')}">${item.course_name}</span></a></li>
+            <li class="status-item is-denied"><i class="icon fa fa-times-circle"></i><span class="label">${_('Denied:')}</span> <span class="course-name"><a href="${reverse('verify_student_midcourse_reverify_dash')}">${item.course_name}</span></a></li>
         % endfor
     %endif
 
     % if reverifications["approved"]:
         % for item in reverifications["approved"]:
-            <li class="status-item is-approved"><i class="icon-ok"></i><span class="label">${_('Approved:')}</span> <span class="course-name"><a href="${reverse('verify_student_midcourse_reverify_dash')}">${item.course_name}</span></a></li>
+            <li class="status-item is-approved"><i class="icon fa fa-check-square-o"></i><span class="label">${_('Approved:')}</span> <span class="course-name"><a href="${reverse('verify_student_midcourse_reverify_dash')}">${item.course_name}</span></a></li>
         % endfor
     %endif
     </ul>

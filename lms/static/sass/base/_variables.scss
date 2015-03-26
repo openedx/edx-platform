@@ -1,4 +1,7 @@
-// base
+// lms - utilities - variables
+// ====================
+
+// BASE
 $baseline: 20px;
 
 // ====================
@@ -12,15 +15,6 @@ $fg-max-columns: 12;
 $fg-max-width: 1400px;
 $fg-min-width: 810px;
 
-// Card Sizes
-// breakpoints for course cards
-$bp-xl-min: 1180px;
-$bp-l-min: 980px;
-$bp-m-min: 768px;
-$bp-s-min: 320px;
-$bp-s-max: 320px;
-$bp-m-max: 768px;
-
 // ====================
 
 // FONTS
@@ -28,6 +22,12 @@ $sans-serif: 'Open Sans', $verdana, sans-serif;
 $monospace: Monaco, 'Bitstream Vera Sans Mono', 'Lucida Console', monospace;
 $body-font-family: $sans-serif;
 $serif: $georgia;
+
+// FONT-WEIGHTS
+$font-light: 300;
+$font-regular: 400;
+$font-semibold: 600;
+$font-bold: 700;
 
 // ====================
 
@@ -38,7 +38,18 @@ $base-font-color: rgb(60,60,60);
 $baseFontColor: rgb(60,60,60);
 $base-font-color: rgb(60,60,60);
 $lighter-base-font-color: rgb(100,100,100);
-$very-light-text: #fff;
+$very-light-text: rgb(255,255,255); // #ffffff
+
+// ====================
+
+// TIMING - used for animation/transition mixin syncing
+$tmg-s3: 3.0s;
+$tmg-s2: 2.0s;
+$tmg-s1: 1.0s;
+$tmg-avg: 0.75s;
+$tmg-f1: 0.50s;
+$tmg-f2: 0.25s;
+$tmg-f3: 0.125s;
 
 // ====================
 
@@ -46,32 +57,32 @@ $very-light-text: #fff;
 $transparent: rgba(0,0,0,0); // used when color value is needed for UI width/transitions but element is transparent
 
 // COLORS
-$black: rgb(0,0,0);
+$black: rgb(0,0,0);  // #000000;
 $black-t0: rgba($black, 0.125);
 $black-t1: rgba($black, 0.25);
 $black-t2: rgba($black, 0.5);
 $black-t3: rgba($black, 0.75);
 
-$white: rgb(255,255,255);
+$white: rgb(255,255,255);  // #FFFFFF;
 $white-t0: rgba($white, 0.125);
 $white-t1: rgba($white, 0.25);
 $white-t2: rgba($white, 0.5);
 $white-t3: rgba($white, 0.75);
 
-$gray: rgb(127,127,127);
-$gray-l1: tint($gray,20%);
-$gray-l2: tint($gray,40%);
-$gray-l3: tint($gray,60%); // #cbcbcb;
-$gray-l4: tint($gray,80%); // #e5e5e5;
-$gray-l5: tint($gray,90%); // #f2f2f2;
-$gray-l6: tint($gray,95%); // #f8f8f8;
-$gray-l7: tint($gray,99%);
-$gray-d1: shade($gray,20%);
-$gray-d2: shade($gray,40%);
-$gray-d3: shade($gray,60%);
-$gray-d4: shade($gray,80%);
+$gray: rgb(127,127,127);    // #7f7f7f
+$gray-l1: tint($gray,20%);  // #989898
+$gray-l2: tint($gray,40%);  // #b2b2b2
+$gray-l3: tint($gray,60%);  // #cbcbcb
+$gray-l4: tint($gray,80%);  // #e5e5e5
+$gray-l5: tint($gray,90%);  // #f2f2f2
+$gray-l6: tint($gray,95%);  // #f8f8f8
+$gray-l7: tint($gray,99%);  // #fdfdfd
+$gray-d1: shade($gray,20%); // #656565
+$gray-d2: shade($gray,40%); // #4c4c4c
+$gray-d3: shade($gray,60%); // #323232
+$gray-d4: shade($gray,80%); // #191919
 
-$pink: rgb(182,37,103);
+$pink: rgb(182,37,103); // #b72567;
 $pink-l1: tint($pink,20%);
 $pink-l2: tint($pink,40%);
 $pink-l3: tint($pink,60%);
@@ -88,7 +99,7 @@ $pink-u1: desaturate($pink,15%);
 $pink-u2: desaturate($pink,30%);
 $pink-u3: desaturate($pink,45%);
 
-$red: rgb(178, 6, 16);
+$red: rgb(178, 6, 16); // #b20610;
 $red-l1: tint($red,20%);
 $red-l2: tint($red,40%);
 $red-l3: tint($red,60%);
@@ -105,7 +116,7 @@ $red-u1: desaturate($red,15%);
 $red-u2: desaturate($red,30%);
 $red-u3: desaturate($red,45%);
 
-$green: rgb(37, 184, 90);
+$green: rgb(37, 184, 90); // #25b85a;
 $green-l1: tint($green,20%);
 $green-l2: tint($green,40%);
 $green-l3: tint($green,60%);
@@ -134,54 +145,58 @@ $dark-gray: rgb(51, 51, 51);
 $border-color: rgb(200, 200, 200);
 $sidebar-color: rgb(246, 246, 246);
 $outer-border-color: rgb(170, 170, 170);
-$light-gray: #ddd;
+$light-gray: rgb(221,221,221); // #dddddd
 
 // used by descriptor css
-$lightGrey: #edf1f5;
-$darkGrey: #8891a1;
+$lightGrey: rgb(237,241,245); // #edf1f5
+$darkGrey: rgb(136,145,161); // #8891a1
+$lightGrey1: $gray-l3;
 $blue-d1: shade($blue,20%);
 $blue-d2: shade($blue,40%);
 $blue-d4: shade($blue,80%);
 
 // edx.org marketing site variables
-$m-gray: #8A8C8F;
-$m-gray-l1: #97999B;
-$m-gray-l2: #A4A6A8;
-$m-gray-l3: #B1B2B4;
-$m-gray-l4: #F5F5F5;
-$m-gray-d1: #7D7F83;
-$m-gray-d2: #707276;
-$m-gray-d3: #646668;
-$m-gray-d4: #050505;
+$m-gray: rgb(138,140,143); // #8A8C8F
+$m-gray-l1: rgb(151,153,155); // #97999B
+$m-gray-l2: rgb(164,166,168); // #A4A6A8
+$m-gray-l3: rgb(177,178,180); // #B1B2B4
+$m-gray-l4: rgb(245,245,245); // #F5F5F5
+$m-gray-d1: rgb(125,127,131); // #7D7F83
+$m-gray-d2: rgb(112,114,118); // #707276
+$m-gray-d3: rgb(100,102,104); // #646668
+$m-gray-d4: rgb(5,5,5); // #050505
 $m-gray-t0: rgba($m-gray,0.125);
 $m-gray-t1: rgba($m-gray,0.25);
 $m-gray-t2: rgba($m-gray,0.50);
 $m-gray-t3: rgba($m-gray,0.75);
 
-$m-blue: #1AA1DE;
-$m-blue-l1: #2BACE6;
-$m-blue-l2: #42B5E9;
-$m-blue-l3: #59BEEC;
+$m-blue: rgb(26,161,222); // #1AA1DE
+$m-blue-l1: rgb(43,172,230); // #2BACE6
+$m-blue-l2: rgb(66,181,233); // #42B5E9
+$m-blue-l3: rgb(89,190,236); // #59BEEC
 $m-blue-l4: tint($m-blue,90%);
 $m-blue-l5: tint($m-blue,95%);
-$m-blue-d1: #1790C7;
-$m-blue-d2: #1580B0;
-$m-blue-d3: #126F9A;
-$m-blue-d4: #0A4A67;
+$m-blue-l6: #4bb4fb;
+$m-blue-d1: rgb(23,144,199); // #1790C7
+$m-blue-d2: rgb(21,128,176); // #1580B0
+$m-blue-d3: rgb(18,111,154); // #126F9A
+$m-blue-d4: rgb(10,74,103); // #0A4A67
+$m-blue-d5: rgb(0,158,231); // #009EE7
+$m-blue-d6: #256A97;
 $m-blue-t0: rgba($m-blue,0.125);
 $m-blue-t1: rgba($m-blue,0.25);
 $m-blue-t2: rgba($m-blue,0.50);
 $m-blue-t3: rgba($m-blue,0.75);
 
-$m-pink: #B52A67;
-$m-pink-l1: #CA2F73;
-$m-pink-l2: #D33F80;
-$m-pink-l3: #D7548E;
+$m-pink: rgb(181,42,103); // #B52A67
+$m-pink-l1: rgb(202,47,115); //#CA2F73
+$m-pink-l2: rgb(211,63,128); //#D33F80
+$m-pink-l3: rgb(215,84,142); //#D7548E
 $m-pink-l4: tint($m-pink,75%);
 $m-pink-l5: tint($m-pink,85%);
-$m-pink-d1: #A0255B;
-$m-pink-d2: #8C204F;
-$m-pink-d3: #771C44;
+$m-pink-d1: rgb(160,37,91); // #A0255B
+$m-pink-d2: rgb(140,32,79); // #8C204F
+$m-pink-d3: rgb(119,28,68); // #771C44
 
 $m-green: rgb(0, 136, 1);
 $m-green-s1: rgb(96, 188, 97);
@@ -201,7 +216,7 @@ $m-green-t3: rgba($m-green,0.75);
 
 // ====================
 
-// shadows
+// SHADOWS
 $shadow: rgba(0,0,0,0.2);
 $shadow-l1: rgba(0,0,0,0.1);
 $shadow-l2: rgba(0,0,0,0.05);
@@ -223,16 +238,16 @@ $body-bg: rgb(250,250,250);
 $container-bg: $white;
 $header-image: linear-gradient(-90deg, rgba(255,255,255, 1), rgba(230,230,230, 0.9));
 $header-bg: $white;
-$courseware-header-image: linear-gradient(top, #fff, #eee);
+$courseware-header-image: linear-gradient(top, rgb(255,255,255), rgb(238,238,238));
 $courseware-header-bg: transparent;
 $footer-bg: $white;
 $courseware-footer-border: none;
 $courseware-footer-shadow: none;
 $courseware-footer-margin: 0px;
-$courseware-border-bottom-color: #44a2de;
-$courseware-button-border-color: #e6e6e6;
-$courseware-hover-color: #333435;
-$courseware-navigation-color: #009ee7;
+$courseware-border-bottom-color: rgb(68,162,222); // #44a2de
+$courseware-button-border-color: rgb(230,230,230); // #e6e6e6
+$courseware-hover-color: rgb(51,52,53); // #333435
+$courseware-navigation-color: rgb(0,158,231); // #009ee7
 
 // ====================
 
@@ -262,9 +277,9 @@ $audit-color-lvl2: tint($audit-color-lvl1, 33%);
 // ====================
 
 // ACTIONS: general
-$button-bg-image: linear-gradient(#fff 0%, rgb(250,250,250) 50%, rgb(237,237,237) 50%, rgb(220,220,220) 100%);
+$button-bg-image: linear-gradient(rgb(255,255,255) 0%, rgb(250,250,250) 50%, rgb(237,237,237) 50%, rgb(220,220,220) 100%);
 $button-bg-color: transparent;
-$button-bg-hover-color: #fff;
+$button-bg-hover-color: $white;
 
 // ACTIONS: primary
 $action-primary-bg: $m-blue-d3;
@@ -314,6 +329,8 @@ $header-graphic-sub-color: $m-gray-d2;
 $error-color: $error-red;
 $warning-color: $m-pink;
 $confirm-color: $m-green;
+$active-color: $blue;
+$highlight-color: rgb(255,255,0);
 
 // Notifications
 $notify-banner-bg-1: rgb(56,56,56);
@@ -343,11 +360,14 @@ $dashboard-course-cover-border: $light-gray;
 
 // MISC: course assets
 $content-wrapper-bg: $white;
-$course-bg-color: #d6d6d6;
+$course-bg-color: #f2f2f2;
 $course-bg-image: url(../images/bg-texture.png);
 $account-content-wrapper-bg: shade($body-bg, 2%);
 $course-profile-bg: rgb(245,245,245);
 $course-header-bg: rgba(255,255,255, 0.93);
+
+// MISC: course background texture
+//$course-bg-image: url(../images/bg-texture.png);
 
 // MISC: borders
 $border-color-1: rgb(190,190,190);
@@ -365,18 +385,18 @@ $link-color-d1: $m-blue-d2;
 $link-hover: $pink;
 $site-status-color: $pink;
 $button-color: $blue;
-$button-archive-color: #eee;
+$button-archive-color: rgb(238,238,238); // #eeeeee
 
 // MISC: shadow, form, modal
 $shadow-color: $blue;
-$form-bg-color: #fff;
+$form-bg-color: $white;
 $modal-bg-color: rgb(245,245,245);
 
 // MISC: sidebar
 $sidebar-chapter-bg-top: rgba(255, 255, 255, .6);
 $sidebar-chapter-bg-bottom: rgba(255, 255, 255, 0);
-$sidebar-chapter-bg: #eee;
-$sidebar-active-image: linear-gradient(top, #e6e6e6, #d6d6d6);
+$sidebar-chapter-bg: rgb(238,238,238); // #eeeeee
+$sidebar-active-image: linear-gradient(top, rgb(230,230,230), rgb(214,214,214));
 
 // TOP HEADER IMAGE MARGIN
 $header_image_margin: -69px;
@@ -387,20 +407,20 @@ $footer_margin: ($baseline/4) 0 ($baseline*1.5) 0;
 // ====================
 
 // VIEWS: homepage
-$homepage__header--gradient__color--alpha: lighten($blue, 15%);
-$homepage__header--gradient__color--bravo: saturate($blue, 30%);
-$homepage__header--background: lighten($blue, 15%);
+$homepage__header--gradient__color--alpha: lighten($gray, 15%);
+$homepage__header--gradient__color--bravo: saturate($gray, 30%);
+$homepage__header--background: lighten($gray, 15%);
 
 // ====================
 
 // IMAGES: backgrounds
 $homepage-bg-image: none;
 
-$login-banner-image: url(../images/bg-banner-account.png);
-$register-banner-image: url(../images/bg-banner-account.png);
-$passwordreset-banner-image: url(../images/bg-banner-account.png);
+$login-banner-image: url(../images/edx-theme/edx-background-banner-account.png);
+$register-banner-image: url(../images/edx-theme/edx-background-banner-account.png);
+$passwordreset-banner-image: url(../images/edx-theme/edx-background-banner-account.png);
 
-$video-thumb-url: '../images/courses/video-thumb.jpg';
+$video-thumb-url: '../images/homepage-hero-video-thumb.jpg';
 
 // ====================
 
@@ -417,3 +437,24 @@ $header-sans-serif: 'Open Sans', Arial, Helvetica, sans-serif;
 // SPLINT: colors
 
 $msg-bg: $action-primary-bg;
+
+
+$dark-gray1: rgb(74,74,74); // #
+$light-gray1: rgb(242,242,242); // #f2f2f2
+$light-gray2: rgb(171,171,171); // #ababab
+$light-gray3: rgb(249,249,249); // #f9f9f9
+$dark-gray2: rgb(151,151,151); // #979797
+$blue1: rgb(74,144,226); // #4A90E2
+$blue2: rgb(0,161,229); // #00A1E5
+$green1: rgb(97,161,46); // #61A12E
+$red1: rgb(208,2,27); // #D0021B
+
+// +case: search/result highlight
+// --------------------
+$result-highlight-color-base: rgba($highlight-color, 0.25);
+
+// +feature: student notes
+// --------------------
+$student-notes-highlight-color-base: saturate($yellow, 65%);
+$student-notes-highlight-color: tint($student-notes-highlight-color-base, 50%);
+$student-notes-highlight-color-focus: $student-notes-highlight-color-base;

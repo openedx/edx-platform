@@ -2,25 +2,23 @@
 """
 Unit tests for bulk-email-related forms.
 """
-from django.test.utils import override_settings
 from django.conf import settings
+from django.test.utils import override_settings
+from mock import patch
 
+from bulk_email.models import CourseAuthorization, CourseEmailTemplate
+from bulk_email.forms import CourseAuthorizationAdminForm, CourseEmailTemplateForm
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MOCK_MODULESTORE, TEST_DATA_MIXED_TOY_MODULESTORE
+)
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 
-from mock import patch
 
-from bulk_email.models import CourseAuthorization
-from bulk_email.forms import CourseAuthorizationAdminForm
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-
-
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CourseAuthorizationFormTest(ModuleStoreTestCase):
     """Test the CourseAuthorizationAdminForm form for Mongo-backed courses."""
 
@@ -124,7 +122,7 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
             form.save()
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE)
 class CourseAuthorizationXMLFormTest(ModuleStoreTestCase):
     """Check that XML courses cannot be authorized for email."""
 
@@ -145,3 +143,153 @@ class CourseAuthorizationXMLFormTest(ModuleStoreTestCase):
 
         with self.assertRaisesRegexp(ValueError, "The CourseAuthorization could not be created because the data didn't validate."):
             form.save()
+
+
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+class CourseEmailTemplateFormTest(ModuleStoreTestCase):
+    """Test the CourseEmailTemplateForm that is used in the Django admin subsystem."""
+
+    def test_missing_message_body_in_html(self):
+        """
+        Asserts that we fail validation if we do not have the {{message_body}} tag
+        in the submitted HTML template
+        """
+        form_data = {
+            'html_template': '',
+            'plain_template': '{{message_body}}',
+            'name': ''
+        }
+        form = CourseEmailTemplateForm(form_data)
+        self.assertFalse(form.is_valid())
+
+    def test_missing_message_body_in_plain(self):
+        """
+        Asserts that we fail validation if we do not have the {{message_body}} tag
+        in the submitted plain template
+        """
+        form_data = {
+            'html_template': '{{message_body}}',
+            'plain_template': '',
+            'name': ''
+        }
+        form = CourseEmailTemplateForm(form_data)
+        self.assertFalse(form.is_valid())
+
+    def test_blank_name_is_null(self):
+        """
+        Asserts that submitting a CourseEmailTemplateForm with a blank name is stored
+        as a NULL in the database
+        """
+        form_data = {
+            'html_template': '{{message_body}}',
+            'plain_template': '{{message_body}}',
+            'name': ''
+        }
+        form = CourseEmailTemplateForm(form_data)
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        # now inspect the database and make sure the blank name was stored as a NULL
+        # Note this will throw an exception if it is not found
+        cet = CourseEmailTemplate.objects.get(name=None)
+        self.assertIsNotNone(cet)
+
+    def test_name_with_only_spaces_is_null(self):
+        """
+        Asserts that submitting a CourseEmailTemplateForm just blank whitespace is stored
+        as a NULL in the database
+        """
+        form_data = {
+            'html_template': '{{message_body}}',
+            'plain_template': '{{message_body}}',
+            'name': '   '
+        }
+        form = CourseEmailTemplateForm(form_data)
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        # now inspect the database and make sure the whitespace only name was stored as a NULL
+        # Note this will throw an exception if it is not found
+        cet = CourseEmailTemplate.objects.get(name=None)
+        self.assertIsNotNone(cet)
+
+    def test_name_with_spaces_is_trimmed(self):
+        """
+        Asserts that submitting a CourseEmailTemplateForm with a name that contains
+        whitespace at the beginning or end of a name is stripped
+        """
+        form_data = {
+            'html_template': '{{message_body}}',
+            'plain_template': '{{message_body}}',
+            'name': ' foo  '
+        }
+        form = CourseEmailTemplateForm(form_data)
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        # now inspect the database and make sure the name is properly
+        # stripped
+        cet = CourseEmailTemplate.objects.get(name='foo')
+        self.assertIsNotNone(cet)
+
+    def test_non_blank_name(self):
+        """
+        Asserts that submitting a CourseEmailTemplateForm with a non-blank name
+        can be found in the database under than name as a look-up key
+        """
+        form_data = {
+            'html_template': '{{message_body}}',
+            'plain_template': '{{message_body}}',
+            'name': 'foo'
+        }
+        form = CourseEmailTemplateForm(form_data)
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        # now inspect the database and make sure the blank name was stored as a NULL
+        # Note this will throw an exception if it is not found
+        cet = CourseEmailTemplate.objects.get(name='foo')
+        self.assertIsNotNone(cet)
+
+    def test_duplicate_name(self):
+        """
+        Assert that we cannot submit a CourseEmailTemplateForm with a name
+        that already exists
+        """
+
+        # first set up one template
+        form_data = {
+            'html_template': '{{message_body}}',
+            'plain_template': '{{message_body}}',
+            'name': 'foo'
+        }
+        form = CourseEmailTemplateForm(form_data)
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        # try to submit form with the same name
+        form = CourseEmailTemplateForm(form_data)
+        self.assertFalse(form.is_valid())
+
+        # try again with a name with extra whitespace
+        # this should fail as we strip the whitespace away
+        form_data = {
+            'html_template': '{{message_body}}',
+            'plain_template': '{{message_body}}',
+            'name': '  foo '
+        }
+        form = CourseEmailTemplateForm(form_data)
+        self.assertFalse(form.is_valid())
+
+        # then try a different name
+        form_data = {
+            'html_template': '{{message_body}}',
+            'plain_template': '{{message_body}}',
+            'name': 'bar'
+        }
+        form = CourseEmailTemplateForm(form_data)
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        form = CourseEmailTemplateForm(form_data)
+        self.assertFalse(form.is_valid())

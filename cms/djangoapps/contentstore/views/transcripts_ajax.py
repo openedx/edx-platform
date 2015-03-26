@@ -38,7 +38,7 @@ from xmodule.video_module.transcripts_utils import (
     TranscriptsRequestValidationException
 )
 
-from .access import has_course_access
+from student.auth import has_course_author_access
 
 __all__ = [
     'upload_transcripts',
@@ -100,7 +100,8 @@ def upload_transcripts(request):
     except ValueError:
         return error_response(response, 'Invalid video_list JSON.')
 
-    source_subs_filedata = request.FILES['transcript-file'].read().decode('utf8')
+    # Used utf-8-sig encoding type instead of utf-8 to remove BOM(Byte Order Mark), e.g. U+FEFF
+    source_subs_filedata = request.FILES['transcript-file'].read().decode('utf-8-sig')
     source_subs_filename = request.FILES['transcript-file'].name
 
     if '.' not in source_subs_filename:
@@ -377,7 +378,10 @@ def choose_transcripts(request):
     if item.sub != html5_id:  # update sub value
         item.sub = html5_id
         item.save_with_metadata(request.user)
-    response = {'status': 'Success',  'subs': item.sub}
+    response = {
+        'status': 'Success',
+        'subs': item.sub,
+    }
     return JsonResponse(response)
 
 
@@ -408,7 +412,10 @@ def replace_transcripts(request):
 
     item.sub = youtube_id
     item.save_with_metadata(request.user)
-    response = {'status': 'Success',  'subs': item.sub}
+    response = {
+        'status': 'Success',
+        'subs': item.sub,
+    }
     return JsonResponse(response)
 
 
@@ -532,12 +539,12 @@ def _get_item(request, data):
     Returns the item.
     """
     usage_key = UsageKey.from_string(data.get('locator'))
-    # This is placed before has_course_access() to validate the location,
-    # because has_course_access() raises  r if location is invalid.
+    # This is placed before has_course_author_access() to validate the location,
+    # because has_course_author_access() raises  r if location is invalid.
     item = modulestore().get_item(usage_key)
 
     # use the item's course_key, because the usage_key might not have the run
-    if not has_course_access(request.user, item.location.course_key):
+    if not has_course_author_access(request.user, item.location.course_key):
         raise PermissionDenied()
 
     return item

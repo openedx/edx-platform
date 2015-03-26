@@ -1,0 +1,14 @@
+{
+    "standard_test": {
+        "test_string": "This is a test string. sub this: %%USER_ID%% into anon_id",
+        "expected": "This is a test string. sub this: 123456789 into anon_id"
+    },
+    "multiple_subs": {
+        "test_string": "There are a lot of anonymous ids here: %%USER_ID%% %%USER_ID%% %%USER_ID%% %%USER_ID%%",
+        "expected": "There are a lot of anonymous ids here: 123456789 123456789 123456789 123456789"
+    },
+    "sub_with_html": {
+        "test_string": "There is html in this guy <b>%%USER_ID%%</b>",
+        "expected": "There is html in this guy <b>123456789</b>"
+    }
+}

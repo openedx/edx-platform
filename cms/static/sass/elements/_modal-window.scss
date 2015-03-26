@@ -11,7 +11,7 @@
     @include box-sizing(border-box);
     position: absolute;
     width: 50%;
-    box-shadow: 0px 0px 7px $shadow-d1;
+    box-shadow: 0 0 7px $shadow-d1;
     border-radius: ($baseline/5);
     background-color: $gray-l4;
     padding: 7px;
@@ -52,6 +52,45 @@
       }
     }
 
+    // UI: summary messages
+    .summary-message {
+      margin-bottom: $baseline;
+      padding: ($baseline*0.75);
+      background: $gray-d3;
+
+      .icon, .copy {
+        display: inline-block;
+        vertical-align: top;
+      }
+
+      .icon {
+        @extend %t-icon4;
+        @include margin-right($baseline/2);
+        color: $white;
+      }
+
+      .copy {
+        @extend %t-copy-sub1;
+        max-width: 85%;
+        color: $white;
+      }
+    }
+
+    // CASE: Warning summary message
+    .summary-message-warning {
+      border-top: ($baseline/5) solid $color-warning;
+
+      .icon {
+        color: $color-warning;
+      }
+    }
+
+    // visual dividers
+    .divider-visual {
+      margin: ($baseline*0.75) 0;
+      border: ($baseline/20) solid $gray-l4;
+    }
+
     // sections within a modal
     .modal-section {
       margin-bottom: ($baseline*0.75);
@@ -64,9 +103,18 @@
     .modal-section-title {
       @extend %t-title6;
       margin: 0 0 ($baseline/2) 0;
-      border-bottom: 1px solid $gray-l4;
+      border-bottom: ($baseline/10) solid $gray-l4;
       padding-bottom: ($baseline/4);
       color: $gray-d2;
+    }
+
+    .modal-subsection-title {
+      @extend %t-title8;
+      @extend %t-strong;
+      margin-bottom: ($baseline/4);
+      text-transform: uppercase;
+      letter-spacing: 0.1;
+      color: $gray-l2;
     }
 
     .modal-section-content {
@@ -222,6 +270,10 @@
       height: 365px;
     }
 
+    .CodeMirror-advanced {
+      height: 435px;
+    }
+
     .wrapper-comp-settings {
 
       .list-input {
@@ -230,143 +282,6 @@
           height: auto;
           max-height: none;
         }
-      }
-    }
-  }
-
-  // outline: edit item settings
-  .wrapper-modal-window-bulkpublish-section,
-  .wrapper-modal-window-bulkpublish-subsection,
-  .wrapper-modal-window-bulkpublish-unit,
-  .course-outline-modal {
-
-    .list-fields {
-
-      .field {
-        display: inline-block;
-        vertical-align: top;
-        margin-right: ($baseline/2);
-        margin-bottom: ($baseline/4);
-
-        label {
-          @extend %t-copy-sub1;
-          @extend %t-strong;
-          @include transition(color $tmg-f3 ease-in-out 0s);
-          margin: 0 0 ($baseline/4) 0;
-
-          &.is-focused {
-            color: $blue;
-          }
-        }
-
-
-        input, textarea {
-          @extend %t-copy-base;
-          @include transition(all $tmg-f2 ease-in-out 0s);
-          height: 100%;
-          width: 100%;
-          padding: ($baseline/2);
-
-          // CASE: long length
-          &.long {
-            width: 100%;
-          }
-
-          // CASE: short length
-          &.short {
-            width: 25%;
-          }
-        }
-
-        // CASE: specific release + due times/dates
-        .start-date,
-        .start-time,
-        .due-date,
-        .due-time {
-          width: ($baseline*7);
-        }
-
-        .tip {
-          @extend %t-copy-sub1;
-          @include transition(color, 0.15s, ease-in-out);
-          display: block;
-          margin-top: ($baseline/4);
-          color: $gray-l2;
-        }
-
-        .tip-warning {
-          color: $gray-d2;
-        }
-      }
-
-      // CASE: type-based input
-      .field-text {
-
-        // TODO: refactor the _forms.scss partial to allow for this area to inherit from it
-        label, input, textarea {
-          display: block;
-        }
-      }
-
-      // CASE: select input
-      .field-select {
-
-        .label, .input {
-          display: inline-block;
-          vertical-align: middle;
-        }
-
-        .label {
-          margin-right: ($baseline/2);
-        }
-
-        .input {
-          width: 100%;
-        }
-
-        // CASE: checkbox input
-        .field-checkbox {
-
-          .label, label {
-            margin-bottom: 0;
-          }
-        }
-      }
-    }
-
-
-
-    // UI: grading section
-    .edit-settings-grading {
-
-      .grading-type {
-        margin-bottom: $baseline;
-      }
-    }
-
-    // UI: staff lock section
-    .edit-staff-lock {
-
-      .checkbox-cosmetic .input-checkbox {
-        @extend %cont-text-sr;
-
-        // CASE: unchecked
-        ~ .tip-warning {
-          display: block;
-        }
-
-        // CASE: checked
-        &:checked {
-
-          ~ .tip-warning {
-            display: none;
-          }
-        }
-      }
-
-      // needed to override poorly scoped margin-bottom on any label element in a view (from _forms.scss)
-      .checkbox-cosmetic .label {
-        margin-bottom: 0;
       }
     }
   }
@@ -390,7 +305,7 @@
   }
 
 
-  // special overrides for video module editor/hidden tab editors
+  // MODAL TYPE: component - video modal (includes special overrides for xblock-related editing view)
   .modal-lg.modal-type-video {
 
     .modal-content {
@@ -509,8 +424,229 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: #000;
+    background: $black;
     opacity: 0.5;
     filter: alpha(opacity=50);
+  }
+
+  // MODAL TYPE: component - visibility modal
+  .xblock-visibility_view {
+
+    .visibility-controls-secondary {
+      max-height: 100%;
+      overflow-y: auto;
+      @include margin(($baseline*0.75), 0, 0, $baseline);
+    }
+
+    .visibility-controls-group {
+      @extend %wipe-last-child;
+      margin-bottom: $baseline;
+    }
+
+    // UI: form fields
+    .list-fields {
+
+      .field {
+        @extend %wipe-last-child;
+        margin-bottom: ($baseline/4);
+
+        label {
+          @extend %t-copy-sub1;
+        }
+      }
+
+      // UI: radio and checkbox inputs
+      .field-radio, .field-checkbox {
+
+        label {
+          @include margin-left($baseline/4);
+        }
+      }
+    }
+
+    // CASE: content group has been removed
+    .field-visibility-content-group.was-removed {
+
+      .input-checkbox:checked ~ label {
+        color: $color-error;
+      }
+
+      .note {
+        @extend %t-copy-sub2;
+        @extend %t-regular;
+        display: block;
+        color: $color-error;
+      }
+    }
+
+    // CASE: no groups configured for visibility
+    .is-not-configured {
+      @extend %no-content;
+      padding: ($baseline);
+      @include text-align(left); // reset for %no-content's default styling
+
+      .title {
+        @extend %t-title6;
+        font-weight: 600;  // needed for poorly scoped .title rule in modals
+        margin: 0 0 ($baseline/2) 0; // needed for poorly scoped .title rule in modals
+      }
+
+      .copy {
+        @extend %t-copy-sub1;
+
+         p {
+          @extend %wipe-last-child;
+          margin-bottom: $baseline;
+        }
+      }
+
+      &.has-actions {
+
+        .actions {
+          margin-top: $baseline;
+        }
+
+        .action {
+          @include margin-left(0); // reset for %no-content's default styling
+        }
+      }
+    }
+  }
+
+  // MODAL TYPE: outline - edit item settings
+  .wrapper-modal-window-bulkpublish-section,
+  .wrapper-modal-window-bulkpublish-subsection,
+  .wrapper-modal-window-bulkpublish-unit,
+  .course-outline-modal {
+
+    .list-fields {
+
+      .field {
+        display: inline-block;
+        vertical-align: top;
+        @include margin-right($baseline/2);
+        margin-bottom: ($baseline/4);
+
+        label {
+          @extend %t-copy-sub1;
+          @extend %t-strong;
+          @include transition(color $tmg-f3 ease-in-out 0s);
+          margin: 0 0 ($baseline/4) 0;
+
+          &.is-focused {
+            color: $blue;
+          }
+        }
+
+
+        input, textarea {
+          @extend %t-copy-base;
+          @include transition(all $tmg-f2 ease-in-out 0s);
+          height: 100%;
+          width: 100%;
+          padding: ($baseline/2);
+
+          // CASE: long length
+          &.long {
+            width: 100%;
+          }
+
+          // CASE: short length
+          &.short {
+            width: 25%;
+          }
+        }
+
+        // CASE: specific release + due times/dates
+        .start-date,
+        .start-time,
+        .due-date,
+        .due-time {
+          width: ($baseline*7);
+        }
+
+        .tip {
+          @extend %t-copy-sub1;
+          @include transition(color, 0.15s, ease-in-out);
+          display: block;
+          margin-top: ($baseline/4);
+          color: $gray-l2;
+        }
+
+        .tip-warning {
+          color: $gray-d2;
+        }
+      }
+
+      // CASE: type-based input
+      .field-text {
+
+        // TODO: refactor the _forms.scss partial to allow for this area to inherit from it
+        label, input, textarea {
+          display: block;
+        }
+      }
+
+      // CASE: select input
+      .field-select {
+
+        .label, .input {
+          display: inline-block;
+          vertical-align: middle;
+        }
+
+        .label {
+          @include margin-right($baseline/2);
+        }
+
+        .input {
+          width: 100%;
+        }
+
+        // CASE: checkbox input
+        .field-checkbox {
+
+          .label, label {
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+
+
+
+    // UI: grading section
+    .edit-settings-grading {
+
+      .grading-type {
+        margin-bottom: $baseline;
+      }
+    }
+
+    // UI: staff lock section
+    .edit-staff-lock {
+
+      .checkbox-cosmetic .input-checkbox {
+        @extend %cont-text-sr;
+
+        // CASE: unchecked
+        ~ .tip-warning {
+          display: block;
+        }
+
+        // CASE: checked
+        &:checked {
+
+          ~ .tip-warning {
+            display: none;
+          }
+        }
+      }
+
+      // needed to override poorly scoped margin-bottom on any label element in a view (from _forms.scss)
+      .checkbox-cosmetic .label {
+        margin-bottom: 0;
+      }
+    }
   }
 }

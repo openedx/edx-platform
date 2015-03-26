@@ -6,9 +6,18 @@ to decide whether to check course creator role, and other such functions.
 """
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
+from opaque_keys.edx.locator import LibraryLocator
 
 from student.roles import GlobalStaff, CourseCreatorRole, CourseStaffRole, CourseInstructorRole, CourseRole, \
-    CourseBetaTesterRole
+    CourseBetaTesterRole, OrgInstructorRole, OrgStaffRole, LibraryUserRole, OrgLibraryUserRole
+
+
+# Studio permissions:
+STUDIO_EDIT_ROLES = 8
+STUDIO_VIEW_USERS = 4
+STUDIO_EDIT_CONTENT = 2
+STUDIO_VIEW_CONTENT = 1
+# In addition to the above, one is always allowed to "demote" oneself to a lower role within a course, or remove oneself
 
 
 def has_access(user, role):
@@ -38,6 +47,67 @@ def has_access(user, role):
             CourseInstructorRole(role.course_key).has_user(user)):
         return True
     return False
+
+
+def get_user_permissions(user, course_key, org=None):
+    """
+    Get the bitmask of permissions that this user has in the given course context.
+    Can also set course_key=None and pass in an org to get the user's
+    permissions for that organization as a whole.
+    """
+    if org is None:
+        org = course_key.org
+        course_key = course_key.for_branch(None)
+    else:
+        assert course_key is None
+    all_perms = STUDIO_EDIT_ROLES | STUDIO_VIEW_USERS | STUDIO_EDIT_CONTENT | STUDIO_VIEW_CONTENT
+    # global staff, org instructors, and course instructors have all permissions:
+    if GlobalStaff().has_user(user) or OrgInstructorRole(org=org).has_user(user):
+        return all_perms
+    if course_key and has_access(user, CourseInstructorRole(course_key)):
+        return all_perms
+    # Staff have all permissions except EDIT_ROLES:
+    if OrgStaffRole(org=org).has_user(user) or (course_key and has_access(user, CourseStaffRole(course_key))):
+        return STUDIO_VIEW_USERS | STUDIO_EDIT_CONTENT | STUDIO_VIEW_CONTENT
+    # Otherwise, for libraries, users can view only:
+    if course_key and isinstance(course_key, LibraryLocator):
+        if OrgLibraryUserRole(org=org).has_user(user) or has_access(user, LibraryUserRole(course_key)):
+            return STUDIO_VIEW_USERS | STUDIO_VIEW_CONTENT
+    return 0
+
+
+def has_studio_write_access(user, course_key):
+    """
+    Return True if user has studio write access to the given course.
+    Note that the CMS permissions model is with respect to courses.
+    There is a super-admin permissions if user.is_staff is set.
+    Also, since we're unifying the user database between LMS and CAS,
+    I'm presuming that the course instructor (formally known as admin)
+    will not be in both INSTRUCTOR and STAFF groups, so we have to cascade our
+    queries here as INSTRUCTOR has all the rights that STAFF do.
+
+    :param user:
+    :param course_key: a CourseKey
+    """
+    return bool(STUDIO_EDIT_CONTENT & get_user_permissions(user, course_key))
+
+
+def has_course_author_access(user, course_key):
+    """
+    Old name for has_studio_write_access
+    """
+    return has_studio_write_access(user, course_key)
+
+
+def has_studio_read_access(user, course_key):
+    """
+    Return True iff user is allowed to view this course/library in studio.
+    Will also return True if user has write access in studio (has_course_author_access)
+
+    There is currently no such thing as read-only course access in studio, but
+    there is read-only access to content libraries.
+    """
+    return bool(STUDIO_VIEW_CONTENT & get_user_permissions(user, course_key))
 
 
 def add_users(caller, role, *users):
@@ -83,4 +153,3 @@ def _check_caller_authority(caller, role):
     elif isinstance(role, CourseRole):  # instructors can change the roles w/in their course
         if not has_access(caller, CourseInstructorRole(role.course_key)):
             raise PermissionDenied
-

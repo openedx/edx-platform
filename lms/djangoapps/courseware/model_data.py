@@ -12,16 +12,17 @@ from .models import (
     XModuleStudentInfoField
 )
 import logging
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.block_types import BlockTypeKeyV1
+from opaque_keys.edx.asides import AsideUsageKeyV1
 
 from django.db import DatabaseError
-from django.contrib.auth.models import User
 
 from xblock.runtime import KeyValueStore
 from xblock.exceptions import KeyValueMultiSaveError, InvalidScopeError
 from xblock.fields import Scope, UserScope
 from xmodule.modulestore.django import modulestore
+from xblock.core import XBlockAside
 
 log = logging.getLogger(__name__)
 
@@ -46,7 +47,7 @@ class FieldDataCache(object):
     A cache of django model objects needed to supply the data
     for a module and its decendants
     """
-    def __init__(self, descriptors, course_id, user, select_for_update=False):
+    def __init__(self, descriptors, course_id, user, select_for_update=False, asides=None):
         '''
         Find any courseware.models objects that are needed by any descriptor
         in descriptors. Attempts to minimize the number of queries to the database.
@@ -58,10 +59,16 @@ class FieldDataCache(object):
         course_id: The id of the current course
         user: The user for which to cache data
         select_for_update: True if rows should be locked until end of transaction
+        asides: The list of aside types to load, or None to prefetch no asides.
         '''
         self.cache = {}
         self.descriptors = descriptors
         self.select_for_update = select_for_update
+
+        if asides is None:
+            self.asides = []
+        else:
+            self.asides = asides
 
         assert isinstance(course_id, CourseKey)
         self.course_id = course_id
@@ -75,7 +82,7 @@ class FieldDataCache(object):
     @classmethod
     def cache_for_descriptor_descendents(cls, course_id, user, descriptor, depth=None,
                                          descriptor_filter=lambda descriptor: True,
-                                         select_for_update=False):
+                                         select_for_update=False, asides=None):
         """
         course_id: the course in the context of which we want StudentModules.
         user: the django user for whom to load modules.
@@ -110,11 +117,10 @@ class FieldDataCache(object):
 
             return descriptors
 
-        # FIXME
-        with modulestore().bulk_temp_noop_operations(descriptor.location.course_key):
+        with modulestore().bulk_operations(descriptor.location.course_key):
             descriptors = get_child_descriptors(descriptor, depth, descriptor_filter)
 
-        return FieldDataCache(descriptors, course_id, user, select_for_update)
+        return FieldDataCache(descriptors, course_id, user, select_for_update, asides=asides)
 
     def _query(self, model_class, **kwargs):
         """
@@ -141,6 +147,35 @@ class FieldDataCache(object):
         )
         return res
 
+    @property
+    def _all_usage_ids(self):
+        """
+        Return a set of all usage_ids for the descriptors that this FieldDataCache is caching
+        against, and well as all asides for those descriptors.
+        """
+        usage_ids = set()
+        for descriptor in self.descriptors:
+            usage_ids.add(descriptor.scope_ids.usage_id)
+
+            for aside_type in self.asides:
+                usage_ids.add(AsideUsageKeyV1(descriptor.scope_ids.usage_id, aside_type))
+
+        return usage_ids
+
+    @property
+    def _all_block_types(self):
+        """
+        Return a set of all block_types that are cached by this FieldDataCache.
+        """
+        block_types = set()
+        for descriptor in self.descriptors:
+            block_types.add(BlockTypeKeyV1(descriptor.entry_point, descriptor.scope_ids.block_type))
+
+        for aside_type in self.asides:
+            block_types.add(BlockTypeKeyV1(XBlockAside.entry_point, aside_type))
+
+        return block_types
+
     def _retrieve_fields(self, scope, fields):
         """
         Queries the database for all of the fields in the specified scope
@@ -149,7 +184,7 @@ class FieldDataCache(object):
             return self._chunked_query(
                 StudentModule,
                 'module_state_key__in',
-                (descriptor.scope_ids.usage_id for descriptor in self.descriptors),
+                self._all_usage_ids,
                 course_id=self.course_id,
                 student=self.user.pk,
             )
@@ -157,14 +192,14 @@ class FieldDataCache(object):
             return self._chunked_query(
                 XModuleUserStateSummaryField,
                 'usage_id__in',
-                (descriptor.scope_ids.usage_id for descriptor in self.descriptors),
+                self._all_usage_ids,
                 field_name__in=set(field.name for field in fields),
             )
         elif scope == Scope.preferences:
             return self._chunked_query(
                 XModuleStudentPrefsField,
                 'module_type__in',
-                set(descriptor.scope_ids.block_type for descriptor in self.descriptors),
+                self._all_block_types,
                 student=self.user.pk,
                 field_name__in=set(field.name for field in fields),
             )
@@ -196,7 +231,7 @@ class FieldDataCache(object):
         elif key.scope == Scope.user_state_summary:
             return (key.scope, key.block_scope_id, key.field_name)
         elif key.scope == Scope.preferences:
-            return (key.scope, key.block_scope_id, key.field_name)
+            return (key.scope, BlockTypeKeyV1(key.block_family, key.block_scope_id), key.field_name)
         elif key.scope == Scope.user_info:
             return (key.scope, key.field_name)
 
@@ -240,33 +275,30 @@ class FieldDataCache(object):
             return field_object
 
         if key.scope == Scope.user_state:
-            # When we start allowing block_scope_ids to be either Locations or Locators,
-            # this assertion will fail. Fix the code here when that happens!
-            assert(isinstance(key.block_scope_id, UsageKey))
-            field_object, _ = StudentModule.objects.get_or_create(
+            field_object, __ = StudentModule.objects.get_or_create(
                 course_id=self.course_id,
-                student=User.objects.get(id=key.user_id),
+                student_id=key.user_id,
                 module_state_key=key.block_scope_id,
                 defaults={
                     'state': json.dumps({}),
-                    'module_type': key.block_scope_id.category,
+                    'module_type': key.block_scope_id.block_type,
                 },
             )
         elif key.scope == Scope.user_state_summary:
-            field_object, _ = XModuleUserStateSummaryField.objects.get_or_create(
+            field_object, __ = XModuleUserStateSummaryField.objects.get_or_create(
                 field_name=key.field_name,
                 usage_id=key.block_scope_id
             )
         elif key.scope == Scope.preferences:
-            field_object, _ = XModuleStudentPrefsField.objects.get_or_create(
+            field_object, __ = XModuleStudentPrefsField.objects.get_or_create(
                 field_name=key.field_name,
-                module_type=key.block_scope_id,
-                student=User.objects.get(id=key.user_id),
+                module_type=BlockTypeKeyV1(key.block_family, key.block_scope_id),
+                student_id=key.user_id,
             )
         elif key.scope == Scope.user_info:
-            field_object, _ = XModuleStudentInfoField.objects.get_or_create(
+            field_object, __ = XModuleStudentInfoField.objects.get_or_create(
                 field_name=key.field_name,
-                student=User.objects.get(id=key.user_id),
+                student_id=key.user_id,
             )
 
         cache_key = self._cache_key_from_kvs_key(key)
@@ -350,8 +382,8 @@ class DjangoKeyValueStore(KeyValueStore):
                 state[field.field_name] = kv_dict[field]
                 field_object.state = json.dumps(state)
             else:
-            # The remaining scopes save fields on different rows, so
-            # we don't have to worry about conflicts
+                # The remaining scopes save fields on different rows, so
+                # we don't have to worry about conflicts
                 field_object.value = json.dumps(kv_dict[field])
 
         for field_object in field_objects:

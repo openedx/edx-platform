@@ -138,7 +138,7 @@ class CombinedOpenEndedV1Module():
         self.skip_basic_checks = instance_state.get('skip_spelling_checks', SKIP_BASIC_CHECKS) in TRUE_DICT
 
         if system.open_ended_grading_interface:
-            self.peer_gs = PeerGradingService(system.open_ended_grading_interface, system)
+            self.peer_gs = PeerGradingService(system.open_ended_grading_interface, system.render_template)
         else:
             self.peer_gs = MockPeerGradingService()
 
@@ -159,7 +159,7 @@ class CombinedOpenEndedV1Module():
             raise
         self.display_due_date = self.timeinfo.display_due_date
 
-        self.rubric_renderer = CombinedOpenEndedRubric(system, True)
+        self.rubric_renderer = CombinedOpenEndedRubric(system.render_template, True)
         rubric_string = stringify_children(definition['rubric'])
         self._max_score = self.rubric_renderer.check_if_rubric_is_parseable(rubric_string, location, MAX_SCORE_ALLOWED)
 
@@ -256,7 +256,6 @@ class CombinedOpenEndedV1Module():
         Returns True if this task_state is from something that was just reset
         """
         return all(self.is_initial_child_state(child) for child in task_state)
-
 
     def states_sort_key(self, idx_task_states):
         """
@@ -544,8 +543,8 @@ class CombinedOpenEndedV1Module():
                 last_response_data = self.get_last_response(self.current_task_number - 1)
                 current_response_data = self.get_current_attributes(self.current_task_number)
 
-                if (current_response_data['min_score_to_attempt'] > last_response_data['score']
-                    or current_response_data['max_score_to_attempt'] < last_response_data['score']):
+                if current_response_data['min_score_to_attempt'] > last_response_data['score'] or\
+                   current_response_data['max_score_to_attempt'] < last_response_data['score']:
                     self.state = self.DONE
                     self.ready_to_reset = True
 
@@ -818,7 +817,7 @@ class CombinedOpenEndedV1Module():
             log.error("Invalid response from grading server for location {0} and student {1}".format(self.location, student_id))
             error_message = "Received invalid response from the graders.  Please notify course staff."
             return success, allowed_to_submit, error_message
-        if count_graded >= count_required or count_available==0:
+        if count_graded >= count_required or count_available == 0:
             error_message = ""
             return success, allowed_to_submit, error_message
         else:
@@ -853,7 +852,7 @@ class CombinedOpenEndedV1Module():
         contexts = []
         rubric_number = self.current_task_number
         if self.ready_to_reset:
-            rubric_number+=1
+            rubric_number += 1
         response = self.get_last_response(rubric_number)
         score_length = len(response['grader_types'])
         for z in xrange(score_length):
@@ -861,7 +860,7 @@ class CombinedOpenEndedV1Module():
                 try:
                     feedback = response['feedback_dicts'][z].get('feedback', '')
                 except TypeError:
-                    return {'success' : False}
+                    return {'success': False}
                 rubric_scores = [[response['rubric_scores'][z]]]
                 grader_types = [[response['grader_types'][z]]]
                 feedback_items = [[response['feedback_items'][z]]]
@@ -879,14 +878,14 @@ class CombinedOpenEndedV1Module():
                     # That longer string appears when a user is viewing a graded rubric
                     # returned from one of the graders of their openended response problem.
                     'task_name': ugettext('Scored rubric'),
-                    'feedback' : feedback
+                    'feedback': feedback
                 })
 
         context = {
             'results': contexts,
         }
         html = self.system.render_template('{0}/combined_open_ended_results.html'.format(self.TEMPLATE_DIR), context)
-        return {'html': html, 'success': True, 'hide_reset' : False}
+        return {'html': html, 'success': True, 'hide_reset': False}
 
     def get_legend(self, _data):
         """
@@ -978,7 +977,7 @@ class CombinedOpenEndedV1Module():
                     max_number_of_attempts=self.max_attempts
                 )
             }
-        self.student_attempts +=1
+        self.student_attempts += 1
         self.state = self.INITIAL
         self.ready_to_reset = False
         for i in xrange(len(self.task_xml)):
@@ -1228,7 +1227,6 @@ class CombinedOpenEndedV1Descriptor():
             return xml_object.xpath(k)[0]
 
         return {'task_xml': parse_task('task'), 'prompt': parse('prompt'), 'rubric': parse('rubric')}
-
 
     def definition_to_xml(self, resource_fs):
         '''Return an xml element representing this definition.'''

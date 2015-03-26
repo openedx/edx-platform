@@ -34,7 +34,7 @@ domReady(function() {
         $('.nav-dd .nav-item .title').removeClass('is-selected');
     });
 
-    $('.nav-dd .nav-item').click(function(e) {
+    $('.nav-dd .nav-item, .filterable-column .nav-item').click(function(e) {
 
         $subnav = $(this).find('.wrapper-nav-sub');
         $title = $(this).find('.title');

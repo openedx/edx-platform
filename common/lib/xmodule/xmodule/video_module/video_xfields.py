@@ -145,9 +145,14 @@ class VideoFields(object):
         scope=Scope.user_info,
         default=True
     )
-
     handout = String(
         help=_("Upload a handout to accompany this video. Students can download the handout by clicking Download Handout under the video."),
         display_name=_("Upload Handout"),
         scope=Scope.settings,
+    )
+    edx_video_id = String(
+        help=_("If you were assigned a Video ID by edX for the video to play in this component, enter the ID here. In this case, do not enter values in the Default Video URL, the Video File URLs, and the YouTube ID fields. If you were not assigned an edX Video ID, enter values in those other fields and ignore this field."),
+        display_name=_("EdX Video ID"),
+        scope=Scope.settings,
+        default="",
     )

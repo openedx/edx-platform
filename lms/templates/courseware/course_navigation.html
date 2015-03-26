@@ -12,28 +12,54 @@ def url_class(is_active):
     return "active"
   return ""
 %>
-<%! from xmodule.tabs import CourseTabList %>
-<%! from courseware.access import has_access %>
-<%! from django.conf import settings %>
-<%! from django.core.urlresolvers import reverse %>
-<%! from django.utils.translation import ugettext as _ %>
+<%! from courseware.tabs import get_course_tab_list %>
 <%! from courseware.views import notification_image_for_tab %>
-<% import waffle %>
+<%! from django.core.urlresolvers import reverse %>
+<%! from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition %>
+<%! from student.models import CourseEnrollment %>
+<%
+  cohorted_user_partition = get_cohorted_user_partition(course.id)
+  show_preview_menu = staff_access and active_page in ['courseware', 'info']
+  is_student_masquerade = masquerade and masquerade.role == 'student'
+  masquerade_group_id = masquerade.group_id if masquerade else None
+%>
+
+% if show_preview_menu:
+    <nav class="wrapper-preview-menu">
+        <div class="preview-menu">
+            <ol class="preview-actions">
+                <li class="action-preview">
+                    <form action="#" class="action-preview-form" method="post">
+                        <label for="action-preview-select" class="action-preview-label">${_("View this course as:")}</label>
+                        <select class="action-preview-select" id="action-preview-select" name="select">
+                            <option value="staff" ${"selected" if not is_student_masquerade else ""}>${_("Staff")}</option>
+                            <option value="student" ${"selected" if is_student_masquerade and not masquerade_group_id else ""}>${_("Student")}</option>
+                            % if cohorted_user_partition:
+                                % for group in sorted(cohorted_user_partition.groups, key=lambda group: group.name):
+                                <option value="group.id" data-group-id="${group.id}" ${"selected" if masquerade_group_id == group.id else ""}>
+                                    ${_("Student in {content_group}").format(content_group=group.name)}
+                                </option>
+                                % endfor
+                            % endif
+                        </select>
+                        <button type="submit" class="sr" name="submit" value="submit">${_("set preview mode")}</button>
+                    </form>
+                </li>
+            </ol>
+        </div>
+    </nav>
+% endif
 
 % if disable_tabs is UNDEFINED or not disable_tabs:
-<nav class="${active_page} course-material">
-  <div class="inner-wrapper">
+<nav class="${active_page} wrapper-course-material">
+  <div class="course-material">
     <ol class="course-tabs">
-      % for tab in CourseTabList.iterate_displayable(course, settings, user.is_authenticated(), has_access(user, 'staff', course, course.id)):
+      % for tab in get_course_tab_list(course, user):
         <%
             tab_is_active = (tab.tab_id == active_page) or (tab.tab_id == default_tab)
             tab_image = notification_image_for_tab(tab, user, course)
         %>
-        % if waffle.flag_is_active(request, 'visual_treatment'):
-          <li class="${"prominent" if tab.name in ("Courseware", "Course Content") else ""}">
-        % else:
           <li>
-        % endif
              <a href="${tab.link_func(course, reverse) | h}" class="${url_class(tab_is_active)}">
                  ${_(tab.name) | h}
                  % if tab_is_active:
@@ -47,44 +73,46 @@ def url_class(is_active):
              </a>
           </li>
       % endfor
-    <%block name="extratabs" />
-        % if masquerade is not UNDEFINED:
-          % if staff_access and masquerade is not None:
-            <li style="float:right"><a href="#" id="staffstatus">${_("Staff view")}</a></li>
-          % endif
-        % endif
+      <%block name="extratabs" />
     </ol>
   </div>
 </nav>
 %endif
 
-% if masquerade is not UNDEFINED:
-  % if staff_access and masquerade is not None:
+% if show_preview_menu:
 <script type="text/javascript">
-masq = (function(){
-    var el = $('#staffstatus');
-    var setstat = function(status){
-        if (status=='student'){
-            el.html('<font color="green">${_("Student view")}</font>');
-        }else{
-            el.html('<font color="red">${_("Staff view")}</font>');
-        }
-    }
-    setstat('${masquerade}');
+(function() {
+    var element = $('.action-preview-select');
+    % if disable_student_access:
+        element.attr("disabled", true);
+        element.attr("title", "${_("Course is not yet visible to students.")}");
+    % endif
 
-    el.click(function(){
-        $.ajax({ url: '/masquerade/toggle',
-                 type: 'GET',
-                 success: function(result){
-                     setstat(result.status);
-                     location.reload();
-                 },
-                 error: function() {
-                     alert('Error: cannot connect to server');
-                 }
-               });
+    element.change(function() {
+        var selectedOption, data;
+        if (element.attr("disabled")) {
+           return alert("${_("You cannot view the course as a student or beta tester before the course release date.")}");
+        }
+        selectedOption = element.find('option:selected');
+        data = {
+            role: selectedOption.val() === 'staff' ? 'staff' : 'student',
+            user_partition_id: ${cohorted_user_partition.id if cohorted_user_partition else 'null'},
+            group_id: selectedOption.data('group-id')
+        };
+        $.ajax({
+            url: '/courses/${course.id}/masquerade',
+            type: 'POST',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(result) {
+                location.reload();
+            },
+            error: function() {
+                alert('Error: cannot connect to server');
+            }
+        });
     });
-}() );
+}());
 </script>
-  % endif
 % endif

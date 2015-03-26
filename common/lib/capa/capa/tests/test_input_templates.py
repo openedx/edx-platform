@@ -11,6 +11,7 @@ from mako.template import Template as MakoTemplate
 from mako import exceptions
 from capa.inputtypes import Status
 
+
 class TemplateError(Exception):
     """
     Error occurred while rendering a Mako template.
@@ -497,6 +498,7 @@ class FormulaEquationInputTemplateTest(TemplateTestCase):
 
         self.assert_has_xpath(xml, "//input[@size='40']", self.context)
 
+
 class AnnotationInputTemplateTest(TemplateTestCase):
     """
     Test mako template for `<annotationinput>` input.
@@ -793,17 +795,30 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
                              '1_choiceinput_1_textinput_0': '0'}
 
     def setUp(self):
-        choices = [('1_choiceinput_0bc',
-                   [{'tail_text': '', 'type': 'text', 'value': '', 'contents': ''},
-                   {'tail_text': '', 'type': 'textinput', 'value': '', 'contents': 'choiceinput_0_textinput_0'}]),
-                   ('1_choiceinput_1bc', [{'tail_text': '', 'type': 'text', 'value': '', 'contents': ''},
-                   {'tail_text': '', 'type': 'textinput', 'value': '', 'contents': 'choiceinput_1_textinput_0'}])]
-        self.context = {'id': '1',
-                        'choices': choices,
-                        'status': Status('correct'),
-                        'input_type': 'radio',
-                        'label': 'choicetext label',
-                        'value': self.VALUE_DICT}
+        choices = [
+            (
+                '1_choiceinput_0bc',
+                [
+                    {'tail_text': '', 'type': 'text', 'value': '', 'contents': ''},
+                    {'tail_text': '', 'type': 'textinput', 'value': '', 'contents': 'choiceinput_0_textinput_0'},
+                ]
+            ),
+            (
+                '1_choiceinput_1bc',
+                [
+                    {'tail_text': '', 'type': 'text', 'value': '', 'contents': ''},
+                    {'tail_text': '', 'type': 'textinput', 'value': '', 'contents': 'choiceinput_1_textinput_0'},
+                ]
+            )
+        ]
+        self.context = {
+            'id': '1',
+            'choices': choices,
+            'status': Status('correct'),
+            'input_type': 'radio',
+            'label': 'choicetext label',
+            'value': self.VALUE_DICT,
+        }
 
         super(ChoiceTextGroupTemplateTest, self).setUp()
 
@@ -883,7 +898,8 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
             {'status': Status('unsubmitted'), 'input_type': 'checkbox', 'value': {}},
             {'status': Status('unsubmitted'), 'input_type': 'checkbox', 'value': self.EMPTY_DICT},
             {'status': Status('unsubmitted'), 'input_type': 'checkbox', 'value': self.VALUE_DICT},
-            {'status': Status('unsubmitted'), 'input_type': 'checkbox', 'value': self.BOTH_CHOICE_CHECKBOX}]
+            {'status': Status('unsubmitted'), 'input_type': 'checkbox', 'value': self.BOTH_CHOICE_CHECKBOX},
+        ]
 
         self.context['status'] = Status('unanswered')
 

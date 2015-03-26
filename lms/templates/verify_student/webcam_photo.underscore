@@ -1,0 +1,19 @@
+<div class="placeholder-cam" id="camera">
+  <div class="placeholder-art">
+    <p class="copy"><%- gettext( "Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission." ) %></p>
+  </div>
+
+  <video id="photo_id_video" aria-label="<%- gettext( 'Live view of webcam' ) %>" autoplay></video><br/>
+  <canvas id="photo_id_canvas" style="display:none;" width="640" height="480"></canvas>
+</div>
+
+<div class="controls photo-controls">
+  <div class="control control-retake is-hidden" id="webcam_reset_button">
+    <a class="action action-redo"><%- gettext( "Retake Photo" ) %></a>
+  </div>
+  <div class="control control-do is-hidden" id="webcam_capture_button">
+    <a class="action action-do">
+      <i class="icon fa fa-camera" aria-hidden="true"></i> <span class="sr"><%- gettext( "Take Photo" ) %></span>
+    </a>
+  </div>
+</div>

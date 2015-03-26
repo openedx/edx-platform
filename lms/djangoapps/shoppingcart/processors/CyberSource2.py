@@ -25,6 +25,7 @@ import binascii
 import re
 import json
 import uuid
+import logging
 from textwrap import dedent
 from datetime import datetime
 from collections import OrderedDict, defaultdict
@@ -37,6 +38,8 @@ from shoppingcart.models import Order
 from shoppingcart.processors.exceptions import *
 from shoppingcart.processors.helpers import get_processor_config
 from microsite_configuration import microsite
+
+log = logging.getLogger(__name__)
 
 
 def process_postpay_callback(params):
@@ -76,12 +79,19 @@ def process_postpay_callback(params):
                 'error_html': ''
             }
         else:
+            _record_payment_info(params, result['order'])
             return {
                 'success': False,
                 'order': result['order'],
                 'error_html': _get_processor_decline_html(params)
             }
     except CCProcessorException as error:
+        log.exception('error processing CyberSource postpay callback')
+        # if we have the order and the id, log it
+        if hasattr(error, 'order'):
+            _record_payment_info(params, error.order)
+        else:
+            log.info(json.dumps(params))
         return {
             'success': False,
             'order': None,  # due to exception we may not have the order
@@ -101,7 +111,7 @@ def processor_hash(value):
 
     """
     secret_key = get_processor_config().get('SECRET_KEY', '')
-    hash_obj = hmac.new(secret_key, value, sha256)
+    hash_obj = hmac.new(secret_key.encode('utf-8'), value.encode('utf-8'), sha256)
     return binascii.b2a_base64(hash_obj.digest())[:-1]  # last character is a '\n', which we don't want
 
 
@@ -126,6 +136,17 @@ def verify_signatures(params):
             (missing keys, wrong types)
 
     """
+
+    # First see if the user cancelled the transaction
+    # if so, then not all parameters will be passed back so we can't yet verify signatures
+    if params.get('decision') == u'CANCEL':
+        raise CCProcessorUserCancelled()
+
+    #  if the user decline the transaction
+    # if so, then auth_amount will not be passed back so we can't yet verify signatures
+    if params.get('decision') == u'DECLINE':
+        raise CCProcessorUserDeclined()
+
     # Validate the signature to ensure that the message is from CyberSource
     # and has not been tampered with.
     signed_fields = params.get('signed_field_names', '').split(',')
@@ -190,7 +211,7 @@ def sign(params):
     return params
 
 
-def render_purchase_form_html(cart, callback_url=None):
+def render_purchase_form_html(cart, callback_url=None, extra_data=None):
     """
     Renders the HTML of the hidden POST form that must be used to initiate a purchase with CyberSource
 
@@ -203,17 +224,21 @@ def render_purchase_form_html(cart, callback_url=None):
             the URL provided by the administrator of the account
             (CyberSource config, not LMS config).
 
+        extra_data (list): Additional data to include as merchant-defined data fields.
+
     Returns:
         unicode: The rendered HTML form.
 
     """
     return render_to_string('shoppingcart/cybersource_form.html', {
         'action': get_purchase_endpoint(),
-        'params': get_signed_purchase_params(cart, callback_url=callback_url),
+        'params': get_signed_purchase_params(
+            cart, callback_url=callback_url, extra_data=extra_data
+        ),
     })
 
 
-def get_signed_purchase_params(cart, callback_url=None):
+def get_signed_purchase_params(cart, callback_url=None, extra_data=None):
     """
     This method will return a digitally signed set of CyberSource parameters
 
@@ -226,14 +251,16 @@ def get_signed_purchase_params(cart, callback_url=None):
             the URL provided by the administrator of the account
             (CyberSource config, not LMS config).
 
+        extra_data (list): Additional data to include as merchant-defined data fields.
+
     Returns:
         dict
 
     """
-    return sign(get_purchase_params(cart, callback_url=callback_url))
+    return sign(get_purchase_params(cart, callback_url=callback_url, extra_data=extra_data))
 
 
-def get_purchase_params(cart, callback_url=None):
+def get_purchase_params(cart, callback_url=None, extra_data=None):
     """
     This method will build out a dictionary of parameters needed by CyberSource to complete the transaction
 
@@ -245,6 +272,8 @@ def get_purchase_params(cart, callback_url=None):
             completes a purchase.  If not provided, then CyberSource will use
             the URL provided by the administrator of the account
             (CyberSource config, not LMS config).
+
+        extra_data (list): Additional data to include as merchant-defined data fields.
 
     Returns:
         dict
@@ -264,7 +293,7 @@ def get_purchase_params(cart, callback_url=None):
     params['transaction_type'] = 'sale'
 
     params['locale'] = 'en'
-    params['signed_date_time'] =  datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+    params['signed_date_time'] = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
     params['signed_field_names'] = 'access_key,profile_id,amount,currency,transaction_type,reference_number,signed_date_time,locale,transaction_uuid,signed_field_names,unsigned_field_names,orderNumber'
     params['unsigned_field_names'] = ''
     params['transaction_uuid'] = uuid.uuid4().hex
@@ -272,6 +301,13 @@ def get_purchase_params(cart, callback_url=None):
 
     if callback_url is not None:
         params['override_custom_receipt_page'] = callback_url
+        params['override_custom_cancel_page'] = callback_url
+
+    if extra_data is not None:
+        # CyberSource allows us to send additional data in "merchant defined data" fields
+        for num, item in enumerate(extra_data, start=1):
+            key = u"merchant_defined_data{num}".format(num=num)
+            params[key] = item
 
     return params
 
@@ -325,7 +361,7 @@ def _payment_accepted(order_id, auth_amount, currency, decision):
                 'order': order
             }
         else:
-            raise CCProcessorWrongAmountException(
+            ex = CCProcessorWrongAmountException(
                 _(
                     u"The amount charged by the processor {charged_amount} {charged_amount_currency} is different "
                     u"than the total cost of the order {total_cost} {total_cost_currency}."
@@ -336,6 +372,10 @@ def _payment_accepted(order_id, auth_amount, currency, decision):
                     total_cost_currency=order.currency
                 )
             )
+
+            #pylint: disable=attribute-defined-outside-init
+            ex.order = order
+            raise ex
     else:
         return {
             'accepted': False,
@@ -383,6 +423,20 @@ def _record_purchase(params, order):
     )
 
 
+def _record_payment_info(params, order):
+    """
+    Record the purchase and run purchased_callbacks
+
+    Args:
+        params (dict): The parameters we received from CyberSource.
+
+    Returns:
+        None
+    """
+    order.processor_reply_dump = json.dumps(params)
+    order.save()
+
+
 def _get_processor_decline_html(params):
     """
     Return HTML indicating that the user's payment was declined.
@@ -428,9 +482,9 @@ def _get_processor_exception_html(exception):
     if isinstance(exception, CCProcessorDataException):
         return _format_error_html(
             _(
-                u"Sorry! Our payment processor sent us back a payment confirmation that had inconsistent data!  "
-                u"We apologize that we cannot verify whether the charge went through and take further action on your order.  "
-                u"The specific error message is: {msg}  "
+                u"Sorry! Our payment processor sent us back a payment confirmation that had inconsistent data! "
+                u"We apologize that we cannot verify whether the charge went through and take further action on your order. "
+                u"The specific error message is: {msg} "
                 u"Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}."
             ).format(
                 msg=u'<span class="exception_msg">{msg}</span>'.format(msg=exception.message),
@@ -440,8 +494,8 @@ def _get_processor_exception_html(exception):
     elif isinstance(exception, CCProcessorWrongAmountException):
         return _format_error_html(
             _(
-                u"Sorry! Due to an error your purchase was charged for a different amount than the order total!  "
-                u"The specific error message is: {msg}.  "
+                u"Sorry! Due to an error your purchase was charged for a different amount than the order total! "
+                u"The specific error message is: {msg}. "
                 u"Your credit card has probably been charged. Contact us with payment-specific questions at {email}."
             ).format(
                 msg=u'<span class="exception_msg">{msg}</span>'.format(msg=exception.message),
@@ -455,16 +509,35 @@ def _get_processor_exception_html(exception):
                 u"unable to validate that the message actually came from the payment processor. "
                 u"The specific error message is: {msg}. "
                 u"We apologize that we cannot verify whether the charge went through and take further action on your order. "
-                u"Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}."
+                u"Your credit card may possibly have been charged. Contact us with payment-specific questions at {email}."
             ).format(
                 msg=u'<span class="exception_msg">{msg}</span>'.format(msg=exception.message),
+                email=payment_support_email
+            )
+        )
+    elif isinstance(exception, CCProcessorUserCancelled):
+        return _format_error_html(
+            _(
+                u"Sorry! Our payment processor sent us back a message saying that you have cancelled this transaction. "
+                u"The items in your shopping cart will exist for future purchase. "
+                u"If you feel that this is in error, please contact us with payment-specific questions at {email}."
+            ).format(
+                email=payment_support_email
+            )
+        )
+    elif isinstance(exception, CCProcessorUserDeclined):
+        return _format_error_html(
+            _(
+                u"We're sorry, but this payment was declined. The items in your shopping cart have been saved. "
+                u"If you have any questions about this transaction, please contact us at {email}."
+            ).format(
                 email=payment_support_email
             )
         )
     else:
         return _format_error_html(
             _(
-                u"Sorry!  Your payment could not be processed because an unexpected exception occurred.  "
+                u"Sorry! Your payment could not be processed because an unexpected exception occurred. "
                 u"Please contact us at {email} for assistance."
             ).format(email=payment_support_email)
         )
@@ -472,7 +545,7 @@ def _get_processor_exception_html(exception):
 
 def _format_error_html(msg):
     """ Format an HTML error message """
-    return '<p class="error_msg">{msg}</p>'.format(msg=msg)
+    return u'<p class="error_msg">{msg}</p>'.format(msg=msg)
 
 
 CARDTYPE_MAP = defaultdict(lambda: "UNKNOWN")

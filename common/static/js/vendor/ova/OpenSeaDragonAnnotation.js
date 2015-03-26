@@ -187,7 +187,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             }
             
             // if the colored highlights by tags plugin it is notified to colorize
-               annotator.publish('colorizeHighlight', [an]);
+            annotator.publish('externalCallToHighlightTags', [an]);
         },
         
         /**
@@ -231,7 +231,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                 var span = document.createElement('span');
                 var rectPosition = an.rangePosition;
                 span.className = "annotator-hl";
-                span.style.border = '2px solid rgba(0,0,0,0.5)';
+                
+                // outline and border below create a double line one black and one white
+                // so to be able to differentiate when selecting dark or light images
+                span.style.border = '2px solid rgb(255, 255, 255)';
+                span.style.outline = '2px solid rgb(0, 0, 0)';
                 span.style.background = 'rgba(0,0,0,0)';
                 
                 // Adds listening items for the viewer and editor
@@ -305,7 +309,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                 viewer.innerTracker.setTracking(false);
                 this.rect = document.createElement('div');
                 this.rect.style.background = 'rgba(0,0,0,0)';
-                this.rect.style.border = '2px solid rgba(0,0,0,0.5)';
+                
+                // outline and border below create a double line one black and one white
+                // so to be able to differentiate when selecting dark or light images
+                this.rect.style.border = '2px solid rgb(255, 255, 255)';
+                this.rect.style.outline = '2px solid rgb(0, 0, 0)';
+                
                 this.rect.style.position = 'absolute';
                 this.rect.className = 'DrawingRect';
                 // set the initial position
@@ -577,13 +586,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             var isRP = (typeof rp!='undefined');
             var isSource = false;
             
-            // Double checks that the image being displayed matches the annotations 
-            var source = this.viewer.source;
-            var tilesUrl = typeof source.tilesUrl!='undefined'?source.tilesUrl:'';
-            var functionUrl = typeof source.getTileUrl!='undefined'?source.getTileUrl:'';
-            var compareUrl = tilesUrl!=''?tilesUrl:('' + functionUrl).replace(/\s+/g, ' ');
-            if(isContainer) isSource = (an.target.src == compareUrl);
-            
+            // Though it would be better to store server ids of images in the annotation that
+            // would require changing annotations that were already made, instead we check if
+            // the id is a substring of the thumbnail, which according to OpenSeaDragon API should be the case.
+            var sourceId = this.viewer.source['@id'];
+
+            // code runs on annotation creation before thumbnail is created
+            var targetThumb = an.target ? an.target.thumb : false;
+            if (isContainer) {
+                // reason why this is okay is that we are trying to ascertain that the annotation
+                // is related to the image drawn. If thumbnail attribute is empty it means the annotation
+                // was just created and should still be considered an annotation of this image.
+                isSource = targetThumb ? (targetThumb.indexOf(sourceId) !== -1) : true;
+            }            
             return (isOpenSeaDragon && isContainer && isImage && isRP && isSource);
         },
         
@@ -841,13 +856,13 @@ Annotator.Plugin.OpenSeaDragon = (function(_super) {
         // Makes sure OSD exists and that annotation is an image annotation
         // with a position in the OSD instance
         var isOpenSeaDragon = (typeof annotator.osda != 'undefined');
-        var isContainer = (typeof an.target!='undefined' && an.target.container==this.viewer.id );
+        var isContainer = (typeof an.target!='undefined' && an.target.container==osda.viewer.id );
         var isImage = (typeof an.media!='undefined' && an.media=='image');
         var isRP = (typeof rp!='undefined');
         var isSource = false;
         
         // Double checks that the image being displayed matches the annotations 
-        var source = this.viewer.source;
+        var source = osda.viewer.source;
         var tilesUrl = typeof source.tilesUrl!='undefined'?source.tilesUrl:'';
         var functionUrl = typeof source.getTileUrl!='undefined'?source.getTileUrl:'';
         var compareUrl = tilesUrl!=''?tilesUrl:('' + functionUrl).replace(/\s+/g, ' ');
@@ -1020,6 +1035,10 @@ OpenSeadragonAnnotation = function (element, options) {
     function reloadEditor(){
         tinymce.EditorManager.execCommand('mceRemoveEditor',true, "annotator-field-0");
         tinymce.EditorManager.execCommand('mceAddEditor',true, "annotator-field-0");
+        
+        // if person hits into/out of fullscreen before closing the editor should close itself
+        // ideally we would want to keep it open and reposition, this would make a great TODO in the future
+        annotator.editor.hide();
     }
 
     var self = this;
@@ -1038,6 +1057,14 @@ OpenSeadragonAnnotation = function (element, options) {
     document.addEventListener("msfullscreenchange", function () {
         reloadEditor();
     }, false);
+
+    // for some reason the above doesn't work when person hits ESC to exit full screen...
+    $(document).keyup(function(e) {
+        // esc key reloads editor as well
+        if (e.keyCode == 27) { 
+            reloadEditor();
+        }   
+    });
     
     this.options = options;
 

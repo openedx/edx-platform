@@ -3,17 +3,18 @@ Tests for class dashboard (Metrics tab in instructor dashboard)
 """
 
 import json
-from mock import patch
 
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from mock import patch
+
+from capa.tests.response_xml_factory import StringResponseXMLFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from courseware.tests.factories import StudentModuleFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory, AdminFactory
-from capa.tests.response_xml_factory import StringResponseXMLFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from class_dashboard.dashboard_data import (get_problem_grade_distribution, get_sequential_open_distrib,
                                             get_problem_set_grade_distrib, get_d3_problem_grade_distrib,
@@ -26,7 +27,7 @@ from class_dashboard.views import has_instructor_access_for_class
 USER_COUNT = 11
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestGetProblemGradeDistribution(ModuleStoreTestCase):
     """
     Tests related to class_dashboard/dashboard_data.py

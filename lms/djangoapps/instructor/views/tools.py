@@ -14,6 +14,7 @@ from courseware.models import StudentModule
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+from opaque_keys.edx.keys import UsageKey
 
 from bulk_email.models import CourseAuthorization
 
@@ -58,7 +59,7 @@ def bulk_email_is_enabled_for_course(course_id):
     3. Bulk email is enabled for the course.
     """
 
-    bulk_email_enabled_globally = (settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] == True)
+    bulk_email_enabled_globally = (settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] is True)
     is_studio_course = (modulestore().get_modulestore_type(course_id) != ModuleStoreEnum.Type.xml)
     bulk_email_enabled_for_course = CourseAuthorization.instructor_email_enabled(course_id)
 
@@ -309,3 +310,13 @@ def dump_student_extensions(course, student):
         "title": _("Due date extensions for {0} {1} ({2})").format(
             student.first_name, student.last_name, student.username),
         "data": data}
+
+
+def add_block_ids(payload):
+    """
+    rather than manually parsing block_ids from module_ids on the client, pass the block_ids explicitly in the payload
+    """
+    if 'data' in payload:
+        for ele in payload['data']:
+            if 'module_id' in ele:
+                ele['block_id'] = UsageKey.from_string(ele['module_id']).block_id

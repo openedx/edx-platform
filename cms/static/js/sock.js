@@ -3,12 +3,22 @@ require(["domReady", "jquery", "jquery.smoothScroll"],
         var toggleSock = function (e) {
             e.preventDefault();
 
-            var $btnLabel = $(this).find('.copy');
+            var $btnShowSockLabel = $(this).find('.copy-show');
+            var $btnHideSockLabel = $(this).find('.copy-hide');
             var $sock = $('.wrapper-sock');
             var $sockContent = $sock.find('.wrapper-inner');
 
-            $sock.toggleClass('is-shown');
-            $sockContent.toggle('fast');
+            if ($sock.hasClass('is-shown')) {
+                $sock.removeClass('is-shown');
+                $sockContent.hide('fast');
+                $btnHideSockLabel.removeClass("is-shown").addClass("is-hidden");
+                $btnShowSockLabel.removeClass("is-hidden").addClass("is-shown");
+            } else {
+                $sock.addClass('is-shown');
+                $sockContent.show('fast');
+                $btnHideSockLabel.removeClass("is-hidden").addClass("is-shown");
+                $btnShowSockLabel.removeClass("is-shown").addClass("is-hidden");
+            }
 
             $.smoothScroll({
                 offset: -200,
@@ -17,12 +27,6 @@ require(["domReady", "jquery", "jquery.smoothScroll"],
                 scrollElement: null,
                 scrollTarget: $sock
             });
-
-            if ($sock.hasClass('is-shown')) {
-                $btnLabel.text(gettext('Hide Studio Help'));
-            } else {
-                $btnLabel.text(gettext('Looking for Help with Studio?'));
-            }
         };
 
         domReady(function () {

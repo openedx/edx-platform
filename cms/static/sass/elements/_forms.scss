@@ -1,7 +1,34 @@
 // studio - elements - forms
 // ====================
 
-// forms - general
+// Table of Contents
+// * +Forms - General
+// * +Field - Is Editable
+// * +Field - With Error
+// * +Forms - Additional UI
+// * +Form - Create New
+// * +Form - Inline Name Edit
+// * +Form - Create New Wrapper
+// * +Form - Grandfathered
+
+// +Forms - General
+// ====================
+// element-specific utilities
+// --------------------
+// UI: checkbox/radio inputs
+%input-tickable {
+
+  ~ label {
+    color: $color-copy-base;
+  }
+
+  // STATE: checked/selected
+  &:checked ~ label {
+    @extend %t-strong;
+    color: $ui-action-primary-color-focus;
+  }
+}
+
 input[type="text"],
 input[type="email"],
 input[type="password"],
@@ -31,9 +58,8 @@ textarea.text {
   }
 }
 
-// ====================
-
-// forms - fields - not editable
+// +Fields - Not Editable
+// ==================== 
 .field.is-not-editable {
 
   & label.is-focused {
@@ -45,9 +71,8 @@ textarea.text {
   }
 }
 
-// ====================
-
-// field with error
+// +Fields - With Error
+// ==================== 
 .field.error {
 
   input, textarea {
@@ -55,9 +80,8 @@ textarea.text {
   }
 }
 
-// ====================
-
-// forms - additional UI
+// +Forms - Additional UI
+// ==================== 
 form {
 
   // CASE: cosmetic checkbox input
@@ -69,7 +93,7 @@ form {
     }
 
     .input-checkbox-checked, .input-checkbox-unchecked {
-      width: $baseline;
+      width: ($baseline*0.75);
     }
 
     .input-checkbox {
@@ -99,8 +123,18 @@ form {
     }
   }
 
+  // CASE: checkbox input
+  .field-checkbox .input-checkbox {
+    @extend %input-tickable;
+  }
+
+  // CASE: radio input
+  .field-radio .input-radio {
+    @extend %input-tickable;
+  }
+
   // CASE: file input
-  input[type=file] {
+  input[type="file"] {
     @extend %t-copy-sub1;
   }
 
@@ -138,7 +172,8 @@ form {
   }
 }
 
-// ELEM: form
+// +Form - Create New
+// ==================== 
 // form styling for creating a new content item (course, user, textbook)
 // TODO: refactor this into a placeholder to extend.
 .form-create {
@@ -355,9 +390,10 @@ form {
   }
 }
 
+// +Form - Inline Name Edit 
+// ==================== 
 // form - inline xblock name edit on unit, container, outline
-
-// TOOD: abstract this out into a Sass placeholder
+// TODO: abstract this out into a Sass placeholder
 .incontext-editor.is-editable {
 
   .incontext-editor-value,
@@ -372,6 +408,10 @@ form {
     @extend %ui-btn-non-blue;
     @extend %t-copy-base;
     padding-top: ($baseline/10);
+
+    .icon.icon {
+      vertical-align: baseline;
+    }
   }
 
   .incontext-editor-form {
@@ -391,10 +431,10 @@ form {
   }
 }
 
-// ELEM: form wrapper
+// +Form - Create New Wrapper 
+// ==================== 
 .wrapper-create-element {
   height: 0;
-  margin-bottom: $baseline;
   opacity: 0.0;
   pointer-events: none;
   overflow: hidden;
@@ -405,20 +445,20 @@ form {
 
   &.is-shown {
     height: auto; // define a specific height for the animating version of this UI to work properly
+    margin-bottom: $baseline;
     opacity: 1.0;
     pointer-events: auto;
   }
 }
 
-// ====================
-
-// forms - grandfathered
+// +Form - Grandfathered 
+// ==================== 
 input.search {
   padding: 6px 15px 8px 30px;
   @include box-sizing(border-box);
   border: 1px solid $darkGrey;
   border-radius: 20px;
-  background: url(../img/search-icon.png) no-repeat 8px 7px #edf1f5;
+  background: url(../images/search-icon.png) no-repeat 8px 7px #edf1f5;
   font-family: 'Open Sans', sans-serif;
   color: $baseFontColor;
   outline: 0;
@@ -441,7 +481,7 @@ code {
 
 .CodeMirror {
   @extend %t-copy-sub1;
-  background: #fff;
+  background: $white;
   font-family: $f-monospace;
 }
 

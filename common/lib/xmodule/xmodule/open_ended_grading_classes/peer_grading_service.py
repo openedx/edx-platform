@@ -1,5 +1,5 @@
 import logging
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 
 from .grading_service_module import GradingService
 from opaque_keys.edx.keys import UsageKey
@@ -14,8 +14,8 @@ class PeerGradingService(GradingService):
 
     METRIC_NAME = 'edxapp.open_ended_grading.peer_grading_service'
 
-    def __init__(self, config, system):
-        config['system'] = system
+    def __init__(self, config, render_template):
+        config['render_template'] = render_template
         super(PeerGradingService, self).__init__(config)
         self.url = config['url'] + config['peer_grading']
         self.login_url = self.url + '/login/'
@@ -27,7 +27,6 @@ class PeerGradingService(GradingService):
         self.get_problem_list_url = self.url + '/get_problem_list/'
         self.get_notifications_url = self.url + '/get_notifications/'
         self.get_data_for_location_url = self.url + '/get_data_for_location/'
-        self.system = system
 
     def get_data_for_location(self, problem_location, student_id):
         if isinstance(problem_location, UsageKey):
@@ -103,7 +102,7 @@ class PeerGradingService(GradingService):
         self._record_result('get_problem_list', result)
         dog_stats_api.histogram(
             self._metric_name('get_problem_list.result.length'),
-            len(result.get('problem_list',[]))
+            len(result.get('problem_list', [])),
         )
         return result
 
@@ -160,4 +159,11 @@ class MockPeerGradingService(object):
                 ]}
 
     def get_data_for_location(self, problem_location, student_id):
-        return {"version": 1, "count_graded": 3, "count_required": 3, "success": True, "student_sub_count": 1, 'submissions_available' : 0}
+        return {
+            "version": 1,
+            "count_graded": 3,
+            "count_required": 3,
+            "success": True,
+            "student_sub_count": 1,
+            'submissions_available': 0,
+        }

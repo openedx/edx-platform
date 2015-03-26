@@ -15,7 +15,7 @@
   height: 500px;
   background-color: Gainsboro;
   border: 1px solid DarkGray;
-  margin-top: -20px;
+  margin-top: -($baseline);
 }
 
 #wmd-preview {
@@ -28,10 +28,10 @@
 
 #wmd-button-row {
   position: relative; 
-  margin-left: 5px;
-  margin-right: 5px;
+  margin-left: ($baseline/4);
+  margin-right: ($baseline/4);
   margin-bottom: 0px;
-  margin-top: 10px;
+  margin-top: ($baseline/2);
   padding: 0px;  
   height: 20px;
 }
@@ -49,10 +49,10 @@
 .wmd-button {
   width: 20px; 
   height: 20px; 
-  margin-left: 5px;
-  margin-right: 5px;
+  margin-left: ($baseline/4);
+  margin-right: ($baseline/4);
   position: absolute;
-  background-image: url(../images/askbot/wmd-buttons.png);
+  background-image: url(../images/wmd-buttons.png);
   background-repeat: no-repeat;
   background-position: 0px 0px;
   display: inline-block; 
@@ -62,8 +62,8 @@
 .wmd-button > a {
   width: 20px; 
   height: 20px; 
-  margin-left: 5px;
-  margin-right: 5px;
+  margin-left: ($baseline/4);
+  margin-right: ($baseline/4);
   position: absolute;
   display: inline-block; 
 }

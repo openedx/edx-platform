@@ -1,4 +1,5 @@
-define(["backbone", "underscore", "gettext"], function(Backbone, _, gettext) {
+define(["backbone", "underscore", "gettext", "js/models/validation_helpers"],
+    function(Backbone, _, gettext, ValidationHelpers) {
 
 var CourseDetails = Backbone.Model.extend({
     defaults: {
@@ -15,24 +16,10 @@ var CourseDetails = Backbone.Model.extend({
         intro_video: null,
         effort: null,	// an int or null,
         course_image_name: '', // the filename
-        course_image_asset_path: '' // the full URL (/c4x/org/course/num/asset/filename)
-    },
-
-    // When init'g from html script, ensure you pass {parse: true} as an option (2nd arg to reset)
-    parse: function(attributes) {
-        if (attributes['start_date']) {
-            attributes.start_date = new Date(attributes.start_date);
-        }
-        if (attributes['end_date']) {
-            attributes.end_date = new Date(attributes.end_date);
-        }
-        if (attributes['enrollment_start']) {
-            attributes.enrollment_start = new Date(attributes.enrollment_start);
-        }
-        if (attributes['enrollment_end']) {
-            attributes.enrollment_end = new Date(attributes.enrollment_end);
-        }
-        return attributes;
+        course_image_asset_path: '', // the full URL (/c4x/org/course/num/asset/filename)
+        pre_requisite_courses: [],
+        entrance_exam_enabled : '',
+        entrance_exam_minimum_score_pct: '50'
     },
 
     validate: function(newattrs) {
@@ -59,6 +46,16 @@ var CourseDetails = Backbone.Model.extend({
                 errors.intro_video = gettext("Key should only contain letters, numbers, _, or -");
             }
             // TODO check if key points to a real video using google's youtube api
+        }
+        if(_.has(newattrs, 'entrance_exam_minimum_score_pct')){
+            var range = {
+                min: 1,
+                max: 100
+            };
+            if(!ValidationHelpers.validateIntegerRange(newattrs.entrance_exam_minimum_score_pct, range)){
+                errors.entrance_exam_minimum_score_pct = gettext("Please enter an integer between "
+                    + range.min +" and "+ range.max +".");
+            }
         }
         if (!_.isEmpty(errors)) return errors;
         // NOTE don't return empty errors as that will be interpreted as an error state

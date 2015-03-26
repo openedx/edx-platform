@@ -9,11 +9,12 @@ from edxmako.shortcuts import render_to_response
 
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import LibraryLocator
 from util.json_request import JsonResponse, expect_json
-from student.roles import CourseInstructorRole, CourseStaffRole
+from student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
 from course_creators.views import user_requested_access
 
-from .access import has_course_access
+from student.auth import STUDIO_EDIT_ROLES, STUDIO_VIEW_USERS, get_user_permissions
 
 from student.models import CourseEnrollment
 from django.http import HttpResponseNotFound
@@ -50,8 +51,7 @@ def course_team_handler(request, course_key_string=None, email=None):
         json: remove a particular course team member from the course team (email is required).
     """
     course_key = CourseKey.from_string(course_key_string) if course_key_string else None
-    if not has_course_access(request.user, course_key):
-        raise PermissionDenied()
+    # No permissions check here - each helper method does its own check.
 
     if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         return _course_team_user(request, course_key, email)
@@ -66,7 +66,8 @@ def _manage_users(request, course_key):
     This view will return all CMS users who are editors for the specified course
     """
     # check that logged in user has permissions to this item
-    if not has_course_access(request.user, course_key):
+    user_perms = get_user_permissions(request.user, course_key)
+    if not user_perms & STUDIO_VIEW_USERS:
         raise PermissionDenied()
 
     course_module = modulestore().get_course(course_key)
@@ -78,7 +79,7 @@ def _manage_users(request, course_key):
         'context_course': course_module,
         'staff': staff,
         'instructors': instructors,
-        'allow_actions': has_course_access(request.user, course_key, role=CourseInstructorRole),
+        'allow_actions': bool(user_perms & STUDIO_EDIT_ROLES),
     })
 
 
@@ -88,18 +89,14 @@ def _course_team_user(request, course_key, email):
     Handle the add, remove, promote, demote requests ensuring the requester has authority
     """
     # check that logged in user has permissions to this item
-    if has_course_access(request.user, course_key, role=CourseInstructorRole):
-        # instructors have full permissions
-        pass
-    elif has_course_access(request.user, course_key, role=CourseStaffRole) and email == request.user.email:
-        # staff can only affect themselves
+    requester_perms = get_user_permissions(request.user, course_key)
+    permissions_error_response = JsonResponse({"error": _("Insufficient permissions")}, 403)
+    if (requester_perms & STUDIO_VIEW_USERS) or (email == request.user.email):
+        # This user has permissions to at least view the list of users or is editing themself
         pass
     else:
-        msg = {
-            "error": _("Insufficient permissions")
-        }
-        return JsonResponse(msg, 400)
-
+        # This user is not even allowed to know who the authorized users are.
+        return permissions_error_response
 
     try:
         user = User.objects.get(email=email)
@@ -109,7 +106,13 @@ def _course_team_user(request, course_key, email):
         }
         return JsonResponse(msg, 404)
 
-    # role hierarchy: globalstaff > "instructor" > "staff" (in a course)
+    is_library = isinstance(course_key, LibraryLocator)
+    # Ordered list of roles: can always move self to the right, but need STUDIO_EDIT_ROLES to move any user left
+    if is_library:
+        role_hierarchy = (CourseInstructorRole, CourseStaffRole, LibraryUserRole)
+    else:
+        role_hierarchy = (CourseInstructorRole, CourseStaffRole)
+
     if request.method == "GET":
         # just return info about the user
         msg = {
@@ -118,11 +121,16 @@ def _course_team_user(request, course_key, email):
             "role": None,
         }
         # what's the highest role that this user has? (How should this report global staff?)
-        for role in [CourseInstructorRole(course_key), CourseStaffRole(course_key)]:
-            if role.has_user(user):
+        for role in role_hierarchy:
+            if role(course_key).has_user(user):
                 msg["role"] = role.ROLE
                 break
         return JsonResponse(msg)
+
+    # All of the following code is for editing/promoting/deleting users.
+    # Check that the user has STUDIO_EDIT_ROLES permission or is editing themselves:
+    if not ((requester_perms & STUDIO_EDIT_ROLES) or (user.id == request.user.id)):
+        return permissions_error_response
 
     # can't modify an inactive user
     if not user.is_active:
@@ -132,60 +140,44 @@ def _course_team_user(request, course_key, email):
         return JsonResponse(msg, 400)
 
     if request.method == "DELETE":
-        try:
-            try_remove_instructor(request, course_key, user)
-        except CannotOrphanCourse as oops:
-            return JsonResponse(oops.msg, 400)
+        new_role = None
+    else:
+        # only other operation supported is to promote/demote a user by changing their role:
+        # role may be None or "" (equivalent to a DELETE request) but must be set.
+        # Check that the new role was specified:
+        if "role" in request.json or "role" in request.POST:
+            new_role = request.json.get("role", request.POST.get("role"))
+        else:
+            return JsonResponse({"error": _("No `role` specified.")}, 400)
 
-        auth.remove_users(request.user, CourseStaffRole(course_key), user)
-        return JsonResponse()
+    old_roles = set()
+    role_added = False
+    for role_type in role_hierarchy:
+        role = role_type(course_key)
+        if role_type.ROLE == new_role:
+            if (requester_perms & STUDIO_EDIT_ROLES) or (user.id == request.user.id and old_roles):
+                # User has STUDIO_EDIT_ROLES permission or
+                # is currently a member of a higher role, and is thus demoting themself
+                auth.add_users(request.user, role, user)
+                role_added = True
+            else:
+                return permissions_error_response
+        elif role.has_user(user):
+            # Remove the user from this old role:
+            old_roles.add(role)
 
-    # all other operations require the requesting user to specify a role
-    role = request.json.get("role", request.POST.get("role"))
-    if role is None:
-        return JsonResponse({"error": _("`role` is required")}, 400)
+    if new_role and not role_added:
+        return JsonResponse({"error": _("Invalid `role` specified.")}, 400)
 
-    if role == "instructor":
-        if not has_course_access(request.user, course_key, role=CourseInstructorRole):
-            msg = {
-                "error": _("Only instructors may create other instructors")
-            }
+    for role in old_roles:
+        if isinstance(role, CourseInstructorRole) and role.users_with_role().count() == 1:
+            msg = {"error": _("You may not remove the last Admin. Add another Admin first.")}
             return JsonResponse(msg, 400)
-        auth.add_users(request.user, CourseInstructorRole(course_key), user)
-        # auto-enroll the course creator in the course so that "View Live" will work.
-        CourseEnrollment.enroll(user, course_key)
-    elif role == "staff":
-        # add to staff regardless (can't do after removing from instructors as will no longer
-        # be allowed)
-        auth.add_users(request.user, CourseStaffRole(course_key), user)
-        try:
-            try_remove_instructor(request, course_key, user)
-        except CannotOrphanCourse as oops:
-            return JsonResponse(oops.msg, 400)
+        auth.remove_users(request.user, role, user)
 
-        # auto-enroll the course creator in the course so that "View Live" will work.
+    if new_role and not is_library:
+        # The user may be newly added to this course.
+        # auto-enroll the user in the course so that "View Live" will work.
         CourseEnrollment.enroll(user, course_key)
 
     return JsonResponse()
-
-
-class CannotOrphanCourse(Exception):
-    """
-    Exception raised if an attempt is made to remove all responsible instructors from course.
-    """
-    def __init__(self, msg):
-        self.msg = msg
-        Exception.__init__(self)
-
-
-def try_remove_instructor(request, course_key, user):
-
-    # remove all roles in this course from this user: but fail if the user
-    # is the last instructor in the course team
-    instructors = CourseInstructorRole(course_key)
-    if instructors.has_user(user):
-        if instructors.users_with_role().count() == 1:
-            msg = {"error": _("You may not remove the last instructor from a course")}
-            raise CannotOrphanCourse(msg)
-        else:
-            auth.remove_users(request.user, instructors, user)

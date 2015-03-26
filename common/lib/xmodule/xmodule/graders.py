@@ -359,8 +359,10 @@ class AssignmentFormatGrader(CourseGrader):
             # if there is only one entry in a section, suppress the existing individual entry and the average,
             # and just display a single entry for the section.  That way it acts automatically like a
             # SingleSectionGrader.
-            total_detail = u"{section_type} = {percent:.0%}".format(percent=total_percent,
-                                                                   section_type=self.section_type)
+            total_detail = u"{section_type} = {percent:.0%}".format(
+                percent=total_percent,
+                section_type=self.section_type,
+            )
             total_label = u"{short_label}".format(short_label=self.short_label)
             breakdown = [{'percent': total_percent, 'label': total_label,
                           'detail': total_detail, 'category': self.category, 'prominent': True}, ]

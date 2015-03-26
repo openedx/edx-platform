@@ -2,10 +2,12 @@
 import json
 import logging
 import sys
+from lxml import etree
 
 from pkg_resources import resource_string
 
 from .capa_base import CapaMixin, CapaFields, ComplexEncoder
+from capa import responsetypes
 from .progress import Progress
 from xmodule.x_module import XModule, module_attr
 from xmodule.raw_module import RawDescriptor
@@ -88,11 +90,11 @@ class CapaModule(CapaMixin, XModule):
 
         except NotFoundError as err:
             _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
-            raise ProcessingError, (not_found_error_message, err), traceback_obj
+            raise ProcessingError(not_found_error_message), None, traceback_obj
 
         except Exception as err:
             _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
-            raise ProcessingError, (generic_error_message, err), traceback_obj
+            raise ProcessingError(generic_error_message), None, traceback_obj
 
         after = self.get_progress()
 
@@ -138,7 +140,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
         Show them only if use_latex_compiler is set to True in
         course settings.
         """
-        return (not 'latex' in template['template_id'] or course.use_latex_compiler)
+        return ('latex' not in template['template_id'] or course.use_latex_compiler)
 
     def get_context(self):
         _context = RawDescriptor.get_context(self)
@@ -171,6 +173,13 @@ class CapaDescriptor(CapaFields, RawDescriptor):
             CapaDescriptor.use_latex_compiler,
         ])
         return non_editable_fields
+
+    @property
+    def problem_types(self):
+        """ Low-level problem type introspection for content libraries filtering by problem type """
+        tree = etree.XML(self.data)  # pylint: disable=no-member
+        registered_tags = responsetypes.registry.registered_tags()
+        return set([node.tag for node in tree.iter() if node.tag in registered_tags])
 
     # Proxy to CapaModule for access to any of its attributes
     answer_available = module_attr('answer_available')

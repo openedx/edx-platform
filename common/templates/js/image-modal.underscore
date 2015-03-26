@@ -3,36 +3,36 @@
     <%= smallHTML%>
     <a href="#" class="modal-ui-icon action-fullscreen" role="button">
       <span class="label">
-        <i class="icon-fullscreen icon-large"></i> <%= gettext("Fullscreen") %>
+        <i class="icon fa fa-arrows-alt fa-large"></i> <%= gettext("Fullscreen") %>
       </span>
     </a>
   </section>
-  
+
   <section class="image-modal">
     <section class="image-content">
       <div class="image-wrapper">
         <img alt="<%= largeALT %>, <%= gettext('Large') %>" src="<%= largeSRC %>" />
       </div>
-      
+
       <a href="#" class="modal-ui-icon action-close" role="button">
         <span class="label">
-          <i class="icon-remove icon-large"></i> <%= gettext("Close") %>
+          <i class="icon fa fa-remove fa-large"></i> <%= gettext("Close") %>
         </span>
       </a>
-      
+
       <ul class="image-controls">
         <li class="image-control">
           <a href="#" class="modal-ui-icon action-zoom-in" role="button">
             <span class="label">
-              <i class="icon-zoom-in icon-large"></i> <%= gettext("Zoom In") %>
+              <i class="icon fa fa fa-search-plus fa-large"></i> <%= gettext("Zoom In") %>
             </span>
           </a>
         </li>
-    
+
         <li class="image-control">
-          <a href="#" class="modal-ui-icon action-zoom-out is-disabled" role="button">
+          <a href="#" class="modal-ui-icon action-zoom-out is-disabled" aria-disabled="true" role="button">
             <span class="label">
-              <i class="icon-zoom-out icon-large"></i> <%= gettext("Zoom Out") %>
+              <i class="icon fa fa fa-search-minus fa-large"></i> <%= gettext("Zoom Out") %>
             </span>
           </a>
         </li>

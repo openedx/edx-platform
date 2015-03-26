@@ -1,5 +1,8 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%page args="section_data"/>
+<%! from courseware.courses import get_studio_url %>
+<%! from microsite_configuration import microsite %>
+<%! from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition %>
 
 <script type="text/template" id="member-list-widget-template">
   <div class="member-list-widget">
@@ -26,8 +29,7 @@
   </div>
 </script>
 
-<div class="vert-left">
-<div class="batch-enrollment">
+<div class="batch-enrollment membership-section">
   <h2> ${_("Batch Enrollment")} </h2>
   <p>
     <label for="student-ids">
@@ -41,7 +43,7 @@
     <label for="auto-enroll">${_("Auto Enroll")}</label>
     <div class="hint auto-enroll-hint">
       <span class="hint-caret"></span>
-      <p> 
+      <p>
 	${_("If this option is <em>checked</em>, users who have not yet registered for {platform_name} will be automatically enrolled.").format(platform_name=settings.PLATFORM_NAME)}
 	${_("If this option is left <em>unchecked</em>, users who have not yet registered for {platform_name} will not be enrolled, but will be allowed to enroll once they make an account.").format(platform_name=settings.PLATFORM_NAME)}
 	<br /><br />
@@ -55,7 +57,7 @@
     <label for="email-students">${_("Notify users by email")}</label>
     <div class="hint email-students-hint">
       <span class="hint-caret"></span>
-      <p> 
+      <p>
 	${_("If this option is <em>checked</em>, users will receive an email notification.")}
       </p>
     </div>
@@ -69,8 +71,34 @@
   <div class="request-response-error"></div>
 </div>
 
+%if microsite.get_value('ALLOW_AUTOMATED_SIGNUPS', settings.FEATURES.get('ALLOW_AUTOMATED_SIGNUPS', False)):
+  <hr class="divider" />
+
+  <div class="auto_enroll auto_enroll_csv">
+    <h2> ${_("Register/Enroll Students")} </h2>
+    <p>
+    ${_("To register and enroll a list of users in this course, choose a CSV file that contains the following columns in this exact order: email, username, name, and country. Please include one student per row and do not include any headers, footers, or blank lines.")}
+    </p>
+    <form id="student-auto-enroll-form" method="post" action="${ section_data['upload_student_csv_button_url'] }" enctype="multipart/form-data">
+      <div class="customBrowseBtn">
+        <input disabled="disabled" id="browseFile" placeholder="choose file" />
+        <div class="file-browse btn btn-primary">
+            <span class="browse"> Browse </span>
+            <input class="file_field" id="browseBtn" name="students_list" type="file" accept=".csv"/>
+        </div>
+      </div>
+      <button type="submit" name="enrollment_signup_button">${_("Upload CSV")}</button>
+
+      <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+    </form>
+    <div class="results"></div>
+  </div>
+%endif
+
+<hr class="divider" />
+
 %if section_data['access']['instructor']:
-<div class="batch-beta-testers">
+<div class="batch-beta-testers membership-section">
   <h2> ${_("Batch Beta Tester Addition")} </h2>
   <p>
     <label for="student-ids-for-beta">
@@ -111,10 +139,11 @@
   <div class="request-response"></div>
   <div class="request-response-error"></div>
 </div>
-%endif
-</div>
 
-<div class="vert-right member-lists-management">
+<hr class="divider" />
+%endif
+
+<div class="member-lists-management membership-section">
   ## Translators: an "Administration List" is a list, such as Course Staff, that users can be added to.
   <h2> ${_("Administration List Management")} </h2>
 
@@ -216,3 +245,53 @@
   %endif
 
 </div>
+
+% if course.is_cohorted:
+    <hr class="divider" />
+    <div class="cohort-management membership-section"
+         data-ajax_url="${section_data['cohorts_ajax_url']}"
+         data-advanced-settings-url="${section_data['advanced_settings_url']}"
+         data-upload_cohorts_csv_url="${section_data['upload_cohorts_csv_url']}"
+    >
+    </div>
+
+    <%block name="headextra">
+        <%
+        cohorted_user_partition = get_cohorted_user_partition(course.id)
+        content_groups = cohorted_user_partition.groups if cohorted_user_partition else []
+        %>
+        <script>
+        $(document).ready(function() {
+            var cohortManagementElement = $('.cohort-management');
+            if (cohortManagementElement.length > 0) {
+                var cohorts = new edx.groups.CohortCollection(),
+                    cohortUserPartitionId = ${cohorted_user_partition.id if cohorted_user_partition else 'null'},
+                    contentGroups = [
+                        % for content_group in content_groups:
+                            new edx.groups.ContentGroupModel({
+                                id: ${content_group.id},
+                                name: "${content_group.name | h}",
+                                user_partition_id: cohortUserPartitionId
+                            }),
+                        % endfor
+                    ];
+                cohorts.url = cohortManagementElement.data('ajax_url');
+                var cohortsView = new edx.groups.CohortsView({
+                    el: cohortManagementElement,
+                    model: cohorts,
+                    contentGroups: contentGroups,
+                    context: {
+                        uploadCohortsCsvUrl: cohortManagementElement.data('upload_cohorts_csv_url'),
+                        studioAdvancedSettingsUrl: cohortManagementElement.data('advanced-settings-url'),
+                        studioGroupConfigurationsUrl: '${get_studio_url(course, 'group_configurations') | h}'
+                    }
+                });
+                cohorts.fetch().done(function() {
+                    cohortsView.render();
+                });
+            }
+        });
+        </script>
+
+    </%block>
+% endif

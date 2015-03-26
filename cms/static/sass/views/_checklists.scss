@@ -5,12 +5,10 @@
 
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
-    float: left;
   }
 
   .content-primary {
-    width: flex-grid(9, 12);
-    margin-right: flex-gutter();
+    @extend .ui-col-wide;
   }
 
   // checklists - general
@@ -45,7 +43,7 @@
         }
       }
     }
-    // <span class="viz viz-checklist-status"><span class="viz value viz-checklist-status-value"><span class="int">0</span>% of checklist completed</span></span>
+
 
     // header/title
     header {
@@ -58,20 +56,21 @@
       .checklist-title {
         @include transition(color $tmg-f2 ease-in-out 0s);
         width: flex-grid(6, 9);
-        margin: 0 flex-gutter() 0 0;
-        float: left;
+        margin: 0;
+        @include margin-right(flex-gutter());
+        @include float(left);
 
         .ui-toggle-expansion {
           @include transition(all $tmg-f2 ease-in-out 0s);
           @extend %t-action1;
           display: inline-block;
           vertical-align: middle;
-          margin-right: ($baseline/2);
+          @include margin-right($baseline/2);
           color: $gray-l4;
         }
 
         &.is-selectable {
-          cursor: pointer;
+          @extend %ui-fake-link;
 
           &:hover {
             color: $blue;
@@ -86,13 +85,13 @@
       .checklist-status {
         @extend %t-copy-sub1;
         width: flex-grid(3, 9);
-        float: right;
+        @include float(right);
         margin-top: ($baseline/2);
-        text-align: right;
+        @include text-align(right);
         color: $gray-l2;
 
 
-        .icon-ok {
+        .fa-check-square-o {
           @extend %t-icon4;
           display: inline-block;
           margin-left: ($baseline/2);
@@ -127,9 +126,9 @@
 
       .action-primary {
         @include green-button();
-        float: left;
+        @include float(left);
 
-        .icon-add {
+        .fa-plus {
           @extend %t-icon7;
           display: inline-block;
           vertical-align: middle;
@@ -141,9 +140,9 @@
         @include grey-button();
         @extend %t-action3;
         @extend %t-regular;
-        float: right;
+        @include float(right);
 
-        .icon-delete {
+        .fa-trash-o {
           @extend %t-icon7;
           display: inline-block;
           vertical-align: middle;
@@ -184,13 +183,13 @@
 
       header {
 
-        .checklist-title, .icon-caret-down {
+        .checklist-title, .fa-caret-down {
           color: $green;
         }
 
         .checklist-status {
 
-          .status-count, .status-amount, .icon-ok {
+          .status-count, .status-amount, .fa-check-square-o {
             color: $green;
           }
         }
@@ -227,21 +226,22 @@
       .task-input {
         display: inline-block;
         vertical-align: text-top;
-        float: left;
-        margin: ($baseline/2) flex-gutter() 0 0;
+        @include float(left);
+        margin-top: ($baseline/2);
+        @include margin-right(flex-gutter());
       }
 
       .task-details {
         @extend %t-strong;
         display: inline-block;
         vertical-align: text-top;
-        float: left;
+        @include float(left);
         width: flex-grid(6,9);
 
         .task-name {
           @include transition(color $tmg-f2 ease-in-out 0s);
+          @extend %ui-fake-link;
           vertical-align: baseline;
-          cursor: pointer;
           margin-bottom: 0;
         }
 
@@ -260,11 +260,11 @@
       }
 
       .task-actions {
-        @include transition(opacity $tmg-f2 ease-in-out 0.25s);
+        @include transition(opacity $tmg-f2 ease-in-out $tmg-f2);
         @include clearfix();
         display: inline-block;
         vertical-align: middle;
-        float: right;
+        @include float(right);
         width: flex-grid(2,9);
         margin: ($baseline/2) 0 0 flex-gutter();
         opacity: 0.0;
@@ -336,6 +336,6 @@
   }
 
   .content-supplementary {
-    width: flex-grid(3, 12);
+    @extend .ui-col-narrow;
   }
 }

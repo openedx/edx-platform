@@ -2,6 +2,7 @@ import logging
 from xmodule.fields import Timedelta
 log = logging.getLogger(__name__)
 
+
 class TimeInfo(object):
     """
     This is a simple object that calculates and stores datetime information for an XModule
@@ -14,6 +15,7 @@ class TimeInfo(object):
 
     """
     _delta_standin = Timedelta()
+
     def __init__(self, due_date, grace_period_string_or_timedelta):
         if due_date is not None:
             self.display_due_date = due_date

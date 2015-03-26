@@ -4,7 +4,7 @@ h2.problem-header {
 
 div.problem-progress {
   display: inline-block;
-  padding-left: 5px;
+  padding-left: ($baseline/4);
   color: #666;
   font-weight: 100;
   font-size: em(16);
@@ -17,14 +17,12 @@ div.lti {
 
     .wrapper-lti-link {
         @include font-size(14);
-        position: relative;
         background-color: $sidebar-color;
-        padding: ($baseline*1.8) ($baseline*1.5) ($baseline*1.1) $baseline;
+        padding: $baseline;
 
         .lti-link {
-            position: absolute;
-            top: ($baseline*1.8);
-            right: $baseline;
+            margin-bottom: 0;
+            text-align: right;
 
             .link_lti_new_window {
                 @extend .gray-button;
@@ -32,10 +30,6 @@ div.lti {
                 @include line-height(14);
             }
         }
-    }
-
-    div.ltiTextBox {
-        width: 280px;
     }
 
     form.ltiLaunchForm {
@@ -56,8 +50,8 @@ div.lti {
     }
 
     div.problem-feedback {
-        margin-top: 5px;
-        margin-bottom: 5px;
+        margin-top: ($baseline/4);
+        margin-bottom: ($baseline/4);
 
     }
 }

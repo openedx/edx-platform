@@ -1,7 +1,7 @@
 // studio - utilities - INHERITED mixins and extends
 
 // NOTE: these are older/poorly architected mixins that we want to move away from using or refactor in the future.
-// They are still referenced when styliing current interface elements and as such need to be preserved for the time being.
+// They are still referenced when styling current interface elements and as such need to be preserved for the time being.
 // talbs: we need to slowly ween ourselves off of these
 // ====================
 
@@ -122,7 +122,7 @@
   @include transition(background-color 0.15s, box-shadow 0.15s);
   @extend %t-action3;
   @extend %t-strong;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset, 0 0 0 rgba(0, 0, 0, 0);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset, 0 0 0 $transparent;
   display: inline-block;
   padding: ($baseline/5) $baseline ($baseline/4);
 
@@ -296,20 +296,7 @@
   }
 }
 
-@mixin dark-grey-button {
-  @include button;
-  border: 1px solid $gray-d2;
-  border-radius: 3px;
-  background: -webkit-linear-gradient(top, rgba(255, 255, 255, .2), rgba(255, 255, 255, 0)) $gray-d1;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, .2) inset;
-  color: $white;
-
-  &:hover, &:focus {
-    background-color: $gray-d4;
-    color: $white;
-  }
-}
-
+// only needed for course updates
 @mixin edit-box {
   box-shadow: 0 1px 0 rgba(255, 255, 255, .2) inset;
   padding: 15px 20px;
@@ -333,11 +320,11 @@
   h5 {
     @extend %t-strong;
     margin-bottom: 8px;
-    color: #fff;
+    color: $white;
   }
 
   .row {
-    margin-bottom: 10px;
+    margin-bottom: ($baseline/2);
     padding: 0;
     border: none;
   }
@@ -353,99 +340,12 @@
   }
 }
 
-@mixin tree-view {
-  border: 0;
-  background: $white;
-
-  .branch {
-    margin-bottom: 0;
-  }
-
-  .branch > .section-item {
-    border-top: 1px solid #c5cad4;
-  }
-
-  .section-item {
-    @include transition(background $tmg-avg ease-in-out 0);
-    @extend %t-action3;
-    position: relative;
-    display: block;
-    padding: 6px 8px 8px 16px;
-    background: #edf1f5;
-
-    &:hover, &:focus {
-      background: $blue-l5;
-
-      .item-actions {
-        display: block;
-      }
-    }
-
-    &.editing {
-      background: $orange-l4;
-    }
-
-    .draft-item:after,
-    .public-item:after,
-    .private-item:after {
-      @extend %t-strong;
-      @extend %t-action5;
-      margin-left: 3px;
-      text-transform: uppercase;
-    }
-
-    .draft-item:after {
-      content: "- draft";
-    }
-
-    .private-item:after {
-      content: "- private";
-    }
-
-    .private-item {
-      color: $gray-l1;
-    }
-
-    .draft-item {
-      color: $yellow-d1;
-    }
-  }
-
-  a {
-    color: $baseFontColor;
-
-    &.new-unit-item {
-      color: #6d788b;
-    }
-  }
-
-  ol {
-    .section-item {
-      padding-left: 56px;
-    }
-
-    .new-unit-item {
-      margin-left: 56px;
-    }
-  }
-
-  ol ol {
-    .section-item {
-      padding-left: 96px;
-    }
-
-    .new-unit-item {
-      margin-left: 96px;
-    }
-  }
-}
-
 // ====================
 
 // sunsetted mixins
 @mixin active {
   @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
-  box-shadow: 0 -1px 0 rgba(0, 0, 0, .2) inset, 0 1px 0 #fff inset;
+  box-shadow: 0 -1px 0 $shadow inset, 0 1px 0 $white inset;
   background-color: rgba(255, 255, 255, .3);
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }

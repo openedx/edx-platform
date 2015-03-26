@@ -7,6 +7,7 @@ class @DiscussionViewSpecHelper
           pinned: false,
           endorsed: false,
           votes: {up_count: '0'},
+          read: false,
           unread_comments_count: 0,
           comments_count: 0,
           abuse_flaggers: [],
@@ -20,7 +21,7 @@ class @DiscussionViewSpecHelper
         button = view.$el.find(".action-vote")
         expect(button.hasClass("is-checked")).toBe(user.voted(model))
         expect(button.attr("aria-checked")).toEqual(user.voted(model).toString())
-        expect(button.find(".js-visual-vote-count").text()).toMatch("^#{model.get('votes').up_count} Votes?$")
+        expect(button.find(".vote-count").text()).toMatch("^#{model.get('votes').up_count} Votes?$")
         expect(button.find(".sr.js-sr-vote-count").text()).toMatch("^currently #{model.get('votes').up_count} votes?$")
 
     @checkRenderVote = (view, model) ->

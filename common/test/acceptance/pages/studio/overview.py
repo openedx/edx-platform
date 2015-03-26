@@ -305,7 +305,8 @@ class CourseOutlineChild(PageObject, CourseOutlineItem):
             grandkids.extend(descendant.children)
 
         grand_locators = [grandkid.locator for grandkid in grandkids]
-        return [descendant for descendant in descendants if not descendant.locator in grand_locators]
+        return [descendant for descendant in descendants if descendant.locator not in grand_locators]
+
 
 class CourseOutlineUnit(CourseOutlineChild):
     """
@@ -328,6 +329,7 @@ class CourseOutlineUnit(CourseOutlineChild):
     def children(self):
         return self.q(css=self._bounded_selector(self.BODY_SELECTOR)).map(
             lambda el: CourseOutlineUnit(self.browser, el.get_attribute('data-locator'))).results
+
 
 class CourseOutlineSubsection(CourseOutlineContainer, CourseOutlineChild):
     """
@@ -487,11 +489,15 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         click_css(self, '.wrapper-mast nav.nav-actions .button-new')
 
-    def add_section_from_bottom_button(self):
+    def add_section_from_bottom_button(self, click_child_icon=False):
         """
         Clicks the button for adding a section which resides at the bottom of the screen.
         """
-        click_css(self, self.BOTTOM_ADD_SECTION_BUTTON)
+        element_css = self.BOTTOM_ADD_SECTION_BUTTON
+        if click_child_icon:
+            element_css += " .fa-plus"
+
+        click_css(self, element_css)
 
     def toggle_expand_collapse(self):
         """
@@ -614,6 +620,7 @@ class CourseOutlineModal(object):
         for i in xrange(abs(date_diff)):
             self.page.q(css=selector).click()
         self.page.q(css="a.ui-state-default").nth(day - 1).click()  # set day
+        self.page.wait_for_element_invisibility("#ui-datepicker-div", "datepicker should be closed")
         EmptyPromise(
             lambda: getattr(self, property_name) == u'{m}/{d}/{y}'.format(m=month, d=day, y=year),
             "{} is updated in modal.".format(property_name)

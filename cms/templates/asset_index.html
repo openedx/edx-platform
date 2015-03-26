@@ -17,18 +17,15 @@
 % endfor
 </%block>
 
-<%block name="jsextra">
-<script type="text/javascript">
-    require(["jquery", "js/collections/asset", "js/views/assets", "jquery.fileupload"],
-            function($, AssetCollection, AssetsView) {
-
-        var assets = new AssetCollection();
-        assets.url = "${asset_callback_url}";
-        var assetsView = new AssetsView({collection: assets, el: $('.assets-wrapper')});
-        assetsView.render();
-
-    }); // end of require()
-</script>
+<%block name="requirejs">
+    require(["js/factories/asset_index"], function (AssetIndexFactory) {
+        AssetIndexFactory({
+          assetCallbackUrl: "${asset_callback_url}",
+          uploadChunkSizeInMBs: ${chunk_size_in_mbs},
+          maxFileSizeInMBs: ${max_file_size_in_mbs},
+          maxFileSizeRedirectUrl: "${max_file_size_redirect_url}"
+        });
+    });
 </%block>
 
 <%block name="content">
@@ -44,7 +41,7 @@
             <h3 class="sr">${_("Page Actions")}</h3>
             <ul>
                 <li class="nav-item">
-                    <a href="#" class="button upload-button new-button"><i class="icon-plus"></i> ${_("Upload New File")}</a>
+                    <a href="#" class="button upload-button new-button"><i class="icon fa fa-plus"></i> ${_("Upload New File")}</a>
                 </li>
             </ul>
         </nav>
@@ -54,40 +51,44 @@
 <div class="wrapper-content wrapper">
     <section class="content">
         <article class="content-primary" role="main">
-            <div class="assets-wrapper"/>
+            <div class="wrapper-assets" />
             <div class="ui-loading">
-                <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">${_("Loading&hellip;")}</span></p>
+                <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">${_("Loading")}</span></p>
             </div>
         </article>
 
-        <aside class="content-supplementary" role="complimentary">
+        <aside class="content-supplementary" role="complementary">
             <div class="bit">
-                <h3 class="title-3">${_("What files are listed here?")}</h3>
-            	<p>${_("In addition to the files you upload on this page, any files that you add to the course appear in this list. These files include your course image, textbook chapters, and files that appear on your Course Handouts sidebar.")}</p>
+                <h3 class="title-3">${_("Adding Files for Your Course")}</h3>
+
+                <p>${_("To add files to use in your course, click {em_start}Upload New File{em_end}. Then follow the prompts to upload a file from your computer.").format(em_start='<strong>', em_end="</strong>")}</p>
+
+                <p>${_("{em_start}Caution{em_end}: {platform_name} recommends that you limit the file size to {em_start}10 MB{em_end}. In addition, do not upload video or audio files. You should use a third party service to host multimedia files.").format(em_start='<strong>', em_end="</strong>", platform_name=settings.PLATFORM_NAME)}</p>
+
+            	<p>${_("The course image, textbook chapters, and files that appear on your Course Handouts sidebar also appear in this list.")}</p>
             </div>
             <div class="bit">
-                <h3 class="title-3">${_("File URLs")}</h3>
-                 <ul class="list-details">
-                    <li class="item-detail">${_("You use the Embed URL value to link to the file or image from a component, a course update, or a course handout.")}</li>
-                    <li class="item-detail">${_("You use the External URL value to reference the file or image from outside of your course. Do not use the External URL as a link value within your course.")}</li>
-          			
-        		</ul>
+                <h3 class="title-3">${_("Using File URLs")}</h3>
+
+                <p>${_("Use the {em_start}{studio_name} URL{em_end} value to link to the file or image from a component, a course update, or a course handout.").format(studio_name=settings.STUDIO_SHORT_NAME, em_start="<strong>", em_end="</strong>")}</p>
+
+                <p>${_("Use the {em_start}Web URL{em_end} value to reference the file or image only from outside of your course. {em_start}Note:{em_end} If you lock a file, the Web URL no longer works for external access to a file.").format(em_start='<strong>', em_end="</strong>")}</p>
+
+                <p>${_("To copy a URL, double click the value in the URL column, then copy the selected text.")}</p>
             </div>
-             <div class="bit">
-                <h3 class="title-3">${_("What can I do on this page?")}</h3>
-                 <ul class="list-details">
-                    <li class="item-detail">${_("You can upload new files or view, download, or delete existing files. You can lock a file so that people who are not enrolled in your course cannot access that file.")}</li>
-                    
-                </ul>
+            <div class="bit external-help">
+                <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about managing files")}</a>
             </div>
+
         </aside>
     </section>
 </div>
 
 <div class="upload-modal modal">
-    <a href="#" class="close-button"><i class="icon-remove-sign"></i> <span class="sr">${_('close')}</span></a>
+    <a href="#" class="close-button"><i class="icon fa fa-times-circle"></i> <span class="sr">${_('close')}</span></a>
     <div class="modal-body">
         <h1 class="title">${_("Upload New File")}</h1>
+        <h2>${_("Max per-file size: {max_filesize}MB").format(max_filesize=max_file_size_in_mbs)}</h2>
         <p class="file-name">
         <div class="progress-bar">
             <div class="progress-fill"></div>
@@ -111,14 +112,14 @@
 <!-- alert: save confirmed with close -->
 <div class="wrapper wrapper-alert wrapper-alert-confirmation" role="status">
     <div class="alert confirmation">
-        <i class="icon-ok"></i>
+        <i class="icon fa fa-check"></i>
 
         <div class="copy">
             <h2 class="title title-3">${_('Your file has been deleted.')}</h2>
         </div>
 
         <a href="" rel="view" class="action action-alert-close">
-            <i class="icon-remove-sign"></i>
+            <i class="icon fa fa-times-circle"></i>
             <span class="label">${_('close alert')}</span>
         </a>
     </div>

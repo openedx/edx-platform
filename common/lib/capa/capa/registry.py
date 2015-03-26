@@ -1,5 +1,6 @@
 """A registry for finding classes based on tags in the class."""
 
+
 class TagRegistry(object):
     """
     A registry mapping tags to handlers.
@@ -23,15 +24,20 @@ class TagRegistry(object):
         if len(cls.tags) == 0:
             raise ValueError("No tags specified for class {0}".format(cls.__name__))
 
-        for t in cls.tags:
-            if t in self._mapping:
-                other_cls = self._mapping[t]
+        for tag in cls.tags:
+            if tag in self._mapping:
+                other_cls = self._mapping[tag]
                 if cls == other_cls:
                     # registering the same class multiple times seems silly, but ok
                     continue
-                raise ValueError("Tag {0} already registered by class {1}."
-                                 " Can't register for class {2}"
-                                     .format(t, other_cls.__name__, cls.__name__))
+                raise ValueError(
+                    "Tag {0} already registered by class {1}."
+                    " Can't register for class {2}".format(
+                        tag,
+                        other_cls.__name__,
+                        cls.__name__,
+                    )
+                )
 
         # Ok, should be good to change state now.
         for t in cls.tags:

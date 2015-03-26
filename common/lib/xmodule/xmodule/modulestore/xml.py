@@ -18,22 +18,21 @@ from contextlib import contextmanager
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import make_error_tracker, exc_info_to_str
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.x_module import XMLParsingSystem, policy_key
+from xmodule.x_module import XMLParsingSystem, policy_key, OpaqueKeyReader, AsideKeyGenerator
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
 from xmodule.modulestore import ModuleStoreEnum, ModuleStoreReadBase
 from xmodule.tabs import CourseTabList
-from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 from opaque_keys.edx.locator import CourseLocator
 
 from xblock.field_data import DictFieldData
-from xblock.runtime import DictKeyValueStore, IdGenerator
+from xblock.runtime import DictKeyValueStore
 
 
 from .exceptions import ItemNotFoundError
 from .inheritance import compute_inherited_metadata, inheriting_field_data
 
-from xblock.fields import ScopeIds, Reference, ReferenceList, ReferenceValueDict
+from xblock.fields import ScopeIds
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
                                  remove_comments=True, remove_blank_text=True)
@@ -54,7 +53,7 @@ def clean_out_mako_templating(xml_string):
 
 class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
     def __init__(self, xmlstore, course_id, course_dir,
-                 error_tracker, parent_tracker,
+                 error_tracker,
                  load_error_modules=True, **kwargs):
         """
         A class that handles loading from xml.  Does some munging to ensure that
@@ -64,9 +63,9 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         """
         self.unnamed = defaultdict(int)  # category -> num of new url_names for that category
         self.used_names = defaultdict(set)  # category -> set of used url_names
-        id_generator = CourseLocationGenerator(course_id)
 
-        # cdodge: adding the course_id as passed in for later reference rather than having to recomine the org/course/url_name
+        # Adding the course_id as passed in for later reference rather than
+        # having to recombine the org/course/url_name
         self.course_id = course_id
         self.load_error_modules = load_error_modules
         self.modulestore = xmlstore
@@ -172,10 +171,10 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
                 make_name_unique(xml_data)
 
-                descriptor = create_block_from_xml(
-                    etree.tostring(xml_data, encoding='unicode'),
-                    self,
-                    id_generator,
+                descriptor = self.xblock_from_node(
+                    xml_data,
+                    None,  # parent_id
+                    id_manager,
                 )
             except Exception as err:  # pylint: disable=broad-except
                 if not self.load_error_modules:
@@ -201,17 +200,26 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 descriptor = ErrorDescriptor.from_xml(
                     xml,
                     self,
-                    id_generator,
+                    id_manager,
                     err_msg
                 )
 
             descriptor.data_dir = course_dir
 
+            if descriptor.scope_ids.usage_id in xmlstore.modules[course_id]:
+                # keep the parent pointer if any but allow everything else to overwrite
+                other_copy = xmlstore.modules[course_id][descriptor.scope_ids.usage_id]
+                descriptor.parent = other_copy.parent
+                if descriptor != other_copy:
+                    log.warning("%s has more than one definition", descriptor.scope_ids.usage_id)
             xmlstore.modules[course_id][descriptor.scope_ids.usage_id] = descriptor
 
             if descriptor.has_children:
                 for child in descriptor.get_children():
-                    parent_tracker.add_parent(child.scope_ids.usage_id, descriptor.scope_ids.usage_id)
+                    # parent is alphabetically least
+                    if child.parent is None or child.parent > descriptor.scope_ids.usage_id:
+                        child.parent = descriptor.location
+                        child.save()
 
             # After setting up the descriptor, save any changes that we have
             # made to attributes on the descriptor to the underlying KeyValueStore.
@@ -229,12 +237,16 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
         resources_fs = OSFS(xmlstore.data_dir / course_dir)
 
+        id_manager = CourseLocationManager(course_id)
+
         super(ImportSystem, self).__init__(
             load_item=load_item,
             resources_fs=resources_fs,
             render_template=render_template,
             error_tracker=error_tracker,
             process_xml=process_xml,
+            id_generator=id_manager,
+            id_reader=id_manager,
             **kwargs
         )
 
@@ -245,12 +257,13 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         block.children.append(child_block.scope_ids.usage_id)
 
 
-class CourseLocationGenerator(IdGenerator):
+class CourseLocationManager(OpaqueKeyReader, AsideKeyGenerator):
     """
     IdGenerator for Location-based definition ids and usage ids
     based within a course
     """
     def __init__(self, course_id):
+        super(CourseLocationManager, self).__init__()
         self.course_id = course_id
         self.autogen_ids = itertools.count(0)
 
@@ -263,105 +276,16 @@ class CourseLocationGenerator(IdGenerator):
             slug = 'autogen_{}_{}'.format(block_type, self.autogen_ids.next())
         return self.course_id.make_usage_key(block_type, slug)
 
+    def get_definition_id(self, usage_id):
+        """Retrieve the definition that a usage is derived from.
 
-def _make_usage_key(course_key, value):
-    """
-    Makes value into a UsageKey inside the specified course.
-    If value is already a UsageKey, returns that.
-    """
-    if isinstance(value, UsageKey):
-        return value
-    return course_key.make_usage_key_from_deprecated_string(value)
+        Args:
+            usage_id: The id of the usage to query
 
-
-def _convert_reference_fields_to_keys(xblock):  # pylint: disable=invalid-name
-    """
-    Find all fields of type reference and convert the payload into UsageKeys
-    """
-    course_key = xblock.scope_ids.usage_id.course_key
-
-    for field in xblock.fields.itervalues():
-        if field.is_set_on(xblock):
-            field_value = getattr(xblock, field.name)
-            if isinstance(field, Reference):
-                setattr(xblock, field.name, _make_usage_key(course_key, field_value))
-            elif isinstance(field, ReferenceList):
-                setattr(xblock, field.name, [_make_usage_key(course_key, ele) for ele in field_value])
-            elif isinstance(field, ReferenceValueDict):
-                for key, subvalue in field_value.iteritems():
-                    assert isinstance(subvalue, basestring)
-                    field_value[key] = _make_usage_key(course_key, subvalue)
-                setattr(xblock, field.name, field_value)
-
-
-def create_block_from_xml(xml_data, system, id_generator):
-    """
-    Create an XBlock instance from XML data.
-
-    Args:
-        xml_data (string): A string containing valid xml.
-        system (XMLParsingSystem): The :class:`.XMLParsingSystem` used to connect the block
-            to the outside world.
-        id_generator (IdGenerator): An :class:`~xblock.runtime.IdGenerator` that
-            will be used to construct the usage_id and definition_id for the block.
-
-    Returns:
-        XBlock: The fully instantiated :class:`~xblock.core.XBlock`.
-
-    """
-    node = etree.fromstring(xml_data)
-    raw_class = system.load_block_type(node.tag)
-    xblock_class = system.mixologist.mix(raw_class)
-
-    # leave next line commented out - useful for low-level debugging
-    # log.debug('[create_block_from_xml] tag=%s, class=%s' % (node.tag, xblock_class))
-
-    block_type = node.tag
-    url_name = node.get('url_name')
-    def_id = id_generator.create_definition(block_type, url_name)
-    usage_id = id_generator.create_usage(def_id)
-
-    scope_ids = ScopeIds(None, block_type, def_id, usage_id)
-    xblock = xblock_class.parse_xml(node, system, scope_ids, id_generator)
-
-    _convert_reference_fields_to_keys(xblock)
-
-    return xblock
-
-
-class ParentTracker(object):
-    """A simple class to factor out the logic for tracking location parent pointers."""
-    def __init__(self):
+        Returns:
+            The `definition_id` the usage is derived from
         """
-        Init
-        """
-        # location -> parent.  Not using defaultdict because we care about the empty case.
-        self._parents = dict()
-
-    def add_parent(self, child, parent):
-        """
-        Add a parent of child location to the set of parents.  Duplicate calls have no effect.
-
-        child and parent must be :class:`.Location` instances.
-        """
-        self._parents[child] = parent
-
-    def is_known(self, child):
-        """
-        returns True iff child has some parents.
-        """
-        return child in self._parents
-
-    def make_known(self, location):
-        """Tell the parent tracker about an object, without registering any
-        parents for it.  Used for the top level course descriptor locations."""
-        self._parents.setdefault(location, None)
-
-    def parent(self, child):
-        """
-        Return the parent of this child.  If not is_known(child), will throw a KeyError
-        """
-        return self._parents[child]
+        return usage_id
 
 
 class XMLModuleStore(ModuleStoreReadBase):
@@ -369,8 +293,8 @@ class XMLModuleStore(ModuleStoreReadBase):
     An XML backed ModuleStore
     """
     def __init__(
-        self, data_dir, default_class=None, course_dirs=None, course_ids=None,
-        load_error_modules=True, i18n_service=None, pyfs_service=None, **kwargs
+            self, data_dir, default_class=None, course_dirs=None, course_ids=None,
+            load_error_modules=True, i18n_service=None, fs_service=None, user_service=None, **kwargs
     ):
         """
         Initialize an XMLModuleStore from data_dir
@@ -381,8 +305,8 @@ class XMLModuleStore(ModuleStoreReadBase):
             default_class (str): dot-separated string defining the default descriptor
                 class to use if none is specified in entry_points
 
-            course_dirs or course_ids (list of str): If specified, the list of course_dirs or course_ids to load. Otherwise,
-                load all courses. Note, providing both
+            course_dirs or course_ids (list of str): If specified, the list of course_dirs or course_ids to load.
+                Otherwise, load all courses. Note, providing both
         """
         super(XMLModuleStore, self).__init__(**kwargs)
 
@@ -403,13 +327,12 @@ class XMLModuleStore(ModuleStoreReadBase):
             class_ = getattr(import_module(module_path), class_name)
             self.default_class = class_
 
-        self.parent_trackers = defaultdict(ParentTracker)
-
         # All field data will be stored in an inheriting field data.
         self.field_data = inheriting_field_data(kvs=DictKeyValueStore())
 
         self.i18n_service = i18n_service
-        self.pyfs_service = pyfs_service
+        self.fs_service = fs_service
+        self.user_service = user_service
 
         # If we are specifically asked for missing courses, that should
         # be an error.  If we are asked for "all" courses, find the ones
@@ -451,7 +374,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         else:
             self.courses[course_dir] = course_descriptor
             self._course_errors[course_descriptor.id] = errorlog
-            self.parent_trackers[course_descriptor.id].make_known(course_descriptor.scope_ids.usage_id)
+            course_descriptor.parent = None
 
     def __unicode__(self):
         '''
@@ -555,15 +478,17 @@ class XMLModuleStore(ModuleStoreReadBase):
             if self.i18n_service:
                 services['i18n'] = self.i18n_service
 
-            if self.pyfs_service:
-                services['fs'] = self.pyfs_service
+            if self.fs_service:
+                services['fs'] = self.fs_service
+
+            if self.user_service:
+                services['user'] = self.user_service
 
             system = ImportSystem(
                 xmlstore=self,
                 course_id=course_id,
                 course_dir=course_dir,
                 error_tracker=tracker,
-                parent_tracker=self.parent_trackers[course_id],
                 load_error_modules=self.load_error_modules,
                 get_policy=get_policy,
                 mixins=self.xblock_mixins,
@@ -807,10 +732,8 @@ class XMLModuleStore(ModuleStoreReadBase):
         '''Find the location that is the parent of this location in this
         course.  Needed for path_to_location().
         '''
-        if not self.parent_trackers[location.course_key].is_known(location):
-            raise ItemNotFoundError("{0} not in {1}".format(location, location.course_key))
-
-        return self.parent_trackers[location.course_key].parent(location)
+        block = self.get_item(location, 0)
+        return block.parent
 
     def get_modulestore_type(self, course_key=None):
         """
@@ -846,3 +769,27 @@ class XMLModuleStore(ModuleStoreReadBase):
         if branch_setting != ModuleStoreEnum.Branch.published_only:
             raise ValueError(u"Cannot set branch setting to {} on a ReadOnly store".format(branch_setting))
         yield
+
+    def _find_course_asset(self, asset_key):
+        """
+        For now this is not implemented, but others should feel free to implement using the asset.json
+        which export produces.
+        """
+        log.warning("_find_course_asset request of XML modulestore - not implemented.")
+        return (None, None)
+
+    def find_asset_metadata(self, asset_key, **kwargs):
+        """
+        For now this is not implemented, but others should feel free to implement using the asset.json
+        which export produces.
+        """
+        log.warning("find_asset_metadata request of XML modulestore - not implemented.")
+        return None
+
+    def get_all_asset_metadata(self, course_key, asset_type, start=0, maxresults=-1, sort=None, **kwargs):
+        """
+        For now this is not implemented, but others should feel free to implement using the asset.json
+        which export produces.
+        """
+        log.warning("get_all_asset_metadata request of XML modulestore - not implemented.")
+        return []

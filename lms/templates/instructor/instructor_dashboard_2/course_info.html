@@ -1,28 +1,35 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%page args="section_data"/>
 
-<div class="enrollment-wrapper">
-  <h2>${_("Enrollment Information")}</h2>
-  ## Translators: 'track' refers to the enrollment type ('honor', 'verified', or 'audit')
-  <span class="tip">${_("Number of enrollees (instructors, staff members, and students) by track")}</span>
-  <br/><br/>
-  <% modes = section_data['enrollment_count'] %>
-  <table>
-    <tr>
-      <td>${_("Verified")}</td><td>${modes['verified']}</td>
-    </tr>
-    <tr>
-      <td>${_("Audit")}</td><td>${modes['audit']}</td>
-    </tr>
-    <tr>
-      <td>${_("Honor")}</td><td>${modes['honor']}</td>
-    </tr>
-    <tr style="color:green;border-top:1px solid #000">
-      <td style="padding-top:10px;"><b>${_("Total")}</b></td><td style="padding-top:10px;"><b>${modes['total']}</b></td>
-    </tr>
-  </table>
-</div>
-<hr>
+%if settings.FEATURES.get('DISPLAY_ANALYTICS_ENROLLMENTS') or section_data.get('enrollment_message'):
+  <div class="enrollment-wrapper">
+    <h2>${_("Enrollment Information")}</h2>
+
+    %if settings.FEATURES.get('DISPLAY_ANALYTICS_ENROLLMENTS'):
+      ## Translators: 'track' refers to the enrollment type ('honor', 'verified', or 'audit')
+      <span class="tip">${_("Number of enrollees (instructors, staff members, and students) by track")}</span>
+      <br/><br/>
+      <% modes = section_data['enrollment_count'] %>
+      <table>
+        <tr>
+          <td>${_("Verified")}</td><td>${modes['verified']}</td>
+        </tr>
+        <tr>
+          <td>${_("Audit")}</td><td>${modes['audit']}</td>
+        </tr>
+        <tr>
+          <td>${_("Honor")}</td><td>${modes['honor']}</td>
+        </tr>
+        <tr style="color:green;border-top:1px solid #000">
+          <td style="padding-top:10px;"><b>${_("Total")}</b></td><td style="padding-top:10px;"><b>${modes['total']}</b></td>
+        </tr>
+      </table>
+      %elif section_data.get('enrollment_message'):
+        <p>${section_data['enrollment_message']}</p>
+      %endif
+  </div>
+  <hr>
+%endif
 
 <div class="basic-wrapper">
   <h2>${_("Basic Course Information")}</h2>
@@ -30,17 +37,17 @@
   <ul class="list-input">
     <li class="field text is-not-editable" id="field-course-organization">
       <label for="course-organization">${_("Organization:")}</label>
-      <b>${ section_data['course_id'].org }</b>
+      <b>${ section_data['course_id'].org | h}</b>
     </li>
 
     <li class="field text is-not-editable" id="field-course-number">
       <label for="course-number">${_("Course Number:")}</label>
-      <b>${ section_data['course_id'].course }</b>
+      <b>${ section_data['course_id'].course | h}</b>
     </li>
 
     <li class="field text is-not-editable" id="field-course-name">
       <label for="course-name">${_("Course Name:")}</label>
-      <b>${ section_data['course_id'].run }</b>
+      <b>${ section_data['course_id'].run | h}</b>
     </li>
 
     <li class="field text is-not-editable" id="field-course-display-name">
@@ -63,12 +70,21 @@
       <b>${_("No")}</b>
       %endif
     </li>
-
     <li class="field text is-not-editable" id="field-grade-cutoffs">
       <label for="start-date">${_("Grade Cutoffs:")}</label>
       <b>${ section_data['grade_cutoffs'] }</b>
     </li>
   </ul>
+
+  %if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD', ''):
+      <p>
+        ## Translators: git is a version-control system; see http://git-scm.com/about
+        ${_("View detailed Git import logs for this course {link_start}by clicking here{link_end}.").format(
+            link_start='<a href="{}">'.format(section_data['detailed_gitlogs_url']),
+            link_end='</a>'
+        )}
+      </p>
+  %endif
 </div>
 
 

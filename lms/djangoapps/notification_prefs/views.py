@@ -12,7 +12,7 @@ from django.views.decorators.http import require_GET, require_POST
 
 from edxmako.shortcuts import render_to_response
 from notification_prefs import NOTIFICATION_PREF_KEY
-from user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.models import UserPreference
 
 
 class UsernameDecryptionException(Exception):
@@ -132,6 +132,7 @@ def ajax_disable(request):
 
     return HttpResponse(status=204)
 
+
 @require_GET
 def ajax_status(request):
     """
@@ -143,13 +144,12 @@ def ajax_status(request):
     if not request.user.is_authenticated():
         raise PermissionDenied
 
-
     qs = UserPreference.objects.filter(
         user=request.user,
         key=NOTIFICATION_PREF_KEY
     )
 
-    return HttpResponse(json.dumps({"status":len(qs)}), content_type="application/json")
+    return HttpResponse(json.dumps({"status": len(qs)}), content_type="application/json")
 
 
 @require_GET

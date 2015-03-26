@@ -1,9 +1,10 @@
 import json
 import logging
+import warnings
 
 from lxml import etree
 
-from xblock.fields import Integer, Scope
+from xblock.fields import Integer, Scope, Boolean
 from xblock.fragment import Fragment
 from pkg_resources import resource_string
 
@@ -44,23 +45,45 @@ class SequenceFields(object):
         scope=Scope.user_state,
     )
 
+    # Entrance Exam flag -- see cms/contentstore/views/entrance_exam.py for usage
+    is_entrance_exam = Boolean(
+        display_name=_("Is Entrance Exam"),
+        help=_(
+            "Tag this course module as an Entrance Exam.  " +
+            "Note, you must enable Entrance Exams for this course setting to take effect."
+        ),
+        scope=Scope.settings,
+    )
+
 
 class SequenceModule(SequenceFields, XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
-    js = {'coffee': [resource_string(__name__,
-                                     'js/src/sequence/display.coffee')],
-          'js': [resource_string(__name__, 'js/src/sequence/display/jquery.sequence.js')]}
-    css = {'scss': [resource_string(__name__, 'css/sequence/display.scss')]}
+    js = {
+        'coffee': [resource_string(__name__, 'js/src/sequence/display.coffee')],
+        'js': [resource_string(__name__, 'js/src/sequence/display/jquery.sequence.js')],
+    }
+    css = {
+        'scss': [resource_string(__name__, 'css/sequence/display.scss')],
+    }
     js_module_name = "Sequence"
-
 
     def __init__(self, *args, **kwargs):
         super(SequenceModule, self).__init__(*args, **kwargs)
 
-        # if position is specified in system, then use that instead
-        if getattr(self.system, 'position', None) is not None:
-            self.position = int(self.system.position)
+        # If position is specified in system, then use that instead.
+        position = getattr(self.system, 'position', None)
+        if position is not None:
+            try:
+                self.position = int(self.system.position)
+            except (ValueError, TypeError):
+                # Check for https://openedx.atlassian.net/browse/LMS-6496
+                warnings.warn(
+                    "Sequential position cannot be converted to an integer: {pos!r}".format(
+                        pos=self.system.position,
+                    ),
+                    RuntimeWarning,
+                )
 
     def get_progress(self):
         ''' Return the total progress, adding total done and total available.
@@ -75,7 +98,13 @@ class SequenceModule(SequenceFields, XModule):
     def handle_ajax(self, dispatch, data):  # TODO: bounds checking
         ''' get = request.POST instance '''
         if dispatch == 'goto_position':
-            self.position = int(data['position'])
+            # set position to default value if either 'position' argument not
+            # found in request or it is a non-positive integer
+            position = data.get('position', u'1')
+            if position.isdigit() and int(position) > 0:
+                self.position = int(position)
+            else:
+                self.position = 1
             return json.dumps({'success': True})
         raise NotFoundError('Unexpected dispatch type')
 
@@ -135,7 +164,9 @@ class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
     mako_template = 'widgets/sequence-edit.html'
     module_class = SequenceModule
 
-    js = {'coffee': [resource_string(__name__, 'js/src/sequence/edit.coffee')]}
+    js = {
+        'coffee': [resource_string(__name__, 'js/src/sequence/edit.coffee')],
+    }
     js_module_name = "SequenceDescriptor"
 
     @classmethod

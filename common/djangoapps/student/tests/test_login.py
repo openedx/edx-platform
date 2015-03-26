@@ -3,7 +3,6 @@ Tests for student activation and login
 '''
 import json
 import unittest
-from mock import patch
 
 from django.test import TestCase
 from django.test.client import Client
@@ -12,17 +11,21 @@ from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.http import HttpResponseBadRequest, HttpResponse
-from student.tests.factories import UserFactory, RegistrationFactory, UserProfileFactory
-from student.views import _parse_course_id_from_string, _get_course_enrollment_domain
-
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
-from xmodule.modulestore.django import modulestore
-
 from external_auth.models import ExternalAuthMap
+import httpretty
+from mock import patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from social.apps.django_app.default.models import UserSocialAuth
 
-TEST_DATA_MIXED_MODULESTORE = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
+from student.tests.factories import UserFactory, RegistrationFactory, UserProfileFactory
+from student.views import (
+    _parse_course_id_from_string,
+    _get_course_enrollment_domain,
+    login_oauth_token,
+)
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class LoginTest(TestCase):
@@ -329,9 +332,9 @@ class UtilFnTest(TestCase):
         """
         Tests the _parse_course_id_from_string util function
         """
-        COURSE_ID = u'org/num/run'                                # pylint: disable=C0103
-        COURSE_URL = u'/courses/{}/otherstuff'.format(COURSE_ID)  # pylint: disable=C0103
-        NON_COURSE_URL = u'/blahblah'                             # pylint: disable=C0103
+        COURSE_ID = u'org/num/run'                                # pylint: disable=invalid-name
+        COURSE_URL = u'/courses/{}/otherstuff'.format(COURSE_ID)  # pylint: disable=invalid-name
+        NON_COURSE_URL = u'/blahblah'                             # pylint: disable=invalid-name
         self.assertEqual(
             _parse_course_id_from_string(COURSE_URL),
             SlashSeparatedCourseKey.from_deprecated_string(COURSE_ID)
@@ -339,7 +342,7 @@ class UtilFnTest(TestCase):
         self.assertIsNone(_parse_course_id_from_string(NON_COURSE_URL))
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class ExternalAuthShibTest(ModuleStoreTestCase):
     """
     Tests how login_user() interacts with ExternalAuth, in particular Shib
@@ -409,7 +412,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         Tests the redirects when visiting course-specific URL with @login_required.
         Should vary by course depending on its enrollment_domain
         """
-        TARGET_URL = reverse('courseware', args=[self.course.id.to_deprecated_string()])            # pylint: disable=C0103
+        TARGET_URL = reverse('courseware', args=[self.course.id.to_deprecated_string()])            # pylint: disable=invalid-name
         noshib_response = self.client.get(TARGET_URL, follow=True)
         self.assertEqual(noshib_response.redirect_chain[-1],
                          ('http://testserver/accounts/login?next={url}'.format(url=TARGET_URL), 302))
@@ -417,7 +420,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
                                               .format(platform_name=settings.PLATFORM_NAME)))
         self.assertEqual(noshib_response.status_code, 200)
 
-        TARGET_URL_SHIB = reverse('courseware', args=[self.shib_course.id.to_deprecated_string()])  # pylint: disable=C0103
+        TARGET_URL_SHIB = reverse('courseware', args=[self.shib_course.id.to_deprecated_string()])  # pylint: disable=invalid-name
         shib_response = self.client.get(**{'path': TARGET_URL_SHIB,
                                            'follow': True,
                                            'REMOTE_USER': self.extauth.external_id,
@@ -430,3 +433,90 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         self.assertEqual(shib_response.redirect_chain[-2],
                          ('http://testserver{url}'.format(url=TARGET_URL_SHIB), 302))
         self.assertEqual(shib_response.status_code, 200)
+
+
+@httpretty.activate
+class LoginOAuthTokenMixin(object):
+    """
+    Mixin with tests for the login_oauth_token view. A TestCase that includes
+    this must define the following:
+
+    BACKEND: The name of the backend from python-social-auth
+    USER_URL: The URL of the endpoint that the backend retrieves user data from
+    UID_FIELD: The field in the user data that the backend uses as the user id
+    """
+
+    def setUp(self):
+        self.client = Client()
+        self.url = reverse(login_oauth_token, kwargs={"backend": self.BACKEND})
+        self.social_uid = "social_uid"
+        self.user = UserFactory()
+        UserSocialAuth.objects.create(user=self.user, provider=self.BACKEND, uid=self.social_uid)
+
+    def _setup_user_response(self, success):
+        """
+        Register a mock response for the third party user information endpoint;
+        success indicates whether the response status code should be 200 or 400
+        """
+        if success:
+            status = 200
+            body = json.dumps({self.UID_FIELD: self.social_uid})
+        else:
+            status = 400
+            body = json.dumps({})
+        httpretty.register_uri(
+            httpretty.GET,
+            self.USER_URL,
+            body=body,
+            status=status,
+            content_type="application/json"
+        )
+
+    def _assert_error(self, response, status_code, error):
+        """Assert that the given response was a 400 with the given error code"""
+        self.assertEqual(response.status_code, status_code)
+        self.assertEqual(json.loads(response.content), {"error": error})
+        self.assertNotIn("partial_pipeline", self.client.session)
+
+    def test_success(self):
+        self._setup_user_response(success=True)
+        response = self.client.post(self.url, {"access_token": "dummy"})
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(self.client.session['_auth_user_id'], self.user.id)  # pylint: disable=no-member
+
+    def test_invalid_token(self):
+        self._setup_user_response(success=False)
+        response = self.client.post(self.url, {"access_token": "dummy"})
+        self._assert_error(response, 401, "invalid_token")
+
+    def test_missing_token(self):
+        response = self.client.post(self.url)
+        self._assert_error(response, 400, "invalid_request")
+
+    def test_unlinked_user(self):
+        UserSocialAuth.objects.all().delete()
+        self._setup_user_response(success=True)
+        response = self.client.post(self.url, {"access_token": "dummy"})
+        self._assert_error(response, 401, "invalid_token")
+
+    def test_get_method(self):
+        response = self.client.get(self.url, {"access_token": "dummy"})
+        self.assertEqual(response.status_code, 405)
+
+
+# This is necessary because cms does not implement third party auth
+@unittest.skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
+class LoginOAuthTokenTestFacebook(LoginOAuthTokenMixin, TestCase):
+    """Tests login_oauth_token with the Facebook backend"""
+    BACKEND = "facebook"
+    USER_URL = "https://graph.facebook.com/me"
+    UID_FIELD = "id"
+
+
+# This is necessary because cms does not implement third party auth
+@unittest.skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
+class LoginOAuthTokenTestGoogle(LoginOAuthTokenMixin, TestCase):
+    """Tests login_oauth_token with the Google backend"""
+    BACKEND = "google-oauth2"
+    USER_URL = "https://www.googleapis.com/oauth2/v1/userinfo"
+    UID_FIELD = "email"

@@ -4,6 +4,10 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
         var XBlockView = BaseView.extend({
             // takes XBlockInfo as a model
 
+            events: {
+                "click .notification-action-button": "fireNotificationActionEvent"
+            },
+
             initialize: function() {
                 BaseView.prototype.initialize.call(this);
                 this.view = this.options.view;
@@ -195,6 +199,14 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
                 }
                 // Return an already resolved promise for synchronous updates
                 return $.Deferred().resolve().promise();
+            },
+
+            fireNotificationActionEvent: function(event) {
+               var eventName = $(event.currentTarget).data("notification-action");
+               if (eventName) {
+                   event.preventDefault();
+                   this.notifyRuntime(eventName, this.model.get("id"));
+               }
             }
         });
 

@@ -4,6 +4,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from django_comment_common.models import Role
 from student.models import CourseEnrollment, User
 
+
 class RoleAssignmentTest(TestCase):
     """
     Basic checks to make sure our Roles get assigned and unassigned as students

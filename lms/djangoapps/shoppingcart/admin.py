@@ -2,7 +2,9 @@
 Allows django admin site to add PaidCourseRegistrationAnnotations
 """
 from ratelimitbackend import admin
-from shoppingcart.models import PaidCourseRegistrationAnnotation, Coupon
+from shoppingcart.models import (
+    PaidCourseRegistrationAnnotation, Coupon, DonationConfiguration
+)
 
 
 class SoftDeleteCouponAdmin(admin.ModelAdmin):
@@ -20,7 +22,7 @@ class SoftDeleteCouponAdmin(admin.ModelAdmin):
         admin site. This is used by changelist_view. """
         # Default: qs = self.model._default_manager.get_active_coupons_query_set()
         # Queryset with all the coupons including the soft-deletes: qs = self.model._default_manager.get_query_set()
-        query_string = self.model._default_manager.get_active_coupons_query_set()  # pylint: disable=W0212
+        query_string = self.model._default_manager.get_active_coupons_query_set()  # pylint: disable=protected-access
         return query_string
 
     def get_actions(self, request):
@@ -49,3 +51,4 @@ class SoftDeleteCouponAdmin(admin.ModelAdmin):
 
 admin.site.register(PaidCourseRegistrationAnnotation)
 admin.site.register(Coupon, SoftDeleteCouponAdmin)
+admin.site.register(DonationConfiguration)

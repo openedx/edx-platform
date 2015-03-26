@@ -55,6 +55,10 @@ set -e
 #
 ###############################################################################
 
+# Violations thresholds for failing the build
+PYLINT_THRESHOLD=6300
+PEP8_THRESHOLD=0
+
 source $HOME/jenkins_env
 
 # Clean up previous builds
@@ -103,9 +107,11 @@ SHARD=${SHARD:="all"}
 case "$TEST_SUITE" in
 
     "quality")
-        paver run_pep8 > pep8.log || { cat pep8.log ; exit 1; }
-        paver run_pylint > pylint.log || { cat pylint.log; exit 1; }
-        paver run_quality
+        paver find_fixme > fixme.log || { cat fixme.log; EXIT=1; }
+        paver run_pep8 -l $PEP8_THRESHOLD > pep8.log || { cat pep8.log; EXIT=1; }
+        paver run_pylint -l $PYLINT_THRESHOLD > pylint.log || { cat pylint.log; EXIT=1; }
+        # Run quality task. Pass in the 'fail-under' percentage to diff-quality
+        paver run_quality -p 100
 
         # Need to create an empty test result so the post-build
         # action doesn't fail the build.
@@ -116,6 +122,7 @@ case "$TEST_SUITE" in
 <testcase classname="quality" name="quality" time="0.604"></testcase>
 </testsuite>
 END
+        exit $EXIT
         ;;
 
     "unit")
@@ -183,7 +190,7 @@ END
                 # action doesn't fail the build.
                 # May be unnecessary if we changed the "Skip if there are no test files"
                 # option to True in the jenkins job definitions.
-                mkdir -p reports
+                mkdir -p reports/bok_choy
                 cat > reports/bok_choy/xunit.xml <<END
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuite name="nosetests" tests="1" errors="0" failures="0" skip="0">

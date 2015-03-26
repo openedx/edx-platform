@@ -1,70 +1,74 @@
 <%! from django.utils.translation import ugettext as _ %>
 
-## TODO (ECOM-16): This is part of an AB-test of auto-registration.
-## Once the test completes, we can make the winning configuration the default
-## and remove this flag.
-%if not autoreg:
-<!-- /experiment-control -->
+<%namespace name='static' file='../static_content.html'/>
+
 <header class="page-header">
-  <h2 class="title">
-    %if upgrade:
-      <span class="sts-label">${_("You are upgrading your registration for")}</span>
-    %elif reverify:
-      <span class="sts-label">${_("You are re-verifying for")}</span>
-    %else:
-      <span class="sts-label">${_("You are registering for")}</span>
-    %endif
-
-    <span class="wrapper-sts">
-      <span class="sts-course">
-        <span class="sts-course-org">${course_org}</span>
-        <span class="sts-course-number">${course_num}</span>
-        <span class="sts-course-name">${course_name}</span>
-      </span>
-
-      <span class="sts-track">
-        <span class="sts-track-value">
-          %if upgrade:
-            <span class="context">${_("Upgrading to:")}</span> ${_("ID Verified")}
-          %elif reverify:
-            <span class="context">${_("Re-verifying for:")}</span> ${_("ID Verified")}
-          %else:
-            <span class="context">${_("Registering as: ")}</span> ${_("ID Verified")}
-          %endif
+    <h2 class="title">
+        <span class="wrapper-sts">
+            <% organization = '<span class="sts-course-org">' + course_org + '</span>' %>
+            <% course_name_html = '<span class="sts-course-number">' + course_num + '</span> <span class="sts-course-name">' + course_name + '</span>' %>
+            % if upgrade:
+                <span class="sts-label">
+                    ${_("You are upgrading your enrollment for {organization}'s {course_name}").format(
+                        organization=organization,
+                        course_name=course_name_html
+                    )}
+                </span>
+            % elif reverify:
+                <span class="sts-label">
+                    ${_("You are re-verifying for {organization}'s {course_name}").format(
+                        organization=organization,
+                        course_name=course_name_html
+                    )}
+                </span>
+            % elif modes_dict and "professional" in modes_dict:
+                <span class="sts-label">
+                    ${_("You are enrolling in {organization}'s {course_name}").format(
+                        organization=organization,
+                        course_name=course_name_html
+                    )}
+                </span>
+            % else:
+                <span class="sts-label">
+                    ${_("Congrats! You are now enrolled in {organization}'s {course_name}").format(
+                        organization=organization,
+                        course_name=course_name_html
+                    )}
+                </span>
+            % endif
         </span>
-      </span>
-    </span>
-  </h2>
+
+        % if modes_dict and "professional" in modes_dict:
+            <span class="sts-track professional-ed">
+                <span class="sts-track-value">
+                    ${_("Professional Education")}
+                </span>
+            </span>
+        % else:
+            <span class="sts-track">
+                <span class="sts-track-value">
+                    % if upgrade:
+                        ${_("{span_start}Upgrading to:{span_end} Verified").format(
+                            span_start='<span class="context">',
+                            span_end='</span>'
+                        )}
+                    % elif reverify:
+                        ${_("{span_start}Re-verifying for:{span_end} Verified").format(
+                            span_start='<span class="context">',
+                            span_end='</span>'
+                        )}
+                    % else:
+                        ${_("{span_start}Enrolling as:{span_end} Verified").format(
+                            span_start='<span class="context">',
+                            span_end='</span>'
+                        )}
+                    % endif
+                </span>
+            </span>
+        % endif
+    </h2>
 </header>
 
-%else:
-<!-- /experiment-variant-A -->
-<header class="page-header exp-variant-A">
-  <h2 class="title">
-    <span class="wrapper-sts">
-      %if upgrade:
-        <span class="sts-label">${_("You are upgrading your registration for")}</span>
-      %elif reverify:
-        <span class="sts-label">${_("You are re-verifying for")}</span>
-      %elif modes_dict and "professional" in modes_dict:
-        <span class="sts-label">${_("You are registering for")}</span>
-      %else:
-        <span class="sts-label">${_("Congrats! You are now registered to audit")}</span>
-      %endif
-        <span class="sts-course-org">${course_org}'s</span>
-        <span class="sts-course-number">${course_num}</span>
-        <span class="sts-course-name">${course_name}.</span>
-    </span>
-    <span class="sts-track">
-      <span class="sts-track-value">
-        %if upgrade:
-          <span class="context">${_("Upgrading to:")}</span> ${_("ID Verified")}
-        %elif reverify:
-          <span class="context">${_("Re-verifying for:")}</span> ${_("ID Verified")}
-        %else:
-          <span class="context">${_("Registering as: ")}</span> ${_("ID Verified")}
-        %endif
-    </span>
-  </h2>
-</header>
-%endif
+<%block name="js_extra">
+    <%static:js group='rwd_header_footer'/>
+</%block>

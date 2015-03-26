@@ -2,40 +2,19 @@
 
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "home" %></%def>
-<%block name="title">${_("My Courses")}</%block>
+<%block name="title">${_("{studio_name} Home").format(studio_name=settings.STUDIO_SHORT_NAME)}</%block>
 <%block name="bodyclass">is-signedin index view-dashboard</%block>
 
-<%block name="jsextra">
-<script type="text/javascript">
-require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
-    // showing/hiding creation rights UI
-    $('.show-creationrights').click(function(e){
-        (e).preventDefault();
-        $(this).closest('.wrapper-creationrights').toggleClass('is-shown').find('.ui-toggle-control').toggleClass('current');
-    });
-
-    var reloadPage = function () {
-        location.reload();
-    };
-
-    var showError = function ()  {
-        $('#request-coursecreator-submit').toggleClass('has-error').find('.label').text('Sorry, there was error with your request');
-        $('#request-coursecreator-submit').find('.icon-cog').toggleClass('icon-spin');
-    };
-
-    $('#request-coursecreator').ajaxForm({error: showError, success: reloadPage});
-
-    $('#request-coursecreator-submit').click(function(e){
-      $(this).toggleClass('is-disabled is-submitting').find('.label').text('Submitting Your Request');
-    });
-});
-</script>
+<%block name="requirejs">
+  require(["js/factories/index"], function (IndexFactory) {
+      IndexFactory();
+  });
 </%block>
 
 <%block name="content">
 <div class="wrapper-mast wrapper">
   <header class="mast has-actions">
-    <h1 class="page-header">${_("My Courses")}</h1>
+    <h1 class="page-header">${_("{studio_name} Home").format(studio_name=settings.STUDIO_SHORT_NAME)}</h1>
 
     % if user.is_active:
     <nav class="nav-actions">
@@ -43,8 +22,12 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
       <ul>
         <li class="nav-item">
           % if course_creator_status=='granted':
-          <a href="#" class="button new-button new-course-button"><i class="icon-plus icon-inline"></i>
+          <a href="#" class="button new-button new-course-button"><i class="icon fa fa-plus icon-inline"></i>
               ${_("New Course")}</a>
+            % if libraries_enabled:
+              <a href="#" class="button new-button new-library-button"><i class="icon fa fa-plus icon-inline"></i>
+              ${_("New Library")}</a>
+            % endif
           % elif course_creator_status=='disallowed_for_this_site' and settings.FEATURES.get('STUDIO_REQUEST_EMAIL',''):
           <a href="mailto:${settings.FEATURES.get('STUDIO_REQUEST_EMAIL','')}">${_("Email staff to create course")}</a>
           % endif
@@ -59,21 +42,6 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
   % if user.is_active:
   <section class="content">
     <article class="content-primary" role="main">
-
-      <div class="introduction">
-        <h2 class="title">${_("Welcome, {0}!").format(user.username)}</h2>
-
-        %if len(courses) > 0:
-        <div class="copy">
-          <p>${_("Here are all of the courses you currently have access to in Studio:")}</p>
-        </div>
-
-        %else:
-        <div class="copy">
-          <p>${_("You currently aren't associated with any Studio Courses.")}</p>
-        </div>
-        %endif
-      </div>
 
       % if course_creator_status=='granted':
       <div class="wrapper-create-element wrapper-create-course">
@@ -93,29 +61,34 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
               <ol class="list-input">
                 <li class="field text required" id="field-course-name">
                   <label for="new-course-name">${_("Course Name")}</label>
-                  <input class="new-course-name" id="new-course-name" type="text" name="new-course-name" aria-required="true" placeholder="${_('e.g. Introduction to Computer Science')}" />
-                  <span class="tip">${_("The public display name for your course. This cannot be changed, but you can set a different display name in Advanced Settings later.")}</span>
-                  <span class="tip tip-error is-hiding"></span>
+                  ## Translators: This is an example name for a new course, seen when filling out the form to create a new course.
+                  <input class="new-course-name" id="new-course-name" type="text" name="new-course-name" required placeholder="${_('e.g. Introduction to Computer Science')}" aria-describedby="tip-new-course-name tip-error-new-course-name" />
+                  <span class="tip" id="tip-new-course-name">${_("The public display name for your course. This cannot be changed, but you can set a different display name in Advanced Settings later.")}</span>
+                  <span class="tip tip-error is-hiding" id="tip-error-new-course-name"></span>
                 </li>
                 <li class="field text required" id="field-organization">
                   <label for="new-course-org">${_("Organization")}</label>
-                  <input class="new-course-org" id="new-course-org" type="text" name="new-course-org" aria-required="true" placeholder="${_('e.g. UniversityX or OrganizationX')}" />
-                  <span class="tip">${_("The name of the organization sponsoring the course.")}  <strong>${_("Note: This is part of your course URL, so no spaces or special characters are allowed.")}</strong> ${_("This cannot be changed, but you can set a different display name in Advanced Settings later.")}</span>
-                  <span class="tip tip-error is-hiding"></span>
+                  ## Translators: This is an example for the name of the organization sponsoring a course, seen when filling out the form to create a new course. The organization name cannot contain spaces.
+                  ## Translators: "e.g. UniversityX or OrganizationX" is a placeholder displayed when user put no data into this field.
+                  <input class="new-course-org" id="new-course-org" type="text" name="new-course-org" required placeholder="${_('e.g. UniversityX or OrganizationX')}" aria-describedby="tip-new-course-org tip-error-new-course-org" />
+                  <span class="tip" id="tip-new-course-org">${_("The name of the organization sponsoring the course.")}  <strong>${_("Note: This is part of your course URL, so no spaces or special characters are allowed.")}</strong> ${_("This cannot be changed, but you can set a different display name in Advanced Settings later.")}</span>
+                  <span class="tip tip-error is-hiding" id="tip-error-new-course-org"></span>
                 </li>
 
                 <li class="field text required" id="field-course-number">
                   <label for="new-course-number">${_("Course Number")}</label>
-                  <input class="new-course-number" id="new-course-number" type="text" name="new-course-number" aria-required="true" placeholder="${_('e.g. CS101')}" />
-                  <span class="tip">${_("The unique number that identifies your course within your organization.")} <strong>${_("Note: This is part of your course URL, so no spaces or special characters are allowed and it cannot be changed.")}</strong></span>
-                  <span class="tip tip-error is-hiding"></span>
+                  ## Translators: This is an example for the number used to identify a course, seen when filling out the form to create a new course. The number here is short for "Computer Science 101". It can contain letters but cannot contain spaces.
+                  <input class="new-course-number" id="new-course-number" type="text" name="new-course-number" required placeholder="${_('e.g. CS101')}" aria-describedby="tip-new-course-number tip-error-new-course-number" />
+                  <span class="tip" id="tip-new-course-number">${_("The unique number that identifies your course within your organization.")} <strong>${_("Note: This is part of your course URL, so no spaces or special characters are allowed and it cannot be changed.")}</strong></span>
+                  <span class="tip tip-error is-hiding" id="tip-error-new-course-number"></span>
                 </li>
 
                 <li class="field text required" id="field-course-run">
                   <label for="new-course-run">${_("Course Run")}</label>
-                  <input class="new-course-run" id="new-course-run" type="text" name="new-course-run" aria-required="true"placeholder="${_('e.g. 2014_T1')}" />
-                  <span class="tip">${_("The term in which your course will run.")} <strong>${_("Note: This is part of your course URL, so no spaces or special characters are allowed and it cannot be changed.")}</strong></span>
-                  <span class="tip tip-error is-hiding"></span>
+                  ## Translators: This is an example for the "run" used to identify different instances of a course, seen when filling out the form to create a new course.
+                  <input class="new-course-run" id="new-course-run" type="text" name="new-course-run" required placeholder="${_('e.g. 2014_T1')}" aria-describedby="tip-new-course-run tip-error-new-course-run" />
+                  <span class="tip" id="tip-new-course-run">${_("The term in which your course will run.")} <strong>${_("Note: This is part of your course URL, so no spaces or special characters are allowed and it cannot be changed.")}</strong></span>
+                  <span class="tip tip-error is-hiding" id="tip-error-new-course-run"></span>
                 </li>
               </ol>
 
@@ -129,18 +102,70 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
           </div>
         </form>
       </div>
+
+        %if libraries_enabled:
+        <div class="wrapper-create-element wrapper-create-library">
+          <form class="form-create create-library library-info" id="create-library-form" name="create-library-form">
+            <div class="wrap-error">
+              <div id="library_creation_error" name="library_creation_error" class="message message-status message-status error" role="alert">
+              <p>${_("Please correct the highlighted fields below.")}</p>
+              </div>
+            </div>
+
+            <div class="wrapper-form">
+              <h3 class="title">${_("Create a New Library")}</h3>
+
+              <fieldset>
+                <legend class="sr">${_("Required Information to Create a New Library")}</legend>
+
+                <ol class="list-input">
+                  <li class="field text required" id="field-library-name">
+                    <label for="new-library-name">${_("Library Name")}</label>
+                    ## Translators: This is an example name for a new content library, seen when filling out the form to create a new library. (A library is a collection of content or problems.)
+                    <input class="new-library-name" id="new-library-name" type="text" name="new-library-name" required placeholder="${_('e.g. Computer Science Problems')}" aria-describedby="tip-new-library-name tip-error-new-library-name" />
+                    <span class="tip" id="tip-new-library-name">${_("The public display name for your library.")}</span>
+                    <span class="tip tip-error is-hiding" id="tip-error-new-library-name"></span>
+                  </li>
+                  <li class="field text required" id="field-organization">
+                    <label for="new-library-org">${_("Organization")}</label>
+                    <input class="new-library-org" id="new-library-org" type="text" name="new-library-org" required placeholder="${_('e.g. UniversityX or OrganizationX')}" aria-describedby="tip-new-library-org tip-error-new-library-org" />
+                    <span class="tip" id="tip-new-library-org">${_("The public organization name for your library.")} ${_("This cannot be changed.")}</span>
+                    <span class="tip tip-error is-hiding" id="tip-error-new-library-org"></span>
+                  </li>
+
+                  <li class="field text required" id="field-library-number">
+                    <label for="new-library-number">${_("Library Code")}</label>
+                    ## Translators: This is an example for the "code" used to identify a library, seen when filling out the form to create a new library. This example is short for "Computer Science Problems". The example number may contain letters but must not contain spaces.
+                    <input class="new-library-number" id="new-library-number" type="text" name="new-library-number" required placeholder="${_('e.g. CSPROB')}" aria-describedby="tip-new-library-number tip-error-new-library-number" />
+                    <span class="tip" id="tip-new-library-number">${_("The unique code that identifies this library.")} <strong>${_("Note: This is part of your library URL, so no spaces or special characters are allowed.")}</strong> ${_("This cannot be changed.")}</span>
+                    <span class="tip tip-error is-hiding" id="tip-error-new-library-number"></span>
+                  </li>
+                </ol>
+
+              </fieldset>
+            </div>
+
+            <div class="actions">
+              <input type="hidden" value="${allow_unicode_course_id}" class="allow-unicode-course-id" />
+              <input type="submit" value="${_('Create')}" class="action action-primary new-library-save" />
+              <input type="button" value="${_('Cancel')}" class="action action-secondary action-cancel new-library-cancel" />
+            </div>
+          </form>
+        </div>
+        % endif
+
       % endif
 
       <!-- STATE: processing courses -->
       %if allow_course_reruns and rerun_creator_status and len(in_process_course_actions) > 0:
       <div class="courses courses-processing">
-          <h3 class="title">Courses Being Processed</h3>
+          <h3 class="title">${_("Courses Being Processed")}</h3>
 
           <ul class="list-courses">
             %for course_info in sorted(in_process_course_actions, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
             <!-- STATE: re-run is processing -->
             %if course_info['is_in_progress']:
-            <li class="wrapper-course has-status" data-course-key="${course_info['course_key']}">
+            <li class="wrapper-course has-status" data-course-key="${course_info['course_key'] | h}">
               <div class="course-item course-rerun is-processing">
                 <div class="course-details" href="#">
                   <h3 class="course-title">${course_info['display_name']}</h3>
@@ -160,16 +185,20 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
                 </div>
 
                 <dl class="course-status">
-                  <dt class="label sr">This re-run processing status:</dt>
+                  <dt class="label sr">${_("This course run is currently being created.")}</dt>
                   <dd class="value">
-                    <i class="icon icon-refresh icon-spin"></i>
-                    <span class="copy">Configuring as re-run</span>
+                    <i class="icon fa fa-refresh fa-spin"></i>
+                    ## Translators: This is a status message, used to inform the user of what the system is doing. This status means that the user has requested to re-run an existing course, and the system is currently in the process of duplicating and configuring the existing course so that it can be re-run.
+                    <span class="copy">${_("Configuring as re-run")}</span>
                   </dd>
                 </dl>
               </div>
 
               <div class="status-message">
-                <p class="copy">${_('The new course will be added to your course list in 5-10 minutes. Return to this page or <a href="#" class="action-reload">refresh it</a> to update the course list. The new course will need some manual configuration.')}</p>
+                <p class="copy">${_('The new course will be added to your course list in 5-10 minutes. Return to this page or {link_start}refresh it{link_end} to update the course list. The new course will need some manual configuration.').format(
+                    link_start='<a href="#" class="action-reload">',
+                    link_end='</a>',
+                  )}</p>
               </div>
             </li>
             %endif
@@ -178,7 +207,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
 
             <!-- STATE: re-run has error -->
             %if course_info['is_failed']:
-            <li class="wrapper-course has-status" data-course-key="${course_info['course_key']}">
+            <li class="wrapper-course has-status" data-course-key="${course_info['course_key'] | h}">
               <div class="course-item course-rerun has-error">
                 <div class="course-details" href="#">
                   <h3 class="course-title">${course_info['display_name']}</h3>
@@ -200,7 +229,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
                 <dl class="course-status">
                   <dt class="label sr">This re-run processing status:</dt>
                   <dd class="value">
-                    <i class="icon icon-warning-sign"></i>
+                    <i class="icon fa fa-warning"></i>
                     <span class="copy">Configuration Error</span>
                   </dd>
                 </dl>
@@ -212,7 +241,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
                 <ul  class="status-actions">
                   <li class="action action-dismiss">
                     <a href="#" class="button dismiss-button" data-dismiss-link="${course_info['dismiss_link']}">
-                      <i class="icon icon-remove-sign"></i>
+                      <i class="icon fa fa-times-circle"></i>
                       <span class="button-copy">${_("Dismiss")}</span>
                     </a>
                   </li>
@@ -225,11 +254,18 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
       </div>
       %endif
 
+      %if libraries_enabled:
+      <ul id="course-index-tabs">
+        <li class="courses-tab active"><a>${_("Courses")}</a></li>
+        <li class="libraries-tab"><a>${_("Libraries")}</a></li>
+      </ul>
+      %endif
+
       %if len(courses) > 0:
-      <div class="courses">
+      <div class="courses courses-tab active">
         <ul class="list-courses">
           %for course_info in sorted(courses, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
-          <li class="course-item" data-course-key="${course_info['course_key']}">
+          <li class="course-item" data-course-key="${course_info['course_key'] | h}">
             <a class="course-link" href="${course_info['url']}">
               <h3 class="course-title">${course_info['display_name']}</h3>
 
@@ -259,24 +295,16 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
             </ul>
           </li>
           %endfor
-          % if allow_course_reruns and rerun_creator_status and course_creator_status=='granted':
-          <script type="text/javascript">
-              $('.course-item').addClass('can-rerun');
-          </script>
-          % endif
         </ul>
       </div>
 
       %else:
-      <div class="courses">
-      </div>
-
-      <div class="notice notice-incontext notice-instruction notice-instruction-nocourses list-notices">
+      <div class="notice notice-incontext notice-instruction notice-instruction-nocourses list-notices courses-tab active">
         <div class="notice-item">
           <div class="msg">
-            <h3 class="title">${_("Are you staff on an existing Studio course?")}</h3>
+            <h3 class="title">${_("Are you staff on an existing {studio_name} course?").format(studio_name=settings.STUDIO_SHORT_NAME)}</h3>
             <div class="copy">
-              <p>${_('You will need to be added to the course in Studio by the course creator. Please get in touch with the course creator or administrator for the specific course you are helping to author.')}</p>
+              <p>${_('You will need to be added to the course in {studio_name} by the course creator. Please get in touch with the course creator or administrator for the specific course you are helping to author.').format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
             </div>
           </div>
         </div>
@@ -292,7 +320,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
 
           <ul class="list-actions">
             <li class="action-item">
-              <a href="#" class="action-primary action-create action-create-course new-course-button"><i class="icon-plus icon-inline"></i> ${_('Create Your First Course')}</a>
+              <a href="#" class="action-primary action-create action-create-course new-course-button"><i class="icon fa fa-plus icon-inline"></i> ${_('Create Your First Course')}</a>
             </li>
           </ul>
         </div>
@@ -305,12 +333,13 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
       %if course_creator_status == "unrequested":
       <div class="wrapper wrapper-creationrights">
         <h3 class="title">
-          <a href="#instruction-creationrights" class="ui-toggle-control show-creationrights"><span class="label">${_('Becoming a Course Creator in Studio')}</span> <i class="icon-remove-sign"></i></a>
+          <a href="#instruction-creationrights" class="ui-toggle-control show-creationrights"><span class="label">${_('Becoming a Course Creator in {studio_name}').format(studio_name=settings.STUDIO_SHORT_NAME)}</span> <i class="icon fa fa-times-circle"></i></a>
         </h3>
 
         <div class="notice notice-incontext notice-instruction notice-instruction-creationrights ui-toggle-target" id="instruction-creationrights">
           <div class="copy">
-            <p>${_('edX Studio is a hosted solution for our xConsortium partners and selected guests. Courses for which you are a team member appear above for you to edit, while course creator privileges are granted by edX. Our team will evaluate your request and provide you feedback within 24 hours during the work week.')}</p>
+            <p>${_('{studio_name} is a hosted solution for our xConsortium partners and selected guests. Courses for which you are a team member appear above for you to edit, while course creator privileges are granted by {platform_name}. Our team will evaluate your request and provide you feedback within 24 hours during the work week.').format(
+              studio_name=settings.STUDIO_NAME, platform_name=settings.PLATFORM_NAME)}</p>
           </div>
 
           <div class="status status-creationrights is-unrequested">
@@ -318,7 +347,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
 
             <form id="request-coursecreator" action="${request_course_creator_url}" method="post" enctype="multipart/form-data">
               <div class="form-actions">
-                <button type="submit" id="request-coursecreator-submit" name="request-coursecreator-submit" class="action-primary action-request"><i class="icon-cog icon-inline icon-spin"></i> <span class="label">${_('Request the Ability to Create Courses')}</span></button>
+                <button type="submit" id="request-coursecreator-submit" name="request-coursecreator-submit" class="action-primary action-request"><i class="icon fa fa-cog icon-inline fa fa-spin"></i> <span class="label">${_('Request the Ability to Create Courses')}</span></button>
               </div>
             </form>
           </div>
@@ -328,12 +357,14 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
       %elif course_creator_status == "denied":
       <div class="wrapper wrapper-creationrights is-shown">
         <h3 class="title">
-          <a href="#instruction-creationrights" class="ui-toggle-control current show-creationrights"><span class="label">${_('Your Course Creator Request Status')}</span> <i class="icon-remove-sign"></i></a>
+          <a href="#instruction-creationrights" class="ui-toggle-control current show-creationrights"><span class="label">${_('Your Course Creator Request Status')}</span> <i class="icon fa fa-times-circle"></i></a>
         </h3>
 
         <div class="notice notice-incontext notice-instruction notice-instruction-creationrights ui-toggle-target" id="instruction-creationrights">
           <div class="copy">
-            <p>${_('edX Studio is a hosted solution for our xConsortium partners and selected guests. Courses for which you are a team member appear above for you to edit, while course creator privileges are granted by edX. Our team is has completed evaluating your request.')}</p>
+            <p>${_('{studio_name} is a hosted solution for our xConsortium partners and selected guests. Courses for which you are a team member appear above for you to edit, while course creator privileges are granted by {platform_name}. Our team is has completed evaluating your request.').format(
+              studio_name=settings.STUDIO_NAME, platform_name=settings.PLATFORM_NAME,
+            )}</p>
           </div>
 
           <div class="status status-creationrights has-status is-denied">
@@ -344,7 +375,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
               <dd class="value">
                 <span class="status-indicator"></span>
                 <span class="value-formal">${_('Denied')}</span>
-                <span class="value-description">${_('Your request did not meet the criteria/guidelines specified by edX Staff.')}</span>
+                <span class="value-description">${_('Your request did not meet the criteria/guidelines specified by {platform_name} Staff.').format(platform_name=settings.PLATFORM_NAME)}</span>
               </dd>
             </dl>
           </div>
@@ -354,12 +385,14 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
       %elif course_creator_status == "pending":
       <div class="wrapper wrapper-creationrights is-shown">
         <h3 class="title">
-          <a href="#instruction-creationrights" class="ui-toggle-control current show-creationrights"><span class="label">${_('Your Course Creator Request Status')}</span> <i class="icon-remove-sign"></i></a>
+          <a href="#instruction-creationrights" class="ui-toggle-control current show-creationrights"><span class="label">${_('Your Course Creator Request Status')}</span> <i class="icon fa fa-times-circle"></i></a>
         </h3>
 
         <div class="notice notice-incontext notice-instruction notice-instruction-creationrights ui-toggle-target" id="instruction-creationrights">
           <div class="copy">
-            <p>${_('edX Studio is a hosted solution for our xConsortium partners and selected guests. Courses for which you are a team member appear above for you to edit, while course creator privileges are granted by edX. Our team is currently  evaluating your request.')}</p>
+            <p>${_('{studio_name} is a hosted solution for our xConsortium partners and selected guests. Courses for which you are a team member appear above for you to edit, while course creator privileges are granted by {platform_name}. Our team is currently  evaluating your request.').format(
+              studio_name=settings.STUDIO_NAME, platform_name=settings.PLATFORM_NAME,
+            )}</p>
           </div>
 
           <div class="status status-creationrights has-status is-pending">
@@ -370,7 +403,9 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
               <dd class="value">
                 <span class="status-indicator"></span>
                 <span class="value-formal">${_('Pending')}</span>
-                <span class="value-description">${_('Your request is currently being reviewed by edX staff and should be updated shortly.')}</span>
+                <span class="value-description">
+                  ${_('Your request is currently being reviewed by {platform_name} staff and should be updated shortly.').format(platform_name=settings.PLATFORM_NAME)}
+                </span>
               </dd>
             </dl>
           </div>
@@ -378,40 +413,104 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
       </div>
       % endif
 
+      %if len(libraries) > 0:
+      <div class="libraries libraries-tab">
+        <ul class="list-courses">
+          %for library_info in sorted(libraries, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
+          <li class="course-item">
+            <a class="library-link" href="${library_info['url']}">
+              <h3 class="course-title">${library_info['display_name']}</h3>
+
+              <div class="course-metadata">
+                <span class="course-org metadata-item">
+                  <span class="label">${_("Organization:")}</span> <span class="value">${library_info['org']}</span>
+                </span>
+                <span class="course-num metadata-item">
+                  <span class="label">${_("Course Number:")}</span>
+                  <span class="value">${library_info['number']}</span>
+                </span>
+                % if not library_info["can_edit"]:
+                  <span class="extra-metadata">${_("(Read-only)")}</span>
+                % endif
+              </div>
+            </a>
+          </li>
+          %endfor
+        </ul>
+      </div>
+
+      %else:
+      <div class="notice notice-incontext notice-instruction notice-instruction-nocourses list-notices libraries-tab">
+        <div class="notice-item">
+          <div class="msg">
+            <div class="copy">
+              <p>${_("You don't have any content libraries yet.")}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      %endif
+
     </article>
-    <aside class="content-supplementary" role="complimentary">
+    <aside class="content-supplementary" role="complementary">
       <div class="bit">
-        <h3 class="title title-3">${_('New to edX Studio?')}</h3>
-        <p>${_('Click Help in the upper-right corner to get more information about the Studio page you are viewing. You can also use the links at the bottom of the page to access our continously updated documentation and other Studio resources.')}</p>
+        <h3 class="title title-3">${_('New to {studio_name}?').format(studio_name=settings.STUDIO_NAME)}</h3>
+        <p>${_('Click Help in the upper-right corner to get more information about the {studio_name} page you are viewing. You can also use the links at the bottom of the page to access our continously updated documentation and other {studio_name} resources.').format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
 
         <ol class="list-actions">
           <li class="action-item">
 
-            <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank">${_("Getting Started with edX Studio")}</a>
+            <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank">${_("Getting Started with {studio_name}").format(studio_name=settings.STUDIO_NAME)}</a>
           </li>
-          <li class="action-item">
-            <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="Use our feedback tool, Tender, to request help">${_('Request help with edX Studio')}</a>
-          </li>
+          % if settings.TENDER_DOMAIN:
+            <li class="action-item">
+              <a href="http://${settings.TENDER_DOMAIN}/discussion/new" class="show-tender" title="${_("Use our feedback tool, Tender, to request help")}">
+                ${_("Request help with {studio_name}").format(studio_name=settings.STUDIO_NAME)}
+              </a>
+            </li>
+          % endif
         </ol>
       </div>
 
       % if course_creator_status=='disallowed_for_this_site' and settings.FEATURES.get('STUDIO_REQUEST_EMAIL',''):
       <div class="bit">
-        <h3 class="title title-3">${_('Can I create courses in Studio?')}</h3>
-        <p>${_('In order to create courses in Studio, you must')} <a href="mailto:${settings.FEATURES.get('STUDIO_REQUEST_EMAIL','')}">${_("contact edX staff to help you create a course")}</a></p>
+        <h3 class="title title-3">${_("Can I create courses in {studio_name}?").format(studio_name=settings.STUDIO_NAME)}</h3>
+        <p>${_("In order to create courses in {studio_name}, you must {link_start}contact {platform_name} staff to help you create a course{link_end}.").format(
+            studio_name=settings.STUDIO_NAME,
+            platform_name=settings.PLATFORM_NAME,
+            link_start='<a href="mailto:{email}">'.format(email=settings.FEATURES.get('STUDIO_REQUEST_EMAIL','')),
+            link_end="</a>",
+          )}</p>
       </div>
       % endif
 
       % if course_creator_status == "unrequested":
       <div class="bit">
-        <h3 class="title title-3">${_('Can I create courses in Studio?')}</h3>
-        <p>${_('In order to create courses in Studio, you must have course creator privileges to create your own course.')}</p>
+        <h3 class="title title-3">${_("Can I create courses in {studio_name}?").format(studio_name=settings.STUDIO_NAME)}</h3>
+        <p>${_('In order to create courses in {studio_name}, you must have course creator privileges to create your own course.').format(studio_name=settings.STUDIO_NAME)}</p>
       </div>
 
       % elif course_creator_status == "denied":
       <div class="bit">
-        <h3 class="title title-3">${_('Can I create courses in Studio?')}</h3>
-        <p>${_('Your request to author courses in studio has been denied. Please')} <a href="http://help.edge.edx.org/discussion/new" class="show-tender">${_('contact edX Staff with further questions')}</a></p>
+        <h3 class="title title-3">${_("Can I create courses in {studio_name}?").format(studio_name=settings.STUDIO_NAME)}</h3>
+<%!
+from django.conf import settings
+
+if settings.TENDER_DOMAIN:
+  help_link_start = '<a href="http://{domain}/discussion/new" class="show-tender">'.format(
+    domain=settings.TENDER_DOMAIN,
+  )
+  help_link_end = '</a>'
+else:
+  help_link_start = '<a href="mailto:{email}">'.format(email=settings.TECH_SUPPORT_EMAIL)
+  help_link_end = '</a>'
+%>
+        <p>${_("Your request to author courses in {studio_name} has been denied. Please {link_start}contact {platform_name} Staff with further questions{link_end}.").format(
+            studio_name=settings.STUDIO_NAME,
+            platform_name=settings.PLATFORM_NAME,
+            link_start=help_link_start,
+            link_end=help_link_end,
+          )}</p>
       </div>
 
       % endif
@@ -428,7 +527,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
 
       <div class="notice notice-incontext notice-instruction notice-instruction-verification">
         <div class="msg">
-          <h3 class="title">${_('We need to verify your email address')}</h3>
+          <h3 class="title">${_("We need to verify your email address")}</h3>
           <div class="copy">
             <p>${_('Almost there! In order to complete your sign up we need you to verify your email address (%(email)s). An activation message and next steps should be waiting for you there.') % dict(email=user.email)}</p>
           </div>
@@ -436,15 +535,19 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
       </div>
     </article>
 
-    <aside class="content-supplementary" role="complimentary">
+    <aside class="content-supplementary" role="complementary">
       <div class="bit">
         <h3 class="title title-3">${_('Need help?')}</h3>
         <p>${_('Please check your Junk or Spam folders in case our email isn\'t in your INBOX. Still can\'t find the verification email? Request help via the link below.')}</p>
 
         <ol class='list-actions'>
-          <li class="action-item">
-            <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="Use our feedback tool, Tender, to request help">Request help with your Studio account</a>
-          </li>
+          % if settings.TENDER_DOMAIN:
+            <li class="action-item">
+              <a href="http://${settings.TENDER_DOMAIN}/discussion/new" class="show-tender" title="${_("Use our feedback tool, Tender, to request help")}">
+                ${_("Request help with your {studio_name} account").format(studio_name=settings.STUDIO_NAME)}
+              </a>
+            </li>
+          % endif
         </ol>
       </div>
     </aside>

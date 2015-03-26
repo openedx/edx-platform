@@ -27,15 +27,7 @@ class BaseVerticalModuleTest(XModuleXmlImportTest):
         course_seq = self.course.get_children()[0]
         self.module_system = get_test_system()
 
-        def get_module(descriptor):
-            """Mocks module_system get_module function"""
-            module_system = get_test_system()
-            module_system.get_module = get_module
-            descriptor.bind_for_student(module_system, descriptor._field_data)  # pylint: disable=protected-access
-            return descriptor
-
-        self.module_system.get_module = get_module
-        self.module_system.descriptor_system = self.course.runtime
+        self.module_system.descriptor_runtime = self.course._runtime  # pylint: disable=protected-access
         self.course.runtime.export_fs = MemoryFS()
 
         self.vertical = course_seq.get_children()[0]

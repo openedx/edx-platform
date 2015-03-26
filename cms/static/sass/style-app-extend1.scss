@@ -1,37 +1,55 @@
 // studio - css architecture
 // ====================
 
-// libs and resets *do not edit*
-@import 'bourbon/bourbon'; // lib - bourbon
+// Table of Contents 
+// * +Libs and Resets
+// * +Vendor and Rebase 
+// * +Base - Utilities
+// * +Base - Assets
+// * +Base - Starter
+// * +Base - Elements
+// * +Base - Specific Views
+// * +Base - Contexts
 
-// VENDOR + REBASE *referenced/used vendor presentation and reset*
-// ====================
+
+// +Libs and Resets - *do not edit*
+// ==================== 
+@import 'bourbon/bourbon'; // lib - bourbon
+@import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
+
+// +Vendor and Rebase - *referenced/used vendor presentation and reset*
+// ==================== 
 @import 'reset';
 
-// BASE  *default edX offerings*
-// ====================
-// base - utilities
+// +Base - Utilities
+// ==================== 
 @import 'variables';
 @import 'mixins';
 @import 'mixins-inherited';
 
-// base - assets
+// +Base - Assets
+// ==================== 
 @import 'assets/fonts';
-@import 'assets/graphics'; // sprites, basic img/figure/svg styling
+@import 'assets/graphics'; // sprites, basic image/figure/svg styling
 @import 'assets/anims'; // animations
 
-// base - starter
+// +Base - Starter
+// ==================== 
 @import 'base';
 
-// base - elements
+// +Base - Elements
+// ==================== 
 @import 'elements/typography';
+@import 'elements/pagination'; // pagination
 @import 'elements/icons'; // references to icons used
 @import 'elements/controls'; // buttons, link styles, sliders, etc.
 @import 'elements/xblocks'; //  studio rendering chrome for xblocks
 @import 'elements/modules'; //  content module patterns
 @import 'elements/layout'; // various standard layouts
+@import 'elements/uploaded-assets'; // layout for asset tables
 
-// base - specific views
+// +Base - Specific Views
+// ==================== 
 @import 'views/account';
 @import 'views/assets';
 @import 'views/updates';
@@ -50,12 +68,11 @@
 @import 'views/textbooks';
 @import 'views/export-git';
 @import 'views/group-configuration';
+@import 'views/video-upload';
 
-// base - contexts
+// +Base - Contexts
+// ==================== 
 @import 'contexts/ie'; // ie-specific rules (mostly for known/older bugs)
-
-// temp - inherited
-@import 'assets/content-types';
 
 @import 'developer'; // used for any developer-created scss that needs further polish/refactoring
 @import 'shame';     // used for any bad-form/orphaned scss

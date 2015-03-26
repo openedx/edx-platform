@@ -81,7 +81,7 @@ class StudentModuleHistoryCleaner(object):
             for smid in self.module_ids_to_check(batch_size):
                 try:
                     self.clean_one_student_module(smid)
-                except Exception:       # pylint: disable=W0703
+                except Exception:       # pylint: disable=broad-except
                     trace = traceback.format_exc()
                     self.say("Couldn't clean student_module_id {}:\n{}".format(smid, trace))
             if not self.dry_run:
@@ -160,11 +160,11 @@ class StudentModuleHistoryCleaner(object):
 
         """
         start = self.next_student_module_id
-        for smid in range(start, start+batch_size):
+        for smid in range(start, start + batch_size):
             if smid > self.last_student_module_id:
                 break
             yield smid
-            self.next_student_module_id = smid+1
+            self.next_student_module_id = smid + 1
 
     def get_history_for_student_modules(self, student_module_id):
         """
@@ -177,7 +177,8 @@ class StudentModuleHistoryCleaner(object):
 
         """
         cursor = connection.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT id, created FROM courseware_studentmodulehistory
             WHERE student_module_id = %s
             ORDER BY created, id
@@ -196,7 +197,8 @@ class StudentModuleHistoryCleaner(object):
         """
         assert ids_to_delete
         cursor = connection.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
             DELETE FROM courseware_studentmodulehistory
             WHERE id IN ({ids})
             """.format(ids=",".join(str(i) for i in ids_to_delete))

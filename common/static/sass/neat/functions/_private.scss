@@ -64,7 +64,7 @@
 
 // Generates a striped background
 @function gradient-stops($grid-columns, $color: $visual-grid-color) {
-  $transparent: rgba(0,0,0,0);
+  $transparent: $transparent;
 
   $column-width: flex-grid(1, $grid-columns);
   $gutter-width: flex-gutter($grid-columns);

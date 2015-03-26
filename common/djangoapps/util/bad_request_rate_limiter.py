@@ -4,6 +4,7 @@ which can be used for rate limiting
 """
 from ratelimitbackend.backends import RateLimitMixin
 
+
 class BadRequestRateLimiter(RateLimitMixin):
     """
     Use the 3rd party RateLimitMixin to help do rate limiting on the Password Reset flows

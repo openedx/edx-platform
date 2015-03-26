@@ -6,10 +6,41 @@ class @DiscussionSpecHelper
         window.user = new DiscussionUser({username: "test_user", id: "567", upvoted_ids: []})
         DiscussionUtil.setUser(window.user)
 
+    @makeTA = () ->
+        DiscussionUtil.roleIds["Community TA"].push(parseInt(DiscussionUtil.getUser().id))
+
     @makeModerator = () ->
-        DiscussionUtil.roleIds["Moderator"].push(parseInt(window.user.id))
+        DiscussionUtil.roleIds["Moderator"].push(parseInt(DiscussionUtil.getUser().id))
+
+    @makeAjaxSpy = (fakeAjax) ->
+        spyOn($, "ajax").andCallFake(
+            (params) ->
+                fakeAjax(params)
+                {always: ->}
+        )
+
+    @makeEventSpy = () ->
+        jasmine.createSpyObj('event', ['preventDefault', 'target'])
+
+    @makeCourseSettings = (is_cohorted=true) ->
+        new DiscussionCourseSettings(
+            category_map:
+                children: ['Test Topic', 'Other Topic']
+                entries:
+                    'Test Topic':
+                        is_cohorted: is_cohorted
+                        id: 'test_topic'
+                    'Other Topic':
+                        is_cohorted: is_cohorted
+                        id: 'other_topic'
+            is_cohorted: is_cohorted
+        )
 
     @setUnderscoreFixtures = ->
+        for templateName in ['thread-show']
+            templateFixture = readFixtures('templates/discussion/' + templateName + '.underscore')
+            appendSetFixtures($('<script>', { id: templateName + '-template', type: 'text/template' })
+                .text(templateFixture))
         appendSetFixtures("""
 <div id="fixture-element"></div>
 
@@ -30,7 +61,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                 <div class="response-count"/>
                 <div class="add-response">
                     <button class="button add-response-btn">
-                        <i class="icon icon-reply"></i>
+                        <i class="icon fa fa-reply"></i>
                         <span class="add-response-btn-text">Add A Response</span>
                     </button>
                 </div>
@@ -50,62 +81,16 @@ browser and pasting the output.  When that file changes, this one should be rege
             </div>
         </div>
         <div class="post-tools">
-            <a href="javascript:void(0)" class="forum-thread-expand"><span class="icon icon-plus"/> Expand discussion</a>
-            <a href="javascript:void(0)" class="forum-thread-collapse"><span class="icon icon-minus"/> Collapse discussion</a>
+            <a href="javascript:void(0)" class="forum-thread-expand"><span class="icon fa fa-plus"/> Expand discussion</a>
+            <a href="javascript:void(0)" class="forum-thread-collapse"><span class="icon fa fa-minus"/> Collapse discussion</a>
         </div>
     </article>
 </script>
 
-<script aria-hidden="true" type="text/template" id="thread-show-template">
-  <div class="discussion-post">
-      <header>
-      <% if (obj.group_id) { %>
-      <div class="group-visibility-label"><%- obj.group_string%></div>
-              <% }  %>
-
-          <div class="post-header-content">
-
-            <h1><%- title %></h1>
-            <p class="posted-details">
-                <%- thread_type %> posted <span class='timeago' title='<%- created_at %>'><%- created_at %></span> by <%= author_display %>
-            </p>
-            <div class="post-labels">
-                <span class="post-label-pinned"><i class="icon icon-pushpin"></i>Pinned</span>
-                <span class="post-label-reported"><i class="icon icon-flag"></i>Reported</span>
-                <span class="post-label-closed"><i class="icon icon-lock"></i>Closed</span>
-            </div>
-          </div>
-          <div class="post-header-actions post-extended-content">
-            <%=
-                _.template(
-                    $('#forum-actions').html(),
-                    {
-                        contentId: cid,
-                        contentType: 'post',
-                        primaryActions: ['vote', 'follow'],
-                        secondaryActions: ['pin', 'edit', 'delete', 'report', 'close']
-                    }
-                )
-            %>
-          </div>
-      </header>
-
-      <div class="post-body"><%- body %></div>
-
-      
-      <% if (mode == "tab" && obj.courseware_url) { %>
-          <div class="post-context"><%
-          var courseware_link = interpolate('<a href="%s">%s</a>', [courseware_url, _.escape(courseware_title)]);
-          print(interpolate('(this post is about %(courseware_title_linked)s)', {'courseware_title_linked': courseware_link}, true));
-          %></div>
-      <% } %>
-  </div>
-</script>
-
 <script aria-hidden="true" type="text/template" id="thread-edit-template">
-  <div class="discussion-post edit-post-form">
     <h1>Editing post</h1>
     <ul class="edit-post-form-errors"></ul>
+    <div class="forum-edit-post-form-wrapper"></div>
     <div class="form-row">
       <label class="sr" for="edit-post-title">Edit post title</label>
       <input type="text" id="edit-post-title" class="edit-post-title" name="title" value="<%-title %>" placeholder="Title">
@@ -115,14 +100,13 @@ browser and pasting the output.  When that file changes, this one should be rege
     </div>
     <input type="submit" id="edit-post-submit" class="post-update" value="Update post">
     <a href="#" class="post-cancel">Cancel</a>
-  </div>
 </script>
 
 <script aria-hidden="true" type="text/template" id="thread-response-template">
     <div class="discussion-response"></div>
     <a href="#" class="action-show-comments">
         <%- interpolate('Show Comments (%(num_comments)s)', {num_comments: comments.length}, true) %>
-        <i class="icon icon-caret-down"></i>
+        <i class="icon fa fa-caret-down"></i>
     </a>
     <ol class="comments">
         <li class="new-comment">
@@ -145,7 +129,7 @@ browser and pasting the output.  When that file changes, this one should be rege
         <%= author_display %>
         <p class="posted-details">
             <span class="timeago" title="<%= created_at %>"><%= created_at %></span>
-            
+
               <% if (obj.endorsement) { %> - <%=
                 interpolate(
                     thread.get("thread_type") == "question" ?
@@ -159,7 +143,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                 )%><% } %>
           </p>
           <div class="post-labels">
-              <span class="post-label-reported"><i class="icon icon-flag"></i>Reported</span>
+              <span class="post-label-reported"><i class="icon fa fa-flag"></i>Reported</span>
           </div>
           </div>
           <div class="response-header-actions">
@@ -206,7 +190,7 @@ browser and pasting the output.  When that file changes, this one should be rege
             }
         )
     %>
-    
+
     <p class="posted-details">
     <%=
       interpolate(
@@ -216,7 +200,7 @@ browser and pasting the output.  When that file changes, this one should be rege
       )%>
     </p>
     <div class="post-labels">
-      <span class="post-label-reported"><i class="icon icon-flag"></i>Reported</span>
+      <span class="post-label-reported"><i class="icon fa fa-flag"></i>Reported</span>
     </div>
   </div>
 </script>
@@ -240,41 +224,41 @@ browser and pasting the output.  When that file changes, this one should be rege
         <%
         var icon_class, sr_text;
         if (thread_type == "discussion") {
-            icon_class = "icon-comments";
+            icon_class = "fa-comments";
             sr_text = "discussion";
         } else if (endorsed) {
-            icon_class = "icon-ok";
+            icon_class = "fa-check";
             sr_text = "answered question";
         } else {
-            icon_class = "icon-question";
+            icon_class = "fa-question";
             sr_text = "unanswered question";
         }
         %>
         <span class="sr"><%= sr_text %></span>
-        <i class="icon <%= icon_class %>"></i>
+        <i class="icon fa <%= icon_class %>"></i>
       </div><div class="forum-nav-thread-wrapper-1">
         <span class="forum-nav-thread-title"><%- title %></span>
-        
+
         <%
         var labels = "";
         if (pinned) {
-            labels += '<li class="post-label-pinned"><i class="icon icon-pushpin"></i>Pinned</li> ';
+            labels += '<li class="post-label-pinned"><i class="icon fa fa-thumb-tack"></i>Pinned</li> ';
         }
         if (typeof(subscribed) != "undefined" && subscribed) {
-            labels += '<li class="post-label-following"><i class="icon icon-star"></i>Following</li> ';
+            labels += '<li class="post-label-following"><i class="icon fa fa-star"></i>Following</li> ';
         }
         if (staff_authored) {
-            labels += '<li class="post-label-by-staff"><i class="icon icon-user"></i>By: Staff</li> ';
+            labels += '<li class="post-label-by-staff"><i class="icon fa fa-user"></i>By: Staff</li> ';
         }
         if (community_ta_authored) {
-            labels += '<li class="post-label-by-community-ta"><i class="icon icon-user"></i>By: Community TA</li> ';
+            labels += '<li class="post-label-by-community-ta"><i class="icon fa fa-user"></i>By: Community TA</li> ';
         }
         if (labels != "") {
             print('<ul class="forum-nav-thread-labels">' + labels + '</ul>');
         }
         %>
       </div><div class="forum-nav-thread-wrapper-2">
-        
+
         <span class="forum-nav-thread-votes-count">+<%=
             interpolate(
                 '%(votes_up_count)s%(span_sr_open)s votes %(span_close)s',
@@ -282,7 +266,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                 true
                 )
         %></span>
-        
+
         <span class="forum-nav-thread-comments-count <% if (unread_comments_count > 0) { %>is-unread<% } %>">
             <%
         var fmt;
@@ -323,7 +307,7 @@ browser and pasting the output.  When that file changes, this one should be rege
         </div>
 
         <div class="search-alert-controls">
-          <a href="#" class="dismiss control control-dismiss"><i class="icon icon-remove"></i></a>
+          <a href="#" class="dismiss control control-dismiss"><i class="icon fa fa-remove"></i></a>
         </div>
     </div>
 </script>
@@ -331,63 +315,20 @@ browser and pasting the output.  When that file changes, this one should be rege
 <script aria-hidden="true" type="text/template" id="new-post-template">
     <form class="forum-new-post-form">
         <ul class="post-errors" style="display: none"></ul>
-        <div class="post-field">
-            <div class="field-label">
-                <span class="field-label-text">
-                    Post type:
-                </span><fieldset class="field-input">
-                    <input type="radio" name="<%= form_id %>-post-type" class="post-type-input" id="<%= form_id %>-post-type-question" value="question" checked>
-                    <label for="<%= form_id %>-post-type-question" class="post-type-label">
-                        <i class="icon icon-question"></i>
-                        Question
-                    </label>
-                    <input type="radio" name="<%= form_id %>-post-type" class="post-type-input" id="<%= form_id %>-post-type-discussion" value="discussion">
-                    <label for="<%= form_id %>-post-type-discussion" class="post-type-label">
-                        <i class="icon icon-comments"></i>
-                        Discussion
-                    </label>
-                </fieldset>
-            </div><span class="field-help">
-                Questions raise issues that need answers. Discussions share ideas and start conversations.
-            </span>
-        </div>
-        <% if (mode=="tab") { %>
-        <div class="post-field">
-            <div class="field-label">
-                <span class="field-label-text">
-                    Topic Area:
-                </span><div class="field-input post-topic">
-                    <a href="#" class="post-topic-button">
-                        <span class="sr">Discussion topics; current selection is: </span>
-                        <span class="js-selected-topic"></span>
-                        <span class="drop-arrow" aria-hidden="true">▾</span>
-                    </a>
-                    <div class="topic-menu-wrapper">
-                        <label class="topic-filter-label">
-                            <span class="sr">Filter topics</span>
-                            <input type="text" class="topic-filter-input" placeholder="Filter topics">
-                        </label>
-                        <ul class="topic-menu" role="menu"><%= topics_html %></ul>
-                   </div>
-               </div>
-            </div><span class="field-help">
-                Add your post to a relevant topic to help others find it.
-            </span>
-        </div>
-        <% } %>
+        <div class="forum-new-post-form-wrapper"></div>
         <% if (cohort_options) { %>
         <div class="post-field">
             <label class="field-label">
                 <span class="field-label-text">
                     Visible To:
-                </span><select class="field-input js-group-select" name="group_id">
+                </span><select class="field-input js-group-select" name="group_id" <% if (!is_commentable_cohorted) { %>disabled<% } %>>
                     <option value="">All Groups</option>
                     <% _.each(cohort_options, function(opt) { %>
                     <option value="<%= opt.value %>" <% if (opt.selected) { %>selected<% } %>><%- opt.text %></option>
                     <% }); %>
                  </select>
             </label><div class="field-help">
-                Instructors can set whether a post in a cohorted topic is visible to all cohorts or only to a specific cohort.
+                Discussion admins, moderators, and TAs can make their posts visible to all students or specify a single cohort.
             </div>
         </div>
         <% } %>
@@ -399,11 +340,11 @@ browser and pasting the output.  When that file changes, this one should be rege
                 Add a clear and descriptive title to encourage participation.
             </span>
         </div>
-        <div class="post-field js-post-body editor" name="body" data-placeholder="Enter your question or comment…"></div>
+        <div class="post-field js-post-body editor" name="body" data-placeholder="Enter your question or comment"></div>
         <div class="post-options">
             <label class="post-option is-enabled">
                 <input type="checkbox" name="follow" class="post-option-input js-follow" checked>
-                <i class="icon icon-star"></i>follow this post
+                <i class="icon fa fa-star"></i>follow this post
             </label>
             <% if (allow_anonymous) { %>
             <label class="post-option">
@@ -425,6 +366,29 @@ browser and pasting the output.  When that file changes, this one should be rege
     </form>
 </script>
 
+<script aria-hidden="true" type="text/template" id="thread-type-template">
+    <div class="post-field">
+        <div class="field-label">
+            <span class="field-label-text">
+                "Post type:"
+            </span><fieldset class="field-input">
+                <input type="radio" name="<%= form_id %>-post-type" class="post-type-input" id="<%= form_id %>-post-type-question" value="question" checked>
+                <label for="<%= form_id %>-post-type-question" class="post-type-label">
+                    <i class="icon fa fa-question"></i>
+                    "Question"
+                </label>
+                <input type="radio" name="<%= form_id %>-post-type" class="post-type-input" id="<%= form_id %>-post-type-discussion" value="discussion">
+                <label for="<%= form_id %>-post-type-discussion" class="post-type-label">
+                    <i class="icon fa fa-comments"></i>
+                    "Discussion"
+                </label>
+            </fieldset>
+        </div><span class="field-help">
+            "Questions raise issues that need answers. Discussions share ideas and start conversations."
+        </span>
+    </div>
+</script>
+
 <script aria-hidden="true" type="text/template" id="new-post-menu-entry-template">
     <li role="menuitem" class="topic-menu-item">
         <a href="#" class="topic-title" data-discussion-id="<%- id %>" data-cohorted="<%- is_cohorted %>"><%- text %></a>
@@ -438,6 +402,27 @@ browser and pasting the output.  When that file changes, this one should be rege
     </li>
 </script>
 
+<script aria-hidden="true" type="text/template" id="topic-template">
+    <div class="field-label">
+        <span class="field-label-text">Topic Area:</span><div class="field-input post-topic">
+            <a href="#" class="post-topic-button">
+                <span class="sr">Discussion topics; current selection is: </span>
+                <span class="js-selected-topic"></span>
+                <span class="drop-arrow" aria-hidden="true">▾</span>
+            </a>
+            <div class="topic-menu-wrapper">
+                <label class="topic-filter-label">
+                    <span class="sr">Filter topics</span>
+                    <input type="text" class="topic-filter-input" placeholder="Filter topics">
+                </label>
+                <ul class="topic-menu" role="menu"><%= topics_html %></ul>
+           </div>
+       </div>
+    </div><span class="field-help">
+        Add your post to a relevant topic to help others find it.
+    </span>
+</script>
+
 
 
 
@@ -449,7 +434,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                     <span class="label-unchecked">Endorse</span>
                     <span class="label-checked">Unendorse</span>
                 </span>
-                <span class="action-icon"><i class="icon icon-ok"></i></span>
+                <span class="action-icon"><i class="icon fa fa-check"></i></span>
             </a>
         </li>
     </script>
@@ -463,7 +448,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                     <span class="label-unchecked">Mark as Answer</span>
                     <span class="label-checked">Unmark as Answer</span>
                 </span>
-                <span class="action-icon"><i class="icon icon-ok"></i></span>
+                <span class="action-icon"><i class="icon fa fa-check"></i></span>
             </a>
         </li>
     </script>
@@ -477,7 +462,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                     <span class="label-unchecked">Follow</span>
                     <span class="label-checked">Unfollow</span>
                 </span>
-                <span class="action-icon"><i class="icon icon-star"></i></span>
+                <span class="action-icon"><i class="icon fa fa-star"></i></span>
             </a>
         </li>
     </script>
@@ -485,16 +470,19 @@ browser and pasting the output.  When that file changes, this one should be rege
 
 <script type="text/template" id="forum-action-vote">
     <li class="actions-item">
+        <span aria-hidden="true" class="display-vote" style="display: none;">
+          <span class="vote-count"></span>
+        </span>
         <a href="#" class="action-button action-vote" role="checkbox" aria-checked="false">
             <span class="sr">Vote</span>
             <span class="sr js-sr-vote-count"></span>
 
             <span class="action-label" aria-hidden="true">
-              <span class="js-visual-vote-count"></span>
+              <span class="vote-count"></span>
             </span>
 
             <span class="action-icon" aria-hidden="true">
-                <i class="icon icon-plus"></i>
+                <i class="icon fa fa-plus"></i>
             </span>
         </a>
     </li>
@@ -512,7 +500,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                     <span class="label-checked">Unreport</span>
                 </span>
                 <span class="action-icon">
-                  <i class="icon icon-flag"></i>
+                  <i class="icon fa fa-flag"></i>
                 </span>
             </a>
         </li>
@@ -528,7 +516,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                     <span class="label-checked">Unpin</span>
                 </span>
                 <span class="action-icon">
-                  <i class="icon icon-pushpin"></i>
+                  <i class="icon fa fa-thumb-tack"></i>
                 </span>
             </a>
         </li>
@@ -544,7 +532,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                     <span class="label-checked">Open</span>
                 </span>
                 <span class="action-icon">
-                  <i class="icon icon-lock"></i>
+                  <i class="icon fa fa-lock"></i>
                 </span>
             </a>
         </li>
@@ -558,7 +546,7 @@ browser and pasting the output.  When that file changes, this one should be rege
         <li class="actions-item">
             <a href="javascript:void(0)" class="action-list-item action-edit" role="button">
                 <span class="action-label">Edit</span>
-                <span class="action-icon"><i class="icon icon-pencil"></i></span>
+                <span class="action-icon"><i class="icon fa fa-pencil-square-o"></i></span>
             </a>
         </li>
     </script>
@@ -568,7 +556,7 @@ browser and pasting the output.  When that file changes, this one should be rege
         <li class="actions-item">
             <a href="javascript:void(0)" class="action-list-item action-delete" role="button">
                 <span class="action-label">Delete</span>
-                <span class="action-icon"><i class="icon icon-remove"></i></span>
+                <span class="action-icon"><i class="icon fa fa-remove"></i></span>
             </a>
         </li>
     </script>
@@ -581,7 +569,7 @@ browser and pasting the output.  When that file changes, this one should be rege
             <div class="more-wrapper">
                 <a href="javascript:void(0)" class="action-button action-more" role="button" aria-haspopup="true" aria-controls="action-menu-<%= contentId %>">
                     <span class="action-label">More</span>
-                    <span class="action-icon"><i class="icon icon-ellipsis-horizontal"></i></span>
+                    <span class="action-icon"><i class="icon fa fa-ellipsis-h"></i></span>
                 </a>
                 <div class="actions-dropdown" id="action-menu-<%= contentType %>" aria-expanded="false">
                   <ul class="actions-dropdown-list">

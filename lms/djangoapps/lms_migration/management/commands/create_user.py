@@ -6,7 +6,7 @@
 
 import os
 import sys
-import string       # pylint: disable=W0402
+import string       # pylint: disable=deprecated-module
 import datetime
 from getpass import getpass
 import json
@@ -28,8 +28,11 @@ class MyCompleter(object):  # Custom completer
     def complete(self, text, state):
         if state == 0:  # on first trigger, build possible matches
             if text:  # cache matches (entries that start with entered text)
-                self.matches = [s for s in self.options
-                                    if s and s.startswith(text)]
+                self.matches = [
+                    option
+                    for option in self.options
+                    if option and option.startswith(text)
+                ]
             else:  # no text entered, all matches possible
                 self.matches = self.options[:]
 
@@ -98,7 +101,6 @@ class Command(BaseCommand):
 
             name = raw_input('Full name: ')
 
-
         user = User(username=uname, email=email, is_active=True)
         user.set_password(password)
         try:
@@ -116,13 +118,14 @@ class Command(BaseCommand):
 
         if make_eamap:
             credentials = "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN=%s/emailAddress=%s" % (name, email)
-            eamap = ExternalAuthMap(external_id=email,
-                                    external_email=email,
-                                    external_domain=mit_domain,
-                                    external_name=name,
-                                    internal_password=password,
-                                    external_credentials=json.dumps(credentials),
-                )
+            eamap = ExternalAuthMap(
+                external_id=email,
+                external_email=email,
+                external_domain=mit_domain,
+                external_name=name,
+                internal_password=password,
+                external_credentials=json.dumps(credentials),
+            )
             eamap.user = user
             eamap.dtsignup = datetime.datetime.now(UTC)
             eamap.save()
@@ -145,7 +148,7 @@ class Command(BaseCommand):
             gname = raw_input("Add group (tab to autocomplete, empty line to end): ")
             if not gname:
                 break
-            if not gname in groups:
+            if gname not in groups:
                 print "Unknown group %s" % gname
                 continue
             g = Group.objects.get(name=gname)

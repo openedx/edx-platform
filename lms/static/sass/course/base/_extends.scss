@@ -1,6 +1,17 @@
+// lms - course - extends
+// ====================
+
+// lms inner wrapper
+%inner-wrapper {
+  margin: 0 auto;
+  max-width: 1180px;
+  width: flex-grid(12);
+}
+
+// Older Course Extends - to review/remove with LMS cleanup
 h1.top-header {
   border-bottom: 1px solid $border-color-2;
-  text-align: left;
+  @include text-align(left);
   font-size: em(24);
   font-weight: 100;
   padding-bottom: lh();
@@ -87,7 +98,7 @@ h1.top-header {
   h3 {
     background: none;
     border: none;
-    color: #000;
+    color: $black;
     font-weight: normal;
     margin: 0;
     overflow: hidden;
@@ -101,11 +112,11 @@ h1.top-header {
 
     &.active {
       // @extend .bottom-border;
-      color: #000;
+      color: $black;
       font-weight: bold;
 
       a {
-        color: #000;
+        color: $black;
       }
     }
   }
@@ -127,11 +138,11 @@ h1.top-header {
         line-height: lh();
         font-size: 1em;
         @include box-sizing(border-box);
-        padding: lh(.25) lh(.5) lh(.25) 0;
+        padding: lh(.25) lh(0.5) lh(.25) 0;
 
         &:hover, &:focus {
           color: #666;
-          background: #f6f6f6;
+          background: $gray-l6;
         }
       }
     }

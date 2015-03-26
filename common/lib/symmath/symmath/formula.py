@@ -12,7 +12,7 @@ Provides sympy representation.
 #
 
 import os
-import string       # pylint: disable=W0402
+import string       # pylint: disable=deprecated-module
 import re
 import logging
 import operator
@@ -256,7 +256,6 @@ class formula(object):
                 fix_pmathml(k)
 
         fix_pmathml(xml)
-
 
         def fix_hat(xml):
             """

@@ -3,6 +3,7 @@ from xmodule.util.django import get_current_request, get_current_request_hostnam
 from nose.tools import assert_is_none
 from unittest import TestCase
 
+
 class UtilDjangoTests(TestCase):
     """
     Tests for methods exposed in util/django

@@ -1,8 +1,8 @@
 define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js/models/course",
     "js/collections/textbook", "js/views/show_textbook", "js/views/edit_textbook", "js/views/list_textbooks",
     "js/views/edit_chapter", "js/views/feedback_prompt", "js/views/feedback_notification",
-    "js/spec_helpers/create_sinon", "js/spec_helpers/modal_helpers", "jasmine-stealth"],
-(Textbook, Chapter, ChapterSet, Course, TextbookSet, ShowTextbook, EditTextbook, ListTexbook, EditChapter, Prompt, Notification, create_sinon, modal_helpers) ->
+    "js/common_helpers/ajax_helpers", "js/spec_helpers/modal_helpers", "jasmine-stealth"],
+(Textbook, Chapter, ChapterSet, Course, TextbookSet, ShowTextbook, EditTextbook, ListTexbook, EditChapter, Prompt, Notification, AjaxHelpers, modal_helpers) ->
     feedbackTpl = readFixtures('system-feedback.underscore')
 
     beforeEach ->
@@ -83,7 +83,7 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
                 delete CMS.URL.TEXTBOOKS
 
             it "should destroy itself on confirmation", ->
-                requests = create_sinon["requests"](this)
+                requests = AjaxHelpers["requests"](this)
 
                 @view.render().$(".delete").click()
                 ctorOptions = @promptSpies.constructor.mostRecentCall.args[0]

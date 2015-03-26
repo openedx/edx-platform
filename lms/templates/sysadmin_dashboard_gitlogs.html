@@ -12,6 +12,23 @@
   <%static:css group='style-course'/>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
+  <script>
+      $(function() {
+          $(".toggle-import-log").click(function(e) {
+              var self = $(this);
+              var id = self.data("import-log");
+              $("#import-log-" + id).toggle({
+                  duration: 200
+              });
+              if (self.html() === "[ + ]") {
+                  self.html("[ &#8722; ]");
+              } else {
+                  self.html("[ + ]");
+              }
+              e.preventDefault();
+          });
+      });
+  </script>
 </%block>
 <style type="text/css">
 a.active-section {
@@ -41,6 +58,9 @@ table.stat_table td {
 	border-style: solid;
 	border-color: #666666;
 	background-color: #ffffff;
+}
+.import-log {
+    display: none;
 }
 
 a.selectedmode { background-color: yellow; }
@@ -75,18 +95,18 @@ textarea {
 
       %if course_id is not None:
           ## Translators: Git is a version-control system; see http://git-scm.com/about
-          <h2>${_('Recent git load activity for {course_id}').format(course_id=course_id)}</h2>
+          <h2>${_('Recent git load activity for {course_id}').format(course_id=course_id) | h}</h2>
           %if error_msg:
               <h3>${_('Error')}:</h3>
               <p>${error_msg}</p>
           %endif
       %endif
 
-      <table class="stat_table">
+      <table class="stat_table" width="100%">
         <thead>
           <tr>
-            <th>${_('Date')}</th>
-            <th>${_('Course ID')}</th>
+            <th width="15%">${_('Date')}</th>
+            <th width="15%">${_('Course ID')}</th>
             ## Translators: Git is a version-control system; see http://git-scm.com/about
             <th>${_('Git Action')}</th>
           </tr>
@@ -96,32 +116,50 @@ textarea {
           if course_id == None:
               logs = cilset[:10]
           else:
-              logs = cilset[:2]
-          %>
-          % for cil in logs:
-              <%
-                  course_id_string = cil.course_id.to_deprecated_string() if cil.course_id else None
+              logs = cilset[:5]
 
+          cil = None
+          %>
+          % for index, cil in enumerate(logs):
+              <%
                   # Appropriate datetime string for current locale and timezone
                   date = get_time_display(cil.created.replace(tzinfo=UTC),
                                           DEFAULT_DATE_TIME_FORMAT, coerce_tz=settings.TIME_ZONE)
               %>
               <tr>
                 <td>${date}</td>
-                <td><a href="${reverse('gitlogs')}/${course_id_string}">${course_id_string}</a></td>
-                <td>${cil.git_log}</td>
-              </tr>
-          %endfor
-          ## Show the full log if viewing information about a specific course
-          %if course_id is not None:
-              <tr>
-                <td colspan="3">
-                  <pre>${cil.import_log | h}</pre>
+                <td>
+                  <a href="${reverse('gitlogs_detail', kwargs={'course_id': unicode(cil.course_id)})}">
+                    ${cil.course_id | h}
+                  </a>
+                </td>
+                <td>
+                  %if course_id is not None:
+                      <a class="toggle-import-log" data-import-log="${index}" href="#">[ + ]</a>
+                  %endif
+                  ${cil.git_log}
                 </td>
               </tr>
-          %endif
+
+              ## Show the full log of the latest import if viewing logs for a specific course
+              %if course_id is not None:
+                  <tr class="import-log" id="import-log-${index}">
+                    <td colspan="3">
+                      <pre>
+                        ${cil.import_log | h}
+                      </pre>
+                    </td>
+                  </tr>
+              %endif
+          %endfor
         </tbody>
       </table>
+
+      ## If viewing a single course and there are no logs available, let the user know
+      %if course_id is not None and cil is None:
+        ## Translators: git is a version-control system; see http://git-scm.com/about
+        ${_('No git import logs have been recorded for this course.')}
+      %endif
     </section>
   </div>
 </section>

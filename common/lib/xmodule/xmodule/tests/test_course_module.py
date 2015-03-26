@@ -36,14 +36,12 @@ class DummySystem(ImportSystem):
         course_id = SlashSeparatedCourseKey(ORG, COURSE, 'test_run')
         course_dir = "test_dir"
         error_tracker = Mock()
-        parent_tracker = Mock()
 
         super(DummySystem, self).__init__(
             xmlstore=xmlstore,
             course_id=course_id,
             course_dir=course_dir,
             error_tracker=error_tracker,
-            parent_tracker=parent_tracker,
             load_error_modules=load_error_modules,
             field_data=KvsFieldData(DictKeyValueStore()),
         )
@@ -75,9 +73,16 @@ def get_dummy_course(start, announcement=None, is_new=None, advertised_start=Non
                 <html url_name="h" display_name="H">Two houses, ...</html>
             </chapter>
          </course>
-         '''.format(org=ORG, course=COURSE, start=start, is_new=is_new,
-        announcement=announcement, advertised_start=advertised_start, end=end,
-        certs=certs)
+     '''.format(
+        org=ORG,
+        course=COURSE,
+        start=start,
+        is_new=is_new,
+        announcement=announcement,
+        advertised_start=advertised_start,
+        end=end,
+        certs=certs,
+    )
 
     return system.process_xml(start_xml)
 
@@ -185,13 +190,13 @@ class IsNewCourseTestCase(unittest.TestCase):
             assertion(a_score, b_score)
 
     start_advertised_settings = [
-        # start, advertised, result, is_still_default
-        ('2012-12-02T12:00', None, 'Dec 02, 2012', False),
-        ('2012-12-02T12:00', '2011-11-01T12:00', 'Nov 01, 2011', False),
-        ('2012-12-02T12:00', 'Spring 2012', 'Spring 2012', False),
-        ('2012-12-02T12:00', 'November, 2011', 'November, 2011', False),
-        (xmodule.course_module.CourseFields.start.default, None, 'TBD', True),
-        (xmodule.course_module.CourseFields.start.default, 'January 2014', 'January 2014', False),
+        # start, advertised, result, is_still_default, date_time_result
+        ('2012-12-02T12:00', None, 'Dec 02, 2012', False, u'Dec 02, 2012 at 12:00 UTC'),
+        ('2012-12-02T12:00', '2011-11-01T12:00', 'Nov 01, 2011', False, u'Nov 01, 2011 at 12:00 UTC'),
+        ('2012-12-02T12:00', 'Spring 2012', 'Spring 2012', False, 'Spring 2012'),
+        ('2012-12-02T12:00', 'November, 2011', 'November, 2011', False, 'November, 2011'),
+        (xmodule.course_module.CourseFields.start.default, None, 'TBD', True, 'TBD'),
+        (xmodule.course_module.CourseFields.start.default, 'January 2014', 'January 2014', False, 'January 2014'),
     ]
 
     @patch('xmodule.course_module.datetime.now')
@@ -200,7 +205,15 @@ class IsNewCourseTestCase(unittest.TestCase):
         for s in self.start_advertised_settings:
             d = get_dummy_course(start=s[0], advertised_start=s[1])
             print "Checking start=%s advertised=%s" % (s[0], s[1])
-            self.assertEqual(d.start_date_text, s[2])
+            self.assertEqual(d.start_datetime_text(), s[2])
+
+    @patch('xmodule.course_module.datetime.now')
+    def test_start_date_time_text(self, gmtime_mock):
+        gmtime_mock.return_value = NOW
+        for setting in self.start_advertised_settings:
+            course = get_dummy_course(start=setting[0], advertised_start=setting[1])
+            print "Checking start=%s advertised=%s" % (setting[0], setting[1])
+            self.assertEqual(course.start_datetime_text("DATE_TIME"), setting[4])
 
     def test_start_date_is_default(self):
         for s in self.start_advertised_settings:
@@ -242,10 +255,18 @@ class IsNewCourseTestCase(unittest.TestCase):
     def test_end_date_text(self):
         # No end date set, returns empty string.
         d = get_dummy_course('2012-12-02T12:00')
-        self.assertEqual('', d.end_date_text)
+        self.assertEqual('', d.end_datetime_text())
 
         d = get_dummy_course('2012-12-02T12:00', end='2014-9-04T12:00')
-        self.assertEqual('Sep 04, 2014', d.end_date_text)
+        self.assertEqual('Sep 04, 2014', d.end_datetime_text())
+
+    def test_end_date_time_text(self):
+        # No end date set, returns empty string.
+        course = get_dummy_course('2012-12-02T12:00')
+        self.assertEqual('', course.end_datetime_text("DATE_TIME"))
+
+        course = get_dummy_course('2012-12-02T12:00', end='2014-9-04T12:00')
+        self.assertEqual('Sep 04, 2014 at 12:00 UTC', course.end_datetime_text("DATE_TIME"))
 
 
 class DiscussionTopicsTestCase(unittest.TestCase):

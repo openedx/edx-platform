@@ -134,9 +134,11 @@ class ResponseXMLFactory(object):
                         len(choice_names) == len(choices)
         """
         # Names of group elements
-        group_element_names = {'checkbox': 'checkboxgroup',
-                                'radio': 'radiogroup',
-                                'multiple': 'choicegroup'}
+        group_element_names = {
+            'checkbox': 'checkboxgroup',
+            'radio': 'radiogroup',
+            'multiple': 'choicegroup'
+        }
 
         # Retrieve **kwargs
         choices = kwargs.get('choices', [True])
@@ -441,7 +443,6 @@ class FormulaResponseXMLFactory(ResponseXMLFactory):
         sample_str = self._sample_str(sample_dict, num_samples, tolerance)
         response_element.set("samples", sample_str)
 
-
         # Set the tolerance
         responseparam_element = etree.SubElement(response_element, "responseparam")
         responseparam_element.set("type", "tolerance")
@@ -487,10 +488,12 @@ class FormulaResponseXMLFactory(ResponseXMLFactory):
         variables = [str(v) for v in sample_dict.keys()]
         low_range_vals = [str(f[0]) for f in sample_dict.values()]
         high_range_vals = [str(f[1]) for f in sample_dict.values()]
-        sample_str = (",".join(sample_dict.keys()) + "@" +
-                        ",".join(low_range_vals) + ":" +
-                        ",".join(high_range_vals) +
-                        "#" + str(num_samples))
+        sample_str = (
+            ",".join(sample_dict.keys()) + "@" +
+            ",".join(low_range_vals) + ":" +
+            ",".join(high_range_vals) +
+            "#" + str(num_samples)
+        )
         return sample_str
 
 
@@ -500,7 +503,6 @@ class ImageResponseXMLFactory(ResponseXMLFactory):
     def create_response_element(self, **kwargs):
         """ Create the <imageresponse> element."""
         return etree.Element("imageresponse")
-
 
     def create_input_element(self, **kwargs):
         """ Create the <imageinput> element.
@@ -578,7 +580,7 @@ class JavascriptResponseXMLFactory(ResponseXMLFactory):
         # Both display_src and display_class given,
         # or neither given
         assert((display_src and display_class) or
-                (not display_src and not display_class))
+               (not display_src and not display_class))
 
         # Create the <javascriptresponse> element
         response_element = etree.Element("javascriptresponse")
@@ -764,7 +766,7 @@ class AnnotationResponseXMLFactory(ResponseXMLFactory):
         text_children = [
             {'tag': 'title', 'text': kwargs.get('title', 'super cool annotation')},
             {'tag': 'text', 'text': kwargs.get('text', 'texty text')},
-            {'tag': 'comment', 'text':kwargs.get('comment', 'blah blah erudite comment blah blah')},
+            {'tag': 'comment', 'text': kwargs.get('comment', 'blah blah erudite comment blah blah')},
             {'tag': 'comment_prompt', 'text': kwargs.get('comment_prompt', 'type a commentary below')},
             {'tag': 'tag_prompt', 'text': kwargs.get('tag_prompt', 'select one tag')}
         ]
@@ -772,7 +774,7 @@ class AnnotationResponseXMLFactory(ResponseXMLFactory):
         for child in text_children:
             etree.SubElement(input_element, child['tag']).text = child['text']
 
-        default_options = [('green', 'correct'),('eggs', 'incorrect'), ('ham', 'partially-correct')]
+        default_options = [('green', 'correct'), ('eggs', 'incorrect'), ('ham', 'partially-correct')]
         options = kwargs.get('options', default_options)
         options_element = etree.SubElement(input_element, 'options')
 

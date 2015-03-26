@@ -71,6 +71,7 @@ def my_update_subtask_status(entry_id, current_task_id, new_subtask_status):
         update_subtask_status(entry_id, current_task_id, new_subtask_status)
 
 
+@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
 class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
     """Tests instructor task that send bulk email."""
 
@@ -91,7 +92,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         to_option = SEND_TO_ALL
         course_id = course_id or self.course.id
         course_email = CourseEmail.create(course_id, self.instructor, to_option, "Test Subject", "<p>This is a test message</p>")
-        task_input = {'email_id': course_email.id}  # pylint: disable=E1101
+        task_input = {'email_id': course_email.id}  # pylint: disable=no-member
         task_id = str(uuid4())
         instructor_task = InstructorTaskFactory.create(
             course_id=course_id,
@@ -134,7 +135,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
         with self.assertRaises(ValueError):
             with patch('bulk_email.tasks.update_subtask_status', dummy_update_subtask_status):
-                send_bulk_course_email(task_entry.id, {})  # pylint: disable=E1101
+                send_bulk_course_email(task_entry.id, {})  # pylint: disable=no-member
 
     def _create_students(self, num_students):
         """Create students for testing"""

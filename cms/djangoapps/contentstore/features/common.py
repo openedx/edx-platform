@@ -1,5 +1,5 @@
-# pylint: disable=C0111
-# pylint: disable=W0621
+# pylint: disable=missing-docstring
+# pylint: disable=redefined-outer-name
 
 import os
 from lettuce import world, step
@@ -171,7 +171,7 @@ def log_into_studio(
     world.log_in(username=uname, password=password, email=email, name=name)
     # Navigate to the studio dashboard
     world.visit('/')
-    assert_in(uname, world.css_text('h2.title', timeout=10))
+    assert_in(uname, world.css_text('span.account-username', timeout=10))
 
 
 def add_course_author(user, course):
@@ -286,8 +286,15 @@ def _do_studio_prompt_action(intent, action):
     Wait for a studio prompt to appear and press the specified action button
     See cms/static/js/views/feedback_prompt.js for implementation
     """
-    assert intent in ['warning', 'error', 'confirmation', 'announcement',
-        'step-required', 'help', 'mini']
+    assert intent in [
+        'warning',
+        'error',
+        'confirmation',
+        'announcement',
+        'step-required',
+        'help',
+        'mini',
+    ]
     assert action in ['primary', 'secondary']
 
     world.wait_for_present('div.wrapper-prompt.is-shown#prompt-{}'.format(intent))
@@ -333,7 +340,6 @@ def get_codemirror_value(index=0, find_prefix="$"):
     )
 
 
-
 def attach_file(filename, sub_path):
     path = os.path.join(TEST_ROOT, sub_path, filename)
     world.browser.execute_script("$('input.file-input').css('display', 'block')")
@@ -342,9 +348,19 @@ def attach_file(filename, sub_path):
 
 
 def upload_file(filename, sub_path=''):
+    # The file upload dialog is a faux modal, a div that takes over the display
     attach_file(filename, sub_path)
-    button_css = '.wrapper-modal-window-assetupload .action-upload'
+    modal_css = 'div.wrapper-modal-window-assetupload'
+    button_css = '{} .action-upload'.format(modal_css)
     world.css_click(button_css)
+
+    # Clicking the Upload button triggers an AJAX POST.
+    world.wait_for_ajax_complete()
+
+    # The modal stays up with a "File uploaded succeeded" confirmation message, then goes away.
+    # It should take under 2 seconds, so wait up to 10.
+    # Note that is_css_not_present will return as soon as the element is gone.
+    assert world.is_css_not_present(modal_css, wait_time=10)
 
 
 @step(u'"([^"]*)" logs in$')
@@ -388,4 +404,3 @@ def create_other_user(_step, name, has_extra_perms, role_name):
 @step('I log out')
 def log_out(_step):
     world.visit('logout')
-

@@ -1,25 +1,23 @@
-nav.course-material {
-  @include clearfix;
+.wrapper-course-material {
+  @include clearfix();
   @include box-sizing(border-box);
   border-bottom: none;
-  margin: 0px auto 0px;
-  padding: 0px;
+  margin: 0 auto 0;
+  padding: 0;
   width: 100%;
 
-  .inner-wrapper {
-    margin: 0 auto;
-    max-width: 1200px;
-    width: flex-grid(12);
+  .course-material{
+    @extend %inner-wrapper; 
   }
 
   ol.course-tabs {
     @include border-top-radius(4px);
-    @include clearfix;
-    padding: 28px 0 10px 0;
-    margin-left: 10px;
+    @include clearfix();
+    @include margin-left(10px);
+    padding: ($baseline*0.75) 0 ($baseline*0.75) 0;
 
     li {
-      float: left;
+      @include float(left);
       list-style: none;
       margin-right: 6px;
 
@@ -30,7 +28,7 @@ nav.course-material {
       }
 
       &.prominent + li {
-          padding-left: 15px;
+          padding-left: ($baseline*0.75);
           border-left: 1px solid #333;
       }
 
@@ -39,7 +37,7 @@ nav.course-material {
         color: #555;
         display: block;
         text-align: center;
-        padding: 10px 13px 12px;
+        padding: ($baseline/2) 13px 12px;
         font-size: 14px;
         font-weight: bold;
         text-decoration: none;
@@ -51,11 +49,11 @@ nav.course-material {
         }
 
         &.active {
-          // background: rgba(0, 0, 0, .2);
+          // background: $shadow;
           @include linear-gradient(top, rgba(0, 0, 0, .4), rgba(0, 0, 0, .25));
           background-color: transparent;
           box-shadow: 0 1px 0 rgba(255, 255, 255, .5), 0 1px 1px rgba(0, 0, 0, .3) inset;
-          color: #fff;
+          color: $white;
           text-shadow: 0 1px 0 rgba(0, 0, 0, .4);
         }
       }
@@ -64,7 +62,7 @@ nav.course-material {
 }
 
 .course-content {
-  margin-top: 30px;
+  margin-top: ($baseline*1.5);
 
   .courseware {
     min-height: 300px;
@@ -72,9 +70,9 @@ nav.course-material {
 }
 
 header.global.slim {
-  box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
+  box-shadow: 0 1px 2px $shadow-l1;
   height: auto;
-  padding: 5px 0 10px 0;
+  padding: ($baseline/4) 0 ($baseline/2) 0;
   border-bottom: 1px solid $outer-border-color;
   background: $header-bg;
 
@@ -93,7 +91,7 @@ header.global.slim {
       border-radius: 3px;
       @include box-sizing(border-box);
       box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
-      color: #fff;
+      color: $white;
       display: inline-block;
       font-family: $sans-serif;
       font-size: 14px;
@@ -115,12 +113,12 @@ header.global.slim {
   }
 
   nav {
-    padding-top: 5px;
+    padding-top: ($baseline/4);
   }
 
   h1.logo {
-    margin: 0 10px 0 13px;
-    padding-right: 20px;
+    margin: 0 ($baseline/2) 0 0;
+    @include padding-right(20px);
 
     &:before {
       @extend %faded-vertical-divider;
@@ -128,7 +126,7 @@ header.global.slim {
       display: block;
       height: 35px;
       position: absolute;
-      right: 3px;
+      @include right(3px);
       top: 0;
       width: 1px;
     }
@@ -155,8 +153,8 @@ header.global.slim {
 
   h2 {
     display: block;
-    width: 700px;
-    float: left;
+    width: 550px;
+    @include float(left);
     font-size: 0.9em;
     font-weight: 600;
     color: $lighter-base-font-color;

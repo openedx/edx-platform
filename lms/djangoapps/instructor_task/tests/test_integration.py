@@ -5,8 +5,8 @@ Runs tasks on answers to course problems to validate that code
 paths actually work.
 
 """
-import logging
 import json
+import logging
 from mock import patch
 import textwrap
 
@@ -16,8 +16,10 @@ from django.core.urlresolvers import reverse
 
 from capa.tests.response_xml_factory import (CodeResponseXMLFactory,
                                              CustomResponseXMLFactory)
+from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.partitions.partitions import Group, UserPartition
 
 from courseware.model_data import StudentModule
 
@@ -26,10 +28,11 @@ from instructor_task.api import (submit_rescore_problem_for_all_students,
                                  submit_reset_problem_attempts_for_all_students,
                                  submit_delete_problem_state_for_all_students)
 from instructor_task.models import InstructorTask
-from instructor_task.tests.test_base import (InstructorTaskModuleTestCase, TEST_COURSE_ORG, TEST_COURSE_NUMBER,
-                                             OPTION_1, OPTION_2)
+from instructor_task.tasks_helper import upload_grades_csv
+from instructor_task.tests.test_base import (InstructorTaskModuleTestCase, TestReportMixin, TEST_COURSE_ORG,
+                                             TEST_COURSE_NUMBER, OPTION_1, OPTION_2)
 from capa.responsetypes import StudentInputError
-from lms.lib.xblock.runtime import quote_slashes
+from lms.djangoapps.lms_xblock.runtime import quote_slashes
 
 
 log = logging.getLogger(__name__)
@@ -488,3 +491,199 @@ class TestDeleteProblemTask(TestIntegrationTask):
         instructor_task = self.delete_problem_state('instructor', location)
         instructor_task = InstructorTask.objects.get(id=instructor_task.id)
         self.assertEqual(instructor_task.task_state, SUCCESS)
+
+
+class TestGradeReportConditionalContent(TestReportMixin, TestIntegrationTask):
+    """
+    Check that grade export works when graded content exists within
+    split modules.
+    """
+    def setUp(self):
+        """
+        Set up a course with graded problems within a split test.
+
+        Course hierarchy is as follows (modeled after how split tests
+        are created in studio):
+        -> course
+            -> chapter
+                -> sequential (graded)
+                    -> vertical
+                        -> split_test
+                            -> vertical (Group A)
+                                -> problem
+                            -> vertical (Group B)
+                                -> problem
+        """
+        super(TestGradeReportConditionalContent, self).setUp()
+
+        # Create user partitions
+        self.user_partition_group_a = 0
+        self.user_partition_group_b = 1
+        self.partition = UserPartition(
+            0,
+            'first_partition',
+            'First Partition',
+            [
+                Group(self.user_partition_group_a, 'Group A'),
+                Group(self.user_partition_group_b, 'Group B')
+            ]
+        )
+
+        # Create course with group configurations and grading policy
+        self.initialize_course(
+            course_factory_kwargs={
+                'user_partitions': [self.partition],
+                'grading_policy': {
+                    "GRADER": [{
+                        "type": "Homework",
+                        "min_count": 1,
+                        "drop_count": 0,
+                        "short_label": "HW",
+                        "weight": 1.0
+                    }]
+                }
+            }
+        )
+
+        # Create users and partition them
+        self.student_a = self.create_student('student_a')
+        self.student_b = self.create_student('student_b')
+        UserCourseTagFactory(
+            user=self.student_a,
+            course_id=self.course.id,
+            key='xblock.partition_service.partition_{0}'.format(self.partition.id),  # pylint: disable=no-member
+            value=str(self.user_partition_group_a)
+        )
+        UserCourseTagFactory(
+            user=self.student_b,
+            course_id=self.course.id,
+            key='xblock.partition_service.partition_{0}'.format(self.partition.id),  # pylint: disable=no-member
+            value=str(self.user_partition_group_b)
+        )
+
+        # Create a vertical to contain our split test
+        problem_vertical = ItemFactory.create(
+            parent_location=self.problem_section.location,
+            category='vertical',
+            display_name='Problem Unit'
+        )
+
+        # Create the split test and child vertical containers
+        vertical_a_url = self.course.id.make_usage_key('vertical', 'split_test_vertical_a')
+        vertical_b_url = self.course.id.make_usage_key('vertical', 'split_test_vertical_b')
+        self.split_test = ItemFactory.create(
+            parent_location=problem_vertical.location,
+            category='split_test',
+            display_name='Split Test',
+            user_partition_id=self.partition.id,  # pylint: disable=no-member
+            group_id_to_child={str(index): url for index, url in enumerate([vertical_a_url, vertical_b_url])}
+        )
+        self.vertical_a = ItemFactory.create(
+            parent_location=self.split_test.location,
+            category='vertical',
+            display_name='Group A problem container',
+            location=vertical_a_url
+        )
+        self.vertical_b = ItemFactory.create(
+            parent_location=self.split_test.location,
+            category='vertical',
+            display_name='Group B problem container',
+            location=vertical_b_url
+        )
+
+    def verify_csv_task_success(self, task_result):
+        """
+        Verify that all students were successfully graded by
+        `upload_grades_csv`.
+
+        Arguments:
+            task_result (dict): Return value of `upload_grades_csv`.
+        """
+        self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, task_result)
+
+    def verify_grades_in_csv(self, students_grades):
+        """
+        Verify that the grades CSV contains the expected grades data.
+
+        Arguments:
+            students_grades (iterable): An iterable of dictionaries,
+                where each dict maps a student to another dict
+                representing their grades we expect to see in the CSV.
+                For example: [student_a: {'grade': 1.0, 'HW': 1.0}]
+        """
+        def merge_dicts(*dicts):
+            """
+            Return the union of dicts
+
+            Arguments:
+                dicts: tuple of dicts
+            """
+            return dict([item for d in dicts for item in d.items()])
+
+        def user_partition_group(user):
+            """Return a dict having single key with value equals to students group in partition"""
+            group_config_hdr_tpl = 'Experiment Group ({})'
+            return {
+                group_config_hdr_tpl.format(self.partition.name): self.partition.scheme.get_group_for_user(   # pylint: disable=E1101
+                    self.course.id, user, self.partition, track_function=None
+                ).name
+            }
+
+        self.verify_rows_in_csv(
+            [
+                merge_dicts(
+                    {'id': str(student.id), 'username': student.username, 'email': student.email},
+                    grades,
+                    user_partition_group(student)
+                )
+                for student_grades in students_grades for student, grades in student_grades.iteritems()
+            ]
+        )
+
+    def test_both_groups_problems(self):
+        """
+        Verify that grade export works when each user partition
+        receives (different) problems.  Each user's grade on their
+        particular problem should show up in the grade report.
+        """
+        problem_a_url = 'problem_a_url'
+        problem_b_url = 'problem_b_url'
+        self.define_option_problem(problem_a_url, parent=self.vertical_a)
+        self.define_option_problem(problem_b_url, parent=self.vertical_b)
+        # student A will get 100%, student B will get 50% because
+        # OPTION_1 is the correct option, and OPTION_2 is the
+        # incorrect option
+        self.submit_student_answer(self.student_a.username, problem_a_url, [OPTION_1, OPTION_1])
+        self.submit_student_answer(self.student_b.username, problem_b_url, [OPTION_1, OPTION_2])
+
+        with patch('instructor_task.tasks_helper._get_current_task'):
+            result = upload_grades_csv(None, None, self.course.id, None, 'graded')
+            self.verify_csv_task_success(result)
+            self.verify_grades_in_csv(
+                [
+                    {self.student_a: {'grade': '1.0', 'HW': '1.0'}},
+                    {self.student_b: {'grade': '0.5', 'HW': '0.5'}}
+                ]
+            )
+
+    def test_one_group_problem(self):
+        """
+        Verify that grade export works when only the Group A user
+        partition receives a problem.  We expect to see a column for
+        the homework where student_a's entry includes their grade, and
+        student b's entry shows a 0.
+        """
+        problem_a_url = 'problem_a_url'
+        self.define_option_problem(problem_a_url, parent=self.vertical_a)
+
+        self.submit_student_answer(self.student_a.username, problem_a_url, [OPTION_1, OPTION_1])
+
+        with patch('instructor_task.tasks_helper._get_current_task'):
+            result = upload_grades_csv(None, None, self.course.id, None, 'graded')
+            self.verify_csv_task_success(result)
+            self.verify_grades_in_csv(
+                [
+                    {self.student_a: {'grade': '1.0', 'HW': '1.0'}},
+                    {self.student_b: {'grade': '0.0', 'HW': '0.0'}}
+                ]
+            )

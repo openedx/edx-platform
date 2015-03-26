@@ -23,8 +23,10 @@ class MockCommentServiceRequestHandler(BaseHTTPRequestHandler):
         post_dict = json.loads(data_string)
 
         # Log the request
-        logger.debug("Comment Service received POST request %s to path %s" %
-                    (json.dumps(post_dict), self.path))
+        logger.debug(
+            "Comment Service received POST request {0} to path {1}"
+            .format(json.dumps(post_dict), self.path)
+        )
 
         # Every good post has at least an API key
         if 'X-Edx-Api-Key' in self.headers:
@@ -58,8 +60,10 @@ class MockCommentServiceRequestHandler(BaseHTTPRequestHandler):
         post_dict = json.loads(data_string)
 
         # Log the request
-        logger.debug("Comment Service received PUT request %s to path %s" %
-                    (json.dumps(post_dict), self.path))
+        logger.debug(
+            "Comment Service received PUT request {0} to path {1}"
+            .format(json.dumps(post_dict), self.path)
+        )
 
         # Every good post has at least an API key
         if 'X-Edx-Api-Key' in self.headers:

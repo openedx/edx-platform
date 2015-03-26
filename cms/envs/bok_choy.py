@@ -5,6 +5,11 @@ Settings for bok choy tests
 import os
 from path import path
 
+# Pylint gets confused by path.py instances, which report themselves as class
+# objects. As a result, pylint applies the wrong regex in validating names,
+# and throws spurious errors. Therefore, we disable invalid-name checking.
+# pylint: disable=invalid-name
+
 
 ########################## Prod-like settings ###################################
 # These should be as close as possible to the settings we use in production.
@@ -13,9 +18,9 @@ from path import path
 # This is a convenience for ensuring (a) that we can consistently find the files
 # and (b) that the files are the same in Jenkins as in local dev.
 os.environ['SERVICE_VARIANT'] = 'bok_choy'
-os.environ['CONFIG_ROOT'] = path(__file__).abspath().dirname()  # pylint: disable=E1120
+os.environ['CONFIG_ROOT'] = path(__file__).abspath().dirname()  # pylint: disable=no-value-for-parameter
 
-from .aws import *  # pylint: disable=W0401, W0614
+from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 ######################### Testing overrides ####################################
 
@@ -23,7 +28,7 @@ from .aws import *  # pylint: disable=W0401, W0614
 INSTALLED_APPS += ('django_extensions',)
 
 # Redirect to the test_root folder within the repo
-TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"  # pylint: disable=E1120
+TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"  # pylint: disable=no-value-for-parameter
 GITHUB_REPO_ROOT = (TEST_ROOT / "data").abspath()
 LOG_DIR = (TEST_ROOT / "log").abspath()
 
@@ -31,11 +36,12 @@ LOG_DIR = (TEST_ROOT / "log").abspath()
 update_module_store_settings(
     MODULESTORE,
     module_store_options={
-        'fs_root': (TEST_ROOT / "data").abspath(),  # pylint: disable=E1120
+        'fs_root': (TEST_ROOT / "data").abspath(),  # pylint: disable=no-value-for-parameter
     },
     xml_store_options={
         'data_dir': (TEST_ROOT / "data").abspath(),
     },
+    default_store=os.environ.get('DEFAULT_STORE', 'draft'),
 )
 
 # Enable django-pipeline and staticfiles
@@ -53,6 +59,15 @@ for log_name, log_level in LOG_OVERRIDES:
 # Use the auto_auth workflow for creating users and logging them in
 FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 
+# Enable milestones app
+FEATURES['MILESTONES_APP'] = True
+
+# Enable pre-requisite course
+FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
+
+########################### Entrance Exams #################################
+FEATURES['ENTRANCE_EXAMS'] = True
+
 # Unfortunately, we need to use debug mode to serve staticfiles
 DEBUG = True
 
@@ -65,6 +80,6 @@ YOUTUBE['TEXT_API']['url'] = "127.0.0.1:{0}/test_transcripts_youtube/".format(YO
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
-    from .private import *      # pylint: disable=F0401
+    from .private import *      # pylint: disable=import-error
 except ImportError:
     pass

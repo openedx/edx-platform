@@ -33,7 +33,7 @@ from sys import float_info
 from collections import namedtuple
 from shapely.geometry import Point, MultiPoint
 
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 
 # specific library imports
 from calc import evaluator, UndefinedVariable
@@ -55,9 +55,11 @@ log = logging.getLogger(__name__)
 
 registry = TagRegistry()
 
-CorrectMap = correctmap.CorrectMap  # pylint: disable=C0103
+CorrectMap = correctmap.CorrectMap  # pylint: disable=invalid-name
 CORRECTMAP_PY = None
 
+# Make '_' a no-op so we can scrape strings
+_ = lambda text: text
 
 #-----------------------------------------------------------------------------
 # Exceptions
@@ -305,6 +307,7 @@ class LoncapaResponse(object):
                     code,
                     globals_dict,
                     python_path=self.context['python_path'],
+                    extra_files=self.context['extra_files'],
                     slug=self.id,
                     random_seed=self.context['seed'],
                     unsafely=self.capa_system.can_execute_unsafe_code(),
@@ -438,6 +441,7 @@ class JavascriptResponse(LoncapaResponse):
     Javascript using Node.js.
     """
 
+    human_name = _('JavaScript Input')
     tags = ['javascriptresponse']
     max_inputfields = 1
     allowed_inputfields = ['javascriptinput']
@@ -683,6 +687,7 @@ class ChoiceResponse(LoncapaResponse):
 
     """
 
+    human_name = _('Checkboxes')
     tags = ['choiceresponse']
     max_inputfields = 1
     allowed_inputfields = ['checkboxgroup', 'radiogroup']
@@ -714,12 +719,13 @@ class ChoiceResponse(LoncapaResponse):
         if not isinstance(student_answer, list):
             student_answer = [student_answer]
 
+        no_empty_answer = student_answer != []
         student_answer = set(student_answer)
 
         required_selected = len(self.correct_choices - student_answer) == 0
         no_extra_selected = len(student_answer - self.correct_choices) == 0
 
-        correct = required_selected & no_extra_selected
+        correct = required_selected & no_extra_selected & no_empty_answer
 
         if correct:
             return CorrectMap(self.answer_id, 'correct')
@@ -752,6 +758,7 @@ class MultipleChoiceResponse(LoncapaResponse):
     """
     # TODO: handle direction and randomize
 
+    human_name = _('Multiple Choice')
     tags = ['multiplechoiceresponse']
     max_inputfields = 1
     allowed_inputfields = ['choicegroup']
@@ -872,7 +879,7 @@ class MultipleChoiceResponse(LoncapaResponse):
             # Both to avoid double-processing, and to feed the logs.
             if self.has_shuffle():
                 return
-            self._has_shuffle = True  # pylint: disable=W0201
+            self._has_shuffle = True  # pylint: disable=attribute-defined-outside-init
             # Move elements from tree to list for shuffling, then put them back.
             ordering = list(choicegroup.getchildren())
             for choice in ordering:
@@ -956,7 +963,7 @@ class MultipleChoiceResponse(LoncapaResponse):
             # Both to avoid double-processing, and to feed the logs.
             if self.has_answerpool():
                 return
-            self._has_answerpool = True  # pylint: disable=W0201
+            self._has_answerpool = True  # pylint: disable=attribute-defined-outside-init
 
             choices_list = list(choicegroup.getchildren())
 
@@ -1040,6 +1047,7 @@ class MultipleChoiceResponse(LoncapaResponse):
 @registry.register
 class TrueFalseResponse(MultipleChoiceResponse):
 
+    human_name = _('True/False Choice')
     tags = ['truefalseresponse']
 
     def mc_setup_response(self):
@@ -1071,6 +1079,7 @@ class OptionResponse(LoncapaResponse):
     TODO: handle direction and randomize
     """
 
+    human_name = _('Dropdown')
     tags = ['optionresponse']
     hint_tag = 'optionhint'
     allowed_inputfields = ['optioninput']
@@ -1106,6 +1115,7 @@ class NumericalResponse(LoncapaResponse):
     to a number (e.g. `4+5/2^2`), and accepts with a tolerance.
     """
 
+    human_name = _('Numerical Input')
     tags = ['numericalresponse']
     hint_tag = 'numericalhint'
     allowed_inputfields = ['textline', 'formulaequationinput']
@@ -1306,6 +1316,7 @@ class StringResponse(LoncapaResponse):
             </hintgroup>
         </stringresponse>
     """
+    human_name = _('Text Input')
     tags = ['stringresponse']
     hint_tag = 'stringhint'
     allowed_inputfields = ['textline']
@@ -1424,6 +1435,7 @@ class CustomResponse(LoncapaResponse):
     or in a <script>...</script>
     """
 
+    human_name = _('Custom Evaluated Script')
     tags = ['customresponse']
 
     allowed_inputfields = ['textline', 'textbox', 'crystallography',
@@ -1480,6 +1492,7 @@ class CustomResponse(LoncapaResponse):
                             code,
                             globals_dict,
                             python_path=self.context['python_path'],
+                            extra_files=self.context['extra_files'],
                             slug=self.id,
                             random_seed=self.context['seed'],
                             unsafely=self.capa_system.can_execute_unsafe_code(),
@@ -1512,7 +1525,10 @@ class CustomResponse(LoncapaResponse):
         log.debug('%s: student_answers=%s', unicode(self), student_answers)
 
         # ordered list of answer id's
-        idset = sorted(self.answer_ids)
+        # sort the responses on the bases of the problem's position number
+        # which can be found in the last place in the problem id. Then convert
+        # this number into an int, so that we sort on ints instead of strings
+        idset = sorted(self.answer_ids, key=lambda x: int(x.split("_")[-1]))
         try:
             # ordered list of answers
             submission = [student_answers[k] for k in idset]
@@ -1596,11 +1612,17 @@ class CustomResponse(LoncapaResponse):
         correct = self.context['correct']
         messages = self.context['messages']
         overall_message = self.clean_message_html(self.context['overall_message'])
+        grade_decimals = self.context.get('grade_decimals')
+
         correct_map = CorrectMap()
         correct_map.set_overall_message(overall_message)
 
         for k in range(len(idset)):
-            npoints = self.maxpoints[idset[k]] if correct[k] == 'correct' else 0
+            max_points = self.maxpoints[idset[k]]
+            if grade_decimals:
+                npoints = max_points * grade_decimals[k]
+            else:
+                npoints = max_points if correct[k] == 'correct' else 0
             correct_map.set(idset[k], correct[k], msg=messages[k],
                             npoints=npoints)
         return correct_map
@@ -1613,6 +1635,8 @@ class CustomResponse(LoncapaResponse):
                     self.code,
                     self.context,
                     cache=self.capa_system.cache,
+                    python_path=self.context['python_path'],
+                    extra_files=self.context['extra_files'],
                     slug=self.id,
                     random_seed=self.context['seed'],
                     unsafely=self.capa_system.can_execute_unsafe_code(),
@@ -1639,7 +1663,9 @@ class CustomResponse(LoncapaResponse):
             )
             if isinstance(ret, dict):
                 # One kind of dictionary the check function can return has the
-                # form {'ok': BOOLEAN, 'msg': STRING}
+                # form {'ok': BOOLEAN, 'msg': STRING, 'grade_decimal' (optional): FLOAT (between 0.0 and 1.0)}
+                # 'ok' will control the checkmark, while grade_decimal, if present, will scale
+                # the score the student receives on the response.
                 # If there are multiple inputs, they all get marked
                 # to the same correct/incorrect value
                 if 'ok' in ret:
@@ -1654,28 +1680,49 @@ class CustomResponse(LoncapaResponse):
                     else:
                         self.context['messages'][0] = msg
 
+                    if 'grade_decimal' in ret:
+                        decimal = ret['grade_decimal']
+                    else:
+                        decimal = 1.0 if ret['ok'] else 0.0
+                    grade_decimals = [decimal] * len(idset)
+                    self.context['grade_decimals'] = grade_decimals
+
                 # Another kind of dictionary the check function can return has
                 # the form:
-                # {'overall_message': STRING,
-                #  'input_list': [{ 'ok': BOOLEAN, 'msg': STRING }, ...] }
+                # { 'overall_message': STRING,
+                #   'input_list': [
+                #     { 'ok': BOOLEAN, 'msg': STRING, 'grade_decimal' (optional): FLOAT (between 0.0 and 1.0)},
+                #   ...
+                #   ]
+                # }
+                # 'ok' will control the checkmark, while grade_decimal, if present, will scale
+                # the score the student receives on the response.
                 #
                 # This allows the function to return an 'overall message'
                 # that applies to the entire problem, as well as correct/incorrect
-                # status and messages for individual inputs
+                # status, scaled grades, and messages for individual inputs
                 elif 'input_list' in ret:
                     overall_message = ret.get('overall_message', '')
                     input_list = ret['input_list']
 
                     correct = []
                     messages = []
+                    grade_decimals = []
                     for input_dict in input_list:
                         correct.append('correct'
                                        if input_dict['ok'] else 'incorrect')
                         msg = (self.clean_message_html(input_dict['msg'])
                                if 'msg' in input_dict else None)
                         messages.append(msg)
+                        if 'grade_decimal' in input_dict:
+                            decimal = input_dict['grade_decimal']
+                        else:
+                            decimal = 1.0 if input_dict['ok'] else 0.0
+                        grade_decimals.append(decimal)
+
                     self.context['messages'] = messages
                     self.context['overall_message'] = overall_message
+                    self.context['grade_decimals'] = grade_decimals
 
                 # Otherwise, we do not recognize the dictionary
                 # Raise an exception
@@ -1763,6 +1810,7 @@ class SymbolicResponse(CustomResponse):
     Symbolic math response checking, using symmath library.
     """
 
+    human_name = _('Symbolic Math Input')
     tags = ['symbolicresponse']
     max_inputfields = 1
 
@@ -1831,6 +1879,7 @@ class CodeResponse(LoncapaResponse):
 
     """
 
+    human_name = _('Code Input')
     tags = ['coderesponse']
     allowed_inputfields = ['textbox', 'filesubmission', 'matlabinput']
     max_inputfields = 1
@@ -2078,10 +2127,19 @@ class CodeResponse(LoncapaResponse):
         except etree.XMLSyntaxError as _err:
             # If `html` contains attrs with no values, like `controls` in <audio controls src='smth'/>,
             # XML parser will raise exception, so wee fallback to html5parser, which will set empty "" values for such attrs.
-            parsed = html5lib.parseFragment(msg, treebuilder='lxml', namespaceHTMLElements=False)
+            try:
+                parsed = html5lib.parseFragment(msg, treebuilder='lxml', namespaceHTMLElements=False)
+            except ValueError:
+                # the parsed message might contain strings that are not
+                # xml compatible, in which case, throw the error message
+                parsed = False
+
             if not parsed:
-                log.error("Unable to parse external grader message as valid"
-                      " XML: score_msg['msg']=%s", msg)
+                log.error(
+                    "Unable to parse external grader message as valid"
+                    " XML: score_msg['msg']=%s",
+                    msg,
+                )
                 return fail
 
         return (True, score_result['correct'], score_result['score'], msg)
@@ -2099,6 +2157,7 @@ class ExternalResponse(LoncapaResponse):
 
     """
 
+    human_name = _('External Grader')
     tags = ['externalresponse']
     allowed_inputfields = ['textline', 'textbox']
     awdmap = {
@@ -2186,7 +2245,7 @@ class ExternalResponse(LoncapaResponse):
         cmap = CorrectMap()
         try:
             submission = [student_answers[k] for k in idset]
-        except Exception as err:  # pylint: disable=W0703
+        except Exception as err:  # pylint: disable=broad-except
             log.error(
                 'Error %s: cannot get student answer for %s; student_answers=%s',
                 err,
@@ -2201,7 +2260,7 @@ class ExternalResponse(LoncapaResponse):
 
         try:
             rxml = self.do_external_request('get_score', extra_payload)
-        except Exception as err:  # pylint: disable=W0703
+        except Exception as err:  # pylint: disable=broad-except
             log.error('Error %s', err)
             if self.capa_system.DEBUG:
                 cmap.set_dict(dict(zip(sorted(
@@ -2233,7 +2292,7 @@ class ExternalResponse(LoncapaResponse):
         try:
             rxml = self.do_external_request('get_answers', {})
             exans = json.loads(rxml.find('expected').text)
-        except Exception as err:  # pylint: disable=W0703
+        except Exception as err:  # pylint: disable=broad-except
             log.error('Error %s', err)
             if self.capa_system.DEBUG:
                 msg = '<span class="inline-error">%s</span>' % str(
@@ -2256,6 +2315,7 @@ class FormulaResponse(LoncapaResponse):
     Checking of symbolic math response using numerical sampling.
     """
 
+    human_name = _('Math Expression Input')
     tags = ['formularesponse']
     hint_tag = 'formulahint'
     allowed_inputfields = ['textline', 'formulaequationinput']
@@ -2443,7 +2503,7 @@ class FormulaResponse(LoncapaResponse):
             name = hxml.get('name')
             correct_answer = contextualize_text(
                 hxml.get('answer'), self.context)
-            # pylint: disable=W0703
+            # pylint: disable=broad-except
             try:
                 correctness = self.check_formula(
                     correct_answer,
@@ -2468,6 +2528,7 @@ class SchematicResponse(LoncapaResponse):
     """
     Circuit schematic response type.
     """
+    human_name = _('Circuit Schematic Builder')
     tags = ['schematicresponse']
     allowed_inputfields = ['schematic']
 
@@ -2496,6 +2557,8 @@ class SchematicResponse(LoncapaResponse):
                 self.code,
                 self.context,
                 cache=self.capa_system.cache,
+                python_path=self.context['python_path'],
+                extra_files=self.context['extra_files'],
                 slug=self.id,
                 random_seed=self.context['seed'],
                 unsafely=self.capa_system.can_execute_unsafe_code(),
@@ -2544,6 +2607,7 @@ class ImageResponse(LoncapaResponse):
         True, if click is inside any region or rectangle. Otherwise False.
     """
 
+    human_name = _('Image Mapped Input')
     tags = ['imageresponse']
     allowed_inputfields = ['imageinput']
 
@@ -2662,6 +2726,7 @@ class AnnotationResponse(LoncapaResponse):
     The response contains both a comment (student commentary) and an option (student tag).
     Only the tag is currently graded. Answers may be incorrect, partially correct, or correct.
     """
+    human_name = _('Annotation Input')
     tags = ['annotationresponse']
     allowed_inputfields = ['annotationinput']
     max_inputfields = 1
@@ -2786,6 +2851,7 @@ class ChoiceTextResponse(LoncapaResponse):
     ChoiceResponse.
     """
 
+    human_name = _('Checkboxes With Text Input')
     tags = ['choicetextresponse']
     max_inputfields = 1
     allowed_inputfields = ['choicetextgroup',
@@ -3116,20 +3182,23 @@ class ChoiceTextResponse(LoncapaResponse):
 # TEMPORARY: List of all response subclasses
 # FIXME: To be replaced by auto-registration
 
-# pylint: disable=E0604
-__all__ = [CodeResponse,
-           NumericalResponse,
-           FormulaResponse,
-           CustomResponse,
-           SchematicResponse,
-           ExternalResponse,
-           ImageResponse,
-           OptionResponse,
-           SymbolicResponse,
-           StringResponse,
-           ChoiceResponse,
-           MultipleChoiceResponse,
-           TrueFalseResponse,
-           JavascriptResponse,
-           AnnotationResponse,
-           ChoiceTextResponse]
+# pylint: disable=invalid-all-object
+__all__ = [
+    CodeResponse,
+    NumericalResponse,
+    FormulaResponse,
+    CustomResponse,
+    SchematicResponse,
+    ExternalResponse,
+    ImageResponse,
+    OptionResponse,
+    SymbolicResponse,
+    StringResponse,
+    ChoiceResponse,
+    MultipleChoiceResponse,
+    TrueFalseResponse,
+    JavascriptResponse,
+    AnnotationResponse,
+    ChoiceTextResponse,
+]
+# pylint: enable=invalid-all-object

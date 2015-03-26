@@ -1,35 +1,49 @@
 // studio - xmodule architecture
 // ====================
 
-// libs and resets *do not edit*
-@import 'bourbon/bourbon'; // lib - bourbon
+// Table of Contents 
+// * +Libs and Resets
+// * +Vendor and Rebase 
+// * +Base - Utilities
+// * +Base - Assets
+// * +Base - Starter
+// * +Base - Elements
+// * +Xmodule
 
-// VENDOR + REBASE *referenced/used vendor presentation and reset*
-// ====================
+// +Libs and Resets - *do not edit*
+// ==================== 
+@import 'bourbon/bourbon'; // lib - bourbon
+@import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
+
+// +Vendor and Rebase - *referenced/used vendor presentation and reset*
+// ==================== 
 @import 'reset';
 
-// BASE  *default edX offerings*
-// ====================
-// base - utilities
+// +Base - Utilities
+// ==================== 
 @import 'variables';
 @import 'mixins';
 @import 'mixins-inherited';
 
-// base - assets
+// +Base - Assets
+// ==================== 
 @import 'assets/fonts';
-@import 'assets/graphics'; // sprites, basic img/figure/svg styling
+@import 'assets/graphics'; // sprites, basic image/figure/svg styling
 @import 'assets/anims'; // animations
 
-// base - starter
+// +Base - Starter
+// ==================== 
 @import 'base';
 
-// base - elements
+// +Base - Elements
+// ==================== 
 @import 'elements/typography';
 @import 'elements/icons'; // references to icons used
 @import 'elements/controls'; // buttons, link styles, sliders, etc.
 @import 'elements/navigation'; // all archetypes of navigation
 
-// xmodule
+// +Xmodule
+// ==================== 
 @import 'xmodule/modules/css/module-styles.scss';
 @import 'xmodule/descriptors/css/module-styles.scss';
 @import 'elements/xmodules'; // styling for Studio-specific contexts

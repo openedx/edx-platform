@@ -12,7 +12,7 @@ from contentstore import utils
 from contentstore.tests.utils import CourseTestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locator import CourseLocator
@@ -85,6 +85,7 @@ class LMSLinksTestCase(TestCase):
         location = course_key.make_usage_key('course', 'test')
         link = utils.get_lms_link_for_item(location)
         self.assertEquals(link, "//localhost:8000/courses/mitX/101/test/jump_to/i4x://mitX/101/course/test")
+
 
 class ExtraPanelTabTestCase(TestCase):
     """ Tests adding and removing extra course tabs. """
@@ -168,27 +169,26 @@ class CourseImageTestCase(TestCase):
 
     def test_get_image_url(self):
         """Test image URL formatting."""
-        course = CourseFactory.create(org='edX', course='999')
+        course = CourseFactory.create()
         url = utils.course_image_url(course)
-        self.assertEquals(url, '/c4x/edX/999/asset/{0}'.format(course.course_image))
+        self.assertEquals(url, unicode(course.id.make_asset_key('asset', course.course_image)))
 
     def test_non_ascii_image_name(self):
-        # Verify that non-ascii image names are cleaned
-        course = CourseFactory.create(course_image=u'before_\N{SNOWMAN}_after.jpg')
+        """ Verify that non-ascii image names are cleaned """
+        course_image = u'before_\N{SNOWMAN}_after.jpg'
+        course = CourseFactory.create(course_image=course_image)
         self.assertEquals(
             utils.course_image_url(course),
-            '/c4x/{org}/{course}/asset/before___after.jpg'.format(org=course.location.org, course=course.location.course)
+            unicode(course.id.make_asset_key('asset', course_image.replace(u'\N{SNOWMAN}', '_')))
         )
 
     def test_spaces_in_image_name(self):
-        # Verify that image names with spaces in them are cleaned
+        """ Verify that image names with spaces in them are cleaned """
+        course_image = u'before after.jpg'
         course = CourseFactory.create(course_image=u'before after.jpg')
         self.assertEquals(
             utils.course_image_url(course),
-            '/c4x/{org}/{course}/asset/before_after.jpg'.format(
-                org=course.location.org,
-                course=course.location.course
-            )
+            unicode(course.id.make_asset_key('asset', course_image.replace(" ", "_")))
         )
 
 
@@ -423,3 +423,63 @@ class InheritedStaffLockTest(StaffLockTest):
     def test_no_inheritance_for_orphan(self):
         """Tests that an orphaned xblock does not inherit staff lock"""
         self.assertFalse(utils.ancestor_has_staff_lock(self.orphan))
+
+
+class GroupVisibilityTest(CourseTestCase):
+    """
+    Test content group access rules.
+    """
+    def setUp(self):
+        super(GroupVisibilityTest, self).setUp()
+
+        chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
+        sequential = ItemFactory.create(category='sequential', parent_location=chapter.location)
+        vertical = ItemFactory.create(category='vertical', parent_location=sequential.location)
+        html = ItemFactory.create(category='html', parent_location=vertical.location)
+        problem = ItemFactory.create(
+            category='problem', parent_location=vertical.location, data="<problem></problem>"
+        )
+        self.sequential = self.store.get_item(sequential.location)
+        self.vertical = self.store.get_item(vertical.location)
+        self.html = self.store.get_item(html.location)
+        self.problem = self.store.get_item(problem.location)
+
+    def set_group_access(self, xblock, value):
+        """ Sets group_access to specified value and calls update_item to persist the change. """
+        xblock.group_access = value
+        self.store.update_item(xblock, self.user.id)
+
+    def test_no_visibility_set(self):
+        """ Tests when group_access has not been set on anything. """
+
+        def verify_all_components_visible_to_all():  # pylint: disable=invalid-name
+            """ Verifies when group_access has not been set on anything. """
+            for item in (self.sequential, self.vertical, self.html, self.problem):
+                self.assertFalse(utils.has_children_visible_to_specific_content_groups(item))
+                self.assertFalse(utils.is_visible_to_specific_content_groups(item))
+
+        verify_all_components_visible_to_all()
+
+        # Test with group_access set to Falsey values.
+        self.set_group_access(self.vertical, {1: []})
+        self.set_group_access(self.html, {2: None})
+
+        verify_all_components_visible_to_all()
+
+    def test_sequential_and_problem_have_group_access(self):
+        """ Tests when group_access is set on a few different components. """
+        self.set_group_access(self.sequential, {1: [0]})
+        # This is a no-op.
+        self.set_group_access(self.vertical, {1: []})
+        self.set_group_access(self.problem, {2: [3, 4]})
+
+        # Note that "has_children_visible_to_specific_content_groups" only checks immediate children.
+        self.assertFalse(utils.has_children_visible_to_specific_content_groups(self.sequential))
+        self.assertTrue(utils.has_children_visible_to_specific_content_groups(self.vertical))
+        self.assertFalse(utils.has_children_visible_to_specific_content_groups(self.html))
+        self.assertFalse(utils.has_children_visible_to_specific_content_groups(self.problem))
+
+        self.assertTrue(utils.is_visible_to_specific_content_groups(self.sequential))
+        self.assertFalse(utils.is_visible_to_specific_content_groups(self.vertical))
+        self.assertFalse(utils.is_visible_to_specific_content_groups(self.html))
+        self.assertTrue(utils.is_visible_to_specific_content_groups(self.problem))

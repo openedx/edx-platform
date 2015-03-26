@@ -6,8 +6,6 @@ import mock
 import unittest
 import json
 import requests
-import time
-import copy
 from ..xqueue import StubXQueueService, StubXQueueHandler
 
 

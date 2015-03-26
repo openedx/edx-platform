@@ -1,5 +1,5 @@
 .home {
-  padding: 0px;
+  padding: 0;
 
   > .container {
     @include box-sizing(border-box);
@@ -11,26 +11,26 @@
     background-size: cover;
     background-image: $homepage-bg-image;
     border-bottom: 1px solid $border-color-3;
-    box-shadow: 0 1px 0 0 $course-header-bg, inset 0 -1px 5px 0 rgba(0,0,0, 0.1);
-    @include clearfix;
+    box-shadow: 0 1px 0 0 $course-header-bg, inset 0 -1px 5px 0 $shadow-l1;
+    @include clearfix();
     height: 460px;
     overflow: hidden;
     margin-top: $header_image_margin;
-    padding: 0px;
+    padding: 0;
     width: flex-grid(12);
 
     .outer-wrapper {
       @extend .animation-home-header-pop-up;
       margin: 0 auto;
-      padding: 240px 10px 0px;
+      padding: 240px ($baseline/2) 0;
       position: relative;
       max-width: 1200px;
       min-width: 760px;
-      @include clearfix;
+      @include clearfix();
     }
 
     .title {
-      background: #FFF;
+      background: $white;
       background: $course-header-bg;
       border: 1px solid $border-color-3;
       box-shadow: 0 4px 25px 0 rgba(0,0,0, 0.5);
@@ -79,7 +79,7 @@
     }
 
     .media {
-      background: #FFF;
+      background: $white;
       background: $course-header-bg;
       border: 1px solid $border-color-3;
       border-left: 0;
@@ -107,20 +107,20 @@
         .play-intro {
           @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.65), rgba(0,0,0, 0.75)));
           border-radius: 4px;
-          box-shadow: 0 1px 12px 0 rgba(0,0,0, 0.4);
+          box-shadow: 0 1px 12px 0 $shadow-d1;
           @include box-sizing(border-box);
           border: 2px solid rgba(255,255,255, 0.8);
           height: 60px;
           left: 50%;
           margin-top: -30px;
-          margin-left: -30px;
+          margin-left: -($baseline*1.5);
           position: absolute;
           top: 50%;
           @include transition(all 0.15s linear 0s);
           width: 60px;
 
           &::after {
-            color: #fff;
+            color: $white;
             color: rgba(255,255,255, 0.8);
             content: "\25B6";
             display: block;
@@ -147,7 +147,7 @@
           border-color: rgba(255,255,255, 0.9);
 
           &::after {
-            color: #fff;
+            color: $white;
             color: rgba(255,255,255, 1);
           }
         }
@@ -157,7 +157,7 @@
 
   .highlighted-courses {
     @include box-sizing(border-box);
-    margin-bottom: 40px;
+    margin-bottom: ($baseline*2);
     position: relative;
     width: flex-grid(12);
     z-index: 1;
@@ -167,7 +167,7 @@
       border: 1px solid $border-color-2;
       border-radius: 4px;
       border-top-color: $border-color-1;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255, 0.4), 0 0px 12px 0 rgba(0,0,0, 0.2);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255, 0.4), 0 0px 12px 0 $shadow;
       color: $lighter-base-font-color;
       letter-spacing: 1px;
       margin-bottom: 0px;
@@ -202,7 +202,7 @@
     hr {
       @extend %faded-hr-divider-light;
       border: none;
-      margin: 0px;
+      margin: 0;
       position: relative;
       z-index: 2;
 
@@ -262,7 +262,7 @@
       }
 
       a {
-        @include transition(all 0.25s ease-in-out 0s);
+        @include transition(all $tmg-f2 ease-in-out 0s);
 
         &::before {
           @include background-image(radial-gradient(50% 50%, circle closest-side, rgba(255,255,255, 1) 0%, rgba(255,255,255, 0) 100%));
@@ -275,7 +275,7 @@
           opacity: 0;
           width: 200px;
           position: absolute;
-          @include transition(all 0.25s ease-in-out 0s);
+          @include transition(all $tmg-f2 ease-in-out 0s);
           top: 50%;
           z-index: 1;
         }
@@ -285,7 +285,7 @@
           left: 0px;
           position: absolute;
           text-align: center;
-          @include transition(all 0.25s ease-in-out 0s);
+          @include transition(all $tmg-f2 ease-in-out 0s);
           width: 100%;
           z-index: 2;
 
@@ -303,7 +303,7 @@
 
         img {
           position: relative;
-          @include transition(all 0.25s ease-in-out 0s);
+          @include transition(all $tmg-f2 ease-in-out 0s);
           vertical-align: middle;
           z-index: 2;
         }
@@ -367,19 +367,19 @@
 
   .more-info {
     border: 1px solid $border-color-2;
-    margin-bottom: 80px;
+    margin-bottom: ($baseline*4);
     width: flex-grid(12);
 
     header {
       @include background-image(linear-gradient(-90deg, rgb(250,250,250), rgb(230,230,230)));
       border-bottom: 1px solid $border-color-2;
-      @include clearfix;
+      @include clearfix();
       padding: 10px 20px 8px;
       position: relative;
 
       h2 {
         float: left;
-        margin: 0px;
+        margin: 0;
         text-shadow: 0 1px rgba(255,255,255, 0.6);
       }
 
@@ -416,15 +416,15 @@
 
       .blog-posts {
         border-bottom: 1px solid $border-color-2;
-        margin-bottom: 20px;
-        padding-bottom: 20px;
-        @include clearfix;
+        margin-bottom: $baseline;
+        padding-bottom: $baseline;
+        @include clearfix();
 
         > article {
           border: 1px dotted transparent;
           border-color: $border-color-2;
           @include box-sizing(border-box);
-          @include clearfix;
+          @include clearfix();
           float: left;
           margin-right: flex-gutter();
           padding: 10px;
@@ -434,11 +434,11 @@
           &:hover, &:focus {
             background: $body-bg;
             border: 1px solid $border-color-2;
-            box-shadow: inset 0 0 3px 0 rgba(0,0,0, 0.1);
+            box-shadow: inset 0 0 3px 0 $shadow-l1;
           }
 
           &:last-child {
-            margin-right: 0px;
+            margin-right: 0;
           }
 
           .post-graphics {
@@ -494,7 +494,7 @@
           line-height: 1.6em;
           font-family: $serif;
           font-style: italic;
-          margin-left: 10px;
+          margin-left: ($baseline/2);
 
           &.read-more {
             float: right;

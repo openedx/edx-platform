@@ -45,7 +45,7 @@ class StudentState(object):
 
     @property
     def num_pending(self):
-        return max(self.INITIAL_ESSAYS_AVAILABLE- self.num_graded, 0)
+        return max(self.INITIAL_ESSAYS_AVAILABLE - self.num_graded, 0)
 
     @property
     def num_required(self):
@@ -300,7 +300,6 @@ class StubOraHandler(StubHttpRequestHandler):
         """
         self._success_response({'problem_list': self.server.problem_list})
 
-
     @require_params('POST', 'grader_id', 'location', 'submission_id', 'score', 'feedback', 'submission_key')
     def _save_grade(self):
         """
@@ -421,7 +420,6 @@ class StubOraHandler(StubHttpRequestHandler):
                 )
                 self.send_response(400)
 
-
     def _student(self, method, key='student_id'):
         """
         Return the `StudentState` instance for the student ID given
@@ -528,8 +526,7 @@ class StubOraService(StubHttpService):
             'num_graded': self.DUMMY_DATA['problem_list_num_graded'],
             'num_pending': self.DUMMY_DATA['problem_list_num_pending'],
             'num_required': self.DUMMY_DATA['problem_list_num_required']
-            } for location, name in self.problems.items()
-        ]
+        } for location, name in self.problems.items()]
 
     def register_problem(self, location, name):
         """

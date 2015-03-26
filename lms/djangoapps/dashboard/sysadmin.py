@@ -167,7 +167,7 @@ class Users(SysadminDashboardView):
 
         msg = u''
         if settings.FEATURES['AUTH_USE_CERTIFICATES']:
-            if not '@' in uname:
+            if '@' not in uname:
                 email = '{0}@{1}'.format(uname, email_domain)
             else:
                 email = uname
@@ -190,7 +190,7 @@ class Users(SysadminDashboardView):
 
             email = uname
 
-            if not '@' in email:
+            if '@' not in email:
                 msg += _('email address required (not username)')
                 return msg
             new_password = password

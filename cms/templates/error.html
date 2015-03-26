@@ -10,19 +10,35 @@
   % endif
 </%block>
 
+<%!
+from django.conf import settings
+
+if settings.TENDER_DOMAIN:
+  help_link_start = '<a href="http://{domain}/discussion/new" class="show-tender" title="{title}">'.format(
+    domain=settings.TENDER_DOMAIN,
+    title=_("Use our feedback tool, Tender, to share your feedback")
+  ),
+  help_link_end = '</a>'
+else:
+  help_link_start = '<a href="mailto:{email}">'.format(email=settings.TECH_SUPPORT_EMAIL)
+  help_link_end = '</a>'
+%>
+
 <%block name="content">
   <article class="error-prompt">
     % if error == '404':
       <h1>${_("The Page You Requested Page Cannot be Found")}</h1>
-      <p class="description">${_("We're sorry. We couldn't find the Studio page you're looking for. You may want to return to the Studio Dashboard and try again. If you are still having problems accessing things, please feel free to {link_start}contact Studio support{link_end} for further help.").format(
-          link_start='<a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="{title}">'.format(title=_("Use our feedback tool, Tender, to share your feedback")),
-          link_end='</a>',
+      <p class="description">${_("We're sorry. We couldn't find the {studio_name} page you're looking for. You may want to return to the {studio_name} Dashboard and try again. If you are still having problems accessing things, please feel free to {link_start}contact {studio_name} support{link_end} for further help.").format(
+          studio_name=settings.STUDIO_SHORT_NAME,
+          link_start=help_link_start,
+          link_end=help_link_end,
         )}</p>
     % elif error == '500':
       <h1>${_("The Server Encountered an Error")}</h1>
-      <p class="description">${_("We're sorry. There was a problem with the server while trying to process your last request. You may want to return to the Studio Dashboard or try this request again. If you are still having problems accessing things, please feel free to {link_start}contact Studio support{link_end} for further help.").format(
-          link_start='<a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="{title}">'.format(title=_("Use our feedback tool, Tender, to share your feedback")),
-          link_end='</a>',
+      <p class="description">${_("We're sorry. There was a problem with the server while trying to process your last request. You may want to return to the {studio_name} Dashboard or try this request again. If you are still having problems accessing things, please feel free to {link_start}contact {studio_name} support{link_end} for further help.").format(
+          studio_name=settings.STUDIO_SHORT_NAME,
+          link_start=help_link_start,
+          link_end=help_link_end,
         )}</p>
     % endif
     <a href="/" class="back-button">${_("Back to dashboard")}</a>

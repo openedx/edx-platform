@@ -19,24 +19,11 @@
 
 <%block name="jsextra">
   <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
-  <script type="text/javascript">
-require(["domReady!", "jquery", "js/views/settings/grading", "js/models/settings/course_grading_policy"], function(doc, $, GradingView, CourseGradingPolicyModel) {
-    $("form :input").focus(function() {
-      $("label[for='" + this.id + "']").addClass("is-focused");
-    }).blur(function() {
-      $("label").removeClass("is-focused");
+</%block>
+<%block name="requirejs">
+    require(["js/factories/settings_graders"], function(SettingsGradersFactory) {
+        SettingsGradersFactory(${course_details|n}, "${grading_url}");
     });
-
-    var model = new CourseGradingPolicyModel(${course_details|n},{parse:true});
-    model.urlRoot = '${grading_url}';
-    var editor = new GradingView({
-        el: $('.settings-grading'),
-        model : model
-    });
-
-    editor.render();
-});
-  </script>
 </%block>
 
 <%block name="content">
@@ -62,8 +49,8 @@ require(["domReady!", "jquery", "js/views/settings/grading", "js/models/settings
           <ol class="list-input">
             <li class="field" id="field-course-grading-range">
               <div class="grade-controls course-grading-range well">
-                <a href="#" class="new-grade-button"><span class="plus-icon"></span></a>
-                <div class="grade-slider">
+                <a href="#" class="new-grade-button"><span class="icon fa fa-plus"></span></a>
+                <div class="grade-slider" dir="ltr">
                   <div class="grade-bar">
                     <ol class="increments">
                       <li class="increment-0">0</li>
@@ -118,14 +105,14 @@ require(["domReady!", "jquery", "js/views/settings/grading", "js/models/settings
 
           <div class="actions">
             <a href="#" class="new-button new-course-grading-item add-grading-data">
-              <i class="icon-plus"></i> ${_("New Assignment Type")}
+              <i class="icon fa fa-plus"></i> ${_("New Assignment Type")}
             </a>
           </div>
         </section>
       </form>
     </article>
 
-    <aside class="content-supplementary" role="complimentary">
+    <aside class="content-supplementary" role="complementary">
       <div class="bit">
         <h3 class="title-3">${_("What can I do on this page?")}</h3>
         <p>${_("You can use the slider under Overall Grade Range to specify whether your course is pass/fail or graded by letter, and to establish the thresholds for each grade.")}</p>
@@ -147,10 +134,8 @@ require(["domReady!", "jquery", "js/views/settings/grading", "js/models/settings
           <ul>
             <li class="nav-item"><a href="${detailed_settings_url}">${_("Details &amp; Schedule")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
-            <li class="nav-item"><a href="${advanced_settings_url}">${_("Advanced Settings")}</a></li>
-          % if "split_test" in context_course.advanced_modules:
             <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>
-          % endif
+            <li class="nav-item"><a href="${advanced_settings_url}">${_("Advanced Settings")}</a></li>
           </ul>
         </nav>
       % endif

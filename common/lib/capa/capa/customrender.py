@@ -44,12 +44,11 @@ class MathRenderer(object):
 
         mathstr = re.sub(r'\$(.*)\$', r'[mathjaxinline]\1[/mathjaxinline]', xml.text)
         mtag = 'mathjax'
-        if not r'\displaystyle' in mathstr:
+        if r'\displaystyle' not in mathstr:
             mtag += 'inline'
         else:
             mathstr = mathstr.replace(r'\displaystyle', '')
         self.mathstr = mathstr.replace('mathjaxinline]', '%s]' % mtag)
-
 
     def get_html(self):
         """

@@ -1,12 +1,12 @@
 @shard_1
 Feature: LMS.Homepage for web users
   In order to get an idea what edX is about
-  As a an anonymous web user
+  As an anonymous web user
   I want to check the information on the home page
 
-  Scenario: User can see the "Login" button
+  Scenario: User can see the "Sign in" button
     Given I visit the homepage
-    Then I should see a link called "Log in"
+    Then I should see a link called "Sign in"
 
   Scenario: User can see the "Register Now" button
     Given I visit the homepage
@@ -20,4 +20,4 @@ Feature: LMS.Homepage for web users
     | jobs    | Jobs   |
     | faq     | FAQ    |
     | contact | Contact|
-    | press   | News   |
+    | news    | News   |

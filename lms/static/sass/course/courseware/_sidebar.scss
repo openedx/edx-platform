@@ -1,8 +1,8 @@
 .course-index {
   @extend .sidebar;
   @extend .tran;
-  border-radius: 3px 0 0 3px;
-  border-right: 1px solid $border-color-2;
+  @include border-right(1px solid $border-color-2);
+  @include border-radius(3px, 0, 0, 3px);
 
   #open_close_accordion {
     display: none;
@@ -42,12 +42,12 @@
 
       &.ui-accordion-header {
         border-bottom: none;
-        color: #000;
+        color: $black;
 
         a {
           border-radius: 0;
           box-shadow: none;
-          padding-left: 19px;
+          @include padding-left(19px);
           color: $link-color;
         }
 
@@ -61,9 +61,22 @@
         }
 
         span.ui-icon {
-          left: 0;
-          background-image: url("/static/images/ui-icons_222222_256x240.png");
+          @include left(0);
           opacity: 0.3;
+          background-image: url("/static/images/ui-icons_222222_256x240.png");  // jQuery UI sprite
+
+          &.ui-icon-triangle-1-e {
+
+            // CASE: left to right layout
+            @include ltr {
+              background-position: -32px -16px; // jQuery UI east arrow position
+            }
+
+           // CASE: right to left layout
+           @include rtl {
+              background-position: -96px -16px; // jQuery UI west arrow position
+            }
+          }
         }
       }
     }
@@ -74,11 +87,11 @@
       padding: 11px 14px;
       @include linear-gradient(top, $sidebar-chapter-bg-top, $sidebar-chapter-bg-bottom);
       background-color: $sidebar-chapter-bg;
-      box-shadow: 0 1px 0 #fff inset, 0 -1px 0 rgba(0, 0, 0, .1) inset;
+      box-shadow: 0 1px 0 $white inset, 0 -1px 0 $shadow-l1 inset;
       @include transition(background-color .1s linear 0s);
 
       &.is-open {
-        background: #fff;
+        background: $white;
       }
 
       &:first-child {
@@ -87,11 +100,11 @@
 
       &:last-child {
         border-radius: 0 0 0 3px;
-        box-shadow: 0 1px 0 #fff inset;
+        box-shadow: 0 1px 0 $white inset;
       }
 
       &:hover, &:focus {
-        background-color: #fff
+        background-color: $white;
       }
     }
 
@@ -107,13 +120,13 @@
       li {
         border-bottom: 0;
         border-radius: 0;
-        margin-bottom: 4px;
+        margin-bottom: ($baseline/5);
 
         a {
           background: transparent;
           border-radius: 4px;
           display: block;
-          padding: 5px 36px 5px 10px;
+          padding: ($baseline/4) 36px ($baseline/4) ($baseline/2);
           position: relative;
           text-decoration: none;
 
@@ -137,7 +150,7 @@
           }
 
           &:hover, &:focus {
-            background: rgba(0, 0, 0, .1);
+            background: $shadow-l1;
 
             > a p {
               color: #333;
@@ -145,7 +158,7 @@
           }
 
           &:active {
-            box-shadow: inset 0 1px 14px 0 rgba(0,0,0, 0.1);
+            box-shadow: inset 0 1px 14px 0 $shadow-l1;
 
             &:after {
               opacity: 1.0;
@@ -192,13 +205,17 @@
 
         &.graded {
          > a {
-           background-image: url('../images/graded.png');
-           background-repeat: no-repeat;
-           background-position: 97% center;
+           > img {
+             margin: auto;
+             position: absolute;
+             top: 0;
+             bottom: 0;
+             right: 7px;
+           }
           }
 
           &.active > a {
-            @include background-image(url('../images/graded.png'), linear-gradient(top, #e6e6e6, #d6d6d6));
+            background: linear-gradient(to bottom, #e6e6e6, #d6d6d6);
           }
         }
       }

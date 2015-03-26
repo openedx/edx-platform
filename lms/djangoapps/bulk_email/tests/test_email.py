@@ -3,8 +3,9 @@
 Unit tests for sending course email
 """
 import json
-
-from mock import patch
+from mock import patch, Mock
+import os
+from unittest import skipIf
 
 from django.conf import settings
 from django.core import mail
@@ -12,16 +13,15 @@ from django.core.urlresolvers import reverse
 from django.core.management import call_command
 from django.test.utils import override_settings
 
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from courseware.tests.factories import StaffFactory, InstructorFactory
-
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 from bulk_email.models import Optout
+from courseware.tests.factories import StaffFactory, InstructorFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from instructor_task.subtasks import update_subtask_status
 from student.roles import CourseStaffRole
 from student.models import CourseEnrollment
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 STAFF_COUNT = 3
 STUDENT_COUNT = 10
@@ -37,16 +37,14 @@ class MockCourseEmailResult(object):
 
     def get_mock_update_subtask_status(self):
         """Wrapper for mock email function."""
-        def mock_update_subtask_status(entry_id, current_task_id, new_subtask_status):  # pylint: disable=W0613
+        def mock_update_subtask_status(entry_id, current_task_id, new_subtask_status):  # pylint: disable=unused-argument
             """Increments count of number of emails sent."""
             self.emails_sent += new_subtask_status.succeeded
             return update_subtask_status(entry_id, current_task_id, new_subtask_status)
         return mock_update_subtask_status
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
-class TestEmailSendFromDashboard(ModuleStoreTestCase):
+class EmailSendFromDashboardTestCase(ModuleStoreTestCase):
     """
     Test that emails send correctly.
     """
@@ -92,6 +90,14 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         """
         patch.stopall()
 
+
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
+@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
+class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase):
+    """
+    Tests email sending with mocked html_to_text.
+    """
     @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_email_disabled(self):
         """
@@ -107,6 +113,7 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         # We should get back a HttpResponseForbidden (status code 403)
         self.assertContains(response, "Email is not enabled for this course.", status_code=403)
 
+    @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
     def test_send_to_self(self):
         """
         Make sure email send to myself goes to myself.
@@ -222,33 +229,6 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
             '[' + self.course.display_name + '] ' + uni_subject
         )
 
-    def test_unicode_message_send_to_all(self):
-        """
-        Make sure email (with Unicode characters) send to all goes there.
-        """
-        # Now we know we have pulled up the instructor dash's email view
-        # (in the setUp method), we can test sending an email.
-
-        uni_message = u'ẗëṡẗ ṁëṡṡäġë ḟöṛ äḷḷ ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ fоѓ аll'
-        test_email = {
-            'action': 'Send email',
-            'send_to': 'all',
-            'subject': 'test subject for all',
-            'message': uni_message
-        }
-        # Post the email to the instructor dashboard API
-        response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
-
-        self.assertEquals(len(mail.outbox), 1 + len(self.staff) + len(self.students))
-        self.assertItemsEqual(
-            [e.to[0] for e in mail.outbox],
-            [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
-        )
-
-        message_body = mail.outbox[0].body
-        self.assertIn(uni_message, message_body)
-
     def test_unicode_students_send_to_all(self):
         """
         Make sure email (with Unicode characters) send to all goes there.
@@ -317,3 +297,42 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
                                 [s.email for s in self.students] +
                                 [s.email for s in added_users if s not in optouts])
         self.assertItemsEqual(outbox_contents, should_send_contents)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
+@skipIf(os.environ.get("TRAVIS") == 'true', "Skip this test in Travis CI.")
+class TestEmailSendFromDashboard(EmailSendFromDashboardTestCase):
+    """
+    Tests email sending without mocked html_to_text.
+
+    Note that these tests are skipped on Travis because we can't use the
+    function `html_to_text` as it is currently implemented on Travis.
+    """
+
+    def test_unicode_message_send_to_all(self):
+        """
+        Make sure email (with Unicode characters) send to all goes there.
+        """
+        # Now we know we have pulled up the instructor dash's email view
+        # (in the setUp method), we can test sending an email.
+
+        uni_message = u'ẗëṡẗ ṁëṡṡäġë ḟöṛ äḷḷ ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ fоѓ аll'
+        test_email = {
+            'action': 'Send email',
+            'send_to': 'all',
+            'subject': 'test subject for all',
+            'message': uni_message
+        }
+        # Post the email to the instructor dashboard API
+        response = self.client.post(self.send_mail_url, test_email)
+        self.assertEquals(json.loads(response.content), self.success_content)
+
+        self.assertEquals(len(mail.outbox), 1 + len(self.staff) + len(self.students))
+        self.assertItemsEqual(
+            [e.to[0] for e in mail.outbox],
+            [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
+        )
+
+        message_body = mail.outbox[0].body
+        self.assertIn(uni_message, message_body)

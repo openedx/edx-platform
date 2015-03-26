@@ -22,19 +22,42 @@ nav {
 
 // ====================
 
+// skip navigation
+.nav-skip {
+  @include font-size(13);
+  display: block;
+  position: absolute;
+  left: 0px;
+  top: -($baseline*30);
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  background: $white;
+  border-bottom: 1px solid $gray-l4;
+  padding: ($baseline*0.75) ($baseline/2);
+
+  &:focus, &:active {
+    position: static;
+    width: auto;
+    height: auto;
+  }
+}
+
+// ====================
+
 // dropdown
 .nav-dd {
 
   .title {
 
-    .label, .icon-caret-down {
+    .label, .fa-caret-down {
       display: inline-block;
       vertical-align: middle;
     }
 
     .ui-toggle-dd {
       @include transition(all $tmg-f2 ease-in-out 0s);
-      margin-left: ($baseline/10);
+      margin: 0 ($baseline/10);
       display: inline-block;
       vertical-align: middle;
     }
@@ -148,7 +171,7 @@ nav {
     }
 
     .nav-sub {
-      text-align: left;
+      @include text-align(left);
 
       // ui triangle/nub
       &:after {
@@ -167,20 +190,20 @@ nav {
   &.ui-right {
 
     .wrapper-nav-sub {
-      left: none;
-      right: 0;
+      @include left(none);
+      @include right(0);
     }
 
     .nav-sub {
 
       // ui triangle/nub
       &:after {
-        right: $baseline;
+        @include right($baseline);
         margin-right: -10px;
       }
 
       &:before {
-        right: $baseline;
+        @include right($baseline);
         margin-right: -11px;
       }
     }

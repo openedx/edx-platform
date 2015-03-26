@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from lettuce import step, world
 from notification_prefs import NOTIFICATION_PREF_KEY
-from user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.models import UserPreference
 
 
 USERNAME = "robot"

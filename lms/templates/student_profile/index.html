@@ -1,0 +1,31 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! import third_party_auth %>
+<%namespace name='static' file='/static_content.html'/>
+
+<%inherit file="../main.html" />
+
+<%block name="pagetitle">${_("Student Profile")}</%block>
+
+<%block name="js_extra">
+    <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/backbone-min.js')}"></script>
+    <%static:js group='student_profile'/>
+</%block>
+
+<%block name="header_extras">
+% for template_name in ["profile", "languages"]:
+    <script type="text/template" id="${template_name}-tpl">
+        <%static:include path="student_profile/${template_name}.underscore" />
+    </script>
+% endfor
+</%block>
+
+<h1>Student Profile</h1>
+
+<p>This is a placeholder for the student's profile page.</p>
+
+<div id="profile-container"></div>
+
+% if third_party_auth.is_enabled():
+    <%include file="third_party_auth.html" />
+% endif

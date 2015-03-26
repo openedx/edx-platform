@@ -5,12 +5,10 @@
 
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
-    float: left;
   }
 
   .content-primary {
-    width: flex-grid(9, 12);
-    margin-right: flex-gutter();
+    @extend .ui-col-wide;
 
     .no-textbook-content {
       @extend %no-content;
@@ -31,7 +29,7 @@
         .textbook-title {
           @extend %t-title4;
           @extend %t-strong;
-          margin-right: ($baseline*14);
+          @include margin-right($baseline*14);
         }
 
         .ui-toggle-expansion {
@@ -43,7 +41,7 @@
         }
 
         &.is-selectable {
-          cursor: pointer;
+          @extend %ui-fake-link;
 
           &:hover {
             color: $blue;
@@ -85,7 +83,7 @@
           opacity: 0.0;
           position: absolute;
           top: $baseline;
-          right: $baseline;
+          @include right($baseline);
 
           .action {
             display: inline-block;
@@ -305,9 +303,9 @@
             display: block;
             width: 46%;
             border-bottom: none;
-            margin: 0 ($baseline*0.75) 0 0;
+            @include margin(0, ($baseline*0.75), 0, 0);
             padding: ($baseline/4) 0 0 0;
-            float: left;
+            @include float(left);
             position: relative;
 
             input, textarea {
@@ -318,13 +316,13 @@
                 @extend %ui-btn-flat-outline;
                 position: absolute;
                 top: 3px;
-                right: 0;
+                @include right(0);
             }
 
           }
 
           .action-close {
-            @include transition(color 0.25s ease-in-out);
+            @include transition(color $tmg-f2 ease-in-out);
             @extend %t-action1;
             display: inline-block;
             float: right;
@@ -354,6 +352,6 @@
   }
 }
   .content-supplementary {
-    width: flex-grid(3, 12);
+    @extend .ui-col-narrow;
   }
 }

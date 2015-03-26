@@ -11,13 +11,13 @@
 
     .ui-toggle-control {
       // needed to override general a element transition properties - need to fix.
-      transition-duration: 0.25s;
+      transition-duration: $tmg-f2;
       transition-timing-function: ease-in-out;
     }
 
-    .icon-remove-sign {
+    .fa-times-circle {
       // needed to override general a element transition properties - need to fix.
-      transition-duration: 0.25s;
+      transition-duration: $tmg-f2;
       transition-timing-function: ease-in-out;
     }
   }
@@ -120,6 +120,23 @@ div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler{
 // xmodule editor tab font-weight override
 .xmodule_edit.xmodule_VideoDescriptor .editor-with-tabs .editor-tabs .inner_tab_wrap a.tab {
   font-weight: normal !important;
+}
+
+// ====================
+
+// xblock message UI override
+// (to fake the Studio no-content pattern design since validation classes cannot be removed in logic layer)
+.wrapper-xblock .xblock-message.no-container-content.xblock-message.no-container-content {
+  border: 0;
+  padding: ($baseline*1.5) ($baseline*2);
+  background-color: $gray-l4;
+  text-align: center;
+  color: $gray;
+
+  .button,
+  .action {
+    @extend %btn-primary-green;
+  }
 }
 
 // ====================

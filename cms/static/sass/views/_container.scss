@@ -6,7 +6,20 @@
 
 // ====================
 
+// view-specific utilities
+// --------------------
+%status-value-base {
+  @extend %t-title7;
+  @extend %t-strong;
+}
+
+%status-value-sub1 {
+  @extend %t-title8;
+  display: block;
+}
+
 // UI: container page view
+// --------------------
 .view-container {
   @extend %two-col-1;
 
@@ -51,7 +64,7 @@
           .button {
             @extend %t-action3;
             @extend %t-regular;
-            padding: ($baseline/4) ($baseline*.75);
+            padding: ($baseline/4) ($baseline*0.75);
           }
         }
       }
@@ -65,7 +78,7 @@
       padding: ($baseline*1.5) ($baseline*2);
 
       // custom rules to reuse xblock validation styling in ui-well context
-      .icon-warning-sign {
+      .fa-warning {
         display: none;
       }
     }
@@ -102,6 +115,7 @@
       @extend %t-title8;
     }
 
+    // UI: publishing details/summary
     .bit-publishing {
       @extend %bar-module;
 
@@ -137,7 +151,7 @@
 
       .bar-mod-content {
         border: 0;
-        padding: ($baseline/2) ($baseline*.75) ($baseline/4) ($baseline*.75);
+        padding: ($baseline/2) ($baseline*0.75) ($baseline/4) ($baseline*0.75);
 
         .title {
           margin-bottom: ($baseline/10);
@@ -159,37 +173,43 @@
       .wrapper-release {
 
         .release-date {
-          @extend %t-strong;
+          @extend %status-value-base;
         }
 
         .release-with {
-          @extend %t-title8;
-          display: block;
+          @extend %status-value-sub1;
         }
       }
 
       .wrapper-visibility {
 
         .copy {
-          @extend %t-strong;
+          @extend %status-value-base;
           margin-bottom: ($baseline/10);
         }
 
-        [class^="icon-"] {
-          margin-left: ($baseline/4);
+        .icon {
           color: $gray-d1;
         }
 
         .inherited-from {
-          @extend %t-title8;
-          display: block;
+          @extend %status-value-sub1;
         }
 
+        // UI: note about specific access
+        .note-visibility {
+          @extend %status-value-sub1;
 
+          .icon {
+            @include margin-right($baseline/4);
+          }
+        }
       }
 
       .wrapper-pub-actions {
-        padding: ($baseline*.75);
+        border-top: 1px solid $gray-l4;
+        margin-top: ($baseline/2);
+        padding: $baseline ($baseline*0.75) ($baseline*0.75) ($baseline*0.75);
 
         .action-publish {
           @extend %btn-primary-blue;
@@ -209,7 +229,6 @@
           }
         }
       }
-
     }
 
     // versioning widget
@@ -217,7 +236,7 @@
 
       .wrapper-last-publish {
         margin-bottom: $baseline;
-        padding: ($baseline*.75);
+        padding: ($baseline*0.75);
         background-color: $white;
 
         .copy {
@@ -237,15 +256,14 @@
     }
 
     // location widget
-    .unit-location {
+    .unit-location, .library-location {
       @extend %bar-module;
       border-top: none;
 
-      .wrapper-unit-id {
+      .wrapper-unit-id, .wrapper-library-id {
 
-        .unit-id-value {
-          @extend %cont-text-wrap;
-          @extend %t-copy-sub1;
+        .unit-id-value, .library-id-value {
+          @extend %status-value-base;
           display: inline-block;
           width: 100%;
         }
@@ -262,10 +280,49 @@
 
         .item-title {
           @extend %cont-text-wrap;
+
+          a {
+            color: $blue;
+
+            &:hover {
+              color: $orange-d1;
+            }
+          }
+        }
+
+        // CASE: is current item being edited/viewed
+        .is-current {
+          background: $gray-l4;
+
+          .unit-title a {
+            @extend %ui-disabled;
+            @extend %t-strong;
+            color: $color-heading-base;
+          }
+        }
+
+        // typographical overrides (based off of outline-simple)
+        .section-header, .subsection-header {
+          line-height: 0;
+          margin-bottom: ($baseline/2);
+        }
+
+        .section-header {
+          border-bottom: 1px solid $gray-l4;
+          padding-bottom: ($baseline/2);
+        }
+
+        // subsections overrides (based off of outline-simple)
+        .outline-subsection {
+          border: none;
+          padding: 0;
+        }
+
+        // units overrides (based off of outline-simple)
+        .outline-unit {
+          padding: 3px 6px;
         }
       }
     }
   }
 }
-
-

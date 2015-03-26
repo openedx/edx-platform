@@ -52,6 +52,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/jasmine-imagediff.js
     - xmodule_js/common_static/js/vendor/jasmine.async.js
     - xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js
+    - xmodule_js/common_static/js/vendor/jQuery-File-Upload/js
     - xmodule_js/src/xmodule.js
     - xmodule_js/common_static/js/test/i18n.js
     - xmodule_js/common_static/js/vendor/draggabilly.pkgd.js
@@ -60,13 +61,21 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/URI.min.js
     - xmodule_js/common_static/js/vendor/jquery.smooth-scroll.min.js
     - xmodule_js/common_static/coffee/src/jquery.immediateDescendents.js
+    - xmodule_js/common_static/js/xblock/
     - xmodule_js/common_static/coffee/src/xblock/
     - xmodule_js/common_static/js/vendor/URI.min.js
+    - xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport.js
+    - xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload.js
+    - xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload-process.js
+    - xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload-validate.js
+    - xmodule_js/common_static/js/vendor/mock-ajax.js
 
 # Paths to source JavaScript files
 src_paths:
     - coffee/src
     - js
+    - js/common_helpers
+    - js/factories
 
 # Paths to spec (test) JavaScript files
 spec_paths:

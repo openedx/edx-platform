@@ -1,9 +1,22 @@
 // studio - utilities - variables
 // ====================
 
+// Table of Contents 
+// * +Grid
+// * +Fonts
+// * +Colors - Utility
+// * +Colors - Primary
+// * +Colors - Shadow
+// * +Color - Application
+// * +Timing
+// * +Archetype UI
+// * +Specific UI
+// * +Deprecated
+
 $baseline: 20px;
 
-// grid
+// +Grid
+// ==================== 
 $gw-column: ($baseline*3);
 $gw-gutter: $baseline;
 $fg-column: $gw-column;
@@ -12,17 +25,17 @@ $fg-max-columns: 12;
 $fg-max-width: 1280px;
 $fg-min-width: 900px;
 
-// ====================
-
-// fonts
-$f-serif: 'Bree Serif', Georgia, Cambria, 'Times New Roman', Times, serif;
+// +Fonts
+// ==================== 
 $f-sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif;
-$f-decorative: '';
 $f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace;
 
-// ====================
+// +Colors - Utility
+// ==================== 
+$transparent: rgba(0,0,0,0); // used when color value is needed for UI width/transitions but element is transparent
 
-// colors - new for re-org
+// +Colors - Primary
+// ==================== 
 $black: rgb(0,0,0);
 $black-t0: rgba($black, 0.125);
 $black-t1: rgba($black, 0.25);
@@ -69,7 +82,7 @@ $blue-t1: rgba($blue, 0.25);
 $blue-t2: rgba($blue, 0.50);
 $blue-t3: rgba($blue, 0.75);
 
-$pink: rgb(183, 37, 103);
+$pink: rgb(183, 37, 103); // #b72567;
 $pink-l1: tint($pink,20%);
 $pink-l2: tint($pink,40%);
 $pink-l3: tint($pink,60%);
@@ -86,7 +99,7 @@ $pink-u1: desaturate($pink,15%);
 $pink-u2: desaturate($pink,30%);
 $pink-u3: desaturate($pink,45%);
 
-$red: rgb(178, 6, 16);
+$red: rgb(178, 6, 16);  // #b20610;
 $red-l1: tint($red,20%);
 $red-l2: tint($red,40%);
 $red-l3: tint($red,60%);
@@ -103,7 +116,7 @@ $red-u1: desaturate($red,15%);
 $red-u2: desaturate($red,30%);
 $red-u3: desaturate($red,45%);
 
-$green: rgb(37, 184, 90);
+$green: rgb(37, 184, 90); // #25b85a
 $green-l1: tint($green,20%);
 $green-l2: tint($green,40%);
 $green-l3: tint($green,60%);
@@ -154,27 +167,31 @@ $orange-u1: desaturate($orange,15%);
 $orange-u2: desaturate($orange,30%);
 $orange-u3: desaturate($orange,45%);
 
+// +Colors - Shadows
+// ==================== 
 $shadow: rgba($black, 0.2);
 $shadow-l1: rgba($black, 0.1);
 $shadow-l2: rgba($black, 0.05);
 $shadow-d1: rgba($black, 0.4);
 $shadow-d2: rgba($black, 0.6);
 
-// colors - application
+// +Colors - Application
+// ==================== 
 $color-draft: $gray-l3;
 $color-live: $blue;
 $color-ready: $green;
 $color-warning: $orange-l2;
 $color-error: $red-l2;
 $color-staff-only: $black;
+$color-visibility-set: $black;
 
 $color-heading-base: $gray-d2;
 $color-copy-base: $gray-l1;
 $color-copy-emphasized: $gray-d2;
 
-// ====================
-
-// timing - used for animation/transition mixin syncing
+// +Timing
+// ==================== 
+// used for animation/transition mixin syncing
 $tmg-s3: 3.0s;
 $tmg-s2: 2.0s;
 $tmg-s1: 1.0s;
@@ -183,24 +200,22 @@ $tmg-f1: 0.50s;
 $tmg-f2: 0.25s;
 $tmg-f3: 0.125s;
 
-// ====================
-
-// archetype UI
+// +Archetype UI
+// ==================== 
 $ui-action-primary-color: $blue-u2;
 $ui-action-primary-color-focus: $blue-s1;
 
 $ui-link-color: $blue-u2;
 $ui-link-color-focus: $blue-s1;
 
-// ====================
-
-// specific UI
+// +Specific UI
+// ==================== 
 $ui-notification-height: ($baseline*10);
 $ui-update-color: $blue-l4;
 
-// ====================
-
-// inherited
+// +Deprecated 
+// ==================== 
+// do not use, future clean up will use updated styles
 $baseFontColor: $gray-d2;
 $lighter-base-font-color: rgb(100,100,100);
 $offBlack: #3c3c3c;
@@ -229,7 +244,4 @@ $body-line-height: golden-ratio(.875em, 1);
 
 // carried over from LMS for xmodules
 $action-primary-active-bg: #1AA1DE; // $m-blue
-$very-light-text: #fff;
-
-
-
+$very-light-text: $white;

@@ -6,10 +6,12 @@ describe "DiscussionThreadView", ->
         jasmine.Clock.useMock()
         @threadData = DiscussionViewSpecHelper.makeThreadWithProps({})
         @thread = new Thread(@threadData)
+        @discussion = new Discussion(@thread)
         spyOn($, "ajax")
         # Avoid unnecessary boilerplate
         spyOn(DiscussionThreadShowView.prototype, "convertMath")
         spyOn(DiscussionContentView.prototype, "makeWmdEditor")
+        spyOn(DiscussionUtil, "makeWmdEditor")
         spyOn(ThreadResponseView.prototype, "renderShowView")
 
     renderWithContent = (view, content) ->
@@ -40,9 +42,65 @@ describe "DiscussionThreadView", ->
         else
             expect(view.$el.find(".load-response-button").length).toEqual(0)
 
+    describe "closed and open Threads", ->
+
+        createDiscussionThreadView = (originallyClosed, mode) ->
+            threadData = DiscussionViewSpecHelper.makeThreadWithProps({closed: originallyClosed})
+            thread = new Thread(threadData)
+            discussion = new Discussion(thread)
+            view = new DiscussionThreadView(
+                model: thread
+                el: $("#fixture-element")
+                mode: mode
+                course_settings: DiscussionSpecHelper.makeCourseSettings()
+            )
+            renderWithContent(view, {resp_total: 1, children: [{}]})
+            if mode == "inline"
+              view.expand()
+            spyOn(DiscussionUtil, "updateWithUndo").andCallFake(
+              (model, updates, safeAjaxParams, errorMsg) ->
+                model.set(updates)
+            )
+            view
+
+        checkCommentForm = (originallyClosed, mode) ->
+            view = createDiscussionThreadView(originallyClosed, mode)
+            expect(view.$('.comment-form').closest('li').is(":visible")).toBe(not originallyClosed)
+            expect(view.$(".discussion-reply-new").is(":visible")).toBe(not originallyClosed)
+            view.$(".action-close").click()
+            expect(view.$('.comment-form').closest('li').is(":visible")).toBe(originallyClosed)
+            expect(view.$(".discussion-reply-new").is(":visible")).toBe(originallyClosed)
+
+        checkVoteDisplay = (originallyClosed, mode) ->
+            view = createDiscussionThreadView(originallyClosed, mode)
+            expect(view.$('.action-vote').is(":visible")).toBe(not originallyClosed)
+            expect(view.$('.display-vote').is(":visible")).toBe(originallyClosed)
+            view.$(".action-close").click()
+            expect(view.$('.action-vote').is(":visible")).toBe(originallyClosed)
+            expect(view.$('.display-vote').is(":visible")).toBe(not originallyClosed)
+
+        _.each(["tab", "inline"], (mode) =>
+                it 'Test that in #{mode} mode when a closed thread is opened the comment form is displayed', ->
+                        checkCommentForm(true, mode)
+
+                it 'Test that in #{mode} mode when a open thread is closed the comment form is hidden', ->
+                        checkCommentForm(false, mode)
+
+                it 'Test that in #{mode} mode when a closed thread is opened the vote button is displayed and vote count is hidden', ->
+                        checkVoteDisplay(true, mode)
+
+                it 'Test that in #{mode} mode when a open thread is closed the vote button is hidden and vote count is displayed', ->
+                        checkVoteDisplay(false, mode)
+        )
+
     describe "tab mode", ->
         beforeEach ->
-            @view = new DiscussionThreadView({ model: @thread, el: $("#fixture-element"), mode: "tab"})
+            @view = new DiscussionThreadView(
+                model: @thread
+                el: $("#fixture-element")
+                mode: "tab"
+                course_settings: DiscussionSpecHelper.makeCourseSettings()
+            )
 
         describe "response count and pagination", ->
             it "correctly render for a thread with no responses", ->
@@ -83,7 +141,12 @@ describe "DiscussionThreadView", ->
 
     describe "inline mode", ->
         beforeEach ->
-            @view = new DiscussionThreadView({ model: @thread, el: $("#fixture-element"), mode: "inline"})
+            @view = new DiscussionThreadView(
+                model: @thread
+                el: $("#fixture-element")
+                mode: "inline"
+                course_settings: DiscussionSpecHelper.makeCourseSettings()
+            )
 
         describe "render", ->
             it "shows content that should be visible when collapsed", ->
@@ -150,11 +213,26 @@ describe "DiscussionThreadView", ->
                 expect($(".post-body").text()).toEqual(maliciousAbbreviation)
                 expect($(".post-body").html()).not.toContain("<script")
 
+            it "re-renders the show view correctly when leaving the edit view", ->
+                DiscussionViewSpecHelper.setNextResponseContent({resp_total: 0, children: []})
+                @view.render()
+                @view.expand()
+                assertExpandedContentVisible(@view, true)
+                @view.edit()
+                assertContentVisible(@view, ".edit-post-body", true)
+                expect(@view.$el.find(".post-actions-list").length).toBe(0)
+                @view.closeEditView(DiscussionSpecHelper.makeEventSpy())
+                expect(@view.$el.find(".edit-post-body").length).toBe(0)
+                assertContentVisible(@view, ".post-actions-list", true)
+
     describe "for question threads", ->
         beforeEach ->
             @thread.set("thread_type", "question")
             @view = new DiscussionThreadView(
-                {model: @thread, el: $("#fixture-element"), mode: "tab"}
+                model: @thread
+                el: $("#fixture-element")
+                mode: "tab"
+                course_settings: DiscussionSpecHelper.makeCourseSettings()
             )
 
         renderTestCase = (view, numEndorsed, numNonEndorsed) ->

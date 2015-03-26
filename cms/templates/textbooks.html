@@ -22,25 +22,12 @@ CMS.URL = CMS.URL || {};
 CMS.URL.UPLOAD_ASSET = "${upload_asset_url}"
 CMS.URL.TEXTBOOKS = "${textbook_url}"
 CMS.URL.LMS_BASE = "${settings.LMS_BASE}"
-require(["js/models/section", "js/collections/textbook", "js/views/list_textbooks"],
-        function(Section, TextbookCollection, ListTextbooksView) {
-  var textbooks = new TextbookCollection(${json.dumps(textbooks)}, {parse: true});
-  var tbView = new ListTextbooksView({collection: textbooks});
-
-  $(function() {
-      $(".content-primary").append(tbView.render().el);
-      $(".nav-actions .new-button").click(function(e) {
-          tbView.addOne(e);
-      })
-      $(window).on("beforeunload", function() {
-          var dirty = textbooks.find(function(textbook) { return textbook.isDirty(); });
-          if(dirty) {
-              return "${_('You have unsaved changes. Do you really want to leave this page?')}";
-          }
-      })
-  })
-});
 </script>
+</%block>
+<%block name="requirejs">
+    require(["js/factories/textbooks"], function(TextbooksFactory) {
+        TextbooksFactory(${json.dumps(textbooks)});
+    });
 </%block>
 
 <%block name="content">
@@ -55,7 +42,7 @@ require(["js/models/section", "js/collections/textbook", "js/views/list_textbook
         <h3 class="sr">${_("Page Actions")}</h3>
         <ul>
           <li class="nav-item">
-            <a href="#" class="button new-button"><i class="icon-plus"></i> ${_("New Textbook")}</a>
+            <a href="#" class="button new-button"><i class="icon fa fa-plus"></i> ${_("New Textbook")}</a>
           </li>
         </ul>
       </nav>
@@ -67,7 +54,7 @@ require(["js/models/section", "js/collections/textbook", "js/views/list_textbook
       <article class="content-primary" role="main">
 
       </article>
-      <aside class="content-supplementary" role="complimentary">
+      <aside class="content-supplementary" role="complementary">
         <div class="bit">
           <h3 class="title-3">${_("Why should I break my textbook into chapters?")}</h3>
           <p>${_("Breaking your textbook into multiple chapters reduces loading times for students, especially those with slow Internet connections. Breaking up textbooks into chapters can also help students more easily find topic-based information.")}</p>
@@ -78,7 +65,7 @@ require(["js/models/section", "js/collections/textbook", "js/views/list_textbook
         </div>
 
         <div class="bit external-help">
-          <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn More")}</a>
+          <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about textbooks")}</a>
         </div>
       </aside>
     </section>

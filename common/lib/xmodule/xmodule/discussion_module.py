@@ -11,7 +11,11 @@ _ = lambda text: text
 
 
 class DiscussionFields(object):
-    discussion_id = String(scope=Scope.settings, default="$$GUID$$")
+    discussion_id = String(
+        display_name=_("Discussion Id"),
+        help=_("The id is a unique identifier for the discussion. It is non editable."),
+        scope=Scope.settings,
+        default="$$GUID$$")
     display_name = String(
         display_name=_("Display Name"),
         help=_("Display name for this module"),

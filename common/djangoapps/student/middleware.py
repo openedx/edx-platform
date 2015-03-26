@@ -7,6 +7,7 @@ from django.utils.translation import ugettext as _
 from django.conf import settings
 from student.models import UserStanding
 
+
 class UserStandingMiddleware(object):
     """
     Checks a user's standing on request. Returns a 403 if the user's
@@ -23,15 +24,13 @@ class UserStandingMiddleware(object):
         else:
             if user_account.account_status == UserStanding.ACCOUNT_DISABLED:
                 msg = _(
-                            'Your account has been disabled. If you believe '
-                            'this was done in error, please contact us at '
-                            '{link_start}{support_email}{link_end}'
-                        ).format(
-                            support_email=settings.DEFAULT_FEEDBACK_EMAIL,
-                            link_start=u'<a href="mailto:{address}?subject={subject_line}">'.format(
-                                address=settings.DEFAULT_FEEDBACK_EMAIL,
-                                subject_line=_('Disabled Account'),
-                            ),
-                            link_end=u'</a>'
-                        )
+                    'Your account has been disabled. If you believe '
+                    'this was done in error, please contact us at '
+                    '{support_email}'
+                ).format(
+                    support_email=u'<a href="mailto:{address}?subject={subject_line}">{address}</a>'.format(
+                        address=settings.DEFAULT_FEEDBACK_EMAIL,
+                        subject_line=_('Disabled Account'),
+                    ),
+                )
                 return HttpResponseForbidden(msg)

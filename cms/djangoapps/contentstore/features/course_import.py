@@ -1,6 +1,6 @@
-# pylint: disable=C0111
-# pylint: disable=W0621
-# pylint: disable=W0613
+# pylint: disable=missing-docstring
+# pylint: disable=redefined-outer-name
+# pylint: disable=unused-argument
 
 import os
 from lettuce import world, step

@@ -1,0 +1,78 @@
+// studio - css architecture
+// ====================
+
+// Table of Contents 
+// * +Libs and Resets
+// * +Vendor and Rebase 
+// * +Base - Utilities
+// * +Base - Assets
+// * +Base - Starter
+// * +Base - Elements
+// * +Base - Specific Views
+// * +Base - Contexts
+
+
+// +Libs and Resets - *do not edit*
+// ==================== 
+@import 'bourbon/bourbon'; // lib - bourbon
+@import 'vendor/bi-app/bi-app-rtl'; // set the layout for right to left languages
+
+// +Vendor and Rebase - *referenced/used vendor presentation and reset*
+// ==================== 
+@import 'reset';
+
+// +Base - Utilities
+// ==================== 
+@import 'variables';
+@import 'mixins';
+@import 'mixins-inherited';
+
+// +Base - Assets
+// ==================== 
+@import 'assets/fonts';
+@import 'assets/graphics'; // sprites, basic image/figure/svg styling
+@import 'assets/anims'; // animations
+
+// +Base - Starter
+// ==================== 
+@import 'base';
+
+// +Base - Elements
+// ==================== 
+@import 'elements/typography';
+@import 'elements/pagination'; // pagination
+@import 'elements/icons'; // references to icons used
+@import 'elements/controls'; // buttons, link styles, sliders, etc.
+@import 'elements/xblocks'; //  studio rendering chrome for xblocks
+@import 'elements/modules'; //  content module patterns
+@import 'elements/layout'; // various standard layouts
+@import 'elements/uploaded-assets'; // layout for asset tables
+
+// +Base - Specific Views
+// ==================== 
+@import 'views/account';
+@import 'views/assets';
+@import 'views/updates';
+@import 'views/dashboard';
+@import 'views/export';
+@import 'views/index';
+@import 'views/course-create';
+@import 'views/import';
+@import 'views/outline';
+@import 'views/settings';
+@import 'views/static-pages';
+@import 'views/unit';
+@import 'views/container';
+@import 'views/users';
+@import 'views/checklists';
+@import 'views/textbooks';
+@import 'views/export-git';
+@import 'views/group-configuration';
+@import 'views/video-upload';
+
+// +Base - Contexts
+// ==================== 
+@import 'contexts/ie'; // ie-specific rules (mostly for known/older bugs)
+
+@import 'developer'; // used for any developer-created scss that needs further polish/refactoring
+@import 'shame';     // used for any bad-form/orphaned scss

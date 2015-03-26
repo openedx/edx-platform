@@ -18,7 +18,7 @@ from xmodule.modulestore.django import ASSET_IGNORE_REGEX
 
 class MongoContentStore(ContentStore):
 
-    # pylint: disable=W0613
+    # pylint: disable=unused-argument
     def __init__(self, host, db, port=27017, user=None, password=None, bucket='fs', collection=None, **kwargs):
         """
         Establish the connection with the mongo backend and connect to the collections
@@ -167,14 +167,14 @@ class MongoContentStore(ContentStore):
                     policy.setdefault(asset['asset_key'].name, {})[attr] = value
 
         with open(assets_policy_file, 'w') as f:
-            json.dump(policy, f)
+            json.dump(policy, f, sort_keys=True, indent=4)
 
     def get_all_content_thumbnails_for_course(self, course_key):
         return self._get_all_content_for_course(course_key, get_thumbnails=True)[0]
 
-    def get_all_content_for_course(self, course_key, start=0, maxresults=-1, sort=None):
+    def get_all_content_for_course(self, course_key, start=0, maxresults=-1, sort=None, filter_params=None):
         return self._get_all_content_for_course(
-            course_key, start=start, maxresults=maxresults, get_thumbnails=False, sort=sort
+            course_key, start=start, maxresults=maxresults, get_thumbnails=False, sort=sort, filter_params=filter_params
         )
 
     def remove_redundant_content_for_courses(self):
@@ -197,7 +197,13 @@ class MongoContentStore(ContentStore):
             self.fs_files.remove(query)
         return assets_to_delete
 
-    def _get_all_content_for_course(self, course_key, get_thumbnails=False, start=0, maxresults=-1, sort=None):
+    def _get_all_content_for_course(self,
+                                    course_key,
+                                    get_thumbnails=False,
+                                    start=0,
+                                    maxresults=-1,
+                                    sort=None,
+                                    filter_params=None):
         '''
         Returns a list of all static assets for a course. The return format is a list of asset data dictionary elements.
 
@@ -208,15 +214,17 @@ class MongoContentStore(ContentStore):
             contentType: The mimetype string of the asset
             md5: An md5 hash of the asset content
         '''
+        query = query_for_course(course_key, "asset" if not get_thumbnails else "thumbnail")
+        find_args = {"sort": sort}
         if maxresults > 0:
-            items = self.fs_files.find(
-                query_for_course(course_key, "asset" if not get_thumbnails else "thumbnail"),
-                skip=start, limit=maxresults, sort=sort
-            )
-        else:
-            items = self.fs_files.find(
-                query_for_course(course_key, "asset" if not get_thumbnails else "thumbnail"), sort=sort
-            )
+            find_args.update({
+                "skip": start,
+                "limit": maxresults,
+            })
+        if filter_params:
+            query.update(filter_params)
+
+        items = self.fs_files.find(query, **find_args)
         count = items.count()
         assets = list(items)
 
@@ -374,6 +382,36 @@ class MongoContentStore(ContentStore):
             dbkey['run'] = _id_field['run']
         fs_entry['_id'] = dbkey
         return dbkey
+
+    def ensure_indexes(self):
+
+        # Index needed thru 'category' by `_get_all_content_for_course` and others. That query also takes a sort
+        # which can be `uploadDate`, `display_name`,
+
+        self.fs_files.create_index(
+            [('_id.org', pymongo.ASCENDING), ('_id.course', pymongo.ASCENDING), ('_id.name', pymongo.ASCENDING)],
+            sparse=True
+        )
+        self.fs_files.create_index(
+            [('content_son.org', pymongo.ASCENDING), ('content_son.course', pymongo.ASCENDING), ('content_son.name', pymongo.ASCENDING)],
+            sparse=True
+        )
+        self.fs_files.create_index(
+            [('_id.org', pymongo.ASCENDING), ('_id.course', pymongo.ASCENDING), ('uploadDate', pymongo.ASCENDING)],
+            sparse=True
+        )
+        self.fs_files.create_index(
+            [('_id.org', pymongo.ASCENDING), ('_id.course', pymongo.ASCENDING), ('display_name', pymongo.ASCENDING)],
+            sparse=True
+        )
+        self.fs_files.create_index(
+            [('content_son.org', pymongo.ASCENDING), ('content_son.course', pymongo.ASCENDING), ('uploadDate', pymongo.ASCENDING)],
+            sparse=True
+        )
+        self.fs_files.create_index(
+            [('content_son.org', pymongo.ASCENDING), ('content_son.course', pymongo.ASCENDING), ('display_name', pymongo.ASCENDING)],
+            sparse=True
+        )
 
 
 def query_for_course(course_key, category=None):

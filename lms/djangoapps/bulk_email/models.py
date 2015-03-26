@@ -20,6 +20,7 @@ from html_to_text import html_to_text
 from mail_utils import wrap_message
 
 from xmodule_django.models import CourseKeyField
+from util.keyword_substitution import substitute_keywords_with_data
 
 log = logging.getLogger(__name__)
 
@@ -43,7 +44,7 @@ class Email(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-    class Meta:  # pylint: disable=C0111
+    class Meta:  # pylint: disable=missing-docstring
         abstract = True
 
 
@@ -67,12 +68,14 @@ class CourseEmail(Email):
     )
     course_id = CourseKeyField(max_length=255, db_index=True)
     to_option = models.CharField(max_length=64, choices=TO_OPTION_CHOICES, default=SEND_TO_MYSELF)
+    template_name = models.CharField(null=True, max_length=255)
+    from_addr = models.CharField(null=True, max_length=255)
 
     def __unicode__(self):
         return self.subject
 
     @classmethod
-    def create(cls, course_id, sender, to_option, subject, html_message, text_message=None):
+    def create(cls, course_id, sender, to_option, subject, html_message, text_message=None, template_name=None, from_addr=None):
         """
         Create an instance of CourseEmail.
 
@@ -101,6 +104,8 @@ class CourseEmail(Email):
             subject=subject,
             html_message=html_message,
             text_message=text_message,
+            template_name=template_name,
+            from_addr=from_addr,
         )
         course_email.save_now()
 
@@ -120,6 +125,12 @@ class CourseEmail(Email):
         """
         self.save()
 
+    def get_template(self):
+        """
+        Returns the corresponding CourseEmailTemplate for this CourseEmail.
+        """
+        return CourseEmailTemplate.get_template(name=self.template_name)
+
 
 class Optout(models.Model):
     """
@@ -131,7 +142,7 @@ class Optout(models.Model):
     user = models.ForeignKey(User, db_index=True, null=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
 
-    class Meta:  # pylint: disable=C0111
+    class Meta:  # pylint: disable=missing-docstring
         unique_together = ('user', 'course_id')
 
 
@@ -151,16 +162,17 @@ class CourseEmailTemplate(models.Model):
     """
     html_template = models.TextField(null=True, blank=True)
     plain_template = models.TextField(null=True, blank=True)
+    name = models.CharField(null=True, max_length=255, unique=True, blank=True)
 
     @staticmethod
-    def get_template():
+    def get_template(name=None):
         """
         Fetch the current template
 
         If one isn't stored, an exception is thrown.
         """
         try:
-            return CourseEmailTemplate.objects.get()
+            return CourseEmailTemplate.objects.get(name=name)
         except CourseEmailTemplate.DoesNotExist:
             log.exception("Attempting to fetch a non-existent course email template")
             raise
@@ -174,21 +186,21 @@ class CourseEmailTemplate(models.Model):
         using the provided template.  The template is a format string,
         which is rendered using format() with the provided `context` dict.
 
-        This doesn't insert user's text into template, until such time we can
-        support proper error handling due to errors in the message body
-        (e.g. due to the use of curly braces).
-
-        Instead, for now, we insert the message body *after* the substitutions
-        have been performed, so that anything in the message body that might
-        interfere will be innocently returned as-is.
+        Any keywords encoded in the form %%KEYWORD%% found in the message
+        body are subtituted with user data before the body is inserted into
+        the template.
 
         Output is returned as a unicode string.  It is not encoded as utf-8.
         Such encoding is left to the email code, which will use the value
         of settings.DEFAULT_CHARSET to encode the message.
         """
-        # If we wanted to support substitution, we'd call:
-        # format_string = format_string.replace(COURSE_EMAIL_MESSAGE_BODY_TAG, message_body)
+
+        # Substitute all %%-encoded keywords in the message body
+        if 'user_id' in context and 'course_id' in context:
+            message_body = substitute_keywords_with_data(message_body, context['user_id'], context['course_id'])
+
         result = format_string.format(**context)
+
         # Note that the body tag in the template will now have been
         # "formatted", so we need to do the same to the tag being
         # searched for.

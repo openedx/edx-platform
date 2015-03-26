@@ -15,7 +15,8 @@ class AutoAuthPage(PageObject):
     this url will create a user and log them in.
     """
 
-    def __init__(self, browser, username=None, email=None, password=None, staff=None, course_id=None, roles=None):
+    def __init__(self, browser, username=None, email=None, password=None,
+                 staff=None, course_id=None, roles=None, no_login=None):
         """
         Auto-auth is an end-point for HTTP GET requests.
         By default, it will create accounts with random user credentials,
@@ -51,6 +52,9 @@ class AutoAuthPage(PageObject):
         if roles is not None:
             self._params['roles'] = roles
 
+        if no_login:
+            self._params['no_login'] = True
+
     @property
     def url(self):
         """
@@ -66,7 +70,7 @@ class AutoAuthPage(PageObject):
 
     def is_browser_on_page(self):
         message = self.q(css='BODY').text[0]
-        match = re.search(r'Logged in user ([^$]+) with password ([^$]+) and user_id ([^$]+)$', message)
+        match = re.search(r'(Logged in|Created) user ([^$]+) with password ([^$]+) and user_id ([^$]+)$', message)
         return True if match else False
 
     def get_user_id(self):

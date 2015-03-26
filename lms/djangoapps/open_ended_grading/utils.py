@@ -9,7 +9,6 @@ from xmodule.open_ended_grading_classes.grading_service_module import GradingSer
 from django.utils.translation import ugettext as _
 from django.conf import settings
 
-from lms.lib.xblock.runtime import LmsModuleSystem
 from edxmako.shortcuts import render_to_string
 
 
@@ -25,18 +24,6 @@ GRADER_DISPLAY_NAMES = {
 
 STUDENT_ERROR_MESSAGE = _("Error occurred while contacting the grading service.  Please notify course staff.")
 STAFF_ERROR_MESSAGE = _("Error occurred while contacting the grading service.  Please notify your edX point of contact.")
-
-SYSTEM = LmsModuleSystem(
-    static_url='/static',
-    track_function=None,
-    get_module=None,
-    render_template=render_to_string,
-    replace_urls=None,
-    descriptor_runtime=None,
-    services={
-        'i18n': ModuleI18nService(),
-    },
-)
 
 
 def generate_problem_url(problem_url_parts, base_course_url):
@@ -85,7 +72,7 @@ def create_controller_query_service():
     """
     Return an instance of a service that can query edX ORA.
     """
-    return ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, SYSTEM)
+    return ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, render_to_string)
 
 
 class StudentProblemList(object):

@@ -1,12 +1,15 @@
 """
 Test the publish code (mostly testing that publishing doesn't result in orphans)
 """
+from nose.plugins.attrib import attr
+
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.test_split_w_old_mongo import SplitWMongoCourseBoostrapper
-from xmodule.modulestore.tests.factories import check_mongo_calls
-from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.factories import check_mongo_calls, mongo_uses_error_check
 
 
+@attr('mongo')
 class TestPublish(SplitWMongoCourseBoostrapper):
     """
     Test the publish code (primary causing orphans)
@@ -24,30 +27,30 @@ class TestPublish(SplitWMongoCourseBoostrapper):
 
         # with bulk will delay all inheritance computations which won't be added into the mongo_calls
         with self.draft_mongo.bulk_operations(self.old_course_key):
-            # finds: 1 for parent to add child
+            # finds: 1 for parent to add child and 2 to get ancestors
             # sends: 1 for insert, 1 for parent (add child)
-            with check_mongo_calls(1, 2):
+            with check_mongo_calls(3, 2):
                 self._create_item('chapter', 'Chapter1', {}, {'display_name': 'Chapter 1'}, 'course', 'runid', split=False)
 
-            with check_mongo_calls(2, 2):
+            with check_mongo_calls(4, 2):
                 self._create_item('chapter', 'Chapter2', {}, {'display_name': 'Chapter 2'}, 'course', 'runid', split=False)
             # For each vertical (2) created:
             #   - load draft
             #   - load non-draft
             #   - get last error
             #   - load parent
+            #   - get ancestors
             #   - load inheritable data
-            with check_mongo_calls(10, 6):
+            with check_mongo_calls(15, 6):
                 self._create_item('vertical', 'Vert1', {}, {'display_name': 'Vertical 1'}, 'chapter', 'Chapter1', split=False)
                 self._create_item('vertical', 'Vert2', {}, {'display_name': 'Vertical 2'}, 'chapter', 'Chapter1', split=False)
             # For each (4) item created
-            #   - load draft
-            #   - load non-draft
-            #   - get last error
-            #   - load parent
-            #   - load inheritable data
-            #   - load parent
-            with check_mongo_calls(24, 12):
+            #   - try to find draft
+            #   - try to find non-draft
+            #   - compute what is parent
+            #   - load draft parent again & compute its parent chain up to course
+            # count for updates increased to 16 b/c of edit_info updating
+            with check_mongo_calls(36, 16):
                 self._create_item('html', 'Html1', "<p>Goodbye</p>", {'display_name': 'Parented Html'}, 'vertical', 'Vert1', split=False)
                 self._create_item(
                     'discussion', 'Discussion1',
@@ -75,7 +78,7 @@ class TestPublish(SplitWMongoCourseBoostrapper):
                     split=False
                 )
 
-            with check_mongo_calls(0, 2):
+            with check_mongo_calls(2, 2):
                 # 2 finds b/c looking for non-existent parents
                 self._create_item('static_tab', 'staticuno', "<p>tab</p>", {'display_name': 'Tab uno'}, None, None, split=False)
                 self._create_item('course_info', 'updates', "<ol><li><h2>Sep 22</h2><p>test</p></li></ol>", {}, None, None, split=False)
@@ -87,12 +90,25 @@ class TestPublish(SplitWMongoCourseBoostrapper):
         """
         vert_location = self.old_course_key.make_usage_key('vertical', block_id='Vert1')
         item = self.draft_mongo.get_item(vert_location, 2)
-        # Vert1 has 3 children; so, publishes 4 nodes which may mean 4 inserts & 1 bulk remove
-        # TODO: LMS-11220: Document why find count is 25
-        # 25-June-2014 find calls are 19. Probably due to inheritance recomputation?
-        # 02-July-2014 send calls are 7. 5 from above, plus 2 for updating subtree edit info for Chapter1 and course
-        #              find calls are 22. 19 from above, plus 3 for finding the parent of Vert1, Chapter1, and course
-        with check_mongo_calls(25, 7):
+        # Finds:
+        #   1 get draft vert,
+        #   2 compute parent
+        #   3-14 for each child: (3 children x 4 queries each)
+        #      get draft, compute parent, and then published child
+        #      compute inheritance
+        #   15 get published vert
+        #   16-18 get ancestor chain
+        #   19 compute inheritance
+        #   20-22 get draft and published vert, compute parent
+        # Sends:
+        #   delete the subtree of drafts (1 call),
+        #   update the published version of each node in subtree (4 calls),
+        #   update the ancestors up to course (2 calls)
+        if mongo_uses_error_check(self.draft_mongo):
+            max_find = 23
+        else:
+            max_find = 22
+        with check_mongo_calls(max_find, 7):
             self.draft_mongo.publish(item.location, self.user_id)
 
         # verify status

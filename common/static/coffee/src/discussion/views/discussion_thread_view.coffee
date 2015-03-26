@@ -21,11 +21,32 @@ if Backbone?
       @mode = options.mode or "inline"  # allowed values are "tab" or "inline"
       if @mode not in ["tab", "inline"]
         throw new Error("invalid mode: " + @mode)
+
+      # Quick fix to have an actual model when we're receiving new models from
+      # the server.
+      @model.collection.on "reset", (collection) =>
+        id = @model.get("id")
+        @model = collection.get(id) if collection.get(id)
+
       @createShowView()
       @responses = new Comments()
       @loadedResponses = false
       if @isQuestion()
         @markedAnswers = new Comments()
+
+    rerender: () ->
+      if @showView?
+        @showView.undelegateEvents()
+      @undelegateEvents()
+      @$el.empty()
+      @initialize(
+        mode: @mode
+        model: @model
+        el: @el
+        course_settings: @course_settings
+        topicId: @topicId
+      )
+      @render()
 
     renderTemplate: ->
       @template = _.template($("#thread-template").html())
@@ -55,6 +76,9 @@ if Backbone?
     attrRenderer: $.extend({}, DiscussionContentView.prototype.attrRenderer, {
       closed: (closed) ->
         @$(".discussion-reply-new").toggle(not closed)
+        @$('.comment-form').closest('li').toggle(not closed)
+        @$(".action-vote").toggle(not closed)
+        @$(".display-vote").toggle(closed)
         @renderAddResponseButton()
     })
 
@@ -120,7 +144,9 @@ if Backbone?
           )
           @trigger "thread:responses:rendered"
           @loadedResponses = true
-        error: (xhr) =>
+        error: (xhr, textStatus) =>
+          return if textStatus == 'abort'
+
           if xhr.status == 404
             DiscussionUtil.discussionAlert(
               gettext("Sorry"),
@@ -233,6 +259,7 @@ if Backbone?
       comment = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), votes: { up_count: 0 }, abuse_flaggers:[], endorsed: false, user_id: window.user.get("id"))
       comment.set('thread', @model.get('thread'))
       @renderResponseToList(comment, ".js-response-list")
+      @renderAttrs()
       @model.addComment()
       @renderAddResponseButton()
 
@@ -251,49 +278,20 @@ if Backbone?
       @createEditView()
       @renderEditView()
 
-    update: (event) =>
-
-      newTitle = @editView.$(".edit-post-title").val()
-      newBody  = @editView.$(".edit-post-body textarea").val()
-
-      url = DiscussionUtil.urlFor('update_thread', @model.id)
-
-      DiscussionUtil.safeAjax
-          $elem: $(event.target)
-          $loading: $(event.target) if event
-          url: url
-          type: "POST"
-          dataType: 'json'
-          async: false # TODO when the rest of the stuff below is made to work properly..
-          data:
-              title: newTitle
-              body: newBody
-
-          error: DiscussionUtil.formErrorHandler(@$(".edit-post-form-errors"))
-          success: (response, textStatus) =>
-              # TODO: Move this out of the callback, this makes it feel sluggish
-              @editView.$(".edit-post-title").val("").attr("prev-text", "")
-              @editView.$(".edit-post-body textarea").val("").attr("prev-text", "")
-              @editView.$(".wmd-preview p").html("")
-
-              @model.set
-                title: newTitle
-                body: newBody
-              @model.unset("abbreviatedBody")
-
-              @createShowView()
-              @renderShowView()
-
     createEditView: () ->
-
       if @showView?
         @showView.undelegateEvents()
         @showView.$el.empty()
         @showView = null
 
-      @editView = new DiscussionThreadEditView(model: @model)
-      @editView.bind "thread:update", @update
-      @editView.bind "thread:cancel_edit", @cancelEdit
+      @editView = new DiscussionThreadEditView(
+        container: @$('.thread-content-wrapper')
+        model: @model
+        mode: @mode
+        course_settings: @options.course_settings
+      )
+      @editView.bind "thread:updated thread:cancel_edit", @closeEditView
+      @editView.bind "comment:endorse", @endorseThread
 
     renderSubView: (view) ->
       view.setElement(@$('.thread-content-wrapper'))
@@ -301,15 +299,9 @@ if Backbone?
       view.delegateEvents()
 
     renderEditView: () ->
-      @renderSubView(@editView)
+      @editView.render()
 
     createShowView: () ->
-
-      if @editView?
-        @editView.undelegateEvents()
-        @editView.$el.empty()
-        @editView = null
-
       @showView = new DiscussionThreadShowView({model: @model, mode: @mode})
       @showView.bind "thread:_delete", @_delete
       @showView.bind "thread:edit", @edit
@@ -317,10 +309,13 @@ if Backbone?
     renderShowView: () ->
       @renderSubView(@showView)
 
-    cancelEdit: (event) =>
-      event.preventDefault()
+    closeEditView: (event) =>
       @createShowView()
       @renderShowView()
+      @renderAttrs()
+      # next call is necessary to re-render the post action controls after
+      # submitting or cancelling a thread edit in inline mode.
+      @$el.find(".post-extended-content").show()
 
     # If you use "delete" here, it will compile down into JS that includes the
     # use of DiscussionThreadView.prototype.delete, and that will break IE8

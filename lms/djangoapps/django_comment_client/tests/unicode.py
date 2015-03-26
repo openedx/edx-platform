@@ -1,5 +1,6 @@
 # coding=utf-8
 
+
 class UnicodeTestMixin(object):
     def test_ascii(self):
         self._test_unicode_data(u"This post contains ASCII.")

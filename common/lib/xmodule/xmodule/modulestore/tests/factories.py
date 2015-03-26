@@ -6,13 +6,16 @@ from factory.containers import CyclicDefinitionError
 from uuid import uuid4
 
 from xmodule.modulestore import prefer_xmodules, ModuleStoreEnum
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from opaque_keys.edx.locations import Location
 from opaque_keys.edx.keys import UsageKey
 from xblock.core import XBlock
 from xmodule.tabs import StaticTab
 from decorator import contextmanager
 from mock import Mock, patch
-from nose.tools import assert_less_equal, assert_greater_equal, assert_equal
+from nose.tools import assert_less_equal, assert_greater_equal
+import factory
+import threading
+from xmodule.modulestore.django import modulestore
 
 
 class Dummy(object):
@@ -35,13 +38,16 @@ class XModuleFactory(Factory):
         return modulestore()
 
 
+last_course = threading.local()
+
+
 class CourseFactory(XModuleFactory):
     """
     Factory for XModule courses.
     """
-    org = 'MITx'
-    number = '999'
-    display_name = 'Robot Super Course'
+    org = factory.Sequence(lambda n: 'org.%d' % n)
+    number = factory.Sequence(lambda n: 'course_%d' % n)
+    display_name = factory.Sequence(lambda n: 'Run %d' % n)
 
     # pylint: disable=unused-argument
     @classmethod
@@ -58,15 +64,49 @@ class CourseFactory(XModuleFactory):
         run = kwargs.get('run', name)
         user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
 
+        # Pass the metadata just as field=value pairs
+        kwargs.update(kwargs.pop('metadata', {}))
+        default_store_override = kwargs.pop('default_store', None)
+
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
-            # Write the data to the mongo datastore
-            kwargs.update(kwargs.get('metadata', {}))
-            course_key = SlashSeparatedCourseKey(org, number, run)
-            # TODO - We really should call create_course here.  However, since create_course verifies there are no
-            # duplicates, this breaks several tests that do not clean up properly in between tests.
-            new_course = store.create_xblock(None, course_key, 'course', block_id=run, fields=kwargs)
-            store.update_item(new_course, user_id, allow_not_found=True)
+            if default_store_override is not None:
+                with store.default_store(default_store_override):
+                    new_course = store.create_course(org, number, run, user_id, fields=kwargs)
+            else:
+                new_course = store.create_course(org, number, run, user_id, fields=kwargs)
+
+            last_course.loc = new_course.location
             return new_course
+
+
+class LibraryFactory(XModuleFactory):
+    """
+    Factory for creating a content library
+    """
+    org = factory.Sequence('org{}'.format)
+    library = factory.Sequence('lib{}'.format)
+    display_name = factory.Sequence('Test Library {}'.format)
+
+    # pylint: disable=unused-argument
+    @classmethod
+    def _create(cls, target_class, **kwargs):
+        """
+        Create a library with a unique name and key.
+        All class attributes (from this class and base classes) are automagically
+        passed in via **kwargs.
+        """
+        # some of the kwargst actual field values, so pop those off for use separately:
+        org = kwargs.pop('org')
+        library = kwargs.pop('library')
+        store = kwargs.pop('modulestore')
+        user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
+
+        # Pass the metadata just as field=value pairs
+        kwargs.update(kwargs.pop('metadata', {}))
+        default_store_override = kwargs.pop('default_store', ModuleStoreEnum.Type.split)
+        with store.default_store(default_store_override):
+            new_library = store.create_library(org, library, user_id, fields=kwargs)
+            return new_library
 
 
 class ItemFactory(XModuleFactory):
@@ -96,7 +136,7 @@ class ItemFactory(XModuleFactory):
 
     @lazy_attribute
     def parent_location(self):
-        default_location = Location('MITx', '999', 'Robot_Super_Course', 'course', 'Robot_Super_Course', None)
+        default_location = getattr(last_course, 'loc', None)
         try:
             parent = self.parent
         # This error is raised if the caller hasn't provided either parent or parent_location
@@ -170,25 +210,17 @@ class ItemFactory(XModuleFactory):
             # replace the display name with an optional parameter passed in from the caller
             if display_name is not None:
                 metadata['display_name'] = display_name
-            runtime = parent.runtime if parent else None
-            store.create_item(
+
+            module = store.create_child(
                 user_id,
-                location.course_key,
+                parent.location,
                 location.block_type,
                 block_id=location.block_id,
                 metadata=metadata,
                 definition_data=data,
-                runtime=runtime
+                runtime=parent.runtime,
+                fields=kwargs,
             )
-
-            module = store.get_item(location)
-
-            for attr, val in kwargs.items():
-                setattr(module, attr, val)
-            # Save the attributes we just set
-            module.save()
-
-            store.update_item(module, user_id)
 
             # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
             # if we add one then we need to also add it to the policy information (i.e. metadata)
@@ -208,12 +240,15 @@ class ItemFactory(XModuleFactory):
                 parent.children.append(location)
                 store.update_item(parent, user_id)
                 if publish_item:
-                    store.publish(parent.location, user_id)
+                    published_parent = store.publish(parent.location, user_id)
+                    # module is last child of parent
+                    return published_parent.get_children()[-1]
+                else:
+                    return store.get_item(location)
             elif publish_item:
-                store.publish(location, user_id)
-
-        # return the published item
-        return store.get_item(location)
+                return store.publish(location, user_id)
+            else:
+                return module
 
 
 @contextmanager
@@ -270,6 +305,17 @@ def check_sum_of_calls(object_, methods, maximum_calls, minimum_calls=1):
     assert_less_equal(call_count, maximum_calls)
 
 
+def mongo_uses_error_check(store):
+    """
+    Does mongo use the error check as a separate message?
+    """
+    if hasattr(store, 'mongo_wire_version'):
+        return store.mongo_wire_version() <= 1
+    if hasattr(store, 'modulestores'):
+        return any([mongo_uses_error_check(substore) for substore in store.modulestores])
+    return False
+
+
 @contextmanager
 def check_mongo_calls(num_finds=0, num_sends=None):
     """
@@ -282,18 +328,55 @@ def check_mongo_calls(num_finds=0, num_sends=None):
         the given int value.
     """
     with check_sum_of_calls(
-        pymongo.message,
-        ['query', 'get_more'],
-        num_finds,
-        num_finds
+            pymongo.message,
+            ['query', 'get_more'],
+            num_finds,
+            num_finds
     ):
         if num_sends is not None:
             with check_sum_of_calls(
-                pymongo.message,
-                ['insert', 'update', 'delete'],
-                num_sends,
-                num_sends
+                    pymongo.message,
+                    # mongo < 2.6 uses insert, update, delete and _do_batched_insert. >= 2.6 _do_batched_write
+                    ['insert', 'update', 'delete', '_do_batched_write_command', '_do_batched_insert', ],
+                    num_sends,
+                    num_sends
             ):
                 yield
         else:
             yield
+
+
+# This dict represents the attribute keys for a course's 'about' info.
+# Note: The 'video' attribute is intentionally excluded as it must be
+# handled separately; its value maps to an alternate key name.
+# Reference : cms/djangoapps/models/settings/course_details.py
+
+ABOUT_ATTRIBUTES = {
+    'effort': "Testing effort",
+}
+
+
+class CourseAboutFactory(XModuleFactory):
+    """
+    Factory for XModule course about.
+    """
+
+    @classmethod
+    def _create(cls, target_class, **kwargs):  # pylint: disable=unused-argument
+        """
+        Uses **kwargs:
+
+        effort:  effor information
+
+        video : video link
+        """
+        user_id = kwargs.pop('user_id', None)
+        course_id, course_runtime = kwargs.pop("course_id"), kwargs.pop("course_runtime")
+        store = modulestore()
+        for about_key in ABOUT_ATTRIBUTES:
+            about_item = store.create_xblock(course_runtime, course_id, 'about', about_key)
+            about_item.data = ABOUT_ATTRIBUTES[about_key]
+            store.update_item(about_item, user_id, allow_not_found=True)
+        about_item = store.create_xblock(course_runtime, course_id, 'about', 'video')
+        about_item.data = "www.youtube.com/embed/testing-video-link"
+        store.update_item(about_item, user_id, allow_not_found=True)

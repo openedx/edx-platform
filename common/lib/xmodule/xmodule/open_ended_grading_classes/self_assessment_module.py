@@ -119,7 +119,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         if self.child_state == self.INITIAL:
             return ''
 
-        rubric_renderer = CombinedOpenEndedRubric(system, False)
+        rubric_renderer = CombinedOpenEndedRubric(system.render_template, False)
         rubric_dict = rubric_renderer.render_rubric(self.child_rubric)
         success = rubric_dict['success']
         rubric_html = rubric_dict['html']
@@ -198,7 +198,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             'success': success,
             'rubric_html': self.get_rubric_html(system),
             'error': error_message,
-            'student_response': data['student_answer'].replace("\n","<br/>")
+            'student_response': data['student_answer'].replace("\n", "<br/>"),
         }
 
     def save_assessment(self, data, _system):

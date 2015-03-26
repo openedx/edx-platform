@@ -2,21 +2,22 @@
 Unit tests for Ecommerce feature flag in new instructor dashboard.
 """
 
-from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
+import datetime
+import pytz
+from django.test.utils import override_settings
+from mock import patch
 
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from course_modes.models import CourseMode
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
+from student.roles import CourseFinanceAdminRole
+from shoppingcart.models import Coupon, PaidCourseRegistration, CourseRegistrationCode
 from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from course_modes.models import CourseMode
-from shoppingcart.models import Coupon, PaidCourseRegistration, CourseRegistrationCode
-from mock import patch
-from student.roles import CourseFinanceAdminRole
 
-
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestECommerceDashboardViews(ModuleStoreTestCase):
     """
     Check for E-commerce view on the new instructor dashboard
@@ -49,25 +50,28 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         """
         response = self.client.get(self.url)
         self.assertTrue(self.e_commerce_link in response.content)
+        # Coupons should show up for White Label sites with priced honor modes.
+        self.assertTrue('Coupons' in response.content)
 
     def test_user_has_finance_admin_rights_in_e_commerce_tab(self):
         response = self.client.get(self.url)
         self.assertTrue(self.e_commerce_link in response.content)
 
-        # Total amount html should render in e-commerce page, total amount will be 0
-        total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
-        self.assertTrue('<span>Total Amount: <span>$' + str(total_amount) + '</span></span>' in response.content)
-        self.assertTrue('Download All e-Commerce Purchase' in response.content)
+        # Order/Invoice sales csv button text should render in e-commerce page
+        self.assertTrue('Total CC Amount' in response.content)
+        self.assertTrue('Download All CC Sales' in response.content)
+        self.assertTrue('Download All Invoice Sales' in response.content)
+        self.assertTrue('Enter the invoice number to invalidate or re-validate sale' in response.content)
 
         # removing the course finance_admin role of login user
         CourseFinanceAdminRole(self.course.id).remove_users(self.instructor)
 
-        # total amount should not be visible in e-commerce page if the user is not finance admin
+        # Order/Invoice sales csv button text should not be visible in e-commerce page if the user is not finance admin
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.post(url)
-        total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
-        self.assertFalse('Download All e-Commerce Purchase' in response.content)
-        self.assertFalse('<span>Total Amount: <span>$' + str(total_amount) + '</span></span>' in response.content)
+        self.assertFalse('Download All Order Sales' in response.content)
+        self.assertFalse('Download All Invoice Sales' in response.content)
+        self.assertFalse('Enter the invoice number to invalidate or re-validate sale' in response.content)
 
     def test_user_view_course_price(self):
         """
@@ -144,12 +148,25 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         """
         # URL for add_coupon
         add_coupon_url = reverse('add_coupon', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        expiration_date = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=2)
+
         data = {
             'code': 'A2314', 'course_id': self.course.id.to_deprecated_string(),
-            'description': 'ADSADASDSAD', 'created_by': self.instructor, 'discount': 5
+            'description': 'ADSADASDSAD', 'created_by': self.instructor, 'discount': 5,
+            'expiration_date': '{month}/{day}/{year}'.format(month=expiration_date.month, day=expiration_date.day, year=expiration_date.year)
         }
         response = self.client.post(add_coupon_url, data)
         self.assertTrue("coupon with the coupon code ({code}) added successfully".format(code=data['code']) in response.content)
+
+        #now add the coupon with the wrong value in the expiration_date
+        # server will through the ValueError Exception in the expiration_date field
+        data = {
+            'code': '213454', 'course_id': self.course.id.to_deprecated_string(),
+            'description': 'ADSADASDSAD', 'created_by': self.instructor, 'discount': 5,
+            'expiration_date': expiration_date.strftime('"%d/%m/%Y')
+        }
+        response = self.client.post(add_coupon_url, data)
+        self.assertTrue("Please enter the date in this format i-e month/day/year" in response.content)
 
         data = {
             'code': 'A2314', 'course_id': self.course.id.to_deprecated_string(),
@@ -175,7 +192,8 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         self.assertTrue('Please Enter the Integer Value for Coupon Discount' in response.content)
 
         course_registration = CourseRegistrationCode(
-            code='Vs23Ws4j', course_id=self.course.id.to_deprecated_string(), created_by=self.instructor
+            code='Vs23Ws4j', course_id=unicode(self.course.id), created_by=self.instructor,
+            mode_slug='honor'
         )
         course_registration.save()
 
@@ -221,13 +239,15 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         """
         coupon = Coupon(
             code='AS452', description='asdsadsa', course_id=self.course.id.to_deprecated_string(),
-            percentage_discount=10, created_by=self.instructor
+            percentage_discount=10, created_by=self.instructor,
+            expiration_date=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=2)
         )
         coupon.save()
         # URL for edit_coupon_info
         edit_url = reverse('get_coupon_info', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.post(edit_url, {'id': coupon.id})
         self.assertTrue('coupon with the coupon id ({coupon_id}) updated successfully'.format(coupon_id=coupon.id) in response.content)
+        self.assertIn(coupon.display_expiry_date, response.content)
 
         response = self.client.post(edit_url, {'id': 444444})
         self.assertTrue('coupon with the coupon id ({coupon_id}) DoesNotExist'.format(coupon_id=444444) in response.content)
@@ -253,7 +273,7 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         response = self.client.post(self.url)
         self.assertTrue('<td>AS452</td>' in response.content)
         data = {
-            'coupon_id': coupon.id, 'code': 'AS452', 'discount': '10', 'description': 'updated_description',  # pylint: disable=E1101
+            'coupon_id': coupon.id, 'code': 'AS452', 'discount': '10', 'description': 'updated_description',  # pylint: disable=no-member
             'course_id': coupon.course_id.to_deprecated_string()
         }
         # URL for update_coupon
@@ -271,3 +291,20 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         data['coupon_id'] = ''  # Coupon id is not provided
         response = self.client.post(update_coupon_url, data=data)
         self.assertTrue('coupon id not found' in response.content)
+
+    def test_verified_course(self):
+        """Verify the e-commerce panel shows up for verified courses as well, without Coupons """
+        # Change honor mode to verified.
+        original_mode = CourseMode.objects.get(course_id=self.course.id, mode_slug='honor')
+        original_mode.delete()
+        new_mode = CourseMode(
+            course_id=unicode(self.course.id), mode_slug='verified',
+            mode_display_name='verified', min_price=10, currency='usd'
+        )
+        new_mode.save()
+
+        # Get the response value, ensure the Coupon section is not included.
+        response = self.client.get(self.url)
+        self.assertTrue(self.e_commerce_link in response.content)
+        # Coupons should show up for White Label sites with priced honor modes.
+        self.assertFalse('Coupons List' in response.content)

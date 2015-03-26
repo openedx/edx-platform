@@ -2,6 +2,7 @@
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 
+
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
@@ -19,6 +20,7 @@
 <%!
 from util.date_utils import get_time_display
 from django.conf import settings
+from django.utils.http import urlquote_plus
 %>
 
 <%block name="js_extra">
@@ -51,7 +53,9 @@ from django.conf import settings
       %if settings.FEATURES.get("SHOW_PROGRESS_SUCCESS_BUTTON"):
         <%
           SUCCESS_BUTTON_URL = settings.PROGRESS_SUCCESS_BUTTON_URL.format(
-            course_id=course.id.to_deprecated_string(), student_id=student.id)
+            course_id=urlquote_plus(unicode(course.id)),
+            student_id=urlquote_plus(student.id)
+          )
           nonzero_cutoffs = [cutoff for cutoff in course.grade_cutoffs.values() if cutoff > 0]
           success_cutoff = min(nonzero_cutoffs) if nonzero_cutoffs else None
         %>

@@ -168,8 +168,8 @@ class TestSafeExecCaching(unittest.TestCase):
 
     def test_unicode_submission(self):
         # Check that using non-ASCII unicode does not raise an encoding error.
-        # Try several non-ASCII unicode characters
-        for code in [129, 500, 2**8 - 1, 2**16 - 1]:
+        # Try several non-ASCII unicode characters.
+        for code in [129, 500, 2 ** 8 - 1, 2 ** 16 - 1]:
             code_with_unichr = unicode("# ") + unichr(code)
             try:
                 safe_exec(code_with_unichr, {}, cache=DictCache({}))
@@ -194,7 +194,7 @@ class TestUpdateHash(unittest.TestCase):
         make them different.
 
         """
-        d1 = {k:1 for k in "abcdefghijklmnopqrstuvwxyz"}
+        d1 = {k: 1 for k in "abcdefghijklmnopqrstuvwxyz"}
         d2 = dict(d1)
         for i in xrange(10000):
             d2[i] = 1
@@ -216,8 +216,8 @@ class TestUpdateHash(unittest.TestCase):
         self.assertNotEqual(h1, hs1)
 
     def test_list_ordering(self):
-        h1 = self.hash_obj({'a': [1,2,3]})
-        h2 = self.hash_obj({'a': [3,2,1]})
+        h1 = self.hash_obj({'a': [1, 2, 3]})
+        h2 = self.hash_obj({'a': [3, 2, 1]})
         self.assertNotEqual(h1, h2)
 
     def test_dict_ordering(self):
@@ -228,8 +228,8 @@ class TestUpdateHash(unittest.TestCase):
 
     def test_deep_ordering(self):
         d1, d2 = self.equal_but_different_dicts()
-        o1 = {'a':[1, 2, [d1], 3, 4]}
-        o2 = {'a':[1, 2, [d2], 3, 4]}
+        o1 = {'a': [1, 2, [d1], 3, 4]}
+        o2 = {'a': [1, 2, [d2], 3, 4]}
         h1 = self.hash_obj(o1)
         h2 = self.hash_obj(o2)
         self.assertEqual(h1, h2)

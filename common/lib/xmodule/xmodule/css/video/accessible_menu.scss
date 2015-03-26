@@ -22,22 +22,22 @@ $a11y--blue-s1: saturate($blue,15%);
   }
 
   .a11y-menu-list {
+    @extend %ui-depth1;
     top: 100%;
     margin: 0;
     padding: 0;
     display: none;
     position: absolute;
-    z-index: 10;
     list-style: none;
     background-color: $white;
     border: 1px solid #eee;
 
     li {
+      @extend %ui-fake-link;
       margin: 0;
       padding: 0;
       border-bottom: 1px solid #eee;
       color: $white;
-      cursor: pointer;
 
       a {
         display: block;
@@ -90,12 +90,12 @@ $a11y--blue-s1: saturate($blue,15%);
     }
 
     > a {
-      @include transition(all 0.25s ease-in-out 0s);
+      @include transition(all $tmg-f2 ease-in-out 0s);
       @include font-size(12);
       display: block;
       border-radius: 0 3px 3px 0;
       background-color: $very-light-text;
-      padding: ($baseline*.75 $baseline*1.25 $baseline*.75 $baseline*.75);
+      padding: ($baseline*0.75) ($baseline*1.25) ($baseline*0.75) ($baseline*0.75);
       color: $a11y--gray-l2;
       min-width: 1.5em;
       line-height: 14px;
@@ -107,7 +107,7 @@ $a11y--blue-s1: saturate($blue,15%);
         @extend %use-font-awesome;
         content: "\f0d7";
         position: absolute;
-        right: ($baseline*.5);
+        right: ($baseline*0.5);
         top: 33%;
         color: $lighter-base-font-color;
       }
@@ -122,7 +122,7 @@ $a11y--blue-s1: saturate($blue,15%);
         a {
           border: 0;
           display: block;
-          padding: lh(.5);
+          padding: lh(0.5);
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
@@ -130,4 +130,97 @@ $a11y--blue-s1: saturate($blue,15%);
       }
     }
   }
+}
+
+
+.contextmenu, .submenu {
+  @extend %ui-depth5;
+  border: 1px solid #333;
+  background: $white;
+  color: #333;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  position: absolute;
+  top: 0;
+  display: none;
+  outline: none;
+  cursor: default;
+  white-space: nowrap;
+
+  &.is-opened {
+     display: block;
+  }
+
+  .menu-item, .submenu-item {
+    border-top: 1px solid $gray-l3;
+    padding: ($baseline/4) ($baseline/2);
+    outline: none;
+
+    & > span {
+        color: #333;
+      }
+
+    &:first-child {
+      border-top: none;
+    }
+
+    &:focus {
+      background: #333;
+      color: $white;
+
+      & > span {
+        color: $white;
+      }
+    }
+  }
+
+  .submenu-item {
+    position: relative;
+    padding: ($baseline/4) $baseline ($baseline/4) ($baseline/2);
+
+    &:after {
+      content: '\25B6';
+      position: absolute;
+      right: 5px;
+      line-height: 25px;
+      font-size: 10px;
+    }
+
+    .submenu {
+      display: none;
+    }
+
+    &.is-opened {
+      background: #333;
+      color: $white;
+
+      & > span {
+        color: $white;
+      }
+
+      & > .submenu {
+        display: block;
+      }
+    }
+
+    .is-selected {
+      font-weight: bold;
+    }
+  }
+
+  .is-disabled {
+    pointer-events: none;
+    color: $gray-l3;
+  }
+}
+
+.overlay {
+  @extend %ui-depth5;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: transparent;
 }

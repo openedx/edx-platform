@@ -1,4 +1,4 @@
-# pylint: disable=C0111,W0613
+# pylint: disable=missing-docstring,unused-argument
 
 from django.http import (HttpResponse, HttpResponseServerError,
                          HttpResponseNotFound)

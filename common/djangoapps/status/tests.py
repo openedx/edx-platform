@@ -36,7 +36,6 @@ class TestStatus(TestCase):
         "edX/toy/2012_Fall" : "A toy story"
         }"""
 
-
     # json to use, expected results for course=None (e.g. homepage),
     # for toy course, for full course.  Note that get_site_status_msg
     # is supposed to return global message even if course=None.  The
@@ -48,7 +47,7 @@ class TestStatus(TestCase):
         (global_only, "Hello, Globe", "Hello, Globe", "Hello, Globe"),
         (toy_only, None, "A toy story", None),
         (global_and_toy, "Hello, Globe", "Hello, Globe<br>A toy story", "Hello, Globe"),
-        ]
+    ]
 
     def setUp(self):
         """

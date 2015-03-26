@@ -2,7 +2,7 @@
 import json
 import logging
 import requests
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 from requests.exceptions import RequestException, ConnectionError, HTTPError
 
 from .combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError
@@ -27,7 +27,7 @@ class GradingService(object):
         self.username = config['username']
         self.password = config['password']
         self.session = requests.Session()
-        self.system = config['system']
+        self.render_template = config['render_template']
 
     def _login(self):
         """
@@ -142,7 +142,7 @@ class GradingService(object):
         try:
             if 'rubric' in response:
                 rubric = response['rubric']
-                rubric_renderer = CombinedOpenEndedRubric(self.system, view_only)
+                rubric_renderer = CombinedOpenEndedRubric(self.render_template, view_only)
                 rubric_dict = rubric_renderer.render_rubric(rubric)
                 success = rubric_dict['success']
                 rubric_html = rubric_dict['html']

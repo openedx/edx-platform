@@ -12,7 +12,7 @@ from django.test.utils import override_settings
 from django.utils.timezone import utc
 
 from courseware.models import StudentModule
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from student.tests.factories import UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -39,7 +39,7 @@ class TestHandleDashboardError(unittest.TestCase):
     Test handle_dashboard_error decorator.
     """
     def test_error(self):
-        # pylint: disable=W0613
+        # pylint: disable=unused-argument
         @tools.handle_dashboard_error
         def view(request, course_id):
             """
@@ -51,7 +51,7 @@ class TestHandleDashboardError(unittest.TestCase):
         self.assertEqual(response, {'error': 'Oh noes!'})
 
     def test_no_error(self):
-        # pylint: disable=W0613
+        # pylint: disable=unused-argument
         @tools.handle_dashboard_error
         def view(request, course_id):
             """
@@ -97,7 +97,7 @@ class TestParseDatetime(unittest.TestCase):
             tools.parse_datetime('foo')
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestFindUnit(ModuleStoreTestCase):
     """
     Test the find_unit function.
@@ -119,7 +119,8 @@ class TestFindUnit(ModuleStoreTestCase):
         Test finding a nested unit.
         """
         url = self.homework.location.to_deprecated_string()
-        self.assertEqual(tools.find_unit(self.course, url), self.homework)
+        found_unit = tools.find_unit(self.course, url)
+        self.assertEqual(found_unit.location, self.homework.location)
 
     def test_find_unit_notfound(self):
         """
@@ -130,7 +131,7 @@ class TestFindUnit(ModuleStoreTestCase):
             tools.find_unit(self.course, url)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestGetUnitsWithDueDate(ModuleStoreTestCase):
     """
     Test the get_units_with_due_date function.
@@ -178,7 +179,7 @@ class TestTitleOrUrl(unittest.TestCase):
         self.assertEquals(tools.title_or_url(unit), 'test:hello')
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestSetDueDateExtension(ModuleStoreTestCase):
     """
     Test the set_due_date_extensions function.
@@ -252,7 +253,7 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         self.assertEqual(self.extended_due(self.homework), None)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestDataDumps(ModuleStoreTestCase):
     """
     Test data dumps for reporting.

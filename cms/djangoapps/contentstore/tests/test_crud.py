@@ -1,5 +1,7 @@
 import unittest
 
+from opaque_keys.edx.locator import LocalId
+
 from xmodule import templates
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests import persistent_factories
@@ -7,10 +9,9 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.capa_module import CapaDescriptor
-from opaque_keys.edx.locator import BlockUsageLocator, LocalId
+from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
 from xmodule.html_module import HtmlDescriptor
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class TemplateTests(unittest.TestCase):
@@ -20,9 +21,21 @@ class TemplateTests(unittest.TestCase):
 
     def setUp(self):
         clear_existing_modulestores()  # redundant w/ cleanup but someone was getting errors
-        self.addCleanup(ModuleStoreTestCase.drop_mongo_collections)
+        self.addCleanup(self._drop_mongo_collections)
         self.addCleanup(clear_existing_modulestores)
         self.split_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.split)
+
+    @staticmethod
+    def _drop_mongo_collections():
+        """
+        If using a Mongo-backed modulestore & contentstore, drop the collections.
+        """
+        module_store = modulestore()
+        if hasattr(module_store, '_drop_database'):
+            module_store._drop_database()  # pylint: disable=protected-access
+        _CONTENTSTORE.clear()
+        if hasattr(module_store, 'close_connections'):
+            module_store.close_connections()
 
     def test_get_templates(self):
         found = templates.all_templates()
@@ -66,8 +79,10 @@ class TemplateTests(unittest.TestCase):
         self.assertEqual(index_info['course'], 'course')
         self.assertEqual(index_info['run'], '2014')
 
-        test_chapter = persistent_factories.ItemFactory.create(display_name='chapter 1',
-            parent_location=test_course.location)
+        test_chapter = persistent_factories.ItemFactory.create(
+            display_name='chapter 1',
+            parent_location=test_course.location
+        )
         self.assertIsInstance(test_chapter, SequenceDescriptor)
         # refetch parent which should now point to child
         test_course = self.split_store.get_course(test_course.id.version_agnostic())
@@ -156,8 +171,10 @@ class TemplateTests(unittest.TestCase):
             course='history', run='doomed', org='edu.harvard',
             display_name='doomed test course',
             user_id='testbot')
-        persistent_factories.ItemFactory.create(display_name='chapter 1',
-            parent_location=test_course.location)
+        persistent_factories.ItemFactory.create(
+            display_name='chapter 1',
+            parent_location=test_course.location
+        )
 
         id_locator = test_course.id.for_branch(ModuleStoreEnum.BranchName.draft)
         guid_locator = test_course.location.course_agnostic()
@@ -180,10 +197,17 @@ class TemplateTests(unittest.TestCase):
             display_name='history test course',
             user_id='testbot'
         )
-        chapter = persistent_factories.ItemFactory.create(display_name='chapter 1',
-            parent_location=test_course.location, user_id='testbot')
-        sub = persistent_factories.ItemFactory.create(display_name='subsection 1',
-            parent_location=chapter.location, user_id='testbot', category='vertical')
+        chapter = persistent_factories.ItemFactory.create(
+            display_name='chapter 1',
+            parent_location=test_course.location,
+            user_id='testbot'
+        )
+        sub = persistent_factories.ItemFactory.create(
+            display_name='subsection 1',
+            parent_location=chapter.location,
+            user_id='testbot',
+            category='vertical'
+        )
         first_problem = persistent_factories.ItemFactory.create(
             display_name='problem 1', parent_location=sub.location, user_id='testbot', category='problem',
             data="<problem></problem>"
@@ -198,9 +222,7 @@ class TemplateTests(unittest.TestCase):
 
         second_problem = persistent_factories.ItemFactory.create(
             display_name='problem 2',
-            parent_location=BlockUsageLocator.make_relative(
-                test_course.location.version_agnostic(), block_type='problem', block_id=sub.location.block_id
-            ),
+            parent_location=sub.location.version_agnostic(),
             user_id='testbot', category='problem',
             data="<problem></problem>"
         )
@@ -208,6 +230,7 @@ class TemplateTests(unittest.TestCase):
         # The draft course root has 2 revisions: the published revision, and then the subsequent
         # changes to the draft revision
         version_history = self.split_store.get_block_generations(test_course.location)
+        self.assertIsNotNone(version_history)
         self.assertEqual(version_history.locator.version_guid, test_course.location.version_guid)
         self.assertEqual(len(version_history.children), 1)
         self.assertEqual(version_history.children[0].children, [])

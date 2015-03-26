@@ -4,6 +4,7 @@ Utility methods useful for Studio page tests.
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from bok_choy.promise import EmptyPromise
+from bok_choy.javascript import js_defined
 
 from ...tests.helpers import disable_animations
 
@@ -50,6 +51,7 @@ def wait_for_notification(page):
     EmptyPromise(_is_saving_done, 'Notification should have been hidden.', timeout=60).fulfill()
 
 
+@js_defined('window.jQuery')
 def press_the_notification_button(page, name):
     # Because the notification uses a CSS transition,
     # Selenium will always report it as being visible.
@@ -101,6 +103,34 @@ def add_advanced_component(page, menu_index, name):
     click_css(page, component_css, 0)
 
 
+def add_component(page, item_type, specific_type):
+    """
+    Click one of the "Add New Component" buttons.
+
+    item_type should be "advanced", "html", "problem", or "video"
+
+    specific_type is required for some types and should be something like
+    "Blank Common Problem".
+    """
+    btn = page.q(css='.add-xblock-component .add-xblock-component-button[data-type={}]'.format(item_type))
+    multiple_templates = btn.filter(lambda el: 'multiple-templates' in el.get_attribute('class')).present
+    btn.click()
+    if multiple_templates:
+        sub_template_menu_div_selector = '.new-component-{}'.format(item_type)
+        page.wait_for_element_visibility(sub_template_menu_div_selector, 'Wait for the templates sub-menu to appear')
+        page.wait_for_element_invisibility(
+            '.add-xblock-component .new-component',
+            'Wait for the add component menu to disappear'
+        )
+
+        all_options = page.q(css='.new-component-{} ul.new-component-template li a span'.format(item_type))
+        chosen_option = all_options.filter(lambda el: el.text == specific_type).first
+        chosen_option.click()
+    wait_for_notification(page)
+    page.wait_for_ajax()
+
+
+@js_defined('window.jQuery')
 def type_in_codemirror(page, index, text, find_prefix="$"):
     script = """
     var cm = {find_prefix}('div.CodeMirror:eq({index})').get(0).CodeMirror;
@@ -110,6 +140,7 @@ def type_in_codemirror(page, index, text, find_prefix="$"):
     page.browser.execute_script(script, str(text))
 
 
+@js_defined('window.jQuery')
 def get_codemirror_value(page, index=0, find_prefix="$"):
     return page.browser.execute_script(
         """

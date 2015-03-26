@@ -4,7 +4,7 @@
 <section id="edit-coupon-modal" class="modal" role="dialog" tabindex="-1" aria-label="${_('Edit Coupon')}">
   <div class="inner-wrapper">
     <button class="close-modal">
-      <i class="icon-remove"></i>
+      <i class="icon fa fa-remove"></i>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
         ${_('Close')}
@@ -29,7 +29,7 @@
           <ol class="list-input">
             <li class="field required text" id="edit-coupon-modal-field-code">
               <label for="edit_coupon_code" class="required">${_("Code")}</label>
-              <input class="field readonly" id="edit_coupon_code" type="text" name="code" maxlength="16" value="" placeholder="example: A123DS"
+              <input class="field readonly" id="edit_coupon_code" type="text" name="code" maxlength="16" value="" placeholder="${_('example: A123DS')}"
                     readonly aria-required="true"/>
             </li>
             <li class="field required text" id="edit-coupon-modal-field-discount">
@@ -50,12 +50,17 @@
                      readonly aria-required="true"/>
             </li>
 
+            <li class="field" id="edit-coupon-modal-field-expiration-date">
+              <label for="edit_coupon_expiration_date">${_("Expiration Date")}</label>
+              <input class="field readonly" id="edit_coupon_expiration_date" type="text" name="expiration_date" value=""
+                     readonly aria-required="true"/>
+            </li>
           </ol>
         </fieldset>
 
         <div class="submit">
           <input type="hidden" name="coupon_id" id="coupon_id"/>
-          <input name="submit" type="submit" id="update_coupon_button" value="${_('Update Coupon')}"/>
+          <input name="submit" type="button" id="update_coupon_button" value="${_('Update Coupon')}"/>
         </div>
       </form>
     </div>

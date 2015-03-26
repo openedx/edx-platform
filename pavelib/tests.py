@@ -48,7 +48,7 @@ def test_system(options):
     if test_id:
         if not system:
             system = test_id.split('/')[0]
-        if system == 'common':
+        if system in ['common', 'openedx']:
             system = 'lms'
         opts['test_id'] = test_id
 
@@ -79,7 +79,7 @@ def test_system(options):
 ])
 def test_lib(options):
     """
-    Run tests for common/lib/
+    Run tests for common/lib/ and pavelib/ (paver-tests)
     """
     lib = getattr(options, 'lib', None)
     test_id = getattr(options, 'test_id', lib)
@@ -102,6 +102,9 @@ def test_lib(options):
 
     test_suite = suites.PythonTestSuite('python tests', subsuites=lib_tests, **opts)
     test_suite.run()
+
+    # Clear the Esperanto directory of any test artifacts
+    sh('git checkout conf/locale/eo')
 
 
 @task
@@ -159,7 +162,7 @@ def test(options):
 @task
 @needs('pavelib.prereqs.install_prereqs')
 @cmdopts([
-    ("compare_branch", "b", "Branch to compare against, defaults to origin/master"),
+    ("compare_branch=", "b", "Branch to compare against, defaults to origin/master"),
 ])
 def coverage(options):
     """

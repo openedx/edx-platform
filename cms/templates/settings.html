@@ -25,29 +25,12 @@
 window.CMS = window.CMS || {};
 CMS.URL = CMS.URL || {};
 CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
-
-require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/settings/main"],
-  function(doc, $, CourseDetailsModel, MainView) {
-    // highlighting labels when fields are focused in
-    $("form :input").focus(function() {
-      $("label[for='" + this.id + "']").addClass("is-focused");
-    }).blur(function() {
-      $("label").removeClass("is-focused");
-      });
-    var model = new CourseDetailsModel();
-    model.urlRoot = '${details_url}';
-    model.fetch({
-      success: function(model) {
-        var editor = new MainView({
-            el: $('.settings-details'),
-            model: model
-        });
-        editor.render();
-      },
-      reset: true
-    });
-});
   </script>
+</%block>
+<%block name="requirejs">
+    require(["js/factories/settings"], function(SettingsFactory) {
+        SettingsFactory("${details_url}");
+    });
 </%block>
 
 <%block name="content">
@@ -114,7 +97,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
                 %>
                 <a title="${_('Send a note to students via email')}"
                     href="mailto:someone@domain.com?Subject=${email_subject}&body=${email_body}" class="action action-primary">
-                    <i class="icon-envelope-alt icon-inline"></i>${_("Invite your students")}</a>
+                    <i class="icon fa fa-envelope-o icon-inline"></i>${_("Invite your students")}</a>
               </li>
             </ul>
           </div>
@@ -122,12 +105,19 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
 
           % if not about_page_editable:
           <div class="notice notice-incontext notice-workflow">
-            <h3 class="title">${_("Promoting Your Course with edX")}</h3>
+            <h3 class="title">${_("Promoting Your Course with {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</h3>
             <div class="copy">
-              <p>${_('Your course summary page will not be viewable until your '
-                      'course has been announced. To provide content for the '
-                      'page and preview it, follow the instructions provided '
-                      'by your <abbr title="Program Manager">PM</abbr>.')}</p>
+              <p>${_(
+                'Your course summary page will not be viewable until your course '
+                'has been announced. To provide content for the page and preview '
+                'it, follow the instructions provided by your {manager}.').format(
+                  manager='<abbr title="{program_manager}">{pm}</abbr>'.format(
+                    ## Translators: This is a job title
+                    program_manager=_("Program Manager"),
+                    ## Translators: This is an abbreviation for "Program Manager", which is a job title
+                    pm=_("PM"),
+                  )
+              )}</p>
             </div>
           </div>
           % endif
@@ -152,7 +142,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
               <div class="field time" id="field-course-start-time">
                 <label for="course-start-time">${_("Course Start Time")}</label>
                 <input type="text" class="time start timepicker" id="course-start-time" value="" placeholder="HH:MM" autocomplete="off" />
-                <span class="tip tip-stacked" id="timezone"></span>
+                <span class="tip tip-stacked timezone">${_("(UTC)")}</span>
               </div>
             </li>
 
@@ -166,7 +156,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
               <div class="field time" id="field-course-end-time">
                 <label for="course-end-time">${_("Course End Time")}</label>
                 <input type="text" class="time end" id="course-end-time" value="" placeholder="HH:MM" autocomplete="off" />
-                <span class="tip tip-stacked" id="timezone"></span>
+                <span class="tip tip-stacked timezone">${_("(UTC)")}</span>
               </div>
             </li>
           </ol>
@@ -182,7 +172,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
               <div class="field time" id="field-enrollment-start-time">
                 <label for="course-enrollment-start-time">${_("Enrollment Start Time")}</label>
                 <input type="text" class="time start" id="course-enrollment-start-time" value="" placeholder="HH:MM" autocomplete="off" />
-                <span class="tip tip-stacked" id="timezone"></span>
+                <span class="tip tip-stacked timezone">${_("(UTC)")}</span>
               </div>
             </li>
 
@@ -196,7 +186,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
               <div class="field time" id="field-enrollment-end-time">
                 <label for="course-enrollment-end-time">${_("Enrollment End Time")}</label>
                 <input type="text" class="time end" id="course-enrollment-end-time" value="" placeholder="HH:MM" autocomplete="off" />
-                <span class="tip tip-stacked" id="timezone"></span>
+                <span class="tip tip-stacked timezone">${_("(UTC)")}</span>
               </div>
             </li>
           </ol>
@@ -205,7 +195,12 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
           <div class="notice notice-incontext notice-workflow">
             <h3 class="title">${_("These Dates Are Not Used When Promoting Your Course")}</h3>
             <div class="copy">
-              <p>${_('These dates impact <strong>when your courseware can be viewed</strong>, but they are <strong>not the dates shown on your course summary page</strong>.  To provide the course start and registration dates as shown on your course summary page, follow the instructions provided by your <abbr title="Program Manager">PM</abbr>.')}</p>
+              <p>${_(
+                'These dates impact <strong>when your courseware can be viewed</strong>, '
+                'but they are <strong>not the dates shown on your course summary page</strong>. '
+                'To provide the course start and registration dates as shown on your course '
+                'summary page, follow the instructions provided by your Program Manager.'
+              )}</p>
             </div>
           </div>
           % endif
@@ -261,7 +256,8 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
 
                   <div class="wrapper-input">
                     <div class="input">
-                      <input type="text" class="long new-course-image-url" id="course-image-url" value="" placeholder="Your course image URL" autocomplete="off" />
+                      ## Translators: This is the placeholder text for a field that requests the URL for a course image
+                      <input type="text" dir="ltr" class="long new-course-image-url" id="course-image-url" value="" placeholder="${_("Your course image URL")}" autocomplete="off" />
                       <span class="tip tip-stacked">${_("Please provide a valid path and name to your course image (Note: only JPEG or PNG format supported)")}</span>
                     </div>
                     <button type="button" class="action action-upload-image">${_("Upload Course Image")}</button>
@@ -281,7 +277,8 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
                   </div>
 
                   <div class="input">
-                    <input type="text" class="long new-course-introduction-video add-video-data" id="course-introduction-video" value="" placeholder="your YouTube video's ID" autocomplete="off" />
+                    ## Translators: This is the placeholder text for a field that requests a YouTube video ID for a course video
+                    <input type="text"  dir="ltr" class="long new-course-introduction-video add-video-data" id="course-introduction-video" value="" placeholder="${_("your YouTube video's ID")}" autocomplete="off" />
                     <span class="tip tip-stacked">${_("Enter your YouTube video's ID (along with any restriction parameters)")}</span>
                   </div>
                 </li>
@@ -304,12 +301,44 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
                   <input type="text" class="short time" id="course-effort" placeholder="HH:MM" />
                   <span class="tip tip-inline">${_("Time spent on all course work")}</span>
                 </li>
+                % if settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES'):
+                <li class="field field-select" id="field-pre-requisite-course">
+                  <form action="#" class="pre-requisite-course-form" method="post">
+                    <label for="pre-requisite-course">${_("Prerequisite Course")}</label>
+                    <select class="input" id="pre-requisite-course">
+                        <option value="">${_("None")}</option>
+                        % for course_info in sorted(possible_pre_requisite_courses, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
+                        <option value="${course_info['course_key']}">${course_info['display_name']}</option>
+                        % endfor
+                    </select>
+                    <span class="tip tip-inline">${_("Course that students must complete before beginning this course")}</span>
+                    <button type="submit" class="sr" name="submit" value="submit">${_("set pre-requisite course")}</button>
+                   </form>
+                </li>
+                % endif
+                % if settings.FEATURES.get('ENTRANCE_EXAMS'):
+                <li>
+                    <h3 id="heading-entrance-exam">${_("Entrance Exam")}</h3>
+                    <div class="show-data">
+                        <div class="heading">
+                            <input type="checkbox" id="entrance-exam-enabled" />
+                            <label for="entrance-exam-enabled">${_("Require students to pass an exam before beginning the course.")}</label>
+                        </div>
+                         <div class="div-grade-requirements" hidden="hidden">
+                          <p><span class="tip tip-inline">${_("You can now view and author your course entrance exam from the ")}<a href='${course_handler_url}'>${_("Course Outline")}</a></span></p>
+                          <p><h3>${_("Grade Requirements")}</h3></p>
+                          <p><div><input type="text" id="entrance-exam-minimum-score-pct" aria-describedby="min-score-format"><span id="min-score-format" class="tip tip-inline">${_(" %")}</span></div></p>
+                          <p><span class="tip tip-inline">${_("The score student must meet in order to successfully complete the entrance exam. ")}</span></p>
+                        </div>
+                    </div>
+                </li>
+                % endif
               </ol>
             </section>
           % endif
       </form>
     </article>
-    <aside class="content-supplementary" role="complimentary">
+    <aside class="content-supplementary" role="complementary">
      <div class="bit">
         <h3 class="title-3">${_("How are these settings used?")}</h3>
         <p>${_("Your course's schedule determines when students can enroll in and begin a course.")}</p>
@@ -329,10 +358,8 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
           <ul>
             <li class="nav-item"><a href="${grading_config_url}">${_("Grading")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
-            <li class="nav-item"><a href="${advanced_config_url}">${_("Advanced Settings")}</a></li>
-          % if "split_test" in context_course.advanced_modules:
             <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>
-          % endif
+            <li class="nav-item"><a href="${advanced_config_url}">${_("Advanced Settings")}</a></li>
           </ul>
         </nav>
      % endif

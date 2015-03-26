@@ -1,6 +1,9 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.template.defaultfilters import escapejs %>
 <%! from django_comment_client.permissions import has_permission %>
+
+<%namespace name='static' file='../static_content.html'/>
+
 ## IMPORTANT: In order to keep js tests valid and relevant, please be sure to update the appropriate HTML in
 ## common/static/coffee/spec/discussion_spec_helper.coffee is changed and regenerated, whenever this one changes.
 <script aria-hidden="true" type="text/template" id="thread-template">
@@ -16,7 +19,7 @@
                 <div class="response-count"/>
                 <div class="add-response">
                     <button class="button add-response-btn">
-                        <i class="icon icon-reply"></i>
+                        <i class="icon fa fa-reply"></i>
                         <span class="add-response-btn-text">${_('Add A Response')}</span>
                     </button>
                 </div>
@@ -38,75 +41,22 @@
             </div>
         </div>
         <div class="post-tools">
-            <a href="javascript:void(0)" class="forum-thread-expand"><span class="icon icon-plus"/> ${_("Expand discussion")}</a>
-            <a href="javascript:void(0)" class="forum-thread-collapse"><span class="icon icon-minus"/> ${_("Collapse discussion")}</a>
+            <a href="javascript:void(0)" class="forum-thread-expand"><span class="icon fa fa-plus"/> ${_("Expand discussion")}</a>
+            <a href="javascript:void(0)" class="forum-thread-collapse"><span class="icon fa fa-minus"/> ${_("Collapse discussion")}</a>
         </div>
     </article>
 </script>
 
-<script aria-hidden="true" type="text/template" id="thread-show-template">
-  <div class="discussion-post">
-      <header>
-      ${"<% if (obj.group_id) { %>"}
-      <div class="group-visibility-label">${"<%- obj.group_string%>"}</div>
-              ${"<% }  %>"}
-
-          <div class="post-header-content">
-
-            <h1>${'<%- title %>'}</h1>
-            <p class="posted-details">
-                ## This part is incredibly gross but necessary to combine i18n in
-                ## mako with logic in underscore.
-                ## Translators: post_type describes the kind of post this is
-                ## (e.g. "question" or "discussion"); time_ago is how much time
-                ## has passed since the post was created (e.g. "4 hours ago")
-                ${_("{post_type} posted {time_ago} by {author}").format(
-                    post_type="<%- thread_type %>",
-                    time_ago="<span class='timeago' title='<%- created_at %>'><%- created_at %></span>",
-                    author="<%= author_display %>"
-                )}
-            </p>
-            <div class="post-labels">
-                <span class="post-label-pinned"><i class="icon icon-pushpin"></i>${_("Pinned")}</span>
-                <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
-                <span class="post-label-closed"><i class="icon icon-lock"></i>${_("Closed")}</span>
-            </div>
-          </div>
-          <div class="post-header-actions post-extended-content">
-            ${"""<%=
-                _.template(
-                    $('#forum-actions').html(),
-                    {
-                        contentId: cid,
-                        contentType: 'post',
-                        primaryActions: ['vote', 'follow'],
-                        secondaryActions: ['pin', 'edit', 'delete', 'report', 'close']
-                    }
-                )
-            %>"""}
-          </div>
-      </header>
-
-      <div class="post-body">${'<%- body %>'}</div>
-
-      <%  js_block = u"""
-          var courseware_link = interpolate('<a href="%s">%s</a>', [courseware_url, _.escape(courseware_title)]);
-          print(interpolate('{}', {{'courseware_title_linked': courseware_link}}, true));
-          """.format(
-                  ## Translators: 'courseware_title_linked' is a placeholder for the title of the courseware unit referenced by this discussion thread.
-                  escapejs(_("(this post is about %(courseware_title_linked)s)"))
-              )
-      %>
-      ${'<% if (mode == "tab" && obj.courseware_url) { %>'}
-          <div class="post-context">${'<%'}${js_block}${'%>'}</div>
-      ${'<% } %>'}
-  </div>
+% for template_name in ['thread-show']:
+<script aria-hidden="true" type="text/template" id="${template_name}-template">
+    <%static:include path="js/discussion/${template_name}.underscore" />
 </script>
+% endfor
 
 <script aria-hidden="true" type="text/template" id="thread-edit-template">
-  <div class="discussion-post edit-post-form">
     <h1>${_("Editing post")}</h1>
-    <ul class="edit-post-form-errors"></ul>
+    <ul class="post-errors"></ul>
+    <div class="forum-edit-post-form-wrapper"></div>
     <div class="form-row">
       <label class="sr" for="edit-post-title">${_("Edit post title")}</label>
       <input type="text" id="edit-post-title" class="edit-post-title" name="title" value="${"<%-title %>"}" placeholder="${_('Title') | h}">
@@ -116,14 +66,13 @@
     </div>
     <input type="submit" id="edit-post-submit" class="post-update" value="${_("Update post") | h}">
     <a href="#" class="post-cancel">${_("Cancel")}</a>
-  </div>
 </script>
 
 <script aria-hidden="true" type="text/template" id="thread-response-template">
     <div class="discussion-response"></div>
     <a href="#" class="action-show-comments">
         ${u"<%- interpolate('{}', {{num_comments: comments.length}}, true) %>".format(escapejs(_("Show Comments (%(num_comments)s)")))}
-        <i class="icon icon-caret-down"></i>
+        <i class="icon fa fa-caret-down"></i>
     </a>
     <ol class="comments">
         <li class="new-comment">
@@ -132,7 +81,7 @@
                 <ul class="discussion-errors"></ul>
                 <label class="sr" for="add-new-comment">${_("Add a comment")}</label>
                 <div class="comment-body" id="add-new-comment" data-id="${'<%- wmdId %>'}"
-                data-placeholder="${_('Add a comment...') | h}"></div>
+                data-placeholder="${_('Add a comment') | h}"></div>
                 <div class="comment-post-control">
                     <a class="discussion-submit-comment control-button" href="#">${_("Submit")}</a>
                 </div>
@@ -177,7 +126,7 @@
               ${"<% if (obj.endorsement) { %> - <%="}${js_block}${"%><% } %>"}
           </p>
           <div class="post-labels">
-              <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
+              <span class="post-label-reported"><i class="icon fa fa-flag"></i>${_("Reported")}</span>
           </div>
           </div>
           <div class="response-header-actions">
@@ -239,7 +188,7 @@
     ${'<%='}${js_block}${'%>'}
     </p>
     <div class="post-labels">
-      <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
+      <span class="post-label-reported"><i class="icon fa fa-flag"></i>${_("Reported")}</span>
     </div>
   </div>
 </script>
@@ -263,13 +212,13 @@
         ${u"""<%
         var icon_class, sr_text;
         if (thread_type == "discussion") {{
-            icon_class = "icon-comments";
+            icon_class = "fa-comments";
             sr_text = "{discussion}";
         }} else if (endorsed) {{
-            icon_class = "icon-ok";
+            icon_class = "fa-check-square-o";
             sr_text = "{answered_question}";
         }} else {{
-            icon_class = "icon-question";
+            icon_class = "fa-question";
             sr_text = "{unanswered_question}";
         }}
         %>""".format(
@@ -281,23 +230,23 @@
             unanswered_question=escapejs(_("unanswered question"))
         )}
         <span class="sr">${"<%= sr_text %>"}</span>
-        <i class="icon ${"<%= icon_class %>"}"></i>
+        <i class="icon fa ${"<%= icon_class %>"}"></i>
       </div><div class="forum-nav-thread-wrapper-1">
         <span class="forum-nav-thread-title">${"<%- title %>"}</span>
         <%
         js_block = u"""
         var labels = "";
         if (pinned) {{
-            labels += '<li class="post-label-pinned"><i class="icon icon-pushpin"></i>{pinned_text}</li> ';
+            labels += '<li class="post-label-pinned"><i class="icon fa fa-thumb-tack"></i>{pinned_text}</li> ';
         }}
         if (typeof(subscribed) != "undefined" && subscribed) {{
-            labels += '<li class="post-label-following"><i class="icon icon-star"></i>{following_text}</li> ';
+            labels += '<li class="post-label-following"><i class="icon fa fa-star"></i>{following_text}</li> ';
         }}
         if (staff_authored) {{
-            labels += '<li class="post-label-by-staff"><i class="icon icon-user"></i>{staff_text}</li> ';
+            labels += '<li class="post-label-by-staff"><i class="icon fa fa-user"></i>{staff_text}</li> ';
         }}
         if (community_ta_authored) {{
-            labels += '<li class="post-label-by-community-ta"><i class="icon icon-user"></i>{community_ta_text}</li> ';
+            labels += '<li class="post-label-by-community-ta"><i class="icon fa fa-user"></i>{community_ta_text}</li> ';
         }}
         if (labels != "") {{
             print('<ul class="forum-nav-thread-labels">' + labels + '</ul>');
@@ -369,35 +318,37 @@
     </section>
 
       % if settings.FEATURES.get('ENABLE_DISCUSSION_HOME_PANEL'):
-        <span class="label label-settings">${_("HOW TO USE EDX DISCUSSIONS")}</span>
+        <span class="label label-settings">
+          ${_("How to use {platform_name} discussions").format(platform_name=settings.PLATFORM_NAME)}
+        </span>
         <table class="home-helpgrid">
           <tr class="helpgrid-row helpgrid-row-navigation">
             <td class="row-title">${_("Find discussions")}</td>
             <td class="row-item">
-              <i class="icon icon-reorder"></i>
+              <i class="icon fa fa-reorder"></i>
               <span class="row-description">${_("Focus in on specific topics")}</span>
             </td>
             <td class="row-item">
-              <i class="icon icon-search"></i>
+              <i class="icon fa fa-search"></i>
               <span class="row-description">${_("Search for specific posts ")}</span>
             </td>
             <td class="row-item">
-              <i class="icon icon-sort"></i>
+              <i class="icon fa fa-sort"></i>
               <span class="row-description">${_("Sort by date, vote, or comments")}</span>
             </td>
           </tr>
           <tr class="helpgrid-row helpgrid-row-participation">
             <td class="row-title">${_("Engage with posts")}</td>
             <td class="row-item">
-              <i class="icon icon-plus"></i>
+              <i class="icon fa fa-plus"></i>
               <span class="row-description">${_("Upvote posts and good responses")}</span>
             </td>
             <td class="row-item">
-              <i class="icon icon-flag"></i>
+              <i class="icon fa fa-flag"></i>
               <span class="row-description">${_("Report Forum Misuse")}</span>
             </td>
             <td class="row-item">
-              <i class="icon icon-star"></i>
+              <i class="icon fa fa-star"></i>
               <span class="row-description">${_("Follow posts for updates")}</span>
             </td>
           </tr>
@@ -408,7 +359,7 @@
                 <span class="sr">${_("Toggle Notifications Setting")}</span>
                 <span class="notification-checkbox">
                   <input type="checkbox" id="email-setting-checkbox" class="email-setting" name="email-notification"/>
-                  <i class="icon icon-envelope"></i>
+                  <i class="icon fa fa-envelope"></i>
                 </span>
               </label>
               <span class="row-description">${_("Check this box to receive an email digest once a day notifying you about new, unread activity from posts you are following.")}</span>
@@ -426,7 +377,7 @@
         </div>
 
         <div class="search-alert-controls">
-          <a href="#" class="dismiss control control-dismiss"><i class="icon icon-remove"></i></a>
+          <a href="#" class="dismiss control control-dismiss"><i class="icon fa fa-remove"></i></a>
         </div>
     </div>
 </script>
@@ -434,69 +385,21 @@
 <script aria-hidden="true" type="text/template" id="new-post-template">
     <form class="forum-new-post-form">
         <ul class="post-errors" style="display: none"></ul>
-        <div class="post-field">
-            <div class="field-label">
-                <span class="field-label-text">
-                    ## Translators: This is the label for a control to
-                    ## select a forum post type
-                    ${_("Post type:")}
-                </span><fieldset class="field-input">
-                    <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-question" value="question" checked>
-                    <label for="${"<%= form_id %>"}-post-type-question" class="post-type-label">
-                        <i class="icon icon-question"></i>
-                        ## Translators: This is a forum post type
-                        ${_("Question")}
-                    </label>
-                    <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-discussion" value="discussion">
-                    <label for="${"<%= form_id %>"}-post-type-discussion" class="post-type-label">
-                        <i class="icon icon-comments"></i>
-                        ## Translators: This is a forum post type
-                        ${_("Discussion")}
-                    </label>
-                </fieldset>
-            </div><span class="field-help">
-                ${_("Questions raise issues that need answers. Discussions share ideas and start conversations.")}
-            </span>
-        </div>
-        ${'<% if (mode=="tab") { %>'}
-        <div class="post-field">
-            ## Using div here instead of label because we are using a non-native control
-            <div class="field-label">
-                <span class="field-label-text">
-                    ${_("Topic Area:")}
-                </span><div class="field-input post-topic">
-                    <a href="#" class="post-topic-button">
-                        <span class="sr">${_("Discussion topics; current selection is: ")}</span>
-                        <span class="js-selected-topic"></span>
-                        <span class="drop-arrow" aria-hidden="true">▾</span>
-                    </a>
-                    <div class="topic-menu-wrapper">
-                        <label class="topic-filter-label">
-                            <span class="sr">${_("Filter topics")}</span>
-                            <input type="text" class="topic-filter-input" placeholder="${_('Filter topics')}">
-                        </label>
-                        <ul class="topic-menu" role="menu">${'<%= topics_html %>'}</ul>
-                   </div>
-               </div>
-            </div><span class="field-help">
-                ${_("Add your post to a relevant topic to help others find it.")}
-            </span>
-        </div>
-        ${'<% } %>'}
+        <div class="forum-new-post-form-wrapper"></div>
         ${'<% if (cohort_options) { %>'}
         <div class="post-field">
             <label class="field-label">
                 <span class="field-label-text">
                     ## Translators: This labels the selector for which group of students can view a post
                     ${_("Visible To:")}
-                </span><select class="field-input js-group-select" name="group_id">
+                </span><select class="field-input js-group-select" name="group_id" ${'<% if (!is_commentable_cohorted) { %>'}disabled${'<% } %>'}>
                     <option value="">${_("All Groups")}</option>
                     ${'<% _.each(cohort_options, function(opt) { %>'}
                     <option value="${'<%= opt.value %>'}" ${'<% if (opt.selected) { %>selected<% } %>'}>${'<%- opt.text %>'}</option>
                     ${'<% }); %>'}
                  </select>
             </label><div class="field-help">
-                ${_("Instructors can set whether a post in a cohorted topic is visible to all cohorts or only to a specific cohort.")}
+                ${_("Discussion admins, moderators, and TAs can make their posts visible to all students or specify a single cohort.")}
             </div>
         </div>
         ${'<% } %>'}
@@ -508,11 +411,11 @@
                 ${_("Add a clear and descriptive title to encourage participation.")}
             </span>
         </div>
-        <div class="post-field js-post-body editor" name="body" data-placeholder="${_(u'Enter your question or comment…')}"></div>
+        <div class="post-field js-post-body editor" name="body" data-placeholder="${_('Enter your question or comment')}"></div>
         <div class="post-options">
             <label class="post-option is-enabled">
                 <input type="checkbox" name="follow" class="post-option-input js-follow" checked>
-                <i class="icon icon-star"></i>${_("follow this post")}
+                <i class="icon fa fa-star"></i>${_("follow this post")}
             </label>
             ${'<% if (allow_anonymous) { %>'}
             <label class="post-option">
@@ -534,6 +437,33 @@
     </form>
 </script>
 
+<script aria-hidden="true" type="text/template" id="thread-type-template">
+    <div class="post-field">
+        <div class="field-label">
+            <span class="field-label-text">
+                ## Translators: This is the label for a control to
+                ## select a forum post type
+                ${_("Post type:")}
+            </span><fieldset class="field-input">
+                <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-question" value="question">
+                <label for="${"<%= form_id %>"}-post-type-question" class="post-type-label">
+                    <i class="icon fa fa-question"></i>
+                    ## Translators: This is a forum post type
+                    ${_("Question")}
+                </label>
+                <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-discussion" value="discussion" checked>
+                <label for="${"<%= form_id %>"}-post-type-discussion" class="post-type-label">
+                    <i class="icon fa fa-comments"></i>
+                    ## Translators: This is a forum post type
+                    ${_("Discussion")}
+                </label>
+            </fieldset>
+        </div><span class="field-help">
+            ${_("Questions raise issues that need answers. Discussions share ideas and start conversations.")}
+        </span>
+    </div>
+</script>
+
 <script aria-hidden="true" type="text/template" id="new-post-menu-entry-template">
     <li role="menuitem" class="topic-menu-item">
         <a href="#" class="topic-title" data-discussion-id="${'<%- id %>'}" data-cohorted="${'<%- is_cohorted %>'}">${'<%- text %>'}</a>
@@ -547,6 +477,28 @@
     </li>
 </script>
 
+<script aria-hidden="true" type="text/template" id="topic-template">
+    ## Using div here instead of label because we are using a non-native control
+    <div class="field-label">
+        <span class="field-label-text">${_("Topic Area:")}</span><div class="field-input post-topic">
+            <a href="#" class="post-topic-button">
+                <span class="sr">${_("Discussion topics; current selection is: ")}</span>
+                <span class="js-selected-topic"></span>
+                <span class="drop-arrow" aria-hidden="true">▾</span>
+            </a>
+            <div class="topic-menu-wrapper">
+                <label class="topic-filter-label">
+                    <span class="sr">${_("Filter topics")}</span>
+                    <input type="text" class="topic-filter-input" placeholder="${_('Filter topics')}">
+                </label>
+                <ul class="topic-menu" role="menu">${'<%= topics_html %>'}</ul>
+           </div>
+       </div>
+    </div><span class="field-help">
+        ${_("Add your post to a relevant topic to help others find it.")}
+    </span>
+</script>
+
 <%def name="primaryAction(action_class, icon, sr_label, unchecked_label, checked_label)">
     <script type="text/template" id="forum-action-${action_class}">
         <li class="actions-item">
@@ -556,7 +508,7 @@
                     <span class="label-unchecked">${unchecked_label}</span>
                     <span class="label-checked">${checked_label}</span>
                 </span>
-                <span class="action-icon"><i class="icon icon-${icon}"></i></span>
+                <span class="action-icon"><i class="icon fa fa-${icon}"></i></span>
             </a>
         </li>
     </script>
@@ -568,17 +520,20 @@ ${primaryAction("follow", "star", _("Follow"), _("Follow"), _("Unfollow"))}
 
 <script type="text/template" id="forum-action-vote">
     <li class="actions-item">
+        <span aria-hidden="true" class="display-vote" >
+          <span class="vote-count"></span>
+        </span>
         <a href="#" class="action-button action-vote" role="checkbox" aria-checked="false">
             ## Vote counts are populated by JS
             <span class="sr">${_("Vote")}</span>
             <span class="sr js-sr-vote-count"></span>
 
             <span class="action-label" aria-hidden="true">
-              <span class="js-visual-vote-count"></span>
+              <span class="vote-count"></span>
             </span>
 
             <span class="action-icon" aria-hidden="true">
-                <i class="icon icon-plus"></i>
+                <i class="icon fa fa-plus"></i>
             </span>
         </a>
     </li>
@@ -594,7 +549,7 @@ ${primaryAction("follow", "star", _("Follow"), _("Follow"), _("Unfollow"))}
                     <span class="label-checked">${checked_label}</span>
                 </span>
                 <span class="action-icon">
-                  <i class="icon icon-${icon}"></i>
+                  <i class="icon fa fa-${icon}"></i>
                 </span>
             </a>
         </li>
@@ -602,7 +557,7 @@ ${primaryAction("follow", "star", _("Follow"), _("Follow"), _("Unfollow"))}
 </%def>
 
 ${secondaryStateAction("report", "flag", _("Report abuse"), _("Report"), _("Unreport"))}
-${secondaryStateAction("pin", "pushpin", _("Pin"), _("Pin"), _("Unpin"))}
+${secondaryStateAction("pin", "thumb-tack", _("Pin"), _("Pin"), _("Unpin"))}
 ${secondaryStateAction("close", "lock", _("Close"), _("Close"), _("Open"))}
 
 <%def name="secondaryAction(action_class, icon, label)">
@@ -610,13 +565,13 @@ ${secondaryStateAction("close", "lock", _("Close"), _("Close"), _("Open"))}
         <li class="actions-item">
             <a href="javascript:void(0)" class="action-list-item action-${action_class}" role="button">
                 <span class="action-label">${label}</span>
-                <span class="action-icon"><i class="icon icon-${icon}"></i></span>
+                <span class="action-icon"><i class="icon fa fa-${icon}"></i></span>
             </a>
         </li>
     </script>
 </%def>
 
-${secondaryAction("edit", "pencil", _("Edit"))}
+${secondaryAction("edit", "pencil-square-o", _("Edit"))}
 ${secondaryAction("delete", "remove", _("Delete"))}
 
 <script type="text/template" id="forum-actions">
@@ -626,7 +581,7 @@ ${secondaryAction("delete", "remove", _("Delete"))}
             <div class="more-wrapper">
                 <a href="javascript:void(0)" class="action-button action-more" role="button" aria-haspopup="true" aria-controls="action-menu-${"<%= contentId %>"}">
                     <span class="action-label">${_("More")}</span>
-                    <span class="action-icon"><i class="icon icon-ellipsis-horizontal"></i></span>
+                    <span class="action-icon"><i class="icon fa fa-ellipsis-h"></i></span>
                 </a>
                 <div class="actions-dropdown" id="action-menu-${"<%= contentType %>"}" aria-expanded="false">
                   <ul class="actions-dropdown-list">

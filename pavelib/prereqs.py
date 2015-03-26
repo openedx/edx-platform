@@ -26,6 +26,25 @@ if os.path.exists(PRIVATE_REQS):
     PYTHON_REQ_FILES.append(PRIVATE_REQS)
 
 
+def no_prereq_install():
+    """
+    Determine if NO_PREREQ_INSTALL should be truthy or falsy.
+    """
+    vals = {
+        '0': False,
+        '1': True,
+        'true': True,
+        'false': False,
+    }
+
+    val = os.environ.get("NO_PREREQ_INSTALL", 'False').lower()
+
+    try:
+        return vals[val]
+    except KeyError:
+        return False
+
+
 def compute_fingerprint(path_list):
     """
     Hash the contents of all the files and directories in `path_list`.
@@ -123,7 +142,7 @@ def install_ruby_prereqs():
     """
     Installs Ruby prereqs
     """
-    if os.environ.get("NO_PREREQ_INSTALL", False):
+    if no_prereq_install():
         return
 
     prereq_cache("Ruby prereqs", ["Gemfile"], ruby_prereqs_installation)
@@ -134,7 +153,7 @@ def install_node_prereqs():
     """
     Installs Node prerequisites
     """
-    if os.environ.get("NO_PREREQ_INSTALL", False):
+    if no_prereq_install():
         return
 
     prereq_cache("Node prereqs", ["package.json"], node_prereqs_installation)
@@ -145,7 +164,7 @@ def install_python_prereqs():
     """
     Installs Python prerequisites
     """
-    if os.environ.get("NO_PREREQ_INSTALL", False):
+    if no_prereq_install():
         return
 
     prereq_cache("Python prereqs", PYTHON_REQ_FILES + [sysconfig.get_python_lib()], python_prereqs_installation)
@@ -156,7 +175,7 @@ def install_prereqs():
     """
     Installs Ruby, Node and Python prerequisites
     """
-    if os.environ.get("NO_PREREQ_INSTALL", False):
+    if no_prereq_install():
         return
 
     install_ruby_prereqs()

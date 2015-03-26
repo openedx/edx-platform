@@ -5,13 +5,11 @@
 
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
-    float: left;
   }
 
   .content-primary {
     @extend %ui-window;
-    width: flex-grid(9, 12);
-    margin-right: flex-gutter();
+    @extend .ui-col-wide;
     padding: $baseline ($baseline*1.5);
   }
 
@@ -27,8 +25,8 @@
     @extend %t-strong;
     display: none;
     border-bottom: 2px solid $yellow;
-    margin: 0 0 20px 0;
-    padding: 10px 20px;
+    margin: 0 0 $baseline 0;
+    padding: ($baseline/2) $baseline;
     background: $paleYellow;
 
     .text {
@@ -67,16 +65,17 @@
 
       .title-2 {
         width: flex-grid(4, 9);
-        margin: 0 flex-gutter() 0 0;
-        float: left;
+        margin: 0;
+        @include margin-right(flex-gutter());
+        @include float(left);
       }
 
       .tip {
         @extend %t-copy-sub2;
         width: flex-grid(5, 9);
-        float: right;
+        @include float(right);
         margin-top: ($baseline/2);
-        text-align: right;
+        @include text-align(right);
         color: $gray-l2;
       }
     }
@@ -101,8 +100,12 @@
       @include transition(color $tmg-f2 ease-in-out 0s);
       display: block;
       margin-top: ($baseline/4);
-      color: $gray-l3;
+      color: $gray-d1;
     }
+    .tip-inline{
+    display: inline;
+    margin-left: 5px;
+  }
 
     .message-error {
       @extend %t-copy-sub1;
@@ -125,10 +128,32 @@
 
     // form basics
     .list-input {
-      margin: 0;
-      padding: 0;
-      list-style: none;
+      @extend %cont-no-list;
 
+      .show-data{
+        .heading{
+          border: 1px solid #E0E0E0;
+          padding: 5px 15px;
+          margin-top: 5px;
+        }
+         .div-grade-requirements{
+            border: 1px solid #E0E0E0;
+            border-top: none;
+            padding: 10px 15px;
+           label{font-weight: 600;}
+           input#entrance-exam-minimum-score-pct{
+              height: 40px;
+              font-size: 18px;
+           }
+         }
+      }
+      #heading-entrance-exam{
+        font-weight: 600;
+      }
+
+      label[for="entrance-exam-enabled"] {
+        font-size: 14px;
+      }
       .field {
         margin: 0 0 ($baseline*2) 0;
 
@@ -339,7 +364,7 @@
             @extend %t-action3;
             @extend %t-strong;
 
-            [class^="icon-"] {
+            .icon {
               @extend %t-icon5;
               display: inline-block;
               vertical-align: middle;
@@ -372,7 +397,7 @@
         }
 
         .field {
-          float: left;
+          @include float(left);
           width: flex-grid(3, 9);
           margin-bottom: ($baseline/4);
           margin-right: flex-gutter();
@@ -384,7 +409,7 @@
           .tip {
             position: absolute;
             top: 0;
-            right: 0;
+            @include right(0);
           }
         }
       }
@@ -511,14 +536,15 @@
         height: ($baseline*2);
         position: relative;
         display: inline-block;
-        vertical-align: middle;
         margin-right: flex-gutter();
+        vertical-align: middle;
+        text-align: center;
         border-radius: 20px;
         border: 1px solid $darkGrey;
         background-color: #d1dae3;
         color: #6d788b;
 
-        .plus-icon {
+        .icon {
           position: absolute;
           top: 50%;
           left: 50%;
@@ -598,6 +624,7 @@
 
           .grade-specific-bar {
             height: 50px !important;
+            text-align: left;
           }
 
           .grades {
@@ -661,7 +688,7 @@
               .range {
                 @include font-size(10);
                 display: block;
-                margin-right: 15px;
+                margin-right: ($baseline*0.75);
                 line-height: 12px;
               }
 
@@ -671,7 +698,7 @@
                 right: -1px;
                 height: 50px;
                 width: 2px;
-                background-color: #fff;
+                background-color: $white;
                 box-shadow: -1px 0 3px rgba(0,0,0,0.1);
 
                 cursor: ew-resize;
@@ -860,7 +887,7 @@
       .CodeMirror {
         @extend %t-copy-base;
         @include box-sizing(border-box);
-        box-shadow: 0 1px 2px rgba(0, 0, 0, .1) inset;
+        box-shadow: 0 1px 2px $shadow-l1 inset;
         @include linear-gradient($lightGrey, tint($lightGrey, 90%));
         padding: 5px 8px;
         border: 1px solid $mediumGrey;
@@ -897,13 +924,13 @@
   }
 
   .content-supplementary {
-    width: flex-grid(3, 12);
+    @extend .ui-col-narrow;
   }
-  
+
   .wrapper-modal-window {
-    
+
     .validation-error-modal-content {
-      
+
       .error-header {
         p {
           strong {
@@ -911,28 +938,28 @@
           }
         }
       }
-      
+
       hr {
         margin: 25px 0;
       }
-      
+
       .error-list {
         .error-item {
           .error-item-title {
             color: $error-red;
           }
-          
+
           .error-item-message {
             width:100%;
             border: none;
             resize: none;
-          
+
             &:focus {
               outline: 0;
             }
           }
         }
-      }  
+      }
     }
   }
 }

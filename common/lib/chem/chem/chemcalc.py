@@ -192,7 +192,6 @@ def _render_to_html(tree):
             return children.replace(' ', '')
 
 
-
 def render_to_html(eq):
     '''
     Render a chemical equation string to html.
@@ -230,7 +229,6 @@ def render_to_html(eq):
     if arrow == '':
         # only one side
         return spanify(render_expression(left))
-
 
     return spanify(render_expression(left) + render_arrow(arrow) + render_expression(right))
 
@@ -341,8 +339,12 @@ def divide_chemical_expression(s1, s2, ignore_state=False):
         if treedic['1 phases'] != treedic['2 phases']:
             return False
 
-    if any(map(lambda x, y: x / y - treedic['1 factors'][0] / treedic['2 factors'][0],
-                                         treedic['1 factors'], treedic['2 factors'])):
+    if any(
+        [
+            x / y - treedic['1 factors'][0] / treedic['2 factors'][0]
+            for (x, y) in zip(treedic['1 factors'], treedic['2 factors'])
+        ]
+    ):
         # factors are not proportional
         return False
     else:

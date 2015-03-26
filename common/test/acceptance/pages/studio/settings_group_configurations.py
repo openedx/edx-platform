@@ -1,7 +1,7 @@
 """
 Course Group Configurations page.
 """
-
+from bok_choy.promise import EmptyPromise
 from .course_page import CoursePage
 from .utils import confirm_prompt
 
@@ -12,31 +12,92 @@ class GroupConfigurationsPage(CoursePage):
     """
 
     url_path = "group_configurations"
+    experiment_groups_css = ".experiment-groups"
+    content_groups_css = ".content-groups"
 
     def is_browser_on_page(self):
-        return self.q(css='body.view-group-configurations').present
+        """
+        Verify that the browser is on the page and it is not still loading.
+        """
+        EmptyPromise(
+            lambda: self.q(css='body.view-group-configurations').present,
+            'On the group configuration page'
+        ).fulfill()
+
+        EmptyPromise(
+            lambda: not self.q(css='span.spin').visible,
+            'Group Configurations are finished loading'
+        ).fulfill()
+
+        return True
 
     @property
-    def group_configurations(self):
+    def experiment_group_configurations(self):
         """
-        Return list of the group configurations for the course.
+        Return list of the experiment group configurations for the course.
         """
-        css = '.group-configurations-list-item'
-        return [GroupConfiguration(self, index) for index in xrange(len(self.q(css=css)))]
+        return self._get_groups(self.experiment_groups_css)
 
-    def create(self):
+    @property
+    def content_groups(self):
+        """
+        Return list of the content groups for the course.
+        """
+        return self._get_groups(self.content_groups_css)
+
+    def _get_groups(self, prefix):
+        """
+        Return list of the group-configurations-list-item's of specified type for the course.
+        """
+        css = prefix + ' .wrapper-collection'
+        return [GroupConfiguration(self, prefix, index) for index in xrange(len(self.q(css=css)))]
+
+    def create_experiment_group_configuration(self):
         """
         Creates new group configuration.
         """
-        self.q(css=".new-button").first.click()
+        self.q(css=self.experiment_groups_css + " .new-button").first.click()
+
+    def create_first_content_group(self):
+        """
+        Creates new content group when there are none initially defined.
+        """
+        self.q(css=self.content_groups_css + " .new-button").first.click()
+
+    def add_content_group(self):
+        """
+        Creates new content group when at least one already exists
+        """
+        self.q(css=self.content_groups_css + " .action-add").first.click()
 
     @property
-    def no_group_configuration_message_is_present(self):
-        return self.q(css='.wrapper-content .no-group-configurations-content').present
+    def no_experiment_groups_message_is_present(self):
+        return self._no_content_message(self.experiment_groups_css).present
 
     @property
-    def no_group_configuration_message_text(self):
-        return self.q(css='.wrapper-content .no-group-configurations-content').text[0]
+    def no_content_groups_message_is_present(self):
+        return self._no_content_message(self.content_groups_css).present
+
+    @property
+    def no_experiment_groups_message_text(self):
+        return self._no_content_message(self.experiment_groups_css).text[0]
+
+    @property
+    def no_content_groups_message_text(self):
+        return self._no_content_message(self.content_groups_css).text[0]
+
+    def _no_content_message(self, prefix):
+        """
+        Returns the message about "no content" for the specified type.
+        """
+        return self.q(css='.wrapper-content ' + prefix + ' .no-content')
+
+    @property
+    def experiment_group_sections_present(self):
+        """
+        Returns whether or not anything related to content experiments is present.
+        """
+        return self.q(css=self.experiment_groups_css).present or self.q(css=".experiment-groups-doc").present
 
 
 class GroupConfiguration(object):
@@ -44,9 +105,9 @@ class GroupConfiguration(object):
     Group Configuration wrapper.
     """
 
-    def __init__(self, page, index):
+    def __init__(self, page, prefix, index):
         self.page = page
-        self.SELECTOR = '.group-configurations-list-item-{}'.format(index)
+        self.SELECTOR = prefix + ' .wrapper-collection-{}'.format(index)
         self.index = index
 
     def get_selector(self, css=''):
@@ -134,9 +195,9 @@ class GroupConfiguration(object):
         """
         Return group configuration mode.
         """
-        if self.find_css('.group-configuration-edit').present:
+        if self.find_css('.collection-edit').present:
             return 'edit'
-        elif self.find_css('.group-configuration-details').present:
+        elif self.find_css('.collection').present:
             return 'details'
 
     @property
@@ -166,14 +227,14 @@ class GroupConfiguration(object):
         """
         Return group configuration name.
         """
-        return self.get_text('.group-configuration-title')
+        return self.get_text('.title')
 
     @name.setter
     def name(self, value):
         """
         Set group configuration name.
         """
-        self.find_css('.group-configuration-name-input').first.fill(value)
+        self.find_css('.collection-name-input').first.fill(value)
 
     @property
     def description(self):
@@ -208,11 +269,11 @@ class GroupConfiguration(object):
 
     @property
     def details_error_icon_is_present(self):
-        return self.find_css('.wrapper-group-configuration-usages .icon-exclamation-sign').present
+        return self.find_css('.wrapper-group-configuration-usages .fa-exclamation-circle').present
 
     @property
     def details_warning_icon_is_present(self):
-        return self.find_css('.wrapper-group-configuration-usages .icon-warning-sign').present
+        return self.find_css('.wrapper-group-configuration-usages .fa-warning').present
 
     @property
     def details_message_is_present(self):
@@ -224,7 +285,7 @@ class GroupConfiguration(object):
 
     @property
     def edit_warning_icon_is_present(self):
-        return self.find_css('.wrapper-group-configuration-validation .icon-warning-sign').present
+        return self.find_css('.wrapper-group-configuration-validation .fa-warning').present
 
     @property
     def edit_warning_message_is_present(self):

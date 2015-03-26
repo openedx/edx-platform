@@ -1,25 +1,32 @@
 """
 Test cases for tabs.
+Note: Tests covering workflows in the actual tabs.py file begin after line 100
 """
-from mock import MagicMock, Mock, patch
-
-from courseware.courses import get_course_by_id
-from courseware.views import get_static_tab_contents, static_tab
-
+from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.test.utils import override_settings
-from django.core.urlresolvers import reverse
-
-from student.tests.factories import UserFactory
-from xmodule.tabs import CourseTabList
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from courseware.tests.helpers import get_request_for_user, LoginEnrollmentTestCase
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from mock import MagicMock, Mock, patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
+from courseware.courses import get_course_by_id
+from courseware.tests.helpers import get_request_for_user, LoginEnrollmentTestCase
+from xmodule import tabs
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MIXED_TOY_MODULESTORE, TEST_DATA_MIXED_CLOSED_MODULESTORE
+)
+from courseware.views import get_static_tab_contents, static_tab
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+if settings.FEATURES.get('MILESTONES_APP', False):
+    from courseware.tabs import get_course_tab_list
+    from milestones import api as milestones_api
+    from milestones.models import MilestoneRelationshipType
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE)
 class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """Test cases for Static Tab Dates."""
 
@@ -47,13 +54,12 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     def test_invalid_course_key(self):
         request = get_request_for_user(UserFactory.create())
         with self.assertRaises(Http404):
-            static_tab(request, 'edX/toy', 'new_tab')
+            static_tab(request, course_id='edX/toy', tab_slug='new_tab')
 
-    @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
     def test_get_static_tab_contents(self):
         course = get_course_by_id(self.toy_course_key)
         request = get_request_for_user(UserFactory.create())
-        tab = CourseTabList.get_tab_by_slug(course.tabs, 'resources')
+        tab = tabs.CourseTabList.get_tab_by_slug(course.tabs, 'resources')
 
         # Test render works okay
         tab_content = get_static_tab_contents(request, course, tab)
@@ -69,8 +75,11 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             self.assertIn("this module is temporarily unavailable", static_tab)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_CLOSED_MODULESTORE)
 class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
+    """
+    Tests for the static tab dates of an XML course
+    """
     # The following XML test course (which lives at common/test/data/2014)
     # is closed; we're testing that tabs still appear when
     # the course is already closed
@@ -96,3 +105,120 @@ class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertIn(self.xml_data, resp.content)
 
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_CLOSED_MODULESTORE)
+class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+    """
+    Validate tab behavior when dealing with Entrance Exams
+    """
+    if settings.FEATURES.get('ENTRANCE_EXAMS', False):
+
+        def setUp(self):
+            """
+            Test case scaffolding
+            """
+            self.course = CourseFactory.create()
+            self.instructor_tab = ItemFactory.create(
+                category="instructor", parent_location=self.course.location,
+                data="Instructor Tab", display_name="Instructor"
+            )
+            self.extra_tab_2 = ItemFactory.create(
+                category="static_tab", parent_location=self.course.location,
+                data="Extra Tab", display_name="Extra Tab 2"
+            )
+            self.extra_tab_3 = ItemFactory.create(
+                category="static_tab", parent_location=self.course.location,
+                data="Extra Tab", display_name="Extra Tab 3"
+            )
+            self.setup_user()
+            self.enroll(self.course)
+            self.user.is_staff = True
+            self.relationship_types = milestones_api.get_milestone_relationship_types()
+            MilestoneRelationshipType.objects.create(name='requires')
+            MilestoneRelationshipType.objects.create(name='fulfills')
+
+        def test_get_course_tabs_list_entrance_exam_enabled(self):
+            """
+            Unit Test: test_get_course_tabs_list_entrance_exam_enabled
+            """
+            entrance_exam = ItemFactory.create(
+                category="chapter", parent_location=self.course.location,
+                data="Exam Data", display_name="Entrance Exam"
+            )
+            entrance_exam.is_entrance_exam = True
+            milestone = {
+                'name': 'Test Milestone',
+                'namespace': '{}.entrance_exams'.format(unicode(self.course.id)),
+                'description': 'Testing Courseware Tabs'
+            }
+            self.course.entrance_exam_enabled = True
+            self.course.entrance_exam_id = unicode(entrance_exam.location)
+            milestone = milestones_api.add_milestone(milestone)
+            milestones_api.add_course_milestone(
+                unicode(self.course.id),
+                self.relationship_types['REQUIRES'],
+                milestone
+            )
+            milestones_api.add_course_content_milestone(
+                unicode(self.course.id),
+                unicode(entrance_exam.location),
+                self.relationship_types['FULFILLS'],
+                milestone
+            )
+            course_tab_list = get_course_tab_list(self.course, self.user)
+            self.assertEqual(len(course_tab_list), 2)
+            self.assertEqual(course_tab_list[0]['tab_id'], 'courseware')
+            self.assertEqual(course_tab_list[0]['name'], 'Entrance Exam')
+            self.assertEqual(course_tab_list[1]['tab_id'], 'instructor')
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE)
+class TextBookTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+    """
+    Validate tab behavior when dealing with textbooks.
+    """
+
+    def setUp(self):
+        self.course = CourseFactory.create()
+        self.set_up_books(2)
+        self.course.tabs = [
+            tabs.CoursewareTab(),
+            tabs.CourseInfoTab(),
+            tabs.TextbookTabs(),
+            tabs.PDFTextbookTabs(),
+            tabs.HtmlTextbookTabs(),
+        ]
+        self.setup_user()
+        self.enroll(self.course)
+        self.num_textbook_tabs = sum(1 for tab in self.course.tabs if isinstance(tab, tabs.TextbookTabsBase))
+        self.num_textbooks = self.num_textbook_tabs * len(self.books)
+
+    def set_up_books(self, num_books):
+        """Initializes the textbooks in the course and adds the given number of books to each textbook"""
+        self.books = [MagicMock() for _ in range(num_books)]
+        for book_index, book in enumerate(self.books):
+            book.title = 'Book{0}'.format(book_index)
+        self.course.textbooks = self.books
+        self.course.pdf_textbooks = self.books
+        self.course.html_textbooks = self.books
+
+    def test_pdf_textbook_tabs(self):
+        """
+        Test that all textbooks tab links generating correctly.
+        """
+        type_to_reverse_name = {'textbook': 'book', 'pdftextbook': 'pdf_book', 'htmltextbook': 'html_book'}
+
+        course_tab_list = get_course_tab_list(self.course, self.user)
+        num_of_textbooks_found = 0
+        for tab in course_tab_list:
+            # Verify links of all textbook type tabs.
+            if isinstance(tab, tabs.SingleTextbookTab):
+                book_type, book_index = tab.tab_id.split("/", 1)
+                expected_link = reverse(
+                    type_to_reverse_name[book_type],
+                    args=[self.course.id.to_deprecated_string(), book_index]
+                )
+                tab_link = tab.link_func(self.course, reverse)
+                self.assertEqual(tab_link, expected_link)
+                num_of_textbooks_found += 1
+        self.assertEqual(num_of_textbooks_found, self.num_textbooks)

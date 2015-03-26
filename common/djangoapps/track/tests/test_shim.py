@@ -1,21 +1,10 @@
 """Ensure emitted events contain the fields legacy processors expect to find."""
 
-from datetime import datetime
-
-from freezegun import freeze_time
 from mock import sentinel
-from django.test import TestCase
 from django.test.utils import override_settings
-from pytz import UTC
 
-from eventtracking.django import DjangoTracker
+from track.tests import EventTrackingTestCase, FROZEN_TIME
 
-
-IN_MEMORY_BACKEND = {
-    'mem': {
-        'ENGINE': 'track.tests.test_shim.InMemoryBackend'
-    }
-}
 
 LEGACY_SHIM_PROCESSOR = [
     {
@@ -23,20 +12,14 @@ LEGACY_SHIM_PROCESSOR = [
     }
 ]
 
-FROZEN_TIME = datetime(2013, 10, 3, 8, 24, 55, tzinfo=UTC)
 
-
-@freeze_time(FROZEN_TIME)
-class LegacyFieldMappingProcessorTestCase(TestCase):
+class LegacyFieldMappingProcessorTestCase(EventTrackingTestCase):
     """Ensure emitted events contain the fields legacy processors expect to find."""
 
     @override_settings(
-        EVENT_TRACKING_BACKENDS=IN_MEMORY_BACKEND,
         EVENT_TRACKING_PROCESSORS=LEGACY_SHIM_PROCESSOR,
     )
     def test_event_field_mapping(self):
-        django_tracker = DjangoTracker()
-
         data = {sentinel.key: sentinel.value}
 
         context = {
@@ -49,16 +32,15 @@ class LegacyFieldMappingProcessorTestCase(TestCase):
             'user_id': sentinel.user_id,
             'course_id': sentinel.course_id,
             'org_id': sentinel.org_id,
-            'event_type': sentinel.event_type,
             'client_id': sentinel.client_id,
         }
-        with django_tracker.context('test', context):
-            django_tracker.emit(sentinel.name, data)
+        with self.tracker.context('test', context):
+            self.tracker.emit(sentinel.name, data)
 
-        emitted_event = django_tracker.backends['mem'].get_event()
+        emitted_event = self.get_event()
 
         expected_event = {
-            'event_type': sentinel.event_type,
+            'event_type': sentinel.name,
             'name': sentinel.name,
             'context': {
                 'user_id': sentinel.user_id,
@@ -79,15 +61,12 @@ class LegacyFieldMappingProcessorTestCase(TestCase):
         self.assertEqual(expected_event, emitted_event)
 
     @override_settings(
-        EVENT_TRACKING_BACKENDS=IN_MEMORY_BACKEND,
         EVENT_TRACKING_PROCESSORS=LEGACY_SHIM_PROCESSOR,
     )
     def test_missing_fields(self):
-        django_tracker = DjangoTracker()
+        self.tracker.emit(sentinel.name)
 
-        django_tracker.emit(sentinel.name)
-
-        emitted_event = django_tracker.backends['mem'].get_event()
+        emitted_event = self.get_event()
 
         expected_event = {
             'event_type': sentinel.name,
@@ -104,19 +83,3 @@ class LegacyFieldMappingProcessorTestCase(TestCase):
             'session': '',
         }
         self.assertEqual(expected_event, emitted_event)
-
-
-class InMemoryBackend(object):
-    """A backend that simply stores all events in memory"""
-
-    def __init__(self):
-        super(InMemoryBackend, self).__init__()
-        self.events = []
-
-    def send(self, event):
-        """Store the event in a list"""
-        self.events.append(event)
-
-    def get_event(self):
-        """Return the first event that was emitted."""
-        return self.events[0]

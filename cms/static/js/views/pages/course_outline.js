@@ -26,7 +26,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 });
                 this.model.on('change', this.setCollapseExpandVisibility, this);
                 $('.dismiss-button').bind('click', ViewUtils.deleteNotificationHandler(function () {
-                    $('.wrapper-alert-announcement').removeClass('is-shown').addClass('is-hidden')
+                    $('.wrapper-alert-announcement').removeClass('is-shown').addClass('is-hidden');
                 }));
             },
 

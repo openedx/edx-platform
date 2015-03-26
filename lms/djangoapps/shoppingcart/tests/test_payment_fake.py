@@ -92,6 +92,17 @@ class PaymentFakeViewTest(TestCase):
         # Generate shoppingcart signatures
         post_params = sign(self.CLIENT_POST_PARAMS)
 
+        # Configure the view to declined payments
+        resp = self.client.put(
+            '/shoppingcart/payment_fake',
+            data="decline", content_type='text/plain'
+        )
+        self.assertEqual(resp.status_code, 200)
+
+        # Check that the decision is "DECLINE"
+        resp_params = PaymentFakeView.response_post_params(post_params)
+        self.assertEqual(resp_params.get('decision'), 'DECLINE')
+
         # Configure the view to fail payments
         resp = self.client.put(
             '/shoppingcart/payment_fake',

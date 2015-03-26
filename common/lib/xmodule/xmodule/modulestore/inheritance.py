@@ -1,15 +1,16 @@
 """
 Support for inheritance of fields down an XBlock hierarchy.
 """
+from __future__ import absolute_import
 
 from datetime import datetime
 from pytz import UTC
-
 from xmodule.partitions.partitions import UserPartition
 from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict, Integer, List
 from xblock.runtime import KeyValueStore, KvsFieldData
-
 from xmodule.fields import Date, Timedelta
+from django.conf import settings
+
 
 # Make '_' a no-op so we can scrape strings
 _ = lambda text: text
@@ -66,8 +67,7 @@ class InheritanceMixin(XBlockMixin):
     giturl = String(
         display_name=_("GIT URL"),
         help=_("Enter the URL for the course data GIT repository."),
-        scope=Scope.settings,
-        deprecated=True  # Deprecated because GIT workflow users do not use Studio.
+        scope=Scope.settings
     )
     xqa_key = String(
         display_name=_("XQA Key"),
@@ -75,13 +75,13 @@ class InheritanceMixin(XBlockMixin):
         deprecated=True
     )
     annotation_storage_url = String(
-        help=_("Enter the secret string for annotation storage. The textannotation, videoannotation, and imageannotation advanced modules require this string."),
+        help=_("Enter the location of the annotation storage server. The textannotation, videoannotation, and imageannotation advanced modules require this setting."),
         scope=Scope.settings,
         default="http://your_annotation_storage.com",
         display_name=_("URL for Annotation Storage")
     )
     annotation_token_secret = String(
-        help=_("Enter the location of the annotation storage server. The textannotation, videoannotation, and imageannotation advanced modules require this setting."),
+        help=_("Enter the secret string for annotation storage. The textannotation, videoannotation, and imageannotation advanced modules require this string."),
         scope=Scope.settings,
         default="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         display_name=_("Secret Token String for Annotation")
@@ -127,7 +127,7 @@ class InheritanceMixin(XBlockMixin):
     )
     max_attempts = Integer(
         display_name=_("Maximum Attempts"),
-        help=_("Enter the maximum number of times a student can try to answer problems. This is a course-wide setting, but you can specify a different number when you create an individual problem. To allow unlimited attempts, enter null."),
+        help=_("Enter the maximum number of times a student can try to answer problems. By default, Maximum Attempts is set to null, meaning that students have an unlimited number of attempts for problems. You can override this course-wide setting for individual problems. However, if the course-wide setting is a specific number, you cannot set the Maximum Attempts for individual problems to unlimited."),
         values={"min": 0}, scope=Scope.settings
     )
     matlab_api_key = String(
@@ -142,8 +142,8 @@ class InheritanceMixin(XBlockMixin):
     # This is should be scoped to content, but since it's defined in the policy
     # file, it is currently scoped to settings.
     user_partitions = UserPartitionList(
-        display_name=_("Experiment Group Configurations"),
-        help=_("Enter the configurations that govern how students are grouped for content experiments."),
+        display_name=_("Group Configurations"),
+        help=_("Enter the configurations that govern how students are grouped together."),
         default=[],
         scope=Scope.settings
     )
@@ -152,6 +152,37 @@ class InheritanceMixin(XBlockMixin):
         help=_("Enter true or false. If true, video caching will be used for HTML5 videos."),
         default=True,
         scope=Scope.settings
+    )
+
+    reset_key = "DEFAULT_SHOW_RESET_BUTTON"
+    default_reset_button = getattr(settings, reset_key) if hasattr(settings, reset_key) else False
+    show_reset_button = Boolean(
+        display_name=_("Show Reset Button for Problems"),
+        help=_("Enter true or false. If true, problems in the course default to always displaying a 'Reset' button. You can "
+               "override this in each problem's settings. All existing problems are affected when this course-wide setting is changed."),
+        scope=Scope.settings,
+        default=default_reset_button
+    )
+    edxnotes = Boolean(
+        display_name=_("Enable Student Notes"),
+        help=_("Enter true or false. If true, students can use the Student Notes feature."),
+        default=False,
+        scope=Scope.settings
+    )
+    edxnotes_visibility = Boolean(
+        display_name="Student Notes Visibility",
+        help=_("Indicates whether Student Notes are visible in the course. "
+               "Students can also show or hide their notes in the courseware."),
+        default=True,
+        scope=Scope.user_info
+    )
+
+    in_entrance_exam = Boolean(
+        display_name=_("Tag this module as part of an Entrance Exam section"),
+        help=_("Enter true or false. If true, answer submissions for problem modules will be "
+               "considered in the Entrance Exam scoring/gating algorithm."),
+        scope=Scope.settings,
+        default=False
     )
 
 
@@ -192,8 +223,8 @@ def inherit_metadata(descriptor, inherited_data):
 
 def own_metadata(module):
     """
-    Return a dictionary that contains only non-inherited field keys,
-    mapped to their serialized values
+    Return a JSON-friendly dictionary that contains only non-inherited field
+    keys, mapped to their serialized values
     """
     return module.get_explicitly_set_fields_by_scope(Scope.settings)
 
@@ -214,11 +245,19 @@ class InheritingFieldData(KvsFieldData):
         """
         The default for an inheritable name is found on a parent.
         """
-        if name in self.inheritable_names and block.parent is not None:
-            parent = block.get_parent()
-            if parent:
-                return getattr(parent, name)
-        super(InheritingFieldData, self).default(block, name)
+        if name in self.inheritable_names:
+            # Walk up the content tree to find the first ancestor
+            # that this field is set on. Use the field from the current
+            # block so that if it has a different default than the root
+            # node of the tree, the block's default will be used.
+            field = block.fields[name]
+            ancestor = block.get_parent()
+            while ancestor is not None:
+                if field.is_set_on(ancestor):
+                    return field.read_json(ancestor)
+                else:
+                    ancestor = ancestor.get_parent()
+        return super(InheritingFieldData, self).default(block, name)
 
 
 def inheriting_field_data(kvs):
@@ -256,6 +295,8 @@ class InheritanceKeyValueStore(KeyValueStore):
 
     def default(self, key):
         """
-        Check to see if the default should be from inheritance rather than from the field's global default
+        Check to see if the default should be from inheritance. If not
+        inheriting, this will raise KeyError which will cause the caller to use
+        the field's global default.
         """
         return self.inherited_settings[key.field_name]

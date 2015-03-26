@@ -30,7 +30,7 @@ function () {
     //     get the 'state' object as a context.
     function _makeFunctionsPublic(state) {
         var methodsDict = {
-            exitFullScreen: exitFullScreen,
+            exitFullScreenHandler: exitFullScreenHandler,
             hideControls: hideControls,
             hidePlayPlaceholder: hidePlayPlaceholder,
             pause: pause,
@@ -39,6 +39,7 @@ function () {
             showControls: showControls,
             showPlayPlaceholder: showPlayPlaceholder,
             toggleFullScreen: toggleFullScreen,
+            toggleFullScreenHandler: toggleFullScreenHandler,
             togglePlayback: togglePlayback,
             updateControlsHeight: updateControlsHeight,
             updateVcrVidTime: updateVcrVidTime
@@ -93,7 +94,7 @@ function () {
     //     Bind any necessary function callbacks to DOM events (click, mousemove, etc.).
     function _bindHandlers(state) {
         state.videoControl.playPauseEl.on('click', state.videoControl.togglePlayback);
-        state.videoControl.fullScreenEl.on('click', state.videoControl.toggleFullScreen);
+        state.videoControl.fullScreenEl.on('click', state.videoControl.toggleFullScreenHandler);
         state.el.on('fullscreen', function (event, isFullScreen) {
             var height = state.videoControl.updateControlsHeight();
 
@@ -111,7 +112,7 @@ function () {
             }
         });
 
-        $(document).on('keyup', state.videoControl.exitFullScreen);
+        $(document).on('keyup', state.videoControl.exitFullScreenHandler);
 
         if ((state.videoType === 'html5') && (state.config.autohideHtml5)) {
             state.el.on('mousemove', state.videoControl.showControls);
@@ -246,19 +247,22 @@ function () {
 
     function togglePlayback(event) {
         event.preventDefault();
-
-        if (this.videoControl.isPlaying) {
-            this.trigger('videoPlayer.pause', null);
-        } else {
-            this.trigger('videoPlayer.play', null);
-        }
+        this.videoCommands.execute('togglePlayback');
     }
 
-    function toggleFullScreen(event) {
+    /**
+     * Event handler to toggle fullscreen mode.
+     * @param {jquery Event} event
+     */
+    function toggleFullScreenHandler(event) {
         event.preventDefault();
+        this.videoCommands.execute('toggleFullScreen');
+    }
+
+    /** Toggle fullscreen mode. */
+    function toggleFullScreen() {
         var fullScreenClassNameEl = this.el.add(document.documentElement),
-            win = $(window),
-            text;
+            win = $(window), text;
 
         if (this.videoControl.fullScreenState) {
             this.videoControl.fullScreenState = this.isFullScreen = false;
@@ -280,9 +284,14 @@ function () {
         this.el.trigger('fullscreen', [this.isFullScreen]);
     }
 
-    function exitFullScreen(event) {
+    /**
+     * Event handler to exit from fullscreen mode.
+     * @param {jquery Event} event
+     */
+    function exitFullScreenHandler(event) {
         if ((this.isFullScreen) && (event.keyCode === 27)) {
-            this.videoControl.toggleFullScreen(event);
+            event.preventDefault();
+            this.videoCommands.execute('toggleFullScreen');
         }
     }
 

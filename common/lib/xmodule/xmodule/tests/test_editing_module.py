@@ -28,10 +28,18 @@ class TabsEditingDescriptorTestCase(unittest.TestCase):
                 'template': "tabs/codemirror-edit.html",
                 'current': True,
                 'css': {
-                    'scss': [resource_string(__name__,
-                    '../../test_files/test_tabseditingdescriptor.scss')],
-                    'css': [resource_string(__name__,
-                    '../../test_files/test_tabseditingdescriptor.css')]
+                    'scss': [
+                        resource_string(
+                            __name__,
+                            '../../test_files/test_tabseditingdescriptor.scss'
+                        )
+                    ],
+                    'css': [
+                        resource_string(
+                            __name__,
+                            '../../test_files/test_tabseditingdescriptor.css'
+                        )
+                    ]
                 }
             },
             {
@@ -65,4 +73,3 @@ class TabsEditingDescriptorTestCase(unittest.TestCase):
         """"test get_context"""
         rendered_context = self.descriptor.get_context()
         self.assertListEqual(rendered_context['tabs'], self.tabs)
-

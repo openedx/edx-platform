@@ -11,8 +11,8 @@
   background: $white;
   box-shadow: 0px 1px 1px $shadow-l1;
 
-
-  &:hover {
+  // STATE: hover/focus
+  &:hover, &:focus {
     box-shadow: 0 0 1px $shadow;
   }
 
@@ -41,7 +41,7 @@
       display: inline-block;
       width: 49%;
       vertical-align: middle;
-      text-align: right;
+      @include text-align(right);
     }
   }
 
@@ -95,13 +95,44 @@
           }
         }
 
-        [class^="icon-"] {
+        .icon {
           display: inline-block;
           vertical-align: middle;
         }
       }
     }
   }
+
+  .container-paging-header {
+    .meta-wrap {
+      margin: $baseline ($baseline/2);
+    }
+    .meta {
+      @extend %t-copy-sub2;
+      display: inline-block;
+      vertical-align: top;
+      width: flex-grid(9, 12);
+      color: $gray-l1;
+
+      .count-current-shown,
+      .count-total,
+      .sort-order {
+        @extend %t-strong;
+      }
+    }
+
+    .pagination {
+      @extend %pagination;
+    }
+  }
+
+  .container-paging-footer {
+    .pagination {
+      @extend %pagination;
+    }
+  }
+
+
 
   // ====================
 
@@ -119,42 +150,50 @@
 
   // ====================
 
-  // UI: xblocks - calls-to-action
-  .wrapper-xblock .header-actions {
+  .wrapper-xblock {
 
-    .actions-list {
+    // UI: xblocks - calls-to-action
+    .header-actions .actions-list {
       @extend %actions-list;
     }
-  }
 
-  // UI: xblock is collapsible
-  .wrapper-xblock.is-collapsible,
-  .wrapper-xblock.xblock-type-container {
+    // CASE: xblock is collapsible
+    &.is-collapsible,
+    &.xblock-type-container {
 
-    [class^="icon-"] {
-      font-style: normal;
-    }
+      .icon {
+        font-style: normal;
+      }
 
-    .expand-collapse {
-      @extend %expand-collapse;
-      margin: 0 ($baseline/4);
-      height: ($baseline*1.25);
-      width: $baseline;
+      .expand-collapse {
+        @extend %expand-collapse;
+        margin: 0 ($baseline/4);
+        height: ($baseline*1.25);
+        width: $baseline;
 
-      &:focus {
-        outline: 0;
+        &:focus {
+          outline: 0;
+        }
+      }
+
+      .action-view {
+
+        .action-button {
+          transition: none;
+        }
+
+        .action-button-text {
+          padding-right: ($baseline/5);
+          padding-left: 0;
+        }
       }
     }
 
-    .action-view {
+    // CASE: xblock has specific visibility based on content groups set
+    &.has-group-visibility-set {
 
-      .action-button {
-        transition: none;
-      }
-
-      .action-button-text {
-        padding-right: ($baseline/5);
-        padding-left: 0;
+      .action-visibility .visibility-button.visibility-button { // needed to cascade in front of overscoped header-actions CSS rule
+        color: $color-visibility-set;
       }
     }
   }
@@ -165,10 +204,10 @@
     .xblock-message {
       @extend %t-copy-sub1;
       background-color: $gray-d2;
-      padding: ($baseline/2) ($baseline*.75);
+      padding: ($baseline*0.75);
       color: $white;
 
-      [class^="icon-"] {
+      .icon {
         font-style: normal;
       }
 
@@ -187,18 +226,18 @@
         }
 
         &.has-warnings {
-          border-bottom: 3px solid $orange;
+          border-top: 3px solid $orange;
 
-          .icon-warning-sign {
+          .fa-exclamation-triangle {
             margin-right: ($baseline/2);
             color: $orange;
           }
         }
 
         &.has-errors {
-          border-bottom: 3px solid $red-l2;
+          border-top: 3px solid $red-l2;
 
-          .icon-exclamation-sign {
+          .fa-exclamation-circle {
             margin-right: ($baseline/2);
             color: $red-l2;
           }
@@ -231,14 +270,13 @@
     }
 
     .xblock-message {
-      border-radius: 3px 3px 0 0;
 
       &.validation {
-        padding-top: ($baseline*.75);
+        padding-top: ($baseline*0.75);
       }
 
       .xblock-message-list {
-        margin: ($baseline/5) ($baseline*2.5);
+        margin: 0 ($baseline*2.25);
         list-style-type: disc;
         color: $gray-l3;
       }
@@ -248,7 +286,7 @@
       }
 
       &.information {
-        padding: 0 0 ($baseline/2) 0;
+        padding: ($baseline/2) 0;
         background-color: $gray-l5;
         color: $gray-d1;
       }
@@ -342,27 +380,11 @@
     .wrapper-xblock-message {
 
       .xblock-message {
-        border-radius: 0 0 3px 3px;
-
-        .xblock-message-list {
-          margin: 0;
-          list-style-type: none;
-        }
 
         &.information {
           @extend %t-copy-sub2;
-          padding: 0 0 ($baseline/2) $baseline;
+          padding: 0 $baseline ($baseline*0.75) $baseline;
           color: $gray-l1;
-        }
-
-        &.validation.has-warnings {
-          border: 0;
-          border-top: 3px solid $orange;
-        }
-
-        &.validation.has-errors {
-          border: 0;
-          border-top: 3px solid $red-l2;
         }
       }
     }
@@ -388,7 +410,7 @@
     &.is-inactive {
       margin: ($baseline*1.5) 0 0 0;
       border-top: 2px dotted $gray-l2;
-      padding: ($baseline*.75) 0;
+      padding: ($baseline*0.75) 0;
       background-color: $gray-l4;
 
       .wrapper-xblock.level-nesting {
@@ -467,9 +489,7 @@
 
   //settings-list
   .list-input.settings-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
+    @extend %cont-no-list;
     overflow: auto;
     max-height: 400px;
 
@@ -590,9 +610,9 @@
       width: 25px;
       height: 25px;
       vertical-align: middle;
-      padding: 5px;
+      padding: ($baseline/4);
       border-radius: 50%;
-      margin: 0 $baseline/2;
+      margin: 0 ($baseline/2);
       box-shadow: none;
       text-shadow: none;
       border: 1px solid $gray-l1;
@@ -670,13 +690,13 @@
         width: 100%;
         padding: ($baseline/2);
 
-        *[class^="icon-"] {
+        .icon {
           margin-right: ($baseline/4);
         }
       }
 
       .remove-setting {
-        @include transition(color 0.25s ease-in-out);
+        @include transition(color $tmg-f2 ease-in-out);
         @extend %t-action1;
         display: inline-block;
         background: transparent;
@@ -697,7 +717,7 @@
       // label
       .setting-label {
           vertical-align: top;
-          margin-top: ($baseline*.75);
+          margin-top: ($baseline*0.75);
       }
 
       // inputs and labels
@@ -730,7 +750,7 @@
 
       .setting-clear {
         vertical-align: top;
-        margin: ($baseline*.75) 0 0 0;
+        margin: ($baseline*0.75) 0 0 0;
       }
 
       .create-setting {
@@ -741,13 +761,13 @@
         width: 88%;
         padding: ($baseline/2);
 
-        *[class^="icon-"] {
+        .icon {
           margin-right: ($baseline/4);
         }
       }
 
       .remove-setting {
-        @include transition(color 0.25s ease-in-out);
+        @include transition(color $tmg-f2 ease-in-out);
         @extend %t-action1;
         display: inline-block;
         background: transparent;

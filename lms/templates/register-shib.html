@@ -7,7 +7,7 @@
 
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils import html %>
-<%! from django_countries.countries import COUNTRIES %>
+<%! from django_countries import countries %>
 <%! from student.models import UserProfile %>
 <%! from datetime import date %>
 <%! import calendar %>
@@ -71,14 +71,16 @@
       if(enable) {
         $submitButton.
           removeClass('is-disabled').
+          attr('aria-disabled', false).
           removeProp('disabled').
           text("${_('Update my {platform_name} Account').format(platform_name=settings.PLATFORM_NAME)}");
       }
       else {
         $submitButton.
           addClass('is-disabled').
+          attr('aria-disabled', true).
           prop('disabled', true).
-          text("${_(u'Processing your account information …')}");
+          text("${_('Processing your account information')}");
       }
     }
   </script>

@@ -1,20 +1,20 @@
 """
 Tests related to the Microsites feature
 """
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
+from courseware.tests.helpers import LoginEnrollmentTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
+from course_modes.models import CourseMode
+from xmodule.course_module import (
+    CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CATALOG_VISIBILITY_NONE)
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-from helpers import LoginEnrollmentTestCase
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 
-MICROSITE_TEST_HOSTNAME = 'testmicrosite.testserver'
-
-
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     This is testing of the Microsite feature
@@ -44,10 +44,22 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self.course_outside_microsite = CourseFactory.create(display_name='Robot_Course_Outside_Microsite', org='FooX')
 
-    def create_student_accounts(self):
-        """
-        Build out the test accounts we'll use in these tests
-        """
+        # have a course which explicitly sets visibility in catalog to False
+        self.course_hidden_visibility = CourseFactory.create(
+            display_name='Hidden_course',
+            org='TestMicrositeX',
+            catalog_visibility=CATALOG_VISIBILITY_NONE,
+        )
+
+        # have a course which explicitly sets visibility in catalog and about to true
+        self.course_with_visibility = CourseFactory.create(
+            display_name='visible_course',
+            org='TestMicrositeX',
+            course="foo",
+            catalog_visibility=CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
+        )
+
+    def setup_users(self):
         # Create student accounts and activate them.
         for i in range(len(self.STUDENT_INFO)):
             email, password = self.STUDENT_INFO[i]
@@ -55,15 +67,14 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
             self.create_account(username, email, password)
             self.activate_user(email)
 
-
-    @override_settings(SITE_NAME=MICROSITE_TEST_HOSTNAME)
+    @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
     def test_microsite_anonymous_homepage_content(self):
         """
         Verify that the homepage, when accessed via a Microsite domain, returns
         HTML that reflects the Microsite branding elements
         """
 
-        resp = self.client.get('/', HTTP_HOST=MICROSITE_TEST_HOSTNAME)
+        resp = self.client.get('/', HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
         self.assertEqual(resp.status_code, 200)
 
         # assert various branding definitions on this Microsite
@@ -77,8 +88,14 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # assert that test course display name is visible
         self.assertContains(resp, 'Robot_Super_Course')
 
+        # assert that test course with 'visible_in_catalog' to True is showing up
+        self.assertContains(resp, 'visible_course')
+
         # assert that test course that is outside microsite is not visible
         self.assertNotContains(resp, 'Robot_Course_Outside_Microsite')
+
+        # assert that a course that has visible_in_catalog=False is not visible
+        self.assertNotContains(resp, 'Hidden_course')
 
         # assert that footer template has been properly overriden on homepage
         self.assertContains(resp, 'This is a Test Microsite footer')
@@ -88,7 +105,6 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # assert that the edX partners tag line is not in the HTML
         self.assertNotContains(resp, 'Explore free courses from')
-
 
     def test_not_microsite_anonymous_homepage_content(self):
         """
@@ -114,22 +130,45 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # assert that footer template has been properly overriden on homepage
         self.assertNotContains(resp, 'This is a Test Microsite footer')
 
+    def test_no_redirect_on_homepage_when_no_enrollments(self):
+        """
+        Verify that a user going to homepage will not redirect if he/she has no course enrollments
+        """
+        self.setup_users()
+
+        email, password = self.STUDENT_INFO[0]
+        self.login(email, password)
+        resp = self.client.get(reverse('root'), HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        self.assertEquals(resp.status_code, 200)
+
+    def test_no_redirect_on_homepage_when_has_enrollments(self):
+        """
+        Verify that a user going to homepage will not redirect to dashboard if he/she has
+        a course enrollment
+        """
+        self.setup_users()
+
+        email, password = self.STUDENT_INFO[0]
+        self.login(email, password)
+        self.enroll(self.course, True)
+
+        resp = self.client.get(reverse('root'), HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        self.assertEquals(resp.status_code, 200)
 
     def test_microsite_course_enrollment(self):
         """
         Enroll user in a course scoped in a Microsite and one course outside of a Microsite
         and make sure that they are only visible in the right Dashboards
         """
+        self.setup_users()
 
-        self.create_student_accounts()
-
-        email, password = self.STUDENT_INFO[0]
+        email, password = self.STUDENT_INFO[1]
         self.login(email, password)
         self.enroll(self.course, True)
         self.enroll(self.course_outside_microsite, True)
 
         # Access the microsite dashboard and make sure the right courses appear
-        resp = self.client.get(reverse('dashboard'), HTTP_HOST=MICROSITE_TEST_HOSTNAME)
+        resp = self.client.get(reverse('dashboard'), HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
         self.assertContains(resp, 'Robot_Super_Course')
         self.assertNotContains(resp, 'Robot_Course_Outside_Microsite')
 
@@ -137,3 +176,47 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         resp = self.client.get(reverse('dashboard'))
         self.assertNotContains(resp, 'Robot_Super_Course')
         self.assertContains(resp, 'Robot_Course_Outside_Microsite')
+
+    @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
+    def test_visible_about_page_settings(self):
+        """
+        Make sure the Microsite is honoring the visible_about_page permissions that is
+        set in configuration
+        """
+        url = reverse('about_course', args=[self.course_with_visibility.id.to_deprecated_string()])
+        resp = self.client.get(url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        self.assertEqual(resp.status_code, 200)
+
+        url = reverse('about_course', args=[self.course_hidden_visibility.id.to_deprecated_string()])
+        resp = self.client.get(url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        self.assertEqual(resp.status_code, 404)
+
+    @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
+    def test_paid_course_registration(self):
+        """
+        Make sure that Microsite overrides on the ENABLE_SHOPPING_CART and
+        ENABLE_PAID_COURSE_ENROLLMENTS are honored
+        """
+        course_mode = CourseMode(
+            course_id=self.course_with_visibility.id,
+            mode_slug="honor",
+            mode_display_name="honor cert",
+            min_price=10,
+        )
+        course_mode.save()
+
+        # first try on the non microsite, which
+        # should pick up the global configuration (where ENABLE_PAID_COURSE_REGISTRATIONS = False)
+        url = reverse('about_course', args=[self.course_with_visibility.id.to_deprecated_string()])
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("Register for {}".format(self.course_with_visibility.id.course), resp.content)
+        self.assertNotIn("Add {} to Cart ($10)".format(self.course_with_visibility.id.course), resp.content)
+
+        # now try on the microsite
+        url = reverse('about_course', args=[self.course_with_visibility.id.to_deprecated_string()])
+        resp = self.client.get(url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotIn("Register for {}".format(self.course_with_visibility.id.course), resp.content)
+        self.assertIn("Add {} to Cart ($10)".format(self.course_with_visibility.id.course), resp.content)
+        self.assertIn('$("#add_to_cart_post").click', resp.content)

@@ -5,7 +5,11 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
     function ($, _, gettext, NotificationView, PromptView) {
         var toggleExpandCollapse, showLoadingIndicator, hideLoadingIndicator, confirmThenRunOperation,
             runOperationShowingMessage, disableElementWhileRunning, getScrollOffset, setScrollOffset,
-            setScrollTop, redirect, reload, hasChangedAttributes, deleteNotificationHandler;
+            setScrollTop, redirect, reload, hasChangedAttributes, deleteNotificationHandler,
+            validateRequiredField, validateURLItemEncoding, validateTotalKeyLength, checkTotalKeyLengthViolations;
+
+        // see https://openedx.atlassian.net/browse/TNL-889 for what is it and why it's 65
+        var MAX_SUM_KEY_LENGTH = 65;
 
         /**
          * Toggles the expanded state of the current element.
@@ -88,9 +92,9 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
          * a JQuery promise.
          */
         disableElementWhileRunning = function(element, operation) {
-            element.addClass("is-disabled");
+            element.addClass("is-disabled").attr('aria-disabled', true);
             return operation().always(function() {
-                element.removeClass("is-disabled");
+                element.removeClass("is-disabled").attr('aria-disabled', false);
             });
         };
 
@@ -173,6 +177,55 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
             return false;
         };
 
+        /**
+         * Helper method for course/library creation - verifies a required field is not blank.
+         */
+        validateRequiredField = function (msg) {
+            return msg.length === 0 ? gettext('Required field.') : '';
+        };
+
+        /**
+         * Helper method for course/library creation.
+         * Check that a course (org, number, run) doesn't use any special characters
+         */
+        validateURLItemEncoding = function (item, allowUnicode) {
+            var required = validateRequiredField(item);
+            if (required) {
+                return required;
+            }
+            if (allowUnicode) {
+                if (/\s/g.test(item)) {
+                    return gettext('Please do not use any spaces in this field.');
+                }
+            }
+            else {
+                if (item !== encodeURIComponent(item) || item.match(/[!'()*]/)) {
+                    return gettext('Please do not use any spaces or special characters in this field.');
+                }
+            }
+            return '';
+        };
+
+        // Ensure that sum length of key field values <= ${MAX_SUM_KEY_LENGTH} chars.
+        validateTotalKeyLength = function (key_field_selectors) {
+            var totalLength = _.reduce(
+                key_field_selectors,
+                function (sum, ele) { return sum + $(ele).val().length;},
+                0
+            );
+            return totalLength <= MAX_SUM_KEY_LENGTH;
+        };
+
+        checkTotalKeyLengthViolations = function(selectors, classes, key_field_selectors, message_tpl) {
+            if (!validateTotalKeyLength(key_field_selectors)) {
+                $(selectors.errorWrapper).addClass(classes.shown).removeClass(classes.hiding);
+                $(selectors.errorMessage).html('<p>' + _.template(message_tpl, {limit: MAX_SUM_KEY_LENGTH}) + '</p>');
+                $(selectors.save).addClass(classes.disabled);
+            } else {
+                $(selectors.errorWrapper).removeClass(classes.shown).addClass(classes.hiding);
+            }
+        };
+
         return {
             'toggleExpandCollapse': toggleExpandCollapse,
             'showLoadingIndicator': showLoadingIndicator,
@@ -186,6 +239,10 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
             'setScrollOffset': setScrollOffset,
             'redirect': redirect,
             'reload': reload,
-            'hasChangedAttributes': hasChangedAttributes
+            'hasChangedAttributes': hasChangedAttributes,
+            'validateRequiredField': validateRequiredField,
+            'validateURLItemEncoding': validateURLItemEncoding,
+            'validateTotalKeyLength': validateTotalKeyLength,
+            'checkTotalKeyLengthViolations': checkTotalKeyLengthViolations
         };
     });

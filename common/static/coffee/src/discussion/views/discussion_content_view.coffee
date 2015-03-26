@@ -118,13 +118,13 @@ if Backbone?
             true
           )
         )
-        button.find(".js-visual-vote-count").html(
-          interpolate(
-            ngettext("%(numVotes)s Vote", "%(numVotes)s Votes", numVotes),
-            {numVotes: numVotes},
-            true
-          )
-        )
+        votesHtml = interpolate(
+                      ngettext("%(numVotes)s Vote", "%(numVotes)s Votes", numVotes),
+                      {numVotes: numVotes},
+                      true
+                    )
+        button.find(".vote-count").html(votesHtml)
+        @$el.find('.display-vote .vote-count').html(votesHtml)
 
       pinned: (pinned) ->
         @updateButtonState(".action-pin", pinned)
@@ -138,6 +138,8 @@ if Backbone?
       closed: (closed) ->
         @updateButtonState(".action-close", closed)
         @$(".post-label-closed").toggleClass("is-hidden", not closed)
+        @$(".action-vote").toggle(not closed)
+        @$(".display-vote").toggle(closed)
     })
 
     toggleSecondaryActions: (event) =>
@@ -194,7 +196,7 @@ if Backbone?
       url = @model.urlFor("endorse")
       updates =
         endorsed: is_endorsing
-        endorsement: if is_endorsing then {username: DiscussionUtil.getUser().get("username"), time: new Date().toISOString()} else null
+        endorsement: if is_endorsing then {username: DiscussionUtil.getUser().get("username"), user_id: DiscussionUtil.getUser().id, time: new Date().toISOString()} else null
       if @model.get('thread').get('thread_type') == 'question'
         if is_endorsing
           msg = gettext("We had some trouble marking this response as an answer.  Please try again.")

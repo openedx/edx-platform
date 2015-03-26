@@ -1,7 +1,6 @@
 """
  Test contentstore.mongo functionality
 """
-import os
 import logging
 from uuid import uuid4
 import unittest

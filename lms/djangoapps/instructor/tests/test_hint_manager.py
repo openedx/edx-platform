@@ -6,14 +6,16 @@ from mock import patch, MagicMock
 
 from courseware.models import XModuleUserStateSummaryField
 from courseware.tests.factories import UserStateSummaryFactory
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 import instructor.hint_manager as view
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
+# pylint: disable=missing-docstring
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class HintManagerTest(ModuleStoreTestCase):
 
     def setUp(self):
@@ -28,19 +30,25 @@ class HintManagerTest(ModuleStoreTestCase):
         self.c.login(username='robot', password='test')
         self.course_id = self.course.id
         self.problem_id = self.course_id.make_usage_key('crowdsource_hinter', 'crowdsource_hinter_001')
-        UserStateSummaryFactory.create(field_name='hints',
-                              usage_id=self.problem_id,
-                              value=json.dumps({'1.0': {'1': ['Hint 1', 2],
-                                                        '3': ['Hint 3', 12]},
-                                                '2.0': {'4': ['Hint 4', 3]}
-                                                }))
-        UserStateSummaryFactory.create(field_name='mod_queue',
-                              usage_id=self.problem_id,
-                              value=json.dumps({'2.0': {'2': ['Hint 2', 1]}}))
+        UserStateSummaryFactory.create(
+            field_name='hints',
+            usage_id=self.problem_id,
+            value=json.dumps({
+                '1.0': {'1': ['Hint 1', 2], '3': ['Hint 3', 12]},
+                '2.0': {'4': ['Hint 4', 3]}
+            })
+        )
+        UserStateSummaryFactory.create(
+            field_name='mod_queue',
+            usage_id=self.problem_id,
+            value=json.dumps({'2.0': {'2': ['Hint 2', 1]}})
+        )
 
-        UserStateSummaryFactory.create(field_name='hint_pk',
-                              usage_id=self.problem_id,
-                              value=5)
+        UserStateSummaryFactory.create(
+            field_name='hint_pk',
+            usage_id=self.problem_id,
+            value=5
+        )
         # Mock out location_to_problem_name, which ordinarily accesses the modulestore.
         # (I can't figure out how to get fake structures into the modulestore.)
         view.location_to_problem_name = lambda course_id, loc: "Test problem"

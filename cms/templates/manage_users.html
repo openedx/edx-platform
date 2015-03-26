@@ -21,7 +21,7 @@
       <ul>
         %if allow_actions:
         <li class="nav-item">
-          <a href="#" class="button new-button create-user-button"><i class="icon-plus"></i> ${_("New Team Member")}</a>
+          <a href="#" class="button new-button create-user-button"><i class="icon fa fa-plus"></i> ${_("New Team Member")}</a>
         </li>
         %endif
       </ul>
@@ -114,8 +114,8 @@
                 <a href="#" class="admin-role toggle-admin-role ${'remove' if is_instuctor else 'add'}-admin-role">${_("Remove Admin Access") if is_instuctor else _("Add Admin Access")}</a>
               % endif
             </li>
-            <li class="action action-delete ${"is-disabled" if request.user.id == user.id else ""}">
-                <a href="#" class="delete remove-user action-icon" data-id="${user.email}"><i class="icon-trash"></i><span class="sr">${_("Delete the user, {username}").format(username=user.username)}</span></a>
+            <li class="action action-delete ${"is-disabled" if request.user.id == user.id else ""}" aria-disabled="${'true' if request.user.id == user.id else 'false'}">
+                <a href="#" class="delete remove-user action-icon" data-id="${user.email}"><i class="icon fa fa-trash-o"></i><span class="sr">${_("Delete the user, {username}").format(username=user.username)}</span></a>
             </li>
           </ul>
           % endif
@@ -130,20 +130,20 @@
         <div class="msg">
           <h3 class="title">${_('Add Team Members to This Course')}</h3>
           <div class="copy">
-            <p>${_('Adding team members makes course authoring collaborative. Users must be signed up for Studio and have an active account. ')}</p>
+            <p>${_('Adding team members makes course authoring collaborative. Users must be signed up for {studio_name} and have an active account.').format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
           </div>
         </div>
 
         <ul class="list-actions">
           <li class="action-item">
-            <a href="#" class="action action-primary button new-button create-user-button"><i class="icon-plus icon-inline"></i> ${_('Add a New Team Member')}</a>
+            <a href="#" class="action action-primary button new-button create-user-button"><i class="icon fa fa-plus icon-inline"></i> ${_('Add a New Team Member')}</a>
           </li>
         </ul>
       </div>
       %endif
     </article>
 
-    <aside class="content-supplementary" role="complimentary">
+    <aside class="content-supplementary" role="complementary">
       <div class="bit">
         <h3 class="title-3">${_("Course Team Roles")}</h3>
         <p>${_("Course team members, or staff, are course co-authors. They have full writing and editing privileges on all course content.")}</p>
@@ -161,216 +161,8 @@
 </div>
 </%block>
 
-<%block name="jsextra">
-<script type="text/javascript">
-require(["jquery", "underscore", "gettext", "js/views/feedback_prompt"],
-    function($, _, gettext, PromptView) {
-
-  var staffEmails = ${json.dumps([user.email for user in staff])};
-  var tplUserURL = "${reverse('contentstore.views.course_team_handler', kwargs={'course_key_string': unicode(context_course.id), 'email': '@@EMAIL@@'})}"
-
-  var unknownErrorMessage = gettext("Unknown");
-
-  $(document).ready(function() {
-    var $createUserForm = $('#create-user-form');
-    var $createUserFormWrapper = $createUserForm.closest('.wrapper-create-user');
-    $createUserForm.bind('submit', function(e) {
-      e.preventDefault();
-      var email = $('#user-email-input').val().trim();
-      if(!email) {
-        var msg = new PromptView.Error({
-          title: gettext("A valid email address is required"),
-          message: gettext("You must enter a valid email address in order to add a new team member"),
-          actions: {
-            primary: {
-              text: gettext("Return and add email address"),
-              click: function(view) {
-                view.hide();
-                $("#user-email-input").focus();
-              }
-            }
-          }
-        })
-        msg.show();
-        return;
-      }
-      if(_.contains(staffEmails, email)) {
-        var msg = new PromptView.Warning({
-          title: gettext("Already a course team member"),
-          message: _.template(gettext("{email} is already on the “{course}” team. If you're trying to add a new member, please double-check the email address you provided."), {email: email, course: course.escape('name')}, {interpolate: /\{(.+?)\}/g}),
-          actions: {
-            primary: {
-              text: gettext("Return to team listing"),
-              click: function(view) {
-                view.hide();
-                $("#user-email-input").focus();
-              }
-            }
-          }
-        })
-        msg.show();
-        return;
-      }
-      var url = tplUserURL.replace("@@EMAIL@@", $('#user-email-input').val().trim())
-      $.ajax({
-        url: url,
-        type: 'POST',
-        dataType: 'json',
-        contentType: 'application/json',
-        data: JSON.stringify({
-          role: 'staff',
-        }),
-        success: function(data) {
-          location.reload();
-        },
-        notifyOnError: false,
-        error: function(jqXHR, textStatus, errorThrown) {
-          var message;
-          try {
-            message = JSON.parse(jqXHR.responseText).error || unknownErrorMessage;
-          } catch (e) {
-            message = unknownErrorMessage
-          }
-          var prompt = new PromptView.Error({
-            title: gettext("Error adding user"),
-            message: message,
-            actions: {
-              primary: {
-                text: gettext("OK"),
-                click: function(view) {
-                  view.hide();
-                  $("#user-email-input").focus()
-                }
-              }
-            }
-          })
-          prompt.show();
-        }
-      });
-    });
-
-    var $cancelButton = $createUserForm.find('.action-cancel');
-    $cancelButton.bind('click', function(e) {
-      e.preventDefault();
-      $('.create-user-button').toggleClass('is-disabled');
-      $createUserFormWrapper.toggleClass('is-shown');
-      $('#user-email-input').val('');
-    });
-
-    $('.create-user-button').bind('click', function(e) {
-      e.preventDefault();
-      $('.create-user-button').toggleClass('is-disabled');
-      $createUserFormWrapper.toggleClass('is-shown');
-      $createUserForm.find('#user-email-input').focus();
-    });
-
-    $('body').bind('keyup', function(e) {
-      if(e.which == 27) {
-        $cancelButton.click();
-      }
-    });
-
-    $('.remove-user').click(function() {
-      var email = $(this).data('id');
-      var msg = new PromptView.Warning({
-        title: gettext("Are you sure?"),
-        message: _.template(gettext("Are you sure you want to delete {email} from the course team for “{course}”?"), {email: email, course: course.get('name')}, {interpolate: /\{(.+?)\}/g}),
-        actions: {
-          primary: {
-            text: gettext("Delete"),
-            click: function(view) {
-              view.hide();
-              var url = tplUserURL.replace("@@EMAIL@@", email)
-              $.ajax({
-                url: url,
-                type: 'DELETE',
-                dataType: 'json',
-                contentType: 'application/json',
-                success: function(data) {
-                  location.reload();
-                },
-                notifyOnError: false,
-                error: function(jqXHR, textStatus, errorThrown) {
-                  var message;
-                  try {
-                    message = JSON.parse(jqXHR.responseText).error || unknownErrorMessage;
-                  } catch (e) {
-                    message = unknownErrorMessage;
-                  }
-                  var prompt = new PromptView.Error({
-                    title: gettext("Error removing user"),
-                    message: message,
-                    actions: {
-                      primary: {
-                        text: gettext("OK"),
-                        click: function(view) {
-                          view.hide();
-                        }
-                      }
-                    }
-                  })
-                  prompt.show();
-                }
-              });
-            }
-          },
-          secondary: {
-            text: gettext("Cancel"),
-            click: function(view) {
-              view.hide();
-            }
-          }
-        }
-      });
-      msg.show();
-    });
-
-    $(".toggle-admin-role").click(function(e) {
-      e.preventDefault()
-      var type;
-      if($(this).hasClass("add-admin-role")) {
-        role = 'instructor';
-      } else {
-        role = 'staff';
-      }
-      var url = $(this).closest("li[data-url]").data("url");
-      $.ajax({
-        url: url,
-        type: 'POST',
-        dataType: 'json',
-        contentType: 'application/json',
-        data: JSON.stringify({
-          role: role
-        }),
-        success: function(data) {
-          location.reload();
-        },
-        notifyOnError: false,
-        error: function(jqXHR, textStatus, errorThrown) {
-          var message;
-          try {
-            message = JSON.parse(jqXHR.responseText).error || unknownErrorMessage;
-          } catch (e) {
-            message = unknownErrorMessage;
-          }
-          var prompt = new PromptView.Error({
-            title: gettext("There was an error changing the user's role"),
-            message: message,
-            actions: {
-              primary: {
-                text: gettext("Try Again"),
-                click: function(view) {
-                  view.hide();
-                }
-              }
-            }
-          })
-          prompt.show();
-        }
-      })
-    })
-
+<%block name="requirejs">
+  require(["js/factories/manage_users"], function(ManageUsersFactory) {
+      ManageUsersFactory(${json.dumps([user.email for user in staff])}, "${reverse('contentstore.views.course_team_handler', kwargs={'course_key_string': unicode(context_course.id), 'email': '@@EMAIL@@'})}");
   });
-});
-</script>
 </%block>

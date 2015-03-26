@@ -5,23 +5,21 @@
 
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
-    float: left;
   }
 
   .content-primary {
-    width: flex-grid(9,12);
-    margin-right: flex-gutter();
+    @extend .ui-col-wide;
   }
 
   .content-supplementary {
-    width: flex-grid(3,12);
+    @extend .ui-col-narrow;
   }
 
   // UI: export controls
   .export-controls {
     @extend %ui-window;
-    @include clearfix;
-    padding: 30px 40px;
+    @include clearfix();
+    padding: ($baseline*1.5) ($baseline*2);
   }
 
   // UI: import form
@@ -59,7 +57,7 @@
     margin: $baseline 0;
     padding: ($baseline*0.75) $baseline;
 
-    [class^="icon"] {
+    .icon {
       @extend %t-icon2;
       display: inline-block;
       vertical-align: middle;
@@ -135,7 +133,7 @@
         float: left;
         width: flex-grid(1,9);
 
-        *[class^="icon-"] {
+        .icon {
           @include transition(opacity $tmg-f1 ease-in-out 0);
           @extend %t-icon4;
           position: absolute;
@@ -195,17 +193,17 @@
         &.is-not-started {
           opacity: 0.5;
 
-          .icon-warning-sign {
+          .fa-warning {
             visibility: hidden;
             opacity: 0.0;
           }
 
-          .icon-cog {
+          .fa-cog {
             visibility: visible;
             opacity: 1.0;
           }
 
-          .icon-check {
+          .fa-check {
             opacity: 0.3;
           }
         }
@@ -213,12 +211,12 @@
         // STATE: started
         &.is-started {
 
-          .icon-warning-sign  {
+          .fa-warning  {
             visibility: hidden;
             opacity: 0.0;
           }
 
-          .icon-cog {
+          .fa-cog {
             visibility: visible;
             opacity: 1.0;
           }
@@ -227,17 +225,17 @@
         // STATE: completed
         &.is-complete {
 
-          .icon-cog {
+          .fa-cog {
             visibility: visible;
             opacity: 1.0;
           }
 
-          .icon-warning-sign {
+          .fa-warning {
             visibility: hidden;
             opacity: 0.0;
           }
 
-          *[class^="icon-"] {
+          .icon {
             color: $green;
           }
 
@@ -253,17 +251,17 @@
         // STATE: error
         &.has-error {
 
-          .icon-cog {
+          .fa-cog {
             visibility: hidden;
             opacity: 0.0;
           }
 
-          .icon-warning-sign {
+          .fa-warning {
             visibility: visible;
             opacity: 1.0;
           }
 
-          *[class^="icon-"] {
+          .icon {
             color: $red;
           }
 

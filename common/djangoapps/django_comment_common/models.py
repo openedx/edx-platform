@@ -64,11 +64,19 @@ class Role(models.Model):
         # pylint: disable=no-member
         return self.name + " for " + (self.course_id.to_deprecated_string() if self.course_id else "all courses")
 
-    def inherit_permissions(self, role):   # TODO the name of this method is a little bit confusing,
-                                         # since it's one-off and doesn't handle inheritance later
+    # TODO the name of this method is a little bit confusing,
+    # since it's one-off and doesn't handle inheritance later
+    def inherit_permissions(self, role):
+        """
+        Make this role inherit permissions from the given role.
+        Permissions are only added, not removed. Does not handle inheritance.
+        """
         if role.course_id and role.course_id != self.course_id:
-            logging.warning("%s cannot inherit permissions from %s due to course_id inconsistency", \
-                            self, role)
+            logging.warning(
+                "%s cannot inherit permissions from %s due to course_id inconsistency",
+                self,
+                role,
+            )
         for per in role.permissions.all():
             self.add_permission(per)
 

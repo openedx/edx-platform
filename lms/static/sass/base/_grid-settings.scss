@@ -1,0 +1,13 @@
+@import "neat/neat-helpers"; // or "neat-helpers" when in Rails
+
+/* Change the grid settings */
+$max-width: 1200px;
+/* Override the default global box-sizing */
+$border-box-sizing: false;
+
+
+/* Breakpoints */
+$mobile: new-breakpoint(max-width 320px 4);
+$tablet: new-breakpoint(min-width 321px max-width 768px, 8);
+$desktop: new-breakpoint(min-width 769px 12);
+$xl-desktop:  new-breakpoint(min-width 980px 12);

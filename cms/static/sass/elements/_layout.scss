@@ -40,25 +40,25 @@
       @include clearfix();
 
       .page-header {
-        float: left;
+        @include float(left);
         width: flex-grid(6,12);
-        margin-right: flex-gutter();
+        @include margin-right(flex-gutter());
       }
 
       .nav-actions {
         position: relative;
         bottom: -($baseline*0.75);
-        float: right;
+        @include float(right);
         width: flex-grid(6,12);
-        text-align: right;
+        @include text-align(right);
 
         .nav-item {
           display: inline-block;
           vertical-align: top;
-          margin-right: ($baseline/2);
+          @include margin-right(($baseline/2));
 
           &:last-child {
-            margin-right: 0;
+            @include margin-right(0);
           }
         }
 
@@ -72,7 +72,7 @@
             vertical-align: baseline;
           }
 
-          [class^="icon-"] {
+          .icon {
             display: inline-block;
             vertical-align: baseline;
           }
@@ -214,8 +214,8 @@
 // 3/4 - 1/4 two col layout
 %two-col-1 {
   .content-primary {
-    float: left;
-    margin-right: flex-gutter();
+    @include float(left);
+    @include margin-right(flex-gutter());
     width: flex-grid(9,12);
     box-shadow: none;
     border: 0;
@@ -223,7 +223,7 @@
   }
 
   .content-supplementary {
-    float: left;
+    @include float(left);
     width: flex-grid(3,12);
   }
 }

@@ -1,0 +1,54 @@
+// studio - css architecture
+// ====================
+
+// Table of Contents 
+// * +Libs and Resets
+// * +Vendor and Rebase 
+// * +Base - Utilities
+// * +Base - Assets
+// * +Base - Starter
+// * +Base - Elements
+
+// +Libs and Resets - *do not edit*
+// ==================== 
+@import 'bourbon/bourbon'; // lib - bourbon
+@import 'vendor/bi-app/bi-app-rtl'; // set the layout for right to left languages
+
+// +Vendor and Rebase - *referenced/used vendor presentation and reset*
+// ==================== 
+@import 'reset';
+
+// +Base - Utilities
+// ==================== 
+@import 'variables';
+@import 'mixins';
+@import 'mixins-inherited';
+
+// +Base - Assets
+// ==================== 
+@import 'assets/fonts';
+@import 'assets/graphics'; // sprites, basic image/figure/svg styling
+@import 'assets/anims'; // animations
+
+// +Base - Starter
+// ==================== 
+@import 'base';
+
+// +Base - Elements
+// ==================== 
+@import 'elements/typography';
+@import 'elements/icons'; // references to icons used
+@import 'elements/controls'; // buttons, link styles, sliders, etc.
+@import 'elements/modules'; //  content module patterns
+@import 'elements/navigation'; // all archetypes of navigation
+@import 'elements/layout'; // various standard layouts
+@import 'elements/forms';
+@import 'elements/header';
+@import 'elements/footer';
+@import 'elements/sock';
+@import 'elements/tender-widget';
+@import 'elements/system-feedback'; // alerts, notifications, states
+@import 'elements/system-help'; // help UI
+@import 'elements/modal'; // interstitial UI, dialogs, modal windows
+@import 'elements/vendor'; // overrides to vendor-provided styling
+@import 'elements/modal-window';

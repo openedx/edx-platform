@@ -1,7 +1,22 @@
 // studio - elements - UI controls
 // ====================
 
-// general actions
+// Table of Contents 
+// * +General Action - Extend
+// * +General Type and Size - Extend
+// * +Primary Button - Extends
+// * +Secondary Button - Extends
+// * +Button
+// * +UI Dropdown Button - Extend
+// * +UI Nav Dropdown Button - Extend
+// * +UI Actions List - Extend
+// * +UI Expand/Collapse - Extend
+// * +Drag and Drop
+
+
+
+// +General Action - Extend
+// ==================== 
 %action {
   @extend %ui-fake-link;
 
@@ -12,16 +27,16 @@
   }
 }
 
-// ====================
-
-// general type and size
+// +General Type and Size - Extend
+// ==================== 
 %sizing {
   @extend %t-action4;
   padding: ($baseline/4) ($baseline/2) ($baseline/3) ($baseline/2);
 }
 
-// ====================
 
+// +Primary Button - Extends
+// ==================== 
 // gray primary button
 %btn-primary-gray {
   @extend %ui-btn-primary;
@@ -90,6 +105,8 @@
   }
 }
 
+// +Secondary Button - Extends
+// ==================== 
 // gray secondary button
 %btn-secondary-gray {
   @extend %ui-btn-secondary;
@@ -175,21 +192,19 @@
   }
 }
 
-// ====================
-
-// button elements
+// +Button Element
+// ==================== 
 .button {
 
-  [class^="icon-"] {
+  .icon {
     display: inline-block;
     vertical-align: middle;
     margin-right: ($baseline/4);
   }
 }
 
+// +UI Dropdown Button - Extend
 // ====================
-
-// simple dropdown button styling - should we move this elsewhere?
 %ui-btn-dd {
   @extend %ui-btn;
   @extend %ui-btn-pill;
@@ -210,7 +225,8 @@
   }
 }
 
-// layout-based buttons - nav dd
+// +UI Nav Dropdown Button - Extend
+// ====================
 %ui-btn-dd-nav-primary {
   @extend %ui-btn-dd;
   background: $white;
@@ -232,10 +248,8 @@
   }
 }
 
+// +UI Actions List - Extend
 // ====================
-
-// UI: element actions list
-
 %actions-list {
   display: inline-block;
   margin-bottom: 0;
@@ -267,7 +281,7 @@
         background-color: $gray-l1;
       }
 
-      [class^="icon-"] {
+      .icon {
         font-style: normal;
       }
     }
@@ -278,7 +292,16 @@
       height: ($baseline*1.2);
       width: ($baseline);
       margin: 0;
-      background: transparent url("../img/drag-handles.png") no-repeat right center;
+
+      // CASE: right to left layout
+      @include rtl {
+       background: transparent url("../images/drag-handles.png") no-repeat left center;
+      }
+
+      // CASE: left to right layout
+      @include ltr {
+        background: transparent url("../images/drag-handles.png") no-repeat right center;
+      }
     }
 
     &.toggle-action {
@@ -287,7 +310,9 @@
   }
 }
 
-// UI: elem is collapsible - TODO: this should be transitioned away from in favor of %ui-expand-collapse
+// +UI Expand/Collapse - Extend
+// ====================
+// TODO: this should be transitioned away from in favor of %ui-expand-collapse
 %expand-collapse {
   @include transition(all $tmg-f2 linear 0s);
   display: inline-block;
@@ -313,7 +338,9 @@
   }
 }
 
-// UI: expand collapse
+// +UI Expand/Collapse - Extend
+// ====================
+// will replace %expand-collapse
 %ui-expand-collapse {
   @include transition(all $tmg-f2 linear 0s);
 
@@ -330,7 +357,7 @@
 
     // STATE: hover/active
     &:hover, &:active {
-      cursor: pointer;
+      @extend %ui-fake-link;
       color: $ui-link-color-focus;
     }
   }
@@ -348,15 +375,18 @@
   }
 }
 
-// UI: drag handles
+// +Drag and Drop Styling
+// ====================
+
+// UI: drag handle
 .drag-handle {
 
   &:hover, &:focus {
     cursor: move;
   }
 }
-
-// UI: elem is draggable
+ 
+// UI: is draggable
 .is-draggable {
   @include transition(border-color $tmg-f2 ease-in-out 0, box-shadow $tmg-f2 ease-in-out 0, margin $tmg-f2 ease-in-out 0);
   position: relative;
@@ -369,7 +399,7 @@
     border-top: 1px solid $blue-l1;
     opacity: 0.0;
 
-    *[class^="icon-caret"] {
+    .fa-caret-right {
       @extend %t-icon5;
       position: absolute;
       top: -12px;
@@ -387,7 +417,7 @@
   }
 }
 
-// UI: drag state - is dragging
+// UI: is dragging - drag state
 .is-dragging {
   @extend %ui-depth4;
   left: -($baseline/4);

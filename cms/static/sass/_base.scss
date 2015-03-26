@@ -1,7 +1,25 @@
 // studio - base styling
 // ====================
 
-// basic setup
+// Table of Contents 
+// * +Basic Setup 
+// * +Typography - Basic
+// * +Typography - Primary Content
+// * +Typography - Secondary Content
+// * +Typography - Loose Headings
+// * +Layout - Basic
+// * +Layout - Basic Page Header
+// * +Layout - Basic Page Content
+// * +Layout - Primary Content
+// * +Layout - Supplemental Content
+// * +Layout - Grandfathered
+// * +UI - Actions
+// * +UI - Misc
+// * +Utility - Basic
+// * +JS Dependent
+
+// +Basic Setup
+// ==================== 
 html {
   font-size: 62.5%;
   height: 102%; // force scrollbar to prevent jump when scroll appears, cannot use overflow because it breaks drag
@@ -38,7 +56,7 @@ h1 {
 }
 
 .page-actions {
-  margin-bottom: 30px;
+  margin-bottom: ($baseline*1.5);
 }
 
 .wrapper {
@@ -47,9 +65,8 @@ h1 {
   width: 100%;
 }
 
-// ====================
-
-// typography - basic
+// +Typography - Basic
+// ==================== 
 .page-header {
   @extend %t-title3;
   @extend %t-strong;
@@ -93,9 +110,8 @@ h1 {
   }
 }
 
-// ====================
-
-// typography - primary content
+// +Typography - Primary Content
+// ==================== 
 .content-primary {
 
   .section-header {
@@ -131,7 +147,8 @@ h1 {
   }
 }
 
-// typography - primary content
+// +Typography - Secondary Content
+// ==================== 
 .content-secondary {
 
   .section-header {
@@ -159,44 +176,12 @@ h1 {
   }
 }
 
-// ====================
-
-// typography - loose headings (BT: needs to be removed once html is clean)
+// +Typography - Loose Headings  (BT: needs to be removed once html is clean)
+// ==================== 
 .title-1, .title-2, .title-3, .title-4, .title-5, .title-6 {
   @extend %t-strong;
 }
 
-// typography - primary content
-.content-secondary {
-
-  .section-header {
-    color: $gray-d3;
-
-    .subtitle {
-      color: $gray-l2;
-    }
-  }
-
-  .content-header {
-    color: $gray-d3;
-
-    .subtitle {
-      color: $gray-l2;
-    }
-  }
-
-  .content-header {
-    color: $gray-d3;
-
-    .subtitle {
-      color: $gray-l2;
-    }
-  }
-}
-
-// ====================
-
-// typography - loose headings (BT: needs to be removed once html is clean)
 .title-1 {
   @extend %t-title3;
   margin-bottom: ($baseline*1.5);
@@ -240,16 +225,14 @@ p, ul, ol, dl {
   }
 }
 
-// ====================
-
-// layout - basic
+// +Layout - Basic
+// ==================== 
 .wrapper-view {
 
 }
 
-// ====================
-
-// layout - basic page header
+// +Layout - Basic Page Header
+// ==================== 
 .wrapper-mast {
   margin: ($baseline*1.5) 0 0 0;
   padding: 0 $baseline;
@@ -279,25 +262,25 @@ p, ul, ol, dl {
       @include clearfix();
 
       .page-header {
-        float: left;
+        @include float(left);
+        @include margin-right(flex-gutter());
         width: flex-grid(6,12);
-        margin-right: flex-gutter();
       }
 
       .nav-actions {
+        @include float(left);
+        @include text-align(right);
         position: relative;
         bottom: -($baseline*0.75);
-        float: right;
         width: flex-grid(6,12);
-        text-align: right;
 
         .nav-item {
           display: inline-block;
           vertical-align: top;
-          margin-right: ($baseline/2);
+          @include margin-right($baseline/2);
 
           &:last-child {
-            margin-right: 0;
+            @include margin-right(0);
           }
         }
 
@@ -391,7 +374,8 @@ p, ul, ol, dl {
   }
 }
 
-// layout - basic page content
+// +Layout - Basic Page Content
+// ==================== 
 .wrapper-content {
   margin: 0;
   padding: 0 $baseline;
@@ -434,7 +418,8 @@ p, ul, ol, dl {
   @include box-sizing(border-box);
 }
 
-// layout - primary content
+// +Layout - Primary Content
+// ==================== 
 .content-primary {
 
   .title-1 {
@@ -471,7 +456,8 @@ p, ul, ol, dl {
   }
 }
 
-// layout - supplemental content
+// +Layout - Supplemental Content
+// ==================== 
 .content-supplementary {
 
   > section {
@@ -479,9 +465,8 @@ p, ul, ol, dl {
   }
 }
 
-// ====================
-
-// layout - grandfathered
+// +Layout - Grandfathered
+// ==================== 
 .main-wrapper {
   position: relative;
   margin: 0 ($baseline*2);
@@ -500,26 +485,25 @@ p, ul, ol, dl {
 
 .main-column {
   clear: both;
-  float: left;
+  @include float(left);
   width: 70%;
 }
 
 .sidebar {
-  float: right;
+  @include float(right);
   width: 28%;
 }
 
 .left {
-  float: left;
+  @include float(left);
 }
 
 .right {
-  float: right;
+  @include float(right);
 }
 
-// ====================
-
-// UI - actions
+// +UI - Actions
+// ==================== 
 .new-unit-item,
 .new-subsection-item,
 .new-policy-item {
@@ -539,7 +523,7 @@ p, ul, ol, dl {
 .item-actions {
   position: absolute;
   top: 5px;
-  right: 5px;
+  @include right(5px);
 
   .edit-button,
   .delete-button,
@@ -550,30 +534,24 @@ p, ul, ol, dl {
   }
 }
 
-// ====================
-
-// misc
+// +UI - Misc
+// ==================== 
 hr.divide {
   @extend %cont-text-sr;
 }
 
 .item-details {
     float: left;
-    padding: 10px 0;
+    padding: ($baseline/2) 0;
 }
 
 .details {
     @extend %t-copy-sub1;
     display: none;
-    margin-bottom: 30px;
+    margin-bottom: ($baseline*1.5);
 }
 
 .window {
-  // border-radius: 3px;
-  // box-shadow: 0 1px 1px $shadow-l1;
-  // margin-bottom: $baseline;
-  // border: 1px solid $gray-l2;
-  // background: $white;
 
   .window-contents {
     padding: 20px;
@@ -609,165 +587,9 @@ hr.divide {
   }
 
   .row {
-    margin-bottom: 10px;
-    padding-bottom: 10px;
+    margin-bottom: ($baseline/2);
+    padding-bottom: ($baseline/2);
     border-bottom: 1px solid #cbd1db;
-  }
-}
-
-// ====================
-
-// system notifications
-.toast-notification {
-  @include transition(all $tmg-f2 linear 0s);
-  @include linear-gradient(top, rgba(255, 255, 255, .1), rgba(255, 255, 255, 0));
-  @extend %t-copy-sub1;
-  display: none;
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 99999;
-  max-width: 350px;
-  padding: 15px 20px 17px;
-  border-radius: 3px;
-  border: 1px solid #333;
-  background-color: rgba(30, 30, 30, .92);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, .3), 0 1px 0 rgba(255, 255, 255, .1) inset;
-  text-align: center;
-  color: #fff;
-
-  p, span {
-    color: #fff;
-  }
-
-  strong {
-    @extend %t-copy-base;
-    @extend %t-strong;
-    display: block;
-    margin-bottom: 10px;
-    text-align: center;
-  }
-
-  .close-button {
-    @extend %t-action1;
-    @extend %t-strong;
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 27px;
-    height: 27px;
-    line-height: 25px;
-    color: #aaa;
-    text-align: center;
-
-    .close-icon {
-      @extend %t-action2;
-      @extend %t-strong;
-    }
-  }
-
-  .action-button {
-    @include blue-button;
-    @include box-sizing(border-box);
-    @extend %t-action4;
-    width: 100%;
-    margin-top: 10px;
-    text-align: center;
-  }
-}
-
-.waiting {
-  position: relative;
-
-  &:before {
-    content: '';
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 999998;
-    width: 100%;
-    height: 100%;
-    border-radius: inherit;
-    background: rgba(255, 255, 255, .9);
-  }
-
-  &:after {
-    @extend .spinner-icon;
-    content: '';
-    display: block;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    margin-left: -10px;
-    margin-top: -10px;
-    z-index: 999999;
-  }
-}
-
-.waiting-inline {
-  &:after {
-    content: '';
-    @extend .spinner-icon;
-  }
-}
-
-.new-button {
-  @include green-button;
-  @extend %t-action4;
-  padding: 8px 20px 10px;
-  text-align: center;
-
-  &.big {
-    display: block;
-  }
-
-  .icon-plus {
-    margin-top: -2px;
-    line-height: 0;
-  }
-}
-
-.view-button {
-  @include blue-button;
-  @extend %t-action4;
-  text-align: center;
-
-  &.big {
-    display: block;
-  }
-
-  .icon-eye-open {
-    @extend %t-action2;
-    display: inline-block;
-    vertical-align: middle;
-    margin-right: 8px;
-    margin-top: -3px;
-    line-height: 0;
-  }
-}
-
-.edit-button.standard,
-.delete-button.standard,
-.duplicate-button.standard {
-  @include white-button;
-  @extend %t-regular;
-  @extend %t-action4;
-  float: left;
-  padding: 3px 10px 4px;
-  margin-left: 7px;
-
-  .edit-icon,
-  .delete-icon,
-  .duplicate-icon{
-    margin-right: 4px;
-  }
-}
-
-.delete-button.standard {
-
-  &:hover {
-    background-color: tint($orange, 75%);
   }
 }
 
@@ -799,9 +621,9 @@ hr.divide {
   }
 }
 
-// ====================
 
-// basic utility
+// +Utility - Basic
+// ==================== 
 
 // UI - semantically hide text
 .sr {
@@ -816,19 +638,6 @@ hr.divide {
 // UI - disabled
 .is-disabled {
   @extend %ui-disabled;
-}
-
-.non-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.wrap {
-  text-wrap: wrap;
-  white-space: pre-wrap;
-  white-space: -moz-pre-wrap;
-  word-wrap: break-word;
 }
 
 // ui - semantic + visual divider
@@ -857,9 +666,8 @@ hr.divider {
   }
 }
 
-// ====================
-
-// js dependant
+// +JS Dependent
+// ==================== 
 body.js {
 
   // lean/simple modal window
@@ -889,7 +697,7 @@ body.js {
         @extend %cont-text-sr;
       }
 
-      [class^="icon-"] {
+      .icon {
         @extend %t-action1;
         color: $white;
       }
@@ -920,15 +728,5 @@ body.js {
       margin-top: ($baseline/2);
       color: $gray-l1;
     }
-  }
-}
-
-// ====================
-
-// works in progress & testing
-body.hide-wip {
-
-  .wip-box {
-    display: none;
   }
 }

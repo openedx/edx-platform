@@ -2,8 +2,12 @@ import codecs
 from fractions import Fraction
 import unittest
 
-from .chemcalc import (compare_chemical_expression, divide_chemical_expression,
-                      render_to_html, chemical_equations_equal)
+from .chemcalc import (
+    compare_chemical_expression,
+    divide_chemical_expression,
+    render_to_html,
+    chemical_equations_equal,
+)
 
 import miller
 
@@ -36,8 +40,12 @@ class Test_Compare_Equations(unittest.TestCase):
         self.assertTrue(chemical_equations_equal('H2 + O2 -> H2O2',
                                                  '2O2 + 2H2 -> 2H2O2'))
 
-        self.assertFalse(chemical_equations_equal('2H2 + O2 -> H2O2',
-                                                 '2O2 + 2H2 -> 2H2O2'))
+        self.assertFalse(
+            chemical_equations_equal(
+                '2H2 + O2 -> H2O2',
+                '2O2 + 2H2 -> 2H2O2',
+            )
+        )
 
     def test_different_arrows(self):
         self.assertTrue(chemical_equations_equal('H2 + O2 -> H2O2',
@@ -50,8 +58,13 @@ class Test_Compare_Equations(unittest.TestCase):
         self.assertTrue(chemical_equations_equal('H2 + O2 -> H2O2',
                                                  '2O2 + 2H2 -> 2H2O2'))
 
-        self.assertFalse(chemical_equations_equal('H2 + O2 -> H2O2',
-                                                 '2O2 + 2H2 -> 2H2O2', exact=True))
+        self.assertFalse(
+            chemical_equations_equal(
+                'H2 + O2 -> H2O2',
+                '2O2 + 2H2 -> 2H2O2',
+                exact=True,
+            )
+        )
 
         # order still doesn't matter
         self.assertTrue(chemical_equations_equal('H2 + O2 -> H2O2',
@@ -63,7 +76,6 @@ class Test_Compare_Equations(unittest.TestCase):
 
         self.assertFalse(chemical_equations_equal('H2O( -> H2O2',
                                                   'H2O -> H2O2'))
-
 
         self.assertFalse(chemical_equations_equal('H2 + O2 ==> H2O2',   # strange arrow
                                                   '2O2 + 2H2 -> 2H2O2'))

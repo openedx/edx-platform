@@ -1,0 +1,93 @@
+<form id="settings_details" class="settings-details" method="post" action="">
+<section class="group-settings schedule">
+  <header>
+    <h2 class="title-2">Course Schedule</h2>
+  </header>
+
+  <ol class="list-input">
+    <li class="field-group field-group-course-start" id="course-start">
+      <div class="field date" id="field-course-start-date">
+        <label for="course-start-date">Course Start Date</label>
+        <input type="text" class="start-date date start datepicker" id="course-start-date" placeholder="MM/DD/YYYY" autocomplete="off" />
+        <span class="tip tip-stacked">First day the course begins</span>
+      </div>
+
+      <div class="field time" id="field-course-start-time">
+        <label for="course-start-time">Course Start Time</label>
+        <input type="text" class="time start timepicker" id="course-start-time" value="" placeholder="HH:MM" autocomplete="off" />
+        <span class="tip tip-stacked timezone">(UTC)</span>
+      </div>
+    </li>
+
+    <li class="field-group field-group-course-end" id="course-end">
+      <div class="field date" id="field-course-end-date">
+        <label for="course-end-date">Course End Date</label>
+        <input type="text" class="end-date date end" id="course-end-date" placeholder="MM/DD/YYYY" autocomplete="off" />
+        <span class="tip tip-stacked">Last day your course is active</span>
+      </div>
+
+      <div class="field time" id="field-course-end-time">
+        <label for="course-end-time">Course End Time</label>
+        <input type="text" class="time end" id="course-end-time" value="" placeholder="HH:MM" autocomplete="off" />
+        <span class="tip tip-stacked timezone">(UTC)</span>
+      </div>
+    </li>
+  </ol>
+
+  <ol class="list-input">
+    <li class="field-group field-group-enrollment-start" id="enrollment-start">
+      <div class="field date" id="field-enrollment-start-date">
+        <label for="course-enrollment-start-date">Enrollment Start Date</label>
+        <input type="text" class="start-date date start" id="course-enrollment-start-date" placeholder="MM/DD/YYYY" autocomplete="off" />
+        <span class="tip tip-stacked">First day students can enroll</span>
+      </div>
+
+      <div class="field time" id="field-enrollment-start-time">
+        <label for="course-enrollment-start-time">Enrollment Start Time</label>
+        <input type="text" class="time start" id="course-enrollment-start-time" value="" placeholder="HH:MM" autocomplete="off" />
+        <span class="tip tip-stacked timezone">(UTC)</span>
+      </div>
+    </li>
+
+    <li class="field-group field-group-enrollment-end" id="enrollment-end">
+      <div class="field date" id="field-enrollment-end-date">
+        <label for="course-enrollment-end-date">Enrollment End Date</label>
+        <input type="text" class="end-date date end" id="course-enrollment-end-date" placeholder="MM/DD/YYYY" autocomplete="off" />
+        <span class="tip tip-stacked">Last day students can enroll</span>
+      </div>
+
+      <div class="field time" id="field-enrollment-end-time">
+        <label for="course-enrollment-end-time">Enrollment End Time</label>
+        <input type="text" class="time end" id="course-enrollment-end-time" value="" placeholder="HH:MM" autocomplete="off" />
+        <span class="tip tip-stacked timezone">(UTC)</span>
+      </div>
+    </li>
+    <li>
+    <li class="field field-select" id="field-pre-requisite-course">
+                    <label for="pre-requisite-course" class="">Prerequisite Course</label>
+                    <select class="input" id="pre-requisite-course">
+                        <option value="">None</option>
+                        <option value="test/CSS101/2012_T1">[Test] Communicating for Impact</option>
+                        <option value="Test/3423/2014_T2">CohortAverageTesting</option>
+                        <option value="edX/Open_DemoX/edx_demo_course">edX Demonstration Course</option>
+                    </select>
+                    <span class="tip tip-inline">Course that students must complete before beginning this course</span>
+                    <button type="submit" class="sr" name="submit" value="submit">set pre-requisite course</button>
+    </li>
+        <h3 id="heading-entrance-exam">${_("Entrance Exam")}</h3>
+            <div class="show-data">
+                <div class="heading">
+                    <input type="checkbox" id="entrance-exam-enabled" />
+                    <label for="entrance-exam-enabled">${_("Require students to pass an exam before beginning the course.")}</label>
+                </div>
+                <div class="div-grade-requirements">
+                    <p><span class="tip tip-inline">${_("To create your course entrance exam, go to the ")}<a href='${course_handler_url}'>${_("Course Outline")}</a>${_(". An Entrance Exam section will be created automatically.")}</span></p>
+                    <p><label for="entrance-exam-minimum-score-pct">${_("Minimum Passing Score")}</label></p>
+                    <p><div><input type="text" id="entrance-exam-minimum-score-pct" aria-describedby="min-score-format min-score-tip"><span id="min-score-format" class="tip tip-inline">${_(" %")}</span></div></p>
+                    <p><span class="tip tip-inline" id="min-score-tip">${_("The minimum score a student must receive to pass the entrance exam.")}</span></p>
+                </div>
+            </div>
+    </li>
+  </ol>
+</section>
+</form>

@@ -205,4 +205,3 @@ def body_string(body_dict, prefix=""):
             body_list.append(u"{}{}:{}\n".format(prefix, key, value).encode('utf-8'))
 
     return "".join(body_list)  # Note that trailing \n's are important
-

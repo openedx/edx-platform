@@ -70,12 +70,10 @@
   .content-primary,
   .content-supplementary {
     @include box-sizing(border-box);
-    float: left;
   }
 
   .content-primary {
-    width: flex-grid(9, 12);
-    margin-right: flex-gutter();
+    @extend .ui-col-wide;
 
     .no-content {
       @extend %no-content;
@@ -83,7 +81,7 @@
   }
 
   .content-supplementary {
-    width: flex-grid(3, 12);
+    @extend .ui-col-narrow;
   }
 
 
@@ -297,7 +295,7 @@
       }
 
       .section-header-details {
-        float: left;
+        @include float(left);
         width: flex-grid(6, 9);
 
         .icon, .wrapper-section-title {
@@ -306,20 +304,29 @@
         }
 
         .icon {
-          margin-right: ($baseline/4);
+          @include margin-right($baseline/4);
         }
 
         .wrapper-section-title {
           width: flex-grid(5, 6);
           line-height: 0;
         }
+
+        .action-edit.action-inline {
+
+          .icon {
+            @include margin-right(0);
+            @include transform(none);
+            vertical-align: middle;
+          }
+        }
       }
 
       .section-header-actions {
-        float: right;
+        @include float(right);
         width: flex-grid(3, 9);
         margin-top: -($baseline/4);
-        text-align: right;
+        @include text-align(right);
 
         .actions-list {
           @extend %actions-list;
@@ -385,7 +392,7 @@
       }
 
       .subsection-header-details {
-        float: left;
+        @include float(left);
         width: flex-grid(6, 9);
 
         .icon, .wrapper-subsection-title {
@@ -394,7 +401,7 @@
         }
 
         .icon {
-          margin-right: ($baseline/4);
+          @include margin-right($baseline/4);
         }
 
         .wrapper-subsection-title {
@@ -402,13 +409,22 @@
           margin-top: -($baseline/10);
           line-height: 0;
         }
+
+        .action-edit.action-inline {
+
+          .icon {
+            @include transform(none);
+            margin-right: 0;
+            vertical-align: middle;
+          }
+        }
       }
 
       .subsection-header-actions {
-        float: right;
+        @include float(right);
         width: flex-grid(3, 9);
         margin-top: -($baseline/4);
-        text-align: right;
+        @include text-align(right);
 
         .actions-list {
           @extend %actions-list;
@@ -424,7 +440,7 @@
 
       // status
       .subsection-status {
-        margin: 0 0 0 $outline-indent-width;
+        @include margin(0, 0, 0, $outline-indent-width);
       }
 
       // content
@@ -467,16 +483,16 @@
       }
 
       .unit-header-details {
-        float: left;
+        @include float(left);
         width: flex-grid(6, 9);
         margin-top: ($baseline/4);
       }
 
       .unit-header-actions {
-        float: right;
+        @include float(right);
         width: flex-grid(3, 9);
         margin-top: -($baseline/10);
-        text-align: right;
+        @include text-align(right);
 
         .actions-list {
           @extend %actions-list;
@@ -497,7 +513,7 @@
         .icon {
           display: inline-block;
           vertical-align: middle;
-          margin-right: ($baseline/2);
+          @include margin-right($baseline/2);
         }
       }
     }
@@ -577,7 +593,7 @@
       border-top: 1px solid $blue-l1;
       opacity: 0.0;
 
-      *[class^="icon-caret"] {
+      .fa-caret-right {
         @extend %t-icon5;
         position: absolute;
         top: -12px;

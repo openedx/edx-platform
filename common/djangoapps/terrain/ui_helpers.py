@@ -1,5 +1,5 @@
-# pylint: disable=C0111
-# pylint: disable=W0621
+# pylint: disable=missing-docstring
+# pylint: disable=redefined-outer-name
 
 from lettuce import world
 
@@ -28,28 +28,27 @@ GLOBAL_WAIT_FOR_TIMEOUT = 60
 
 REQUIREJS_WAIT = {
     # Settings - Schedule & Details
-    re.compile('^Schedule & Details Settings \|'): [
+    re.compile(r'^Schedule & Details Settings \|'): [
         "jquery", "js/base", "js/models/course",
         "js/models/settings/course_details", "js/views/settings/main"],
 
     # Settings - Advanced Settings
-    re.compile('^Advanced Settings \|'): [
+    re.compile(r'^Advanced Settings \|'): [
         "jquery", "js/base", "js/models/course", "js/models/settings/advanced",
         "js/views/settings/advanced", "codemirror"],
 
     # Unit page
-    re.compile('^Unit \|'): [
+    re.compile(r'^Unit \|'): [
         "jquery", "js/base", "js/models/xblock_info", "js/views/pages/container",
         "js/collections/component_template", "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
 
     # Content - Outline
     # Note that calling your org, course number, or display name, 'course' will mess this up
-    re.compile('^Course Outline \|'): [
-        "js/base", "js/models/course", "js/models/location", "js/models/section",
-        "js/views/section_edit"],
+    re.compile(r'^Course Outline \|'): [
+        "js/base", "js/models/course", "js/models/location", "js/models/section"],
 
     # Dashboard
-    re.compile('^My Courses \|'): [
+    re.compile(r'^Studio Home \|'): [
         "js/sock", "gettext", "js/base",
         "jquery.ui", "coffee/src/main", "underscore"],
 
@@ -57,7 +56,13 @@ REQUIREJS_WAIT = {
     re.compile(r'^\s*Files & Uploads'): [
         'js/base', 'jquery.ui', 'coffee/src/main', 'underscore',
         'js/views/assets', 'js/views/asset'
-    ]
+    ],
+
+    # Pages
+    re.compile(r'^Pages \|'): [
+        'js/models/explicit_url', 'coffee/src/views/tabs',
+        'xmodule', 'coffee/src/main', 'xblock/cms.runtime.v1'
+    ],
 }
 
 
@@ -147,24 +152,7 @@ class RequireJSError(Exception):
     pass
 
 
-@world.absorb
-def wait_for_requirejs(dependencies=None):
-    """
-    If requirejs is loaded on the page, this function will pause
-    Selenium until require is finished loading the given dependencies.
-    If requirejs is not loaded on the page, this function will return
-    immediately.
-
-    :param dependencies: a list of strings that identify resources that
-        we should wait for requirejs to load. By default, requirejs will only
-        wait for jquery.
-    """
-    if not dependencies:
-        dependencies = ["jquery"]
-    # stick jquery at the front
-    if dependencies[0] != "jquery":
-        dependencies.insert(0, "jquery")
-
+def load_requrejs_modules(dependencies, callback="callback(true);"):
     javascript = """
         var callback = arguments[arguments.length - 1];
         if(window.require) {{
@@ -175,16 +163,17 @@ def wait_for_requirejs(dependencies=None):
           addEventListener("beforeunload", unloadHandler);
           addEventListener("unload", unloadHandler);
           require({deps}, function($) {{
+            var modules = arguments;
             setTimeout(function() {{
               removeEventListener("beforeunload", unloadHandler);
               removeEventListener("unload", unloadHandler);
-              callback(true);
+              {callback}
             }}, 50);
           }});
         }} else {{
           callback(false);
         }}
-    """.format(deps=json.dumps(dependencies))
+    """.format(deps=json.dumps(dependencies), callback=callback)
     for _ in range(5):  # 5 attempts max
         try:
             result = world.browser.driver.execute_async_script(dedent(javascript))
@@ -215,6 +204,46 @@ def wait_for_requirejs(dependencies=None):
                 raise err
         else:
             return result
+
+
+def wait_for_xmodules_to_load():
+    """
+    If requirejs is loaded on the page, this function will pause
+    Selenium until require is finished loading all xmodules.
+    If requirejs is not loaded on the page, this function will return
+    immediately.
+    """
+    callback = """
+        if (modules[0] && modules[0].done) {{
+            modules[0].done(function () {{callback(true)}});
+        }}
+    """
+    return load_requrejs_modules(["xmodule"], callback)
+
+
+@world.absorb
+def wait_for_requirejs(dependencies=None):
+    """
+    If requirejs is loaded on the page, this function will pause
+    Selenium until require is finished loading the given dependencies.
+    If requirejs is not loaded on the page, this function will return
+    immediately.
+
+    :param dependencies: a list of strings that identify resources that
+        we should wait for requirejs to load. By default, requirejs will only
+        wait for jquery.
+    """
+    if not dependencies:
+        dependencies = ["jquery"]
+    # stick jquery at the front
+    if dependencies[0] != "jquery":
+        dependencies.insert(0, "jquery")
+
+    result = load_requrejs_modules(dependencies)
+    if result and "xmodule" in dependencies:
+        result = wait_for_xmodules_to_load()
+
+    return result
 
 
 @world.absorb

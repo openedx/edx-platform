@@ -7,7 +7,7 @@ import random
 import json
 from time import sleep
 
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 from smtplib import SMTPServerDisconnected, SMTPDataError, SMTPConnectError, SMTPException
 from boto.ses.exceptions import (
     SESAddressNotVerifiedError,
@@ -252,7 +252,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     return progress
 
 
-@task(default_retry_delay=settings.BULK_EMAIL_DEFAULT_RETRY_DELAY, max_retries=settings.BULK_EMAIL_MAX_RETRIES)  # pylint: disable=E1102
+@task(default_retry_delay=settings.BULK_EMAIL_DEFAULT_RETRY_DELAY, max_retries=settings.BULK_EMAIL_MAX_RETRIES)  # pylint: disable=not-callable
 def send_course_email(entry_id, email_id, to_list, global_email_context, subtask_status_dict):
     """
     Sends an email to a list of recipients.
@@ -336,11 +336,11 @@ def send_course_email(entry_id, email_id, to_list, global_email_context, subtask
         # was encountered has already been updated before the retry call was made,
         # so we only log here.
         log.warning("Send-email task %s for email %s: being retried", current_task_id, email_id)
-        raise send_exception  # pylint: disable=E0702
+        raise send_exception  # pylint: disable=raising-bad-type
     else:
         log.error("Send-email task %s for email %s: failed: %s", current_task_id, email_id, send_exception)
         update_subtask_status(entry_id, current_task_id, new_subtask_status)
-        raise send_exception  # pylint: disable=E0702
+        raise send_exception  # pylint: disable=raising-bad-type
 
     # return status in a form that can be serialized by Celery into JSON:
     log.info("Send-email task %s for email %s: returning status %s", current_task_id, email_id, new_subtask_status)
@@ -438,9 +438,13 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
 
     course_title = global_email_context['course_title']
     subject = "[" + course_title + "] " + course_email.subject
-    from_addr = _get_source_address(course_email.course_id, course_title)
 
-    course_email_template = CourseEmailTemplate.get_template()
+    # use the email from address in the CourseEmail, if it is present, otherwise compute it
+    from_addr = course_email.from_addr if course_email.from_addr else \
+        _get_source_address(course_email.course_id, course_title)
+
+    # use the CourseEmailTemplate that was associated with the CourseEmail
+    course_email_template = course_email.get_template()
     try:
         connection = get_connection()
         connection.open()
@@ -459,6 +463,8 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
             email = current_recipient['email']
             email_context['email'] = email
             email_context['name'] = current_recipient['profile__name']
+            email_context['user_id'] = current_recipient['pk']
+            email_context['course_id'] = course_email.course_id
 
             # Construct message content using templates and context:
             plaintext_msg = course_email_template.render_plaintext(course_email.text_message, email_context)
@@ -686,7 +692,7 @@ def _submit_for_retry(entry_id, email_id, to_list, global_email_context, current
 
 def _statsd_tag(course_title):
     """
-    Calculate the tag we will use for DataDog.
+    Prefix the tag we will use for DataDog.
+    The tag also gets modified by our dogstats_wrapper code.
     """
-    tag = u"course_email:{0}".format(course_title).encode('utf-8')
-    return tag[:200]
+    return u"course_email:{0}".format(course_title)

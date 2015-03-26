@@ -1,6 +1,6 @@
-define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "tzAbbr", "js/models/uploads",
+define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "js/utils/date_utils", "js/models/uploads",
     "js/views/uploads", "js/utils/change_on_enter", "jquery.timepicker", "date"],
-    function(ValidatingView, CodeMirror, _, $, ui, tzAbbr, FileUploadModel, FileUploadDialog, TriggerChangeEventOnEnter) {
+    function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel, FileUploadDialog, TriggerChangeEventOnEnter) {
 
 var DetailsView = ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseDetails
@@ -10,9 +10,10 @@ var DetailsView = ValidatingView.extend({
         // Leaving change in as fallback for older browsers
         "change input" : "updateModel",
         "change textarea" : "updateModel",
+        "change select" : "updateModel",
         'click .remove-course-introduction-video' : "removeVideo",
         'focus #course-overview' : "codeMirrorize",
-        'mouseover #timezone' : "updateTime",
+        'mouseover .timezone' : "updateTime",
         // would love to move to a general superclass, but event hashes don't inherit in backbone :-(
         'focus :input' : "inputFocus",
         'blur :input' : "inputUnfocus",
@@ -20,7 +21,7 @@ var DetailsView = ValidatingView.extend({
     },
 
     initialize : function() {
-        this.fileAnchorTemplate = _.template('<a href="<%= fullpath %>"> <i class="icon-file"></i><%= filename %></a>');
+        this.fileAnchorTemplate = _.template('<a href="<%= fullpath %>"> <i class="icon fa fa-file"></i><%= filename %></a>');
         // fill in fields
         this.$el.find("#course-organization").val(this.model.get('org'));
         this.$el.find("#course-number").val(this.model.get('course_id'));
@@ -34,8 +35,6 @@ var DetailsView = ValidatingView.extend({
         this.$el.find('img.course-image').load(function() {
             $(this).show();
         });
-
-        this.$el.find('#timezone').html("(" + tzAbbr() + ")");
 
         this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.listenTo(this.model, 'change', this.showNotificationBar);
@@ -66,6 +65,20 @@ var DetailsView = ValidatingView.extend({
         this.$el.find('#course-image-url').val(imageURL);
         this.$el.find('#course-image').attr('src', imageURL);
 
+        var pre_requisite_courses = this.model.get('pre_requisite_courses');
+        pre_requisite_courses = pre_requisite_courses.length > 0 ? pre_requisite_courses : '';
+        this.$el.find('#' + this.fieldToSelectorMap['pre_requisite_courses']).val(pre_requisite_courses);
+
+        if (this.model.get('entrance_exam_enabled') == 'true') {
+            this.$('#' + this.fieldToSelectorMap['entrance_exam_enabled']).attr('checked', this.model.get('entrance_exam_enabled'));
+            this.$('.div-grade-requirements').show();
+        }
+        else {
+            this.$('#' + this.fieldToSelectorMap['entrance_exam_enabled']).removeAttr('checked');
+            this.$('.div-grade-requirements').hide();
+        }
+        this.$('#' + this.fieldToSelectorMap['entrance_exam_minimum_score_pct']).val(this.model.get('entrance_exam_minimum_score_pct'));
+
         return this;
     },
     fieldToSelectorMap : {
@@ -77,15 +90,22 @@ var DetailsView = ValidatingView.extend({
         'short_description' : 'course-short-description',
         'intro_video' : 'course-introduction-video',
         'effort' : "course-effort",
-        'course_image_asset_path': 'course-image-url'
+        'course_image_asset_path': 'course-image-url',
+        'pre_requisite_courses': 'pre-requisite-course',
+        'entrance_exam_enabled': 'entrance-exam-enabled',
+        'entrance_exam_minimum_score_pct': 'entrance-exam-minimum-score-pct'
     },
 
     updateTime : function(e) {
-        var now = new Date();
-        var hours = now.getHours();
-        var minutes = now.getMinutes();
-        $(e.currentTarget).attr('title', (hours % 12 === 0 ? 12 : hours % 12) + ":" + (minutes < 10 ? "0" : "")  +
-                now.getMinutes() + (hours < 12 ? "am" : "pm") + " (current local time)");
+        var now = new Date(),
+            hours = now.getUTCHours(),
+            minutes = now.getUTCMinutes(),
+            currentTimeText = gettext('%(hours)s:%(minutes)s (current UTC time)');
+
+        $(e.currentTarget).attr('title', interpolate(currentTimeText, {
+            'hours': hours,
+            'minutes': minutes
+        }, true));
     },
 
     setupDatePicker: function (fieldName) {
@@ -95,14 +115,10 @@ var DetailsView = ValidatingView.extend({
         var timefield = $(div).find("input:.time");
         var cachethis = this;
         var setfield = function () {
-            var date = datefield.datepicker('getDate');
-            if (date) {
-                var time = timefield.timepicker("getSecondsFromMidnight");
-                if (!time) {
-                    time = 0;
-                }
-                var newVal = new Date(date.getTime() + time * 1000);
-                if (!cacheModel.has(fieldName) || cacheModel.get(fieldName).getTime() !== newVal.getTime()) {
+            var newVal = DateUtils.getDate(datefield, timefield),
+                oldTime = new Date(cacheModel.get(fieldName)).getTime();
+            if (newVal) {
+                if (!cacheModel.has(fieldName) || oldTime !== newVal.getTime()) {
                     cachethis.clearValidationErrors();
                     cachethis.setAndValidate(fieldName, newVal);
                 }
@@ -126,13 +142,14 @@ var DetailsView = ValidatingView.extend({
         timefield.on('changeTime', setfield);
         timefield.on('input', setfield);
 
-        datefield.datepicker('setDate', this.model.get(fieldName));
+        date = this.model.get(fieldName)
         // timepicker doesn't let us set null, so check that we have a time
-        if (this.model.has(fieldName)) {
-            timefield.timepicker('setTime', this.model.get(fieldName));
-        } // but reset the field either way
+        if (date) {
+            DateUtils.setDate(datefield, timefield, date);
+        } // but reset fields either way
         else {
             timefield.val('');
+            datefield.val('');
         }
     },
 
@@ -152,8 +169,30 @@ var DetailsView = ValidatingView.extend({
         case 'course-effort':
             this.setField(event);
             break;
+        case 'entrance-exam-enabled':
+            if($(event.currentTarget).is(":checked")){
+                this.$('.div-grade-requirements').show();
+            }else{
+                this.$('.div-grade-requirements').hide();
+            }
+            this.setField(event);
+            break;
+        case 'entrance-exam-minimum-score-pct':
+            // If the val is an empty string then update model with default value.
+            if ($(event.currentTarget).val() === '') {
+                this.model.set('entrance_exam_minimum_score_pct', this.model.defaults.entrance_exam_minimum_score_pct);
+            }
+            else {
+                this.setField(event);
+            }
+            break;
         case 'course-short-description':
             this.setField(event);
+            break;
+        case 'pre-requisite-course':
+            var value = $(event.currentTarget).val();
+            value = value == "" ? [] : [value];
+            this.model.set('pre_requisite_courses', value);
             break;
         // Don't make the user reload the page to check the Youtube ID.
         // Wait for a second to load the video, avoiding egregious AJAX calls.

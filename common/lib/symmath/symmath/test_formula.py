@@ -1,17 +1,17 @@
 """
 Tests of symbolic math
 """
-
-
 import unittest
 import formula
 import re
 from lxml import etree
 
+
 def stripXML(xml):
     xml = xml.replace('\n', '')
     xml = re.sub(r'\> +\<', '><', xml)
     return xml
+
 
 class FormulaTest(unittest.TestCase):
     # for readability later
@@ -40,7 +40,6 @@ class FormulaTest(unittest.TestCase):
 
         # success?
         self.assertEqual(test, expected)
-
 
     def test_fix_simple_superscripts(self):
         expr = '''
@@ -91,7 +90,6 @@ class FormulaTest(unittest.TestCase):
         # success?
         self.assertEqual(test, expected)
 
-
     def test_fix_msubsup(self):
         expr = '''
 <msubsup>
@@ -100,7 +98,7 @@ class FormulaTest(unittest.TestCase):
   <mi>c</mi>
 </msubsup>'''
 
-        expected = '<msup><mi>a_b</mi><mi>c</mi></msup>' # which is (a_b)^c
+        expected = '<msup><mi>a_b</mi><mi>c</mi></msup>'  # which is (a_b)^c
 
         # wrap
         expr = stripXML(self.mathml_start + expr + self.mathml_end)

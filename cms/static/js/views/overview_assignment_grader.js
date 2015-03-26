@@ -13,7 +13,7 @@ define(["js/views/baseview", "underscore", "gettext", "js/models/assignment_grad
                     // TODO move to a template file
                     '<h4 class="status-label"><%= assignmentType %></h4>' +
                     '<a data-tooltip="Mark/unmark this subsection as graded" class="menu-toggle" href="#">' +
-                        '<% if (!hideSymbol) {%><i class="icon-ok"></i><%};%>' +
+                        '<% if (!hideSymbol) {%><i class="icon fa fa-check"></i><%};%>' +
                     '</a>' +
                     '<ul class="menu">' +
                         '<% graders.each(function(option) { %>' +
@@ -68,7 +68,7 @@ define(["js/views/baseview", "underscore", "gettext", "js/models/assignment_grad
               this.removeMenu(e);
 
                   var saving = new NotificationView.Mini({
-                      title: gettext('Saving') + '&hellip;'
+                      title: gettext('Saving')
                   });
                   saving.show();
 

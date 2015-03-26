@@ -1,6 +1,7 @@
 <%!
 from staticfiles.storage import staticfiles_storage
 from pipeline_mako import compressed_css, compressed_js
+from django.utils.translation import get_language_bidi
 %>
 
 <%def name='url(file, raw=False)'><%
@@ -11,6 +12,13 @@ except:
 %>${url}${"?raw" if raw else ""}</%def>
 
 <%def name='css(group, raw=False)'>
+  <%
+      rtl_group = '{}-rtl'.format(group)
+
+      if get_language_bidi() and rtl_group in settings.PIPELINE_CSS:
+        group = rtl_group
+  %>
+
   % if settings.FEATURES['USE_DJANGO_PIPELINE']:
     ${compressed_css(group, raw=raw)}
   % else:

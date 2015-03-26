@@ -1,38 +1,42 @@
+# -*- coding: utf-8 -*-
 """
 This file demonstrates writing tests using the unittest module. These will pass
 when you run "manage.py test".
 
 Replace this with more appropriate tests for your application.
 """
-import logging
-import unittest
 from datetime import datetime, timedelta
+import logging
 import pytz
+import unittest
 
 from django.conf import settings
-from django.test import TestCase
-from django.test.utils import override_settings
-from django.test.client import RequestFactory, Client
 from django.contrib.auth.models import User, AnonymousUser
-from django.core.urlresolvers import reverse
 from django.contrib.sessions.middleware import SessionMiddleware
-
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
+from django.core.urlresolvers import reverse
+from django.test import TestCase
+from django.test.client import RequestFactory, Client
+from django.test.utils import override_settings
+from mock import Mock, patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from mock import Mock, patch
-
-from student.models import anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment, unique_id_for_user
+from student.models import (
+    anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment, unique_id_for_user
+)
 from student.views import (process_survey_link, _cert_info,
                            change_enrollment, complete_course_mode_info)
 from student.tests.factories import UserFactory, CourseModeFactory
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 
-from certificates.models import CertificateStatuses
-from certificates.tests.factories import GeneratedCertificateFactory
-import shoppingcart
-from bulk_email.models import Optout
+# These imports refer to lms djangoapps.
+# Their testcases are only run under lms.
+from bulk_email.models import Optout  # pylint: disable=import-error
+from certificates.models import CertificateStatuses  # pylint: disable=import-error
+from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
+import shoppingcart  # pylint: disable=import-error
+
 
 log = logging.getLogger(__name__)
 
@@ -175,19 +179,15 @@ class CourseEndingTest(TestCase):
         self.assertIsNone(_cert_info(user, course2, cert_status))
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class DashboardTest(TestCase):
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+class DashboardTest(ModuleStoreTestCase):
     """
     Tests for dashboard utility functions
     """
-    # arbitrary constant
-    COURSE_SLUG = "100"
-    COURSE_NAME = "test_course"
-    COURSE_ORG = "EDX"
 
     def setUp(self):
-        self.course = CourseFactory.create(org=self.COURSE_ORG, display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
-        self.assertIsNotNone(self.course)
+        super(DashboardTest, self).setUp()
+        self.course = CourseFactory.create()
         self.user = UserFactory.create(username="jack", email="jack@fake.edx.org", password='test')
         self.client = Client()
 
@@ -268,6 +268,7 @@ class DashboardTest(TestCase):
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @patch('courseware.views.log.warning')
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_blocked_course_scenario(self, log_warning):
 
         self.client.login(username="jack", password="test")
@@ -279,8 +280,9 @@ class DashboardTest(TestCase):
             recipient_name='Testw_1', recipient_email='test2@test.com', internal_reference="A",
             course_id=self.course.id, is_valid=False
         )
-        course_reg_code = shoppingcart.models.CourseRegistrationCode(code="abcde", course_id=self.course.id,
-                                                                     created_by=self.user, invoice=sale_invoice_1)
+        course_reg_code = shoppingcart.models.CourseRegistrationCode(
+            code="abcde", course_id=self.course.id, created_by=self.user, invoice=sale_invoice_1, mode_slug='honor'
+        )
         course_reg_code.save()
 
         cart = shoppingcart.models.Order.get_cart_for_user(self.user)
@@ -288,9 +290,15 @@ class DashboardTest(TestCase):
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': course_reg_code.code})
         self.assertEqual(resp.status_code, 200)
 
-        # freely enroll the user into course
-        resp = self.client.get(reverse('shoppingcart.views.register_courses'))
-        self.assertIn('success', resp.content)
+        redeem_url = reverse('register_code_redemption', args=[course_reg_code.code])
+        response = self.client.get(redeem_url)
+        self.assertEquals(response.status_code, 200)
+        # check button text
+        self.assertTrue('Activate Course Enrollment' in response.content)
+
+        #now activate the user by enrolling him/her to the course
+        response = self.client.post(redeem_url)
+        self.assertEquals(response.status_code, 200)
 
         response = self.client.get(reverse('dashboard'))
         self.assertIn('You can no longer access this course because payment has not yet been received', response.content)
@@ -324,7 +332,7 @@ class DashboardTest(TestCase):
         )
         enrollment = CourseEnrollment.enroll(self.user, self.course.id, mode='honor')
 
-        # TODO: Until we can allow course administrators to define a refund period for paid for courses show_refund_option should be False. # pylint: disable=W0511
+        # TODO: Until we can allow course administrators to define a refund period for paid for courses show_refund_option should be False. # pylint: disable=fixme
         self.assertFalse(enrollment.refundable())
 
         resp = self.client.post(reverse('student.views.dashboard', args=[]))
@@ -582,7 +590,7 @@ class EnrollInCourseTest(TestCase):
         self.assert_enrollment_mode_change_event_was_emitted(user, course_id, "honor")
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class ChangeEnrollmentViewTest(ModuleStoreTestCase):
     """Tests the student.views.change_enrollment view"""
@@ -665,21 +673,16 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
         self.assertEqual(enrollment_mode, u'honor')
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class PaidRegistrationTest(ModuleStoreTestCase):
     """
     Tests for paid registration functionality (not verified student), involves shoppingcart
     """
-    # arbitrary constant
-    COURSE_SLUG = "100"
-    COURSE_NAME = "test_course"
-    COURSE_ORG = "EDX"
-
     def setUp(self):
+        super(PaidRegistrationTest, self).setUp()
         # Create course
+        self.course = CourseFactory.create()
         self.req_factory = RequestFactory()
-        self.course = CourseFactory.create(org=self.COURSE_ORG, display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
-        self.assertIsNotNone(self.course)
         self.user = User.objects.create(username="jack", email="jack@fake.edx.org")
 
     @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
@@ -703,19 +706,14 @@ class PaidRegistrationTest(ModuleStoreTestCase):
             shoppingcart.models.Order.get_cart_for_user(self.user), self.course.id))
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class AnonymousLookupTable(TestCase):
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+class AnonymousLookupTable(ModuleStoreTestCase):
     """
     Tests for anonymous_id_functions
     """
-    # arbitrary constant
-    COURSE_SLUG = "100"
-    COURSE_NAME = "test_course"
-    COURSE_ORG = "EDX"
-
     def setUp(self):
-        self.course = CourseFactory.create(org=self.COURSE_ORG, display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
-        self.assertIsNotNone(self.course)
+        super(AnonymousLookupTable, self).setUp()
+        self.course = CourseFactory.create()
         self.user = UserFactory()
         CourseModeFactory.create(
             course_id=self.course.id,
@@ -736,3 +734,11 @@ class AnonymousLookupTable(TestCase):
         real_user = user_by_anonymous_id(anonymous_id)
         self.assertEqual(self.user, real_user)
         self.assertEqual(anonymous_id, anonymous_id_for_user(self.user, self.course.id, save=False))
+
+    def test_roundtrip_with_unicode_course_id(self):
+        course2 = CourseFactory.create(display_name=u"Omega Course Ω")
+        CourseEnrollment.enroll(self.user, course2.id)
+        anonymous_id = anonymous_id_for_user(self.user, course2.id)
+        real_user = user_by_anonymous_id(anonymous_id)
+        self.assertEqual(self.user, real_user)
+        self.assertEqual(anonymous_id, anonymous_id_for_user(self.user, course2.id, save=False))

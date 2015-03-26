@@ -11,7 +11,7 @@ data: |
     </p>
     <p>Which animal shown below is a kitten?</p>
     <imageresponse>
-      <imageinput src="https://studio.edx.org/c4x/edX/DemoX/asset/Dog-and-Cat.jpg" width="640" height="400" rectangle="(385,98)-(600,337)"/>
+      <imageinput src="https://studio.edx.org/c4x/edX/DemoX/asset/Dog-and-Cat.jpg" width="640" height="400" rectangle="(385,98)-(600,337)" alt="Two animals side by side. On the left, a brown furry animal with floppy ears and a large dark nose, on the right, a smaller furry animal with pointy ears and a small pink nose."/>
     </imageresponse>
     <solution>
       <div class="detailed-solution">

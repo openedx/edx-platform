@@ -1,4 +1,4 @@
-% if user.is_authenticated():
+% if settings.TENDER_DOMAIN and user.is_authenticated():
 <script type="text/javascript">
 window.Tender = {
   hideToggle: true,
@@ -7,6 +7,14 @@ window.Tender = {
   hide_kb: 'true',
   widgetToggles: document.getElementsByClassName('show-tender')
 }
-require(['tender']);
+// In order to avoid requirejs timeout errors should tender not be
+// available, we're not using domReady as a loader plugin here.
+// For more details, please see the note at
+// http://requirejs.org/docs/api.html#pageload
+require(['domReady'], function (domReady) {
+  domReady(function () {
+      require(['tender']);
+  });
+});
 </script>
 % endif

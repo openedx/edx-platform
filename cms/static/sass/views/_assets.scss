@@ -5,21 +5,19 @@
 
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
-    float: left;
   }
 
   .content-primary {
-    width: flex-grid(9, 12);
-    margin-right: flex-gutter();
+    @extend .ui-col-wide;
   }
 
   .content-supplementary {
-    width: flex-grid(3, 12);
+    @extend .ui-col-narrow;
   }
 
   .nav-actions {
 
-    .icon-cloud-upload {
+    .fa-cloud-upload {
       @extend %t-copy;
       vertical-align: bottom;
       margin-right: ($baseline/5);
@@ -35,16 +33,17 @@
     color: $gray;
 
     .new-button {
+      @extend %btn-primary-green;
       @extend %t-action3;
-      margin-left: $baseline;
+      @include margin-left($baseline);
 
-      [class^="icon-"] {
-        margin-right: ($baseline/2);
+      .icon {
+        @include margin-right($baseline/2);
       }
     }
   }
 
-  .asset-library {
+  .assets-library {
     @include clearfix;
 
     .meta-wrap {
@@ -59,6 +58,7 @@
 
       .count-current-shown,
       .count-total,
+      .filter-column,
       .sort-order {
         @extend %t-strong;
       }
@@ -70,7 +70,7 @@
       width: flex-grid(3, 12);
 
       &.pagination-compact {
-        text-align: right;
+        @include text-align(right);
       }
 
       &.pagination-full {
@@ -136,7 +136,7 @@
       .current-page {
         @extend %ui-depth1;
         position: absolute;
-        left: -($baseline/4);
+        @include left(-($baseline/4));
       }
 
       .page-divider {
@@ -200,11 +200,10 @@
         text-align: left;
         color: $gray;
 
-        .column-sort-link {
+        .column-sort-link, .column-selected-link {
           cursor: pointer;
           color: $blue;
         }
-
 
         .current-sort {
           @extend %t-strong;
@@ -215,6 +214,56 @@
         &.embed-col {
           padding-left: ($baseline*0.75);
           padding-right: ($baseline*0.75);
+        }
+
+        &.nav-dd{
+          // basic layout - nav items
+          margin: 0 -($baseline/2);
+          color: $blue;
+          cursor: pointer;
+          .wrapper-nav-sub {
+            top: 35px;
+            @extend %ui-depth2;
+
+            > ol > .nav-item {
+              @extend %t-action3;
+              @extend %t-strong;
+              display: inline-block;
+              vertical-align: middle;
+
+              &:last-child {
+                margin-right: 0;
+              }
+            }
+            .nav-sub {
+              @include text-align(left);
+
+              // ui triangle/nub
+              &:after {
+                left: $baseline;
+                margin-left: -10px;
+              }
+
+              &:before {
+                left: $baseline;
+                margin-left: -11px;
+              }
+
+              .nav-item {
+                &.reset-filter{
+                  display:none;
+                }
+
+                a {
+                  color: $gray-d1;
+
+                  &:hover {
+                    color: $blue-s1;
+                  }
+                }
+              }
+            }
+          }
         }
       }
 
@@ -250,7 +299,7 @@
           }
 
           &.is-locked {
-            background-image: url('../img/bg-micro-stripes.png');
+            background-image: url('../images/bg-micro-stripes.png');
             background-position: 0 0;
             background-repeat: repeat;
           }
@@ -268,6 +317,8 @@
 
       .thumb-col {
         padding: ($baseline/2) $baseline;
+        @extend %t-copy-sub2;
+        color: $gray-l2;
 
         .thumb {
           width: 100px;
@@ -289,6 +340,11 @@
           }
         }
 
+        .type-col {
+          @extend %t-copy-sub2;
+          color: $gray-l2;
+        }
+
         .date-col {
           @include transition(all $tmg-f2 ease-in-out 0s);
           @extend %t-copy-sub2;
@@ -297,8 +353,14 @@
 
         .embed-col {
           @include transition(all $tmg-f2 ease-in-out 0s);
+          @extend %t-copy-sub2;
           padding-left: ($baseline*0.75);
           color: $gray-l2;
+
+          .label {
+            display: inline-block;
+            width: ($baseline*2);
+          }
 
           .embeddable-xml-input {
             @include transition(all $tmg-f2 ease-in-out 0s);
@@ -306,13 +368,14 @@
             box-shadow: none;
             border: 1px solid transparent;
             background: none;
-            width: 100%;
+            padding: ($baseline/5);
             color: $gray-l2;
 
             &:focus {
               background-color: $white;
               box-shadow: 0 1px 5px $shadow-l1 inset;
               border: 1px solid $gray-l3;
+              color: $black;
             }
           }
         }
@@ -363,11 +426,11 @@
       }
 
       &.action-lock .lock-checkbox ~ .action-button {
-        .icon-lock {
+        .fa-lock {
           display: none;
         }
 
-        .icon-unlock-alt {
+        .fa-unlock-alt {
           display: inline-block;
         }
       }
@@ -376,11 +439,11 @@
         background-color: $gray;
         color: $white;
 
-        .icon-lock {
+        .fa-lock {
           display: inline-block;
         }
 
-       .icon-unlock-alt {
+       .fa-unlock-alt {
           display: none;
         }
       }
@@ -455,7 +518,7 @@
       background: none;
       padding: 0;
 
-      [class^="icon-"] {
+      .icon {
         @extend %t-action1;
       }
 

@@ -45,6 +45,7 @@ describe "ThreadResponseShowView", ->
     it "renders endorsement correctly for a marked answer in a question thread", ->
         endorsement = {
           "username": "test_endorser",
+          "user_id": "test_id",
           "time": new Date().toISOString()
         }
         @thread.set("thread_type", "question")
@@ -56,6 +57,7 @@ describe "ThreadResponseShowView", ->
         expect(@view.$(".posted-details").text().replace(/\s+/g, " ")).toMatch(
           "marked as answer less than a minute ago by " + endorsement.username
         )
+        expect(@view.$(".posted-details > a").attr('href')).toEqual("/courses/edX/999/test/discussion/forum/users/test_id")
 
     it "renders anonymous endorsement correctly for a marked answer in a question thread", ->
         endorsement = {
@@ -74,6 +76,7 @@ describe "ThreadResponseShowView", ->
     it "renders endorsement correctly for an endorsed response in a discussion thread", ->
         endorsement = {
           "username": "test_endorser",
+          "user_id": "test_id",
           "time": new Date().toISOString()
         }
         @thread.set("thread_type", "discussion")
@@ -85,6 +88,7 @@ describe "ThreadResponseShowView", ->
         expect(@view.$(".posted-details").text().replace(/\s+/g, " ")).toMatch(
           "endorsed less than a minute ago by " + endorsement.username
         )
+        expect(@view.$(".posted-details > a").attr('href')).toEqual("/courses/edX/999/test/discussion/forum/users/test_id")
 
     it "renders anonymous endorsement correctly for an endorsed response in a discussion thread", ->
         endorsement = {

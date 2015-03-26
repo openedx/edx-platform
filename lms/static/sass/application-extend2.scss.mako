@@ -1,11 +1,12 @@
 ## NOTE: This Sass infrastructure is redundant, but needed in order to address an IE9 rule limit within CSS - http://blogs.msdn.com/b/ieinternals/archive/2011/05/14/10164546.aspx
 
-
 // lms - css application architecture (platform)
 // ====================
 
 // libs and resets *do not edit*
 @import 'bourbon/bourbon'; // lib - bourbon
+@import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
+
 
 // BASE  *default edX offerings*
 // ====================
@@ -44,7 +45,9 @@
 @import 'elements/system-feedback';
 
 // base - specific views
+@import 'views/login-register';
 @import 'views/verification';
+@import 'views/decoupled-verification';
 @import 'views/shoppingcart';
 
 // applications
@@ -56,7 +59,7 @@
 @import "discussion/elements/labels";
 @import "discussion/elements/navigation";
 @import "discussion/views/thread";
-@import "discussion/views/new-post";
+@import "discussion/views/create-edit-post";
 @import "discussion/views/response";
 @import 'discussion/utilities/developer';
 @import 'discussion/utilities/shame';

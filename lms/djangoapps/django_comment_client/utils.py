@@ -1,3 +1,4 @@
+import json
 import pytz
 from collections import defaultdict
 import logging
@@ -8,17 +9,19 @@ from django.core.urlresolvers import reverse
 from django.db import connection
 from django.http import HttpResponse
 from django.utils import simplejson
+from django.utils.timezone import UTC
+
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
 
 from edxmako import lookup_template
 import pystache_custom as pystache
 
-from xmodule.modulestore.django import modulestore
-from django.utils.timezone import UTC
+from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_id, get_cohort_id, is_commentable_cohorted, is_course_cohorted
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from opaque_keys.edx.locations import i4xEncoder
 from opaque_keys.edx.keys import CourseKey
-import json
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -69,7 +72,7 @@ def _get_discussion_modules(course):
     return filter(has_required_keys, all_modules)
 
 
-def _get_discussion_id_map(course):
+def get_discussion_id_map(course):
     def get_entry(module):
         discussion_id = module.discussion_id
         title = module.discussion_target
@@ -88,7 +91,7 @@ def _filter_unstarted_categories(category_map):
     unfiltered_queue = [category_map]
     filtered_queue = [result_map]
 
-    while len(unfiltered_queue) > 0:
+    while unfiltered_queue:
 
         unfiltered_map = unfiltered_queue.pop()
         filtered_map = filtered_queue.pop()
@@ -120,7 +123,7 @@ def _filter_unstarted_categories(category_map):
 def _sort_map_entries(category_map, sort_alpha):
     things = []
     for title, entry in category_map["entries"].items():
-        if entry["sort_key"] == None and sort_alpha:
+        if entry["sort_key"] is None and sort_alpha:
             entry["sort_key"] = title
         things.append((title, entry))
     for title, category in category_map["subcategories"].items():
@@ -198,6 +201,23 @@ def get_discussion_category_map(course):
     _sort_map_entries(category_map, course.discussion_sort_alpha)
 
     return _filter_unstarted_categories(category_map)
+
+
+def get_discussion_categories_ids(course):
+    """
+    Returns a list of available ids of categories for the course.
+    """
+    ids = []
+    queue = [get_discussion_category_map(course)]
+    while queue:
+        category_map = queue.pop()
+        for child in category_map["children"]:
+            if child in category_map["entries"]:
+                ids.append(category_map["entries"][child]["id"])
+            else:
+                queue.append(category_map["subcategories"][child])
+
+    return ids
 
 
 class JsonResponse(HttpResponse):
@@ -350,7 +370,7 @@ def extend_content(content):
 
 
 def add_courseware_context(content_list, course):
-    id_map = _get_discussion_id_map(course)
+    id_map = get_discussion_id_map(course)
 
     for content in content_list:
         commentable_id = content['commentable_id']
@@ -364,14 +384,23 @@ def add_courseware_context(content_list, course):
             content.update({"courseware_url": url, "courseware_title": title})
 
 
-def safe_content(content, course_id, is_staff=False):
+def prepare_content(content, course_key, is_staff=False):
+    """
+    This function is used to pre-process thread and comment models in various
+    ways before adding them to the HTTP response.  This includes fixing empty
+    attribute fields, enforcing author anonymity, and enriching metadata around
+    group ownership and response endorsement.
+
+    @TODO: not all response pre-processing steps are currently integrated into
+    this function.
+    """
     fields = [
         'id', 'title', 'body', 'course_id', 'anonymous', 'anonymous_to_peers',
         'endorsed', 'parent_id', 'thread_id', 'votes', 'closed', 'created_at',
         'updated_at', 'depth', 'type', 'commentable_id', 'comments_count',
         'at_position_list', 'children', 'highlighted_title', 'highlighted_body',
         'courseware_title', 'courseware_url', 'unread_comments_count',
-        'read', 'group_id', 'group_name', 'group_string', 'pinned', 'abuse_flaggers',
+        'read', 'group_id', 'group_name', 'pinned', 'abuse_flaggers',
         'stats', 'resp_skip', 'resp_limit', 'resp_total', 'thread_type',
         'endorsed_responses', 'non_endorsed_responses', 'non_endorsed_resp_total',
         'endorsement',
@@ -397,7 +426,7 @@ def safe_content(content, course_id, is_staff=False):
         # Only reveal endorser if requester can see author or if endorser is staff
         if (
             endorser and
-            ("username" in fields or cached_has_permission(endorser, "endorse_comment", course_id))
+            ("username" in fields or cached_has_permission(endorser, "endorse_comment", course_key))
         ):
             endorsement["username"] = endorser.username
         else:
@@ -405,9 +434,52 @@ def safe_content(content, course_id, is_staff=False):
 
     for child_content_key in ["children", "endorsed_responses", "non_endorsed_responses"]:
         if child_content_key in content:
-            safe_children = [
-                safe_content(child, course_id, is_staff) for child in content[child_content_key]
+            children = [
+                prepare_content(child, course_key, is_staff) for child in content[child_content_key]
             ]
-            content[child_content_key] = safe_children
+            content[child_content_key] = children
+
+    if is_course_cohorted(course_key):
+        # Augment the specified thread info to include the group name if a group id is present.
+        if content.get('group_id') is not None:
+            content['group_name'] = get_cohort_by_id(course_key, content.get('group_id')).name
+    else:
+        # Remove any cohort information that might remain if the course had previously been cohorted.
+        content.pop('group_id', None)
 
     return content
+
+
+def get_group_id_for_comments_service(request, course_key, commentable_id=None):
+    """
+    Given a user requesting content within a `commentable_id`, determine the
+    group_id which should be passed to the comments service.
+
+    Returns:
+        int: the group_id to pass to the comments service or None if nothing
+        should be passed
+
+    Raises:
+        ValueError if the requested group_id is invalid
+    """
+    if commentable_id is None or is_commentable_cohorted(course_key, commentable_id):
+        if request.method == "GET":
+            requested_group_id = request.GET.get('group_id')
+        elif request.method == "POST":
+            requested_group_id = request.POST.get('group_id')
+        if cached_has_permission(request.user, "see_all_cohorts", course_key):
+            if not requested_group_id:
+                return None
+            try:
+                group_id = int(requested_group_id)
+                get_cohort_by_id(course_key, group_id)
+            except CourseUserGroup.DoesNotExist:
+                raise ValueError
+        else:
+            # regular users always query with their own id.
+            group_id = get_cohort_id(request.user, course_key)
+        return group_id
+    else:
+        # Never pass a group_id to the comments service for a non-cohorted
+        # commentable
+        return None

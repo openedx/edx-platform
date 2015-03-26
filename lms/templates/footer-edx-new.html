@@ -1,0 +1,122 @@
+## mako
+<%! from django.core.urlresolvers import reverse %>
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='static_content.html'/>
+## WARNING: These files are specific to edx.org and are not used in installations outside of that domain. Open edX users will want to use the file "footer.html" for any changes or overrides.
+<div class="wrapper wrapper-footer edx-footer edx-footer-new">
+  <footer id="footer-global" class="footer-global" role="contentinfo" aria-label="Footer">
+
+    <div class="footer-about">
+      <h2 class="sr footer-about-title">${_("About edX")}</h2>
+
+      <div class="footer-about-logo">
+        <img alt="edX logo" src="${static.url('images/edx-theme/edx-header-logo.png')}">
+      </div>
+
+      <div class="footer-about-copy">
+        <p>
+          ${_(
+            "{EdX} offers interactive online classes and MOOCs from the world's best universities. "
+            "Online courses from {MITx}, {HarvardX}, {BerkeleyX}, {UTx} and many other universities. "
+            "Topics include biology, business, chemistry, computer science, economics, finance, "
+            "electronics, engineering, food and nutrition, history, humanities, law, literature, "
+            "math, medicine, music, philosophy, physics, science, statistics and more. {EdX} is a "
+            "non-profit online initiative created by founding partners {Harvard} and {MIT}."
+            ).format(
+            EdX="EdX", Harvard="Harvard", MIT="MIT", HarvardX="HarvardX", MITx="MITx",
+            BerkeleyX="BerkeleyX", UTx="UTx"
+          )}
+        </p>
+      </div>
+
+      <div class="footer-about-copyright">
+      	## Using "edX Inc." explicitly here for copyright purposes (settings.PLATFORM_NAME is just "edX", and this footer is only used on edx.org)
+      	<p>&copy; ${settings.COPYRIGHT_YEAR} edX Inc.</p>
+
+      	## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
+      	<p>
+      	  ## Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'. Please do not translate any of these trademarks and company names.
+      	  ${_("EdX, Open edX, and the edX and Open edX logos are registered trademarks or trademarks of {link_start}edX Inc.{link_end}").format(
+      	      link_start=u"<a href='https://www.edx.org/'><span class='copy'>",
+      	      link_end=u"</span></a>"
+      	  )}
+      	</p>
+      </div>
+
+      <div class="footer-about-links">
+        <a href="${marketing_link('TOS')}"><span class="copy">${_("Terms of Service and Honor Code")}</span></a>
+        <a href="${marketing_link('PRIVACY')}"><span class="copy">${_("Privacy Policy")}</span> <span class="note">${_("(Revised 4/16/2014)")}</span></a>
+      </div>
+    </div>
+
+    <nav class="footer-nav" role="navigation" aria-label="About Us">
+      <h2 class="footer-nav-title">${_("About edX")}</h2>
+
+      <div class="footer-nav-links">
+        <a href="${marketing_link('ABOUT')}"><span class="copy">${_("About")}</span></a>
+        <a href="${marketing_link('NEWS')}"><span class="copy">${_("News")}</span></a>
+        <a href="${marketing_link('CONTACT')}"><span class="copy">${_("Contact")}</span></a>
+        <a href="${marketing_link('FAQ')}"><span class="copy">${_("FAQ")}</span></a>
+        <a href="${marketing_link('BLOG')}"><span class="copy">${_("edX Blog")}</span></a>
+        <a href="${marketing_link('DONATE')}"><span class="copy">${_("Donate to edX")}</span></a>
+        <a href="${marketing_link('JOBS')}"><span class="copy">${_("Jobs at edX")}</span></a>
+      </div>
+    </nav>
+
+    <div class="footer-follow">
+      <h2 class="footer-follow-title">${_("Follow Us")}</h2>
+
+      <div class="footer-follow-links">
+        ## Translators: This is the website name of www.twitter.com. Please
+        ## translate this the way that Twitter advertises in your language.
+        <a href="${settings.PLATFORM_TWITTER_URL}" title="${_("Twitter")}" rel="noreferrer">
+          <i class="icon fa fa-twitter element-invisible"></i>
+          <span class="copy">${_("Twitter")}</span>
+        </a>
+        ## Translators: This is the website name of www.facebook.com. Please
+        ## translate this the way that Facebook advertises in your language.
+        <a href="${settings.PLATFORM_FACEBOOK_ACCOUNT}" title="${_("Facebook")}" rel="noreferrer">
+          <i class="icon fa fa-facebook element-invisible"></i>
+          <span class="copy">${_("Facebook")}</span>
+        </a>
+        ## Translators: This is the website name of www.meetup.com. Please
+        ## translate this the way that Meetup advertises in your language.
+        <a href="${settings.PLATFORM_MEETUP_URL}" title="${_("Meetup")}" rel="noreferrer">
+          <i class="icon fa fa-calendar element-invisible"></i>
+          <span class="copy">${_("Meetup")}</span>
+        </a>
+        ## Translators: This is the website name of www.linked.com. Please
+        ## translate this the way that LinkedIn advertises in your language.
+        <a href="${settings.PLATFORM_LINKEDIN_URL}" title="${_("LinkedIn")}" rel="noreferrer">
+          <i class="icon fa fa-linkedin element-invisible"></i>
+          <span class="copy">${_("LinkedIn")}</span>
+        </a>
+        ## Translators: This is the website name of plus.google.com. Please
+        ## translate this the way that Google+ advertises in your language.
+        <a href="${settings.PLATFORM_GOOGLE_PLUS_URL}" title="${_("Google+")}" rel="noreferrer">
+          <i class="icon fa fa-google-plus element-invisible"></i>
+          <span class="copy">${_("Google+")}</span>
+        </a>
+      </div>
+
+      % if settings.FEATURES.get('ENABLE_FOOTER_MOBILE_APP_LINKS'):
+      <div class="footer-mobile-apps">
+        <h2 class="footer-nav-title">${_("Mobile Apps")}</h2>
+        <div class="mobile-app-wrapper">
+          <a href="${settings.MOBILE_STORE_URLS.get('apple', '#')}">
+            <img class="app-store" alt="${_("Apple app on Apple Store")}" src="${static.url('images/app/app_store_badge_135x40.svg')}">
+          </a>
+        </div>
+        <div class="mobile-app-wrapper">
+          <a href="${settings.MOBILE_STORE_URLS.get('google', '#')}">
+            <img class="google-play" alt="${_("Android app on Google Play")}" src="${static.url('images/app/google_play_badge_45.png')}">
+          </a>
+        </div>
+      </div>
+      % endif
+    </div>
+  </footer>
+</div>
+
+<script type="text/javascript" src="/static/js/vendor/noreferrer.js" charset="utf-8"></script>
+

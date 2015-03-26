@@ -2,6 +2,8 @@
 Unit tests for the notes app.
 """
 
+from mock import patch, Mock
+
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from django.test import TestCase
 from django.test.client import Client
@@ -12,7 +14,7 @@ from django.core.exceptions import ValidationError
 import collections
 import json
 
-from . import utils, api, models
+from notes import utils, api, models
 
 
 class UtilsTest(TestCase):
@@ -49,7 +51,9 @@ class ApiTest(TestCase):
         self.client = Client()
 
         # Mocks
-        api.api_enabled = self.mock_api_enabled(True)
+        patcher = patch.object(api, 'api_enabled', Mock(return_value=True))
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
         # Create two accounts
         self.password = 'abc'
@@ -72,9 +76,6 @@ class ApiTest(TestCase):
 
         # Make sure no note with this ID ever exists for testing purposes
         self.NOTE_ID_DOES_NOT_EXIST = 99999
-
-    def mock_api_enabled(self, is_enabled):
-        return (lambda request, course_id: is_enabled)
 
     def login(self, as_student=None):
         username = None

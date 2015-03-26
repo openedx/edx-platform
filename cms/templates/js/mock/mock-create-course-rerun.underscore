@@ -104,7 +104,7 @@
                             </div>
 
                             <div class="actions">
-                                <button type="submit" class="action action-primary rerun-course-save is-disabled">Create Re-run</button>
+                                <button type="submit" class="action action-primary rerun-course-save is-disabled" aria-disabled="true" >Create Re-run</button>
                                 <button type="button" class="action action-secondary action-cancel rerun-course-cancel">Cancel</button>
                             </div>
                         </form>

@@ -11,6 +11,7 @@ import logging
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
 from xmodule.modulestore import ModuleStoreEnum
 from opaque_keys.edx.locator import CourseLocator
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger(__name__)
 
@@ -46,6 +47,8 @@ class SplitMigrator(object):
 
         # create the course: set fields to explicitly_set for each scope, id_root = new_course_locator, master_branch = 'production'
         original_course = self.source_modulestore.get_course(source_course_key, **kwargs)
+        if original_course is None:
+            raise ItemNotFoundError(unicode(source_course_key))
 
         if new_org is None:
             new_org = source_course_key.org
@@ -116,7 +119,7 @@ class SplitMigrator(object):
 
         # clean up orphans in published version: in old mongo, parents pointed to the union of their published and draft
         # children which meant some pointers were to non-existent locations in 'direct'
-        self.split_modulestore.internal_clean_children(course_version_locator)
+        self.split_modulestore.fix_not_found(course_version_locator, user_id)
 
     def _add_draft_modules_to_course(self, published_course_usage_key, source_course_key, user_id, **kwargs):
         """

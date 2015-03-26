@@ -161,7 +161,6 @@ class TestDownloadYoutubeSubs(ModuleStoreTestCase):
     number = '999'
     display_name = 'Test course'
 
-
     def clear_sub_content(self, subs_id):
         """
         Remove, if subtitle content exists.
@@ -472,6 +471,7 @@ class TestYoutubeTranscripts(unittest.TestCase):
         self.assertEqual(transcripts, expected_transcripts)
         mock_get.assert_called_with('http://video.google.com/timedtext', params={'lang': 'en', 'v': 'good_youtube_id'})
 
+
 class TestTranscript(unittest.TestCase):
     """
     Tests for Transcript class e.g. different transcript conversions.
@@ -488,7 +488,6 @@ class TestTranscript(unittest.TestCase):
             At the left we can see...
 
         """)
-
 
         self.sjson_transcript = textwrap.dedent("""\
             {

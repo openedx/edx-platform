@@ -30,7 +30,7 @@ class PollFields(object):
 
     voted = Boolean(help="Whether this student has voted on the poll", scope=Scope.user_state, default=False)
     poll_answer = String(help="Student answer", scope=Scope.user_state, default='')
-    poll_answers = Dict(help="All possible answers for the poll fro other students", scope=Scope.user_state_summary)
+    poll_answers = Dict(help="Poll answers from all students", scope=Scope.user_state_summary)
 
     # List of answers, in the form {'id': 'some id', 'text': 'the answer text'}
     answers = List(help="Poll answers from xml", scope=Scope.content, default=[])
@@ -41,10 +41,12 @@ class PollFields(object):
 class PollModule(PollFields, XModule):
     """Poll Module"""
     js = {
-      'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee')],
-      'js': [resource_string(__name__, 'js/src/poll/poll.js'),
-             resource_string(__name__, 'js/src/poll/poll_main.js')]
-         }
+        'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee')],
+        'js': [
+            resource_string(__name__, 'js/src/poll/poll.js'),
+            resource_string(__name__, 'js/src/poll/poll_main.js')
+        ]
+    }
     css = {'scss': [resource_string(__name__, 'css/poll/display.scss')]}
     js_module_name = "Poll"
 
@@ -94,11 +96,11 @@ class PollModule(PollFields, XModule):
     def get_html(self):
         """Renders parameters to template."""
         params = {
-                  'element_id': self.location.html_id(),
-                  'element_class': self.location.category,
-                  'ajax_url': self.system.ajax_url,
-                  'configuration_json': self.dump_poll(),
-                  }
+            'element_id': self.location.html_id(),
+            'element_class': self.location.category,
+            'ajax_url': self.system.ajax_url,
+            'configuration_json': self.dump_poll(),
+        }
         self.content = self.system.render_template('poll.html', params)
         return self.content
 
@@ -119,7 +121,7 @@ class PollModule(PollFields, XModule):
         # Now we use this hack.
         temp_poll_answers = self.poll_answers
 
-         # Fill self.poll_answers, prepare data for template context.
+        # Fill self.poll_answers, prepare data for template context.
         for answer in self.answers:
             # Set default count for answer = 0.
             if answer['id'] not in temp_poll_answers:
@@ -127,13 +129,15 @@ class PollModule(PollFields, XModule):
             answers_to_json[answer['id']] = cgi.escape(answer['text'])
         self.poll_answers = temp_poll_answers
 
-        return json.dumps({'answers': answers_to_json,
+        return json.dumps({
+            'answers': answers_to_json,
             'question': cgi.escape(self.question),
             # to show answered poll after reload:
             'poll_answer': self.poll_answer,
             'poll_answers': self.poll_answers if self.voted else {},
             'total': sum(self.poll_answers.values()) if self.voted else 0,
-            'reset': str(self.descriptor.xml_attributes.get('reset', 'true')).lower()})
+            'reset': str(self.descriptor.xml_attributes.get('reset', 'true')).lower()
+        })
 
 
 class PollDescriptor(PollFields, MakoModuleDescriptor, XmlDescriptor):

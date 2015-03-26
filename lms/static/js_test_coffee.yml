@@ -1,0 +1,87 @@
+---
+# LMS CoffeeScript tests that are not yet using RequireJS.
+#
+#
+# To run all the tests and print results to the console:
+#
+#   js-test-tool run TEST_SUITE --use-firefox
+#
+# where `TEST_SUITE` is this file.
+#
+#
+# To run the tests in your default browser ("dev mode"):
+#
+#   js-test-tool dev TEST_SUITE
+#
+
+test_suite_name: lms-coffee
+
+test_runner: jasmine
+
+# Path prepended to source files in the coverage report (optional)
+# For example, if the source path
+# is "src/source.js" (relative to this YAML file)
+# and the prepend path is "base/dir"
+# then the coverage report will show
+# "base/dir/src/source.js"
+prepend_path: lms/static
+
+# Paths to library JavaScript files (optional)
+lib_paths:
+    - xmodule_js/common_static/js/test/i18n.js
+    - xmodule_js/common_static/coffee/src/ajax_prefix.js
+    - xmodule_js/common_static/js/src/logger.js
+    - xmodule_js/common_static/js/vendor/jasmine-jquery.js
+    - xmodule_js/common_static/js/vendor/jasmine-imagediff.js
+    - xmodule_js/common_static/js/vendor/require.js
+    - js/RequireJS-namespace-undefine.js
+    - xmodule_js/common_static/js/vendor/jquery.min.js
+    - xmodule_js/common_static/js/vendor/jquery-ui.min.js
+    - xmodule_js/common_static/js/vendor/jquery.cookie.js
+    - xmodule_js/common_static/js/vendor/flot/jquery.flot.js
+    - xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js
+    - xmodule_js/common_static/js/vendor/URI.min.js
+    - xmodule_js/common_static/coffee/src/jquery.immediateDescendents.js
+    - xmodule_js/common_static/js/xblock
+    - xmodule_js/common_static/coffee/src/xblock
+    - xmodule_js/src/capa/
+    - xmodule_js/src/video/
+    - xmodule_js/src/xmodule.js
+
+# Paths to source JavaScript files
+src_paths:
+    - coffee/src
+
+# Paths to spec (test) JavaScript files
+spec_paths:
+    - coffee/spec
+
+# Paths to fixture files (optional)
+# The fixture path will be set automatically when using jasmine-jquery.
+# (https://github.com/velesin/jasmine-jquery)
+#
+# You can then access fixtures using paths relative to
+# the test suite description:
+#
+#   loadFixtures('path/to/fixture/fixture.html');
+#
+fixture_paths:
+    - coffee/fixtures
+
+# Regular expressions used to exclude *.js files from
+# appearing in the test runner page.
+# Files are included by default, which means that they
+# are loaded using a <script> tag in the test runner page.
+# When loading many files, this can be slow, so
+# exclude any files you don't need.
+#exclude_from_page:
+#    - path/to/lib/exclude/*
+
+# Regular expression used to guarantee that a *.js file
+# is included in the test runner page.
+# If a file name matches both `exclude_from_page` and
+# `include_in_page`, the file WILL be included.
+# You can use this to exclude all files in a directory,
+# but make an exception for particular files.
+#include_in_page:
+#    - path/to/lib/include/*

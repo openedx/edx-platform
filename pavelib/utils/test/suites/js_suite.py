@@ -17,6 +17,7 @@ class JsTestSuite(TestSuite):
         super(JsTestSuite, self).__init__(*args, **kwargs)
         self.run_under_coverage = kwargs.get('with_coverage', True)
         self.mode = kwargs.get('mode', 'run')
+        self.port = kwargs.get('port')
 
         try:
             self.test_id = (Env.JS_TEST_ID_FILES[Env.JS_TEST_ID_KEYS.index(self.root)])
@@ -52,6 +53,9 @@ class JsTestSuite(TestSuite):
                 xunit_report=self.xunit_report,
             )
         )
+
+        if self.port:
+            cmd += " -p {port}".format(port=self.port)
 
         if self.run_under_coverage:
             cmd += " --coverage-xml {report_dir}".format(

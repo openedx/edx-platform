@@ -2,13 +2,17 @@
     Test split modulestore w/o using any django stuff.
 """
 import datetime
+from importlib import import_module
+from path import path
 import random
 import re
 import unittest
 import uuid
-from importlib import import_module
-from path import path
 
+from contracts import contract
+from nose.plugins.attrib import attr
+
+from xblock.fields import Reference, ReferenceList, ReferenceValueDict
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import (
@@ -22,13 +26,16 @@ from xmodule.x_module import XModuleMixin
 from xmodule.fields import Date, Timedelta
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.tests.test_modulestore import check_has_course_method
+from xmodule.modulestore.split_mongo import BlockKey
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from xmodule.modulestore.edit_info import EditInfoMixin
 
 
 BRANCH_NAME_DRAFT = ModuleStoreEnum.BranchName.draft
 BRANCH_NAME_PUBLISHED = ModuleStoreEnum.BranchName.published
 
 
+@attr('mongo')
 class SplitModuleTest(unittest.TestCase):
     '''
     The base set of tests manually populates a db w/ courses which have
@@ -45,7 +52,7 @@ class SplitModuleTest(unittest.TestCase):
     modulestore_options = {
         'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': '',
-        'xblock_mixins': (InheritanceMixin, XModuleMixin)
+        'xblock_mixins': (InheritanceMixin, XModuleMixin, EditInfoMixin)
     }
 
     MODULESTORE = {
@@ -71,216 +78,225 @@ class SplitModuleTest(unittest.TestCase):
             "user_id": "test@edx.org",
             "fields": {
                 "tabs": [
-                        {
-                            "type": "courseware"
-                        },
-                        {
-                            "type": "course_info",
-                            "name": "Course Info"
-                        },
-                        {
-                            "type": "discussion",
-                            "name": "Discussion"
-                        },
-                        {
-                            "type": "wiki",
-                            "name": "Wiki"
-                        }
-                    ],
+                    {
+                        "type": "courseware"
+                    },
+                    {
+                        "type": "course_info",
+                        "name": "Course Info"
+                    },
+                    {
+                        "type": "discussion",
+                        "name": "Discussion"
+                    },
+                    {
+                        "type": "wiki",
+                        "name": "Wiki"
+                    }
+                ],
                 "start": _date_field.from_json("2013-02-14T05:00"),
                 "display_name": "The Ancient Greek Hero",
                 "grading_policy": {
                     "GRADER": [
-                    {
-                        "min_count": 5,
-                        "weight": 0.15,
-                        "type": "Homework",
-                        "drop_count": 1,
-                        "short_label": "HWa"
-                    },
-                    {
-                        "short_label": "",
-                        "min_count": 2,
-                        "type": "Lab",
-                        "drop_count": 0,
-                        "weight": 0.15
-                    },
-                    {
-                        "short_label": "Midterm",
-                        "min_count": 1,
-                        "type": "Midterm Exam",
-                        "drop_count": 0,
-                        "weight": 0.3
-                    },
-                    {
-                        "short_label": "Final",
-                        "min_count": 1,
-                        "type": "Final Exam",
-                        "drop_count": 0,
-                        "weight": 0.4
-                    }
+                        {
+                            "min_count": 5,
+                            "weight": 0.15,
+                            "type": "Homework",
+                            "drop_count": 1,
+                            "short_label": "HWa"
+                        },
+                        {
+                            "short_label": "",
+                            "min_count": 2,
+                            "type": "Lab",
+                            "drop_count": 0,
+                            "weight": 0.15
+                        },
+                        {
+                            "short_label": "Midterm",
+                            "min_count": 1,
+                            "type": "Midterm Exam",
+                            "drop_count": 0,
+                            "weight": 0.3
+                        },
+                        {
+                            "short_label": "Final",
+                            "min_count": 1,
+                            "type": "Final Exam",
+                            "drop_count": 0,
+                            "weight": 0.4
+                        }
                     ],
                     "GRADE_CUTOFFS": {
                         "Pass": 0.75
                     },
                 },
             },
-            "revisions": [{
-                "user_id": "testassist@edx.org",
-                "update": {
-                    "head12345": {
-                        "end": _date_field.from_json("2013-04-13T04:30"),
-                        "tabs": [
-                        {
-                            "type": "courseware"
-                        },
-                        {
-                            "type": "course_info",
-                            "name": "Course Info"
-                        },
-                        {
-                            "type": "discussion",
-                            "name": "Discussion"
-                        },
-                        {
-                            "type": "wiki",
-                            "name": "Wiki"
-                        },
-                        {
-                            "type": "static_tab",
-                            "name": "Syllabus",
-                            "url_slug": "01356a17b5924b17a04b7fc2426a3798"
-                        },
-                        {
-                            "type": "static_tab",
-                            "name": "Advice for Students",
-                            "url_slug": "57e9991c0d794ff58f7defae3e042e39"
+            "revisions": [
+                {
+                    "user_id": "testassist@edx.org",
+                    "update": {
+                        ("course", "head12345"): {
+                            "end": _date_field.from_json("2013-04-13T04:30"),
+                            "tabs": [
+                                {
+                                    "type": "courseware"
+                                },
+                                {
+                                    "type": "course_info",
+                                    "name": "Course Info"
+                                },
+                                {
+                                    "type": "discussion",
+                                    "name": "Discussion"
+                                },
+                                {
+                                    "type": "wiki",
+                                    "name": "Wiki"
+                                },
+                                {
+                                    "type": "static_tab",
+                                    "name": "Syllabus",
+                                    "url_slug": "01356a17b5924b17a04b7fc2426a3798"
+                                },
+                                {
+                                    "type": "static_tab",
+                                    "name": "Advice for Students",
+                                    "url_slug": "57e9991c0d794ff58f7defae3e042e39"
+                                }
+                            ],
+                            "graceperiod": _time_delta_field.from_json("2 hours 0 minutes 0 seconds"),
+                            "grading_policy": {
+                                "GRADER": [
+                                    {
+                                        "min_count": 5,
+                                        "weight": 0.15,
+                                        "type": "Homework",
+                                        "drop_count": 1,
+                                        "short_label": "HWa"
+                                    },
+                                    {
+                                        "short_label": "",
+                                        "min_count": 12,
+                                        "type": "Lab",
+                                        "drop_count": 2,
+                                        "weight": 0.15
+                                    },
+                                    {
+                                        "short_label": "Midterm",
+                                        "min_count": 1,
+                                        "type": "Midterm Exam",
+                                        "drop_count": 0,
+                                        "weight": 0.3
+                                    },
+                                    {
+                                        "short_label": "Final",
+                                        "min_count": 1,
+                                        "type": "Final Exam",
+                                        "drop_count": 0,
+                                        "weight": 0.4
+                                    }
+                                ],
+                                "GRADE_CUTOFFS": {
+                                    "Pass": 0.55
+                                }
+                            },
                         }
-                        ],
-                        "graceperiod": _time_delta_field.from_json("2 hours 0 minutes 0 seconds"),
-                        "grading_policy": {
-                            "GRADER": [
-                                {
-                                    "min_count": 5,
-                                    "weight": 0.15,
-                                    "type": "Homework",
-                                    "drop_count": 1,
-                                    "short_label": "HWa"
-                                },
-                                {
-                                    "short_label": "",
-                                    "min_count": 12,
-                                    "type": "Lab",
-                                    "drop_count": 2,
-                                    "weight": 0.15
-                                },
-                                {
-                                    "short_label": "Midterm",
-                                    "min_count": 1,
-                                    "type": "Midterm Exam",
-                                    "drop_count": 0,
-                                    "weight": 0.3
-                                },
-                                {
-                                    "short_label": "Final",
-                                    "min_count": 1,
-                                    "type": "Final Exam",
-                                    "drop_count": 0,
-                                    "weight": 0.4
-                                }
-                            ],
-                            "GRADE_CUTOFFS": {
-                                "Pass": 0.55
-                            }
-                        },
-                    }}
-                },
-                {"user_id": "testassist@edx.org",
-                 "update":
-                    {"head12345": {
-                        "end": _date_field.from_json("2013-06-13T04:30"),
-                        "grading_policy": {
-                            "GRADER": [
-                                {
-                                    "min_count": 4,
-                                    "weight": 0.15,
-                                    "type": "Homework",
-                                    "drop_count": 2,
-                                    "short_label": "HWa"
-                                },
-                                {
-                                    "short_label": "",
-                                    "min_count": 12,
-                                    "type": "Lab",
-                                    "drop_count": 2,
-                                    "weight": 0.15
-                                },
-                                {
-                                    "short_label": "Midterm",
-                                    "min_count": 1,
-                                    "type": "Midterm Exam",
-                                    "drop_count": 0,
-                                    "weight": 0.3
-                                },
-                                {
-                                    "short_label": "Final",
-                                    "min_count": 1,
-                                    "type": "Final Exam",
-                                    "drop_count": 0,
-                                    "weight": 0.4
-                                }
-                            ],
-                            "GRADE_CUTOFFS": {
-                                "Pass": 0.45
-                            }
-                        },
-                        "enrollment_start": _date_field.from_json("2013-01-01T05:00"),
-                        "enrollment_end": _date_field.from_json("2013-03-02T05:00"),
-                        "advertised_start": "Fall 2013",
-                    }},
-                "create": [
-                    {
-                        "id": "chapter1",
-                        "parent": "head12345",
-                        "category": "chapter",
-                        "fields": {
-                            "display_name": "Hercules"
-                        },
-                    },
-                    {
-                        "id": "chapter2",
-                        "parent": "head12345",
-                        "category": "chapter",
-                        "fields": {
-                            "display_name": "Hera heckles Hercules"
-                        },
-                    },
-                    {
-                        "id": "chapter3",
-                        "parent": "head12345",
-                        "category": "chapter",
-                        "fields": {
-                            "display_name": "Hera cuckolds Zeus"
-                        },
-                    },
-                    {
-                        "id": "problem1",
-                        "parent": "chapter3",
-                        "category": "problem",
-                        "fields": {
-                            "display_name": "Problem 3.1",
-                            "graceperiod": _time_delta_field.from_json("4 hours 0 minutes 0 seconds"),
-                        },
-                    },
-                    {
-                        "id": "problem3_2",
-                        "parent": "chapter3",
-                        "category": "problem",
-                        "fields": {
-                            "display_name": "Problem 3.2"
-                        },
                     }
-                ]
+                },
+                {
+                    "user_id": "testassist@edx.org",
+                    "update": {
+                        ("course", "head12345"): {
+                            "end": _date_field.from_json("2013-06-13T04:30"),
+                            "grading_policy": {
+                                "GRADER": [
+                                    {
+                                        "min_count": 4,
+                                        "weight": 0.15,
+                                        "type": "Homework",
+                                        "drop_count": 2,
+                                        "short_label": "HWa"
+                                    },
+                                    {
+                                        "short_label": "",
+                                        "min_count": 12,
+                                        "type": "Lab",
+                                        "drop_count": 2,
+                                        "weight": 0.15
+                                    },
+                                    {
+                                        "short_label": "Midterm",
+                                        "min_count": 1,
+                                        "type": "Midterm Exam",
+                                        "drop_count": 0,
+                                        "weight": 0.3
+                                    },
+                                    {
+                                        "short_label": "Final",
+                                        "min_count": 1,
+                                        "type": "Final Exam",
+                                        "drop_count": 0,
+                                        "weight": 0.4
+                                    }
+                                ],
+                                "GRADE_CUTOFFS": {
+                                    "Pass": 0.45
+                                }
+                            },
+                            "enrollment_start": _date_field.from_json("2013-01-01T05:00"),
+                            "enrollment_end": _date_field.from_json("2013-03-02T05:00"),
+                            "advertised_start": "Fall 2013",
+                        }
+                    },
+                    "create": [
+                        {
+                            "id": "chapter1",
+                            "parent": "head12345",
+                            "parent_type": "course",
+                            "category": "chapter",
+                            "fields": {
+                                "display_name": "Hercules"
+                            },
+                        },
+                        {
+                            "id": "chapter2",
+                            "parent": "head12345",
+                            "parent_type": "course",
+                            "category": "chapter",
+                            "fields": {
+                                "display_name": "Hera heckles Hercules"
+                            },
+                        },
+                        {
+                            "id": "chapter3",
+                            "parent": "head12345",
+                            "parent_type": "course",
+                            "category": "chapter",
+                            "fields": {
+                                "display_name": "Hera cuckolds Zeus"
+                            },
+                        },
+                        {
+                            "id": "problem1",
+                            "parent": "chapter3",
+                            "parent_type": "chapter",
+                            "category": "problem",
+                            "fields": {
+                                "display_name": "Problem 3.1",
+                                "graceperiod": _time_delta_field.from_json("4 hours 0 minutes 0 seconds"),
+                            },
+                        },
+                        {
+                            "id": "problem3_2",
+                            "parent": "chapter3",
+                            "parent_type": "chapter",
+                            "category": "problem",
+                            "fields": {
+                                "display_name": "Problem 3.2"
+                            },
+                        }
+                    ]
                 },
             ]
         },
@@ -346,49 +362,50 @@ class SplitModuleTest(unittest.TestCase):
                     }
                 },
             },
-            "revisions": [{
-                "user_id": "test@edx.org",
-                "update": {
-                    "head23456": {
-                        "display_name": "The most wonderful course",
-                        "grading_policy": {
-                            "GRADER": [
-                                {
-                                    "min_count": 14,
-                                    "weight": 0.25,
-                                    "type": "Homework",
-                                    "drop_count": 1,
-                                    "short_label": "HWa"
-                                },
-                                {
-                                    "short_label": "",
-                                    "min_count": 12,
-                                    "type": "Lab",
-                                    "drop_count": 2,
-                                    "weight": 0.25
-                                },
-                                {
-                                    "short_label": "Midterm",
-                                    "min_count": 1,
-                                    "type": "Midterm Exam",
-                                    "drop_count": 0,
-                                    "weight": 0.2
-                                },
-                                {
-                                    "short_label": "Final",
-                                    "min_count": 1,
-                                    "type": "Final Exam",
-                                    "drop_count": 0,
-                                    "weight": 0.3
+            "revisions": [
+                {
+                    "user_id": "test@edx.org",
+                    "update": {
+                        ("course", "head23456"): {
+                            "display_name": "The most wonderful course",
+                            "grading_policy": {
+                                "GRADER": [
+                                    {
+                                        "min_count": 14,
+                                        "weight": 0.25,
+                                        "type": "Homework",
+                                        "drop_count": 1,
+                                        "short_label": "HWa"
+                                    },
+                                    {
+                                        "short_label": "",
+                                        "min_count": 12,
+                                        "type": "Lab",
+                                        "drop_count": 2,
+                                        "weight": 0.25
+                                    },
+                                    {
+                                        "short_label": "Midterm",
+                                        "min_count": 1,
+                                        "type": "Midterm Exam",
+                                        "drop_count": 0,
+                                        "weight": 0.2
+                                    },
+                                    {
+                                        "short_label": "Final",
+                                        "min_count": 1,
+                                        "type": "Final Exam",
+                                        "drop_count": 0,
+                                        "weight": 0.3
+                                    }
+                                ],
+                                "GRADE_CUTOFFS": {
+                                    "Pass": 0.45
                                 }
-                            ],
-                            "GRADE_CUTOFFS": {
-                                "Pass": 0.45
-                            }
-                        },
+                            },
+                        }
                     }
                 }
-            }
             ]
         },
         "guestx.contender": {
@@ -450,7 +467,7 @@ class SplitModuleTest(unittest.TestCase):
     }
 
     @staticmethod
-    def bootstrapDB(split_store):
+    def bootstrapDB(split_store):  # pylint: disable=invalid-name
         '''
         Sets up the initial data into the db
         '''
@@ -465,13 +482,13 @@ class SplitModuleTest(unittest.TestCase):
                 root_block_id=course_spec['root_block_id']
             )
             for revision in course_spec.get('revisions', []):
-                for block_id, fields in revision.get('update', {}).iteritems():
+                for (block_type, block_id), fields in revision.get('update', {}).iteritems():
                     # cheat since course is most frequent
                     if course.location.block_id == block_id:
                         block = course
                     else:
                         # not easy to figure out the category but get_item won't care
-                        block_usage = BlockUsageLocator.make_relative(course.location, '', block_id)
+                        block_usage = BlockUsageLocator.make_relative(course.location, block_type, block_id)
                         block = split_store.get_item(block_usage)
                     for key, value in fields.iteritems():
                         setattr(block, key, value)
@@ -483,7 +500,7 @@ class SplitModuleTest(unittest.TestCase):
                     elif spec['parent'] == course.location.block_id:
                         parent = course
                     else:
-                        block_usage = BlockUsageLocator.make_relative(course.location, '', spec['parent'])
+                        block_usage = BlockUsageLocator.make_relative(course.location, spec['parent_type'], spec['parent'])
                         parent = split_store.get_item(block_usage)
                     block_id = LocalId(spec['id'])
                     child = split_store.create_xblock(
@@ -516,7 +533,7 @@ class SplitModuleTest(unittest.TestCase):
             SplitModuleTest.modulestore = None
         super(SplitModuleTest, self).tearDown()
 
-    def findByIdInResult(self, collection, _id):
+    def findByIdInResult(self, collection, _id):  # pylint: disable=invalid-name
         """
         Result is a collection of descriptors. Find the one whose block id
         matches the _id.
@@ -679,10 +696,10 @@ class SplitModuleCourseTests(SplitModuleTest):
         locator = CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT)
         course = modulestore().get_course(locator)
         block_map = modulestore().cache_items(
-            course.system, [child.block_id for child in course.children], course.id, depth=3
+            course.system, [BlockKey.from_usage_key(child) for child in course.children], course.id, depth=3
         )
-        self.assertIn('chapter1', block_map)
-        self.assertIn('problem3_2', block_map)
+        self.assertIn(BlockKey('chapter', 'chapter1'), block_map)
+        self.assertIn(BlockKey('problem', 'problem3_2'), block_map)
 
     def test_course_successors(self):
         """
@@ -714,6 +731,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(result.children[0].locator.version_guid, versions[-2])
         self.assertEqual(len(result.children[0].children), 1)
         self.assertEqual(result.children[0].children[0].locator.version_guid, versions[0])
+
 
 class SplitModuleItemTests(SplitModuleTest):
     '''
@@ -855,7 +873,7 @@ class SplitModuleItemTests(SplitModuleTest):
         with self.assertRaises(ItemNotFoundError):
             modulestore().get_item(locator)
 
-    # pylint: disable=W0212
+    # pylint: disable=protected-access
     def test_matching(self):
         '''
         test the block and value matches help functions
@@ -873,6 +891,11 @@ class SplitModuleItemTests(SplitModuleTest):
         self.assertTrue(modulestore()._value_matches(['I need some help', 'today'], re.compile(r'help')))
         self.assertFalse(modulestore()._value_matches('I need some help', re.compile(r'Help')))
         self.assertTrue(modulestore()._value_matches(['I need some help', 'today'], re.compile(r'Help', re.IGNORECASE)))
+
+        self.assertTrue(modulestore()._value_matches('gotcha', {'$in': ['a', 'bunch', 'of', 'gotcha']}))
+        self.assertFalse(modulestore()._value_matches('gotcha', {'$in': ['a', 'bunch', 'of', 'gotchas']}))
+        self.assertFalse(modulestore()._value_matches('gotcha', {'$nin': ['a', 'bunch', 'of', 'gotcha']}))
+        self.assertTrue(modulestore()._value_matches('gotcha', {'$nin': ['a', 'bunch', 'of', 'gotchas']}))
 
         self.assertTrue(modulestore()._block_matches({'a': 1, 'b': 2}, {'a': 1}))
         self.assertFalse(modulestore()._block_matches({'a': 1, 'b': 2}, {'a': 2}))
@@ -901,10 +924,6 @@ class SplitModuleItemTests(SplitModuleTest):
         )
         self.assertEqual(len(matches), 2)
 
-        matches = modulestore().get_items(locator, qualifiers={'children': 'chapter2'})
-        self.assertEqual(len(matches), 1)
-        self.assertEqual(matches[0].location.block_id, 'head12345')
-
     def test_get_parents(self):
         '''
         get_parent_location(locator): BlockUsageLocator
@@ -918,8 +937,9 @@ class SplitModuleItemTests(SplitModuleTest):
         self.assertEqual(parent.block_id, 'head12345')
         self.assertEqual(parent.org, "testx")
         self.assertEqual(parent.course, "GreekHero")
-        locator = locator.course_key.make_usage_key('Chapter', 'chapter2')
+        locator = locator.course_key.make_usage_key('chapter', 'chapter2')
         parent = modulestore().get_parent_location(locator)
+        self.assertIsNotNone(parent)
         self.assertEqual(parent.block_id, 'head12345')
         locator = locator.course_key.make_usage_key('garbage', 'nosuchblock')
         parent = modulestore().get_parent_location(locator)
@@ -945,6 +965,10 @@ class SplitModuleItemTests(SplitModuleTest):
 
 
 def version_agnostic(children):
+    """
+    children: list of descriptors
+    Returns the `children` list with each member version-agnostic
+    """
     return [child.version_agnostic() for child in children]
 
 
@@ -1033,7 +1057,6 @@ class TestItemCrud(SplitModuleTest):
         parent = modulestore().get_item(locator)
         self.assertIn(new_module.location.version_agnostic(), version_agnostic(parent.children))
         self.assertEqual(new_module.definition_locator.definition_id, original.definition_locator.definition_id)
-
 
     def test_unique_naming(self):
         """
@@ -1238,7 +1261,7 @@ class TestItemCrud(SplitModuleTest):
         self.assertNotEqual(updated_problem.location.version_guid, pre_version_guid)
         self.assertEqual(version_agnostic(updated_problem.children), version_agnostic(block.children))
         self.assertNotIn(moved_child, version_agnostic(updated_problem.children))
-        locator = locator.course_key.make_usage_key('Chapter', "chapter1")
+        locator = locator.course_key.make_usage_key('chapter', "chapter1")
         other_block = modulestore().get_item(locator)
         other_block.children.append(moved_child)
         other_updated = modulestore().update_item(other_block, self.user_id)
@@ -1289,7 +1312,7 @@ class TestItemCrud(SplitModuleTest):
             fields={'display_name': 'problem 2', 'data': another_payload},
             definition_locator=original.definition_locator,
         )
-        # pylint: disable=W0212
+        # pylint: disable=protected-access
         modulestore()._clear_cache()
 
         # now begin the test
@@ -1372,6 +1395,41 @@ class TestItemCrud(SplitModuleTest):
         node_loc = node.location.map_into_course(parent.course_key)
         for _ in range(4):
             self.create_subtree_for_deletion(node_loc, category_queue[1:])
+
+    def test_split_modulestore_create_child_with_position(self):
+        """
+        This test is designed to hit a specific set of use cases having to do with
+        the child positioning logic found in split_mongo/split.py:create_child()
+        """
+        # Set up the split module store
+        store = modulestore()
+        user = random.getrandbits(32)
+        course_key = CourseLocator('test_org', 'test_transaction', 'test_run')
+        with store.bulk_operations(course_key):
+            new_course = store.create_course('test_org', 'test_transaction', 'test_run', user, BRANCH_NAME_DRAFT)
+            new_course_locator = new_course.id
+            versionless_course_locator = new_course_locator.version_agnostic()
+            first_child = store.create_child(
+                self.user_id,
+                new_course.location,
+                "chapter"
+            )
+            refetch_course = store.get_course(versionless_course_locator)
+            second_child = store.create_child(
+                self.user_id,
+                refetch_course.location,
+                "chapter",
+                position=0
+            )
+
+            # First child should have been moved to second position, and better child takes the lead
+            refetch_course = store.get_course(versionless_course_locator)
+            children = refetch_course.get_children()
+            self.assertEqual(unicode(children[1].location), unicode(first_child.location))
+            self.assertEqual(unicode(children[0].location), unicode(second_child.location))
+
+            # Clean up the data so we don't break other tests which apparently expect a particular state
+            store.delete_course(refetch_course.id, user)
 
 
 class TestCourseCreation(SplitModuleTest):
@@ -1519,9 +1577,9 @@ class TestCourseCreation(SplitModuleTest):
             new_course.location.as_object_id(new_course.location.version_guid)
         )
         self.assertIsNotNone(db_structure, "Didn't find course")
-        self.assertNotIn('course', db_structure['blocks'])
-        self.assertIn('top', db_structure['blocks'])
-        self.assertEqual(db_structure['blocks']['top']['category'], 'chapter')
+        self.assertNotIn(BlockKey('course', 'course'), db_structure['blocks'])
+        self.assertIn(BlockKey('chapter', 'top'), db_structure['blocks'])
+        self.assertEqual(db_structure['blocks'][BlockKey('chapter', 'top')]['block_type'], 'chapter')
 
     def test_create_id_dupe(self):
         """
@@ -1534,6 +1592,40 @@ class TestCourseCreation(SplitModuleTest):
             modulestore().create_course(
                 dupe_course_key.org, dupe_course_key.course, dupe_course_key.run, user, BRANCH_NAME_DRAFT
             )
+
+    def test_bulk_ops_get_courses(self):
+        """
+        Test get_courses when some are created, updated, and deleted w/in a bulk operation
+        """
+        # create 3 courses before bulk operation
+        split_store = modulestore()
+
+        user = random.getrandbits(32)
+        to_be_created = split_store.make_course_key('new', 'created', 'course')
+        with split_store.bulk_operations(to_be_created):
+            split_store.create_course(
+                to_be_created.org, to_be_created.course, to_be_created.run, user, master_branch=BRANCH_NAME_DRAFT,
+            )
+
+            modified_course_loc = CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT)
+            with split_store.bulk_operations(modified_course_loc):
+                modified_course = modulestore().get_course(modified_course_loc)
+                modified_course.advertised_start = 'coming soon to a theater near you'
+                split_store.update_item(modified_course, user)
+
+                to_be_deleted = split_store.make_course_key("guestx", "contender", "run")
+                with split_store.bulk_operations(to_be_deleted):
+                    split_store.delete_course(to_be_deleted, user)
+
+                    # now get_courses
+                    courses = split_store.get_courses(BRANCH_NAME_DRAFT)
+
+                    self.assertEqual(len(courses), 3)
+                    course_ids = [course.id.for_branch(None) for course in courses]
+                    self.assertNotIn(to_be_deleted, course_ids)
+                    self.assertIn(to_be_created, course_ids)
+                    fetched_modified = [course for course in courses if course.id == modified_course_loc][0]
+                    self.assertEqual(fetched_modified.advertised_start, modified_course.advertised_start)
 
 
 class TestInheritance(SplitModuleTest):
@@ -1559,6 +1651,56 @@ class TestInheritance(SplitModuleTest):
         # overridden
         self.assertEqual(node.graceperiod, datetime.timedelta(hours=4))
 
+    def test_inheritance_not_saved(self):
+        """
+        Was saving inherited settings with updated blocks causing inheritance to be sticky
+        """
+        # set on parent, retrieve child, verify setting
+        chapter = modulestore().get_item(
+            BlockUsageLocator(
+                CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT), 'chapter', 'chapter3'
+            )
+        )
+        problem = modulestore().get_item(
+            BlockUsageLocator(
+                CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT), 'problem', 'problem3_2'
+            )
+        )
+        self.assertFalse(problem.visible_to_staff_only)
+
+        chapter.visible_to_staff_only = True
+        modulestore().update_item(chapter, self.user_id)
+        problem = modulestore().get_item(problem.location.version_agnostic())
+        self.assertTrue(problem.visible_to_staff_only)
+
+        # unset on parent, retrieve child, verify unset
+        chapter = modulestore().get_item(chapter.location.version_agnostic())
+        del chapter.visible_to_staff_only
+        modulestore().update_item(chapter, self.user_id)
+
+        problem = modulestore().get_item(problem.location.version_agnostic())
+        self.assertFalse(problem.visible_to_staff_only)
+
+    def test_dynamic_inheritance(self):
+        """
+        Test inheritance for create_item with and without a parent pointer
+        """
+        course_key = CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT)
+        chapter = modulestore().get_item(BlockUsageLocator(course_key, 'chapter', 'chapter3'))
+
+        chapter.visible_to_staff_only = True
+        orphan_problem = modulestore().create_item(self.user_id, course_key, 'problem')
+        self.assertFalse(orphan_problem.visible_to_staff_only)
+        parented_problem = modulestore().create_child(self.user_id, chapter.location.version_agnostic(), 'problem')
+        # FIXME LMS-11376
+#         self.assertTrue(parented_problem.visible_to_staff_only)
+
+        orphan_problem = modulestore().create_xblock(chapter.runtime, course_key, 'problem')
+        self.assertFalse(orphan_problem.visible_to_staff_only)
+        parented_problem = modulestore().create_xblock(chapter.runtime, course_key, 'problem', parent_xblock=chapter)
+        # FIXME LMS-11376
+#         self.assertTrue(parented_problem.visible_to_staff_only)
+
 
 class TestPublish(SplitModuleTest):
     """
@@ -1581,23 +1723,27 @@ class TestPublish(SplitModuleTest):
         chapter2 = source_course.make_usage_key('chapter', 'chapter2')
         chapter3 = source_course.make_usage_key('chapter', 'chapter3')
         modulestore().copy(self.user_id, source_course, dest_course, [head], [chapter2, chapter3])
-        expected = [head.block_id, chapter1.block_id]
-        self._check_course(
-            source_course, dest_course, expected, [chapter2.block_id, chapter3.block_id, "problem1", "problem3_2"]
-        )
+        expected = [BlockKey.from_usage_key(head), BlockKey.from_usage_key(chapter1)]
+        unexpected = [
+            BlockKey.from_usage_key(chapter2),
+            BlockKey.from_usage_key(chapter3),
+            BlockKey("problem", "problem1"),
+            BlockKey("problem", "problem3_2")
+        ]
+        self._check_course(source_course, dest_course, expected, unexpected)
         # add a child under chapter1
         new_module = modulestore().create_child(
             self.user_id, chapter1, "sequential",
             fields={'display_name': 'new sequential'},
         )
         # remove chapter1 from expected b/c its pub'd version != the source anymore since source changed
-        expected.remove(chapter1.block_id)
+        expected.remove(BlockKey.from_usage_key(chapter1))
         # check that it's not in published course
         with self.assertRaises(ItemNotFoundError):
             modulestore().get_item(new_module.location.map_into_course(dest_course))
         # publish it
         modulestore().copy(self.user_id, source_course, dest_course, [new_module.location], None)
-        expected.append(new_module.location.block_id)
+        expected.append(BlockKey.from_usage_key(new_module.location))
         # check that it is in the published course and that its parent is the chapter
         pub_module = modulestore().get_item(new_module.location.map_into_course(dest_course))
         self.assertEqual(
@@ -1609,12 +1755,10 @@ class TestPublish(SplitModuleTest):
         )
         # publish it
         modulestore().copy(self.user_id, source_course, dest_course, [new_module.location], None)
-        expected.append(new_module.location.block_id)
+        expected.append(BlockKey.from_usage_key(new_module.location))
         # check that it is in the published course (no error means it worked)
         pub_module = modulestore().get_item(new_module.location.map_into_course(dest_course))
-        self._check_course(
-            source_course, dest_course, expected, [chapter2.block_id, chapter3.block_id, "problem1", "problem3_2"]
-        )
+        self._check_course(source_course, dest_course, expected, unexpected)
 
     def test_exceptions(self):
         """
@@ -1647,8 +1791,14 @@ class TestPublish(SplitModuleTest):
         chapter2 = source_course.make_usage_key('chapter', 'chapter2')
         problem1 = source_course.make_usage_key('problem', 'problem1')
         modulestore().copy(self.user_id, source_course, dest_course, [head], [chapter2])
-        expected = ["head12345", "chapter1", "chapter3", "problem1", "problem3_2"]
-        self._check_course(source_course, dest_course, expected, ["chapter2"])
+        expected = [
+            BlockKey("course", "head12345"),
+            BlockKey("chapter", "chapter1"),
+            BlockKey("chapter", "chapter3"),
+            BlockKey("problem", "problem1"),
+            BlockKey("problem", "problem3_2"),
+        ]
+        self._check_course(source_course, dest_course, expected, [BlockKey("chapter", "chapter2")])
         # now move problem1 and delete problem3_2
         chapter1 = modulestore().get_item(source_course.make_usage_key("chapter", "chapter1"))
         chapter3 = modulestore().get_item(source_course.make_usage_key("chapter", "chapter3"))
@@ -1656,9 +1806,15 @@ class TestPublish(SplitModuleTest):
         chapter3.children.remove(problem1.map_into_course(chapter3.location.course_key))
         modulestore().delete_item(source_course.make_usage_key("problem", "problem3_2"), self.user_id)
         modulestore().copy(self.user_id, source_course, dest_course, [head], [chapter2])
-        expected = ["head12345", "chapter1", "chapter3", "problem1"]
-        self._check_course(source_course, dest_course, expected, ["chapter2", "problem3_2"])
+        expected = [
+            BlockKey("course", "head12345"),
+            BlockKey("chapter", "chapter1"),
+            BlockKey("chapter", "chapter3"),
+            BlockKey("problem", "problem1")
+        ]
+        self._check_course(source_course, dest_course, expected, [BlockKey("chapter", "chapter2"), BlockKey("problem", "problem3_2")])
 
+    @contract(expected_blocks="list(BlockKey)", unexpected_blocks="list(BlockKey)")
     def _check_course(self, source_course_loc, dest_course_loc, expected_blocks, unexpected_blocks):
         """
         Check that the course has the expected blocks and does not have the unexpected blocks
@@ -1666,9 +1822,8 @@ class TestPublish(SplitModuleTest):
         history_info = modulestore().get_course_history_info(dest_course_loc)
         self.assertEqual(history_info['edited_by'], self.user_id)
         for expected in expected_blocks:
-            # since block_type has no impact on identity, we can just provide an empty string
-            source = modulestore().get_item(source_course_loc.make_usage_key("", expected))
-            pub_copy = modulestore().get_item(dest_course_loc.make_usage_key("", expected))
+            source = modulestore().get_item(source_course_loc.make_usage_key(expected.type, expected.id))
+            pub_copy = modulestore().get_item(dest_course_loc.make_usage_key(expected.type, expected.id))
             # everything except previous_version & children should be the same
             self.assertEqual(source.category, pub_copy.category)
             self.assertEqual(
@@ -1684,25 +1839,46 @@ class TestPublish(SplitModuleTest):
             for field in source.fields.values():
                 if field.name == 'children':
                     self._compare_children(field.read_from(source), field.read_from(pub_copy), unexpected_blocks)
+                elif isinstance(field, (Reference, ReferenceList, ReferenceValueDict)):
+                    self.assertReferenceEqual(field.read_from(source), field.read_from(pub_copy))
                 else:
                     self.assertEqual(field.read_from(source), field.read_from(pub_copy))
         for unexp in unexpected_blocks:
             with self.assertRaises(ItemNotFoundError):
-                modulestore().get_item(dest_course_loc.make_usage_key("", unexp))
+                modulestore().get_item(dest_course_loc.make_usage_key(unexp.type, unexp.id))
 
+    def assertReferenceEqual(self, expected, actual):
+        if isinstance(expected, BlockUsageLocator):
+            expected = BlockKey.from_usage_key(expected)
+            actual = BlockKey.from_usage_key(actual)
+        elif isinstance(expected, list):
+            expected = [BlockKey.from_usage_key(key) for key in expected]
+            actual = [BlockKey.from_usage_key(key) for key in actual]
+        elif isinstance(expected, dict):
+            expected = {key: BlockKey.from_usage_key(val) for (key, val) in expected}
+            actual = {key: BlockKey.from_usage_key(val) for (key, val) in actual}
+        self.assertEqual(expected, actual)
+
+    @contract(
+        source_children="list(BlockUsageLocator)",
+        dest_children="list(BlockUsageLocator)",
+        unexpected="list(BlockKey)"
+    )
     def _compare_children(self, source_children, dest_children, unexpected):
         """
         Ensure dest_children == source_children minus unexpected
         """
-        dest_cursor = 0
-        for child in source_children:
-            child = child.version_agnostic()
-            if child.block_id in unexpected:
-                self.assertNotIn(child.block_id, [dest.block_id for dest in dest_children])
-            else:
-                self.assertEqual(child.block_id, dest_children[dest_cursor].block_id)
-                dest_cursor += 1
-        self.assertEqual(dest_cursor, len(dest_children))
+        source_block_keys = [
+            src_key
+            for src_key
+            in (BlockKey.from_usage_key(src) for src in source_children)
+            if src_key not in unexpected
+        ]
+        dest_block_keys = [BlockKey.from_usage_key(dest) for dest in dest_children]
+        for unexp in unexpected:
+            self.assertNotIn(unexp, dest_block_keys)
+
+        self.assertEqual(source_block_keys, dest_block_keys)
 
 
 class TestSchema(SplitModuleTest):
@@ -1727,7 +1903,7 @@ class TestSchema(SplitModuleTest):
             )
 
 
-#===========================================
+# ===========================================
 def modulestore():
     """
     Mock the django dependent global modulestore function to disentangle tests from django
@@ -1747,7 +1923,7 @@ def modulestore():
         options.update(SplitModuleTest.MODULESTORE['OPTIONS'])
         options['render_template'] = render_to_template_mock
 
-        # pylint: disable=W0142
+        # pylint: disable=star-args
         SplitModuleTest.modulestore = class_(
             None,  # contentstore
             SplitModuleTest.MODULESTORE['DOC_STORE_CONFIG'],
@@ -1759,6 +1935,6 @@ def modulestore():
     return SplitModuleTest.modulestore
 
 
-# pylint: disable=W0613
+# pylint: disable=unused-argument, missing-docstring
 def render_to_template_mock(*args):
     pass

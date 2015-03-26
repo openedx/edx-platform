@@ -3,87 +3,110 @@ Unittests for migrating a course to split mongo
 """
 import unittest
 
-from django.contrib.auth.models import User
 from django.core.management import CommandError, call_command
 from contentstore.management.commands.migrate_to_split import Command
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.django import modulestore, clear_existing_modulestores
-from opaque_keys.edx.locator import CourseLocator
-# pylint: disable=E1101
+from xmodule.modulestore.django import modulestore
 
 
-@unittest.skip("Not fixing split mongo until we land this long branch")
 class TestArgParsing(unittest.TestCase):
     """
     Tests for parsing arguments for the `migrate_to_split` management command
     """
     def setUp(self):
+        super(TestArgParsing, self).setUp()
         self.command = Command()
 
     def test_no_args(self):
+        """
+        Test the arg length error
+        """
         errstring = "migrate_to_split requires at least two arguments"
         with self.assertRaisesRegexp(CommandError, errstring):
             self.command.handle()
 
     def test_invalid_location(self):
+        """
+        Test passing an unparsable course id
+        """
         errstring = "Invalid location string"
         with self.assertRaisesRegexp(CommandError, errstring):
             self.command.handle("foo", "bar")
 
-    def test_nonexistant_user_id(self):
+    def test_nonexistent_user_id(self):
+        """
+        Test error for using an unknown user primary key
+        """
         errstring = "No user found identified by 99"
         with self.assertRaisesRegexp(CommandError, errstring):
-            self.command.handle("i4x://org/course/category/name", "99")
+            self.command.handle("org/course/name", "99")
 
-    def test_nonexistant_user_email(self):
+    def test_nonexistent_user_email(self):
+        """
+        Test error for using an unknown user email
+        """
         errstring = "No user found identified by fake@example.com"
         with self.assertRaisesRegexp(CommandError, errstring):
-            self.command.handle("i4x://org/course/category/name", "fake@example.com")
+            self.command.handle("org/course/name", "fake@example.com")
 
 
-@unittest.skip("Not fixing split mongo until we land this long branch")
+# pylint: disable=no-member, protected-access
 class TestMigrateToSplit(ModuleStoreTestCase):
     """
     Unit tests for migrating a course from old mongo to split mongo
     """
 
     def setUp(self):
-        super(TestMigrateToSplit, self).setUp()
-        uname = 'testuser'
-        email = 'test+courses@edx.org'
-        password = 'foo'
-        self.user = User.objects.create_user(uname, email, password)
+        super(TestMigrateToSplit, self).setUp(create_user=True)
         self.course = CourseFactory()
-        self.addCleanup(ModuleStoreTestCase.drop_mongo_collections)
-        self.addCleanup(clear_existing_modulestores)
 
     def test_user_email(self):
+        """
+        Test migration for real as well as testing using an email addr to id the user
+        """
         call_command(
             "migrate_to_split",
-            str(self.course.location),
+            str(self.course.id),
             str(self.user.email),
         )
-        course_from_split = modulestore('split').get_course(self.course.id)
-        self.assertIsNotNone(course_from_split)
+        split_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.split)
+        new_key = split_store.make_course_key(self.course.id.org, self.course.id.course, self.course.id.run)
+        self.assertTrue(
+            split_store.has_course(new_key),
+            "Could not find course"
+        )
+        # I put this in but realized that the migrator doesn't make the new course the
+        # default mapping in mixed modulestore. I left the test here so we can debate what it ought to do.
+#         self.assertEqual(
+#             ModuleStoreEnum.Type.split,
+#             modulestore()._get_modulestore_for_courselike(new_key).get_modulestore_type(),
+#             "Split is not the new default for the course"
+#         )
 
     def test_user_id(self):
+        """
+        Test that the command accepts the user's primary key
+        """
+        # lack of error implies success
         call_command(
             "migrate_to_split",
-            str(self.course.location),
+            str(self.course.id),
             str(self.user.id),
         )
-        course_from_split = modulestore('split').get_course(self.course.id)
-        self.assertIsNotNone(course_from_split)
 
     def test_locator_string(self):
+        """
+        Test importing to a different course id
+        """
         call_command(
             "migrate_to_split",
-            str(self.course.location),
+            str(self.course.id),
             str(self.user.id),
-            "org.dept+name.run",
+            "org.dept", "name", "run",
         )
-        locator = CourseLocator(org="org.dept", course="name", run="run", branch=ModuleStoreEnum.RevisionOption.published_only)
-        course_from_split = modulestore('split').get_course(locator)
+        split_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.split)
+        locator = split_store.make_course_key(self.course.id.org, self.course.id.course, self.course.id.run)
+        course_from_split = modulestore().get_course(locator)
         self.assertIsNotNone(course_from_split)

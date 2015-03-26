@@ -1,34 +1,58 @@
 // studio - utilities - mixins and extends
 // ====================
 
-// mixins - font sizing
+// Table of Contents 
+// * +Font Sizing - Mixin
+// * +Line Height - Mixin
+// * +Sizing - Mixin
+// * +Square - Mixin
+// * +Placeholder Styling - Mixin
+// * +Flex Support - Mixin
+// * +Flex Polyfill - Extends
+// * +UI - Wrapper - Extends
+// * +UI - Window - Extend
+// * +UI - Visual Link - Extend
+// * +UI - Functional Disable - Extend
+// * +UI - Visual Link - Extend
+// * +UI - Depth Levels - Extends
+// * +UI - Clear Children - Extends
+// * +UI - Buttons - Extends
+// * +UI - Well Archetype - Extends
+// * +Content - No List - Extends
+// * +Content - Hidden Image Text - Extend
+// * +Content - Screenreader Text - Extend
+// * +Content - Text Wrap - Extend
+// * +Content - Text Truncate - Extend
+
+// +Font Sizing - Mixin
+// ==================== 
 @mixin font-size($sizeValue: 16){
   font-size: $sizeValue + px;
   font-size: ($sizeValue/10) + rem;
 }
 
-// mixins - line height
+// +Line Height - Mixin
+// ==================== 
 @mixin line-height($fontSize: auto){
   line-height: ($fontSize*1.48) + px;
   line-height: (($fontSize/10)*1.48) + rem;
 }
 
-// ====================
-
-// mixins - sizing
+// +Sizing - Mixin
+// ==================== 
 @mixin size($width: $baseline, $height: $baseline) {
   height: $height;
   width: $width;
 }
 
-// mixins - sizing
+// +Square - Mixin
+// ==================== 
 @mixin square($size: $baseline) {
   @include size($size);
 }
 
-// ====================
-
-// mixins - placeholder styling
+// +Placeholder Styling - Mixin
+// ==================== 
 @mixin placeholder($color) {
   :-moz-placeholder {
     color: $color;
@@ -41,9 +65,8 @@
   }
 }
 
-// ====================
-
-// mixins - flex support
+// +Flex Support - Mixin
+// ==================== 
 @mixin ui-flexbox() {
   display: -webkit-box;
   display: -moz-box;
@@ -52,7 +75,10 @@
   display: flex;
 }
 
-// extends - justify-content right for display:flex alignment in older browsers
+// +Flex PolyFill - Extends
+// ==================== 
+
+// justify-content right for display:flex alignment in older browsers
 %ui-justify-right-flex {
   -webkit-box-pack: flex-end;
   -moz-box-pack: flex-end;
@@ -61,7 +87,7 @@
   justify-content: flex-end;
 }
 
-// extends - justify-content left for display:flex alignment in older browsers
+// justify-content left for display:flex alignment in older browsers
 %ui-justify-left-flex {
   -webkit-box-pack: flex-start;
   -moz-box-pack: flex-start;
@@ -70,7 +96,7 @@
   justify-content: flex-start;
 }
 
-// extends - align items center for display:flex alignment in older browsers
+// align items center for display:flex alignment in older browsers
 %ui-align-center-flex {
   -webkit-flex-align: center;
   -ms-flex-align: center;
@@ -78,16 +104,30 @@
   align-items: center;
 }
 
-// ====================
 
-// extends - UI - used for page/view-level wrappers (for centering/grids)
+// +UI - Wrapper - Extends
+// ==================== 
+// used for page/view-level wrappers (for centering/grids)
 %ui-wrapper {
   @include clearfix();
   @include box-sizing(border-box);
   width: 100%;
 }
 
-// extends - UI - window
+// layout placeholders
+.ui-col-wide  {
+  width: flex-grid(9, 12);
+  @include margin-right(flex-gutter());
+  @include float(left);
+}
+
+.ui-col-narrow  {
+  width: flex-grid(3, 12);
+  @include float(left);
+}
+
+// +UI - Window - Extends
+// ==================== 
 %ui-window {
   @include clearfix();
   border-radius: ($baseline/10);
@@ -102,19 +142,22 @@
   }
 }
 
-// extends - UI - visual link
+// +UI - Visual Link - Extends
+// ==================== 
 %ui-fake-link {
   cursor: pointer;
 }
 
-// extends - UI - functional disable
+// +UI - Functional Disable - Extends
+// ==================== 
 %ui-disabled {
   pointer-events: none;
   outline: none;
   cursor: default;
 }
 
-// extends - UI - depth levels
+// +UI - Depth Levels - Extends
+// ==================== 
 %ui-depth0 { z-index: 0; }
 %ui-depth1 { z-index: 10; }
 %ui-depth2 { z-index: 100; }
@@ -123,7 +166,9 @@
 %ui-depth5 { z-index: 100000; }
 
 
-// extends - UI - utility - nth-type style clearing
+// +UI - Clear Children - Extends
+// ==================== 
+// extends - UI - utility - first child clearing
 %wipe-first-child {
 
   &:first-child {
@@ -133,7 +178,7 @@
   }
 }
 
-// extends - UI - utility - nth-type style clearing
+// extends - UI - utility - last child clearing
 %wipe-last-child {
 
   &:last-child {
@@ -143,10 +188,11 @@
   }
 }
 
-// extends - UI - buttons
+// +UI - Buttons - Extends
+// ==================== 
 %ui-btn {
   @include box-sizing(border-box);
-  @include transition(color 0.25s ease-in-out 0s, border-color 0.25s ease-in-out 0s, background 0.25s ease-in-out 0s, box-shadow 0.25s ease-in-out 0s);
+  @include transition(color $tmg-f2 ease-in-out 0s, border-color $tmg-f2 ease-in-out 0s, background $tmg-f2 ease-in-out 0s, box-shadow $tmg-f2 ease-in-out 0s);
   display: inline-block;
   cursor: pointer;
 
@@ -281,7 +327,8 @@
   }
 }
 
-// extends - UI archetypes - well
+// +UI - Well Archetype - Extends
+// ==================== 
 %ui-well {
   box-shadow: inset 0 1px 2px 1px $shadow;
   padding: ($baseline*0.75) $baseline;
@@ -300,7 +347,7 @@
     @extend %t-action3;
     margin-left: $baseline;
 
-    [class^="icon-"] {
+    .icon {
       margin-right: ($baseline/2);
     }
   }
@@ -329,9 +376,9 @@
   display: none;
 }
 
-// ====================
-
-// extends - content - removes list styling/spacing when using uls, ols for navigation and less content-centric cases
+// +Content - No List - Extends
+// ==================== 
+// removes list styling/spacing when using uls, ols for navigation and less content-centric cases
 %cont-no-list {
   list-style: none;
   margin: 0;
@@ -344,14 +391,17 @@
   }
 }
 
-// extends - content - image-replacement hidden text
+// +Content - Hidden Image Text - Extend
+// ==================== 
+// image-replacement hidden text
 %cont-text-hide {
   text-indent: 100%;
   white-space: nowrap;
   overflow: hidden;
 }
 
-// extends - content - hidden elems - screenreaders
+// +Content - Screenreader Text - Extend
+// ==================== 
 %cont-text-sr {
   border: 0;
   clip: rect(0 0 0 0);
@@ -363,12 +413,14 @@
   width: 1px;
 }
 
-// extends - content - wrapping
+// +Content - Text Wrap - Extend
+// ==================== 
 %cont-text-wrap {
   word-wrap: break-word;
 }
 
-// extends - content - text overflow by ellipsis
+// +Content - Text Truncate - Extend
+// ==================== 
 %cont-truncated {
   @include box-sizing(border-box);
   overflow: hidden;

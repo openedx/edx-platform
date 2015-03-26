@@ -1,0 +1,6 @@
+{
+    "acceptance.lms": "lms/*.py",
+    "acceptance.studio": "cms/*.py",
+    "acceptance.common_lib": "common/lib/*.py",
+    "acceptance.common_app": "common/djangoapps/*.py"
+}

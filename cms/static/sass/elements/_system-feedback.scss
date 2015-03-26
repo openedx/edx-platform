@@ -18,7 +18,7 @@
   background: $yellow-d1;
   color: $white;
 
-  [class^="icon-"] {
+  .feedback-symbol {
     @extend %t-icon5;
     position: relative;
     top: 1px;
@@ -210,7 +210,7 @@
     vertical-align: middle;
     width: $baseline*17.5;
     border: 4px solid $black;
-    text-align: left;
+    @include text-align(left);
 
     .copy {
       border-top: 4px solid $blue;
@@ -225,10 +225,10 @@
 
       .nav-item {
         display: inline-block;
-        margin-right: ($baseline*0.75);
+        @include margin-right($baseline*0.75);
 
         &:last-child {
-          margin-right: 0;
+          @include margin-right(0);
         }
       }
 
@@ -246,7 +246,7 @@
   // types of prompts - error
   .prompt.error {
 
-    [class^="icon"] {
+    .feedback-symbol {
       color: $red-l1;
     }
 
@@ -258,7 +258,7 @@
   // types of prompts - confirmation
   .prompt.confirmation {
 
-    [class^="icon"] {
+    .feedback-symbol {
       color: $green;
     }
 
@@ -270,7 +270,7 @@
   // types of prompts - error
   .prompt.warning {
 
-    [class^="icon"] {
+    .feedback-symbol {
       color: $orange;
     }
 
@@ -295,7 +295,7 @@
   &.wrapper-notification-warning {
     box-shadow: 0 -1px 3px $shadow, inset 0 3px 1px $orange;
 
-    [class^="icon"] {
+    .feedback-symbol {
       color: $orange;
     }
   }
@@ -303,7 +303,7 @@
   &.wrapper-notification-error {
     box-shadow: 0 -1px 3px $shadow, inset 0 3px 1px $red-l1;
 
-    [class^="icon"] {
+    .feedback-symbol {
       color: $red-l1;
     }
   }
@@ -311,7 +311,7 @@
   &.wrapper-notification-confirmation {
     box-shadow: 0 -1px 3px $shadow, inset 0 3px 1px $green;
 
-    [class^="icon"] {
+    .feedback-symbol {
       color: $green;
     }
   }
@@ -336,13 +336,13 @@
       max-width: none;
       min-width: none;
 
-      [class^="icon"], .copy {
+      .feedback-symbol, .copy {
         float: none;
         display: inline-block;
         vertical-align: middle;
       }
 
-      [class^="icon"] {
+      .feedback-symbol {
         width: $baseline;
         height: ($baseline*1.25);
         margin-right: ($baseline/4);
@@ -371,7 +371,7 @@
       max-width: none;
       min-width: none;
 
-      [class^="icon"] {
+      .feedback-symbol {
         width: $baseline;
         margin-right: ($baseline*0.75);
       }
@@ -399,14 +399,14 @@
     @extend %t-strong;
   }
 
-  [class^="icon"], .copy {
+  .feedback-symbol, .copy {
     float: left;
     display: inline-block;
     vertical-align: middle;
   }
 
-  [class^="icon"] {
-    @include transition (color 0.50s ease-in-out 0s);
+  .feedback-symbol {
+    @include transition (color $tmg-f1 ease-in-out 0s);
     @extend %t-icon3;
     width: flex-grid(1, 12);
     height: ($baseline*1.25);
@@ -431,28 +431,28 @@
   // with actions
   &.has-actions {
 
-    [class^="icon"] {
+    .feedback-symbol {
       width: flex-grid(1, 12);
     }
 
     .copy {
       width: flex-grid(7, 12);
-      margin-right: flex-gutter();
+      @include margin-right(flex-gutter());
     }
 
     .nav-actions {
       width: flex-grid(4, 12);
-      float: right;
+      @include float(left);
       margin-top: ($baseline/4);
       text-align: right;
 
       .nav-item {
         display: inline-block;
         vertical-align: middle;
-        margin-right: ($baseline/2);
+        @include margin-right($baseline/2);
 
         &:last-child {
-          margin-right: 0;
+          @include margin-right(0);
         }
       }
     }
@@ -481,7 +481,7 @@
     max-width: none;
     min-width: 0;
 
-    [class^="icon"] {
+    .feedback-symbol {
       @include animation(rotateCW $tmg-s3 linear infinite);
       width: 25px;
       margin: -4px 10px 0 0;
@@ -527,7 +527,7 @@
   &.wrapper-alert-warning {
     box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $orange;
 
-    .alert-symbol {
+    .feedback-symbol {
       color: $orange;
     }
   }
@@ -535,7 +535,7 @@
   &.wrapper-alert-error {
     box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $red-l1;
 
-    .alert-symbol {
+    .feedback-symbol {
       color: $red-l1;
     }
   }
@@ -543,7 +543,7 @@
   &.wrapper-alert-confirmation {
     box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $green;
 
-    .alert-symbol {
+    .feedback-symbol {
       color: $green;
     }
   }
@@ -551,7 +551,7 @@
   &.wrapper-alert-announcement {
     box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $blue;
 
-    .alert-symbol {
+    .feedback-symbol {
       color: $blue;
     }
   }
@@ -559,7 +559,7 @@
   &.wrapper-alert-step-required {
     box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $pink;
 
-    .alert-symbol {
+    .feedback-symbol {
       color: $pink;
     }
   }
@@ -579,12 +579,12 @@
     @extend %t-strong;
   }
 
-  .alert-symbol, .copy {
+  .feedback-symbol, .copy {
     float: left;
   }
 
-  .alert-symbol {
-    @include transition (color 0.50s ease-in-out 0s);
+  .feedback-symbol {
+    @include transition (color $tmg-f1 ease-in-out 0s);
     @extend %t-icon3;
     width: flex-grid(1, 12);
     margin: ($baseline/4) flex-gutter() 0 0;
@@ -593,6 +593,7 @@
 
   .copy {
     width: flex-grid(10, 12);
+    margin-top: ($baseline/2);
     color: $gray-l2;
 
     .title {
@@ -605,29 +606,29 @@
   // with actions
   &.has-actions {
 
-    .alert-symbol {
+    .feedback-symbol {
       width: flex-grid(1, 12);
     }
 
-    .copy {
-      width: flex-grid(7, 12);
-      margin-right: flex-gutter();
-    }
+  	.copy {
+  		width: flex-grid(7, 12);
+  		@include margin-right(flex-gutter());
+  	}
 
-    .nav-actions {
-     width: flex-grid(4, 12);
-     float: right;
-     margin-top: ($baseline/2);
-     text-align: right;
+  	.nav-actions {
+  	  width: flex-grid(4, 12);
+      @include float(left);
+      margin-top: ($baseline/2);
+  	  text-align: right;
 
-     .nav-item {
-       display: inline-block;
-       vertical-align: middle;
-       margin-right: ($baseline/2);
+  	  .nav-item {
+  	    display: inline-block;
+  	    vertical-align: middle;
+  	    @include margin-right($baseline/2);
 
-       &:last-child {
-         margin-right: 0;
-       }
+  	    &:last-child {
+  	      @include margin-right(0);
+  	    }
 
        .action-primary {
         @extend %t-action4;
@@ -655,7 +656,7 @@
       @extend %cont-text-sr;
     }
 
-    [class^="icon"] {
+    .icon {
       @extend %t-icon6;
       color: $white;
       width: auto;
@@ -759,10 +760,10 @@
   .message {
     @extend %t-copy-sub1;
     background-color: $gray-d2;
-    padding: ($baseline/2) ($baseline*.75);
+    padding: ($baseline/2) ($baseline*0.75);
     color: $white;
 
-    [class^="icon-"] {
+    .icon {
       font-style: normal;
     }
 
@@ -784,7 +785,7 @@
     &.has-warnings {
       border-bottom: 3px solid $orange;
 
-      .icon-warning-sign {
+      .fa-warning {
         margin-right: ($baseline/2);
         color: $orange;
       }
@@ -793,7 +794,7 @@
     &.has-errors {
       border-bottom: 3px solid $red-l2;
 
-      .icon-exclamation-sign {
+      .fa-exclamation-circle {
         margin-right: ($baseline/2);
         color: $red-l2;
       }
@@ -828,7 +829,7 @@ body.uxdesign.alerts {
   .content-primary {
     @extend %ui-window;
     width: flex-grid(12, 12);
-    margin-right: flex-gutter();
+    @include margin-right(flex-gutter());
     padding: $baseline ($baseline*1.5);
 
     > section {
@@ -855,9 +856,9 @@ body.uxdesign.alerts {
         }
 
         a {
-          float: left;
+          @include float(left);
           width: flex-grid(5, 12);
-          margin-right: flex-gutter();
+          @include margin-right(flex-gutter());
         }
       }
     }
@@ -872,16 +873,16 @@ body.uxdesign.alerts {
   .alert {
     @extend %t-copy-sub1;
     padding: 15px 20px;
-    margin-bottom: 30px;
+    margin-bottom: ($baseline*1.5);
     border-radius: 3px;
     border: 1px solid #edbd3c;
     border-radius: 3px;
     background: #fbf6e1;
     // background: #edbd3c;
-    @include clearfix;
+    @include clearfix();
 
     .alert-message {
-      float: left;
+      @include float(left);
       margin: 4px 0 0 0;
       color: $gray-d3;
     }
@@ -891,7 +892,7 @@ body.uxdesign.alerts {
     }
 
     .alert-action {
-      float: right;
+      @include float(left);
 
       &.secondary {
         @include orange-button;

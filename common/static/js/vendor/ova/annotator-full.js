@@ -3371,5 +3371,3 @@ Annotator.prototype.setupPlugins = function(config, options) {
 /*
 //
 */
-
-//@ sourceMappingURL=annotator-full.map

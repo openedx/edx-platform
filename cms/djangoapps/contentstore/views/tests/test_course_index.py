@@ -6,19 +6,20 @@ import lxml
 import datetime
 
 from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url, add_instructor
-from contentstore.views.access import has_course_access
+from contentstore.utils import reverse_course_url, reverse_library_url, add_instructor
+from student.auth import has_course_author_access
 from contentstore.views.course import course_outline_initial_state
 from contentstore.views.item import create_xblock_info, VisibilityState
 from course_action_state.models import CourseRerunState
 from util.date_utils import get_default_time_display
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
 from opaque_keys.edx.locator import CourseLocator
 from student.tests.factories import UserFactory
 from course_action_state.managers import CourseRerunUIStateManager
 from django.conf import settings
+import pytz
 
 
 class TestCourseIndex(CourseTestCase):
@@ -41,7 +42,7 @@ class TestCourseIndex(CourseTestCase):
         """
         Test getting the list of courses and then pulling up their outlines
         """
-        index_url = '/course/'
+        index_url = '/home/'
         index_response = authed_client.get(index_url, {}, HTTP_ACCEPT='text/html')
         parsed_html = lxml.html.fromstring(index_response.content)
         course_link_eles = parsed_html.find_class('course-link')
@@ -59,6 +60,27 @@ class TestCourseIndex(CourseTestCase):
             self.assertEqual(outline_link.get("href"), link.get("href"))
             course_menu_link = outline_parsed.find_class('nav-course-courseware-outline')[0]
             self.assertEqual(course_menu_link.find("a").get("href"), link.get("href"))
+
+    def test_libraries_on_course_index(self):
+        """
+        Test getting the list of libraries from the course listing page
+        """
+        # Add a library:
+        lib1 = LibraryFactory.create()
+
+        index_url = '/home/'
+        index_response = self.client.get(index_url, {}, HTTP_ACCEPT='text/html')
+        parsed_html = lxml.html.fromstring(index_response.content)
+        library_link_elements = parsed_html.find_class('library-link')
+        self.assertEqual(len(library_link_elements), 1)
+        link = library_link_elements[0]
+        self.assertEqual(
+            link.get("href"),
+            reverse_library_url('library_handler', lib1.location.library_key),
+        )
+        # now test that url
+        outline_response = self.client.get(link.get("href"), {}, HTTP_ACCEPT='text/html')
+        self.assertEqual(outline_response.status_code, 200)
 
     def test_is_staff_access(self):
         """
@@ -106,8 +128,8 @@ class TestCourseIndex(CourseTestCase):
 
         # First spot check some values in the root response
         self.assertEqual(json_response['category'], 'course')
-        self.assertEqual(json_response['id'], 'i4x://MITx/999/course/Robot_Super_Course')
-        self.assertEqual(json_response['display_name'], 'Robot Super Course')
+        self.assertEqual(json_response['id'], unicode(self.course.location))
+        self.assertEqual(json_response['display_name'], self.course.display_name)
         self.assertTrue(json_response['published'])
         self.assertIsNone(json_response['visibility_state'])
 
@@ -116,7 +138,7 @@ class TestCourseIndex(CourseTestCase):
         self.assertTrue(len(children) > 0)
         first_child_response = children[0]
         self.assertEqual(first_child_response['category'], 'chapter')
-        self.assertEqual(first_child_response['id'], 'i4x://MITx/999/chapter/Week_1')
+        self.assertEqual(first_child_response['id'], unicode(chapter.location))
         self.assertEqual(first_child_response['display_name'], 'Week 1')
         self.assertTrue(json_response['published'])
         self.assertEqual(first_child_response['visibility_state'], VisibilityState.unscheduled)
@@ -180,7 +202,7 @@ class TestCourseIndex(CourseTestCase):
             # delete nofications that are dismissed
             CourseRerunState.objects.get(id=rerun_state.id)
 
-        self.assertFalse(has_course_access(user2, rerun_course_key))
+        self.assertFalse(has_course_author_access(user2, rerun_course_key))
 
     def assert_correct_json_response(self, json_response):
         """
@@ -227,8 +249,8 @@ class TestCourseOutline(CourseTestCase):
 
         # First spot check some values in the root response
         self.assertEqual(json_response['category'], 'course')
-        self.assertEqual(json_response['id'], 'i4x://MITx/999/course/Robot_Super_Course')
-        self.assertEqual(json_response['display_name'], 'Robot Super Course')
+        self.assertEqual(json_response['id'], unicode(self.course.location))
+        self.assertEqual(json_response['display_name'], self.course.display_name)
         self.assertTrue(json_response['published'])
         self.assertIsNone(json_response['visibility_state'])
 
@@ -237,7 +259,7 @@ class TestCourseOutline(CourseTestCase):
         self.assertTrue(len(children) > 0)
         first_child_response = children[0]
         self.assertEqual(first_child_response['category'], 'chapter')
-        self.assertEqual(first_child_response['id'], 'i4x://MITx/999/chapter/Week_1')
+        self.assertEqual(first_child_response['id'], unicode(self.chapter.location))
         self.assertEqual(first_child_response['display_name'], 'Week 1')
         self.assertTrue(json_response['published'])
         self.assertEqual(first_child_response['visibility_state'], VisibilityState.unscheduled)
@@ -302,7 +324,7 @@ class TestCourseOutline(CourseTestCase):
         self.assertEqual(_get_release_date(response), 'Unscheduled')
         _assert_settings_link_present(response)
 
-        self.course.start = datetime.datetime(2014, 1, 1)
+        self.course.start = datetime.datetime(2014, 1, 1, tzinfo=pytz.utc)
         modulestore().update_item(self.course, ModuleStoreEnum.UserID.test)
         response = self.client.get(outline_url, {}, HTTP_ACCEPT='text/html')
 

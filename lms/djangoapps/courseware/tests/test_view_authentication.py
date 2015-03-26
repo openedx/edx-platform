@@ -1,22 +1,13 @@
 import datetime
 import pytz
 
-from mock import patch
-
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
+from mock import patch
 
-# Need access to internal func to put users in the right group
 from courseware.access import has_access
-
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
-
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from courseware.tests.factories import (
     BetaTesterFactory,
     StaffFactory,
@@ -26,9 +17,12 @@ from courseware.tests.factories import (
     OrgInstructorFactory,
 )
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that view authentication works properly.
@@ -72,7 +66,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         urls.extend([
             reverse('book', kwargs={'course_id': course.id.to_deprecated_string(),
                                     'book_index': index})
-            for index, book in enumerate(course.textbooks)
+            for index, __ in enumerate(course.textbooks)
         ])
         for url in urls:
             self.assert_request_status_code(404, url)
@@ -132,7 +126,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         self.course = modulestore().get_course(self.course.id)
 
-        self.test_course = CourseFactory.create(number='666', display_name='Robot_Sub_Course')
+        self.test_course = CourseFactory.create(org=self.course.id.org)
         self.other_org_course = CourseFactory.create(org='Other_Org_Course')
         self.sub_courseware_chapter = ItemFactory.create(
             parent_location=self.test_course.location,
@@ -395,9 +389,11 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertTrue(self.enroll(self.course))
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestBetatesterAccess(ModuleStoreTestCase):
-
+    """
+    Tests for the beta tester feature
+    """
     def setUp(self):
 
         now = datetime.datetime.now(pytz.UTC)

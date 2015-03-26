@@ -40,10 +40,10 @@ class RubricParsingError(Exception):
 class CombinedOpenEndedRubric(object):
     TEMPLATE_DIR = "combinedopenended/openended"
 
-    def __init__(self, system, view_only=False):
+    def __init__(self, render_template, view_only=False):
         self.has_score = False
         self.view_only = view_only
-        self.system = system
+        self.render_template = render_template
 
     def render_rubric(self, rubric_xml, score_list=None):
         '''
@@ -70,7 +70,7 @@ class CombinedOpenEndedRubric(object):
             rubric_template = '{0}/open_ended_rubric.html'.format(self.TEMPLATE_DIR)
             if self.view_only:
                 rubric_template = '{0}/open_ended_view_only_rubric.html'.format(self.TEMPLATE_DIR)
-            html = self.system.render_template(
+            html = self.render_template(
                 rubric_template,
                 {
                     'categories': rubric_categories,
@@ -236,7 +236,7 @@ class CombinedOpenEndedRubric(object):
                             rubric_categories[i]['options'][j]['grader_types'].append(grader_type)
                             #Grab the score and add it to the actual scores.  J will be the score for the selected
                             #grader type
-                            if len(actual_scores)<=i:
+                            if len(actual_scores) <= i:
                                 #Initialize a new list in the list of lists
                                 actual_scores.append([j])
                             else:
@@ -249,12 +249,12 @@ class CombinedOpenEndedRubric(object):
         for (i, a) in enumerate(actual_scores):
             if int(a) == max_scores[i]:
                 correct.append(1)
-            elif int(a)==0:
+            elif int(a) == 0:
                 correct.append(0)
             else:
                 correct.append(.5)
 
-        html = self.system.render_template(
+        html = self.render_template(
             '{0}/open_ended_combined_rubric.html'.format(self.TEMPLATE_DIR),
             {
                 'categories': rubric_categories,

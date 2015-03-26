@@ -1,0 +1,42 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+
+<%inherit file="../main.html" />
+
+<%block name="pagetitle">${_("Sign in or Register")}</%block>
+
+<%block name="js_extra">
+    <script src="${static.url('js/vendor/underscore-min.js')}"></script>
+    <script src="${static.url('js/vendor/underscore.string.min.js')}"></script>
+    <script src="${static.url('js/vendor/backbone-min.js')}"></script>
+    <script src="${static.url('js/vendor/url.min.js')}"></script>
+    <script src="${static.url('js/vendor/history.js')}"></script>
+    <%static:js group='student_account'/>
+</%block>
+
+<%block name="header_extras">
+    % for template_name in ["account", "access", "form_field", "login", "register", "password_reset"]:
+        <script type="text/template" id="${template_name}-tpl">
+            <%static:include path="student_account/${template_name}.underscore" />
+        </script>
+% endfor
+</%block>
+
+<div class="section-bkg-wrapper">
+    <div id="login-and-registration-container"
+        class="login-register"
+        data-initial-mode="${initial_mode}"
+        data-third-party-auth='${third_party_auth|h}'
+        data-platform-name='${platform_name}'
+        data-login-form-desc='${login_form_desc|h}'
+        data-registration-form-desc='${registration_form_desc|h}'
+        data-password-reset-form-desc='${password_reset_form_desc|h}'
+    />
+</div>
+
+% if settings.FEATURES.get('ENABLE_COMBINED_LOGIN_REGISTRATION'):
+    ## This overwrites the "footer" block declared in main.html
+    ## with an empty block, effectively hiding the footer
+    ## from logistration pages.
+    <%block name="footer"/>
+% endif

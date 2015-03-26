@@ -18,7 +18,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from xmodule_django.models import CourseKeyField, LocationKeyField
+from xmodule_django.models import CourseKeyField, LocationKeyField, BlockTypeKeyField
 
 
 class StudentModule(models.Model):
@@ -32,14 +32,15 @@ class StudentModule(models.Model):
     MODULE_TYPES = (('problem', 'problem'),
                     ('video', 'video'),
                     ('html', 'html'),
+                    ('course', 'course'),
+                    ('chapter', 'Section'),
+                    ('sequential', 'Subsection'),
+                    ('library_content', 'Library Content'),
                     )
     ## These three are the key for the object
     module_type = models.CharField(max_length=32, choices=MODULE_TYPES, default='problem', db_index=True)
 
-    # Key used to share state. By default, this is the module_id,
-    # but for abtests and the like, this can be set to a shared value
-    # for many instances of the module.
-    # Filename for homeworks, etc.
+    # Key used to share state. This is the XBlock usage_id
     module_state_key = LocationKeyField(max_length=255, db_index=True, db_column='module_id')
     student = models.ForeignKey(User, db_index=True)
 
@@ -54,10 +55,11 @@ class StudentModule(models.Model):
     ## Grade, and are we done?
     grade = models.FloatField(null=True, blank=True, db_index=True)
     max_grade = models.FloatField(null=True, blank=True)
-    DONE_TYPES = (('na', 'NOT_APPLICABLE'),
-                    ('f', 'FINISHED'),
-                    ('i', 'INCOMPLETE'),
-                    )
+    DONE_TYPES = (
+        ('na', 'NOT_APPLICABLE'),
+        ('f', 'FINISHED'),
+        ('i', 'INCOMPLETE'),
+    )
     done = models.CharField(max_length=8, choices=DONE_TYPES, default='na', db_index=True)
 
     created = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -129,7 +131,34 @@ class StudentModuleHistory(models.Model):
             history_entry.save()
 
 
-class XModuleUserStateSummaryField(models.Model):
+class XBlockFieldBase(models.Model):
+    """
+    Base class for all XBlock field storage.
+    """
+    class Meta:
+        abstract = True
+
+    # The name of the field
+    field_name = models.CharField(max_length=64, db_index=True)
+
+    # The value of the field. Defaults to None dumped as json
+    value = models.TextField(default='null')
+
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
+    modified = models.DateTimeField(auto_now=True, db_index=True)
+
+    def __unicode__(self):
+        return u'{}<{!r}'.format(
+            self.__class__.__name__,
+            {
+                key: getattr(self, key)
+                for key in self._meta.get_all_field_names()
+                if key not in ('created', 'modified')
+            }
+        )
+
+
+class XModuleUserStateSummaryField(XBlockFieldBase):
     """
     Stores data set in the Scope.user_state_summary scope by an xmodule field
     """
@@ -137,64 +166,25 @@ class XModuleUserStateSummaryField(models.Model):
     class Meta:
         unique_together = (('usage_id', 'field_name'),)
 
-    # The name of the field
-    field_name = models.CharField(max_length=64, db_index=True)
-
     # The definition id for the module
     usage_id = LocationKeyField(max_length=255, db_index=True)
 
-    # The value of the field. Defaults to None dumped as json
-    value = models.TextField(default='null')
 
-    created = models.DateTimeField(auto_now_add=True, db_index=True)
-    modified = models.DateTimeField(auto_now=True, db_index=True)
-
-    def __repr__(self):
-        return 'XModuleUserStateSummaryField<%r>' % ({
-            'field_name': self.field_name,
-            'usage_id': self.usage_id,
-            'value': self.value,
-        },)
-
-    def __unicode__(self):
-        return unicode(repr(self))
-
-
-class XModuleStudentPrefsField(models.Model):
+class XModuleStudentPrefsField(XBlockFieldBase):
     """
     Stores data set in the Scope.preferences scope by an xmodule field
     """
 
-    class Meta:
+    class Meta:  # pylint: disable=missing-docstring
         unique_together = (('student', 'module_type', 'field_name'),)
 
-    # The name of the field
-    field_name = models.CharField(max_length=64, db_index=True)
-
     # The type of the module for these preferences
-    module_type = models.CharField(max_length=64, db_index=True)
-
-    # The value of the field. Defaults to None dumped as json
-    value = models.TextField(default='null')
+    module_type = BlockTypeKeyField(max_length=64, db_index=True)
 
     student = models.ForeignKey(User, db_index=True)
 
-    created = models.DateTimeField(auto_now_add=True, db_index=True)
-    modified = models.DateTimeField(auto_now=True, db_index=True)
 
-    def __repr__(self):
-        return 'XModuleStudentPrefsField<%r>' % ({
-            'field_name': self.field_name,
-            'module_type': self.module_type,
-            'student': self.student.username,
-            'value': self.value,
-        },)
-
-    def __unicode__(self):
-        return unicode(repr(self))
-
-
-class XModuleStudentInfoField(models.Model):
+class XModuleStudentInfoField(XBlockFieldBase):
     """
     Stores data set in the Scope.preferences scope by an xmodule field
     """
@@ -202,26 +192,7 @@ class XModuleStudentInfoField(models.Model):
     class Meta:
         unique_together = (('student', 'field_name'),)
 
-    # The name of the field
-    field_name = models.CharField(max_length=64, db_index=True)
-
-    # The value of the field. Defaults to None dumped as json
-    value = models.TextField(default='null')
-
     student = models.ForeignKey(User, db_index=True)
-
-    created = models.DateTimeField(auto_now_add=True, db_index=True)
-    modified = models.DateTimeField(auto_now=True, db_index=True)
-
-    def __repr__(self):
-        return 'XModuleStudentInfoField<%r>' % ({
-            'field_name': self.field_name,
-            'student': self.student.username,
-            'value': self.value,
-        },)
-
-    def __unicode__(self):
-        return unicode(repr(self))
 
 
 class OfflineComputedGrade(models.Model):

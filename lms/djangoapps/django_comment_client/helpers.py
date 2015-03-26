@@ -9,12 +9,16 @@ def include_mustache_templates():
 
     def is_valid_file_name(file_name):
         return file_name.endswith('.mustache')
+
     def read_file(file_name):
         return open(mustache_dir / file_name, "r").read().decode('utf-8')
+
     def template_id_from_file_name(file_name):
         return file_name.rpartition('.')[0]
+
     def process_mako(template_content):
         return Template(template_content).render_unicode()
+
     def make_script_tag(id, content):
         return u"<script type='text/template' id='{0}'>{1}</script>".format(id, content)
 

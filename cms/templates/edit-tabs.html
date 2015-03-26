@@ -5,6 +5,7 @@
   from django.utils.translation import ugettext as _
   from django.core.urlresolvers import reverse
   from xmodule.tabs import StaticTab
+  from django.template.defaultfilters import escapejs
 %>
 <%block name="title">${_("Pages")}</%block>
 <%block name="bodyclass">is-signedin course view-static-pages</%block>
@@ -17,25 +18,10 @@
 % endfor
 </%block>
 
-<%block name="jsextra">
-<script type='text/javascript'>
-    require(["js/models/explicit_url", "coffee/src/views/tabs",
-        "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
-            function (TabsModel, TabsEditView, xmoduleLoader) {
-                xmoduleLoader.done(function () {
-                    var model = new TabsModel({
-                        id: "${context_course.location}",
-                        explicit_url: "${reverse('contentstore.views.tabs_handler', kwargs={'course_key_string': context_course.id})}"
-                    });
-
-                    new TabsEditView({
-                        el: $('.tab-list'),
-                        model: model,
-                        mast: $('.wrapper-mast')
-                    });
-                });
-            });
-  </script>
+<%block name="requirejs">
+    require(["js/factories/edit_tabs"], function (EditTabsFactory) {
+        EditTabsFactory("${context_course.location | escapejs}", "${reverse('contentstore.views.tabs_handler', kwargs={'course_key_string': context_course.id})}");
+    });
 </%block>
 
 <%block name="content">
@@ -51,7 +37,7 @@
       <h3 class="sr">${_("Page Actions")}</h3>
       <ul>
         <li class="nav-item">
-          <a href="#" class="button new-button new-tab"><i class="icon-plus"></i> ${_("New Page")}</a>
+          <a href="#" class="button new-button new-tab"><i class="icon fa fa-plus"></i> ${_("New Page")}</a>
         </li>
         <li class="nav-item">
           <a href="${lms_link}" rel="external" class="button view-button view-live-button">${_("View Live")}</a>
@@ -86,7 +72,7 @@
                 %>
 
                 % if isinstance(tab, StaticTab):
-                    <li class="component ${css_class}" data-locator="${tab.locator}" data-tab-id="${tab.tab_id}"></li>
+                    <li class="component ${css_class}" data-locator="${tab.locator | h}" data-tab-id="${tab.tab_id | h}"></li>
 
                 % else:
                     <li class="course-nav-item ${css_class}" data-tab-id="${tab.tab_id}">
@@ -119,7 +105,7 @@
                             % else:
                               <input type="checkbox" class="toggle-checkbox" data-tooltip="${_('Show/hide page')}" />
                             % endif
-                            <div class="action-button"><i class="icon-eye-open"></i><i class="icon-eye-close"></i></div>
+                            <div class="action-button"><i class="icon fa fa-eye"></i><i class="icon fa fa-eye-slash"></i></div>
                           </li>
                         % endif
 
@@ -145,13 +131,13 @@
           </div>
 
           <div class="add-pages">
-              <p>${_("You can add additional custom pages to your course.")} <a href="#" class="button new-button new-tab"><i class="icon-plus"></i>${_("Add a New Page")}</a></p>
+              <p>${_("You can add additional custom pages to your course.")} <a href="#" class="button new-button new-tab"><i class="icon fa fa-plus"></i>${_("Add a New Page")}</a></p>
           </div>
         </article>
       </div>
     </article>
 
-    <aside class="content-supplementary" role="complimentary">
+    <aside class="content-supplementary" role="complementary">
       <div class="bit">
         <h3 class="title-3">${_("What are pages?")}</h3>
         <p>${_("Pages are listed horizontally at the top of your course. Default pages (Courseware, Course info, Discussion, Wiki, and Progress) are followed by textbooks and custom pages that you create.")}</p>
@@ -172,12 +158,12 @@
 <div class="content-modal" id="preview-lms-staticpages">
   <h3 class="title">${_("Pages in Your Course")}</h3>
   <figure>
-    <img src="${static.url("img/preview-lms-staticpages.png")}" alt="${_('Preview of Pages in your course')}" />
+    <img src="${static.url("images/preview-lms-staticpages.png")}" alt="${_('Preview of Pages in your course')}" />
     <figcaption class="description">${_("Pages appear in your course's top navigation bar. The default pages (Courseware, Course Info, Discussion, Wiki, and Progress) are followed by textbooks and custom pages.")}</figcaption>
   </figure>
 
   <a href="#" rel="view" class="action action-modal-close">
-    <i class="icon-remove-sign"></i>
+    <i class="icon fa fa-times-circle"></i>
     <span class="label">${_("close modal")}</span>
   </a>
 </div>

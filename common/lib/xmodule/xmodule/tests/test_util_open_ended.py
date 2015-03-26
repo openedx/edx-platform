@@ -20,6 +20,7 @@ S3_INTERFACE = {
     "storage_bucket_name": "",
 }
 
+
 class MockS3Key(object):
     """
     Mock an S3 Key object from boto.  Used for file upload testing.
@@ -96,6 +97,7 @@ class DummyModulestore(object):
         descriptor.xmodule_runtime = self.get_module_system(descriptor)
         return descriptor
 
+
 def serialize_child_history(task_state):
     """
     To json serialize feedback and post_assessment in child_history of task state.
@@ -106,6 +108,7 @@ def serialize_child_history(task_state):
             if "feedback" in attempt["post_assessment"]:
                 attempt["post_assessment"]["feedback"] = json.dumps(attempt["post_assessment"].get("feedback"))
             task_state["child_history"][i]["post_assessment"] = json.dumps(attempt["post_assessment"])
+
 
 def serialize_open_ended_instance_state(json_str):
     """

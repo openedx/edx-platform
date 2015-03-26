@@ -1,8 +1,12 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.conf import settings
 from datetime import datetime
 from model_utils import Choices
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
+from util.milestones_helpers import fulfill_course_milestone
 
 """
 Certificates are created for a student and an offering of a course.
@@ -49,20 +53,20 @@ Eligibility:
        If the user and course is present in the certificate whitelist table
        then the student will be issued a certificate regardless of his grade,
        unless he has allow_certificate set to False.
-
 """
 
 
 class CertificateStatuses(object):
-    deleted      = 'deleted'
-    deleting     = 'deleting'
+    deleted = 'deleted'
+    deleting = 'deleting'
     downloadable = 'downloadable'
-    error        = 'error'
-    generating   = 'generating'
-    notpassing   = 'notpassing'
+    error = 'error'
+    generating = 'generating'
+    notpassing = 'notpassing'
     regenerating = 'regenerating'
-    restricted   = 'restricted'
-    unavailable  = 'unavailable'
+    restricted = 'restricted'
+    unavailable = 'unavailable'
+
 
 class CertificateWhitelist(models.Model):
     """
@@ -88,7 +92,7 @@ class GeneratedCertificate(models.Model):
     course_id = CourseKeyField(max_length=255, blank=True, default=None)
     verify_uuid = models.CharField(max_length=32, blank=True, default='')
     download_uuid = models.CharField(max_length=32, blank=True, default='')
-    download_url = models.CharField(max_length=128, blank=True,  default='')
+    download_url = models.CharField(max_length=128, blank=True, default='')
     grade = models.CharField(max_length=5, blank=True, default='')
     key = models.CharField(max_length=32, blank=True, default='')
     distinction = models.BooleanField(default=False)
@@ -116,6 +120,18 @@ class GeneratedCertificate(models.Model):
             pass
 
         return None
+
+
+@receiver(post_save, sender=GeneratedCertificate)
+def handle_post_cert_generated(sender, instance, **kwargs):  # pylint: disable=no-self-argument, unused-argument
+    """
+    Handles post_save signal of GeneratedCertificate, and mark user collected
+    course milestone entry if user has passed the course
+    or certificate status is 'generating'.
+    """
+    if settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES') and instance.status == CertificateStatuses.generating:
+        fulfill_course_milestone(instance.course_id, instance.user)
+
 
 def certificate_status_for_student(student, course_id):
     '''

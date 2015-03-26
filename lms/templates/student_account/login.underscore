@@ -1,0 +1,60 @@
+<div class="status already-authenticated-msg hidden">
+    <% if (context.currentProvider) { %>
+        <p class="message-copy">
+            <%- _.sprintf( gettext("You've successfully signed into %(currentProvider)s, but your %(currentProvider)s account isn't linked with an %(platformName)s account. To link your accounts, go to your %(platformName)s dashboard."), context ) %>
+        </p>
+    <% } %>
+</div>
+
+<div class="js-reset-success status submission-success hidden">
+    <h4 class="message-title"><%- gettext("Password Reset Email Sent") %></h4>
+    <div class="message-copy">
+        <p>
+            <%- gettext("We've sent instructions for resetting your password to the email address you provided.") %>
+        </p>
+    </div>
+</div>
+
+<div class="status submission-error hidden" aria-live="polite">
+    <h4 class="message-title"><%- gettext("We couldn't sign you in.") %></h4>
+    <ul class="message-copy"></ul>
+</div>
+
+<form id="login" class="login-form">
+
+    <div class="section-title lines">
+        <h2>
+            <span class="text"><%- gettext("Sign in") %></span>
+        </h2>
+    </div>
+
+    <%= context.fields %>
+
+    <button type="submit" class="action action-primary action-update js-login login-button"><%- gettext("Sign in") %></button>
+
+    <div class="login-providers">
+        <div class="section-title lines">
+            <h2>
+                <span class="text"><%- gettext("or sign in with") %></span>
+            </h2>
+        </div>
+
+        <% _.each( context.providers, function( provider ) {
+            if ( provider.loginUrl ) { %>
+                <button type="button" class="button button-primary button-<%- provider.name %> login-provider login-<%- provider.name %>" data-provider-url="<%- provider.loginUrl %>">
+                    <div class="icon fa <%- provider.iconClass %>" aria-hidden="true"></div>
+                    <%- provider.name %>
+                </button>
+            <% }
+        }); %>
+    </div>
+</form>
+
+<div class="toggle-form">
+    <div class="section-title">
+        <h2>
+            <span class="text"><%- _.sprintf( gettext("New to %(platformName)s?"), context ) %></span>
+        </h2>
+    </div>
+    <button class="nav-btn form-toggle" data-type="register"><%- gettext("Create an account") %></button>
+</div>

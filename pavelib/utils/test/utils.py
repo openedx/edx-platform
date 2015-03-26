@@ -54,6 +54,7 @@ def clean_mongo():
         repo_root=Env.REPO_ROOT,
     ))
 
+
 def check_firefox_version():
     """
     Check that firefox is the correct version.
@@ -63,13 +64,12 @@ def check_firefox_version():
 
     if firefox_ver != expected_firefox_ver:
         raise Exception(
-            'Required firefox version not found.\n\n'
-            'To install the required version:\n'
+            'Required firefox version not found.\n'
+            'Expected: {expected_version}; Actual: {actual_version}.\n\n'
             'As the root user in devstack, run the following:\n\n'
             '\t$ sudo wget -O /tmp/firefox_28.deb https://s3.amazonaws.com/vagrant.testeng.edx.org/firefox_28.0%2Bbuild2-0ubuntu0.12.04.1_amd64.deb\n'
             '\t$ sudo gdebi -nq /tmp/firefox_28.deb\n\n'
             'Confirm the new version:\n'
             '\t$ firefox --version\n'
-            '\t{version}'.format(version=expected_firefox_ver)
+            '\t{expected_version}'.format(actual_version=firefox_ver, expected_version=expected_firefox_ver)
         )
-

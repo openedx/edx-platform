@@ -68,13 +68,6 @@ Feature: LMS.Verified certificates
 #        And I press the payment button
 #        Then I am at the payment page
 
-    Scenario: I can take a verified certificate course for free
-        Given I am logged in
-        And the course has an honor mode
-        When I select the honor code option
-        Then I should see the course on my dashboard
-        And a "edx.course.enrollment.activated" server event is emitted
-
     Scenario: The upsell offer is on the dashboard if I am auditing
         Given I am logged in
         When I select the audit track

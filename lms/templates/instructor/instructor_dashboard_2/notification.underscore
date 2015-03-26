@@ -1,0 +1,31 @@
+<div class="message message-<%= type %>" tabindex="-1">
+    <h3 class="message-title">
+        <%- title %>
+    </h3>
+
+    <% if (details.length > 0 || message) { %>
+        <div class="message-copy">
+            <% if (message) { %>
+                <p><%- message %></p>
+            <% } %>
+            <% if (details.length > 0) { %>
+                <ul class="list-summary summary-items">
+                    <% for (var i = 0; i < details.length; i++) { %>
+                        <li class="summary-item"><%- details[i] %></li>
+                    <% } %>
+                </ul>
+            <% } %>
+        </div>
+    <% } %>
+
+    <% if (actionText) { %>
+        <div class="message-actions">
+            <button class="action-primary <%- actionClass %>">
+                <% if (actionIconClass) { %>
+                    <i class="icon fa <%- actionIconClass %>"></i>
+                <% } %>
+                <%- actionText %>
+            </button>
+        </div>
+    <% } %>
+</div>

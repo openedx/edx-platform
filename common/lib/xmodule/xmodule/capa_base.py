@@ -12,7 +12,7 @@ import sys
 
 # We don't want to force a dependency on datadog, so make the import conditional
 try:
-    from dogapi import dog_stats_api
+    import dogstats_wrapper as dog_stats_api
 except ImportError:
     # pylint: disable=invalid-name
     dog_stats_api = None
@@ -29,6 +29,8 @@ from xblock.fields import Scope, String, Boolean, Dict, Integer, Float
 from .fields import Timedelta, Date
 from django.utils.timezone import UTC
 from .util.duedate import get_extended_due_date
+from xmodule.capa_base_constants import RANDOMIZATION, SHOWANSWER
+from django.conf import settings
 
 log = logging.getLogger("edx.courseware")
 
@@ -63,9 +65,9 @@ class Randomization(String):
     """
     def from_json(self, value):
         if value in ("", "true"):
-            return "always"
+            return RANDOMIZATION.ALWAYS
         elif value == "false":
-            return "per_student"
+            return RANDOMIZATION.PER_STUDENT
         return value
 
     to_json = from_json
@@ -103,15 +105,15 @@ class CapaFields(object):
     max_attempts = Integer(
         display_name=_("Maximum Attempts"),
         help=_("Defines the number of times a student can try to answer this problem. "
-              "If the value is not set, infinite attempts are allowed."),
+               "If the value is not set, infinite attempts are allowed."),
         values={"min": 0}, scope=Scope.settings
     )
     due = Date(help=_("Date that this problem is due by"), scope=Scope.settings)
     extended_due = Date(
         help=_("Date that this problem is due by for a particular student. This "
-             "can be set by an instructor, and will override the global due "
-             "date if it is set to a date that is later than the global due "
-             "date."),
+               "can be set by an instructor, and will override the global due "
+               "date if it is set to a date that is later than the global due "
+               "date."),
         default=None,
         scope=Scope.user_state,
     )
@@ -122,36 +124,45 @@ class CapaFields(object):
     showanswer = String(
         display_name=_("Show Answer"),
         help=_("Defines when to show the answer to the problem. "
-              "A default value can be set in Advanced Settings."),
+               "A default value can be set in Advanced Settings."),
         scope=Scope.settings,
-        default="finished",
+        default=SHOWANSWER.FINISHED,
         values=[
-            {"display_name": _("Always"), "value": "always"},
-            {"display_name": _("Answered"), "value": "answered"},
-            {"display_name": _("Attempted"), "value": "attempted"},
-            {"display_name": _("Closed"), "value": "closed"},
-            {"display_name": _("Finished"), "value": "finished"},
-            {"display_name": _("Correct or Past Due"), "value": "correct_or_past_due"},
-            {"display_name": _("Past Due"), "value": "past_due"},
-            {"display_name": _("Never"), "value": "never"}]
+            {"display_name": _("Always"), "value": SHOWANSWER.ALWAYS},
+            {"display_name": _("Answered"), "value": SHOWANSWER.ANSWERED},
+            {"display_name": _("Attempted"), "value": SHOWANSWER.ATTEMPTED},
+            {"display_name": _("Closed"), "value": SHOWANSWER.CLOSED},
+            {"display_name": _("Finished"), "value": SHOWANSWER.FINISHED},
+            {"display_name": _("Correct or Past Due"), "value": SHOWANSWER.CORRECT_OR_PAST_DUE},
+            {"display_name": _("Past Due"), "value": SHOWANSWER.PAST_DUE},
+            {"display_name": _("Never"), "value": SHOWANSWER.NEVER}]
     )
     force_save_button = Boolean(
         help=_("Whether to force the save button to appear on the page"),
         scope=Scope.settings,
         default=False
     )
+    reset_key = "DEFAULT_SHOW_RESET_BUTTON"
+    default_reset_button = getattr(settings, reset_key) if hasattr(settings, reset_key) else False
+    show_reset_button = Boolean(
+        display_name=_("Show Reset Button"),
+        help=_("Determines whether a 'Reset' button is shown so the user may reset their answer. "
+               "A default value can be set in Advanced Settings."),
+        scope=Scope.settings,
+        default=default_reset_button
+    )
     rerandomize = Randomization(
         display_name=_("Randomization"),
         help=_("Defines how often inputs are randomized when a student loads the problem. "
-             "This setting only applies to problems that can have randomly generated numeric values. "
-             "A default value can be set in Advanced Settings."),
-        default="never",
+               "This setting only applies to problems that can have randomly generated numeric values. "
+               "A default value can be set in Advanced Settings."),
+        default=RANDOMIZATION.NEVER,
         scope=Scope.settings,
         values=[
-            {"display_name": _("Always"), "value": "always"},
-            {"display_name": _("On Reset"), "value": "onreset"},
-            {"display_name": _("Never"), "value": "never"},
-            {"display_name": _("Per Student"), "value": "per_student"}
+            {"display_name": _("Always"), "value": RANDOMIZATION.ALWAYS},
+            {"display_name": _("On Reset"), "value": RANDOMIZATION.ONRESET},
+            {"display_name": _("Never"), "value": RANDOMIZATION.NEVER},
+            {"display_name": _("Per Student"), "value": RANDOMIZATION.PER_STUDENT}
         ]
     )
     data = String(help=_("XML data for the problem"), scope=Scope.content, default="<problem></problem>")
@@ -170,7 +181,7 @@ class CapaFields(object):
     weight = Float(
         display_name=_("Problem Weight"),
         help=_("Defines the number of points each problem is worth. "
-              "If the value is not set, each response field in the problem is worth one point."),
+               "If the value is not set, each response field in the problem is worth one point."),
         values={"min": 0, "step": .1},
         scope=Scope.settings
     )
@@ -252,9 +263,12 @@ class CapaMixin(CapaFields):
                 msg += u'<p><pre>{tb}</pre></p>'.format(
                     # just the traceback, no message - it is already present above
                     tb=cgi.escape(
-                        u''.join(['Traceback (most recent call last):\n'] +
-                        traceback.format_tb(sys.exc_info()[2])))
+                        u''.join(
+                            ['Traceback (most recent call last):\n'] +
+                            traceback.format_tb(sys.exc_info()[2])
+                        )
                     )
+                )
                 # create a dummy problem with error message instead of failing
                 problem_text = (u'<problem><text><span class="inline-error">'
                                 u'Problem {url} has an error:</span>{msg}</text></problem>'.format(
@@ -274,9 +288,9 @@ class CapaMixin(CapaFields):
         """
         Choose a new seed.
         """
-        if self.rerandomize == 'never':
+        if self.rerandomize == RANDOMIZATION.NEVER:
             self.seed = 1
-        elif self.rerandomize == "per_student" and hasattr(self.runtime, 'seed'):
+        elif self.rerandomize == RANDOMIZATION.PER_STUDENT and hasattr(self.runtime, 'seed'):
             # see comment on randomization_bin
             self.seed = randomization_bin(self.runtime.seed, unicode(self.location).encode('utf-8'))
         else:
@@ -298,6 +312,7 @@ class CapaMixin(CapaFields):
             anonymous_student_id=self.runtime.anonymous_student_id,
             cache=self.runtime.cache,
             can_execute_unsafe_code=self.runtime.can_execute_unsafe_code,
+            get_python_lib_zip=self.runtime.get_python_lib_zip,
             DEBUG=self.runtime.DEBUG,
             filestore=self.runtime.filestore,
             i18n=self.runtime.service(self, "i18n"),
@@ -445,7 +460,7 @@ class CapaMixin(CapaFields):
         """
         Return True/False to indicate whether to show the "Check" button.
         """
-        submitted_without_reset = (self.is_submitted() and self.rerandomize == "always")
+        submitted_without_reset = (self.is_submitted() and self.rerandomize == RANDOMIZATION.ALWAYS)
 
         # If the problem is closed (past due / too many attempts)
         # then we do NOT show the "check" button
@@ -462,19 +477,20 @@ class CapaMixin(CapaFields):
         """
         is_survey_question = (self.max_attempts == 0)
 
-        if self.rerandomize in ["always", "onreset"]:
+        # If the problem is closed (and not a survey question with max_attempts==0),
+        # then do NOT show the reset button.
+        if (self.closed() and not is_survey_question):
+            return False
 
-            # If the problem is closed (and not a survey question with max_attempts==0),
-            # then do NOT show the reset button.
-            # If the problem hasn't been submitted yet, then do NOT show
-            # the reset button.
-            if (self.closed() and not is_survey_question) or not self.is_submitted():
+        # Button only shows up for randomized problems if the question has been submitted
+        if self.rerandomize in [RANDOMIZATION.ALWAYS, RANDOMIZATION.ONRESET] and self.is_submitted():
+            return True
+        else:
+            # Do NOT show the button if the problem is correct
+            if self.is_correct():
                 return False
             else:
-                return True
-        # Only randomized problems need a "reset" button
-        else:
-            return False
+                return self.show_reset_button
 
     def should_show_save_button(self):
         """
@@ -488,7 +504,7 @@ class CapaMixin(CapaFields):
             return not self.closed()
         else:
             is_survey_question = (self.max_attempts == 0)
-            needs_reset = self.is_submitted() and self.rerandomize == "always"
+            needs_reset = self.is_submitted() and self.rerandomize == RANDOMIZATION.ALWAYS
 
             # If the student has unlimited attempts, and their answers
             # are not randomized, then we do not need a save button
@@ -502,7 +518,7 @@ class CapaMixin(CapaFields):
             # In those cases. the if statement below is false,
             # and the save button can still be displayed.
             #
-            if self.max_attempts is None and self.rerandomize != "always":
+            if self.max_attempts is None and self.rerandomize != RANDOMIZATION.ALWAYS:
                 return False
 
             # If the problem is closed (and not a survey question with max_attempts==0),
@@ -696,28 +712,28 @@ class CapaMixin(CapaFields):
         """
         if self.showanswer == '':
             return False
-        elif self.showanswer == "never":
+        elif self.showanswer == SHOWANSWER.NEVER:
             return False
         elif self.runtime.user_is_staff:
             # This is after the 'never' check because admins can see the answer
             # unless the problem explicitly prevents it
             return True
-        elif self.showanswer == 'attempted':
+        elif self.showanswer == SHOWANSWER.ATTEMPTED:
             return self.attempts > 0
-        elif self.showanswer == 'answered':
+        elif self.showanswer == SHOWANSWER.ANSWERED:
             # NOTE: this is slightly different from 'attempted' -- resetting the problems
             # makes lcp.done False, but leaves attempts unchanged.
             return self.lcp.done
-        elif self.showanswer == 'closed':
+        elif self.showanswer == SHOWANSWER.CLOSED:
             return self.closed()
-        elif self.showanswer == 'finished':
+        elif self.showanswer == SHOWANSWER.FINISHED:
             return self.closed() or self.is_correct()
 
-        elif self.showanswer == 'correct_or_past_due':
+        elif self.showanswer == SHOWANSWER.CORRECT_OR_PAST_DUE:
             return self.is_correct() or self.is_past_due()
-        elif self.showanswer == 'past_due':
+        elif self.showanswer == SHOWANSWER.PAST_DUE:
             return self.is_past_due()
-        elif self.showanswer == 'always':
+        elif self.showanswer == SHOWANSWER.ALWAYS:
             return True
 
         return False
@@ -798,7 +814,10 @@ class CapaMixin(CapaFields):
         new_answers = dict()
         for answer_id in answers:
             try:
-                new_answer = {answer_id: self.runtime.replace_urls(answers[answer_id])}
+                answer_content = self.runtime.replace_urls(answers[answer_id])
+                if self.runtime.replace_jump_to_id_urls:
+                    answer_content = self.runtime.replace_jump_to_id_urls(answer_content)
+                new_answer = {answer_id: answer_content}
             except TypeError:
                 log.debug(u'Unable to perform URL substitution on answers[%s]: %s',
                           answer_id, answers[answer_id])
@@ -951,7 +970,7 @@ class CapaMixin(CapaFields):
             raise NotFoundError(_("Problem is closed."))
 
         # Problem submitted. Student should reset before checking again
-        if self.done and self.rerandomize == "always":
+        if self.done and self.rerandomize == RANDOMIZATION.ALWAYS:
             event_info['failure'] = 'unreset'
             self.track_function_unmask('problem_check_fail', event_info)
             if dog_stats_api:
@@ -971,8 +990,8 @@ class CapaMixin(CapaFields):
 
         # Wait time between resets: check if is too soon for submission.
         if self.last_submission_time is not None and self.submission_wait_seconds != 0:
-             # pylint: disable=maybe-no-member
-             # pylint is unable to verify that .total_seconds() exists
+            # pylint: disable=maybe-no-member
+            # pylint is unable to verify that .total_seconds() exists
             if (current_time - self.last_submission_time).total_seconds() < self.submission_wait_seconds:
                 remaining_secs = int(self.submission_wait_seconds - (current_time - self.last_submission_time).total_seconds())
                 msg = _(u'You must wait at least {wait_secs} between submissions. {remaining_secs} remaining.').format(
@@ -1110,7 +1129,7 @@ class CapaMixin(CapaFields):
 
             if permutation_option is not None:
                 # Add permutation record tuple: (one of:'shuffle'/'answerpool', [as-displayed list])
-                if not 'permutation' in event_info:
+                if 'permutation' not in event_info:
                     event_info['permutation'] = {}
                 event_info['permutation'][response.answer_id] = (permutation_option, response.unmask_order())
 
@@ -1205,7 +1224,7 @@ class CapaMixin(CapaFields):
             # was presented to the user, with values interpolated etc, but that can be done
             # later if necessary.
             variant = ''
-            if self.rerandomize != 'never':
+            if self.rerandomize != RANDOMIZATION.NEVER:
                 variant = self.seed
 
             is_correct = correct_map.is_correct(input_id)
@@ -1332,7 +1351,7 @@ class CapaMixin(CapaFields):
 
         # Problem submitted. Student should reset before saving
         # again.
-        if self.done and self.rerandomize == "always":
+        if self.done and self.rerandomize == RANDOMIZATION.ALWAYS:
             event_info['failure'] = 'done'
             self.track_function_unmask('save_problem_fail', event_info)
             return {
@@ -1356,7 +1375,7 @@ class CapaMixin(CapaFields):
     def reset_problem(self, _data):
         """
         Changes problem state to unfinished -- removes student answers,
-        and causes problem to rerender itself.
+        Causes problem to rerender itself if randomization is enabled.
 
         Returns a dictionary of the form:
           {'success': True/False,
@@ -1379,7 +1398,7 @@ class CapaMixin(CapaFields):
                 'error': _("Problem is closed."),
             }
 
-        if not self.done:
+        if not self.is_submitted():
             event_info['failure'] = 'not_done'
             self.track_function_unmask('reset_problem_fail', event_info)
             return {
@@ -1388,7 +1407,7 @@ class CapaMixin(CapaFields):
                 'error': _("Refresh the page and make an attempt before resetting."),
             }
 
-        if self.rerandomize in ["always", "onreset"]:
+        if self.is_submitted() and self.rerandomize in [RANDOMIZATION.ALWAYS, RANDOMIZATION.ONRESET]:
             # Reset random number generator seed.
             self.choose_new_seed()
 

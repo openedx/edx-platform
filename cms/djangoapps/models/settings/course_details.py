@@ -4,12 +4,28 @@ import datetime
 import json
 from json.encoder import JSONEncoder
 
+from django.conf import settings
+
 from opaque_keys.edx.locations import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from contentstore.utils import course_image_url
 from models.settings import course_grading
 from xmodule.fields import Date
 from xmodule.modulestore.django import modulestore
+
+# This list represents the attribute keys for a course's 'about' info.
+# Note: The 'video' attribute is intentionally excluded as it must be
+# handled separately; its value maps to an alternate key name.
+ABOUT_ATTRIBUTES = [
+    'syllabus',
+    'short_description',
+    'overview',
+    'effort',
+    'entrance_exam_enabled',
+    'entrance_exam_id',
+    'entrance_exam_minimum_score_pct',
+]
+
 
 class CourseDetails(object):
     def __init__(self, org, course_id, run):
@@ -28,6 +44,25 @@ class CourseDetails(object):
         self.effort = None  # int hours/week
         self.course_image_name = ""
         self.course_image_asset_path = ""  # URL of the course image
+        self.pre_requisite_courses = []  # pre-requisite courses
+        self.entrance_exam_enabled = ""  # is entrance exam enabled
+        self.entrance_exam_id = ""  # the content location for the entrance exam
+        self.entrance_exam_minimum_score_pct = settings.FEATURES.get(
+            'ENTRANCE_EXAM_MIN_SCORE_PCT',
+            '50'
+        )  # minimum passing score for entrance exam content module/tree
+
+    @classmethod
+    def _fetch_about_attribute(cls, course_key, attribute):
+        """
+        Retrieve an attribute from a course's "about" info
+        """
+        usage_key = course_key.make_usage_key('about', attribute)
+        try:
+            value = modulestore().get_item(usage_key).data
+        except ItemNotFoundError:
+            value = None
+        return value
 
     @classmethod
     def fetch(cls, course_key):
@@ -41,39 +76,18 @@ class CourseDetails(object):
         course_details.end_date = descriptor.end
         course_details.enrollment_start = descriptor.enrollment_start
         course_details.enrollment_end = descriptor.enrollment_end
+        course_details.pre_requisite_courses = descriptor.pre_requisite_courses
         course_details.course_image_name = descriptor.course_image
         course_details.course_image_asset_path = course_image_url(descriptor)
 
-        temploc = course_key.make_usage_key('about', 'syllabus')
-        try:
-            course_details.syllabus = modulestore().get_item(temploc).data
-        except ItemNotFoundError:
-            pass
+        for attribute in ABOUT_ATTRIBUTES:
+            value = cls._fetch_about_attribute(course_key, attribute)
+            if value is not None:
+                setattr(course_details, attribute, value)
 
-        temploc = course_key.make_usage_key('about', 'short_description')
-        try:
-            course_details.short_description = modulestore().get_item(temploc).data
-        except ItemNotFoundError:
-            pass
-
-        temploc = course_key.make_usage_key('about', 'overview')
-        try:
-            course_details.overview = modulestore().get_item(temploc).data
-        except ItemNotFoundError:
-            pass
-
-        temploc = course_key.make_usage_key('about', 'effort')
-        try:
-            course_details.effort = modulestore().get_item(temploc).data
-        except ItemNotFoundError:
-            pass
-
-        temploc = course_key.make_usage_key('about', 'video')
-        try:
-            raw_video = modulestore().get_item(temploc).data
+        raw_video = cls._fetch_about_attribute(course_key, 'video')
+        if raw_video:
             course_details.intro_video = CourseDetails.parse_video_tag(raw_video)
-        except ItemNotFoundError:
-            pass
 
         return course_details
 
@@ -154,13 +168,19 @@ class CourseDetails(object):
             descriptor.course_image = jsondict['course_image_name']
             dirty = True
 
+        if 'pre_requisite_courses' in jsondict \
+                and sorted(jsondict['pre_requisite_courses']) != sorted(descriptor.pre_requisite_courses):
+            descriptor.pre_requisite_courses = jsondict['pre_requisite_courses']
+            dirty = True
+
         if dirty:
             module_store.update_item(descriptor, user.id)
 
         # NOTE: below auto writes to the db w/o verifying that any of the fields actually changed
         # to make faster, could compare against db or could have client send over a list of which fields changed.
-        for about_type in ['syllabus', 'overview', 'effort', 'short_description']:
-            cls.update_about_item(course_key, about_type, jsondict[about_type], descriptor, user)
+        for attribute in ABOUT_ATTRIBUTES:
+            if attribute in jsondict:
+                cls.update_about_item(course_key, attribute, jsondict[attribute], descriptor, user)
 
         recomposed_video_tag = CourseDetails.recompose_video_tag(jsondict['intro_video'])
         cls.update_about_item(course_key, 'video', recomposed_video_tag, descriptor, user)

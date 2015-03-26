@@ -91,12 +91,17 @@ class TestCourseRerunStateManager(TestCase):
 
         # set state to fail
         exception = Exception("failure in rerunning")
-        CourseRerunState.objects.failed(course_key=self.course_key, exception=exception)
-        self.expected_rerun_state.update({
-            'state': CourseRerunUIStateManager.State.FAILED,
-            'message': exception.message,
-        })
+        try:
+            raise exception
+        except:
+            CourseRerunState.objects.failed(course_key=self.course_key)
+
+        self.expected_rerun_state.update(
+            {'state': CourseRerunUIStateManager.State.FAILED}
+        )
+        self.expected_rerun_state.pop('message')
         rerun = self.verify_rerun_state()
+        self.assertIn(exception.message, rerun.message)
 
         # dismiss ui and verify
         self.dismiss_ui_and_verify(rerun)

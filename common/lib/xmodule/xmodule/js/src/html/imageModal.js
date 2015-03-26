@@ -1,6 +1,7 @@
-$(function() {
+var setupFullScreenModal = function() {
   
-  // Set up on page load
+  // Setup full screen image modal.
+  // Executed from HTMLModule in display.js.
   $("a.modal-content").each(function() {
     var smallImageObject = $(this).children();
     var largeImageSRC = $(this).attr('href');
@@ -45,8 +46,8 @@ $(function() {
   //Define function to close modal
   function closeModal(imageModal) {
     imageModal.removeClass('image-is-fit-to-screen').removeClass('image-is-zoomed');
-    $(".wrapper-modal-image .image-content .image-controls .modal-ui-icon.action-zoom-in").removeClass('is-disabled');
-    $(".wrapper-modal-image .image-content .image-controls .modal-ui-icon.action-zoom-out").addClass('is-disabled');
+    $(".wrapper-modal-image .image-content .image-controls .modal-ui-icon.action-zoom-in").removeClass('is-disabled').attr('aria-disabled', false);
+    $(".wrapper-modal-image .image-content .image-controls .modal-ui-icon.action-zoom-out").addClass('is-disabled').attr('aria-disabled', true);
     var currentDraggie = imageModal.data("draggie");
     currentDraggie.disable();
     $('body').css('overflow', 'auto');
@@ -103,7 +104,7 @@ $(function() {
         currentDraggie.disable();
       }
       
-      $(".wrapper-modal-image .image-content .image-controls .modal-ui-icon").toggleClass('is-disabled');
+      $(".wrapper-modal-image .image-content .image-controls .modal-ui-icon").toggleClass('is-disabled').attr('aria-disabled', $(this).hasClass('is-disabled'));
     }
   });
-});
+};

@@ -8,23 +8,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.split_migrator import SplitMigrator
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore import ModuleStoreEnum
-
-
-def user_from_str(identifier):
-    """
-    Return a user identified by the given string. The string could be an email
-    address, or a stringified integer corresponding to the ID of the user in
-    the database. If no user could be found, a User.DoesNotExist exception
-    will be raised.
-    """
-    try:
-        user_id = int(identifier)
-    except ValueError:
-        return User.objects.get(email=identifier)
-
-    return User.objects.get(id=user_id)
+from contentstore.management.commands.utils import user_from_str
 
 
 class Command(BaseCommand):
@@ -48,7 +33,7 @@ class Command(BaseCommand):
         try:
             course_key = CourseKey.from_string(args[0])
         except InvalidKeyError:
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(args[0])
+            raise CommandError("Invalid location string")
 
         try:
             user = user_from_str(args[1])
@@ -63,7 +48,7 @@ class Command(BaseCommand):
         except IndexError:
             pass
 
-        return course_key, user, org, course, run
+        return course_key, user.id, org, course, run
 
     def handle(self, *args, **options):
         course_key, user, org, course, run = self.parse_args(*args)

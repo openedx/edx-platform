@@ -3,9 +3,8 @@
  * the ancestors of the unit along with its direct siblings. It also has a single "New Unit"
  * button to allow a new sibling unit to be added.
  */
-define(['js/views/xblock_outline'],
-    function(XBlockOutlineView) {
-
+define(['underscore', 'js/views/xblock_outline', 'js/views/unit_outline_child'],
+    function(_, XBlockOutlineView, UnitOutlineChildView) {
         var UnitOutlineView = XBlockOutlineView.extend({
             // takes XBlockInfo as a model
 
@@ -29,7 +28,11 @@ define(['js/views/xblock_outline'],
                     // i.e. subsection and then section.
                     for (i=ancestors.length - 1; i >= 0; i--) {
                         ancestor = ancestors[i];
-                        ancestorView = this.createChildView(ancestor, previousAncestor, ancestorView);
+                        ancestorView = this.createChildView(
+                            ancestor,
+                            previousAncestor,
+                            {parentView: ancestorView, currentUnitId: this.model.get('id')}
+                        );
                         ancestorView.render();
                         listElement.append(ancestorView.$el);
                         previousAncestor = ancestor;
@@ -37,6 +40,17 @@ define(['js/views/xblock_outline'],
                     }
                 }
                 return ancestorView;
+            },
+
+            getChildViewClass: function() {
+                return UnitOutlineChildView;
+            },
+
+            getTemplateContext: function() {
+                return _.extend(
+                    XBlockOutlineView.prototype.getTemplateContext.call(this),
+                    {currentUnitId: this.model.get('id')}
+                );
             }
         });
 

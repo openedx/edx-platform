@@ -19,19 +19,28 @@ define(["jquery", "underscore", "mathjax", "codemirror", "tinymce",
         'define': define
     };
 
-    var urls = ${urls};
-    var head = $("head");
-    var deferred = $.Deferred();
-    var numResources = urls.length;
-    $.each(urls, function (i, url) {
-        head.append($("<script/>", {src: url}));
-        // Wait for all the scripts to execute.
-        require([url], function () {
-            if (i === numResources - 1) {
-               deferred.resolve();
+    /**
+     * Loads all modules one-by-one in exact order.
+     * The module should be used until we'll use RequireJS for XModules.
+     * @param {Array} modules A list of urls.
+     * @return {jQuery Promise}
+     **/
+    var requireQueue = function(modules) {
+        var deferred = $.Deferred();
+        var loadScript = function (queue) {
+            // Loads the next script if queue is not empty.
+            if (queue.length) {
+                require([queue.shift()], function() {
+                    loadScript(queue);
+                });
+            } else {
+                deferred.resolve();
             }
-        });
-    });
+        };
 
-    return deferred.promise();
+        loadScript(modules.concat());
+        return deferred.promise();
+    };
+
+    return requireQueue(${urls});
 });

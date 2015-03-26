@@ -15,3 +15,12 @@ class CCProcessorDataException(CCProcessorException):
 
 class CCProcessorWrongAmountException(CCProcessorException):
     pass
+
+
+class CCProcessorUserCancelled(CCProcessorException):
+    pass
+
+
+class CCProcessorUserDeclined(CCProcessorException):
+    """Transaction declined."""
+    pass

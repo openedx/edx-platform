@@ -1,4 +1,5 @@
 @import 'bourbon/bourbon';
+@import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
 
 @import 'base/reset';
 @import 'base/font_face';
@@ -26,36 +27,38 @@
 // base - elements
 @import 'elements/typography';
 @import 'elements/controls';
+@import 'elements/navigation'; // all archetypes of navigation
 
-// Course base / layout styles
+// course - base
 @import 'course/layout/courseware_header';
+@import 'course/layout/courseware_preview';
 @import 'course/layout/footer';
 @import 'course/base/mixins';
 @import 'course/base/base';
 @import 'course/base/extends';
 @import 'xmodule/modules/css/module-styles.scss';
-
-// courseware
 @import 'course/courseware/courseware';
 @import 'course/courseware/sidebar';
 @import 'course/courseware/amplifier';
-@import 'course/layout/calculator';
-@import 'course/layout/timer';
-@import 'course/layout/chat';
 
-// course-specific courseware (all styles in these files should be gated by a
-// course-specific class). This should be replaced with a better way of
-// providing course-specific styling.
+// course - modules
+@import 'course/modules/student-notes'; // student notes
+@import 'course/modules/calculator'; // calculator utility
+@import 'course/modules/timer'; // timer
+@import 'course/modules/chat'; // chat utility
+
+
+// course - specific courses
 @import "course/courseware/courses/_cs188.scss";
 
-// wiki
+// course - wiki
 @import "course/wiki/basic-html";
 @import "course/wiki/sidebar";
 @import "course/wiki/create";
 @import "course/wiki/wiki";
 @import "course/wiki/table";
 
-// pages
+// course - views
 @import "course/info";
 @import "course/syllabus"; // TODO arjun replace w/ custom tabs, see courseware/courses.py
 @import "course/textbook";
@@ -65,12 +68,13 @@
 @import "course/staff_grading";
 @import "course/rubric";
 @import "course/open_ended_grading";
+@import "course/student-notes";
 
-// instructor
+// course - instructor-only views
 @import "course/instructor/instructor";
 @import "course/instructor/instructor_2";
 @import "course/instructor/email";
 @import "xmodule/descriptors/css/module-styles.scss";
 
-// discussion
+// course - discussion
 @import "course/discussion/form-wmd-toolbar";

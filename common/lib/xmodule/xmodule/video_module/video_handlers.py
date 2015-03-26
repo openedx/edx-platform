@@ -30,7 +30,7 @@ log = logging.getLogger(__name__)
 
 
 # Disable no-member warning:
-# pylint: disable=E1101
+# pylint: disable=no-member
 
 
 class VideoStudentViewHandlers(object):
@@ -55,7 +55,7 @@ class VideoStudentViewHandlers(object):
 
         if dispatch == 'save_user_state':
             for key in data:
-                if hasattr(self, key) and key in accepted_keys:
+                if key in accepted_keys:
                     if key in conversions:
                         value = conversions[key](data[key])
                     else:
@@ -132,45 +132,6 @@ class VideoStudentViewHandlers(object):
                 return Transcript.asset(self.location, self.sub).data
             else:
                 return get_or_create_sjson(self)
-
-    def get_transcript(self, transcript_format='srt'):
-        """
-        Returns transcript, filename and MIME type.
-
-        Raises:
-            - NotFoundError if cannot find transcript file in storage.
-            - ValueError if transcript file is empty or incorrect JSON.
-            - KeyError if transcript file has incorrect format.
-
-        If language is 'en', self.sub should be correct subtitles name.
-        If language is 'en', but if self.sub is not defined, this means that we
-        should search for video name in order to get proper transcript (old style courses).
-        If language is not 'en', give back transcript in proper language and format.
-        """
-        lang = self.transcript_language
-
-        if lang == 'en':
-            if self.sub:  # HTML5 case and (Youtube case for new style videos)
-                transcript_name = self.sub
-            elif self.youtube_id_1_0:  # old courses
-                transcript_name = self.youtube_id_1_0
-            else:
-                log.debug("No subtitles for 'en' language")
-                raise ValueError
-
-            data = Transcript.asset(self.location, transcript_name, lang).data
-            filename = u'{}.{}'.format(transcript_name, transcript_format)
-            content = Transcript.convert(data, 'sjson', transcript_format)
-        else:
-            data = Transcript.asset(self.location, None, None, self.transcripts[lang]).data
-            filename = u'{}.{}'.format(os.path.splitext(self.transcripts[lang])[0], transcript_format)
-            content = Transcript.convert(data, 'srt', transcript_format)
-
-        if not content:
-            log.debug('no subtitles produced in get_transcript')
-            raise ValueError
-
-        return content, filename, Transcript.mime_types[transcript_format]
 
     def get_static_transcript(self, request):
         """
@@ -283,20 +244,7 @@ class VideoStudentViewHandlers(object):
                 response.content_type = transcript_mime_type
 
         elif dispatch == 'available_translations':
-            available_translations = []
-            if self.sub:  # check if sjson exists for 'en'.
-                try:
-                    Transcript.asset(self.location, self.sub, 'en')
-                except NotFoundError:
-                    pass
-                else:
-                    available_translations = ['en']
-            for lang in self.transcripts:
-                try:
-                    Transcript.asset(self.location, None, None, self.transcripts[lang])
-                except NotFoundError:
-                    continue
-                available_translations.append(lang)
+            available_translations = self.available_translations()
             if available_translations:
                 response = Response(json.dumps(available_translations))
                 response.content_type = 'application/json'
@@ -352,7 +300,14 @@ class VideoStudioViewHandlers(object):
 
             if request.method == 'POST':
                 subtitles = request.POST['file']
-                save_to_store(subtitles.file.read(), unicode(subtitles.filename), 'application/x-subrip', self.location)
+                try:
+                    file_data = subtitles.file.read()
+                    unicode(file_data, "utf-8", "strict")
+                except UnicodeDecodeError:
+                    log.info("Invalid encoding type for transcript file: {}".format(subtitles.filename))
+                    msg = _("Invalid encoding type, transcripts should be UTF-8 encoded.")
+                    return Response(msg, status=400)
+                save_to_store(file_data, unicode(subtitles.filename), 'application/x-subrip', self.location)
                 generate_sjson_for_all_speeds(self, unicode(subtitles.filename), {}, language)
                 response = {'filename': unicode(subtitles.filename), 'status': 'Success'}
                 return Response(json.dumps(response), status=201)

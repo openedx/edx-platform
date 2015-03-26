@@ -1,8 +1,8 @@
 # disable missing docstring
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 
 from lettuce import world
-from nose.tools import assert_equal, assert_in  # pylint: disable=E0611
+from nose.tools import assert_equal, assert_in  # pylint: disable=no-name-in-module
 from terrain.steps import reload_the_page
 from common import type_in_codemirror
 from selenium.webdriver.common.keys import Keys
@@ -93,8 +93,10 @@ def click_component_from_menu(category, component_type, is_advanced):
     """
     if is_advanced:
         # Sometimes this click does not work if you go too fast.
-        world.retry_on_exception(_click_advanced,
-            ignored_exceptions=AssertionError)
+        world.retry_on_exception(
+            _click_advanced,
+            ignored_exceptions=AssertionError,
+        )
 
     # Retry this in case the list is empty because you tried too fast.
     link = world.retry_on_exception(

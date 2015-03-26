@@ -4,7 +4,7 @@
 <section id="set-course-mode-price-modal" class="modal" role="dialog" tabindex="-1" aria-label="${_('Set Course Mode Price')}">
   <div class="inner-wrapper">
     <button class="close-modal">
-      <i class="icon-remove"></i>
+      <i class="icon fa fa-remove"></i>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
         ${_('Close')}
@@ -21,7 +21,7 @@
           ${_("Please enter Course Mode detail below")}</p>
       </div>
 
-      <form id="set_price_form" action="${section_data['set_course_mode_url']}" method="post" data-remote="true">
+      <form id="set_price_form">
         <div id="course_form_error" class="modal-form-error"></div>
         <fieldset class="group group-form group-form-requiredinformation">
           <legend class="is-hidden">${_("Required Information")}</legend>
@@ -40,7 +40,7 @@
           </ol>
         </fieldset>
         <div class="submit">
-          <input name="submit" type="submit" id="set_course_button" value="${_('Set Price')}"/>
+          <input name="submit" type="button" id="set_course_button" value="${_('Set Price')}"/>
         </div>
       </form>
     </div>

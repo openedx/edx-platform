@@ -1,5 +1,30 @@
 class @HTMLEditingDescriptor
 
+  # custom fonts are prepended to font selection dropdown
+  CUSTOM_FONTS = "Default='Open Sans', Verdana, Arial, Helvetica, sans-serif;"
+
+  # list of standard tinyMCE fonts: http://www.tinymce.com/wiki.php/Configuration:font_formats
+  STANDARD_FONTS = "Andale Mono=andale mono,times;"+
+    "Arial=arial,helvetica,sans-serif;"+
+    "Arial Black=arial black,avant garde;"+
+    "Book Antiqua=book antiqua,palatino;"+
+    "Comic Sans MS=comic sans ms,sans-serif;"+
+    "Courier New=courier new,courier;"+
+    "Georgia=georgia,palatino;"+
+    "Helvetica=helvetica;"+
+    "Impact=impact,chicago;"+
+    "Symbol=symbol;"+
+    "Tahoma=tahoma,arial,helvetica,sans-serif;"+
+    "Terminal=terminal,monaco;"+
+    "Times New Roman=times new roman,times;"+
+    "Trebuchet MS=trebuchet ms,geneva;"+
+    "Verdana=verdana,geneva;"+
+    "Webdings=webdings;"+
+    "Wingdings=wingdings,zapf dingbats"
+
+  _getFonts = () ->
+    CUSTOM_FONTS + STANDARD_FONTS
+
   constructor: (element) ->
     @element = element
     @base_asset_url = @element.find("#editor-tab").data('base-asset-url')
@@ -35,6 +60,7 @@ class @HTMLEditingDescriptor
       tinyMCE.suffix = ".min"
       @tiny_mce_textarea = $(".tiny-mce", @element).tinymce({
         script_url : "#{baseUrl}/js/vendor/tinymce/js/tinymce/tinymce.full.min.js",
+        font_formats : _getFonts(),
         theme : "modern",
         skin: 'studio-tmce4',
         schema: "html5",

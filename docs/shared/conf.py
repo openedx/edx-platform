@@ -21,9 +21,10 @@
 #
 # -----------------------------------------------------------------------------
 
-import sys, os
+import os
 
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
+
 
 def add_base(paths):
     """
@@ -33,7 +34,6 @@ def add_base(paths):
     """
 
     return [os.path.join(BASEDIR, x) for x in paths]
-    
 
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -146,7 +146,7 @@ html_theme = 'default'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = add_base(['_static'])
+#html_static_path = add_base(['_static'])
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -196,21 +196,26 @@ htmlhelp_basename = 'edxdoc'
 # -- Options for LaTeX output --------------------------------------------------
 
 latex_elements = {
-# The paper size ('letterpaper' or 'a4paper').
-#'papersize': 'letterpaper',
+    # The paper size ('letterpaper' or 'a4paper').
+    #'papersize': 'letterpaper',
 
-# The font size ('10pt', '11pt' or '12pt').
-#'pointsize': '10pt',
+    # The font size ('10pt', '11pt' or '12pt').
+    #'pointsize': '10pt',
 
-# Additional stuff for the LaTeX preamble.
-#'preamble': '',
+    # Additional stuff for the LaTeX preamble.
+    #'preamble': '',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'getting_started.tex', u'edX Studio Documentation',
-   u'EdX Doc Team', 'manual'),
+    (
+        'index',
+        'getting_started.tex',
+        u'edX Studio Documentation',
+        u'EdX Doc Team',
+        'manual',
+    ),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -253,9 +258,15 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'getting_started', u'getting_started Documentation',
-   u'EdX Doc Team', 'getting_started', 'One line description of project.',
-   'Miscellaneous'),
+    (
+        'index',
+        'getting_started',
+        u'getting_started Documentation',
+        u'EdX Doc Team',
+        'getting_started',
+        'One line description of project.',
+        'Miscellaneous',
+    ),
 ]
 
 # Documents to append as an appendix to all manuals.

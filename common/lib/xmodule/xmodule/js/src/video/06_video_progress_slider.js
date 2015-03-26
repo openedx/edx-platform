@@ -76,7 +76,10 @@ function () {
             'title': gettext('Video position'),
             'aria-disabled': false,
             'aria-valuetext': getTimeDescription(state.videoProgressSlider
-                .slider.slider('option', 'value'))
+                .slider.slider('option', 'value')),
+            'aria-valuemax': state.videoPlayer.duration(),
+            'aria-valuemin': '0',
+            'aria-valuenow': state.videoPlayer.currentTime
         });
     }
 
@@ -243,6 +246,12 @@ function () {
                 .slider('option', 'max', duration)
                 .slider('option', 'value', time);
         }
+
+        // Update aria values.
+        this.videoProgressSlider.handle.attr({
+            'aria-valuemax': duration,
+            'aria-valuenow': time
+        });
     }
 
     // When the video stops playing (either because the end was reached, or

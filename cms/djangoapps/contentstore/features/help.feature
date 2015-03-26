@@ -11,7 +11,7 @@ Feature: CMS.Help
     Scenario: Users can access online help within a course
         Given I have opened a new course in Studio
 
-        And I click the course link in My Courses
+        And I click the course link in Studio Home
         Then I should see online help for "outline"
 
         And I go to the course updates page

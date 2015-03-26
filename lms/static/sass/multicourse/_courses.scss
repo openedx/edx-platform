@@ -1,6 +1,6 @@
 .find-courses, .university-profile {
   background: $course-profile-bg;
-  padding-bottom: 60px;
+  padding-bottom: ($baseline*3);
 
   header.search {
     background: $course-profile-bg;
@@ -18,17 +18,17 @@
       margin: 0 auto;
       max-width: 1200px;
       min-width: 760px;
-      padding-top: 200px;
+      padding-top: ($baseline*10);
       position: relative;
       text-align: center;
       width: flex-grid(12);
 
       > hgroup {
-        background: #FFF;
+        background: $white;
         background: $course-header-bg;
         border: 1px solid $border-color-3;
         box-shadow: 0 4px 25px 0 rgba(0,0,0, 0.5);
-        padding: 20px 30px;
+        padding: $baseline ($baseline*1.5);
         position: relative;
         z-index: 2;
       }
@@ -42,14 +42,14 @@
 
         .logo {
           display: inline-block;
+          @include border-right(1px solid $light-gray);
           height: 80px;
-          margin-right: 30px;
-          padding-right: 30px;
+          @include margin-right(30px);
+          @include padding-right(30px);
           position: relative;
           vertical-align: middle;
 
           &::after {
-            @extend %faded-vertical-divider;
             content: "";
             display: block;
             height: 80px;
@@ -75,7 +75,7 @@
         h1, h2 {
           display: inline-block;
           letter-spacing: 1px;
-          margin-bottom: 0px;
+          margin-bottom: 0;
           text-shadow: 0 1px rgba(255,255,255, 0.8);
           vertical-align: middle;
         }
@@ -85,9 +85,9 @@
 
   section.message {
     border-top: 1px solid $border-color-2;
-    @include clearfix;
-    margin-top: 20px;
-    padding-top: 60px;
+    @include clearfix();
+    margin-top: $baseline;
+    padding-top: ($baseline*3);
     @include columns(2 20px);
   }
 }

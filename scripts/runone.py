@@ -9,12 +9,14 @@ import sys
 # to become:
 #   test --settings=cms.envs.test --pythonpath=. -s cms/djangoapps/contentstore/tests/test_course_settings.py:CourseDetailsViewTest.test_update_and_fetch
 
+
 def find_full_path(path_to_file):
     """Find the full path where we only have a relative path from somewhere in the tree."""
     for subdir, dirs, files in os.walk("."):
         full = os.path.relpath(os.path.join(subdir, path_to_file))
         if os.path.exists(full):
             return full
+
 
 def main(argv):
     parser = argparse.ArgumentParser(description="Run just one test")

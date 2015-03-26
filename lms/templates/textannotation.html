@@ -32,8 +32,10 @@ ${static.css(group='style-xmodule-annotations', raw=True)}
     </div>
 </div>
 
-
 <script>
+// TODO: Fix indentation in the following block
+(function (require) {
+    var init = function() {
     function onClickHideInstructions(){
         //Reset function if there is more than one event handler
         $(this).off();
@@ -61,7 +63,7 @@ ${static.css(group='style-xmodule-annotations', raw=True)}
     var unit_id = $('#sequence-list').find('.active').attr("data-element");
     uri += unit_id;
     var pagination = 100,
-        is_staff = !('${user.is_staff}'=='False'),
+        is_staff = '${is_course_staff}' === 'True',
         options = {
         optionsAnnotator: {
             permissions:{
@@ -85,7 +87,7 @@ ${static.css(group='style-xmodule-annotations', raw=True)}
                         'delete': ["${user.email}"],
                         'admin':  ["${user.email}"]
                 },
-                showViewPermissionsCheckbox: true,
+                showViewPermissionsCheckbox: false,
                 showEditPermissionsCheckbox: false,
                 userAuthorize: function(action, annotation, user) {
                     var token, tokens, _i, _len;
@@ -179,6 +181,11 @@ ${static.css(group='style-xmodule-annotations', raw=True)}
         //Load the plugin Video/Text Annotation
         ova = new OpenVideoAnnotation.Annotator($('#textHolder'),options);
 
+        // TODO: Fix to avoid using global scope!
+        window.options = options;
+        window.ova = ova;
+        // END TODO
+
         if (typeof Annotator.Plugin["Grouping"] === 'function') 
             ova.annotator.addPlugin("Grouping");
 
@@ -202,18 +209,17 @@ ${static.css(group='style-xmodule-annotations', raw=True)}
                 annotation_mode: "${annotation_mode}",
             };
         Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
+        // TODO: Fix to avoid using global scope!
+        window.Catch = Catch;
+        // END TODO
     }
 
-    // if the following is true, template is being rendered in LMS, otherwise it is in Studio
-    if (typeof Annotator !== 'undefined') {
-        startova();
-    } else {
-        try {
-            require(["ova"], function(ova) {
-                startova();
-            });
-        } catch(error) {
-            console.log("Error: " + error.message + " - Annotator not loaded in LMS.");
-        }
+    startova();
+    };
+    try {
+        require(["ova"], init);
+    } catch(error) {
+        console.log("Error: " + error.message + " - Annotator not loaded in LMS.");
     }
+}).call(this, require || RequireJS.require);
 </script>

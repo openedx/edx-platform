@@ -187,7 +187,8 @@ class StubOraServiceTest(unittest.TestCase):
             params={'course_id': 'test course'}
         )
 
-        self._assert_response(response,
+        self._assert_response(
+            response,
             {'version': 1, 'success': True, 'problem_list': []}
         )
 

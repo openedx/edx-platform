@@ -1,8 +1,8 @@
 # DON'T JUST ADD NEW DEPENDENCIES!!!
 #
 # If you open a pull request that adds a new dependency, you should notify:
-#   * @jtauber - to check licensing
-#   * One of @e0d, @jarv, or @feanil - to check system requirements
+#   * @mollydb - to check licensing
+#   * One of @e0d or @feanil - to check system requirements
 
 # Python libraries to install directly from github
 
@@ -10,26 +10,29 @@
 -e git+https://github.com/edx/django-staticfiles.git@d89aae2a82f2b#egg=django-staticfiles
 -e git+https://github.com/edx/django-pipeline.git@88ec8a011e481918fdc9d2682d4017c835acd8be#egg=django-pipeline
 -e git+https://github.com/edx/django-wiki.git@cd0b2b31997afccde519fe5b3365e61a9edb143f#egg=django-wiki
--e git+https://github.com/gabrielfalcao/lettuce.git@cccc3978ad2df82a78b6f9648fe2e9baddd22f88#egg=lettuce
+-e git+https://github.com/edx/django-oauth2-provider.git@0.2.7-fork-edx-2#egg=django-oauth2-provider
+-e git+https://github.com/edx/MongoDBProxy.git@25b99097615bda06bd7cdfe5669ed80dc2a7fed0#egg=mongodb_proxy
 -e git+https://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
 -e git+https://github.com/eventbrite/zendesk.git@d53fe0e81b623f084e91776bcf6369f8b7b63879#egg=zendesk
 -e git+https://github.com/un33k/django-ipware.git@42cb1bb1dc680a60c6452e8bb2b843c2a0382c90#egg=django-ipware
 -e git+https://github.com/appliedsec/pygeoip.git@95e69341cebf5a6a9fbf7c4f5439d458898bdc3b#egg=pygeoip
--e git+https://github.com/jazkarta/edx-jsme.git@813079fd5218ed275248d2a1fcae2fcbf20a0838#egg=edx-jsme
+-e git+https://github.com/jazkarta/edx-jsme.git@c5bfa5d361d6685d8c643838fc0055c25f8b7999#egg=edx-jsme
 -e git+https://github.com/pmitros/django-pyfs.git@d175715e0fe3367ec0f1ee429c242d603f6e8b10#egg=djpyfs
+git+https://github.com/mitocw/django-cas.git@60a5b8e5a62e63e0d5d224a87f0b489201a0c695#egg=django-cas
 
 # Our libraries:
--e git+https://github.com/edx/XBlock.git@81a6d713c98d4914af96a0ca624ee7fa4903625e#egg=XBlock
--e git+https://github.com/edx/codejail.git@71f5c5616e2a73ae8cecd1ff2362774a773d3665#egg=codejail
--e git+https://github.com/edx/diff-cover.git@v0.5.0#egg=diff_cover
--e git+https://github.com/edx/js-test-tool.git@v0.1.5#egg=js_test_tool
--e git+https://github.com/edx/django-waffle.git@823a102e48#egg=django-waffle
+-e git+https://github.com/edx/XBlock.git@9c634481dfc85a17dcb3351ca232d7098a38e10e#egg=XBlock
+-e git+https://github.com/edx/codejail.git@6b17c33a89bef0ac510926b1d7fea2748b73aadd#egg=codejail
+-e git+https://github.com/edx/js-test-tool.git@v0.1.6#egg=js_test_tool
 -e git+https://github.com/edx/event-tracking.git@0.1.0#egg=event-tracking
--e git+https://github.com/edx/edx-analytics-data-api-client.git@c2264bdd604eb0a603afa5d88c884edfdeb8089a#egg=edx-analytics-data-api-client
--e git+https://github.com/edx/bok-choy.git@2e6eab960a97fe41778292fe8e1b2f0b69a1be2d#egg=bok_choy
+-e git+https://github.com/edx/bok-choy.git@9fd05383dc434e0275c9874fd50ad14e519448bc#egg=bok_choy
 -e git+https://github.com/edx-solutions/django-splash.git@7579d052afcf474ece1239153cffe1c89935bc4f#egg=django-splash
--e git+https://github.com/edx/acid-block.git@459aff7b63db8f2c5decd1755706c1a64fb4ebb1#egg=acid-xblock
--e git+https://github.com/edx/edx-ora2.git@release-2014-09-12T14.26#egg=edx-ora2
--e git+https://github.com/edx/opaque-keys.git@a7c506befdf9b97bbbb6961e0b0c7fa4807003eb#egg=opaque-keys
+-e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
+-e git+https://github.com/edx/edx-ora2.git@release-2015-01-05T12.24#egg=edx-ora2
+-e git+https://github.com/edx/opaque-keys.git@1254ed4d615a428591850656f39f26509b86d30a#egg=opaque-keys
 -e git+https://github.com/edx/ease.git@97de68448e5495385ba043d3091f570a699d5b5f#egg=ease
--e git+https://github.com/edx/i18n-tools.git@0d7847f9dfa2281640527b4dc51f5854f950f9b7#egg=i18n-tools
+-e git+https://github.com/edx/i18n-tools.git@56f048af9b6868613c14aeae760548834c495011#egg=i18n-tools
+-e git+https://github.com/edx/edx-oauth2-provider.git@0.4.0#egg=oauth2-provider
+-e git+https://github.com/edx/edx-val.git@ba00a5f2e0571e9a3f37d293a98efe4cbca850d5#egg=edx-val
+-e git+https://github.com/edx/edx-milestones.git@4dfe78a2aae9559ccc979746d13a9b67f0ec311e#egg=edx-milestones
+-e git+https://github.com/pmitros/RecommenderXBlock.git@9b07e807c89ba5761827d0387177f71aa57ef056#egg=recommender-xblock

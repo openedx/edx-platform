@@ -121,7 +121,6 @@ class PuzzleComplete(models.Model):
                  'subset': c.puzzle_subset,
                  'created': c.created} for c in complete]
 
-
     @staticmethod
     def is_level_complete(anonymous_user_id, level, sub_level, due=None):
         """
@@ -141,4 +140,3 @@ class PuzzleComplete(models.Model):
             complete = complete.filter(created__lte=due)
 
         return complete.exists()
-

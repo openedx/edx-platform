@@ -36,42 +36,42 @@ nav.sequence-nav {
   // TODO (cpennington): This doesn't work anymore. XModules aren't able to
   // import from external sources.
   @extend .topbar;
-  margin: -4px 0 30px;
+  margin: -4px 0 ($baseline*1.5);
   position: relative;
   border-bottom: none;
 
   .left-shadow {
+    @extend %ui-depth4;
+    @include linear-gradient(left, $shadow, $transparent);
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 9999;
     width: 20px;
     height: 46px;
-    @include linear-gradient(left, rgba(0, 0, 0, .2), rgba(0, 0, 0, 0));
     background-color: transparent;
     pointer-events: none;
   }
 
   .right-shadow {
+    @extend %ui-depth4;
+    @include linear-gradient(right, $shadow, $transparent);
     position: absolute;
     top: 0;
     right: 0;
-    z-index: 9999;
     width: 20px;
     height: 46px;
-    @include linear-gradient(right, rgba(0, 0, 0, .2), rgba(0, 0, 0, 0));
     background-color: transparent;
     pointer-events: none;
   }
 
   .sequence-list-wrapper {
-    position: relative;
-    z-index: 99;
-    border: 1px solid #ccc;
-    height: 44px;
-    margin: 0 30px;
+    @extend %ui-depth2;
     @include linear-gradient(top, #ddd, #eee);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, .1) inset;
+    position: relative;
+    border: 1px solid $gray-l3;
+    height: 44px;
+    margin: 0 ($baseline*1.5);
+    box-shadow: 0 1px 3px $shadow-l1 inset;
   }
 
   ol {
@@ -82,7 +82,7 @@ nav.sequence-nav {
     display: table;
     height: 100%;
     margin: 0;
-    padding: 0 10px;
+    padding: 0 ($baseline/2);
     width: 100%;
 
     a {
@@ -94,31 +94,31 @@ nav.sequence-nav {
       min-width: 20px;
 
       a {
+        @extend %ui-fake-link;
+        @include transition(none);
         width: 100%;
         height: 42px;
         margin: 0;
         background-position: center 14px;
         background-repeat: no-repeat;
         border: 1px solid transparent;
-        cursor: pointer;
         display: block;
         padding: 0;
         position: relative;
-        @include transition(none);
 
 /*        &:focus {
           outline: 0;
         }
 */
         &:hover, &:focus {
-          background-color: #fff;
+          background-color: $white;
           background-repeat: no-repeat;
           background-position: center 14px;
         }
 
         &.active {
-          background-color: #fff;
-          z-index: 9;
+          @extend %ui-depth1;
+          background-color: $white;
 
           // &:after {
           //   content: '▲';
@@ -132,7 +132,7 @@ nav.sequence-nav {
           // }
 
           &:hover, &:focus {
-            background-color: #fff;
+            background-color: $white;
             background-repeat: no-repeat;
             background-position: center 14px;
           }
@@ -197,21 +197,22 @@ nav.sequence-nav {
         }
 
         p {
+          @extend %ui-depth2;
           background: #333;
-          color: #fff;
+          color: $white;
           font-family: $sans-serif;
           line-height: lh();
-          left: 0px;
+          right: 0;
           opacity: 0.0;
           padding: 6px;
           position: absolute;
           top: 48px;
-          text-shadow: 0 -1px 0 #000;
+          text-shadow: 0 -1px 0 $black;
           @include transition(all .1s $ease-in-out-quart 0s);
           white-space: pre;
-          z-index: 99;
           visibility: hidden;
           pointer-events: none;
+
 
           &:empty {
             background: none;
@@ -226,7 +227,7 @@ nav.sequence-nav {
             content: " ";
             display: block;
             height: 10px;
-            left: 18px;
+            right: 18px;
             position: absolute;
             top: -5px;
             @include transform(rotate(45deg));
@@ -237,7 +238,7 @@ nav.sequence-nav {
         &:hover, &:focus {
           p {
             display: block;
-            margin-top: 4px;
+            margin-top: ($baseline/5);
             opacity: 1.0;
             visibility: visible;
           }
@@ -262,7 +263,7 @@ nav.sequence-nav {
       margin-bottom: 0;
       height: 44px;
       width: 70px;
-      border: 1px solid #ccc;
+      border: 1px solid $gray-l3;
       @include linear-gradient(top, #eee, #ddd);
       box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset;
       z-index: 1;
@@ -276,6 +277,7 @@ nav.sequence-nav {
           height: 100%;
           width: 40px;
           text-indent: -9999px;
+          overflow: hidden;
           @include transition(all .2s $ease-in-out-quad 0s);
 
 /*          &:focus {
@@ -294,23 +296,41 @@ nav.sequence-nav {
       }
 
       &.prev {
-        left: -10px;
-        border-radius: 35px 0 0 35px;
+        @include left(-10px);
+        @include border-radius(35px, 0, 0, 35px);
 
         a {
-          background-image: url('../images/sequence-nav/previous-icon.png');
           background-position: center 15px;
+
+          // CASE: left to right layout
+          @include ltr {
+            background-image: url('../images/sequence-nav/previous-icon.png');
+          }
+
+          // CASE: right to left layout
+          @include rtl {
+            background-image: url('../images/sequence-nav/next-icon.png');
+          }
         }
       }
 
       &.next {
-        right: -10px;
-        border-radius: 0 35px 35px 0;
+        @include right(-10px);
+        @include border-radius(0, 35px, 35px, 0);
 
         a {
-          margin-left: 30px;
-          background-image: url('../images/sequence-nav/next-icon.png');
+          @include margin-left(30px);
           background-position: center 15px;
+
+          // CASE: left to right layout
+          @include ltr {
+            background-image: url('../images/sequence-nav/next-icon.png');
+          }
+
+          // CASE: right to left layout
+          @include rtl {
+            background-image: url('../images/sequence-nav/previous-icon.png');
+          }
         }
       }
     }
@@ -334,10 +354,10 @@ nav.sequence-bottom {
     display: inline-block;
 
     li {
-      float: left;
+      @include float(left);
       width: 50px;
       height: 44px;
-      border: 1px solid #ccc;
+      border: 1px solid $gray-l3;
       @include linear-gradient(top, #eee, #ddd);
       box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset;
 
@@ -349,8 +369,9 @@ nav.sequence-bottom {
           background-repeat: no-repeat;
           border: none;
           display: block;
-          padding: lh(.5) 4px;
+          padding: lh(0.5) 4px;
           text-indent: -9999px;
+          overflow: hidden;
           @include transition(all .2s $ease-in-out-quad 0s);
 
           &:hover, &:focus {
@@ -369,21 +390,39 @@ nav.sequence-bottom {
       }
 
       &.prev {
-        border-radius: 35px 0 0 35px;
+        @include border-radius(35px, 0, 0, 35px);
 
         a {
-          background-image: url('../images/sequence-nav/previous-icon.png');
           background-position: center 15px;
+
+         // CASE: left to right layout
+         @include ltr {
+            background-image: url('../images/sequence-nav/previous-icon.png');
+          }
+
+          // CASE: right to left layout
+          @include rtl {
+            background-image: url('../images/sequence-nav/next-icon.png');
+          }
         }
       }
 
       &.next {
-        border-radius: 0 35px 35px 0;
-        border-left: none;
+        @include border-radius(0, 35px, 35px, 0);
+        @include border-left(none);
 
         a {
-          background-image: url('../images/sequence-nav/next-icon.png');
           background-position: center 15px;
+
+          // CASE: left to right layout
+          @include ltr {
+            background-image: url('../images/sequence-nav/next-icon.png');
+          }
+
+          // CASE: right to left layout
+          @include rtl {
+            background-image: url('../images/sequence-nav/previous-icon.png');
+          }
         }
       }
     }

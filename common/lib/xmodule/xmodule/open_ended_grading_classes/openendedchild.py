@@ -145,9 +145,9 @@ class OpenEndedChild(object):
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
         if system.open_ended_grading_interface:
-            self.peer_gs = PeerGradingService(system.open_ended_grading_interface, system)
+            self.peer_gs = PeerGradingService(system.open_ended_grading_interface, system.render_template)
             self.controller_qs = controller_query_service.ControllerQueryService(
-                system.open_ended_grading_interface, system
+                system.open_ended_grading_interface, system.render_template
             )
         else:
             self.peer_gs = MockPeerGradingService()
@@ -245,7 +245,7 @@ class OpenEndedChild(object):
         Replaces "\n" newlines with <br/>
         """
         retv = re.sub(r'</p>$', '', re.sub(r'^<p>', '', html))
-        return re.sub("\n","<br/>", retv)
+        return re.sub("\n", "<br/>", retv)
 
     def new_history_entry(self, answer):
         """
@@ -293,7 +293,7 @@ class OpenEndedChild(object):
             'child_attempts': self.child_attempts,
             'child_created': self.child_created,
             'stored_answer': self.stored_answer,
-            }
+        }
         return json.dumps(state)
 
     def _allow_reset(self):
@@ -333,13 +333,13 @@ class OpenEndedChild(object):
                 previous_answer = latest
             else:
                 previous_answer = ""
-            previous_answer = previous_answer.replace("<br/>","\n").replace("<br>", "\n")
+            previous_answer = previous_answer.replace("<br/>", "\n").replace("<br>", "\n")
         else:
             if latest is not None and len(latest) > 0:
                 previous_answer = latest
             else:
                 previous_answer = ""
-            previous_answer = previous_answer.replace("\n","<br/>")
+            previous_answer = previous_answer.replace("\n", "<br/>")
 
         return previous_answer
 
@@ -439,16 +439,16 @@ class OpenEndedChild(object):
         image_tag = ""
 
         # Ensure that a valid file was uploaded.
-        if ('valid_files_attached' in data
-            and data['valid_files_attached'] in ['true', '1', True]
-            and data['student_file'] is not None
-            and len(data['student_file']) > 0):
-                has_file_to_upload = True
-                student_file = data['student_file'][0]
+        if 'valid_files_attached' in data and \
+           data['valid_files_attached'] in ['true', '1', True] and \
+           data['student_file'] is not None and \
+           len(data['student_file']) > 0:
+            has_file_to_upload = True
+            student_file = data['student_file'][0]
 
-                # Upload the file to S3 and generate html to embed a link.
-                s3_public_url = self.upload_file_to_s3(student_file)
-                image_tag = self.generate_file_link_html_from_url(s3_public_url, student_file.name)
+            # Upload the file to S3 and generate html to embed a link.
+            s3_public_url = self.upload_file_to_s3(student_file)
+            image_tag = self.generate_file_link_html_from_url(s3_public_url, student_file.name)
 
         return has_file_to_upload, image_tag
 
@@ -521,7 +521,7 @@ class OpenEndedChild(object):
 
         # Find all links in the string.
         links = re.findall(r'(https?://\S+)', string)
-        if len(links)>0:
+        if len(links) > 0:
             has_link = True
 
         # Autolink by wrapping links in anchor tags.

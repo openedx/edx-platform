@@ -123,8 +123,8 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         # By default, `parse_qs` returns a list of values for each param
         # For convenience, we replace lists of 1 element with just the element
         return {
-            k:v[0] if len(v) == 1 else v
-            for k,v in urlparse.parse_qs(query).items()
+            key: value[0] if len(value) == 1 else value
+            for key, value in urlparse.parse_qs(query).items()
         }
 
     @lazy
@@ -189,7 +189,9 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         )
 
         if headers is None:
-            headers = dict()
+            headers = {
+                'Access-Control-Allow-Origin': "*",
+            }
 
         BaseHTTPRequestHandler.send_response(self, status_code)
 

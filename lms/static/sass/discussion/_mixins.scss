@@ -6,7 +6,7 @@
   display: block;
   border: 1px solid #2d81ad;
   border-radius: 3px;
-  padding: 0 ($baseline*.75);
+  padding: 0 ($baseline*0.75);
   height: 35px;
   color: $white;
   text-shadow: none;
@@ -25,7 +25,7 @@
   display: block;
   border: 1px solid #aaa;
   border-radius: 3px;
-  padding: 0 ($baseline*.75);
+  padding: 0 ($baseline*0.75);
   height: 35px;
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
   color: $dark-gray;
@@ -42,7 +42,7 @@
   display: block;
   border: 1px solid #222;
   border-radius: 3px;
-  padding: 0 ($baseline*.75);
+  padding: 0 ($baseline*0.75);
   height: 35px;
   background: -webkit-linear-gradient(top, #777, #555);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
@@ -89,7 +89,7 @@
 
 @mixin discussion-wmd-preview-label {
   padding-top: 3px;
-  padding-left: 5px;
+  @include padding-left(5px);
   width: 100%;
   color: #bbb;
   text-transform: uppercase;
@@ -97,9 +97,14 @@
 }
 
 @mixin discussion-wmd-preview {
-  padding: 10px 20px;
+  padding: ($baseline/2) $baseline;
   width: 100%;
   color: #333;
+
+  ol, ul { // Fix up the RTL-only _reset.scss, but only in specific places
+    @include padding-left(40px);
+    @include padding-right(0);
+  }
 }
 
 @-webkit-keyframes fadeIn {
@@ -130,11 +135,11 @@
   color: $color;
 
   .icon {
-    margin-right: ($baseline/5);
+    @include margin-right($baseline/5);
   }
 
   &:last-child {
-    margin-right: 0;
+    @include margin-right(0);
   }
 
   &.is-hidden {

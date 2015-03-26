@@ -36,7 +36,7 @@ site_status_msg = get_site_status_msg(course_id)
 % endif
 </%block>
 
-  <header class="${"global slim" if course else "global-new"}" aria-label="${_('Global Navigation')}">
+  <header class="global ${"slim" if course else ""}" aria-label="${_('Global Navigation')}">
     <nav>
     <h1 class="logo">
       <a href="${marketing_link('ROOT')}">
@@ -58,6 +58,11 @@ site_status_msg = get_site_status_msg(course_id)
             <a href="${marketing_link('COURSES')}">${_('Find Courses')}</a>
           </li>
         % endif
+        %if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD','') and user.is_staff:
+          <li>
+            <a href="${reverse('sysadmin')}">Sysadmin</a>
+          </li>
+        %endif
       </%block>
     </ol>
     <ol class="user">
@@ -75,15 +80,15 @@ site_status_msg = get_site_status_msg(course_id)
               <li><a href="${marketing_link('FAQ')}">${_("Help")}</a></li>
             % endif
           </%block>
-          <li><a href="${reverse('logout')}" role="menuitem">${_("Log Out")}</a></li>
+          <li><a href="${reverse('logout')}" role="menuitem">${_("Sign out")}</a></li>
         </ul>
       </li>
     </ol>
-      % if display_shopping_cart: # see shoppingcart.context_processor.user_has_cart_context_processor
+      % if should_display_shopping_cart_func(): # see shoppingcart.context_processor.user_has_cart_context_processor
         <ol class="user">
           <li class="primary">
             <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">
-              <i class="icon-shopping-cart"></i> ${_("Shopping Cart")}
+              <i class="icon fa fa-shopping-cart"></i> ${_("Shopping Cart")}
             </a>
           </li>
         </ol>
@@ -96,33 +101,33 @@ site_status_msg = get_site_status_msg(course_id)
             <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
           </li>
           <li class="nav-global-02">
-            <a href="${marketing_link('COURSES')}">${_("Find Courses")}</a>
+            <a href="${marketing_link('COURSES')}">${_("Courses")}</a>
           </li>
           <li class="nav-global-03">
-            <a href="${marketing_link('SCHOOLS')}">${_("Schools & Partners")}</a>
+            <a href="${marketing_link('SCHOOLS')}">${_("Schools")}</a>
           </li>
         % endif
       </%block>
+      % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
+          % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+          <li class="nav-global-04">
+            <a class="cta cta-register" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register Now")}</a>
+          </li>
+          % else:
+          <li class="nav-global-04">
+            <a class="cta cta-register" href="/register">${_("Register Now")}</a>
+          </li>
+          % endif
+      % endif
     </ol>
 
     <ol class="right nav-courseware">
-      % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
-        % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-        <li class="nav-courseware-01">
-          <a class="cta cta-register" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
-        </li>
-        % else:
-        <li class="nav-courseware-01">
-          <a class="cta cta-register" href="/register">${_("Register")}</a>
-        </li>
-        % endif
-      % endif
-    <li class="nav-courseware-02">
+    <li class="nav-courseware-01">
       % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
           % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-          <a class="cta cta-login nav-courseware-button" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Log in")}</a>
+          <a class="cta cta-login" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Sign in")}</a>
           % else:
-          <a class="cta cta-login nav-courseware-button" href="/login${login_query()}">${_("Log in")}</a>
+          <a class="cta cta-login" href="/login${login_query()}">${_("Sign in")}</a>
           % endif
       % endif
     </li>

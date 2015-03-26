@@ -3,8 +3,8 @@ from factory.django import DjangoModelFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
-# Factories don't have __init__ methods, and are self documenting
-# pylint: disable=W0232
+# Factories are self documenting
+# pylint: disable=missing-docstring
 class CourseModeFactory(DjangoModelFactory):
     FACTORY_FOR = CourseMode
 

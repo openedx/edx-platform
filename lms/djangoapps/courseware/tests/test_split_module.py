@@ -5,18 +5,17 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from mock import MagicMock
 
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from courseware.module_render import get_module_for_descriptor
 from courseware.model_data import FieldDataCache
+from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
 from xmodule.partitions.partitions import Group, UserPartition
-from user_api.tests.factories import UserCourseTagFactory
+from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class SplitTestBase(ModuleStoreTestCase):
     """
     Sets up a basic course and user for split test testing.
@@ -271,7 +270,7 @@ class TestSplitTestVert(SplitTestBase):
         html1 = self._html(cond1vert, 1)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class SplitTestPosition(ModuleStoreTestCase):
     """
     Check that we can change positions in a course with partitions defined

@@ -17,16 +17,14 @@
   // basic layout
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
-    float: left;
   }
 
   .content-primary {
-    width: flex-grid(9, 12);
-    margin-right: flex-gutter();
+    @extend .ui-col-wide;
   }
 
   .content-supplementary {
-    width: flex-grid(3, 12);
+    @extend .ui-col-narrow;
   }
 
   // ====================
@@ -91,7 +89,7 @@
         margin: 3px flex-gutter() 0 0;
       }
 
-      .icon-remove-sign {
+      .fa-times-circle {
         @extend %t-action1;
         @include transform(rotate(45deg));
         @include transform-origin(center center);
@@ -116,7 +114,7 @@
       .ui-toggle-control {
         @include border-bottom-radius(0);
 
-        .icon-remove-sign {
+        .fa-times-circle {
           @include transform(rotate(90deg));
           @include transform-origin(center center);
         }
@@ -164,7 +162,7 @@
         position: relative;
         overflow: hidden;
 
-        .icon-cog {
+        .fa-cog {
           @include transition(all $tmg-f1 ease-in-out $tmg-f1);
           @extend %t-icon4;
           position: absolute;
@@ -178,7 +176,7 @@
         &.is-submitting {
           padding-left: ($baseline*2);
 
-          .icon-cog {
+          .fa-cog {
             left: ($baseline*0.75);
             visibility: visible;
             opacity: 1.0;
@@ -191,7 +189,7 @@
           background: $red;
           border-color: $red-d1;
 
-          .icon-cog {
+          .fa-cog {
             left: ($baseline*0.75);
             visibility: visible;
             opacity: 1.0;
@@ -291,10 +289,44 @@
 
   // ====================
 
-  // ELEM: course listings
-  .courses {
-    margin: $baseline 0;
+  // Course/Library tabs
+  #course-index-tabs {
+    margin: 0;
+    font-size: 1.4rem;
 
+    li {
+      display: inline-block;
+      line-height: $baseline*2;
+      margin: 0 10px;
+
+      &.active {
+        border-bottom: 4px solid $blue;
+      }
+
+      &.active, &:hover {
+        a {
+          color: $gray-d2;
+        }
+      }
+
+      a {
+        color: $blue;
+        cursor: pointer;
+        display: inline-block;
+      }
+    }
+  }
+
+  // ELEM: course listings
+  .courses-tab, .libraries-tab {
+    display: none;
+
+    &.active {
+      display: block;
+    }
+  }
+
+  .courses, .libraries {
     .title {
       @extend %t-title6;
       margin-bottom: $baseline;
@@ -313,7 +345,6 @@
 	}
 
   .list-courses {
-    margin-top: $baseline;
     border-radius: 3px;
     border: 1px solid $gray-l2;
     background: $white;
@@ -420,8 +451,15 @@
         pointer-events: auto;
       }
 
-      .course-title {
-        color: $orange-d1;
+      .view-live-button {
+        @extend %ui-depth3;
+        @extend %btn-primary-blue;
+        @extend %sizing;
+        @include transition(opacity $tmg-f2 ease-in-out 0);
+        @include box-sizing(border-box);
+        padding: ($baseline/2);
+        opacity: 0.0;
+        pointer-events: none;
       }
 
       .course-metadata {
@@ -439,13 +477,13 @@
     .course-link {
       @extend %ui-depth2;
       width: flex-grid(6, 9);
-      margin-right: flex-gutter();
+      @include margin-right(flex-gutter());
     }
 
     // course title
     .course-title {
       @extend %t-title4;
-      margin: 0 ($baseline*2) ($baseline/4) 0;
+      @include margin(0, ($baseline*2), ($baseline/4), 0);
       font-weight: 300;
     }
 
@@ -459,25 +497,20 @@
       .metadata-item {
         display: inline-block;
 
-        &:after {
+        & + .metadata-item:before {
           content: "/";
           margin-left: ($baseline/10);
           margin-right: ($baseline/10);
           color: $gray-l4;
         }
 
-        &:last-child {
-
-          &:after {
-            content: "";
-            margin-left: 0;
-            margin-right: 0;
-          }
-        }
-
         .label {
           @extend %cont-text-sr;
         }
+      }
+
+      .extra-metadata {
+        margin-left: ($baseline/10);
       }
     }
 
@@ -486,17 +519,17 @@
       @extend %ui-depth3;
       position: static;
       width: flex-grid(3, 9);
-      text-align: right;
+      @include text-align(right);
       opacity: 0;
       pointer-events: none;
 
       .action {
         display: inline-block;
         vertical-align: middle;
-        margin-right: ($baseline/2);
+        @include margin-right($baseline/2);
 
         &:last-child {
-          margin-right: 0;
+          @include margin-right(0);
         }
       }
 
@@ -617,7 +650,7 @@
 
   // course listings
 
-  .create-course {
+  .create-course, .create-library {
 
     .row {
       @include clearfix();

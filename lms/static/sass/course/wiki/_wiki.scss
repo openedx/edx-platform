@@ -10,12 +10,12 @@ section.wiki {
   }
 
   .wiki-wrapper {
-    @include clearfix;
+    @include clearfix();
 
     > header {
       height: 33px;
       padding: 24px 0 26px;
-      border-bottom: 1px solid #ccc;
+      border-bottom: 1px solid $gray-l3;
       border-radius: 3px 3px 0 0;
       background-color: $sidebar-color;
     }
@@ -32,11 +32,11 @@ section.wiki {
   .breadcrumb {
     list-style: none;
     padding-left: 0;
-    margin: 0 0 0 40px;
+    margin: 0 0 0 ($baseline*2);
 
     li {
       float: left;
-      margin-right: 10px;
+      margin-right: ($baseline/2);
       font-size: 0.9em;
 
       a {
@@ -54,7 +54,7 @@ section.wiki {
       &:after {
         content: '›';
         display: inline;
-        margin-left: 10px;
+        margin-left: ($baseline/2);
         color: $base-font-color;
         height: 30px;
         line-height: 31px;
@@ -77,7 +77,7 @@ section.wiki {
   .global-functions {
     display: block;
     width: auto;
-    margin-right: 20px;
+    margin-right: $baseline;
   }
 
   .add-article-btn {
@@ -99,7 +99,7 @@ section.wiki {
       width: 180px;
       height: 27px;
       padding: 0 15px 0 35px;
-      background: url(../images/search-icon.png) no-repeat 9px center #f6f6f6;
+      background: url(../images/search-icon.png) no-repeat 9px center $gray-l6;
       border: 1px solid #c8c8c8;
       border-radius: 14px;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12) inset;
@@ -155,8 +155,8 @@ section.wiki {
     }
 
     h3 {
-      margin-top: 40px;
-      margin-bottom: 20px;
+      margin-top: ($baseline*2);
+      margin-bottom: $baseline;
       font-weight: bold;
       font-size: 1.25em;
     }
@@ -190,14 +190,14 @@ section.wiki {
     }
 
     li {
-      margin-bottom: 15px;
+      margin-bottom: ($baseline*0.75);
       line-height: 1.6em;
     }
 
     pre {
       padding: 10px;
       border: 1px solid #ddd;
-      background: #f8f8f8;
+      background: $gray-l6;
       border-radius: 4px;
       font-size: 0.9em;
       font-family: Monaco, monospace;
@@ -206,7 +206,7 @@ section.wiki {
     .toc {
       background-color: $sidebar-color;
       padding: 9px;
-      margin: 10px 0;
+      margin: ($baseline/2) 0;
       border-radius: 5px;
 
       ul {
@@ -231,7 +231,7 @@ section.wiki {
     @include box-sizing(border-box);
 
     .timestamp{
-      margin-top: 15px;
+      margin-top: ($baseline*0.75);
       padding: 15px 0 0 10px;
       border-top: 1px solid $light-gray;
 
@@ -250,7 +250,7 @@ section.wiki {
     .see-children {
       padding: 15px 0 0;
       border-top: 1px solid $light-gray;
-      margin-top: 15px;
+      margin-top: ($baseline*0.75);
 
       a {
         display: block;
@@ -260,7 +260,7 @@ section.wiki {
         line-height: 25px;
 
         &:hover, &:focus {
-          background-color: #f6f6f6;
+          background-color: $gray-l6;
           text-decoration: none;
         }
       }
@@ -278,30 +278,6 @@ section.wiki {
           color: $link-color;
           font-weight: bold;
           background-color: $gray-l4;
-
-          .icon-view,
-          .icon-home {
-            background-position: -25px 0;
-          }
-
-          .icon-edit {
-            background-position: -25px -25px;
-          }
-
-          .icon-changes,
-          .icon-time {
-            background-position: -25px -49px;
-          }
-
-          .icon-attachments,
-          .icon-file {
-            background-position: -25px -73px;
-          }
-
-          .icon-settings {
-            background-position: -25px -99px;
-          }
-
         }
       }
     }
@@ -318,40 +294,13 @@ section.wiki {
         float: left;
         display: block;
         width: 25px;
-        height: 25px;
         margin-right: 3px;
-        background: url(../images/wiki-icons.png) no-repeat;
-      }
-
-      [class^="icon-"] {
+        margin-top: 5px;
         padding-right: ($baseline/4);
       }
 
-      .icon-view,
-      .icon-home {
-        background-position: 0 0;
-      }
-
-      .icon-edit {
-        background-position: 0 -25px;
-      }
-
-      .icon-changes,
-      .icon-time {
-        background-position: 0 -49px;
-      }
-
-      .icon-attachments,
-      .icon-file {
-        background-position: 0 -73px;
-      }
-
-      .icon-settings {
-        background-position: 0 -99px;
-      }
-
       &:hover, &:focus {
-        background-color: #f6f6f6;
+        background-color: $gray-l6;
         text-decoration: none;
       }
     }
@@ -419,15 +368,15 @@ section.wiki {
     position: relative;
 
     canvas {
-      box-shadow: 0 0 1px 1px rgba(0, 0, 0, .1), 0 1px 6px rgba(0, 0, 0, .2);
+      box-shadow: 0 0 1px 1px $shadow-l1, 0 1px 6px $shadow;
     }
 
     &:before {
+      @extend %ui-depth4;
       content: 'click to edit schematic';
       position: absolute;
       top: 10px;
       left: 7px;
-      z-index: 9999;
       font-family: $sans-serif;
       font-size: 0.75em;
       color: #aaa;
@@ -440,14 +389,14 @@ section.wiki {
   }
 
   .control-group {
-    margin-bottom: 20px;
+    margin-bottom: $baseline;
   }
 
   #hint_id_summary {
     display: inline-block;
     font-size: 0.9em;
     line-height: 32px;
-    margin-left: 15px;
+    margin-left: ($baseline*0.75);
   }
 
   .asteriskField {
@@ -461,7 +410,7 @@ section.wiki {
   .btn {
     @include button(simple, #eee);
     font-size: 0.8em;
-    margin-right: 5px;
+    margin-right: ($baseline/4);
     line-height: 1.2em;
     text-transform: none !important;
     letter-spacing: 0 !important;
@@ -482,7 +431,7 @@ section.wiki {
     }
 
     &.btn-info {
-      @include button(simple, #ccc);
+      @include button(simple, $gray-l3);
       font-size: 0.8em;
     }
   }
@@ -492,8 +441,8 @@ section.wiki {
   }
 
   .modal {
+    @extend %ui-depth4;
     width: 960px;
-    z-index: 9999;
     min-height: 500px;
     margin-left: -480px;
     top: 150px;
@@ -505,7 +454,7 @@ section.wiki {
       margin-left: -200px;
 
       h4 {
-        margin-bottom: 20px;
+        margin-bottom: $baseline;
         font-weight: bold;
       }
 
@@ -572,12 +521,12 @@ section.wiki {
     }
 
     .modal-footer .btn {
-      margin-right: 10px;
+      margin-right: ($baseline/2);
     }
   }
 
   .modal-inner-wrapper {
-    background: #fff;
+    background: $white;
     padding: 20px;
   }
 
@@ -594,7 +543,7 @@ section.wiki {
     width: 972px;
 
     .left-column {
-      margin-right: 10px;
+      margin-right: ($baseline/2);
     }
 
     .left-column,
@@ -605,11 +554,11 @@ section.wiki {
   }
 
   #cheatsheet-body {
-    background: #fff;
+    background: $white;
     text-align: left;
     padding: 20px;
     font-size: 14px;
-    @include clearfix;
+    @include clearfix();
 
     h3 {
       font-weight: bold;
@@ -623,11 +572,11 @@ section.wiki {
   }
 
   #cheatsheet-body section + section {
-    margin-top: 40px;
+    margin-top: ($baseline*2);
   }
 
   #cheatsheet-body pre{
-    color: #000;
+    color: $black;
     text-align: left;
     background: #eee;
     padding: 10px;
@@ -642,7 +591,7 @@ section.wiki {
 
   &.history {
     .accordion {
-      margin-bottom: 15px;
+      margin-bottom: ($baseline*0.75);
       padding: 15px;
       border: 1px solid $light-gray;
       background: #f9f9f9;
@@ -704,8 +653,8 @@ section.wiki {
 
   #settings_form {
     .well {
-      margin-bottom: 15px;
-      @include clearfix;
+      margin-bottom: ($baseline*0.75);
+      @include clearfix();
     }
 
     .control-group {
@@ -715,7 +664,7 @@ section.wiki {
     }
 
     label {
-      margin-left: 15px;
+      margin-left: ($baseline*0.75);
     }
 
     .controls {
@@ -759,7 +708,7 @@ section.wiki {
     color: $pink;
 
     .help-block {
-      margin-top: 10px;
+      margin-top: ($baseline/2);
     }
 
     input {
@@ -788,7 +737,7 @@ section.wiki {
     border-radius: 5px;
 
     .well-small {
-      @include clearfix;
+      @include clearfix();
 
       a {
         display: inline-block;
@@ -802,8 +751,8 @@ section.wiki {
   }
 
   .filter-clear {
-    margin-right: 10px;
-    margin-top: 10px;
+    margin-right: ($baseline/2);
+    margin-top: ($baseline/2);
     font-size: .9em;
 
     a {
@@ -817,7 +766,7 @@ section.wiki {
 
   .table.table-striped {
     width: 100%;
-    margin-top: 20px;
+    margin-top: $baseline;
 
     th, td {
       border-bottom: 1px solid $light-gray;
@@ -830,7 +779,7 @@ section.wiki {
     }
 
     tr:nth-child(even) {
-      background: #F6F6F6;
+      background: $gray-l6;
     }
   }
 
@@ -855,7 +804,7 @@ section.wiki {
     }
 
     li {
-      margin-bottom: 15px;
+      margin-bottom: ($baseline*0.75);
       border: 1px solid #DDD;
       background: #F9F9F9;
       border-radius: 5px;
@@ -978,7 +927,7 @@ section.wiki {
     border: 1px solid darken($pink, 15%);
 
     p {
-      color: #fff;
+      color: $white;
 
       a {
         display: block;
@@ -986,7 +935,7 @@ section.wiki {
         margin: lh() (-(lh())) (-(lh()));
         padding: lh();
         border-top: 1px solid darken($pink, 15%);
-        color: #fff;
+        color: $white;
         font-weight: bold;
         font-size: em(18);
         @include transition(none);
@@ -1002,10 +951,10 @@ section.wiki {
 }
 
 .modal-backdrop {
+  @extend %ui-depth3;
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 999;
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, .4);
@@ -1026,14 +975,14 @@ section.wiki {
 
 
 #circuit_editor_modal.modal {
+  @extend %ui-depth4;
   width: 648px;
-  z-index: 9999;
   margin-left: -325px;
   top: 150px;
 
   .modal-header {
     h1, p {
-      color: #fff;
+      color: $white;
     }
 
     h1 {
@@ -1059,7 +1008,7 @@ section.wiki {
   .modal-footer .btn {
     @include button(simple, #eee);
     font-size: 0.8em;
-    margin-right: 5px;
+    margin-right: ($baseline/4);
     line-height: 1.2em;
     text-transform: none !important;
     letter-spacing: 0 !important;
@@ -1074,6 +1023,6 @@ section.wiki {
       font-size: 0.8em;
     }
 
-    margin-right: 10px;
+    margin-right: ($baseline/2);
   }
 }

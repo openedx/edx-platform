@@ -1,5 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
+<%! from django.template.defaultfilters import escapejs %>
 
 <%inherit file="../main.html" />
 <%namespace name='static' file='/static_content.html'/>
@@ -11,10 +12,11 @@
 <script type="text/javascript">
 var submitToPaymentProcessing = function(event) {
     event.preventDefault();
+    $("#pay_button").addClass("is-disabled").attr('aria-disabled', true);
     var xhr = $.post(
       "${create_order_url}",
       {
-        "course_id" : "${course_id}",
+        "course_id" : "${course_id | escapejs}",
       },
       function(data) {
         for (prop in data) {
@@ -29,7 +31,9 @@ var submitToPaymentProcessing = function(event) {
     .done(function(data) {
       $("#pay_form").submit();
     })
-    .fail(function(jqXhr,text_status, error_thrown) { alert(jqXhr.responseText); });
+    .fail(function(jqXhr,text_status, error_thrown) {
+      $("#pay_button").removeClass("is-disabled").attr('aria-disabled', false);
+      alert(jqXhr.responseText); });
 }
 $(document).ready(function() {
     $("#pay_button").click(submitToPaymentProcessing);
@@ -64,7 +68,7 @@ $(document).ready(function() {
 
           <li class="progress-step progress-step-icon" id="progress-step4">
             <span class="wrapper-step-number"><span class="step-number">
-              <i class="icon-ok"></i>
+              <i class="icon fa fa-check-square-o"></i>
             </span></span>
             <span class="step-name">${_("Confirmation")}</span>
           </li>

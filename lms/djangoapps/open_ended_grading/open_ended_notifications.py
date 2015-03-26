@@ -10,7 +10,6 @@ from xmodule.open_ended_grading_classes.controller_query_service import Controll
 from xmodule.modulestore.django import ModuleI18nService
 
 from courseware.access import has_access
-from lms.lib.xblock.runtime import LmsModuleSystem
 from edxmako.shortcuts import render_to_string
 from student.models import unique_id_for_user
 from util.cache import cache
@@ -66,17 +65,7 @@ def staff_grading_notifications(course, user):
 
 
 def peer_grading_notifications(course, user):
-    system = LmsModuleSystem(
-        track_function=None,
-        get_module=None,
-        render_template=render_to_string,
-        replace_urls=None,
-        descriptor_runtime=None,
-        services={
-            'i18n': ModuleI18nService(),
-        },
-    )
-    peer_gs = peer_grading_service.PeerGradingService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
+    peer_gs = peer_grading_service.PeerGradingService(settings.OPEN_ENDED_GRADING_INTERFACE, render_to_string)
     pending_grading = False
     img_path = ""
     course_id = course.id
@@ -128,20 +117,8 @@ def combined_notifications(course, user):
     if not user.is_authenticated():
         return notification_dict
 
-    #Define a mock modulesystem
-    system = LmsModuleSystem(
-        static_url="/static",
-        track_function=None,
-        get_module=None,
-        render_template=render_to_string,
-        replace_urls=None,
-        descriptor_runtime=None,
-        services={
-            'i18n': ModuleI18nService(),
-        },
-    )
     #Initialize controller query service using our mock system
-    controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
+    controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, render_to_string)
     student_id = unique_id_for_user(user)
     user_is_staff = has_access(user, 'staff', course)
     course_id = course.id
@@ -158,11 +135,15 @@ def combined_notifications(course, user):
 
     try:
         #Get the notifications from the grading controller
-        notifications = controller_qs.check_combined_notifications(course.id, student_id, user_is_staff,
-                                                                         last_time_viewed)
+        notifications = controller_qs.check_combined_notifications(
+            course.id,
+            student_id,
+            user_is_staff,
+            last_time_viewed,
+        )
         if notifications.get('success'):
             if (notifications.get('staff_needs_to_grade') or
-                notifications.get('student_needs_to_peer_grade')):
+                    notifications.get('student_needs_to_peer_grade')):
                 pending_grading = True
     except:
         #Non catastrophic error, so no real action
@@ -194,8 +175,12 @@ def set_value_in_cache(student_id, course_id, notification_type, value):
 
 
 def create_key_name(student_id, course_id, notification_type):
-    key_name = u"{prefix}{type}_{course}_{student}".format(prefix=KEY_PREFIX, type=notification_type, course=course_id,
-                                                          student=student_id)
+    key_name = u"{prefix}{type}_{course}_{student}".format(
+        prefix=KEY_PREFIX,
+        type=notification_type,
+        course=course_id,
+        student=student_id,
+    )
     return key_name
 
 

@@ -65,4 +65,3 @@ class Command(BaseCommand):
                     ))
         except IOError:
             raise CommandError("Error writing to file: %s" % output_filename)
-

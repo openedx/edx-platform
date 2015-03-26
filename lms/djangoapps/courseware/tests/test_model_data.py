@@ -16,9 +16,10 @@ from courseware.tests.factories import UserStateSummaryFactory
 from courseware.tests.factories import StudentPrefsFactory, StudentInfoFactory
 
 from xblock.fields import Scope, BlockScope, ScopeIds
+from xblock.exceptions import KeyValueMultiSaveError
+from xblock.core import XBlock
 from django.test import TestCase
 from django.db import DatabaseError
-from xblock.core import KeyValueMultiSaveError
 
 
 def mock_field(scope, name):
@@ -29,7 +30,7 @@ def mock_field(scope, name):
 
 
 def mock_descriptor(fields=[]):
-    descriptor = Mock()
+    descriptor = Mock(entry_point=XBlock.entry_point)
     descriptor.scope_ids = ScopeIds('user1', 'mock_problem', location('def_id'), location('usage_id'))
     descriptor.module_class.fields.values.return_value = fields
     descriptor.fields.values.return_value = fields
@@ -219,7 +220,7 @@ class StorageTestBase(object):
     """
     # Disable pylint warnings that arise because of the way the child classes call
     # this base class -- pylint's static analysis can't keep up with it.
-    # pylint: disable=E1101, E1102
+    # pylint: disable=no-member, not-callable
 
     factory = None
     scope = None
@@ -237,7 +238,6 @@ class StorageTestBase(object):
             mock_field(self.scope, 'other_existing_field')])
         self.field_data_cache = FieldDataCache([self.mock_descriptor], course_id, self.user)
         self.kvs = DjangoKeyValueStore(self.field_data_cache)
-
 
     def test_set_and_get_existing_field(self):
         self.kvs.set(self.key_factory('existing_field'), 'test_value')

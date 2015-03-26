@@ -9,7 +9,7 @@
     background-size: cover;
     box-shadow: 0 1px 80px 0 rgba(0,0,0, 0.5);
     border-bottom: 1px solid $border-color-3;
-    box-shadow: inset 0 1px 5px 0 rgba(0,0,0, 0.1);
+    box-shadow: inset 0 1px 5px 0 $shadow-l1;
     height: 280px;
     margin-top: $header_image_margin;
     padding-top: 150px;
@@ -22,7 +22,7 @@
       border: 1px solid $border-color-3;
       box-shadow: 0 4px 25px 0 rgba(0,0,0, 0.5);
       @include box-sizing(border-box);
-      @include clearfix;
+      @include clearfix();
       margin: 0 auto;
       max-width: 1200px;
       min-width: 760px;
@@ -35,10 +35,10 @@
       }
       .intro {
         @include box-sizing(border-box);
-        @include clearfix;
+        @include clearfix();
         display: table-cell;
         vertical-align: middle;
-        padding: 20px 20px;
+        padding: $baseline;
         position: relative;
         width: flex-grid(8) + flex-gutter();
         z-index: 2;
@@ -46,8 +46,8 @@
         > hgroup {
           border-bottom: 1px solid $border-color-2;
           box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
-          margin-bottom: 20px;
-          padding-bottom: 20px;
+          margin-bottom: $baseline;
+          padding-bottom: $baseline;
           width: 100%;
 
           h1 {
@@ -63,7 +63,7 @@
               color: $lighter-base-font-color;
               font: italic 800 0.6em/1em $sans-serif;
               letter-spacing: 0px;
-              margin-left: 15px;
+              margin-left: ($baseline*0.75);
               text-shadow: 0 1px rgba(255,255,255, 0.6);
               text-transform: none;
 
@@ -92,7 +92,7 @@
         }
 
         .main-cta {
-          @include clearfix;
+          @include clearfix();
           float: left;
           margin-right: flex-gutter();
           @include transition(all 0.15s linear 0s);
@@ -105,7 +105,7 @@
             display: block;
             font: normal 1.2rem/1.6rem $sans-serif;
             letter-spacing: 1px;
-            padding: 10px 0px;
+            padding: ($baseline/2) 0;
             text-transform: uppercase;
             text-align: center;
             width: flex-grid(6);
@@ -129,7 +129,7 @@
             float: left;
             font: normal 1.2rem/1.6rem $sans-serif;
             letter-spacing: 1px;
-            padding: 10px 0px;
+            padding: ($baseline/2) 0;
             text-transform: uppercase;
             text-align: center;
             width: flex-grid(3, 8);
@@ -161,7 +161,7 @@
             color: rgb(143, 14, 14);
             display: none;
             padding: 12px;
-            margin-top: 5px;
+            margin-top: ($baseline/4);
           }
         }
       }
@@ -184,7 +184,7 @@
           .play-intro {
             @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.65), rgba(0,0,0, 0.75)));
             border-radius: 4px;
-            box-shadow: 0 1px 12px 0 rgba(0,0,0, 0.4);
+            box-shadow: 0 1px 12px 0 $shadow-d1;
             border: 2px solid rgba(255,255,255, 0.8);
             height: 80px;
             left: 50%;
@@ -232,7 +232,7 @@
   }
 
   .container {
-    @include clearfix;
+    @include clearfix();
 
     .wrap-instructor-info {
       &.studio-view {
@@ -261,7 +261,7 @@
     nav {
       border-bottom: 1px solid $border-color-2;
       @include box-sizing(border-box);
-      @include clearfix;
+      @include clearfix();
       margin: 40px 0;
       width: flex-grid(12);
 
@@ -295,7 +295,7 @@
   }
 
   .details {
-    float: left;
+    @include float(left);
     margin-right: flex-gutter();
     width: flex-grid(8);
     font: normal 1em/1.6em $serif;
@@ -315,20 +315,20 @@
 
     .inner-wrapper {
       > section {
-        margin-bottom: 40px;
+        margin-bottom: ($baseline*2);
       }
 
       .course-staff {
 
         .teacher {
-          @include clearfix;
-          margin-bottom: 40px;
+          @include clearfix();
+          margin-bottom: ($baseline*2);
 
           h3 {
             color: $base-font-color;
             font-family: $sans-serif;
             font-weight: 700;
-            margin-bottom: 15px;
+            margin-bottom: ($baseline*0.75);
             text-transform: none;
           }
 
@@ -363,19 +363,19 @@
       }
 
       .faq {
-        @include clearfix;
+        @include clearfix();
 
         .responses {
           float: left;
         }
 
         .response {
-          margin-bottom: 40px;
+          margin-bottom: ($baseline*2);
 
           h3 {
             font-family: $sans-serif;
             font-weight: 700;
-            margin-bottom: 15px;
+            margin-bottom: ($baseline*0.75);
           }
         }
       }
@@ -384,7 +384,7 @@
 
   .course-sidebar {
     @include box-sizing(border-box);
-    float: left;
+    @include float(left);
     width: flex-grid(4);
 
     > section {
@@ -405,7 +405,7 @@
           background: url('../images/opencourseware.png') 0 0 no-repeat;
           width: 266px;
           height: 31px;
-          margin-bottom: 20px;
+          margin-bottom: $baseline;
         }
 
         ul {
@@ -446,7 +446,7 @@
         font-weight: 800;
         display: inline-block;
         letter-spacing: 0px;
-        margin-right: 15px;
+        margin-right: ($baseline*0.75);
         padding-right: 15px;
 
         &:hover, &:focus {
@@ -500,23 +500,23 @@
         }
 
         .share {
-          height: 44px;
           display: inline-block;
-          margin-right: 10px;
+          height: 35px;
+          width: 35px;
+          margin-right: ($baseline);
+          margin-top: ($baseline/4);
+          font-size: 1.75em;
+          text-decoration: none;
+          color: $black;
           opacity: 0.5;
           @include transition(all 0.15s linear 0s);
-          width: 44px;
 
           &:hover, &:focus {
             opacity: 1.0;
           }
 
-          img {
-            width: 100%;
-          }
-
           &:last-child {
-            margin-right: 0px;
+            margin-right: 0;
           }
         }
       }
@@ -531,24 +531,14 @@
 
     .important-dates {
       list-style: none;
-      margin: 0px;
-      padding: 0px 10px;
+      margin: 0;
+      padding: 0 ($baseline/2);
 
       li {
-        @include clearfix;
+        @include clearfix();
         border-bottom: 1px dotted $border-color-2;
-        margin-bottom: 20px;
-        padding-bottom: 10px;
-
-        &.prerequisites {
-          border: 1px solid $border-color-2;
-          margin: 0 -10px 0;
-          padding: 10px;
-
-          p {
-            margin-right: 10px;
-          }
-        }
+        margin-bottom: $baseline;
+        padding-bottom: ($baseline/2);
 
         &:hover, &:focus {
           .icon {
@@ -556,49 +546,36 @@
           }
         }
 
-        p {
+        .important-dates-item-title {
           color: $lighter-base-font-color;
           float: left;
           font-family: $sans-serif;
         }
 
         .icon {
-          background-size: cover;
-          float: left;
-          height: 19px;
-          margin: 2px 10px 0 0;
-          opacity: 0.6;
-          @include transition(all 0.15s linear 0s);
-          width: 19px;
-
-          &.start {
-            @include background-image(url('../images/portal-icons/calendar-icon.png'));
-          }
-
-          &.end {
-            @include background-image(url('../images/portal-icons/calendar-icon.png'));
-          }
-
-          &.length {
-            @include background-image(url('../images/portal-icons/chart-icon.png'));
-          }
-
-          &.course-number {
-            @include background-image(url('../images/portal-icons/course-info-icon.png'));
-          }
-
-          &.effort {
-            @include background-image(url('../images/portal-icons/pencil-icon.png'));
-          }
-
-          &.prereq {
-            @include background-image(url('../images/portal-icons/prerec-icon.png'));
-          }
+            float: left;
+            padding: 1px;
+            margin: ($baseline/5) ($baseline/2) 0 0;
+            opacity: .6;
         }
 
-        span {
+        .important-dates-item-text {
           float: right;
           font-weight: 700;
+        }
+      }
+
+      .prerequisite-course {
+        .pre-requisite {
+          max-width: 39%;
+          @extend %text-truncated;
+        }
+        .tip {
+          float: left;
+          margin: $baseline 0 ($baseline/2);
+          font-size: 0.8em;
+          color: $lighter-base-font-color;
+          font-family: $sans-serif;
         }
       }
     }

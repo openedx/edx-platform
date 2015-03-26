@@ -11,9 +11,7 @@
             "host": [
                 "localhost"
             ],
-            "password": "password",
-            "port": 27017,
-            "user": "edxapp"
+            "port": 27017
         },
         "ENGINE": "xmodule.contentstore.mongo.MongoContentStore",
         "OPTIONS": {
@@ -21,16 +19,14 @@
             "host": [
                 "localhost"
             ],
-            "password": "password",
-            "port": 27017,
-            "user": "edxapp"
+            "port": 27017
         }
     },
     "DATABASES": {
         "default": {
             "ENGINE": "django.db.backends.mysql",
             "HOST": "localhost",
-            "NAME": "test",
+            "NAME": "edxtest",
             "PASSWORD": "",
             "PORT": "3306",
             "USER": "root"
@@ -42,9 +38,7 @@
         "host": [
             "localhost"
         ],
-        "password": "password",
-        "port": 27017,
-        "user": "edxapp"
+        "port": 27017
     },
     "MODULESTORE": {
         "default": {
@@ -60,9 +54,7 @@
                             "host": [
                                 "localhost"
                             ],
-                            "password": "password",
-                            "port": 27017,
-                            "user": "edxapp"
+                            "port": 27017
                         },
                         "ENGINE": "xmodule.modulestore.mongo.DraftMongoModuleStore",
                         "OPTIONS": {
@@ -73,10 +65,8 @@
                             "host": [
                                 "localhost"
                             ],
-                            "password": "password",
                             "port": 27017,
-                            "render_template": "edxmako.shortcuts.render_to_string",
-                            "user": "edxapp"
+                            "render_template": "edxmako.shortcuts.render_to_string"
                         }
                     },
                     {
@@ -98,6 +88,13 @@
         "staff_grading": "staff_grading",
         "url": "http://localhost:18060/",
         "username": "lms"
+    },
+    "DJFS": {
+            "type": "s3fs",
+            "bucket": "test",
+            "prefix": "test",
+            "aws_access_key_id": "test",
+            "aws_secret_access_key": "test"
     },
     "SECRET_KEY": "",
     "XQUEUE_INTERFACE": {

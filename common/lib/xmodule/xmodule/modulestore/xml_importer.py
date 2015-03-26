@@ -26,8 +26,9 @@ import mimetypes
 from path import path
 import json
 import re
+from lxml import etree
 
-from .xml import XMLModuleStore, ImportSystem, ParentTracker
+from .xml import XMLModuleStore, ImportSystem
 from xblock.runtime import KvsFieldData, DictKeyValueStore
 from xmodule.x_module import XModuleDescriptor
 from opaque_keys.edx.keys import UsageKey
@@ -38,10 +39,13 @@ from xmodule.errortracker import make_error_tracker
 from .store_utilities import rewrite_nonportable_content_links
 import xblock
 from xmodule.tabs import CourseTabList
+from xmodule.assetstore import AssetMetadata
 from xmodule.modulestore.django import ASSET_IGNORE_REGEX
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.mongo.base import MongoRevisionKey
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.store_utilities import draft_node_constructor, get_draft_subtree_roots
+
 
 log = logging.getLogger(__name__)
 
@@ -137,7 +141,8 @@ def import_from_xml(
         default_class='xmodule.raw_module.RawDescriptor',
         load_error_modules=True, static_content_store=None,
         target_course_id=None, verbose=False,
-        do_import_static=True, create_new_course_if_not_present=False):
+        do_import_static=True, create_course_if_not_present=False,
+        raise_on_failure=False):
     """
     Import xml-based courses from data_dir into modulestore.
 
@@ -165,7 +170,7 @@ def import_from_xml(
             time the course is loaded. Static content for some courses may also be
             served directly by nginx, instead of going through django.
 
-        create_new_course_if_not_present: If True, then a new course is created if it doesn't already exist.
+        create_course_if_not_present: If True, then a new course is created if it doesn't already exist.
             Otherwise, it throws an InvalidLocationError if the course does not exist.
 
         default_class, load_error_modules: are arguments for constructing the XMLModuleStore (see its doc)
@@ -190,11 +195,18 @@ def import_from_xml(
         if target_course_id is not None:
             dest_course_id = target_course_id
         else:
+            # Note that dest_course_id will be in the format for the default modulestore.
             dest_course_id = store.make_course_key(course_key.org, course_key.course, course_key.run)
+
+        existing_course_id = store.has_course(dest_course_id, ignore_case=True)
+        # store.has_course will return the course_key in the format for the modulestore in which it was found.
+        # This may be different from dest_course_id, so correct to the format found.
+        if existing_course_id:
+            dest_course_id = existing_course_id
 
         runtime = None
         # Creates a new course if it doesn't already exist
-        if create_new_course_if_not_present and not store.has_course(dest_course_id, ignore_case=True):
+        if create_course_if_not_present and not existing_course_id:
             try:
                 new_course = store.create_course(dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id)
                 runtime = new_course.runtime
@@ -220,6 +232,9 @@ def import_from_xml(
             _import_static_content_wrapper(
                 static_content_store, do_import_static, course_data_path, dest_course_id, verbose
             )
+
+            # Import asset metadata stored in XML.
+            _import_course_asset_metadata(store, course_data_path, dest_course_id, raise_on_failure)
 
             # STEP 3: import PUBLISHED items
             # now loop through all the modules depth first and then orphans
@@ -283,10 +298,60 @@ def import_from_xml(
     return new_courses
 
 
+def _import_course_asset_metadata(store, data_dir, course_id, raise_on_failure):
+    """
+    Read in assets XML file, parse it, and add all asset metadata to the modulestore.
+    """
+    asset_dir = path(data_dir) / AssetMetadata.EXPORTED_ASSET_DIR
+    assets_filename = AssetMetadata.EXPORTED_ASSET_FILENAME
+    asset_xml_file = asset_dir / assets_filename
+
+    def make_asset_id(course_id, asset_xml):
+        """
+        Construct an asset ID out of a complete asset XML section.
+        """
+        asset_type = None
+        asset_name = None
+        for child in asset_xml.iterchildren():
+            if child.tag == AssetMetadata.ASSET_TYPE_ATTR:
+                asset_type = child.text
+            elif child.tag == AssetMetadata.ASSET_BASENAME_ATTR:
+                asset_name = child.text
+        return course_id.make_asset_key(asset_type, asset_name)
+
+    all_assets = []
+    try:
+        xml_data = etree.parse(asset_xml_file).getroot()
+        assert(xml_data.tag == AssetMetadata.ALL_ASSETS_XML_TAG)
+        for asset in xml_data.iterchildren():
+            if asset.tag == AssetMetadata.ASSET_XML_TAG:
+                # Construct the asset key.
+                asset_key = make_asset_id(course_id, asset)
+                asset_md = AssetMetadata(asset_key)
+                asset_md.from_xml(asset)
+                all_assets.append(asset_md)
+    except IOError:
+        logging.info('No {} file is present with asset metadata.'.format(assets_filename))
+        return
+    except Exception:  # pylint: disable=W0703
+        logging.exception('Error while parsing asset xml.')
+        if raise_on_failure:
+            raise
+        else:
+            return
+
+    # Now add all asset metadata to the modulestore.
+    if len(all_assets) > 0:
+        store.save_asset_metadata_list(all_assets, all_assets[0].edited_by, import_only=True)
+
+
 def _import_course_module(
         store, runtime, user_id, data_dir, course_key, dest_course_id, source_course, do_import_static,
         verbose,
 ):
+    """
+    Import a course module.
+    """
     if verbose:
         log.debug("Scanning {0} for course module...".format(course_key))
 
@@ -388,6 +453,7 @@ def _import_static_content_wrapper(static_content_store, do_import_static, cours
             dest_course_id, subpath=simport, verbose=verbose
         )
 
+
 def _import_module_and_update_references(
         module, store, user_id,
         source_course_id, dest_course_id,
@@ -420,9 +486,13 @@ def _import_module_and_update_references(
 
     fields = {}
     for field_name, field in module.fields.iteritems():
-        if field.is_set_on(module):
+        if field.scope != Scope.parent and field.is_set_on(module):
             if isinstance(field, Reference):
-                fields[field_name] = _convert_reference_fields_to_new_namespace(field.read_from(module))
+                value = field.read_from(module)
+                if value is None:
+                    fields[field_name] = None
+                else:
+                    fields[field_name] = _convert_reference_fields_to_new_namespace(field.read_from(module))
             elif isinstance(field, ReferenceList):
                 references = field.read_from(module)
                 fields[field_name] = [_convert_reference_fields_to_new_namespace(reference) for reference in references]
@@ -437,6 +507,8 @@ def _import_module_and_update_references(
                 value = field.read_from(module)
                 # remove any export/import only xml_attributes
                 # which are used to wire together draft imports
+                if 'parent_url' in value:
+                    del value['parent_url']
                 if 'parent_sequential_url' in value:
                     del value['parent_sequential_url']
 
@@ -485,19 +557,56 @@ def _import_course_draft(
         course_id=source_course_id,
         course_dir=draft_course_dir,
         error_tracker=errorlog.tracker,
-        parent_tracker=ParentTracker(),
         load_error_modules=False,
         mixins=xml_module_store.xblock_mixins,
         field_data=KvsFieldData(kvs=DictKeyValueStore()),
     )
 
-    # now walk the /vertical directory where each file in there
-    # will be a draft copy of the Vertical
+    def _import_module(module):
+        # IMPORTANT: Be sure to update the module location in the NEW namespace
+        module_location = module.location.map_into_course(target_course_id)
+        # Update the module's location to DRAFT revision
+        # We need to call this method (instead of updating the location directly)
+        # to ensure that pure XBlock field data is updated correctly.
+        _update_module_location(module, module_location.replace(revision=MongoRevisionKey.draft))
 
-    # First it is necessary to order the draft items by their desired index in the child list
-    # (order os.walk returns them in is not guaranteed).
-    drafts = dict()
-    for dirname, _dirnames, filenames in os.walk(draft_dir + "/vertical"):
+        parent_url = get_parent_url(module)
+        index = index_in_children_list(module)
+
+        # make sure our parent has us in its list of children
+        # this is to make sure private only modules show up
+        # in the list of children since they would have been
+        # filtered out from the non-draft store export.
+        if parent_url is not None and index is not None:
+            course_key = descriptor.location.course_key
+            parent_location = course_key.make_usage_key_from_deprecated_string(parent_url)
+
+            # IMPORTANT: Be sure to update the parent in the NEW namespace
+            parent_location = parent_location.map_into_course(target_course_id)
+
+            parent = store.get_item(parent_location, depth=0)
+
+            non_draft_location = module.location.map_into_course(target_course_id)
+            if not any(child.block_id == module.location.block_id for child in parent.children):
+                parent.children.insert(index, non_draft_location)
+                store.update_item(parent, user_id)
+
+        _import_module_and_update_references(
+            module, store, user_id,
+            source_course_id,
+            target_course_id,
+            runtime=mongo_runtime,
+        )
+        for child in module.get_children():
+            _import_module(child)
+
+    # Now walk the /vertical directory.
+    # Each file in the directory will be a draft copy of the vertical.
+
+    # First it is necessary to order the draft items by their desired index in the child list,
+    # since the order in which os.walk() returns the files is not guaranteed.
+    drafts = []
+    for dirname, _dirnames, filenames in os.walk(draft_dir):
         for filename in filenames:
             module_path = os.path.join(dirname, filename)
             with open(module_path, 'r') as f:
@@ -552,62 +661,27 @@ def _import_course_draft(
                         filename, __ = os.path.splitext(filename)
                         descriptor.location = descriptor.location.replace(name=filename)
 
-                        index = int(descriptor.xml_attributes['index_in_children_list'])
-                        if index in drafts:
-                            drafts[index].append(descriptor)
-                        else:
-                            drafts[index] = [descriptor]
+                        index = index_in_children_list(descriptor)
+                        parent_url = get_parent_url(descriptor, xml)
+                        draft_url = descriptor.location.to_deprecated_string()
 
-                except Exception:
+                        draft = draft_node_constructor(
+                            module=descriptor, url=draft_url, parent_url=parent_url, index=index
+                        )
+
+                        drafts.append(draft)
+
+                except Exception:  # pylint: disable=broad-except
                     logging.exception('Error while parsing course xml.')
 
-        # For each index_in_children_list key, there is a list of vertical descriptors.
-        for key in sorted(drafts.iterkeys()):
-            for descriptor in drafts[key]:
-                course_key = descriptor.location.course_key
-                try:
-                    def _import_module(module):
-                        # IMPORTANT: Be sure to update the module location in the NEW namespace
-                        module_location = module.location.map_into_course(target_course_id)
-                        # Update the module's location to DRAFT revision
-                        # We need to call this method (instead of updating the location directly)
-                        # to ensure that pure XBlock field data is updated correctly.
-                        _update_module_location(module, module_location.replace(revision=MongoRevisionKey.draft))
+    # sort drafts by `index_in_children_list` attribute
+    drafts.sort(key=lambda x: x.index)
 
-                        # make sure our parent has us in its list of children
-                        # this is to make sure private only verticals show up
-                        # in the list of children since they would have been
-                        # filtered out from the non-draft store export.
-                        # Note though that verticals nested below the unit level will not have
-                        # a parent_sequential_url and do not need special handling.
-                        if module.location.category == 'vertical' and 'parent_sequential_url' in module.xml_attributes:
-                            sequential_url = module.xml_attributes['parent_sequential_url']
-                            index = int(module.xml_attributes['index_in_children_list'])
-
-                            seq_location = course_key.make_usage_key_from_deprecated_string(sequential_url)
-
-                            # IMPORTANT: Be sure to update the sequential in the NEW namespace
-                            seq_location = seq_location.map_into_course(target_course_id)
-                            sequential = store.get_item(seq_location, depth=0)
-
-                            non_draft_location = module.location.map_into_course(target_course_id)
-                            if not any(child.block_id == module.location.block_id for child in sequential.children):
-                                sequential.children.insert(index, non_draft_location)
-                                store.update_item(sequential, user_id)
-
-                        _import_module_and_update_references(
-                            module, store, user_id,
-                            source_course_id,
-                            target_course_id,
-                            runtime=mongo_runtime,
-                        )
-                        for child in module.get_children():
-                            _import_module(child)
-
-                    _import_module(descriptor)
-
-                except Exception:
-                    logging.exception('while importing draft descriptor %s', descriptor)
+    for draft in get_draft_subtree_roots(drafts):
+        try:
+            _import_module(draft.module)
+        except Exception:  # pylint: disable=broad-except
+            logging.exception('while importing draft descriptor %s', draft.module)
 
 
 def allowed_metadata_by_category(category):
@@ -644,6 +718,56 @@ def check_module_metadata_editability(module):
         )
 
     return err_cnt
+
+
+def get_parent_url(module, xml=None):
+    """
+    Get the parent_url, if any, from module using xml as an alternative source. If it finds it in
+    xml but not on module, it modifies module so that the next call to this w/o the xml will get the parent url
+    """
+    if hasattr(module, 'xml_attributes'):
+        return module.xml_attributes.get(
+            # handle deprecated old attr
+            'parent_url', module.xml_attributes.get('parent_sequential_url')
+        )
+    if xml is not None:
+        create_xml_attributes(module, xml)
+        return get_parent_url(module)  # don't reparse xml b/c don't infinite recurse but retry above lines
+    return None
+
+
+def index_in_children_list(module, xml=None):
+    """
+    Get the index_in_children_list, if any, from module using xml
+    as an alternative source. If it finds it in xml but not on module,
+    it modifies module so that the next call to this w/o the xml
+    will get the field.
+    """
+    if hasattr(module, 'xml_attributes'):
+        val = module.xml_attributes.get('index_in_children_list')
+        if val is not None:
+            return int(val)
+        return None
+    if xml is not None:
+        create_xml_attributes(module, xml)
+        return index_in_children_list(module)  # don't reparse xml b/c don't infinite recurse but retry above lines
+    return None
+
+
+def create_xml_attributes(module, xml):
+    """
+    Make up for modules which don't define xml_attributes by creating them here and populating
+    """
+    xml_attrs = {}
+    for attr, val in xml.attrib.iteritems():
+        if attr not in module.fields:
+            # translate obsolete attr
+            if attr == 'parent_sequential_url':
+                attr = 'parent_url'
+            xml_attrs[attr] = val
+
+    # now cache it on module where it's expected
+    setattr(module, 'xml_attributes', xml_attrs)
 
 
 def validate_no_non_editable_metadata(module_store, course_id, category):

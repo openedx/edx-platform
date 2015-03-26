@@ -1,11 +1,11 @@
 ## NOTE: This Sass infrastructure is redundant, but needed in order to address an IE9 rule limit within CSS - http://blogs.msdn.com/b/ieinternals/archive/2011/05/14/10164546.aspx
 
-
 // lms - css application architecture (platform)
 // ====================
 
 // libs and resets *do not edit*
 @import 'bourbon/bourbon'; // lib - bourbon
+@import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
 
 // BASE  *default edX offerings*
 // ====================
@@ -55,6 +55,7 @@
 @import 'multicourse/error-pages';
 @import 'multicourse/help';
 @import 'multicourse/edge';
+@import 'multicourse/survey-page';
 
 @import 'developer'; // used for any developer-created scss that needs further polish/refactoring
 @import 'shame';     // used for any bad-form/orphaned scss

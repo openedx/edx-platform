@@ -10,6 +10,8 @@ from django.contrib.auth.models import User
 
 FAKE_MICROSITE = {
     "SITE_NAME": "openedx.localhost",
+    "university": "fakeuniversity",
+    "course_org_filter": "fakeorg",
     "REGISTRATION_EXTRA_FIELDS": {
         "address1": "required",
         "city": "required",
@@ -23,7 +25,8 @@ FAKE_MICROSITE = {
     ]
 }
 
-def fake_site_name(name, default=None):  # pylint: disable=W0613
+
+def fake_site_name(name, default=None):
     """
     create a fake microsite site name
     """
@@ -32,11 +35,13 @@ def fake_site_name(name, default=None):  # pylint: disable=W0613
     else:
         return default
 
-def fake_microsite_get_value(name, default=None):  # pylint: disable=W0613
+
+def fake_microsite_get_value(name, default=None):
     """
     create a fake microsite site name
     """
     return FAKE_MICROSITE.get(name, default)
+
 
 class TestMicrosite(TestCase):
     """Test for Account Creation from a white labeled Micro-Sites"""

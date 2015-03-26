@@ -11,11 +11,11 @@
 <div class="wrapper-content wrapper">
   <section class="content">
     <header>
-      <h1 class="title title-1">${_("Sign Up for edX Studio")}</h1>
-      <a href="${reverse('login')}" class="action action-signin">${_("Already have a Studio Account? Sign in")}</a>
+      <h1 class="title title-1">${_("Sign Up for {studio_name}").format(studio_name=settings.STUDIO_NAME)}</h1>
+      <a href="${reverse('login')}" class="action action-signin">${_("Already have a {studio_name} Account? Sign in").format(studio_name=settings.STUDIO_SHORT_NAME)}</a>
     </header>
 
-    <p class="introduction">${_("Ready to start creating online courses? Sign up below and start creating your first edX course today.")}</p>
+    <p class="introduction">${_("Ready to start creating online courses? Sign up below and start creating your first {platform_name} course today.").format(platform_name=settings.PLATFORM_NAME)}</p>
 
     <article class="content-primary" role="main">
       <form id="register_form" method="post">
@@ -23,22 +23,25 @@
         </div>
 
         <fieldset>
-          <legend class="sr">${_("Required Information to Sign Up for edX Studio")}</legend>
+          <legend class="sr">${_("Required Information to Sign Up for {studio_name}").format(studio_name=settings.STUDIO_NAME)}</legend>
 
           <ol class="list-input">
             <li class="field text required" id="field-email">
               <label for="email">${_("E-mail")}</label>
-              <input id="email" type="email" name="email" placeholder="example: username@domain.com" />
+              ## Translators: This is the placeholder text for a field that requests an email address.
+              <input id="email" type="email" name="email" placeholder="${_("example: username@domain.com")}" />
             </li>
 
             <li class="field text required" id="field-name">
               <label for="name">${_("Full Name")}</label>
-              <input id="name" type="text" name="name" placeholder="example: Jane Doe" />
+              ## Translators: This is the placeholder text for a field that requests the user's full name.
+              <input id="name" type="text" name="name" placeholder="${_("example: Jane Doe")}" />
             </li>
 
             <li class="field text required" id="field-username">
               <label for="username">${_("Public Username")}</label>
-              <input id="username" type="text" name="username" placeholder="example: JaneDoe" />
+              ## Translators: This is the placeholder text for a field that asks the user to pick a username
+              <input id="username" type="text" name="username" placeholder="${_("example: JaneDoe")}" />
               <span class="tip tip-stacked">${_("This will be used in public discussions with your courses and in our edX101 support forums")}</span>
             </li>
 
@@ -77,17 +80,21 @@
       </form>
     </article>
 
-    <aside class="content-supplementary" role="complimentary">
-      <h2 class="sr">${_("Common Studio Questions")}</h2>
+    <aside class="content-supplementary" role="complementary">
+      <h2 class="sr">${_("Common {studio_name} Questions").format(studio_name=settings.STUDIO_SHORT_NAME)}</h2>
 
       <div class="bit">
-        <h3 class="title-3">${_("Who is Studio for?")}</h3>
-        <p>${_("Studio is for anyone that wants to create online courses that leverage the global edX platform. Our users are often faculty members, teaching assistants and course staff, and members of instructional technology groups.")}</p>
+        <h3 class="title-3">${_("Who is {studio_name} for?").format(studio_name=settings.STUDIO_SHORT_NAME)}</h3>
+        <p>${_("{studio_name} is for anyone that wants to create online courses that leverage the global {platform_name} platform. Our users are often faculty members, teaching assistants and course staff, and members of instructional technology groups.").format(
+          studio_name=settings.STUDIO_SHORT_NAME, platform_name=settings.PLATFORM_NAME,
+        )}</p>
       </div>
 
       <div class="bit">
-        <h3 class="title-3">${_("How technically savvy do I need to be to create courses in Studio?")}</h3>
-        <p>${_("Studio is designed to be easy to use by almost anyone familiar with common web-based authoring environments (Wordpress, Moodle, etc.). No programming knowledge is required, but for some of the more advanced features, a technical background would be helpful. As always, we are here to help, so don't hesitate to dive right in.")}</p>
+        <h3 class="title-3">${_("How technically savvy do I need to be to create courses in {studio_name}?").format(studio_name=settings.STUDIO_SHORT_NAME)}</h3>
+        <p>${_("{studio_name} is designed to be easy to use by almost anyone familiar with common web-based authoring environments (Wordpress, Moodle, etc.). No programming knowledge is required, but for some of the more advanced features, a technical background would be helpful. As always, we are here to help, so don't hesitate to dive right in.").format(
+          studio_name=settings.STUDIO_SHORT_NAME,
+        )}</p>
       </div>
 
       <div class="bit">
@@ -99,35 +106,8 @@
 </div>
 </%block>
 
-<%block name="jsextra">
-  <script type="text/javascript">
-require(["jquery", "jquery.cookie"], function($) {
-  $("form :input").focus(function() {
-    $("label[for='" + this.id + "']").addClass("is-focused");
-  }).blur(function() {
-    $("label").removeClass("is-focused");
-  });
-
-  $('form#register_form').submit(function(e) {
-    e.preventDefault();
-    var submit_data = $('#register_form').serialize();
-
-    $.ajax({
-      url: '/create_account',
-      type: 'POST',
-      dataType: 'json',
-      data: submit_data,
-      headers: {'X-CSRFToken': $.cookie('csrftoken')},
-      success: function(json) {
-        location.href = "/course/";
-      },
-      error: function(jqXHR, textStatus, errorThrown) {
-        json = $.parseJSON(jqXHR.responseText);
-        $('#register_error').html(json.value).stop().addClass('is-shown');
-      },
-      notifyOnError: false
+<%block name="requirejs">
+    require(["js/factories/register"], function (RegisterFactory) {
+        RegisterFactory();
     });
-  });
-});
-  </script>
 </%block>

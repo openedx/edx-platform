@@ -25,7 +25,9 @@ class StubHttpServiceTest(unittest.TestCase):
             'test_empty': '',
             'test_int': 12345,
             'test_float': 123.45,
-            'test_dict': { 'test_key': 'test_val' },
+            'test_dict': {
+                'test_key': 'test_val',
+            },
             'test_empty_dict': {},
             'test_unicode': u'\u2603 the snowman',
             'test_none': None,

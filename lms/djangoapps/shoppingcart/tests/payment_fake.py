@@ -78,7 +78,7 @@ class PaymentFakeView(View):
         """
         new_status = request.body
 
-        if not new_status in ["success", "failure"]:
+        if new_status not in ["success", "failure", "decline"]:
             return HttpResponseBadRequest()
 
         else:
@@ -109,9 +109,17 @@ class PaymentFakeView(View):
         """
         Calculate the POST params we want to send back to the client.
         """
+
+        if cls.PAYMENT_STATUS_RESPONSE == "success":
+            decision = "ACCEPT"
+        elif cls.PAYMENT_STATUS_RESPONSE == "decline":
+            decision = "DECLINE"
+        else:
+            decision = "REJECT"
+
         resp_params = {
             # Indicate whether the payment was successful
-            "decision": "ACCEPT" if cls.PAYMENT_STATUS_RESPONSE == "success" else "REJECT",
+            "decision": decision,
 
             # Reflect back parameters we were sent by the client
             "req_amount": post_params.get('amount'),
@@ -170,6 +178,13 @@ class PaymentFakeView(View):
             'bill_trans_ref_no', 'signed_field_names', 'signed_date_time'
         ]
 
+        # if decision is decline , cancel or error then remove auth_amount from signed_field.
+        # list and also delete from resp_params dict
+
+        if decision in ["DECLINE", "CANCEL", "ERROR"]:
+            signed_fields.remove('auth_amount')
+            del resp_params["auth_amount"]
+
         # Add the list of signed fields
         resp_params['signed_field_names'] = ",".join(signed_fields)
 
@@ -202,13 +217,27 @@ class PaymentFakeView(View):
         # Build the context dict used to render the HTML form,
         # filling in values for the hidden input fields.
         # These will be sent in the POST request to the callback URL.
+
+        post_params_success = self.response_post_params(post_params)
+
+        # Build the context dict for decline form,
+        # remove the auth_amount value from here to
+        # reproduce exact response coming from actual postback call
+
+        post_params_decline = self.response_post_params(post_params)
+        del post_params_decline["auth_amount"]
+        post_params_decline["decision"] = 'DECLINE'
+
         context_dict = {
 
             # URL to send the POST request to
             "callback_url": callback_url,
 
-            # POST params embedded in the HTML form
-            'post_params': self.response_post_params(post_params)
+            # POST params embedded in the HTML success form
+            'post_params_success': post_params_success,
+
+            # POST params embedded in the HTML decline form
+            'post_params_decline': post_params_decline
         }
 
         return render_to_response('shoppingcart/test/fake_payment_page.html', context_dict)

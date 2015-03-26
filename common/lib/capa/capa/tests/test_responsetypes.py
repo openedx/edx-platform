@@ -3,15 +3,19 @@
 Tests of responsetypes
 """
 
+from cStringIO import StringIO
 from datetime import datetime
 import json
 import os
 import pyparsing
 import random
-import unittest
 import textwrap
-import requests
+import unittest
+import zipfile
+
 import mock
+from pytz import UTC
+import requests
 
 from . import new_loncapa_problem, test_capa_system, load_fixture
 import calc
@@ -22,8 +26,6 @@ from capa.correctmap import CorrectMap
 from capa.util import convert_files_to_filenames
 from capa.util import compare_with_tolerance
 from capa.xqueue_interface import dateformat
-
-from pytz import UTC
 
 
 class ResponseTest(unittest.TestCase):
@@ -604,7 +606,6 @@ class StringResponseTest(ResponseTest):
         self.assert_grade(problem, u"î", "incorrect")
         self.assert_grade(problem, u"o", "incorrect")
 
-
     def test_backslash_and_unicode_regexps(self):
         """
         Test some special cases of [unicode] regexps.
@@ -730,7 +731,7 @@ class StringResponseTest(ResponseTest):
             case_sensitive=False,
             hints=hints,
         )
-         # We should get a hint for Wisconsin
+        # We should get a hint for Wisconsin
         input_dict = {'1_2_1': 'Wisconsin'}
         correct_map = problem.grade_answers(input_dict)
         self.assertEquals(correct_map.get_hint('1_2_1'),
@@ -1004,6 +1005,7 @@ class CodeResponseTest(ResponseTest):
 
         invalid_grader_msgs = [
             '<audio',  # invalid XML and HTML5
+            '<p>\b</p>',  # invalid special character
         ]
 
         answer_ids = sorted(self.problem.get_question_answers())
@@ -1039,8 +1041,6 @@ class CodeResponseTest(ResponseTest):
                 self.assertEquals(output[answer_id]['msg'], u'Invalid grader reply. Please contact the course staff.')
 
 
-
-
 class ChoiceResponseTest(ResponseTest):
     from capa.tests.response_xml_factory import ChoiceResponseXMLFactory
     xml_factory_class = ChoiceResponseXMLFactory
@@ -1071,6 +1071,17 @@ class ChoiceResponseTest(ResponseTest):
 
         # No choice 3 exists --> mark incorrect
         self.assert_grade(problem, 'choice_3', 'incorrect')
+
+    def test_grade_with_no_checkbox_selected(self):
+        """
+        Test that answer marked as incorrect if no checkbox selected.
+        """
+        problem = self.build_problem(
+            choice_type='checkbox', choices=[False, False, False]
+        )
+
+        correct_map = problem.grade_answers({})
+        self.assertEqual(correct_map.get_correctness('1_2_1'), 'incorrect')
 
 
 class JavascriptResponseTest(ResponseTest):
@@ -1397,7 +1408,7 @@ class CustomResponseTest(ResponseTest):
         #       or an ordered list of answers (if there are multiple inputs)
         #
         # The function should return a dict of the form
-        # { 'ok': BOOL, 'msg': STRING }
+        # { 'ok': BOOL, 'msg': STRING } (no 'grade_decimal' key to test that it's optional)
         #
         script = textwrap.dedent("""
             def check_func(expect, answer_given):
@@ -1412,9 +1423,11 @@ class CustomResponseTest(ResponseTest):
 
         correctness = correct_map.get_correctness('1_2_1')
         msg = correct_map.get_msg('1_2_1')
+        npoints = correct_map.get_npoints('1_2_1')
 
         self.assertEqual(correctness, 'correct')
         self.assertEqual(msg, "Message text")
+        self.assertEqual(npoints, 1)
 
         # Incorrect answer
         input_dict = {'1_2_1': '0'}
@@ -1422,9 +1435,45 @@ class CustomResponseTest(ResponseTest):
 
         correctness = correct_map.get_correctness('1_2_1')
         msg = correct_map.get_msg('1_2_1')
+        npoints = correct_map.get_npoints('1_2_1')
 
         self.assertEqual(correctness, 'incorrect')
         self.assertEqual(msg, "Message text")
+        self.assertEqual(npoints, 0)
+
+    def test_function_code_single_input_decimal_score(self):
+        # For function code, we pass in these arguments:
+        #
+        #   'expect' is the expect attribute of the <customresponse>
+        #
+        #   'answer_given' is the answer the student gave (if there is just one input)
+        #       or an ordered list of answers (if there are multiple inputs)
+        #
+        # The function should return a dict of the form
+        # { 'ok': BOOL, 'msg': STRING, 'grade_decimal': FLOAT }
+        #
+        script = textwrap.dedent("""
+            def check_func(expect, answer_given):
+                return {
+                    'ok': answer_given == expect,
+                    'msg': 'Message text',
+                    'grade_decimal': 0.9 if answer_given == expect else 0.1,
+                }
+        """)
+
+        problem = self.build_problem(script=script, cfn="check_func", expect="42")
+
+        # Correct answer
+        input_dict = {'1_2_1': '42'}
+        correct_map = problem.grade_answers(input_dict)
+        self.assertEqual(correct_map.get_npoints('1_2_1'), 0.9)
+        self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
+
+        # Incorrect answer
+        input_dict = {'1_2_1': '43'}
+        correct_map = problem.grade_answers(input_dict)
+        self.assertEqual(correct_map.get_npoints('1_2_1'), 0.1)
+        self.assertEqual(correct_map.get_correctness('1_2_1'), 'incorrect')
 
     def test_function_code_multiple_input_no_msg(self):
 
@@ -1467,7 +1516,7 @@ class CustomResponseTest(ResponseTest):
         # the check function can return a dict of the form:
         #
         # {'overall_message': STRING,
-        #  'input_list': [{'ok': BOOL, 'msg': STRING}, ...] }
+        #  'input_list': [{'ok': BOOL, 'msg': STRING}, ...] } (no grade_decimal to test it's optional)
         #
         # 'overall_message' is displayed at the end of the response
         #
@@ -1500,10 +1549,58 @@ class CustomResponseTest(ResponseTest):
         self.assertEqual(correct_map.get_correctness('1_2_2'), 'correct')
         self.assertEqual(correct_map.get_correctness('1_2_3'), 'correct')
 
+        # Expect that the inputs were given correct npoints
+        self.assertEqual(correct_map.get_npoints('1_2_1'), 0)
+        self.assertEqual(correct_map.get_npoints('1_2_2'), 1)
+        self.assertEqual(correct_map.get_npoints('1_2_3'), 1)
+
         # Expect that we received messages for each individual input
         self.assertEqual(correct_map.get_msg('1_2_1'), 'Feedback 1')
         self.assertEqual(correct_map.get_msg('1_2_2'), 'Feedback 2')
         self.assertEqual(correct_map.get_msg('1_2_3'), 'Feedback 3')
+
+    def test_function_code_multiple_inputs_decimal_score(self):
+
+        # If the <customresponse> has multiple inputs associated with it,
+        # the check function can return a dict of the form:
+        #
+        # {'overall_message': STRING,
+        #  'input_list': [{'ok': BOOL, 'msg': STRING, 'grade_decimal': FLOAT}, ...] }
+        #        #
+        # 'input_list' contains dictionaries representing the correctness
+        #           and message for each input.
+        script = textwrap.dedent("""
+            def check_func(expect, answer_given):
+                check1 = (int(answer_given[0]) == 1)
+                check2 = (int(answer_given[1]) == 2)
+                check3 = (int(answer_given[2]) == 3)
+                score1 = 0.9 if check1 else 0.1
+                score2 = 0.9 if check2 else 0.1
+                score3 = 0.9 if check3 else 0.1
+                return {
+                    'input_list': [
+                        {'ok': check1, 'grade_decimal': score1, 'msg': 'Feedback 1'},
+                        {'ok': check2, 'grade_decimal': score2, 'msg': 'Feedback 2'},
+                        {'ok': check3, 'grade_decimal': score3, 'msg': 'Feedback 3'},
+                    ]
+                }
+            """)
+
+        problem = self.build_problem(script=script, cfn="check_func", num_inputs=3)
+
+        # Grade the inputs (one input incorrect)
+        input_dict = {'1_2_1': '-999', '1_2_2': '2', '1_2_3': '3'}
+        correct_map = problem.grade_answers(input_dict)
+
+        # Expect that the inputs were graded individually
+        self.assertEqual(correct_map.get_correctness('1_2_1'), 'incorrect')
+        self.assertEqual(correct_map.get_correctness('1_2_2'), 'correct')
+        self.assertEqual(correct_map.get_correctness('1_2_3'), 'correct')
+
+        # Expect that the inputs were given correct npoints
+        self.assertEqual(correct_map.get_npoints('1_2_1'), 0.1)
+        self.assertEqual(correct_map.get_npoints('1_2_2'), 0.9)
+        self.assertEqual(correct_map.get_npoints('1_2_3'), 0.9)
 
     def test_function_code_with_extra_args(self):
         script = textwrap.dedent("""\
@@ -1712,8 +1809,100 @@ class CustomResponseTest(ResponseTest):
             except ResponseError:
                 self.fail("Could not use name '{0}s' in custom response".format(module_name))
 
+    def test_python_lib_zip_is_available(self):
+        # Prove that we can import code from a zipfile passed down to us.
+
+        # Make a zipfile with one module in it with one function.
+        zipstring = StringIO()
+        zipf = zipfile.ZipFile(zipstring, "w")
+        zipf.writestr("my_helper.py", textwrap.dedent("""\
+            def seventeen():
+                return 17
+            """))
+        zipf.close()
+
+        # Use that module in our Python script.
+        script = textwrap.dedent("""
+            import my_helper
+            num = my_helper.seventeen()
+            """)
+        capa_system = test_capa_system()
+        capa_system.get_python_lib_zip = lambda: zipstring.getvalue()
+        problem = self.build_problem(script=script, capa_system=capa_system)
+        self.assertEqual(problem.context['num'], 17)
+
+    def test_function_code_multiple_inputs_order(self):
+        # Ensure that order must be correct according to sub-problem position
+        script = textwrap.dedent("""
+            def check_func(expect, answer_given):
+                check1 = (int(answer_given[0]) == 1)
+                check2 = (int(answer_given[1]) == 2)
+                check3 = (int(answer_given[2]) == 3)
+                check4 = (int(answer_given[3]) == 4)
+                check5 = (int(answer_given[4]) == 5)
+                check6 = (int(answer_given[5]) == 6)
+                check7 = (int(answer_given[6]) == 7)
+                check8 = (int(answer_given[7]) == 8)
+                check9 = (int(answer_given[8]) == 9)
+                check10 = (int(answer_given[9]) == 10)
+                check11 = (int(answer_given[10]) == 11)
+                return {'overall_message': 'Overall message',
+                            'input_list': [
+                                { 'ok': check1, 'msg': '1'},
+                                { 'ok': check2, 'msg': '2'},
+                                { 'ok': check3, 'msg': '3'},
+                                { 'ok': check4, 'msg': '4'},
+                                { 'ok': check5, 'msg': '5'},
+                                { 'ok': check6, 'msg': '6'},
+                                { 'ok': check7, 'msg': '7'},
+                                { 'ok': check8, 'msg': '8'},
+                                { 'ok': check9, 'msg': '9'},
+                                { 'ok': check10, 'msg': '10'},
+                                { 'ok': check11, 'msg': '11'},
+                ]}
+            """)
+
+        problem = self.build_problem(script=script, cfn="check_func", num_inputs=11)
+
+        # Grade the inputs showing out of order
+        input_dict = {
+            '1_2_1': '1',
+            '1_2_2': '2',
+            '1_2_3': '3',
+            '1_2_4': '4',
+            '1_2_5': '5',
+            '1_2_6': '6',
+            '1_2_10': '10',
+            '1_2_11': '16',
+            '1_2_7': '7',
+            '1_2_8': '8',
+            '1_2_9': '9'
+        }
+
+        correct_order = [
+            '1_2_1', '1_2_2', '1_2_3', '1_2_4', '1_2_5', '1_2_6', '1_2_7', '1_2_8', '1_2_9', '1_2_10', '1_2_11'
+        ]
+
+        correct_map = problem.grade_answers(input_dict)
+
+        self.assertNotEqual(problem.student_answers.keys(), correct_order)
+
+        # euqal to correct order after sorting at get_score
+        self.assertListEqual(problem.responders.values()[0].context['idset'], correct_order)
+
+        self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
+        self.assertEqual(correct_map.get_correctness('1_2_9'), 'correct')
+        self.assertEqual(correct_map.get_correctness('1_2_11'), 'incorrect')
+
+        self.assertEqual(correct_map.get_msg('1_2_1'), '1')
+        self.assertEqual(correct_map.get_msg('1_2_9'), '9')
+        self.assertEqual(correct_map.get_msg('1_2_11'), '11')
+
 
 class SchematicResponseTest(ResponseTest):
+    """
+    Class containing setup and tests for Schematic responsetype.
+    """
     from capa.tests.response_xml_factory import SchematicResponseXMLFactory
     xml_factory_class = SchematicResponseXMLFactory
 

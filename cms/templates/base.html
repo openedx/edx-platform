@@ -1,5 +1,9 @@
 ## -*- coding: utf-8 -*-
-<%! from django.utils.translation import ugettext as _ %>
+<%!
+from django.utils.translation import ugettext as _
+from django.template.defaultfilters import escapejs
+import json
+%>
 <%namespace name='static' file='static_content.html'/>
 
 <!doctype html>
@@ -7,16 +11,23 @@
 <!--[if IE 8]><html class="ie8 lte9 lte8" lang="${LANGUAGE_CODE}"><![endif]-->
 <!--[if IE 9]><html class="ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
 <!--[if gt IE 9]><!--><html lang="${LANGUAGE_CODE}"><!--<![endif]-->
-  <head>
+<%
+    # set doc language direction
+    from django.utils.translation import get_language_bidi
+    dir_rtl = 'rtl' if get_language_bidi() else 'ltr'
+%>
+  <head dir="${dir_rtl}">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>
         <%block name="title"></%block> |
         % if context_course:
         <% ctx_loc = context_course.location %>
-        ${context_course.display_name_with_default} |
+        ${context_course.display_name_with_default | h} |
+        % elif context_library:
+        ${context_library.display_name_with_default | h} |
         % endif
-        edX Studio
+        ${settings.STUDIO_NAME}
     </title>
 
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -34,316 +45,26 @@
     <%block name="header_extras"></%block>
   </head>
 
-  <body class="<%block name='bodyclass'></%block> hide-wip lang_${LANGUAGE_CODE}">
-  <%include file="google_tag_manager.html" />
-
+  <body class="${dir_rtl} <%block name='bodyclass'></%block> lang_${LANGUAGE_CODE}">
   <%block name="view_notes"></%block>
 
     <a class="nav-skip" href="#content">${_("Skip to this view's content")}</a>
 
     <script type="text/javascript">
-    window.baseUrl = "${settings.STATIC_URL}";
-    var require = {
-        baseUrl: baseUrl,
-        waitSeconds: 60,
-        paths: {
-            "domReady": "js/vendor/domReady",
-            "gettext": "/i18n",
-            "mustache": "js/vendor/mustache",
-            "codemirror": "js/vendor/codemirror-compressed",
-            "codemirror/stex": "js/vendor/CodeMirror/stex",
-            "jquery": "js/vendor/jquery.min",
-            "jquery.ui": "js/vendor/jquery-ui.min",
-            "jquery.form": "js/vendor/jquery.form",
-            "jquery.markitup": "js/vendor/markitup/jquery.markitup",
-            "jquery.leanModal": "js/vendor/jquery.leanModal.min",
-            "jquery.ajaxQueue": "js/vendor/jquery.ajaxQueue",
-            "jquery.smoothScroll": "js/vendor/jquery.smooth-scroll.min",
-            "jquery.timepicker": "js/vendor/timepicker/jquery.timepicker",
-            "jquery.cookie": "js/vendor/jquery.cookie",
-            "jquery.qtip": "js/vendor/jquery.qtip.min",
-            "jquery.scrollTo": "js/vendor/jquery.scrollTo-1.4.2-min",
-            "jquery.flot": "js/vendor/flot/jquery.flot.min",
-            "jquery.fileupload": "js/vendor/jQuery-File-Upload/js/jquery.fileupload",
-            "jquery.iframe-transport": "js/vendor/jQuery-File-Upload/js/jquery.iframe-transport",
-            "jquery.inputnumber": "js/vendor/html5-input-polyfills/number-polyfill",
-            "jquery.immediateDescendents": "coffee/src/jquery.immediateDescendents",
-            "datepair": "js/vendor/timepicker/datepair",
-            "date": "js/vendor/date",
-            "tzAbbr": "js/vendor/tzAbbr",
-            "underscore": "js/vendor/underscore-min",
-            "underscore.string": "js/vendor/underscore.string.min",
-            "backbone": "js/vendor/backbone-min",
-            "backbone.associations": "js/vendor/backbone-associations-min",
-            "backbone.paginator": "js/vendor/backbone.paginator.min",
-            "tinymce": "js/vendor/tinymce/js/tinymce/tinymce.full.min",
-            "jquery.tinymce": "js/vendor/tinymce/js/tinymce/jquery.tinymce.min",
-            "xmodule": "/xmodule/xmodule",
-            "xblock": "coffee/src/xblock",
-            "utility": "js/src/utility",
-            "accessibility": "js/src/accessibility_tools",
-            "draggabilly": "js/vendor/draggabilly.pkgd",
-            "URI": "js/vendor/URI.min",
-            "ieshim": "js/src/ie_shim",
-            "tooltip_manager": "js/src/tooltip_manager",
-
-            // Files needed for Annotations feature
-            "annotator": "js/vendor/ova/annotator-full",
-            "annotator-harvardx": "js/vendor/ova/annotator-full-firebase-auth",
-            "video.dev": "js/vendor/ova/video.dev",
-            "vjs.youtube": 'js/vendor/ova/vjs.youtube',
-            "rangeslider": 'js/vendor/ova/rangeslider',
-            "share-annotator": 'js/vendor/ova/share-annotator',
-            "richText-annotator": 'js/vendor/ova/richText-annotator',
-            "reply-annotator": 'js/vendor/ova/reply-annotator',
-            "grouping-annotator": 'js/vendor/ova/grouping-annotator',
-            "tags-annotator": 'js/vendor/ova/tags-annotator',
-            "diacritic-annotator": 'js/vendor/ova/diacritic-annotator',
-            "flagging-annotator": 'js/vendor/ova/flagging-annotator',
-            "jquery-Watch": 'js/vendor/ova/jquery-Watch',
-            "openseadragon": 'js/vendor/ova/openseadragon',
-            "osda": 'js/vendor/ova/OpenSeaDragonAnnotation',
-            "ova": 'js/vendor/ova/ova',
-            "catch": 'js/vendor/ova/catch/js/catch',
-            "handlebars": 'js/vendor/ova/catch/js/handlebars-1.1.2',
-            // end of Annotation tool files
-
-            // externally hosted files
-            "tender": [
-                "//edxedge.tenderapp.com/tender_widget",
-                // if tender fails to load, fallback on a local file
-                // so that require doesn't fall over
-                "js/src/tender_fallback"
-            ],
-            "mathjax": "//edx-static.s3.amazonaws.com/mathjax-MathJax-727332c/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
-            "youtube": [
-                // youtube URL does not end in ".js". We add "?noext" to the path so
-                // that require.js adds the ".js" to the query component of the URL,
-                // and leaves the path component intact.
-                "//www.youtube.com/player_api?noext",
-                // if youtube fails to load, fallback on a local file
-                // so that require doesn't fall over
-                "js/src/youtube_fallback"
-            ]
-        },
-        shim: {
-            "gettext": {
-                exports: "gettext"
-            },
-            "date": {
-                exports: "Date"
-            },
-            "jquery.ui": {
-                deps: ["jquery"],
-                exports: "jQuery.ui"
-            },
-            "jquery.form": {
-                deps: ["jquery"],
-                exports: "jQuery.fn.ajaxForm"
-            },
-            "jquery.markitup": {
-                deps: ["jquery"],
-                exports: "jQuery.fn.markitup"
-            },
-            "jquery.leanmodal": {
-                deps: ["jquery"],
-                exports: "jQuery.fn.leanModal"
-            },
-            "jquery.ajaxQueue": {
-                deps: ["jquery"],
-                exports: "jQuery.fn.ajaxQueue"
-            },
-            "jquery.smoothScroll": {
-                deps: ["jquery"],
-                exports: "jQuery.fn.smoothScroll"
-            },
-            "jquery.cookie": {
-                deps: ["jquery"],
-                exports: "jQuery.fn.cookie"
-            },
-            "jquery.qtip": {
-                deps: ["jquery"],
-                exports: "jQuery.fn.qtip"
-            },
-            "jquery.scrollTo": {
-                deps: ["jquery"],
-                exports: "jQuery.fn.scrollTo",
-            },
-            "jquery.flot": {
-                deps: ["jquery"],
-                exports: "jQuery.fn.plot"
-            },
-            "jquery.fileupload": {
-                deps: ["jquery.iframe-transport"],
-                exports: "jQuery.fn.fileupload"
-            },
-            "jquery.inputnumber": {
-                deps: ["jquery"],
-                exports: "jQuery.fn.inputNumber"
-            },
-            "jquery.tinymce": {
-                deps: ["jquery", "tinymce"],
-                exports: "jQuery.fn.tinymce"
-            },
-            "datepair": {
-                deps: ["jquery.ui", "jquery.timepicker"]
-            },
-            "underscore": {
-                exports: "_"
-            },
-            "backbone": {
-                deps: ["underscore", "jquery"],
-                exports: "Backbone"
-            },
-            "backbone.associations": {
-                deps: ["backbone"],
-                exports: "Backbone.Associations"
-            },
-            "backbone.paginator": {
-                deps: ["backbone"],
-                exports: "Backbone.Paginator"
-            },
-            "tender": {
-                exports: 'Tender'
-            },
-            "youtube": {
-                exports: "YT"
-            },
-            "codemirror": {
-                exports: "CodeMirror"
-            },
-            "codemirror/stex": {
-                deps: ["codemirror"]
-            },
-            "tinymce": {
-                exports: "tinymce"
-            },
-            "mathjax": {
-                exports: "MathJax",
-                init: function() {
-                  MathJax.Hub.Config({
-                    tex2jax: {
-                      inlineMath: [
-                        ["\\(","\\)"],
-                        ['[mathjaxinline]','[/mathjaxinline]']
-                      ],
-                      displayMath: [
-                        ["\\[","\\]"],
-                        ['[mathjax]','[/mathjax]']
-                      ]
-                    }
-                  });
-                  MathJax.Hub.Configured();
-                }
-            },
-            "URI": {
-                exports: "URI"
-            },
-            "tooltip_manager": {
-                deps: ["jquery", "underscore"]
-            },
-            "jquery.immediateDescendents": {
-                deps: ["jquery"]
-            },
-            "xblock/core": {
-                exports: "XBlock",
-                deps: ["jquery", "jquery.immediateDescendents"]
-            },
-            "xblock/runtime.v1": {
-                exports: "XBlock",
-                deps: ["xblock/core"]
-            },
-
-            "coffee/src/main": {
-                deps: ["coffee/src/ajax_prefix"]
-            },
-            "coffee/src/logger": {
-                exports: "Logger",
-                deps: ["coffee/src/ajax_prefix"]
-            },
-
-            // the following are all needed for annotation tools
-            "video.dev": {
-                exports:"videojs"
-            },
-            "vjs.youtube": {
-                deps: ["video.dev"]
-            },
-            "rangeslider": {
-                deps: ["video.dev"]
-            },
-            "annotator": {
-                exports: "Annotator"
-            },
-            "annotator-harvardx":{
-                deps: ["annotator"]
-            },
-            "share-annotator": {
-                deps: ["annotator"]
-            },
-            "richText-annotator": {
-                deps: ["annotator", "tinymce"]
-            },
-            "reply-annotator": {
-                deps: ["annotator"]
-            },
-            "tags-annotator": {
-                deps: ["annotator"]
-            },
-            "diacritic-annotator": {
-                deps: ["annotator"]
-            },
-            "flagging-annotator": {
-                deps: ["annotator"]
-            },
-            "grouping-annotator": {
-                deps: ["annotator"]
-            },
-            "ova":{
-                exports: "ova",
-                deps: ["annotator", "annotator-harvardx", "video.dev", "vjs.youtube", "rangeslider", "share-annotator", "richText-annotator", "reply-annotator", "tags-annotator", "flagging-annotator", "grouping-annotator", "diacritic-annotator", "jquery-Watch", "catch", "handlebars", "URI"]
-            },
-            "osda":{
-                exports: "osda",
-                deps: ["annotator", "annotator-harvardx", "video.dev", "vjs.youtube", "rangeslider", "share-annotator", "richText-annotator", "reply-annotator", "tags-annotator", "flagging-annotator", "grouping-annotator", "diacritic-annotator", "openseadragon", "jquery-Watch", "catch", "handlebars", "URI"]
-            },
-            // end of annotation tool files
-        },
-        // load jquery and gettext automatically
-        deps: ["jquery", "gettext"],
-        callback: function() {
-            // load other scripts on every page, after jquery loads
-            require(["js/base", "coffee/src/main", "coffee/src/logger", "datepair", "accessibility", "ieshim", "tooltip_manager"]);
-            // we need "datepair" because it dynamically modifies the page
-            // when it is loaded -- yuck!
-        }
-    };
+      window.baseUrl = ${json.dumps(settings.STATIC_URL)};
+      window.TENDER_DOMAIN = ${json.dumps(settings.TENDER_DOMAIN)};
+      var require = {baseUrl: window.baseUrl};
     </script>
     <script type="text/javascript" src="${static.url("js/vendor/require.js")}"></script>
+    <script type="text/javascript" src="${static.url("require-config.js")}"></script>
 
     ## js templates
     <script id="system-feedback-tpl" type="text/template">
       <%static:include path="js/system-feedback.underscore" />
     </script>
 
-
-    % if context_course:
-        <script type="text/javascript">
-        require(['js/models/course'], function(Course) {
-            window.course = new Course({
-                id: "${context_course.id}",
-                name: "${context_course.display_name_with_default | h}",
-                url_name: "${context_course.location.name | h}",
-                org: "${context_course.location.org | h}",
-                num: "${context_course.location.course | h}",
-                revision: "${context_course.location.revision | h}"
-            });
-        });
-        </script>
-    % endif
-
     <!-- view -->
-    <div class="wrapper wrapper-view">
+    <div class="wrapper wrapper-view" dir="${dir_rtl}">
         <% online_help_token = self.online_help_token() if hasattr(self, 'online_help_token') else None %>
         <%include file="widgets/header.html" args="online_help_token=online_help_token" />
 
@@ -356,12 +77,8 @@
       </div>
 
       % if user.is_authenticated():
-      <script type="text/javascript">
-        require(['js/sock']);
-      </script>
-      <%include file="widgets/sock.html" args="online_help_token=online_help_token" />
+        <%include file="widgets/sock.html" args="online_help_token=online_help_token" />
       % endif
-
       <%include file="widgets/footer.html" />
       <%include file="widgets/tender.html" />
 
@@ -369,18 +86,32 @@
     </div>
 
     <div id="page-prompt"></div>
-    <%block name="jsextra"></%block>
-    <div class="modal-cover"></div>
 
-    % if show_intercom_widget:
-      <script>
-        window.intercomSettings = {
-          email: "${intercom_user_email}",
-          user_hash: "${intercom_user_hash}",
-          app_id: "${intercom_app_id}"
-        };
-      </script>
-      <script>(function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic('reattach_activator');ic('update',intercomSettings);}else{var d=document;var i=function(){i.c(arguments)};i.q=[];i.c=function(args){i.q.push(args)};w.Intercom=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://widget.intercom.io/widget/${intercom_app_id}';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}})()</script>
-    % endif
+    <%block name="modal_placeholder"></%block>
+
+    <%block name="jsextra"></%block>
+    <script type="text/javascript">
+      require(['js/factories/common_deps'], function () {
+          require(['js/factories/base'], function () {
+            % if context_course:
+              require(['js/factories/course'], function(CourseFactory) {
+                  CourseFactory({
+                      id: "${context_course.id | escapejs}",
+                      name: "${context_course.display_name_with_default | h}",
+                      url_name: "${context_course.location.name | h}",
+                      org: "${context_course.location.org | h}",
+                      num: "${context_course.location.course | h}",
+                      revision: "${context_course.location.revision | h}"
+                  });
+              });
+            % endif
+            % if user.is_authenticated():
+                require(['js/sock']);
+            % endif
+            <%block name='requirejs'></%block>
+          });
+      });
+    </script>
+    <div class="modal-cover"></div>
   </body>
 </html>

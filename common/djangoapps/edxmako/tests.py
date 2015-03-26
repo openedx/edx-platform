@@ -10,15 +10,16 @@ from django.test.utils import override_settings
 from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
 import edxmako.middleware
+from edxmako.middleware import get_template_request_context
 from edxmako import add_lookup, LOOKUP
 from edxmako.shortcuts import (
     marketing_link,
     render_to_string,
-    header_footer_context_processor,
     open_source_footer_context_processor
 )
 from student.tests.factories import UserFactory
 from util.testing import UrlResetMixin
+
 
 @ddt.ddt
 class ShortcutsTests(UrlResetMixin, TestCase):
@@ -39,17 +40,6 @@ class ShortcutsTests(UrlResetMixin, TestCase):
             expected_link = reverse('login')
             link = marketing_link('ABOUT')
             self.assertEquals(link, expected_link)
-
-    @ddt.data((True, True), (False, False), (False, True), (True, False))
-    @ddt.unpack
-    def test_header_and_footer(self, header_setting, footer_setting):
-        with patch.dict('django.conf.settings.FEATURES', {
-            'ENABLE_NEW_EDX_HEADER': header_setting,
-            'ENABLE_NEW_EDX_FOOTER': footer_setting,
-        }):
-            result = header_footer_context_processor({})
-            self.assertEquals(footer_setting, result.get('ENABLE_NEW_EDX_FOOTER'))
-            self.assertEquals(header_setting, result.get('ENABLE_NEW_EDX_HEADER'))
 
     @ddt.data((True, None), (False, None))
     @ddt.unpack
@@ -94,11 +84,11 @@ class MakoMiddlewareTest(TestCase):
 
         self.middleware.process_request(self.request)
         # requestcontext should not be None.
-        self.assertIsNotNone(edxmako.middleware.REQUEST_CONTEXT.context)
+        self.assertIsNotNone(get_template_request_context())
 
         self.middleware.process_response(self.request, self.response)
         # requestcontext should be None.
-        self.assertIsNone(edxmako.middleware.REQUEST_CONTEXT.context)
+        self.assertIsNone(get_template_request_context())
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @patch("edxmako.middleware.REQUEST_CONTEXT")

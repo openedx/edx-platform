@@ -23,7 +23,7 @@ html.video-fullscreen{
 
   .instructor-info-action {
     @extend %t-copy-sub2;
-    float: right;
+    @include float(right);
     margin-left: ($baseline/2);
     padding: ($baseline/4) ($baseline/2);
     border-radius: ($baseline/4);
@@ -62,7 +62,7 @@ div.course-wrapper {
 
     ul {
       li {
-        margin-bottom: lh(.5);
+        margin-bottom: lh(0.5);
       }
     }
 
@@ -84,7 +84,7 @@ div.course-wrapper {
       > div {
         @extend .clearfix;
         border-bottom: 1px solid #ddd;
-        margin-bottom: 15px;
+        margin-bottom: ($baseline*0.75);
         padding: 0 0 15px;
 
         .collapsible {
@@ -204,11 +204,15 @@ div.course-wrapper {
       display: none;
       @include clearfix();
       white-space: pre-wrap;
-      border-top: 1px solid #ccc;
+      border-top: 1px solid $gray-l3;
       padding-top: lh();
       margin-top: lh();
       line-height: lh();
       font-family: Consolas, "Lucida Console", Monaco, "Courier New", Courier, monospace;
+
+      // Debugging content is always in English, therefore it's never RTL
+      direction: ltr;
+      text-align: left;
     }
 
     div.ui-tabs {
@@ -220,7 +224,7 @@ div.course-wrapper {
       .ui-tabs-nav {
         background: none;
         border: 0;
-        margin-bottom: lh(.5);
+        margin-bottom: lh(0.5);
       }
 
       .ui-tabs-panel {
@@ -265,30 +269,30 @@ div.course-wrapper {
 }
 
 .xmodule_VideoModule {
-  margin-bottom: 30px;
+  margin-bottom: ($baseline*1.5);
 
 
 }
 
 textarea.short-form-response {
     height: 200px;
-    padding: 5px;
-    margin-top: 5px;
-    margin-bottom: 5px;
+    padding: ($baseline/4);
+    margin-top: ($baseline/4);
+    margin-bottom: ($baseline/4);
     width: 100%;
 }
 
 section.self-assessment {
     textarea.hint {
         height: 100px;
-        padding: 5px;
-        margin-top: 5px;
-        margin-bottom: 5px;
+        padding: ($baseline/4);
+        margin-top: ($baseline/4);
+        margin-bottom: ($baseline/4);
     }
 
     div {
-        margin-top: 5px;
-        margin-bottom: 5px;
+        margin-top: ($baseline/4);
+        margin-bottom: ($baseline/4);
     }
 
     .error {
@@ -299,14 +303,14 @@ section.self-assessment {
 
 section.foldit {
    table {
-       margin-top: 10px;
+       margin-top: ($baseline/2);
    }
    th {
         text-align: center;
    }
    td {
-       padding-left: 5px;
-       padding-right: 5px;
+       padding-left: ($baseline/4);
+       padding-right: ($baseline/4);
 
    }
 }

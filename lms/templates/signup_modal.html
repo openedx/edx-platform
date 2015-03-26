@@ -3,7 +3,7 @@
 <%namespace name='static' file='static_content.html'/>
 <%! from django.conf import settings %>
 <%! from django.core.urlresolvers import reverse %>
-<%! from django_countries.countries import COUNTRIES %>
+<%! from django_countries import countries %>
 <%! from student.models import UserProfile %>
 <%! from datetime import date %>
 <%! import calendar %>
@@ -11,7 +11,7 @@
 <section id="signup-modal" class="modal signup-modal">
   <div class="inner-wrapper">
     <button class="close-modal">
-      <i class="icon-remove"></i>
+      <i class="icon fa fa-remove"></i>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
         ${_('Close')}

@@ -17,20 +17,10 @@
 % endfor
 </%block>
 
-<%block name="jsextra">
-<script type="text/javascript">
-require(["domReady!", "jquery", "js/collections/checklist", "js/views/checklist"],
-        function(doc, $, ChecklistCollection, ChecklistView) {
-    var checklistCollection = new ChecklistCollection();
-    checklistCollection.url = "${handler_url}";
-
-    var editor = new ChecklistView({
-        el: $('.course-checklists'),
-        collection: checklistCollection
-    });
-    checklistCollection.fetch({reset: true});
-});
-</script>
+<%block name="requirejs">
+  require(["js/factories/checklists"], function (ChecklistsFactory) {
+    ChecklistsFactory("${handler_url}");
+  });
 </%block>
 
 
@@ -52,7 +42,7 @@ require(["domReady!", "jquery", "js/collections/checklist", "js/views/checklist"
       </form>
     </article>
 
-    <aside class="content-supplementary" role="complimentary">
+    <aside class="content-supplementary" role="complementary">
       <div class="bit">
         <h3 class="title title-3">${_("What are course checklists?")}</h3>
         <p>
@@ -64,7 +54,7 @@ require(["domReady!", "jquery", "js/collections/checklist", "js/views/checklist"
       </div>
 
       <div class="bit">
-        <h3 class="title title-3">${_("Studio checklists")}</h3>
+        <h3 class="title title-3">${_("{studio_name} checklists").format(studio_name=settings.STUDIO_SHORT_NAME)}</h3>
         <nav class="nav-page checklists-current">
           <ol>
             % for checklist in checklists:

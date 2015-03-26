@@ -54,6 +54,15 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
             },
 
             renderTemplate: function() {
+                var html = this.template(this.getTemplateContext());
+                if (this.parentInfo) {
+                    this.setElement($(html));
+                } else {
+                    this.$el.html(html);
+                }
+            },
+
+            getTemplateContext: function() {
                 var xblockInfo = this.model,
                     childInfo = xblockInfo.get('child_info'),
                     parentInfo = this.parentInfo,
@@ -62,7 +71,6 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     parentType = parentInfo ? XBlockViewUtils.getXBlockType(parentInfo.get('category')) : null,
                     addChildName = null,
                     defaultNewChildName = null,
-                    html,
                     isCollapsed = this.shouldRenderChildren() && !this.shouldExpandChildren();
                 if (childInfo) {
                     addChildName = interpolate(gettext('New %(component_type)s'), {
@@ -70,7 +78,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     }, true);
                     defaultNewChildName = childInfo.display_name;
                 }
-                html = this.template({
+                return {
                     xblockInfo: xblockInfo,
                     visibilityClass: XBlockViewUtils.getXBlockVisibilityClass(xblockInfo.get('visibility_state')),
                     typeListClass: XBlockViewUtils.getXBlockListTypeClass(xblockType),
@@ -86,20 +94,15 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     includesChildren: this.shouldRenderChildren(),
                     hasExplicitStaffLock: this.model.get('has_explicit_staff_lock'),
                     staffOnlyMessage: this.model.get('staff_only_message')
-                });
-                if (this.parentInfo) {
-                    this.setElement($(html));
-                } else {
-                    this.$el.html(html);
-                }
+                };
             },
 
             renderChildren: function() {
                 var self = this,
-                    xblockInfo = this.model;
-                if (xblockInfo.get('child_info')) {
-                    _.each(this.model.get('child_info').children, function(child) {
-                        var childOutlineView = self.createChildView(child, xblockInfo);
+                    parentInfo = this.model;
+                if (parentInfo.get('child_info')) {
+                    _.each(this.model.get('child_info').children, function(childInfo) {
+                        var childOutlineView = self.createChildView(childInfo, parentInfo);
                         childOutlineView.render();
                         self.addChildView(childOutlineView);
                     });
@@ -182,15 +185,20 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 return true;
             },
 
-            createChildView: function(xblockInfo, parentInfo, parentView) {
-                return new XBlockOutlineView({
-                    model: xblockInfo,
+            getChildViewClass: function() {
+                return XBlockOutlineView;
+            },
+
+            createChildView: function(childInfo, parentInfo, options) {
+                var viewClass = this.getChildViewClass();
+                return new viewClass(_.extend({
+                    model: childInfo,
                     parentInfo: parentInfo,
+                    parentView: this,
                     initialState: this.initialState,
                     expandedLocators: this.expandedLocators,
-                    template: this.template,
-                    parentView: parentView || this
-                });
+                    template: this.template
+                }, options));
             },
 
             onSync: function(event) {
@@ -273,7 +281,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
 
             handleAddEvent: function(event) {
                 var self = this,
-                    target = $(event.target),
+                    target = $(event.currentTarget),
                     category = target.data('category');
                 event.preventDefault();
                 XBlockViewUtils.addXBlock(target).done(function(locator) {

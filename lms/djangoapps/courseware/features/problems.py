@@ -2,14 +2,12 @@
 Steps for problem.feature lettuce tests
 '''
 
-# pylint: disable=C0111
-# pylint: disable=W0621
+# pylint: disable=missing-docstring
+# pylint: disable=redefined-outer-name
 
 from lettuce import world, step
-from lettuce.django import django_url
 from common import i_am_registered_for_the_course, visit_scenario_item
 from problems_setup import PROBLEM_DICT, answer_problem, problem_has_answer, add_problem_to_course
-from nose.tools import assert_equal
 
 
 def _view_problem(step, problem_type, problem_settings=None):
@@ -28,6 +26,13 @@ def view_problem_with_attempts(step, problem_type, attempts):
     _view_problem(step, problem_type, {'max_attempts': attempts})
 
 
+@step(u'I am viewing a randomization "([^"]*)" "([^"]*)" problem with "([^"]*)" attempts with reset')
+def view_problem_attempts_reset(step, randomization, problem_type, attempts, ):
+    _view_problem(step, problem_type, {'max_attempts': attempts,
+                                       'rerandomize': randomization,
+                                       'show_reset_button': True})
+
+
 @step(u'I am viewing a "([^"]*)" that shows the answer "([^"]*)"')
 def view_problem_with_show_answer(step, problem_type, answer):
     _view_problem(step, problem_type, {'showanswer': answer})
@@ -36,6 +41,11 @@ def view_problem_with_show_answer(step, problem_type, answer):
 @step(u'I am viewing a "([^"]*)" problem')
 def view_problem(step, problem_type):
     _view_problem(step, problem_type)
+
+
+@step(u'I am viewing a randomization "([^"]*)" "([^"]*)" problem with reset button on')
+def view_random_reset_problem(step, randomization, problem_type):
+    _view_problem(step, problem_type, {'rerandomize': randomization, 'show_reset_button': True})
 
 
 @step(u'External graders respond "([^"]*)"')

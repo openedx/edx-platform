@@ -66,7 +66,7 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
             <% } %>
         </h5>
         <% if (visibleToStaffOnly) { %>
-            <p class="copy">
+            <p class="visbility-copy copy">
                 <%= gettext("Staff Only") %>
                 <% if (!hasExplicitStaffLock) { %>
                     <span class="inherited-from">
@@ -75,30 +75,38 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
                 <% } %>
             </p>
         <% } else { %>
-            <p class="copy"><%= gettext("Staff and Students") %></p>
+            <p class="visbility-copy copy"><%= gettext("Staff and Students") %></p>
         <% } %>
-        <p class="action-inline">
-            <a href="" class="action-staff-lock" role="button" aria-pressed="<%= hasExplicitStaffLock %>">
+            <% if (hasContentGroupComponents) { %>
+                <p class="note-visibility">
+                    <i class="icon fa fa-eye" aria-hidden="true"></i>
+                    <span class="note-copy"><%= gettext("Some content in this unit is visible only to particular content groups") %></span>
+                </p>
+            <% } %>
+        <ul class="actions-inline">
+            <li class="action-inline">
+                <a href="" class="action-staff-lock" role="button" aria-pressed="<%= hasExplicitStaffLock %>">
                 <% if (hasExplicitStaffLock) { %>
-                    <i class="icon-check"></i>
+                    <i class="icon fa fa-check-square-o" aria-hidden="true"></i>
                 <% } else { %>
-                    <i class="icon-check-empty"></i>
+                    <i class="icon fa fa-square-o" aria-hidden="true"></i>
                 <% } %>
                 <%= gettext('Hide from students') %>
             </a>
-        </p>
+            </li>
+        </ul>
     </div>
 
     <div class="wrapper-pub-actions bar-mod-actions">
         <ul class="action-list">
             <li class="action-item">
                 <a class="action-publish action-primary <% if (published && !hasChanges) { %>is-disabled<% } %>"
-                   href=""><%= gettext("Publish") %>
+                   href="" aria-disabled="<% if (published && !hasChanges) { %>true<% } else { %>false<% } %>" ><%= gettext("Publish") %>
                 </a>
             </li>
             <li class="action-item">
                 <a class="action-discard action-secondary <% if (!published || !hasChanges) { %>is-disabled<% } %>"
-                   href=""><%= gettext("Discard Changes") %>
+                   href="" aria-disabled="<% if (!published || !hasChanges) { %>true<% } else { %>false<% } %>"><%= gettext("Discard Changes") %>
                 </a>
             </li>
         </ul>

@@ -38,7 +38,7 @@ from reverification.models import MidcourseReverificationWindow
 log = logging.getLogger(__name__)
 
 
-def generateUUID():  # pylint: disable=C0103
+def generateUUID():  # pylint: disable=invalid-name
     """ Utility function; generates UUIDs """
     return str(uuid.uuid4())
 
@@ -188,11 +188,8 @@ class PhotoVerification(StatusModel):
         Returns the earliest allowed date given the settings
 
         """
-        DAYS_GOOD_FOR = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
-        allowed_date = (
-            datetime.now(pytz.UTC) - timedelta(days=DAYS_GOOD_FOR)
-        )
-        return allowed_date
+        days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+        return datetime.now(pytz.UTC) - timedelta(days=days_good_for)
 
     @classmethod
     def user_is_verified(cls, user, earliest_allowed_date=None, window=None):
@@ -214,7 +211,7 @@ class PhotoVerification(StatusModel):
         ).exists()
 
     @classmethod
-    def user_has_valid_or_pending(cls, user, earliest_allowed_date=None, window=None):
+    def user_has_valid_or_pending(cls, user, earliest_allowed_date=None, window=None, queryset=None):
         """
         Return whether the user has a complete verification attempt that is or
         *might* be good. This means that it's approved, been submitted, or would
@@ -225,15 +222,21 @@ class PhotoVerification(StatusModel):
         If window=None, this will check for the user's *initial* verification.  If
         window is anything else, this will check for the reverification associated
         with that window.
+
+        If a queryset is provided, that will be used instead of hitting the database.
         """
         valid_statuses = ['submitted', 'approved']
         if not window:
             valid_statuses.append('must_retry')
-        return cls.objects.filter(
-            user=user,
+        if queryset is None:
+            queryset = cls.objects.filter(user=user)
+
+        return queryset.filter(
             status__in=valid_statuses,
-            created_at__gte=(earliest_allowed_date
-                             or cls._earliest_allowed_date()),
+            created_at__gte=(
+                earliest_allowed_date
+                or cls._earliest_allowed_date()
+            ),
             window=window,
         ).exists()
 
@@ -296,7 +299,10 @@ class PhotoVerification(StatusModel):
                     return ('none', error_msg)
 
             if attempt.created_at < cls._earliest_allowed_date():
-                return ('expired', error_msg)
+                return (
+                    'expired',
+                    _("Your {platform_name} verification has expired.").format(platform_name=settings.PLATFORM_NAME)
+                )
 
             # If someone is denied their original verification attempt, they can try to reverify.
             # However, if a midcourse reverification is denied, that denial is permanent.
@@ -310,6 +316,65 @@ class PhotoVerification(StatusModel):
 
         return (status, error_msg)
 
+    @classmethod
+    def verification_for_datetime(cls, deadline, candidates):
+        """Find a verification in a set that applied during a particular datetime.
+
+        A verification is considered "active" during a datetime if:
+        1) The verification was created before the datetime, and
+        2) The verification is set to expire after the datetime.
+
+        Note that verification status is *not* considered here,
+        just the start/expire dates.
+
+        If multiple verifications were active at the deadline,
+        returns the most recently created one.
+
+        Arguments:
+            deadline (datetime): The datetime at which the verification applied.
+                If `None`, then return the most recently created candidate.
+            candidates (list of `PhotoVerification`s): Potential verifications to search through.
+
+        Returns:
+            PhotoVerification: A photo verification that was active at the deadline.
+                If no verification was active, return None.
+
+        """
+        if len(candidates) == 0:
+            return None
+
+        # If there's no deadline, then return the most recently created verification
+        if deadline is None:
+            return candidates[0]
+
+        # Otherwise, look for a verification that was in effect at the deadline,
+        # preferring recent verifications.
+        # If no such verification is found, implicitly return `None`
+        for verification in candidates:
+            if verification.active_at_datetime(deadline):
+                return verification
+
+    @property
+    def expiration_datetime(self):
+        """Datetime that the verification will expire. """
+        days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+        return self.created_at + timedelta(days=days_good_for)
+
+    def active_at_datetime(self, deadline):
+        """Check whether the verification was active at a particular datetime.
+
+        Arguments:
+            deadline (datetime): The date at which the verification was active
+                (created before and expired after).
+
+        Returns:
+            bool
+
+        """
+        return (
+            self.created_at < deadline and
+            self.expiration_datetime > deadline
+        )
 
     def parsed_error_msg(self):
         """
@@ -395,6 +460,9 @@ class PhotoVerification(StatusModel):
         if self.status == "approved":
             return
 
+        log.info(u"Verification for user '{user_id}' approved by '{reviewer}'.".format(
+            user_id=self.user, reviewer=user_id
+        ))
         self.error_msg = ""  # reset, in case this attempt was denied before
         self.error_code = ""  # reset, in case this attempt was denied before
         self.reviewing_user = user_id
@@ -438,6 +506,9 @@ class PhotoVerification(StatusModel):
             lets you amend the error message in case there were additional
             details to be made.
         """
+        log.info(u"Verification for user '{user_id}' denied by '{reviewer}'.".format(
+            user_id=self.user, reviewer=reviewing_user
+        ))
         self.error_msg = error_msg
         self.error_code = error_code
         self.reviewing_user = reviewing_user
@@ -553,7 +624,10 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
                 attempt = attempts[0]
                 if attempt.status != "approved":
                     return False
-            except Exception:  # pylint: disable=W0703
+            except Exception:  # pylint: disable=broad-except
+                log.exception(
+                    u"An error occurred while checking re-verification for user '{user_id}'".format(user_id=user)
+                )
                 return False
 
         return True
@@ -671,7 +745,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
             ("photoIdReasons", "Text not clear"): _("We couldn't read your name from your photo ID image."),
             ("generalReasons", "Name mismatch"): _("The name associated with your account and the name on your ID do not match."),
             ("userPhotoReasons", "Image not clear"): _("The image of your face was not clear."),
-            ("userPhotoReasons", "Face out of view"): _("Your face was not visible in your self-photo"),
+            ("userPhotoReasons", "Face out of view"): _("Your face was not visible in your self-photo."),
         }
 
         try:
@@ -776,7 +850,6 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         body_txt = json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False).encode('utf-8')
 
         return header_txt + "\n\n" + body_txt
-
 
     def send_request(self):
         """

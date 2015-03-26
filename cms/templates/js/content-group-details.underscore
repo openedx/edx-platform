@@ -1,0 +1,13 @@
+<div class="collection-details">
+    <header class="collection-header">
+        <h3 class="title">
+            <%- name %>
+        </h3>
+    </header>
+
+    <ul class="actions">
+        <li class="action action-edit">
+            <button class="edit"><i class="icon fa fa-pencil"></i> <%= gettext("Edit") %></button>
+        </li>
+    </ul>
+</div>

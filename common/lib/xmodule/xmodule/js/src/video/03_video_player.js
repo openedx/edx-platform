@@ -96,7 +96,7 @@ function (HTML5Video, Resizer) {
             $(window).on('unload', state.saveState);
 
             if (!state.isFlashMode() && state.speed != '1.0') {
-                state.videoPlayer.setPlaybackRate(state.speed);
+                state.videoPlayer.setPlaybackRate(state.speed, true);
             }
         });
 
@@ -351,18 +351,17 @@ function (HTML5Video, Resizer) {
         }
     }
 
-    function setPlaybackRate(newSpeed) {
+    function setPlaybackRate(newSpeed, useCueVideoById) {
         var duration = this.videoPlayer.duration(),
             time = this.videoPlayer.currentTime,
             methodName, youtubeId;
 
+        // If useCueVideoById is true it will reload video again.
+        // Used useCueVideoById to fix the issue video not playing if we change
+        // the speed before playing the video.
         if (
-            this.isHtml5Mode() &&
-            !(
-                this.browserIsFirefox &&
-                newSpeed === '1.0' &&
-                this.isYoutubeType()
-            )
+          this.isHtml5Mode() && !(this.browserIsFirefox &&
+          (useCueVideoById || newSpeed === '1.0') && this.isYoutubeType())
         ) {
             this.videoPlayer.player.setPlaybackRate(newSpeed);
         } else {
@@ -385,7 +384,10 @@ function (HTML5Video, Resizer) {
             // is in a PAUSED state.
             //
             // Why? This is how the YouTube API is implemented.
-            this.videoPlayer.updatePlayTime(time);
+            // sjson.search() only works if time is defined.
+            if (!_.isUndefined(time)) {
+                this.videoPlayer.updatePlayTime(time);
+            }
             if (time > 0 && this.isFlashMode()) {
                 this.videoPlayer.seekTo(time);
                 this.trigger(
@@ -394,6 +396,14 @@ function (HTML5Video, Resizer) {
                         duration: duration
                     }
                 );
+            }
+            // In Html5 mode if video speed is changed before playing in firefox and
+            // changed speed is not '1.0' then manually trigger setPlaybackRate method.
+            // In browsers other than firefox like safari user can set speed to '1.0'
+            // if its not already set to '1.0' so in that case we don't have to
+            // call 'setPlaybackRate'
+            if (this.isHtml5Mode() && newSpeed != '1.0') {
+                this.videoPlayer.player.setPlaybackRate(newSpeed);
             }
         }
     }
@@ -487,6 +497,11 @@ function (HTML5Video, Resizer) {
 
         this.videoPlayer.updatePlayTime(time, true);
         this.el.trigger('seek', arguments);
+
+        // the timer is stopped above; restart it.
+        if (this.videoPlayer.isPlaying()) {
+            this.videoPlayer.runTimer();
+        }
     }
 
     function runTimer() {

@@ -12,7 +12,7 @@
     function format(time, formatFull) {
         var hours, minutes, seconds;
 
-        if (!_.isFinite(time)) {
+        if (!_.isFinite(time) || time < 0) {
             time = 0;
         }
 

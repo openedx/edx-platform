@@ -13,10 +13,10 @@ from embargo.models import EmbargoedCourse, EmbargoedState, IPFilter
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class EmbargoCourseFormTest(ModuleStoreTestCase):
     """Test the course form properly validates course IDs"""
 

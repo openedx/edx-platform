@@ -12,10 +12,11 @@ import logging
 from opaque_keys.edx.locations import Location
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateItemError, DuplicateCourseError
+from xmodule.modulestore.exceptions import (
+    ItemNotFoundError, DuplicateItemError, DuplicateCourseError, InvalidBranchSetting
+)
 from xmodule.modulestore.mongo.base import (
-    MongoModuleStore, MongoRevisionKey, as_draft, as_published,
-    SORT_REVISION_FAVOR_DRAFT
+    MongoModuleStore, MongoRevisionKey, as_draft, as_published, SORT_REVISION_FAVOR_DRAFT
 )
 from xmodule.modulestore.store_utilities import rewrite_nonportable_content_links
 from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, DIRECT_ONLY_CATEGORIES
@@ -146,12 +147,15 @@ class DraftModuleStore(MongoModuleStore):
         :param course_key: which course to delete
         :param user_id: id of the user deleting the course
         """
+        # Note: does not need to inform the bulk mechanism since after the course is deleted,
+        # it can't calculate inheritance anyway. Nothing is there to be dirty.
         # delete the assets
         super(DraftModuleStore, self).delete_course(course_key, user_id)
 
         # delete all of the db records for the course
         course_query = self._course_key_to_son(course_key)
         self.collection.remove(course_query, multi=True)
+        self.delete_all_asset_metadata(course_key, user_id)
 
     def clone_course(self, source_course_id, dest_course_id, user_id, fields=None, **kwargs):
         """
@@ -413,6 +417,8 @@ class DraftModuleStore(MongoModuleStore):
             item['_id']['revision'] = MongoRevisionKey.draft
             # ensure keys are in fixed and right order before inserting
             item['_id'] = self._id_dict_to_son(item['_id'])
+            bulk_record = self._get_bulk_ops_record(location.course_key)
+            bulk_record.dirty = True
             try:
                 self.collection.insert(item)
             except pymongo.errors.DuplicateKeyError:
@@ -535,7 +541,7 @@ class DraftModuleStore(MongoModuleStore):
             )
         self._delete_subtree(location, as_functions)
 
-    def _delete_subtree(self, location, as_functions):
+    def _delete_subtree(self, location, as_functions, draft_only=False):
         """
         Internal method for deleting all of the subtree whose revisions match the as_functions
         """
@@ -549,10 +555,23 @@ class DraftModuleStore(MongoModuleStore):
             next_tier = []
             for child_loc in current_entry.get('definition', {}).get('children', []):
                 child_loc = course_key.make_usage_key_from_deprecated_string(child_loc)
-                for rev_func in as_functions:
-                    current_loc = rev_func(child_loc)
-                    current_son = current_loc.to_deprecated_son()
-                    next_tier.append(current_son)
+
+                # single parent can have 2 versions: draft and published
+                # get draft parents only while deleting draft module
+                if draft_only:
+                    revision = MongoRevisionKey.draft
+                else:
+                    revision = ModuleStoreEnum.RevisionOption.all
+
+                parents = self._get_raw_parent_locations(child_loc, revision)
+                # Don't delete modules if one of its parents shouldn't be deleted
+                # This should only be an issue for courses have ended up in
+                # a state where modules have multiple parents
+                if all(parent.to_deprecated_son() in to_be_deleted for parent in parents):
+                    for rev_func in as_functions:
+                        current_loc = rev_func(child_loc)
+                        current_son = current_loc.to_deprecated_son()
+                        next_tier.append(current_son)
 
             return next_tier
 
@@ -587,7 +606,10 @@ class DraftModuleStore(MongoModuleStore):
                 _internal(next_tier)
 
         _internal([root_usage.to_deprecated_son() for root_usage in root_usages])
-        self.collection.remove({'_id': {'$in': to_be_deleted}}, safe=self.collection.safe)
+        if len(to_be_deleted) > 0:
+            bulk_record = self._get_bulk_ops_record(root_usages[0].course_key)
+            bulk_record.dirty = True
+            self.collection.remove({'_id': {'$in': to_be_deleted}}, safe=self.collection.safe)
 
     @MongoModuleStore.memoize_request_cache
     def has_changes(self, xblock):
@@ -602,6 +624,9 @@ class DraftModuleStore(MongoModuleStore):
             return True
         # if this block doesn't have changes, then check its children
         elif xblock.has_children:
+            # fix a bug where dangling pointers should imply a change
+            if len(xblock.children) > len(xblock.get_children()):
+                return True
             return any([self.has_changes(child) for child in xblock.get_children()])
         # otherwise there are no changes
         else:
@@ -618,6 +643,9 @@ class DraftModuleStore(MongoModuleStore):
 
         Raises:
             ItemNotFoundError: if any of the draft subtree nodes aren't found
+
+        Returns:
+            The newly published xblock
         """
         # NOTE: cannot easily use self._breadth_first b/c need to get pub'd and draft as pairs
         # (could do it by having 2 breadth first scans, the first to just get all published children
@@ -669,7 +697,11 @@ class DraftModuleStore(MongoModuleStore):
                                 # So, do not delete the child.  It will be published when the new parent is published.
                                 pass
 
-            super(DraftModuleStore, self).update_item(item, user_id, isPublish=True, is_publish_root=is_root)
+            # update the published (not draft) item (ignoring that item is "draft"). The published
+            # may not exist; (if original_published is None); so, allow_not_found
+            super(DraftModuleStore, self).update_item(
+                item, user_id, isPublish=True, is_publish_root=is_root, allow_not_found=True
+            )
             to_be_deleted.append(as_draft(item_location).to_deprecated_son())
 
         # verify input conditions
@@ -678,6 +710,8 @@ class DraftModuleStore(MongoModuleStore):
 
         _internal_depth_first(location, True)
         if len(to_be_deleted) > 0:
+            bulk_record = self._get_bulk_ops_record(location.course_key)
+            bulk_record.dirty = True
             self.collection.remove({'_id': {'$in': to_be_deleted}})
         return self.get_item(as_published(location))
 
@@ -723,7 +757,7 @@ class DraftModuleStore(MongoModuleStore):
             # If 2 versions versions exist, we can assume one is a published version. Go ahead and do the delete
             # of the draft version.
             if versions_found.count() > 1:
-                self._delete_subtree(root_location, [as_draft])
+                self._delete_subtree(root_location, [as_draft], draft_only=True)
             elif versions_found.count() == 1:
                 # Since this method cannot be called on something in DIRECT_ONLY_CATEGORIES and we call
                 # delete_subtree as soon as we find an item with a draft version, if there is only 1 version

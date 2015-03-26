@@ -4,7 +4,8 @@ Views for the course_mode module
 
 import decimal
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseBadRequest
+from django.conf import settings
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.views.generic.base import View
 from django.utils.translation import ugettext as _
@@ -17,22 +18,25 @@ from course_modes.models import CourseMode
 from courseware.access import has_access
 from student.models import CourseEnrollment
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
+from util.db import commit_on_success_with_read_committed
 from xmodule.modulestore.django import modulestore
 
 
 class ChooseModeView(View):
-    """
-    View used when the user is asked to pick a mode
+    """View used when the user is asked to pick a mode.
 
     When a get request is used, shows the selection page.
+
     When a post request is used, assumes that it is a form submission
-        from the selection page, parses the response, and then sends user
-        to the next step in the flow
+    from the selection page, parses the response, and then sends user
+    to the next step in the flow.
+
     """
 
     @method_decorator(login_required)
     def get(self, request, course_id, error=None):
-        """ Displays the course mode choice page
+        """Displays the course mode choice page.
 
         Args:
             request (`Request`): The Django Request object.
@@ -46,49 +50,56 @@ class ChooseModeView(View):
             Response
 
         """
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_key = CourseKey.from_string(course_id)
 
-        enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(request.user, course_key)
         upgrade = request.GET.get('upgrade', False)
         request.session['attempting_upgrade'] = upgrade
 
-        # TODO (ECOM-16): Remove once the AB-test of auto-registration completes
-        auto_register = request.session.get('auto_register', False)
+        # TODO (ECOM-188): Once the A/B test of decoupled/verified flows
+        # completes, we can remove this flag.
+        # The A/B test framework will reload the page with the ?separate-verified GET param
+        # set if the user is in the experimental condition.  We then store this flag
+        # in a session variable so downstream views can check it.
+        if request.GET.get('separate-verified', False):
+            request.session['separate-verified'] = True
+        elif request.GET.get('disable-separate-verified', False) and 'separate-verified' in request.session:
+            del request.session['separate-verified']
 
-        # Inactive users always need to re-register
-        # Verified and professional users do not need to register or upgrade
-        # Registered users who are not trying to upgrade do not need to re-register
-        if not auto_register:
-            go_to_dashboard = (
-                is_active and
-                (not upgrade or enrollment_mode in ['verified', 'professional'])
-            )
-
-        # If auto-registration is enabled, then students might already be registered,
-        # but we should still show them the "choose your track" page so they have
-        # the option to enter the verification/payment flow.
-        # TODO (ECOM-16): Based on the results of the AB-test, set the default behavior to
-        # either enable or disable auto-registration.
-        else:
-            go_to_dashboard = (
-                not upgrade and enrollment_mode in ['verified', 'professional']
-            )
-
-        if go_to_dashboard:
-            return redirect(reverse('dashboard'))
-
+        enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(request.user, course_key)
         modes = CourseMode.modes_for_course_dict(course_key)
 
         # We assume that, if 'professional' is one of the modes, it is the *only* mode.
         # If we offer more modes alongside 'professional' in the future, this will need to route
         # to the usual "choose your track" page.
-        if "professional" in modes:
-            return redirect(
-                reverse(
-                    'verify_student_show_requirements',
-                    kwargs={'course_id': course_key.to_deprecated_string()}
+        has_enrolled_professional = (enrollment_mode == "professional" and is_active)
+        if "professional" in modes and not has_enrolled_professional:
+            # TODO (ECOM-188): Once the A/B test of separating verification / payment completes,
+            # we can remove the check for the session variable.
+            if settings.FEATURES.get('SEPARATE_VERIFICATION_FROM_PAYMENT') and request.session.get('separate-verified', False):
+                return redirect(
+                    reverse(
+                        'verify_student_start_flow',
+                        kwargs={'course_id': unicode(course_key)}
+                    )
                 )
-            )
+            else:
+                return redirect(
+                    reverse(
+                        'verify_student_show_requirements',
+                        kwargs={'course_id': unicode(course_key)}
+                    )
+                )
+
+        # If there isn't a verified mode available, then there's nothing
+        # to do on this page.  The user has almost certainly been auto-registered
+        # in the "honor" track by this point, so we send the user
+        # to the dashboard.
+        if not CourseMode.has_verified_mode(modes):
+            return redirect(reverse('dashboard'))
+
+        # If a user has already paid, redirect them to the dashboard.
+        if is_active and enrollment_mode in CourseMode.VERIFIED_MODES:
+            return redirect(reverse('dashboard'))
 
         donation_for_course = request.session.get("donation_for_course", {})
         chosen_price = donation_for_course.get(unicode(course_key), None)
@@ -104,7 +115,7 @@ class ChooseModeView(View):
             "error": error,
             "upgrade": upgrade,
             "can_audit": "audit" in modes,
-            "autoreg": auto_register
+            "responsive": True
         }
         if "verified" in modes:
             context["suggested_prices"] = [
@@ -120,8 +131,21 @@ class ChooseModeView(View):
         return render_to_response("course_modes/choose.html", context)
 
     @method_decorator(login_required)
+    @method_decorator(commit_on_success_with_read_committed)
     def post(self, request, course_id):
-        """ Takes the form submission from the page and parses it """
+        """Takes the form submission from the page and parses it.
+
+        Args:
+            request (`Request`): The Django Request object.
+            course_id (unicode): The slash-separated course key.
+
+        Returns:
+            Status code 400 when the requested mode is unsupported. When the honor mode
+            is selected, redirects to the dashboard. When the verified mode is selected,
+            returns error messages if the indicated contribution amount is invalid or
+            below the minimum, otherwise redirects to the verification flow.
+
+        """
         course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         user = request.user
 
@@ -134,24 +158,26 @@ class ChooseModeView(View):
 
         upgrade = request.GET.get('upgrade', False)
 
-        requested_mode = self.get_requested_mode(request.POST)
+        requested_mode = self._get_requested_mode(request.POST)
 
         allowed_modes = CourseMode.modes_for_course_dict(course_key)
         if requested_mode not in allowed_modes:
             return HttpResponseBadRequest(_("Enrollment mode not supported"))
 
-        if requested_mode in ("audit", "honor"):
-            CourseEnrollment.enroll(user, course_key, requested_mode)
-            return redirect('dashboard')
+        if requested_mode == 'honor':
+            # The user will have already been enrolled in the honor mode at this
+            # point, so we just redirect them to the dashboard, thereby avoiding
+            # hitting the database a second time attempting to enroll them.
+            return redirect(reverse('dashboard'))
 
         mode_info = allowed_modes[requested_mode]
 
-        if requested_mode == "verified":
+        if requested_mode == 'verified':
             amount = request.POST.get("contribution") or \
                 request.POST.get("contribution-other-amt") or 0
 
             try:
-                # validate the amount passed in and force it into two digits
+                # Validate the amount passed in and force it into two digits
                 amount_value = decimal.Decimal(amount).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)
             except decimal.InvalidOperation:
                 error_msg = _("Invalid amount selected.")
@@ -166,18 +192,82 @@ class ChooseModeView(View):
             donation_for_course[unicode(course_key)] = amount_value
             request.session["donation_for_course"] = donation_for_course
 
-            return redirect(
-                reverse('verify_student_show_requirements',
-                        kwargs={'course_id': course_key.to_deprecated_string()}) + "?upgrade={}".format(upgrade))
+            # TODO (ECOM-188): Once the A/B test of separate verification flow completes,
+            # we can remove the check for the session variable.
+            if settings.FEATURES.get('SEPARATE_VERIFICATION_FROM_PAYMENT') and request.session.get('separate-verified', False):
+                return redirect(
+                    reverse(
+                        'verify_student_start_flow',
+                        kwargs={'course_id': unicode(course_key)}
+                    )
+                )
+            else:
+                return redirect(
+                    reverse(
+                        'verify_student_show_requirements',
+                        kwargs={'course_id': unicode(course_key)}
+                    ) + "?upgrade={}".format(upgrade)
+                )
 
-    def get_requested_mode(self, request_dict):
+    def _get_requested_mode(self, request_dict):
+        """Get the user's requested mode
+
+        Args:
+            request_dict (`QueryDict`): A dictionary-like object containing all given HTTP POST parameters.
+
+        Returns:
+            The course mode slug corresponding to the choice in the POST parameters,
+            None if the choice in the POST parameters is missing or is an unsupported mode.
+
         """
-        Given the request object of `user_choice`, return the
-        corresponding course mode slug
-        """
-        if 'audit_mode' in request_dict:
-            return 'audit'
-        if 'certificate_mode' and request_dict.get("honor-code"):
-            return 'honor'
-        if 'certificate_mode' in request_dict:
+        if 'verified_mode' in request_dict:
             return 'verified'
+        if 'honor_mode' in request_dict:
+            return 'honor'
+        else:
+            return None
+
+
+def create_mode(request, course_id):
+    """Add a mode to the course corresponding to the given course ID.
+
+    Only available when settings.FEATURES['MODE_CREATION_FOR_TESTING'] is True.
+
+    Attempts to use the following querystring parameters from the request:
+        `mode_slug` (str): The mode to add, either 'honor', 'verified', or 'professional'
+        `mode_display_name` (str): Describes the new course mode
+        `min_price` (int): The minimum price a user must pay to enroll in the new course mode
+        `suggested_prices` (str): Comma-separated prices to suggest to the user.
+        `currency` (str): The currency in which to list prices.
+
+    By default, this endpoint will create an 'honor' mode for the given course with display name
+    'Honor Code', a minimum price of 0, no suggested prices, and using USD as the currency.
+
+    Args:
+        request (`Request`): The Django Request object.
+        course_id (unicode): The slash-separated course key.
+
+    Returns:
+        Response
+    """
+    PARAMETERS = {
+        'mode_slug': u'honor',
+        'mode_display_name': u'Honor Code Certificate',
+        'min_price': 0,
+        'suggested_prices': u'',
+        'currency': u'usd',
+    }
+
+    # Try pulling querystring parameters out of the request
+    for parameter, default in PARAMETERS.iteritems():
+        PARAMETERS[parameter] = request.GET.get(parameter, default)
+
+    # Attempt to create the new mode for the given course
+    course_key = CourseKey.from_string(course_id)
+    CourseMode.objects.get_or_create(course_id=course_key, **PARAMETERS)
+
+    # Return a success message and a 200 response
+    return HttpResponse("Mode '{mode_slug}' created for course with ID '{course_id}'.".format(
+        mode_slug=PARAMETERS['mode_slug'],
+        course_id=course_id
+    ))

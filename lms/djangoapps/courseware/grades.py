@@ -10,7 +10,7 @@ from django.conf import settings
 from django.db import transaction
 from django.test.client import RequestFactory
 
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 
 from courseware import courses
 from courseware.model_data import FieldDataCache
@@ -22,33 +22,12 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.duedate import get_extended_due_date
 from .models import StudentModule
 from .module_render import get_module_for_descriptor
+from .module_utils import yield_dynamic_descriptor_descendents
 from submissions import api as sub_api  # installed from the edx-submissions repository
 from opaque_keys import InvalidKeyError
 
+
 log = logging.getLogger("edx.courseware")
-
-
-def yield_dynamic_descriptor_descendents(descriptor, module_creator):
-    """
-    This returns all of the descendants of a descriptor. If the descriptor
-    has dynamic children, the module will be created using module_creator
-    and the children (as descriptors) of that module will be returned.
-    """
-    def get_dynamic_descriptor_children(descriptor):
-        if descriptor.has_dynamic_children():
-            module = module_creator(descriptor)
-            if module is None:
-                return []
-            return module.get_child_descriptors()
-        else:
-            return descriptor.get_children()
-
-    stack = [descriptor]
-
-    while len(stack) > 0:
-        next_descriptor = stack.pop()
-        stack.extend(get_dynamic_descriptor_children(next_descriptor))
-        yield next_descriptor
 
 
 def answer_distributions(course_key):
@@ -139,6 +118,7 @@ def answer_distributions(course_key):
             continue
 
     return answer_counts
+
 
 @transaction.commit_manually
 def grade(student, request, course, keep_raw_scores=False):
@@ -259,8 +239,10 @@ def _grade(student, request, course, keep_raw_scores):
             if graded_total.possible > 0:
                 format_scores.append(graded_total)
             else:
-                log.info("Unable to grade a section with a total possible score of zero. " +
-                              str(section_descriptor.location))
+                log.info(
+                    "Unable to grade a section with a total possible score of zero. " +
+                    str(section_descriptor.location)
+                )
 
         totaled_scores[section_format] = format_scores
 
@@ -274,8 +256,9 @@ def _grade(student, request, course, keep_raw_scores):
     grade_summary['grade'] = letter_grade
     grade_summary['totaled_scores'] = totaled_scores  	# make this available, eg for instructor download & debugging
     if keep_raw_scores:
-        grade_summary['raw_scores'] = raw_scores        # way to get all RAW scores out to instructor
-                                                        # so grader can be double-checked
+        # way to get all RAW scores out to instructor
+        # so grader can be double-checked
+        grade_summary['raw_scores'] = raw_scores
     return grade_summary
 
 
@@ -522,7 +505,7 @@ def iterate_grades_for(course_id, students):
     request = RequestFactory().get('/')
 
     for student in students:
-        with dog_stats_api.timer('lms.grades.iterate_grades_for', tags=['action:{}'.format(course_id)]):
+        with dog_stats_api.timer('lms.grades.iterate_grades_for', tags=[u'action:{}'.format(course_id)]):
             try:
                 request.user = student
                 # Grading calls problem rendering, which calls masquerading,

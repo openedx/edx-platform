@@ -1,5 +1,7 @@
 // lms - views - verification flow
 // ====================
+@import '../base/grid-settings';
+@import 'neat/neat'; // lib - Neat
 
 // MISC: extends - button
 %btn-verify-primary {
@@ -12,11 +14,10 @@
 .is-expandable {
 
   .title-expand {
-
   }
 
   .expandable-icon {
-    @include transition(all 0.25s ease-in-out 0s);
+    @include transition(all $tmg-f2 ease-in-out 0s);
     display: inline-block;
     vertical-align: middle;
     margin-right: ($baseline/4);
@@ -106,6 +107,11 @@
     font-family: $sans-serif;
     font-style: normal;
     color: $m-gray-d4;
+  }
+
+  // reset: navigation (needed due to edX's new global-header styling)
+  .global-new .nav-global a {
+    padding-bottom: ($baseline +1);
   }
 
   // HACK: nasty override due to our bad input/button styling
@@ -350,12 +356,13 @@
   // UI: page header
   .page-header {
     width: flex-grid(12,12);
-    margin: 0 0 ($baseline/2) 0;
-    border-bottom: ($baseline/4) solid $m-gray-l4;
+    margin-bottom: 0;
+    border-bottom: none;
 
     .title {
       @include clearfix();
       width: flex-grid(12,12);
+      margin: 0;
 
       .sts-course, .sts-track {
         display: inline-block;
@@ -368,100 +375,69 @@
 
         .sts-track-value {
           @extend %copy-badge;
-          color: $white;
+          display: inline-block;
           background: $verified-color-lvl3;
+          color: $white;
+          font-weight: 600;
 
           .context {
-            margin-right: ($baseline/4);
             opacity: 0.80;
             color: $white;
             letter-spacing: 0.1rem;
           }
         }
+
+        &.professional-ed {
+
+          .sts-track-value {
+            background-color: $professional-color-lvl1;
+          }
+        }
       }
 
-      .sts-label {
-        @extend %t-title7;
+      .sts-label, .sts-course-org, .sts-course-number, .sts-course-name {
+        @extend %t-title5;
         @extend %t-weight4;
-        display: block;
-        margin-bottom: ($baseline/2);
-        border-bottom: ($baseline/10) solid $m-gray-l4;
-        padding-bottom: ($baseline/2);
-        color: $m-gray-d1;
-      }
-
-      .sts-course {
-        @extend %t-title;
-        width: flex-grid(9,12);
+        @include font-size(14);
+        @include line-height(14);
+        display: inline-block;
+        color: $gray;
         text-transform: none;
       }
 
-      .sts-course-org, .sts-course-number {
-        @extend %t-title5;
-        @extend %t-weight4;
-        display: inline-block;
+      .sts-label {
+        margin: 0;
+        border: none;
+        padding: 0;
+      }
+
+      .sts-course {
+        width: initial;
       }
 
       .sts-course-org {
-        margin-right: ($baseline/4);
+        margin-right: 0;
       }
 
-      .sts-course-name {
-        @include font-size(28);
-        @include line-height(28);
-        @extend %t-weight4;
-        display: block;
+      .wrapper-sts {
+        display: inline-block;
+        width: flex-grid(9,12);
+        margin-bottom: ($baseline/4);
       }
-    }
-  }
 
-  // CASE: page header - experiment variant A overrides
-  .page-header.exp-variant-A {
-    margin-bottom: 0;
-    border-bottom: none;
+      .title .sts-track {
+        display: inline-block;
 
-    .title {
-      margin: 0;
-    }
+        .sts-track-value {
+          background: $verified-color-lvl3;
+        }
 
+        &.professional-ed {
 
-    .sts-label {
-      display: inline-block;
-      margin: 0;
-      border: none;
-      padding: 0;
-      text-transform: none;
-    }
-
-    .sts-course-org {
-      margin-right: 0;
-    }
-
-    .sts-label, .sts-course-org, .sts-course-number, .sts-course-name {
-      @extend %t-title5;
-      @extend %t-weight4;
-      @include font-size(14);
-      @include line-height(14);
-      display: inline-block;
-      color: $gray;
-      text-transform: none;
-    }
-
-    .wrapper-sts {
-      display: inline-block;
-      width: flex-grid(9,12);
-      margin-bottom: ($baseline/4);
-    }
-
-    .sts-course {
-      width: initial;
-    }
-
-    .title .sts-track {
-      display: inline-block;
-
-      .sts-track-value {
-        background: $m-blue-l1;
+          .sts-track-value {
+            background-color: $professional-color-lvl1;
+          }
+        }
       }
     }
   }
@@ -475,7 +451,7 @@
   }
 
   .progress-sts {
-    @include size(($baseline/4));
+    @include size($baseline/4);
     @extend %ui-depth1;
     position: absolute;
     top: 43px;
@@ -723,7 +699,7 @@
             @extend %btn-primary-blue;
             padding: ($baseline/2) ($baseline*0.75);
 
-            *[class^="icon-"] {
+            .icon {
               @extend %t-icon4;
               padding: ($baseline*.25) ($baseline*.5);
               display: block;
@@ -756,8 +732,8 @@
           left: ($baseline/2);
         }
 
-        // control - take/do
-        .control-do {
+        // control - take/do, retake
+        .control-do, .control-retake {
           left: 45%;
         }
 
@@ -788,7 +764,7 @@
           .action-retakephotos a {
             @extend %btn-primary-blue;
             @include font-size(14);
-            padding: ($baseline/2) ($baseline*.75);
+            padding: ($baseline/2) ($baseline*0.75);
           }
         }
       }
@@ -916,7 +892,7 @@
           .action-editname a {
             @extend %btn-primary-blue;
             @include font-size(14);
-            padding: ($baseline/2) ($baseline*.75);
+            padding: ($baseline/2) ($baseline*0.75);
           }
         }
       }
@@ -1013,7 +989,7 @@
       @extend %t-weight4;
       position: absolute;
       top: -($baseline*1.25);
-      left: 45%;
+      left: calc( 50% - 46px );
       padding: ($baseline/2) ($baseline*1.5);
       background: white;
       text-align: center;
@@ -1027,11 +1003,11 @@
   // UI: nav - wizard
   .nav-wizard {
     @extend %ui-well;
-    @include clearfix;
+    @include clearfix();
     width: flex-grid(12,12);
     border-radius: ($baseline/10);
     background: $m-gray-l4;
-    padding: ($baseline*.75) $baseline;
+    padding: ($baseline*0.75) $baseline;
 
     .help-inline, .wizard-steps {
 
@@ -1130,10 +1106,6 @@
   // ====================
 
   // UI: main content
-  .wrapper-content-main {
-
-  }
-
   .content-main {
     width: flex-grid(12,12);
 
@@ -1157,28 +1129,37 @@
   }
 
   .content-supplementary {
-    width: flex-grid(12,12);
+    @include box-sizing(border-box);
+    @include outer-container;
+    @include span-columns(12);
 
     .list-help {
       @include clearfix();
 
       .help-item {
-        width: flex-grid(4,12);
+        @include fill-parent;
+
         float: left;
         margin-right: flex-gutter();
+        margin-bottom: 25px;
 
         &:last-child {
-          margin-right: 0
+          margin: 0;
         }
       }
     }
-  }
 
-  // CASE: supplemental content - experiment variant A overrides
-  .wrapper-content-supplementary.exp-variant-A {
+    @include media( 550px ) {
+      .list-help {
+        .help-item {
+          @include span-columns(4);
+          margin-bottom: 0;
 
-    .help-item-technical {
-      width: flex-grid(8,12);
+          &.help-item-technical {
+            @include span-columns(8);
+          }
+        }
+      }
     }
   }
 
@@ -1186,6 +1167,10 @@
 
   // VIEW: select a track
   &.step-select-track {
+    .container {
+      min-width: 0;
+      max-width: 1200px;
+    }
 
     .sts-track {
       @extend %text-sr;
@@ -1193,11 +1178,10 @@
 
     .form-register-choose {
       @include clearfix();
-      width: flex-grid(12,12);
       margin: ($baseline*2) 0;
 
       .deco-divider {
-        width: flex-grid(8,12);
+        @include fill-parent;
         float: left;
       }
     }
@@ -1207,7 +1191,7 @@
     }
 
     .register-choice {
-      width: flex-grid(8,12);
+      @include fill-parent;
       margin: 0 flex-gutter() $baseline 0;
       border-top: ($baseline/4) solid $m-gray-d4;
       padding: $baseline ($baseline*1.5);
@@ -1222,40 +1206,53 @@
         vertical-align: middle;
       }
 
-      .wrapper-copy {
-        width: flex-grid(8,8);
-      }
-
       .list-actions {
-        width: flex-grid(8,8);
+        @include fill-parent;
         text-align: right;
+        float: right;
+        margin: ($baseline/4) 0;
+        border-top: none;
+        clear: both;
       }
 
       .title {
         @extend %t-title5;
         @extend %t-weight5;
         margin-bottom: ($baseline/2);
+        width: calc( 100% - 30px );
       }
 
       .copy {
         @extend %t-copy-base;
       }
 
-      .action-select input {
-        @extend %t-weight4;
-        padding: ($baseline/2) ($baseline*0.75);
+      .action-select {
+        @include fill-parent;
+
+        input {
+          @extend %t-weight4;
+          padding: ($baseline/2) ($baseline*0.75);
+          width: 100%;
+          white-space: normal;
+        }
       }
     }
 
     .register-choice-audit {
       border-color: $m-blue-d1;
 
-      .wrapper-copy {
-        width: flex-grid(8,8);
+      .deco-ribbon {
+        position: relative;
+        top: -($baseline*2.5);
+        right: -($baseline*0.35);
+        float: right;
+        display: block;
+        width: ($baseline*2.9);
+        height: ($baseline*4.2);
       }
 
       .list-actions {
-        width: flex-grid(8,8);
+        margin: ($baseline) 0;
       }
 
       .action-select input {
@@ -1269,17 +1266,12 @@
 
       .deco-ribbon {
         position: absolute;
-        top: -($baseline*1.5);
+        top: -10px;
         right: $baseline;
         display: block;
-        width: ($baseline*3);
-        height: ($baseline*4);
-        background: transparent url('../images/vcert-ribbon-s.png') no-repeat 0 0;
-      }
-
-      .list-actions {
-        margin: ($baseline/2) 0;
-        border-top: ($baseline/10) solid $m-gray-t1;
+        width: 45px;
+        height: 45px;
+        background: transparent url('../images/verified-ribbon.png') no-repeat 0 0;
       }
 
       .action-intro, .action-select {
@@ -1288,13 +1280,9 @@
       }
 
       .action-intro {
+        @include fill-parent;
         @extend %copy-detail;
-        width: flex-grid(3,8);
         text-align: left;
-      }
-
-      .action-select {
-        width: flex-grid(5,8);
       }
 
       .action-select input {
@@ -1319,7 +1307,7 @@
     }
 
     .help-register {
-      width: flex-grid(4,12);
+      @include span-columns(4);
 
       .title {
         @extend %hd-lv4;
@@ -1351,9 +1339,16 @@
 
     .contribution-options {
       @include clearfix();
-      margin: $baseline 0;
+      @include fill-parent;
+      margin: 0;
+
+      &:after{
+        clear: none;
+        display: none;
+      }
 
       .field {
+        @include fill-parent;
         float: left;
         margin: 0 ($baseline/2) ($baseline/2) 0;
         padding: ($baseline/2) ($baseline*0.75);
@@ -1392,37 +1387,63 @@
         }
       }
     }
-  }
 
-  // CASE: select a track - experiment variant A overrides
-  .wrapper-register-choose.exp-variant-A {
+    @include media(min-width 550px max-width 768px) {
+      .contribution-options {
+        .field {
+          @include span-columns(6);
 
-    .register-choice {
-      width: flex-grid(12,12);
-    }
+          &:nth-of-type(even) {
+            margin-right: 0;
+          }
+        }
+      }
 
-    .deco-divider{
-      width: flex-grid(12,12);
-    }
+      .register-choice {
+        .list-actions {
+          float: left;
+          width: auto;
+        }
 
-    .contribution-options {
-      width: flex-grid(8,12);
-      margin: 0;
+        .action-select {
+          width: initial;
 
-      &:after{
-        clear: none;
-        display: none;
+          input {
+            width: initial;
+          }
+        }
       }
     }
 
-    .register-choice-certificate .list-actions {
-      border-top: none;
-      width: flex-grid(4,12);
-      float: right;
-      margin: ($baseline/4) 0;
+    @include media( $desktop ) {
+      .contribution-options {
+        .field {
+          width: auto;
+        }
+      }
 
-      .action-select {
-        width: initial;
+      .register-choice {
+        .list-actions {
+          @include span-columns(4);
+          width: auto;
+        }
+
+        .action-select {
+          width: initial;
+
+          input {
+            width: initial;
+          }
+        }
+      }
+    }
+
+    @include media( $xl-desktop ) {
+      .register-choice {
+        .list-actions {
+          float: right;
+          clear: none;
+        }
       }
     }
   }
@@ -1496,15 +1517,15 @@
             color: $white;
           }
 
-          .icon-over, .icon-under {
+          .fa-stack-1x, .fa-stack-2x {
             position: relative;
           }
 
-          .icon-under {
+          .fa-stack-2x {
             @extend %ui-depth1;
           }
 
-          .icon-over {
+          .fa-stack-1x {
             @extend %ui-depth2;
             @extend %t-icon5;
             position: absolute;
@@ -1512,6 +1533,26 @@
             top: 34px;
             background: $verified-color-lvl3;
             padding: 3px 5px;
+          }
+
+          .id-photo {
+            width: 23px;
+            padding: 3px 0;
+          }
+
+          &.old-id-card {
+            width: 88px;
+            height: 88px;
+
+            .fa-list-alt {
+              left: -7px;
+            }
+
+            .id-photo {
+              top: 13px;
+              left: -3px;
+              line-height: 1.1em;
+            }
           }
         }
 
@@ -1670,7 +1711,7 @@
     }
 
     .modal.edit-name .submit input {
-      color: #fff;
+      color: $white;
     }
 
     .modal {
@@ -1930,7 +1971,7 @@
 
         .item {
           box-shadow: 0 2px 5px 0 $shadow-l1 inset;
-          margin: ($baseline*.75) ($baseline*.75) ($baseline*.75) 0;
+          margin: ($baseline*0.75) ($baseline*0.75) ($baseline*0.75) 0;
           border: 1px solid $m-gray-t2;
 
           &.complete {
@@ -1993,7 +2034,7 @@
 
         .course-info {
           margin-bottom: ($baseline/2);
-          padding: ($baseline/2) ($baseline*.75);
+          padding: ($baseline/2) ($baseline*0.75);
         }
 
         .course-name {
@@ -2010,7 +2051,7 @@
 
         .reverify-status {
           background-color: $light-gray;
-          padding: ($baseline/2) ($baseline*.75);
+          padding: ($baseline/2) ($baseline*0.75);
         }
       }
 
@@ -2129,7 +2170,7 @@
               @extend %btn-primary-blue;
               padding: ($baseline/2) ($baseline*0.75);
 
-              *[class^="icon-"] {
+              .icon {
                 @extend %t-icon4;
                 padding: ($baseline*.25) ($baseline*.5);
                 display: block;
@@ -2162,8 +2203,8 @@
             left: ($baseline/2);
           }
 
-          // control - take/do
-          .control-do {
+          // control - take/do, retake
+          .control-do, .control-retake {
             left: 45%;
           }
 
@@ -2194,7 +2235,7 @@
             .action-retakephotos a {
               @extend %btn-primary-blue;
               @include font-size(14);
-              padding: ($baseline/2) ($baseline*.75);
+              padding: ($baseline/2) ($baseline*0.75);
             }
           }
         }
@@ -2251,13 +2292,13 @@
           .action-editname a {
             @extend %btn-primary-blue;
             @include font-size(14);
-            padding: ($baseline/2) ($baseline*.75);
+            padding: ($baseline/2) ($baseline*0.75);
           }
         }
       }
 
       .nav-wizard {
-        padding: ($baseline*.75) $baseline;
+        padding: ($baseline*0.75) $baseline;
 
         .prompt-verify {
           float: left;

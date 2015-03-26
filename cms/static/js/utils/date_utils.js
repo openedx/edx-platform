@@ -25,8 +25,19 @@ define(["jquery", "date", "jquery.ui", "jquery.timepicker"], function($, date) {
         }
     };
 
+    var renderDate = function(dateArg) {
+        // Render a localized date from an argument that can be passed to
+        // the Date constructor (e.g. another Date or an ISO 8601 string)
+        var date = new Date(dateArg);
+        return date.toLocaleString(
+            [],
+            {timeZone: "UTC", timeZoneName: "short"}
+        );
+    };
+
     return {
         getDate: getDate,
-        setDate: setDate
+        setDate: setDate,
+        renderDate: renderDate
     };
 });

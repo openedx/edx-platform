@@ -1,6 +1,6 @@
-define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers", "js/views/course_rerun",
+define(["jquery", "js/common_helpers/ajax_helpers", "js/spec_helpers/view_helpers", "js/views/course_rerun",
         "js/views/utils/create_course_utils", "js/views/utils/view_utils", "jquery.simulate"],
-    function ($, create_sinon, view_helpers, CourseRerunUtils, CreateCourseUtilsFactory, ViewUtils) {
+    function ($, AjaxHelpers, ViewHelpers, CourseRerunUtils, CreateCourseUtilsFactory, ViewUtils) {
         describe("Create course rerun page", function () {
             var selectors = {
                     org: '.rerun-course-org',
@@ -26,7 +26,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 },
                 mockCreateCourseRerunHTML = readFixtures('mock/mock-create-course-rerun.underscore');
 
-            var CreateCourseUtils = CreateCourseUtilsFactory(selectors, classes);
+            var CreateCourseUtils = new CreateCourseUtilsFactory(selectors, classes);
 
             var fillInFields = function (org, number, run, name) {
                 $(selectors.org).val(org);
@@ -36,25 +36,25 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
             };
 
             beforeEach(function () {
-                view_helpers.installMockAnalytics();
+                ViewHelpers.installMockAnalytics();
                 window.source_course_key = 'test_course_key';
                 appendSetFixtures(mockCreateCourseRerunHTML);
                 CourseRerunUtils.onReady();
             });
 
             afterEach(function () {
-                view_helpers.removeMockAnalytics();
+                ViewHelpers.removeMockAnalytics();
                 delete window.source_course_key;
             });
 
             describe("Field validation", function () {
                 it("returns a message for an empty string", function () {
-                    var message = CreateCourseUtils.validateRequiredField('');
+                    var message = ViewUtils.validateRequiredField('');
                     expect(message).not.toBe('');
                 });
 
                 it("does not return a message for a non empty string", function () {
-                    var message = CreateCourseUtils.validateRequiredField('edX');
+                    var message = ViewUtils.validateRequiredField('edX');
                     expect(message).toBe('');
                 });
             });
@@ -62,7 +62,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
             describe("Error messages", function () {
                 var setErrorMessage = function(selector, message) {
                     var element = $(selector).parent();
-                    CreateCourseUtils.setNewCourseFieldInErr(element, message);
+                    CreateCourseUtils.setFieldInErr(element, message);
                     return element;
                 };
 
@@ -156,11 +156,11 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
             });
 
             it("saves course reruns", function () {
-                var requests = create_sinon.requests(this);
+                var requests = AjaxHelpers.requests(this);
                 var redirectSpy = spyOn(ViewUtils, 'redirect')
                 fillInFields('DemoX', 'DM101', '2014', 'Demo course');
                 $(selectors.save).click();
-                create_sinon.expectJsonRequest(requests, 'POST', '/course/', {
+                AjaxHelpers.expectJsonRequest(requests, 'POST', '/course/', {
                     source_course_key: 'test_course_key',
                     org: 'DemoX',
                     number: 'DM101',
@@ -170,17 +170,17 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 expect($(selectors.save)).toHaveClass(classes.disabled);
                 expect($(selectors.save)).toHaveClass(classes.processing);
                 expect($(selectors.cancel)).toHaveClass(classes.hidden);
-                create_sinon.respondWithJson(requests, {
+                AjaxHelpers.respondWithJson(requests, {
                     url: 'dummy_test_url'
                 });
                 expect(redirectSpy).toHaveBeenCalledWith('dummy_test_url');
             });
 
             it("displays an error when saving fails", function () {
-                var requests = create_sinon.requests(this);
+                var requests = AjaxHelpers.requests(this);
                 fillInFields('DemoX', 'DM101', '2014', 'Demo course');
                 $(selectors.save).click();
-                create_sinon.respondWithJson(requests, {
+                AjaxHelpers.respondWithJson(requests, {
                     ErrMsg: 'error message'
                 });
                 expect($(selectors.errorWrapper)).not.toHaveClass(classes.hidden);
@@ -190,7 +190,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
             });
 
             it("does not save if there are validation errors", function () {
-                var requests = create_sinon.requests(this);
+                var requests = AjaxHelpers.requests(this);
                 fillInFields('DemoX', 'DM101', '', 'Demo course');
                 $(selectors.save).click();
                 expect(requests.length).toBe(0);

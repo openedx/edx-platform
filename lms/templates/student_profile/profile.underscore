@@ -1,0 +1,14 @@
+<form id="profile-form">
+    <label for="profile-name"><%- gettext("Full Name") %></label>
+    <input id="profile-name" type="text" name="profile-name" value="" placeholder="Xsy" />
+    <div id="profile-name-status" />
+
+    <label for="preference-language"><%- gettext('Preferred Language') %></label>
+    <select id="preference-language" name="preference-language"></select>
+    <div id="preference-language-status" />
+
+    <div class="profile-submit">
+        <input type="submit" id="submit-button" value="<%- gettext('Update Profile') %>">
+    </div>
+    <div id="submit-status" />
+</form>

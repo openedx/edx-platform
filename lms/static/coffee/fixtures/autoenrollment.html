@@ -1,0 +1,20 @@
+<div class="auto_enroll auto_enroll_csv">
+  <h2> ${_("Register/Enroll Students")} </h2>
+
+  <p>
+    ${_("To register and enroll a list of users in this course, choose a CSV file that contains the following columns in this exact order: email, username, name, and country. Please include one student per row and do not include any headers, footers, or blank lines.")}
+  </p>
+
+  <form id="student-auto-enroll-form">
+    <div class="customBrowseBtn">
+      <input disabled="disabled" id="browseFile" placeholder="choose file"/>
+
+      <div class="file-browse btn btn-primary">
+        <span class="browse"> Browse </span>
+        <input class="file_field" id="browseBtn" name="students_list" type="file" accept=".csv"/>
+      </div>
+    </div>
+    <button type="submit" name="enrollment_signup_button">${_("Upload CSV")}</button>
+  </form>
+  <div class="results"></div>
+</div>
