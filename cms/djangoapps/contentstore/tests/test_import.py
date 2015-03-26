@@ -11,6 +11,7 @@ from django.conf import settings
 import ddt
 import copy
 
+from openedx.core.djangoapps.content.course_structures.tests import SignalDisconnectTestMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -28,7 +29,7 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 @ddt.ddt
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
-class ContentStoreImportTest(ModuleStoreTestCase):
+class ContentStoreImportTest(SignalDisconnectTestMixin, ModuleStoreTestCase):
     """
     Tests that rely on the toy and test_import_course courses.
     NOTE: refactor using CourseFactory so they do not.
