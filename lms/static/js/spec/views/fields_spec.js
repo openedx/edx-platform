@@ -19,6 +19,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 FieldViews.TextFieldView,
                 FieldViews.DropdownFieldView,
                 FieldViews.LinkFieldView,
+                FieldViews.TextareaFieldView
+
             ];
 
             beforeEach(function () {
@@ -26,6 +28,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 TemplateHelpers.installTemplate('templates/fields/field_dropdown');
                 TemplateHelpers.installTemplate('templates/fields/field_link');
                 TemplateHelpers.installTemplate('templates/fields/field_text');
+                TemplateHelpers.installTemplate('templates/fields/field_textarea');
 
                 timerCallback = jasmine.createSpy('timerCallback');
                 jasmine.Clock.useMock();
@@ -55,7 +58,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                         title: 'Username',
                         valueAttribute: 'username',
                         helpMessage: 'The username that you use to sign in to edX.'
-                    })
+                    });
 
                     var view = new fieldViewClass(fieldData).render();
                     FieldViewsSpecHelpers.verifySuccessMessageReset(view, fieldData, timerCallback);
@@ -66,7 +69,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 requests = AjaxHelpers.requests(this);
 
-                var fieldViewClass = FieldViews.FieldView;
+                var fieldViewClass = FieldViews.EditableFieldView;
                 var fieldData = FieldViewsSpecHelpers.createFieldData(fieldViewClass, {
                     title: 'Preferred Language',
                     valueAttribute: 'language',
@@ -156,6 +159,35 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 FieldViewsSpecHelpers.expectTitleAndMessageToBe(view, fieldData.title, fieldData.helpMessage);
                 expect(view.$('.u-field-value > a').text().trim()).toBe(fieldData.linkTitle);
             });
-        });
 
+            it("correctly renders TextAreaFieldView with edit mode", function() {
+                var fieldData = createFieldData(FieldViews.TextareaFieldView, {
+                    title: 'About me',
+                    valueAttribute: 'bio',
+                    helpMessage: 'Wicked is good'
+                });
+                var view = new FieldViews.TextareaFieldView(fieldData).render();
+
+                expectTitleAndMessageToBe(view, fieldData.title, fieldData.helpMessage);
+                expect(view.$('.u-field-value > textarea').val()).toBe(BIO);
+            });
+
+            it("correctly renders TextAreaFieldView with display mode", function() {
+                var fieldData = createFieldData(FieldViews.TextareaFieldView, {
+                    title: 'About me',
+                    valueAttribute: 'bio',
+                    helpMessage: 'Wicked is good',
+                    placeholderValue: "Tell other edX learners a little about yourself: where you live, what your interests are, why you’re taking courses on edX, or what you hope to learn."
+                });
+                // set bio to empty to see the placeholder.
+                fieldData.model.set({bio: ''});
+                var fieldObject = new FieldViews.TextareaFieldView(fieldData);
+                fieldObject.showDisplayMode();
+
+                var view = fieldObject.render();
+                expectTitleAndMessageToBe(view, fieldData.title, fieldData.helpMessage);
+                expect(view.$('.u-field-value').text()).toBe(fieldData.placeholderValue);
+            });
+
+        });
     });
