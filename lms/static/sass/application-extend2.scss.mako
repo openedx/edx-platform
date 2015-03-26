@@ -46,6 +46,7 @@
 
 // base - specific views
 @import "views/account-settings";
+@import "views/learner-profile";
 @import 'views/login-register';
 @import 'views/verification';
 @import 'views/decoupled-verification';
