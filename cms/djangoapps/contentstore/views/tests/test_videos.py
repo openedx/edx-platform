@@ -315,6 +315,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             self.assertEqual(val_info["client_video_id"], file_info["file_name"])
             self.assertEqual(val_info["status"], "upload")
             self.assertEqual(val_info["duration"], 0)
+            self.assertEqual(val_info["courses"], [unicode(self.course.id)])
 
             # Ensure response is correct
             response_file = response_obj["files"][i]
