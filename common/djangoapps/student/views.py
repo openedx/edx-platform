@@ -500,7 +500,7 @@ def courses_allow_unenroll(courses):
             ca = CourseAllowUnenroll.objects.get(course_id=enrollment.course_id)
         except CourseAllowUnenroll.DoesNotExist:
             flag = False
-        res.update({ca.course_id: flag})
+        res.update({enrollment.course_id: flag})
     return res
 
 @login_required
