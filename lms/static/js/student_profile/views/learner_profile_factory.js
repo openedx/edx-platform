@@ -5,9 +5,10 @@
         'js/student_account/models/user_account_model',
         'js/student_account/models/user_preferences_model',
         'js/views/fields',
+        'js/student_profile/views/learner_profile_fields',
         'js/student_profile/views/learner_profile_view'
     ], function (gettext, $, _, Backbone, AccountSettingsModel, AccountPreferencesModel, FieldsView,
-                 LearnerProfileView) {
+                 LearnerProfileFieldsView, LearnerProfileView) {
 
         return function (options) {
 
@@ -23,7 +24,7 @@
 
             var editable = options['own_profile'] ? 'toggle' : 'never';
 
-            var accountPrivacyFieldView = new FieldsView.AccountPrivacyFieldView({
+            var accountPrivacyFieldView = new LearnerProfileFieldsView.AccountPrivacyFieldView({
                 model: accountPreferencesModel,
                 required: true,
                 editable: 'always',
@@ -37,14 +38,15 @@
                 helpMessage: '',
                 accountSettingsPageUrl: options['account_settings_page_url']
             });
+
             var usernameFieldView = new FieldsView.ReadonlyFieldView({
                     model: accountSettingsModel,
                     valueAttribute: "username",
                     helpMessage: ""
             });
+
             var sectionOneFieldViews = [
                 usernameFieldView,
-
                 new FieldsView.DropdownFieldView({
                     model: accountSettingsModel,
                     required: true,
@@ -56,7 +58,6 @@
                     options: options['country_options'],
                     helpMessage: ''
                 }),
-
                 new FieldsView.DropdownFieldView({
                     model: accountSettingsModel,
                     required: false,

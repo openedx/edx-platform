@@ -3,10 +3,11 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
         'js/views/fields',
         'js/student_account/models/user_account_model',
         'js/student_account/models/user_preferences_model',
+        'js/student_profile/views/learner_profile_fields',
         'js/student_profile/views/learner_profile_view'
        ],
     function (Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, FieldViews, UserAccountModel,
-                AccountPreferencesModel, LearnerProfileView) {
+                AccountPreferencesModel, LearnerProfileFields, LearnerProfileView) {
         'use strict';
 
         describe("edx.user.LearnerProfileView", function (options) {
@@ -24,7 +25,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 var editable = ownProfile ? 'toggle' : 'never';
 
-                var accountPrivacyFieldView = new FieldViews.AccountPrivacyFieldView({
+                var accountPrivacyFieldView = new LearnerProfileFields.AccountPrivacyFieldView({
                     model: accountPreferencesModel,
                     required: true,
                     editable: 'always',

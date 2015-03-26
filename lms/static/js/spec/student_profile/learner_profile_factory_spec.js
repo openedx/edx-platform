@@ -4,10 +4,11 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
         'js/student_account/models/user_account_model',
         'js/student_account/models/user_preferences_model',
         'js/student_profile/views/learner_profile_view',
+        'js/student_profile/views/learner_profile_fields',
         'js/student_profile/views/learner_profile_factory'
         ],
     function (Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, FieldViews, UserAccountModel, UserPreferencesModel,
-              LearnerProfileView, LearnerProfilePage) {
+              LearnerProfileView, LearnerProfileFields, LearnerProfilePage) {
         'use strict';
 
         describe("edx.user.LearnerProfileFactory", function () {
