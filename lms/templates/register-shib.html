@@ -72,7 +72,7 @@
         $submitButton.
           removeClass('is-disabled').
           removeProp('disabled').
-          text("${_('Update my {platform_name} Account').format(platform_name=settings.PLATFORM_NAME)}");
+          text("${_('Update my {account_name} Account').format(account_name=settings.ACCOUNT_NAME)}");
       }
       else {
         $submitButton.
