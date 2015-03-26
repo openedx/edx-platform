@@ -1040,6 +1040,7 @@ def accounts_login(request):
         'pipeline_running': 'false',
         'pipeline_url': auth_pipeline_urls(pipeline.AUTH_ENTRY_LOGIN, redirect_url=redirect_to),
         'platform_name': settings.PLATFORM_NAME,
+        'account_name': settings.ACCOUNT_NAME,
     }
     return render_to_response('login.html', context)
 
