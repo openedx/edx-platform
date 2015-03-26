@@ -5,6 +5,36 @@
 .u-field {
     padding: $baseline 0;
     border-bottom: 1px solid $gray-l5;
+    border: 1px dashed transparent;
+    border-radius: 3px;
+
+    &.mode-placeholder:hover {
+        border: 2px dashed $link-color;
+    }
+
+    &.editable-toggle.mode-display:hover {
+        background-color: $m-blue-l4;
+        border-radius: 3px;
+
+        .message-can-edit {
+            display: inline-block;
+            color: $link-color;
+        }
+
+    }
+
+    &.mode-hidden {
+        display: none;
+    }
+
+    i {
+      color: $gray;
+      vertical-align:text-bottom
+    }
+
+    .message-can-edit {
+        display: none;
+    }
 
     .message-error {
         color: $alert-color;
@@ -33,10 +63,14 @@
     }
 }
 
+.u-field-icon {
+    width: $baseline;
+}
+
 .u-field-title {
     width: flex-grid(3, 12);
     display: inline-block;
-    color: $dark-gray1;
+    color: $gray-l1;
     vertical-align: top;
     margin-bottom: 0;
     pointer-events: none
@@ -57,12 +91,12 @@
 }
 
 .u-field-message {
-    @extend small;
+    @extend %t-copy-sub1;
     @include padding-left($baseline/2);
     width: flex-grid(6, 12);
     display: inline-block;
     vertical-align: top;
-    color: $dark-gray1;
+    color: $gray-l1;
 
     i {
         @include margin-right($baseline/4);

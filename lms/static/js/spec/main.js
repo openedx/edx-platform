@@ -89,6 +89,8 @@
             'js/student_account/views/RegisterView': 'js/student_account/views/RegisterView',
             'js/student_account/views/AccessView': 'js/student_account/views/AccessView',
             'js/student_profile/profile': 'js/student_profile/profile',
+            'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory',
+            'js/student_profile/views/learner_profile_view': 'js/student_profile/views/learner_profile_view',
 
             // edxnotes
             'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min'
@@ -589,6 +591,8 @@
         'lms/include/js/spec/student_account/account_settings_view_spec.js',
         'lms/include/js/spec/student_profile/profile_spec.js',
         'lms/include/js/spec/views/fields_spec.js',
+        'lms/include/js/spec/student_profile/learner_profile_factory_spec.js',
+        'lms/include/js/spec/student_profile/learner_profile_view_spec.js',
         'lms/include/js/spec/verify_student/pay_and_verify_view_spec.js',
         'lms/include/js/spec/verify_student/webcam_photo_view_spec.js',
         'lms/include/js/spec/verify_student/image_input_spec.js',

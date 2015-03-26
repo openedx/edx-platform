@@ -15,6 +15,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 FieldViews.TextFieldView,
                 FieldViews.DropdownFieldView,
                 FieldViews.LinkFieldView,
+                FieldViews.TextareaFieldView
+
             ];
 
             var USERNAME = 'Legolas',
@@ -27,7 +29,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 GOALS = '',
                 LEVEL_OF_EDUCATION = null,
                 MAILING_ADDRESS = '',
-                YEAR_OF_BIRTH = null;
+                YEAR_OF_BIRTH = null,
+                BIO = "My Name is Theon Greyjoy. I'm member of House Greyjoy";
 
             var USER_ACCOUNT_API_URL = '/api/user/v0/accounts/user';
 
@@ -44,7 +47,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     goals: data.goals || GOALS,
                     level_of_education: data.level_of_education || LEVEL_OF_EDUCATION,
                     mailing_address: data.mailing_address || MAILING_ADDRESS,
-                    year_of_birth: data.year_of_birth || YEAR_OF_BIRTH
+                    year_of_birth: data.year_of_birth || YEAR_OF_BIRTH,
+                    bio: data.bio || BIO
                 };
                 var model = new UserAccountModel(data);
                 model.url = USER_ACCOUNT_API_URL;
@@ -56,7 +60,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     model: fieldData.model || createMockUserAccountModel({}),
                     title: fieldData.title || 'Field Title',
                     valueAttribute: fieldData.valueAttribute,
-                    helpMessage: fieldData.helpMessage || 'I am a field message'
+                    helpMessage: fieldData.helpMessage || 'I am a field message',
+                    placeholderValue: fieldData.placeholderValue || 'I am a placeholder message'
                 };
 
                 switch (fieldType) {
@@ -105,6 +110,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 TemplateHelpers.installTemplate('templates/fields/field_dropdown');
                 TemplateHelpers.installTemplate('templates/fields/field_link');
                 TemplateHelpers.installTemplate('templates/fields/field_text');
+                TemplateHelpers.installTemplate('templates/fields/field_textarea');
 
                 timerCallback = jasmine.createSpy('timerCallback');
                 jasmine.Clock.useMock();
@@ -132,9 +138,20 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     expectMessageContains(view, view.indicators['inProgress']);
                     expectMessageContains(view, view.messages['inProgress']);
 
-                    view.showSuccessMessage();
-                    expectMessageContains(view, view.indicators['success']);
-                    expectMessageContains(view, view.getMessage('success'));
+                    if (view.fieldType === 'textarea') {
+                        expect(view.$('textarea').length).toBe(1);
+                        expect(view.el).toHaveClass("mode-edit");
+
+                        view.showSuccessMessage();
+
+                        expect(view.el).not.toHaveClass("mode-edit");
+                        expect(view.$('textarea').length).toBe(0);
+                    }
+                    else {
+                        view.showSuccessMessage();
+                        expectMessageContains(view, view.indicators['success']);
+                        expectMessageContains(view, view.getMessage('success'));
+                    }
 
                     expect(timerCallback).not.toHaveBeenCalled();
 
@@ -151,13 +168,16 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             });
 
             it("resets to help message some time after success message is set", function() {
-                for (var i=0; i<fieldViewClasses.length; i++) {
-                    var fieldViewClass = fieldViewClasses[i];
+                var updatedFielViewClasses = fieldViewClasses;
+                updatedFielViewClasses.pop();
+
+                for (var i=0; i<updatedFielViewClasses.length; i++) {
+                    var fieldViewClass = updatedFielViewClasses[i];
                     var fieldData = createFieldData(fieldViewClass, {
                         title: 'Username',
                         valueAttribute: 'username',
                         helpMessage: 'The username that you use to sign in to edX.'
-                    })
+                    });
 
                     var view = new fieldViewClass(fieldData).render();
 
@@ -182,7 +202,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 requests = AjaxHelpers.requests(this);
 
-                var fieldViewClass = FieldViews.FieldView;
+                var fieldViewClass = FieldViews.EditableFieldView;
                 var fieldData = createFieldData(fieldViewClass, {
                     title: 'Preferred Language',
                     valueAttribute: 'language',
@@ -278,7 +298,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     // When server returns success.
                     expectMessageContains(view, view.indicators['success']);
 
-                    view.$(selector).val(data.name).change();
+                    view.$(selector).val(data.name + 'with error').change();
                     AjaxHelpers.respondWithError(requests, 500);
                     // When server returns a 500 error
                     expectMessageContains(view, view.indicators['error']);
@@ -302,5 +322,35 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 expectTitleAndMessageToBe(view, fieldData.title, fieldData.helpMessage);
                 expect(view.$('.u-field-value > a').text().trim()).toBe(fieldData.linkTitle);
             });
+
+            it("correctly renders TextAreaFieldView with edit mode", function() {
+                var fieldData = createFieldData(FieldViews.TextareaFieldView, {
+                    title: 'About me',
+                    valueAttribute: 'bio',
+                    helpMessage: 'Wicked is good'
+                });
+                var view = new FieldViews.TextareaFieldView(fieldData).render();
+
+                expectTitleAndMessageToBe(view, fieldData.title, fieldData.helpMessage);
+                expect(view.$('.u-field-value > textarea').val()).toBe(BIO);
+            });
+
+            it("correctly renders TextAreaFieldView with display mode", function() {
+                var fieldData = createFieldData(FieldViews.TextareaFieldView, {
+                    title: 'About me',
+                    valueAttribute: 'bio',
+                    helpMessage: 'Wicked is good',
+                    placeholderValue: "Tell other edX learners a little about yourself: where you live, what your interests are, why you’re taking courses on edX, or what you hope to learn."
+                });
+                // set bio to empty to see the placeholder.
+                fieldData.model.set({bio: ''});
+                var fieldObject = new FieldViews.TextareaFieldView(fieldData);
+                fieldObject.showDisplayMode();
+
+                var view = fieldObject.render();
+                expectTitleAndMessageToBe(view, fieldData.title, fieldData.helpMessage);
+                expect(view.$('.u-field-value').text()).toBe(fieldData.placeholderValue);
+            });
+
         });
     });

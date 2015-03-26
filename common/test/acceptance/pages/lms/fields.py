@@ -11,6 +11,40 @@ class FieldsMixin(object):
     """
     Methods for testing fields in pages.
     """
+    def mode_for_field(self, field_id):
+        """
+        Extract current field mode.
+
+        Returns:
+            `placeholder`/`edit`/`display`
+        """
+        self.wait_for_ajax()
+
+        query = self.q(css='.u-field-{}'.format(field_id))
+
+        if not query.present:
+            return None
+
+        field_classes = query.attrs('class')[0].split()
+
+        if 'mode-placeholder' in field_classes:
+            return 'placeholder'
+
+        if 'mode-display' in field_classes:
+            return 'display'
+
+        if 'mode-edit' in field_classes:
+            return 'edit'
+
+    def icon_for_field(self, field_id, icon_id):
+        """
+        Check if field icon is present.
+        """
+        self.wait_for_ajax()
+
+        query = self.q(css='.u-field-{} .u-field-icon'.format(field_id))
+        return query.present and icon_id in query.attrs('class')[0].split()
+
     def title_for_field(self, field_id):
         """
         Return the title of a field.
@@ -60,6 +94,23 @@ class FieldsMixin(object):
             "Indicator \"{0}\" is visible.".format(self.indicator_for_field(field_id))
         ).fulfill()
 
+    def make_field_editable(self, field_id):
+        """
+        Make a field editable.
+        """
+        query = self.q(css='.u-field-{}'.format(field_id))
+
+        if not query.present:
+            return None
+
+        field_classes = query.attrs('class')[0].split()
+
+        if 'mode-placeholder' in field_classes or 'mode-display' in field_classes:
+            if field_id == 'bio':
+                self.q(css='.u-field-bio > .wrapper-u-field').first.click()
+            else:
+                self.q(css='.u-field-{}'.format(field_id)).first.click()
+
     def value_for_readonly_field(self, field_id):
         """
         Return the value in a readonly field.
@@ -85,11 +136,42 @@ class FieldsMixin(object):
             query.results[0].send_keys(u'\ue007')  # Press Enter
         return query.attrs('value')[0]
 
+    def value_for_textarea_field(self, field_id, value=None):
+        """
+        Get or set the value of a textarea field.
+        """
+        self.wait_for_ajax()
+
+        self.make_field_editable(field_id)
+
+        query = self.q(css='.u-field-{} textarea'.format(field_id))
+        if not query.present:
+            return None
+
+        if value is not None:
+            query.fill(value)
+            query.results[0].send_keys(u'\ue004')  # Focus Out using TAB
+
+        if self.mode_for_field(field_id) == 'edit':
+            return query.text[0]
+        else:
+            return self.get_non_editable_mode_value(field_id)
+
+    def get_non_editable_mode_value(self, field_id):
+        """
+        Return value of field in `display` or `placeholder` mode.
+        """
+        self.wait_for_ajax()
+
+        return self.q(css='.u-field-{} .u-field-value'.format(field_id)).text[0]
+
     def value_for_dropdown_field(self, field_id, value=None):
         """
         Get or set the value in a dropdown field.
         """
         self.wait_for_ajax()
+
+        self.make_field_editable(field_id)
 
         query = self.q(css='.u-field-{} select'.format(field_id))
         if not query.present:
@@ -97,7 +179,11 @@ class FieldsMixin(object):
 
         if value is not None:
             select_option_by_text(query, value)
-        return get_selected_option_text(query)
+
+        if self.mode_for_field(field_id) == 'edit':
+            return get_selected_option_text(query)
+        else:
+            return self.get_non_editable_mode_value(field_id)
 
     def link_title_for_link_field(self, field_id):
         """
