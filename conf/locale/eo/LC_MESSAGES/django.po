@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-01-05 10:10-0500\n"
-"PO-Revision-Date: 2015-01-05 15:10:55.806837\n"
+"POT-Creation-Date: 2015-03-26 14:59+0000\n"
+"PO-Revision-Date: 2015-03-26 14:59:54.038139\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -55,6 +55,11 @@ msgstr ""
 #: cms/djangoapps/contentstore/utils.py common/lib/xmodule/xmodule/tabs.py
 msgid "Open Ended Panel"
 msgstr "Öpén Éndéd Pänél Ⱡ'σ#"
+
+#: cms/djangoapps/contentstore/utils.py common/lib/xmodule/xmodule/tabs.py
+#: lms/templates/edxnotes/edxnotes.html
+msgid "Notes"
+msgstr "Nötés Ⱡ'σяєм ι#"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: "Discussion" is the title of the course forum page
@@ -99,6 +104,69 @@ msgstr "Süßséçtïön Ⱡ#"
 msgid "Unit"
 msgstr "Ûnït Ⱡ'σяєм#"
 
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This is the status for a video that the servers have
+#. successfully processed
+#: cms/djangoapps/contentstore/views/videos.py
+#: lms/djangoapps/instructor/views/instructor_task_helpers.py
+#: lms/templates/verify_student/midcourse_reverify_dash.html
+msgid "Complete"
+msgstr "Çömplété #"
+
+#: cms/djangoapps/contentstore/views/videos.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/instructor/views/api.py lms/templates/help_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/receipt.html
+msgid "Name"
+msgstr "Nämé Ⱡ'σяєм#"
+
+#: cms/djangoapps/contentstore/views/videos.py
+#: lms/djangoapps/shoppingcart/reports.py
+#: lms/templates/open_ended_problems/open_ended_problems.html
+#: lms/templates/shoppingcart/receipt.html
+#: lms/templates/shoppingcart/verified_cert_receipt.html
+msgid "Status"
+msgstr "Stätüs Ⱡ'σяєм ιρѕ#"
+
+#: common/djangoapps/cities/models.py common/djangoapps/cities/models.py
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "Code"
+msgstr "Çödé Ⱡ'σяєм#"
+
+#: common/djangoapps/cities/models.py lms/templates/shoppingcart/receipt.html
+msgid "State"
+msgstr "Stäté Ⱡ'σяєм ι#"
+
+#: common/djangoapps/cities/models.py
+msgid "States"
+msgstr "Stätés Ⱡ'σяєм ιρѕ#"
+
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the city in which they live.
+#: common/djangoapps/cities/models.py
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
+#: lms/templates/register.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/receipt.html
+msgid "City"
+msgstr "Çïtý Ⱡ'σяєм#"
+
+#: common/djangoapps/cities/models.py
+msgid "Cities"
+msgstr "Çïtïés Ⱡ'σяєм ιρѕ#"
+
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
 msgstr "Hönör Çödé Çértïfïçäté Ⱡ'σяє#"
@@ -133,6 +201,7 @@ msgid "Community TA"
 msgstr "Çömmünïtý TÀ Ⱡ#"
 
 #: common/djangoapps/django_comment_common/models.py
+#: lms/templates/courseware/course_navigation.html
 msgid "Student"
 msgstr "Stüdént #"
 
@@ -190,11 +259,21 @@ msgstr "Jünïör séçöndärý/jünïör hïgh/mïddlé sçhööl Ⱡ'σяєм
 msgid "Elementary/primary school"
 msgstr "Éléméntärý/prïmärý sçhööl Ⱡ'σяєм#"
 
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: 'None' refers to the student's level of education
 #: common/djangoapps/student/models.py
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
 msgid "None"
 msgstr "Nöné Ⱡ'σяєм#"
+
+#: common/djangoapps/student/validators.py
+msgid "Identificador no debe contener caracteres."
+msgstr "Ìdéntïfïçädör nö déßé çönténér çäräçtérés. Ⱡ'σяєм ιρѕυ#"
+
+#: common/djangoapps/student/validators.py common/djangoapps/student/views.py
+#: common/djangoapps/student/views.py
+msgid "Invalid ID"
+msgstr "Ìnvälïd ÌD Ⱡ#"
 
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
@@ -393,6 +472,10 @@ msgid "You are missing one or more required fields"
 msgstr "Ýöü äré mïssïng öné ör möré réqüïréd fïélds Ⱡ'σяєм ιρѕυм#"
 
 #: common/djangoapps/student/views.py
+msgid "A valid ID is required."
+msgstr "À välïd ÌD ïs réqüïréd. Ⱡ'σяє#"
+
+#: common/djangoapps/student/views.py
 msgid "Username cannot be more than {num} characters long"
 msgstr "Ûsérnämé çännöt ßé möré thän {num} çhäräçtérs löng Ⱡ'σяєм ιρѕυм #"
 
@@ -497,10 +580,6 @@ msgstr ""
 #: common/djangoapps/student/views.py
 msgid "Name required"
 msgstr "Nämé réqüïréd Ⱡ'#"
-
-#: common/djangoapps/student/views.py common/djangoapps/student/views.py
-msgid "Invalid ID"
-msgstr "Ìnvälïd ÌD Ⱡ#"
 
 #. Translators: the translation for "LONG_DATE_FORMAT" must be a format
 #. string for formatting dates in a long form.  For example, the
@@ -866,6 +945,14 @@ msgstr[1] ""
 msgid "Maximum upload file size is {file_size} bytes."
 msgstr "Mäxïmüm üplöäd fïlé sïzé ïs {file_size} ßýtés. Ⱡ'σяєм ιρѕ#"
 
+#: common/djangoapps/util/milestones_helpers.py
+msgid "Course {} requires {}"
+msgstr "Çöürsé {} réqüïrés {} Ⱡ'σя#"
+
+#: common/djangoapps/util/milestones_helpers.py
+msgid "System defined milestone"
+msgstr "Sýstém défïnéd mïléstöné Ⱡ'σяє#"
+
 #: common/djangoapps/util/password_policy_validators.py
 msgid "Invalid Length ({0})"
 msgstr "Ìnvälïd Léngth ({0}) Ⱡ'σя#"
@@ -1027,8 +1114,24 @@ msgid "See XML source line {sourcenum}."
 msgstr "Séé XML söürçé lïné {sourcenum}. Ⱡ'σяє#"
 
 #: common/lib/capa/capa/responsetypes.py
+msgid "JavaScript Input"
+msgstr "JäväSçrïpt Ìnpüt Ⱡ'σ#"
+
+#: common/lib/capa/capa/responsetypes.py
 msgid "Execution of unsafe Javascript code is not allowed."
 msgstr "Éxéçütïön öf ünsäfé Jäväsçrïpt çödé ïs nöt ällöwéd. Ⱡ'σяєм ιρѕυм ∂#"
+
+#: common/lib/capa/capa/responsetypes.py
+#: cms/templates/widgets/problem-edit.html
+#: cms/templates/widgets/problem-edit.html
+msgid "Checkboxes"
+msgstr "Çhéçkßöxés Ⱡ#"
+
+#: common/lib/capa/capa/responsetypes.py
+#: cms/templates/widgets/problem-edit.html
+#: cms/templates/widgets/problem-edit.html
+msgid "Multiple Choice"
+msgstr "Mültïplé Çhöïçé Ⱡ'#"
 
 #. Translators: 'unmask_name' is a method name and should not be translated.
 #: common/lib/capa/capa/responsetypes.py
@@ -1053,6 +1156,22 @@ msgid "Choicegroup must include at least 1 correct and 1 incorrect choice"
 msgstr ""
 "Çhöïçégröüp müst ïnçlüdé ät léäst 1 çörréçt änd 1 ïnçörréçt çhöïçé Ⱡ'σяєм "
 "ιρѕυм ∂σłσя #"
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "True/False Choice"
+msgstr "Trüé/Fälsé Çhöïçé Ⱡ'σ#"
+
+#: common/lib/capa/capa/responsetypes.py
+#: cms/templates/widgets/problem-edit.html
+#: cms/templates/widgets/problem-edit.html
+msgid "Dropdown"
+msgstr "Dröpdöwn #"
+
+#: common/lib/capa/capa/responsetypes.py
+#: cms/templates/widgets/problem-edit.html
+#: cms/templates/widgets/problem-edit.html
+msgid "Numerical Input"
+msgstr "Nümérïçäl Ìnpüt Ⱡ'#"
 
 #: common/lib/capa/capa/responsetypes.py common/lib/capa/capa/responsetypes.py
 msgid "There was a problem with the staff answer to this problem."
@@ -1108,6 +1227,12 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: common/lib/capa/capa/responsetypes.py
+#: cms/templates/widgets/problem-edit.html
+#: cms/templates/widgets/problem-edit.html
+msgid "Text Input"
+msgstr "Téxt Ìnpüt Ⱡ#"
+
+#: common/lib/capa/capa/responsetypes.py
 msgid "error"
 msgstr "érrör Ⱡ'σяєм ι#"
 
@@ -1125,6 +1250,10 @@ msgid "or"
 msgstr "ör Ⱡ'#"
 
 #: common/lib/capa/capa/responsetypes.py
+msgid "Custom Evaluated Script"
+msgstr "Çüstöm Évälüätéd Sçrïpt Ⱡ'σяє#"
+
+#: common/lib/capa/capa/responsetypes.py
 msgid "error getting student answer from {student_answers}"
 msgstr "érrör géttïng stüdént änswér fröm {student_answers} Ⱡ'σяєм ιρѕ#"
 
@@ -1138,6 +1267,10 @@ msgstr ""
 "ÇüstömRéspönsé: çhéçk fünçtïön rétürnéd än ïnvälïd dïçtïönärý! Ⱡ'σяєм ιρѕυм "
 "∂σłσя#"
 
+#: common/lib/capa/capa/responsetypes.py
+msgid "Symbolic Math Input"
+msgstr "Sýmßölïç Mäth Ìnpüt Ⱡ'σя#"
+
 #. Translators: 'SymbolicResponse' is a problem type and should not be
 #. translated.
 #: common/lib/capa/capa/responsetypes.py
@@ -1145,6 +1278,10 @@ msgid "An error occurred with SymbolicResponse. The error was: {error_msg}"
 msgstr ""
 "Àn érrör öççürréd wïth SýmßölïçRéspönsé. Thé érrör wäs: {error_msg} Ⱡ'σяєм "
 "ιρѕυм ∂σłσ#"
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Code Input"
+msgstr "Çödé Ìnpüt Ⱡ#"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "No answer provided."
@@ -1174,6 +1311,14 @@ msgstr ""
 "Ìnvälïd grädér réplý. Pléäsé çöntäçt thé çöürsé stäff. Ⱡ'σяєм ιρѕυм ∂σ#"
 
 #: common/lib/capa/capa/responsetypes.py
+msgid "External Grader"
+msgstr "Éxtérnäl Grädér Ⱡ'#"
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Math Expression Input"
+msgstr "Mäth Éxpréssïön Ìnpüt Ⱡ'σя#"
+
+#: common/lib/capa/capa/responsetypes.py
 msgid "Invalid input: {bad_input} not permitted in answer."
 msgstr "Ìnvälïd ïnpüt: {bad_input} nöt pérmïttéd ïn änswér. Ⱡ'σяєм ιρѕυм#"
 
@@ -1195,6 +1340,10 @@ msgid "Invalid input: Could not parse '{bad_input}' as a formula"
 msgstr ""
 "Ìnvälïd ïnpüt: Çöüld nöt pärsé '{bad_input}' äs ä förmülä Ⱡ'σяєм ιρѕυм ∂#"
 
+#: common/lib/capa/capa/responsetypes.py
+msgid "Circuit Schematic Builder"
+msgstr "Çïrçüït Sçhémätïç Büïldér Ⱡ'σяєм#"
+
 #. Translators: 'SchematicResponse' is a problem type and should not be
 #. translated.
 #: common/lib/capa/capa/responsetypes.py
@@ -1202,6 +1351,10 @@ msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
 msgstr ""
 "Érrör ïn évälüätïng SçhémätïçRéspönsé. Thé érrör wäs: {error_msg} Ⱡ'σяєм "
 "ιρѕυм ∂σł#"
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Image Mapped Input"
+msgstr "Ìmägé Mäppéd Ìnpüt Ⱡ'σ#"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "error grading {image_input_id} (input={user_input})"
@@ -1213,6 +1366,14 @@ msgid "Error in problem specification! Cannot parse rectangle in {sr_coords}"
 msgstr ""
 "Érrör ïn prößlém spéçïfïçätïön! Çännöt pärsé réçtänglé ïn {sr_coords} Ⱡ'σяєм"
 " ιρѕυм ∂σłσя#"
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Annotation Input"
+msgstr "Ànnötätïön Ìnpüt Ⱡ'σ#"
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Checkboxes With Text Input"
+msgstr "Çhéçkßöxés Wïth Téxt Ìnpüt Ⱡ'σяєм#"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Answer not provided for {input_type}"
@@ -1241,13 +1402,14 @@ msgstr "XML dätä för thé ännötätïön Ⱡ'σяєм#"
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/library_content_module.py
 #: common/lib/xmodule/xmodule/lti_module.py
 #: common/lib/xmodule/xmodule/peer_grading_module.py
 #: common/lib/xmodule/xmodule/split_test_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
-#: cms/templates/container.html
+#: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
 msgstr "Dïspläý Nämé Ⱡ#"
 
@@ -1255,6 +1417,7 @@ msgstr "Dïspläý Nämé Ⱡ#"
 #: common/lib/xmodule/xmodule/discussion_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/library_content_module.py
 #: common/lib/xmodule/xmodule/peer_grading_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
@@ -1797,6 +1960,16 @@ msgstr ""
 "Éntér thé däté ýöü wänt tö ädvértïsé äs thé çöürsé stärt däté, ïf thïs däté "
 "ïs dïfférént fröm thé sét stärt däté. Tö ädvértïsé thé sét stärt däté, éntér"
 " nüll. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ι#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Pre-Requisite Courses"
+msgstr "Pré-Réqüïsïté Çöürsés Ⱡ'σя#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Pre-Requisite Course key if this course has a pre-requisite course"
+msgstr ""
+"Pré-Réqüïsïté Çöürsé kéý ïf thïs çöürsé häs ä pré-réqüïsïté çöürsé Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Show Calculator"
@@ -2347,6 +2520,14 @@ msgstr ""
 "thé pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ι#"
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"True if timezones should be shown on dates in the courseware. Deprecated in "
+"favor of due_date_display_format."
+msgstr ""
+"Trüé ïf tïmézönés shöüld ßé shöwn ön dätés ïn thé çöürséwäré. Dépréçätéd ïn "
+"fävör öf düé_däté_dïspläý_förmät. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Due Date Display Format"
 msgstr "Düé Däté Dïspläý Förmät Ⱡ'σяє#"
 
@@ -2536,6 +2717,12 @@ msgid "Invitation Only"
 msgstr "Ìnvïtätïön Önlý Ⱡ'#"
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Whether to restrict enrollment to invitation by the course staff."
+msgstr ""
+"Whéthér tö réstrïçt énröllmént tö ïnvïtätïön ßý thé çöürsé stäff. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Pre-Course Survey Name"
 msgstr "Pré-Çöürsé Sürvéý Nämé Ⱡ'σяє#"
 
@@ -2583,10 +2770,50 @@ msgid "Both"
 msgstr "Böth Ⱡ'σяєм#"
 
 #: common/lib/xmodule/xmodule/course_module.py
-#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
-#: lms/templates/footer.html
+#: lms/templates/footer-edx-new.html lms/templates/footer.html
+#: lms/templates/static_templates/about.html
+#: lms/templates/static_templates/about.html
 msgid "About"
 msgstr "Àßöüt Ⱡ'σяєм ι#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Entrance Exam Enabled"
+msgstr "Éntränçé Éxäm Énäßléd Ⱡ'σя#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Specify whether students must complete an entrance exam before they can view"
+" your course content.Note, you must enable Entrance Exams for this course "
+"setting to take effect."
+msgstr ""
+"Spéçïfý whéthér stüdénts müst çömplété än éntränçé éxäm ßéföré théý çän vïéw"
+" ýöür çöürsé çöntént.Nöté, ýöü müst énäßlé Éntränçé Éxäms för thïs çöürsé "
+"séttïng tö täké éfféçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg"
+" єł#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Entrance Exam Minimum Score (%)"
+msgstr "Éntränçé Éxäm Mïnïmüm Sçöré (%) Ⱡ'σяєм ι#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Specify a minimum percentage score for an entrance exam before students can "
+"view your course content.Note, you must enable Entrance Exams for this "
+"course setting to take effect."
+msgstr ""
+"Spéçïfý ä mïnïmüm pérçéntägé sçöré för än éntränçé éxäm ßéföré stüdénts çän "
+"vïéw ýöür çöürsé çöntént.Nöté, ýöü müst énäßlé Éntränçé Éxäms för thïs "
+"çöürsé séttïng tö täké éfféçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłι#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Entrance Exam ID"
+msgstr "Éntränçé Éxäm ÌD Ⱡ'σ#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Content module identifier (location) of entrance exam."
+msgstr ""
+"Çöntént mödülé ïdéntïfïér (löçätïön) öf éntränçé éxäm. Ⱡ'σяєм ιρѕυм ∂σ#"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
@@ -2777,6 +3004,140 @@ msgstr ""
 msgid "No email address found."
 msgstr "Nö émäïl äddréss föünd. Ⱡ'σяє#"
 
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid "Any Type"
+msgstr "Àný Týpé #"
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid "\"{value}\" is not a valid library ID."
+msgstr "\"{value}\" ïs nöt ä välïd lïßrärý ÌD. Ⱡ'σяєм ι#"
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+#: cms/templates/index.html
+msgid "Libraries"
+msgstr "Lïßrärïés #"
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid ""
+"Enter a library ID for each library from which you want to draw content."
+msgstr ""
+"Éntér ä lïßrärý ÌD för éäçh lïßrärý fröm whïçh ýöü wänt tö dräw çöntént. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid "Mode"
+msgstr "Mödé Ⱡ'σяєм#"
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid "Determines how content is drawn from the library"
+msgstr "Détérmïnés höw çöntént ïs dräwn fröm thé lïßrärý Ⱡ'σяєм ιρѕυм #"
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid "Choose n at random"
+msgstr "Çhöösé n ät rändöm Ⱡ'σ#"
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid "Count"
+msgstr "Çöünt Ⱡ'σяєм ι#"
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid "Enter the number of components to display to each student."
+msgstr ""
+"Éntér thé nümßér öf çömpönénts tö dïspläý tö éäçh stüdént. Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid "Problem Type"
+msgstr "Prößlém Týpé Ⱡ#"
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid ""
+"Choose a problem type to fetch from the library. If \"Any Type\" is selected"
+" no filtering is applied."
+msgstr ""
+"Çhöösé ä prößlém týpé tö fétçh fröm thé lïßrärý. Ìf \"Àný Týpé\" ïs séléçtéd"
+" nö fïltérïng ïs äpplïéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid "Scored"
+msgstr "Sçöréd Ⱡ'σяєм ιρѕ#"
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid ""
+"Set this value to True if this module is either a graded assignment or a "
+"practice problem."
+msgstr ""
+"Sét thïs välüé tö Trüé ïf thïs mödülé ïs éïthér ä grädéd ässïgnmént ör ä "
+"präçtïçé prößlém. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid "This component is out of date. The library has new content."
+msgstr ""
+"Thïs çömpönént ïs öüt öf däté. Thé lïßrärý häs néw çöntént. Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#. Translators: {refresh_icon} placeholder is substituted to "↻" (without
+#. double quotes)
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid "{refresh_icon} Update now."
+msgstr "{refresh_icon} Ûpdäté nöw. Ⱡ'#"
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid "Library is invalid, corrupt, or has been deleted."
+msgstr "Lïßrärý ïs ïnvälïd, çörrüpt, ör häs ßéén délétéd. Ⱡ'σяєм ιρѕυм ∂#"
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid "Edit Library List."
+msgstr "Édït Lïßrärý Lïst. Ⱡ'σ#"
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid ""
+"This course does not support content libraries. Contact your system "
+"administrator for more information."
+msgstr ""
+"Thïs çöürsé döés nöt süppört çöntént lïßrärïés. Çöntäçt ýöür sýstém "
+"ädmïnïsträtör för möré ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid "A library has not yet been selected."
+msgstr "À lïßrärý häs nöt ýét ßéén séléçtéd. Ⱡ'σяєм ιρ#"
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid "Select a Library."
+msgstr "Séléçt ä Lïßrärý. Ⱡ'σ#"
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid "There are no matching problem types in the specified libraries."
+msgstr ""
+"Théré äré nö mätçhïng prößlém týpés ïn thé spéçïfïéd lïßrärïés. Ⱡ'σяєм ιρѕυм"
+" ∂σłσя#"
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid "Select another problem type."
+msgstr "Séléçt änöthér prößlém týpé. Ⱡ'σяєм #"
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid "The specified libraries are configured to fetch {count} problem, "
+msgid_plural ""
+"The specified libraries are configured to fetch {count} problems, "
+msgstr[0] ""
+"Thé spéçïfïéd lïßrärïés äré çönfïgüréd tö fétçh {count} prößlém,  Ⱡ'σяєм "
+"ιρѕυм ∂σłσя#"
+msgstr[1] ""
+"Thé spéçïfïéd lïßrärïés äré çönfïgüréd tö fétçh {count} prößléms,  Ⱡ'σяєм "
+"ιρѕυм ∂σłσя#"
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid "but there is only {actual} matching problem."
+msgid_plural "but there are only {actual} matching problems."
+msgstr[0] "ßüt théré ïs önlý {actual} mätçhïng prößlém. Ⱡ'σяєм ιρѕ#"
+msgstr[1] "ßüt théré äré önlý {actual} mätçhïng prößléms. Ⱡ'σяєм ιρѕυ#"
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid "Edit the library configuration."
+msgstr "Édït thé lïßrärý çönfïgürätïön. Ⱡ'σяєм ι#"
+
 #: common/lib/xmodule/xmodule/library_root_xblock.py
 msgid "Enter the name of the library as it should appear in Studio."
 msgstr ""
@@ -2859,10 +3220,6 @@ msgstr ""
 "ïn thé çürrént pägé. Thïs séttïng ïs önlý üséd whén Hïdé Éxtérnäl Tööl ïs "
 "sét tö Fälsé.   Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, "
 "ѕє∂ ∂σ єιυѕмσ∂ тєм#"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Scored"
-msgstr "Sçöréd Ⱡ'σяєм ιρѕ#"
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
@@ -2965,6 +3322,17 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: common/lib/xmodule/xmodule/lti_module.py
+msgid "Accept grades past deadline"
+msgstr "Àççépt grädés päst déädlïné Ⱡ'σяєм#"
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid ""
+"Select True to allow third party systems to post grades past the deadline."
+msgstr ""
+"Séléçt Trüé tö ällöw thïrd pärtý sýstéms tö pöst grädés päst thé déädlïné. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
 "Could not parse custom parameter: {custom_parameter}. Should be \"x=y\" "
 "string."
@@ -3039,6 +3407,14 @@ msgstr "Düé Däté #"
 msgid "Enter the date by which problems are due."
 msgstr "Éntér thé däté ßý whïçh prößléms äré düé. Ⱡ'σяєм ιρѕυ#"
 
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Is Entrance Exam"
+msgstr "Ìs Éntränçé Éxäm Ⱡ'σ#"
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Tag this course module as an Entrance Exam.  "
+msgstr "Täg thïs çöürsé mödülé äs än Éntränçé Éxäm.   Ⱡ'σяєм ιρѕυм#"
+
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Group ID {group_id}"
 msgstr "Gröüp ÌD {group_id} Ⱡ#"
@@ -3110,6 +3486,15 @@ msgid ""
 msgstr ""
 "Thé éxpérïmént üsés ä délétéd gröüp çönfïgürätïön. Séléçt ä välïd gröüp "
 "çönfïgürätïön ör délété thïs éxpérïmént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"The experiment uses a group configuration that is not supported for "
+"experiments. Select a valid group configuration or delete this experiment."
+msgstr ""
+"Thé éxpérïmént üsés ä gröüp çönfïgürätïön thät ïs nöt süppörtéd för "
+"éxpérïménts. Séléçt ä välïd gröüp çönfïgürätïön ör délété thïs éxpérïmént. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ι#"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid ""
@@ -3186,7 +3571,7 @@ msgstr "Péér grädïng Ⱡ#"
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: "Syllabus" appears on a tab that, when clicked, opens the
 #. syllabus of the course.
-#: common/lib/xmodule/xmodule/tabs.py lms/templates/courseware/syllabus.html
+#: common/lib/xmodule/xmodule/tabs.py cms/templates/syllabuses.html
 msgid "Syllabus"
 msgstr "Sýlläßüs #"
 
@@ -3494,6 +3879,39 @@ msgstr ""
 "séttïngs. Àll éxïstïng prößléms äré äfféçtéd whén thïs çöürsé-wïdé séttïng "
 "ïs çhängéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
 "∂σ єιυѕмσ#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enable Student Notes"
+msgstr "Énäßlé Stüdént Nötés Ⱡ'σя#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter true or false. If true, students can use the Student Notes feature."
+msgstr ""
+"Éntér trüé ör fälsé. Ìf trüé, stüdénts çän üsé thé Stüdént Nötés féätüré. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Indicates whether Student Notes are visible in the course. Students can also"
+" show or hide their notes in the courseware."
+msgstr ""
+"Ìndïçätés whéthér Stüdént Nötés äré vïsïßlé ïn thé çöürsé. Stüdénts çän älsö"
+" shöw ör hïdé théïr nötés ïn thé çöürséwäré. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тє#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Tag this module as part of an Entrance Exam section"
+msgstr "Täg thïs mödülé äs pärt öf än Éntränçé Éxäm séçtïön Ⱡ'σяєм ιρѕυм ∂#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter true or false. If true, answer submissions for problem modules will be"
+" considered in the Entrance Exam scoring/gating algorithm."
+msgstr ""
+"Éntér trüé ör fälsé. Ìf trüé, änswér süßmïssïöns för prößlém mödülés wïll ßé"
+" çönsïdéréd ïn thé Éntränçé Éxäm sçörïng/gätïng älgörïthm. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #. Translators: "Self" is used to denote an openended response that is self-
 #. graded
@@ -4051,6 +4469,7 @@ msgstr "Ìndéx Ⱡ'σяєм ι#"
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 #: lms/templates/wiki/plugins/attachments/index.html
 #: lms/templates/discussion/_thread_list_template.html
+#: lms/templates/edxnotes/edxnotes.html
 msgid "Search"
 msgstr "Séärçh Ⱡ'σяєм ιρѕ#"
 
@@ -4062,29 +4481,10 @@ msgstr "Çöpýrïght #"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/djangoapps/instructor/views/api.py lms/templates/help_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
-#: lms/templates/shoppingcart/billing_details.html
-#: lms/templates/shoppingcart/billing_details.html
-#: lms/templates/shoppingcart/receipt.html
-msgid "Name"
-msgstr "Nämé Ⱡ'σяєм#"
-
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's public username.
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/tools.py
-#: openedx/core/djangoapps/user_api/views.py
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
@@ -4144,6 +4544,10 @@ msgstr "Wélçömé tö thé édX Wïkï Ⱡ'σяє#"
 #: lms/djangoapps/course_wiki/views.py
 msgid "Visit a course wiki to add an article."
 msgstr "Vïsït ä çöürsé wïkï tö ädd än ärtïçlé. Ⱡ'σяєм ιρѕ#"
+
+#: lms/djangoapps/courseware/tabs.py cms/templates/settings.html
+msgid "Entrance Exam"
+msgstr "Éntränçé Éxäm Ⱡ'#"
 
 #. Translators: The join of three or more institution names (e.g., Harvard,
 #. MIT, and Dartmouth).
@@ -4558,6 +4962,20 @@ msgstr ""
 msgid "Good"
 msgstr "Gööd Ⱡ'σяєм#"
 
+#: lms/djangoapps/edxnotes/helpers.py
+msgid "EdxNotes Service is unavailable. Please try again in a few minutes."
+msgstr ""
+"ÉdxNötés Sérvïçé ïs ünäväïläßlé. Pléäsé trý ägäïn ïn ä féw mïnütés. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕ#"
+
+#: lms/djangoapps/edxnotes/helpers.py
+msgid "Server error. Please try again in a few minutes."
+msgstr "Sérvér érrör. Pléäsé trý ägäïn ïn ä féw mïnütés. Ⱡ'σяєм ιρѕυм #"
+
+#: lms/djangoapps/edxnotes/helpers.py
+msgid "No endpoint was provided for EdxNotes."
+msgstr "Nö éndpöïnt wäs prövïdéd för ÉdxNötés. Ⱡ'σяєм ιρѕ#"
+
 #: lms/djangoapps/instructor/views/api.py
 msgid "User does not exist."
 msgstr "Ûsér döés nöt éxïst. Ⱡ'σя#"
@@ -4678,11 +5096,7 @@ msgstr "Géndér Ⱡ'σяєм ιρѕ#"
 msgid "Level of Education"
 msgstr "Lévél öf Édüçätïön Ⱡ'σ#"
 
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's mailing address.
-#: lms/djangoapps/instructor/views/api.py
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
+#: lms/djangoapps/instructor/views/api.py lms/templates/register.html
 msgid "Mailing Address"
 msgstr "Mäïlïng Àddréss Ⱡ'#"
 
@@ -4725,6 +5139,19 @@ msgid "The file must contain a 'username' column, an 'email' column, or both."
 msgstr ""
 "Thé fïlé müst çöntäïn ä 'üsérnämé' çölümn, än 'émäïl' çölümn, ör ßöth. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Unable to generate redeem codes because of course misconfiguration."
+msgstr ""
+"Ûnäßlé tö généräté rédéém çödés ßéçäüsé öf çöürsé mïsçönfïgürätïön. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕ#"
+
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/shoppingcart/models.py
+msgid "pdf download unavailable right now, please contact support."
+msgstr ""
+"pdf döwnlöäd ünäväïläßlé rïght nöw, pléäsé çöntäçt süppört. Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Module does not exist."
@@ -4813,6 +5240,11 @@ msgid "Please Enter the Coupon Discount Value Less than or Equal to 100"
 msgstr ""
 "Pléäsé Éntér thé Çöüpön Dïsçöünt Välüé Léss thän ör Éqüäl tö 100 Ⱡ'σяєм "
 "ιρѕυм ∂σłσя #"
+
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "Please enter the date in this format i-e month/day/year"
+msgstr ""
+"Pléäsé éntér thé däté ïn thïs förmät ï-é mönth/däý/ýéär Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "coupon with the coupon code ({code}) added successfully"
@@ -4915,11 +5347,6 @@ msgstr[0] "{num_emails} fäïléd Ⱡ#"
 msgstr[1] "{num_emails} fäïléd Ⱡ#"
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid "Complete"
-msgstr "Çömplété #"
-
-#: lms/djangoapps/instructor/views/instructor_task_helpers.py
 msgid "Incomplete"
 msgstr "Ìnçömplété Ⱡ#"
 
@@ -4999,7 +5426,10 @@ msgstr "Érrör: {err} Ⱡ#"
 msgid "Remote gradebook response for {action}"
 msgstr "Rémöté grädéßöök réspönsé för {action} Ⱡ'σяєм ι#"
 
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's full name.
 #: lms/djangoapps/instructor/views/legacy.py
+#: openedx/core/djangoapps/user_api/views.py
 msgid "Full name"
 msgstr "Füll nämé #"
 
@@ -5011,12 +5441,8 @@ msgstr "{title} ïn çöürsé {course_key} Ⱡ'σ#"
 msgid "ID"
 msgstr "ÌD Ⱡ'#"
 
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's full name.
 #: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/tools.py
-#: openedx/core/djangoapps/user_api/views.py cms/templates/register.html
+#: lms/djangoapps/instructor/views/tools.py cms/templates/register.html
 #: lms/templates/dashboard.html lms/templates/register-shib.html
 #: lms/templates/register.html lms/templates/register.html
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
@@ -5277,36 +5703,6 @@ msgstr " (skïppïng {skipped}) Ⱡ'#"
 msgid " (out of {total})"
 msgstr " (öüt öf {total}) Ⱡ'#"
 
-#: lms/djangoapps/linkedin/templates/linkedin_email.html
-msgid ""
-"\n"
-"      Dear %(student_name)s,\n"
-"    "
-msgstr ""
-"\n"
-"      Déär %(student_name)s,\n"
-"     Ⱡ'σя#"
-
-#: lms/djangoapps/linkedin/templates/linkedin_email.html
-msgid ""
-" \n"
-"    Congratulations on earning your certificate in %(course_name)s!\n"
-"    Since you have an account on LinkedIn, you can display your hard earned\n"
-"    credential for your colleagues to see.  Click the button below to add the\n"
-"    certificate to your profile.\n"
-"    "
-msgstr ""
-" \n"
-"    Çöngrätülätïöns ön éärnïng ýöür çértïfïçäté ïn %(course_name)s!\n"
-"    Sïnçé ýöü hävé än äççöünt ön LïnkédÌn, ýöü çän dïspläý ýöür härd éärnéd\n"
-"    çrédéntïäl för ýöür çölléägüés tö séé.  Çlïçk thé ßüttön ßélöw tö ädd thé\n"
-"    çértïfïçäté tö ýöür pröfïlé.\n"
-"     Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя#"
-
-#: lms/djangoapps/linkedin/templates/linkedin_email.html
-msgid "Add to profile"
-msgstr "Àdd tö pröfïlé Ⱡ'#"
-
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "Courseware Chrome"
 msgstr "Çöürséwäré Çhrömé Ⱡ'σ#"
@@ -5359,15 +5755,31 @@ msgstr ""
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
-"This xblock refers to a deleted or invalid content group configuration."
+"A dictionary that maps which groups can be shown this block. The keys are "
+"group configuration ids and the values are a list of group IDs. If there is "
+"no key for a group configuration or if the set of group IDs is empty then "
+"the block is considered visible to all. Note that this field is ignored if "
+"the block is visible_to_staff_only."
 msgstr ""
-"Thïs xßlöçk référs tö ä délétéd ör ïnvälïd çöntént gröüp çönfïgürätïön. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+"À dïçtïönärý thät mäps whïçh gröüps çän ßé shöwn thïs ßlöçk. Thé kéýs äré "
+"gröüp çönfïgürätïön ïds änd thé välüés äré ä lïst öf gröüp ÌDs. Ìf théré ïs "
+"nö kéý för ä gröüp çönfïgürätïön ör ïf thé sét öf gröüp ÌDs ïs émptý thén "
+"thé ßlöçk ïs çönsïdéréd vïsïßlé tö äll. Nöté thät thïs fïéld ïs ïgnöréd ïf "
+"thé ßlöçk ïs vïsïßlé_tö_stäff_önlý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя"
+" α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σł#"
 
 #: lms/djangoapps/lms_xblock/mixin.py
-msgid "This xblock refers to a deleted or invalid content group."
+msgid ""
+"This component refers to deleted or invalid content group configurations."
 msgstr ""
-"Thïs xßlöçk référs tö ä délétéd ör ïnvälïd çöntént gröüp. Ⱡ'σяєм ιρѕυм ∂σł#"
+"Thïs çömpönént référs tö délétéd ör ïnvälïd çöntént gröüp çönfïgürätïöns. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: lms/djangoapps/lms_xblock/mixin.py
+msgid "This component refers to deleted or invalid content groups."
+msgstr ""
+"Thïs çömpönént référs tö délétéd ör ïnvälïd çöntént gröüps. Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
 
 #: lms/djangoapps/open_ended_grading/staff_grading_service.py
 msgid ""
@@ -5566,6 +5978,94 @@ msgstr "Dönätïön för {course} Ⱡ'σ#"
 msgid "Donation for {platform_name}"
 msgstr "Dönätïön för {platform_name} Ⱡ'σ#"
 
+#: lms/djangoapps/shoppingcart/pdf.py
+msgid "Page {page_number} of {page_count}"
+msgstr "Pägé {page_number} öf {page_count} Ⱡ'#"
+
+#: lms/djangoapps/shoppingcart/pdf.py lms/djangoapps/shoppingcart/pdf.py
+#: lms/templates/shoppingcart/receipt.html
+msgid "Invoice"
+msgstr "Ìnvöïçé #"
+
+#: lms/djangoapps/shoppingcart/pdf.py
+msgid "Receipt"
+msgstr "Réçéïpt #"
+
+#: lms/djangoapps/shoppingcart/pdf.py
+msgid "Order"
+msgstr "Ördér Ⱡ'σяєм ι#"
+
+#: lms/djangoapps/shoppingcart/pdf.py
+msgid "{id_label} # {item_id}"
+msgstr "{id_label} # {item_id} #"
+
+#: lms/djangoapps/shoppingcart/pdf.py
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Date: {date}"
+msgstr "Däté: {date} #"
+
+#: lms/djangoapps/shoppingcart/pdf.py lms/djangoapps/shoppingcart/reports.py
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/shoppingcart/verified_cert_receipt.html
+#: lms/templates/shoppingcart/verified_cert_receipt.html
+#: wiki/plugins/attachments/forms.py
+msgid "Description"
+msgstr "Désçrïptïön Ⱡ#"
+
+#: lms/djangoapps/shoppingcart/pdf.py lms/djangoapps/shoppingcart/reports.py
+msgid "Quantity"
+msgstr "Qüäntïtý #"
+
+#: lms/djangoapps/shoppingcart/pdf.py
+msgid ""
+"List Price\n"
+"per item"
+msgstr ""
+"Lïst Prïçé\n"
+"pér ïtém Ⱡ'σя#"
+
+#: lms/djangoapps/shoppingcart/pdf.py
+msgid ""
+"Discount\n"
+"per item"
+msgstr ""
+"Dïsçöünt\n"
+"pér ïtém Ⱡ'σ#"
+
+#: lms/djangoapps/shoppingcart/pdf.py
+msgid "Amount"
+msgstr "Àmöünt Ⱡ'σяєм ιρѕ#"
+
+#: lms/djangoapps/shoppingcart/pdf.py
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/receipt.html
+#: lms/templates/shoppingcart/verified_cert_receipt.html
+msgid "Total"
+msgstr "Tötäl Ⱡ'σяєм ι#"
+
+#: lms/djangoapps/shoppingcart/pdf.py
+msgid "Payment Received"
+msgstr "Päýmént Réçéïvéd Ⱡ'σ#"
+
+#: lms/djangoapps/shoppingcart/pdf.py
+msgid "Balance"
+msgstr "Bälänçé #"
+
+#: lms/djangoapps/shoppingcart/pdf.py
+msgid "Billing Address"
+msgstr "Bïllïng Àddréss Ⱡ'#"
+
+#: lms/djangoapps/shoppingcart/pdf.py
+msgid "Disclaimer"
+msgstr "Dïsçläïmér Ⱡ#"
+
+#: lms/djangoapps/shoppingcart/pdf.py
+msgid "TERMS AND CONDITIONS"
+msgstr "TÉRMS ÀND ÇÖNDÌTÌÖNS Ⱡ'σя#"
+
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Order Number"
 msgstr "Ördér Nümßér Ⱡ#"
@@ -5600,17 +6100,6 @@ msgid "Order ID"
 msgstr "Ördér ÌD #"
 
 #: lms/djangoapps/shoppingcart/reports.py
-#: lms/templates/open_ended_problems/open_ended_problems.html
-#: lms/templates/shoppingcart/receipt.html
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid "Status"
-msgstr "Stätüs Ⱡ'σяєм ιρѕ#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Quantity"
-msgstr "Qüäntïtý #"
-
-#: lms/djangoapps/shoppingcart/reports.py
 msgid "Unit Cost"
 msgstr "Ûnït Çöst #"
 
@@ -5622,16 +6111,6 @@ msgstr "Tötäl Çöst Ⱡ#"
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 msgid "Currency"
 msgstr "Çürrénçý #"
-
-#: lms/djangoapps/shoppingcart/reports.py
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-#: wiki/plugins/attachments/forms.py
-msgid "Description"
-msgstr "Désçrïptïön Ⱡ#"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Comments"
@@ -5740,7 +6219,7 @@ msgstr "Ýöü äré älréädý régïstéréd ïn çöürsé {course_id}. Ⱡ'
 msgid "Course added to cart."
 msgstr "Çöürsé äddéd tö çärt. Ⱡ'σя#"
 
-#: lms/djangoapps/shoppingcart/views.py
+#: lms/djangoapps/shoppingcart/views.py lms/djangoapps/shoppingcart/views.py
 msgid "Discount does not exist against code '{code}'."
 msgstr "Dïsçöünt döés nöt éxïst ägäïnst çödé '{code}'. Ⱡ'σяєм ιρѕυм#"
 
@@ -5771,12 +6250,6 @@ msgstr ""
 msgid "Only one coupon redemption is allowed against an order"
 msgstr ""
 "Önlý öné çöüpön rédémptïön ïs ällöwéd ägäïnst än ördér Ⱡ'σяєм ιρѕυм ∂σ#"
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "Coupon '{code}' is not valid for any course in the shopping cart."
-msgstr ""
-"Çöüpön '{code}' ïs nöt välïd för äný çöürsé ïn thé shöppïng çärt. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя#"
 
 #: lms/djangoapps/shoppingcart/views.py
 msgid "success"
@@ -6261,6 +6734,17 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
+"We're sorry, but this payment was declined. The items in your shopping cart "
+"have been saved. If you have any questions about this transaction, please "
+"contact us at {email}."
+msgstr ""
+"Wé'ré sörrý, ßüt thïs päýmént wäs déçlïnéd. Thé ïtéms ïn ýöür shöppïng çärt "
+"hävé ßéén sävéd. Ìf ýöü hävé äný qüéstïöns äßöüt thïs tränsäçtïön, pléäsé "
+"çöntäçt üs ät {email}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
+"#"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
 "Sorry! Your payment could not be processed because an unexpected exception "
 "occurred. Please contact us at {email} for assistance."
 msgstr ""
@@ -6395,6 +6879,18 @@ msgstr ""
 "Théré wäs än érrör ïn ýöür däté ïnpüt.  Ìt shöüld ßé förmättéd äs ÝÝÝÝ-MM-DD"
 " Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
 
+#: lms/djangoapps/student_account/views.py
+msgid "No user with the provided email address exists."
+msgstr "Nö üsér wïth thé prövïdéd émäïl äddréss éxïsts. Ⱡ'σяєм ιρѕυм #"
+
+#: lms/djangoapps/student_account/views.py
+msgid "No email address provided."
+msgstr "Nö émäïl äddréss prövïdéd. Ⱡ'σяєм#"
+
+#: lms/djangoapps/verify_student/models.py
+msgid "Your {platform_name} verification has expired."
+msgstr "Ýöür {platform_name} vérïfïçätïön häs éxpïréd. Ⱡ'σяєм ιρ#"
+
 #: lms/djangoapps/verify_student/models.py
 msgid "No photo ID was provided."
 msgstr "Nö phötö ÌD wäs prövïdéd. Ⱡ'σяєм#"
@@ -6415,8 +6911,8 @@ msgid "The image of your face was not clear."
 msgstr "Thé ïmägé öf ýöür fäçé wäs nöt çléär. Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/verify_student/models.py
-msgid "Your face was not visible in your self-photo"
-msgstr "Ýöür fäçé wäs nöt vïsïßlé ïn ýöür sélf-phötö Ⱡ'σяєм ιρѕυм#"
+msgid "Your face was not visible in your self-photo."
+msgstr "Ýöür fäçé wäs nöt vïsïßlé ïn ýöür sélf-phötö. Ⱡ'σяєм ιρѕυм#"
 
 #: lms/djangoapps/verify_student/models.py
 msgid "There was an error verifying your ID photos."
@@ -6633,13 +7129,20 @@ msgstr ""
 #: lms/templates/registration/password_reset_confirm.html
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
-"correctly. <br /> Required fields are noted by <strong "
-"class=\"indicator\">bold text and an asterisk (*)</strong>."
+"correctly."
 msgstr ""
 "Pléäsé éntér ýöür néw pässwörd twïçé sö wé çän vérïfý ýöü týpéd ït ïn "
-"çörréçtlý. <br /> Réqüïréd fïélds äré nötéd ßý <strong "
-"class=\"indicator\">ßöld téxt änd än ästérïsk (*)</strong>. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕ#"
+"çörréçtlý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid ""
+"\n"
+"        Required fields are noted by %(bold_start)sbold text and an asterisk (*)%(bold_end)s.\n"
+"        "
+msgstr ""
+"\n"
+"        Réqüïréd fïélds äré nötéd ßý %(bold_start)sßöld téxt änd än ästérïsk (*)%(bold_end)s.\n"
+"         Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/registration/password_reset_confirm.html
 #: lms/templates/forgot_password_modal.html lms/templates/login.html
@@ -6700,10 +7203,10 @@ msgstr ""
 #: lms/templates/registration/password_reset_email.html
 msgid ""
 "You're receiving this e-mail because you requested a password reset for your"
-" user account at edx.org."
+" user account at %(site_name)s."
 msgstr ""
 "Ýöü'ré réçéïvïng thïs é-mäïl ßéçäüsé ýöü réqüéstéd ä pässwörd rését för ýöür"
-" üsér äççöünt ät édx.örg. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+" üsér äççöünt ät %(site_name)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/templates/registration/password_reset_email.html
 msgid "Please go to the following page and choose a new password:"
@@ -6724,8 +7227,8 @@ msgid "Thanks for using our site!"
 msgstr "Thänks för üsïng öür sïté! Ⱡ'σяєм#"
 
 #: lms/templates/registration/password_reset_email.html
-msgid "The edX Team"
-msgstr "Thé édX Téäm Ⱡ#"
+msgid "The %(platform_name)s Team"
+msgstr "Thé %(platform_name)s Téäm Ⱡ#"
 
 #: lms/templates/wiki/article.html
 msgid "Last modified:"
@@ -7007,10 +7510,9 @@ msgstr ""
 msgid "[Article Name](wiki:ArticleName)"
 msgstr "[Àrtïçlé Nämé](wïkï:ÀrtïçléNämé) Ⱡ'σяєм ι#"
 
-#. Translators: Do not translate "edX"
 #: lms/templates/wiki/includes/cheatsheet.html
-msgid "edX Additions:"
-msgstr "édX Àddïtïöns: Ⱡ'#"
+msgid "%(platform_name)s Additions:"
+msgstr "%(platform_name)s Àddïtïöns: Ⱡ'#"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Math Expression"
@@ -7025,8 +7527,8 @@ msgid "Wikipedia"
 msgstr "Wïkïpédïä #"
 
 #: lms/templates/wiki/includes/cheatsheet.html
-msgid "edX Wiki"
-msgstr "édX Wïkï #"
+msgid "%(platform_name)s Wiki"
+msgstr "%(platform_name)s Wïkï #"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Huge Header"
@@ -7203,14 +7705,6 @@ msgstr ""
 msgid "Password"
 msgstr "Pässwörd #"
 
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-#. Translators: This phrase appears next to a checkbox on the login form
-#. which the user can check in order to remain logged in after their
-#. session ends.
-#: openedx/core/djangoapps/user_api/views.py lms/templates/login.html
-msgid "Remember me"
-msgstr "Rémémßér mé Ⱡ#"
-
 #: openedx/core/djangoapps/user_api/views.py
 msgid ""
 "It looks like {email_address} and {username} belong to an existing account. "
@@ -7243,39 +7737,39 @@ msgstr ""
 msgid "The name that will appear on your certificates"
 msgstr "Thé nämé thät wïll äppéär ön ýöür çértïfïçätés Ⱡ'σяєм ιρѕυм #"
 
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's public username.
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Public username"
+msgstr "Püßlïç üsérnämé Ⱡ'#"
+
 #: openedx/core/djangoapps/user_api/views.py
 msgid "The name that will identify you in your courses"
 msgstr "Thé nämé thät wïll ïdéntïfý ýöü ïn ýöür çöürsés Ⱡ'σяєм ιρѕυм #"
 
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's highest completed level of education.
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
-msgid "Highest Level of Education Completed"
-msgstr "Hïghést Lévél öf Édüçätïön Çömplétéd Ⱡ'σяєм ιρ#"
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Highest level of education completed"
+msgstr "Hïghést lévél öf édüçätïön çömplétéd Ⱡ'σяєм ιρ#"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's year of birth.
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
-msgid "Year of Birth"
-msgstr "Ýéär öf Bïrth Ⱡ'#"
-
-#: openedx/core/djangoapps/user_api/views.py
-msgid "If you'd like, tell us why you're interested in {platform_name}"
-msgstr ""
-"Ìf ýöü'd lïké, téll üs whý ýöü'ré ïntéréstéd ïn {platform_name} Ⱡ'σяєм ιρѕυм"
-" ∂#"
+#: openedx/core/djangoapps/user_api/views.py lms/templates/signup_modal.html
+msgid "Year of birth"
+msgstr "Ýéär öf ßïrth Ⱡ'#"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This label appears above a field on the registration form
-#. which allows the user to input the city in which they live.
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/receipt.html
-msgid "City"
-msgstr "Çïtý Ⱡ'σяєм#"
+#. meant to hold the user's mailing address.
+#: openedx/core/djangoapps/user_api/views.py lms/templates/signup_modal.html
+msgid "Mailing address"
+msgstr "Mäïlïng äddréss Ⱡ'#"
+
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Tell us why you're interested in {platform_name}"
+msgstr "Téll üs whý ýöü'ré ïntéréstéd ïn {platform_name} Ⱡ'σяєм ιρ#"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This label appears above a dropdown menu on the registration
@@ -7285,6 +7779,10 @@ msgstr "Çïtý Ⱡ'σяєм#"
 #: lms/templates/shoppingcart/receipt.html
 msgid "Country"
 msgstr "Çöüntrý #"
+
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Please select your Country."
+msgstr "Pléäsé séléçt ýöür Çöüntrý. Ⱡ'σяєм#"
 
 #: openedx/core/djangoapps/user_api/views.py
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -7298,7 +7796,6 @@ msgstr "Hönör Çödé Ⱡ#"
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py lms/templates/footer-edx-new.html
-#: lms/templates/footer-legacy.html lms/templates/footer.html
 msgid "Terms of Service and Honor Code"
 msgstr "Térms öf Sérvïçé änd Hönör Çödé Ⱡ'σяєм ι#"
 
@@ -7316,7 +7813,7 @@ msgstr "Ýöü müst ägréé tö thé {platform_name} {terms_of_service}. Ⱡ'�
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py cms/templates/widgets/footer.html
-#: lms/templates/static_templates/tos.html
+#: lms/templates/footer.html lms/templates/static_templates/tos.html
 #: lms/templates/static_templates/tos.html
 msgid "Terms of Service"
 msgstr "Térms öf Sérvïçé Ⱡ'σ#"
@@ -7475,6 +7972,10 @@ msgstr ""
 "{err} Ⱡ'σяєм ιρ#"
 
 #: cms/djangoapps/contentstore/views/course.py
+msgid "Invalid prerequisite course key"
+msgstr "Ìnvälïd préréqüïsïté çöürsé kéý Ⱡ'σяєм ι#"
+
+#: cms/djangoapps/contentstore/views/course.py
 msgid "invalid JSON"
 msgstr "ïnvälïd JSÖN Ⱡ#"
 
@@ -7513,6 +8014,14 @@ msgid "Could not find the course.xml file in the package."
 msgstr "Çöüld nöt fïnd thé çöürsé.xml fïlé ïn thé päçkägé. Ⱡ'σяєм ιρѕυм ∂#"
 
 #: cms/djangoapps/contentstore/views/item.py
+msgid "Invalid data"
+msgstr "Ìnvälïd dätä Ⱡ#"
+
+#: cms/djangoapps/contentstore/views/item.py
+msgid "Invalid data ({details})"
+msgstr "Ìnvälïd dätä ({details}) Ⱡ'σ#"
+
+#: cms/djangoapps/contentstore/views/item.py
 msgid "Empty"
 msgstr "Émptý Ⱡ'σяєм ι#"
 
@@ -7527,6 +8036,32 @@ msgstr "Düplïçäté öf '{0}' Ⱡ'σ#"
 #: cms/djangoapps/contentstore/views/item.py
 msgid "{section_or_subsection} \"{display_name}\""
 msgstr "{section_or_subsection} \"{display_name}\" #"
+
+#: cms/djangoapps/contentstore/views/library.py
+msgid "Unable to create library - missing required field '{field}'"
+msgstr ""
+"Ûnäßlé tö çréäté lïßrärý - mïssïng réqüïréd fïéld '{field}' Ⱡ'σяєм ιρѕυм "
+"∂σł#"
+
+#: cms/djangoapps/contentstore/views/library.py
+msgid ""
+"Unable to create library '{name}'.\n"
+"\n"
+"{err}"
+msgstr ""
+"Ûnäßlé tö çréäté lïßrärý '{name}'.\n"
+"\n"
+"{err} Ⱡ'σяєм ιρ#"
+
+#: cms/djangoapps/contentstore/views/library.py
+msgid ""
+"There is already a library defined with the same organization and library "
+"code. Please change your library code so that it is unique within your "
+"organization."
+msgstr ""
+"Théré ïs älréädý ä lïßrärý défïnéd wïth thé sämé örgänïzätïön änd lïßrärý "
+"çödé. Pléäsé çhängé ýöür lïßrärý çödé sö thät ït ïs ünïqüé wïthïn ýöür "
+"örgänïzätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ι#"
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Incoming video data is empty."
@@ -7555,16 +8090,84 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: cms/djangoapps/contentstore/views/user.py
-msgid "`role` is required"
-msgstr "`rölé` ïs réqüïréd Ⱡ'σ#"
+msgid "No `role` specified."
+msgstr "Nö `rölé` spéçïfïéd. Ⱡ'σя#"
 
 #: cms/djangoapps/contentstore/views/user.py
-msgid "Only instructors may create other instructors"
-msgstr "Önlý ïnstrüçtörs mäý çréäté öthér ïnstrüçtörs Ⱡ'σяєм ιρѕυм#"
+msgid "Invalid `role` specified."
+msgstr "Ìnvälïd `rölé` spéçïfïéd. Ⱡ'σяєм#"
 
 #: cms/djangoapps/contentstore/views/user.py
-msgid "You may not remove the last instructor from a course"
-msgstr "Ýöü mäý nöt rémövé thé läst ïnstrüçtör fröm ä çöürsé Ⱡ'σяєм ιρѕυм ∂σ#"
+msgid "You may not remove the last Admin. Add another Admin first."
+msgstr ""
+"Ýöü mäý nöt rémövé thé läst Àdmïn. Àdd änöthér Àdmïn fïrst. Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#. #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
+#. Translators: This is the status of an active video upload
+#: cms/djangoapps/contentstore/views/videos.py cms/templates/import.html
+msgid "Uploading"
+msgstr "Ûplöädïng #"
+
+#. Translators: This is the status for a video that the servers are currently
+#. processing
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "In Progress"
+msgstr "Ìn Prögréss Ⱡ#"
+
+#. #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
+#. Translators: This is the status for a video that the servers have failed to
+#. process
+#: cms/djangoapps/contentstore/views/videos.py
+#: lms/templates/verify_student/midcourse_reverify_dash.html
+msgid "Failed"
+msgstr "Fäïléd Ⱡ'σяєм ιρѕ#"
+
+#. Translators: This is the status for a video for which an invalid
+#. processing token was provided in the course settings
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Invalid Token"
+msgstr "Ìnvälïd Tökén Ⱡ'#"
+
+#. Translators: This is the status for a video that is in an unknown state
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Unknown"
+msgstr "Ûnknöwn #"
+
+#. Translators: This is the header for a CSV file column
+#. containing URLs for video encodings for the named profile
+#. (e.g. desktop, mobile high quality, mobile low quality)
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "{profile_name} URL"
+msgstr "{profile_name} ÛRL #"
+
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Duration"
+msgstr "Dürätïön #"
+
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Date Added"
+msgstr "Däté Àddéd Ⱡ#"
+
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Video ID"
+msgstr "Vïdéö ÌD #"
+
+#. #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
+#. Translators: This is listed as the duration for a video that has not
+#. yet reached the point in its processing by the servers where its
+#. duration is determined.
+#: cms/djangoapps/contentstore/views/videos.py cms/templates/index.html
+#: lms/templates/dashboard/_dashboard_status_verification.html
+#: lms/templates/verify_student/midcourse_reverify_dash.html
+msgid "Pending"
+msgstr "Péndïng #"
+
+#. Translators: This is the suggested filename when downloading the URL
+#. listing for videos uploaded through Studio
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "{course}_video_urls"
+msgstr "{course}_vïdéö_ürls Ⱡ'#"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "unrequested"
@@ -7615,21 +8218,25 @@ msgstr "Pägé Nöt Föünd Ⱡ'#"
 msgid "Page not found"
 msgstr "Pägé nöt föünd Ⱡ'#"
 
+#: cms/templates/asset_index.html cms/templates/container.html
+#: cms/templates/course_outline.html cms/templates/group_configurations.html
+#: cms/templates/group_configurations.html cms/templates/library.html
+#: lms/templates/courseware/legacy_instructor_dashboard.html
+#: lms/templates/courseware/legacy_instructor_dashboard.html
+#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Loading"
+msgstr "Löädïng #"
+
 #: cms/templates/asset_index.html lms/templates/courseware/courseware.html
 #: lms/templates/verify_student/_modal_editname.html
 msgid "close"
 msgstr "çlösé Ⱡ'σяєм ι#"
 
-#: cms/templates/container.html cms/templates/course_outline.html
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Loading..."
-msgstr "Löädïng... Ⱡ#"
-
 #: cms/templates/course-create-rerun.html
 #: cms/templates/course-create-rerun.html cms/templates/index.html
-#: cms/templates/manage_users.html
+#: cms/templates/index.html cms/templates/manage_users.html
+#: cms/templates/manage_users_lib.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
@@ -7650,8 +8257,9 @@ msgid "Dismiss"
 msgstr "Dïsmïss #"
 
 #: cms/templates/group_configurations.html cms/templates/manage_users.html
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html cms/templates/widgets/header.html
+#: cms/templates/manage_users_lib.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+#: cms/templates/widgets/header.html cms/templates/widgets/header.html
 #: lms/templates/wiki/includes/article_menu.html
 msgid "Settings"
 msgstr "Séttïngs #"
@@ -7661,20 +8269,23 @@ msgid "Error:"
 msgstr "Érrör: Ⱡ'σяєм ιρѕ#"
 
 #: cms/templates/index.html cms/templates/index.html cms/templates/index.html
+#: cms/templates/index.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Organization:"
 msgstr "Örgänïzätïön: Ⱡ'#"
 
 #: cms/templates/index.html cms/templates/index.html cms/templates/index.html
+#: cms/templates/index.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Number:"
 msgstr "Çöürsé Nümßér: Ⱡ'#"
 
-#: cms/templates/index.html
-#: lms/templates/dashboard/_dashboard_status_verification.html
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid "Pending"
-msgstr "Péndïng #"
+#: cms/templates/index.html lms/templates/navigation.html
+#: lms/templates/sysadmin_dashboard.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/courseware/courses.html
+msgid "Courses"
+msgstr "Çöürsés #"
 
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/help_modal.html lms/templates/login.html
@@ -7689,9 +8300,9 @@ msgstr "É-mäïl Ⱡ'σяєм ιρѕ#"
 #. email
 #. address.
 #: cms/templates/login.html cms/templates/manage_users.html
-#: cms/templates/register.html lms/templates/login.html
-#: lms/templates/register-shib.html lms/templates/register.html
-#: lms/templates/register.html
+#: cms/templates/manage_users_lib.html cms/templates/register.html
+#: lms/templates/login.html lms/templates/register-shib.html
+#: lms/templates/register.html lms/templates/register.html
 msgid "example: username@domain.com"
 msgstr "éxämplé: üsérnämé@dömäïn.çöm Ⱡ'σяєм #"
 
@@ -7699,20 +8310,20 @@ msgstr "éxämplé: üsérnämé@dömäïn.çöm Ⱡ'σяєм #"
 msgid "Forgot password?"
 msgstr "Förgöt pässwörd? Ⱡ'σ#"
 
-#: cms/templates/manage_users.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Admin"
 msgstr "Àdmïn Ⱡ'σяєм ι#"
 
-#: cms/templates/manage_users.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
+#: lms/templates/courseware/course_navigation.html
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Staff"
 msgstr "Stäff Ⱡ'σяєм ι#"
 
-#: cms/templates/register.html cms/templates/widgets/header.html
-#: lms/templates/index.html
-msgid "Sign Up"
-msgstr "Sïgn Ûp #"
+#: cms/templates/manage_users_lib.html lms/templates/folditchallenge.html
+msgid "User"
+msgstr "Ûsér Ⱡ'σяєм#"
 
 #. Translators: This is the placeholder text for a field that requests the
 #. user's full name.
@@ -7727,10 +8338,30 @@ msgstr "éxämplé: Jäné Döé Ⱡ'σ#"
 msgid "Public Username"
 msgstr "Püßlïç Ûsérnämé Ⱡ'#"
 
+#. Translators: This is the placeholder text for a field that asks the user to
+#. pick a username
+#: cms/templates/register.html lms/templates/register-shib.html
+#: lms/templates/register.html lms/templates/register.html
+msgid "example: JaneDoe"
+msgstr "éxämplé: JänéDöé Ⱡ'σ#"
+
+#: cms/templates/register.html lms/templates/register.html
+msgid "TYPE ID"
+msgstr "TÝPÉ ÌD #"
+
 #: cms/templates/register.html
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "Preferred Language"
 msgstr "Préférréd Längüägé Ⱡ'σ#"
+
+#: cms/templates/settings.html lms/templates/courseware/course_about.html
+msgid "Requirements"
+msgstr "Réqüïréménts Ⱡ#"
+
+#: cms/templates/studio_xblock_wrapper.html lms/templates/help_modal.html
+#: lms/templates/help_modal.html lms/templates/module-error.html
+msgid "Details"
+msgstr "Détäïls #"
 
 #. Translators: this is a verb describing the action of viewing more details
 #: cms/templates/studio_xblock_wrapper.html
@@ -7756,8 +8387,7 @@ msgstr ""
 " #"
 
 #: cms/templates/widgets/footer.html lms/templates/footer-edx-new.html
-#: lms/templates/footer-legacy.html lms/templates/footer.html
-#: lms/templates/static_templates/privacy.html
+#: lms/templates/footer.html lms/templates/static_templates/privacy.html
 #: lms/templates/static_templates/privacy.html
 msgid "Privacy Policy"
 msgstr "Prïväçý Pölïçý Ⱡ'#"
@@ -7819,7 +8449,6 @@ msgid "Select your contribution for this course (min. $"
 msgstr "Séléçt ýöür çöntrïßütïön för thïs çöürsé (mïn. $ Ⱡ'σяєм ιρѕυм #"
 
 #: common/templates/course_modes/choose.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "):"
 msgstr "): Ⱡ'#"
 
@@ -7874,113 +8503,6 @@ msgstr "Güïdéd Dïsçüssïön Ⱡ'σ#"
 #: lms/templates/annotatable.html
 msgid "Hide Annotations"
 msgstr "Hïdé Ànnötätïöns Ⱡ'σ#"
-
-#: lms/templates/contact.html lms/templates/static_templates/about.html
-#: lms/templates/static_templates/about.html
-msgid "Vision"
-msgstr "Vïsïön Ⱡ'σяєм ιρѕ#"
-
-#: lms/templates/contact.html
-msgid "Faq"
-msgstr "Fäq Ⱡ'σя#"
-
-#: lms/templates/contact.html lms/templates/footer-legacy.html
-msgid "Press"
-msgstr "Préss Ⱡ'σяєм ι#"
-
-#: lms/templates/contact.html lms/templates/footer-edx-new.html
-#: lms/templates/footer-legacy.html lms/templates/footer.html
-#: lms/templates/static_templates/contact.html
-#: lms/templates/static_templates/contact.html
-msgid "Contact"
-msgstr "Çöntäçt #"
-
-#: lms/templates/contact.html
-msgid "Class Feedback"
-msgstr "Çläss Féédßäçk Ⱡ'#"
-
-#: lms/templates/contact.html
-msgid ""
-"We are always seeking feedback to improve our courses. If you are an "
-"enrolled student and have any questions, feedback, suggestions, or any other"
-" issues specific to a particular class, please post on the discussion forums"
-" of that&nbsp;class."
-msgstr ""
-"Wé äré älwäýs séékïng féédßäçk tö ïmprövé öür çöürsés. Ìf ýöü äré än "
-"énrölléd stüdént änd hävé äný qüéstïöns, féédßäçk, süggéstïöns, ör äný öthér"
-" ïssüés spéçïfïç tö ä pärtïçülär çläss, pléäsé pöst ön thé dïsçüssïön förüms"
-" öf thät&nbsp;çläss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
-"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тє#"
-
-#: lms/templates/contact.html
-msgid "General Inquiries and Feedback"
-msgstr "Généräl Ìnqüïrïés änd Féédßäçk Ⱡ'σяєм #"
-
-#: lms/templates/contact.html
-msgid ""
-"If you have a general question about {platform_name} please email "
-"{contact_email}. To see if your question has already been answered, visit "
-"our {faq_link_start}FAQ page{faq_link_end}. You can also join the discussion"
-" on our {fb_link_start}facebook page{fb_link_end}. Though we may not have a "
-"chance to respond to every email, we take all feedback into consideration."
-msgstr ""
-"Ìf ýöü hävé ä généräl qüéstïön äßöüt {platform_name} pléäsé émäïl "
-"{contact_email}. Tö séé ïf ýöür qüéstïön häs älréädý ßéén änswéréd, vïsït "
-"öür {faq_link_start}FÀQ pägé{faq_link_end}. Ýöü çän älsö jöïn thé dïsçüssïön"
-" ön öür {fb_link_start}fäçéßöök pägé{fb_link_end}. Thöügh wé mäý nöt hävé ä "
-"çhänçé tö réspönd tö évérý émäïl, wé täké äll féédßäçk ïntö çönsïdérätïön. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
-"тємρσя ιη¢ι∂ι∂υηт υт #"
-
-#: lms/templates/contact.html
-msgid "Technical Inquiries and Feedback"
-msgstr "Téçhnïçäl Ìnqüïrïés änd Féédßäçk Ⱡ'σяєм ι#"
-
-#: lms/templates/contact.html
-msgid ""
-"If you have suggestions/feedback about the overall {platform_name} platform,"
-" or are facing general technical issues with the platform (e.g., issues with"
-" email addresses and passwords), you can reach us at {tech_email}. For "
-"technical questions, please make sure you are using a current version of "
-"Firefox or Chrome, and include browser and version in your e-mail, as well "
-"as screenshots or other pertinent details. If you find a bug or other "
-"issues, you can reach us at the following: {bugs_email}."
-msgstr ""
-"Ìf ýöü hävé süggéstïöns/féédßäçk äßöüt thé övéräll {platform_name} plätförm,"
-" ör äré fäçïng généräl téçhnïçäl ïssüés wïth thé plätförm (é.g., ïssüés wïth"
-" émäïl äddréssés änd pässwörds), ýöü çän réäçh üs ät {tech_email}. För "
-"téçhnïçäl qüéstïöns, pléäsé mäké süré ýöü äré üsïng ä çürrént vérsïön öf "
-"Fïréföx ör Çhrömé, änd ïnçlüdé ßröwsér änd vérsïön ïn ýöür é-mäïl, äs wéll "
-"äs sçréénshöts ör öthér pértïnént détäïls. Ìf ýöü fïnd ä ßüg ör öthér "
-"ïssüés, ýöü çän réäçh üs ät thé föllöwïng: {bugs_email}. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
-"łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, q#"
-
-#: lms/templates/contact.html
-msgid "Media"
-msgstr "Médïä Ⱡ'σяєм ι#"
-
-#: lms/templates/contact.html
-msgid ""
-"Please visit our {link_start}media/press page{link_end} for more "
-"information. For any media or press inquiries, please email {email}."
-msgstr ""
-"Pléäsé vïsït öür {link_start}médïä/préss pägé{link_end} för möré "
-"ïnförmätïön. För äný médïä ör préss ïnqüïrïés, pléäsé émäïl {email}. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: lms/templates/contact.html
-msgid "Universities"
-msgstr "Ûnïvérsïtïés Ⱡ#"
-
-#: lms/templates/contact.html
-msgid ""
-"If you are a university wishing to collaborate with or if you have questions"
-" about {platform_name}, please email {email}."
-msgstr ""
-"Ìf ýöü äré ä ünïvérsïtý wïshïng tö çölläßöräté wïth ör ïf ýöü hävé qüéstïöns"
-" äßöüt {platform_name}, pléäsé émäïl {email}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢ση#"
 
 #: lms/templates/course.html
 msgid "New"
@@ -8248,10 +8770,6 @@ msgstr "Süßmïttéd #"
 msgid "Puzzle Leaderboard"
 msgstr "Püzzlé Léädérßöärd Ⱡ'σ#"
 
-#: lms/templates/folditchallenge.html
-msgid "User"
-msgstr "Ûsér Ⱡ'σяєм#"
-
 #: lms/templates/footer-edx-new.html lms/templates/footer-edx-new.html
 msgid "About edX"
 msgstr "Àßöüt édX #"
@@ -8276,9 +8794,16 @@ msgstr ""
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
 "ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυ#"
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
-msgid "&copy; 2014 edX, some rights reserved."
-msgstr "&copy; 2014 édX, sömé rïghts résérvéd. Ⱡ'σяєм ιρ#"
+#. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
+#. Please do not translate any of these trademarks and company names.
+#: lms/templates/footer-edx-new.html lms/templates/footer.html
+msgid ""
+"EdX, Open edX, and the edX and Open edX logos are registered trademarks or "
+"trademarks of {link_start}edX Inc.{link_end}"
+msgstr ""
+"ÉdX, Öpén édX, änd thé édX änd Öpén édX lögös äré régïstéréd trädémärks ör "
+"trädémärks öf {link_start}édX Ìnç.{link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σ#"
 
 #: lms/templates/footer-edx-new.html
 msgid "(Revised 4/16/2014)"
@@ -8288,8 +8813,14 @@ msgstr "(Révïséd 4/16/2014) Ⱡ'σя#"
 msgid "News"
 msgstr "Néws Ⱡ'σяєм#"
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
-#: lms/templates/footer.html lms/templates/static_templates/faq.html
+#: lms/templates/footer-edx-new.html lms/templates/footer.html
+#: lms/templates/static_templates/contact.html
+#: lms/templates/static_templates/contact.html
+msgid "Contact"
+msgstr "Çöntäçt #"
+
+#: lms/templates/footer-edx-new.html lms/templates/footer.html
+#: lms/templates/static_templates/faq.html
 #: lms/templates/static_templates/faq.html
 msgid "FAQ"
 msgstr "FÀQ Ⱡ'σя#"
@@ -8310,54 +8841,60 @@ msgstr "Jößs ät édX Ⱡ#"
 msgid "Follow Us"
 msgstr "Föllöw Ûs #"
 
-#: lms/templates/footer-edx-new.html
+#. Translators: This is the website name of www.twitter.com. Please
+#. translate this the way that Twitter advertises in your language.
+#: lms/templates/footer-edx-new.html lms/templates/footer-edx-new.html
 msgid "Twitter"
 msgstr "Twïttér #"
 
-#: lms/templates/footer-edx-new.html
+#. Translators: This is the website name of www.facebook.com. Please
+#. translate this the way that Facebook advertises in your language.
+#: lms/templates/footer-edx-new.html lms/templates/footer-edx-new.html
 msgid "Facebook"
 msgstr "Fäçéßöök #"
 
-#: lms/templates/footer-edx-new.html
+#. Translators: This is the website name of www.meetup.com. Please
+#. translate this the way that Meetup advertises in your language.
+#: lms/templates/footer-edx-new.html lms/templates/footer-edx-new.html
 msgid "Meetup"
 msgstr "Méétüp Ⱡ'σяєм ιρѕ#"
 
-#: lms/templates/footer-edx-new.html
+#. Translators: This is the website name of www.linked.com. Please
+#. translate this the way that LinkedIn advertises in your language.
+#: lms/templates/footer-edx-new.html lms/templates/footer-edx-new.html
 msgid "LinkedIn"
 msgstr "LïnkédÌn #"
 
-#: lms/templates/footer-edx-new.html
+#. Translators: This is the website name of plus.google.com. Please
+#. translate this the way that Google+ advertises in your language.
+#: lms/templates/footer-edx-new.html lms/templates/footer-edx-new.html
 msgid "Google+"
 msgstr "Gööglé+ #"
 
-#: lms/templates/footer-legacy.html lms/templates/footer.html
-#: lms/templates/static_templates/jobs.html
+#: lms/templates/footer-edx-new.html
+msgid "Mobile Apps"
+msgstr "Mößïlé Àpps Ⱡ#"
+
+#: lms/templates/footer-edx-new.html
+msgid "Apple app on Apple Store"
+msgstr "Àpplé äpp ön Àpplé Störé Ⱡ'σяє#"
+
+#: lms/templates/footer-edx-new.html
+msgid "Android app on Google Play"
+msgstr "Àndröïd äpp ön Gööglé Pläý Ⱡ'σяєм#"
+
+#: lms/templates/footer.html lms/templates/static_templates/jobs.html
 #: lms/templates/static_templates/jobs.html
 msgid "Jobs"
 msgstr "Jößs Ⱡ'σяєм#"
 
-#: lms/templates/footer-legacy.html
-msgid "edX Logo"
-msgstr "édX Lögö #"
-
-#: lms/templates/footer-legacy.html
-msgid ""
-"{EdX} is a non-profit created by founding partners {Harvard} and {MIT} whose"
-" mission is to bring the best of higher education to students of all ages "
-"anywhere in the world, wherever there is Internet access. {EdX}'s free "
-"online MOOCs are interactive and subjects include computer science, public "
-"health, and artificial intelligence."
-msgstr ""
-"{EdX} ïs ä nön-pröfït çréätéd ßý föündïng pärtnérs {Harvard} änd {MIT} whösé"
-" mïssïön ïs tö ßrïng thé ßést öf hïghér édüçätïön tö stüdénts öf äll ägés "
-"änýwhéré ïn thé wörld, whérévér théré ïs Ìntérnét äççéss. {EdX}'s fréé "
-"önlïné MÖÖÇs äré ïntéräçtïvé änd süßjéçts ïnçlüdé çömpütér sçïénçé, püßlïç "
-"héälth, änd ärtïfïçïäl ïntéllïgénçé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє є#"
-
 #: lms/templates/footer.html
-msgid "&copy; 2014 {platform_name}, some rights reserved"
-msgstr "&copy; 2014 {platform_name}, sömé rïghts résérvéd Ⱡ'σяєм ιρ#"
+msgid ""
+"{tos_link_start}Terms of Service{tos_link_end} and {honor_link_start}Honor "
+"Code{honor_link_end}"
+msgstr ""
+"{tos_link_start}Térms öf Sérvïçé{tos_link_end} änd {honor_link_start}Hönör "
+"Çödé{honor_link_end} Ⱡ'σяєм ιρѕυм#"
 
 #. Translators: 'Open edX' is a brand, please keep this untranslated. See
 #. http://openedx.org for more information.
@@ -8529,11 +9066,6 @@ msgstr "Mäké ä Süggéstïön Ⱡ'σ#"
 msgid "Brief description of your suggestion"
 msgstr "Brïéf désçrïptïön öf ýöür süggéstïön Ⱡ'σяєм ιρ#"
 
-#: lms/templates/help_modal.html lms/templates/help_modal.html
-#: lms/templates/module-error.html
-msgid "Details"
-msgstr "Détäïls #"
-
 #: lms/templates/help_modal.html
 msgid "question"
 msgstr "qüéstïön #"
@@ -8567,16 +9099,22 @@ msgid "Free courses from <strong>{university_name}</strong>"
 msgstr "Fréé çöürsés fröm <strong>{university_name}</strong> Ⱡ'σяєм#"
 
 #: lms/templates/index.html
-msgid "The Future of Online Education"
-msgstr "Thé Fütüré öf Önlïné Édüçätïön Ⱡ'σяєм #"
-
-#: lms/templates/index.html
 msgid "For anyone, anywhere, anytime"
 msgstr "För änýöné, änýwhéré, änýtïmé Ⱡ'σяєм #"
 
+#. Translators: 'Open edX' is a brand, please keep this untranslated. See
+#. http://openedx.org for more information.
 #: lms/templates/index.html
-msgid "Stay up to date with all {platform_name} has to offer!"
-msgstr "Stäý üp tö däté wïth äll {platform_name} häs tö öffér! Ⱡ'σяєм ιρѕυ#"
+msgid "Welcome to Open edX!"
+msgstr "Wélçömé tö Öpén édX! Ⱡ'σя#"
+
+#. Translators: 'Open edX' is a brand, please keep this untranslated. See
+#. http://openedx.org for more information.
+#: lms/templates/index.html
+msgid "It works! This is the default homepage for this Open edX instance."
+msgstr ""
+"Ìt wörks! Thïs ïs thé défäült hömépägé för thïs Öpén édX ïnstänçé. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -8603,6 +9141,24 @@ msgid "The keys are valid for a limited amount of time. Has the key expired?"
 msgstr ""
 "Thé kéýs äré välïd för ä lïmïtéd ämöünt öf tïmé. Häs thé kéý éxpïréd? Ⱡ'σяєм"
 " ιρѕυм ∂σłσя ѕ#"
+
+#: lms/templates/library-block-author-preview-header.html
+msgid ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} component drawn randomly from this "
+"list."
+msgid_plural ""
+"Showing all matching content eligible to be added into {display_name}. Each "
+"student will be assigned {max_count} components drawn randomly from this "
+"list."
+msgstr[0] ""
+"Shöwïng äll mätçhïng çöntént élïgïßlé tö ßé äddéd ïntö {display_name}. Éäçh "
+"stüdént wïll ßé ässïgnéd {max_count} çömpönént dräwn rändömlý fröm thïs "
+"lïst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+msgstr[1] ""
+"Shöwïng äll mätçhïng çöntént élïgïßlé tö ßé äddéd ïntö {display_name}. Éäçh "
+"stüdént wïll ßé ässïgnéd {max_count} çömpönénts dräwn rändömlý fröm thïs "
+"lïst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/login-sidebar.html
 msgid "Helpful Information"
@@ -8653,9 +9209,10 @@ msgstr "Lög ïntö Mý {platform_name} Àççöünt Ⱡ'σяє#"
 msgid "Access My Courses"
 msgstr "Àççéss Mý Çöürsés Ⱡ'σ#"
 
-#: lms/templates/login.html lms/templates/register.html
-msgid "Processing your account information…"
-msgstr "Pröçéssïng ýöür äççöünt ïnförmätïön… Ⱡ'σяєм ιρ#"
+#: lms/templates/login.html lms/templates/register-shib.html
+#: lms/templates/register.html
+msgid "Processing your account information"
+msgstr "Pröçéssïng ýöür äççöünt ïnförmätïön Ⱡ'σяєм ιρ#"
 
 #: lms/templates/login.html
 msgid "Please log in"
@@ -8692,6 +9249,10 @@ msgstr ""
 #: lms/templates/login.html
 msgid "Account Preferences"
 msgstr "Àççöünt Préférénçés Ⱡ'σя#"
+
+#: lms/templates/login.html
+msgid "Remember me"
+msgstr "Rémémßér mé Ⱡ#"
 
 #. Translators: provider_name is the name of an external, third-party user
 #. authentication provider (like Google or LinkedIn).
@@ -8761,8 +9322,8 @@ msgid "(reload your page to refresh)"
 msgstr "(rélöäd ýöür pägé tö réfrésh) Ⱡ'σяєм #"
 
 #: lms/templates/manage_user_standing.html
-msgid "working..."
-msgstr "wörkïng... Ⱡ#"
+msgid "working"
+msgstr "wörkïng #"
 
 #: lms/templates/mathjax_accessible.html
 msgid ""
@@ -8854,8 +9415,8 @@ msgid "More options dropdown"
 msgstr "Möré öptïöns dröpdöwn Ⱡ'σя#"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
-msgid "Log Out"
-msgstr "Lög Öüt #"
+msgid "Sign out"
+msgstr "Sïgn öüt #"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Shopping Cart"
@@ -8868,9 +9429,8 @@ msgstr "Régïstér #"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html lms/templates/navigation.html
-#: lms/templates/register-sidebar.html
-msgid "Log in"
-msgstr "Lög ïn Ⱡ'σяєм ιρѕ#"
+msgid "Sign in"
+msgstr "Sïgn ïn #"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid ""
@@ -8883,12 +9443,6 @@ msgstr ""
 #: lms/templates/navigation.html
 msgid "Global Navigation"
 msgstr "Glößäl Nävïgätïön Ⱡ'σ#"
-
-#: lms/templates/navigation.html lms/templates/sysadmin_dashboard.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/courseware/courses.html
-msgid "Courses"
-msgstr "Çöürsés #"
 
 #: lms/templates/navigation.html
 msgid "Schools"
@@ -8950,10 +9504,6 @@ msgid "Update my {platform_name} Account"
 msgstr "Ûpdäté mý {platform_name} Àççöünt Ⱡ'σя#"
 
 #: lms/templates/register-shib.html
-msgid "Processing your account information …"
-msgstr "Pröçéssïng ýöür äççöünt ïnförmätïön … Ⱡ'σяєм ιρѕ#"
-
-#: lms/templates/register-shib.html
 msgid "Welcome {username}!  Please set your preferences below"
 msgstr "Wélçömé {username}!  Pléäsé sét ýöür préférénçés ßélöw Ⱡ'σяєм ιρѕυм #"
 
@@ -8982,11 +9532,6 @@ msgstr ""
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
 msgid "Enter a public username:"
 msgstr "Éntér ä püßlïç üsérnämé: Ⱡ'σяє#"
-
-#: lms/templates/register-shib.html lms/templates/register.html
-#: lms/templates/register.html
-msgid "example: JaneDoe"
-msgstr "éxämplé: JänéDöé Ⱡ'σ#"
 
 #: lms/templates/register-shib.html lms/templates/register.html
 #: lms/templates/register.html
@@ -9020,6 +9565,10 @@ msgstr "Régïsträtïön Hélp Ⱡ'σ#"
 #: lms/templates/register-sidebar.html
 msgid "Already registered?"
 msgstr "Àlréädý régïstéréd? Ⱡ'σя#"
+
+#: lms/templates/register-sidebar.html
+msgid "Log in"
+msgstr "Lög ïn Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/register-sidebar.html
 msgid "Welcome to {platform_name}"
@@ -9117,10 +9666,11 @@ msgstr "Ýöü'vé süççéssfüllý sïgnéd ïn wïth {selected_provider}. �
 
 #: lms/templates/register.html
 msgid ""
-"We just need a little more information before you start learning with edX."
+"We just need a little more information before you start learning with "
+"{platform_name}."
 msgstr ""
-"Wé jüst nééd ä lïttlé möré ïnförmätïön ßéföré ýöü stärt léärnïng wïth édX. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+"Wé jüst nééd ä lïttlé möré ïnförmätïön ßéföré ýöü stärt léärnïng wïth "
+"{platform_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/register.html
 msgid "Please complete the following fields to register for an account. "
@@ -9135,6 +9685,10 @@ msgstr "Néédéd för äný çértïfïçätés ýöü mäý éärn Ⱡ'σяє�
 #: lms/templates/register.html lms/templates/register.html
 msgid "cannot be changed later"
 msgstr "çännöt ßé çhängéd lätér Ⱡ'σяє#"
+
+#: lms/templates/register.html
+msgid "Ejemplo: Quito, Pichincha, Ecuador"
+msgstr "Éjémplö: Qüïtö, Pïçhïnçhä, Éçüädör Ⱡ'σяєм ιρ#"
 
 #: lms/templates/register.html
 msgid "Welcome {username}"
@@ -9155,6 +9709,15 @@ msgstr "Àddïtïönäl Pérsönäl Ìnförmätïön Ⱡ'σяєм ι#"
 #: lms/templates/register.html
 msgid "example: New York"
 msgstr "éxämplé: Néw Ýörk Ⱡ'σ#"
+
+#: lms/templates/register.html
+msgid "Highest Level of Education Completed"
+msgstr "Hïghést Lévél öf Édüçätïön Çömplétéd Ⱡ'σяєм ιρ#"
+
+#: lms/templates/register.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid "Year of Birth"
+msgstr "Ýéär öf Bïrth Ⱡ'#"
 
 #: lms/templates/register.html
 msgid "Please share with us your reasons for registering with {platform_name}"
@@ -9220,14 +9783,6 @@ msgstr "Füll Nämé * Ⱡ#"
 #: lms/templates/signup_modal.html
 msgid "Ed. Completed"
 msgstr "Éd. Çömplétéd Ⱡ'#"
-
-#: lms/templates/signup_modal.html
-msgid "Year of birth"
-msgstr "Ýéär öf ßïrth Ⱡ'#"
-
-#: lms/templates/signup_modal.html
-msgid "Mailing address"
-msgstr "Mäïlïng äddréss Ⱡ'#"
 
 #: lms/templates/signup_modal.html
 msgid "Goals in signing up for {platform_name}"
@@ -9642,6 +10197,187 @@ msgstr "Ýöür wörds: Ⱡ#"
 msgid "Total number of words:"
 msgstr "Tötäl nümßér öf wörds: Ⱡ'σяє#"
 
+#: lms/templates/calculator/toggle_calculator.html
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Open Calculator"
+msgstr "Öpén Çälçülätör Ⱡ'#"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Calculator Input Field"
+msgstr "Çälçülätör Ìnpüt Fïéld Ⱡ'σяє#"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid ""
+"Use the arrow keys to navigate the tips or use the tab key to return to the "
+"calculator"
+msgstr ""
+"Ûsé thé ärröw kéýs tö nävïgäté thé tïps ör üsé thé täß kéý tö rétürn tö thé "
+"çälçülätör Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Hints"
+msgstr "Hïnts Ⱡ'σяєм ι#"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid ""
+"For detailed information, see {math_link_start}Entering Mathematical and "
+"Scientific Expressions{math_link_end} in the {guide_link_start}edX Guide for"
+" Students{guide_link_end}."
+msgstr ""
+"För détäïléd ïnförmätïön, séé {math_link_start}Éntérïng Mäthémätïçäl änd "
+"Sçïéntïfïç Éxpréssïöns{math_link_end} ïn thé {guide_link_start}édX Güïdé för"
+" Stüdénts{guide_link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Tips"
+msgstr "Tïps Ⱡ'σяєм#"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid ""
+"Use parentheses () to make expressions clear. You can use parentheses inside"
+" other parentheses."
+msgstr ""
+"Ûsé pärénthésés () tö mäké éxpréssïöns çléär. Ýöü çän üsé pärénthésés ïnsïdé"
+" öthér pärénthésés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Do not use spaces in expressions."
+msgstr "Dö nöt üsé späçés ïn éxpréssïöns. Ⱡ'σяєм ι#"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "For constants, indicate multiplication explicitly (example: 5*c)."
+msgstr ""
+"För çönstänts, ïndïçäté mültïplïçätïön éxplïçïtlý (éxämplé: 5*ç). Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "For affixes, type the number and affix without a space (example: 5c)."
+msgstr ""
+"För äffïxés, týpé thé nümßér änd äffïx wïthöüt ä späçé (éxämplé: 5ç). Ⱡ'σяєм"
+" ιρѕυм ∂σłσя ѕ#"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid ""
+"For functions, type the name of the function, then the expression in "
+"parentheses."
+msgstr ""
+"För fünçtïöns, týpé thé nämé öf thé fünçtïön, thén thé éxpréssïön ïn "
+"pärénthésés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "To Use"
+msgstr "Tö Ûsé Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Type"
+msgstr "Týpé Ⱡ'σяєм#"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Examples"
+msgstr "Éxämplés #"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Numbers"
+msgstr "Nümßérs #"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Integers"
+msgstr "Ìntégérs #"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Fractions"
+msgstr "Fräçtïöns #"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Decimals"
+msgstr "Déçïmäls #"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Operators"
+msgstr "Öpérätörs #"
+
+#. Translators: Please do not translate mathematical symbols.
+#: lms/templates/calculator/toggle_calculator.html
+msgid "+ - * / (add, subtract, multiply, divide)"
+msgstr "+ - * / (ädd, süßträçt, mültïplý, dïvïdé) Ⱡ'σяєм ιρѕυ#"
+
+#. Translators: Please do not translate mathematical symbols.
+#: lms/templates/calculator/toggle_calculator.html
+msgid "^ (raise to a power)"
+msgstr "^ (räïsé tö ä pöwér) Ⱡ'σя#"
+
+#. Translators: Please do not translate mathematical symbols.
+#: lms/templates/calculator/toggle_calculator.html
+msgid "|| (parallel resistors)"
+msgstr "|| (pärällél résïstörs) Ⱡ'σяє#"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Greek letters"
+msgstr "Gréék léttérs Ⱡ'#"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Name of letter"
+msgstr "Nämé öf léttér Ⱡ'#"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Constants"
+msgstr "Çönstänts #"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Affixes"
+msgstr "Àffïxés #"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Percent sign (%) and metric affixes (d, c, m, u, n, p, k, M, G, T)"
+msgstr ""
+"Pérçént sïgn (%) änd métrïç äffïxés (d, ç, m, ü, n, p, k, M, G, T) Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Basic functions"
+msgstr "Bäsïç fünçtïöns Ⱡ'#"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Trigonometric functions"
+msgstr "Trïgönömétrïç fünçtïöns Ⱡ'σяє#"
+
+#. Translators: Please see http://en.wikipedia.org/wiki/Scientific_notation
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Scientific notation"
+msgstr "Sçïéntïfïç nötätïön Ⱡ'σя#"
+
+#. Translators: 10^ is a mathematical symbol. Please do not translate.
+#: lms/templates/calculator/toggle_calculator.html
+msgid "10^ and the exponent"
+msgstr "10^ änd thé éxpönént Ⱡ'σя#"
+
+#. Translators: this is part of scientific notation. Please see
+#. http://en.wikipedia.org/wiki/Scientific_notation#E_notation
+#: lms/templates/calculator/toggle_calculator.html
+msgid "e notation"
+msgstr "é nötätïön Ⱡ#"
+
+#. Translators: 1e is a mathematical symbol. Please do not translate.
+#: lms/templates/calculator/toggle_calculator.html
+msgid "1e and the exponent"
+msgstr "1é änd thé éxpönént Ⱡ'σя#"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Calculate"
+msgstr "Çälçüläté #"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Calculator Output Field"
+msgstr "Çälçülätör Öütpüt Fïéld Ⱡ'σяє#"
+
+#: lms/templates/chat/toggle_chat.html
+msgid "Open Chat"
+msgstr "Öpén Çhät #"
+
+#: lms/templates/chat/toggle_chat.html
+msgid "Close Chat"
+msgstr "Çlösé Çhät Ⱡ#"
+
 #: lms/templates/combinedopenended/combined_open_ended.html
 msgid "Open Response"
 msgstr "Öpén Réspönsé Ⱡ'#"
@@ -9828,6 +10564,7 @@ msgstr "düé {date} #"
 
 #: lms/templates/courseware/course_about.html
 #: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/course_about.html
 #: lms/templates/courseware/mktg_course_about.html
 msgid "An error occurred. Please try again later."
 msgstr "Àn érrör öççürréd. Pléäsé trý ägäïn lätér. Ⱡ'σяєм ιρѕυ#"
@@ -9892,6 +10629,17 @@ msgstr "Övérvïéw #"
 msgid "Share with friends and family!"
 msgstr "Shäré wïth frïénds änd fämïlý! Ⱡ'σяєм #"
 
+#: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/course_about.html
+msgid "Tweet that you've registered for this course"
+msgstr "Twéét thät ýöü'vé régïstéréd för thïs çöürsé Ⱡ'σяєм ιρѕυм#"
+
+#: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/course_about.html
+msgid "Email someone to say you've registered for this course"
+msgstr ""
+"Émäïl söméöné tö säý ýöü'vé régïstéréd för thïs çöürsé Ⱡ'σяєм ιρѕυм ∂σ#"
+
 #. Translators: This text will be automatically posted to the student's
 #. Twitter account. {url} should appear at the end of the text.
 #: lms/templates/courseware/course_about.html
@@ -9909,6 +10657,12 @@ msgid "I just registered for {number} {title} through {platform} {url}"
 msgstr ""
 "Ì jüst régïstéréd för {number} {title} thröügh {platform} {url} Ⱡ'σяєм "
 "ιρѕυм#"
+
+#: lms/templates/courseware/course_about.html
+msgid "Post a Facebook message to say you've registered for this course"
+msgstr ""
+"Pöst ä Fäçéßöök méssägé tö säý ýöü'vé régïstéréd för thïs çöürsé Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
 
 #: lms/templates/courseware/course_about.html
 msgid "Classes Start"
@@ -9935,8 +10689,26 @@ msgid "Prerequisites"
 msgstr "Préréqüïsïtés Ⱡ'#"
 
 #: lms/templates/courseware/course_about.html
+msgid "You must successfully complete {course} before you begin this course"
+msgstr ""
+"Ýöü müst süççéssfüllý çömplété {course} ßéföré ýöü ßégïn thïs çöürsé Ⱡ'σяєм "
+"ιρѕυм ∂σłσя#"
+
+#: lms/templates/courseware/course_about.html
 msgid "Additional Resources"
 msgstr "Àddïtïönäl Résöürçés Ⱡ'σя#"
+
+#: lms/templates/courseware/course_navigation.html
+msgid "View this course as:"
+msgstr "Vïéw thïs çöürsé äs: Ⱡ'σя#"
+
+#: lms/templates/courseware/course_navigation.html
+msgid "Student in {content_group}"
+msgstr "Stüdént ïn {content_group} Ⱡ'#"
+
+#: lms/templates/courseware/course_navigation.html
+msgid "set preview mode"
+msgstr "sét prévïéw mödé Ⱡ'σ#"
 
 #. Translators: 'needs attention' is an alternative string for the
 #. notification image that indicates the tab "needs attention".
@@ -9945,17 +10717,8 @@ msgid "needs attention"
 msgstr "nééds ätténtïön Ⱡ'#"
 
 #: lms/templates/courseware/course_navigation.html
-#: lms/templates/courseware/course_navigation.html
-msgid "Staff view"
-msgstr "Stäff vïéw Ⱡ#"
-
-#: lms/templates/courseware/course_navigation.html
 msgid "Course is not yet visible to students."
 msgstr "Çöürsé ïs nöt ýét vïsïßlé tö stüdénts. Ⱡ'σяєм ιρѕ#"
-
-#: lms/templates/courseware/course_navigation.html
-msgid "Student view"
-msgstr "Stüdént vïéw Ⱡ#"
 
 #: lms/templates/courseware/course_navigation.html
 msgid ""
@@ -9966,12 +10729,16 @@ msgstr ""
 "réléäsé däté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/courseware/courses.html
-msgid "Explore free courses from leading universities."
-msgstr "Éxplöré fréé çöürsés fröm léädïng ünïvérsïtïés. Ⱡ'σяєм ιρѕυм #"
-
-#: lms/templates/courseware/courses.html
 msgid "Explore free courses from {university_name}."
 msgstr "Éxplöré fréé çöürsés fröm {university_name}. Ⱡ'σяєм #"
+
+#: lms/templates/courseware/courses.html
+msgid "Explore courses from {platform_name}."
+msgstr "Éxplöré çöürsés fröm {platform_name}. Ⱡ'σяєм#"
+
+#: lms/templates/courseware/courses.html
+msgid "{platform_name} Logo"
+msgstr "{platform_name} Lögö #"
 
 #: lms/templates/courseware/courseware-error.html
 msgid ""
@@ -10001,94 +10768,8 @@ msgid "No content has been added to this course"
 msgstr "Nö çöntént häs ßéén äddéd tö thïs çöürsé Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/courseware/courseware.html
-msgid "Open Calculator"
-msgstr "Öpén Çälçülätör Ⱡ'#"
-
-#: lms/templates/courseware/courseware.html
-msgid "Calculator Input Field"
-msgstr "Çälçülätör Ìnpüt Fïéld Ⱡ'σяє#"
-
-#: lms/templates/courseware/courseware.html
-msgid ""
-"Use the arrow keys to navigate the tips or use the tab key to return to the "
-"calculator"
-msgstr ""
-"Ûsé thé ärröw kéýs tö nävïgäté thé tïps ör üsé thé täß kéý tö rétürn tö thé "
-"çälçülätör Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/templates/courseware/courseware.html
-msgid "Hints"
-msgstr "Hïnts Ⱡ'σяєм ι#"
-
-#: lms/templates/courseware/courseware.html
-msgid ""
-"For detailed information, see {math_link_start}Entering Mathematical and "
-"Scientific Expressions{math_link_end} in the {guide_link_start}edX Guide for"
-" Students{guide_link_end}."
-msgstr ""
-"För détäïléd ïnförmätïön, séé {math_link_start}Éntérïng Mäthémätïçäl änd "
-"Sçïéntïfïç Éxpréssïöns{math_link_end} ïn thé {guide_link_start}édX Güïdé för"
-" Stüdénts{guide_link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: lms/templates/courseware/courseware.html
-msgid "Tips"
-msgstr "Tïps Ⱡ'σяєм#"
-
-#: lms/templates/courseware/courseware.html
-msgid "To Use"
-msgstr "Tö Ûsé Ⱡ'σяєм ιρѕ#"
-
-#: lms/templates/courseware/courseware.html
-msgid "Type"
-msgstr "Týpé Ⱡ'σяєм#"
-
-#: lms/templates/courseware/courseware.html
-msgid "Examples"
-msgstr "Éxämplés #"
-
-#: lms/templates/courseware/courseware.html
-msgid "Numbers"
-msgstr "Nümßérs #"
-
-#: lms/templates/courseware/courseware.html
-msgid "Operators"
-msgstr "Öpérätörs #"
-
-#: lms/templates/courseware/courseware.html
-msgid "Greek letters"
-msgstr "Gréék léttérs Ⱡ'#"
-
-#: lms/templates/courseware/courseware.html
-msgid "Constants"
-msgstr "Çönstänts #"
-
-#: lms/templates/courseware/courseware.html
-msgid "Affixes"
-msgstr "Àffïxés #"
-
-#: lms/templates/courseware/courseware.html
-msgid "Basic functions"
-msgstr "Bäsïç fünçtïöns Ⱡ'#"
-
-#: lms/templates/courseware/courseware.html
-msgid "Trigonometric functions"
-msgstr "Trïgönömétrïç fünçtïöns Ⱡ'σяє#"
-
-#: lms/templates/courseware/courseware.html
-msgid "Scientific notation"
-msgstr "Sçïéntïfïç nötätïön Ⱡ'σя#"
-
-#: lms/templates/courseware/courseware.html
-msgid "e notation"
-msgstr "é nötätïön Ⱡ#"
-
-#: lms/templates/courseware/courseware.html
-msgid "Calculate"
-msgstr "Çälçüläté #"
-
-#: lms/templates/courseware/courseware.html
-msgid "Calculator Output Field"
-msgstr "Çälçülätör Öütpüt Fïéld Ⱡ'σяє#"
+msgid "Course Utilities Navigation"
+msgstr "Çöürsé Ûtïlïtïés Nävïgätïön Ⱡ'σяєм#"
 
 #: lms/templates/courseware/error-message.html
 msgid ""
@@ -10315,11 +10996,11 @@ msgstr ""
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid ""
-"To manage beta tester roles and cohort groups, visit the Membership section "
-"of the Instructor Dashboard."
+"To manage beta tester roles and cohorts, visit the Membership section of the"
+" Instructor Dashboard."
 msgstr ""
-"Tö mänägé ßétä téstér rölés änd çöhört gröüps, vïsït thé Mémßérshïp séçtïön "
-"öf thé Ìnstrüçtör Däshßöärd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+"Tö mänägé ßétä téstér rölés änd çöhörts, vïsït thé Mémßérshïp séçtïön öf thé"
+" Ìnstrüçtör Däshßöärd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid ""
@@ -10531,10 +11212,6 @@ msgstr "Vïéw Grädïng ïn stüdïö Ⱡ'σяє#"
 #: lms/templates/courseware/progress.html
 msgid "Course Progress for Student '{username}' ({email})"
 msgstr "Çöürsé Prögréss för Stüdént '{username}' ({email}) Ⱡ'σяєм ιρѕ#"
-
-#: lms/templates/courseware/progress.html
-msgid "Download your certificate"
-msgstr "Döwnlöäd ýöür çértïfïçäté Ⱡ'σяєм#"
 
 #: lms/templates/courseware/progress.html
 msgid "{earned:.3n} of {total:.3n} possible points"
@@ -10822,6 +11499,7 @@ msgstr "Vïéw Àrçhïvéd Çöürsé Ⱡ'σя#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/shoppingcart/registration_code_receipt.html
 msgid "View Course"
 msgstr "Vïéw Çöürsé Ⱡ#"
 
@@ -10854,6 +11532,14 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Email Settings"
 msgstr "Émäïl Séttïngs Ⱡ'#"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"You must successfully complete {link_start}{prc_display}{link_end} before "
+"you begin this course."
+msgstr ""
+"Ýöü müst süççéssfüllý çömplété {link_start}{prc_display}{link_end} ßéföré "
+"ýöü ßégïn thïs çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
 #: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
@@ -10923,7 +11609,6 @@ msgstr "Àpprövéd: #"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 #: lms/templates/dashboard/_dashboard_status_verification.html
-#: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "ID-Verification Status"
 msgstr "ÌD-Vérïfïçätïön Stätüs Ⱡ'σяє#"
 
@@ -10945,16 +11630,21 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Re-verify Yourself"
-msgstr "Ré-vérïfý Ýöürsélf Ⱡ'σ#"
+msgid "{platform_name} Verification Status"
+msgstr "{platform_name} Vérïfïçätïön Stätüs Ⱡ'σяє#"
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Resubmit Verification"
+msgstr "Résüßmït Vérïfïçätïön Ⱡ'σя#"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"If you fail to pass a verification attempt before your course ends, you will"
-" not receive a verified certificate."
+"To receive a verified certificate, you have to submit a new photo of "
+"yourself and your government-issued photo ID before the course ends."
 msgstr ""
-"Ìf ýöü fäïl tö päss ä vérïfïçätïön ättémpt ßéföré ýöür çöürsé énds, ýöü wïll"
-" nöt réçéïvé ä vérïfïéd çértïfïçäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+"Tö réçéïvé ä vérïfïéd çértïfïçäté, ýöü hävé tö süßmït ä néw phötö öf "
+"ýöürsélf änd ýöür gövérnmént-ïssüéd phötö ÌD ßéföré thé çöürsé énds. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂#"
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html
 msgid "Could Not Link Accounts"
@@ -11144,12 +11834,9 @@ msgid "Show Comments (%(num_comments)s)"
 msgstr "Shöw Çömménts (%(num_comments)s) Ⱡ'σя#"
 
 #: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
 msgid "Add a comment"
 msgstr "Àdd ä çömmént Ⱡ'#"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Add a comment..."
-msgstr "Àdd ä çömmént... Ⱡ'σ#"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "marked as answer %(time_ago)s by %(user)s"
@@ -11237,8 +11924,8 @@ msgid "DISCUSSION HOME:"
 msgstr "DÌSÇÛSSÌÖN HÖMÉ: Ⱡ'σ#"
 
 #: lms/templates/discussion/_underscore_templates.html
-msgid "HOW TO USE EDX DISCUSSIONS"
-msgstr "HÖW TÖ ÛSÉ ÉDX DÌSÇÛSSÌÖNS Ⱡ'σяєм#"
+msgid "How to use {platform_name} discussions"
+msgstr "Höw tö üsé {platform_name} dïsçüssïöns Ⱡ'σяєм#"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Find discussions"
@@ -11303,11 +11990,10 @@ msgstr "Àll Gröüps Ⱡ#"
 #: lms/templates/discussion/_underscore_templates.html
 msgid ""
 "Discussion admins, moderators, and TAs can make their posts visible to all "
-"students or specify a single cohort group."
+"students or specify a single cohort."
 msgstr ""
 "Dïsçüssïön ädmïns, mödérätörs, änd TÀs çän mäké théïr pösts vïsïßlé tö äll "
-"stüdénts ör spéçïfý ä sïnglé çöhört gröüp. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢т#"
+"stüdénts ör spéçïfý ä sïnglé çöhört. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Title:"
@@ -11320,8 +12006,8 @@ msgstr ""
 "∂σłσя#"
 
 #: lms/templates/discussion/_underscore_templates.html
-msgid "Enter your question or comment…"
-msgstr "Éntér ýöür qüéstïön ör çömmént… Ⱡ'σяєм ι#"
+msgid "Enter your question or comment"
+msgstr "Éntér ýöür qüéstïön ör çömmént Ⱡ'σяєм #"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "follow this post"
@@ -11482,6 +12168,68 @@ msgstr "Vïéw dïsçüssïön Ⱡ'#"
 #: lms/templates/discussion/mustache/_user_profile.mustache
 msgid "Active Threads"
 msgstr "Àçtïvé Thréäds Ⱡ'#"
+
+#: lms/templates/edxnotes/edxnotes.html
+msgid "Student Notes"
+msgstr "Stüdént Nötés Ⱡ'#"
+
+#: lms/templates/edxnotes/edxnotes.html
+msgid "Highlights and notes you've made in course content"
+msgstr "Hïghlïghts änd nötés ýöü'vé mädé ïn çöürsé çöntént Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/templates/edxnotes/edxnotes.html
+msgid "Search notes for:"
+msgstr "Séärçh nötés för: Ⱡ'σ#"
+
+#: lms/templates/edxnotes/edxnotes.html
+msgid "Search notes for..."
+msgstr "Séärçh nötés för... Ⱡ'σя#"
+
+#: lms/templates/edxnotes/edxnotes.html
+msgid "View notes by:"
+msgstr "Vïéw nötés ßý: Ⱡ'#"
+
+#: lms/templates/edxnotes/edxnotes.html
+msgid ""
+"You have not made any notes in this course yet. Other students in this "
+"course are using notes to:"
+msgstr ""
+"Ýöü hävé nöt mädé äný nötés ïn thïs çöürsé ýét. Öthér stüdénts ïn thïs "
+"çöürsé äré üsïng nötés tö: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: lms/templates/edxnotes/edxnotes.html
+msgid "Mark a passage or concept so that it's easy to find later."
+msgstr ""
+"Märk ä pässägé ör çönçépt sö thät ït's éäsý tö fïnd lätér. Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: lms/templates/edxnotes/edxnotes.html
+msgid "Record thoughts about a specific passage or concept."
+msgstr "Réçörd thöüghts äßöüt ä spéçïfïç pässägé ör çönçépt. Ⱡ'σяєм ιρѕυм ∂σ#"
+
+#: lms/templates/edxnotes/edxnotes.html
+msgid ""
+"Highlight important information to review later in the course or in future "
+"courses."
+msgstr ""
+"Hïghlïght ïmpörtänt ïnförmätïön tö révïéw lätér ïn thé çöürsé ör ïn fütüré "
+"çöürsés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/templates/edxnotes/edxnotes.html
+msgid ""
+"Get started by making a note in something you just read, like "
+"{section_link}."
+msgstr ""
+"Gét stärtéd ßý mäkïng ä nöté ïn söméthïng ýöü jüst réäd, lïké "
+"{section_link}. Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/templates/edxnotes/toggle_notes.html
+msgid "Hide notes"
+msgstr "Hïdé nötés Ⱡ#"
+
+#: lms/templates/edxnotes/toggle_notes.html
+msgid "Show notes"
+msgstr "Shöw nötés Ⱡ#"
 
 #: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
 msgid "Welcome to {course_name}"
@@ -12068,10 +12816,6 @@ msgid "INVOICE"
 msgstr "ÌNVÖÌÇÉ #"
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Date: {date}"
-msgstr "Däté: {date} #"
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "Invoice No: {invoice_number}"
 msgstr "Ìnvöïçé Nö: {invoice_number} Ⱡ'#"
 
@@ -12138,23 +12882,23 @@ msgstr ""
 msgid ""
 "We are sorry. Our course staff did not approve your request to change your "
 "name from {old_name} to {new_name}. If you need further assistance, please "
-"e-mail the tech support at"
+"e-mail the tech support at {email}"
 msgstr ""
 "Wé äré sörrý. Öür çöürsé stäff dïd nöt äpprövé ýöür réqüést tö çhängé ýöür "
 "nämé fröm {old_name} tö {new_name}. Ìf ýöü nééd fürthér ässïstänçé, pléäsé "
-"é-mäïl thé téçh süppört ät Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιη#"
+"é-mäïl thé téçh süppört ät {email} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg#"
 
 #: lms/templates/emails/reject_name_change.txt
 msgid ""
 "We are sorry. Our course staff did not approve your request to change your "
 "name from {old_name} to {new_name}. If you need further assistance, please "
-"e-mail the course staff at ta@edx.org."
+"e-mail the course staff at {email}."
 msgstr ""
 "Wé äré sörrý. Öür çöürsé stäff dïd nöt äpprövé ýöür réqüést tö çhängé ýöür "
 "nämé fröm {old_name} tö {new_name}. Ìf ýöü nééd fürthér ässïstänçé, pléäsé "
-"é-mäïl thé çöürsé stäff ät tä@édx.örg. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єł#"
+"é-mäïl thé çöürsé stäff ät {email}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя"
+" α∂ιριѕι¢ιηg #"
 
 #: lms/templates/emails/remove_beta_tester_email_message.txt
 msgid ""
@@ -12315,15 +13059,13 @@ msgid "Please enter Coupon detail below"
 msgstr "Pléäsé éntér Çöüpön détäïl ßélöw Ⱡ'σяєм ι#"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-msgid "Code"
-msgstr "Çödé Ⱡ'σяєм#"
-
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Percentage Discount"
 msgstr "Pérçéntägé Dïsçöünt Ⱡ'σя#"
+
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+msgid "Add expiration date"
+msgstr "Àdd éxpïrätïön däté Ⱡ'σя#"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Enrollment Information"
@@ -12345,13 +13087,6 @@ msgstr "Àüdït Ⱡ'σяєм ι#"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Honor"
 msgstr "Hönör Ⱡ'σяєм ι#"
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/shoppingcart/billing_details.html
-#: lms/templates/shoppingcart/receipt.html
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid "Total"
-msgstr "Tötäl Ⱡ'σяєм ι#"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Basic Course Information"
@@ -12386,6 +13121,15 @@ msgstr "Häs thé çöürsé éndéd? Ⱡ'σя#"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Grade Cutoffs:"
 msgstr "Grädé Çütöffs: Ⱡ'#"
+
+#. Translators: git is a version-control system; see http://git-scm.com/about
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid ""
+"View detailed Git import logs for this course {link_start}by clicking "
+"here{link_end}."
+msgstr ""
+"Vïéw détäïléd Gït ïmpört lögs för thïs çöürsé {link_start}ßý çlïçkïng "
+"héré{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
@@ -12643,6 +13387,10 @@ msgid "Coupons Information"
 msgstr "Çöüpöns Ìnförmätïön Ⱡ'σя#"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Expiry Date"
+msgstr "Éxpïrý Däté Ⱡ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Discount (%)"
 msgstr "Dïsçöünt (%) Ⱡ#"
 
@@ -12651,8 +13399,24 @@ msgid "Redeem Count"
 msgstr "Rédéém Çöünt Ⱡ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "{code}"
+msgstr "{code} Ⱡ'σя#"
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "{description}"
+msgstr "{description} Ⱡ'σя#"
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "{discount}"
+msgstr "{discount} Ⱡ'σя#"
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Invoice number should not be empty."
 msgstr "Ìnvöïçé nümßér shöüld nöt ßé émptý. Ⱡ'σяєм ιρ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Never Expires"
+msgstr "Névér Éxpïrés Ⱡ'#"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Please enter the course price"
@@ -12696,6 +13460,10 @@ msgstr "Ûpdäté Çöüpön Ìnförmätïön Ⱡ'σяєм#"
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "example: A123DS"
 msgstr "éxämplé: À123DS Ⱡ'#"
+
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "Expiration Date"
+msgstr "Éxpïrätïön Däté Ⱡ'#"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Individual due date extensions"
@@ -13972,6 +14740,7 @@ msgid "Thank you for your purchase!"
 msgstr "Thänk ýöü för ýöür pürçhäsé! Ⱡ'σяєм #"
 
 #: lms/templates/shoppingcart/receipt.html
+#: lms/templates/shoppingcart/registration_code_redemption.html
 msgid "View Dashboard"
 msgstr "Vïéw Däshßöärd Ⱡ'#"
 
@@ -14026,10 +14795,6 @@ msgid "Used"
 msgstr "Ûséd Ⱡ'σяєм#"
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "Invoice"
-msgstr "Ìnvöïçé #"
-
-#: lms/templates/shoppingcart/receipt.html
 msgid "Date of purchase"
 msgstr "Däté öf pürçhäsé Ⱡ'σ#"
 
@@ -14082,10 +14847,6 @@ msgid "Address 2"
 msgstr "Àddréss 2 #"
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "State"
-msgstr "Stäté Ⱡ'σяєм ι#"
-
-#: lms/templates/shoppingcart/receipt.html
 msgid "Registration for"
 msgstr "Régïsträtïön för Ⱡ'σ#"
 
@@ -14121,35 +14882,39 @@ msgstr ""
 "Nöté: ïtéms wïth strïkéthöügh lïké <del>thïs</del> hävé ßéén réfündéd. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
+#: lms/templates/shoppingcart/registration_code_receipt.html
 #: lms/templates/shoppingcart/registration_code_redemption.html
 msgid "Confirm Enrollment"
 msgstr "Çönfïrm Énröllmént Ⱡ'σ#"
 
+#: lms/templates/shoppingcart/registration_code_receipt.html
 #: lms/templates/shoppingcart/registration_code_redemption.html
 msgid "{site_name} -  Confirm Enrollment"
 msgstr "{site_name} -  Çönfïrm Énröllmént Ⱡ'σяєм#"
 
+#: lms/templates/shoppingcart/registration_code_receipt.html
 #: lms/templates/shoppingcart/registration_code_redemption.html
 msgid "Confirm your enrollment for:"
 msgstr "Çönfïrm ýöür énröllmént för: Ⱡ'σяєм #"
 
+#: lms/templates/shoppingcart/registration_code_receipt.html
 #: lms/templates/shoppingcart/registration_code_redemption.html
 msgid "course dates"
 msgstr "çöürsé dätés Ⱡ#"
 
-#: lms/templates/shoppingcart/registration_code_redemption.html
+#: lms/templates/shoppingcart/registration_code_receipt.html
 msgid "{course_name}"
 msgstr "{course_name} Ⱡ'σя#"
 
-#: lms/templates/shoppingcart/registration_code_redemption.html
+#: lms/templates/shoppingcart/registration_code_receipt.html
 msgid "{start_date}"
 msgstr "{start_date} Ⱡ'σя#"
 
-#: lms/templates/shoppingcart/registration_code_redemption.html
+#: lms/templates/shoppingcart/registration_code_receipt.html
 msgid "{end_date}"
 msgstr "{end_date} Ⱡ'σя#"
 
-#: lms/templates/shoppingcart/registration_code_redemption.html
+#: lms/templates/shoppingcart/registration_code_receipt.html
 msgid ""
 "You've clicked a link for an enrollment code that has already been used. "
 "Check your <a href={dashboard_url}>course dashboard</a> to see if you're "
@@ -14160,6 +14925,7 @@ msgstr ""
 "énrölléd ïn thé çöürsé, ör çöntäçt ýöür çömpäný's ädmïnïsträtör. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕ#"
 
+#: lms/templates/shoppingcart/registration_code_receipt.html
 #: lms/templates/shoppingcart/registration_code_redemption.html
 msgid ""
 "You have successfully enrolled in {course_name}. This course has now been "
@@ -14168,7 +14934,7 @@ msgstr ""
 "Ýöü hävé süççéssfüllý énrölléd ïn {course_name}. Thïs çöürsé häs nöw ßéén "
 "äddéd tö ýöür däshßöärd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
-#: lms/templates/shoppingcart/registration_code_redemption.html
+#: lms/templates/shoppingcart/registration_code_receipt.html
 msgid ""
 "You're already registered for this course. Visit your <a "
 "href={dashboard_url}>dashboard</a> to see the course."
@@ -14177,6 +14943,20 @@ msgstr ""
 "href={dashboard_url}>däshßöärd</a> tö séé thé çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
 " αмєт#"
 
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "The course you are registering for is full."
+msgstr "Thé çöürsé ýöü äré régïstérïng för ïs füll. Ⱡ'σяєм ιρѕυм#"
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "The course you are registering for is closed."
+msgstr "Thé çöürsé ýöü äré régïstérïng för ïs çlöséd. Ⱡ'σяєм ιρѕυм#"
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+#: lms/templates/shoppingcart/registration_code_redemption.html
+msgid "There was an error processing your redeem code."
+msgstr "Théré wäs än érrör pröçéssïng ýöür rédéém çödé. Ⱡ'σяєм ιρѕυм #"
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
 #: lms/templates/shoppingcart/registration_code_redemption.html
 msgid ""
 "You're about to activate an enrollment code for {course_name} by "
@@ -14188,9 +14968,34 @@ msgstr ""
 "äçtïväté thïs çödé ïf ýöü'ré ïts ïnténdéd réçïpïént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg #"
 
+#: lms/templates/shoppingcart/registration_code_receipt.html
 #: lms/templates/shoppingcart/registration_code_redemption.html
-msgid "View Dashboard &nbsp; &nbsp; &#x25b8;"
-msgstr "Vïéw Däshßöärd &nbsp; &nbsp; &#x25b8; Ⱡ'σяєм#"
+msgid "Activate Course Enrollment"
+msgstr "Àçtïväté Çöürsé Énröllmént Ⱡ'σяєм#"
+
+#: lms/templates/shoppingcart/registration_code_redemption.html
+msgid "{course_number} {course_title} Cover Image"
+msgstr "{course_number} {course_title} Çövér Ìmägé Ⱡ'σя#"
+
+#: lms/templates/shoppingcart/registration_code_redemption.html
+msgid ""
+"You've clicked a link for an enrollment code that has already been used. "
+"Check your {link_start}course dashboard{link_end} to see if you're enrolled "
+"in the course, or contact your company's administrator."
+msgstr ""
+"Ýöü'vé çlïçkéd ä lïnk för än énröllmént çödé thät häs älréädý ßéén üséd. "
+"Çhéçk ýöür {link_start}çöürsé däshßöärd{link_end} tö séé ïf ýöü'ré énrölléd "
+"ïn thé çöürsé, ör çöntäçt ýöür çömpäný's ädmïnïsträtör. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕ#"
+
+#: lms/templates/shoppingcart/registration_code_redemption.html
+msgid ""
+"You're already registered for this course. Visit your "
+"{link_start}dashboard{link_end} to see the course."
+msgstr ""
+"Ýöü'ré älréädý régïstéréd för thïs çöürsé. Vïsït ýöür "
+"{link_start}däshßöärd{link_end} tö séé thé çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт#"
 
 #: lms/templates/shoppingcart/shopping_cart.html
 #: lms/templates/shoppingcart/shopping_cart.html
@@ -14459,19 +15264,16 @@ msgstr "Thïs Çöürsé Ûnäväïläßlé Ìn Ýöür Çöüntrý Ⱡ'σяєм
 
 #: lms/templates/static_templates/embargo.html
 msgid ""
-"Our system indicates that you are trying to access an edX course from a "
-"country currently subject to U.S. economic and trade sanctions. "
-"Unfortunately, at this time edX must comply with export controls, and we "
-"cannot allow you to access this particular course. Feel free to browse our "
-"catalogue to find other courses you may be interested in taking."
+"Our system indicates that you are trying to access this {platform_name} "
+"course from a country or region currently subject to U.S. economic and trade"
+" sanctions. Unfortunately, at this time {platform_name} must comply with "
+"export controls, and we cannot allow you to access this course."
 msgstr ""
-"Öür sýstém ïndïçätés thät ýöü äré trýïng tö äççéss än édX çöürsé fröm ä "
-"çöüntrý çürréntlý süßjéçt tö Û.S. éçönömïç änd trädé sänçtïöns. "
-"Ûnförtünätélý, ät thïs tïmé édX müst çömplý wïth éxpört çöntröls, änd wé "
-"çännöt ällöw ýöü tö äççéss thïs pärtïçülär çöürsé. Féél fréé tö ßröwsé öür "
-"çätälögüé tö fïnd öthér çöürsés ýöü mäý ßé ïntéréstéd ïn täkïng. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє #"
+"Öür sýstém ïndïçätés thät ýöü äré trýïng tö äççéss thïs {platform_name} "
+"çöürsé fröm ä çöüntrý ör régïön çürréntlý süßjéçt tö Û.S. éçönömïç änd trädé"
+" sänçtïöns. Ûnförtünätélý, ät thïs tïmé {platform_name} müst çömplý wïth "
+"éxpört çöntröls, änd wé çännöt ällöw ýöü tö äççéss thïs çöürsé. Ⱡ'σяєм ιρѕυм"
+" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη#"
 
 #: lms/templates/static_templates/media-kit.html
 #: lms/templates/static_templates/media-kit.html
@@ -14557,8 +15359,8 @@ msgid "Student Account"
 msgstr "Stüdént Àççöünt Ⱡ'#"
 
 #: lms/templates/student_account/login_and_register.html
-msgid "Log in or Register"
-msgstr "Lög ïn ör Régïstér Ⱡ'σ#"
+msgid "Sign in or Register"
+msgstr "Sïgn ïn ör Régïstér Ⱡ'σя#"
 
 #: lms/templates/student_profile/index.html
 msgid "Student Profile"
@@ -14938,13 +15740,13 @@ msgstr "Çhéçk Ýöür Nämé Ⱡ'#"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 msgid ""
-"Make sure your full name on your edX account ({full_name}) matches the ID "
-"you originally submitted. We will also use this as the name on your "
-"certificate."
+"Make sure your full name on your {platform_name} account ({full_name}) "
+"matches the ID you originally submitted. We will also use this as the name "
+"on your certificate."
 msgstr ""
-"Mäké süré ýöür füll nämé ön ýöür édX äççöünt ({full_name}) mätçhés thé ÌD "
-"ýöü örïgïnällý süßmïttéd. Wé wïll älsö üsé thïs äs thé nämé ön ýöür "
-"çértïfïçäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιρι#"
+"Mäké süré ýöür füll nämé ön ýöür {platform_name} äççöünt ({full_name}) "
+"mätçhés thé ÌD ýöü örïgïnällý süßmïttéd. Wé wïll älsö üsé thïs äs thé nämé "
+"ön ýöür çértïfïçäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιρι#"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -15052,10 +15854,6 @@ msgstr "Ýöü hävé nö ré-vérïfïçätïöns ät présént. Ⱡ'σяєм �
 #: lms/templates/verify_student/midcourse_reverify_dash.html
 msgid "The status of your submitted re-verifications:"
 msgstr "Thé stätüs öf ýöür süßmïttéd ré-vérïfïçätïöns: Ⱡ'σяєм ιρѕυм #"
-
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid "Failed"
-msgstr "Fäïléd Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/verify_student/midcourse_reverify_dash.html
 msgid "Don't want to re-verify right now?"
@@ -15358,12 +16156,12 @@ msgstr "Rétäké Ýöür Phötös Ⱡ'σ#"
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid ""
-"Make sure your full name on your edX account ({full_name}) matches your ID. "
-"We will also use this as the name on your certificate."
+"Make sure your full name on your {platform_name} account ({full_name}) "
+"matches your ID. We will also use this as the name on your certificate."
 msgstr ""
-"Mäké süré ýöür füll nämé ön ýöür édX äççöünt ({full_name}) mätçhés ýöür ÌD. "
-"Wé wïll älsö üsé thïs äs thé nämé ön ýöür çértïfïçäté. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєт#"
+"Mäké süré ýöür füll nämé ön ýöür {platform_name} äççöünt ({full_name}) "
+"mätçhés ýöür ÌD. Wé wïll älsö üsé thïs äs thé nämé ön ýöür çértïfïçäté. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/templates/verify_student/photo_reverification.html
 msgid ""
@@ -15458,10 +16256,15 @@ msgstr "Révïéw thé Phötös Ýöü'vé Täkén Ⱡ'σяєм #"
 msgid "Check Your Contribution Level"
 msgstr "Çhéçk Ýöür Çöntrïßütïön Lévél Ⱡ'σяєм #"
 
+#. Translators: The last part of this string will appear such as: "(min. 50
+#. USD)"
 #: lms/templates/verify_student/photo_verification.html
-msgid "Please confirm your contribution for this course (min. $"
+msgid ""
+"Please confirm your contribution for this course (min. {min_price} "
+"{currency}):"
 msgstr ""
-"Pléäsé çönfïrm ýöür çöntrïßütïön för thïs çöürsé (mïn. $ Ⱡ'σяєм ιρѕυм ∂σł#"
+"Pléäsé çönfïrm ýöür çöntrïßütïön för thïs çöürsé (mïn. {min_price} "
+"{currency}): Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/verify_student/photo_verification.html
 msgid "Your Course Total"
@@ -15538,9 +16341,10 @@ msgid "Register for {}"
 msgstr "Régïstér för {} Ⱡ'#"
 
 #: lms/templates/verify_student/show_requirements.html
-msgid "You need to activate your edX account before proceeding"
+msgid "You need to activate your {platform_name} account before proceeding"
 msgstr ""
-"Ýöü nééd tö äçtïväté ýöür édX äççöünt ßéföré pröçéédïng Ⱡ'σяєм ιρѕυм ∂σł#"
+"Ýöü nééd tö äçtïväté ýöür {platform_name} äççöünt ßéföré pröçéédïng Ⱡ'σяєм "
+"ιρѕυм ∂σł#"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
@@ -15806,8 +16610,8 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: cms/templates/activation_invalid.html
-msgid "Contact edX Support"
-msgstr "Çöntäçt édX Süppört Ⱡ'σя#"
+msgid "Contact {platform_name} Support"
+msgstr "Çöntäçt {platform_name} Süppört Ⱡ'σя#"
 
 #: cms/templates/asset_index.html cms/templates/asset_index.html
 #: cms/templates/widgets/header.html
@@ -15816,15 +16620,16 @@ msgstr "Fïlés &amp; Ûplöäds Ⱡ'σ#"
 
 #: cms/templates/asset_index.html cms/templates/course_info.html
 #: cms/templates/course_outline.html cms/templates/edit-tabs.html
-#: cms/templates/textbooks.html cms/templates/videos_index.html
-#: cms/templates/widgets/header.html
+#: cms/templates/syllabuses.html cms/templates/textbooks.html
+#: cms/templates/videos_index.html cms/templates/widgets/header.html
 msgid "Content"
 msgstr "Çöntént #"
 
 #: cms/templates/asset_index.html cms/templates/container.html
 #: cms/templates/course_info.html cms/templates/course_outline.html
-#: cms/templates/edit-tabs.html cms/templates/group_configurations.html
-#: cms/templates/index.html cms/templates/manage_users.html
+#: cms/templates/edit-tabs.html cms/templates/index.html
+#: cms/templates/library.html cms/templates/manage_users.html
+#: cms/templates/manage_users_lib.html cms/templates/syllabuses.html
 #: cms/templates/textbooks.html cms/templates/videos_index.html
 msgid "Page Actions"
 msgstr "Pägé Àçtïöns Ⱡ#"
@@ -15833,10 +16638,6 @@ msgstr "Pägé Àçtïöns Ⱡ#"
 #: cms/templates/videos_index.html
 msgid "Upload New File"
 msgstr "Ûplöäd Néw Fïlé Ⱡ'#"
-
-#: cms/templates/asset_index.html
-msgid "Loading&hellip;"
-msgstr "Löädïng&hellip; Ⱡ#"
 
 #: cms/templates/asset_index.html
 msgid "Adding Files for Your Course"
@@ -15877,28 +16678,31 @@ msgstr "Ûsïng Fïlé ÛRLs Ⱡ'#"
 
 #: cms/templates/asset_index.html
 msgid ""
-"Use the {em_start}Embed URL{em_end} value to link to the file or image from "
-"a component, a course update, or a course handout."
+"Use the {em_start}{studio_name} URL{em_end} value to link to the file or "
+"image from a component, a course update, or a course handout."
 msgstr ""
-"Ûsé thé {em_start}Émßéd ÛRL{em_end} välüé tö lïnk tö thé fïlé ör ïmägé fröm "
-"ä çömpönént, ä çöürsé üpdäté, ör ä çöürsé händöüt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢#"
+"Ûsé thé {em_start}{studio_name} ÛRL{em_end} välüé tö lïnk tö thé fïlé ör "
+"ïmägé fröm ä çömpönént, ä çöürsé üpdäté, ör ä çöürsé händöüt. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: cms/templates/asset_index.html
 msgid ""
-"Use the {em_start}External URL{em_end} value to reference the file or image "
-"only from outside of your course."
+"Use the {em_start}Web URL{em_end} value to reference the file or image only "
+"from outside of your course. {em_start}Note:{em_end} If you lock a file, the"
+" Web URL no longer works for external access to a file."
 msgstr ""
-"Ûsé thé {em_start}Éxtérnäl ÛRL{em_end} välüé tö référénçé thé fïlé ör ïmägé "
-"önlý fröm öütsïdé öf ýöür çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+"Ûsé thé {em_start}Wéß ÛRL{em_end} välüé tö référénçé thé fïlé ör ïmägé önlý "
+"fröm öütsïdé öf ýöür çöürsé. {em_start}Nöté:{em_end} Ìf ýöü löçk ä fïlé, thé"
+" Wéß ÛRL nö löngér wörks för éxtérnäl äççéss tö ä fïlé. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт,#"
 
 #: cms/templates/asset_index.html
 msgid ""
-"Click in the Embed URL or External URL column to select the value, then copy"
-" it."
+"To copy a URL, double click the value in the URL column, then copy the "
+"selected text."
 msgstr ""
-"Çlïçk ïn thé Émßéd ÛRL ör Éxtérnäl ÛRL çölümn tö séléçt thé välüé, thén çöpý"
-" ït. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+"Tö çöpý ä ÛRL, döüßlé çlïçk thé välüé ïn thé ÛRL çölümn, thén çöpý thé "
+"séléçtéd téxt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: cms/templates/asset_index.html
 msgid "Learn more about managing files"
@@ -16102,6 +16906,9 @@ msgstr ""
 msgid "Required Information to Create a re-run of a course"
 msgstr "Réqüïréd Ìnförmätïön tö Çréäté ä ré-rün öf ä çöürsé Ⱡ'σяєм ιρѕυм ∂#"
 
+#. Translators: This is an example name for a new course, seen when filling
+#. out
+#. the form to create a new course.
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 msgid "e.g. Introduction to Computer Science"
 msgstr "é.g. Ìntrödüçtïön tö Çömpütér Sçïénçé Ⱡ'σяєм ιρѕ#"
@@ -16115,11 +16922,17 @@ msgstr ""
 "thé örïgïnäl çöürsé nämé.) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
-#: cms/templates/settings.html
+#: cms/templates/index.html cms/templates/settings.html
 msgid "Organization"
 msgstr "Örgänïzätïön Ⱡ#"
 
+#. Translators: This is an example for the name of the organization sponsoring
+#. a course, seen when filling out the form to create a new course. The
+#. organization name cannot contain spaces.
+#. Translators: "e.g. UniversityX or OrganizationX" is a placeholder displayed
+#. when user put no data into this field.
 #: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/index.html
 msgid "e.g. UniversityX or OrganizationX"
 msgstr "é.g. ÛnïvérsïtýX ör ÖrgänïzätïönX Ⱡ'σяєм ι#"
 
@@ -16138,6 +16951,10 @@ msgstr ""
 msgid "Note: No spaces or special characters are allowed."
 msgstr "Nöté: Nö späçés ör spéçïäl çhäräçtérs äré ällöwéd. Ⱡ'σяєм ιρѕυм ∂#"
 
+#. Translators: This is an example for the number used to identify a course,
+#. seen when filling out the form to create a new course. The number here is
+#. short for "Computer Science 101". It can contain letters but cannot contain
+#. spaces.
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 msgid "e.g. CS101"
 msgstr "é.g. ÇS101 Ⱡ#"
@@ -16156,6 +16973,9 @@ msgstr ""
 msgid "Course Run"
 msgstr "Çöürsé Rün Ⱡ#"
 
+#. Translators: This is an example for the "run" used to identify different
+#. instances of a course, seen when filling out the form to create a new
+#. course.
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 msgid "e.g. 2014_T1"
 msgstr "é.g. 2014_T1 Ⱡ#"
@@ -16235,7 +17055,7 @@ msgstr ""
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ #"
 
 #: cms/templates/course_outline.html cms/templates/course_outline.html
-#: cms/templates/course_outline.html
+#: cms/templates/course_outline.html cms/templates/settings.html
 msgid "Course Outline"
 msgstr "Çöürsé Öütlïné Ⱡ'#"
 
@@ -16474,6 +17294,12 @@ msgstr "çlösé mödäl Ⱡ#"
 msgid "Internal Server Error"
 msgstr "Ìntérnäl Sérvér Érrör Ⱡ'σя#"
 
+#: cms/templates/error.html cms/templates/widgets/footer.html
+#: cms/templates/widgets/sock.html
+msgid "Use our feedback tool, Tender, to share your feedback"
+msgstr ""
+"Ûsé öür féédßäçk tööl, Téndér, tö shäré ýöür féédßäçk Ⱡ'σяєм ιρѕυм ∂σ#"
+
 #: cms/templates/error.html
 msgid "The Page You Requested Page Cannot be Found"
 msgstr "Thé Pägé Ýöü Réqüéstéd Pägé Çännöt ßé Föünd Ⱡ'σяєм ιρѕυм#"
@@ -16490,12 +17316,6 @@ msgstr ""
 " stïll hävïng prößléms äççéssïng thïngs, pléäsé féél fréé tö "
 "{link_start}çöntäçt {studio_name} süppört{link_end} för fürthér hélp. Ⱡ'σяєм"
 " ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ т#"
-
-#: cms/templates/error.html cms/templates/error.html
-#: cms/templates/widgets/footer.html cms/templates/widgets/sock.html
-msgid "Use our feedback tool, Tender, to share your feedback"
-msgstr ""
-"Ûsé öür féédßäçk tööl, Téndér, tö shäré ýöür féédßäçk Ⱡ'σяєм ιρѕυм ∂σ#"
 
 #: cms/templates/error.html
 msgid "The Server Encountered an Error"
@@ -16730,35 +17550,63 @@ msgid "Course git url:"
 msgstr "Çöürsé gït ürl: Ⱡ'#"
 
 #: cms/templates/group_configurations.html
-msgid "New Group Configuration"
-msgstr "Néw Gröüp Çönfïgürätïön Ⱡ'σяє#"
+#: cms/templates/group_configurations.html
+#: cms/templates/visibility_editor.html
+msgid "Content Groups"
+msgstr "Çöntént Gröüps Ⱡ'#"
+
+#: cms/templates/group_configurations.html
+#: cms/templates/group_configurations.html
+msgid "Experiment Group Configurations"
+msgstr "Éxpérïmént Gröüp Çönfïgürätïöns Ⱡ'σяєм ι#"
 
 #: cms/templates/group_configurations.html
 msgid "This module is disabled at the moment."
 msgstr "Thïs mödülé ïs dïsäßléd ät thé mömént. Ⱡ'σяєм ιρѕ#"
 
 #: cms/templates/group_configurations.html
-msgid "Loading"
-msgstr "Löädïng #"
-
-#: cms/templates/group_configurations.html cms/templates/settings_graders.html
-msgid "What can I do on this page?"
-msgstr "Whät çän Ì dö ön thïs pägé? Ⱡ'σяєм#"
-
-#: cms/templates/group_configurations.html
-msgid "You can create, edit, and delete group configurations."
+msgid ""
+"Use content groups to give groups of students access to a specific set of "
+"course content. In addition to course content that is intended for all "
+"students, each content group sees content that you specifically designate as"
+" visible to it. By associating a content group with one or more cohorts, you"
+" can customize the content that a particular cohort or cohorts sees in your "
+"course."
 msgstr ""
-"Ýöü çän çréäté, édït, änd délété gröüp çönfïgürätïöns. Ⱡ'σяєм ιρѕυм ∂σ#"
+"Ûsé çöntént gröüps tö gïvé gröüps öf stüdénts äççéss tö ä spéçïfïç sét öf "
+"çöürsé çöntént. Ìn äddïtïön tö çöürsé çöntént thät ïs ïnténdéd för äll "
+"stüdénts, éäçh çöntént gröüp séés çöntént thät ýöü spéçïfïçällý désïgnäté äs"
+" vïsïßlé tö ït. Bý ässöçïätïng ä çöntént gröüp wïth öné ör möré çöhörts, ýöü"
+" çän çüstömïzé thé çöntént thät ä pärtïçülär çöhört ör çöhörts séés ïn ýöür "
+"çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ "
+"єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυ#"
 
 #: cms/templates/group_configurations.html
 msgid ""
-"A group configuration defines how many groups of students are in an "
-"experiment. When you create an experiment, you select the group "
-"configuration to use."
+"Click {em_start}New content group{em_end} to add a new content group. To "
+"edit the name of a content group, hover over its box and click "
+"{em_start}Edit{em_end}. Content groups cannot be deleted."
 msgstr ""
-"À gröüp çönfïgürätïön défïnés höw mäný gröüps öf stüdénts äré ïn än "
-"éxpérïmént. Whén ýöü çréäté än éxpérïmént, ýöü séléçt thé gröüp "
-"çönfïgürätïön tö üsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι#"
+"Çlïçk {em_start}Néw çöntént gröüp{em_end} tö ädd ä néw çöntént gröüp. Tö "
+"édït thé nämé öf ä çöntént gröüp, hövér övér ïts ßöx änd çlïçk "
+"{em_start}Édït{em_end}. Çöntént gröüps çännöt ßé délétéd. Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg #"
+
+#: cms/templates/group_configurations.html
+#: cms/templates/group_configurations.html
+msgid "Learn More"
+msgstr "Léärn Möré Ⱡ#"
+
+#: cms/templates/group_configurations.html
+msgid ""
+"Use experiment group configurations to define how many groups of students "
+"are in a content experiment. When you create a content experiment for a "
+"course, you select the group configuration to use."
+msgstr ""
+"Ûsé éxpérïmént gröüp çönfïgürätïöns tö défïné höw mäný gröüps öf stüdénts "
+"äré ïn ä çöntént éxpérïmént. Whén ýöü çréäté ä çöntént éxpérïmént för ä "
+"çöürsé, ýöü séléçt thé gröüp çönfïgürätïön tö üsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂#"
 
 #: cms/templates/group_configurations.html
 msgid ""
@@ -16779,10 +17627,6 @@ msgstr ""
 "Ýöü çän délété ä gröüp çönfïgürätïön önlý ïf ït ïs nöt ïn üsé ïn än "
 "éxpérïmént. Tö délété ä çönfïgürätïön, hövér övér ïts ßöx änd çlïçk thé "
 "délété ïçön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι#"
-
-#: cms/templates/group_configurations.html
-msgid "Learn More"
-msgstr "Léärn Möré Ⱡ#"
 
 #: cms/templates/group_configurations.html cms/templates/settings.html
 #: cms/templates/settings_advanced.html cms/templates/settings_graders.html
@@ -17131,10 +17975,6 @@ msgid "Course Import Status"
 msgstr "Çöürsé Ìmpört Stätüs Ⱡ'σя#"
 
 #: cms/templates/import.html
-msgid "Uploading"
-msgstr "Ûplöädïng #"
-
-#: cms/templates/import.html
 msgid "Transferring your file to our servers"
 msgstr "Tränsférrïng ýöür fïlé tö öür sérvérs Ⱡ'σяєм ιρѕ#"
 
@@ -17237,35 +18077,22 @@ msgstr ""
 
 #: cms/templates/index.html cms/templates/index.html
 #: cms/templates/widgets/header.html
-msgid "My Courses"
-msgstr "Mý Çöürsés Ⱡ#"
+msgid "{studio_name} Home"
+msgstr "{studio_name} Hömé #"
 
 #: cms/templates/index.html
 msgid "New Course"
 msgstr "Néw Çöürsé Ⱡ#"
 
 #: cms/templates/index.html
+msgid "New Library"
+msgstr "Néw Lïßrärý Ⱡ#"
+
+#: cms/templates/index.html
 msgid "Email staff to create course"
 msgstr "Émäïl stäff tö çréäté çöürsé Ⱡ'σяєм #"
 
-#: cms/templates/index.html
-msgid "Welcome, {0}!"
-msgstr "Wélçömé, {0}! Ⱡ'#"
-
-#: cms/templates/index.html
-msgid ""
-"Here are all of the courses you currently have access to in {studio_name}:"
-msgstr ""
-"Héré äré äll öf thé çöürsés ýöü çürréntlý hävé äççéss tö ïn {studio_name}: "
-"Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: cms/templates/index.html
-msgid "You currently aren't associated with any {studio_name} Courses."
-msgstr ""
-"Ýöü çürréntlý ärén't ässöçïätéd wïth äný {studio_name} Çöürsés. Ⱡ'σяєм ιρѕυм"
-" ∂σ#"
-
-#: cms/templates/index.html
+#: cms/templates/index.html cms/templates/index.html
 msgid "Please correct the highlighted fields below."
 msgstr "Pléäsé çörréçt thé hïghlïghtéd fïélds ßélöw. Ⱡ'σяєм ιρѕυм#"
 
@@ -17326,8 +18153,67 @@ msgid "The term in which your course will run."
 msgstr "Thé térm ïn whïçh ýöür çöürsé wïll rün. Ⱡ'σяєм ιρѕ#"
 
 #: cms/templates/index.html
+msgid "Highest Level of Education Required"
+msgstr "Hïghést Lévél öf Édüçätïön Réqüïréd Ⱡ'σяєм ιρ#"
+
+#: cms/templates/index.html cms/templates/index.html
 msgid "Create"
 msgstr "Çréäté Ⱡ'σяєм ιρѕ#"
+
+#: cms/templates/index.html
+msgid "Create a New Library"
+msgstr "Çréäté ä Néw Lïßrärý Ⱡ'σя#"
+
+#: cms/templates/index.html
+msgid "Required Information to Create a New Library"
+msgstr "Réqüïréd Ìnförmätïön tö Çréäté ä Néw Lïßrärý Ⱡ'σяєм ιρѕυм#"
+
+#: cms/templates/index.html
+msgid "Library Name"
+msgstr "Lïßrärý Nämé Ⱡ#"
+
+#. Translators: This is an example name for a new content library, seen when
+#. filling out the form to create a new library. (A library is a collection of
+#. content or problems.)
+#: cms/templates/index.html
+msgid "e.g. Computer Science Problems"
+msgstr "é.g. Çömpütér Sçïénçé Prößléms Ⱡ'σяєм #"
+
+#: cms/templates/index.html
+msgid "The public display name for your library."
+msgstr "Thé püßlïç dïspläý nämé för ýöür lïßrärý. Ⱡ'σяєм ιρѕυ#"
+
+#: cms/templates/index.html
+msgid "The public organization name for your library."
+msgstr "Thé püßlïç örgänïzätïön nämé för ýöür lïßrärý. Ⱡ'σяєм ιρѕυм #"
+
+#: cms/templates/index.html cms/templates/index.html
+msgid "This cannot be changed."
+msgstr "Thïs çännöt ßé çhängéd. Ⱡ'σяє#"
+
+#: cms/templates/index.html
+msgid "Library Code"
+msgstr "Lïßrärý Çödé Ⱡ#"
+
+#. Translators: This is an example for the "code" used to identify a library,
+#. seen when filling out the form to create a new library. This example is
+#. short for "Computer Science Problems". The example number may contain
+#. letters but must not contain spaces.
+#: cms/templates/index.html
+msgid "e.g. CSPROB"
+msgstr "é.g. ÇSPRÖB Ⱡ#"
+
+#: cms/templates/index.html
+msgid "The unique code that identifies this library."
+msgstr "Thé ünïqüé çödé thät ïdéntïfïés thïs lïßrärý. Ⱡ'σяєм ιρѕυм#"
+
+#: cms/templates/index.html
+msgid ""
+"Note: This is part of your library URL, so no spaces or special characters "
+"are allowed."
+msgstr ""
+"Nöté: Thïs ïs pärt öf ýöür lïßrärý ÛRL, sö nö späçés ör spéçïäl çhäräçtérs "
+"äré ällöwéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: cms/templates/index.html
 msgid "Courses Being Processed"
@@ -17479,6 +18365,14 @@ msgstr ""
 " ßé üpdätéd shörtlý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: cms/templates/index.html
+msgid "(Read-only)"
+msgstr "(Réäd-önlý) Ⱡ#"
+
+#: cms/templates/index.html
+msgid "You don't have any content libraries yet."
+msgstr "Ýöü dön't hävé äný çöntént lïßrärïés ýét. Ⱡ'σяєм ιρѕυ#"
+
+#: cms/templates/index.html
 msgid "New to {studio_name}?"
 msgstr "Néw tö {studio_name}? Ⱡ#"
 
@@ -17573,6 +18467,82 @@ msgstr ""
 msgid "Request help with your {studio_name} account"
 msgstr "Réqüést hélp wïth ýöür {studio_name} äççöünt Ⱡ'σяєм ιρ#"
 
+#: cms/templates/library.html
+msgid "Content Library"
+msgstr "Çöntént Lïßrärý Ⱡ'#"
+
+#: cms/templates/library.html
+msgid "Add Component"
+msgstr "Àdd Çömpönént Ⱡ'#"
+
+#: cms/templates/library.html cms/templates/library.html
+msgid "Library ID"
+msgstr "Lïßrärý ÌD Ⱡ#"
+
+#: cms/templates/library.html
+msgid "Tip:"
+msgstr "Tïp: Ⱡ'σяєм#"
+
+#: cms/templates/library.html
+msgid ""
+"To add content from this library to a course that uses a Randomized Content "
+"Block, copy this ID and enter it in the Libraries field in the Randomized "
+"Content Block settings."
+msgstr ""
+"Tö ädd çöntént fröm thïs lïßrärý tö ä çöürsé thät üsés ä Rändömïzéd Çöntént "
+"Blöçk, çöpý thïs ÌD änd éntér ït ïn thé Lïßrärïés fïéld ïn thé Rändömïzéd "
+"Çöntént Blöçk séttïngs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg"
+" єł#"
+
+#: cms/templates/library.html
+msgid "Adding content to your library"
+msgstr "Àddïng çöntént tö ýöür lïßrärý Ⱡ'σяєм #"
+
+#: cms/templates/library.html
+msgid ""
+"Add components to your library for use in courses, using Add New Component "
+"at the bottom of this page."
+msgstr ""
+"Àdd çömpönénts tö ýöür lïßrärý för üsé ïn çöürsés, üsïng Àdd Néw Çömpönént "
+"ät thé ßöttöm öf thïs pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: cms/templates/library.html
+msgid ""
+"Components are listed in the order in which they are added, with the most "
+"recently added at the bottom. Use the pagination arrows to navigate from "
+"page to page if you have more than one page of components in your library."
+msgstr ""
+"Çömpönénts äré lïstéd ïn thé ördér ïn whïçh théý äré äddéd, wïth thé möst "
+"réçéntlý äddéd ät thé ßöttöm. Ûsé thé pägïnätïön ärröws tö nävïgäté fröm "
+"pägé tö pägé ïf ýöü hävé möré thän öné pägé öf çömpönénts ïn ýöür lïßrärý. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕ#"
+
+#: cms/templates/library.html
+msgid "Using library content in courses"
+msgstr "Ûsïng lïßrärý çöntént ïn çöürsés Ⱡ'σяєм ι#"
+
+#: cms/templates/library.html
+msgid ""
+"Use library content in courses by adding the "
+"{em_start}library_content{em_end} policy key to Advanced Settings, then "
+"adding a Randomized Content Block to your courseware. In the settings for "
+"each Randomized Content Block, enter the Library ID for each library from "
+"which you want to draw content, and specify the number of problems to be "
+"randomly selected and displayed to each student."
+msgstr ""
+"Ûsé lïßrärý çöntént ïn çöürsés ßý äddïng thé "
+"{em_start}lïßrärý_çöntént{em_end} pölïçý kéý tö Àdvänçéd Séttïngs, thén "
+"äddïng ä Rändömïzéd Çöntént Blöçk tö ýöür çöürséwäré. Ìn thé séttïngs för "
+"éäçh Rändömïzéd Çöntént Blöçk, éntér thé Lïßrärý ÌD för éäçh lïßrärý fröm "
+"whïçh ýöü wänt tö dräw çöntént, änd spéçïfý thé nümßér öf prößléms tö ßé "
+"rändömlý séléçtéd änd dïspläýéd tö éäçh stüdént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
+"łαвσяє єт ∂σłσяє мαgηα αłι#"
+
+#: cms/templates/library.html
+msgid "Learn more about content libraries"
+msgstr "Léärn möré äßöüt çöntént lïßrärïés Ⱡ'σяєм ιρ#"
+
 #: cms/templates/login.html cms/templates/widgets/header.html
 msgid "Sign In"
 msgstr "Sïgn Ìn #"
@@ -17608,7 +18578,7 @@ msgstr ""
 msgid "Course Team Settings"
 msgstr "Çöürsé Téäm Séttïngs Ⱡ'σя#"
 
-#: cms/templates/manage_users.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 msgid "New Team Member"
 msgstr "Néw Téäm Mémßér Ⱡ'#"
 
@@ -17616,11 +18586,11 @@ msgstr "Néw Téäm Mémßér Ⱡ'#"
 msgid "Add a User to Your Course's Team"
 msgstr "Àdd ä Ûsér tö Ýöür Çöürsé's Téäm Ⱡ'σяєм ι#"
 
-#: cms/templates/manage_users.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 msgid "New Team Member Information"
 msgstr "Néw Téäm Mémßér Ìnförmätïön Ⱡ'σяєм#"
 
-#: cms/templates/manage_users.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 msgid "User's Email Address"
 msgstr "Ûsér's Émäïl Àddréss Ⱡ'σя#"
 
@@ -17632,37 +18602,39 @@ msgstr ""
 "Pléäsé prövïdé thé émäïl äddréss öf thé çöürsé stäff mémßér ýöü'd lïké tö "
 "ädd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
 
-#: cms/templates/manage_users.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 msgid "Add User"
 msgstr "Àdd Ûsér #"
 
 #: cms/templates/manage_users.html cms/templates/manage_users.html
+#: cms/templates/manage_users_lib.html
 msgid "Current Role:"
 msgstr "Çürrént Rölé: Ⱡ'#"
 
 #: cms/templates/manage_users.html cms/templates/manage_users.html
+#: cms/templates/manage_users_lib.html
 msgid "You!"
 msgstr "Ýöü! Ⱡ'σяєм#"
 
-#: cms/templates/manage_users.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 msgid "send an email message to {email}"
 msgstr "sénd än émäïl méssägé tö {email} Ⱡ'σяєм #"
 
-#: cms/templates/manage_users.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 msgid "Promote another member to Admin to remove your admin rights"
 msgstr ""
 "Prömöté änöthér mémßér tö Àdmïn tö rémövé ýöür ädmïn rïghts Ⱡ'σяєм ιρѕυм "
 "∂σłσ#"
 
-#: cms/templates/manage_users.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 msgid "Remove Admin Access"
 msgstr "Rémövé Àdmïn Àççéss Ⱡ'σя#"
 
-#: cms/templates/manage_users.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 msgid "Add Admin Access"
 msgstr "Àdd Àdmïn Àççéss Ⱡ'σ#"
 
-#: cms/templates/manage_users.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 msgid "Delete the user, {username}"
 msgstr "Délété thé üsér, {username} Ⱡ'σя#"
 
@@ -17719,6 +18691,100 @@ msgstr ""
 "Àdmïn, thén äsk thät üsér tö rémövé ýöü fröm thé Çöürsé Téäm lïst. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єι#"
 
+#: cms/templates/manage_users_lib.html
+msgid "Library User Access"
+msgstr "Lïßrärý Ûsér Àççéss Ⱡ'σя#"
+
+#: cms/templates/manage_users_lib.html cms/templates/widgets/header.html
+msgid "User Access"
+msgstr "Ûsér Àççéss Ⱡ#"
+
+#: cms/templates/manage_users_lib.html
+msgid "Grant Access to This Library"
+msgstr "Gränt Àççéss tö Thïs Lïßrärý Ⱡ'σяєм #"
+
+#: cms/templates/manage_users_lib.html
+msgid "Provide the email address of the user you want to add"
+msgstr ""
+"Prövïdé thé émäïl äddréss öf thé üsér ýöü wänt tö ädd Ⱡ'σяєм ιρѕυм ∂σ#"
+
+#: cms/templates/manage_users_lib.html
+msgid "Remove Staff Access"
+msgstr "Rémövé Stäff Àççéss Ⱡ'σя#"
+
+#: cms/templates/manage_users_lib.html
+msgid "Add Staff Access"
+msgstr "Àdd Stäff Àççéss Ⱡ'σ#"
+
+#: cms/templates/manage_users_lib.html
+msgid "Remove this user"
+msgstr "Rémövé thïs üsér Ⱡ'σ#"
+
+#: cms/templates/manage_users_lib.html
+msgid "Remove me"
+msgstr "Rémövé mé #"
+
+#: cms/templates/manage_users_lib.html
+msgid "Remove me from this library"
+msgstr "Rémövé mé fröm thïs lïßrärý Ⱡ'σяєм#"
+
+#: cms/templates/manage_users_lib.html
+msgid "Add More Users to This Library"
+msgstr "Àdd Möré Ûsérs tö Thïs Lïßrärý Ⱡ'σяєм #"
+
+#: cms/templates/manage_users_lib.html
+msgid ""
+"Grant other members of your course team access to this library. New library "
+"users must have an active {studio_name} account."
+msgstr ""
+"Gränt öthér mémßérs öf ýöür çöürsé téäm äççéss tö thïs lïßrärý. Néw lïßrärý "
+"üsérs müst hävé än äçtïvé {studio_name} äççöünt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢#"
+
+#: cms/templates/manage_users_lib.html
+msgid "Add a New User"
+msgstr "Àdd ä Néw Ûsér Ⱡ'#"
+
+#: cms/templates/manage_users_lib.html
+msgid "Library Access Roles"
+msgstr "Lïßrärý Àççéss Rölés Ⱡ'σя#"
+
+#: cms/templates/manage_users_lib.html
+msgid "There are three access roles for libraries: User, Staff, and Admin."
+msgstr ""
+"Théré äré thréé äççéss rölés för lïßrärïés: Ûsér, Stäff, änd Àdmïn. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕ#"
+
+#: cms/templates/manage_users_lib.html
+msgid ""
+"Users can view library content and can reference or use library components "
+"in their courses, but they cannot edit the contents of a library."
+msgstr ""
+"Ûsérs çän vïéw lïßrärý çöntént änd çän référénçé ör üsé lïßrärý çömpönénts "
+"ïn théïr çöürsés, ßüt théý çännöt édït thé çönténts öf ä lïßrärý. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ι#"
+
+#: cms/templates/manage_users_lib.html
+msgid ""
+"Staff are content co-authors. They have full editing privileges on the "
+"contents of a library."
+msgstr ""
+"Stäff äré çöntént çö-äüthörs. Théý hävé füll édïtïng prïvïlégés ön thé "
+"çönténts öf ä lïßrärý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: cms/templates/manage_users_lib.html
+msgid ""
+"Admins have full editing privileges and can also add and remove other team "
+"members. There must be at least one user with Admin privileges in a library."
+msgstr ""
+"Àdmïns hävé füll édïtïng prïvïlégés änd çän älsö ädd änd rémövé öthér téäm "
+"mémßérs. Théré müst ßé ät léäst öné üsér wïth Àdmïn prïvïlégés ïn ä lïßrärý."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕ#"
+
+#: cms/templates/register.html cms/templates/widgets/header.html
+msgid "Sign Up"
+msgstr "Sïgn Ûp #"
+
 #: cms/templates/register.html
 msgid "Sign Up for {studio_name}"
 msgstr "Sïgn Ûp för {studio_name} Ⱡ'#"
@@ -17748,8 +18814,16 @@ msgstr ""
 "süppört förüms Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: cms/templates/register.html
-msgid "Your Location"
-msgstr "Ýöür Löçätïön Ⱡ'#"
+msgid "Cedula / Pasaporte"
+msgstr "Çédülä / Päsäpörté Ⱡ'σ#"
+
+#: cms/templates/register.html
+msgid "example: 0102030405"
+msgstr "éxämplé: 0102030405 Ⱡ'σя#"
+
+#: cms/templates/register.html
+msgid "Don't input special characters in your ID"
+msgstr "Dön't ïnpüt spéçïäl çhäräçtérs ïn ýöür ÌD Ⱡ'σяєм ιρѕυ#"
 
 #: cms/templates/register.html
 msgid "I agree to the {a_start} Terms of Service {a_end}"
@@ -17889,11 +18963,11 @@ msgstr ""
 "ïnstrüçtïöns prövïdéd ßý ýöür {manager}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłι#"
 
-#: cms/templates/settings.html cms/templates/settings.html
+#: cms/templates/settings.html
 msgid "Program Manager"
 msgstr "Prögräm Mänägér Ⱡ'#"
 
-#: cms/templates/settings.html cms/templates/settings.html
+#: cms/templates/settings.html
 msgid "PM"
 msgstr "PM Ⱡ'#"
 
@@ -17963,14 +19037,14 @@ msgid ""
 "These dates impact <strong>when your courseware can be viewed</strong>, but "
 "they are <strong>not the dates shown on your course summary page</strong>. "
 "To provide the course start and registration dates as shown on your course "
-"summary page, follow the instructions provided by your {manager}."
+"summary page, follow the instructions provided by your Program Manager."
 msgstr ""
 "Thésé dätés ïmpäçt <strong>whén ýöür çöürséwäré çän ßé vïéwéd</strong>, ßüt "
 "théý äré <strong>nöt thé dätés shöwn ön ýöür çöürsé sümmärý pägé</strong>. "
 "Tö prövïdé thé çöürsé stärt änd régïsträtïön dätés äs shöwn ön ýöür çöürsé "
-"sümmärý pägé, föllöw thé ïnstrüçtïöns prövïdéd ßý ýöür {manager}. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢#"
+"sümmärý pägé, föllöw thé ïnstrüçtïöns prövïdéd ßý ýöür Prögräm Mänägér. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
+"тємρσя ιη¢ι∂ι∂#"
 
 #: cms/templates/settings.html
 msgid "Introducing Your Course"
@@ -18068,10 +19142,6 @@ msgstr ""
 " ιρѕυм ∂σłσя ѕ#"
 
 #: cms/templates/settings.html
-msgid "Requirements"
-msgstr "Réqüïréménts Ⱡ#"
-
-#: cms/templates/settings.html
 msgid "Expectations of the students taking this course"
 msgstr "Éxpéçtätïöns öf thé stüdénts täkïng thïs çöürsé Ⱡ'σяєм ιρѕυм #"
 
@@ -18082,6 +19152,48 @@ msgstr "Höürs öf Éffört pér Wéék Ⱡ'σяє#"
 #: cms/templates/settings.html
 msgid "Time spent on all course work"
 msgstr "Tïmé spént ön äll çöürsé wörk Ⱡ'σяєм #"
+
+#: cms/templates/settings.html
+msgid "Prerequisite Course"
+msgstr "Préréqüïsïté Çöürsé Ⱡ'σя#"
+
+#: cms/templates/settings.html
+msgid "Course that students must complete before beginning this course"
+msgstr ""
+"Çöürsé thät stüdénts müst çömplété ßéföré ßégïnnïng thïs çöürsé Ⱡ'σяєм ιρѕυм"
+" ∂σłσя#"
+
+#: cms/templates/settings.html
+msgid "set pre-requisite course"
+msgstr "sét pré-réqüïsïté çöürsé Ⱡ'σяє#"
+
+#: cms/templates/settings.html
+msgid "Require students to pass an exam before beginning the course."
+msgstr ""
+"Réqüïré stüdénts tö päss än éxäm ßéföré ßégïnnïng thé çöürsé. Ⱡ'σяєм ιρѕυм "
+"∂σłσя#"
+
+#: cms/templates/settings.html
+msgid "You can now view and author your course entrance exam from the "
+msgstr ""
+"Ýöü çän nöw vïéw änd äüthör ýöür çöürsé éntränçé éxäm fröm thé  Ⱡ'σяєм ιρѕυм"
+" ∂σłσя#"
+
+#: cms/templates/settings.html
+msgid "Grade Requirements"
+msgstr "Grädé Réqüïréménts Ⱡ'σ#"
+
+#: cms/templates/settings.html
+msgid " %"
+msgstr " % Ⱡ'#"
+
+#: cms/templates/settings.html
+msgid ""
+"The score student must meet in order to successfully complete the entrance "
+"exam. "
+msgstr ""
+"Thé sçöré stüdént müst méét ïn ördér tö süççéssfüllý çömplété thé éntränçé "
+"éxäm.  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: cms/templates/settings.html
 msgid "How are these settings used?"
@@ -18215,6 +19327,10 @@ msgid "New Assignment Type"
 msgstr "Néw Àssïgnmént Týpé Ⱡ'σя#"
 
 #: cms/templates/settings_graders.html
+msgid "What can I do on this page?"
+msgstr "Whät çän Ì dö ön thïs pägé? Ⱡ'σяєм#"
+
+#: cms/templates/settings_graders.html
 msgid ""
 "You can use the slider under Overall Grade Range to specify whether your "
 "course is pass/fail or graded by letter, and to establish the thresholds for"
@@ -18248,8 +19364,53 @@ msgid "Expand or Collapse"
 msgstr "Éxpänd ör Çölläpsé Ⱡ'σ#"
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Visibility Settings"
+msgstr "Vïsïßïlïtý Séttïngs Ⱡ'σя#"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Visibility"
+msgstr "Vïsïßïlïtý Ⱡ#"
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
 msgstr "Thïs ßlöçk çöntäïns mültïplé çömpönénts. Ⱡ'σяєм ιρѕυ#"
+
+#: cms/templates/syllabuses.html
+msgid "Syllabuses"
+msgstr "Sýlläßüsés Ⱡ#"
+
+#: cms/templates/syllabuses.html
+msgid "New Syllabus"
+msgstr "Néw Sýlläßüs Ⱡ#"
+
+#: cms/templates/syllabuses.html
+msgid "Why should I break my text into chapters?"
+msgstr "Whý shöüld Ì ßréäk mý téxt ïntö çhäptérs? Ⱡ'σяєм ιρѕυ#"
+
+#: cms/templates/syllabuses.html
+msgid ""
+"It's best practice to break your course's textbook into multiple chapters to"
+" reduce loading times for students. Breaking up textbooks into chapters can "
+"also help students more easily find topic-based information."
+msgstr ""
+"Ìt's ßést präçtïçé tö ßréäk ýöür çöürsé's téxtßöök ïntö mültïplé çhäptérs tö"
+" rédüçé löädïng tïmés för stüdénts. Bréäkïng üp téxtßööks ïntö çhäptérs çän "
+"älsö hélp stüdénts möré éäsïlý fïnd töpïç-ßäséd ïnförmätïön. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ є#"
+
+#: cms/templates/syllabuses.html cms/templates/textbooks.html
+msgid "What if my book isn't divided into chapters?"
+msgstr "Whät ïf mý ßöök ïsn't dïvïdéd ïntö çhäptérs? Ⱡ'σяєм ιρѕυм#"
+
+#: cms/templates/syllabuses.html
+msgid ""
+"If you haven't broken your text into chapters, you can upload the entire "
+"text as a single chapter and enter a name of your choice in the Chapter Name"
+" field."
+msgstr ""
+"Ìf ýöü hävén't ßrökén ýöür téxt ïntö çhäptérs, ýöü çän üplöäd thé éntïré "
+"téxt äs ä sïnglé çhäptér änd éntér ä nämé öf ýöür çhöïçé ïn thé Çhäptér Nämé"
+" fïéld. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢#"
 
 #: cms/templates/temp-course-landing.html
 msgid "{platform_name} edge"
@@ -18275,10 +19436,6 @@ msgstr ""
 "téxtßööks ïntö çhäptérs çän älsö hélp stüdénts möré éäsïlý fïnd töpïç-ßäséd "
 "ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
 "∂σ єιυѕмσ∂ #"
-
-#: cms/templates/textbooks.html
-msgid "What if my book isn't divided into chapters?"
-msgstr "Whät ïf mý ßöök ïsn't dïvïdéd ïntö çhäptérs? Ⱡ'σяєм ιρѕυм#"
 
 #: cms/templates/textbooks.html
 msgid ""
@@ -18372,6 +19529,61 @@ msgstr ""
 "{em_start}ÉdX Vïdéö ÌD{em_end} fïéld. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя#"
 
+#: cms/templates/visibility_editor.html
+msgid "No content groups exist"
+msgstr "Nö çöntént gröüps éxïst Ⱡ'σяє#"
+
+#: cms/templates/visibility_editor.html
+msgid ""
+"Use content groups to give groups of students access to a specific set of "
+"course content. Create one or more content groups, and make specific "
+"components visible to them."
+msgstr ""
+"Ûsé çöntént gröüps tö gïvé gröüps öf stüdénts äççéss tö ä spéçïfïç sét öf "
+"çöürsé çöntént. Çréäté öné ör möré çöntént gröüps, änd mäké spéçïfïç "
+"çömpönénts vïsïßlé tö thém. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg є#"
+
+#: cms/templates/visibility_editor.html
+msgid "Manage content groups"
+msgstr "Mänägé çöntént gröüps Ⱡ'σя#"
+
+#. Translators: Any text between {screen_reader_start} and {screen_reader_end}
+#. is only read by screen readers and never shown in the browser.
+#: cms/templates/visibility_editor.html
+msgid ""
+"{screen_reader_start}Warning:{screen_reader_end} The Unit this component is "
+"contained in is hidden from students. Visibility settings here will be "
+"trumped by this."
+msgstr ""
+"{screen_reader_start}Wärnïng:{screen_reader_end} Thé Ûnït thïs çömpönént ïs "
+"çöntäïnéd ïn ïs hïddén fröm stüdénts. Vïsïßïlïtý séttïngs héré wïll ßé "
+"trümpéd ßý thïs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: cms/templates/visibility_editor.html
+msgid "Make visible to:"
+msgstr "Mäké vïsïßlé tö: Ⱡ'σ#"
+
+#: cms/templates/visibility_editor.html
+msgid "All Students and Staff"
+msgstr "Àll Stüdénts änd Stäff Ⱡ'σяє#"
+
+#: cms/templates/visibility_editor.html
+msgid "Specific Content Groups"
+msgstr "Spéçïfïç Çöntént Gröüps Ⱡ'σяє#"
+
+#: cms/templates/visibility_editor.html
+msgid "Deleted Content Group"
+msgstr "Délétéd Çöntént Gröüp Ⱡ'σя#"
+
+#: cms/templates/visibility_editor.html
+msgid ""
+"Content group no longer exists. Please choose another or allow access to All"
+" Students and staff"
+msgstr ""
+"Çöntént gröüp nö löngér éxïsts. Pléäsé çhöösé änöthér ör ällöw äççéss tö Àll"
+" Stüdénts änd stäff Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
 #: cms/templates/emails/activation_email.txt
 msgid ""
 "Thank you for signing up for {studio_name}! To activate your account, please"
@@ -18460,9 +19672,16 @@ msgstr ""
 "Àn äçtïvätïön lïnk häs ßéén sént tö {email}, älöng wïth ïnstrüçtïöns för "
 "äçtïvätïng ýöür äççöünt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
+#. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX
+#. Inc.'. Please do not translate any of these trademarks and company names.
 #: cms/templates/widgets/footer.html
-msgid "All rights reserved."
-msgstr "Àll rïghts résérvéd. Ⱡ'σя#"
+msgid ""
+"EdX, Open edX, Studio, and the edX and Open edX logos are registered "
+"trademarks or trademarks of {link_start}edX Inc.{link_end}"
+msgstr ""
+"ÉdX, Öpén édX, Stüdïö, änd thé édX änd Öpén édX lögös äré régïstéréd "
+"trädémärks ör trädémärks öf {link_start}édX Ìnç.{link_end} Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: cms/templates/widgets/footer.html cms/templates/widgets/sock.html
 msgid "Contact Us"
@@ -18472,9 +19691,9 @@ msgstr "Çöntäçt Ûs Ⱡ#"
 msgid "Current Course:"
 msgstr "Çürrént Çöürsé: Ⱡ'#"
 
-#: cms/templates/widgets/header.html
-msgid "{course_name}'s Navigation:"
-msgstr "{course_name}'s Nävïgätïön: Ⱡ'σ#"
+#: cms/templates/widgets/header.html cms/templates/widgets/header.html
+msgid "Navigation for {course_name}"
+msgstr "Nävïgätïön för {course_name} Ⱡ'σ#"
 
 #: cms/templates/widgets/header.html
 msgid "Outline"
@@ -18499,6 +19718,14 @@ msgstr "Ìmpört Ⱡ'σяєм ιρѕ#"
 #: cms/templates/widgets/header.html
 msgid "Export"
 msgstr "Éxpört Ⱡ'σяєм ιρѕ#"
+
+#: cms/templates/widgets/header.html
+msgid "Current Library:"
+msgstr "Çürrént Lïßrärý: Ⱡ'σ#"
+
+#: cms/templates/widgets/header.html
+msgid "Library"
+msgstr "Lïßrärý #"
 
 #: cms/templates/widgets/header.html
 msgid "Help &amp; Account Navigation"
@@ -18528,31 +19755,6 @@ msgstr "Läünçh Lätéx Söürçé Çömpïlér Ⱡ'σяєм #"
 #: cms/templates/widgets/problem-edit.html
 msgid "Heading 1"
 msgstr "Héädïng 1 #"
-
-#: cms/templates/widgets/problem-edit.html
-#: cms/templates/widgets/problem-edit.html
-msgid "Multiple Choice"
-msgstr "Mültïplé Çhöïçé Ⱡ'#"
-
-#: cms/templates/widgets/problem-edit.html
-#: cms/templates/widgets/problem-edit.html
-msgid "Checkboxes"
-msgstr "Çhéçkßöxés Ⱡ#"
-
-#: cms/templates/widgets/problem-edit.html
-#: cms/templates/widgets/problem-edit.html
-msgid "Text Input"
-msgstr "Téxt Ìnpüt Ⱡ#"
-
-#: cms/templates/widgets/problem-edit.html
-#: cms/templates/widgets/problem-edit.html
-msgid "Numerical Input"
-msgstr "Nümérïçäl Ìnpüt Ⱡ'#"
-
-#: cms/templates/widgets/problem-edit.html
-#: cms/templates/widgets/problem-edit.html
-msgid "Dropdown"
-msgstr "Dröpdöwn #"
 
 #: cms/templates/widgets/problem-edit.html
 #: cms/templates/widgets/problem-edit.html
