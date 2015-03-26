@@ -1797,12 +1797,17 @@ if FEATURES.get('AUTH_USE_CAS'):
     INSTALLED_APPS += ('django_cas',)
     MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
 
-############# CORS headers for cross-domain requests #################
+############# Cross-domain requests #################
 
 if FEATURES.get('ENABLE_CORS_HEADERS'):
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = ()
     CORS_ORIGIN_ALLOW_ALL = False
+
+# Default cache expiration for the cross-domain proxy HTML page.
+# This is a static page that can be iframed into an external page
+# to simulate cross-domain requests.
+XDOMAIN_PROXY_CACHE_TIMEOUT = 60 * 15
 
 ###################### Registration ##################################
 
