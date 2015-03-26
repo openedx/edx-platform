@@ -1435,18 +1435,6 @@ def _do_create_account(post_vars, extended_profile=None):
     if post_vars.get('city_id'):
         city = City.objects.get(id=post_vars['city_id'])
         profile.city = city
-    type_id = post_vars['type_id']
-    if type_id == 'cedula':
-        js = {}
-        try:
-            validate_cedula(post_vars['cedula'])
-        except ValidationError:
-            js['value'] = "ID Incorrecto"
-            js['field'] = 'cedula'
-            js['sucess'] = False
-            return JsonResponse(js, status=400)
-
-    profile.cedula = post_vars['cedula']
 
     # add any extended profile information in the denormalized 'meta' field in the profile
     if extended_profile:
@@ -1581,15 +1569,6 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
             js['field'] = field_name
             return JsonResponse(js, status=400)
 
-    type_id = post_vars['type_id']
-    if type_id == 'cedula':
-        try:
-            validate_cedula(post_vars['cedula'])
-        except ValidationError:
-            js['value'] = _("A valid ID is required.")
-            js['field'] = 'cedula'
-            return HttpResponse(json.dumps(js))
-
         max_length = 75
         if field_name == 'username':
             max_length = 30
@@ -1602,6 +1581,26 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
             js['value'] = error_str[field_name]
             js['field'] = field_name
             return JsonResponse(js, status=400)
+
+    type_id = post_vars['type_id']
+    if type_id == 'cedula':
+        try:
+            validate_cedula(post_vars['cedula'])
+        except ValidationError:
+            js['value'] = _("A valid ID is required.")
+            js['field'] = 'cedula'
+            return JsonResponse(js, status=400)
+    prof = False
+    try:
+        prof = UserProfile.objects.get(cedula=post_vars['cedula'])
+    except UserProfile.DoesNotExist:
+        pass
+    if prof:
+        js = {
+            'value': _("CEDULA/PASAPORTE Existente"),
+            'field': 'cedula'
+            }
+        return JsonResponse(js, status=400)
 
     try:
         validate_email(post_vars['email'])

@@ -199,6 +199,7 @@ class UserProfile(models.Model):
 
     class Meta:  # pylint: disable=missing-docstring
         db_table = "auth_userprofile"
+        unique_together = (('cedula',),)
 
     # CRITICAL TODO/SECURITY
     # Sanitize all fields.
