@@ -1020,3 +1020,39 @@ class UnitPublishingTest(ContainerBase):
     #     self.assertEqual(2, self.courseware.num_xblock_components)
     #     self.assertEqual('html', self.courseware.xblock_component_type(0))
     #     self.assertEqual('discussion', self.courseware.xblock_component_type(1))
+
+
+class DisplayNameTest(ContainerBase):
+    """
+    Test consistent use of display_name_with_default
+    """
+    def populate_course_fixture(self, course_fixture):
+        """
+        Sets up a course structure with nested verticals.
+        """
+        course_fixture.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit').add_children(
+                        XBlockFixtureDesc('vertical', None)
+                    )
+                )
+            )
+        )
+
+    def test_display_name_default(self):
+        """
+        Scenario: Given that an XBlock with a dynamic display name has been added to the course,
+            When I view the unit page and note the display name of the block,
+            Then I see the dynamically generated display name,
+            And when I then go to the container page for that same block,
+            Then I see the same generated display name.
+        """
+        # Unfortunately no blocks in the core platform implement display_name_with_default
+        # in an interesting way for this test, so we are just testing for consistency and not
+        # the actual value.
+        unit = self.go_to_unit_page()
+        test_block = unit.xblocks[1]
+        title_on_unit_page = test_block.name
+        container = test_block.go_to_container()
+        self.assertEqual(container.name, title_on_unit_page)
