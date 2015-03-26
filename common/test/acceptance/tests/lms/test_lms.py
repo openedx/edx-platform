@@ -33,6 +33,7 @@ from ...pages.studio.settings import SettingsPage
 from ...pages.lms.login_and_register import CombinedLoginAndRegisterPage
 from ...pages.lms.track_selection import TrackSelectionPage
 from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
+from ...pages.lms.course_wiki import CourseWikiPage, CourseWikiEditPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
 
 
@@ -423,6 +424,59 @@ class LanguageTest(WebAppTest):
         self.assertIn(self.current_courses_text, changed_text)
 
 
+class CourseWikiTest(UniqueCourseTest):
+    """
+    Tests that verify the course wiki.
+    """
+
+    def setUp(self):
+        """
+        Initialize pages and install a course fixture.
+        """
+        super(CourseWikiTest, self).setUp()
+
+        # self.course_info['number'] must be shorter since we are accessing the wiki. See TNL-1751
+        self.course_info['number'] = self.unique_id[0:6]
+
+        self.course_info_page = CourseInfoPage(self.browser, self.course_id)
+        self.course_wiki_page = CourseWikiPage(self.browser, self.course_id)
+        self.course_info_page = CourseInfoPage(self.browser, self.course_id)
+        self.course_wiki_edit_page = CourseWikiEditPage(self.browser, self.course_id, self.course_info)
+        self.tab_nav = TabNavPage(self.browser)
+
+        CourseFixture(
+            self.course_info['org'], self.course_info['number'],
+            self.course_info['run'], self.course_info['display_name']
+        ).install()
+
+        # Auto-auth register for the course
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+
+        # Access course wiki page
+        self.course_info_page.visit()
+        self.tab_nav.go_to_tab('Wiki')
+
+    def _open_editor(self):
+        self.course_wiki_page.open_editor()
+        self.course_wiki_edit_page.wait_for_page()
+
+    def test_edit_course_wiki(self):
+        """
+        Wiki page by default is editable for students.
+
+        After accessing the course wiki,
+        Replace the content of the default page
+        Confirm new content has been saved
+
+        """
+        content = "hello"
+        self._open_editor()
+        self.course_wiki_edit_page.replace_wiki_content(content)
+        self.course_wiki_edit_page.save_wiki_content()
+        actual_content = unicode(self.course_wiki_page.q(css='.wiki-article p').text[0])
+        self.assertEqual(content, actual_content)
+
+
 class HighLevelTabTest(UniqueCourseTest):
     """
     Tests that verify each of the high-level tabs available within a course.
@@ -433,6 +487,9 @@ class HighLevelTabTest(UniqueCourseTest):
         Initialize pages and install a course fixture.
         """
         super(HighLevelTabTest, self).setUp()
+
+        # self.course_info['number'] must be shorter since we are accessing the wiki. See TNL-1751
+        self.course_info['number'] = self.unique_id[0:6]
 
         self.course_info_page = CourseInfoPage(self.browser, self.course_id)
         self.progress_page = ProgressPage(self.browser, self.course_id)
@@ -512,6 +569,26 @@ class HighLevelTabTest(UniqueCourseTest):
         self.course_info_page.visit()
         self.tab_nav.go_to_tab('Test Static Tab')
         self.assertTrue(self.tab_nav.is_on_tab('Test Static Tab'))
+
+    def test_wiki_tab_first_time(self):
+        """
+        Navigate to the course wiki tab. When the wiki is accessed for
+        the first time, it is created on the fly.
+        """
+
+        course_wiki = CourseWikiPage(self.browser, self.course_id)
+        # From the course info page, navigate to the wiki tab
+        self.course_info_page.visit()
+        self.tab_nav.go_to_tab('Wiki')
+        self.assertTrue(self.tab_nav.is_on_tab('Wiki'))
+
+        # Assert that a default wiki is created
+        expected_article_name = "{org}.{course_number}.{course_run}".format(
+            org=self.course_info['org'],
+            course_number=self.course_info['number'],
+            course_run=self.course_info['run']
+        )
+        self.assertEqual(expected_article_name, course_wiki.article_name)
 
     def test_courseware_nav(self):
         """
