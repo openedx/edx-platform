@@ -434,9 +434,9 @@ class DiscussionUserProfilePage(CoursePage):
         return (
             self.q(css='section.discussion-user-threads[data-course-id="{}"]'.format(self.course_id)).present
             and
-            self.q(css='section.user-profile div.sidebar-username').present
+            self.q(css='section.user-profile a.leaner-profile-link').present
             and
-            self.q(css='section.user-profile div.sidebar-username').text[0] == self.username
+            self.q(css='section.user-profile a.leaner-profile-link').text[0] == self.username
         )
 
     @wait_for_js
@@ -515,6 +515,13 @@ class DiscussionUserProfilePage(CoursePage):
             self.is_window_on_top,
             "Window is on top"
         ).fulfill()
+
+    def click_on_sidebar_username(self):
+        EmptyPromise(
+            self.is_browser_on_page,
+            "Could not locate sidebar username"
+        ).fulfill()
+        self.q(css='.leaner-profile-link').first.click()
 
 
 class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
