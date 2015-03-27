@@ -432,7 +432,7 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
         for section in expected:
             self.assertIn(section, content)
         doc = PyQuery(content['html'])
-        self.assertEquals(len(doc('div.xblock.xblock-student_view')), 1)
+        self.assertEquals(len(doc('div.xblock-student_view-videosequence')), 1)
 
 
 @ddt.ddt

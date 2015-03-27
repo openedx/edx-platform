@@ -237,12 +237,13 @@ class HTMLSnippet(object):
             .format(self.__class__))
 
 
-def shim_xmodule_js(fragment):
+def shim_xmodule_js(block, fragment):
     """
     Set up the XBlock -> XModule shim on the supplied :class:`xblock.fragment.Fragment`
     """
     if not fragment.js_init_fn:
         fragment.initialize_js('XBlockToXModuleShim')
+        fragment.json_init_args = {'xmodule-type': block.js_module_name}
 
 
 class XModuleMixin(XBlockMixin):

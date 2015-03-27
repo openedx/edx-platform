@@ -77,7 +77,11 @@ def wrap_xblock(runtime_class, block, view, frag, context, usage_id_serializer, 
 
     css_classes = [
         'xblock',
-        'xblock-{}'.format(markupsafe.escape(view))
+        'xblock-{}'.format(markupsafe.escape(view)),
+        'xblock-{}-{}'.format(
+            markupsafe.escape(view),
+            markupsafe.escape(block.scope_ids.block_type),
+        )
     ]
 
     if isinstance(block, (XModule, XModuleDescriptor)):
@@ -90,7 +94,7 @@ def wrap_xblock(runtime_class, block, view, frag, context, usage_id_serializer, 
 
         css_classes.append('xmodule_' + markupsafe.escape(class_name))
         data['type'] = block.js_module_name
-        shim_xmodule_js(frag)
+        shim_xmodule_js(block, frag)
 
     if frag.js_init_fn:
         data['init'] = frag.js_init_fn
