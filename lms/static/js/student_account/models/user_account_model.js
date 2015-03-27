@@ -20,8 +20,9 @@
                 mailing_address: "",
                 year_of_birth: null,
                 bio: null,
-                default_public_account_fields: [],
-                language_proficiencies: []
+                language_proficiencies: [],
+                requires_parental_consent: true,
+                default_public_account_fields: []
             },
 
             parse : function(response, xhr) {

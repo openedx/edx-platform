@@ -21,6 +21,7 @@ class LearnerProfilePage(FieldsMixin, PageObject):
 
     def __init__(self, browser, username):
         """
+        Initialize the page and set the username.
         """
         super(LearnerProfilePage, self).__init__(browser)
         self.username = username

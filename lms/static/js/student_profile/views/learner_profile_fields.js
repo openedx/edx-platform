@@ -17,10 +17,16 @@
             message: function () {
                 if (this.profileIsPrivate) {
                     this._super(interpolate_text(
-                        gettext('Your profile is set to limited because you have not set your birth year yet. Set it on the {account_settings_page_link}.'),
+                        gettext("Your profile is disabled because you haven't filled in your Year of Birth. Please visit the Account Settings page. {account_settings_page_link}."),
                         {'account_settings_page_link': '<a href="' + this.options.accountSettingsPageUrl + '">' + gettext('Account Settings page') + '</a>'}
                     ));
-                } else {
+                } else if (this.requiresParentalConsent) {
+                    this._super(interpolate_text(
+                        gettext('Your profile is disabled because you are under 14. If this is incorrect, please visit the Account Settings page. {account_settings_page_link}.'),
+                        {'account_settings_page_link': '<a href="' + this.options.accountSettingsPageUrl + '">' + gettext('Account Settings page') + '</a>'}
+                    ));
+                }
+                else {
                     this._super('');
                 }
                 return this._super();
