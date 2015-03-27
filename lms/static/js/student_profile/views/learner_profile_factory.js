@@ -6,9 +6,12 @@
         'js/student_account/models/user_preferences_model',
         'js/views/fields',
         'js/student_profile/views/learner_profile_fields',
-        'js/student_profile/views/learner_profile_view'
+        'js/student_profile/views/learner_profile_view',
+        'js/student_account/views/account_settings_fields'
+
+
     ], function (gettext, $, _, Backbone, AccountSettingsModel, AccountPreferencesModel, FieldsView,
-                 LearnerProfileFieldsView, LearnerProfileView) {
+                 LearnerProfileFieldsView, LearnerProfileView, AccountSettingsFieldViews) {
 
         return function (options) {
 
@@ -58,14 +61,14 @@
                     options: options['country_options'],
                     helpMessage: ''
                 }),
-                new FieldsView.DropdownFieldView({
+                new AccountSettingsFieldViews.LanguageProficienciesFieldView({
                     model: accountSettingsModel,
                     required: false,
                     editable: editable,
                     showMessages: false,
                     iconName: 'fa-comment',
                     placeholderValue: gettext('Add language'),
-                    valueAttribute: "language",
+                    valueAttribute: "language_proficiencies",
                     options: options['language_options'],
                     helpMessage: ''
                 })
