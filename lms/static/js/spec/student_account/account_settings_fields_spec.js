@@ -47,7 +47,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 requests = AjaxHelpers.requests(this);
 
                 var selector = '.u-field-value > select';
-                var fieldData = FieldViewsSpecHelpers.createFieldData(AccountSettingsFieldViews.PasswordFieldView, {
+                var fieldData = FieldViewsSpecHelpers.createFieldData(AccountSettingsFieldViews.DropdownFieldView, {
                     valueAttribute: 'language',
                     options: FieldViewsSpecHelpers.SELECT_OPTIONS
                 });
@@ -73,5 +73,24 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 FieldViewsSpecHelpers.expectMessageContains(view, "You must sign out of edX and sign back in before your language changes take effect.");
             });
 
+            it("reads and saves the value correctly for LanguageProficienciesFieldView", function() {
+                requests = AjaxHelpers.requests(this);
+
+                var selector = '.u-field-value > select';
+                var fieldData = FieldViewsSpecHelpers.createFieldData(AccountSettingsFieldViews.DropdownFieldView, {
+                    valueAttribute: 'language_proficiencies',
+                    options: FieldViewsSpecHelpers.SELECT_OPTIONS
+                });
+                fieldData.model.set({'language_proficiencies': [{'code': FieldViewsSpecHelpers.SELECT_OPTIONS[0][0]}]});
+
+                var view = new AccountSettingsFieldViews.LanguageProficienciesFieldView(fieldData).render();
+
+                expect(view.modelValue()).toBe(FieldViewsSpecHelpers.SELECT_OPTIONS[0][0]);
+
+                var data = {'language_proficiencies': [{'code': FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]}]};
+                view.$(selector).val(FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]).change();
+                FieldViewsSpecHelpers.expectAjaxRequestWithData(requests, data);
+                AjaxHelpers.respondWithNoContent(requests);
+            });
         });
     });

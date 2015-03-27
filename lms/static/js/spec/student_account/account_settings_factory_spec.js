@@ -147,7 +147,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 }
 
                 expect(sectionsData[1].fields.length).toBe(5);
-                for (var i = 0; i < sectionsData[1].fields.length; i++) {
+                for (var i = 0; i < 4; i++) {
 
                     var view = sectionsData[1].fields[i].view;
                     FieldViewsSpecHelpers.verifyDropDownField(view, {
