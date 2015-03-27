@@ -15,9 +15,19 @@ define(
                     edx_video_id: "dummy_id",
                     status: "uploading"
                 };
-                var view = new PreviousVideoUploadView(
+                var flag = false;
+                var view = undefined;
+                view = new PreviousVideoUploadView(
                     {model: new Backbone.Model($.extend({}, defaultData, modelData))}
                 );
+
+                waitsFor(function() {
+                    if (typeof(view) != "undefined") {
+                        flag = true;
+                    }
+                    return flag;
+                    }, 'View created', 600);
+
                 return view.render().$el;
             };
 
