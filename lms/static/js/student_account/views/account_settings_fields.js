@@ -83,6 +83,25 @@
             },
         });
 
+        AccountSettingsFieldViews.LanguageProficienciesFieldView = FieldViews.DropdownFieldView.extend({
+
+            modelValue: function () {
+                var modelValue = this.model.get(this.options.valueAttribute);
+                if (_.isArray(modelValue) && modelValue.length > 0) {
+                    return modelValue[0].code
+                } else {
+                    return '';
+                }
+            },
+
+            saveValue: function () {
+                var attributes = {};
+                var value = this.fieldValue() ? [{'code': this.fieldValue()}] : [];
+                attributes[this.options.valueAttribute] = value;
+                this.saveAttributes(attributes);
+            }
+        });
+
         return AccountSettingsFieldViews;
     })
 }).call(this, define || RequireJS.define);

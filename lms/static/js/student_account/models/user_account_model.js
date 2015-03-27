@@ -18,7 +18,8 @@
                 goals: "",
                 level_of_education: null,
                 mailing_address: "",
-                year_of_birth: null
+                year_of_birth: null,
+                language_proficiencies: []
             }
         });
 
