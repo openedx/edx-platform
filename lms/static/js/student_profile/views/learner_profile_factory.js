@@ -63,7 +63,7 @@
                     required: false,
                     editable: editable,
                     showMessages: false,
-                    iconName: 'fa-comment fa-flip-horizontal',
+                    iconName: 'fa-comment',
                     placeholderValue: gettext('Add language'),
                     valueAttribute: "language",
                     options: options['language_options'],
