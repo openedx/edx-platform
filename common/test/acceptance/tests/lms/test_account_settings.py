@@ -53,7 +53,7 @@ class AccountSettingsPageTest(WebAppTest):
                 'fields': [
                     'Username',
                     'Full Name',
-                    'Email',
+                    'Email Address',
                     'Password',
                     'Language',
                 ]
@@ -165,7 +165,7 @@ class AccountSettingsPageTest(WebAppTest):
         """
         self._test_text_field(
             u'email',
-            u'Email',
+            u'Email Address',
             self.EMAIL,
             u'@',
             [u'me@here.com', u'you@there.com'],
