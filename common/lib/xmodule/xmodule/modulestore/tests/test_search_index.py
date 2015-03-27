@@ -1,6 +1,7 @@
 """
 Unit tests for search indexers
 """
+from django.conf import settings
 from lazy.lazy import lazy
 import os
 import mock
@@ -41,11 +42,17 @@ class TestIndexerForLocation(TestCase):
         self.assertIsInstance(indexer, LibrarySearchIndexer)
 
 
+# pylint: disable=no-member
 class SearchIndexerBaseTestMixin(object):
     """ Common features for search indexers tests"""
     ROOT_ID = None
-    TEST_INDEX_FILENAME = "test_root/index_file.dat"
     modulestore = None
+
+    TEST_INDEX_FILENAME = getattr(
+        settings, 'MOCK_SEARCH_BACKING_FILE',
+        "test_root/index_file.dat"
+    )
+    MOCK_SEARCH_ENGINE = getattr(settings, 'SEARCH_ENGINE', "search.tests.mock_search_engine.MockSearchEngine")
 
     def setUp(self):
         """
@@ -116,8 +123,8 @@ class SearchIndexerBaseTestMixin(object):
             result['start_date'] = start_date
         return result
 
-    @mock.patch('search.tests.mock_search_engine.MockSearchEngine.remove')
-    @mock.patch('search.tests.mock_search_engine.MockSearchEngine.index')
+    @mock.patch(MOCK_SEARCH_ENGINE + '.remove')
+    @mock.patch(MOCK_SEARCH_ENGINE + '.index')
     @mock.patch('xmodule.modulestore.search_index.SearchEngine.get_search_engine')
     def test_no_searcher_does_nothing(self, search_engine, index, remove):
         """ Tests that does indexer does nothing if no search engine is available """
@@ -128,8 +135,8 @@ class SearchIndexerBaseTestMixin(object):
         index.assert_not_called()
         remove.assert_not_called()
 
-    @mock.patch('search.tests.mock_search_engine.MockSearchEngine.remove')
-    @mock.patch('search.tests.mock_search_engine.MockSearchEngine.index')
+    @mock.patch(MOCK_SEARCH_ENGINE + '.remove')
+    @mock.patch(MOCK_SEARCH_ENGINE + '.index')
     def test_not_indexable_no_children_does_nothing(self, index, remove):
         """ Tests that does indexer does nothing if xblock is not indexable """
         item, location = self._make_item('html', None)
@@ -138,7 +145,7 @@ class SearchIndexerBaseTestMixin(object):
         index.assert_not_called()
         remove.assert_not_called()
 
-    @mock.patch('search.tests.mock_search_engine.MockSearchEngine.index')
+    @mock.patch(MOCK_SEARCH_ENGINE + '.index')
     def test_add_to_index_no_children_adds_to_index(self, patched_index):
         """ Tests that indexer adds XBlock with no children to index """
         index_dict = {'item': 'value'}
@@ -148,7 +155,7 @@ class SearchIndexerBaseTestMixin(object):
         expected_index_entry = self._make_index_entry(index_dict, location)
         patched_index.assert_called_with(self.indexer.DOCUMENT_TYPE, expected_index_entry)
 
-    @mock.patch('search.tests.mock_search_engine.MockSearchEngine.remove')
+    @mock.patch(MOCK_SEARCH_ENGINE + '.remove')
     def test_add_to_index_with_delete_no_children_simple_removes_from_index(self, patched_remove):
         """ Tests that indexer removes XBlock with no children from index """
         item, location = self._make_item('html', {'item': 'value'})
@@ -156,7 +163,7 @@ class SearchIndexerBaseTestMixin(object):
         self.indexer.add_to_search_index(self.modulestore, location, delete=True)
         patched_remove.assert_called_with(self.indexer.DOCUMENT_TYPE, self._process_index_id(location))
 
-    @mock.patch('search.tests.mock_search_engine.MockSearchEngine.index')
+    @mock.patch(MOCK_SEARCH_ENGINE + '.index')
     def test_add_to_index_with_chidlren_adds_all_to_index(self, patched_index):
         """ Tests that indexer adds XBlock with children to index (both Xblock and all of its children)"""
         index_dict_child1, index_dict_child2 = {'child': 'child1'}, {'child': 'child2'}
@@ -191,7 +198,7 @@ class SearchIndexerBaseTestMixin(object):
             self._make_index_entry(index_dict, location, start_date=start_date)
         ))
 
-    @mock.patch('search.tests.mock_search_engine.MockSearchEngine.remove')
+    @mock.patch(MOCK_SEARCH_ENGINE + '.remove')
     def test_remove_from_index_with_chidlren_removes_all_from_index(self, patched_remove):
         """ Tests that indexer removes XBlock with children from index (both Xblock and all of its children)"""
         index_dict_child1, index_dict_child2 = {'child': 'child1'}, {'child': 'child2'}

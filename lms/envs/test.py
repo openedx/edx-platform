@@ -462,6 +462,9 @@ FEATURES['ENTRANCE_EXAMS'] = True
 FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
 # Use MockSearchEngine as the search engine for test scenario
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
+MOCK_SEARCH_BACKING_FILE = (
+    TEST_ROOT / "index_file.dat"  # pylint: disable=no-value-for-parameter
+).abspath()
 
 FACEBOOK_APP_SECRET = "Test"
 FACEBOOK_APP_ID = "Test"

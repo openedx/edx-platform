@@ -19,7 +19,6 @@ from xmodule.modulestore.search_index import get_indexer_for_location, SearchInd
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
-from xmodule.modulestore.courseware_index import SearchIndexingError
 from opaque_keys.edx.locator import CourseLocator
 from student.tests.factories import UserFactory
 from course_action_state.managers import CourseRerunUIStateManager
@@ -389,7 +388,7 @@ class TestCourseReIndex(CourseTestCase):
         """ Performs search """
         return perform_search(
             query,
-            user=self.user,
+            user=self.user,  # pylint: disable=no-member
             size=10,
             from_=0,
             course_id=unicode(self.course.id))

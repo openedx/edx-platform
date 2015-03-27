@@ -160,7 +160,11 @@ class SearchIndexerBase(object):
                     for child_loc in item.children:
                         remove_index_item_location(child_loc)
 
-            searcher.remove(self.DOCUMENT_TYPE, unicode(self._id_modifier(item.scope_ids.usage_id)))
+                target_location = item.scope_ids.usage_id
+            else:
+                target_location = item_location
+
+            searcher.remove(self.DOCUMENT_TYPE, unicode(self._id_modifier(target_location)))
 
         try:
             if delete:
