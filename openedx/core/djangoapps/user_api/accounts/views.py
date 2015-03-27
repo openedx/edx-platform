@@ -28,9 +28,9 @@ class AccountView(APIView):
 
         **Example Requests**:
 
-            GET /api/user/v0/accounts/{username}/[?view=shared]
+            GET /api/user/v1/accounts/{username}/[?view=shared]
 
-            PATCH /api/user/v0/accounts/{username}/{"key":"value"} "application/merge-patch+json"
+            PATCH /api/user/v1/accounts/{username}/{"key":"value"} "application/merge-patch+json"
 
         **Response Values for GET**
 
@@ -154,7 +154,7 @@ class AccountView(APIView):
 
     def get(self, request, username):
         """
-        GET /api/user/v0/accounts/{username}/
+        GET /api/user/v1/accounts/{username}/
         """
         try:
             account_settings = get_account_settings(request.user, username, view=request.QUERY_PARAMS.get('view'))
@@ -169,7 +169,7 @@ class AccountView(APIView):
 
     def patch(self, request, username):
         """
-        PATCH /api/user/v0/accounts/{username}/
+        PATCH /api/user/v1/accounts/{username}/
 
         Note that this implementation is the "merge patch" implementation proposed in
         https://tools.ietf.org/html/rfc7396. The content_type must be "application/merge-patch+json" or
