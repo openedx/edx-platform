@@ -308,7 +308,7 @@ FEATURES = {
     # When a user goes to the homepage ('/') the user see the
     # courses listed in the announcement dates order - this is default Open edX behavior.
     # Set to True to change the course sorting behavior by their start dates, latest first.
-    'ENABLE_COURSE_SORTING_BY_START_DATE': False,
+    'ENABLE_COURSE_SORTING_BY_START_DATE': True,
 
     # Flag to enable new user account APIs.
     'ENABLE_USER_REST_API': False,

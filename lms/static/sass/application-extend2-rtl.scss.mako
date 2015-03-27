@@ -47,6 +47,7 @@
 @import 'views/verification';
 @import 'views/shoppingcart';
 @import 'views/login-register';
+@import 'views/homepage';
 
 // applications
 @import "discussion/utilities/variables";

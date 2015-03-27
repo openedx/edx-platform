@@ -49,6 +49,7 @@
 @import 'views/verification';
 @import 'views/decoupled-verification';
 @import 'views/shoppingcart';
+@import 'views/homepage';
 @import 'course/auto-cert';
 
 // applications
