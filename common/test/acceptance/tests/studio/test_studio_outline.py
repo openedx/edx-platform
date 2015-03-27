@@ -292,7 +292,7 @@ class WarningMessagesTest(CourseOutlineTest):
         self.course_outline_page.visit()
         section = self.course_outline_page.section(unit_state.name)
         subsection = section.subsection_at(0)
-        subsection.toggle_expand()
+        subsection.expand_subsection()
         unit = subsection.unit_at(0)
         if expected_status_message == self.STAFF_ONLY_WARNING:
             self.assertEqual(section.status_message, self.STAFF_ONLY_WARNING)
@@ -314,7 +314,7 @@ class WarningMessagesTest(CourseOutlineTest):
         name = unit_state.name
         self.course_outline_page.visit()
         subsection = self.course_outline_page.section(name).subsection(name)
-        subsection.toggle_expand()
+        subsection.expand_subsection()
 
         if unit_state.publish_state == self.PublishState.UNPUBLISHED_CHANGES:
             unit = subsection.unit(name).go_to()
@@ -962,7 +962,7 @@ class EditNamesTest(CourseOutlineTest):
             Then the section is collapsed
         """
         self.course_outline_page.visit()
-        self.course_outline_page.section_at(0).toggle_expand()
+        self.course_outline_page.section_at(0).expand_subsection()
         self.assertFalse(self.course_outline_page.section_at(0).in_editable_form())
         self.assertTrue(self.course_outline_page.section_at(0).is_collapsed)
         self.course_outline_page.section_at(0).edit_name()
@@ -1138,7 +1138,7 @@ class DeleteContentTest(CourseOutlineTest):
             And the unit should immediately be deleted from the course outline
         """
         self.course_outline_page.visit()
-        self.course_outline_page.section_at(0).subsection_at(0).toggle_expand()
+        self.course_outline_page.section_at(0).subsection_at(0).expand_subsection()
         self.assertEqual(len(self.course_outline_page.section_at(0).subsection_at(0).units()), 1)
         self.course_outline_page.section_at(0).subsection_at(0).unit_at(0).delete()
         self.assertEqual(len(self.course_outline_page.section_at(0).subsection_at(0).units()), 0)
@@ -1153,7 +1153,7 @@ class DeleteContentTest(CourseOutlineTest):
             And the unit should remain in the course outline
         """
         self.course_outline_page.visit()
-        self.course_outline_page.section_at(0).subsection_at(0).toggle_expand()
+        self.course_outline_page.section_at(0).subsection_at(0).expand_subsection()
         self.assertEqual(len(self.course_outline_page.section_at(0).subsection_at(0).units()), 1)
         self.course_outline_page.section_at(0).subsection_at(0).unit_at(0).delete(cancel=True)
         self.assertEqual(len(self.course_outline_page.section_at(0).subsection_at(0).units()), 1)
@@ -1208,7 +1208,7 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         Toggles the expand collapse state of all sections.
         """
         for section in self.course_outline_page.sections():
-            section.toggle_expand()
+            section.expand_subsection()
 
     def test_expanded_by_default(self):
         """
@@ -1265,7 +1265,7 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         """
         self.course_outline_page.visit()
         self.verify_all_sections(collapsed=False)
-        self.course_outline_page.section_at(0).toggle_expand()
+        self.course_outline_page.section_at(0).expand_subsection()
         self.course_outline_page.toggle_expand_collapse()
         self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
         self.verify_all_sections(collapsed=True)
@@ -1299,7 +1299,7 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         self.course_outline_page.visit()
         self.course_outline_page.toggle_expand_collapse()
         self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
-        self.course_outline_page.section_at(0).toggle_expand()
+        self.course_outline_page.section_at(0).expand_subsection()
         self.course_outline_page.toggle_expand_collapse()
         self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
         self.verify_all_sections(collapsed=False)
@@ -1449,7 +1449,7 @@ class UnitNavigationTest(CourseOutlineTest):
             Then I will be taken to the appropriate unit page
         """
         self.course_outline_page.visit()
-        self.course_outline_page.section_at(0).subsection_at(0).toggle_expand()
+        self.course_outline_page.section_at(0).subsection_at(0).expand_subsection()
         unit = self.course_outline_page.section_at(0).subsection_at(0).unit_at(0).go_to()
         self.assertTrue(unit.is_browser_on_page)
 
@@ -1575,6 +1575,6 @@ class PublishSectionTest(CourseOutlineTest):
         """
         section = self.course_outline_page.section(SECTION_NAME)
         subsection = section.subsection(SUBSECTION_NAME)
-        unit = subsection.toggle_expand().unit(UNIT_NAME)
+        unit = subsection.expand_subsection().unit(UNIT_NAME)
 
         return (section, subsection, unit)

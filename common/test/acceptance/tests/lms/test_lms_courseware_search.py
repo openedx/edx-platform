@@ -4,8 +4,6 @@ Test courseware search
 import os
 import json
 
-from flaky import flaky
-
 from ..helpers import UniqueCourseTest
 from ...pages.common.logout import LogoutPage
 from ...pages.studio.utils import add_html_component, click_css, type_in_codemirror
@@ -99,7 +97,7 @@ class CoursewareSearchTest(UniqueCourseTest):
         """
         self.course_outline.visit()
         subsection = self.course_outline.section_at(section_index).subsection_at(0)
-        subsection.toggle_expand()
+        subsection.expand_subsection()
         unit = subsection.unit_at(0)
         unit.publish()
 
@@ -119,7 +117,7 @@ class CoursewareSearchTest(UniqueCourseTest):
         # create a unit in course outline
         self.course_outline.visit()
         subsection = self.course_outline.section_at(section_index).subsection_at(0)
-        subsection.toggle_expand()
+        subsection.expand_subsection()
         subsection.add_unit()
 
         # got to unit and create an HTML component and save (not publish)
@@ -167,7 +165,6 @@ class CoursewareSearchTest(UniqueCourseTest):
         self.courseware_search_page.search_for_term(self.SEARCH_STRING)
         assert self.SEARCH_STRING in self.courseware_search_page.search_results.html[0]
 
-    @flaky  # TODO fix this, see SOL-336
     def test_reindex(self):
         """
         Make sure new content gets reindexed on button press.

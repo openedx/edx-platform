@@ -69,7 +69,7 @@ class XBlockAcidBase(WebAppTest):
 
         self.outline.visit()
         subsection = self.outline.section('Test Section').subsection('Test Subsection')
-        unit = subsection.toggle_expand().unit('Test Unit').go_to()
+        unit = subsection.expand_subsection().unit('Test Unit').go_to()
 
         acid_block = AcidView(self.browser, unit.xblocks[0].preview_selector)
         self.validate_acid_block_preview(acid_block)
@@ -81,7 +81,7 @@ class XBlockAcidBase(WebAppTest):
 
         self.outline.visit()
         subsection = self.outline.section('Test Section').subsection('Test Subsection')
-        unit = subsection.toggle_expand().unit('Test Unit').go_to()
+        unit = subsection.expand_subsection().unit('Test Unit').go_to()
 
         acid_block = AcidView(self.browser, unit.xblocks[0].edit().editor_selector)
         self.assertTrue(acid_block.init_fn_passed)
@@ -133,7 +133,7 @@ class XBlockAcidParentBase(XBlockAcidBase):
 
         self.outline.visit()
         subsection = self.outline.section('Test Section').subsection('Test Subsection')
-        unit = subsection.toggle_expand().unit('Test Unit').go_to()
+        unit = subsection.expand_subsection().unit('Test Unit').go_to()
         container = unit.xblocks[0].go_to_container()
 
         acid_block = AcidView(self.browser, container.xblocks[0].preview_selector)

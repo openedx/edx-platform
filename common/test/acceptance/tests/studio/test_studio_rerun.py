@@ -94,7 +94,7 @@ class CourseRerunTest(StudioCourseTest):
         EmptyPromise(lambda: not outline_page.has_rerun_notification, "Rerun notification dismissed").fulfill()
 
         subsection = outline_page.section(self.SECTION_NAME).subsection(self.SUBSECITON_NAME)
-        subsection.toggle_expand()
+        subsection.expand_subsection()
         unit_page = subsection.unit(self.UNIT_NAME).go_to()
 
         unit_page.view_published_version()
