@@ -1,9 +1,10 @@
 define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
+        'js/spec/views/fields_helpers',
         'js/spec/student_account/helpers',
         'js/student_account/views/account_settings_factory',
         'js/student_account/views/account_settings_view'
         ],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, AccountSettingsPage, AccountSettingsView) {
+    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, Helpers, AccountSettingsPage, AccountSettingsView) {
         'use strict';
 
         describe("edx.user.AccountSettingsFactory", function () {
@@ -114,5 +115,52 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 Helpers.expectSettingsSectionsAndFieldsToBeRendered(accountSettingsView)
             });
 
+            it("expects all fields to behave correctly", function () {
+
+                requests = AjaxHelpers.requests(this);
+
+                var context = AccountSettingsPage(
+                    FIELDS_DATA, Helpers.USER_ACCOUNTS_API_URL, Helpers.USER_PREFERENCES_API_URL
+                );
+                var accountSettingsView = context.accountSettingsView;
+
+                AjaxHelpers.respondWithJson(requests, Helpers.USER_ACCOUNTS_DATA);
+                AjaxHelpers.respondWithJson(requests, Helpers.USER_PREFERENCES_DATA);
+
+                var sectionsData = accountSettingsView.options.sectionsData;
+
+                expect(sectionsData[0].fields.length).toBe(5);
+
+                var textFields = [sectionsData[0].fields[1], sectionsData[0].fields[2]];
+                for (var i = 0; i < textFields ; i++) {
+
+                    var view = textFields[i].view;
+                    FieldViewsSpecHelpers.verifyTextField(view, {
+                        title: view.options.title,
+                        valueAttribute: view.options.valueAttribute,
+                        helpMessage: view.options.helpMessage,
+                        validValue: 'My Name',
+                        invalidValue1: '',
+                        invalidValue2: '@',
+                        validationError: "Think again!"
+                    }, requests);
+                }
+
+                expect(sectionsData[1].fields.length).toBe(5);
+                for (var i = 0; i < sectionsData[1].fields.length; i++) {
+
+                    var view = sectionsData[1].fields[i].view;
+                    FieldViewsSpecHelpers.verifyDropDownField(view, {
+                        title: view.options.title,
+                        valueAttribute: view.options.valueAttribute,
+                        helpMessage: '',
+                        validValue: Helpers.FIELD_OPTIONS[0][0],
+                        invalidValue1: Helpers.FIELD_OPTIONS[1][0],
+                        invalidValue2: Helpers.FIELD_OPTIONS[2][0],
+                        validationError: "Nope, this will not do!"
+                    }, requests);
+                }
+
+            });
         });
     });
