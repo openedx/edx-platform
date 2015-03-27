@@ -436,7 +436,7 @@ class ExternalDiscussionTab(LinkTab):
     def __init__(self, tab_dict=None, link_value=None):
         super(ExternalDiscussionTab, self).__init__(
             # Translators: 'Discussion' refers to the tab in the courseware that leads to the discussion forums
-            name=_('Discussion'),
+            name=_('FAQ'),
             tab_id='discussion',
             link_value=tab_dict['link'] if tab_dict else link_value,
         )
