@@ -132,7 +132,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 expect(sectionsData[0].fields.length).toBe(5);
 
                 var textFields = [sectionsData[0].fields[1], sectionsData[0].fields[2]];
-                for (var i = 0; i < textFields ; i++) {
+                for (var i = 0; i < textFields.length ; i++) {
 
                     var view = textFields[i].view;
                     FieldViewsSpecHelpers.verifyTextField(view, {
@@ -154,9 +154,9 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                         title: view.options.title,
                         valueAttribute: view.options.valueAttribute,
                         helpMessage: '',
-                        validValue: Helpers.FIELD_OPTIONS[0][0],
-                        invalidValue1: Helpers.FIELD_OPTIONS[1][0],
-                        invalidValue2: Helpers.FIELD_OPTIONS[2][0],
+                        validValue: Helpers.FIELD_OPTIONS[1][0],
+                        invalidValue1: Helpers.FIELD_OPTIONS[2][0],
+                        invalidValue2: Helpers.FIELD_OPTIONS[3][0],
                         validationError: "Nope, this will not do!"
                     }, requests);
                 }

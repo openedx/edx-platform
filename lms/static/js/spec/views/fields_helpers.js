@@ -27,7 +27,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 model: fieldData.model || new UserAccountModel({}),
                 title: fieldData.title || 'Field Title',
                 valueAttribute: fieldData.valueAttribute,
-                helpMessage: fieldData.helpMessage || 'I am a field message'
+                helpMessage: fieldData.helpMessage || 'I am a field message',
+                placeholderValue: fieldData.placeholderValue || 'I am a placeholder message'
             };
 
             switch (fieldType) {
@@ -58,8 +59,12 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             }
         };
 
-        var expectTitleAndMessageToBe = function(view, expectedTitle, expectedMessage) {
+        var expectTitleToBe = function(view, expectedTitle) {
             expect(view.$('.u-field-title').text().trim()).toBe(expectedTitle);
+        };
+
+        var expectTitleAndMessageToBe = function(view, expectedTitle, expectedMessage) {
+            expectTitleToBe(view, expectedTitle);
             expect(view.$('.u-field-message').text().trim()).toBe(expectedMessage);
         };
 
@@ -125,9 +130,19 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             var request_data = {};
             var url = view.model.url;
 
-            expectTitleAndMessageToBe(view, data.title, data.helpMessage);
+            if (data.editable === 'toggle') {
+                expect(view.el).toHaveClass('mode-placeholder');
+                expectTitleToBe(view, data.title);
+                expectMessageContains(view, view.indicators['canEdit']);
+                view.$el.click();
+            } else {
+                expectTitleAndMessageToBe(view, data.title, data.helpMessage);
+            }
 
-            view.$(data.valueElementSelector).val(data.validValue).change();
+            expect(view.el).toHaveClass('mode-edit');
+            expect(view.fieldValue()).not.toBe(data.validValue);
+
+            view.$(data.valueInputSelector).val(data.validValue).change();
             // When the value in the field is changed
             expect(view.fieldValue()).toBe(data.validValue);
             expectMessageContains(view, view.indicators['inProgress']);
@@ -139,9 +154,14 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
             AjaxHelpers.respondWithNoContent(requests);
             // When server returns success.
-            expectMessageContains(view, view.indicators['success']);
+            if (data.editable === 'toggle') {
+                expect(view.el).toHaveClass('mode-display');
+                view.$el.click();
+            } else {
+                expectMessageContains(view, view.indicators['success']);
+            }
 
-            view.$(data.valueElementSelector).val(data.invalidValue1).change();
+            view.$(data.valueInputSelector).val(data.invalidValue1).change();
             request_data[data.valueAttribute] = data.invalidValue1;
             AjaxHelpers.expectJsonRequest(
                 requests, 'PATCH', url, request_data
@@ -150,8 +170,9 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             // When server returns a 500 error
             expectMessageContains(view, view.indicators['error']);
             expectMessageContains(view, view.messages['error']);
+            expect(view.el).toHaveClass('mode-edit');
 
-            view.$(data.valueElementSelector).val(data.invalidValue2).change();
+            view.$(data.valueInputSelector).val(data.invalidValue2).change();
             request_data[data.valueAttribute] = data.invalidValue2;
             AjaxHelpers.expectJsonRequest(
                 requests, 'PATCH', url, request_data
@@ -160,12 +181,29 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             // When server returns a validation error
             expectMessageContains(view, view.indicators['validationError']);
             expectMessageContains(view, data.validationError);
+            expect(view.el).toHaveClass('mode-edit');
+
+            view.$(data.valueInputSelector).val('').change();
+            // When the value in the field is changed
+            expect(view.fieldValue()).toBe('');
+            request_data[data.valueAttribute] = '';
+            AjaxHelpers.expectJsonRequest(
+                requests, 'PATCH', url, request_data
+            );
+            AjaxHelpers.respondWithNoContent(requests);
+            // When server returns success.
+            if (data.editable === 'toggle') {
+                expect(view.el).toHaveClass('mode-placeholder');
+            } else {
+                expect(view.el).toHaveClass('mode-edit');
+            }
         };
 
         var verifyTextField = function (view, data, requests) {
             var selector = '.u-field-value > input';
             verifyEditableField(view, _.extend({
-                    valueElementSelector: selector,
+                    valueSelector: '.u-field-value',
+                    valueInputSelector: '.u-field-value > input'
                 }, data
             ), requests);
         }
@@ -173,7 +211,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
         var verifyDropDownField = function (view, data, requests) {
             var selector = '.u-field-value > select';
             verifyEditableField(view, _.extend({
-                    valueElementSelector: selector,
+                    valueSelector: '.u-field-value',
+                    valueInputSelector: '.u-field-value > select'
                 }, data
             ), requests);
         }
@@ -183,6 +222,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             UserAccountModel: UserAccountModel,
             createFieldData: createFieldData,
             createErrorMessage: createErrorMessage,
+            expectTitleToBe: expectTitleToBe,
             expectTitleAndMessageToBe: expectTitleAndMessageToBe,
             expectMessageContains: expectMessageContains,
             expectAjaxRequestWithData: expectAjaxRequestWithData,

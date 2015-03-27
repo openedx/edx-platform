@@ -1,13 +1,15 @@
 define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
         'js/spec/student_account/helpers',
+        'js/spec/student_profile/helpers',
         'js/views/fields',
         'js/student_account/models/user_account_model',
         'js/student_account/models/user_preferences_model',
         'js/student_profile/views/learner_profile_fields',
-        'js/student_profile/views/learner_profile_view'
+        'js/student_profile/views/learner_profile_view',
+        'js/student_account/views/account_settings_fields'
        ],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, FieldViews, UserAccountModel,
-                AccountPreferencesModel, LearnerProfileFields, LearnerProfileView) {
+    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers, FieldViews, UserAccountModel,
+                AccountPreferencesModel, LearnerProfileFields, LearnerProfileView, AccountSettingsFieldViews) {
         'use strict';
 
         describe("edx.user.LearnerProfileView", function (options) {
@@ -60,14 +62,14 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                         helpMessage: ''
                     }),
 
-                    new FieldViews.DropdownFieldView({
+                    new AccountSettingsFieldViews.LanguageProficienciesFieldView({
                         model: accountSettingsModel,
                         required: false,
                         editable: editable,
                         showMessages: false,
                         iconName: 'fa-comment',
                         placeholderValue: 'Add language',
-                        valueAttribute: "language",
+                        valueAttribute: "language_proficiencies",
                         options: Helpers.FIELD_OPTIONS,
                         helpMessage: ''
                     })
@@ -131,7 +133,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 learnerProfileView.render();
 
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
-                Helpers.expectProfileSectionsAndFieldsToBeRendered(learnerProfileView);
+                LearnerProfileHelpers.expectProfileSectionsAndFieldsToBeRendered(learnerProfileView);
             });
 
             it("renders all fields as expected for self with limited access", function() {
@@ -144,7 +146,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 learnerProfileView.render();
 
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
-                Helpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView);
+                LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView);
             });
 
             it("renders the fields as expected for others with full access", function() {
@@ -157,7 +159,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 learnerProfileView.render();
 
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
-                Helpers.expectProfileSectionsAndFieldsToBeRendered(learnerProfileView, true)
+                LearnerProfileHelpers.expectProfileSectionsAndFieldsToBeRendered(learnerProfileView, true)
             });
 
             it("renders the fields as expected for others with limited access", function() {
@@ -170,7 +172,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 learnerProfileView.render();
 
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
-                Helpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView, true);
+                LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView, true);
             });
         });
     });

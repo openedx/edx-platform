@@ -1,5 +1,6 @@
 define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
         'js/spec/student_account/helpers',
+        'js/spec/student_profile/helpers',
         'js/views/fields',
         'js/student_account/models/user_account_model',
         'js/student_account/models/user_preferences_model',
@@ -7,7 +8,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
         'js/student_profile/views/learner_profile_fields',
         'js/student_profile/views/learner_profile_factory'
         ],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, FieldViews, UserAccountModel, UserPreferencesModel,
+    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers, FieldViews, UserAccountModel, UserPreferencesModel,
               LearnerProfileView, LearnerProfileFields, LearnerProfilePage) {
         'use strict';
 
@@ -40,7 +41,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
-                Helpers.expectProfileSectionsNotToBeRendered(learnerProfileView);
+                LearnerProfileHelpers.expectProfileSectionsNotToBeRendered(learnerProfileView);
 
 
                 var userAccountRequest = requests[0];
@@ -51,7 +52,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, true);
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, false);
-                Helpers.expectProfileSectionsNotToBeRendered(learnerProfileView);
+                LearnerProfileHelpers.expectProfileSectionsNotToBeRendered(learnerProfileView);
             });
 
             it("shows loading error when UserPreferencesModel fails to load", function() {
@@ -71,7 +72,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
-                Helpers.expectProfileSectionsNotToBeRendered(learnerProfileView);
+                LearnerProfileHelpers.expectProfileSectionsNotToBeRendered(learnerProfileView);
 
                 var userAccountRequest = requests[0];
                 expect(userAccountRequest.method).toBe('GET');
@@ -80,7 +81,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 AjaxHelpers.respondWithJson(requests, Helpers.USER_ACCOUNTS_DATA);
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
-                Helpers.expectProfileSectionsNotToBeRendered(learnerProfileView);
+                LearnerProfileHelpers.expectProfileSectionsNotToBeRendered(learnerProfileView);
 
                 var userPreferencesRequest = requests[1];
                 expect(userPreferencesRequest.method).toBe('GET');
@@ -89,7 +90,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 AjaxHelpers.respondWithError(requests, 500);
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, false);
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, true);
-                Helpers.expectProfileSectionsNotToBeRendered(learnerProfileView);
+                LearnerProfileHelpers.expectProfileSectionsNotToBeRendered(learnerProfileView);
             });
 
             it("renders the limited profile after models are successfully fetched", function() {
@@ -110,13 +111,13 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
-                Helpers.expectProfileSectionsNotToBeRendered(learnerProfileView);
+                LearnerProfileHelpers.expectProfileSectionsNotToBeRendered(learnerProfileView);
 
                 AjaxHelpers.respondWithJson(requests, Helpers.USER_ACCOUNTS_DATA);
                 AjaxHelpers.respondWithJson(requests, Helpers.USER_PREFERENCES_DATA);
 
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
-                Helpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView)
+                LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView)
             });
             
             it("renders the full profile after models are successfully fetched", function() {
@@ -136,14 +137,14 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
-                Helpers.expectProfileSectionsNotToBeRendered(learnerProfileView);
+                LearnerProfileHelpers.expectProfileSectionsNotToBeRendered(learnerProfileView);
 
                 AjaxHelpers.respondWithJson(requests, Helpers.USER_ACCOUNTS_DATA);
                 AjaxHelpers.respondWithJson(requests, Helpers.USER_PREFERENCES_DATA);
 
                 // sets the profile for full view.
                 context.accountPreferencesModel.set({account_privacy: 'all_users'});
-                Helpers.expectProfileSectionsAndFieldsToBeRendered(learnerProfileView, false)
+                LearnerProfileHelpers.expectProfileSectionsAndFieldsToBeRendered(learnerProfileView, false)
             });
         });
     });

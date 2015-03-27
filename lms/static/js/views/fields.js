@@ -127,7 +127,7 @@
         FieldViews.EditableFieldView = FieldViews.FieldView.extend({
 
             initialize: function (options) {
-                _.bindAll(this, 'saveAttributes', 'showDisplayMode', 'showEditMode', 'startEditing', 'finishEditing');
+                _.bindAll(this, 'saveAttributes', 'saveSucceeded', 'showDisplayMode', 'showEditMode', 'startEditing', 'finishEditing');
                 this._super(options);
 
                 this.editable = _.isUndefined(this.options.editable) ? 'always': this.options.editable;
@@ -147,14 +147,18 @@
                     patch: true,
                     wait: true,
                     success: function () {
-                        view.showSuccessMessage()
+                        view.saveSucceeded();
                     },
                     error: function (model, xhr) {
-                        view.showErrorMessage(xhr)
+                        view.showErrorMessage(xhr);
                     }
                 };
                 this.showInProgressMessage();
                 this.model.save(attributes, _.extend(defaultOptions, options));
+            },
+
+            saveSucceeded: function () {
+                this.showSuccessMessage();
             },
 
             showDisplayMode: function(render) {
@@ -361,7 +365,7 @@
                 }
             },
 
-            showSuccessMessage: function() {
+            saveSucceeded: function() {
                 this._super();
                 if (this.editable === 'toggle') {
                     this.showDisplayMode(true);
@@ -448,11 +452,12 @@
                 this.$('.u-field-value textarea').focus();
             },
 
-            showSuccessMessage: function() {
+            saveSucceeded: function() {
                 this._super();
-                this.showDisplayMode(true);
+                if (this.editable === 'toggle') {
+                    this.showDisplayMode(true);
+                }
             }
-
         });
 
         FieldViews.LinkFieldView = FieldViews.FieldView.extend({
