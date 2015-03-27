@@ -225,7 +225,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                     <label for="course-about-sidebar-html">${_("Course About Sidebar HTML")}</label>
                     <textarea class="tinymce text-editor" id="course-about-sidebar-html"></textarea>
                     <%def name='about_sidebar_html()'><%
-                        anchor = '<a class="link-courseURL" rel="external" href="{href_url}">{href_text}</a>'
+                        anchor = u"<a class='link-courseURL' rel='external' href='{href_url}'>{href_text}</a>"
                         anchor = anchor.format(
                             href_url=lms_link_for_about_page,
                             href_text=_("your course summary page"),
