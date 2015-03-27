@@ -34,16 +34,30 @@ class ProfileImageUrlTestCase(TestCase):
         """
         self.assertEqual(
             actual_url,
-            'http://example-storage.com/profile_images/{0}_{1}.jpg'.format(expected_name, expected_pixels),
+            'http://example-storage.com/profile_images/{name}_{size}.jpg'.format(
+                name=expected_name, size=expected_pixels
+            )
         )
 
-    def verify_urls(self, expected_name, actual_urls):
+    def verify_default_url(self, actual_url, expected_pixels):
+        """
+        Verify correct url structure for a default profile image.
+        """
+        self.assertEqual(
+            actual_url,
+            '/static/default_{size}.png'.format(size=expected_pixels)
+        )
+
+    def verify_urls(self, expected_name, actual_urls, is_default=False):
         """
         Verify correct url dictionary structure.
         """
         self.assertEqual(set(TEST_SIZES.keys()), set(actual_urls.keys()))
         for size_display_name, url in actual_urls.items():
-            self.verify_url(url, expected_name, TEST_SIZES[size_display_name])
+            if is_default:
+                self.verify_default_url(url, TEST_SIZES[size_display_name])
+            else:
+                self.verify_url(url, expected_name, TEST_SIZES[size_display_name])
 
     def test_get_profile_image_urls(self):
         """
@@ -57,4 +71,4 @@ class ProfileImageUrlTestCase(TestCase):
 
         self.user.profile.has_profile_image = False
         self.user.profile.save()
-        self.verify_urls('default', get_profile_image_urls_for_user(self.user))
+        self.verify_urls('default', get_profile_image_urls_for_user(self.user), is_default=True)

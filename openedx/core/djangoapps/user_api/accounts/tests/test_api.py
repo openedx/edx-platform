@@ -231,8 +231,8 @@ class AccountSettingsOnCreationTest(TestCase):
             'bio': None,
             'profile_image': {
                 'has_image': False,
-                'image_url_full': 'http://example-storage.com/profile_images/default_50.jpg',
-                'image_url_small': 'http://example-storage.com/profile_images/default_10.jpg',
+                'image_url_full': '/static/default_50.png',
+                'image_url_small': '/static/default_10.png',
             },
             'requires_parental_consent': True,
             'language_proficiencies': [],
