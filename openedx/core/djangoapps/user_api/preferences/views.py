@@ -33,9 +33,9 @@ class PreferencesView(APIView):
 
         **Example Requests**:
 
-            GET /api/user/v0/preferences/{username}/
+            GET /api/user/v1/preferences/{username}/
 
-            PATCH /api/user/v0/preferences/{username}/ with content_type "application/merge-patch+json"
+            PATCH /api/user/v1/preferences/{username}/ with content_type "application/merge-patch+json"
 
         **Response Value for GET**
 
@@ -71,7 +71,7 @@ class PreferencesView(APIView):
 
     def get(self, request, username):
         """
-        GET /api/user/v0/preferences/{username}/
+        GET /api/user/v1/preferences/{username}/
         """
         try:
             user_preferences = get_user_preferences(request.user, username=username)
@@ -84,7 +84,7 @@ class PreferencesView(APIView):
 
     def patch(self, request, username):
         """
-        PATCH /api/user/v0/preferences/{username}/
+        PATCH /api/user/v1/preferences/{username}/
         """
         if not request.DATA or not getattr(request.DATA, "keys", None):
             error_message = _("No data provided for user preference update")
@@ -126,11 +126,11 @@ class PreferencesDetailView(APIView):
 
         **Example Requests**:
 
-            GET /api/user/v0/preferences/{username}/{preference_key}
+            GET /api/user/v1/preferences/{username}/{preference_key}
 
-            PUT /api/user/v0/preferences/{username}/{preference_key}
+            PUT /api/user/v1/preferences/{username}/{preference_key}
 
-            DELETE /api/user/v0/preferences/{username}/{preference_key}
+            DELETE /api/user/v1/preferences/{username}/{preference_key}
 
         **Response Values for GET**
 
@@ -167,7 +167,7 @@ class PreferencesDetailView(APIView):
 
     def get(self, request, username, preference_key):
         """
-        GET /api/user/v0/preferences/{username}/{preference_key}
+        GET /api/user/v1/preferences/{username}/{preference_key}
         """
         try:
             value = get_user_preference(request.user, preference_key, username=username)
@@ -182,7 +182,7 @@ class PreferencesDetailView(APIView):
 
     def put(self, request, username, preference_key):
         """
-        PUT /api/user/v0/preferences/{username}/{preference_key}
+        PUT /api/user/v1/preferences/{username}/{preference_key}
         """
         try:
             set_user_preference(request.user, preference_key, request.DATA, username=username)
@@ -210,7 +210,7 @@ class PreferencesDetailView(APIView):
 
     def delete(self, request, username, preference_key):
         """
-        DELETE /api/user/v0/preferences/{username}/{preference_key}
+        DELETE /api/user/v1/preferences/{username}/{preference_key}
         """
         try:
             preference_existed = delete_user_preference(request.user, preference_key, username=username)

@@ -86,13 +86,13 @@ urlpatterns = (
 
     # Course content API
     url(r'^api/course_structure/', include('course_structure_api.urls', namespace='course_structure_api')),
-)
 
-if settings.FEATURES["ENABLE_USER_REST_API"]:
-    urlpatterns += (
-        url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
-        url(r'^api/profile_images/', include('openedx.core.djangoapps.profile_images.urls')),
-    )
+    # User API endpoints
+    url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
+
+    # Profile Images API endpoints
+    url(r'^api/profile_images/', include('openedx.core.djangoapps.profile_images.urls')),
+)
 
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
     # Backwards compatibility with old URL structure, but serve the new views
