@@ -249,7 +249,7 @@ class AccountSettingsPageTest(WebAppTest):
         Test behaviour of "Preferred Language" field.
         """
         self._test_dropdown_field(
-            u'language',
+            u'language_proficiencies',
             u'Preferred Language',
             u'',
             [u'Pushto', u''],

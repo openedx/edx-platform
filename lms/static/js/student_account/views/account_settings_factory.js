@@ -108,10 +108,10 @@
                             })
                         },
                         {
-                            view: new FieldViews.DropdownFieldView({
+                            view: new AccountSettingsFieldViews.LanguageProficienciesFieldView({
                                 model: userAccountModel,
                                 title: gettext('Preferred Language'),
-                                valueAttribute: 'language',
+                                valueAttribute: 'language_proficiencies',
                                 options: fieldsData['preferred_language']['options']
                             })
                         }
