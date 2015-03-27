@@ -185,6 +185,7 @@ LOGGING = get_logger_config(LOG_DIR,
 
 #theming start:
 PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', 'edX')
+ACCOUNT_NAME = ENV_TOKENS.get('ACCOUNT_NAME', 'Your Account Name Here')
 
 # Event Tracking
 if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:

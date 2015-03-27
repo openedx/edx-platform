@@ -148,9 +148,6 @@
               <a href="#">${get_course_about_section(course, "university")}</a>
             % endif
           </h1>
-	  % if self.carnegie_theme_enabled():
-	    <br /><h2>learn to use this user-friendly technology from experts</h2>
-	  % endif
         </hgroup>
 
         <div class="main-cta">
@@ -229,11 +226,7 @@
   </header>
 
   <section class="container">
-      % if self.carnegie_theme_enabled():
-        <section class="details" style="float: none; width: 100%; margin: 0 auto;">
-      % else:
-        <section class="details">
-      % endif
+      <section class="details">
       % if staff_access and studio_url is not None:
         <div class="wrap-instructor-info studio-view">
           <a class="instructor-info-action" href="${studio_url}">${_("View About Page in studio")}</a>
@@ -263,23 +256,14 @@
       % endif
     </section>
 
-    % if not self.carnegie_theme_enabled():
     <section class="course-sidebar">
       <section class="course-summary">
         <header>
           % if microsite.get_value('course_about_show_social_links', True):
           <div class="social-sharing">
             <div class="sharing-message">${_("Share with friends and family!")}</div>
-            ## TODO: this should probably be an overrideable block,
-            ##       or something allowing themes to do whatever they
-            ##       want here (and on this whole page, really).
-            % if self.stanford_theme_enabled():
-              <a href="http://twitter.com/intent/tweet?text=I+just+registered+for+${course.number}+${get_course_about_section(course, 'title')}!+(http://class.stanford.edu)" class="share">
-                <i class="icon icon-twitter"></i><span class="sr">Tweet that you've registered for this course</span>
-              </a>
-              <a href="mailto:?subject=Take%20a%20course%20at%20Stanford%20online!&body=I%20just%20registered%20for%20${course.number}%20${get_course_about_section(course, 'title')}+(http://class.stanford.edu)" class="share">
-                <i class="icon icon-envelope"></i><span class="sr">Email someone to say you've registered for this course</span>
-              </a>
+            % if self.course_about_social_sharing_file:
+              <%include file="${self.course_about_social_sharing_file}" />
             % else:
               <%
                 site_domain = microsite.get_value('site_domain', settings.SITE_NAME)
@@ -363,8 +347,8 @@
             <li class="prerequisites"><i class="icon icon-book"></i><p>${_("Prerequisites")}</p><span class="start-date">${get_course_about_section(course, "prerequisites")}</span></li>
           % endif
         </ol>
-      % if self.stanford_theme_enabled():
-          <%include file="theme-course_about_research.html" />
+      % if self.course_about_sidebar_extra_file:
+          <%include file="${self.course_about_sidebar_extra_file}" />
       % endif
       </section>
   
@@ -390,7 +374,6 @@
             </section>
         %endif
     </section>
-    % endif
   </section>
 </section>
 
