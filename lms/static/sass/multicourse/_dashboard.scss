@@ -7,33 +7,10 @@
 
   .profile-sidebar {
     background: transparent;
-    @include float(left);
-    @include margin-right(flex-gutter());
+    @include float(right);
     width: flex-grid(3);
-    background: transparent;
     box-shadow: 0 0 1px $shadow-l1;
-
-    header.profile {
-      @include box-sizing(border-box);
-      border: 1px solid $border-color-2;
-      border-radius: ($baseline/4) ($baseline/4) 0 0;
-      width: flex-grid(12);
-      background: $dashboard-profile-color;
-
-      .user-name {
-        display: block;
-        overflow: hidden;
-        margin: 0;
-        padding: ($baseline*0.75) ($baseline/2) 0;
-        color: $base-font-color;
-        text-transform: none;
-        text-wrap: nowrap;
-        text-overflow: ellipsis;
-        text-align: center;
-        font-weight: 700;
-        line-height: 1.2em;
-      }
-    }
+    border: 1px solid $border-color-2;
 
     .user-info {
       @include clearfix();
@@ -42,9 +19,6 @@
         @include box-sizing(border-box);
         @include clearfix();
         margin: 0;
-        border: 1px solid $border-color-2;
-        border-top: none;
-        border-radius: 0 0 ($baseline/4) ($baseline/4);
         padding: $baseline;
         width: flex-grid(12);
         background: $white;
@@ -95,40 +69,6 @@
               font-weight: inherit;
             }
 
-            .auth-provider {
-              width: flex-grid(12);
-              display: block;
-              margin-top: ($baseline/4);
-
-              .status {
-                width: flex-grid(1);
-                display: inline-block;
-                color: $gray-l2;
-
-                .fa-link {
-                  color: $base-font-color;
-                }
-
-                .copy {
-                  @extend %text-sr;
-                }
-              }
-
-              .provider {
-                width: flex-grid(9);
-                display: inline-block;
-              }
-
-              .control {
-                width: flex-grid(2);
-                display: inline-block;
-                text-align: right;
-
-                a:link, a:visited {
-                  @extend %t-copy-sub2;
-                }
-              }
-            }
           }
         }
 
