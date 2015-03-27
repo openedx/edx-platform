@@ -17,7 +17,11 @@
         <div class="wrapper-profile-section-two">
             <div class="profile-section-two-fields">
                 <% if (!showFullProfile) { %>
-                    <span class="profile-private--message"><%- gettext('This edX learner is not currently sharing their profile details.') %></span>
+                    <% if(ownProfile) { %>
+                        <span class="profile-private--message"><%- gettext("If you're looking at your own profile: You are currently sharing a limited profile.") %></span>
+                    <% } else {  %>
+                        <span class="profile-private--message"><%- gettext("If you're looking at someone else's profile: This edX learner is currently sharing a limited profile.") %></span>
+                    <% } %>
                 <% } %>
             </div>
         </div>
