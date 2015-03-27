@@ -36,10 +36,7 @@
       edx.dashboard.legacy.init({
         dashboard: "${reverse('dashboard')}",
         signInUser: "${reverse('signin_user')}",
-        passwordReset: "${reverse('password_reset')}",
-        changeEmail: "${reverse('change_email')}",
         changeEmailSettings: "${reverse('change_email_settings')}",
-        changeName: "${reverse('change_name')}",
         verifyToggleBannerFailedOff: "${reverse('verify_student_toggle_failed_banner_off')}",
       });
     });
@@ -60,12 +57,6 @@
         </section>
     %endif
 
-    % if duplicate_provider:
-        <section class="dashboard-banner third-party-auth">
-            <%include file='dashboard/_dashboard_third_party_error.html' />
-        </section>
-    % endif
-
     %if enrollment_message:
         <section class="dashboard-banner">
             ${enrollment_message}
@@ -78,7 +69,8 @@
     <header class="wrapper-header-courses">
       <h2 class="header-courses">${_("Current Courses")}</h2>
     </header>
-
+      
+      
     % if len(course_enrollment_pairs) > 0:
       <ul class="listing-courses">
       <% share_settings = settings.FEATURES.get('DASHBOARD_SHARE_SETTINGS', {}) %>
@@ -133,75 +125,12 @@
     % endif
   </section>
   <section class="profile-sidebar" role="region" aria-label="User info">
-    <header class="profile">
-      <h2 class="username-header"><span class="sr">${_("Username")}: </span><span class="username-label">${ user.username }</span></h2>
-    </header>
     <section class="user-info">
       <ul>
-        <li class="info--username">
-          <span class="title">${_("Full Name")} (<a href="#apply_name_change" rel="leanModal" class="edit-name">${_("edit")}</a>)</span> <span class="data">${ user.profile.name | h }</span>
+        <li class="heads-up">
+          <span class="title">${_("Want to change your account settings?")}</span>
+          <span class="copy">${_("Click the arrow next to your username above.")}</span>
         </li>
-        <li class="info--email">
-          <span class="title">${_("Email")}
-            % if external_auth_map is None or 'shib' not in external_auth_map.external_domain:
-            (<a href="#change_email" rel="leanModal" class="edit-email">${_("edit")}</a>)
-            % endif
-          </span> <span class="data">${ user.email | h }</span>
-        </li>
-
-        %if len(language_options) > 1:
-        <%include file='dashboard/_dashboard_info_language.html' />
-        %endif
-
-        % if third_party_auth.is_enabled():
-        <li class="controls--account">
-          <span class="title">
-            ## Translators: this section lists all the third-party authentication providers (for example, Google and LinkedIn) the user can link with or unlink from their edX account.
-            ${_("Connected Accounts")}
-          </span>
-
-          <span class="data">
-            <span class="third-party-auth">
-
-            % for state in provider_user_states:
-            <div class="auth-provider">
-
-              <div class="status">
-                % if state.has_account:
-                <i class="icon fa fa-link"></i> <span class="copy">${_("Linked")}</span>
-                % else:
-                <i class="icon fa fa-unlink"></i><span class="copy">${_("Not Linked")}</span>
-                % endif
-              </div>
-
-              <span class="provider">${state.provider.NAME}</span>
-              <span class="control">
-              % if state.has_account:
-                <form
-                  action="${pipeline.get_disconnect_url(state.provider.NAME)}"
-                  method="post"
-                  name="${state.get_unlink_form_name()}">
-                  <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
-
-                  <a href="#" onclick="document.${state.get_unlink_form_name()}.submit()">
-                  ## Translators: clicking on this removes the link between a user's edX account and their account with an external authentication provider (like Google or LinkedIn).
-                  ${_("Unlink")}
-                  </a>
-                </form>
-              % else:
-                  <a href="${pipeline.get_login_url(state.provider.NAME, pipeline.AUTH_ENTRY_DASHBOARD, redirect_url='/')}">
-                  ## Translators: clicking on this creates a link between a user's edX account and their account with an external authentication provider (like Google or LinkedIn).
-                  ${_("Link")}
-                  </a>
-              % endif
-              </span>
-            </div>
-            % endfor
-
-            </span>
-          </span>
-        </li>
-        % endif
 
         % if len(order_history_list):
         <li class="order-history">
@@ -209,16 +138,6 @@
           % for order_history_item in order_history_list:
             <span><a href="${order_history_item['receipt_url']}" target="_blank" class="edit-name">${order_history_item['order_date']}</a></span>
           % endfor
-        </li>
-        % endif
-
-        % if external_auth_map is None or 'shib' not in external_auth_map.external_domain:
-        <li class="controls--account">
-          <span class="title"><a href="#password_reset_complete" rel="leanModal" id="pwd_reset_button">${_("Reset Password")}</a></span>
-          <form id="password_reset_form" method="post" data-remote="true" action="${reverse('password_reset')}">
-            <input id="id_email" type="hidden" name="email" maxlength="75" value="${user.email}" />
-            <!-- <input type="submit" id="pwd_reset_button" value="${_("Reset Password")}" /> -->
-          </form>
         </li>
         % endif
 
@@ -259,123 +178,6 @@
         <input type="submit" id="submit" value="${_("Save Settings")}" />
       </div>
     </form>
-  </div>
-</section>
-
-<section id="password_reset_complete" class="modal" aria-hidden="true">
-  <div class="inner-wrapper" role="dialog" aria-labelledby="password-reset-email">
-    <button class="close-modal">
-      <i class="icon fa fa-remove"></i>
-      <span class="sr">
-        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
-        ${_("Close")}
-      </span>
-    </button>
-
-    <header>
-      <h2 id="password-reset-email">
-        ${_("Password Reset Email Sent")}
-        <span class="sr">,
-          ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
-          ${_("window open")}
-        </span>
-      </h2>
-      <hr/>
-    </header>
-    <div>
-      <form> <!-- Here for styling reasons -->
-        <section>
-          <p>${_("An email has been sent to {email}. Follow the link in the email to change your password.").format(email=user.email)}</p>
-        </section>
-      </form>
-    </div>
-  </div>
-</section>
-
-<section id="change_email" class="modal" aria-hidden="true">
-  <div class="inner-wrapper" role="dialog" aria-labelledby="change_email_title">
-    <button class="close-modal">
-      <i class="icon fa fa-remove"></i>
-      <span class="sr">
-        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
-        ${_("Close")}
-      </span>
-    </button>
-
-    <header>
-      <h2>
-        <span id="change_email_title">${_("Change Email")}</span>
-        <span class="sr">,
-          ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
-          ${_("window open")}
-        </span>
-      </h2>
-      <hr/>
-    </header>
-    <div id="change_email_body">
-      <form id="change_email_form">
-        <div id="change_email_error" class="modal-form-error"> </div>
-          <div class="input-group">
-            <label>${_("Please enter your new email address:")}
-              <input id="new_email_field" type="email" value="" />
-            </label>
-            <label>${_("Please confirm your password:")}
-              <input id="new_email_password" value="" type="password" />
-            </label>
-          </div>
-          <section>
-            <p>${_("We will send a confirmation to both {email} and your new email address as part of the process.").format(email=user.email)}</p>
-          </section>
-          <div class="submit">
-            <input type="submit" id="submit_email_change" value="${_("Change Email")}"/>
-          </div>
-      </form>
-    </div>
-  </div>
-</section>
-
-<%include file='modal/_modal-settings-language.html' />
-
-<section id="apply_name_change" class="modal" aria-hidden="true">
-  <div class="inner-wrapper" role="dialog" aria-labelledby="change-name-title">
-    <button class="close-modal">
-      <i class="icon fa fa-remove"></i>
-      <span class="sr">
-        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
-        ${_("Close")}
-      </span>
-    </button>
-
-    <header>
-      <h2 id="change-name-title">
-        ${_("Change your name")}
-        <span class="sr">,
-          ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
-          ${_("window open")}
-        </span>
-      </h2>
-      <hr/>
-    </header>
-    <div id="change_name_body">
-      <form id="change_name_form">
-        <div id="change_name_error" class="modal-form-error"> </div>
-        ## Translators: note that {platform} {cert_name_short} will look something like: "edX certificate". Please do not change the order of these placeholders.
-        <p>${_("To uphold the credibility of your {platform} {cert_name_short}, all name changes will be recorded.").format(platform=settings.PLATFORM_NAME, cert_name_short=cert_name_short)}</p>
-        <br/>
-          <div class="input-group">
-            ## Translators: note that {platform} {cert_name_short} will look something like: "edX certificate". Please do not change the order of these placeholders.
-            <label>${_("Enter your desired full name, as it will appear on your {platform} {cert_name_short}:").format(platform=settings.PLATFORM_NAME, cert_name_short=cert_name_short)}
-              <input id="new_name_field" value="" type="text" />
-            </label>
-            <label>${_("Reason for name change:")}
-              <textarea id="name_rationale_field" value=""></textarea>
-            </label>
-          </div>
-          <div class="submit">
-            <input type="submit" id="submit" value="${_("Change My Name")}">
-          </div>
-      </form>
-    </div>
   </div>
 </section>
 
