@@ -65,7 +65,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                         required: false,
                         editable: editable,
                         showMessages: false,
-                        iconName: 'fa-comment fa-flip-horizontal',
+                        iconName: 'fa-comment',
                         placeholderValue: 'Add language',
                         valueAttribute: "language",
                         options: Helpers.FIELD_OPTIONS,

@@ -12,7 +12,7 @@
         border-radius: 3px;
 
         span {
-            color: $gray-l3;
+            color: $gray-l1;
         }
 
         &:hover {
@@ -40,8 +40,9 @@
     }
 
     i {
-      color: $gray;
-      vertical-align:text-bottom
+      color: $gray-l2;
+      vertical-align:text-bottom;
+      margin-right: 5px;
     }
 
     .message-can-edit {
@@ -77,15 +78,16 @@
 
 .u-field-icon {
     width: $baseline;
+    color: $gray-l2;
 }
 
 .u-field-title {
     width: flex-grid(3, 12);
     display: inline-block;
-    color: $gray-l1;
+    color: $gray;
     vertical-align: top;
     margin-bottom: 0;
-    pointer-events: none
+    pointer-events: none;
 
     label {
         @include margin-left($baseline/2);

@@ -150,6 +150,7 @@
         .u-field-value {
             width: 100%;
             white-space: pre-line;
+            line-height: 1.5em;
 
             textarea {
               width: 100%;
@@ -170,6 +171,7 @@
               font-size: 12px;
               padding-right: 5px;
               vertical-align: middle;
+              color: $gray;
             }
             .u-field-title {
                 width: 100%;
@@ -178,7 +180,9 @@
 
             .u-field-value {
                 text-align: center;
-                line-height: 1.3em;
+                line-height: 1.5em;
+                @extend %t-copy-sub1;
+                color: $gray;
             }
         }
 
