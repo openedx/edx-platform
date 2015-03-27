@@ -1,9 +1,13 @@
 define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
         'js/views/fields',
-        'js/student_account/models/user_account_model',
+        'js/spec/views/fields_helpers',
         'string_utils'],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, UserAccountModel) {
+    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpecHelpers) {
         'use strict';
+
+        var USERNAME = 'Legolas',
+            FULLNAME = 'Legolas Thranduil',
+            EMAIL = 'legolas@woodland.middlearth';
 
         describe("edx.FieldViews", function () {
 
@@ -17,89 +21,6 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 FieldViews.LinkFieldView,
             ];
 
-            var USERNAME = 'Legolas',
-                FULLNAME = 'Legolas Thranduil',
-                EMAIL = 'legolas@woodland.middlearth',
-                LANGUAGE = [['si', 'sindarin'], ['el', 'elvish']],
-                COUNTRY = 'woodland',
-                DATE_JOINED = '',
-                GENDER = 'female',
-                GOALS = '',
-                LEVEL_OF_EDUCATION = null,
-                MAILING_ADDRESS = '',
-                YEAR_OF_BIRTH = null;
-
-            var USER_ACCOUNT_API_URL = '/api/user/v0/accounts/user';
-
-            var createMockUserAccountModel = function (data) {
-                data = {
-                    username: data.username || USERNAME,
-                    name: data.name || FULLNAME,
-                    email: data.email || EMAIL,
-                    password: data.password || '',
-                    language: _.isUndefined(data.language) ? LANGUAGE[0][0] : data.language,
-                    country: data.country || COUNTRY,
-                    date_joined: data.date_joined || DATE_JOINED,
-                    gender: data.gender || GENDER,
-                    goals: data.goals || GOALS,
-                    level_of_education: data.level_of_education || LEVEL_OF_EDUCATION,
-                    mailing_address: data.mailing_address || MAILING_ADDRESS,
-                    year_of_birth: data.year_of_birth || YEAR_OF_BIRTH
-                };
-                var model = new UserAccountModel(data);
-                model.url = USER_ACCOUNT_API_URL;
-                return model;
-            };
-
-            var createFieldData = function (fieldType, fieldData) {
-                var data = {
-                    model: fieldData.model || createMockUserAccountModel({}),
-                    title: fieldData.title || 'Field Title',
-                    valueAttribute: fieldData.valueAttribute,
-                    helpMessage: fieldData.helpMessage || 'I am a field message'
-                };
-
-                switch (fieldType) {
-                    case FieldViews.DropdownFieldView:
-                        data['required'] = fieldData.required || false;
-                        data['options'] = fieldData.options || [['1', 'Option1'], ['2', 'Option2'], ['3', 'Option3']];
-                        break;
-                    case FieldViews.LinkFieldView:
-                    case FieldViews.PasswordFieldView:
-                        data['linkTitle'] = fieldData.linkTitle || "Link Title";
-                        data['linkHref'] = fieldData.linkHref || "/path/to/resource";
-                        data['emailAttribute'] = 'email';
-                        break;
-                }
-
-                return data;
-            };
-
-            var createErrorMessage = function(attribute, user_message) {
-                var field_errors = {}
-                field_errors[attribute] = {
-                    "user_message": user_message
-                }
-                return {
-                    "field_errors": field_errors
-                }
-            };
-
-            var expectTitleAndMessageToBe = function(view, expectedTitle, expectedMessage) {
-                expect(view.$('.u-field-title').text().trim()).toBe(expectedTitle);
-                expect(view.$('.u-field-message').text().trim()).toBe(expectedMessage);
-            };
-
-            var expectMessageContains = function(view, expectedText) {
-                expect(view.$('.u-field-message').html()).toContain(expectedText);
-            };
-
-            var expectAjaxRequestWithData = function(data) {
-                AjaxHelpers.expectJsonRequest(
-                    requests, 'PATCH', USER_ACCOUNT_API_URL, data
-                );
-            };
-
             beforeEach(function () {
                 TemplateHelpers.installTemplate('templates/fields/field_readonly');
                 TemplateHelpers.installTemplate('templates/fields/field_dropdown');
@@ -111,70 +32,33 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             });
 
             it("updates messages correctly for all fields", function() {
-                for (var i=0; i<fieldViewClasses.length; i++) {
+
+                for (var i = 0; i < fieldViewClasses.length; i++) {
+
                     var fieldViewClass = fieldViewClasses[i];
-                    var fieldData = createFieldData(fieldViewClass, {
+                    var fieldData = FieldViewsSpecHelpers.createFieldData(fieldViewClass, {
                         title: 'Username',
                         valueAttribute: 'username',
                         helpMessage: 'The username that you use to sign in to edX.'
                     });
 
                     var view = new fieldViewClass(fieldData).render();
-
-                    var message = "This is field no." + i + "." ;
-                    view.message(message);
-                    expectMessageContains(view, message);
-
-                    view.showHelpMessage();
-                    expectMessageContains(view, view.helpMessage);
-
-                    view.showInProgressMessage();
-                    expectMessageContains(view, view.indicators['inProgress']);
-                    expectMessageContains(view, view.messages['inProgress']);
-
-                    view.showSuccessMessage();
-                    expectMessageContains(view, view.indicators['success']);
-                    expectMessageContains(view, view.getMessage('success'));
-
-                    expect(timerCallback).not.toHaveBeenCalled();
-
-                    view.showErrorMessage({
-                        responseText: JSON.stringify(createErrorMessage(fieldData.valueAttribute, 'Please fix this.')),
-                        status: 400
-                    });
-                    expectMessageContains(view, view.indicators['validationError']);
-
-                    view.showErrorMessage({status: 500});
-                    expectMessageContains(view, view.indicators['error']);
-                    expectMessageContains(view, view.indicators['error']);
+                    FieldViewsSpecHelpers.verifyMessageUpdates(view, fieldData, timerCallback);
                 }
             });
 
             it("resets to help message some time after success message is set", function() {
-                for (var i=0; i<fieldViewClasses.length; i++) {
+
+                for (var i = 0; i < fieldViewClasses.length; i++) {
                     var fieldViewClass = fieldViewClasses[i];
-                    var fieldData = createFieldData(fieldViewClass, {
+                    var fieldData = FieldViewsSpecHelpers.createFieldData(fieldViewClass, {
                         title: 'Username',
                         valueAttribute: 'username',
                         helpMessage: 'The username that you use to sign in to edX.'
                     })
 
                     var view = new fieldViewClass(fieldData).render();
-
-                    view.showHelpMessage();
-                    expectMessageContains(view, view.helpMessage);
-                    view.showSuccessMessage();
-                    expectMessageContains(view, view.indicators['success']);
-                    jasmine.Clock.tick(5000);
-                    // Message gets reset
-                    expectMessageContains(view, view.helpMessage);
-
-                    view.showSuccessMessage();
-                    expectMessageContains(view, view.indicators['success']);
-                    // But if we change the message, it should not get reset.
-                    view.message("Do not reset this!");
-                    jasmine.Clock.tick(5000);
-                    expectMessageContains(view, "Do not reset this!");
+                    FieldViewsSpecHelpers.verifySuccessMessageReset(view, fieldData, timerCallback);
                 }
             });
 
@@ -183,7 +67,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 requests = AjaxHelpers.requests(this);
 
                 var fieldViewClass = FieldViews.FieldView;
-                var fieldData = createFieldData(fieldViewClass, {
+                var fieldData = FieldViewsSpecHelpers.createFieldData(fieldViewClass, {
                     title: 'Preferred Language',
                     valueAttribute: 'language',
                     helpMessage: 'Your preferred language.'
@@ -202,105 +86,76 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 expect(request.requestBody).toBe('{"language":"ur"}');
             });
 
-            it("correctly renders ReadonlyFieldView", function() {
-                var fieldData = createFieldData(FieldViews.ReadonlyFieldView, {
+            it("correctly renders and updates ReadonlyFieldView", function() {
+                var fieldData = FieldViewsSpecHelpers.createFieldData(FieldViews.ReadonlyFieldView, {
                     title: 'Username',
                     valueAttribute: 'username',
                     helpMessage: 'The username that you use to sign in to edX.'
                 });
                 var view = new FieldViews.ReadonlyFieldView(fieldData).render();
 
-                expectTitleAndMessageToBe(view, fieldData.title, fieldData.helpMessage);
+                FieldViewsSpecHelpers.expectTitleAndMessageToBe(view, fieldData.title, fieldData.helpMessage);
                 expect(view.$('.u-field-value input').val().trim()).toBe(USERNAME);
-            });
 
-            it("correctly updates ReadonlyFieldView on model update", function() {
-                var fieldData = createFieldData(FieldViews.ReadonlyFieldView, {
-                    title: 'Username',
-                    valueAttribute: 'username',
-                    helpMessage: 'The username that you use to sign in to edX.'
-                });
-                var view = new FieldViews.ReadonlyFieldView(fieldData).render();
-
-                expect(view.$('.u-field-value input').val().trim()).toBe(USERNAME);
                 view.model.set({'username': 'bookworm'});
                 expect(view.$('.u-field-value input').val().trim()).toBe('bookworm');
             });
 
-            it("correctly renders TextFieldView", function() {
-                var fieldData = createFieldData(FieldViews.TextFieldView, {
-                    title: 'Full Name',
-                    valueAttribute: 'name',
-                    helpMessage: 'This is the name used on your edX certificates. Changes to this field are reviewed.'
-                });
-                var view = new FieldViews.TextFieldView(fieldData).render();
-
-                expectTitleAndMessageToBe(view, fieldData.title, fieldData.helpMessage);
-                expect(view.$('.u-field-value > input').val()).toBe(FULLNAME);
-            });
-
-            it("correctly persists changes to TextFieldView & DropdownFieldView", function() {
+            it("correctly renders, updates and persists changes to TextFieldView", function() {
 
                 requests = AjaxHelpers.requests(this);
 
-                var validationError = "Your name must contain more than three characters.";
+                var fieldData = FieldViewsSpecHelpers.createFieldData(FieldViews.TextFieldView, {
+                    title: 'Full Name',
+                    valueAttribute: 'name',
+                    helpMessage: 'How are you?'
+                });
+                var view = new FieldViews.TextFieldView(fieldData).render();
 
-                var fieldViewClasses = [
-                    [FieldViews.TextFieldView, '.u-field-value > input', 'Next'],
-                    [FieldViews.DropdownFieldView, '.u-field-value > select', '1']
-                ];
+                FieldViewsSpecHelpers.verifyTextField(view, {
+                    title: fieldData.title,
+                    valueAttribute: fieldData.valueAttribute,
+                    helpMessage: fieldData.helpMessage,
+                    validValue: 'My Name',
+                    invalidValue1: 'Your Name',
+                    invalidValue2: 'Her Name',
+                    validationError: "Think again!"
+                }, requests);
+            });
 
-                for (var i=0; i<fieldViewClasses.length; i++) {
+            it("correctly renders, updates and persists changes to DropdownFieldView", function() {
 
-                    var fieldViewClass = fieldViewClasses[i][0];
-                    var fieldData = createFieldData(fieldViewClass, {
-                        title: 'Full Name',
-                        valueAttribute: 'name',
-                        helpMessage: 'edX full name'
-                    });
+                requests = AjaxHelpers.requests(this);
 
-                    var selector = fieldViewClasses[i][1];
-                    var data = {'name': fieldViewClasses[i][2]};
+                var fieldData = FieldViewsSpecHelpers.createFieldData(FieldViews.DropdownFieldView, {
+                    title: 'Full Name',
+                    valueAttribute: 'name',
+                    helpMessage: 'edX full name'
+                });
+                var view = new FieldViews.DropdownFieldView(fieldData).render();
 
-                    var view = new fieldViewClasses[i][0](fieldData).render();
-
-                    // Initially the help message is shown
-                    expectMessageContains(view, fieldData.helpMessage);
-
-                    view.$(selector).val(data.name).change();
-                    // When the value in the field is changed
-                    expect(view.fieldValue()).toBe(fieldViewClasses[i][2]);
-                    expectMessageContains(view, view.indicators['inProgress']);
-                    expectMessageContains(view, view.messages['inProgress']);
-                    expectAjaxRequestWithData(data);
-
-                    AjaxHelpers.respondWithNoContent(requests);
-                    // When server returns success.
-                    expectMessageContains(view, view.indicators['success']);
-
-                    view.$(selector).val(data.name).change();
-                    AjaxHelpers.respondWithError(requests, 500);
-                    // When server returns a 500 error
-                    expectMessageContains(view, view.indicators['error']);
-                    expectMessageContains(view, view.messages['error']);
-
-                    view.$(selector).val('').change();
-                    AjaxHelpers.respondWithError(requests, 400, createErrorMessage(fieldData.valueAttribute, validationError));
-                    // When server returns a validation error
-                    expectMessageContains(view, view.indicators['validationError']);
-                    expectMessageContains(view, validationError);
-                }
+                FieldViewsSpecHelpers.verifyDropDownField(view, {
+                    title: fieldData.title,
+                    valueAttribute: fieldData.valueAttribute,
+                    helpMessage: fieldData.helpMessage,
+                    validValue: FieldViewsSpecHelpers.SELECT_OPTIONS[0][0],
+                    invalidValue1: FieldViewsSpecHelpers.SELECT_OPTIONS[1][0],
+                    invalidValue2: FieldViewsSpecHelpers.SELECT_OPTIONS[2][0],
+                    validationError: "Nope, this will not do!"
+                }, requests);
             });
 
             it("correctly renders LinkFieldView", function() {
-                var fieldData = createFieldData(FieldViews.LinkFieldView, {
+                var fieldData = FieldViewsSpecHelpers.createFieldData(FieldViews.LinkFieldView, {
                     title: 'Title',
                     linkTitle: 'Link title',
                     helpMessage: 'Click the link.'
                 });
                 var view = new FieldViews.LinkFieldView(fieldData).render();
-                expectTitleAndMessageToBe(view, fieldData.title, fieldData.helpMessage);
+
+                FieldViewsSpecHelpers.expectTitleAndMessageToBe(view, fieldData.title, fieldData.helpMessage);
                 expect(view.$('.u-field-value > a').text().trim()).toBe(fieldData.linkTitle);
             });
         });
+
     });
