@@ -50,19 +50,18 @@ class DashboardPage(PageObject):
         return self.q(css='h3.course-title > a').map(_get_course_name).results
 
     @property
-    def full_name(self):
-        """Return the displayed value for the user's full name"""
-        return self.q(css='li.info--username .data').text[0]
+    def sidebar_menu_title(self):
+        """
+        Return the title value for sidebar menu.
+        """
+        return self.q(css='.user-info span.title').text[0]
 
     @property
-    def email(self):
-        """Return the displayed value for the user's email address"""
-        return self.q(css='li.info--email .data').text[0]
-
-    @property
-    def username(self):
-        """Return the displayed value for the user's username"""
-        return self.q(css='.username-label').text[0]
+    def sidebar_menu_description(self):
+        """
+        Return the description text for sidebar menu.
+        """
+        return self.q(css='.user-info span.copy').text[0]
 
     def get_enrollment_mode(self, course_name):
         """Get the enrollment mode for a given course on the dashboard.
@@ -148,27 +147,6 @@ class DashboardPage(PageObject):
             return "a.enter-course:nth-of-type({0})".format(link_index + 1)
         else:
             return None
-
-    def change_language(self, code):
-        """
-        Change the language on the dashboard to the language corresponding with `code`.
-        """
-        self.q(css=".edit-language").first.click()
-        self.q(css='select[name="language"] option[value="{}"]'.format(code)).first.click()
-        self.q(css="#submit-lang").first.click()
-
-        # Clicking the submit-lang button does a jquery ajax post, so make sure that
-        # has completed before continuing on.
-        self.wait_for_ajax()
-
-        self._changed_lang_promise(code).fulfill()
-
-    def _changed_lang_promise(self, code):
-        def _check_func():
-            language_is_selected = self.q(css='select[name="language"] option[value="{}"]'.format(code)).selected
-            modal_is_visible = self.q(css='section#change_language.modal').visible
-            return (language_is_selected and not modal_is_visible)
-        return EmptyPromise(_check_func, "language changed and modal hidden")
 
     def pre_requisite_message_displayed(self):
         """
