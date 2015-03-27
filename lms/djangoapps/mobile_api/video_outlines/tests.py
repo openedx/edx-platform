@@ -63,24 +63,9 @@ class TestVideoAPITestCase(MobileAPITestCase):
         self.youtube_url = 'http://val.edx.org/val/youtube.mp4'
         self.html5_video_url = 'http://video.edx.org/html5/video.mp4'
 
-        api.create_profile({
-            'profile_name': 'youtube',
-            'extension': 'mp4',
-            'width': 1280,
-            'height': 720
-        })
-        api.create_profile({
-            'profile_name': 'mobile_high',
-            'extension': 'mp4',
-            'width': 750,
-            'height': 590
-        })
-        api.create_profile({
-            'profile_name': 'mobile_low',
-            'extension': 'mp4',
-            'width': 640,
-            'height': 480
-        })
+        api.create_profile('youtube')
+        api.create_profile('mobile_high')
+        api.create_profile('mobile_low')
 
         # create the video in VAL
         api.create_video({

@@ -404,8 +404,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         xml_data: A string of xml that will be translated into data and children for
             this module
         system: A DescriptorSystem for interacting with external resources
-        org and course are optional strings that will be used in the generated modules
-            url identifiers
+        id_generator is used to generate course-specific urls and identifiers
         """
         xml_object = etree.fromstring(xml_data)
         url_name = xml_object.get('url_name', xml_object.get('slug'))
@@ -477,6 +476,12 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             ele.set('language', transcript_language)
             ele.set('src', self.transcripts[transcript_language])
             xml.append(ele)
+
+        if self.edx_video_id and edxval_api:
+            try:
+                xml.append(edxval_api.export_to_xml(self.edx_video_id))
+            except edxval_api.ValVideoNotFoundError:
+                pass
 
         return xml
 
@@ -620,6 +625,15 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         # `download_track` needs to have value `True`.
         if 'download_track' not in field_data and track is not None:
             field_data['download_track'] = True
+
+        video_asset_elem = xml.find('video_asset')
+        if (
+                edxval_api and
+                video_asset_elem is not None and
+                'edx_video_id' in field_data
+        ):
+            # Allow ValCannotCreateError to escape
+            edxval_api.import_from_xml(video_asset_elem, field_data['edx_video_id'])
 
         return field_data
 

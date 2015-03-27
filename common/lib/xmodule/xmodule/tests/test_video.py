@@ -15,20 +15,21 @@ the course, section, subsection, unit, etc.
 import unittest
 import datetime
 from uuid import uuid4
-from mock import Mock, patch
 
-from . import LogicTest
 from lxml import etree
+from mock import ANY, Mock, patch
+
+from django.conf import settings
+
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.video_module import VideoDescriptor, create_youtube_string, get_video_from_cdn
-from .test_import import DummySystem
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from xmodule.tests import get_test_descriptor_system
+from xmodule.video_module import VideoDescriptor, create_youtube_string, get_video_from_cdn
 from xmodule.video_module.transcripts_utils import download_youtube_subs, save_to_store
-
-from django.conf import settings
+from . import LogicTest
+from .test_import import DummySystem
 
 SRT_FILEDATA = '''
 0
@@ -87,6 +88,19 @@ def instantiate_descriptor(**field_data):
         scope_ids=ScopeIds(None, None, usage_key, usage_key),
         field_data=DictFieldData(field_data),
     )
+
+
+# Because of the way xmodule.video_module.video_module imports edxval.api, we
+# must mock the entire module, which requires making mock exception classes.
+
+class _MockValVideoNotFoundError(Exception):
+    """Mock ValVideoNotFoundError exception"""
+    pass
+
+
+class _MockValCannotCreateError(Exception):
+    """Mock ValCannotCreateError exception"""
+    pass
 
 
 class VideoModuleTest(LogicTest):
@@ -175,6 +189,21 @@ class VideoDescriptorTestBase(unittest.TestCase):
     def setUp(self):
         super(VideoDescriptorTestBase, self).setUp()
         self.descriptor = instantiate_descriptor()
+
+    def assertXmlEqual(self, expected, xml):
+        """
+        Assert that the given XML fragments have the same attributes, text, and
+        (recursively) children
+        """
+        def get_child_tags(elem):
+            """Extract the list of tag names for children of elem"""
+            return [child.tag for child in elem]
+
+        for attr in ['tag', 'attrib', 'text', 'tail']:
+            self.assertEqual(getattr(expected, attr), getattr(xml, attr))
+        self.assertEqual(get_child_tags(expected), get_child_tags(xml))
+        for left, right in zip(expected, xml):
+            self.assertXmlEqual(left, right)
 
 
 class TestCreateYoutubeString(VideoDescriptorTestBase):
@@ -522,21 +551,61 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'data': ''
         })
 
+    @patch('xmodule.video_module.video_module.edxval_api')
+    def test_import_val_data(self, mock_val_api):
+        def mock_val_import(xml, edx_video_id):
+            """Mock edxval.api.import_from_xml"""
+            self.assertEqual(xml.tag, 'video_asset')
+            self.assertEqual(dict(xml.items()), {'mock_attr': ''})
+            self.assertEqual(edx_video_id, 'test_edx_video_id')
+
+        mock_val_api.import_from_xml = Mock(wraps=mock_val_import)
+        module_system = DummySystem(load_error_modules=True)
+
+        # import new edx_video_id
+        xml_data = """
+            <video edx_video_id="test_edx_video_id">
+                <video_asset mock_attr=""/>
+            </video>
+        """
+        video = VideoDescriptor.from_xml(xml_data, module_system, id_generator=Mock())
+
+        self.assert_attributes_equal(video, {'edx_video_id': 'test_edx_video_id'})
+        mock_val_api.import_from_xml.assert_called_once_with(ANY, 'test_edx_video_id')
+
+    @patch('xmodule.video_module.video_module.edxval_api')
+    def test_import_val_data_invalid(self, mock_val_api):
+        mock_val_api.ValCannotCreateError = _MockValCannotCreateError
+        mock_val_api.import_from_xml = Mock(side_effect=mock_val_api.ValCannotCreateError)
+        module_system = DummySystem(load_error_modules=True)
+
+        # Negative duration is invalid
+        xml_data = """
+            <video edx_video_id="test_edx_video_id">
+                <video_asset client_video_id="test_client_video_id" duration="-1"/>
+            </video>
+        """
+        with self.assertRaises(mock_val_api.ValCannotCreateError):
+            VideoDescriptor.from_xml(xml_data, module_system, id_generator=Mock())
+
 
 class VideoExportTestCase(VideoDescriptorTestBase):
     """
     Make sure that VideoDescriptor can export itself to XML correctly.
     """
-    def assertXmlEqual(self, expected, xml):
-        for attr in ['tag', 'attrib', 'text', 'tail']:
-            self.assertEqual(getattr(expected, attr), getattr(xml, attr))
-        for left, right in zip(expected, xml):
-            self.assertXmlEqual(left, right)
-
-    def test_export_to_xml(self):
+    @patch('xmodule.video_module.video_module.edxval_api')
+    def test_export_to_xml(self, mock_val_api):
         """
         Test that we write the correct XML on export.
         """
+        def mock_val_export(edx_video_id):
+            """Mock edxval.api.export_to_xml"""
+            return etree.Element(  # pylint:disable=no-member
+                'video_asset',
+                attrib={'export_edx_video_id': edx_video_id}
+            )
+
+        mock_val_api.export_to_xml = mock_val_export
         self.descriptor.youtube_id_0_75 = 'izygArpw-Qo'
         self.descriptor.youtube_id_1_0 = 'p2Q6BrNhdh8'
         self.descriptor.youtube_id_1_25 = '1EeWXzPdhSA'
@@ -550,6 +619,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         self.descriptor.html5_sources = ['http://www.example.com/source.mp4', 'http://www.example.com/source.ogg']
         self.descriptor.download_video = True
         self.descriptor.transcripts = {'ua': 'ukrainian_translation.srt', 'ge': 'german_translation.srt'}
+        self.descriptor.edx_video_id = 'test_edx_video_id'
 
         xml = self.descriptor.definition_to_xml(None)  # We don't use the `resource_fs` parameter
         parser = etree.XMLParser(remove_blank_text=True)
@@ -561,8 +631,22 @@ class VideoExportTestCase(VideoDescriptorTestBase):
            <handout src="http://www.example.com/handout"/>
            <transcript language="ge" src="german_translation.srt" />
            <transcript language="ua" src="ukrainian_translation.srt" />
+           <video_asset export_edx_video_id="test_edx_video_id"/>
          </video>
         '''
+        expected = etree.XML(xml_string, parser=parser)
+        self.assertXmlEqual(expected, xml)
+
+    @patch('xmodule.video_module.video_module.edxval_api')
+    def test_export_to_xml_val_error(self, mock_val_api):
+        # Export should succeed without VAL data if video does not exist
+        mock_val_api.ValVideoNotFoundError = _MockValVideoNotFoundError
+        mock_val_api.export_to_xml = Mock(side_effect=mock_val_api.ValVideoNotFoundError)
+        self.descriptor.edx_video_id = 'test_edx_video_id'
+
+        xml = self.descriptor.definition_to_xml(None)
+        parser = etree.XMLParser(remove_blank_text=True)
+        xml_string = '<video url_name="SampleProblem" download_video="false"/>'
         expected = etree.XML(xml_string, parser=parser)
         self.assertXmlEqual(expected, xml)
 
