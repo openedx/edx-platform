@@ -36,6 +36,7 @@
                 if (this.options.own_profile) {
                     var fieldView = this.options.accountPrivacyFieldView;
                     fieldView.profileIsPrivate =  (!this.options.accountSettingsModel.get('year_of_birth'));
+                    fieldView.requiresParentalConsent = (this.options.accountSettingsModel.get('requires_parental_consent'));
                     fieldView.undelegateEvents();
                     this.$('.wrapper-profile-field-account-privacy').append(fieldView.render().el);
                     fieldView.delegateEvents();

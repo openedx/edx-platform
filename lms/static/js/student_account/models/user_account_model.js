@@ -20,7 +20,8 @@
                 mailing_address: "",
                 year_of_birth: null,
                 bio: null,
-                default_public_account_fields: []
+                default_public_account_fields: [],
+                requires_parental_consent: true
             },
 
             parse : function(response, xhr) {

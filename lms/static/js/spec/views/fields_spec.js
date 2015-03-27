@@ -168,11 +168,15 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             });
 
             it("resets to help message some time after success message is set", function() {
-                var updatedFielViewClasses = fieldViewClasses;
-                updatedFielViewClasses.pop();
+                var fieldViewClasses = [
+                    FieldViews.ReadonlyFieldView,
+                    FieldViews.TextFieldView,
+                    FieldViews.DropdownFieldView,
+                    FieldViews.LinkFieldView
+                ];
 
-                for (var i=0; i<updatedFielViewClasses.length; i++) {
-                    var fieldViewClass = updatedFielViewClasses[i];
+                for (var i=0; i<fieldViewClasses.length; i++) {
+                    var fieldViewClass = fieldViewClasses[i];
                     var fieldData = createFieldData(fieldViewClass, {
                         title: 'Username',
                         valueAttribute: 'username',
