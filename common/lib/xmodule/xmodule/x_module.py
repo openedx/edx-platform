@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+import time
 import yaml
 
 from contracts import contract, new_contract
@@ -37,6 +38,7 @@ import dogstats_wrapper as dog_stats_api
 log = logging.getLogger(__name__)
 
 XMODULE_METRIC_NAME = 'edxapp.xmodule'
+XMODULE_DURATION_METRIC_NAME = XMODULE_METRIC_NAME + '.duration'
 
 # Stats event sent to DataDog in order to determine if old XML parsing can be deprecated.
 DEPRECATION_VSCOMPAT_EVENT = 'deprecation.vscompat'
@@ -1165,6 +1167,7 @@ class MetricsMixin(object):
     """
 
     def render(self, block, view_name, context=None):
+        start_time = time.time()
         try:
             status = "success"
             return super(MetricsMixin, self).render(block, view_name, context=context)
@@ -1174,17 +1177,24 @@ class MetricsMixin(object):
             raise
 
         finally:
+            end_time = time.time()
             course_id = getattr(self, 'course_id', '')
-            dog_stats_api.increment(XMODULE_METRIC_NAME, tags=[
+            tags = [
                 u'view_name:{}'.format(view_name),
                 u'action:render',
                 u'action_status:{}'.format(status),
                 u'course_id:{}'.format(course_id),
                 u'block_type:{}'.format(block.scope_ids.block_type)
-            ])
+            ]
+            dog_stats_api.increment(XMODULE_METRIC_NAME, tags=tags)
+            dog_stats_api.histogram(
+                XMODULE_DURATION_METRIC_NAME,
+                end_time - start_time,
+                tags=tags
+            )
 
     def handle(self, block, handler_name, request, suffix=''):
-        handle = None
+        start_time = time.time()
         try:
             status = "success"
             return super(MetricsMixin, self).handle(block, handler_name, request, suffix=suffix)
@@ -1194,14 +1204,21 @@ class MetricsMixin(object):
             raise
 
         finally:
+            end_time = time.time()
             course_id = getattr(self, 'course_id', '')
-            dog_stats_api.increment(XMODULE_METRIC_NAME, tags=[
+            tags = [
                 u'handler_name:{}'.format(handler_name),
                 u'action:handle',
                 u'action_status:{}'.format(status),
                 u'course_id:{}'.format(course_id),
                 u'block_type:{}'.format(block.scope_ids.block_type)
-            ])
+            ]
+            dog_stats_api.increment(XMODULE_METRIC_NAME, tags=tags)
+            dog_stats_api.histogram(
+                XMODULE_DURATION_METRIC_NAME,
+                end_time - start_time,
+                tags=tags
+            )
 
 
 class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
