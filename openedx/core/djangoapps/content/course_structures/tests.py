@@ -1,10 +1,21 @@
 import json
 
+from xmodule.modulestore.django import SignalHandler
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
+from openedx.core.djangoapps.content.course_structures.signals import listen_for_course_publish
 from openedx.core.djangoapps.content.course_structures.tasks import _generate_course_structure, update_course_structure
+
+
+class SignalDisconnectTestMixin(object):
+    """
+    Mixin for tests to disable calls to signals.listen_for_course_publish when the course_published signal is fired.
+    """
+
+    def setUp(self):
+        super(SignalDisconnectTestMixin, self).setUp()
+        SignalHandler.course_published.disconnect(listen_for_course_publish)
 
 
 class CourseStructureTaskTests(ModuleStoreTestCase):

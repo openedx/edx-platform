@@ -19,6 +19,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from mock import Mock
 from opaque_keys.edx.locator import CourseKey, LibraryLocator
+from openedx.core.djangoapps.content.course_structures.tests import SignalDisconnectTestMixin
 
 
 class LibraryTestCase(ModuleStoreTestCase):
@@ -457,7 +458,7 @@ class TestLibraries(LibraryTestCase):
 
 
 @ddt.ddt
-class TestLibraryAccess(LibraryTestCase):
+class TestLibraryAccess(SignalDisconnectTestMixin, LibraryTestCase):
     """
     Test Roles and Permissions related to Content Libraries
     """
