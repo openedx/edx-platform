@@ -54,7 +54,8 @@ def clean_out_mako_templating(xml_string):
 class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
     def __init__(self, xmlstore, course_id, course_dir,
                  error_tracker,
-                 load_error_modules=True, **kwargs):
+                 load_error_modules=True,
+                 branch_settings=None, **kwargs):
         """
         A class that handles loading from xml.  Does some munging to ensure that
         all elements have unique slugs.
@@ -69,6 +70,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         self.course_id = course_id
         self.load_error_modules = load_error_modules
         self.modulestore = xmlstore
+        self.branch_settings = branch_settings
 
         def process_xml(xml):
             """Takes an xml string, and returns a XBlock created from
@@ -175,6 +177,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     xml_data,
                     None,  # parent_id
                     id_manager,
+                    self.branch_settings,
                 )
             except Exception as err:  # pylint: disable=broad-except
                 if not self.load_error_modules:
