@@ -369,7 +369,7 @@ class DiscussionTab(EnrolledOrStaffTab):
     def __init__(self, tab_dict=None):
         super(DiscussionTab, self).__init__(
             # Translators: "Discussion" is the title of the course forum page
-            name=tab_dict['name'] if tab_dict else _('Discussion'),
+            name=tab_dict['name'] if tab_dict else _('FAQ'),
             tab_id=self.type,
             link_func=link_reverse_func('django_comment_client.forum.views.forum_form_discussion'),
         )
