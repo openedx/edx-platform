@@ -33,7 +33,7 @@ class CoursewareSearchIndexer(object):
     """
 
     @staticmethod
-    def index_course(modulestore, course_key, triggered_at=None):
+    def index_course(modulestore, course_key, triggered_at=None, reindex_age=REINDEX_AGE):
         """
         Process course for indexing
 
@@ -51,7 +51,6 @@ class CoursewareSearchIndexer(object):
         Number of items that have been added to the index
         """
         error_list = []
-        indexed_count = 0
         searcher = SearchEngine.get_search_engine(INDEX_NAME)
         if not searcher:
             return
@@ -60,9 +59,11 @@ class CoursewareSearchIndexer(object):
             "course": unicode(course_key),
         }
 
+        # Wrap counter in dictionary - otherwise we seem to lose scope inside the embedded function `index_item`
+        indexed_count = {
+            "count": 0
+        }
         indexed_items = set()
-
-        course = modulestore.get_course(course_key, depth=None, revision=ModuleStoreEnum.RevisionOption.published_only)
 
         def index_item(item, current_start_date, skip_index=False):
             """
@@ -72,17 +73,18 @@ class CoursewareSearchIndexer(object):
             item - item to add to index, its children will be processed recursively
 
             current_start_date - the startdate with which to associate the item,
-            this will apply downwards until overridden while recursively processing
-            the children
+                this will apply downwards until overridden while recursively processing
+                the children
 
             skip_index - simply walk the children in the tree, the content change is
-            older than the REINDEX_AGE window and would have been already indexed.
-            This should really only be passed from the recursive child calls when
-            this method has determined that it is safe to do so
+                older than the REINDEX_AGE window and would have been already indexed.
+                This should really only be passed from the recursive child calls when
+                this method has determined that it is safe to do so
             """
             is_indexable = hasattr(item, "index_dictionary")
+            item_index_dictionary = item.index_dictionary() if is_indexable else None
             # if it's not indexable and it does not have children, then ignore
-            if not is_indexable and not item.has_children:
+            if not item_index_dictionary and not item.has_children:
                 return
 
             item_id = unicode(item.scope_ids.usage_id)
@@ -95,30 +97,28 @@ class CoursewareSearchIndexer(object):
             if item.has_children:
                 # determine if it's okay to skip adding the children herein based upon how recently any may have changed
                 skip_child_index = skip_index or \
-                    (triggered_at is not None and (triggered_at - item.subtree_edited_on) > REINDEX_AGE)
+                    (triggered_at is not None and (triggered_at - item.subtree_edited_on) > reindex_age)
                 for child_item in item.get_children():
                     index_item(child_item, current_start_date, skip_index=skip_child_index)
 
-            if skip_index:
+            if skip_index or not item_index_dictionary:
                 return
 
             item_index = {}
-            item_index_dictionary = item.index_dictionary() if is_indexable else None
-
             # if it has something to add to the index, then add it
-            if item_index_dictionary:
-                try:
-                    item_index.update(location_info)
-                    item_index.update(item_index_dictionary)
-                    item_index['id'] = item_id
-                    if current_start_date:
-                        item_index['start_date'] = current_start_date
+            try:
+                item_index.update(location_info)
+                item_index.update(item_index_dictionary)
+                item_index['id'] = item_id
+                if current_start_date:
+                    item_index['start_date'] = current_start_date
 
-                    searcher.index(DOCUMENT_TYPE, item_index)
-                except Exception as err:  # pylint: disable=broad-except
-                    # broad exception so that index operation does not fail on one item of many
-                    log.warning('Could not index item: %s - %r', item.location, err)
-                    error_list.append(_('Could not index item: {}').format(item.location))
+                searcher.index(DOCUMENT_TYPE, item_index)
+                indexed_count["count"] += 1
+            except Exception as err:  # pylint: disable=broad-except
+                # broad exception so that index operation does not fail on one item of many
+                log.warning('Could not index item: %s - %r', item.location, err)
+                error_list.append(_('Could not index item: {}').format(item.location))
 
         def remove_deleted_items():
             """
@@ -135,9 +135,11 @@ class CoursewareSearchIndexer(object):
                 searcher.remove(DOCUMENT_TYPE, result_id)
 
         try:
-            for item in course.get_children():
-                index_item(item, course.start)
-            remove_deleted_items()
+            with modulestore.branch_setting(ModuleStoreEnum.RevisionOption.published_only):
+                course = modulestore.get_course(course_key, depth=None)
+                for item in course.get_children():
+                    index_item(item, course.start)
+                remove_deleted_items()
         except Exception as err:  # pylint: disable=broad-except
             # broad exception so that index operation does not prevent the rest of the application from working
             log.exception(
@@ -150,7 +152,7 @@ class CoursewareSearchIndexer(object):
         if error_list:
             raise SearchIndexingError(_('Error(s) present during indexing'), error_list)
 
-        return indexed_count
+        return indexed_count["count"]
 
     @classmethod
     def do_course_reindex(cls, modulestore, course_key):
@@ -158,15 +160,15 @@ class CoursewareSearchIndexer(object):
         (Re)index all content within the given course, tracking the fact that a full reindex has taking place
         """
         indexed_count = cls.index_course(modulestore, course_key)
-        cls._track_index_request('edx.course.index.reindexed', indexed_count)
+        if indexed_count:
+            cls._track_index_request('edx.course.index.reindexed', indexed_count)
         return indexed_count
 
     @staticmethod
-    def _track_index_request(event_name, indexed_count, location=None):
+    def _track_index_request(event_name, indexed_count):
         """Track content index requests.
 
         Arguments:
-            location (str): The ID of content to be indexed.
             event_name (str):  Name of the event to be logged.
         Returns:
             None
@@ -176,9 +178,6 @@ class CoursewareSearchIndexer(object):
             "indexed_count": indexed_count,
             'category': 'courseware_index',
         }
-
-        if location:
-            data['location_id'] = location
 
         tracker.emit(
             event_name,

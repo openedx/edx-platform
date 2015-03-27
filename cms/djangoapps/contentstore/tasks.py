@@ -14,7 +14,7 @@ from xmodule.modulestore.courseware_index import CoursewareSearchIndexer, Search
 from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
 from course_action_state.models import CourseRerunState
 from contentstore.utils import initialize_permissions
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.keys import CourseKey
 
 
 LOGGER = get_task_logger(__name__)
