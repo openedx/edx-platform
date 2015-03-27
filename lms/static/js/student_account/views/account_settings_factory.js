@@ -29,7 +29,7 @@
                                 model: userAccountModel,
                                 title: gettext('Username'),
                                 valueAttribute: 'username',
-                                helpMessage: ''
+                                helpMessage: 'The name that identifies you on the edX site. You cannot change your username.'
                             })
                         },
                         {
@@ -37,13 +37,13 @@
                                 model: userAccountModel,
                                 title: gettext('Full Name'),
                                 valueAttribute: 'name',
-                                helpMessage: gettext('The name that appears on your edX certificates.')
+                                helpMessage: gettext('The name that appears on your edX certificates. Other learners never see your full name.')
                             })
                         },
                         {
                             view: new AccountSettingsFieldViews.EmailFieldView({
                                 model: userAccountModel,
-                                title: gettext('Email'),
+                                title: gettext('Email Address'),
                                 valueAttribute: 'email',
                                 helpMessage: gettext('The email address you use to sign in to edX. Communications from edX and your courses are sent to this address.')
                             })
