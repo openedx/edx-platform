@@ -86,6 +86,21 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     def get_asides(self, block):
         return []
 
+    def __repr__(self):
+        """
+        Custom hacky repr.
+        XBlock.Runtime.render() replaces the _view_name attribute while rendering, which
+        causes rendered comparisons of blocks to fail as unequal. So make the _view_name
+        attribute None during the base repr - and set it back to original value afterward.
+        """
+        orig_view_name = None
+        if hasattr(self, '_view_name'):
+            orig_view_name = self._view_name
+        self._view_name = None
+        rt_repr = super(TestModuleSystem, self).__repr__()
+        self._view_name = orig_view_name
+        return rt_repr
+
 
 def get_test_system(course_id=SlashSeparatedCourseKey('org', 'course', 'run')):
     """

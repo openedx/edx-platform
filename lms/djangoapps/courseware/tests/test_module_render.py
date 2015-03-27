@@ -16,6 +16,7 @@ from django.contrib.auth.models import AnonymousUser
 from mock import MagicMock, patch, Mock
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from pyquery import PyQuery
 from courseware.module_render import hash_resource
 from xblock.field_data import FieldData
 from xblock.runtime import Runtime
@@ -430,7 +431,8 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
         content = json.loads(response.content)
         for section in expected:
             self.assertIn(section, content)
-        self.assertIn('<div class="xblock xblock-student_view xmodule_display', content['html'])
+        doc = PyQuery(content['html'])
+        self.assertEquals(len(doc('div.xblock.xblock-student_view')), 1)
 
 
 @ddt.ddt
@@ -567,7 +569,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         )
         result_fragment = module.render(STUDENT_VIEW)
 
-        self.assertIn('div class="xblock xblock-student_view xmodule_display xmodule_HtmlModule"', result_fragment.content)
+        self.assertEquals(len(PyQuery(result_fragment.content)('div.xblock.xblock-student_view.xmodule_HtmlModule')), 1)
 
     def test_xmodule_display_wrapper_disabled(self):
         module = render.get_module(

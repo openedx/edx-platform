@@ -126,9 +126,12 @@ class CommandsTestBase(ModuleStoreTestCase):
         self.assertEqual(dump[child_id]['category'], 'videosequence')
         self.assertEqual(len(dump[child_id]['children']), 2)
 
-        video_id = test_course_key.make_usage_key('video', 'Welcome').to_deprecated_string()
+        video_id = unicode(test_course_key.make_usage_key('video', 'Welcome'))
         self.assertEqual(dump[video_id]['category'], 'video')
-        self.assertEqual(len(dump[video_id]['metadata']), 5)
+        self.assertItemsEqual(
+            dump[video_id]['metadata'].keys(),
+            ['download_video', 'youtube_id_0_75', 'youtube_id_1_0', 'youtube_id_1_25', 'youtube_id_1_5']
+        )
         self.assertIn('youtube_id_1_0', dump[video_id]['metadata'])
 
         # Check if there are the right number of elements

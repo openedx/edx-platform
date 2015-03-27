@@ -144,6 +144,7 @@ pep8==1.5.7
 PyContracts==1.7.1
 pylint==1.4.2
 python-subunit==0.0.16
+pyquery==1.2.9
 radon==1.2
 rednose==0.3
 selenium==2.42.1
