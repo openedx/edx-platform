@@ -143,7 +143,7 @@ def get_test_system(course_id=SlashSeparatedCourseKey('org', 'course', 'run')):
         render_template=mock_render_template,
         replace_urls=str,
         user=user,
-        get_real_user=lambda(__): user,
+        get_real_user=lambda __: user,
         filestore=Mock(name='get_test_system.filestore'),
         debug=True,
         hostname="edx.org",
@@ -378,11 +378,17 @@ class CourseComparisonTest(BulkAssertionTest):
         )
 
     def assertBlocksEqualByFields(self, expected_block, actual_block):
+        """
+        Compare block fields to check for equivalence.
+        """
         self.assertEqual(expected_block.fields, actual_block.fields)
         for field in expected_block.fields.values():
             self.assertFieldEqual(field, expected_block, actual_block)
 
     def assertFieldEqual(self, field, expected_block, actual_block):
+        """
+        Compare a single block field for equivalence.
+        """
         if isinstance(field, (Reference, ReferenceList, ReferenceValueDict)):
             self.assertReferenceRelativelyEqual(field, expected_block, actual_block)
         else:
@@ -436,6 +442,9 @@ class CourseComparisonTest(BulkAssertionTest):
                     self._assertCoursesEqual(expected_items, actual_items, actual_course_key, expect_drafts=True)
 
     def _assertCoursesEqual(self, expected_items, actual_items, actual_course_key, expect_drafts=False):
+        """
+        Actual algorithm to compare courses.
+        """
         with self.bulk_assertions():
             self.assertEqual(len(expected_items), len(actual_items))
 
