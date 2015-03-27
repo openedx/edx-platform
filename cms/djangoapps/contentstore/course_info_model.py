@@ -15,6 +15,8 @@ Current db representation:
 import re
 import logging
 
+from dateutil import parser
+
 from django.http import HttpResponseBadRequest
 from django.utils.translation import ugettext as _
 
@@ -159,7 +161,29 @@ def _get_html(course_updates_items):
     Method to create course_updates_html from course_updates items
     """
     list_items = []
-    for update in reversed(course_updates_items):
+    date_items = []
+    no_date_items = []
+
+    #print course_updates_items
+
+    #for a in (course_updates_items):
+    #   print a.get("date")
+
+
+    for item in course_updates_items:
+        try:
+            parser.parse(item.get("date"))
+            date_items.append(item)
+        except ValueError:
+            no_date_items.append(item)
+
+    date_items = sorted(date_items, key=lambda k: parser.parse(k.get("date")), reverse=True)
+
+    course_updates_items_sorted = date_items + no_date_items
+
+
+  # for update in reversed(course_updates_items):
+    for update in course_updates_items_sorted:
         # filter course update items which have status "deleted".
         if update.get("status") != CourseInfoModule.STATUS_DELETED:
             list_items.append(u"<article><h2>{date}</h2>{content}</article>".format(**update))

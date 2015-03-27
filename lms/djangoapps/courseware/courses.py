@@ -24,6 +24,18 @@ from courseware.module_render import get_module
 from student.models import CourseEnrollment
 import branding
 
+# Libraries used for the updates filtered by date and locale date feature. 
+from xml.dom import minidom
+import lxml
+from lxml import etree
+from dateutil import parser
+from django.utils import timezone
+import datetime
+from django.utils.translation import ugettext as _
+import locale
+from openedx.core.djangoapps.user_api.models import UserPreference
+from lang_pref import LANGUAGE_KEY
+
 log = logging.getLogger(__name__)
 
 
@@ -273,10 +285,46 @@ def get_course_info_section(request, course, section_key):
     """
     info_module = get_course_info_section_module(request, course, section_key)
 
+    lang_to_locale_dict={'es-es':'es_ES.utf8', 'en': 'en_US.utf8', 'ca@valencia' : 'ca_ES.utf8@valencia'}
+
+
+    cur_lang_code = UserPreference.get_preference(request.user, LANGUAGE_KEY) #User preferred language
+    cur_lang_code_mod = lang_to_locale_dict[cur_lang_code] # We obtain the locale
+
+    locale.setlocale(locale.LC_ALL, (cur_lang_code_mod))
+    date_format = locale.nl_langinfo(locale.D_FMT) # It's used if we want this format specifically.
+
     html = ''
     if info_module is not None:
         try:
-            html = info_module.render(STUDENT_VIEW).content
+           # html = info_module.render(STUDENT_VIEW).content
+
+            html_pre = info_module.render(STUDENT_VIEW).content
+            root = lxml.html.fromstring(html_pre)
+            for article in root.findall('article'):
+                article_date = article.find('h2').text
+                # Updates later than now  are not shown.
+                try:
+                    if parser.parse(article_date) > datetime.datetime.now():
+                        root.remove(article)
+                except ValueError:
+                    pass
+            # Updates are shown with user locale format. Updates without date are not affected.
+            for article in root.findall('article'):
+                for heading in article.iter('h2'):
+                    try:
+
+                        heading.text =  parser.parse(heading.text).strftime(date_format) # eg:  17/01/2015 (es y ca@valencia) or 01/17/2015 (en)
+
+                    except ValueError:
+                        heading.text = heading.text
+
+
+            #Finally, the html is created.
+
+            html = lxml.html.tostring(root)
+
+
         except Exception:  # pylint: disable=broad-except
             html = render_to_string('courseware/error-message.html', None)
             log.exception(
