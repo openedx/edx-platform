@@ -186,3 +186,33 @@
     )
   ) if course_id and enrollment_action else ""
 }</%def>
+
+# Performance beacon for onload times
+% if settings.FEATURES.get('ENABLE_ONLOAD_BEACON', False):
+<script>
+  (function () {
+    var sample_rate = ${settings.ONLOAD_BEACON_SAMPLE_RATE};
+    var roll = Math.floor(Math.random() * 100)/100;
+    var onloadBeaconSent = false;
+
+    if(roll < sample_rate){
+      $(window).load(function() {
+        setTimeout(function(){
+          var t = window.performance.timing;
+
+          var data = {
+            event: "onload",
+            value: t.loadEventEnd - t.navigationStart,
+            page: window.location.href,
+          };
+
+          if (!onloadBeaconSent) {
+            $.ajax({method: "POST", url: "/performance", data: data});
+          }
+          onloadBeaconSent = true;
+        }, 0);
+      });
+    }
+  }());
+</script>
+% endif
