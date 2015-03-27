@@ -173,9 +173,11 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         course_names = self.dashboard_page.wait_for_page().available_courses
         self.assertIn(self.course_info["display_name"], course_names)
 
-        self.assertEqual("Test User", self.dashboard_page.full_name)
-        self.assertEqual(email, self.dashboard_page.email)
-        self.assertEqual(username, self.dashboard_page.username)
+        self.assertEqual("want to change your account settings?", self.dashboard_page.sidebar_menu_title.lower())
+        self.assertEqual(
+            "click the arrow next to your username above.",
+            self.dashboard_page.sidebar_menu_description.lower()
+        )
 
     def test_register_failure(self):
         # Navigate to the registration page
@@ -367,61 +369,6 @@ class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
         # Expect that we're enrolled as verified in the course
         enrollment_mode = self.dashboard_page.get_enrollment_mode(self.course_info["display_name"])
         self.assertEqual(enrollment_mode, 'verified')
-
-
-class LanguageTest(WebAppTest):
-    """
-    Tests that the change language functionality on the dashboard works
-    """
-
-    def setUp(self):
-        """
-        Initiailize dashboard page
-        """
-        super(LanguageTest, self).setUp()
-        self.dashboard_page = DashboardPage(self.browser)
-
-        self.test_new_lang = 'eo'
-        # This string is unicode for "ÇÜRRÉNT ÇØÜRSÉS", which should appear in our Dummy Esperanto page
-        # We store the string this way because Selenium seems to try and read in strings from
-        # the HTML in this format. Ideally we could just store the raw ÇÜRRÉNT ÇØÜRSÉS string here
-        self.current_courses_text = u'\xc7\xdcRR\xc9NT \xc7\xd6\xdcRS\xc9S'
-
-        self.username = "test"
-        self.password = "testpass"
-        self.email = "test@example.com"
-
-    def test_change_lang(self):
-        AutoAuthPage(self.browser).visit()
-        self.dashboard_page.visit()
-        # Change language to Dummy Esperanto
-        self.dashboard_page.change_language(self.test_new_lang)
-
-        changed_text = self.dashboard_page.current_courses_text
-
-        # We should see the dummy-language text on the page
-        self.assertIn(self.current_courses_text, changed_text)
-
-    def test_language_persists(self):
-        auto_auth_page = AutoAuthPage(self.browser, username=self.username, password=self.password, email=self.email)
-        auto_auth_page.visit()
-
-        self.dashboard_page.visit()
-        # Change language to Dummy Esperanto
-        self.dashboard_page.change_language(self.test_new_lang)
-
-        # destroy session
-        self.browser.delete_all_cookies()
-
-        # log back in
-        auto_auth_page.visit()
-
-        self.dashboard_page.visit()
-
-        changed_text = self.dashboard_page.current_courses_text
-
-        # We should see the dummy-language text on the page
-        self.assertIn(self.current_courses_text, changed_text)
 
 
 class CourseWikiTest(UniqueCourseTest):
