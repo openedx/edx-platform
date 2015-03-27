@@ -800,8 +800,8 @@ class MongoViewInStudioTest(ViewInStudioTest):
         # Render the parent vertical, then check that there is only a single "View Unit in Studio" link.
         result_fragment = self.module.render(STUDENT_VIEW)
         # The single "View Unit in Studio" link should appear before the first xmodule vertical definition.
-        parts = result_fragment.content.split('xmodule_VerticalModule')
-        self.assertEqual(3, len(parts), "Did not find two vertical modules")
+        parts = result_fragment.content.split('data-block-type="vertical"')
+        self.assertEqual(3, len(parts), "Did not find two vertical blocks")
         self.assertIn('View Unit in Studio', parts[0])
         self.assertNotIn('View Unit in Studio', parts[1])
         self.assertNotIn('View Unit in Studio', parts[2])

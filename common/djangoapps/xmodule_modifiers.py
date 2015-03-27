@@ -9,16 +9,19 @@ import static_replace
 import uuid
 import markupsafe
 from lxml import html, etree
+from contracts import contract
 
 from django.conf import settings
 from django.utils.timezone import UTC
 from django.utils.html import escape
+from django.contrib.auth.models import User
 from edxmako.shortcuts import render_to_string
+from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
 from xblock.fragment import Fragment
 
 from xmodule.seq_module import SequenceModule
-from xmodule.vertical_module import VerticalModule
+from xmodule.vertical_block import VerticalBlock
 from xmodule.x_module import shim_xmodule_js, XModuleDescriptor, XModule, PREVIEW_VIEWS, STUDIO_VIEW
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -193,6 +196,7 @@ def grade_histogram(module_id):
     return grades
 
 
+@contract(user=User, has_instructor_access=bool, block=XBlock, view=basestring, frag=Fragment, context=dict)
 def add_staff_markup(user, has_instructor_access, block, view, frag, context):  # pylint: disable=unused-argument
     """
     Updates the supplied module with a new get_html function that wraps
@@ -204,7 +208,7 @@ def add_staff_markup(user, has_instructor_access, block, view, frag, context):  
     Does nothing if module is a SequenceModule.
     """
     # TODO: make this more general, eg use an XModule attribute instead
-    if isinstance(block, VerticalModule) and (not context or not context.get('child_of_vertical', False)):
+    if isinstance(block, VerticalBlock) and (not context or not context.get('child_of_vertical', False)):
         # check that the course is a mongo backed Studio course before doing work
         is_mongo_course = modulestore().get_modulestore_type(block.location.course_key) != ModuleStoreEnum.Type.xml
         is_studio_course = block.course_edit_method == "Studio"
