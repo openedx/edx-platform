@@ -21,16 +21,26 @@ class LearnerProfilePage(FieldsMixin, PageObject):
 
     def __init__(self, browser, username):
         """
-        Initialize the page and set the username.
+        Initialize the page.
+
+        Arguments:
+            browser (Browser): The browser instance.
+            username (str): Profile username.
         """
         super(LearnerProfilePage, self).__init__(browser)
         self.username = username
 
     @property
     def url(self):
+        """
+        Construct a URL to the page.
+        """
         return BASE_URL + "/u/" + self.username
 
     def is_browser_on_page(self):
+        """
+        Check if browser is showing correct page.
+        """
         return 'Learner Profile' in self.browser.title
 
     @property
@@ -47,6 +57,9 @@ class LearnerProfilePage(FieldsMixin, PageObject):
     def privacy(self, privacy):
         """
         Set user profile privacy.
+
+        Arguments:
+            privacy (str): 'all_users' or 'private'
         """
         self.wait_for_element_visibility('select#u-field-select-account_privacy', 'Privacy dropdown is visiblie')
 
@@ -62,7 +75,7 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         """
         Check if a field with id set to `field_id` is shown.
 
-        Args:
+        Arguments:
             field_id (str): field id
 
         Returns:
@@ -75,7 +88,7 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         """
         Check if a field with id set to `field_id` is editable.
 
-        Args:
+        Arguments:
             field_id (str): field id
 
         Returns:
@@ -118,31 +131,22 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         self.wait_for_ajax()
         return self.q(css='#u-field-select-account_privacy').visible
 
-    def country(self, value=None):
-        """
-        Get or set language.
-        """
-        self.value_for_dropdown_field('country', value)
-
-    def language(self, value=None):
-        """
-        Get or set country.
-        """
-        self.value_for_dropdown_field('language', value)
-
-    def aboutme(self, value=None):
-        """
-        Get or set aboutme.
-        """
-        self.value_for_textarea_field('bio', value)
-
     def field_icon_present(self, field_id):
         """
-        Check if an icon is present for a field. Please note only dropdown fields have icons.
+        Check if an icon is present for a field. Only dropdown fields have icons.
+
+        Arguments:
+            field_id (str): field id
+
+        Returns:
+            True/False
         """
         return self.icon_for_field(field_id, FIELD_ICONS[field_id])
 
     def wait_for_public_fields(self):
+        """
+        Wait for `country`, `language` and `bio` fields to be visible.
+        """
         EmptyPromise(lambda: self.field_is_visible('country'), 'Country field is visible').fulfill()
         EmptyPromise(lambda: self.field_is_visible('language'), 'Language field is visible').fulfill()
         EmptyPromise(lambda: self.field_is_visible('bio'), 'About Me field is visible').fulfill()
