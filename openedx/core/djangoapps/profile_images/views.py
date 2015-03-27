@@ -42,7 +42,7 @@ class ProfileImageUploadView(APIView):
 
     **Example Requests**:
 
-        POST /api/profile_images/v0/{username}/upload
+        POST /api/profile_images/v1/{username}/upload
 
     **Response for POST**
 
@@ -65,7 +65,7 @@ class ProfileImageUploadView(APIView):
 
     def post(self, request, username):
         """
-        POST /api/profile_images/v0/{username}/upload
+        POST /api/profile_images/v1/{username}/upload
         """
         # validate request:
         # verify that the user's
@@ -119,7 +119,7 @@ class ProfileImageRemoveView(APIView):
 
     **Example Requests**:
 
-        POST /api/profile_images/v0/{username}/remove
+        POST /api/profile_images/v1/{username}/remove
 
     **Response for POST**
 
@@ -139,7 +139,7 @@ class ProfileImageRemoveView(APIView):
 
     def post(self, request, username):  # pylint: disable=unused-argument
         """
-        POST /api/profile_images/v0/{username}/remove
+        POST /api/profile_images/v1/{username}/remove
         """
         try:
             # update the user account to reflect that the images were removed.

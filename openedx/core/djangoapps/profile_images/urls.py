@@ -10,12 +10,12 @@ USERNAME_PATTERN = r'(?P<username>[\w.+-]+)'
 urlpatterns = patterns(
     '',
     url(
-        r'^v0/' + USERNAME_PATTERN + '/upload$',
+        r'^v1/' + USERNAME_PATTERN + '/upload$',
         ProfileImageUploadView.as_view(),
         name="profile_image_upload"
     ),
     url(
-        r'^v0/' + USERNAME_PATTERN + '/remove$',
+        r'^v1/' + USERNAME_PATTERN + '/remove$',
         ProfileImageRemoveView.as_view(),
         name="profile_image_remove"
     ),
