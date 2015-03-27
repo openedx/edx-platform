@@ -62,9 +62,9 @@ class LearnerProfilePageTest(WebAppTest):
         """
         Fill in the public profile fields of a user.
         """
-        profile_page.language('English')
-        profile_page.country('United Kingdom')
-        profile_page.aboutme('Nothing Special')
+        profile_page.value_for_dropdown_field('language', 'English')
+        profile_page.value_for_dropdown_field('country', 'United Kingdom')
+        profile_page.value_for_textarea_field('bio', 'Nothing Special')
 
     def visit_my_profile_page(self, user, privacy=None):
         """
@@ -151,9 +151,7 @@ class LearnerProfilePageTest(WebAppTest):
         Scenario: Verify that desired fields are shown when looking at her own private profile.
 
         Given that I am a registered user.
-        And I visit My Profile page.
-        And I set the profile visibility to private.
-        And I reload the page.
+        And I visit others private profile page.
         Then I shouldn't see the profile visibility selector dropdown.
         Then I see some of the profile fields are shown.
         """
@@ -168,16 +166,16 @@ class LearnerProfilePageTest(WebAppTest):
         Scenario: Verify that desired fields are shown when looking at her own public profile.
 
         Given that I am a registered user.
-        And I visit My Profile page.
-        And I set the profile visibility to public.
-        And I reload the page.
+        And I visit others public profile page.
         Then I shouldn't see the profile visibility selector dropdown.
-        Then I see all the profile fields are shown.
+        Then all the profile fields are shown.
+        Then I shouldn't see the profile visibility selector dropdown.
         Also `location`, `language` and `about me` fields are not editable.
         """
         self.visit_other_profile_page(self.OTHER_USER, privacy=self.PRIVACY_PUBLIC)
         self.visit_other_profile_page(self.MY_USER)
 
+        self.other_profile_page.wait_for_public_fields()
         self.assertFalse(self.other_profile_page.privacy_field_visible)
 
         # We are excluding language field from verification because when a usr view another users profile,
@@ -223,6 +221,17 @@ class LearnerProfilePageTest(WebAppTest):
     def test_country_field(self):
         """
         Test behaviour of `Country` field.
+
+        Given that I am a registered user.
+        And I visit My Profile page.
+        And I set the profile visibility to public and set default values for public fields.
+        Then I set country value to `Pakistan`.
+        Then displayed country should be `Pakistan` and country field mode should be `display`
+        And I reload the page.
+        Then displayed country should be `Pakistan` and country field mode should be `display`
+        And I make `country` field editable
+        Then `country` field mode should be `edit`
+        And `country` field icon should be visible.
         """
         self._test_dropdown_field('country', 'Pakistan', 'Pakistan', 'display')
 
@@ -234,6 +243,21 @@ class LearnerProfilePageTest(WebAppTest):
     def test_language_field(self):
         """
         Test behaviour of `Language` field.
+
+        Given that I am a registered user.
+        And I visit My Profile page.
+        And I set the profile visibility to public and set default values for public fields.
+        Then I set language value to `Urdu`.
+        Then displayed language should be `Urdu` and language field mode should be `display`
+        And I reload the page.
+        Then displayed language should be `Urdu` and language field mode should be `display`
+        Then I set empty value for language.
+        Then displayed language should be `Add language` and language field mode should be `placeholder`
+        And I reload the page.
+        Then displayed language should be `Add language` and language field mode should be `placeholder`
+        And I make `language` field editable
+        Then `language` field mode should be `edit`
+        And `language` field icon should be visible.
         """
         self._test_dropdown_field('language', 'Urdu', 'Urdu', 'display')
         self._test_dropdown_field('language', '', 'Add language', 'placeholder')
@@ -243,9 +267,27 @@ class LearnerProfilePageTest(WebAppTest):
 
         self.assertTrue(self.my_profile_page.field_icon_present('language'))
 
-    def test_aboutme_field(self):
+    def test_about_me_field(self):
         """
         Test behaviour of `About Me` field.
+
+        Given that I am a registered user.
+        And I visit My Profile page.
+        And I set the profile visibility to public and set default values for public fields.
+        Then I set about me value to `Eat Sleep Code`.
+        Then displayed about me should be `Eat Sleep Code` and about me field mode should be `display`
+        And I reload the page.
+        Then displayed about me should be `Eat Sleep Code` and about me field mode should be `display`
+        Then I set empty value for about me.
+        Then displayed about me should be `Tell other edX learners a little about yourself: where you live,
+        what your interests are, why you're taking courses on edX, or what you hope to learn.` and about me
+        field mode should be `placeholder`
+        And I reload the page.
+        Then displayed about me should be `Tell other edX learners a little about yourself: where you live,
+        what your interests are, why you're taking courses on edX, or what you hope to learn.` and about me
+        field mode should be `placeholder`
+        And I make `about me` field editable
+        Then `about me` field mode should be `edit`
         """
         placeholder_value = (
             "Tell other edX learners a little about yourself: where you live, what your interests are, "
