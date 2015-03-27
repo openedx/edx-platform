@@ -76,75 +76,12 @@
 <section class="container dashboard" id="dashboard-main">
 
   <section class="profile-sidebar">
-    <header class="profile">
-      <h2><span class="sr">${_("Username")}: </span><span class="user-name">${ user.username }</span></h2>
-    </header>
     <section class="user-info">
       <ul>
-        <li class="info--username">
-          <span class="title">${_("Full Name")} (<a href="#apply_name_change" rel="leanModal" class="edit-name">${_("edit")}</a>)</span> <span class="data">${ user.profile.name | h }</span>
+        <li>
+          <span class="title">${_("looking for your account settings?")}</span>
+          <span>${_("You can now find them in the user menu above.")}</span>
         </li>
-        <li class="info--email">
-          <span class="title">${_("Email")}
-            % if external_auth_map is None or 'shib' not in external_auth_map.external_domain:
-            (<a href="#change_email" rel="leanModal" class="edit-email">${_("edit")}</a>)
-            % endif
-          </span> <span class="data">${ user.email | h }</span>
-        </li>
-
-        %if len(language_options) > 1:
-        <%include file='dashboard/_dashboard_info_language.html' />
-        %endif
-
-        % if third_party_auth.is_enabled():
-        <li class="controls--account">
-          <span class="title">
-            ## Translators: this section lists all the third-party authentication providers (for example, Google and LinkedIn) the user can link with or unlink from their edX account.
-            ${_("Connected Accounts")}
-          </span>
-
-          <span class="data">
-            <span class="third-party-auth">
-
-            % for state in provider_user_states:
-            <div class="auth-provider">
-
-              <div class="status">
-                % if state.has_account:
-                <i class="icon fa fa-link"></i> <span class="copy">${_("Linked")}</span>
-                % else:
-                <i class="icon fa fa-unlink"></i><span class="copy">${_("Not Linked")}</span>
-                % endif
-              </div>
-
-              <span class="provider">${state.provider.NAME}</span>
-              <span class="control">
-
-              % if state.has_account:
-                <form
-                  action="${pipeline.get_disconnect_url(state.provider.NAME)}"
-                  method="post"
-                  name="${state.get_unlink_form_name()}">
-                  <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
-
-                  <a href="#" onclick="document.${state.get_unlink_form_name()}.submit()">
-                    ## Translators: clicking on this removes the link between a user's edX account and their account with an external authentication provider (like Google or LinkedIn).
-                    ${_("Unlink")}
-                  </a>
-                % else:
-                  <a href="${pipeline.get_login_url(state.provider.NAME, pipeline.AUTH_ENTRY_DASHBOARD, redirect_url='/')}">
-                    ## Translators: clicking on this creates a link between a user's edX account and their account with an external authentication provider (like Google or LinkedIn).
-                    ${_("Link")}
-                  </a>
-              % endif
-              </form>
-
-              </span>
-            </div>
-            % endfor
-          </span>
-        </li>
-        % endif
 
         % if len(order_history_list):
         <li class="order-history">
@@ -152,16 +89,6 @@
           % for order_history_item in order_history_list:
             <span><a href="${order_history_item['receipt_url']}" target="_blank" class="edit-name">${order_history_item['order_date']}</a></span>
           % endfor
-        </li>
-        % endif
-
-        % if external_auth_map is None or 'shib' not in external_auth_map.external_domain:
-        <li class="controls--account">
-          <span class="title"><a href="#password_reset_complete" rel="leanModal" id="pwd_reset_button">${_("Reset Password")}</a></span>
-          <form id="password_reset_form" method="post" data-remote="true" action="${reverse('password_reset')}">
-            <input id="id_email" type="hidden" name="email" maxlength="75" value="${user.email}" />
-            <!-- <input type="submit" id="pwd_reset_button" value="${_("Reset Password")}" /> -->
-          </form>
         </li>
         % endif
 
