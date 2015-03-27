@@ -6,6 +6,7 @@ import hashlib
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.storage import get_storage_class
+from staticfiles.storage import staticfiles_storage
 
 from student.models import UserProfile
 from ..errors import UserNotFound
@@ -37,21 +38,20 @@ def _make_profile_image_name(username):
     return hashlib.md5(settings.PROFILE_IMAGE_SECRET_KEY + username).hexdigest()
 
 
-def _get_profile_image_filename(name, size):
+def _get_profile_image_filename(name, size, file_extension='jpg'):
     """
     Returns the full filename for a profile image, given the name and size.
     """
-    return '{name}_{size}.jpg'.format(name=name, size=size)
+    return '{name}_{size}.{file_extension}'.format(name=name, size=size, file_extension=file_extension)
 
 
-def _get_profile_image_urls(name):
+def _get_profile_image_urls(name, storage, file_extension='jpg'):
     """
     Returns a dict containing the urls for a complete set of profile images,
     keyed by "friendly" name (e.g. "full", "large", "medium", "small").
     """
-    storage = get_profile_image_storage()
     return {
-        size_display_name: storage.url(_get_profile_image_filename(name, size))
+        size_display_name: storage.url(_get_profile_image_filename(name, size, file_extension=file_extension))
         for size_display_name, size in PROFILE_IMAGE_SIZES_MAP.items()
     }
 
@@ -86,7 +86,7 @@ def get_profile_image_urls_for_user(user):
 
     """
     if user.profile.has_profile_image:
-        return _get_profile_image_urls(_make_profile_image_name(user.username))
+        return _get_profile_image_urls(_make_profile_image_name(user.username), get_profile_image_storage())
     else:
         return _get_default_profile_image_urls()
 
@@ -98,7 +98,11 @@ def _get_default_profile_image_urls():
 
     TODO The result of this function should be memoized, but not in tests.
     """
-    return _get_profile_image_urls(settings.PROFILE_IMAGE_DEFAULT_FILENAME)
+    return _get_profile_image_urls(
+        settings.PROFILE_IMAGE_DEFAULT_FILENAME,
+        staticfiles_storage,
+        file_extension=settings.PROFILE_IMAGE_DEFAULT_FILE_EXTENSION
+    )
 
 
 def set_has_profile_image(username, has_profile_image=True):

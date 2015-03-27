@@ -2205,7 +2205,10 @@ PROFILE_IMAGE_BACKEND = 'storages.backends.overwrite.OverwriteStorage'
 # i.e. 'http://www.example-image-server.com/'
 PROFILE_IMAGE_DOMAIN = '/'
 PROFILE_IMAGE_URL_PATH = 'media/profile_images/'
-PROFILE_IMAGE_DEFAULT_FILENAME = 'default_profile_image'  # TODO: determine final name
+PROFILE_IMAGE_DEFAULT_FILENAME = (
+    'images/edx-theme/default-profile' if FEATURES['IS_EDX_DOMAIN'] else 'images/default-theme/default-profile'
+)
+PROFILE_IMAGE_DEFAULT_FILE_EXTENSION = 'png'
 # This secret key is used in generating unguessable URLs to users'
 # profile images.  Once it has been set, changing it will make the
 # platform unaware of current image URLs, resulting in reverting all

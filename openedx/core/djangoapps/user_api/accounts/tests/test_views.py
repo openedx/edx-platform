@@ -117,15 +117,23 @@ class TestAccountAPI(UserAPITestCase):
         image.
         """
         if has_profile_image:
+            url_root = 'http://example-storage.com/profile_images'
             filename = hashlib.md5('secret' + self.user.username).hexdigest()
+            file_extension = 'jpg'
         else:
+            url_root = 'http://testserver/static'
             filename = 'default'
+            file_extension = 'png'
         self.assertEqual(
             data['profile_image'],
             {
                 'has_image': has_profile_image,
-                'image_url_full': 'http://example-storage.com/profile_images/{}_50.jpg'.format(filename),
-                'image_url_small': 'http://example-storage.com/profile_images/{}_10.jpg'.format(filename)
+                'image_url_full': '{root}/{filename}_50.{extension}'.format(
+                    root=url_root, filename=filename, extension=file_extension,
+                ),
+                'image_url_small': '{root}/{filename}_10.{extension}'.format(
+                    root=url_root, filename=filename, extension=file_extension,
+                )
             }
         )
 
@@ -599,8 +607,8 @@ class TestAccountAPI(UserAPITestCase):
             response.data["profile_image"],
             {
                 "has_image": False,
-                "image_url_full": "http://testserver/profile_images/default_50.jpg",
-                "image_url_small": "http://testserver/profile_images/default_10.jpg"
+                "image_url_full": "http://testserver/static/default_50.png",
+                "image_url_small": "http://testserver/static/default_10.png"
             }
         )
 
