@@ -1,7 +1,7 @@
 ;(function (define, undefined) {
     'use strict';
     define([
-        'gettext', 'jquery', 'underscore', 'backbone', 'js/views/fields', 'js/vendor/backbone-super'
+        'gettext', 'jquery', 'underscore', 'backbone', 'js/views/fields', 'backbone-super'
     ], function (gettext, $, _, Backbone, FieldViews) {
 
         var LearnerProfileFieldViews = {};

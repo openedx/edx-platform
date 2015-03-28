@@ -37,7 +37,7 @@ class FieldsMixin(object):
         Returns:
             `placeholder`/`edit`/`display`
         """
-        self.wait_for_ajax()
+        self.wait_for_field(field_id)
 
         query = self.q(css='.u-field-{}'.format(field_id))
 
@@ -59,7 +59,7 @@ class FieldsMixin(object):
         """
         Check if field icon is present.
         """
-        self.wait_for_ajax()
+        self.wait_for_field(field_id)
 
         query = self.q(css='.u-field-{} .u-field-icon'.format(field_id))
         return query.present and icon_id in query.attrs('class')[0].split()
@@ -159,7 +159,7 @@ class FieldsMixin(object):
         """
         Get or set the value of a textarea field.
         """
-        self.wait_for_ajax()
+        self.wait_for_field(field_id)
 
         self.make_field_editable(field_id)
 
@@ -180,7 +180,7 @@ class FieldsMixin(object):
         """
         Return value of field in `display` or `placeholder` mode.
         """
-        self.wait_for_ajax()
+        self.wait_for_field(field_id)
 
         return self.q(css='.u-field-{} .u-field-value'.format(field_id)).text[0]
 

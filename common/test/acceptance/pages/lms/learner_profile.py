@@ -10,7 +10,7 @@ from bok_choy.promise import EmptyPromise
 PROFILE_VISIBILITY_SELECTOR = '#u-field-select-account_privacy option[value="{}"]'
 FIELD_ICONS = {
     'country': 'fa-map-marker',
-    'language': 'fa-comment',
+    'language_proficiencies': 'fa-comment',
 }
 
 
@@ -94,7 +94,7 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         Returns:
             True/False
         """
-        self.wait_for_ajax()
+        self.wait_for_field(field_id)
         self.make_field_editable(field_id)
         return self.mode_for_field(field_id) == 'edit'
 
@@ -103,10 +103,9 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         """
         Return list of visible fields.
         """
-        self.wait_for_ajax()
-        self.wait_for_element_visibility('.u-field-username', 'username is not visible')
+        self.wait_for_field('username')
 
-        fields = ['username', 'country', 'language', 'bio']
+        fields = ['username', 'country', 'language_proficiencies', 'bio']
         return [field for field in fields if self.field_is_visible(field)]
 
     @property
@@ -117,7 +116,7 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         self.wait_for_ajax()
         self.wait_for_element_visibility('.u-field-username', 'username is not visible')
 
-        fields = ['country', 'language', 'bio']
+        fields = ['country', 'language_proficiencies', 'bio']
         return [field for field in fields if self.field_is_editable(field)]
 
     @property
@@ -148,5 +147,5 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         Wait for `country`, `language` and `bio` fields to be visible.
         """
         EmptyPromise(lambda: self.field_is_visible('country'), 'Country field is visible').fulfill()
-        EmptyPromise(lambda: self.field_is_visible('language'), 'Language field is visible').fulfill()
+        EmptyPromise(lambda: self.field_is_visible('language_proficiencies'), 'Language field is visible').fulfill()
         EmptyPromise(lambda: self.field_is_visible('bio'), 'About Me field is visible').fulfill()
