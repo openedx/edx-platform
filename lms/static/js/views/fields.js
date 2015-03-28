@@ -20,12 +20,12 @@
             tagName: 'div',
 
             indicators: {
-                'canEdit': '<i class="icon fa fa-pencil message-can-edit"></i>',
-                'error': '<i class="fa fa-exclamation-triangle message-error"></i>',
-                'validationError': '<i class="fa fa-exclamation-triangle message-validation-error"></i>',
-                'inProgress': '<i class="fa fa-spinner fa-pulse message-in-progress"></i>',
-                'success': '<i class="fa fa-check message-success"></i>',
-                'plus': '<i class="fa fa-plus placeholder"></i>'
+                'canEdit': '<i class="icon fa fa-pencil message-can-edit" aria-hidden="true"></i>',
+                'error': '<i class="fa fa-exclamation-triangle message-error" aria-hidden="true"></i>',
+                'validationError': '<i class="fa fa-exclamation-triangle message-validation-error" aria-hidden="true"></i>',
+                'inProgress': '<i class="fa fa-spinner fa-pulse message-in-progress" aria-hidden="true"></i>',
+                'success': '<i class="fa fa-check message-success" aria-hidden="true"></i>',
+                'plus': '<i class="fa fa-plus placeholder" aria-hidden="true"></i>'
             },
 
             messages: {
