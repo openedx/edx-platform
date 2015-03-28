@@ -1,11 +1,14 @@
 """
 Model used by Video module for Branding configuration.
 
+Updated to also support organizations
+
 Includes:
     BrandingInfoConfig: A ConfigurationModel for managing how Video Module will
         use Branding.
 """
 import json
+from django.db import models
 from django.db.models import TextField
 from django.core.exceptions import ValidationError
 from config_models.models import ConfigurationModel
@@ -44,3 +47,10 @@ class BrandingInfoConfig(ConfigurationModel):
         """
         info = cls.current()
         return json.loads(info.configuration) if info.enabled else {}
+
+class Organization(models.Model):
+    name        = models.CharField( max_length = 255 )
+    image       = models.ImageField( blank = True, null = True )
+    about_short = models.TextField( blank = True, null = True )
+    about_long  = models.TextField( blank = True, null = True )
+
