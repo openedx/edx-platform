@@ -22,6 +22,7 @@
 
             render: function () {
                 this.$el.html(this.template({
+                    username: this.options.accountSettingsModel.get('username'),
                     profilePhoto: 'http://www.teachthought.com/wp-content/uploads/2012/07/edX-120x120.jpg',
                     ownProfile: this.options.own_profile,
                     showFullProfile: this.showFullProfile()

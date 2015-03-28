@@ -5,7 +5,7 @@
 <% } %>
 
 <% if (iconName) { %>
-    <i class="u-field-icon icon fa <%- iconName %> fa-fw"></i>
+    <i class="u-field-icon icon fa <%- iconName %> fa-fw" area-hidden="true" ></i>
 <% } %>
 
 <span class="u-field-value">
