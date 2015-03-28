@@ -48,9 +48,16 @@ class BrandingInfoConfig(ConfigurationModel):
         info = cls.current()
         return json.loads(info.configuration) if info.enabled else {}
 
+
+def img_name(instance, filename):
+    ext = filename.split('.')[-1]
+    if not ext:
+        ext = 'jpg'
+    return 'organization/' + instance.name + '.' + ext
+
 class Organization(models.Model):
     name        = models.CharField( max_length = 255 )
-    image       = models.ImageField( blank = True, null = True )
+    image       = models.ImageField( blank = True, null = True, upload_to = img_name )
     about_short = models.TextField( blank = True, null = True )
     about_long  = models.TextField( blank = True, null = True )
 
