@@ -11,11 +11,30 @@ class FieldsMixin(object):
     """
     Methods for testing fields in pages.
     """
+
+    def field(self, field_id):
+        """
+        Return field with field_id.
+        """
+        self.wait_for_ajax()
+
+        query = self.q(css='.u-field-{}'.format(field_id))
+        return query.text[0] if query.present else None
+
+    def wait_for_field(self, field_id):
+        """
+        Wait for a field to appear in DOM.
+        """
+        EmptyPromise(
+            lambda: self.field(field_id) is not None,
+            "Field with id \"{0}\" is in DOM.".format(field_id)
+        ).fulfill()
+
     def title_for_field(self, field_id):
         """
         Return the title of a field.
         """
-        self.wait_for_ajax()
+        self.wait_for_field(field_id)
 
         query = self.q(css='.u-field-{} .u-field-title'.format(field_id))
         return query.text[0] if query.present else None
@@ -24,7 +43,7 @@ class FieldsMixin(object):
         """
         Return the current message in a field.
         """
-        self.wait_for_ajax()
+        self.wait_for_field(field_id)
 
         query = self.q(css='.u-field-{} .u-field-message'.format(field_id))
         return query.text[0] if query.present else None
@@ -42,7 +61,7 @@ class FieldsMixin(object):
         """
         Return the name of the current indicator in a field.
         """
-        self.wait_for_ajax()
+        self.wait_for_field(field_id)
 
         query = self.q(css='.u-field-{} .u-field-message i'.format(field_id))
         return [
@@ -64,7 +83,7 @@ class FieldsMixin(object):
         """
         Return the value in a readonly field.
         """
-        self.wait_for_ajax()
+        self.wait_for_field(field_id)
 
         return self.value_for_text_field(field_id)
 
@@ -72,7 +91,7 @@ class FieldsMixin(object):
         """
         Get or set the value of a text field.
         """
-        self.wait_for_ajax()
+        self.wait_for_field(field_id)
 
         query = self.q(css='.u-field-{} input'.format(field_id))
         if not query.present:
@@ -89,7 +108,7 @@ class FieldsMixin(object):
         """
         Get or set the value in a dropdown field.
         """
-        self.wait_for_ajax()
+        self.wait_for_field(field_id)
 
         query = self.q(css='.u-field-{} select'.format(field_id))
         if not query.present:
@@ -103,7 +122,7 @@ class FieldsMixin(object):
         """
         Return the title of the link in a link field.
         """
-        self.wait_for_ajax()
+        self.wait_for_field(field_id)
 
         query = self.q(css='.u-field-{} a'.format(field_id))
         return query.text[0] if query.present else None
@@ -112,7 +131,7 @@ class FieldsMixin(object):
         """
         Click the link in a link field.
         """
-        self.wait_for_ajax()
+        self.wait_for_field(field_id)
 
         query = self.q(css='.u-field-{} a'.format(field_id))
         if query.present:
