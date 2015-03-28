@@ -1,7 +1,7 @@
 ;(function (define, undefined) {
     'use strict';
     define([
-        'gettext', 'jquery', 'underscore', 'backbone', 'js/mustache', 'js/vendor/backbone-super'
+        'gettext', 'jquery', 'underscore', 'backbone', 'js/mustache', 'backbone-super'
     ], function (gettext, $, _, Backbone, RequireMustache) {
 
         var Mustache = window.Mustache || RequireMustache;
