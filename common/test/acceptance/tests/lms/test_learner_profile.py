@@ -3,6 +3,7 @@
 End-to-end tests for Student's Profile Page.
 """
 
+from ...pages.lms.account_settings import AccountSettingsPage
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.learner_profile import LearnerProfilePage
 from ...pages.lms.dashboard import DashboardPage
@@ -26,16 +27,18 @@ class LearnerProfilePageTest(WebAppTest):
     PRIVACY_PUBLIC = 'all_users'
     PRIVACY_PRIVATE = 'private'
 
-    PUBLIC_PROFILE_FIELDS = ['username', 'country', 'language', 'bio']
+    PUBLIC_PROFILE_FIELDS = ['username', 'country', 'language_proficiencies', 'bio']
     PRIVATE_PROFILE_FIELDS = ['username']
 
-    PUBLIC_PROFILE_EDITABLE_FIELDS = ['country', 'language', 'bio']
+    PUBLIC_PROFILE_EDITABLE_FIELDS = ['country', 'language_proficiencies', 'bio']
 
     def setUp(self):
         """
         Initialize pages.
         """
         super(LearnerProfilePageTest, self).setUp()
+
+        self.account_settings_page = AccountSettingsPage(self.browser)
         self.dashboard_page = DashboardPage(self.browser)
 
         self.my_auto_auth_page = AutoAuthPage(self.browser, username=self.USER_1_NAME, email=self.USER_1_EMAIL).visit()
@@ -62,7 +65,7 @@ class LearnerProfilePageTest(WebAppTest):
         """
         Fill in the public profile fields of a user.
         """
-        profile_page.value_for_dropdown_field('language', 'English')
+        profile_page.value_for_dropdown_field('language_proficiencies', 'English')
         profile_page.value_for_dropdown_field('country', 'United Kingdom')
         profile_page.value_for_textarea_field('bio', 'Nothing Special')
 
@@ -89,6 +92,12 @@ class LearnerProfilePageTest(WebAppTest):
         self.other_profile_page.wait_for_page()
 
         if user is self.OTHER_USER and privacy is not None:
+            self.account_settings_page.visit()
+            self.account_settings_page.wait_for_page()
+            self.assertEqual(self.account_settings_page.value_for_dropdown_field('year_of_birth', '1980'), '1980')
+
+            self.other_profile_page.visit()
+            self.other_profile_page.wait_for_page()
             self.other_profile_page.privacy = privacy
 
             if privacy == self.PRIVACY_PUBLIC:
@@ -178,10 +187,7 @@ class LearnerProfilePageTest(WebAppTest):
         self.other_profile_page.wait_for_public_fields()
         self.assertFalse(self.other_profile_page.privacy_field_visible)
 
-        # We are excluding language field from verification because when a usr view another users profile,
-        # server send `languages` field in model instead of `language`, due to which language field will not be shown
-        # Until this is fixed on server side, we will exclude the language fields.
-        fields_to_check = self.PUBLIC_PROFILE_FIELDS[0:2] + self.PUBLIC_PROFILE_FIELDS[3:]
+        fields_to_check = self.PUBLIC_PROFILE_FIELDS
         self.assertEqual(self.other_profile_page.visible_fields, fields_to_check)
 
         self.assertEqual(self.my_profile_page.editable_fields, [])
@@ -259,13 +265,13 @@ class LearnerProfilePageTest(WebAppTest):
         Then `language` field mode should be `edit`
         And `language` field icon should be visible.
         """
-        self._test_dropdown_field('language', 'Urdu', 'Urdu', 'display')
-        self._test_dropdown_field('language', '', 'Add language', 'placeholder')
+        self._test_dropdown_field('language_proficiencies', 'Urdu', 'Urdu', 'display')
+        self._test_dropdown_field('language_proficiencies', '', 'Add language', 'placeholder')
 
-        self.my_profile_page.make_field_editable('language')
-        self.assertTrue(self.my_profile_page.mode_for_field('language'), 'edit')
+        self.my_profile_page.make_field_editable('language_proficiencies')
+        self.assertTrue(self.my_profile_page.mode_for_field('language_proficiencies'), 'edit')
 
-        self.assertTrue(self.my_profile_page.field_icon_present('language'))
+        self.assertTrue(self.my_profile_page.field_icon_present('language_proficiencies'))
 
     def test_about_me_field(self):
         """
