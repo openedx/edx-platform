@@ -7,10 +7,10 @@ ${_("Hi there,")}
 
 ## Preamble
 ${_("There was recently a request to change the email address associated "
-    "with your {platform_name} account from {old_email} to {new_email}. "
+    "with your {account_name} account from {old_email} to {new_email}. "
     "If you requested this change, please confirm your new email address "
     "by following the link below:").format(
-        platform_name=settings.PLATFORM_NAME,
+        account_name=settings.ACCOUNT_NAME,
         old_email=old_email,
         new_email=new_email
     )

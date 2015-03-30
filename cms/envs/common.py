@@ -30,6 +30,7 @@ import sys
 import lms.envs.common
 # Although this module itself may not use these imported variables, other dependent modules may.
 from lms.envs.common import (
+    ACCOUNT_NAME,
     USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, ALL_LANGUAGES, WIKI_ENABLED, MODULESTORE,
     update_module_store_settings, ASSET_IGNORE_REGEX
 )
