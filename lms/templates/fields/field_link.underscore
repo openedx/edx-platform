@@ -1,11 +1,17 @@
-<label class="u-field-title" for="u-field-link-<%- id %>">
+<span class="u-field-title" for="u-field-link-<%- id %>">
     <%- gettext(title) %>
-</label>
+</span>
 <span class="u-field-value">
-    <a id="u-field-link-<%- id %>" href="<%- gettext(linkHref) %>" aria-describedby="u-field-message-<%- id %>">
-        <%- gettext(linkTitle) %>
+    <a id="u-field-link-<%- id %>" href="<%- gettext(linkHref) %>" aria-describedby="u-field-help-message-<%- id %>">
+        <%if (linkTitle === 'Link') {%>
+            <span aria-hidden="true"><%- gettext(linkTitle) %></span>
+            <span class="sr">Connect your <%- gettext(title) %> account</span>
+        <%} else {%>
+            <%- gettext(linkTitle) %>
+        <%}%>
     </a>
 </span>
 <span class="u-field-message" id="u-field-message-<%- id %>">
-    <%- gettext(message) %>
+    <span class="u-field-message-notification" aria-live="polite"></span>
+    <span class="u-field-message-help" id="u-field-help-message-<%- id %>"><%- gettext(message) %></span>
 </span>
