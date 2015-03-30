@@ -404,8 +404,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         xml_data: A string of xml that will be translated into data and children for
             this module
         system: A DescriptorSystem for interacting with external resources
-        org and course are optional strings that will be used in the generated modules
-            url identifiers
+        id_generator is used to generate course-specific urls and identifiers
         """
         xml_object = etree.fromstring(xml_data)
         url_name = xml_object.get('url_name', xml_object.get('slug'))
@@ -416,7 +415,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             filepath = cls._format_filepath(xml_object.tag, name_to_pathname(url_name))
             xml_object = cls.load_file(filepath, system.resources_fs, usage_id)
             system.parse_asides(xml_object, definition_id, usage_id, id_generator)
-        field_data = cls._parse_video_xml(xml_object)
+        field_data = cls._parse_video_xml(xml_object, id_generator)
         kvs = InheritanceKeyValueStore(initial_values=field_data)
         field_data = KvsFieldData(kvs)
         video = system.construct_xblock_from_class(
@@ -476,6 +475,12 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             ele = etree.Element('transcript')
             ele.set('language', transcript_language)
             ele.set('src', self.transcripts[transcript_language])
+            xml.append(ele)
+
+        # append VAL information if it is exists
+        if self.edx_video_id and edxval_api:
+            ele = etree.Element('edx_val_data')
+            edxval_api.export_to_xml(ele, self.edx_video_id)
             xml.append(ele)
 
         return xml
@@ -552,7 +557,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         return ret
 
     @classmethod
-    def _parse_video_xml(cls, xml):
+    def _parse_video_xml(cls, xml, id_generator):
         """
         Parse video fields out of xml_data. The fields are set if they are
         present in the XML.
@@ -620,6 +625,13 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         # `download_track` needs to have value `True`.
         if 'download_track' not in field_data and track is not None:
             field_data['download_track'] = True
+
+        # Import data into edx VAL if it exists
+        edx_val_data = xml.find('edx_val_data')
+        if edx_val_data is not None:
+            edxval_api.import_from_xml(
+                edx_val_data, field_data['edx_video_id'], id_generator.course_id
+            )
 
         return field_data
 
