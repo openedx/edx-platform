@@ -727,6 +727,7 @@ def _import_course_draft(
         load_error_modules=False,
         mixins=xml_module_store.xblock_mixins,
         field_data=KvsFieldData(kvs=DictKeyValueStore()),
+        branch_settings=ModuleStoreEnum.RevisionOption.draft_only,    # 'rev-opt-draft-only'
     )
 
     def _import_module(module):

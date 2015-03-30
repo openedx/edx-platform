@@ -27,6 +27,8 @@ from xblock.runtime import Runtime, IdReader, IdGenerator
 from xmodule.fields import RelativeTime
 
 from xmodule.errortracker import exc_info_to_str
+from xmodule import modulestore
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.asides import AsideUsageKeyV1, AsideDefinitionKeyV1
@@ -1365,7 +1367,7 @@ class XMLParsingSystem(DescriptorSystem):
         """
         return self.xblock_from_node(node, parent_id, id_generator).scope_ids.usage_id
 
-    def xblock_from_node(self, node, parent_id, id_generator=None):
+    def xblock_from_node(self, node, parent_id, id_generator=None, branch_settings=None):
         """
         Create an XBlock instance from XML data.
 
@@ -1391,6 +1393,9 @@ class XMLParsingSystem(DescriptorSystem):
         url_name = node.get('url_name')  # difference from XBlock.runtime
         def_id = id_generator.create_definition(block_type, url_name)
         usage_id = id_generator.create_usage(def_id)
+        if branch_settings == ModuleStoreEnum.RevisionOption.draft_only:
+            # Change revision of definition key to 'draft'
+            def_id = modulestore.mongo.base.as_draft(def_id)
 
         keys = ScopeIds(None, block_type, def_id, usage_id)
         block_class = self.mixologist.mix(self.load_block_type(block_type))
