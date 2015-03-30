@@ -37,9 +37,13 @@
                 this.set({'profile_is_public': profileIsPublic}, { silent: true });
 
   	            return response;
+            },
+
+            isAboveMinimumAge: function() {
+                var isBirthDefined = !(_.isUndefined(this.get('year_of_birth')) || _.isNull(this.get('year_of_birth')));
+                return isBirthDefined && !(this.get("requires_parental_consent"));
             }
         });
-
         return UserAccountModel;
     })
 }).call(this, define || RequireJS.define);

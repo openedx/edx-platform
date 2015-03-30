@@ -13,8 +13,9 @@
             },
 
             showFullProfile: function () {
+                var isAboveMinimumAge = this.options.accountSettingsModel.isAboveMinimumAge();
                 if (this.options.own_profile) {
-                    return this.options.preferencesModel.get('account_privacy') === 'all_users';
+                    return isAboveMinimumAge && this.options.preferencesModel.get('account_privacy') === 'all_users';
                 } else {
                     return this.options.accountSettingsModel.get('profile_is_public');
                 }
@@ -38,6 +39,7 @@
                     var fieldView = this.options.accountPrivacyFieldView;
                     fieldView.profileIsPrivate =  (!this.options.accountSettingsModel.get('year_of_birth'));
                     fieldView.requiresParentalConsent = (this.options.accountSettingsModel.get('requires_parental_consent'));
+                    fieldView.isAboveMinimumAge = this.options.accountSettingsModel.isAboveMinimumAge();
                     fieldView.undelegateEvents();
                     this.$('.wrapper-profile-field-account-privacy').append(fieldView.render().el);
                     fieldView.delegateEvents();
