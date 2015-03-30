@@ -91,7 +91,6 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
     def test_need_to_verify_expiration(self):
         self._setup_mode_and_enrollment(self.FUTURE, "verified")
         response = self.client.get(self.dashboard_url)
-        self.assertContains(response, self.BANNER_ALT_MESSAGES[VERIFY_STATUS_NEED_TO_VERIFY])
         self.assertContains(response, "You only have 4 days left to verify for this course.")
 
     @ddt.data(None, FUTURE)
@@ -287,13 +286,11 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         # Sanity check: verify that the course is on the page
         self.assertContains(response, unicode(self.course.id))
 
-        # Verify that the correct banner is rendered on the dashboard
-        self.assertContains(response, self.BANNER_ALT_MESSAGES[status])
-
         # Verify that the correct banner color is rendered
         self.assertContains(
             response,
-            "<article class=\"course {}\">".format(self.MODE_CLASSES[status])
+            "<div role=\"region\" aria-label=\"{course_name}\" class=\"course {status}\">".format(
+                course_name=self.course.display_name_with_default, status=self.MODE_CLASSES[status])
         )
 
         # Verify that the correct copy is rendered on the dashboard
