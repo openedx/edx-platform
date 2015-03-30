@@ -364,6 +364,9 @@ FEATURES = {
 
     # Certificates Web/HTML Views
     'CERTIFICATES_HTML_VIEW': False,
+
+    # Allow edX content to be accessed over LTI by external LMS platforms
+    'ENABLE_LTI_PROVIDER': False,
 }
 
 # Ignore static asset files on import which match this pattern
