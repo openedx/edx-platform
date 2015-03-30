@@ -1976,9 +1976,8 @@ class TestMixedModuleStore(CourseComparisonTest):
             dest_store = self.store._get_modulestore_by_type(ModuleStoreEnum.Type.split)
             self.assertCoursesEqual(source_store, source_course_key, dest_store, dest_course_id)
 
-    @skip("PLAT-449 XModule TestMixedModuleStore intermittent test failure")
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_course_publish_signal_firing(self, default):
+    def test_course_publish_signal_direct_firing(self, default):
         with MongoContentstoreBuilder().build() as contentstore:
             self.store = MixedModuleStore(
                 contentstore=contentstore,
@@ -2016,28 +2015,53 @@ class TestMixedModuleStore(CourseComparisonTest):
                         self.store.publish(block.location, self.user_id)
                         self.assertEqual(receiver.call_count, 3)
 
-                    # Test a draftable block type, which needs to be explicitly published.
-                    receiver.reset_mock()
-                    block = self.store.create_child(self.user_id, course.location, 'problem')
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_course_publish_signal_rerun_firing(self, default):
+        with MongoContentstoreBuilder().build() as contentstore:
+            self.store = MixedModuleStore(
+                contentstore=contentstore,
+                create_modulestore_instance=create_modulestore_instance,
+                mappings={},
+                signal_handler=SignalHandler(MixedModuleStore),
+                **self.OPTIONS
+            )
+            self.addCleanup(self.store.close_all_connections)
+
+            with self.store.default_store(default):
+                self.assertIsNotNone(self.store.thread_cache.default_store.signal_handler)
+
+                with mock_signal_receiver(SignalHandler.course_published) as receiver:
+                    self.assertEqual(receiver.call_count, 0)
+
+                    # Course creation and publication should fire the signal
+                    course = self.store.create_course('org_x', 'course_y', 'run_z', self.user_id)
                     self.assertEqual(receiver.call_count, 1)
 
-                    self.store.update_item(block, self.user_id)
-                    self.assertEqual(receiver.call_count, 1)
-
-                    self.store.publish(block.location, self.user_id)
-                    self.assertEqual(receiver.call_count, 2)
-
-                    self.store.unpublish(block.location, self.user_id)
-                    self.assertEqual(receiver.call_count, 3)
-
-                    self.store.delete_item(block.location, self.user_id)
-                    self.assertEqual(receiver.call_count, 4)
+                    course_key = course.id
 
                     # Test course re-runs
                     receiver.reset_mock()
                     dest_course_id = self.store.make_course_key("org.other", "course.other", "run.other")
                     self.store.clone_course(course_key, dest_course_id, self.user_id)
                     self.assertEqual(receiver.call_count, 1)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_course_publish_signal_import_firing(self, default):
+        with MongoContentstoreBuilder().build() as contentstore:
+            self.store = MixedModuleStore(
+                contentstore=contentstore,
+                create_modulestore_instance=create_modulestore_instance,
+                mappings={},
+                signal_handler=SignalHandler(MixedModuleStore),
+                **self.OPTIONS
+            )
+            self.addCleanup(self.store.close_all_connections)
+
+            with self.store.default_store(default):
+                self.assertIsNotNone(self.store.thread_cache.default_store.signal_handler)
+
+                with mock_signal_receiver(SignalHandler.course_published) as receiver:
+                    self.assertEqual(receiver.call_count, 0)
 
                     # Test course imports
                     # Note: The signal is fired once when the course is created and
@@ -2049,3 +2073,172 @@ class TestMixedModuleStore(CourseComparisonTest):
                         create_if_not_present=True,
                     )
                     self.assertEqual(receiver.call_count, 2)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_course_publish_signal_publish_firing(self, default):
+        with MongoContentstoreBuilder().build() as contentstore:
+            self.store = MixedModuleStore(
+                contentstore=contentstore,
+                create_modulestore_instance=create_modulestore_instance,
+                mappings={},
+                signal_handler=SignalHandler(MixedModuleStore),
+                **self.OPTIONS
+            )
+            self.addCleanup(self.store.close_all_connections)
+
+            with self.store.default_store(default):
+                self.assertIsNotNone(self.store.thread_cache.default_store.signal_handler)
+
+                with mock_signal_receiver(SignalHandler.course_published) as receiver:
+                    self.assertEqual(receiver.call_count, 0)
+
+                    # Course creation and publication should fire the signal
+                    course = self.store.create_course('org_x', 'course_y', 'run_z', self.user_id)
+                    self.assertEqual(receiver.call_count, 1)
+
+                    # Test a draftable block type, which needs to be explicitly published, and nest it within the
+                    # normal structure - this is important because some implementors change the parent when adding a
+                    # non-published child; if parent is in DIRECT_ONLY_CATEGORIES then this should not fire the event
+                    receiver.reset_mock()
+                    section = self.store.create_item(self.user_id, course.id, 'chapter')
+                    self.assertEqual(receiver.call_count, 1)
+
+                    subsection = self.store.create_child(self.user_id, section.location, 'sequential')
+                    self.assertEqual(receiver.call_count, 2)
+
+                    # 'units' and 'blocks' are draftable types
+                    receiver.reset_mock()
+                    unit = self.store.create_child(self.user_id, subsection.location, 'vertical')
+                    self.assertEqual(receiver.call_count, 0)
+
+                    block = self.store.create_child(self.user_id, unit.location, 'problem')
+                    self.assertEqual(receiver.call_count, 0)
+
+                    self.store.update_item(block, self.user_id)
+                    self.assertEqual(receiver.call_count, 0)
+
+                    self.store.publish(unit.location, self.user_id)
+                    self.assertEqual(receiver.call_count, 1)
+
+                    self.store.unpublish(unit.location, self.user_id)
+                    self.assertEqual(receiver.call_count, 2)
+
+                    self.store.delete_item(unit.location, self.user_id)
+                    self.assertEqual(receiver.call_count, 3)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_bulk_course_publish_signal_direct_firing(self, default):
+        with MongoContentstoreBuilder().build() as contentstore:
+            self.store = MixedModuleStore(
+                contentstore=contentstore,
+                create_modulestore_instance=create_modulestore_instance,
+                mappings={},
+                signal_handler=SignalHandler(MixedModuleStore),
+                **self.OPTIONS
+            )
+            self.addCleanup(self.store.close_all_connections)
+
+            with self.store.default_store(default):
+                self.assertIsNotNone(self.store.thread_cache.default_store.signal_handler)
+
+                with mock_signal_receiver(SignalHandler.course_published) as receiver:
+                    self.assertEqual(receiver.call_count, 0)
+
+                    # Course creation and publication should fire the signal
+                    course = self.store.create_course('org_x', 'course_y', 'run_z', self.user_id)
+                    self.assertEqual(receiver.call_count, 1)
+
+                    course_key = course.id
+
+                    # Test non-draftable block types. No signals should be received until
+                    receiver.reset_mock()
+                    with self.store.bulk_operations(course_key):
+                        categories = DIRECT_ONLY_CATEGORIES
+                        for block_type in categories:
+                            log.debug('Testing with block type %s', block_type)
+                            block = self.store.create_item(self.user_id, course_key, block_type)
+                            self.assertEqual(receiver.call_count, 0)
+
+                            block.display_name = block_type
+                            self.store.update_item(block, self.user_id)
+                            self.assertEqual(receiver.call_count, 0)
+
+                            self.store.publish(block.location, self.user_id)
+                            self.assertEqual(receiver.call_count, 0)
+
+                    self.assertEqual(receiver.call_count, 1)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_bulk_course_publish_signal_publish_firing(self, default):
+        with MongoContentstoreBuilder().build() as contentstore:
+            self.store = MixedModuleStore(
+                contentstore=contentstore,
+                create_modulestore_instance=create_modulestore_instance,
+                mappings={},
+                signal_handler=SignalHandler(MixedModuleStore),
+                **self.OPTIONS
+            )
+            self.addCleanup(self.store.close_all_connections)
+
+            with self.store.default_store(default):
+                self.assertIsNotNone(self.store.thread_cache.default_store.signal_handler)
+
+                with mock_signal_receiver(SignalHandler.course_published) as receiver:
+                    self.assertEqual(receiver.call_count, 0)
+
+                    # Course creation and publication should fire the signal
+                    course = self.store.create_course('org_x', 'course_y', 'run_z', self.user_id)
+                    self.assertEqual(receiver.call_count, 1)
+
+                    course_key = course.id
+
+                    # Test a draftable block type, which needs to be explicitly published, and nest it within the
+                    # normal structure - this is important because some implementors change the parent when adding a
+                    # non-published child; if parent is in DIRECT_ONLY_CATEGORIES then this should not fire the event
+                    receiver.reset_mock()
+                    with self.store.bulk_operations(course_key):
+                        section = self.store.create_item(self.user_id, course_key, 'chapter')
+                        self.assertEqual(receiver.call_count, 0)
+
+                        subsection = self.store.create_child(self.user_id, section.location, 'sequential')
+                        self.assertEqual(receiver.call_count, 0)
+
+                        # 'units' and 'blocks' are draftable types
+                        unit = self.store.create_child(self.user_id, subsection.location, 'vertical')
+                        self.assertEqual(receiver.call_count, 0)
+
+                        block = self.store.create_child(self.user_id, unit.location, 'problem')
+                        self.assertEqual(receiver.call_count, 0)
+
+                        self.store.update_item(block, self.user_id)
+                        self.assertEqual(receiver.call_count, 0)
+
+                        self.store.publish(unit.location, self.user_id)
+                        self.assertEqual(receiver.call_count, 0)
+
+                        self.store.unpublish(unit.location, self.user_id)
+                        self.assertEqual(receiver.call_count, 0)
+
+                        self.store.delete_item(unit.location, self.user_id)
+                        self.assertEqual(receiver.call_count, 0)
+
+                    self.assertEqual(receiver.call_count, 1)
+
+                    # Test editing draftable block type without publish
+                    receiver.reset_mock()
+                    with self.store.bulk_operations(course_key):
+                        unit = self.store.create_child(self.user_id, subsection.location, 'vertical')
+                        self.assertEqual(receiver.call_count, 0)
+                        block = self.store.create_child(self.user_id, unit.location, 'problem')
+                        self.assertEqual(receiver.call_count, 0)
+                        self.store.publish(unit.location, self.user_id)
+                        self.assertEqual(receiver.call_count, 0)
+                    self.assertEqual(receiver.call_count, 1)
+
+                    receiver.reset_mock()
+                    with self.store.bulk_operations(course_key):
+                        self.assertEqual(receiver.call_count, 0)
+                        unit.display_name = "Change this unit"
+                        self.store.update_item(unit, self.user_id)
+                        self.assertEqual(receiver.call_count, 0)
+                    self.assertEqual(receiver.call_count, 0)
