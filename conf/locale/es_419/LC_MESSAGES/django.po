@@ -160,7 +160,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-03-23 14:26+0000\n"
+"POT-Creation-Date: 2015-03-30 12:44+0000\n"
 "PO-Revision-Date: 2014-12-30 16:21+0000\n"
 "Last-Translator: Cristian Salamea <ovnicraft@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
@@ -4586,6 +4586,12 @@ msgstr "Subir folleto."
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid ""
+"Specify whether access to this video is limited to browsers only, or if it "
+"can be accessed from other applications including mobile apps."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid ""
 "If you were assigned a Video ID by edX for the video to play in this "
 "component, enter the ID here. In this case, do not enter values in the "
 "Default Video URL, the Video File URLs, and the YouTube ID fields. If you "
@@ -4855,7 +4861,7 @@ msgstr ""
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/tools.py
+#: lms/djangoapps/instructor/views/tools.py lms/templates/dashboard.html
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Username"
@@ -4977,13 +4983,17 @@ msgstr "Debe estar registrado en {platform_name} para crear un certificado."
 msgid "Course is not valid"
 msgstr "Curso no válido"
 
-#: lms/djangoapps/courseware/views.py lms/templates/courseware/progress.html
+#: lms/djangoapps/courseware/views.py
 msgid "Your certificate will be available when you pass the course."
 msgstr "Tu certificado estará disponible cuando apruebes el curso."
 
-#: lms/djangoapps/courseware/views.py lms/templates/courseware/progress.html
-msgid "Creating certificate"
-msgstr "Creando certificado"
+#: lms/djangoapps/courseware/views.py
+msgid "Certificate has already been created."
+msgstr ""
+
+#: lms/djangoapps/courseware/views.py
+msgid "Certificate is already being created."
+msgstr ""
 
 #: lms/djangoapps/courseware/features/video.py
 msgid "ERROR: No playable video sources found!"
@@ -5710,6 +5720,10 @@ msgstr "Los datos de inscripciones ya están disponibles en {dashboard_link}."
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Membership"
 msgstr "Afiliación"
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "Cohorts"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Student Admin"
@@ -8136,6 +8150,15 @@ msgstr "No hay adjuntos para este artículo."
 msgid "You cannot create two cohorts with the same name"
 msgstr "No puede crear dos cohortes con el mismo nombre"
 
+#: openedx/core/djangoapps/course_groups/cohorts.py
+msgid ""
+"There must be one cohort to which students can automatically be assigned."
+msgstr ""
+
+#: openedx/core/djangoapps/course_groups/views.py
+msgid "A cohort with the same name already exists."
+msgstr ""
+
 #. Translators: This example email address is used as a placeholder in
 #. a field on the login form meant to hold the user's email address.
 #. Translators: This example email address is used as a placeholder in
@@ -8828,21 +8851,6 @@ msgstr "ejemplo: usuario@dominio.com"
 msgid "Forgot password?"
 msgstr "¿Olvidó su contraseña?"
 
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Admin"
-msgstr "Administrador"
-
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: lms/templates/courseware/course_navigation.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Staff"
-msgstr "Equipo"
-
-#: cms/templates/manage_users_lib.html lms/templates/folditchallenge.html
-msgid "User"
-msgstr "Usuario"
-
 #. Translators: This is the placeholder text for a field that requests the
 #. user's full name.
 #: cms/templates/register.html lms/templates/register.html
@@ -8896,6 +8904,13 @@ msgstr "Está cuenta ya ha sido activada."
 #: lms/templates/registration/activation_complete.html
 msgid "Visit your {link_start}dashboard{link_end} to see your courses."
 msgstr "Visite su {link_start}Panel de control{link_end} para ver sus cursos."
+
+#. Translators: 'Open edX' is a brand, please keep this untranslated. See
+#. http://openedx.org for more information.
+#: cms/templates/widgets/footer.html lms/templates/footer-edx-new.html
+#: lms/templates/footer.html
+msgid "Powered by Open edX"
+msgstr "Con la tecnología de Open edX"
 
 #: cms/templates/widgets/header.html lms/templates/courseware/courseware.html
 msgid "Course Navigation"
@@ -9266,6 +9281,10 @@ msgstr "Enviado"
 msgid "Puzzle Leaderboard"
 msgstr "Tablero de puntuación para acertijos"
 
+#: lms/templates/folditchallenge.html
+msgid "User"
+msgstr "Usuario"
+
 #: lms/templates/footer-edx-new.html
 msgid "About edX"
 msgstr "Acerca de edX"
@@ -9370,12 +9389,6 @@ msgid ""
 msgstr ""
 "{tos_link_start}Términos del servicio{tos_link_end} y "
 "{honor_link_start}Código de Honor{honor_link_end}"
-
-#. Translators: 'Open edX' is a brand, please keep this untranslated. See
-#. http://openedx.org for more information.
-#: lms/templates/footer.html
-msgid "Powered by Open edX"
-msgstr "Con la tecnología de Open edX"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Password Reset"
@@ -9829,6 +9842,10 @@ msgstr ""
 #: lms/templates/module-error.html
 msgid "Raw data:"
 msgstr "Datos planos:"
+
+#: lms/templates/navigation-edx.html
+msgid "Home Page"
+msgstr ""
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "How it Works"
@@ -11170,6 +11187,11 @@ msgid "View this course as:"
 msgstr "Ver este curso como:"
 
 #: lms/templates/courseware/course_navigation.html
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Staff"
+msgstr "Equipo"
+
+#: lms/templates/courseware/course_navigation.html
 msgid "Student in {content_group}"
 msgstr "Estudiante en {content_group}"
 
@@ -11347,6 +11369,10 @@ msgstr ""
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Psychometrics"
 msgstr "Psicometría"
+
+#: lms/templates/courseware/legacy_instructor_dashboard.html
+msgid "Admin"
+msgstr "Administrador"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Forum Admin"
@@ -11696,20 +11722,45 @@ msgid "Course Progress for Student '{username}' ({email})"
 msgstr "Progreso del curso para el estudiante '{username}' ({email})"
 
 #: lms/templates/courseware/progress.html
-msgid ""
-"You can download your certificate as a PDF. You can then print your "
-"certificate or share it with others."
+msgid "Your certificate is available"
 msgstr ""
-"Puedes descargar tu certificado como PDF. Puedes luego imprimir tu "
-"certificado o compartirlo con otros."
+
+#: lms/templates/courseware/progress.html
+msgid ""
+"You can now download your certificate as a PDF. If you keep working and "
+"receive a higher grade, you can request an updated certificate."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "PDF will open in a new browser window or tab."
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "Download Your Certificate"
 msgstr "Descargar Tu certificaddo"
 
 #: lms/templates/courseware/progress.html
-msgid "Create Your Certificate"
-msgstr "Crear tu certificado"
+msgid "We're working on it..."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid ""
+"We're creating your certificate. You can keep working in your courses and a "
+"link to it will appear here and on your Dashboard when it is ready."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "Congratulations, you qualified for a certificate!"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid ""
+"You can keep working for a higher grade, or request your certificate now."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "Request Certificate"
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "{earned:.3n} of {total:.3n} possible points"
@@ -18645,36 +18696,6 @@ msgstr ""
 msgid "Add User"
 msgstr "Agregar usuario"
 
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-msgid "Current Role:"
-msgstr "Rol actual:"
-
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-msgid "You!"
-msgstr "¡Usted!"
-
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-msgid "send an email message to {email}"
-msgstr "envie un correo electrónico a {email}"
-
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-msgid "Promote another member to Admin to remove your admin rights"
-msgstr ""
-"Promueva a otro miembro del equipo a administrador si quiere quitar sus "
-"propios privilegios de administrador"
-
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-msgid "Remove Admin Access"
-msgstr "Quitar acceso de administrador"
-
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-msgid "Add Admin Access"
-msgstr "Agregar accesso de administrador"
-
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-msgid "Delete the user, {username}"
-msgstr "Borrar el usuario, {username}"
-
 #: cms/templates/manage_users.html
 msgid "Add Team Members to This Course"
 msgstr "Agregar miembros de equipo a este curso"
@@ -18746,26 +18767,6 @@ msgid "Provide the email address of the user you want to add"
 msgstr ""
 "Proporcionar la dirección de correo electrónico del usuario que desea "
 "agregar"
-
-#: cms/templates/manage_users_lib.html
-msgid "Remove Staff Access"
-msgstr "Quitar accesos de Staff"
-
-#: cms/templates/manage_users_lib.html
-msgid "Add Staff Access"
-msgstr "Añadir accesos de Staff"
-
-#: cms/templates/manage_users_lib.html
-msgid "Remove this user"
-msgstr "Remover este usuario"
-
-#: cms/templates/manage_users_lib.html
-msgid "Remove me"
-msgstr "Eliminarme"
-
-#: cms/templates/manage_users_lib.html
-msgid "Remove me from this library"
-msgstr "Eliminarme de esta biblioteca"
 
 #: cms/templates/manage_users_lib.html
 msgid "Add More Users to This Library"
@@ -19631,6 +19632,10 @@ msgstr ""
 "Un correo electrónico de activación ha sido enviado a {email} junto con las "
 "instrucciones para activar su cuenta."
 
+#: cms/templates/widgets/footer.html cms/templates/widgets/sock.html
+msgid "Contact Us"
+msgstr "Contáctenos"
+
 #. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX
 #. Inc.'. Please do not translate any of these trademarks and company names.
 #: cms/templates/widgets/footer.html
@@ -19640,10 +19645,6 @@ msgid ""
 msgstr ""
 "EdX, Open edX, Studio y los logos de edX y Open edX son marcas registradas "
 "de {link_start}edX Inc.{link_end}"
-
-#: cms/templates/widgets/footer.html cms/templates/widgets/sock.html
-msgid "Contact Us"
-msgstr "Contáctenos"
 
 #: cms/templates/widgets/header.html
 msgid "Current Course:"
