@@ -517,10 +517,7 @@ class DiscussionUserProfilePage(CoursePage):
         ).fulfill()
 
     def click_on_sidebar_username(self):
-        EmptyPromise(
-            self.is_browser_on_page,
-            "Could not locate sidebar username"
-        ).fulfill()
+        self.wait_for_page()
         self.q(css='.leaner-profile-link').first.click()
 
 
