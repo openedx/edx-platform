@@ -364,7 +364,7 @@ class DiscussionTab(EnrolledOrStaffTab):
     A tab only for the new Berkeley discussion forums.
     """
 
-    type = '111discussion'
+    type = 'discussion'
 
     def __init__(self, tab_dict=None):
         super(DiscussionTab, self).__init__(
