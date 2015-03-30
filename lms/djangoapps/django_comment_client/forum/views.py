@@ -9,6 +9,7 @@ import xml.sax.saxutils as saxutils
 
 from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
+from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.http import Http404, HttpResponseBadRequest
 from django.views.decorators.http import require_GET
@@ -411,16 +412,18 @@ def user_profile(request, course_key, user_id):
                 'annotated_content_info': _attr_safe_json(annotated_content_info),
             })
         else:
+            django_user = User.objects.get(id=user_id)
             context = {
                 'course': course,
                 'user': request.user,
-                'django_user': User.objects.get(id=user_id),
+                'django_user': django_user,
                 'profiled_user': profiled_user.to_dict(),
                 'threads': _attr_safe_json(threads),
                 'user_info': _attr_safe_json(user_info),
                 'annotated_content_info': _attr_safe_json(annotated_content_info),
                 'page': query_params['page'],
                 'num_pages': query_params['num_pages'],
+                'learner_profile_page_url': reverse('learner_profile', kwargs={'username': django_user.username})
             }
 
             return render_to_response('discussion/user_profile.html', context)
