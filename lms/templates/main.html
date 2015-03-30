@@ -31,18 +31,8 @@
 <%def name="is_microsite()">
   <% return microsite.is_request_in_microsite() %>
 </%def>
-
-<%def name="stanford_theme_enabled()">
-  <%
-    if not theme_enabled():
-      return False
-
-    return getattr(settings, "THEME_NAME", None) == "stanford"
-  %>
-</%def>
-
-<%def name="carnegie_theme_enabled()">
-  <% return theme_enabled() and getattr(settings, "THEME_NAME") == "carnegie" %>
+<%def name="is_non_microsite_theme()">
+  <% return theme_enabled() and not is_microsite() %>
 </%def>
 
 ## this needs to be here to prevent the title from mysteriously appearing in the body, in one case
@@ -80,6 +70,18 @@
   <%block name="headextra"/>
 
 <%
+  self.homepage_overlay_file = None
+  self.homepage_promo_video_file = None
+  self.homepage_extra_content_file = None
+  self.course_about_sidebar_extra_file = None
+  self.course_about_social_sharing_file = None
+  self.course_index_overlay_file = None
+  self.course_info_extra_file = None
+  self.dashboard_extra_file = None
+  self.register_extra_file = None
+  self.register_honor_link = None
+  self.register_sidebar_extra_file = None
+
   if theme_enabled() and not is_microsite():
     header_extra_file = 'theme-head-extra.html'
     header_file = 'theme-header.html'
@@ -88,6 +90,17 @@
 
     style_overrides_file = None
 
+    self.homepage_overlay_file = 'theme-homepage_overlay.html'
+    self.homepage_promo_video_file = 'theme-promo_video.html'
+    self.homepage_extra_content_file = 'theme-extra_home_content.html'
+    self.course_about_sidebar_extra_file = 'theme-course_about-sidebar_extra.html'
+    self.course_about_social_sharing_file = 'theme-course_about-social_sharing.html'
+    self.course_index_overlay_file = 'theme-course_index_overlay.html'
+    self.course_info_extra_file = 'theme-course_info_extra.html'
+    self.dashboard_extra_file = 'theme-dashboard_extra.html'
+    self.register_extra_file = 'theme-register_extra.html'
+    self.register_honor_link = marketing_link('TOS') + "#honor"
+    self.register_sidebar_extra_file = 'theme-register_sidebar.html' # TODO: This is hardcoded in register_sidebar.html because it doesn't inherit this file right now.
   else:
     header_extra_file = None
 

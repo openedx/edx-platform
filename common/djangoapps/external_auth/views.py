@@ -175,7 +175,7 @@ def _external_login_or_signup(request,
                     failure_msg = _(dedent("""
                         You have already created an account using an external login like WebAuth or Shibboleth.
                         Please contact %s for support """
-                                           % getattr(settings, 'TECH_SUPPORT_EMAIL', 'techsupport@class.stanford.edu')))
+                                           % settings.TECH_SUPPORT_EMAIL))
                     return default_render_failure(request, failure_msg)
             except User.DoesNotExist:
                 log.info(u'SHIB: No user for %s yet, doing signup', eamap.external_email)

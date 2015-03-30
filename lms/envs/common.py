@@ -39,6 +39,7 @@ from lms.lib.xblock.mixin import LmsBlockMixin
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
 PLATFORM_NAME = "Your Platform Name Here"
+ACCOUNT_NAME = "Your Account Name Here"
 CC_MERCHANT_NAME = PLATFORM_NAME
 
 PLATFORM_FACEBOOK_ACCOUNT = "http://www.facebook.com/YourPlatformFacebookAccount"
@@ -1995,3 +1996,6 @@ FORUM_MONGO_PARAMS = {
 ################### branding - for database driven tiles ##################
 INSTALLED_APPS += ('branding_stanford',)
 DISPLAY_COURSE_TILES = True
+
+ # Set to True for systems where students are auto-registered on login
+DISABLE_REGISTER_BUTTON = False
