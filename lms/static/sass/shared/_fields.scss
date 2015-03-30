@@ -87,8 +87,9 @@
     color: $gray;
     vertical-align: top;
     margin-bottom: 0;
+    -webkit-font-smoothing: antialiased;
 
-    label {
+    label, span {
         @include margin-left($baseline/2);
     }
 }
@@ -113,5 +114,10 @@
 
     i {
         @include margin-right($baseline/4);
+    }
+
+    .u-field-message-help,
+    .u-field-message-notification {
+        color: $gray-l1;
     }
 }

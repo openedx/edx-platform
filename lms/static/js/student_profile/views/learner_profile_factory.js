@@ -65,6 +65,7 @@
             var sectionOneFieldViews = [
                 new FieldsView.DropdownFieldView({
                     model: accountSettingsModel,
+                    screenReaderTitle: gettext('Location'),
                     required: true,
                     editable: editable,
                     showMessages: false,
@@ -76,6 +77,7 @@
                 }),
                 new AccountSettingsFieldViews.LanguageProficienciesFieldView({
                     model: accountSettingsModel,
+                    screenReaderTitle: gettext('Preferred Language'),
                     required: false,
                     editable: editable,
                     showMessages: false,

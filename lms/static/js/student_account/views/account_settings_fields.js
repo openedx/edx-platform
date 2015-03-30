@@ -36,7 +36,7 @@
                         view.showSuccessMessage();
                     },
                     error: function () {
-                        view.message(
+                        view.showNotificationMessage(
                             view.indicators.error +
                             gettext(
                                 'You must sign out of edX and sign back in before your language ' +
@@ -121,6 +121,7 @@
                 this.$el.html(this.template({
                     id: this.options.valueAttribute,
                     title: this.options.title,
+                    screenReaderTitle: this.options.screenReaderTitle,
                     linkTitle: this.options.connected ? gettext('Unlink') : gettext('Link'),
                     linkHref: '',
                     message: this.helpMessage
