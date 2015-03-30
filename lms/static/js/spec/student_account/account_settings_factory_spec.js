@@ -1,10 +1,12 @@
 define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
         'js/spec/views/fields_helpers',
         'js/spec/student_account/helpers',
+        'js/spec/student_account/account_settings_fields_helpers',
         'js/student_account/views/account_settings_factory',
         'js/student_account/views/account_settings_view'
         ],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, Helpers, AccountSettingsPage, AccountSettingsView) {
+    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, Helpers,
+              AccountSettingsFieldViewSpecHelpers, AccountSettingsPage, AccountSettingsView) {
         'use strict';
 
         describe("edx.user.AccountSettingsFactory", function () {
@@ -27,6 +29,23 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 }
             };
 
+            var AUTH_DATA = {
+                'providers': [
+                    {
+                        'name': "Network 1",
+                        'connected': true,
+                        'connect_url': 'yetanother1.com/auth/connect',
+                        'disconnect_url': 'yetanother1.com/auth/disconnect'
+                    },
+                    {
+                        'name': "Network 2",
+                        'connected': true,
+                        'connect_url': 'yetanother2.com/auth/connect',
+                        'disconnect_url': 'yetanother2.com/auth/disconnect'
+                    }
+                ]
+            }
+
             var requests;
 
             beforeEach(function () {
@@ -43,7 +62,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 requests = AjaxHelpers.requests(this);
 
                 var context = AccountSettingsPage(
-                    FIELDS_DATA, Helpers.USER_ACCOUNTS_API_URL, Helpers.USER_PREFERENCES_API_URL
+                    FIELDS_DATA, AUTH_DATA, Helpers.USER_ACCOUNTS_API_URL, Helpers.USER_PREFERENCES_API_URL
                 );
                 var accountSettingsView = context.accountSettingsView;
 
@@ -67,7 +86,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 requests = AjaxHelpers.requests(this);
 
                 var context = AccountSettingsPage(
-                    FIELDS_DATA, Helpers.USER_ACCOUNTS_API_URL, Helpers.USER_PREFERENCES_API_URL
+                    FIELDS_DATA, AUTH_DATA, Helpers.USER_ACCOUNTS_API_URL, Helpers.USER_PREFERENCES_API_URL
                 );
                 var accountSettingsView = context.accountSettingsView;
 
@@ -99,7 +118,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 requests = AjaxHelpers.requests(this);
 
                 var context = AccountSettingsPage(
-                    FIELDS_DATA, Helpers.USER_ACCOUNTS_API_URL, Helpers.USER_PREFERENCES_API_URL
+                    FIELDS_DATA, AUTH_DATA, Helpers.USER_ACCOUNTS_API_URL, Helpers.USER_PREFERENCES_API_URL
                 );
                 var accountSettingsView = context.accountSettingsView;
 
@@ -120,7 +139,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 requests = AjaxHelpers.requests(this);
 
                 var context = AccountSettingsPage(
-                    FIELDS_DATA, Helpers.USER_ACCOUNTS_API_URL, Helpers.USER_PREFERENCES_API_URL
+                    FIELDS_DATA, AUTH_DATA, Helpers.USER_ACCOUNTS_API_URL, Helpers.USER_PREFERENCES_API_URL
                 );
                 var accountSettingsView = context.accountSettingsView;
 
@@ -161,6 +180,13 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     }, requests);
                 }
 
+                var section2Fields = sectionsData[2].fields;
+                expect(section2Fields.length).toBe(2);
+                for (var i = 0; i < section2Fields.length; i++) {
+
+                    var view = section2Fields[i].view;
+                    AccountSettingsFieldViewSpecHelpers.verifyAuthField(view, view.options, requests);
+                }
             });
         });
     });

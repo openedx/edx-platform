@@ -254,3 +254,17 @@ class AccountSettingsPageTest(WebAppTest):
             u'',
             [u'Pushto', u''],
         )
+
+    def test_connected_accounts(self):
+        """
+        Test that fields for third party auth providers exist.
+
+        Currently there is no way to test the whole authentication process
+        because that would require accounts with the providers.
+        """
+        for field_id, title, link_title in [
+            ['auth-facebook', 'Facebook', 'Link'],
+            ['auth-google', 'Google', 'Link'],
+        ]:
+            self.assertEqual(self.account_settings_page.title_for_field(field_id), title)
+            self.assertEqual(self.account_settings_page.link_title_for_link_field(field_id), link_title)
