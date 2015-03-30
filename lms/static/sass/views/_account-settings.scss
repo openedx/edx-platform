@@ -66,4 +66,15 @@
         box-shadow: 0 0 1px 1px $shadow-l2;
         border-radius: 5px;
     }
+
+    a span {
+        color: $link-color;
+    }
+
+    a span {
+        &:hover, &:focus {
+            color: $pink;
+            text-decoration: none !important;
+        }
+    }
 }

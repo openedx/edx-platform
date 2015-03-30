@@ -20,12 +20,12 @@
             tagName: 'div',
 
             indicators: {
-                'canEdit': '<i class="icon fa fa-pencil message-can-edit" aria-hidden="true"></i>',
-                'error': '<i class="fa fa-exclamation-triangle message-error" aria-hidden="true"></i>',
-                'validationError': '<i class="fa fa-exclamation-triangle message-validation-error" aria-hidden="true"></i>',
-                'inProgress': '<i class="fa fa-spinner fa-pulse message-in-progress" aria-hidden="true"></i>',
-                'success': '<i class="fa fa-check message-success" aria-hidden="true"></i>',
-                'plus': '<i class="fa fa-plus placeholder" aria-hidden="true"></i>'
+                'canEdit': '<i class="icon fa fa-pencil message-can-edit" aria-hidden="true"></i><span class="sr">gettext("Editable")</span>',
+                'error': '<i class="fa fa-exclamation-triangle message-error" aria-hidden="true"></i><span class="sr">gettext("Error")</span>',
+                'validationError': '<i class="fa fa-exclamation-triangle message-validation-error" aria-hidden="true"></i><span class="sr">gettext("Validation Error")</span>',
+                'inProgress': '<i class="fa fa-spinner fa-pulse message-in-progress" aria-hidden="true"></i><span class="sr">gettext("In Progress")</span>',
+                'success': '<i class="fa fa-check message-success" aria-hidden="true"></i><span class="sr">gettext("Success")</span>',
+                'plus': '<i class="fa fa-plus placeholder" aria-hidden="true"></i><span class="sr">gettext("Placeholder")</span>'
             },
 
             messages: {
@@ -36,15 +36,17 @@
                 'success': gettext('Your changes have been saved.')
             },
 
-            initialize: function (options) {
+            initialize: function () {
 
                 this.template = _.template($(this.templateSelector).text());
 
                 this.helpMessage = this.options.helpMessage || '';
                 this.showMessages = _.isUndefined(this.options.showMessages) ? true : this.options.showMessages;
 
-                _.bindAll(this, 'modelValue', 'modelValueIsSet', 'message', 'getMessage', 'title',
-                          'showHelpMessage', 'showInProgressMessage', 'showSuccessMessage', 'showErrorMessage');
+                _.bindAll(this, 'modelValue', 'modelValueIsSet', 'showNotificationMessage','getNotificationMessage',
+                    'getMessage', 'title', 'showHelpMessage', 'showInProgressMessage', 'showSuccessMessage',
+                    'showErrorMessage'
+                );
             },
 
             modelValue: function () {
@@ -53,10 +55,6 @@
 
             modelValueIsSet: function() {
                 return (this.modelValue() === true);
-            },
-
-            message: function (message) {
-                return this.$('.u-field-message').html(message);
             },
 
             title: function (text) {
@@ -72,25 +70,38 @@
                 return this.indicators[message_status];
             },
 
+            showHelpMessage: function (message) {
+                if (_.isUndefined(message) || _.isNull(message)) {
+                    message = this.helpMessage;
+                }
+                this.$('.u-field-message-notification').html('');
+                this.$('.u-field-message-help').html(message);
+            },
+
+            getNotificationMessage: function() {
+                return this.$('.u-field-message-notification').html();
+            },
+
+            showNotificationMessage: function(message) {
+                this.$('.u-field-message-help').html('');
+                this.$('.u-field-message-notification').html(message);
+            },
+
             showCanEditMessage: function(show) {
                 if (!_.isUndefined(show) && show) {
-                    this.message(this.getMessage('canEdit'));
+                    this.showNotificationMessage(this.getMessage('canEdit'));
                 } else {
-                    this.message('');
+                    this.showNotificationMessage('');
                 }
             },
 
-            showHelpMessage: function () {
-                this.message(this.helpMessage);
-            },
-
             showInProgressMessage: function () {
-                this.message(this.getMessage('inProgress'));
+                this.showNotificationMessage(this.getMessage('inProgress'));
             },
 
             showSuccessMessage: function () {
                 var successMessage = this.getMessage('success');
-                this.message(successMessage);
+                this.showNotificationMessage(successMessage);
 
                 if (this.options.refreshPageOnSave) {
                     document.location.reload();
@@ -102,7 +113,7 @@
                 this.lastSuccessMessageContext = context;
 
                 setTimeout(function () {
-                    if ((context === view.lastSuccessMessageContext) && (view.message().html() === successMessage)) {
+                    if ((context === view.lastSuccessMessageContext) && (view.getNotificationMessage() === successMessage)) {
                         view.showHelpMessage();
                     }
                 }, messageRevertDelay);
@@ -116,12 +127,12 @@
                                 errors.field_errors[this.options.valueAttribute].user_message
                             ),
                             message = this.indicators.validationError + validationErrorMessage;
-                        this.message(message);
+                        this.showNotificationMessage(message);
                     } catch (error) {
-                        this.message(this.getMessage('error'));
+                        this.showNotificationMessage(this.getMessage('error'));
                     }
                 } else {
-                    this.message(this.getMessage('error'));
+                    this.showNotificationMessage(this.getMessage('error'));
                 }
             }
         });
@@ -305,6 +316,7 @@
                     id: this.options.valueAttribute,
                     mode: this.mode,
                     title: this.options.title,
+                    screenReaderTitle: this.options.screenReaderTitle || this.options.title,
                     iconName: this.options.iconName,
                     required: this.options.required,
                     selectOptions: this.options.options,
@@ -351,7 +363,8 @@
                     if (this.modelValueIsSet() === false) {
                         value = this.options.placeholderValue || '';
                     }
-                    this.$('.u-field-value').html(Mustache.escapeHtml(value));
+                    this.$('.u-field-value').attr('aria-label', this.options.title);
+                    this.$('.u-field-value-readonly').html(Mustache.escapeHtml(value));
                     this.showDisplayMode(false);
                 } else {
                     this.$('.u-field-value select').val(this.modelValue() || '');
@@ -413,9 +426,11 @@
                 }
                 this.$el.html(this.template({
                     id: this.options.valueAttribute,
+                    screenReaderTitle: this.options.screenReaderTitle || this.options.title,
                     mode: this.mode,
                     value: value,
-                    message: this.helpMessage
+                    message: this.helpMessage,
+                    placeholderValue: this.options.placeholderValue
                 }));
                 this.delegateEvents();
                 this.title((this.modelValue() || this.mode === 'edit') ? this.options.title : this.indicators['plus'] + this.options.title);
@@ -489,6 +504,7 @@
                 this.$el.html(this.template({
                     id: this.options.valueAttribute,
                     title: this.options.title,
+                    screenReaderTitle: this.options.screenReaderTitle || this.options.title,
                     linkTitle: this.options.linkTitle,
                     linkHref: this.options.linkHref,
                     message: this.helpMessage

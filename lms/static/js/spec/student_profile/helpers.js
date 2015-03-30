@@ -18,10 +18,10 @@ define(['underscore'], function(_) {
                 expect(view.fieldValue()).toBe(view.modelValue());
 
             } else if ('optionForValue' in view) {
-                expect($($element.find('.u-field-value')[0]).text()).toBe(view.displayValue(view.modelValue()));
+                expect($($element.find('.u-field-value .u-field-value-readonly')[0]).text()).toBe(view.displayValue(view.modelValue()));
 
             }else {
-                expect($($element.find('.u-field-value')[0]).text()).toBe(view.modelValue());
+                expect($($element.find('.u-field-value .u-field-value-readonly')[0]).text()).toBe(view.modelValue());
             }
         } else {
             throw new Error('Unexpected field type: ' + view.fieldType);

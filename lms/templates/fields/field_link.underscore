@@ -1,11 +1,13 @@
-<label class="u-field-title" for="u-field-link-<%- id %>">
+<span class="u-field-title" for="u-field-link-<%- id %>">
     <%- gettext(title) %>
-</label>
+</span>
 <span class="u-field-value">
-    <a id="u-field-link-<%- id %>" href="<%- gettext(linkHref) %>" aria-describedby="u-field-message-<%- id %>">
-        <%- gettext(linkTitle) %>
+    <a id="u-field-link-<%- id %>" href="<%- linkHref %>" aria-describedby="u-field-message-help-<%- id %>">
+       <span class="sr"><%- gettext(screenReaderTitle) %></span>
+       <span class="u-field-link-title-<%- id %>" aria-hidden="true"><%- gettext(linkTitle) %></span>
     </a>
 </span>
 <span class="u-field-message" id="u-field-message-<%- id %>">
-    <%- gettext(message) %>
+    <span class="u-field-message-notification" aria-live="polite"></span>
+    <span class="u-field-message-help" id="u-field-message-help-<%- id %>"><%- gettext(message) %></span>
 </span>
