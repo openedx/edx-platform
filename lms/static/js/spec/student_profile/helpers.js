@@ -35,7 +35,7 @@ define(['underscore'], function(_) {
             expect(privacyFieldElement.length).toBe(0);
         } else {
             expect(privacyFieldElement.length).toBe(1);
-            expectProfileElementContainsField(privacyFieldElement, learnerProfileView.options.accountPrivacyFieldView)
+            expectProfileElementContainsField(privacyFieldElement, learnerProfileView.options.accountPrivacyFieldView);
         }
     };
 
