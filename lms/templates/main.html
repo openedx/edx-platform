@@ -183,7 +183,7 @@
   ) if course_id and enrollment_action else ""
 }</%def>
 
-# Performance beacon for onload times
+<!-- Performance beacon for onload times -->
 % if settings.FEATURES.get('ENABLE_ONLOAD_BEACON', False):
 <script>
   (function () {
