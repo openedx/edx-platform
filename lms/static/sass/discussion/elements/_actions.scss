@@ -295,6 +295,7 @@
 
   .action-button, .action-list-item {
     .action-label {
+      @include float(left);
       .label-checked {
         display: none;
       }
