@@ -19,6 +19,8 @@ from ...pages.lms.discussion import (
     DiscussionTabHomePage,
     DiscussionSortPreferencePage,
 )
+from ...pages.lms.learner_profile import LearnerProfilePage
+
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...fixtures.discussion import (
     SingleThreadViewFixture,
@@ -673,6 +675,24 @@ class DiscussionUserProfileTest(UniqueCourseTest):
         page.click_next_page()
         page.wait_for_ajax()
         self.assertTrue(page.is_window_on_top())
+
+    def test_redirects_to_learner_profile(self):
+        """
+        Scenario: Verify that learner-profile link is present on forum discussions page and we can navigate to it.
+
+        Given that I am on discussion forum user's profile page.
+        And I can see a username on left sidebar
+        When I click on my username.
+        Then I will be navigated to Learner Profile page.
+        And I can my username on Learner Profile page
+        """
+        learner_profile_page = LearnerProfilePage(self.browser, self.PROFILED_USERNAME)
+
+        page = self.check_pages(1)
+        page.click_on_sidebar_username()
+
+        learner_profile_page.wait_for_page()
+        self.assertTrue(learner_profile_page.field_is_visible('username'))
 
 
 @attr('shard_1')
