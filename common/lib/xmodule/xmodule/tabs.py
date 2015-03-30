@@ -1,4 +1,4 @@
-\"""
+"""
 Implement CourseTab
 """
 from abc import ABCMeta, abstractmethod
