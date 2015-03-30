@@ -196,6 +196,7 @@
 
       &:hover, &:focus {
         border-color: $blue-d2;
+        background-color: $white;
 
         .action-label {
           color: $blue-d2;
@@ -216,6 +217,7 @@
 
       &:hover, &:focus {
         border-color: $green-d1;
+        background-color: $white;
 
         .action-label {
           color: $green-d2;
@@ -229,6 +231,7 @@
 
       &:hover, &:focus {
         border-color: $gray;
+        background-color: $white;
 
         .action-icon {
           border: 1px solid $gray;
