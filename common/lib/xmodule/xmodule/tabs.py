@@ -1,4 +1,4 @@
-"""
+\"""
 Implement CourseTab
 """
 from abc import ABCMeta, abstractmethod
@@ -364,7 +364,7 @@ class DiscussionTab(EnrolledOrStaffTab):
     A tab only for the new Berkeley discussion forums.
     """
 
-    type = 'discussion'
+    type = '111discussion'
 
     def __init__(self, tab_dict=None):
         super(DiscussionTab, self).__init__(
