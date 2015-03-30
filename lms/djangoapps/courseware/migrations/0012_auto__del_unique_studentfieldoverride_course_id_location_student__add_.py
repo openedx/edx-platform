@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name, missing-docstring, unused-argument, unused-import, line-too-long
+
 import datetime
 from south.db import db
 from south.v2 import SchemaMigration
@@ -12,11 +14,9 @@ class Migration(SchemaMigration):
         # Adding unique constraint on 'StudentFieldOverride', fields ['course_id', 'field', 'location', 'student']
         db.create_unique('courseware_studentfieldoverride', ['course_id', 'field', 'location', 'student_id'])
 
-
     def backwards(self, orm):
         # Removing unique constraint on 'StudentFieldOverride', fields ['course_id', 'field', 'location', 'student']
         db.delete_unique('courseware_studentfieldoverride', ['course_id', 'field', 'location', 'student_id'])
-
 
     models = {
         'auth.group': {

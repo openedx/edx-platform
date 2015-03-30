@@ -30,6 +30,7 @@ class OverrideFieldDataTests(TestCase):
         OverrideFieldData.provider_classes = None
 
     def tearDown(self):
+        super(OverrideFieldDataTests, self).tearDown()
         OverrideFieldData.provider_classes = None
 
     def make_one(self):

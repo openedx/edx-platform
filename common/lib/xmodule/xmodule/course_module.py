@@ -835,7 +835,7 @@ class CourseFields(object):
     )
 
 
-class CourseModule(CourseFields, SequenceModule):
+class CourseModule(CourseFields, SequenceModule):  # pylint: disable=abstract-method
     """
     The CourseDescriptor needs its module_class to be a SequenceModule, but some code that
     expects a CourseDescriptor to have all its fields can fail if it gets a SequenceModule instead.

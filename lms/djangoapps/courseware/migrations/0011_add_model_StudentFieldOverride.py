@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name, missing-docstring, unused-argument, unused-import, line-too-long
+
 import datetime
 from south.db import db
 from south.v2 import SchemaMigration
@@ -19,11 +21,9 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('courseware', ['StudentFieldOverride'])
 
-
     def backwards(self, orm):
         # Deleting model 'StudentFieldOverride'
         db.delete_table('courseware_studentfieldoverride')
-
 
     models = {
         'auth.group': {

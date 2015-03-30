@@ -120,6 +120,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Undo patches.
         """
+        super(TestCoachDashboard, self).tearDown()
         patch.stopall()
 
     def test_not_a_coach(self):
@@ -419,11 +420,13 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
 
-original_get_children = XModuleMixin.get_children
+GET_CHILDREN = XModuleMixin.get_children
+
+
 def patched_get_children(self, usage_key_filter=None):  # pylint: disable=missing-docstring
     def iter_children():  # pylint: disable=missing-docstring
         print self.__dict__
-        for child in original_get_children(self, usage_key_filter=usage_key_filter):
+        for child in GET_CHILDREN(self, usage_key_filter=usage_key_filter):
             child._field_data_cache = {}  # pylint: disable=protected-access
             if not child.visible_to_staff_only:
                 yield child
@@ -492,7 +495,7 @@ class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
         for block in iter_blocks(course):
             block._field_data = OverrideFieldData.wrap(   # pylint: disable=protected-access
                 coach, block._field_data)   # pylint: disable=protected-access
-            block._field_data_cache = {'tabs':[],'discussion_topics':[]}  # pylint: disable=protected-access
+            block._field_data_cache = {'tabs': [], 'discussion_topics': []}  # pylint: disable=protected-access
 
         def cleanup_provider_classes():
             """

@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name, missing-docstring, unused-argument, unused-import, line-too-long
+
 import datetime
 from south.db import db
 from south.v2 import SchemaMigration
@@ -21,7 +23,6 @@ class Migration(SchemaMigration):
         # Adding index on 'StudentFieldOverride', fields ['course_id', 'location', 'student']
         db.create_index('courseware_studentfieldoverride', ['course_id', 'location', 'student_id'])
 
-
     def backwards(self, orm):
         # Deleting field 'StudentFieldOverride.created'
         db.delete_column('courseware_studentfieldoverride', 'created')
@@ -31,7 +32,6 @@ class Migration(SchemaMigration):
 
         # Removing index on 'StudentFieldOverride', fields ['course_id', 'location', 'student']
         db.delete_index('courseware_studentfieldoverride', ['course_id', 'location', 'student_id'])
-
 
     models = {
         'auth.group': {

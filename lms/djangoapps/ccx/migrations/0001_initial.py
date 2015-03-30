@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name, missing-docstring, unused-argument, unused-import, line-too-long
 import datetime
 from south.db import db
 from south.v2 import SchemaMigration
@@ -48,7 +49,6 @@ class Migration(SchemaMigration):
         # Adding unique constraint on 'CcxFieldOverride', fields ['ccx', 'location', 'field']
         db.create_unique('ccx_ccxfieldoverride', ['ccx_id', 'location', 'field'])
 
-
     def backwards(self, orm):
         # Removing unique constraint on 'CcxFieldOverride', fields ['ccx', 'location', 'field']
         db.delete_unique('ccx_ccxfieldoverride', ['ccx_id', 'location', 'field'])
@@ -64,7 +64,6 @@ class Migration(SchemaMigration):
 
         # Deleting model 'CcxFieldOverride'
         db.delete_table('ccx_ccxfieldoverride')
-
 
     models = {
         'auth.group': {
