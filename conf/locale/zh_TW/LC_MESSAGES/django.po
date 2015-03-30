@@ -113,7 +113,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-03-23 14:26+0000\n"
+"POT-Creation-Date: 2015-03-30 12:44+0000\n"
 "PO-Revision-Date: 2014-12-30 16:21+0000\n"
 "Last-Translator: LIU,SHU-HAO <jeremy55662004@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/edx-platform/language/zh_TW/)\n"
@@ -3993,6 +3993,12 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid ""
+"Specify whether access to this video is limited to browsers only, or if it "
+"can be accessed from other applications including mobile apps."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid ""
 "If you were assigned a Video ID by edX for the video to play in this "
 "component, enter the ID here. In this case, do not enter values in the "
 "Default Video URL, the Video File URLs, and the YouTube ID fields. If you "
@@ -4371,12 +4377,16 @@ msgstr ""
 msgid "Course is not valid"
 msgstr ""
 
-#: lms/djangoapps/courseware/views.py lms/templates/courseware/progress.html
+#: lms/djangoapps/courseware/views.py
 msgid "Your certificate will be available when you pass the course."
 msgstr ""
 
-#: lms/djangoapps/courseware/views.py lms/templates/courseware/progress.html
-msgid "Creating certificate"
+#: lms/djangoapps/courseware/views.py
+msgid "Certificate has already been created."
+msgstr ""
+
+#: lms/djangoapps/courseware/views.py
+msgid "Certificate is already being created."
 msgstr ""
 
 #: lms/djangoapps/courseware/features/video.py
@@ -5029,6 +5039,10 @@ msgstr ""
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Membership"
 msgstr "會員"
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "Cohorts"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Student Admin"
@@ -7153,6 +7167,15 @@ msgstr "這篇文章沒有附件"
 msgid "You cannot create two cohorts with the same name"
 msgstr ""
 
+#: openedx/core/djangoapps/course_groups/cohorts.py
+msgid ""
+"There must be one cohort to which students can automatically be assigned."
+msgstr ""
+
+#: openedx/core/djangoapps/course_groups/views.py
+msgid "A cohort with the same name already exists."
+msgstr ""
+
 #. Translators: This example email address is used as a placeholder in
 #. a field on the login form meant to hold the user's email address.
 #. Translators: This example email address is used as a placeholder in
@@ -7773,21 +7796,6 @@ msgstr "例：username@domain.com"
 msgid "Forgot password?"
 msgstr "忘記密碼？"
 
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Admin"
-msgstr ""
-
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: lms/templates/courseware/course_navigation.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Staff"
-msgstr ""
-
-#: cms/templates/manage_users_lib.html lms/templates/folditchallenge.html
-msgid "User"
-msgstr "用戶"
-
 #. Translators: This is the placeholder text for a field that requests the
 #. user's full name.
 #: cms/templates/register.html lms/templates/register.html
@@ -7841,6 +7849,13 @@ msgstr ""
 #: lms/templates/registration/activation_complete.html
 msgid "Visit your {link_start}dashboard{link_end} to see your courses."
 msgstr "訪問您的{link_start}課程儀表板{link_end}來查看您的課程。"
+
+#. Translators: 'Open edX' is a brand, please keep this untranslated. See
+#. http://openedx.org for more information.
+#: cms/templates/widgets/footer.html lms/templates/footer-edx-new.html
+#: lms/templates/footer.html
+msgid "Powered by Open edX"
+msgstr ""
 
 #: cms/templates/widgets/header.html lms/templates/courseware/courseware.html
 msgid "Course Navigation"
@@ -8188,6 +8203,10 @@ msgstr "已提交"
 msgid "Puzzle Leaderboard"
 msgstr "答題排行榜"
 
+#: lms/templates/folditchallenge.html
+msgid "User"
+msgstr "用戶"
+
 #: lms/templates/footer-edx-new.html
 msgid "About edX"
 msgstr ""
@@ -8279,12 +8298,6 @@ msgstr ""
 msgid ""
 "{tos_link_start}Terms of Service{tos_link_end} and {honor_link_start}Honor "
 "Code{honor_link_end}"
-msgstr ""
-
-#. Translators: 'Open edX' is a brand, please keep this untranslated. See
-#. http://openedx.org for more information.
-#: lms/templates/footer.html
-msgid "Powered by Open edX"
 msgstr ""
 
 #: lms/templates/forgot_password_modal.html
@@ -8697,6 +8710,10 @@ msgstr ""
 #: lms/templates/module-error.html
 msgid "Raw data:"
 msgstr "原始資料："
+
+#: lms/templates/navigation-edx.html
+msgid "Home Page"
+msgstr ""
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "How it Works"
@@ -9962,6 +9979,11 @@ msgid "View this course as:"
 msgstr ""
 
 #: lms/templates/courseware/course_navigation.html
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Staff"
+msgstr ""
+
+#: lms/templates/courseware/course_navigation.html
 msgid "Student in {content_group}"
 msgstr ""
 
@@ -10125,6 +10147,10 @@ msgstr ""
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Psychometrics"
 msgstr "心理測驗學"
+
+#: lms/templates/courseware/legacy_instructor_dashboard.html
+msgid "Admin"
+msgstr ""
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Forum Admin"
@@ -10443,9 +10469,17 @@ msgid "Course Progress for Student '{username}' ({email})"
 msgstr "學生 '{username}' ({email}) 的課程進度"
 
 #: lms/templates/courseware/progress.html
+msgid "Your certificate is available"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
 msgid ""
-"You can download your certificate as a PDF. You can then print your "
-"certificate or share it with others."
+"You can now download your certificate as a PDF. If you keep working and "
+"receive a higher grade, you can request an updated certificate."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "PDF will open in a new browser window or tab."
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -10453,7 +10487,26 @@ msgid "Download Your Certificate"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
-msgid "Create Your Certificate"
+msgid "We're working on it..."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid ""
+"We're creating your certificate. You can keep working in your courses and a "
+"link to it will appear here and on your Dashboard when it is ready."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "Congratulations, you qualified for a certificate!"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid ""
+"You can keep working for a higher grade, or request your certificate now."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "Request Certificate"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -16532,34 +16585,6 @@ msgstr "請提供您想要新增的課程成員的電子郵件地址"
 msgid "Add User"
 msgstr "新增用戶"
 
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-msgid "Current Role:"
-msgstr "當前角色："
-
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-msgid "You!"
-msgstr "您！"
-
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-msgid "send an email message to {email}"
-msgstr "發送一封電子郵件給{email}"
-
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-msgid "Promote another member to Admin to remove your admin rights"
-msgstr "先提升另一名成員為管理員，才能取消您自己的管理權"
-
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-msgid "Remove Admin Access"
-msgstr "取消管理權"
-
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-msgid "Add Admin Access"
-msgstr "新增管理者權限"
-
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-msgid "Delete the user, {username}"
-msgstr "刪除用戶，{username}"
-
 #: cms/templates/manage_users.html
 msgid "Add Team Members to This Course"
 msgstr "新增團隊成員到此課程"
@@ -16615,26 +16640,6 @@ msgstr ""
 
 #: cms/templates/manage_users_lib.html
 msgid "Provide the email address of the user you want to add"
-msgstr ""
-
-#: cms/templates/manage_users_lib.html
-msgid "Remove Staff Access"
-msgstr ""
-
-#: cms/templates/manage_users_lib.html
-msgid "Add Staff Access"
-msgstr ""
-
-#: cms/templates/manage_users_lib.html
-msgid "Remove this user"
-msgstr ""
-
-#: cms/templates/manage_users_lib.html
-msgid "Remove me"
-msgstr ""
-
-#: cms/templates/manage_users_lib.html
-msgid "Remove me from this library"
 msgstr ""
 
 #: cms/templates/manage_users_lib.html
@@ -17367,16 +17372,16 @@ msgid ""
 "activating your account."
 msgstr "我們已發送一封電子郵件至 {email} ，裡面包含一個啟動帳號的連結，以及啟動帳號的操作說明。"
 
+#: cms/templates/widgets/footer.html cms/templates/widgets/sock.html
+msgid "Contact Us"
+msgstr ""
+
 #. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX
 #. Inc.'. Please do not translate any of these trademarks and company names.
 #: cms/templates/widgets/footer.html
 msgid ""
 "EdX, Open edX, Studio, and the edX and Open edX logos are registered "
 "trademarks or trademarks of {link_start}edX Inc.{link_end}"
-msgstr ""
-
-#: cms/templates/widgets/footer.html cms/templates/widgets/sock.html
-msgid "Contact Us"
 msgstr ""
 
 #: cms/templates/widgets/header.html

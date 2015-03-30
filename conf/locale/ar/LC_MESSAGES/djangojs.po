@@ -72,9 +72,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-03-23 14:24+0000\n"
-"PO-Revision-Date: 2015-03-21 23:40+0000\n"
-"Last-Translator: Nabeel El-Dughailib <nabeel@qordoba.com>\n"
+"POT-Creation-Date: 2015-03-30 12:42+0000\n"
+"PO-Revision-Date: 2015-03-27 18:32+0000\n"
+"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -85,8 +85,7 @@ msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: cms/static/coffee/src/views/tabs.js cms/static/js/factories/manage_users.js
-#: cms/static/js/factories/manage_users_lib.js
+#: cms/static/coffee/src/views/tabs.js
 #: cms/static/js/views/course_info_update.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/coffee/src/discussion/utils.js
@@ -97,9 +96,8 @@ msgstr "موافق"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/coffee/src/views/tabs.js cms/static/js/factories/export.js
-#: cms/static/js/factories/manage_users.js
-#: cms/static/js/factories/manage_users_lib.js cms/static/js/views/asset.js
-#: cms/static/js/views/course_info_update.js
+#: cms/static/js/views/asset.js cms/static/js/views/course_info_update.js
+#: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/show_textbook.js cms/static/js/views/validation.js
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
@@ -132,15 +130,9 @@ msgstr ""
 "#-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#\n"
 "سيُفتح هذا الرابط في نافذة متصفّح جديدة/تبويبة جديدة"
 
-#: cms/static/js/factories/manage_users.js
-#: cms/static/js/factories/manage_users_lib.js
-#: lms/static/coffee/src/instructor_dashboard/util.js
-msgid "Unknown"
-msgstr "غير معروف "
-
-#: cms/static/js/factories/manage_users.js
-#: cms/static/js/factories/manage_users_lib.js cms/static/js/views/asset.js
-#: cms/static/js/views/list_item.js cms/static/js/views/show_textbook.js
+#: cms/static/js/views/asset.js cms/static/js/views/list_item.js
+#: cms/static/js/views/manage_users_and_roles.js
+#: cms/static/js/views/show_textbook.js
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: cms/templates/js/content-group-details.underscore
 #: cms/templates/js/content-group-editor.underscore
@@ -163,9 +155,27 @@ msgstr "حذف"
 msgid "Name"
 msgstr "الاسم "
 
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: cms/static/js/views/manage_users_and_roles.js
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+msgid "Ok"
+msgstr "موافق"
+
+#: cms/static/js/views/manage_users_and_roles.js
+#: lms/static/coffee/src/instructor_dashboard/util.js
+msgid "Unknown"
+msgstr "غير معروف "
+
 #: cms/static/js/views/metadata.js lms/static/js/views/file_uploader.js
 msgid "Upload File"
 msgstr "تحميل الملف"
+
+#: cms/static/js/views/validation.js
+#: lms/static/js/groups/views/cohort_discussions_course_wide.js
+#: lms/static/js/groups/views/cohort_discussions_inline.js
+msgid "Your changes have been saved."
+msgstr ""
 
 #. Translators: This message will be added to the front of messages of type
 #. error,
@@ -187,6 +197,8 @@ msgstr "خطأ"
 #: cms/templates/js/group-configuration-editor.underscore
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
+#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
+#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 #, fuzzy
 msgid "Save"
@@ -1174,12 +1186,6 @@ msgstr "لا شيء"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Numbered list"
 msgstr "لائحة مرقّمة"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Ok"
-msgstr "موافق"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -3239,6 +3245,14 @@ msgstr ""
 "عذرًا، لم نعثر على نتائج لـ \"%(query_string)s\". يُرجى محاولة البحث مرّة "
 "أخرى. "
 
+#: lms/static/js/groups/views/cohort_discussions.js
+#: lms/static/js/groups/views/cohort_discussions_course_wide.js
+#: lms/static/js/groups/views/cohort_discussions_inline.js
+#: lms/static/js/groups/views/cohort_form.js
+#: lms/static/js/groups/views/cohorts.js
+msgid "We've encountered an error. Refresh your browser and then try again."
+msgstr "نأسف لحدوث خطأ. يُجرى إعادة فتح متصفّحك ثمّ المحاولة مجدّدًا."
+
 #: lms/static/js/groups/views/cohort_editor.js
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Selected tab"
@@ -3324,10 +3338,6 @@ msgstr "لا يمكن تحفيظ المجموعة"
 msgid "The cohort cannot be added"
 msgstr "لا يمكن إضافة المجموعة"
 
-#: lms/static/js/groups/views/cohort_form.js
-msgid "We've encountered an error. Refresh your browser and then try again."
-msgstr "نأسف لحدوث خطأ. يُجرى إعادة فتح متصفّحك ثمّ المحاولة مجدّدًا."
-
 #: lms/static/js/groups/views/cohorts.js
 msgid "You currently have no cohorts configured"
 msgstr "ليس لديك حاليًّا أي مجموعات مضبوطة "
@@ -3365,6 +3375,14 @@ msgstr "تحميل الملف وإسناد الواجبات إلى الطلّا�
 msgid ""
 "Your file '{file}' has been uploaded. Allow a few minutes for processing."
 msgstr "جرى تحميل ملفّك '{file}'. يُرجى الانتظار لبضع دقائق لإتمام المعالجة."
+
+#: lms/static/js/groups/views/course_cohort_settings_notification.js
+msgid "Cohorts Enabled"
+msgstr ""
+
+#: lms/static/js/groups/views/course_cohort_settings_notification.js
+msgid "Cohorts Disabled"
+msgstr ""
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Allow students to generate certificates for this course?"
@@ -3697,79 +3715,37 @@ msgid "Choose new file"
 msgstr "اختر ملف جديد"
 
 #: cms/static/js/factories/manage_users.js
-#: cms/static/js/factories/manage_users_lib.js
-msgid "A valid email address is required"
-msgstr "يجب إدخال عنوان صحيح للبريد الإلكتروني."
-
-#: cms/static/js/factories/manage_users.js
-msgid "You must enter a valid email address in order to add a new team member"
-msgstr ""
-"يجب عليك أن تُدخِل عنوان صحيح للبريد الإلكتروني لتتمكّن من إضافة عضو جديد "
-"إلى الفريق."
-
-#: cms/static/js/factories/manage_users.js
-#: cms/static/js/factories/manage_users_lib.js
-msgid "Return and add email address"
-msgstr "العودة وإضافة عنوان البريد الإلكتروني."
-
-#: cms/static/js/factories/manage_users.js
 msgid "Already a course team member"
 msgstr "عضو مسبق في فريق المساق"
 
 #: cms/static/js/factories/manage_users.js
-#: cms/static/js/factories/manage_users_lib.js
 msgid ""
-"{email} is already on the {course} team. Recheck the email address if you "
-"want to add a new member."
+"Are you sure you want to delete {email} from the course team for "
+"“{container}”?"
 msgstr ""
-"يوجد هذا البريد الإلكتروني {email} مسبقًا في فريق مساق {course}. يُرجى إعادة"
-" التحقّق من عنوان البريد الإلكتروني إذا أردت أن تضيف عضوًا جديدًا. "
 
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
-msgid "Return to team listing"
-msgstr "العودة إلى إدراج الفريق"
+msgid "Staff"
+msgstr ""
 
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
-msgid "Error adding user"
-msgstr "نأسف لحدوث خطأ في إضافة المستخدم."
-
-#: cms/static/js/factories/manage_users.js
-#: cms/static/js/factories/manage_users_lib.js
-msgid "Are you sure?"
-msgstr "هل أنت واثق؟"
-
-#: cms/static/js/factories/manage_users.js
-msgid ""
-"Are you sure you want to delete {email} from the course team for “{course}”?"
-msgstr "هل أنت واثق من رغبتك في حذف {email} من فريق المساق “{course}”؟ "
-
-#: cms/static/js/factories/manage_users.js
-#: cms/static/js/factories/manage_users_lib.js
-msgid "Error removing user"
-msgstr "ناسف لحدوث خطأ في حذف المستخدم."
-
-#: cms/static/js/factories/manage_users.js
-#: cms/static/js/factories/manage_users_lib.js
-msgid "There was an error changing the user's role"
-msgstr "نأسف لحدوث خطأ في تغيير دور المستخدم."
-
-#: cms/static/js/factories/manage_users.js
-msgid "Try Again"
-msgstr "يُرجى إعادة المحاولة"
-
-#: cms/static/js/factories/manage_users_lib.js
-msgid "You must enter a valid email address in order to add an instructor"
-msgstr "يجب أن تدخل عنوان بريد إلكتروني صالحًا كي تضيف أستاذًا."
+msgid "Admin"
+msgstr ""
 
 #: cms/static/js/factories/manage_users_lib.js
 msgid "Already a library team member"
 msgstr "عضو مسبَق في فريق المكتبة"
 
 #: cms/static/js/factories/manage_users_lib.js
-msgid "Are you sure you want to delete {email} from the library “{library}”?"
-msgstr "هل أنت متأكّد من رغبتك في حذف {email} من المكتبة \"{library}\"؟"
+msgid ""
+"Are you sure you want to delete {email} from the library “{container}”?"
+msgstr ""
+
+#: cms/static/js/factories/manage_users_lib.js
+msgid "Library User"
+msgstr ""
 
 #: cms/static/js/factories/settings_advanced.js
 msgid "Hide Deprecated Settings"
@@ -4100,6 +4076,54 @@ msgstr ""
 "يُرجى الانتباه إلى أنّ حذف هذا الاسم %(item_display_name)s دائم المفعول وغير"
 " قابل للرجوع عنه."
 
+#: cms/static/js/views/manage_users_and_roles.js
+msgid "There was an error changing the user's role"
+msgstr "نأسف لحدوث خطأ في تغيير دور المستخدم."
+
+#: cms/static/js/views/manage_users_and_roles.js
+msgid "Error adding user"
+msgstr "نأسف لحدوث خطأ في إضافة المستخدم."
+
+#: cms/static/js/views/manage_users_and_roles.js
+msgid "Error removing user"
+msgstr "ناسف لحدوث خطأ في حذف المستخدم."
+
+#: cms/static/js/views/manage_users_and_roles.js
+msgid "A valid email address is required"
+msgstr "يجب إدخال عنوان صحيح للبريد الإلكتروني."
+
+#: cms/static/js/views/manage_users_and_roles.js
+msgid "You must enter a valid email address in order to add a new team member"
+msgstr ""
+"يجب عليك أن تُدخِل عنوان صحيح للبريد الإلكتروني لتتمكّن من إضافة عضو جديد "
+"إلى الفريق."
+
+#: cms/static/js/views/manage_users_and_roles.js
+msgid "Return and add email address"
+msgstr "العودة وإضافة عنوان البريد الإلكتروني."
+
+#: cms/static/js/views/manage_users_and_roles.js
+msgid "Already a member"
+msgstr ""
+
+#: cms/static/js/views/manage_users_and_roles.js
+msgid ""
+"{email} is already on the {container} team. Recheck the email address if you"
+" want to add a new member."
+msgstr ""
+
+#: cms/static/js/views/manage_users_and_roles.js
+msgid "Return to team listing"
+msgstr "العودة إلى إدراج الفريق"
+
+#: cms/static/js/views/manage_users_and_roles.js
+msgid "Are you sure?"
+msgstr "هل أنت واثق؟"
+
+#: cms/static/js/views/manage_users_and_roles.js
+msgid "Are you sure you want to restrict {email} access to “{container}”?"
+msgstr ""
+
 #: cms/static/js/views/overview.js
 msgid "Collapse All Sections"
 msgstr "تصغير جميع الأقسام"
@@ -4211,10 +4235,6 @@ msgstr "يُرجى تصحيح الأخطاء في هذه الصفحة أوّلً
 #: cms/static/js/views/validation.js
 msgid "Save Changes"
 msgstr "حفّظ التغييرات"
-
-#: cms/static/js/views/validation.js
-msgid "Your changes have been saved."
-msgstr "جرى حفظ التغييرات التي أجريتها. "
 
 #: cms/static/js/views/xblock_editor.js
 msgid "Editor"
@@ -4567,35 +4587,44 @@ msgstr "الاسم  "
 msgid "Clear search results"
 msgstr "حذف نتائج البحث"
 
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-msgid "(contains %(student_count)s student)"
-msgid_plural "(contains %(student_count)s students)"
-msgstr[0] "(يحتوي على %(student_count)s طالب)"
-msgstr[1] "(يحتوي على %(student_count)s طالب)"
-msgstr[2] "(يحتوي على %(student_count)s طالب)"
-msgstr[3] "(يحتوي على %(student_count)s طالب)"
-msgstr[4] "(يحتوي على %(student_count)s طالب)"
-msgstr[5] "(يشمل %(student_count)s طلّاب)"
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-msgid ""
-"Students are added to this cohort only when you provide their email "
-"addresses or usernames on this page."
+#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
+#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
+msgid "Specify whether discussion topics are divided by cohort"
 msgstr ""
-"لا يُضاف الطلّاب إلى هذه المجموعة إلّا عندما تذكر على هذه الصفحة عنوان "
-"البريد الإلكتروني أو اسم المستخدم لكل واحد منهم. "
 
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-msgid "What does this mean?"
-msgstr "ماذا يعني هذا؟"
+#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
+msgid "Course-Wide Discussion Topics"
+msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-msgid "Students are added to this cohort automatically."
-msgstr "يُضاف الطلّاب إلى هذه المجموعة تلقائيًّا."
+#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
+msgid ""
+"Select the course-wide discussion topics that you want to divide by cohort."
+msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-msgid "Edit settings in Studio"
-msgstr "تعديل الإعدادات في الاستوديو"
+#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
+msgid "Content-Specific Discussion Topics"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
+msgid ""
+"Specify whether content-specific discussion topics are divided by cohort."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
+msgid "Always cohort content-specific discussion topics"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
+msgid "Cohort selected content-specific discussion topics"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
+msgid "No content-specific discussion topics exist."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-subcategory.underscore
+msgid "Cohorted"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Manage Students"
@@ -4647,12 +4676,29 @@ msgid "Add a New Cohort"
 msgstr "إضافة مجموعة جديدة"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+msgid "Enter the name of the cohort"
+msgstr "يُرجى إدخال اسم المجموعة"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Cohort Name"
 msgstr "اسم المجموعة"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-msgid "Enter the name of the cohort"
-msgstr "يُرجى إدخال اسم المجموعة"
+msgid "Cohort Assignment Method"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+msgid "Automatic"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+msgid "Manual"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+msgid ""
+"There must be one cohort to which students can automatically be assigned."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Associated Content Group"
@@ -4682,6 +4728,32 @@ msgstr "مجموعة محتوى محذوفة"
 msgid "Create a content group"
 msgstr "إنشاء مجموعة محتوى"
 
+#: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
+msgid "(contains %(student_count)s student)"
+msgid_plural "(contains %(student_count)s students)"
+msgstr[0] "(يحتوي على %(student_count)s طالب)"
+msgstr[1] "(يحتوي على %(student_count)s طالب)"
+msgstr[2] "(يحتوي على %(student_count)s طالب)"
+msgstr[3] "(يحتوي على %(student_count)s طالب)"
+msgstr[4] "(يحتوي على %(student_count)s طالب)"
+msgstr[5] "(يشمل %(student_count)s طلّاب)"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
+msgid ""
+"Students are added to this cohort only when you provide their email "
+"addresses or usernames on this page."
+msgstr ""
+"لا يُضاف الطلّاب إلى هذه المجموعة إلّا عندما تذكر على هذه الصفحة عنوان "
+"البريد الإلكتروني أو اسم المستخدم لكل واحد منهم. "
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
+msgid "What does this mean?"
+msgstr "ماذا يعني هذا؟"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
+msgid "Students are added to this cohort automatically."
+msgstr "يُضاف الطلّاب إلى هذه المجموعة تلقائيًّا."
+
 #: lms/templates/instructor/instructor_dashboard_2/cohort-selector.underscore
 msgid "Select a cohort"
 msgstr "انتقاء مجموعة"
@@ -4691,16 +4763,12 @@ msgid "%(cohort_name)s (%(user_count)s)"
 msgstr "%(cohort_name)s (%(user_count)s)"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-msgid "Cohort Management"
-msgstr "إدارة المجموعة"
+msgid "Enable Cohorts"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-msgid "Assign students to cohorts manually"
-msgstr "توزيع الطلّاب على المجموعات يدويًّا"
-
-#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-msgid "Select a cohort group to manage"
-msgstr "اختر مجموعة لإدارتها"
+msgid "Select a cohort to manage"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
 msgid "View Cohort"
@@ -5900,6 +5968,34 @@ msgid ""
 msgstr ""
 "أي وحدات مخفيّة صراحةً عن الطلاب ستبقى مخفيّة بعد أن تحذف هذا الخيار من "
 "القسم الفرعي."
+
+#: cms/templates/js/team-member.underscore
+msgid "Current Role:"
+msgstr ""
+
+#: cms/templates/js/team-member.underscore
+msgid "You!"
+msgstr ""
+
+#: cms/templates/js/team-member.underscore
+msgid "send an email message to {email}"
+msgstr ""
+
+#: cms/templates/js/team-member.underscore
+msgid "Promote another member to Admin to remove your admin rights"
+msgstr ""
+
+#: cms/templates/js/team-member.underscore
+msgid "Add {role} Access"
+msgstr ""
+
+#: cms/templates/js/team-member.underscore
+msgid "Remove {role} Access"
+msgstr ""
+
+#: cms/templates/js/team-member.underscore
+msgid "Delete the user, {username}"
+msgstr ""
 
 #: cms/templates/js/upload-dialog.underscore
 msgid "File upload succeeded"

@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-03-23 14:39+0000\n"
-"PO-Revision-Date: 2015-03-23 14:39:08.960523\n"
+"POT-Creation-Date: 2015-03-30 12:56+0000\n"
+"PO-Revision-Date: 2015-03-30 12:56:18.929777\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -4589,6 +4589,15 @@ msgstr "Ûplöäd Händöüt Ⱡ'#"
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid ""
+"Specify whether access to this video is limited to browsers only, or if it "
+"can be accessed from other applications including mobile apps."
+msgstr ""
+"Spéçïfý whéthér äççéss tö thïs vïdéö ïs lïmïtéd tö ßröwsérs önlý, ör ïf ït "
+"çän ßé äççésséd fröm öthér äpplïçätïöns ïnçlüdïng mößïlé äpps. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂#"
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid ""
 "If you were assigned a Video ID by edX for the video to play in this "
 "component, enter the ID here. In this case, do not enter values in the "
 "Default Video URL, the Video File URLs, and the YouTube ID fields. If you "
@@ -4911,7 +4920,7 @@ msgstr ""
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/tools.py
+#: lms/djangoapps/instructor/views/tools.py lms/templates/dashboard.html
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Username"
@@ -5036,15 +5045,19 @@ msgstr ""
 msgid "Course is not valid"
 msgstr "Çöürsé ïs nöt välïd Ⱡ'σя#"
 
-#: lms/djangoapps/courseware/views.py lms/templates/courseware/progress.html
+#: lms/djangoapps/courseware/views.py
 msgid "Your certificate will be available when you pass the course."
 msgstr ""
 "Ýöür çértïfïçäté wïll ßé äväïläßlé whén ýöü päss thé çöürsé. Ⱡ'σяєм ιρѕυм "
 "∂σłσ#"
 
-#: lms/djangoapps/courseware/views.py lms/templates/courseware/progress.html
-msgid "Creating certificate"
-msgstr "Çréätïng çértïfïçäté Ⱡ'σя#"
+#: lms/djangoapps/courseware/views.py
+msgid "Certificate has already been created."
+msgstr "Çértïfïçäté häs älréädý ßéén çréätéd. Ⱡ'σяєм ιρѕ#"
+
+#: lms/djangoapps/courseware/views.py
+msgid "Certificate is already being created."
+msgstr "Çértïfïçäté ïs älréädý ßéïng çréätéd. Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/courseware/features/video.py
 msgid "ERROR: No playable video sources found!"
@@ -5797,6 +5810,10 @@ msgstr "Énröllmént dätä ïs nöw äväïläßlé ïn {dashboard_link}. Ⱡ'
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Membership"
 msgstr "Mémßérshïp Ⱡ#"
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "Cohorts"
+msgstr "Çöhörts #"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Student Admin"
@@ -8280,6 +8297,17 @@ msgstr "Théré äré nö ättäçhménts för thïs ärtïçlé. Ⱡ'σяєм �
 msgid "You cannot create two cohorts with the same name"
 msgstr "Ýöü çännöt çréäté twö çöhörts wïth thé sämé nämé Ⱡ'σяєм ιρѕυм #"
 
+#: openedx/core/djangoapps/course_groups/cohorts.py
+msgid ""
+"There must be one cohort to which students can automatically be assigned."
+msgstr ""
+"Théré müst ßé öné çöhört tö whïçh stüdénts çän äütömätïçällý ßé ässïgnéd. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: openedx/core/djangoapps/course_groups/views.py
+msgid "A cohort with the same name already exists."
+msgstr "À çöhört wïth thé sämé nämé älréädý éxïsts. Ⱡ'σяєм ιρѕυм#"
+
 #. Translators: This example email address is used as a placeholder in
 #. a field on the login form meant to hold the user's email address.
 #. Translators: This example email address is used as a placeholder in
@@ -8971,21 +8999,6 @@ msgstr "éxämplé: üsérnämé@dömäïn.çöm Ⱡ'σяєм #"
 msgid "Forgot password?"
 msgstr "Förgöt pässwörd? Ⱡ'σ#"
 
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Admin"
-msgstr "Àdmïn Ⱡ'σяєм ι#"
-
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: lms/templates/courseware/course_navigation.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Staff"
-msgstr "Stäff Ⱡ'σяєм ι#"
-
-#: cms/templates/manage_users_lib.html lms/templates/folditchallenge.html
-msgid "User"
-msgstr "Ûsér Ⱡ'σяєм#"
-
 #. Translators: This is the placeholder text for a field that requests the
 #. user's full name.
 #: cms/templates/register.html lms/templates/register.html
@@ -9041,6 +9054,13 @@ msgid "Visit your {link_start}dashboard{link_end} to see your courses."
 msgstr ""
 "Vïsït ýöür {link_start}däshßöärd{link_end} tö séé ýöür çöürsés. Ⱡ'σяєм ιρѕυм"
 " #"
+
+#. Translators: 'Open edX' is a brand, please keep this untranslated. See
+#. http://openedx.org for more information.
+#: cms/templates/widgets/footer.html lms/templates/footer-edx-new.html
+#: lms/templates/footer.html
+msgid "Powered by Open edX"
+msgstr "Pöwéréd ßý Öpén édX Ⱡ'σя#"
 
 #: cms/templates/widgets/header.html lms/templates/courseware/courseware.html
 msgid "Course Navigation"
@@ -9414,6 +9434,10 @@ msgstr "Süßmïttéd #"
 msgid "Puzzle Leaderboard"
 msgstr "Püzzlé Léädérßöärd Ⱡ'σ#"
 
+#: lms/templates/folditchallenge.html
+msgid "User"
+msgstr "Ûsér Ⱡ'σяєм#"
+
 #: lms/templates/footer-edx-new.html
 msgid "About edX"
 msgstr "Àßöüt édX #"
@@ -9520,12 +9544,6 @@ msgid ""
 msgstr ""
 "{tos_link_start}Térms öf Sérvïçé{tos_link_end} änd {honor_link_start}Hönör "
 "Çödé{honor_link_end} Ⱡ'σяєм ιρѕυм#"
-
-#. Translators: 'Open edX' is a brand, please keep this untranslated. See
-#. http://openedx.org for more information.
-#: lms/templates/footer.html
-msgid "Powered by Open edX"
-msgstr "Pöwéréd ßý Öpén édX Ⱡ'σя#"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Password Reset"
@@ -9988,6 +10006,10 @@ msgstr ""
 #: lms/templates/module-error.html
 msgid "Raw data:"
 msgstr "Räw dätä: #"
+
+#: lms/templates/navigation-edx.html
+msgid "Home Page"
+msgstr "Hömé Pägé #"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "How it Works"
@@ -11354,6 +11376,11 @@ msgid "View this course as:"
 msgstr "Vïéw thïs çöürsé äs: Ⱡ'σя#"
 
 #: lms/templates/courseware/course_navigation.html
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Staff"
+msgstr "Stäff Ⱡ'σяєм ι#"
+
+#: lms/templates/courseware/course_navigation.html
 msgid "Student in {content_group}"
 msgstr "Stüdént ïn {content_group} Ⱡ'#"
 
@@ -11536,6 +11563,10 @@ msgstr ""
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Psychometrics"
 msgstr "Psýçhömétrïçs Ⱡ'#"
+
+#: lms/templates/courseware/legacy_instructor_dashboard.html
+msgid "Admin"
+msgstr "Àdmïn Ⱡ'σяєм ι#"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Forum Admin"
@@ -11885,20 +11916,53 @@ msgid "Course Progress for Student '{username}' ({email})"
 msgstr "Çöürsé Prögréss för Stüdént '{username}' ({email}) Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/courseware/progress.html
+msgid "Your certificate is available"
+msgstr "Ýöür çértïfïçäté ïs äväïläßlé Ⱡ'σяєм #"
+
+#: lms/templates/courseware/progress.html
 msgid ""
-"You can download your certificate as a PDF. You can then print your "
-"certificate or share it with others."
+"You can now download your certificate as a PDF. If you keep working and "
+"receive a higher grade, you can request an updated certificate."
 msgstr ""
-"Ýöü çän döwnlöäd ýöür çértïfïçäté äs ä PDF. Ýöü çän thén prïnt ýöür "
-"çértïfïçäté ör shäré ït wïth öthérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+"Ýöü çän nöw döwnlöäd ýöür çértïfïçäté äs ä PDF. Ìf ýöü kéép wörkïng änd "
+"réçéïvé ä hïghér grädé, ýöü çän réqüést än üpdätéd çértïfïçäté. Ⱡ'σяєм ιρѕυм"
+" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/courseware/progress.html
+msgid "PDF will open in a new browser window or tab."
+msgstr "PDF wïll öpén ïn ä néw ßröwsér wïndöw ör täß. Ⱡ'σяєм ιρѕυм#"
 
 #: lms/templates/courseware/progress.html
 msgid "Download Your Certificate"
 msgstr "Döwnlöäd Ýöür Çértïfïçäté Ⱡ'σяєм#"
 
 #: lms/templates/courseware/progress.html
-msgid "Create Your Certificate"
-msgstr "Çréäté Ýöür Çértïfïçäté Ⱡ'σяє#"
+msgid "We're working on it..."
+msgstr "Wé'ré wörkïng ön ït... Ⱡ'σяє#"
+
+#: lms/templates/courseware/progress.html
+msgid ""
+"We're creating your certificate. You can keep working in your courses and a "
+"link to it will appear here and on your Dashboard when it is ready."
+msgstr ""
+"Wé'ré çréätïng ýöür çértïfïçäté. Ýöü çän kéép wörkïng ïn ýöür çöürsés änd ä "
+"lïnk tö ït wïll äppéär héré änd ön ýöür Däshßöärd whén ït ïs réädý. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιρ#"
+
+#: lms/templates/courseware/progress.html
+msgid "Congratulations, you qualified for a certificate!"
+msgstr "Çöngrätülätïöns, ýöü qüälïfïéd för ä çértïfïçäté! Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/templates/courseware/progress.html
+msgid ""
+"You can keep working for a higher grade, or request your certificate now."
+msgstr ""
+"Ýöü çän kéép wörkïng för ä hïghér grädé, ör réqüést ýöür çértïfïçäté nöw. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: lms/templates/courseware/progress.html
+msgid "Request Certificate"
+msgstr "Réqüést Çértïfïçäté Ⱡ'σя#"
 
 #: lms/templates/courseware/progress.html
 msgid "{earned:.3n} of {total:.3n} possible points"
@@ -19051,36 +19115,6 @@ msgstr ""
 msgid "Add User"
 msgstr "Àdd Ûsér #"
 
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-msgid "Current Role:"
-msgstr "Çürrént Rölé: Ⱡ'#"
-
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-msgid "You!"
-msgstr "Ýöü! Ⱡ'σяєм#"
-
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-msgid "send an email message to {email}"
-msgstr "sénd än émäïl méssägé tö {email} Ⱡ'σяєм #"
-
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-msgid "Promote another member to Admin to remove your admin rights"
-msgstr ""
-"Prömöté änöthér mémßér tö Àdmïn tö rémövé ýöür ädmïn rïghts Ⱡ'σяєм ιρѕυм "
-"∂σłσ#"
-
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-msgid "Remove Admin Access"
-msgstr "Rémövé Àdmïn Àççéss Ⱡ'σя#"
-
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-msgid "Add Admin Access"
-msgstr "Àdd Àdmïn Àççéss Ⱡ'σ#"
-
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-msgid "Delete the user, {username}"
-msgstr "Délété thé üsér, {username} Ⱡ'σя#"
-
 #: cms/templates/manage_users.html
 msgid "Add Team Members to This Course"
 msgstr "Àdd Téäm Mémßérs tö Thïs Çöürsé Ⱡ'σяєм ι#"
@@ -19150,26 +19184,6 @@ msgstr "Gränt Àççéss tö Thïs Lïßrärý Ⱡ'σяєм #"
 msgid "Provide the email address of the user you want to add"
 msgstr ""
 "Prövïdé thé émäïl äddréss öf thé üsér ýöü wänt tö ädd Ⱡ'σяєм ιρѕυм ∂σ#"
-
-#: cms/templates/manage_users_lib.html
-msgid "Remove Staff Access"
-msgstr "Rémövé Stäff Àççéss Ⱡ'σя#"
-
-#: cms/templates/manage_users_lib.html
-msgid "Add Staff Access"
-msgstr "Àdd Stäff Àççéss Ⱡ'σ#"
-
-#: cms/templates/manage_users_lib.html
-msgid "Remove this user"
-msgstr "Rémövé thïs üsér Ⱡ'σ#"
-
-#: cms/templates/manage_users_lib.html
-msgid "Remove me"
-msgstr "Rémövé mé #"
-
-#: cms/templates/manage_users_lib.html
-msgid "Remove me from this library"
-msgstr "Rémövé mé fröm thïs lïßrärý Ⱡ'σяєм#"
 
 #: cms/templates/manage_users_lib.html
 msgid "Add More Users to This Library"
@@ -20076,6 +20090,10 @@ msgstr ""
 "Àn äçtïvätïön lïnk häs ßéén sént tö {email}, älöng wïth ïnstrüçtïöns för "
 "äçtïvätïng ýöür äççöünt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
+#: cms/templates/widgets/footer.html cms/templates/widgets/sock.html
+msgid "Contact Us"
+msgstr "Çöntäçt Ûs Ⱡ#"
+
 #. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX
 #. Inc.'. Please do not translate any of these trademarks and company names.
 #: cms/templates/widgets/footer.html
@@ -20086,10 +20104,6 @@ msgstr ""
 "ÉdX, Öpén édX, Stüdïö, änd thé édX änd Öpén édX lögös äré régïstéréd "
 "trädémärks ör trädémärks öf {link_start}édX Ìnç.{link_end} Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє#"
-
-#: cms/templates/widgets/footer.html cms/templates/widgets/sock.html
-msgid "Contact Us"
-msgstr "Çöntäçt Ûs Ⱡ#"
 
 #: cms/templates/widgets/header.html
 msgid "Current Course:"
