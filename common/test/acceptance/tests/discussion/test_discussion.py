@@ -686,13 +686,12 @@ class DiscussionUserProfileTest(UniqueCourseTest):
         Then I will be navigated to Learner Profile page.
         And I can my username on Learner Profile page
         """
+        learner_profile_page = LearnerProfilePage(self.browser, self.PROFILED_USERNAME)
+
         page = self.check_pages(1)
         page.click_on_sidebar_username()
 
-        learner_profile_page = LearnerProfilePage(self.browser, self.PROFILED_USERNAME)
         learner_profile_page.wait_for_page()
-
-        learner_profile_page.is_browser_on_page()
         self.assertTrue(learner_profile_page.field_is_visible('username'))
 
 
