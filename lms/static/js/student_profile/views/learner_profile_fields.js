@@ -10,12 +10,12 @@
 
             render: function () {
                 this._super();
-                this.message();
+                this.showNotificationMessage();
                 this.updateFieldValue();
                 return this;
             },
 
-            message: function () {
+            showNotificationMessage: function () {
                 var accountSettingsLink = '<a href="' + this.options.accountSettingsPageUrl + '">' + gettext('Account Settings page.') + '</a>';
                 if (this.profileIsPrivate) {
                     this._super(interpolate_text(

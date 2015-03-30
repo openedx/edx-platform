@@ -59,17 +59,17 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             };
         };
 
-        var expectTitleToBe = function(view, expectedTitle) {
-            expect(view.$('.u-field-title').text().trim()).toBe(expectedTitle);
-        };
-
-        var expectTitleAndMessageToBe = function(view, expectedTitle, expectedMessage) {
-            expectTitleToBe(view, expectedTitle);
-            expect(view.$('.u-field-message').text().trim()).toBe(expectedMessage);
+        var expectTitleToContain = function(view, expectedTitle) {
+            expect(view.$('.u-field-title').text().trim()).toContain(expectedTitle);
         };
 
         var expectMessageContains = function(view, expectedText) {
             expect(view.$('.u-field-message').html()).toContain(expectedText);
+        };
+
+        var expectTitleAndMessageToContain = function(view, expectedTitle, expectedMessage) {
+            expectTitleToContain(view, expectedTitle);
+            expectMessageContains(view, expectedMessage);
         };
 
         var expectAjaxRequestWithData = function(requests, data) {
@@ -82,7 +82,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
             var message = 'Here to help!';
 
-            view.message(message);
+            view.showHelpMessage(message);
             expectMessageContains(view, message);
 
             view.showHelpMessage();
@@ -121,7 +121,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             view.showSuccessMessage();
             expectMessageContains(view, view.indicators.success);
             // But if we change the message, it should not get reset.
-            view.message("Do not reset this!");
+            view.showHelpMessage("Do not reset this!");
             jasmine.Clock.tick(5000);
             expectMessageContains(view, "Do not reset this!");
         };
@@ -132,15 +132,15 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
             if (data.editable === 'toggle') {
                 expect(view.el).toHaveClass('mode-placeholder');
-                expectTitleToBe(view, data.title);
+                expectTitleToContain(view, data.title);
                 expectMessageContains(view, view.indicators.canEdit);
                 view.$el.click();
             } else {
-                expectTitleAndMessageToBe(view, data.title, data.helpMessage);
+                expectTitleAndMessageToContain(view, data.title, data.helpMessage, false);
             }
 
             expect(view.el).toHaveClass('mode-edit');
-            expect(view.fieldValue()).not.toBe(data.validValue);
+            expect(view.fieldValue()).not.toContain(data.validValue);
 
             view.$(data.valueInputSelector).val(data.validValue).change();
             // When the value in the field is changed
@@ -220,8 +220,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             UserAccountModel: UserAccountModel,
             createFieldData: createFieldData,
             createErrorMessage: createErrorMessage,
-            expectTitleToBe: expectTitleToBe,
-            expectTitleAndMessageToBe: expectTitleAndMessageToBe,
+            expectTitleToContain: expectTitleToContain,
+            expectTitleAndMessageToContain: expectTitleAndMessageToContain,
             expectMessageContains: expectMessageContains,
             expectAjaxRequestWithData: expectAjaxRequestWithData,
             verifyMessageUpdates: verifyMessageUpdates,

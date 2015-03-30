@@ -58,10 +58,11 @@
                             view: new AccountSettingsFieldViews.PasswordFieldView({
                                 model: userAccountModel,
                                 title: gettext('Password'),
+                                screenReaderTitle: gettext('Reset your Password'),
                                 valueAttribute: 'password',
                                 emailAttribute: 'email',
                                 linkTitle: gettext('Reset Password'),
-                                linkHref: fieldsData.password.url,
+                                linkHref: fieldsData['password']['url'],
                                 helpMessage: gettext(
                                     'When you click "Reset Password", a message will be sent to your email address. ' +
                                     'Click the link in the message to reset your password.'
@@ -139,6 +140,9 @@
                         return {
                             'view': new AccountSettingsFieldViews.AuthFieldView({
                                 title: provider.name,
+                                screenReaderTitle: interpolate_text(
+                                    gettext("Connect your {accountName} account"), {accountName: provider['name']}
+                                ),
                                 valueAttribute: 'auth-' + provider.name.toLowerCase(),
                                 helpMessage: '',
                                 connected: provider.connected,
