@@ -370,6 +370,10 @@
                 if (this.editable === 'toggle') {
                     this.showDisplayMode(true);
                 }
+            },
+
+            disableField: function(disable) {
+                this.$('.u-field-value select').prop('disabled', disable);
             }
         });
 

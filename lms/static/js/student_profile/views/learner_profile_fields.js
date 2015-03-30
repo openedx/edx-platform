@@ -11,6 +11,7 @@
             render: function () {
                 this._super();
                 this.message();
+                this.updateFieldValue();
                 return this;
             },
 
@@ -30,6 +31,13 @@
                     this._super('');
                 }
                 return this._super();
+            },
+
+            updateFieldValue: function() {
+                if (!this.isAboveMinimumAge) {
+                    this.$('.u-field-value select').val('private');
+                    this.disableField(true);
+                }
             }
         });
 

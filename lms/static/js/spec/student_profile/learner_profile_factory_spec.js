@@ -24,25 +24,24 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 TemplateHelpers.installTemplate('templates/student_profile/learner_profile');
             });
 
-            it("show loading error when UserAccountModel fails to load", function() {
-
-                requests = AjaxHelpers.requests(this);
-
-                var context = LearnerProfilePage({
+            var createProfilePage = function(ownProfile) {
+                return LearnerProfilePage({
                     'accounts_api_url': Helpers.USER_ACCOUNTS_API_URL,
                     'preferences_api_url': Helpers.USER_PREFERENCES_API_URL,
-                    'own_profile': true,
+                    'own_profile': ownProfile,
                     'account_settings_page_url': Helpers.USER_ACCOUNTS_API_URL,
                     'country_options': Helpers.FIELD_OPTIONS,
                     'language_options': Helpers.FIELD_OPTIONS,
                     'has_preferences_access': true
-                }),
+                })
+            };
+
+            it("show loading error when UserAccountModel fails to load", function() {
+
+                requests = AjaxHelpers.requests(this);
+
+                var context = createProfilePage(true),
                     learnerProfileView = context.learnerProfileView;
-
-                Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
-                Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
-                LearnerProfileHelpers.expectProfileSectionsNotToBeRendered(learnerProfileView);
-
 
                 var userAccountRequest = requests[0];
                 expect(userAccountRequest.method).toBe('GET');
@@ -59,20 +58,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 requests = AjaxHelpers.requests(this);
 
-                var context = LearnerProfilePage({
-                    'accounts_api_url': Helpers.USER_ACCOUNTS_API_URL,
-                    'preferences_api_url': Helpers.USER_PREFERENCES_API_URL,
-                    'own_profile': true,
-                    'account_settings_page_url': Helpers.USER_ACCOUNTS_API_URL,
-                    'country_options': Helpers.FIELD_OPTIONS,
-                    'language_options': Helpers.FIELD_OPTIONS,
-                    'has_preferences_access': true
-                }),
+                var context = createProfilePage(true),
                     learnerProfileView = context.learnerProfileView;
-
-                Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
-                Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
-                LearnerProfileHelpers.expectProfileSectionsNotToBeRendered(learnerProfileView);
 
                 var userAccountRequest = requests[0];
                 expect(userAccountRequest.method).toBe('GET');
@@ -97,21 +84,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 requests = AjaxHelpers.requests(this);
 
-                var context = LearnerProfilePage({
-                    'accounts_api_url': Helpers.USER_ACCOUNTS_API_URL,
-                    'preferences_api_url': Helpers.USER_PREFERENCES_API_URL,
-                    'own_profile': true,
-                    'account_settings_page_url': Helpers.USER_ACCOUNTS_API_URL,
-                    'country_options': Helpers.FIELD_OPTIONS,
-                    'language_options': Helpers.FIELD_OPTIONS,
-                    'has_preferences_access': true
-                });
-
-                var learnerProfileView = context.learnerProfileView;
-
-                Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
-                Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
-                LearnerProfileHelpers.expectProfileSectionsNotToBeRendered(learnerProfileView);
+                var context = createProfilePage(true),
+                    learnerProfileView = context.learnerProfileView;
 
                 AjaxHelpers.respondWithJson(requests, Helpers.USER_ACCOUNTS_DATA);
                 AjaxHelpers.respondWithJson(requests, Helpers.USER_PREFERENCES_DATA);
@@ -124,27 +98,48 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 requests = AjaxHelpers.requests(this);
 
-                var context = LearnerProfilePage({
-                    'accounts_api_url': Helpers.USER_ACCOUNTS_API_URL,
-                    'preferences_api_url': Helpers.USER_PREFERENCES_API_URL,
-                    'own_profile': true,
-                    'account_settings_page_url': Helpers.USER_ACCOUNTS_API_URL,
-                    'country_options': Helpers.FIELD_OPTIONS,
-                    'language_options': Helpers.FIELD_OPTIONS,
-                    'has_preferences_access': true
-                }),
+                var context = createProfilePage(true),
                     learnerProfileView = context.learnerProfileView;
 
-                Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
-                Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
-                LearnerProfileHelpers.expectProfileSectionsNotToBeRendered(learnerProfileView);
+                var accountSettingsData = Helpers.USER_ACCOUNTS_DATA;
+                accountSettingsData['year_of_birth'] = 1989;
+                accountSettingsData['requires_parental_consent'] = false;
 
-                AjaxHelpers.respondWithJson(requests, Helpers.USER_ACCOUNTS_DATA);
+                AjaxHelpers.respondWithJson(requests, accountSettingsData);
                 AjaxHelpers.respondWithJson(requests, Helpers.USER_PREFERENCES_DATA);
 
                 // sets the profile for full view.
                 context.accountPreferencesModel.set({account_privacy: 'all_users'});
                 LearnerProfileHelpers.expectProfileSectionsAndFieldsToBeRendered(learnerProfileView, false)
+            });
+
+            it("renders the limited profile for undefined 'year_of_birth'", function() {
+
+                requests = AjaxHelpers.requests(this);
+
+                var context = createProfilePage(true),
+                    learnerProfileView = context.learnerProfileView;
+
+                AjaxHelpers.respondWithJson(requests, Helpers.USER_ACCOUNTS_DATA);
+                AjaxHelpers.respondWithJson(requests, Helpers.USER_PREFERENCES_DATA);
+
+                LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView)
+            });
+
+            it("renders the limited profile for under 13 users", function() {
+
+                requests = AjaxHelpers.requests(this);
+
+                var context = createProfilePage(true),
+                    learnerProfileView = context.learnerProfileView;
+
+                var accountSettingsData = Helpers.USER_ACCOUNTS_DATA;
+                accountSettingsData['requires_parental_consent'] = true;
+
+                AjaxHelpers.respondWithJson(requests, accountSettingsData);
+                AjaxHelpers.respondWithJson(requests, Helpers.USER_PREFERENCES_DATA);
+
+                LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView)
             });
         });
     });
