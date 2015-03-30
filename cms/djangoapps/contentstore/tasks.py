@@ -10,12 +10,12 @@ import logging
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseFields
 
-from xmodule.modulestore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
 from course_action_state.models import CourseRerunState
 from contentstore.utils import initialize_permissions
 from opaque_keys.edx.keys import CourseKey
 
+from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
 
 LOGGER = get_task_logger(__name__)
 FULL_COURSE_REINDEX_THRESHOLD = 1

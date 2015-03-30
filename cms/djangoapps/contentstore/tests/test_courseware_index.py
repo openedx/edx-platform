@@ -8,7 +8,6 @@ from pytz import UTC
 from uuid import uuid4
 
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.courseware_index import CoursewareSearchIndexer, INDEX_NAME, SearchIndexingError
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.mixed import MixedModuleStore
@@ -19,6 +18,8 @@ from xmodule.modulestore.tests.utils import create_modulestore_instance, Locatio
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.tests import DATA_DIR
 from search.search_engine_base import SearchEngine
+
+from contentstore.courseware_index import CoursewareSearchIndexer, INDEX_NAME, SearchIndexingError
 
 
 @ddt.ddt
@@ -147,6 +148,10 @@ class TestCoursewareSearchIndexer(MixedSplitTestCase):
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
             store.update_item(item, ModuleStoreEnum.UserID.test)
 
+    def get_search_engine(self):
+        """ Cenralized call to getting the search engin for the test """
+        return SearchEngine.get_search_engine(INDEX_NAME)
+
     def _perform_test_using_store(self, store_type, test_to_perform):
         """ Helper method to run a test function that uses a specific store """
         with MongoContentstoreBuilder().build() as contentstore:
@@ -164,7 +169,7 @@ class TestCoursewareSearchIndexer(MixedSplitTestCase):
 
     def _test_indexing_course(self, store):
         """ indexing course tests """
-        searcher = SearchEngine.get_search_engine(INDEX_NAME)
+        searcher = self.get_search_engine()
         response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
         self.assertEqual(response["total"], 0)
 
@@ -182,7 +187,7 @@ class TestCoursewareSearchIndexer(MixedSplitTestCase):
 
     def _test_not_indexing_unpublished_content(self, store):
         """ add a new one, only appers in index once added """
-        searcher = SearchEngine.get_search_engine(INDEX_NAME)
+        searcher = self.get_search_engine()
         # Publish the vertical to start with
         self.publish_item(store, self.vertical.location)
         self.reindex_course(store)
@@ -210,7 +215,7 @@ class TestCoursewareSearchIndexer(MixedSplitTestCase):
 
     def _test_deleting_item(self, store):
         """ test deleting an item """
-        searcher = SearchEngine.get_search_engine(INDEX_NAME)
+        searcher = self.get_search_engine()
         # Publish the vertical to start with
         self.publish_item(store, self.vertical.location)
         self.reindex_course(store)
@@ -231,7 +236,7 @@ class TestCoursewareSearchIndexer(MixedSplitTestCase):
 
     def _test_not_indexable(self, store):
         """ test not indexable items """
-        searcher = SearchEngine.get_search_engine(INDEX_NAME)
+        searcher = self.get_search_engine()
         # Publish the vertical to start with
         self.publish_item(store, self.vertical.location)
         self.reindex_course(store)
@@ -258,7 +263,7 @@ class TestCoursewareSearchIndexer(MixedSplitTestCase):
 
     def _test_start_date_propagation(self, store):
         """ make sure that the start date is applied at the right level """
-        searcher = SearchEngine.get_search_engine(INDEX_NAME)
+        searcher = self.get_search_engine()
         early_date = self.course.start
         later_date = self.vertical.start
 
@@ -366,3 +371,6 @@ class TestCoursewareSearchIndexer(MixedSplitTestCase):
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_exception(self, store_type):
         self._perform_test_using_store(store_type, self._test_exception)
+
+    def A(self):
+        self._perform_test_using_store(ModuleStoreEnum.Type.mongo, self._test_indexing_course)

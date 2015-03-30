@@ -268,10 +268,6 @@ VIDEO_CDN_URL = {
 # Courseware Search Index
 FEATURES['ENABLE_COURSEWARE_INDEX'] = True
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
-# Path at which to store the mock index
-MOCK_SEARCH_BACKING_FILE = (
-    TEST_ROOT / "index_file.dat"  # pylint: disable=no-value-for-parameter
-).abspath()
 
 # Dummy secret key for dev/test
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'

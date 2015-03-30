@@ -22,7 +22,6 @@ from edxmako.shortcuts import render_to_response
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from xmodule.contentstore.content import StaticContent
 from xmodule.tabs import PDFTextbookTabs
 from xmodule.partitions.partitions import UserPartition
@@ -35,6 +34,7 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
 
 from django_future.csrf import ensure_csrf_cookie
 from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
+from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from contentstore.utils import (
     add_instructor,
     initialize_permissions,

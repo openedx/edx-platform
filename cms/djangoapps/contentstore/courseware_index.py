@@ -5,10 +5,9 @@ from datetime import timedelta
 import logging
 
 from django.utils.translation import ugettext as _
-from search.search_engine_base import SearchEngine
 from eventtracking import tracker
-
-from . import ModuleStoreEnum
+from xmodule.modulestore import ModuleStoreEnum
+from search.search_engine_base import SearchEngine
 
 
 # Use default index and document names for now
