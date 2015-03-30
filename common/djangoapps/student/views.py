@@ -1758,13 +1758,14 @@ def auto_auth(request):
     # If successful, this will return a tuple containing
     # the new user object.
     try:
-        user, _profile, reg = _do_create_account(form)
+        user, profile, reg = _do_create_account(form)
     except AccountValidationError:
         # Attempt to retrieve the existing user.
         user = User.objects.get(username=username)
         user.email = email
         user.set_password(password)
         user.save()
+        profile = UserProfile.objects.get(user=user)
         reg = Registration.objects.get(user=user)
 
     # Set the user's global staff bit
@@ -1775,6 +1776,12 @@ def auto_auth(request):
     # Activate the user
     reg.activate()
     reg.save()
+
+    # ensure parental consent threshold is met
+    year = datetime.date.today().year
+    age_limit = settings.PARENTAL_CONSENT_AGE_LIMIT
+    profile.year_of_birth = (year - age_limit) - 1
+    profile.save()
 
     # Enroll the user in a course
     if course_key is not None:
