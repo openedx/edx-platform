@@ -47,15 +47,18 @@ def _get_profile_image_filename(name, size, file_extension=PROFILE_IMAGE_FILE_EX
     return '{name}_{size}.{file_extension}'.format(name=name, size=size, file_extension=file_extension)
 
 
-def _get_profile_image_urls(name, storage, file_extension=PROFILE_IMAGE_FILE_EXTENSION):
+def _get_profile_image_urls(name, storage, file_extension=PROFILE_IMAGE_FILE_EXTENSION, version=None):
     """
     Returns a dict containing the urls for a complete set of profile images,
     keyed by "friendly" name (e.g. "full", "large", "medium", "small").
     """
-    return {
-        size_display_name: storage.url(_get_profile_image_filename(name, size, file_extension=file_extension))
-        for size_display_name, size in PROFILE_IMAGE_SIZES_MAP.items()
-    }
+    def _make_url(size):  # pylint: disable=missing-docstring
+        url = storage.url(
+            _get_profile_image_filename(name, size, file_extension=file_extension)
+        )
+        return '{}?v={}'.format(url, version) if version is not None else url
+
+    return {size_display_name: _make_url(size) for size_display_name, size in PROFILE_IMAGE_SIZES_MAP.items()}
 
 
 def get_profile_image_names(username):
@@ -88,7 +91,11 @@ def get_profile_image_urls_for_user(user):
 
     """
     if user.profile.has_profile_image:
-        return _get_profile_image_urls(_make_profile_image_name(user.username), get_profile_image_storage())
+        return _get_profile_image_urls(
+            _make_profile_image_name(user.username),
+            get_profile_image_storage(),
+            version=user.profile.profile_image_uploaded_at.strftime("%s"),
+        )
     else:
         return _get_default_profile_image_urls()
 
@@ -103,19 +110,38 @@ def _get_default_profile_image_urls():
     return _get_profile_image_urls(
         settings.PROFILE_IMAGE_DEFAULT_FILENAME,
         staticfiles_storage,
-        file_extension=settings.PROFILE_IMAGE_DEFAULT_FILE_EXTENSION
+        file_extension=settings.PROFILE_IMAGE_DEFAULT_FILE_EXTENSION,
     )
 
 
-def set_has_profile_image(username, has_profile_image=True):
+def set_has_profile_image(username, is_uploaded, upload_dt=None):
     """
     System (not user-facing) API call used to store whether the user has
-    uploaded a profile image.  Used by profile_image API.
+    uploaded a profile image, and if so, when.  Used by profile_image API.
+
+    Arguments:
+        username (django.contrib.auth.User.username): references the user who
+            uploaded an image.
+
+        is_uploaded (bool): whether or not the user has an uploaded profile
+            image.
+
+        upload_dt (datetime.datetime): If `is_uploaded` is True, this should
+            contain the server-side date+time of the upload.  If `is_uploaded`
+            is False, the parameter is optional and will be ignored.
+
+    Raises:
+        ValueError: is_uploaded was True, but no upload datetime was supplied.
+        UserNotFound: no user with username `username` exists.
     """
+    if is_uploaded and upload_dt is None:
+        raise ValueError("No upload datetime was supplied.")
+    elif not is_uploaded:
+        upload_dt = None
     try:
         profile = UserProfile.objects.get(user__username=username)
     except ObjectDoesNotExist:
         raise UserNotFound()
 
-    profile.has_profile_image = has_profile_image
+    profile.profile_image_uploaded_at = upload_dt
     profile.save()
