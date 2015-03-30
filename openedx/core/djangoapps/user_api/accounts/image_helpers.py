@@ -12,6 +12,7 @@ from student.models import UserProfile
 from ..errors import UserNotFound
 
 
+PROFILE_IMAGE_FILE_EXTENSION = 'jpg'   # All processed profile images are converted to JPEGs
 PROFILE_IMAGE_SIZES_MAP = {
     'full': 500,
     'large': 120,
@@ -38,14 +39,14 @@ def _make_profile_image_name(username):
     return hashlib.md5(settings.PROFILE_IMAGE_SECRET_KEY + username).hexdigest()
 
 
-def _get_profile_image_filename(name, size, file_extension='jpg'):
+def _get_profile_image_filename(name, size, file_extension=PROFILE_IMAGE_FILE_EXTENSION):
     """
     Returns the full filename for a profile image, given the name and size.
     """
     return '{name}_{size}.{file_extension}'.format(name=name, size=size, file_extension=file_extension)
 
 
-def _get_profile_image_urls(name, storage, file_extension='jpg'):
+def _get_profile_image_urls(name, storage, file_extension=PROFILE_IMAGE_FILE_EXTENSION):
     """
     Returns a dict containing the urls for a complete set of profile images,
     keyed by "friendly" name (e.g. "full", "large", "medium", "small").
