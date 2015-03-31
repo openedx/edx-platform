@@ -2,6 +2,7 @@
 Unit tests for search indexers
 """
 from django.conf import settings
+from django.test.utils import override_settings
 from lazy.lazy import lazy
 import os
 import mock
@@ -9,7 +10,7 @@ import json
 
 from uuid import uuid4
 from datetime import datetime
-from unittest import TestCase
+from django.test import TestCase
 
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator, BlockUsageLocator, LibraryUsageLocator
 
@@ -42,6 +43,9 @@ class TestIndexerForLocation(TestCase):
         self.assertIsInstance(indexer, LibrarySearchIndexer)
 
 
+MOCK_SEARCH_ENGINE = getattr(settings, 'SEARCH_ENGINE', "search.tests.mock_search_engine.MockSearchEngine")
+
+
 # pylint: disable=no-member
 class SearchIndexerBaseTestMixin(object):
     """ Common features for search indexers tests"""
@@ -52,7 +56,6 @@ class SearchIndexerBaseTestMixin(object):
         settings, 'MOCK_SEARCH_BACKING_FILE',
         "test_root/index_file.dat"
     )
-    MOCK_SEARCH_ENGINE = getattr(settings, 'SEARCH_ENGINE', "search.tests.mock_search_engine.MockSearchEngine")
 
     def setUp(self):
         """
@@ -220,6 +223,7 @@ class SearchIndexerBaseTestMixin(object):
         self.assertEqual(args, (self.indexer.DOCUMENT_TYPE, self._process_index_id(location)))
 
 
+@override_settings(MOCK_SEARCH_ENGINE=MOCK_SEARCH_ENGINE)
 class TestCoursewareSearchIndexer(SearchIndexerBaseTestMixin, TestCase):
     """ Tests for CoursewareSearchIndexer """
     ROOT_ID = CourseLocator('testx', 'courseware_indexer_test', 'test_run')
@@ -250,6 +254,7 @@ class TestCoursewareSearchIndexer(SearchIndexerBaseTestMixin, TestCase):
         return result
 
 
+@override_settings(MOCK_SEARCH_ENGINE=MOCK_SEARCH_ENGINE)
 class TestLibrarySearchIndexer(SearchIndexerBaseTestMixin, TestCase):
     """ Tests for LibrarySearchIndexer """
     ROOT_ID = LibraryLocator('lib', 'Lib1')
