@@ -168,6 +168,10 @@
           display: inline-block;
           text-align: right;
 
+          .tip {
+            @include font-size(12);
+          }
+
           .action-item {
             display: inline-block;
             margin-left: ($baseline/2);
