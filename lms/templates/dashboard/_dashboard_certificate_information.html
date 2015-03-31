@@ -1,6 +1,9 @@
 <%page args="cert_status, course, enrollment" />
 
-<%! from django.utils.translation import ugettext as _ %>
+<%!
+from django.utils.translation import ugettext as _
+from course_modes.models import CourseMode
+%>
 <%namespace name='static' file='../static_content.html'/>
 
 <%
@@ -61,7 +64,7 @@ else:
         <a class="btn" href="${cert_status['download_url']}"
            title="${_('This link will open/download a PDF document')}">
            ${_("Download Your {cert_name_short} (PDF)").format(cert_name_short=cert_name_short)}</a></li>
-      % elif cert_status['show_download_url'] and enrollment.mode == 'verified':
+      % elif cert_status['show_download_url'] and enrollment.mode in CourseMode.VERIFIED_MODES:
         <li class="action">
         <a class="btn" href="${cert_status['download_url']}"
            title="${_('This link will open/download a PDF document of your verified {cert_name_long}.').format(cert_name_long=cert_name_long)}">
