@@ -198,7 +198,7 @@ else:
     <aside class="content-supplementary" role="complimentary">
       <div class="bit">
           <h3 class="title-3">${_("Why import a library?")}</h3>
-          <p>${_("You might want to update an existing library to a new version, or replace an existing library entirely. You might also have developed a library outside of Studio.")}</p>
+          <p>${_("You might want to update an existing library to a new version, or replace an existing library entirely. You might also have developed a library outside of {studio_name}.").format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
       </div>
 
       <div class="bit">
