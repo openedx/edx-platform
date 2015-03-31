@@ -52,7 +52,7 @@ class AccountView(APIView):
                     * "p" signifying "Doctorate"
                     * "m" signifying "Master's or professional degree"
                     * "b" signifying "Bachelor's degree"
-                    * "a" signifying "Associate's degree"
+                    * "a" signifying "Associate degree"
                     * "hs" signifying "Secondary/high school"
                     * "jhs" signifying "Junior secondary/junior high/middle school"
                     * "el" signifying "Elementary/primary school"
