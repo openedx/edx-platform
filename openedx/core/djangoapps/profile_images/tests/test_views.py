@@ -223,12 +223,8 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
         """
         image_open.side_effect = [Exception(u"whoops"), None]
         with make_image_file() as image_file:
-            response = self.client.post(self.url, {'file': image_file}, format='multipart')
-            self.check_response(
-                response, 400,
-                expected_developer_message=u"Upload failed for profile image: whoops",
-                expected_user_message=u"Upload failed for profile image",
-            )
+            with self.assertRaises(Exception):
+                self.client.post(self.url, {'file': image_file}, format='multipart')
             self.check_images(False)
             self.check_has_profile_image(False)
         self.assertFalse(mock_log.info.called)
@@ -321,12 +317,8 @@ class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
         messages are returned.
         """
         user_profile_save.side_effect = [Exception(u"whoops"), None]
-        response = self.client.post(self.url)
-        self.check_response(
-            response, 400,
-            expected_developer_message=u"Delete failed for profile image: whoops",
-            expected_user_message=u"Delete failed for profile image",
-        )
+        with self.assertRaises(Exception):
+            self.client.post(self.url)
         self.check_images(True)  # thumbnails should remain intact.
         self.check_has_profile_image(True)
         self.assertFalse(mock_log.info.called)

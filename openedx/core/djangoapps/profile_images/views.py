@@ -80,41 +80,31 @@ class ProfileImageUploadView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        try:
-            # process the upload.
-            uploaded_file = request.FILES['file']
+        # process the upload.
+        uploaded_file = request.FILES['file']
 
-            # no matter what happens, delete the temporary file when we're done
-            with closing(uploaded_file):
+        # no matter what happens, delete the temporary file when we're done
+        with closing(uploaded_file):
 
-                # image file validation.
-                try:
-                    validate_uploaded_image(uploaded_file)
-                except ImageValidationError as error:
-                    return Response(
-                        {"developer_message": error.message, "user_message": error.user_message},
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
-
-                # generate profile pic and thumbnails and store them
-                profile_image_names = get_profile_image_names(username)
-                create_profile_images(uploaded_file, profile_image_names)
-
-                # update the user account to reflect that a profile image is available.
-                set_has_profile_image(username, True, _make_upload_dt())
-
-                log.info(
-                    LOG_MESSAGE_CREATE,
-                    {'image_names': profile_image_names.values(), 'user_id': request.user.id}
+            # image file validation.
+            try:
+                validate_uploaded_image(uploaded_file)
+            except ImageValidationError as error:
+                return Response(
+                    {"developer_message": error.message, "user_message": error.user_message},
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
-        except Exception as error:
-            return Response(
-                {
-                    "developer_message": u"Upload failed for profile image: {error}".format(error=error),
-                    "user_message": _(u"Upload failed for profile image"),
 
-                },
-                status=status.HTTP_400_BAD_REQUEST
+            # generate profile pic and thumbnails and store them
+            profile_image_names = get_profile_image_names(username)
+            create_profile_images(uploaded_file, profile_image_names)
+
+            # update the user account to reflect that a profile image is available.
+            set_has_profile_image(username, True, _make_upload_dt())
+
+            log.info(
+                LOG_MESSAGE_CREATE,
+                {'image_names': profile_image_names.values(), 'user_id': request.user.id}
             )
 
         # send client response.
@@ -165,15 +155,6 @@ class ProfileImageRemoveView(APIView):
             )
         except UserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        except Exception as error:
-            return Response(
-                {
-                    "developer_message": u"Delete failed for profile image: {error}".format(error=error),
-                    "user_message": _(u"Delete failed for profile image"),
-
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
 
         # send client response.
         return Response(status=status.HTTP_204_NO_CONTENT)
