@@ -172,8 +172,11 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         course_names = self.dashboard_page.wait_for_page().available_courses
         self.assertIn(self.course_info["display_name"], course_names)
 
-        self.assertEqual("WANT TO CHANGE YOUR ACCOUNT SETTINGS?", self.dashboard_page.sidebar_menu_title)
-        self.assertEqual("Click the arrow next to your username above.", self.dashboard_page.sidebar_menu_description)
+        self.assertEqual("want to change your account settings?", self.dashboard_page.sidebar_menu_title.lower())
+        self.assertEqual(
+            "click the arrow next to your username above.",
+            self.dashboard_page.sidebar_menu_description.lower()
+        )
 
     def test_register_failure(self):
         # Navigate to the registration page
