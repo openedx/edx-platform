@@ -20,8 +20,6 @@ from mock import Mock
 from operator import attrgetter
 from path import path
 from eventtracking import tracker
-from eventtracking.django import DjangoTracker
-
 
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds, Scope, Reference, ReferenceList, ReferenceValueDict
@@ -54,6 +52,11 @@ open_ended_grading_interface = {
 }
 
 
+class MockedTracker(object):
+    def emit(name=None, data=None):
+        pass
+
+
 class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     """
     ModuleSystem for testing
@@ -64,7 +67,7 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         kwargs.setdefault('id_reader', id_manager)
         kwargs.setdefault('id_generator', id_manager)
         kwargs.setdefault('services', {}).setdefault('field-data', DictFieldData({}))
-        self.tracker = DjangoTracker()
+        self.tracker = MockedTracker()
         tracker.register_tracker(self.tracker)
         super(TestModuleSystem, self).__init__(**kwargs)
 
