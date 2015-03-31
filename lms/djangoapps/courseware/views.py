@@ -1028,7 +1028,11 @@ def _progress(request, course_key, student_id):
         # Requesting access to a different student's profile
         if not staff_access:
             raise Http404
-        student = User.objects.get(id=int(student_id))
+        try:
+            student = User.objects.get(id=student_id)
+        # Check for ValueError if 'student_id' cannot be converted to integer.
+        except (ValueError, User.DoesNotExist):
+            raise Http404
 
     # NOTE: To make sure impersonation by instructor works, use
     # student instead of request.user in the rest of the function.
