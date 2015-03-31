@@ -6,7 +6,6 @@ Utility library for working with the edx-milestones app
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
-from courseware.models import StudentModule
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from xmodule.modulestore.django import modulestore
@@ -165,12 +164,10 @@ def get_required_content(course, user):
     """
     required_content = []
     if settings.FEATURES.get('MILESTONES_APP', False):
-        from milestones import api as milestones_api
         from milestones.exceptions import InvalidMilestoneRelationshipTypeException
-
         # Get all of the outstanding milestones for this course, for this user
         try:
-            milestone_paths = milestones_api.get_course_milestones_fulfillment_paths(
+            milestone_paths = get_course_milestones_fulfillment_paths(
                 unicode(course.id),
                 serialize_user(user)
             )
@@ -183,47 +180,7 @@ def get_required_content(course, user):
             if milestone_path.get('content') and len(milestone_path['content']):
                 for content in milestone_path['content']:
                     required_content.append(content)
-
-    #local imports to avoid circular reference
-    from student.models import EntranceExamConfiguration
-    can_skip_entrance_exam = EntranceExamConfiguration.user_can_skip_entrance_exam(user, course.id)
-    # check if required_content has any entrance exam and user is allowed to skip it
-    # then remove it from required content
-    if required_content and getattr(course, 'entrance_exam_enabled', False) and can_skip_entrance_exam:
-        descriptors = [modulestore().get_item(UsageKey.from_string(content)) for content in required_content]
-        entrance_exam_contents = [unicode(descriptor.location)
-                                  for descriptor in descriptors if descriptor.is_entrance_exam]
-        required_content = list(set(required_content) - set(entrance_exam_contents))
     return required_content
-
-
-def calculate_entrance_exam_score(user, course_descriptor, exam_modules):
-    """
-    Calculates the score (percent) of the entrance exam using the provided modules
-    """
-    exam_module_ids = [exam_module.location for exam_module in exam_modules]
-    student_modules = StudentModule.objects.filter(
-        student=user,
-        course_id=course_descriptor.id,
-        module_state_key__in=exam_module_ids,
-    )
-    exam_pct = 0
-    if student_modules:
-        module_pcts = []
-        ignore_categories = ['course', 'chapter', 'sequential', 'vertical']
-        for module in exam_modules:
-            if module.graded and module.category not in ignore_categories:
-                module_pct = 0
-                try:
-                    student_module = student_modules.get(module_state_key=module.location)
-                    if student_module.max_grade:
-                        module_pct = student_module.grade / student_module.max_grade
-                    module_pcts.append(module_pct)
-                except StudentModule.DoesNotExist:
-                    pass
-        if module_pcts:
-            exam_pct = sum(module_pcts) / float(len(module_pcts))
-    return exam_pct
 
 
 def milestones_achieved_by_user(user, namespace):
