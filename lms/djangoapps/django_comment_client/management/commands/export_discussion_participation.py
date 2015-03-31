@@ -30,6 +30,7 @@ class DiscussionExportFields(object):
     UPVOTES = u"num_upvotes"
     FOLOWERS = u"num_thread_followers"
     COMMENTS_GENERATED = u"num_comments_generated"
+    THREADS_READ = u"num_threads_read"
 
 
 class Command(BaseCommand):
@@ -145,7 +146,9 @@ class Extractor(object):
     """ Extracts discussion participation data from db and cs_comments_service """
 
     @classmethod
-    def _make_social_stats(cls, threads=0, comments=0, replies=0, upvotes=0, followers=0, comments_generated=0):
+    def _make_social_stats(
+            cls, threads=0, comments=0, replies=0, upvotes=0, followers=0, comments_generated=0, threads_read=0
+    ):
         """ Builds social stats with values specified """
         return {
             DiscussionExportFields.THREADS: threads,
@@ -154,6 +157,7 @@ class Extractor(object):
             DiscussionExportFields.UPVOTES: upvotes,
             DiscussionExportFields.FOLOWERS: followers,
             DiscussionExportFields.COMMENTS_GENERATED: comments_generated,
+            DiscussionExportFields.THREADS_READ: threads_read,
         }
 
     def _get_users(self, course_key):
@@ -203,7 +207,8 @@ class Exporter(object):
         DiscussionExportFields.USERNAME, DiscussionExportFields.EMAIL, DiscussionExportFields.FIRST_NAME,
         DiscussionExportFields.LAST_NAME, DiscussionExportFields.USER_ID,
         DiscussionExportFields.THREADS, DiscussionExportFields.COMMENTS, DiscussionExportFields.REPLIES,
-        DiscussionExportFields.UPVOTES, DiscussionExportFields.FOLOWERS, DiscussionExportFields.COMMENTS_GENERATED
+        DiscussionExportFields.UPVOTES, DiscussionExportFields.FOLOWERS, DiscussionExportFields.COMMENTS_GENERATED,
+        DiscussionExportFields.THREADS_READ
     ]
 
     def export(self, data):
