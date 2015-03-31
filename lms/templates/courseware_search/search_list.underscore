@@ -9,7 +9,11 @@
 
     <% if (hasMoreResults) { %>
         <a class="search-load-next" href="javascript:void(0);">
-            <%= interpolate(gettext("Load next %s results"), [pageSize]) %>
+            <%= interpolate(
+                ngettext("Load next %(num_items) result", "Load next %(num_items) results", pageSize),
+                { num_items: pageSize },
+                true
+            ) %>
             <i class="icon fa-spinner fa-spin"></i>
         </a>
     <% } %>
