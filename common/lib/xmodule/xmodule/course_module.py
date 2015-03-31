@@ -834,7 +834,7 @@ class CourseFields(object):
     )
 
 
-class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
+class CourseDescriptor(CourseFields, LicenseMixin, SequenceDescriptor):
     """
     The descriptor for the course XModule
     """
