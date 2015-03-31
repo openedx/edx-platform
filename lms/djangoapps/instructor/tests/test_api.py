@@ -673,7 +673,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ('list_report_downloads', {}),
             ('calculate_grades_csv', {}),
             ('get_student_forums_usage', {}),
-            ('get_ora2_responses', {}),
+            ('get_ora2_responses', {'include_email': False}),
             ('get_course_forums_usage', {}),
             ('get_students_features', {}),
             ('graph_course_forums_usage', {}),
@@ -696,7 +696,10 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
         status_code: expected HTTP status code response
         msg: message to display if assertion fails.
         """
-        url = reverse(endpoint, kwargs={'course_id': self.course.id.to_deprecated_string()})
+        if endpoint in ['get_ora2_responses']:
+            url = reverse(endpoint, kwargs={'course_id': self.course.id.to_deprecated_string(), 'include_email': False})
+        else:
+            url = reverse(endpoint, kwargs={'course_id': self.course.id.to_deprecated_string()})
         if endpoint in ['send_email', 'students_update_enrollment', 'bulk_beta_modify_access']:
             response = self.client.post(url, args)
         else:
@@ -2511,7 +2514,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.assertIn(already_running_status, response.content)
 
     def test_get_ora2_responses_success(self):
-        url = reverse('get_ora2_responses', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('get_ora2_responses', kwargs={'course_id': self.course.id.to_deprecated_string(), 'include_email': False})
 
         with patch('instructor_task.api.submit_ora2_request_task') as mock_submit_ora2_task:
             mock_submit_ora2_task.return_value = True
@@ -2520,7 +2523,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.assertIn(success_status, response.content)
 
     def test_get_ora2_responses_already_running(self):
-        url = reverse('get_ora2_responses', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('get_ora2_responses', kwargs={'course_id': self.course.id.to_deprecated_string(), 'include_email': False})
 
         with patch('instructor_task.api.submit_ora2_request_task') as mock_submit_ora2_task:
             mock_submit_ora2_task.side_effect = AlreadyRunningError()

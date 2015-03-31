@@ -131,7 +131,7 @@ urlpatterns = patterns('',  # nopep8
         'instructor.views.api.delete_report_download', name='delete_report_download'),
 
     # Collect ora2 data
-    url(r'get_ora2_responses',
+    url(r'get_ora2_responses/(?P<include_email>\w+)/$',
         'instructor.views.api.get_ora2_responses', name="get_ora2_responses"),
 
     # Collect course forums data

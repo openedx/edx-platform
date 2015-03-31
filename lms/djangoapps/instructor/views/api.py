@@ -88,6 +88,7 @@ from .tools import (
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx import locator
 from student.models import UserProfile, Registration
 import instructor.views.data_access as data_access
 from instructor.views.data_access_constants import QueryType, StudentQuery, QUERYORIGIN_MAP, QueryOrigin
@@ -2111,13 +2112,13 @@ def get_student_forums_usage(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_ora2_responses(request, course_id):
+def get_ora2_responses(request, course_id, include_email):
     """
     Pushes a Celery task which will aggregate ora2 responses for a course into a .csv
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = locator.CourseLocator.from_string(course_id)
     try:
-        instructor_task.api.submit_ora2_request_task(request, course_key)
+        instructor_task.api.submit_ora2_request_task(request, course_key, include_email)
         success_status = _("The ORA2 responses report is being generated.")
         return JsonResponse({"status": success_status})
     except AlreadyRunningError:
@@ -2152,6 +2153,7 @@ def get_course_forums_usage(request, course_id):
             "for the status of the task. When completed, the report "
             "will be available for download in the table below."
         )
+
         return JsonResponse({
             "status": already_running_status
         })
