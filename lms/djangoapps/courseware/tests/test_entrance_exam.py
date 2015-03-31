@@ -246,7 +246,6 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase):
             ]
         )
 
-    @mock.patch('xmodule.x_module.XModuleMixin.has_dynamic_children', mock.Mock(return_value='True'))
     def test_view_redirect_if_entrance_exam_required(self):
         """
         Unit Test: if entrance exam is required. Should return a redirect.
