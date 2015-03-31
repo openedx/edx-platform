@@ -4,7 +4,7 @@ $table-border-color: #c8c8c8;
 div.gradebook-wrapper {
 
   section.gradebook-content {
-    @extend .content;
+    @extend .content-old;
     display: block;
     width: 100%;
     @include clearfix();

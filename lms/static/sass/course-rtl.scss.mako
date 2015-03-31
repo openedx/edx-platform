@@ -31,6 +31,7 @@
 
 
 // course - base
+@import 'course/base/layout';
 @import 'course/layout/courseware_header';
 @import 'course/layout/courseware_preview';
 @import 'course/layout/footer';

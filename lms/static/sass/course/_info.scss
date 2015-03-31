@@ -1,7 +1,7 @@
 div.info-wrapper {
 
   section.updates {
-    @extend .content;
+    @extend .content-old;
     line-height: lh();
 
     > h1 {
@@ -78,7 +78,7 @@ div.info-wrapper {
   }
 
   section.handouts {
-    @extend .sidebar;
+    @extend .sidebar-old;
     border-radius: 0 4px 4px 0;
     @include border-left(1px solid #ddd);
     box-shadow: none;

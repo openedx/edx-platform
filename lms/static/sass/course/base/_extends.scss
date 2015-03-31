@@ -1,14 +1,26 @@
 // lms - course - extends
 // ====================
 
-// lms inner wrapper
+// Table of Contents 
+// * +LMS - Inner Wrapper
+// * +Older Headers and Buttons  [TO-DO]
+// * +Extends - Content Old [TO-DO]
+// * +Extends - Sidebar Old [TO-DO]
+// * +Extends - Topbar
+// * +Extends - Transition
+
+
+// +LMS - Inner Wrapper
+// ==================== 
 %inner-wrapper {
   margin: 0 auto;
   max-width: 1180px;
   width: flex-grid(12);
 }
 
-// Older Course Extends - to review/remove with LMS cleanup
+// +Older Course Extends
+// ==================== 
+// TO-DO: remove or cleanup and use current standards / patterns
 h1.top-header {
   border-bottom: 1px solid $border-color-2;
   @include text-align(left);
@@ -45,19 +57,26 @@ h1.top-header {
   font-size: em(13);
 }
 
-.content {
+// +Extends - Content Old
+// ==================== 
+// TO-DO: remove or cleanup and use current standards / patterns
+.content-old {
   @include box-sizing(border-box);
   display: table-cell;
   padding: 2em 2.5em;
   vertical-align: top;
-  width: flex-grid(9) + flex-gutter();
+  width: flex-grid(9);
 
   @media print {
     box-shadow: none;
   }
 }
 
-.sidebar {
+
+// +Extends - Sidebar Old
+// ==================== 
+// TO-DO: remove or cleanup use of old sidebar extend
+.sidebar-old {
   @include box-sizing(border-box);
   display: table-cell;
   font-family: $sans-serif;
@@ -175,6 +194,8 @@ h1.top-header {
   }
 }
 
+// +Extends - Topbar
+// ==================== 
 .topbar {
   @extend .clearfix;
   border-bottom: 1px solid $border-color;
@@ -195,6 +216,8 @@ h1.top-header {
   }
 }
 
+// +Extends - Transition
+// ==================== 
 .tran {
   @include transition( all .2s $ease-in-out-quad 0s);
 }

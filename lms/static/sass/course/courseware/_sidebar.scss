@@ -1,8 +1,97 @@
-.course-index {
-  @extend .sidebar;
+// lms - views - course outline
+// ====================
+// TO-DO: rename partial to _outline instead of _sidebar
+ 
+// Table of Contents 
+// * +Outline - Sidebar [TO-DO]
+// * +CASE: Outline - Home [TO-DO]
+// * +Outline - Sidebar Old [TO-DO]
+
+
+// +Outline - Sidebar 
+// ==================== 
+.course-wrapper .course-index {
   @extend .tran;
-  @include border-right(1px solid $border-color-2);
+  @include box-sizing(border-box);
+  @include border-right(1px solid $border-color-l3);
   @include border-radius(3px, 0, 0, 3px);
+  width: flex-grid(3);
+
+  .ui-accordion {
+
+
+    .chapter {
+      background-color: $sidebar-chapter-bg;
+      border-bottom: 1px solid $border-color-l3;
+
+      &.is-open {
+        background: $white;
+      }
+
+      &:first-child {
+        border-radius: 3px 0 0 0;
+      }
+
+      &:last-child {
+        border-radius: 0 0 0 3px;
+        box-shadow: 0 1px 0 $white inset;
+      }
+
+      &:hover, &:focus {
+        background-color: $action-primary-focused-fg;
+      }
+    }
+  }
+
+  .ui-accordion-header {
+    padding: ($baseline/2);
+  }
+
+  .ui-accordion-content {
+    padding: 0 $baseline ($baseline/2);
+
+    // TO-DO: add class instead of using element selector
+    a {
+      border-radius: 3px;
+      padding: ($baseline/2) ($baseline*2) ($baseline/2) ($baseline/2);
+
+    }
+
+  }
+}
+
+// +CASE: Outline - Home 
+// ==================== 
+.course-wrapper.home .course-index {
+  // TO-DO: replace .course-wrapper with nesting using .view-outline once tag has been added to <body>
+  @extend %content-primary;
+  @include border-right(1px solid $border-color-l3);
+
+
+  .chapter {
+    @include box-sizing(border-box);
+    background-color: $gray-l6;
+    border-radius: 3px;
+    border: 1px solid $border-color-l3;
+    margin: ($baseline/2);
+
+    &:first-child, &:last-child {
+      border-radius: 3px;
+    }
+
+    &:hover, &:focus {
+      border-color: $action-primary-focused-bg;
+    }
+
+  }
+}
+
+
+// +Outline - Sidebar Old
+// ==================== 
+// TO-DO: review for sass cleanups and update to current standards 
+.course-index {
+  @extend .sidebar-old;
 
   #open_close_accordion {
     display: none;
@@ -16,7 +105,7 @@
     }
   }
 
-  div#accordion {
+  .ui-accordion {
     width: auto;
     font-size: 14px;
 
@@ -25,10 +114,6 @@
       margin: 0;
       overflow: visible;
       font-size: 16px;
-
-      &:first-child {
-        border: none;
-      }
 
       &:hover, &:focus {
         color: #666;
@@ -41,7 +126,6 @@
       }
 
       &.ui-accordion-header {
-        border-bottom: none;
         color: $black;
 
         a {
@@ -61,7 +145,6 @@
         }
 
         span.ui-icon {
-          @include left(0);
           opacity: 0.3;
           background-image: url("/static/images/ui-icons_222222_256x240.png");  // jQuery UI sprite
 
@@ -82,30 +165,10 @@
     }
 
     .chapter {
-      width: 100% !important;
       @include box-sizing(border-box);
-      padding: 11px 14px;
-      @include linear-gradient(top, $sidebar-chapter-bg-top, $sidebar-chapter-bg-bottom);
       background-color: $sidebar-chapter-bg;
-      box-shadow: 0 1px 0 $white inset, 0 -1px 0 $shadow-l1 inset;
       @include transition(background-color .1s linear 0s);
 
-      &.is-open {
-        background: $white;
-      }
-
-      &:first-child {
-        border-radius: 3px 0 0 0;
-      }
-
-      &:last-child {
-        border-radius: 0 0 0 3px;
-        box-shadow: 0 1px 0 $white inset;
-      }
-
-      &:hover, &:focus {
-        background-color: $white;
-      }
     }
 
     ul.ui-accordion-content {
@@ -113,9 +176,7 @@
       border: none;
       border-radius: 0;
       margin: 0;
-      padding: 9px 0 9px 9px;
       overflow: auto;
-      width: 100%;
 
       li {
         border-bottom: 0;
@@ -124,9 +185,7 @@
 
         a {
           background: transparent;
-          border-radius: 4px;
           display: block;
-          padding: ($baseline/4) 36px ($baseline/4) ($baseline/2);
           position: relative;
           text-decoration: none;
 
@@ -169,6 +228,7 @@
 
         &.active {
           font-weight: bold;
+          background-color: $gray-l5;
 
           &:after {
             content: '›';
@@ -210,7 +270,7 @@
              position: absolute;
              top: 0;
              bottom: 0;
-             right: 7px;
+             right: ($baseline/2);
            }
           }
 

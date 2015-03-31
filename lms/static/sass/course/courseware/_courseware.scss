@@ -1,3 +1,19 @@
+// lms - views - courseware
+// ====================
+ 
+// Table of Contents 
+// * +Deprecated - Resets  [TO-DO]
+// * +Instructor Info [TO-DO]
+// * +Course Wrapper - Base
+// * +Course Wrapper - Home
+// * +Course Wrapper - Content Views
+// * +Miscellaneous Resets and Overrides [TO-DO]
+
+
+// +Deprecated - Resets
+// ==================== 
+// not clear when these are necessary, TO-DO: cleanup / review
+
 html {
   height: 100%;
   max-height: 100%;
@@ -10,6 +26,10 @@ html.video-fullscreen{
     overflow: hidden;
   }
 }
+
+// +Instructor Info 
+// ==================== 
+// not clear when this is used, TO-DO: cleanup / review
 
 .wrap-instructor-info {
   margin: ($baseline/2) ($baseline/4) 0 0;
@@ -39,11 +59,40 @@ html.video-fullscreen{
   }
 }
 
+// +Course Wrapper - Base
+// ==================== 
+.course-wrapper {
+  
+}
+
+// +Course Wrapper - Home 
+// ==================== 
+// TO-DO: nest within .view-outline once tag has been added to <body>
+.course-wrapper.home {
+  background-color: $gray-l6; // TO-DO remove / fix specificity 
+
+  .course-content {
+    @extend %content-supplementary;
+    padding: 0;
+    @include padding-left($baseline/2);
+
+    h2 {
+      // TO-DO use class instead of element selector 
+      text-transform: none;
+      letter-spacing: normal;
+    }
+
+  }
+}
+
+// +Course Wrapper - Old Content Views 
+// ==================== 
 div.course-wrapper {
   position: relative;
 
-  section.course-content {
-    @extend .content;
+
+  .course-content {
+    @extend .content-old;
     padding: 40px;
     line-height: 1.6;
 
@@ -276,10 +325,12 @@ div.course-wrapper {
   }
 }
 
+
+// +Miscellaneous Resets and Overrides
+// ==================== 
+
 .xmodule_VideoModule {
   margin-bottom: ($baseline*1.5);
-
-
 }
 
 textarea.short-form-response {

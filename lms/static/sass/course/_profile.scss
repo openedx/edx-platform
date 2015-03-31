@@ -2,7 +2,7 @@
   color: $black;
 
   .user-info {
-    @extend .sidebar;
+    @extend .sidebar-old;
     border-left: 1px solid #d3d3d3;
     border-radius: 0px 4px 4px 0;
     border-right: 0;
@@ -131,7 +131,7 @@
   }
 
   .course-info {
-    @extend .content;
+    @extend .content-old;
 
     header {
       @extend .clearfix;

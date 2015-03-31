@@ -1,0 +1,29 @@
+// lms - course - layout
+// ====================
+
+// Table of Contents 
+// * +Basic Page Content
+// * +Primary Content
+// * +Supplementary Content
+
+// +Basic Page Content
+// ==================== 
+
+
+// +Primary Content
+// ==================== 
+%content-primary {
+	@include float(left);
+	@include margin-right(flex-gutter());
+	width: flex-grid(8,12);
+	box-shadow: none;
+	border: 0;
+	background-color: $white;
+}
+
+// +Supplementary Content
+// ==================== 
+%content-supplementary {
+	@include float(left);
+	width: flex-grid(4,12);
+}

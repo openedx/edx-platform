@@ -18,7 +18,7 @@ div.book-wrapper {
   }
 
   section.book-sidebar {
-    @extend .sidebar;
+    @extend .sidebar-old;
     @extend .tran;
     @include box-sizing(border-box);
     padding: ($baseline/2) 0;
@@ -102,7 +102,7 @@ div.book-wrapper {
   }
 
   .book {
-    @extend .content;
+    @extend .content-old;
     padding: 0;
     width:76%;
 

@@ -42,7 +42,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
 
     .student-notes {
       @include clearfix();
-      @extend .content; // needed extend carried over from course handouts UI, but should be cleaned up
+      @extend .content-old; // needed extend carried over from course handouts UI, but should be cleaned up
       width: 100%;
     }
   }

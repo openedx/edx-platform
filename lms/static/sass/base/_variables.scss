@@ -400,7 +400,7 @@ $modal-bg-color: rgb(245,245,245);
 // MISC: sidebar
 $sidebar-chapter-bg-top: rgba(255, 255, 255, .6);
 $sidebar-chapter-bg-bottom: rgba(255, 255, 255, 0);
-$sidebar-chapter-bg: rgb(238,238,238); // #eeeeee
+$sidebar-chapter-bg: $gray-l6;
 $sidebar-active-image: linear-gradient(top, rgb(230,230,230), rgb(214,214,214));
 
 // TOP HEADER IMAGE MARGIN
