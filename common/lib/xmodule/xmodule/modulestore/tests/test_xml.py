@@ -9,6 +9,7 @@ from mock import patch
 
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.x_module import XModuleMixin
 
 from xmodule.tests import DATA_DIR
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -46,7 +47,11 @@ class TestXMLModuleStore(unittest.TestCase):
 
         # Load the course, but don't make error modules.  This will succeed,
         # but will record the errors.
-        modulestore = XMLModuleStore(DATA_DIR, source_dirs=['toy'], load_error_modules=False)
+        modulestore = XMLModuleStore(
+            DATA_DIR,
+            source_dirs=['toy'],
+            xblock_mixins=(XModuleMixin,),
+            load_error_modules=False)
 
         # Look up the errors during load. There should be none.
         errors = modulestore.get_course_errors(SlashSeparatedCourseKey("edX", "toy", "2012_Fall"))
@@ -119,7 +124,11 @@ class TestXMLModuleStore(unittest.TestCase):
         """
         Test a course whose structure is not a tree.
         """
-        store = XMLModuleStore(DATA_DIR, source_dirs=['xml_dag'])
+        store = XMLModuleStore(
+            DATA_DIR,
+            source_dirs=['xml_dag'],
+            xblock_mixins=(XModuleMixin,),
+        )
         course_key = store.get_courses()[0].id
 
         mock_logging.warning.assert_called_with(

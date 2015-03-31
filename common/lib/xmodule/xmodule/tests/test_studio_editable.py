@@ -2,11 +2,14 @@
 Tests for StudioEditableModule.
 """
 
-from xmodule.tests.test_vertical import BaseVerticalModuleTest
+from xmodule.tests.test_vertical import BaseVerticalBlockTest
 from xmodule.x_module import AUTHOR_VIEW
 
 
-class StudioEditableModuleTestCase(BaseVerticalModuleTest):
+class StudioEditableModuleTestCase(BaseVerticalBlockTest):
+    """
+    Class containing StudioEditableModule tests.
+    """
     def test_render_reorderable_children(self):
         """
         Test the behavior of render_reorderable_children.

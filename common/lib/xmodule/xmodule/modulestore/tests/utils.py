@@ -5,6 +5,7 @@ from importlib import import_module
 from opaque_keys.edx.keys import UsageKey
 from unittest import TestCase
 from xblock.fields import XBlockMixin
+from xmodule.x_module import XModuleMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
 from xmodule.modulestore.edit_info import EditInfoMixin
@@ -84,7 +85,7 @@ class MixedSplitTestCase(TestCase):
         'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': DATA_DIR,
         'render_template': RENDER_TEMPLATE,
-        'xblock_mixins': (EditInfoMixin, InheritanceMixin, LocationMixin),
+        'xblock_mixins': (EditInfoMixin, InheritanceMixin, LocationMixin, XModuleMixin),
     }
     DOC_STORE_CONFIG = {
         'host': MONGO_HOST,

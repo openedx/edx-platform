@@ -16,6 +16,7 @@ from django.contrib.auth.models import AnonymousUser
 from mock import MagicMock, patch, Mock
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from pyquery import PyQuery
 from courseware.module_render import hash_resource
 from xblock.field_data import FieldData
 from xblock.runtime import Runtime
@@ -430,7 +431,8 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
         content = json.loads(response.content)
         for section in expected:
             self.assertIn(section, content)
-        self.assertIn('<div class="xblock xblock-student_view xmodule_display', content['html'])
+        doc = PyQuery(content['html'])
+        self.assertEquals(len(doc('div.xblock-student_view-videosequence')), 1)
 
 
 @ddt.ddt
@@ -567,7 +569,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         )
         result_fragment = module.render(STUDENT_VIEW)
 
-        self.assertIn('div class="xblock xblock-student_view xmodule_display xmodule_HtmlModule"', result_fragment.content)
+        self.assertEquals(len(PyQuery(result_fragment.content)('div.xblock.xblock-student_view.xmodule_HtmlModule')), 1)
 
     def test_xmodule_display_wrapper_disabled(self):
         module = render.get_module(
@@ -798,8 +800,8 @@ class MongoViewInStudioTest(ViewInStudioTest):
         # Render the parent vertical, then check that there is only a single "View Unit in Studio" link.
         result_fragment = self.module.render(STUDENT_VIEW)
         # The single "View Unit in Studio" link should appear before the first xmodule vertical definition.
-        parts = result_fragment.content.split('xmodule_VerticalModule')
-        self.assertEqual(3, len(parts), "Did not find two vertical modules")
+        parts = result_fragment.content.split('data-block-type="vertical"')
+        self.assertEqual(3, len(parts), "Did not find two vertical blocks")
         self.assertIn('View Unit in Studio', parts[0])
         self.assertNotIn('View Unit in Studio', parts[1])
         self.assertNotIn('View Unit in Studio', parts[2])

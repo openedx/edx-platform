@@ -20,6 +20,7 @@ from nose.plugins.attrib import attr
 import pymongo
 from pytz import UTC
 
+from xmodule.x_module import XModuleMixin
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.tests.test_cross_modulestore_import_export import MongoContentstoreBuilder
@@ -73,7 +74,7 @@ class TestMixedModuleStore(CourseComparisonTest):
         'default_class': DEFAULT_CLASS,
         'fs_root': DATA_DIR,
         'render_template': RENDER_TEMPLATE,
-        'xblock_mixins': (EditInfoMixin, InheritanceMixin, LocationMixin),
+        'xblock_mixins': (EditInfoMixin, InheritanceMixin, LocationMixin, XModuleMixin),
     }
     DOC_STORE_CONFIG = {
         'host': HOST,

@@ -47,7 +47,7 @@ class DraftModuleStore(MongoModuleStore):
     This module also includes functionality to promote DRAFT modules (and their children)
     to published modules.
     """
-    def get_item(self, usage_key, depth=0, revision=None, **kwargs):
+    def get_item(self, usage_key, depth=0, revision=None, using_descriptor_system=None, **kwargs):
         """
         Returns an XModuleDescriptor instance for the item at usage_key.
 
@@ -70,6 +70,9 @@ class DraftModuleStore(MongoModuleStore):
                 Note: If the item is in DIRECT_ONLY_CATEGORIES, then returns only the PUBLISHED
                 version regardless of the revision.
 
+            using_descriptor_system (CachingDescriptorSystem): The existing CachingDescriptorSystem
+                to add data to, and to load the XBlocks from.
+
         Raises:
             xmodule.modulestore.exceptions.InsufficientSpecificationError
             if any segment of the usage_key is None except revision
@@ -78,10 +81,14 @@ class DraftModuleStore(MongoModuleStore):
             is found at that usage_key
         """
         def get_published():
-            return wrap_draft(super(DraftModuleStore, self).get_item(usage_key, depth=depth))
+            return wrap_draft(super(DraftModuleStore, self).get_item(
+                usage_key, depth=depth, using_descriptor_system=using_descriptor_system
+            ))
 
         def get_draft():
-            return wrap_draft(super(DraftModuleStore, self).get_item(as_draft(usage_key), depth=depth))
+            return wrap_draft(super(DraftModuleStore, self).get_item(
+                as_draft(usage_key), depth=depth, using_descriptor_system=using_descriptor_system
+            ))
 
         # return the published version if ModuleStoreEnum.RevisionOption.published_only is requested
         if revision == ModuleStoreEnum.RevisionOption.published_only:
