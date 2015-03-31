@@ -1499,6 +1499,15 @@ BULK_EMAIL_INFINITE_RETRY_CAP = 1000
 # routing key that points to it.  At the moment, the name is the same.
 BULK_EMAIL_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 
+# We also define a queue for smaller jobs so that large courses don't block
+# smaller emails (see BULK_EMAIL_JOB_SIZE_THRESHOLD setting)
+BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = DEFAULT_PRIORITY_QUEUE
+
+# For emails with fewer than these number of recipients, send them through
+# a different queue to avoid large courses blocking emails that are meant to be
+# sent to self and staff
+BULK_EMAIL_JOB_SIZE_THRESHOLD = 100
+
 # Flag to indicate if individual email addresses should be logged as they are sent
 # a bulk email message.
 BULK_EMAIL_LOG_SENT_EMAILS = False
