@@ -14,9 +14,11 @@ from xmodule.assetstore import AssetMetadata
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.xml_importer import import_course_from_xml
 from django.test.utils import override_settings
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
+from static_replace import replace_static_urls
 import mock
 from ddt import ddt
 from ddt import data
@@ -85,6 +87,44 @@ class BasicAssetsTestCase(AssetsTestCase):
 
         # Note: Actual contentType for textbook.pdf in asset.json is 'text/pdf'
         self.assertEqual(content.content_type, 'application/pdf')
+
+    def test_relative_url_for_split_course(self):
+        """
+        Test relative path for split courses assets
+        """
+        with modulestore().default_store(ModuleStoreEnum.Type.split):
+            module_store = modulestore()
+            course_id = module_store.make_course_key('edX', 'toy', '2012_Fall')
+            import_course_from_xml(
+                module_store,
+                self.user.id,
+                TEST_DATA_DIR,
+                ['toy'],
+                static_content_store=contentstore(),
+                target_id=course_id,
+                create_if_not_present=True
+            )
+            course = module_store.get_course(course_id)
+
+            filename = 'sample_static.txt'
+            html_src_attribute = '"/static/{}"'.format(filename)
+            asset_url = replace_static_urls(html_src_attribute, course_id=course.id)
+            url = asset_url.replace('"', '')
+            base_url = url.replace(filename, '')
+
+            self.assertTrue("/{}".format(filename) in url)
+            resp = self.client.get(url)
+            self.assertEquals(resp.status_code, 200)
+
+            # simulation of html page where base_url is up-to asset's main directory
+            # and relative_path is dom element with its src
+            relative_path = 'just_a_test.jpg'
+            # browser append relative_path with base_url
+            absolute_path = base_url + relative_path
+
+            self.assertTrue("/{}".format(relative_path) in absolute_path)
+            resp = self.client.get(absolute_path)
+            self.assertEquals(resp.status_code, 200)
 
 
 class PaginationTestCase(AssetsTestCase):
