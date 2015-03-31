@@ -111,7 +111,8 @@ class TestMixedModuleStore(CourseComparisonTest):
                     'xblock_mixins': modulestore_options['xblock_mixins'],
                 }
             },
-        ]
+        ],
+        'xblock_mixins': modulestore_options['xblock_mixins'],
     }
 
     def _compare_ignore_version(self, loc1, loc2, msg=None):
