@@ -371,6 +371,3 @@ class TestCoursewareSearchIndexer(MixedSplitTestCase):
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_exception(self, store_type):
         self._perform_test_using_store(store_type, self._test_exception)
-
-    def A(self):
-        self._perform_test_using_store(ModuleStoreEnum.Type.mongo, self._test_indexing_course)
