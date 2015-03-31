@@ -1,7 +1,7 @@
 ;(function (define, undefined) {
     'use strict';
     define([
-        'gettext', 'underscore', 'backbone',
+        'gettext', 'underscore', 'backbone'
     ], function (gettext, _, Backbone) {
 
         var UserPreferencesModel = Backbone.Model.extend({
