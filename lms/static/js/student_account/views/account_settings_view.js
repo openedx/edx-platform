@@ -1,7 +1,7 @@
 ;(function (define, undefined) {
     'use strict';
     define([
-        'gettext', 'jquery', 'underscore', 'backbone',
+        'gettext', 'jquery', 'underscore', 'backbone'
     ], function (gettext, $, _, Backbone) {
 
         var AccountSettingsView = Backbone.View.extend({
