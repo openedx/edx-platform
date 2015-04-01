@@ -2,9 +2,14 @@
 Serializers for all Course Enrollment related return objects.
 
 """
+import logging
+
 from rest_framework import serializers
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
+
+
+log = logging.getLogger(__name__)
 
 
 class StringListField(serializers.CharField):
@@ -56,7 +61,28 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
     course_details = serializers.SerializerMethodField('get_course_details')
     user = serializers.SerializerMethodField('get_username')
 
+    @property
+    def data(self):
+        serialized_data = super(CourseEnrollmentSerializer, self).data
+
+        # filter the results with empty courses 'course_details'
+        if isinstance(serialized_data, dict):
+            if serialized_data.get('course_details') is None:
+                return None
+
+            return serialized_data
+
+        return [enrollment for enrollment in serialized_data if enrollment.get('course_details')]
+
     def get_course_details(self, model):
+        if model.course is None:
+            msg = u"Course '{0}' does not exist (maybe deleted), in which User (user_id: '{1}') is enrolled.".format(
+                model.course_id,
+                model.user.id
+            )
+            log.warning(msg)
+            return None
+
         field = CourseField()
         return field.to_native(model.course)
 
