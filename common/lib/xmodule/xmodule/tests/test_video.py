@@ -553,11 +553,12 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
 
     @patch('xmodule.video_module.video_module.edxval_api')
     def test_import_val_data(self, mock_val_api):
-        def mock_val_import(xml, edx_video_id):
+        def mock_val_import(xml, edx_video_id, course_id):
             """Mock edxval.api.import_from_xml"""
             self.assertEqual(xml.tag, 'video_asset')
             self.assertEqual(dict(xml.items()), {'mock_attr': ''})
             self.assertEqual(edx_video_id, 'test_edx_video_id')
+            self.assertEqual(course_id, 'test_course_id')
 
         mock_val_api.import_from_xml = Mock(wraps=mock_val_import)
         module_system = DummySystem(load_error_modules=True)
@@ -568,10 +569,12 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
                 <video_asset mock_attr=""/>
             </video>
         """
-        video = VideoDescriptor.from_xml(xml_data, module_system, id_generator=Mock())
+        id_generator = Mock()
+        id_generator.target_course_id = 'test_course_id'
+        video = VideoDescriptor.from_xml(xml_data, module_system, id_generator)
 
         self.assert_attributes_equal(video, {'edx_video_id': 'test_edx_video_id'})
-        mock_val_api.import_from_xml.assert_called_once_with(ANY, 'test_edx_video_id')
+        mock_val_api.import_from_xml.assert_called_once_with(ANY, 'test_edx_video_id', course_id='test_course_id')
 
     @patch('xmodule.video_module.video_module.edxval_api')
     def test_import_val_data_invalid(self, mock_val_api):
