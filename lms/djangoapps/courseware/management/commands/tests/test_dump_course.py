@@ -44,6 +44,7 @@ class CommandsTestBase(ModuleStoreTestCase):
 
     """
     __test__ = False
+    url_name = '2012_Fall'
 
     def setUp(self):
         super(CommandsTestBase, self).setUp()
@@ -201,7 +202,7 @@ class CommandsTestBase(ModuleStoreTestCase):
 
         assert_in = self.assertIn
         assert_in('edX-simple-2012_Fall', names)
-        assert_in('edX-simple-2012_Fall/policies/2012_Fall/policy.json', names)
+        assert_in('edX-simple-2012_Fall/policies/{}/policy.json'.format(self.url_name), names)
         assert_in('edX-simple-2012_Fall/html/toylab.html', names)
         assert_in('edX-simple-2012_Fall/videosequence/A_simple_sequence.xml', names)
         assert_in('edX-simple-2012_Fall/sequential/Lecture_2.xml', names)
@@ -232,3 +233,4 @@ class CommandSplitMongoTestCase(CommandsTestBase):
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
     __test__ = True
+    url_name = 'course'
