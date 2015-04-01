@@ -318,7 +318,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         super(VideoDescriptor, self).__init__(*args, **kwargs)
         # For backwards compatibility -- if we've got XML data, parse it out and set the metadata fields
         if self.data:
-            field_data = self._parse_video_xml(etree.fromstring(self.data))
+            field_data, __ = self._parse_video_xml(etree.fromstring(self.data))
             self._field_data.set_many(self, field_data)
             del self.data
 
@@ -415,7 +415,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             filepath = cls._format_filepath(xml_object.tag, name_to_pathname(url_name))
             xml_object = cls.load_file(filepath, system.resources_fs, usage_id)
             system.parse_asides(xml_object, definition_id, usage_id, id_generator)
-        field_data = cls._parse_video_xml(xml_object)
+        field_data, parsed_import_data = cls._parse_video_xml(xml_object)
         kvs = InheritanceKeyValueStore(initial_values=field_data)
         field_data = KvsFieldData(kvs)
         video = system.construct_xblock_from_class(
@@ -426,6 +426,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             ScopeIds(None, block_type, definition_id, usage_id),
             field_data,
         )
+        video._parsed_import_data = parsed_import_data
         return video
 
     def definition_to_xml(self, resource_fs):
@@ -626,16 +627,29 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         if 'download_track' not in field_data and track is not None:
             field_data['download_track'] = True
 
+        parsed_import_data = {}
         video_asset_elem = xml.find('video_asset')
         if (
                 edxval_api and
                 video_asset_elem is not None and
                 'edx_video_id' in field_data
         ):
-            # Allow ValCannotCreateError to escape
-            edxval_api.import_from_xml(video_asset_elem, field_data['edx_video_id'])
+            parsed_import_data['video_asset_elem'] = video_asset_elem
 
-        return field_data
+        return field_data, parsed_import_data
+
+
+    def post_import(self, target_course_id):
+        """TODO"""
+        if getattr(self, '_parsed_import_data', None) and self._parsed_import_data.get('video_asset_elem'):
+            # Allow ValCannotCreateError to escape
+            edxval_api.import_from_xml(
+                self._parsed_import_data['video_asset_elem'],
+                self.edx_video_id,
+                target_course_id,
+            )
+            delattr(self, '_parsed_import_data')
+
 
     def index_dictionary(self):
         xblock_body = super(VideoDescriptor, self).index_dictionary()
