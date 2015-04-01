@@ -870,11 +870,13 @@ def save_query(request, course_id):
         for query in existing_queries
         if (query != "working" and query != "")
     ]
-    success = data_access.save_query(course_id, clean_existing)
+    group = data_access.save_query(course_id, clean_existing)
+    group_title = group.title or u'Query saved at ' + group.created.strftime("%m-%d-%y %H:%M")
 
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
-        'success': success,
+        'group_id': group.id,
+        'group_title': group_title,
     }
     return JsonResponse(response_payload)
 

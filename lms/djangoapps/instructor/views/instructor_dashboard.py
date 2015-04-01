@@ -34,7 +34,9 @@ from student.models import CourseEnrollment
 from shoppingcart.models import Coupon, PaidCourseRegistration
 from course_modes.models import CourseMode, CourseModesArchive
 from student.roles import CourseFinanceAdminRole
+from instructor_email_widget.models import GroupedQuery
 
+from bulk_email.models import CourseEmail
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 from .tools import get_units_with_due_date, title_or_url, bulk_email_is_enabled_for_course
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -342,6 +344,11 @@ def _section_data_download(course, access):
 def _section_send_email(course, access):
     """ Provide data for the corresponding bulk email section """
     course_key = course.id
+    queries = GroupedQuery.objects.filter(course_id=course_key)
+    query_options = tuple(
+        (query.id, query.title or u'Query saved at ' + query.created.strftime("%m-%d-%y %H:%M"))
+        for query in queries
+    )
 
     # This HtmlDescriptor is only being used to generate a nice text editor.
     html_module = HtmlDescriptor(
@@ -364,6 +371,7 @@ def _section_send_email(course, access):
         'section_display_name': _('Email'),
         'keywords_supported': get_keywords_supported(),
         'access': access,
+        'to_options': CourseEmail.TO_OPTION_CHOICES + query_options,
         'send_email': reverse('send_email', kwargs={'course_id': course_key.to_deprecated_string()}),
         'editor': email_editor,
         'list_instructor_tasks_url': reverse(
