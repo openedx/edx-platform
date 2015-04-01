@@ -127,6 +127,19 @@ class EnrollmentDataTest(ModuleStoreTestCase):
         results = data.get_course_enrollments(self.user.username)
         self.assertEqual(results, created_enrollments)
 
+        # Now create a course enrollment with some invalid course (does
+        # not exist in database) for the user and check that the method
+        # 'get_course_enrollments' ignores course enrollments for invalid
+        # or deleted courses
+        CourseEnrollment.objects.create(
+            user=self.user,
+            course_id='InvalidOrg/InvalidCourse/InvalidRun',
+            mode='honor',
+            is_active=True
+        )
+        updated_results = data.get_course_enrollments(self.user.username)
+        self.assertEqual(results, updated_results)
+
     @ddt.data(
         # Default (no course modes in the database)
         # Expect that users are automatically enrolled as "honor".
