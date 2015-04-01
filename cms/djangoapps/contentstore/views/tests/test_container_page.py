@@ -6,14 +6,16 @@ Unit tests for the container page.
 import re
 import datetime
 from pytz import UTC
+from mock import patch, Mock
+
+from django.http import Http404
+from django.test.client import RequestFactory
+from django.utils import http
+
+import contentstore.views.component as views
 from contentstore.views.tests.utils import StudioPageTestCase
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import ItemFactory
-import contentstore.views.component as views
-from django.test.client import RequestFactory
-from django.utils import http
-from django.http import Http404
-from mock import patch, Mock
 
 
 class ContainerPageTestCase(StudioPageTestCase):
@@ -176,7 +178,7 @@ class ContainerPageTestCase(StudioPageTestCase):
         self.assertRaises(
             Http404, views.container_handler,
             request,
-            usage_key_string='i4x://InvalidOrg/InvalidCourse/vertical/static/InvalidPage',
+            usage_key_string='i4x://InvalidOrg/InvalidCourse/vertical/static/InvalidContent',
             )
 
         # Check 200 response if 'usage_key_string' is correct
