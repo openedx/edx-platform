@@ -1,8 +1,6 @@
 """
 Unit tests for the container page.
 """
-
-
 import re
 import datetime
 from pytz import UTC
