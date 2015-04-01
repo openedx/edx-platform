@@ -683,10 +683,13 @@ def _import_module_and_update_references(
             else:
                 fields[field_name] = field.read_from(module)
 
-    return store.import_xblock(
+    imported_module = store.import_xblock(
         user_id, dest_course_id, module.location.category,
         module.location.block_id, fields, runtime
     )
+    if getattr(imported_module, 'post_import', None):
+        imported_module.post_import(dest_course_id)
+    return imported_module
 
 
 def _import_course_draft(

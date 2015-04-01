@@ -907,11 +907,13 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         """
         video = VideoDescriptor.from_xml(xml_data, module_system, id_generator=Mock())
         self.assertEqual(video.edx_video_id, 'test_edx_video_id')
+        video.post_import("test_course_id")
+
         video_data = get_video_info(video.edx_video_id)
         self.assertEqual(video_data['client_video_id'], 'test_client_video_id')
         self.assertEqual(video_data['duration'], 111)
         self.assertEqual(video_data['status'], 'imported')
-        self.assertEqual(video_data['courses'], [])
+        self.assertEqual(video_data['courses'], ['test_course_id'])
         self.assertEqual(video_data['encoded_videos'][0]['profile'], 'mobile')
         self.assertEqual(video_data['encoded_videos'][0]['url'], 'http://example.com/video')
         self.assertEqual(video_data['encoded_videos'][0]['file_size'], 222)
@@ -929,7 +931,8 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
                 </video_asset>
             </video>
         """
+        video = VideoDescriptor.from_xml(xml_data, module_system, id_generator=Mock())
         with self.assertRaises(ValCannotCreateError):
-            VideoDescriptor.from_xml(xml_data, module_system, id_generator=Mock())
+            video.post_import("test_course_id")
         with self.assertRaises(ValVideoNotFoundError):
             get_video_info("test_edx_video_id")
