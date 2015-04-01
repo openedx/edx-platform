@@ -5,12 +5,12 @@
 <% } %>
 
 <% if (iconName) { %>
-    <i class="u-field-icon icon fa <%- iconName %> fa-fw" area-hidden="true" ></i>
+    <i class="u-field-icon icon fa <%- iconName %> fa-fw" aria-hidden="true" ></i>
 <% } %>
 
 <span class="u-field-value">
     <% if (mode === 'edit') { %>
-        <select name="select" id="u-field-select-<%- id %>" aria-describedby="u-field-message-<%- id %>">
+        <select name="select" id="u-field-select-<%- id %>" aria-describedby="u-field-help-message-<%- id %>">
             <% if (!required) { %>
                 <option value=""></option>
             <% } %>
@@ -18,9 +18,16 @@
                 <option value="<%- selectOption[0] %>"><%- selectOption[1] %></option>
             <% }); %>
         </select>
-    <% } %>
+    <% } else { %>
+        <a href="#" class="u-field-value-readonly-wrapper">
+            <span class="sr"><%- gettext(srText) %></span>
+            <span class="u-field-value-readonly"></span>
+            <span class="sr">Click to edit</span>
+        </a>
+    <% }%>
 </span>
 
 <span class="u-field-message" id="u-field-message-<%- id %>">
-    <%- gettext(message) %>
+    <span class="u-field-message-notification" aria-live="polite"></span>
+    <span class="u-field-message-help" id="u-field-help-message-<%- id %>"><%- gettext(message) %></span>
 </span>

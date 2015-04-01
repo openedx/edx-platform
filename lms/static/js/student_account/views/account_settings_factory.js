@@ -56,6 +56,7 @@
                                 emailAttribute: 'email',
                                 linkTitle: gettext('Reset Password'),
                                 linkHref: fieldsData['password']['url'],
+                                screenReaderText: gettext('Reset your Password'),
                                 helpMessage: gettext('When you click "Reset Password", a message will be sent to your email address. Click the link in the message to reset your password.')
                             })
                         },
@@ -130,7 +131,8 @@
                                 helpMessage: '',
                                 connected: provider['connected'],
                                 connectUrl: provider['connect_url'],
-                                disconnectUrl: provider['disconnect_url']
+                                disconnectUrl: provider['disconnect_url'],
+                                screenReaderText: interpolate_text('Connect your {accountName} account', {accountName: provider['name']})
                             })
                         }
                     })

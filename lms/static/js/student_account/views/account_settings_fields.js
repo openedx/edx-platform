@@ -113,7 +113,8 @@
                     title: this.options.title,
                     linkTitle: this.options.connected ? gettext('Unlink') : gettext('Link'),
                     linkHref: '',
-                    message: this.helpMessage
+                    message: this.helpMessage,
+                    screenReaderText: this.options.screenReaderText
                 }));
                 return this;
             },
