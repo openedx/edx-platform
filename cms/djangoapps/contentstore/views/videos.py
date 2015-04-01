@@ -52,6 +52,8 @@ class StatusDisplayStrings(object):
     # Translators: This is the status for a video for which an invalid
     # processing token was provided in the course settings
     _INVALID_TOKEN = ugettext_noop("Invalid Token")
+    # Translators: This is the status for a video that was included in a course import
+    _IMPORTED = ugettext_noop("Imported")
     # Translators: This is the status for a video that is in an unknown state
     _UNKNOWN = ugettext_noop("Unknown")
 
@@ -64,7 +66,8 @@ class StatusDisplayStrings(object):
         "file_complete": _COMPLETE,
         "file_corrupt": _FAILED,
         "pipeline_error": _FAILED,
-        "invalid_token": _INVALID_TOKEN
+        "invalid_token": _INVALID_TOKEN,
+        "imported": _IMPORTED,
     }
 
     @staticmethod
