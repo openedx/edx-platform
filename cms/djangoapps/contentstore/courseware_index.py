@@ -197,6 +197,12 @@ class CoursewareSearchIndexer(object):
             'category': 'courseware_index',
         }
 
+        self._emit_track_event(event_name, data)
+
+    def _emit_track_event(self, event_name, data):
+        """
+        Emit and log index event.
+        """
         tracker.emit(
             event_name,
             data
