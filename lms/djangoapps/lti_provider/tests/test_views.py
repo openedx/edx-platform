@@ -92,7 +92,7 @@ class LtiLaunchTest(TestCase):
         request = self.build_request(False)
         response = views.lti_launch(request, None)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], '/accounts/login?next=/lti_provider/lti_run/')
+        self.assertEqual(response['Location'], '/accounts/login?next=/lti_provider/lti_run')
 
     def test_forbidden_if_signature_fails(self):
         """
