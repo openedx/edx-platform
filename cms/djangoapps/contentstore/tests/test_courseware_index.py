@@ -333,7 +333,7 @@ class TestCoursewareSearchIndexer(MixedSplitTestCase):
         indexed_count = self.reindex_course(store)
         self.assertEqual(indexed_count, 7)
 
-    @patch('django.conf.settings.SEARCH_ENGINE', 'search.tests.tests.ErroringIndexEngine')
+    @patch('django.conf.settings.SEARCH_ENGINE', 'search.tests.utils.ErroringIndexEngine')
     def _test_exception(self, store):
         """ Test that exception within indexing yields a SearchIndexingError """
         self.publish_item(store, self.vertical.location)
