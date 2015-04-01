@@ -151,7 +151,7 @@ class TestCoursewareSearchIndexer(MixedSplitTestCase):
             store.update_item(item, ModuleStoreEnum.UserID.test)
 
     def get_search_engine(self):
-        """ Cenralized call to getting the search engin for the test """
+        """ Centralized call to getting the search engine for the test """
         return SearchEngine.get_search_engine(INDEX_NAME)
 
     def _perform_test_using_store(self, store_type, test_to_perform):

@@ -4,6 +4,7 @@ from __future__ import absolute_import
 from datetime import timedelta
 import logging
 
+from django.conf import settings
 from django.utils.translation import ugettext as _
 from eventtracking import tracker
 from xmodule.modulestore import ModuleStoreEnum
@@ -16,6 +17,13 @@ DOCUMENT_TYPE = "courseware_content"
 REINDEX_AGE = timedelta(0, 60)
 
 log = logging.getLogger('edx.modulestore')
+
+
+def indexing_is_enabled():
+    """
+    Checks to see if the indexing feature is enabled
+    """
+    return settings.FEATURES.get('ENABLE_COURSEWARE_INDEX', False)
 
 
 class SearchIndexingError(Exception):
@@ -31,8 +39,7 @@ class CoursewareSearchIndexer(object):
     Class to perform indexing for courseware search from different modulestores
     """
 
-    @staticmethod
-    def index_course(modulestore, course_key, triggered_at=None, reindex_age=REINDEX_AGE):
+    def index_course(self, modulestore, course_key, triggered_at=None, reindex_age=REINDEX_AGE):
         """
         Process course for indexing
 
@@ -62,6 +69,11 @@ class CoursewareSearchIndexer(object):
         indexed_count = {
             "count": 0
         }
+
+        # indexed_items is a list of all the items that we wish to remain in the
+        # index, whether or not we are planning to actually update their index.
+        # This is used in order to build a query to remove those items not in this
+        # list - those are ready to be destroyed
         indexed_items = set()
 
         def index_item(item, current_start_date, skip_index=False):
@@ -158,13 +170,13 @@ class CoursewareSearchIndexer(object):
         """
         (Re)index all content within the given course, tracking the fact that a full reindex has taking place
         """
-        indexed_count = cls.index_course(modulestore, course_key)
+        indexer = cls()
+        indexed_count = indexer.index_course(modulestore, course_key)
         if indexed_count:
-            cls._track_index_request('edx.course.index.reindexed', indexed_count)
+            indexer.track_index_request('edx.course.index.reindexed', indexed_count)
         return indexed_count
 
-    @staticmethod
-    def _track_index_request(event_name, indexed_count):
+    def track_index_request(self, event_name, indexed_count):
         """Track content index requests.
 
         Arguments:
