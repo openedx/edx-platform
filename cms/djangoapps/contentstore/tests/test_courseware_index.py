@@ -17,6 +17,7 @@ from xmodule.modulestore.tests.test_cross_modulestore_import_export import Mongo
 from xmodule.modulestore.tests.utils import create_modulestore_instance, LocationMixin
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.tests import DATA_DIR
+from xmodule.x_module import XModuleMixin
 from search.search_engine_base import SearchEngine
 
 from contentstore.courseware_index import CoursewareSearchIndexer, INDEX_NAME, SearchIndexingError
@@ -36,7 +37,7 @@ class TestCoursewareSearchIndexer(MixedSplitTestCase):
         'default_class': DEFAULT_CLASS,
         'fs_root': DATA_DIR,
         'render_template': RENDER_TEMPLATE,
-        'xblock_mixins': (EditInfoMixin, InheritanceMixin, LocationMixin),
+        'xblock_mixins': (EditInfoMixin, InheritanceMixin, LocationMixin, XModuleMixin),
     }
     DOC_STORE_CONFIG = {
         'host': HOST,
@@ -68,7 +69,8 @@ class TestCoursewareSearchIndexer(MixedSplitTestCase):
                     'xblock_mixins': modulestore_options['xblock_mixins'],
                 }
             },
-        ]
+        ],
+        'xblock_mixins': modulestore_options['xblock_mixins'],
     }
 
     def setUp(self):
