@@ -162,6 +162,7 @@ def _make_social_stats(**kwargs):
         DiscussionExportFields.UPVOTES: 0,
         DiscussionExportFields.FOLOWERS: 0,
         DiscussionExportFields.COMMENTS_GENERATED: 0,
+        DiscussionExportFields.THREADS_READ: 0,
     }
     result.update(kwargs)
     return result
@@ -181,6 +182,7 @@ def _make_result(user_id, **kwargs):
         DiscussionExportFields.UPVOTES: 0,
         DiscussionExportFields.FOLOWERS: 0,
         DiscussionExportFields.COMMENTS_GENERATED: 0,
+        DiscussionExportFields.THREADS_READ: 0,
     }
     result.update(kwargs)
     return result
@@ -265,17 +267,19 @@ class ExporterTest(TestCase):
             _make_result(
                 1, username=u"Q", email=u"q@e.com", first_name=u"w", last_name=u"e",
                 num_threads=1, num_comments=3, num_replies=7,
-                num_upvotes=2, num_thread_followers=4, num_comments_generated=4
+                num_upvotes=2, num_thread_followers=4, num_comments_generated=4,
+                num_threads_read=2,
             ),
             _make_result(
                 2, username="A", email="a@d.com", first_name="s", last_name="d",
                 num_threads=7, num_comments=15, num_replies=3,
-                num_upvotes=4, num_thread_followers=5, num_comments_generated=19
+                num_upvotes=4, num_thread_followers=5, num_comments_generated=19,
+                num_threads_read=3,
             )
         ])
         lines = stream.getvalue().split("\r\n")
         self.assertEqual(len(lines), 4)
         self.assertEqual(lines[0], u",".join(exporter.row_order))
-        self.assertEqual(lines[1], u"A,a@d.com,s,d,2,7,15,3,4,5,19")
-        self.assertEqual(lines[2], u"Q,q@e.com,w,e,1,1,3,7,2,4,4")
+        self.assertEqual(lines[1], u"A,a@d.com,s,d,2,7,15,3,4,5,19,3")
+        self.assertEqual(lines[2], u"Q,q@e.com,w,e,1,1,3,7,2,4,4,2")
         self.assertEqual(lines[3], u"")
