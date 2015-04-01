@@ -40,20 +40,7 @@ class VideoUploadTestMixin(object):
             "course_video_upload_token": self.test_token,
         }
         self.save_course()
-        self.profiles = [
-            {
-                "profile_name": "profile1",
-                "extension": "mp4",
-                "width": 640,
-                "height": 480,
-            },
-            {
-                "profile_name": "profile2",
-                "extension": "mp4",
-                "width": 1920,
-                "height": 1080,
-            },
-        ]
+        self.profiles = ["profile1", "profile2"]
         self.previous_uploads = [
             {
                 "edx_video_id": "test1",

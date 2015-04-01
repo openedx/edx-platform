@@ -2,15 +2,21 @@
 """Video xmodule tests in mongo."""
 import json
 from collections import OrderedDict
-from mock import patch, MagicMock
+
+from lxml import etree
+from mock import patch, MagicMock, Mock
 
 from django.conf import settings
+from django.test import TestCase
 
-from xmodule.video_module import create_youtube_string
+from xmodule.video_module import create_youtube_string, VideoDescriptor
 from xmodule.x_module import STUDENT_VIEW
 from xmodule.tests.test_video import VideoDescriptorTestBase
+from xmodule.tests.test_import import DummySystem
 
-from edxval.api import create_profile, create_video
+from edxval.api import (
+    create_profile, create_video, get_video_info, ValCannotCreateError, ValVideoNotFoundError
+)
 
 from . import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
@@ -520,15 +526,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         # create test profiles and their encodings
         encoded_videos = []
         for profile, extension in [("desktop_webm", "webm"), ("desktop_mp4", "mp4")]:
-            result = create_profile(
-                dict(
-                    profile_name=profile,
-                    extension=extension,
-                    width=200,
-                    height=2001
-                )
-            )
-            self.assertEqual(result, profile)
+            create_profile(profile)
             encoded_videos.append(
                 dict(
                     url=u"http://fake-video.edx.org/thundercats.{}".format(extension),
@@ -831,7 +829,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         self.assertFalse(self.item_descriptor.download_video)
 
 
-class VideoDescriptorTest(VideoDescriptorTestBase):
+class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
     """
     Tests for video descriptor that requires access to django settings.
     """
@@ -859,3 +857,79 @@ class VideoDescriptorTest(VideoDescriptorTestBase):
         ]
         rendered_context = self.descriptor.get_context()
         self.assertListEqual(rendered_context['tabs'], correct_tabs)
+
+    def test_export_val_data(self):
+        self.descriptor.edx_video_id = 'test_edx_video_id'
+        create_profile('mobile')
+        create_video({
+            'edx_video_id': self.descriptor.edx_video_id,
+            'client_video_id': 'test_client_video_id',
+            'duration': 111,
+            'status': 'dummy',
+            'encoded_videos': [{
+                'profile': 'mobile',
+                'url': 'http://example.com/video',
+                'file_size': 222,
+                'bitrate': 333,
+            }],
+        })
+
+        actual = self.descriptor.definition_to_xml(resource_fs=None)
+        expected_str = """
+            <video download_video="false" url_name="SampleProblem">
+                <video_asset client_video_id="test_client_video_id" duration="111.0">
+                    <encoded_video profile="mobile" url="http://example.com/video" file_size="222" bitrate="333"/>
+                </video_asset>
+            </video>
+        """
+        parser = etree.XMLParser(remove_blank_text=True)
+        expected = etree.XML(expected_str, parser=parser)
+        self.assertXmlEqual(expected, actual)
+
+    def test_export_val_data_not_found(self):
+        self.descriptor.edx_video_id = 'nonexistent'
+        actual = self.descriptor.definition_to_xml(resource_fs=None)
+        expected_str = """<video download_video="false" url_name="SampleProblem"/>"""
+        parser = etree.XMLParser(remove_blank_text=True)
+        expected = etree.XML(expected_str, parser=parser)
+        self.assertXmlEqual(expected, actual)
+
+    def test_import_val_data(self):
+        create_profile('mobile')
+        module_system = DummySystem(load_error_modules=True)
+
+        xml_data = """
+            <video edx_video_id="test_edx_video_id">
+                <video_asset client_video_id="test_client_video_id" duration="111.0">
+                    <encoded_video profile="mobile" url="http://example.com/video" file_size="222" bitrate="333"/>
+                </video_asset>
+            </video>
+        """
+        video = VideoDescriptor.from_xml(xml_data, module_system, id_generator=Mock())
+        self.assertEqual(video.edx_video_id, 'test_edx_video_id')
+        video_data = get_video_info(video.edx_video_id)
+        self.assertEqual(video_data['client_video_id'], 'test_client_video_id')
+        self.assertEqual(video_data['duration'], 111)
+        self.assertEqual(video_data['status'], 'imported')
+        self.assertEqual(video_data['courses'], [])
+        self.assertEqual(video_data['encoded_videos'][0]['profile'], 'mobile')
+        self.assertEqual(video_data['encoded_videos'][0]['url'], 'http://example.com/video')
+        self.assertEqual(video_data['encoded_videos'][0]['file_size'], 222)
+        self.assertEqual(video_data['encoded_videos'][0]['bitrate'], 333)
+
+    def test_import_val_data_invalid(self):
+        create_profile('mobile')
+        module_system = DummySystem(load_error_modules=True)
+
+        # Negative file_size is invalid
+        xml_data = """
+            <video edx_video_id="test_edx_video_id">
+                <video_asset client_video_id="test_client_video_id" duration="111.0">
+                    <encoded_video profile="mobile" url="http://example.com/video" file_size="-222" bitrate="333"/>
+                </video_asset>
+            </video>
+        """
+        with self.assertRaises(ValCannotCreateError):
+            VideoDescriptor.from_xml(xml_data, module_system, id_generator=Mock())
+        with self.assertRaises(ValVideoNotFoundError):
+            get_video_info("test_edx_video_id")
