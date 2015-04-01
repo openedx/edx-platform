@@ -141,10 +141,10 @@ class CoursewareSearchTest(UniqueCourseTest):
         Login and search for specific content
 
         Arguments:
+            search_term - term to be searched for
 
-        search_term - term to be searched for
-
-        expected - whether you expect the term to yeild results (defaults to True)
+        Returns:
+            (bool) True if search term is found in resulting content; False if not found
         """
         self._auto_auth(self.USERNAME, self.EMAIL, False)
         self.courseware_search_page.visit()
