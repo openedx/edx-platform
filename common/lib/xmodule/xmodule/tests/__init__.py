@@ -16,8 +16,6 @@ import traceback
 import unittest
 
 from contextlib import contextmanager, nested
-from eventtracking import tracker
-from eventtracking.django import DjangoTracker
 from functools import wraps
 from lazy import lazy
 from mock import Mock, patch
@@ -36,7 +34,6 @@ from xmodule.modulestore.inheritance import InheritanceMixin, own_metadata
 from xmodule.modulestore.mongo.draft import DraftModuleStore
 from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.x_module import ModuleSystem, XModuleDescriptor, XModuleMixin
-
 
 MODULE_DIR = path(__file__).dirname()
 # Location of common test DATA directory
@@ -58,14 +55,11 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     """
     ModuleSystem for testing
     """
-    @patch('eventtracking.tracker.emit')
-    def __init__(self, mock_emit, **kwargs):  # pylint: disable=unused-argument
+    def __init__(self, **kwargs):  # pylint: disable=unused-argument
         id_manager = CourseLocationManager(kwargs['course_id'])
         kwargs.setdefault('id_reader', id_manager)
         kwargs.setdefault('id_generator', id_manager)
         kwargs.setdefault('services', {}).setdefault('field-data', DictFieldData({}))
-        self.tracker = DjangoTracker()
-        tracker.register_tracker(self.tracker)
         super(TestModuleSystem, self).__init__(**kwargs)
 
     def handler_url(self, block, handler, suffix='', query='', thirdparty=False):
