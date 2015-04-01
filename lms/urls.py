@@ -613,6 +613,11 @@ if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
         url(r'^certificates/html', 'certificates.views.render_html_view', name='cert_html_view'),
     )
 
+# XDomain proxy
+urlpatterns += (
+    url(r'^xdomain_proxy.html$', 'cors_csrf.views.xdomain_proxy', name='xdomain_proxy'),
+)
+
 urlpatterns = patterns(*urlpatterns)
 
 if settings.DEBUG:
