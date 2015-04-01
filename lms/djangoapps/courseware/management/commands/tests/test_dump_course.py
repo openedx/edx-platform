@@ -201,7 +201,7 @@ class CommandsTestBase(ModuleStoreTestCase):
 
         assert_in = self.assertIn
         assert_in('edX-simple-2012_Fall', names)
-        assert_in('edX-simple-2012_Fall/policies/2012_Fall/policy.json', names)
+        assert_in('edX-simple-2012_Fall/policies/course/policy.json', names)
         assert_in('edX-simple-2012_Fall/html/toylab.html', names)
         assert_in('edX-simple-2012_Fall/videosequence/A_simple_sequence.xml', names)
         assert_in('edX-simple-2012_Fall/sequential/Lecture_2.xml', names)
