@@ -177,11 +177,11 @@ class ContainerPageTestCase(StudioPageTestCase):
             Http404, views.container_handler,
             request,
             usage_key_string='i4x://InvalidOrg/InvalidCourse/vertical/static/InvalidContent',
-            )
+        )
 
         # Check 200 response if 'usage_key_string' is correct
         response = views.container_handler(
             request=request,
-            usage_key_string=self.vertical.location.to_deprecated_string()
+            usage_key_string=unicode(self.vertical.location)
         )
         self.assertEqual(response.status_code, 200)
