@@ -155,6 +155,7 @@ def container_handler(request, usage_key_string):
         json: not currently supported
     """
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
+        # Invalid 'usage_key_string' raises 'InvalidKeyError'
         try:
             usage_key = UsageKey.from_string(usage_key_string)
         except InvalidKeyError:
