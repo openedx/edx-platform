@@ -15,7 +15,8 @@ define(['underscore'], function(_) {
         country: '0',
         language: '0',
         bio: "About the student",
-        language_proficiencies: [{code: '1'}]
+        language_proficiencies: [{code: '1'}],
+        requires_parental_consent: true
     };
 
     var USER_PREFERENCES_DATA = {

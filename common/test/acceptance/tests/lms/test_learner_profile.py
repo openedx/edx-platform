@@ -52,6 +52,9 @@ class LearnerProfilePageTest(WebAppTest):
 
         self.other_profile_page = LearnerProfilePage(self.browser, self.USER_2_NAME)
 
+        self.set_birth_year(self.MY_USER, birth_year='1990')
+        self.set_birth_year(self.OTHER_USER, birth_year='1990')
+
     def authenticate_as_user(self, user):
         """
         Auto authenticate a user.
@@ -74,6 +77,7 @@ class LearnerProfilePageTest(WebAppTest):
         Visits a users profile page.
         """
         self.authenticate_as_user(user)
+
         self.my_profile_page.visit()
         self.my_profile_page.wait_for_page()
 
@@ -92,16 +96,31 @@ class LearnerProfilePageTest(WebAppTest):
         self.other_profile_page.wait_for_page()
 
         if user is self.OTHER_USER and privacy is not None:
-            self.account_settings_page.visit()
-            self.account_settings_page.wait_for_page()
-            self.assertEqual(self.account_settings_page.value_for_dropdown_field('year_of_birth', '1980'), '1980')
-
             self.other_profile_page.visit()
             self.other_profile_page.wait_for_page()
             self.other_profile_page.privacy = privacy
 
             if privacy == self.PRIVACY_PUBLIC:
                 self.set_pubilc_profile_fields_data(self.other_profile_page)
+
+    def set_birth_year(self, user, birth_year):
+        """
+        Set birth year for `user` to the specified value.
+        """
+        self.authenticate_as_user(user)
+        self.account_settings_page.visit()
+        self.account_settings_page.wait_for_page()
+        self.assertEqual(self.account_settings_page.value_for_dropdown_field('year_of_birth', birth_year), birth_year)
+
+    def verify_profile_forced_private_message(self, birth_year, message=None):
+        """
+        Verify age limit messages for a user.
+        """
+        self.set_birth_year(self.MY_USER, birth_year=birth_year)
+        self.visit_my_profile_page(self.MY_USER)
+        self.assertTrue(self.my_profile_page.privacy_field_visible)
+        self.assertEqual(self.my_profile_page.age_limit_message_present, message is not None)
+        self.assertIn(message, self.my_profile_page.profile_forced_private_message)
 
     def test_dashboard_learner_profile_link(self):
         """
@@ -212,7 +231,7 @@ class LearnerProfilePageTest(WebAppTest):
         """
         Test behaviour of a textarea field.
         """
-        self.visit_my_profile_page(self.MY_USER, privacy=self.PRIVACY_PUBLIC)
+        self.visit_my_profile_page(self.MY_USER, privacy=self.PRIVACY_PUBLIC, )
 
         self.my_profile_page.value_for_textarea_field(field_id, new_value)
         self.assertEqual(self.my_profile_page.get_non_editable_mode_value(field_id), displayed_value)
@@ -305,3 +324,26 @@ class LearnerProfilePageTest(WebAppTest):
 
         self.my_profile_page.make_field_editable('bio')
         self.assertTrue(self.my_profile_page.mode_for_field('bio'), 'edit')
+
+    def test_birth_year_not_set(self):
+        """
+        Verify message if birth year is not set.
+
+        Given that I am a registered user.
+        And birth year is not set for the user.
+        And i visit my profile page.
+        Then i should see message `Your profile is disabled because you haven't filled in your Year of Birth.`
+        """
+        message = "You must specify your birth year before you can share your full profile."
+        self.verify_profile_forced_private_message('', message=message)
+
+    def test_user_is_under_age(self):
+        """
+        Verify message if user is under age.
+
+        Given that I am a registered user.
+        And birth year is set so that age is less than 13.
+        And i visit my profile page.
+        Then i should see message `You must be over 13 to share a full profile.`
+        """
+        self.verify_profile_forced_private_message('2010', message='You must be over 13 to share a full profile.')

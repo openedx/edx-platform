@@ -12,12 +12,15 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 AccountPreferencesModel, LearnerProfileFields, LearnerProfileView, AccountSettingsFieldViews) {
         'use strict';
 
-        describe("edx.user.LearnerProfileView", function (options) {
+        describe("edx.user.LearnerProfileView", function () {
 
             var createLearnerProfileView = function (ownProfile, accountPrivacy, profileIsPublic) {
 
                 var accountSettingsModel = new UserAccountModel();
-                accountSettingsModel.set(Helpers.USER_ACCOUNTS_DATA);
+                var accountSettingsData = Helpers.USER_ACCOUNTS_DATA;
+                accountSettingsData['year_of_birth'] = 1989;
+                accountSettingsData['requires_parental_consent'] = false;
+                accountSettingsModel.set(accountSettingsData);
                 accountSettingsModel.set({'profile_is_public': profileIsPublic});
 
                 var accountPreferencesModel = new AccountPreferencesModel();

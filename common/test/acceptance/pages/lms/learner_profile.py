@@ -149,3 +149,19 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         EmptyPromise(lambda: self.field_is_visible('country'), 'Country field is visible').fulfill()
         EmptyPromise(lambda: self.field_is_visible('language_proficiencies'), 'Language field is visible').fulfill()
         EmptyPromise(lambda: self.field_is_visible('bio'), 'About Me field is visible').fulfill()
+
+    @property
+    def profile_forced_private_message(self):
+        """
+        Returns age limit message.
+        """
+        self.wait_for_ajax()
+        return self.q(css='#u-field-message-account_privacy').text[0]
+
+    @property
+    def age_limit_message_present(self):
+        """
+        Check if age limit message is present.
+        """
+        self.wait_for_ajax()
+        return self.q(css='#u-field-message-account_privacy').visible
