@@ -176,7 +176,7 @@ class ContainerPageTestCase(StudioPageTestCase):
         self.assertRaises(
             Http404, views.container_handler,
             request,
-            usage_key_string='i4x://herp/derp/vertical/static/story2.html',
+            usage_key_string='i4x://InvalidOrg/InvalidCourse/vertical/static/InvalidPage',
             )
 
         # Check 200 response if 'usage_key_string' is correct
@@ -184,5 +184,4 @@ class ContainerPageTestCase(StudioPageTestCase):
             request=request,
             usage_key_string=self.vertical.location.to_deprecated_string()
         )
-        # Assert that valid 'usage_key_string' returns 200 status
         self.assertEqual(response.status_code, 200)
