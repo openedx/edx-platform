@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_GET
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
+from opaque_keys import InvalidKeyError
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from edxmako.shortcuts import render_to_response
 
@@ -155,7 +156,10 @@ def container_handler(request, usage_key_string):
     """
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
 
-        usage_key = UsageKey.from_string(usage_key_string)
+        try:
+            usage_key = UsageKey.from_string(usage_key_string)
+        except InvalidKeyError:  # Raise Http404 on invalid 'usage_key_string'
+            raise Http404
         with modulestore().bulk_operations(usage_key.course_key):
             try:
                 course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)
