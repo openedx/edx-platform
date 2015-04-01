@@ -7,6 +7,7 @@ from lxml import etree
 from copy import copy
 from capa.responsetypes import registry
 from gettext import ngettext
+from lazy import lazy
 
 from .mako_module import MakoModuleDescriptor
 from opaque_keys.edx.locator import LibraryLocator
@@ -269,6 +270,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
                     'max_count': self.max_count,
                     'display_name': self.display_name or self.url_name,
                 }))
+                context['can_edit_visibility'] = False
                 self.render_children(context, fragment, can_reorder=False, can_add=False)
         # else: When shown on a unit page, don't show any sort of preview -
         # just the status of this block in the validation area.
@@ -306,16 +308,12 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         non_editable_fields.extend([LibraryContentFields.mode, LibraryContentFields.source_library_version])
         return non_editable_fields
 
-    def get_tools(self):
+    @lazy
+    def tools(self):
         """
         Grab the library tools service or raise an error.
         """
-        lib_tools = self.runtime.service(self, 'library_tools')
-        if not lib_tools:
-            # This error is diagnostic. The user won't see it, but it may be helpful
-            # during debugging.
-            return Response(_(u"Course does not support Library tools."), status=400)
-        return lib_tools
+        return self.runtime.service(self, 'library_tools')
 
     def get_user_id(self):
         """
@@ -343,14 +341,12 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         the version number of the libraries used, so we easily determine if
         this block is up to date or not.
         """
-        lib_tools = self.get_tools()
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         user_id = self.get_user_id()
-        lib_tools.update_children(self, user_id, user_perms)
+        self.tools.update_children(self, user_id, user_perms)
         return Response()
 
-    # pylint: disable=unused-argument
-    def studio_post_duplicate(self, store, parent_usage_key, source_block):
+    def studio_post_duplicate(self, store, source_block):
         """
         Used by the studio after basic duplication of a source block. We handle the children
         ourselves, because we have to properly reference the library upstream and set the overrides.
@@ -360,32 +356,30 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         # The first task will be to refresh our copy of the library to generate the children.
         # We must do this at the currently set version of the library block. Otherwise we may not have
         # exactly the same children-- someone may be duplicating an out of date block, after all.
-        lib_tools = self.get_tools()
         user_id = self.get_user_id()
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         # pylint: disable=no-member
-        lib_tools.update_children(self, user_id, user_perms, version=self.source_library_version)
+        self.tools.update_children(self, user_id, user_perms, version=self.source_library_version)
 
         # Copy over any overridden settings the course author may have applied to the blocks.
         def copy_overrides(source, dest):
             """
             Copy any overrides the user has made on blocks in this library.
             """
-            for field_name in source.fields.keys():
-                field = dest.fields[field_name]
+            for field in source.fields.itervalues():
                 if field.scope == Scope.settings and field.is_set_on(source):
-                    setattr(dest, field_name, getattr(source, field_name))
+                    setattr(dest, field.name, field.read_from(source))
             if source.has_children:
-                source_children = [store.get_item(source_key) for source_key in source.children]
-                dest_children = [store.get_item(dest_key) for dest_key in dest.children]
+                source_children = [self.runtime.get_block(source_key) for source_key in source.children]
+                dest_children = [self.runtime.get_block(dest_key) for dest_key in dest.children]
                 for source_child, dest_child in zip(source_children, dest_children):
                     copy_overrides(source_child, dest_child)
             store.update_item(dest, user_id)
 
         copy_overrides(source_block, self)
 
-        # Don't handle children. Handle parenting.
-        return False, True
+        # Children have been handled.
+        return True
 
     def _validate_library_version(self, validation, lib_tools, version, library_key):
         """

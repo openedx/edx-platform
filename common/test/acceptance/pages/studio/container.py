@@ -407,6 +407,20 @@ class XBlockWrapper(PageObject):
         return self.q(css=self._bounded_selector('.wrapper-xblock.has-group-visibility-set')).is_present()
 
     @property
+    def has_duplicate_button(self):
+        """
+        Returns true if this xblock has a 'duplicate' button
+        """
+        return self.q(css=self._bounded_selector('a.duplicate-button'))
+
+    @property
+    def has_delete_button(self):
+        """
+        Returns true if this xblock has a 'delete' button
+        """
+        return self.q(css=self._bounded_selector('a.delete-button'))
+
+    @property
     def has_edit_visibility_button(self):
         """
         Returns true if this xblock has an 'edit visibility' button

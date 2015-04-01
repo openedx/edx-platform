@@ -28,9 +28,8 @@ class LibraryToolsService(object):
         if not isinstance(library_key, LibraryLocator):
             library_key = LibraryLocator.from_string(library_key)
 
-        library_key = LibraryLocator(
-            org=library_key.org, library=library_key.library, branch=library_key.branch, version_guid=version
-        )
+        if version:
+            library_key.for_version(version)
 
         try:
             return self.store.get_library(library_key, remove_version=False, remove_branch=False)
