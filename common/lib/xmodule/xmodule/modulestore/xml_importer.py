@@ -200,6 +200,7 @@ class ImportManager(object):
             load_error_modules=load_error_modules,
             xblock_mixins=store.xblock_mixins,
             xblock_select=store.xblock_select,
+            target_course_id=target_id,
         )
         self.logger, self.errors = make_error_tracker()
 
@@ -728,6 +729,7 @@ def _import_course_draft(
         load_error_modules=False,
         mixins=xml_module_store.xblock_mixins,
         field_data=KvsFieldData(kvs=DictKeyValueStore()),
+        target_course_id=target_id,
     )
 
     def _import_module(module):

@@ -415,7 +415,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             filepath = cls._format_filepath(xml_object.tag, name_to_pathname(url_name))
             xml_object = cls.load_file(filepath, system.resources_fs, usage_id)
             system.parse_asides(xml_object, definition_id, usage_id, id_generator)
-        field_data = cls._parse_video_xml(xml_object)
+        field_data = cls._parse_video_xml(xml_object, id_generator)
         kvs = InheritanceKeyValueStore(initial_values=field_data)
         field_data = KvsFieldData(kvs)
         video = system.construct_xblock_from_class(
@@ -557,10 +557,13 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         return ret
 
     @classmethod
-    def _parse_video_xml(cls, xml):
+    def _parse_video_xml(cls, xml, id_generator=None):
         """
         Parse video fields out of xml_data. The fields are set if they are
         present in the XML.
+
+        Arguments:
+            id_generator is used to generate course-specific urls and identifiers
         """
         field_data = {}
 
@@ -633,7 +636,11 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 'edx_video_id' in field_data
         ):
             # Allow ValCannotCreateError to escape
-            edxval_api.import_from_xml(video_asset_elem, field_data['edx_video_id'])
+            edxval_api.import_from_xml(
+                video_asset_elem,
+                field_data['edx_video_id'],
+                course_id=getattr(id_generator, 'target_course_id', None)
+            )
 
         return field_data
 
