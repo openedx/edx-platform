@@ -1,10 +1,9 @@
 ##################################################
-Video Outlines API Module
+Mobile Video Outlines API Module
 ##################################################
 
-.. module:: mobile_api
-
-This page contains docstrings and example responses for:
+This page describes how to use the Mobile Video Outlines API to
+complete these actions:
 
 * `Get the Video List`_
 * `Get a Video Transcript`_
@@ -15,57 +14,8 @@ This page contains docstrings and example responses for:
 Get the Video List
 *******************
 
-.. .. autoclass:: video_outlines.views.VideoSummaryList
-..    :members:
+.. autoclass:: mobile_api.video_outlines.views.VideoSummaryList
 
-**Use Case**
-
-Get a list of all videos in the specified course. You can use the video_url
-value to access the video file.
-
-**Example request**:
-
-``GET /api/mobile/v0.5/video_outlines/courses/{organization}/{course_number}/{course_run}``
-
-**Response Values**
-
-An array of videos in the course. For each video:
-
-* section_url: The URL to the first page of the section that contains the video
-  in the Learning Managent System.
-
-* path: An array containing category and name values specifying the complete
-  path the the video in the courseware hierarcy. The following categories
-  values are included: "chapter", "sequential", and "vertical". The name value
-  is the display name for that object.
-
-* unit_url: The URL to the unit contains the video in the Learning Managent
-  System.
-
-* named_path: An array consisting of the display names of the courseware
-  objects in the path to the video.
-
-* summary:  An array of data about the video that includes:
-
-    * category:  The type of component, in this case always "video".
-
-    * video_thumbnail_url: The URL to the thumbnail image for the video, if
-      available.
-
-    * language: The language code for the video.
-
-    * name:  The display name of the video.
-
-    * video_url: The URL to the video file. Use this value to access the video.
-
-    * duration: The length of the video, if available.
-
-    * transcripts: An array of language codes and URLs to available video
-      transcripts. Use the URL value to access a transcript for the video.
-
-    * id: The unique identifier for the video.
-
-    * size: The size of the video file
 
 **Example response**
 
@@ -120,16 +70,7 @@ An array of videos in the course. For each video:
 Get a Video Transcript
 ***********************
 
-.. .. autoclass:: video_outlines.views.VideoTranscripts
-..    :members:
-
-**Use Case**
-
-Use to get a transcript for a specified video and language.
-
-**Example request**:
-
-``/api/mobile/v0.5/video_outlines/transcripts/{organization}/{course_number}/{course_run}/{video ID}/{language code}``
+.. autoclass:: mobile_api.video_outlines.views.VideoTranscripts
     
 **Response Values**
 

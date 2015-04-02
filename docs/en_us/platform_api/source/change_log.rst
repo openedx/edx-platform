@@ -3,7 +3,7 @@ Change Log
 ############
 
 *****************
-January, 2015
+2015
 *****************
 
 .. list-table::
@@ -12,5 +12,9 @@ January, 2015
 
    * - Date
      - Change
+   * - 2 April 2015
+     - Added the :ref:`EdX Platform Course Structure API Version 0`, :ref:`edX
+       Platform Enrollment API Version 1.0` and :ref:`edX Platform User API
+       Version 0` sections.
    * - 29 January 2015
      - Added the :ref:`Get or Change User Status in a Course` section.

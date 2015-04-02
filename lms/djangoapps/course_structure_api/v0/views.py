@@ -77,34 +77,52 @@ class CourseList(CourseViewMixin, ListAPIView):
     """
     **Use Case**
 
-        CourseList returns paginated list of courses in the edX Platform. The list can be filtered by course_id.
+        Get a paginated list of courses in the edX Platform. 
 
-    **Example Request**
+        The list can be filtered by course_id.
+
+        Each page in the list can contain up to 10 courses.
+
+    **Example Requests**
 
           GET /api/course_structure/v0/courses/
+
           GET /api/course_structure/v0/courses/?course_id={course_id1},{course_id2}
 
     **Response Values**
 
-        * id: The unique identifier for the course.
+        * count: The number of courses in the edX platform.
 
-        * name: The name of the course.
+        * next: The URI to the next page of courses.
 
-        * category: The type of content. In this case, the value is always "course".
+        * previous: The URI to the previous page of courses.
 
-        * org: The organization specified for the course.
+        * num_pages: The number of pages listing courses.
 
-        * course: The course number.
+        * results:  A list of courses returned. Each collection in the list
+          contains these fields.
 
-        * org: The run for the course.
+            * id: The unique identifier for the course.
 
-        * uri: The URI to use to get details of the course.
+            * name: The name of the course.
 
-        * image_url: The URI for the course's main image.
+            * category: The type of content. In this case, the value is always
+              "course".
 
-        * start: Course start date
+            * org: The organization specified for the course.
 
-        * end: Course end date
+            * run: The run of the course.
+
+            * course: The course number.
+
+            * uri: The URI to use to get details of the course.
+
+            * image_url: The URI for the course's main image.
+
+            * start: The course start date.
+
+            * end: The course end date. If course end date is not specified, the
+              value is null.
     """
     paginate_by = 10
     paginate_by_param = 'page_size'
@@ -138,27 +156,34 @@ class CourseDetail(CourseViewMixin, RetrieveAPIView):
     """
     **Use Case**
 
-        CourseDetail returns details for a course.
+        Get details for a specific course.
 
-    **Example requests**:
+    **Example Request**:
 
         GET /api/course_structure/v0/courses/{course_id}/
 
     **Response Values**
 
-        * category: The type of content.
-
+        * id: The unique identifier for the course.
+        
         * name: The name of the course.
 
-        * uri: The URI to use to get details of the course.
+        * category: The type of content.
+
+        * org: The organization that is offering the course.
+
+        * run: The run of the course.
 
         * course: The course number.
 
-        * due:  The due date. For courses, the value is always null.
+        * uri: The URI to use to get details about the course.
 
-        * org: The organization specified for the course.
+        * image_url: The URI for the course's main image.
 
-        * id: The unique identifier for the course.
+        * start: The course start date.
+
+        * end: The course end date. If course end date is not specified, the
+          value is null.
     """
 
     serializer_class = serializers.CourseSerializer
@@ -171,7 +196,8 @@ class CourseStructure(CourseViewMixin, RetrieveAPIView):
     """
     **Use Case**
 
-        Retrieves course structure.
+        Get the course structure. This endpoint returns all blocks in the
+        course.
 
     **Example requests**:
 
@@ -179,9 +205,27 @@ class CourseStructure(CourseViewMixin, RetrieveAPIView):
 
     **Response Values**
 
-        * root: ID of the root node of the structure
+        * root: The ID of the root node of the course structure.
 
-        * blocks: Dictionary mapping IDs to block nodes.
+        * blocks: A dictionary that maps block IDs to a collection of
+          information about each block. Each block contains the following
+          fields.
+
+          * id: The ID of the block.
+
+          * type: The type of block. Possible values include sequential,
+            vertical, html, problem, video, and discussion. The type can also be
+            the name of a custom type of block used for the course.
+
+          * display_name: The display name configured for the block.
+
+          * graded: Whether or not the sequential or problem is graded. The
+            value is true or false.
+
+          * format: The assignment type.
+
+          * children: If the block has child blocks, a list of IDs of the child
+            blocks.
     """
     serializer_class = serializers.CourseStructureSerializer
     course = None
@@ -205,7 +249,7 @@ class CourseGradingPolicy(CourseViewMixin, ListAPIView):
     """
     **Use Case**
 
-        Retrieves course grading policy.
+        Get the course grading policy.
 
     **Example requests**:
 
@@ -213,14 +257,16 @@ class CourseGradingPolicy(CourseViewMixin, ListAPIView):
 
     **Response Values**
 
-        * assignment_type: The type of the assignment (e.g. Exam, Homework). Note: These values are course-dependent.
-          Do not make any assumptions based on assignment type.
+        * assignment_type: The type of the assignment, as configured by course
+          staff. For example, course staff might make the assignment types Homework,
+          Quiz, and Exam.
 
-        * count: Number of assignments of the type.
+        * count: The number of assignments of the type.
 
         * dropped: Number of assignments of the type that are dropped.
 
-        * weight: Effect of the assignment type on grading.
+        * weight: The weight, or effect, of the assignment type on the learner's
+          final grade.
     """
 
     serializer_class = serializers.GradingPolicySerializer
