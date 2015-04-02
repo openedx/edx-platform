@@ -13,6 +13,7 @@ and then for each combination of modulestores, performing the sequence:
 """
 from contextlib import contextmanager, nested
 import itertools
+import os
 from path import path
 import random
 from shutil import rmtree
@@ -337,6 +338,7 @@ DIRECT_MS_SETUPS_SHORT = (
 )
 MODULESTORE_SETUPS = DIRECT_MODULESTORE_SETUPS + MIXED_MODULESTORE_SETUPS
 MODULESTORE_SHORTNAMES = DIRECT_MS_SETUPS_SHORT + MIXED_MS_SETUPS_SHORT
+SPLIT_MODULESTORE_SETUP = (MixedModulestoreBuilder([('split', VersioningModulestoreBuilder())]),)
 SHORT_NAME_MAP = dict(zip(MODULESTORE_SETUPS, MODULESTORE_SHORTNAMES))
 
 CONTENTSTORE_SETUPS = (MongoContentstoreBuilder(),)
@@ -345,7 +347,6 @@ COURSE_DATA_NAMES = (
     'manual-testing-complete',
     'split_test_module',
     'split_test_module_draft',
-    'split_test_module_static_tabs',
 )
 
 
@@ -449,3 +450,65 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
                             dest_store,
                             dest_course_key,
                         )
+
+    @ddt.data(*itertools.product(
+        SPLIT_MODULESTORE_SETUP,
+        MIXED_MODULESTORE_SETUPS,
+        CONTENTSTORE_SETUPS,
+        CONTENTSTORE_SETUPS,
+        ['split_course_with_static_tabs'],
+    ))
+    @ddt.unpack
+    def test_split_course_export_import(self, source_builder, dest_builder, source_content_builder, dest_content_builder, course_data_name):
+        # Construct the contentstore for storing the first import
+        with source_content_builder.build() as source_content:
+            # Construct the modulestore for storing the first import (using the previously created contentstore)
+            with source_builder.build(contentstore=source_content) as source_store:
+                # Construct the contentstore for storing the second import
+                with dest_content_builder.build() as dest_content:
+                    # Construct the modulestore for storing the second import (using the second contentstore)
+                    with dest_builder.build(contentstore=dest_content) as dest_store:
+                        source_course_key = source_store.make_course_key('a', 'course', 'course')
+                        dest_course_key = dest_store.make_course_key('a', 'course', 'course')
+
+                        import_course_from_xml(
+                            source_store,
+                            'test_user',
+                            TEST_DATA_DIR,
+                            source_dirs=[course_data_name],
+                            static_content_store=source_content,
+                            target_id=source_course_key,
+                            raise_on_failure=True,
+                            create_if_not_present=True,
+                        )
+
+                        export_course_to_xml(
+                            source_store,
+                            source_content,
+                            source_course_key,
+                            self.export_dir,
+                            'exported_source_course',
+                        )
+
+                        source_course = source_store.get_course(source_course_key, depth=None, lazy=False)
+
+                        self.assertEqual(source_course.url_name, 'course')
+
+                        policy_dir = path(self.export_dir) / 'exported_source_course' / 'policies' / source_course.url_name
+                        policy_path = policy_dir / 'policy.json'
+                        self.assertTrue(os.path.exists(policy_path))
+
+                        import_course_from_xml(
+                            dest_store,
+                            'test_user',
+                            self.export_dir,
+                            source_dirs=['exported_source_course'],
+                            static_content_store=dest_content,
+                            target_id=dest_course_key,
+                            raise_on_failure=True,
+                            create_if_not_present=True,
+                        )
+
+                        dest_course = dest_store.get_course(dest_course_key, depth=None, lazy=False)
+
+                        self.assertEqual(dest_course.url_name, 'course')
