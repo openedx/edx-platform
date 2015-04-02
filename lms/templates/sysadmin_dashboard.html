@@ -5,8 +5,12 @@
 
 <%block name="headextra">
   <%static:css group='style-course'/>
+  <link rel="stylesheet" type="text/css" href="${static.url('css/sysadmin.css')}">
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
+  %if modeflag.get('courses'):
+    <script type="text/javascript" src="${static.url('js/sysadmin/main.js')}"></script>
+  %endif
 </%block>
 
 <style type="text/css">
@@ -141,7 +145,7 @@ textarea {
 %if modeflag.get('courses'):
 <h3>${_('Administer Courses')}</h3><br/>
 
-<form name="action" method="POST">
+<form class="sysadmin-course-form" name="action" method="POST">
   <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }" />
   <ul class="list-input">
 	<li class="field text">
@@ -178,6 +182,31 @@ textarea {
   <div class="form-actions">
 	<button type="submit" name="action" value="del_course">${_('Delete course from site')}</button>
   </div>
+  <hr />
+  <div class="edit-course-tabs">
+      <h4>Edit Course Tabs</h4>
+      <ul class="list-input">
+          <li class="field text">
+              <label for="course_id">
+                  ${_('Course ID')}:
+              </label>
+              <input type="text" name="course_id" class="long-input"/>
+          </li>
+      </ul>
+      <div class="form-actions unique-row">
+        <button type="submit" name="action" value="get_current_tabs">${_('Get Current Tabs')}</button>
+      </div>
+      <div class="form-actions unique-row">
+        <button class="delete-tab-button" type="button" value="delete_tab">${_('Delete Tab')}</button>
+        <input type="text" name="tab_delete"/>
+        <span>(sample argument: 7)</span>
+      </div>
+      <div class="form-actions unique-row">
+        <button class="insert-tab-button" type="button" value="insert_tab">${_('Insert Tab')}</button>
+        <input type="text" name="tab_insert"/>
+        <span>(sample arguments: 7, static_tab, Chat)</span>
+      </div>
+  </div>
 </form>
 <hr style="width:40%" />
 %endif
@@ -206,7 +235,9 @@ textarea {
 %endif
 
 %if msg:
-    <p>${msg}</p>
+    <div class="server-message">
+        <p>${msg}</p>
+    </div>
 %endif
 
 %if datatable:

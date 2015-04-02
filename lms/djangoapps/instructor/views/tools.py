@@ -15,8 +15,8 @@ from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import UsageKey
-
 from bulk_email.models import CourseAuthorization
+import csv
 
 DATE_FIELD = Date()
 
@@ -320,3 +320,35 @@ def add_block_ids(payload):
         for ele in payload['data']:
             if 'module_id' in ele:
                 ele['block_id'] = UsageKey.from_string(ele['module_id']).block_id
+
+
+def generate_course_forums_d3(url_handle):
+    """
+    Grab the csv file at url_handle and parse it. Return a new-line joined csv string to be graphed
+    """
+    reader = csv.reader(url_handle)
+    reader.next()
+    previous_date = -1
+    previous = None
+    rows = [['Date', 'New Threads', 'Responses', 'Comments']]
+    for date, comment_type, number, up_vote, down, net in reader: # pylint: disable=unused-variable
+        if date != previous_date:
+            if previous:
+                rows.append([previous_date] + previous)
+            previous = ['0', '0', '0']
+            previous_date = date
+        if comment_type == 'CommentThread':
+            previous[0] = number
+        elif comment_type == 'Response':
+            previous[1] = number
+        elif comment_type == 'Comment':
+            previous[2] = number
+    # return nothing if there's no data
+    if len(rows) == 1:
+        return None
+    else:
+        # get the last row's stuff
+        rows.append([previous_date] + previous)
+        # make the string to process in d3
+        csv_string = '\n'.join([','.join(row) for row in rows])
+        return csv_string

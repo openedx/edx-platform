@@ -321,19 +321,31 @@ class S3ReportStore(ReportStore):
 
         self.store(course_id, filename, output_buffer)
 
+    def delete_file(self, course_id, filename):
+        """
+        Given the `course_id` and `filename` for the report, this method deletes the report
+        """
+        key = self.key_for(course_id, filename)
+        self.bucket.delete_key(key)
+
     def links_for(self, course_id):
         """
         For a given `course_id`, return a list of `(filename, url)` tuples. `url`
         can be plugged straight into an href
         """
         course_dir = self.key_for(course_id, '')
-        return sorted(
+        sorted_link_data = sorted(
             [
-                (key.key.split("/")[-1], key.generate_url(expires_in=300))
+                # each element in the array is a list with the following format: ('date, 'filename', 'url')
+                (key.key.split('/')[-1].split('_')[-1].split('.csv')[0], key.key.split('/')[-1], key.generate_url(expires_in=300))
                 for key in self.bucket.list(prefix=course_dir.key)
             ],
             reverse=True
         )
+        return [
+            (link_data[1], link_data[2])
+            for link_data in sorted_link_data
+        ]
 
 
 class LocalFSReportStore(ReportStore):
@@ -399,6 +411,13 @@ class LocalFSReportStore(ReportStore):
 
         self.store(course_id, filename, output_buffer)
 
+    def delete_file(self, course_id, filename):
+        """
+        Given the `course_id` and `filename` for the report, this method deletes the report
+        """
+        path = self.path_to(course_id, filename)
+        os.remove(path)
+
     def links_for(self, course_id):
         """
         For a given `course_id`, return a list of `(filename, url)` tuples. `url`
@@ -410,10 +429,15 @@ class LocalFSReportStore(ReportStore):
         course_dir = self.path_to(course_id, '')
         if not os.path.exists(course_dir):
             return []
-        return sorted(
+        sorted_link_data = sorted(
             [
-                (filename, ("file://" + urllib.quote(os.path.join(course_dir, filename))))
+                # each element in the array is a list with the following format: ('date, 'filename', 'url')
+                (filename.split('_')[-1].split('.csv')[0], filename, ('file://' + urllib.quote(os.path.join(course_dir, filename))))
                 for filename in os.listdir(course_dir)
             ],
             reverse=True
         )
+        return [
+            (link_data[1], link_data[2])
+            for link_data in sorted_link_data
+        ]

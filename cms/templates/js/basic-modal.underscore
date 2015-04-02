@@ -9,6 +9,11 @@
             <div class="modal-header">
                 <h2 class="title modal-window-title"><%= title %></h2>
                 <ul class="editor-modes action-list action-modes">
+                <% if (type == 'html') { %>
+                    <span class="tip">
+                      <a rel="modal" href="#keyword-sub-modal"><%= gettext('Supports keyword substitutions') %></a>
+                    </span>
+                <% } %>
                 </ul>
             </div>
             <div class="modal-content">

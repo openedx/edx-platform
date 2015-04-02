@@ -61,7 +61,7 @@ var DetailsView = ValidatingView.extend({
         this.post_enrollment_email_field = this.$el.find('#field-post-enrollment-email');
         this.post_enrollment_email_subject_field = this.$el.find('#field-post-enrollment-email-subject');
 
-        this.enable_enrollment_email_box = this.$el.find('#' + this.fieldToSelectorMap['enable_enrollment_email'])[0];
+        this.enable_enrollment_email_box = this.$el.find('#' + this.fieldToSelectorMap['enable_enrollment_email']);
 
         this.default_pre_template = this.$el.find('#default_pre_enrollment_email_template');
         this.default_post_template = this.$el.find('#default_post_enrollment_email_template');
@@ -88,9 +88,9 @@ var DetailsView = ValidatingView.extend({
         this.post_enrollment_email_elem.val(this.model.get('post_enrollment_email'));
         this.codeMirrorize(null, $('#post-enrollment-email')[0]);
 
-        this.enable_enrollment_email_box.checked = this.model.get('enable_enrollment_email');
+        this.enable_enrollment_email_box.prop('checked', this.model.get('enable_enrollment_email'));
 
-        if (this.enable_enrollment_email_box.checked) {
+        if (this.enable_enrollment_email_box.prop('checked')) {
             this.enrollment_email_settings.show();
         } else {
             this.enrollment_email_settings.hide();
@@ -151,9 +151,10 @@ var DetailsView = ValidatingView.extend({
         var timefield = $(div).find("input:.time");
         var cachethis = this;
         var setfield = function () {
-            var newVal = DateUtils.getDate(datefield, timefield);
+            var newVal = DateUtils.getDate(datefield, timefield),
+                oldTime = new Date(cacheModel.get(fieldName)).getTime();
             if (newVal) {
-                if (!cacheModel.has(fieldName) || cacheModel.get(fieldName).getTime() !== newVal.getTime()) {
+                if (!cacheModel.has(fieldName) || oldTime !== newVal.getTime()) {
                     cachethis.clearValidationErrors();
                     cachethis.setAndValidate(fieldName, newVal);
                 }
@@ -245,7 +246,7 @@ var DetailsView = ValidatingView.extend({
     },
 
     toggleEnrollmentEmails: function(event) {
-        var isChecked = this.enable_enrollment_email_box.checked;
+        var isChecked = this.enable_enrollment_email_box.prop('checked');
 
         /* enable & disable default will show the template */
         if(isChecked) {

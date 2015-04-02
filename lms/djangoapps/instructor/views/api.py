@@ -27,6 +27,7 @@ from django.utils.html import strip_tags
 import string  # pylint: disable=W0402
 import random
 import urllib
+import urllib2
 from util.json_request import JsonResponse
 from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 
@@ -82,10 +83,12 @@ from .tools import (
     strip_if_string,
     bulk_email_is_enabled_for_course,
     add_block_ids,
+    generate_course_forums_d3,
 )
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx import locator
 from student.models import UserProfile, Registration
 import instructor.views.data_access as data_access
 from instructor.views.data_access_constants import QueryType, StudentQuery, QUERYORIGIN_MAP, QueryOrigin
@@ -867,11 +870,13 @@ def save_query(request, course_id):
         for query in existing_queries
         if (query != "working" and query != "")
     ]
-    success = data_access.save_query(course_id, clean_existing)
+    group = data_access.save_query(course_id, clean_existing)
+    group_title = group.title or u'Query saved at ' + group.created.strftime("%m-%d-%y %H:%M")
 
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
-        'success': success,
+        'group_id': group.id,
+        'group_title': group_title,
     }
     return JsonResponse(response_payload)
 
@@ -2067,13 +2072,55 @@ def list_forum_members(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_ora2_responses(request, course_id):
+def delete_report_download(request, course_id):
     """
-    Pushes a Celery task which will aggregate ora2 responses for a course into a .csv
+    Deletes a downloaded report that was previously generated from the Instructor Dashboard
+    """
+    course_id = SlashSeparatedCourseKey.from_string(course_id)
+    filename = request.POST.get('filename')
+    report_store = ReportStore.from_config()
+    report_store.delete_file(course_id, filename)
+    message = {
+        'status': _('The report was successfully deleted!'),
+    }
+    return JsonResponse(message)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def get_student_forums_usage(request, course_id):
+    """
+    Pushes a Celery task which will aggregate student forums usage statistics for a course into a .csv
     """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     try:
-        instructor_task.api.submit_ora2_request_task(request, course_key)
+        instructor_task.api.submit_student_forums_usage_task(request, course_key)
+        success_status = _("The student forums usage report is being generated.")
+        return JsonResponse({"status": success_status})
+    except AlreadyRunningError:
+        already_running_status = _(
+            "A student forums usage report task is already in "
+            "progress. Check the 'Pending Instructor Tasks' table "
+            "for the status of the task. When completed, the report "
+            "will be available for download in the table below."
+        )
+
+        return JsonResponse({
+            "status": already_running_status
+        })
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def get_ora2_responses(request, course_id, include_email):
+    """
+    Pushes a Celery task which will aggregate ora2 responses for a course into a .csv
+    """
+    course_key = locator.CourseLocator.from_string(course_id)
+    try:
+        instructor_task.api.submit_ora2_request_task(request, course_key, include_email)
         success_status = _("The ORA2 responses report is being generated.")
         return JsonResponse({"status": success_status})
     except AlreadyRunningError:
@@ -2087,6 +2134,55 @@ def get_ora2_responses(request, course_id):
         return JsonResponse({
             "status": already_running_status
         })
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def get_course_forums_usage(request, course_id):
+    """
+    Pushes a Celery task which will aggregate course forums statistics into a .csv
+    """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    try:
+        instructor_task.api.submit_course_forums_usage_task(request, course_key)
+        success_status = _("The course forums usage report is being generated.")
+        return JsonResponse({"status": success_status})
+    except AlreadyRunningError:
+        already_running_status = _(
+            "A course forums usage report task is already in "
+            "progress. Check the 'Pending Instructor Tasks' table "
+            "for the status of the task. When completed, the report "
+            "will be available for download in the table below."
+        )
+
+        return JsonResponse({
+            "status": already_running_status
+        })
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def graph_course_forums_usage(request, course_id):
+    """
+    Generate a d3 graphable csv-string by checking the report store for the clicked_on file
+    """
+    clicked_text = request.GET.get('clicked_on')
+    course_key = CourseKey.from_string(course_id)
+    report_store = ReportStore.from_config()
+    graph = None
+    if clicked_text:
+        for name, url in report_store.links_for(course_key):
+            if clicked_text in name and 'course_forums' in name:
+                url_handle = urllib2.urlopen(url)
+                graph = generate_course_forums_d3(url_handle)
+                break
+    if graph:
+        return JsonResponse({'data': graph,
+                             'filename': clicked_text})
+    else:
+        return JsonResponse({'data': 'failure'})
 
 
 @ensure_csrf_cookie
@@ -2381,6 +2477,7 @@ def _split_input_list(str_list):
 
     return new_list
 
+
 #---- Gradebook (shown to small courses only) ----
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2420,6 +2517,7 @@ def spoc_gradebook(request, course_id):
         'ordered_grades': sorted(course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True),
     })
 
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def irc_instructor_auth_token(request, course_id):
@@ -2429,6 +2527,6 @@ def irc_instructor_auth_token(request, course_id):
     course = get_course_by_id(course_key, depth=None)
     is_instructor_here = has_access(request.user, 'staff', course)
     if is_instructor_here:
-        extras_key = hashlib.sha1(course_id+"happy fish").hexdigest()
+        extras_key = hashlib.sha1(course_id + "happy fish").hexdigest()
         return JsonResponse({'extras': extras_key, 'error': ''})
     return JsonResponse({'extras': '', 'error': 'NotInstructor'})

@@ -1,6 +1,12 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%page args="section_data"/>
 
+<script>
+  ${d3_graph_data_download.body()}
+</script>
+
+<%namespace name="d3_graph_data_download" file="/class_dashboard/d3_graph_data_download.js"/>
+
 
 <div class="data-download-container action-type-container">
   <h2>${_("Data Download")}</h2>
@@ -43,7 +49,10 @@
     <p>
       <input type="button" name="calculate-grades-csv" value="${_("Generate Grade Report")}" data-endpoint="${ section_data['calculate_grades_csv_url'] }"/>
       <input type="button" name="get-student-responses" value="${_("Get Student Responses Report")}" data-endpoint="${ section_data['get_student_responses_url'] }"/>
-      <input type="button" name="ora2-response-btn" value="${_("Download Ora2 Responses")}" data-endpoint="${ section_data['get_ora2_responses_url'] }"/>
+      <input type="button" name="ora2-response-btn" value="${_("Download Ora2 Responses (no email addresses)")}" data-endpoint="${ section_data['get_ora2_responses_url'] }"/>
+      <input type="button" name="ora2-response-btn-email" value="${_("Download Ora2 Responses (including email addresses)")}" data-endpoint="${ section_data['get_ora2_email_responses_url'] }"/>
+      <input type="button" name="course-forums-btn"  value="${_("Generate Course Forums Usage Report")}" data-endpoint="${ section_data['get_course_forums_usage_url'] }"/>
+      <input type="button" name="student-forums-btn" value="${_("Generate Student Forums Usage Report")}" data-endpoint="${ section_data['get_student_forums_usage_url']}"/>
     </p>
   %endif
 
@@ -66,7 +75,13 @@
     <p>${_("<b>Note</b>: To keep student data secure, you cannot save or email these links for direct access. Copies of links expire within 5 minutes.")}</p><br>
 
     <div class="report-downloads-table" id="report-downloads-table" data-endpoint="${ section_data['list_report_downloads_url'] }" ></div>
+    <div class="report-downloads-action-block">
+        <div class="report-downloads-graph-title"></div>
+        <div class="report-downloads-graph" id="report-downloads-graph" data-endpoint="${ section_data['graph_course_forums_usage_url'] }"></div>
+        <div class="report-downloads-delete" data-endpoint="${ section_data['delete_report_download_url'] }" ></div>   
+   </div>
   </div>
+
 %endif
 
 %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):

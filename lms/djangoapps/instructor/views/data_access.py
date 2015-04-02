@@ -83,7 +83,7 @@ def save_query(course_id, queries):
         perm_query.save()
         relation = SubqueryForGroupedQuery(grouped=group, query=perm_query)
         relation.save()
-    return True
+    return group
 
 
 def get_group_query_students(course_id, group_id):

@@ -50,6 +50,19 @@ def add_keyword_function_map(mapping):
     KEYWORD_FUNCTION_MAP.update(mapping)
 
 
+def get_keywords_supported():
+    """
+    Returns supported keywords as a list of dicts with name and description
+    """
+    return [
+        {
+            'name': keyword,
+            'desc': value.desc,
+        }
+        for keyword, value in KEYWORD_FUNCTION_MAP.iteritems()
+    ]
+
+
 def substitute_keywords(string, user=None, course=None):
     """
     Replaces all %%-encoded words using KEYWORD_FUNCTION_MAP mapping functions
