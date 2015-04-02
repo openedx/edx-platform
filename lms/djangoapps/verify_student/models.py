@@ -17,6 +17,7 @@ import uuid
 
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
+from django.core.exceptions import ObjectDoesNotExist
 import pytz
 import requests
 
@@ -945,6 +946,20 @@ class VerificationCheckpoint(models.Model):
         """
         self.photo_verification.add(verification_attempt)  # pylint: disable=no-member
 
+    def get_user_latest_status(self, user_id):
+        """ Return the latest status of the given checkpoint attempt by user
+
+        Args:
+            user_id(str): Id of user
+
+        Returns:
+            VerificationStatus object if found any else None
+        """
+        try:
+            return self.checkpoint_status.filter(user_id=user_id).latest()  # pylint: disable=E1101
+        except ObjectDoesNotExist:
+            return None
+
     @classmethod
     def get_verification_checkpoint(cls, course_id, checkpoint_name):
         """Get the verification checkpoint for given course_id and checkpoint name
@@ -976,12 +991,15 @@ class VerificationStatus(models.Model):
         ("error", "error")
     )
 
-    checkpoint = models.ForeignKey(VerificationCheckpoint)
+    checkpoint = models.ForeignKey(VerificationCheckpoint, related_name="checkpoint_status")
     user = models.ForeignKey(User)
     status = models.CharField(choices=VERIFICATION_STATUS_CHOICES, db_index=True, max_length=32)
     timestamp = models.DateTimeField(auto_now_add=True)
     response = models.TextField(null=True, blank=True)
     error = models.TextField(null=True, blank=True)
+
+    class Meta(object):  # pylint: disable=missing-docstring
+        get_latest_by = "timestamp"
 
     @classmethod
     def add_verification_status(cls, checkpoint, user, status):
