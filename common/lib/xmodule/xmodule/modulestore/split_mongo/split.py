@@ -790,7 +790,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         else:
             self.request_cache.data['course_cache'] = {}
 
-    def _lookup_course(self, course_key):
+    def _lookup_course(self, course_key, head_validation=True):
         """
         Decode the locator into the right series of db access. Does not
         return the CourseDescriptor! It returns the actual db json from
@@ -799,11 +799,12 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         Semantics: if course id and branch given, then it will get that branch. If
         also give a version_guid, it will see if the current head of that branch == that guid. If not
         it raises VersionConflictError (the version now differs from what it was when you got your
-        reference)
+        reference) unless you specify head_validation = False, in which case it will return the
+        revision (if specified) by the course_key.
 
         :param course_key: any subclass of CourseLocator
         """
-        if course_key.org and course_key.course and course_key.run:
+        if head_validation and course_key.org and course_key.course and course_key.run:
             if course_key.branch is None:
                 raise InsufficientSpecificationError(course_key)
 
@@ -937,11 +938,11 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         return CourseLocator(org, course, run)
 
-    def _get_structure(self, structure_id, depth, **kwargs):
+    def _get_structure(self, structure_id, depth, head_validation=True, **kwargs):
         """
         Gets Course or Library by locator
         """
-        structure_entry = self._lookup_course(structure_id)
+        structure_entry = self._lookup_course(structure_id, head_validation=head_validation)
         root = structure_entry.structure['root']
         result = self._load_items(structure_entry, [root], depth, **kwargs)
         return result[0]
@@ -955,14 +956,14 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             raise ItemNotFoundError(course_id)
         return self._get_structure(course_id, depth, **kwargs)
 
-    def get_library(self, library_id, depth=0, **kwargs):
+    def get_library(self, library_id, depth=0, head_validation=True, **kwargs):
         """
         Gets the 'library' root block for the library identified by the locator
         """
         if not isinstance(library_id, LibraryLocator):
             # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
             raise ItemNotFoundError(library_id)
-        return self._get_structure(library_id, depth, **kwargs)
+        return self._get_structure(library_id, depth, head_validation=head_validation, **kwargs)
 
     def has_course(self, course_id, ignore_case=False, **kwargs):
         """

@@ -747,6 +747,9 @@ class TestOverrides(LibraryTestCase):
             publish_item=False,
         )
 
+        # Refresh library now that we've added something.
+        self.library = modulestore().get_library(self.lib_key)
+
         # Also create a course:
         with modulestore().default_store(ModuleStoreEnum.Type.split):
             self.course = CourseFactory.create()
@@ -861,6 +864,42 @@ class TestOverrides(LibraryTestCase):
         self.assertEqual(self.problem_in_course.display_name, new_display_name)
         self.assertEqual(self.problem_in_course.weight, new_weight)
         self.assertEqual(self.problem_in_course.data, new_data_value)
+
+    def test_duplicated_version(self):
+        """
+        Test that if a library is updated, and the content block is duplicated,
+        the new block will use the old library version and not the new one.
+        """
+        self.assertEqual(len(self.library.children), 1)
+        self.assertEqual(len(self.lc_block.children), 1)
+
+        # Create an additional problem block in the library:
+        self.problem = ItemFactory.create(
+            category="problem",
+            parent_location=self.library.location,
+            user_id=self.user.id,
+            publish_item=False,
+        )
+
+        # Refresh our reference to the library
+        store = modulestore()
+        self.library = store.get_library(self.lib_key)
+
+        # Refresh our reference to the block
+        self.lc_block = store.get_item(self.lc_block.location)
+
+        # The library has changed...
+        self.assertEqual(len(self.library.children), 2)
+
+        # But the block hasn't.
+        self.assertEqual(len(self.lc_block.children), 1)
+
+        duplicate = store.get_item(
+            _duplicate_item(self.course.location, self.lc_block.location, self.user)
+        )
+        self.assertEqual(len(duplicate.children), 1)
+        self.assertTrue(self.lc_block.source_library_version)
+        self.assertEqual(self.lc_block.source_library_version, duplicate.source_library_version)
 
 
 class TestIncompatibleModuleStore(LibraryTestCase):

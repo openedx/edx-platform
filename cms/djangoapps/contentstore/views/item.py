@@ -612,7 +612,7 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
             store.update_item(dest_module, user.id)
 
         # pylint: disable=protected-access
-        if ('detached' not in source_item.runtime.load_block_type(category)._class_tags):
+        if 'detached' not in source_item.runtime.load_block_type(category)._class_tags:
             parent = store.get_item(parent_usage_key)
             # If source was already a child of the parent, add duplicate immediately afterward.
             # Otherwise, add child to end.
