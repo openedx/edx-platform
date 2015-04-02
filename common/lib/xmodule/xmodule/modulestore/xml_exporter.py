@@ -264,8 +264,14 @@ class CourseExportManager(ExportManager):
             'about', 'about', '.html'
         )
 
+        course_policy_dir_name = courselike.location.run
+        if courselike.url_name != courselike.location.run and courselike.url_name == 'course':
+            # Use url_name for split mongo because course_run is not used when loading policies.
+            course_policy_dir_name = courselike.url_name
+
+        course_run_policy_dir = policies_dir.makeopendir(course_policy_dir_name)
+
         # export the grading policy
-        course_run_policy_dir = policies_dir.makeopendir(courselike.location.run)
         with course_run_policy_dir.open('grading_policy.json', 'w') as grading_policy:
             grading_policy.write(dumps(courselike.grading_policy, cls=EdxJSONEncoder, sort_keys=True, indent=4))
 

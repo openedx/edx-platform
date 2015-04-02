@@ -13,6 +13,7 @@ and then for each combination of modulestores, performing the sequence:
 """
 from contextlib import contextmanager, nested
 import itertools
+import os
 from path import path
 import random
 from shutil import rmtree
@@ -314,14 +315,15 @@ class MixedModulestoreBuilder(StoreBuilderBase):
             # Split stores all asset metadata in the structure collection.
             return store.db_connection.structures
 
-
 MIXED_MODULESTORE_BOTH_SETUP = MixedModulestoreBuilder([
     ('draft', MongoModulestoreBuilder()),
     ('split', VersioningModulestoreBuilder())
 ])
+DRAFT_MODULESTORE_SETUP = MixedModulestoreBuilder([('draft', MongoModulestoreBuilder())])
+SPLIT_MODULESTORE_SETUP = MixedModulestoreBuilder([('split', VersioningModulestoreBuilder())])
 MIXED_MODULESTORE_SETUPS = (
-    MixedModulestoreBuilder([('draft', MongoModulestoreBuilder())]),
-    MixedModulestoreBuilder([('split', VersioningModulestoreBuilder())]),
+    DRAFT_MODULESTORE_SETUP,
+    SPLIT_MODULESTORE_SETUP,
 )
 MIXED_MS_SETUPS_SHORT = (
     'mixed_mongo',
@@ -346,6 +348,8 @@ COURSE_DATA_NAMES = (
     'split_test_module',
     'split_test_module_draft',
 )
+
+EXPORTED_COURSE_DIR_NAME = 'exported_source_course'
 
 
 @ddt.ddt
@@ -397,14 +401,14 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
                             source_content,
                             source_course_key,
                             self.export_dir,
-                            'exported_source_course',
+                            EXPORTED_COURSE_DIR_NAME,
                         )
 
                         import_course_from_xml(
                             dest_store,
                             'test_user',
                             self.export_dir,
-                            source_dirs=['exported_source_course'],
+                            source_dirs=[EXPORTED_COURSE_DIR_NAME],
                             static_content_store=dest_content,
                             target_id=dest_course_key,
                             raise_on_failure=True,
@@ -448,3 +452,58 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
                             dest_store,
                             dest_course_key,
                         )
+
+    def test_split_course_export_import(self):
+        # Construct the contentstore for storing the first import
+        with MongoContentstoreBuilder().build() as source_content:
+            # Construct the modulestore for storing the first import (using the previously created contentstore)
+            with SPLIT_MODULESTORE_SETUP.build(contentstore=source_content) as source_store:
+                # Construct the contentstore for storing the second import
+                with MongoContentstoreBuilder().build() as dest_content:
+                    # Construct the modulestore for storing the second import (using the second contentstore)
+                    with SPLIT_MODULESTORE_SETUP.build(contentstore=dest_content) as dest_store:
+                        source_course_key = source_store.make_course_key('a', 'source', '2015_Fall')
+                        dest_course_key = dest_store.make_course_key('a', 'dest', '2015_Fall')
+
+                        import_course_from_xml(
+                            source_store,
+                            'test_user',
+                            TEST_DATA_DIR,
+                            source_dirs=['split_course_with_static_tabs'],
+                            static_content_store=source_content,
+                            target_id=source_course_key,
+                            raise_on_failure=True,
+                            create_if_not_present=True,
+                        )
+
+                        export_course_to_xml(
+                            source_store,
+                            source_content,
+                            source_course_key,
+                            self.export_dir,
+                            EXPORTED_COURSE_DIR_NAME,
+                        )
+
+                        source_course = source_store.get_course(source_course_key, depth=None, lazy=False)
+
+                        self.assertEqual(source_course.url_name, 'course')
+
+                        export_dir_path = path(self.export_dir)
+                        policy_dir = export_dir_path / 'exported_source_course' / 'policies' / source_course.url_name
+                        policy_path = policy_dir / 'policy.json'
+                        self.assertTrue(os.path.exists(policy_path))
+
+                        import_course_from_xml(
+                            dest_store,
+                            'test_user',
+                            self.export_dir,
+                            source_dirs=[EXPORTED_COURSE_DIR_NAME],
+                            static_content_store=dest_content,
+                            target_id=dest_course_key,
+                            raise_on_failure=True,
+                            create_if_not_present=True,
+                        )
+
+                        dest_course = dest_store.get_course(dest_course_key, depth=None, lazy=False)
+
+                        self.assertEqual(dest_course.url_name, 'course')
