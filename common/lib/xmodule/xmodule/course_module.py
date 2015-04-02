@@ -279,10 +279,10 @@ class CourseFields(object):
         help=_(
             'Enter pairs of dates between which students cannot post to discussion forums. Inside the provided '
             'brackets, enter an additional set of square brackets surrounding each pair of dates you add. '
-            'Format each pair of dates as ["YYYY-MM-DD", "YYYY-MM-DD"]. To specify times as well as dates, format '
-            'each pair as ["YYYY-MM-DDTHH:MM", "YYYY-MM-DDTHH:MM"]. Be sure to include the "T" between the date and time. '
-            'For example, an entry defining two blackout periods looks like this, including the outer pair of square '
-            'brackets: [["2015-09-15", "2015-09-21"], ["2015-10-01", "2015-10-08"]] '
+            'Format each pair of dates as ["YYYY-MM-DD", "YYYY-MM-DD"]. To specify times as well as dates, '
+            'format each pair as ["YYYY-MM-DDTHH:MM", "YYYY-MM-DDTHH:MM"]. Be sure to include the "T" between '
+            'the date and time. For example, an entry defining two blackout periods looks like this, including '
+            'the outer pair of square brackets: [["2015-09-15", "2015-09-21"], ["2015-10-01", "2015-10-08"]] '
         ),
         scope=Scope.settings
     )
