@@ -47,7 +47,7 @@ class AccountView(APIView):
 
                 * gender: One of the fullowing values:
 
-                  * "m" 
+                  * "m"
                   * "f"
                   * "o"
                   * null

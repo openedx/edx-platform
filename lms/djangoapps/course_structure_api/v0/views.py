@@ -77,7 +77,7 @@ class CourseList(CourseViewMixin, ListAPIView):
     """
     **Use Case**
 
-        Get a paginated list of courses in the edX Platform. 
+        Get a paginated list of courses in the edX Platform.
 
         The list can be filtered by course_id.
 
@@ -165,7 +165,7 @@ class CourseDetail(CourseViewMixin, RetrieveAPIView):
     **Response Values**
 
         * id: The unique identifier for the course.
-        
+
         * name: The name of the course.
 
         * category: The type of content.
