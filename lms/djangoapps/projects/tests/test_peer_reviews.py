@@ -6,7 +6,6 @@ Run these tests @ Devstack:
 """
 import json
 import uuid
-from urllib import urlencode
 
 from django.contrib.auth.models import User
 from django.core.cache import cache
