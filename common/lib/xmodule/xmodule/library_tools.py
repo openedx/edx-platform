@@ -16,7 +16,7 @@ class LibraryToolsService(object):
     def __init__(self, modulestore):
         self.store = modulestore
 
-    def _get_library(self, library_key, version=None):
+    def _get_library(self, library_key):
         """
         Given a library key like "library-v1:ProblemX+PR0B", return the
         'library' XBlock with meta-information about the library.
@@ -28,18 +28,10 @@ class LibraryToolsService(object):
         if not isinstance(library_key, LibraryLocator):
             library_key = LibraryLocator.from_string(library_key)
 
-        assert library_key.version_guid is None
-
-        if version:
-            library_key = library_key.for_version(version)
-
         try:
-            library = self.store.get_library(
+            return self.store.get_library(
                 library_key, remove_version=False, remove_branch=False, head_validation=False
             )
-            if version:
-                assert library_key.version_guid == library.location.version_guid
-            return library
         except ItemNotFoundError:
             return None
 
@@ -133,8 +125,8 @@ class LibraryToolsService(object):
             return
 
         source_blocks = []
-        library_key = dest_block.source_library_key
-        library = self._get_library(library_key, version=version)
+        library_key = dest_block.source_library_key.for_version(version)
+        library = self._get_library(library_key)
         if library is None:
             raise ValueError("Requested library not found.")
         if user_perms and not user_perms.can_read(library_key):
