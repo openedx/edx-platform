@@ -41,6 +41,7 @@ from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
 from student.models import anonymous_id_for_user, user_by_anonymous_id
+from student.roles import CourseBetaTesterRole
 from xblock.core import XBlock
 from xblock.fields import Scope
 from xblock.runtime import KvsFieldData, KeyValueStore
@@ -642,6 +643,8 @@ def get_module_system_for_user(user, field_data_cache,
 
     system.set(u'user_is_staff', user_is_staff)
     system.set(u'user_is_admin', has_access(user, u'staff', 'global'))
+    system.set(u'user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
+    system.set(u'days_early_for_beta', getattr(descriptor, 'days_early_for_beta'))
 
     # make an ErrorDescriptor -- assuming that the descriptor's system is ok
     if has_access(user, u'staff', descriptor.location, course_id):

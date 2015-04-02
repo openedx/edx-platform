@@ -997,6 +997,7 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
             _field_data_cache={},
             _dirty_fields={},
             fields={},
+            days_early_for_beta=None,
         )
         descriptor.runtime = CombinedSystem(descriptor._runtime, None)  # pylint: disable=protected-access
         # Use the xblock_class's bind_for_student method
@@ -1307,6 +1308,25 @@ class LMSXBlockServiceBindingTest(ModuleStoreTestCase):
         )
         service = runtime.service(descriptor, expected_service)
         self.assertIsNotNone(service)
+
+    def test_beta_tester_fields_added(self):
+        """
+        Tests that the beta tester fields are set on LMS runtime.
+        """
+        descriptor = ItemFactory(category="pure", parent=self.course)
+        descriptor.days_early_for_beta = 5
+        runtime, _ = render.get_module_system_for_user(
+            self.user,
+            self.field_data_cache,
+            descriptor,
+            self.course.id,
+            self.track_function,
+            self.xqueue_callback_url_prefix,
+            self.request_token
+        )
+
+        self.assertFalse(getattr(runtime, u'user_is_beta_tester'))
+        self.assertEqual(getattr(runtime, u'days_early_for_beta'), 5)
 
 
 class PureXBlockWithChildren(PureXBlock):
