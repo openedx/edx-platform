@@ -277,11 +277,12 @@ class CourseFields(object):
     discussion_blackouts = List(
         display_name=_("Discussion Blackout Dates"),
         help=_(
-            'Enter pairs of dates between which students cannot post to discussion forums. Each pair should be '
-            'formatted as ["YYYY-MM-DD", "YYYY-MM-DD"]. To specify times as well as dates, format each pair '
-            'as ["YYYY-MM-DDTHH:MM", "YYYY-MM-DDTHH:MM"] (be sure to include the "T" between the date and '
-            'time). An entry defining more than one blackout period might look like this: '
-            '[["2014-09-15", "2014-09-21"], ["2014-10-01", "2014-10-08"]]'
+            'Enter pairs of dates between which students cannot post to discussion forums. Inside the provided '
+            'brackets, enter an additional set of square brackets surrounding each pair of dates you add. '
+            'Format each pair of dates as ["YYYY-MM-DD", "YYYY-MM-DD"]. To specify times as well as dates, '
+            'format each pair as ["YYYY-MM-DDTHH:MM", "YYYY-MM-DDTHH:MM"]. Be sure to include the "T" between '
+            'the date and time. For example, an entry defining two blackout periods looks like this, including '
+            'the outer pair of square brackets: [["2015-09-15", "2015-09-21"], ["2015-10-01", "2015-10-08"]] '
         ),
         scope=Scope.settings
     )
@@ -290,8 +291,9 @@ class CourseFields(object):
         help=_(
             'Enter discussion categories in the following format: "CategoryName": '
             '{"id": "i4x-InstitutionName-CourseNumber-course-CourseRun"}. For example, one discussion '
-            'category may be "Lydian Mode": {"id": "i4x-UniversityX-MUS101-course-2014_T1"}. The "id" '
-            'value for each category must be unique.'
+            'category may be "Lydian Mode": {"id": "i4x-UniversityX-MUS101-course-2015_T1"}. The "id" '
+            'value for each category must be unique. In "id" values, the only special characters that are '
+            'supported are underscore, hyphen, and period.'
         ),
         scope=Scope.settings
     )
