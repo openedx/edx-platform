@@ -30,6 +30,7 @@ import urllib
 import urllib2
 from util.json_request import JsonResponse
 from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
+import gzip
 
 from microsite_configuration import microsite
 
@@ -2175,7 +2176,12 @@ def graph_course_forums_usage(request, course_id):
     if clicked_text:
         for name, url in report_store.links_for(course_key):
             if clicked_text in name and 'course_forums' in name:
-                url_handle = urllib2.urlopen(url)
+                request = urllib2.Request(url)
+                request.add_header('Accept-encoding', 'gzip')
+                url_handle = urllib2.urlopen(request)
+                if url_handle.info().get('Content-Encoding') == 'gzip':
+                    file_buffer = StringIO.StringIO(url_handle.read())
+                    url_handle = gzip.GzipFile(fileobj=file_buffer)
                 graph = generate_course_forums_d3(url_handle)
                 break
     if graph:
