@@ -6,17 +6,15 @@ from datetime import datetime
 import uuid
 
 from django.conf import settings
-from django.contrib.auth.models import Group, User
-from django.test import TestCase
+from django.contrib.auth.models import User
 from django.test.utils import override_settings
 
 from projects.management.commands import migrate_project_courseids_v2
 from projects.models import Project, Workgroup, WorkgroupReview, WorkgroupPeerReview, WorkgroupSubmission, WorkgroupSubmissionReview
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 
-from django.db import connection
-
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
+
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class MigrateCourseIdsTests(ModuleStoreTestCase):

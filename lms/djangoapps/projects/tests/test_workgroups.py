@@ -12,7 +12,7 @@ from urllib import urlencode
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.core.cache import cache
-from django.test import TestCase, Client
+from django.test import Client
 from django.test.utils import override_settings
 
 from api_manager.models import GroupProfile

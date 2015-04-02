@@ -10,7 +10,6 @@ from datetime import datetime
 from django.utils.timezone import UTC
 
 from django.conf import settings
-from django.test import TestCase
 from django.test.utils import override_settings
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory

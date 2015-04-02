@@ -4,11 +4,9 @@ Run these tests @ Devstack:
 """
 from datetime import datetime
 from mock import MagicMock, patch
-from unittest import skip
 import uuid
 
 from django.conf import settings
-from django.test import TestCase
 from django.test.utils import override_settings
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
@@ -33,7 +31,7 @@ class GenerateGradebookEntriesTests(ModuleStoreTestCase):
     def setUp(self):
 
         # Turn off the signalling mechanism temporarily
-        #settings._wrapped.default_settings.FEATURES['SIGNAL_ON_SCORE_CHANGED'] = False
+        settings._wrapped.default_settings.FEATURES['SIGNAL_ON_SCORE_CHANGED'] = False
 
         # Create a couple courses to work with
         self.course = CourseFactory.create(
@@ -139,10 +137,9 @@ class GenerateGradebookEntriesTests(ModuleStoreTestCase):
             course.id
         )._xmodule
 
-    @skip
     @patch.dict(settings.FEATURES, {
                 'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
-                'SIGNAL_ON_SCORE_CHANGED': True
+                'SIGNAL_ON_SCORE_CHANGED': False
     })
     def test_generate_gradebook_entries(self):
         """
