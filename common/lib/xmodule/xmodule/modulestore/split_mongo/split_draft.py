@@ -213,7 +213,11 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 parent_loc = self.get_parent_location(branched_location)
                 SplitMongoModuleStore.delete_item(self, branched_location, user_id)
                 # publish parent w/o child if deleted element is direct only (not based on type of parent)
-                if branch == ModuleStoreEnum.BranchName.draft and branched_location.block_type in DIRECT_ONLY_CATEGORIES:
+                if (
+                        branch == ModuleStoreEnum.BranchName.draft and
+                        branched_location.block_type in DIRECT_ONLY_CATEGORIES and parent_loc
+                ):
+                    # will publish if its not an orphan
                     self.publish(parent_loc.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
 
     def _map_revision_to_branch(self, key, revision=None):
