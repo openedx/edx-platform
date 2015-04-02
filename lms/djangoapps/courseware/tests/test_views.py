@@ -774,10 +774,11 @@ class ProgressPageTests(ModuleStoreTestCase):
             'azU3N_8$',
         ]
         for invalid_id in invalid_student_ids:
+
             self.assertRaises(
                 Http404, views.progress,
                 self.request,
-                course_id=self.course.id.to_deprecated_string(),
+                course_id=unicode(self.course.id),
                 student_id=invalid_id
             )
 
