@@ -6,11 +6,10 @@ Run these tests @ Devstack:
 """
 import json
 import uuid
-from urllib import urlencode
 
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.test import TestCase, Client
+from django.test import Client
 from django.test.utils import override_settings
 
 from projects.models import Project, Workgroup, WorkgroupSubmission
