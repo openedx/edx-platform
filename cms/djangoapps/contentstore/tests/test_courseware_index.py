@@ -128,7 +128,7 @@ class TestCoursewareSearchIndexer(MixedSplitTestCase):
     def index_recent_changes(self, store, since_time):
         """ index course using recent changes """
         trigger_time = datetime.now(UTC)
-        return CoursewareSearchIndexer.index_course(
+        return CoursewareSearchIndexer().index_course(
             store,
             self.course.id,
             triggered_at=trigger_time,
