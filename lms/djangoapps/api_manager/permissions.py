@@ -162,4 +162,10 @@ class SecureListAPIView(PermissionMixin,
     """
         Inherited from ListAPIView
     """
-    pass
+    # if page_size parameter in request is zero don't paginate results
+    def get_paginate_by(self):
+        page_size = self.request.QUERY_PARAMS.get('page_size')
+        if page_size and int(page_size) == 0:
+            return None
+        else:
+            return super(SecureListAPIView, self).get_paginate_by()

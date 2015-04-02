@@ -10,14 +10,14 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from projects.management.commands import migrate_project_courseids
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from projects.models import Project, Workgroup, WorkgroupReview, WorkgroupSubmission, WorkgroupSubmissionReview
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from django.db import connection
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class MigrateCourseIdsTests(TestCase):
+
+class MigrateCourseIdsTests(ModuleStoreTestCase):
     """
     Test suite for data migration script
     """
