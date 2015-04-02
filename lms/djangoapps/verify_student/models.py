@@ -35,7 +35,10 @@ from verify_student.ssencrypt import (
 
 from reverification.models import MidcourseReverificationWindow
 
+from xmodule_django.models import CourseKeyField
 log = logging.getLogger(__name__)
+
+from config_models.models import ConfigurationModel
 
 
 def generateUUID():  # pylint: disable=invalid-name
@@ -640,6 +643,17 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         query = cls.objects.filter(user=user, window=None).order_by('-updated_at')
         return query[0]
 
+    @classmethod
+    def get_initial_verification(cls, user):
+        """Get initial verification for a user
+        Arguments:
+            user(User): user object
+        Return:
+            SoftwareSecurePhotoVerification (object)
+        """
+        init_verification = cls.objects.filter(user=user, status__in=["submitted", "approved"], window=None)
+        return init_verification.latest('created_at') if init_verification.exists() else None
+
     @status_before_must_be("created")
     def upload_face_image(self, img_data):
         """
@@ -881,3 +895,131 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         log.debug("Return message:\n\n{}\n\n".format(response.text))
 
         return response
+
+    @classmethod
+    def submit_faceimage(cls, user, face_image, photo_id_key):
+        """Submit the faceimage to SoftwareSecurePhotoVerification
+
+        Arguments:
+            user(User): user object
+            face_image (bytestream): raw bytestream image data
+            photo_id_key (str) : SoftwareSecurePhotoVerification attribute
+        Returns:
+            SoftwareSecurePhotoVerification Object
+        """
+        b64_face_image = face_image.split(",")[1]
+        attempt = SoftwareSecurePhotoVerification(user=user)
+        attempt.upload_face_image(b64_face_image.decode('base64'))
+        attempt.photo_id_key = photo_id_key
+        attempt.mark_ready()
+        attempt.save()
+        attempt.submit()
+        return attempt
+
+
+class VerificationCheckpoint(models.Model):
+    """Represents a point at which a user is challenged to reverify his or her identity.
+        Each checkpoint is uniquely identified by a (course_id, checkpoint_name) tuple.
+    """
+
+    CHECKPOINT_CHOICES = (
+        ("midterm", "midterm"),
+        ("final", "final"),
+    )
+
+    course_id = CourseKeyField(max_length=255, db_index=True)
+    checkpoint_name = models.CharField(max_length=32, choices=CHECKPOINT_CHOICES)
+    photo_verification = models.ManyToManyField(SoftwareSecurePhotoVerification)
+
+    class Meta:  # pylint: disable=missing-docstring, old-style-class
+        unique_together = (('course_id', 'checkpoint_name'),)
+
+    def add_verification_attempt(self, verification_attempt):
+        """ Add the verification attempt in M2M relation of photo_verification
+
+        Arguments:
+            verification_attempt(SoftwareSecurePhotoVerification): SoftwareSecurePhotoVerification object
+
+        Returns:
+            None
+        """
+        self.photo_verification.add(verification_attempt)  # pylint: disable=no-member
+
+    @classmethod
+    def get_verification_checkpoint(cls, course_id, checkpoint_name):
+        """Get the verification checkpoint for given course_id and checkpoint name
+
+        Arguments:
+            course_id(CourseKey): CourseKey
+            checkpoint_name(str): checkpoint name
+
+        Returns:
+            VerificationCheckpoint object if exists otherwise None
+        """
+        try:
+            return cls.objects.get(course_id=course_id, checkpoint_name=checkpoint_name)
+        except cls.DoesNotExist:
+            return None
+
+
+class VerificationStatus(models.Model):
+    """A verification status represents a user’s progress
+    through the verification process for a particular checkpoint
+    Model is an append-only table that represents the user status changes in
+    verification process
+    """
+
+    VERIFICATION_STATUS_CHOICES = (
+        ("submitted", "submitted"),
+        ("approved", "approved"),
+        ("denied", "denied"),
+        ("error", "error")
+    )
+
+    checkpoint = models.ForeignKey(VerificationCheckpoint)
+    user = models.ForeignKey(User)
+    status = models.CharField(choices=VERIFICATION_STATUS_CHOICES, db_index=True, max_length=32)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    response = models.TextField(null=True, blank=True)
+    error = models.TextField(null=True, blank=True)
+
+    @classmethod
+    def add_verification_status(cls, checkpoint, user, status):
+        """ Create new verification status object
+
+        Arguments:
+            checkpoint(VerificationCheckpoint): VerificationCheckpoint object
+            user(User): user object
+            status(str): String representing the status from VERIFICATION_STATUS_CHOICES
+        Returns:
+            None
+        """
+        cls.objects.create(checkpoint=checkpoint, user=user, status=status)
+
+    @classmethod
+    def add_status_from_checkpoints(cls, checkpoints, user, status):
+        """ Create new verification status objects against the given checkpoints
+
+        Arguments:
+            checkpoints(list): list of VerificationCheckpoint objects
+            user(User): user object
+            status(str): String representing the status from VERIFICATION_STATUS_CHOICES
+        Returns:
+            None
+        """
+        for checkpoint in checkpoints:
+            cls.objects.create(checkpoint=checkpoint, user=user, status=status)
+
+
+class InCourseReverificationConfiguration(ConfigurationModel):
+    """Configure in-course re-verification.
+
+    Enable or disable in-course re-verification feature.
+    When this flag is disabled, the "in-course re-verification" feature
+    will be disabled.
+
+    When the flag is enabled, the "in-course re-verification" feature
+    will be enabled.
+
+    """
+    pass
