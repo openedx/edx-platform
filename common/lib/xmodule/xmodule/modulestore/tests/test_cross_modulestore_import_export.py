@@ -347,6 +347,7 @@ COURSE_DATA_NAMES = (
     'manual-testing-complete',
     'split_test_module',
     'split_test_module_draft',
+    'split_test_module_static_tabs',
 )
 
 EXPORTED_COURSE_DIR_NAME = 'exported_source_course'
