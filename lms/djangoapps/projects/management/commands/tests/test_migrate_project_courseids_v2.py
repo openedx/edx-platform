@@ -2,18 +2,15 @@
 Run these tests @ Devstack:
     rake fasttest_lms[common/djangoapps/api_manager/management/commands/tests/test_migrate_orgdata.py]
 """
-from datetime import datetime
-import uuid
 
 from django.contrib.auth.models import User
-from django.test import TestCase
-
 from projects.management.commands import migrate_project_courseids_v2
 from projects.models import Project, Workgroup, WorkgroupReview, WorkgroupPeerReview, WorkgroupSubmission, WorkgroupSubmissionReview
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
-class MigrateCourseIdsTests(TestCase):
+
+class MigrateCourseIdsTests(ModuleStoreTestCase):
     """
     Test suite for data migration script
     """
