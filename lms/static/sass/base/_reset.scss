@@ -93,7 +93,7 @@ td { vertical-align: top; }
   thead { display: table-header-group; }
   tr, img { page-break-inside: avoid; }
   img { max-width: 100% !important; }
-  @page { margin: 0.5cm; }
+  @page { margin: 1cm 1.2cm 2cm; }
   p, h2, h3 { orphans: 3; widows: 3; }
   h2, h3 { page-break-after: avoid; }
 }
