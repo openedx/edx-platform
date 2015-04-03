@@ -7,9 +7,10 @@
         'js/views/fields',
         'js/student_profile/views/learner_profile_fields',
         'js/student_profile/views/learner_profile_view',
-        'js/student_account/views/account_settings_fields'
-    ], function (gettext, $, _, Backbone, Logger, AccountSettingsModel, AccountPreferencesModel, FieldsView,
-                 LearnerProfileFieldsView, LearnerProfileView, AccountSettingsFieldViews) {
+        'js/student_account/views/account_settings_fields',
+        'js/views/message_banner'
+    ], function (gettext, $, _, Backbone, AccountSettingsModel, AccountPreferencesModel, FieldsView,
+                 LearnerProfileFieldsView, LearnerProfileView, AccountSettingsFieldViews, MessageBannerView) {
 
         return function (options) {
 
@@ -24,6 +25,10 @@
             accountSettingsModel.url = options.accounts_api_url;
 
             var editable = options.own_profile ? 'toggle' : 'never';
+
+            var messageView = new MessageBannerView({
+                el: $('.message-banner')
+            });
 
             var accountPrivacyFieldView = new LearnerProfileFieldsView.AccountPrivacyFieldView({
                 model: accountPreferencesModel,
@@ -40,6 +45,17 @@
                 accountSettingsPageUrl: options.account_settings_page_url
             });
 
+            var profileImageFieldView = new LearnerProfileFieldsView.ProfileImageFieldView({
+                model: accountSettingsModel,
+                valueAttribute: "profile_image",
+                editable: editable === 'toggle',
+                messageView: messageView,
+                imageMaxBytes: options['profile_image_max_bytes'],
+                imageMinBytes: options['profile_image_min_bytes'],
+                imageUploadUrl: options['profile_image_upload_url'],
+                imageRemoveUrl: options['profile_image_remove_url']
+            });
+
             var usernameFieldView = new FieldsView.ReadonlyFieldView({
                     model: accountSettingsModel,
                     valueAttribute: "username",
@@ -47,7 +63,6 @@
             });
 
             var sectionOneFieldViews = [
-                usernameFieldView,
                 new FieldsView.DropdownFieldView({
                     model: accountSettingsModel,
                     required: true,
@@ -94,6 +109,7 @@
                 accountSettingsModel: accountSettingsModel,
                 preferencesModel: accountPreferencesModel,
                 accountPrivacyFieldView: accountPrivacyFieldView,
+                profileImageFieldView: profileImageFieldView,
                 usernameFieldView: usernameFieldView,
                 sectionOneFieldViews: sectionOneFieldViews,
                 sectionTwoFieldViews: sectionTwoFieldViews

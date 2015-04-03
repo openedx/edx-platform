@@ -1,0 +1,15 @@
+<div class="image-wrapper">
+    <img class="image-frame" src="<%- gettext(imageUrl) %>"  alt="<%=imageAltText%>"/>
+    <div class="u-field-actions">
+        <label class="u-field-upload-button">
+            <span class="upload-button-icon" aria-hidden="true"><%= uploadButtonIcon %></span>
+            <span class="upload-button-title" aria-live="polite"><%= uploadButtonTitle %></span>
+            <input class="upload-button-input" type="file" name="<%= id %>"/>
+       	</label>
+        
+        <button class="u-field-remove-button" type="button">
+            <span class="remove-button-icon" aria-hidden="true"><%= removeButtonIcon %></span>
+            <span class="remove-button-title" aria-live="polite"><%= removeButtonTitle %></span>
+        </button>
+    </div>
+</div>

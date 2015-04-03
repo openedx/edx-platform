@@ -3,6 +3,8 @@ define(['underscore'], function(_) {
 
     var USER_ACCOUNTS_API_URL = '/api/user/v0/accounts/student';
     var USER_PREFERENCES_API_URL = '/api/user/v0/preferences/student';
+    var IMAGE_UPLOAD_API_URL = '/api/profile_images/v0/staff/upload';
+    var IMAGE_REMOVE_API_URL = '/api/profile_images/v0/staff/remove';
 
     var USER_ACCOUNTS_DATA = {
         username: 'student',
@@ -27,8 +29,11 @@ define(['underscore'], function(_) {
         ['0', 'Option 0'],
         ['1', 'Option 1'],
         ['2', 'Option 2'],
-        ['3', 'Option 3'],
+        ['3', 'Option 3']
     ];
+
+    var IMAGE_MAX_BYTES = 1024 * 1024;
+    var IMAGE_MIN_BYTES = 100;
 
     var expectLoadingIndicatorIsVisible = function (view, visible) {
         if (visible) {
@@ -92,6 +97,10 @@ define(['underscore'], function(_) {
     return {
         USER_ACCOUNTS_API_URL: USER_ACCOUNTS_API_URL,
         USER_PREFERENCES_API_URL: USER_PREFERENCES_API_URL,
+        IMAGE_UPLOAD_API_URL: IMAGE_UPLOAD_API_URL,
+        IMAGE_REMOVE_API_URL: IMAGE_REMOVE_API_URL,
+        IMAGE_MAX_BYTES: IMAGE_MAX_BYTES,
+        IMAGE_MIN_BYTES: IMAGE_MIN_BYTES,
         USER_ACCOUNTS_DATA: USER_ACCOUNTS_DATA,
         USER_PREFERENCES_DATA: USER_PREFERENCES_DATA,
         FIELD_OPTIONS: FIELD_OPTIONS,
