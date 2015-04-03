@@ -24,7 +24,6 @@
             render: function () {
                 this.$el.html(this.template({
                     username: this.options.accountSettingsModel.get('username'),
-                    profilePhoto: 'http://www.teachthought.com/wp-content/uploads/2012/07/edX-120x120.jpg',
                     ownProfile: this.options.ownProfile,
                     showFullProfile: this.showFullProfile()
                 }));
@@ -47,6 +46,11 @@
                 }
 
                 this.$('.profile-section-one-fields').append(this.options.usernameFieldView.render().el);
+
+                var imageView = this.options.profileImageFieldView;
+                imageView.undelegateEvents();
+                this.$('.profile-image-field').append(imageView.render().el);
+                imageView.delegateEvents();
 
                 if (this.showFullProfile()) {
                     _.each(this.options.sectionOneFieldViews, function (fieldView) {
