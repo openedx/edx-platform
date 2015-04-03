@@ -870,11 +870,15 @@ class TestOverrides(LibraryTestCase):
         Test that if a library is updated, and the content block is duplicated,
         the new block will use the old library version and not the new one.
         """
+        store = modulestore()
         self.assertEqual(len(self.library.children), 1)
         self.assertEqual(len(self.lc_block.children), 1)
 
+        # Edit the only problem in the library:
+        self.problem.display_name = "--changed in library--"
+        store.update_item(self.problem, self.user.id)
         # Create an additional problem block in the library:
-        self.problem = ItemFactory.create(
+        ItemFactory.create(
             category="problem",
             parent_location=self.library.location,
             user_id=self.user.id,
@@ -882,24 +886,30 @@ class TestOverrides(LibraryTestCase):
         )
 
         # Refresh our reference to the library
-        store = modulestore()
         self.library = store.get_library(self.lib_key)
 
         # Refresh our reference to the block
         self.lc_block = store.get_item(self.lc_block.location)
+        self.problem_in_course = store.get_item(self.problem_in_course.location)
 
         # The library has changed...
         self.assertEqual(len(self.library.children), 2)
 
         # But the block hasn't.
         self.assertEqual(len(self.lc_block.children), 1)
+        self.assertEqual(self.problem_in_course.location, self.lc_block.children[0])
+        self.assertEqual(self.problem_in_course.display_name, self.original_display_name)
 
+        # Duplicate self.lc_block:
         duplicate = store.get_item(
             _duplicate_item(self.course.location, self.lc_block.location, self.user)
         )
+        # The duplicate should have identical children to the original:
         self.assertEqual(len(duplicate.children), 1)
         self.assertTrue(self.lc_block.source_library_version)
         self.assertEqual(self.lc_block.source_library_version, duplicate.source_library_version)
+        problem2_in_course = store.get_item(duplicate.children[0])
+        self.assertEqual(problem2_in_course.display_name, self.original_display_name)
 
 
 class TestIncompatibleModuleStore(LibraryTestCase):
