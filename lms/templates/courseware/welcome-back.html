@@ -2,13 +2,8 @@
 from django.utils.translation import ugettext as _ 
 %>
 
-<h2>Welcome to ${course.display_org_with_default | h}'s ${course.display_name_with_default}</h2>
+<h2 class="header-outline-info">${course.display_org_with_default | h}</h2>
+<span class="content-outline-info">${course.display_name_with_default}</span>
 
-<span>${chapter_module.display_name_with_default}</span>
-
-<p>${_("You were most recently in {section_link}.").format(
-	    section_link=u'<a href="{url}">{section_name}</a>'.format(
-	        url=prev_section_url,
-	        section_name=prev_section.display_name_with_default,
-	    )
-    )}</p>
+<h2 class="header-outline-info">${_("Last Visit")}</h2>
+<a href="{prev_section_url}" class="content-outline-info">${chapter_module.display_name_with_default} <i class="icon fa fa-caret-right" aria-hidden="true"></i> ${prev_section.display_name_with_default}</a>

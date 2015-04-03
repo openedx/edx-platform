@@ -140,29 +140,32 @@ ${fragment.foot_html()}
 % endif
 
 <div class="container">
-  <div class="course-wrapper">
+  ## TO-DO: apply home class only for main courseware tab experience
+  <div class="course-wrapper home">
 
 % if disable_accordion is UNDEFINED or not disable_accordion:
     <div class="course-index" role="navigation">
-      <header id="open_close_accordion">
-        <a href="#">${_("close")}</a>
-      </header>
-
-      % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
-        <div id="courseware-search-bar" class="courseware-search-bar" role="search" aria-label="Course">
-          <form>
-            <label for="course-search-input" class="sr">${_('Course Search')}</label>
-            <input id="course-search-input" type="text" class="search-field"/>
-            <button type="submit" class="search-button">
-              ${_('search')} <i class="icon fa fa-search" aria-hidden="true"></i>
-            </button>
-            <button type="button" class="cancel-button" aria-label="${_('Clear search')}">
-              <i class="icon fa fa-remove" aria-hidden="true"></i>
-            </button>
-          </form>
+      <header class="wrapper-course-nav-tools">
+        <h2 class="course-tools-header">${_('Course Outline')}</h2>
+        <div id="open_close_accordion">
+          <a href="#">${_("close")}</a>
         </div>
-      % endif
 
+        % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+          <div id="courseware-search-bar" class="courseware-search-bar" role="search" aria-label="Course">
+            <form>
+              <label for="course-search-input" class="sr">${_('Course Search')}</label>
+              <input id="course-search-input" type="text" class="search-field"/>
+              <button type="submit" class="search-button">
+                ${_('search')} <i class="icon fa fa-search" aria-hidden="true"></i>
+              </button>
+              <button type="button" class="cancel-button" aria-label="${_('Clear search')}">
+                <i class="icon fa fa-remove" aria-hidden="true"></i>
+              </button>
+            </form>
+          </div>
+        % endif
+      </header>
       <div id="accordion" style="display: none">
         <nav aria-label="${_('Course Navigation')}">
           % if accordion.strip():

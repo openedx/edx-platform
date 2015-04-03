@@ -67,6 +67,64 @@
   @extend %content-primary;
   @include border-right(1px solid $border-color-l3);
 
+  .wrapper-course-nav-tools {
+    padding: ($baseline/2);
+
+    // UI: courseware search bar
+    .course-tools-header {
+      @extend %t-regular;
+      @include box-sizing(border-box);
+      width: flex-grid(3);
+      display: inline-block;
+      margin: ($baseline/4);
+    }
+
+
+    // UI: courseware search bar
+    .courseware-search-bar {
+      @include box-sizing(border-box);
+      width: flex-grid(3);
+      display: inline-block;
+      position: relative;
+      float: right;
+
+      .search-field {
+        @include box-sizing(border-box);
+        box-shadow: none;
+        border-radius: 3px;
+        width: 100%;
+        background: $white-t1;
+
+        &.is-active {
+          background: $white;
+        }
+      }
+
+      .search-button, .cancel-button {
+        @include box-sizing(border-box);
+        @include right(12px);
+        color: #888;
+        font-size: 14px;
+        font-weight: normal;
+        display: block;
+        position: absolute;
+        top: 0;
+        height: 35px;
+        line-height: 35px;
+        padding: 0;
+        border: none;
+        box-shadow: none;
+        background: transparent;
+      }
+
+      .cancel-button {
+        display: none;
+      }
+
+    }
+
+
+  }
 
   .chapter {
     @include box-sizing(border-box);
@@ -82,6 +140,25 @@
     &:hover, &:focus {
       border-color: $action-primary-focused-bg;
     }
+
+  }
+}
+
+// +UI: Outline - Supplemental Info 
+// ==================== 
+.course-content {
+  padding:  $baseline;
+
+  .header-outline-info {
+    @extend %t-title7;
+    @extend %t-ultrastrong;
+    text-transform: uppercase;
+    margin-bottom: 0;
+  }
+  
+  .content-outline-info {
+    margin-bottom: $baseline;
+    display: inline-block;
 
   }
 }
