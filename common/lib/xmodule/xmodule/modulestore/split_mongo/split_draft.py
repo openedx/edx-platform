@@ -104,7 +104,10 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         """
         source_keys = [self._map_revision_to_branch(key) for key in source_keys]
         dest_key = self._map_revision_to_branch(dest_key)
-        new_keys = super(DraftVersioningModuleStore, self).copy_from_template(source_keys, dest_key, user_id)
+        head_validation = kwargs.get('head_validation')
+        new_keys = super(DraftVersioningModuleStore, self).copy_from_template(
+            source_keys, dest_key, user_id, head_validation
+        )
         if dest_key.branch == ModuleStoreEnum.BranchName.draft:
             # Check if any of new_keys or their descendants need to be auto-published.
             # We don't use _auto_publish_no_children since children may need to be published.

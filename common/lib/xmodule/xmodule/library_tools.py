@@ -144,7 +144,10 @@ class LibraryToolsService(object):
         with self.store.bulk_operations(dest_block.location.course_key):
             dest_block.source_library_version = unicode(library.location.library_key.version_guid)
             self.store.update_item(dest_block, user_id)
-            dest_block.children = self.store.copy_from_template(source_blocks, dest_block.location, user_id)
+            head_validation = not version
+            dest_block.children = self.store.copy_from_template(
+                source_blocks, dest_block.location, user_id, head_validation=head_validation
+            )
             # ^-- copy_from_template updates the children in the DB
             # but we must also set .children here to avoid overwriting the DB again
 

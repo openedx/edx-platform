@@ -804,6 +804,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         :param course_key: any subclass of CourseLocator
         """
+        if not course_key.version_guid:
+            head_validation = True
         if head_validation and course_key.org and course_key.course and course_key.run:
             if course_key.branch is None:
                 raise InsufficientSpecificationError(course_key)
@@ -2171,7 +2173,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             self._update_head(destination_course, index_entry, destination_course.branch, destination_structure['_id'])
 
     @contract(source_keys="list(BlockUsageLocator)", dest_usage=BlockUsageLocator)
-    def copy_from_template(self, source_keys, dest_usage, user_id):
+    def copy_from_template(self, source_keys, dest_usage, user_id, head_validation=True):
         """
         Flexible mechanism for inheriting content from an external course/library/etc.
 
@@ -2210,7 +2212,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 raise ItemNotFoundError("branch is required for all source keys when using copy_from_template")
             if course_key not in source_structures:
                 with self.bulk_operations(course_key):
-                    source_structures[course_key] = self._lookup_course(course_key).structure
+                    source_structures[course_key] = self._lookup_course(
+                        course_key, head_validation=head_validation
+                    ).structure
 
         destination_course = dest_usage.course_key
         with self.bulk_operations(destination_course):
@@ -2227,7 +2231,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             # The descendants() method used above adds the block itself, which we don't consider a descendant.
             orig_descendants.remove(block_key)
             new_descendants = self._copy_from_template(
-                source_structures, source_keys, dest_structure, block_key, user_id
+                source_structures, source_keys, dest_structure, block_key, user_id, head_validation
             )
 
             # Update the edit info:
@@ -2251,7 +2255,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             for k in dest_structure['blocks'][block_key].fields['children']
         ]
 
-    def _copy_from_template(self, source_structures, source_keys, dest_structure, new_parent_block_key, user_id):
+    def _copy_from_template(
+            self, source_structures, source_keys, dest_structure, new_parent_block_key, user_id, head_validation
+    ):
         """
         Internal recursive implementation of copy_from_template()
 
@@ -2265,8 +2271,10 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         for usage_key in source_keys:
             src_course_key = usage_key.course_key
+            hashable_source_id = src_course_key.for_version(None)
             block_key = BlockKey(usage_key.block_type, usage_key.block_id)
             source_structure = source_structures[src_course_key]
+
             if block_key not in source_structure['blocks']:
                 raise ItemNotFoundError(usage_key)
             source_block_info = source_structure['blocks'][block_key]
@@ -2274,7 +2282,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             # Compute a new block ID. This new block ID must be consistent when this
             # method is called with the same (source_key, dest_structure) pair
             unique_data = "{}:{}:{}".format(
-                unicode(src_course_key).encode("utf-8"),
+                unicode(hashable_source_id).encode("utf-8"),
                 block_key.id,
                 new_parent_block_key.id,
             )
@@ -2320,7 +2328,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             if children:
                 children = [src_course_key.make_usage_key(child.type, child.id) for child in children]
                 new_blocks |= self._copy_from_template(
-                    source_structures, children, dest_structure, new_block_key, user_id
+                    source_structures, children, dest_structure, new_block_key, user_id, head_validation
                 )
 
             new_blocks.add(new_block_key)
