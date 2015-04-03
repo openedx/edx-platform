@@ -1,0 +1,4 @@
+  <a data-value="<%- query %>" class="facet-option" href="#" data-type="<%- type %>">
+    <span class="query"><%- query %></span>
+    <i aria-hidden="true" class="fa fa-times"></i>
+  </a>
