@@ -82,6 +82,7 @@ class LibraryRoot(XBlock):
             # Children must have a separate context from the library itself. Make a copy.
             child_context = context.copy()
             child_context['show_preview'] = self.show_children_previews
+            child_context['can_edit_visibility'] = False
             child = self.runtime.get_block(child_key)
             child_view_name = StudioEditableModule.get_preview_view_name(child)
 

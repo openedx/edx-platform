@@ -790,7 +790,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         else:
             self.request_cache.data['course_cache'] = {}
 
-    def _lookup_course(self, course_key):
+    def _lookup_course(self, course_key, head_validation=True):
         """
         Decode the locator into the right series of db access. Does not
         return the CourseDescriptor! It returns the actual db json from
@@ -799,11 +799,14 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         Semantics: if course id and branch given, then it will get that branch. If
         also give a version_guid, it will see if the current head of that branch == that guid. If not
         it raises VersionConflictError (the version now differs from what it was when you got your
-        reference)
+        reference) unless you specify head_validation = False, in which case it will return the
+        revision (if specified) by the course_key.
 
         :param course_key: any subclass of CourseLocator
         """
-        if course_key.org and course_key.course and course_key.run:
+        if not course_key.version_guid:
+            head_validation = True
+        if head_validation and course_key.org and course_key.course and course_key.run:
             if course_key.branch is None:
                 raise InsufficientSpecificationError(course_key)
 
@@ -937,11 +940,11 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         return CourseLocator(org, course, run)
 
-    def _get_structure(self, structure_id, depth, **kwargs):
+    def _get_structure(self, structure_id, depth, head_validation=True, **kwargs):
         """
         Gets Course or Library by locator
         """
-        structure_entry = self._lookup_course(structure_id)
+        structure_entry = self._lookup_course(structure_id, head_validation=head_validation)
         root = structure_entry.structure['root']
         result = self._load_items(structure_entry, [root], depth, **kwargs)
         return result[0]
@@ -955,14 +958,14 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             raise ItemNotFoundError(course_id)
         return self._get_structure(course_id, depth, **kwargs)
 
-    def get_library(self, library_id, depth=0, **kwargs):
+    def get_library(self, library_id, depth=0, head_validation=True, **kwargs):
         """
         Gets the 'library' root block for the library identified by the locator
         """
         if not isinstance(library_id, LibraryLocator):
             # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
             raise ItemNotFoundError(library_id)
-        return self._get_structure(library_id, depth, **kwargs)
+        return self._get_structure(library_id, depth, head_validation=head_validation, **kwargs)
 
     def has_course(self, course_id, ignore_case=False, **kwargs):
         """
@@ -2170,7 +2173,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             self._update_head(destination_course, index_entry, destination_course.branch, destination_structure['_id'])
 
     @contract(source_keys="list(BlockUsageLocator)", dest_usage=BlockUsageLocator)
-    def copy_from_template(self, source_keys, dest_usage, user_id):
+    def copy_from_template(self, source_keys, dest_usage, user_id, head_validation=True):
         """
         Flexible mechanism for inheriting content from an external course/library/etc.
 
@@ -2204,12 +2207,14 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # so that we can access descendant information quickly
         source_structures = {}
         for key in source_keys:
-            course_key = key.course_key.for_version(None)
+            course_key = key.course_key
             if course_key.branch is None:
                 raise ItemNotFoundError("branch is required for all source keys when using copy_from_template")
             if course_key not in source_structures:
                 with self.bulk_operations(course_key):
-                    source_structures[course_key] = self._lookup_course(course_key).structure
+                    source_structures[course_key] = self._lookup_course(
+                        course_key, head_validation=head_validation
+                    ).structure
 
         destination_course = dest_usage.course_key
         with self.bulk_operations(destination_course):
@@ -2226,7 +2231,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             # The descendants() method used above adds the block itself, which we don't consider a descendant.
             orig_descendants.remove(block_key)
             new_descendants = self._copy_from_template(
-                source_structures, source_keys, dest_structure, block_key, user_id
+                source_structures, source_keys, dest_structure, block_key, user_id, head_validation
             )
 
             # Update the edit info:
@@ -2250,7 +2255,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             for k in dest_structure['blocks'][block_key].fields['children']
         ]
 
-    def _copy_from_template(self, source_structures, source_keys, dest_structure, new_parent_block_key, user_id):
+    def _copy_from_template(
+            self, source_structures, source_keys, dest_structure, new_parent_block_key, user_id, head_validation
+    ):
         """
         Internal recursive implementation of copy_from_template()
 
@@ -2263,9 +2270,11 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         new_children = list()  # ordered list of the new children of new_parent_block_key
 
         for usage_key in source_keys:
-            src_course_key = usage_key.course_key.for_version(None)
+            src_course_key = usage_key.course_key
+            hashable_source_id = src_course_key.for_version(None)
             block_key = BlockKey(usage_key.block_type, usage_key.block_id)
-            source_structure = source_structures.get(src_course_key, [])
+            source_structure = source_structures[src_course_key]
+
             if block_key not in source_structure['blocks']:
                 raise ItemNotFoundError(usage_key)
             source_block_info = source_structure['blocks'][block_key]
@@ -2273,7 +2282,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             # Compute a new block ID. This new block ID must be consistent when this
             # method is called with the same (source_key, dest_structure) pair
             unique_data = "{}:{}:{}".format(
-                unicode(src_course_key).encode("utf-8"),
+                unicode(hashable_source_id).encode("utf-8"),
                 block_key.id,
                 new_parent_block_key.id,
             )
@@ -2319,7 +2328,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             if children:
                 children = [src_course_key.make_usage_key(child.type, child.id) for child in children]
                 new_blocks |= self._copy_from_template(
-                    source_structures, children, dest_structure, new_block_key, user_id
+                    source_structures, children, dest_structure, new_block_key, user_id, head_validation
                 )
 
             new_blocks.add(new_block_key)

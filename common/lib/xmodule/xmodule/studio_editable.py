@@ -22,6 +22,7 @@ class StudioEditableBlock(object):
         for child in self.get_children():  # pylint: disable=no-member
             if can_reorder:
                 context['reorderable_items'].add(child.location)
+            context['can_add'] = can_add
             rendered_child = child.render(StudioEditableModule.get_preview_view_name(child), context)
             fragment.add_frag_resources(rendered_child)
 

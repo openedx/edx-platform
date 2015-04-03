@@ -290,3 +290,21 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
         block.reset_field_val("Display Name")
         block.save_settings()
         self.assertEqual(block.name, name_default)
+
+    def test_cannot_manage(self):
+        """
+        Scenario: Given I have a library, a course and library content xblock in a course
+        When I go to studio unit page for library content block
+        And when I click the "View" link
+        Then I can see a preview of the blocks drawn from the library.
+
+        And I do not see a duplicate button
+        And I do not see a delete button
+        """
+        block_wrapper_unit_page = self._get_library_xblock_wrapper(self.unit_page.xblocks[0].children[0])
+        container_page = block_wrapper_unit_page.go_to_container()
+
+        for block in container_page.xblocks:
+            self.assertFalse(block.has_duplicate_button)
+            self.assertFalse(block.has_delete_button)
+            self.assertFalse(block.has_edit_visibility_button)

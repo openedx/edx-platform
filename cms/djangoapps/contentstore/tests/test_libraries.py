@@ -3,6 +3,7 @@ Content library unit tests that require the CMS runtime.
 """
 from contentstore.tests.utils import AjaxEnabledTestClient, parse_json
 from contentstore.utils import reverse_url, reverse_usage_url, reverse_library_url
+from contentstore.views.item import _duplicate_item
 from contentstore.views.preview import _load_preview_module
 from contentstore.views.tests.test_library import LIBRARY_REST_URL
 import ddt
@@ -726,6 +727,7 @@ class TestLibraryAccess(SignalDisconnectTestMixin, LibraryTestCase):
         self.assertEqual(len(lc_block.children), 1 if expected_result else 0)
 
 
+@ddt.ddt
 class TestOverrides(LibraryTestCase):
     """
     Test that overriding block Scope.settings fields from a library in a specific course works
@@ -744,6 +746,9 @@ class TestOverrides(LibraryTestCase):
             user_id=self.user.id,
             publish_item=False,
         )
+
+        # Refresh library now that we've added something.
+        self.library = modulestore().get_library(self.lib_key)
 
         # Also create a course:
         with modulestore().default_store(ModuleStoreEnum.Type.split):
@@ -822,7 +827,8 @@ class TestOverrides(LibraryTestCase):
         self.assertEqual(self.problem.definition_locator.definition_id, definition_id)
         self.assertEqual(self.problem_in_course.definition_locator.definition_id, definition_id)
 
-    def test_persistent_overrides(self):
+    @ddt.data(False, True)
+    def test_persistent_overrides(self, duplicate):
         """
         Test that when we override Scope.settings values in a course,
         the override values persist even when the block is refreshed
@@ -834,7 +840,14 @@ class TestOverrides(LibraryTestCase):
         self.problem_in_course.weight = new_weight
 
         modulestore().update_item(self.problem_in_course, self.user.id)
-        self.problem_in_course = modulestore().get_item(self.problem_in_course.location)
+        if duplicate:
+            # Check that this also works when the RCB is duplicated.
+            self.lc_block = modulestore().get_item(
+                _duplicate_item(self.course.location, self.lc_block.location, self.user)
+            )
+            self.problem_in_course = modulestore().get_item(self.lc_block.children[0])
+        else:
+            self.problem_in_course = modulestore().get_item(self.problem_in_course.location)
         self.assertEqual(self.problem_in_course.display_name, new_display_name)
         self.assertEqual(self.problem_in_course.weight, new_weight)
 
@@ -851,6 +864,52 @@ class TestOverrides(LibraryTestCase):
         self.assertEqual(self.problem_in_course.display_name, new_display_name)
         self.assertEqual(self.problem_in_course.weight, new_weight)
         self.assertEqual(self.problem_in_course.data, new_data_value)
+
+    def test_duplicated_version(self):
+        """
+        Test that if a library is updated, and the content block is duplicated,
+        the new block will use the old library version and not the new one.
+        """
+        store = modulestore()
+        self.assertEqual(len(self.library.children), 1)
+        self.assertEqual(len(self.lc_block.children), 1)
+
+        # Edit the only problem in the library:
+        self.problem.display_name = "--changed in library--"
+        store.update_item(self.problem, self.user.id)
+        # Create an additional problem block in the library:
+        ItemFactory.create(
+            category="problem",
+            parent_location=self.library.location,
+            user_id=self.user.id,
+            publish_item=False,
+        )
+
+        # Refresh our reference to the library
+        self.library = store.get_library(self.lib_key)
+
+        # Refresh our reference to the block
+        self.lc_block = store.get_item(self.lc_block.location)
+        self.problem_in_course = store.get_item(self.problem_in_course.location)
+
+        # The library has changed...
+        self.assertEqual(len(self.library.children), 2)
+
+        # But the block hasn't.
+        self.assertEqual(len(self.lc_block.children), 1)
+        self.assertEqual(self.problem_in_course.location, self.lc_block.children[0])
+        self.assertEqual(self.problem_in_course.display_name, self.original_display_name)
+
+        # Duplicate self.lc_block:
+        duplicate = store.get_item(
+            _duplicate_item(self.course.location, self.lc_block.location, self.user)
+        )
+        # The duplicate should have identical children to the original:
+        self.assertEqual(len(duplicate.children), 1)
+        self.assertTrue(self.lc_block.source_library_version)
+        self.assertEqual(self.lc_block.source_library_version, duplicate.source_library_version)
+        problem2_in_course = store.get_item(duplicate.children[0])
+        self.assertEqual(problem2_in_course.display_name, self.original_display_name)
 
 
 class TestIncompatibleModuleStore(LibraryTestCase):
