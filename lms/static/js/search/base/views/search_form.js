@@ -5,7 +5,7 @@ define(['jquery', 'backbone'], function ($, Backbone) {
 
     return Backbone.View.extend({
 
-        el: '#courseware-search-bar',
+        el: '',
         events: {
             'submit form': 'submitForm',
             'click .cancel-button': 'clearSearch',
@@ -40,9 +40,13 @@ define(['jquery', 'backbone'], function ($, Backbone) {
             }
         },
 
-        clearSearch: function () {
+        resetSearchForm: function () {
             this.$searchField.val('');
             this.setInitialStyle();
+        },
+
+        clearSearch: function () {
+            this.resetSearchForm();
             this.trigger('clear');
         },
 

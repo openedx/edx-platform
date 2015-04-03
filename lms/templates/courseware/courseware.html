@@ -24,9 +24,9 @@ ${page_title_breadcrumbs(course_name())}
 </script>
 % endfor
 
-% for template_name in ["search_item", "search_item_seq", "search_list", "search_loading", "search_error"]:
+% for template_name in ["course_search_item", "course_search_results", "search_loading", "search_error"]:
 <script type="text/template" id="${template_name}-tpl">
-    <%static:include path="courseware_search/${template_name}.underscore" />
+    <%static:include path="search/${template_name}.underscore" />
 </script>
 % endfor
 
@@ -149,16 +149,18 @@ ${fragment.foot_html()}
       </header>
 
       % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
-        <div id="courseware-search-bar" class="courseware-search-bar" role="search" aria-label="Course">
+        <div id="courseware-search-bar" class="search-bar courseware-search-bar" role="search" aria-label="Course">
           <form>
             <label for="course-search-input" class="sr">${_('Course Search')}</label>
-            <input id="course-search-input" type="text" class="search-field"/>
-            <button type="submit" class="search-button">
-              ${_('search')} <i class="icon fa fa-search" aria-hidden="true"></i>
-            </button>
-            <button type="button" class="cancel-button" aria-label="${_('Clear search')}">
-              <i class="icon fa fa-remove" aria-hidden="true"></i>
-            </button>
+            <div class="search-field-wrapper">
+              <input id="course-search-input" type="text" class="search-field"/>
+              <button type="submit" class="search-button">
+                ${_('search')} <i class="icon fa fa-search" aria-hidden="true"></i>
+              </button>
+              <button type="button" class="cancel-button" aria-label="${_('Clear search')}">
+                <i class="icon fa fa-remove" aria-hidden="true"></i>
+              </button>
+            </div>
           </form>
         </div>
       % endif
@@ -198,7 +200,7 @@ ${fragment.foot_html()}
       ${fragment.body_html()}
     </section>
     % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
-      <section class="courseware-search-results" id="courseware-search-results" data-course-id="${course.id}" data-course-name="${course.display_name_with_default}">
+      <section id="courseware-search-results" class="search-results courseware-search-results" data-course-id="${course.id}">
       </section>
     % endif
   </div>

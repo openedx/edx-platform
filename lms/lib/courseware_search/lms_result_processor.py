@@ -20,6 +20,7 @@ class LmsSearchResultProcessor(SearchResultProcessor):
 
     """ SearchResultProcessor for LMS Search """
     _course_key = None
+    _course_name = None
     _usage_key = None
     _module_store = None
     _module_temp_dictionary = {}
@@ -60,6 +61,16 @@ class LmsSearchResultProcessor(SearchResultProcessor):
             "jump_to",
             kwargs={"course_id": self._results_fields["course"], "location": self._results_fields["id"]}
         )
+
+    @property
+    def course_name(self):
+        """
+        Display the course name when searching multiple courses - retain result for subsequent uses
+        """
+        if self._course_name is None:
+            course = self.get_module_store().get_course(self.get_course_key())
+            self._course_name = course.display_name_with_default
+        return self._course_name
 
     @property
     def location(self):

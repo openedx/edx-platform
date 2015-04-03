@@ -41,9 +41,9 @@
 @import 'course/courseware/sidebar';
 @import 'course/courseware/amplifier';
 
-## Import styles for courseware search
+## Import styles for search
 % if env["FEATURES"].get("ENABLE_COURSEWARE_SEARCH"):
-    @import 'course/courseware/courseware_search';
+    @import 'search/_search';
 % endif
 
 // course - modules
