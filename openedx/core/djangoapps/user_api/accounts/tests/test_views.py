@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+from copy import deepcopy
 import ddt
 import hashlib
 import json
@@ -17,6 +18,12 @@ from student.models import UserProfile, LanguageProficiency, PendingEmailChange
 from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KEY
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from .. import PRIVATE_VISIBILITY, ALL_USERS_VISIBILITY
+
+
+# this is used in one test to check the behavior of profile image url
+# generation with a relative url in the config.
+TEST_PROFILE_IMAGE_BACKEND = deepcopy(settings.PROFILE_IMAGE_BACKEND)
+TEST_PROFILE_IMAGE_BACKEND['options']['base_url'] = '/profile-images/'
 
 
 class UserAPITestCase(APITestCase):
@@ -117,7 +124,7 @@ class TestAccountAPI(UserAPITestCase):
         image.
         """
         if has_profile_image:
-            url_root = 'http://example-storage.com/profile_images'
+            url_root = 'http://example-storage.com/profile-images'
             filename = hashlib.md5('secret' + self.user.username).hexdigest()
             file_extension = 'jpg'
         else:
@@ -593,12 +600,12 @@ class TestAccountAPI(UserAPITestCase):
         )
         self.assertIsNone(error_response.data["user_message"])
 
-    @override_settings(PROFILE_IMAGE_DOMAIN='/')
+    @override_settings(PROFILE_IMAGE_BACKEND=TEST_PROFILE_IMAGE_BACKEND)
     def test_convert_relative_profile_url(self):
         """
-        Test that when PROFILE_IMAGE_DOMAIN is set to '/', the API
-        generates the full URL to profile images based on the URL
-        of the request.
+        Test that when TEST_PROFILE_IMAGE_BACKEND['base_url'] begins
+        with a '/', the API generates the full URL to profile images based on
+        the URL of the request.
         """
         self.client.login(username=self.user.username, password=self.test_password)
         response = self.send_get(self.client)
