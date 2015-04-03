@@ -1988,3 +1988,10 @@ html[dir='rtl'] #documentPropertiesOverlay .row > * {
     display: none;
   }
 }
+
+.toolbarButton#openFile,
+.toolbarButton#download,
+.secondaryToolbarButton#secondaryOpenFile,
+.secondaryToolbarButton#secondaryDownload {
+    display: none;
+}
