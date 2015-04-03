@@ -1,6 +1,4 @@
-import courseware
 from django.conf import settings
-from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django.core.urlresolvers import reverse
@@ -12,8 +10,7 @@ from lti_provider.signature_validator import SignatureValidator
 REQUIRED_PARAMETERS = [
     'roles', 'context_id', 'oauth_version', 'oauth_consumer_key',
     'oauth_signature', 'oauth_signature_method', 'oauth_timestamp',
-    'oauth_nonce'
-    ]
+    'oauth_nonce']
 
 LTI_SESSION_KEY = 'lti_provider_parameters'
 
@@ -63,8 +60,7 @@ def lti_launch(request, course_id, chapter=None, section=None, position=None):
 
     if not request.user.is_authenticated():
         run_url = reverse('lti_provider.views.lti_run')
-        return redirect_to_login(run_url, settings.LOGIN_URL,
-                                 REDIRECT_FIELD_NAME)
+        return redirect_to_login(run_url, settings.LOGIN_URL)
 
     return lti_run(request)
 
@@ -99,7 +95,7 @@ def lti_run(request):
     return render_courseware(params)
 
 
-def get_required_parameters(dictionary, additional_params=[]):
+def get_required_parameters(dictionary, additional_params=None):
     """
     Extract all required LTI parameters from a dictionary and verify that none
     are missing.
@@ -108,6 +104,7 @@ def get_required_parameters(dictionary, additional_params=[]):
              None if any parameters are missing.
     """
     params = {}
+    additional_params = additional_params or []
     for key in REQUIRED_PARAMETERS + additional_params:
         if key not in dictionary:
             return None

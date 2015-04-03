@@ -7,6 +7,7 @@ from lti_provider import views
 from lti_provider.signature_validator import SignatureValidator
 from student.tests.factories import UserFactory
 
+
 def set_lti_parameters(dictionary):
     dictionary['roles'] = u'Instructor,urn:lti:instrole:ims/lis/Administrator'
     dictionary['context_id'] = u'lti_launch_context_id'

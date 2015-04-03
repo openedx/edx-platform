@@ -17,6 +17,7 @@ class SignatureValidator(RequestValidator):
     """
 
     def __init__(self):
+        super(SignatureValidator, self).__init__()
         self.endpoint = SignatureOnlyEndpoint(self)
 
     # The OAuth signature uses the endpoint URL as part of the request to be
@@ -27,7 +28,6 @@ class SignatureValidator(RequestValidator):
     # 'https', otherwise the message signature would not match the one generated
     # on the platform.
     enforce_ssl = False
-
 
     def check_client_key(self, key):
         """
@@ -77,7 +77,6 @@ class SignatureValidator(RequestValidator):
         """
         return LtiConsumer.objects.filter(key=client_key).count() == 1
 
-
     def get_client_secret(self, client_key, request):
         """
         Fetch the client secret from the database. This method signature is
@@ -90,7 +89,6 @@ class SignatureValidator(RequestValidator):
             return LtiConsumer.objects.get(key=client_key).secret
         except ObjectDoesNotExist:
             return None
-
 
     def verify(self, request):
         """
@@ -114,3 +112,67 @@ class SignatureValidator(RequestValidator):
 
         result, _ = self.endpoint.validate_request(url, method, body, headers)
         return result
+
+    def get_request_token_secret(self, client_key, token, request):
+        pass
+
+    def get_redirect_uri(self, token, request):
+        pass
+
+    def get_realms(self, token, request):
+        pass
+
+    def invalidate_request_token(self, client_key, request_token, request):
+        pass
+
+    def get_rsa_key(self, client_key, request):
+        pass
+
+    def dummy_access_token(self):
+        pass
+
+    def dummy_client(self):
+        pass
+
+    def verify_realms(self, token, realms, request):
+        pass
+
+    def validate_realms(self, client_key, token, request, uri=None,
+                        realms=None):
+        pass
+
+    def save_verifier(self, token, verifier, request):
+        pass
+
+    def dummy_request_token(self):
+        pass
+
+    def validate_redirect_uri(self, client_key, redirect_uri, request):
+        pass
+
+    def verify_request_token(self, token, request):
+        pass
+
+    def validate_request_token(self, client_key, token, request):
+        pass
+
+    def get_default_realms(self, client_key, request):
+        pass
+
+    def validate_access_token(self, client_key, token, request):
+        pass
+
+    def save_access_token(self, token, request):
+        pass
+
+    def validate_requested_realms(self, client_key, realms, request):
+        pass
+
+    def validate_verifier(self, client_key, token, verifier, request):
+        pass
+
+    def save_request_token(self, token, request):
+        pass
+
+    def get_access_token_secret(self, client_key, token, request):
+        pass

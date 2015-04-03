@@ -5,6 +5,7 @@ from mock import patch
 from lti_provider.models import LtiConsumer
 from lti_provider.signature_validator import SignatureValidator
 
+
 class SignatureValidatorTest(TestCase):
     """
     Tests for the custom SignatureValidator class that uses the oauthlib library
@@ -100,7 +101,8 @@ class SignatureValidatorTest(TestCase):
         secret = SignatureValidator().get_client_secret('client_key', None)
         self.assertIsNone(secret)
 
-    @patch('oauthlib.oauth1.SignatureOnlyEndpoint.validate_request', return_value=(True,None))
+    @patch('oauthlib.oauth1.SignatureOnlyEndpoint.validate_request',
+           return_value=(True, None))
     def test_verification_parameters(self, verify_mock):
         """
         Verify that the signature validaton library method is called using the
