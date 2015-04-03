@@ -295,6 +295,7 @@ div.course-wrapper {
 
     @media print {
       padding: 0 2mm;
+      background: transparent !important;
     }
   }
 
@@ -333,6 +334,7 @@ div.course-wrapper {
 
   @media print {
     border: 0;
+    background: transparent !important;
   }
 }
 
