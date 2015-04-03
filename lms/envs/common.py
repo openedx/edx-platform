@@ -364,6 +364,13 @@ FEATURES = {
 
     # Certificates Web/HTML Views
     'CERTIFICATES_HTML_VIEW': False,
+
+    # Social Media Sharing on Student Dashboard
+    'DASHBOARD_SHARE_SETTINGS': {
+        'FACEBOOK_SHARING': False,
+        'TWITTER_SHARING': False,
+        'TWITTER_SHARING_TEXT': None
+    },
 }
 
 # Ignore static asset files on import which match this pattern
