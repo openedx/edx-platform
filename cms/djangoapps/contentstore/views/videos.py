@@ -334,8 +334,9 @@ def videos_post(course, request):
         )
 
         # persist edx_video_id as uploaded through this course
-        video_meta_data = AssetMetadata(course.id.make_asset_key(VIDEO_ASSET_TYPE, edx_video_id))
-        modulestore().save_asset_metadata(video_meta_data, request.user.id)
+        user_id = request.user.id
+        video_meta_data = AssetMetadata(course.id.make_asset_key(VIDEO_ASSET_TYPE, edx_video_id), created_by=user_id)
+        modulestore().save_asset_metadata(video_meta_data, user_id)
 
         # persist edx_video_id in VAL
         create_video({
