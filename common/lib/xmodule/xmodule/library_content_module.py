@@ -343,8 +343,25 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         """
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         user_id = self.get_user_id()
+        if not self.tools:
+            return Response("Library Tools unavailable in current runtime.", status=400)
         self.tools.update_children(self, user_id, user_perms)
         return Response()
+
+    # Copy over any overridden settings the course author may have applied to the blocks.
+    def _copy_overrides(self, store, user_id, source, dest):
+        """
+        Copy any overrides the user has made on blocks in this library.
+        """
+        for field in source.fields.itervalues():
+            if field.scope == Scope.settings and field.is_set_on(source):
+                setattr(dest, field.name, field.read_from(source))
+        if source.has_children:
+            source_children = [self.runtime.get_block(source_key) for source_key in source.children]
+            dest_children = [self.runtime.get_block(dest_key) for dest_key in dest.children]
+            for source_child, dest_child in zip(source_children, dest_children):
+                self._copy_overrides(store, user_id, source_child, dest_child)
+        store.update_item(dest, user_id)
 
     def studio_post_duplicate(self, store, source_block):
         """
@@ -359,24 +376,11 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         user_id = self.get_user_id()
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         # pylint: disable=no-member
+        if not self.tools:
+            raise RuntimeError("Library tools unavailable, duplication will not be sane!")
         self.tools.update_children(self, user_id, user_perms, version=self.source_library_version)
 
-        # Copy over any overridden settings the course author may have applied to the blocks.
-        def copy_overrides(source, dest):
-            """
-            Copy any overrides the user has made on blocks in this library.
-            """
-            for field in source.fields.itervalues():
-                if field.scope == Scope.settings and field.is_set_on(source):
-                    setattr(dest, field.name, field.read_from(source))
-            if source.has_children:
-                source_children = [self.runtime.get_block(source_key) for source_key in source.children]
-                dest_children = [self.runtime.get_block(dest_key) for dest_key in dest.children]
-                for source_child, dest_child in zip(source_children, dest_children):
-                    copy_overrides(source_child, dest_child)
-            store.update_item(dest, user_id)
-
-        copy_overrides(source_block, self)
+        self._copy_overrides(store, user_id, source_block, self)
 
         # Children have been handled.
         return True
