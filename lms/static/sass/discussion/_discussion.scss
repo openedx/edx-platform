@@ -673,6 +673,8 @@ body.discussion {
 // inline discussion module and profile thread styling
 .discussion-module {
   @extend .discussion-body;
+  @extend %ui-print-excluded;
+
   position: relative;
   margin: $baseline 0;
   padding: $baseline;

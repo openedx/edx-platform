@@ -237,4 +237,8 @@ div.info-wrapper {
       }
     }
   }
+
+  @media print {
+    border: 0;
+  }
 }
