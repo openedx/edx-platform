@@ -22,7 +22,12 @@ from xmodule.tests import DATA_DIR
 from xmodule.x_module import XModuleMixin
 from search.search_engine_base import SearchEngine
 
-from contentstore.courseware_index import CoursewareSearchIndexer, INDEX_NAME, DOCUMENT_TYPE, SearchIndexingError
+from contentstore.courseware_index import (
+    CoursewareSearchIndexer,
+    INDEX_NAME,
+    COURSEWARE_DOCUMENT_TYPE,
+    SearchIndexingError,
+)
 
 COURSE_CHILD_STRUCTURE = {
     "course": "chapter",
@@ -437,8 +442,7 @@ class TestLargeCourseDeletions(MixedWithOptionsTestCase):
             response = searcher.search(field_dictionary={"course": self.course_id})
             while response["total"] > 0:
                 for item in response["results"]:
-                    searcher.remove(DOCUMENT_TYPE, item["data"]["id"])
-                    searcher.remove(DOCUMENT_TYPE, item["data"]["id"])
+                    searcher.remove(COURSEWARE_DOCUMENT_TYPE, item["data"]["id"])
                 response = searcher.search(field_dictionary={"course": self.course_id})
         self.course_id = None
 

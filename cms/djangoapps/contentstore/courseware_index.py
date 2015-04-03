@@ -3,17 +3,22 @@ from __future__ import absolute_import
 
 from datetime import timedelta
 import logging
+import re
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from eventtracking import tracker
-from xmodule.modulestore import ModuleStoreEnum
-from search.search_engine_base import SearchEngine
 
+from contentstore.utils import course_image_url
+from eventtracking import tracker
+from search.search_engine_base import SearchEngine
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.annotator_mixin import html_to_text
 
 # Use default index and document names for now
 INDEX_NAME = "courseware_index"
-DOCUMENT_TYPE = "courseware_content"
+COURSEWARE_DOCUMENT_TYPE = "courseware_content"
+DISCOVERY_DOCUMENT_TYPE = "course_info"
 
 # REINDEX_AGE is the default amount of time that we look back for changes
 # that might have happened. If we are provided with a time at which the
@@ -23,6 +28,39 @@ DOCUMENT_TYPE = "courseware_content"
 REINDEX_AGE = timedelta(0, 60)  # 60 seconds
 
 log = logging.getLogger('edx.modulestore')
+
+
+def fetch_from_about(modulestore, course_id, attribute):
+    """ Get about attribute from modulestore """
+    usage_key = course_id.make_usage_key('about', attribute)
+    try:
+        value = modulestore.get_item(usage_key).data
+    except ItemNotFoundError:
+        value = None
+    return value
+
+
+def fetch_course_information_detail(modulestore, course, about_information):
+    """
+    Fetch the course information attribute for the given course's attribute
+    from the correct persistence location and return its value.
+    """
+    if about_information[2]:
+        return fetch_from_about(modulestore, course.id, about_information[0])
+    else:
+        return getattr(course, about_information[0], None)
+
+
+def strip_html_content_to_text(html_content):
+    """ Gets only the textual part for html content - useful for buildling text to be searched """
+    # Removing HTML-encoded non-breaking space characters
+    text_content = re.sub(r"(\s|&nbsp;|//)+", " ", html_to_text(html_content))
+    # Removing HTML CDATA
+    text_content = re.sub(r"<!\[CDATA\[.*\]\]>", "", text_content)
+    # Removing HTML comments
+    text_content = re.sub(r"<!--.*-->", "", text_content)
+
+    return text_content
 
 
 def indexing_is_enabled():
@@ -45,12 +83,99 @@ class CoursewareSearchIndexer(object):
     Class to perform indexing for courseware search from different modulestores
     """
 
+    # Flags for where to index the information
+    ANALYSE = 1 << 0  # Add the information to the analysed content of the index
+    PROPERTY = 1 << 1  # Add the information as a property of the object being indexed (not analysed)
+
+    # List of properties to add to the index - each item in the list is a tuple of:
+    #   1) Property name to use
+    #   2) Where to add in the index (using flags above)
+    #   3) Whether the property is found in the 'about' area of the modulestore
+    #      (True) or is a property directly on the course object
+    ABOUT_INFORMATION_TO_INCLUDE = [
+        ("advertised_start", PROPERTY, False),
+        ("announcement", PROPERTY, True),
+        ("start", PROPERTY, False),
+        ("end", PROPERTY, False),
+        ("effort", PROPERTY, True),
+        ("display_name", ANALYSE, False),
+        ("overview", ANALYSE, True),
+        ("title", ANALYSE | PROPERTY, True),
+        ("university", ANALYSE | PROPERTY, True),
+        ("number", ANALYSE | PROPERTY, False),
+        ("short_description", ANALYSE, True),
+        ("description", ANALYSE, True),
+        ("key_dates", ANALYSE, True),
+        ("video", ANALYSE, True),
+        ("course_staff_short", ANALYSE, True),
+        ("course_staff_extended", ANALYSE, True),
+        ("requirements", ANALYSE, True),
+        ("syllabus", ANALYSE, True),
+        ("textbook", ANALYSE, True),
+        ("faq", ANALYSE, True),
+        ("more_info", ANALYSE, True),
+        ("ocw_links", ANALYSE, True),
+        ("enrollment_start", PROPERTY, False),
+        ("enrollment_end", PROPERTY, False),
+    ]
+
+    @classmethod
+    def index_about_information(cls, modulestore, course):
+        """
+        Add the given course to the course discovery index
+
+        Arguments:
+        modulestore - modulestore object to use for operations
+
+        course - course object from which to take properties, locate about information
+        """
+        searcher = SearchEngine.get_search_engine(INDEX_NAME)
+        if 'DISABLE_START_DATES' not in settings.FEATURES:
+            settings.FEATURES['DISABLE_START_DATES'] = False
+        if not searcher:
+            return
+
+        course_id = unicode(course.id)
+        try:
+            course_info = {
+                'id': course_id,
+                'course': course_id,
+                'content': {},
+                'image_url': course_image_url(course),
+            }
+
+            for about_information in cls.ABOUT_INFORMATION_TO_INCLUDE:
+                section_content = fetch_course_information_detail(modulestore, course, about_information)
+                if section_content:
+                    if isinstance(section_content, basestring):
+                        section_content = strip_html_content_to_text(section_content)
+                    if about_information[1] & cls.ANALYSE:
+                        course_info['content'][about_information[0]] = section_content
+                    if about_information[1] & cls.PROPERTY:
+                        course_info[about_information[0]] = section_content
+
+            searcher.index(DISCOVERY_DOCUMENT_TYPE, course_info)
+        except Exception as err:
+            log.exception(
+                "Course discovery indexing error encountered, course discovery index may be out of date %s - %r",
+                course_id,
+                err
+            )
+            raise
+        else:
+            log.debug(
+                "Successfully added %s course to the course discovery index",
+                course_id
+            )
+
     @classmethod
     def index_course(cls, modulestore, course_key, triggered_at=None, reindex_age=REINDEX_AGE):
         """
         Process course for indexing
 
         Arguments:
+        modulestore - modulestore object to use for operations
+
         course_key (CourseKey) - course identifier
 
         triggered_at (datetime) - provides time at which indexing was triggered;
@@ -131,7 +256,7 @@ class CoursewareSearchIndexer(object):
                 if current_start_date:
                     item_index['start_date'] = current_start_date
 
-                searcher.index(DOCUMENT_TYPE, item_index)
+                searcher.index(COURSEWARE_DOCUMENT_TYPE, item_index)
                 indexed_count["count"] += 1
             except Exception as err:  # pylint: disable=broad-except
                 # broad exception so that index operation does not fail on one item of many
@@ -144,17 +269,22 @@ class CoursewareSearchIndexer(object):
             as we find items we can shorten the set of items to keep
             """
             response = searcher.search(
-                doc_type=DOCUMENT_TYPE,
+                doc_type=COURSEWARE_DOCUMENT_TYPE,
                 field_dictionary={"course": unicode(course_key)},
                 exclude_ids=indexed_items
             )
             result_ids = [result["data"]["id"] for result in response["results"]]
             for result_id in result_ids:
-                searcher.remove(DOCUMENT_TYPE, result_id)
+                searcher.remove(COURSEWARE_DOCUMENT_TYPE, result_id)
 
         try:
             with modulestore.branch_setting(ModuleStoreEnum.RevisionOption.published_only):
                 course = modulestore.get_course(course_key, depth=None)
+
+                # First add the top-level about information for the course
+                cls.index_about_information(modulestore, course)
+
+                # Next index the content
                 for item in course.get_children():
                     index_item(item, course.start)
                 remove_deleted_items()
