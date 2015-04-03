@@ -1,19 +1,19 @@
 <div id="wrapper-review" class="wrapper-view make-payment-step">
   <div class="review view">
     <% if ( !upgrade ) { %>
-      <h3 class="title center-col">
+      <h2 class="title center-col">
         <%= _.sprintf(
             gettext( "You are enrolling in: %(courseName)s"),
             { courseName: '<span class="course-title">' + courseName + '</span>' }
           ) %>
-      </h3>
+      </h2>
     <% } else { %>
-      <h3 class="title">
+      <h2 class="title">
         <%= _.sprintf(
             gettext( "You are upgrading your enrollment for: %(courseName)s"),
             { courseName: '<span class="course-title">' + courseName + '</span>' }
           ) %>
-      </h3>
+      </h2>
       <div class="instruction">
         <%- gettext( "You can now enter your payment information and complete your enrollment." ) %>
       </div>
@@ -40,7 +40,7 @@
       <ul class="list-reqs <% if ( requirements['account-activation-required'] ) { %>account-not-activated<% } %>">
         <% if ( requirements['account-activation-required'] ) { %>
           <li class="req req-0 req-activate">
-            <h4 class="title"><%- gettext( "Activate Your Account" ) %></h4>
+            <h3 class="title"><%- gettext( "Activate Your Account" ) %></h3>
             <div class="placeholder-art">
               <i class="icon fa fa-envelope-o" aria-hidden="true"></i>
             </div>
@@ -54,7 +54,7 @@
         <% } else {%>
           <% if ( requirements['photo-id-required'] ) { %>
           <li class="req req-1 req-id">
-            <h4 class="title"><%- gettext( "Government-Issued Photo ID" ) %></h4>
+            <h3 class="title"><%- gettext( "Government-Issued Photo ID" ) %></h3>
             <div class="placeholder-art fa-lg">
               <i class="icon fa fa-list-alt fa-stack-2x" aria-hidden="true"></i>
               <i class="icon fa fa-user id-photo fa-stack-1x" aria-hidden="true"></i>
@@ -66,7 +66,7 @@
 
           <% if ( requirements['webcam-required'] ) { %>
           <li class="req req-2 req-webcam">
-            <h4 class="title"><%- gettext( "Webcam" ) %></h4>
+            <h3 class="title"><%- gettext( "Webcam" ) %></h3>
             <div class="placeholder-art">
               <i class="icon fa fa-video-camera" aria-hidden="true"></i>
             </div>
@@ -83,13 +83,13 @@
         <ol class="review-tasks">
           <% if ( suggestedPrices.length > 0 ) { %>
           <li class="review-task review-task-contribution">
-            <h4 class="title">
+            <h3 class="title">
               <% if ( upgrade ) { %>
                 <%- gettext( "Choose your contribution for your Verified Track upgrade" ) %>
               <% } else { %>
                 <%- gettext( "Enter Your Contribution Level" ) %>
               <% } %>
-            </h4>
+            </h3>
             <div class="copy">
               <p>
                 <% if ( !upgrade ) { %>
@@ -138,7 +138,7 @@
 
           <% } else {%>
           <li class="review-task review-task-contribution">
-            <h4 class="title"><%- gettext( "Your Total Contribution" ) %></h4>
+            <h3 class="title"><%- gettext( "Your Total Contribution" ) %></h3>
             <div class="copy">
               <p><%- gettext( "To complete your enrollment, you will need to pay:" ) %></p>
             </div>
