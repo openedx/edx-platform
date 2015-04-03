@@ -1,14 +1,19 @@
 """
 Unit tests for the container page.
 """
-
 import re
 import datetime
 from pytz import UTC
+from mock import patch, Mock
+
+from django.http import Http404
+from django.test.client import RequestFactory
+from django.utils import http
+
+import contentstore.views.component as views
 from contentstore.views.tests.utils import StudioPageTestCase
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import ItemFactory
-from django.utils import http
 
 
 class ContainerPageTestCase(StudioPageTestCase):
@@ -158,3 +163,25 @@ class ContainerPageTestCase(StudioPageTestCase):
         """
         empty_child_container = self._create_item(self.vertical.location, 'split_test', 'Split Test')
         self.validate_preview_html(empty_child_container, self.reorderable_child_view, can_add=False)
+
+    @patch('contentstore.views.component.render_to_response', Mock(return_value=Mock(status_code=200, content='')))
+    def test_container_page_with_valid_and_invalid_usage_key_string(self):
+        """
+        Check that invalid 'usage_key_string' raises Http404.
+        """
+        request = RequestFactory().get('foo')
+        request.user = self.user
+
+        # Check for invalid 'usage_key_strings'
+        self.assertRaises(
+            Http404, views.container_handler,
+            request,
+            usage_key_string='i4x://InvalidOrg/InvalidCourse/vertical/static/InvalidContent',
+        )
+
+        # Check 200 response if 'usage_key_string' is correct
+        response = views.container_handler(
+            request=request,
+            usage_key_string=unicode(self.vertical.location)
+        )
+        self.assertEqual(response.status_code, 200)
