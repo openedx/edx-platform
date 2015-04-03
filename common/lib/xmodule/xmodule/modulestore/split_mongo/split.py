@@ -2205,7 +2205,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # so that we can access descendant information quickly
         source_structures = {}
         for key in source_keys:
-            course_key = key.course_key.for_version(None)
+            course_key = key.course_key
             if course_key.branch is None:
                 raise ItemNotFoundError("branch is required for all source keys when using copy_from_template")
             if course_key not in source_structures:
@@ -2264,9 +2264,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         new_children = list()  # ordered list of the new children of new_parent_block_key
 
         for usage_key in source_keys:
-            src_course_key = usage_key.course_key.for_version(None)
+            src_course_key = usage_key.course_key
             block_key = BlockKey(usage_key.block_type, usage_key.block_id)
-            source_structure = source_structures.get(src_course_key, [])
+            source_structure = source_structures[src_course_key]
             if block_key not in source_structure['blocks']:
                 raise ItemNotFoundError(usage_key)
             source_block_info = source_structure['blocks'][block_key]

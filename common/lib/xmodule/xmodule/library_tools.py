@@ -4,6 +4,7 @@ XBlock runtime services for LibraryContentModule
 from django.core.exceptions import PermissionDenied
 from opaque_keys.edx.locator import LibraryLocator
 from xmodule.library_content_module import ANY_CAPA_TYPE_VALUE
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.capa_module import CapaDescriptor
 
@@ -125,7 +126,9 @@ class LibraryToolsService(object):
             return
 
         source_blocks = []
-        library_key = dest_block.source_library_key.for_version(version)
+        library_key = dest_block.source_library_key
+        if version:
+            library_key = library_key.replace(branch=ModuleStoreEnum.BranchName.library, version_guid=version)
         library = self._get_library(library_key)
         if library is None:
             raise ValueError("Requested library not found.")
