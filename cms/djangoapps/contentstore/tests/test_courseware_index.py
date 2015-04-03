@@ -10,10 +10,12 @@ from pytz import UTC
 from uuid import uuid4
 from unittest import skip
 
+from course_modes.models import CourseMode
 from xmodule.library_tools import normalize_key_for_search
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler
 from xmodule.modulestore.edit_info import EditInfoMixin
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -26,7 +28,12 @@ from xmodule.x_module import XModuleMixin
 
 from search.search_engine_base import SearchEngine
 
-from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer, SearchIndexingError
+from contentstore.courseware_index import (
+    CoursewareSearchIndexer,
+    LibrarySearchIndexer,
+    SearchIndexingError,
+    CourseAboutSearchIndexer,
+)
 from contentstore.signals import listen_for_course_publish, listen_for_library_update
 
 
@@ -120,6 +127,7 @@ class MixedWithOptionsTestCase(MixedSplitTestCase):
     }
 
     INDEX_NAME = None
+    DOCUMENT_TYPE = None
 
     def setUp(self):
         super(MixedWithOptionsTestCase, self).setUp()
@@ -140,7 +148,7 @@ class MixedWithOptionsTestCase(MixedSplitTestCase):
     def search(self, field_dictionary=None):
         """ Performs index search according to passed parameters """
         fields = field_dictionary if field_dictionary else self._get_default_search()
-        return self.searcher.search(field_dictionary=fields)
+        return self.searcher.search(field_dictionary=fields, doc_type=self.DOCUMENT_TYPE)
 
     def _perform_test_using_store(self, store_type, test_to_perform):
         """ Helper method to run a test function that uses a specific store """
@@ -171,6 +179,26 @@ class MixedWithOptionsTestCase(MixedSplitTestCase):
         """ update the item at the given location """
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
             store.update_item(item, ModuleStoreEnum.UserID.test)
+
+    def update_about_item(self, store, about_key, data):
+        """
+        Update the about item with the new data blob. If data is None, then
+        delete the about item.
+        """
+        temploc = self.course.id.make_usage_key('about', about_key)
+        if data is None:
+            try:
+                self.delete_item(store, temploc)
+            # Ignore an attempt to delete an item that doesn't exist
+            except ValueError:
+                pass
+        else:
+            try:
+                about_item = store.get_item(temploc)
+            except ItemNotFoundError:
+                about_item = store.create_xblock(self.course.runtime, self.course.id, 'about', about_key)
+            about_item.data = data
+            store.update_item(about_item, ModuleStoreEnum.UserID.test, allow_not_found=True)
 
 
 @ddt.ddt
@@ -228,6 +256,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         )
 
     INDEX_NAME = CoursewareSearchIndexer.INDEX_NAME
+    DOCUMENT_TYPE = CoursewareSearchIndexer.DOCUMENT_TYPE
 
     def reindex_course(self, store):
         """ kick off complete reindex of the course """
@@ -407,6 +436,55 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         indexed_count = self.reindex_course(store)
         self.assertEqual(indexed_count, 7)
 
+    def _test_course_about_property_index(self, store):
+        """ Test that informational properties in the course object end up in the course_info index """
+        display_name = "Help, I need somebody!"
+        self.course.display_name = display_name
+        self.update_item(store, self.course)
+        self.reindex_course(store)
+        response = self.searcher.search(
+            doc_type=CourseAboutSearchIndexer.DISCOVERY_DOCUMENT_TYPE,
+            field_dictionary={"course": unicode(self.course.id)}
+        )
+        self.assertEqual(response["total"], 1)
+        self.assertEqual(response["results"][0]["data"]["content"]["display_name"], display_name)
+
+    def _test_course_about_store_index(self, store):
+        """ Test that informational properties in the about store end up in the course_info index """
+        short_description = "Not just anybody"
+        self.update_about_item(store, "short_description", short_description)
+        self.reindex_course(store)
+        response = self.searcher.search(
+            doc_type=CourseAboutSearchIndexer.DISCOVERY_DOCUMENT_TYPE,
+            field_dictionary={"course": unicode(self.course.id)}
+        )
+        self.assertEqual(response["total"], 1)
+        self.assertEqual(response["results"][0]["data"]["content"]["short_description"], short_description)
+
+    def _test_course_about_mode_index(self, store):
+        """ Test that informational properties in the course modes store end up in the course_info index """
+        honour_mode = CourseMode(
+            course_id=unicode(self.course.id),
+            mode_slug=CourseMode.HONOR,
+            mode_display_name=CourseMode.HONOR
+        )
+        honour_mode.save()
+        verified_mode = CourseMode(
+            course_id=unicode(self.course.id),
+            mode_slug=CourseMode.VERIFIED,
+            mode_display_name=CourseMode.VERIFIED
+        )
+        verified_mode.save()
+        self.reindex_course(store)
+
+        response = self.searcher.search(
+            doc_type=CourseAboutSearchIndexer.DISCOVERY_DOCUMENT_TYPE,
+            field_dictionary={"course": unicode(self.course.id)}
+        )
+        self.assertEqual(response["total"], 1)
+        self.assertIn(CourseMode.HONOR, response["results"][0]["data"]["modes"])
+        self.assertIn(CourseMode.VERIFIED, response["results"][0]["data"]["modes"])
+
     @patch('django.conf.settings.SEARCH_ENGINE', 'search.tests.utils.ErroringIndexEngine')
     def _test_exception(self, store):
         """ Test that exception within indexing yields a SearchIndexingError """
@@ -446,6 +524,18 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
     def test_exception(self, store_type):
         self._perform_test_using_store(store_type, self._test_exception)
 
+    @ddt.data(*WORKS_WITH_STORES)
+    def test_course_about_property_index(self, store_type):
+        self._perform_test_using_store(store_type, self._test_course_about_property_index)
+
+    @ddt.data(*WORKS_WITH_STORES)
+    def test_course_about_store_index(self, store_type):
+        self._perform_test_using_store(store_type, self._test_course_about_store_index)
+
+    @ddt.data(*WORKS_WITH_STORES)
+    def test_course_about_mode_index(self, store_type):
+        self._perform_test_using_store(store_type, self._test_course_about_mode_index)
+
 
 @patch('django.conf.settings.SEARCH_ENGINE', 'search.tests.utils.ForceRefreshElasticSearchEngine')
 @ddt.ddt
@@ -461,7 +551,6 @@ class TestLargeCourseDeletions(MixedWithOptionsTestCase):
             response = self.searcher.search(field_dictionary={"course": self.course_id})
             while response["total"] > 0:
                 for item in response["results"]:
-                    self.searcher.remove(CoursewareSearchIndexer.DOCUMENT_TYPE, item["data"]["id"])
                     self.searcher.remove(CoursewareSearchIndexer.DOCUMENT_TYPE, item["data"]["id"])
                 response = self.searcher.search(field_dictionary={"course": self.course_id})
         self.course_id = None
@@ -590,13 +679,19 @@ class TestTaskExecution(ModuleStoreTestCase):
     def test_task_indexing_course(self):
         """ Making sure that the receiver correctly fires off the task when invoked by signal """
         searcher = SearchEngine.get_search_engine(CoursewareSearchIndexer.INDEX_NAME)
-        response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
+        response = searcher.search(
+            doc_type=CoursewareSearchIndexer.DOCUMENT_TYPE,
+            field_dictionary={"course": unicode(self.course.id)}
+        )
         self.assertEqual(response["total"], 0)
 
         listen_for_course_publish(self, self.course.id)
 
         # Note that this test will only succeed if celery is working in inline mode
-        response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
+        response = searcher.search(
+            doc_type=CoursewareSearchIndexer.DOCUMENT_TYPE,
+            field_dictionary={"course": unicode(self.course.id)}
+        )
         self.assertEqual(response["total"], 3)
 
     def test_task_library_update(self):
@@ -650,6 +745,7 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
         )
 
     INDEX_NAME = LibrarySearchIndexer.INDEX_NAME
+    DOCUMENT_TYPE = LibrarySearchIndexer.DOCUMENT_TYPE
 
     def _get_default_search(self):
         """ Returns field_dictionary for default search """
