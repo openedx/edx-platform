@@ -145,7 +145,7 @@ def xblock_type_display_name(xblock, default_display_name=None):
         return _('Unit')
     component_class = XBlock.load_class(category, select=settings.XBLOCK_SELECT_FUNCTION)
     if hasattr(component_class, 'display_name') and component_class.display_name.default:
-        return _(component_class.display_name.default)
+        return _(component_class.display_name.default)    # pylint: disable=translation-of-non-string
     else:
         return default_display_name
 
@@ -187,16 +187,28 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
         metadata = {}
         data = None
         template_id = boilerplate
-        if template_id:
-            clz = parent.runtime.load_block_type(category)
-            if clz is not None:
-                template = clz.get_template(template_id)
+        default_display_name = None
+        xblock_class = parent.runtime.load_block_type(category)
+        if xblock_class is not None:
+            if template_id:
+                template = xblock_class.get_template(template_id)
                 if template is not None:
                     metadata = template.get('metadata', {})
                     data = template.get('data')
+                    # If template contains 'display_name', then get it
+                    default_display_name = metadata.get('display_name', None)
+            if default_display_name is None and hasattr(xblock_class, 'display_name'):
+                # If no template assigned or template does not contain
+                # 'display_name', then use the default 'display_name' defined
+                # by the xblock's class type (if it has one).
+                default_display_name = getattr(xblock_class.display_name, 'default', None)
 
         if display_name is not None:
+            # If display_name is given by caller, we just keep it as its original value
             metadata['display_name'] = display_name
+        elif default_display_name is not None:
+            # If not, try to translate the display_name defined in template or class type
+            metadata['display_name'] = _(default_display_name)    # pylint: disable=translation-of-non-string
 
         # We should use the 'fields' kwarg for newer module settings/values (vs. metadata or data)
         fields = {}

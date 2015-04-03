@@ -34,7 +34,7 @@ def i_created_raw_html(step):
 def i_see_only_the_html_display_name(step):
     world.verify_all_setting_entries(
         [
-            ['Display Name', "Text", False],
+            ['Display Name', "Text", True],
             ['Editor', "Visual", False]
         ]
     )
