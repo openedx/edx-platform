@@ -164,37 +164,28 @@ def generate_course_forums_query(course_id, query_type, parent_id_check=None):
     return query
 
 
-def collect_anonymous_ora2_data(course_id):
+def collect_ora2_data(course_id):
     """
-    Call collect_ora2_data for anonymized, aggregated ORA2 response data.
-    """
-    return collect_ora2_data(course_id, False)
-
-
-def collect_email_ora2_data(course_id):
-    """
-    Call collect_ora2_data for aggregated ORA2 response data including users' email addresses
-    """
-    return collect_ora2_data(course_id, True)
-
-
-def collect_ora2_data(course_id, include_email=False):
-    """
-    Query MySQL database for aggregated ora2 response data. include_email = False by default
+    Query MySQL database for aggregated ora2 response data.
     """
     cursor = get_read_replica_cursor_if_available(db)
+
     #Syntax unsupported by other vendors such as SQLite test db
     if db.connection.vendor != 'mysql':
         return '', ['']
-    raw_queries = ora2_data_queries(include_email).split(';')
+
+    raw_queries = ora2_data_queries().split(';')
+    
     cursor.execute(raw_queries[0])
     cursor.execute(raw_queries[1], [course_id])
+
     header = [item[0] for item in cursor.description]
+
     return header, cursor.fetchall()
 
 
 # pylint: disable=invalid-name
-def ora2_data_queries(include_email):
+def ora2_data_queries():
     """
     Wraps a raw SQL query which retrieves all ORA2 responses for a course.
     """
@@ -203,7 +194,7 @@ def ora2_data_queries(include_email):
 SET SESSION group_concat_max_len = 1000000;
 SELECT `sub`.`uuid` AS `submission_uuid`,
 `student`.`item_id` AS `item_id`,
-{id_column},
+`student`.`student_id` AS `anonymized_student_id`,
 `sub`.`submitted_at` AS `submitted_at`,
 `sub`.`raw_answer` AS `raw_answer`,
 (
@@ -286,20 +277,8 @@ FROM `submissions_submission` AS `sub`
 JOIN `submissions_studentitem` AS `student` ON `sub`.`student_item_id`=`student`.`id`
 WHERE `student`.`item_type`="openassessment" AND `student`.`course_id`=%s
     """
-    if include_email:
-        id_column = """
-        (
-            SELECT `auth_user`.`email`
-            FROM `auth_user`
-            JOIN `student_anonymoususerid` AS `anonymous`
-            ON `auth_user`.`id` = `anonymous`.`user_id`
-            WHERE `student`.`student_id` = `anonymous`.`anonymous_user_id`
-        ) AS `email`
-        """
-    else:
-        id_column = "`student`.`student_id` AS `anonymized_student_id`"
 
-    return RAW_QUERY.format(id_column=id_column)
+    return RAW_QUERY
 
 
 def collect_student_forums_data(course_id):

@@ -216,18 +216,9 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
 
         with patch('instructor_task.api.submit_task') as mock_submit_task:
             mock_submit_task.return_value = MagicMock()
-            submit_ora2_request_task(request, self.course.id, "True")
+            submit_ora2_request_task(request, self.course.id)
 
-            mock_submit_task.assert_called_once_with(request, 'ora2_responses', get_ora2_responses, self.course.id, {'include_email': 'True'}, '')
-
-    def test_submit_ora2_email_request_task(self):
-        request = self.create_task_request(self.instructor)
-
-        with patch('instructor_task.api.submit_task') as mock_submit_task:
-            mock_submit_task.return_value = MagicMock()
-            submit_ora2_request_task(request, self.course.id, "False")
-
-            mock_submit_task.assert_called_once_with(request, 'ora2_responses', get_ora2_responses, self.course.id, {'include_email': 'False'}, '')
+            mock_submit_task.assert_called_once_with(request, 'ora2_responses', get_ora2_responses, self.course.id, {}, '')
 
     def test_submit_course_forums_usage_task(self):
         request = self.create_task_request(self.instructor)

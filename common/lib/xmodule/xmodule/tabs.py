@@ -9,8 +9,6 @@ Implement CourseTab
 
 from abc import ABCMeta, abstractmethod
 from xblock.fields import List
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import ModuleStoreEnum
 
 # We should only scrape strings for i18n in this file, since the target language is known only when
 # they are rendered in the template.  So ugettext gets called in the template.
@@ -965,32 +963,3 @@ class UnequalTabsException(Exception):
     A complaint about tab lists being unequal
     """
     pass
-
-
-# Tab functions
-def validate_args(num, tab_type):
-    "Throws for the disallowed cases."
-    if num <= 1:
-        raise ValueError('Tabs 1 and 2 cannot be edited')
-    if tab_type == 'static_tab':
-        raise ValueError('Tabs of type static_tab cannot be edited here (use Studio)')
-
-
-def primitive_delete(course, num):
-    "Deletes the given tab number (0 based)."
-    tabs = course.tabs
-    validate_args(num, tabs[num].get('type', ''))
-    del tabs[num]
-    # Note for future implementations: if you delete a static_tab, then Chris Dodge
-    # points out that there's other stuff to delete beyond this element.
-    # This code happens to not delete static_tab so it doesn't come up.
-    modulestore().update_item(course, ModuleStoreEnum.UserID.primitive_command)
-
-
-def primitive_insert(course, num, tab_type, name):
-    "Inserts a new tab at the given number (0 based)."
-    validate_args(num, tab_type)
-    new_tab = CourseTab.from_json({u'type': unicode(tab_type), u'name': unicode(name)})
-    tabs = course.tabs
-    tabs.insert(num, new_tab)
-    modulestore().update_item(course, ModuleStoreEnum.UserID.primitive_command)
