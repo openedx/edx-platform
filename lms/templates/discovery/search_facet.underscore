@@ -1,0 +1,6 @@
+<button data-value="<%= term %>" data-text="<%= name %>" class="facet-option discovery-button">
+    <%= name %>
+    <span class="count">
+        <%= count %>
+    </span>
+</button>

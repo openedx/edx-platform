@@ -1,10 +1,30 @@
 <%!
+  import json
   from django.utils.translation import ugettext as _
   from microsite_configuration import microsite
 %>
 <%inherit file="../main.html" />
 
 <%namespace name='static' file='../static_content.html'/>
+
+<%block name="header_extras">
+  % for template_name in ["result_item", "filter_bar", "filter", "search_facets_list", "search_facets_section", "search_facet", "more_less_links"]:
+  <script type="text/template" id="${template_name}-tpl">
+      <%static:include path="discovery/${template_name}.underscore" />
+  </script>
+  % endfor
+  <script type="text/javascript">;(function (define) {{
+      define('course_discovery_meanings', function() {{
+          'use strict';
+          return ${json.dumps(course_discovery_meanings)};
+        }});
+      }})(define || RequireJS.define);
+  </script>
+</%block>
+
+<%block name="js_extra">
+  <%static:js group='discovery'/>
+</%block>
 
 <%block name="pagetitle">${_("Courses")}</%block>
 <%
@@ -45,15 +65,38 @@
   </header>
 
   <section class="courses-container">
+
+    <div id="discovery-form" role="search" aria-label="course">
+      <form>
+        <input class="discovery-input" placeholder="${_('Search for a course')}" type="text"/><!-- removes spacing
+        --><button type="submit" class="button postfix discovery-submit" aria-label="${_('Search')}">
+          <i class="icon fa fa-search" aria-hidden="true"></i>
+        </button>
+      </form>
+      <div id="discovery-message"></div>
+      <div aria-live="polite" aria-relevant="all">
+        <div id="loading-indicator" class="hidden">
+          <i class="icon fa fa-spinner fa-spin"></i> ${_('Loading')}
+        </div>
+      </div>
+    </div>
+
+    <div id="filter-bar" class="filters hide-phone">
+    </div>
+
     <section class="courses">
       <ul class="courses-listing">
-	%for course in courses:
+        %for course in courses:
         <li class="courses-listing-item">
           <%include file="../course.html" args="course=course" />
         </li>
         %endfor
       </ul>
     </section>
-  </section>
 
+
+    <aside aria-label="${_('Refine your search')}" class="search-facets phone-menu">
+    </aside>
+
+  </section>
 </section>
