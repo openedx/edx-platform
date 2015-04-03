@@ -601,6 +601,7 @@
 
         // STATE: shown
         &.is-shown {
+          @include clearfix();
           display: block;
         }
 
@@ -757,8 +758,11 @@
 
         // TYPE: status
         &.message-status {
-          background: tint($yellow,70%);
-          border-color: $gray-l3;
+          border-color: $gray-l4;
+
+          .wrapper-message-primary {
+            @include clearfix();
+          }
 
           .message-copy {
             @extend %t-copy-sub1;
@@ -855,19 +859,8 @@
             }
           }
 
-          &.course-status-processing {
-            background-color: $gray-l5;
-            border: 0;
-          }
-
-          &.course-status-certnotavailable {
-            background-color: $gray-l5;
-            border: 0;
-          }
 
           &.course-status-certrendering {
-            background-color: $gray-l5;
-            border: 0;
 
             .cta {
               margin-top: 2px;
@@ -875,8 +868,6 @@
           }
 
           &.course-status-certavailable {
-            background-color: $gray-l5;
-            border: 0;
 
             .message-copy {
               width: flex-grid(6, 12);
@@ -885,8 +876,6 @@
             }
 
             .actions-primary {
-              width: flex-grid(6, 12);
-              position: relative;
               @include float(right);
 
               .action {
