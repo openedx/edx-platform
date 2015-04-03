@@ -121,6 +121,10 @@ class DataDownload
             @$reports_request_response_error.text gettext("Error getting student responses. Please try again.")
           else if e.target.name == 'ora2-response-btn'
             @$reports_request_response_error.text gettext("Error getting ORA2 responses. Please try again.")
+          else if e.target.name == 'course-forums-btn'
+            @$reports_request_response_error.text gettext("Error getting Course Forums data. Please try again.")
+          else if e.target.name == 'student-forums-btn'
+            @$reports_request_response_error.text gettext("Error getting Student Forums data. Please try again.")
           $(".msg-error").css({"display":"block"})
         success: (data) =>
           @$reports_request_response.text data['status']
@@ -155,6 +159,9 @@ class ReportDownloads
   constructor: (@$section) ->
 
     @$report_downloads_table = @$section.find ".report-downloads-table"
+    reports = @$section.find '.reports-download-container'
+    @$reports_request_response = reports.find '.request-response'
+    @$reports_request_response_error = reports.find '.request-response-error'
 
     POLL_INTERVAL = 20000 # 20 seconds, just like the "pending instructor tasks" table
     @downloads_poller = new window.InstructorDashboard.util.IntervalManager(
@@ -183,21 +190,117 @@ class ReportDownloads
       forceFitColumns: true
 
     columns = [
-      id: 'link'
-      field: 'link'
-      name: gettext('File Name')
-      toolTip: gettext("Links are generated on demand and expire within 5 minutes due to the sensitive nature of student information.")
-      sortable: false
-      minWidth: 150
-      cssClass: "file-download-link"
-      formatter: (row, cell, value, columnDef, dataContext) ->
-        '<a href="' + dataContext['url'] + '">' + dataContext['name'] + '</a>'
+      (
+        id: 'link'
+        field: 'link'
+        name: gettext('File Name')
+        toolTip: gettext("Links are generated on demand and expire within 5 minutes due to the sensitive nature of student information.")
+        sortable: false
+        minWidth: 150
+        cssClass: "file-download-link"
+        formatter: (row, cell, value, columnDef, dataContext) ->
+          data_link ='<a class="course-forums-data" href="' + dataContext['url'] + '">' + dataContext['name'] + '</a>'
+          if dataContext['name'].indexOf("course_forums") > -1
+            graph_button = _.template('<a class="graph-forums"><i class="icon-bar-chart"></i> <%= label %></a>',
+                {label: 'Graph This'})
+          else
+            graph_button = ""
+          delete_button = _.template('<a class="delete-report"><i class="icon-remove-sign"></i> <%= label %></a>',
+              {label: 'Delete Report'})
+          return data_link +  delete_button+ graph_button
+      ),
     ]
+
 
     $table_placeholder = $ '<div/>', class: 'slickgrid'
     @$report_downloads_table.append $table_placeholder
     grid = new Slick.Grid($table_placeholder, report_downloads_data, columns, options)
     grid.autosizeColumns()
+
+    $graph_btns = @$section.find(".graph-forums")
+    $graph_btns.click (e) =>
+      parent = jQuery(e.target.parentElement.parentElement)
+      table_row = parent.find(".course-forums-data")
+      @$clicked_name = table_row.text()
+      @$graph_element = @$section.find ".report-downloads-graph"
+      @$graphEndpoint = @$graph_element.data 'endpoint'
+      @graph_forums()
+
+    $delete_btns = @$section.find('.delete-report')
+    $delete_btns.click (e) =>
+      table_row = jQuery(e.target.parentElement.parentElement)
+      filename_cell = table_row.find('.course-forums-data')
+      file_to_delete = filename_cell.text()
+      if confirm gettext 'Are you sure you want to delete the file ' + file_to_delete + '? This cannot be undone.'
+        @$delete_element = @$section.find '.report-downloads-delete'
+        @$delete_endpoint = @$delete_element.data 'endpoint'
+        success_cb = =>
+          @remove_row_from_ui table_row
+          @display_file_delete_success file_to_delete
+        failure_cb = =>
+          @display_file_delete_failure file_to_delete
+        @delete_report(file_to_delete, success_cb, failure_cb)
+
+  remove_row_from_ui: (row) ->
+    row_height = row.height()
+    rows_after = row.nextAll()
+    row.remove()
+    for sib_row in rows_after
+      $sib_row = jQuery(sib_row)
+      currX = $sib_row.offset().left
+      currY = $sib_row.offset().top
+      $sib_row.offset(top: currY - row_height, left: currX)
+
+  display_file_delete_success: (file_to_delete) ->
+    @$reports_request_response.text gettext('The file ' + file_to_delete + ' was successfully deleted.')
+    @$reports_request_response.css({'display': 'block'})
+    @$reports_request_response_error.css({'display': 'none'})
+
+  display_file_delete_failure: (file_to_delete) ->
+    @$reports_request_response_error.text gettext('Error deleting the file ' + file_to_delete + '. Please try again.')
+    @$reports_request_response_error.css({'display': 'block'})
+    @$reports_request_response.css({'display': 'none'})
+
+  delete_report: (file_to_delete, success_cb, failure_cb) ->
+    $.ajax
+      url: @$delete_endpoint
+      type: 'POST'
+      data: 'filename': file_to_delete
+      dataType: 'json'
+      success: (data) ->
+        success_cb()
+      error: (std_ajax_err) =>
+        failure_cb()
+ 
+  get_forum_csv: (cb)->
+    $.ajax
+      dataType: 'json'
+      url: @$graphEndpoint
+      data: "clicked_on": @$clicked_name
+      success: (data) -> cb? null, data
+      error: std_ajax_err ->
+        cb? gettext('Error getting forum csv')
+
+  # graph forums data
+  graph_forums: ->
+      @get_forum_csv (error, forums) =>
+        if error
+          # instead of graph, show the message that the file is missing and to re-generate
+          return @show_errors error
+        data = forums['data']
+        file_name = forums['filename']
+        graph_classname = "report-downloads-graph"
+        if data == 'failure'
+          error_str = "No Data To Graph. The file might have expired; please refresh and try again"
+          $(".report-downloads-graph-title").html(error_str)
+          $("."+graph_classname).html("");
+          return 'No data to Graph'
+        # d3_graph_data_download is defined in templates/class_dashboard/d3_graph_data_download.js
+        # because it uses d3
+        $(".report-downloads-graph-title").html(file_name)
+        d3_graph_data_download(data, "report-downloads-graph")
+  show_errors: (msg) -> @$error_section?.text msg
+
 
 
 # export for use

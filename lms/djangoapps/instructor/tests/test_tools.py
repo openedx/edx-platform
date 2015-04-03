@@ -18,6 +18,7 @@ from xmodule.fields import Date
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from opaque_keys.edx.keys import CourseKey
+import StringIO
 
 from ..views import tools
 
@@ -375,3 +376,54 @@ def msk_from_problem_urlname(course_id, urlname, block_type='problem'):
         urlname = urlname[:-4]
 
     return course_id.make_usage_key(block_type, urlname)
+
+
+class TestGenerateD3CourseForums(unittest.TestCase):
+    """
+    Tests generation of csv string for use in graphing course forums
+    """
+    def test_regular(self):
+        """
+        Test Generating d3 usable csvs
+        """
+        data_string = """ Date,Type,Number,Up Votes,Down Votes,Net Points
+2014-10-8,CommentThread,2,3,0,3
+2014-10-10,CommentThread,1,4,0,4
+2014-10-10,Response,1,3,0,3
+2014-10-11,CommentThread,1,0,0,0
+2014-10-11,Response,5,2,0,2
+2014-10-11,Comment,2,0,0,0
+2014-10-12,CommentThread,1,0,0,0
+2014-10-12,Response,1,0,0,0
+2014-10-12,Comment,1,0,0,0
+2014-10-13,CommentThread,16,5,0,5
+2014-10-13,Response,23,5,0,5
+2014-10-13,Comment,9,0,0,0
+2014-10-14,CommentThread,20,6,0,6
+2014-10-14,Response,51,4,0,4
+2014-10-14,Comment,17,0,0,0
+2014-10-15,CommentThread,18,1,0,1
+2014-10-15,Response,43,13,0,13
+2014-10-15,Comment,18,0,0,0
+2014-10-16,CommentThread,10,3,0,3 """
+        memfile = StringIO.StringIO(data_string)
+        output = tools.generate_course_forums_d3(memfile)
+        to_match = """Date,New Threads,Responses,Comments
+2014-10-8,2,0,0
+2014-10-10,1,1,0
+2014-10-11,1,5,2
+2014-10-12,1,1,1
+2014-10-13,16,23,9
+2014-10-14,20,51,17
+2014-10-15,18,43,18
+2014-10-16,10,0,0"""
+        self.assertEquals(output, to_match)
+
+    def test_no_data(self):
+        """
+        Test Generating d3 usable csvs
+        """
+        data_string = "Date,Type,Number,Up Votes,Down Votes,Net Points"
+        memfile = StringIO.StringIO(data_string)
+        output = tools.generate_course_forums_d3(memfile)
+        self.assertIsNone(output)

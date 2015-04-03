@@ -1031,6 +1031,7 @@ class EmailWidget
       curRow.remove()
       queryToDelete = curRow.getAttribute('groupquery')
       @delete_saved_query(queryToDelete)
+      $('#send_email option[value="' + queryToDelete + '"]').remove()
     $td = $('<td>')
     $td.append($deleteBtn)
     row.appendChild($td[0])
@@ -1196,9 +1197,11 @@ class EmailWidget
 
   # save queries in active queries
   send_save_query: ->
-    @save_query (error, students) =>
+    @save_query (error, data) =>
       if error
         return @show_errors error
+
+      $('#send_email select').append('<option value="' + data['group_id'] + '">' + data['group_title'] + '</option>')
       @load_saved_queries()
 
   get_estimated: (cb)->

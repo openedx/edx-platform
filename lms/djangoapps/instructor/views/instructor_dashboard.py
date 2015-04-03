@@ -18,7 +18,7 @@ from django.utils.html import escape
 from django.http import Http404
 from django.conf import settings
 from util.json_request import JsonResponse
-from util import keyword_substitution
+from util.keyword_substitution import get_keywords_supported
 
 from lms.lib.xblock.runtime import quote_slashes
 from xmodule_modifiers import wrap_xblock
@@ -34,7 +34,9 @@ from student.models import CourseEnrollment
 from shoppingcart.models import Coupon, PaidCourseRegistration
 from course_modes.models import CourseMode, CourseModesArchive
 from student.roles import CourseFinanceAdminRole
+from instructor_email_widget.models import GroupedQuery
 
+from bulk_email.models import CourseEmail
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 from .tools import get_units_with_due_date, title_or_url, bulk_email_is_enabled_for_course
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -323,12 +325,17 @@ def _section_data_download(course, access):
         'access': access,
         'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': course_key.to_deprecated_string()}),
         'get_students_features_url': reverse('get_students_features', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'delete_report_download_url': reverse('delete_report_download', kwargs={'course_id': unicode(course_key)}),
         'get_anon_ids_url': reverse('get_anon_ids', kwargs={'course_id': course_key.to_deprecated_string()}),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_key.to_deprecated_string()}),
         'list_report_downloads_url': reverse('list_report_downloads', kwargs={'course_id': course_key.to_deprecated_string()}),
         'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': course_key.to_deprecated_string()}),
         'get_student_responses_url': reverse('get_student_responses', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'get_student_forums_usage_url': reverse('get_student_forums_usage', kwargs={'course_id': unicode(course_key)}),
         'get_ora2_responses_url': reverse('get_ora2_responses', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'get_course_forums_usage_url': reverse('get_course_forums_usage', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'graph_course_forums_usage_url': reverse('graph_course_forums_usage',
+                                                 kwargs={'course_id': unicode(course_key)}),
     }
     return section_data
 
@@ -336,6 +343,11 @@ def _section_data_download(course, access):
 def _section_send_email(course, access):
     """ Provide data for the corresponding bulk email section """
     course_key = course.id
+    queries = GroupedQuery.objects.filter(course_id=course_key)
+    query_options = tuple(
+        (query.id, query.title or u'Query saved at ' + query.created.strftime("%m-%d-%y %H:%M"))
+        for query in queries
+    )
 
     # This HtmlDescriptor is only being used to generate a nice text editor.
     html_module = HtmlDescriptor(
@@ -356,8 +368,9 @@ def _section_send_email(course, access):
     section_data = {
         'section_key': 'send_email',
         'section_display_name': _('Email'),
-        'keywords_supported': [{'name':keyword, 'desc': value.desc} for keyword, value in keyword_substitution.KEYWORD_FUNCTION_MAP.iteritems()],
+        'keywords_supported': get_keywords_supported(),
         'access': access,
+        'to_options': CourseEmail.TO_OPTION_CHOICES + query_options,
         'send_email': reverse('send_email', kwargs={'course_id': course_key.to_deprecated_string()}),
         'editor': email_editor,
         'list_instructor_tasks_url': reverse(

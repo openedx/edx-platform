@@ -38,6 +38,8 @@ from bulk_email.models import (
 )
 from courseware.courses import get_course, course_image_url
 from student.roles import CourseStaffRole, CourseInstructorRole
+from instructor.views.data_access import get_group_query_students, delete_group_temp_queries_and_students
+from instructor_email_widget.models import GroupedQuery
 from instructor_task.models import InstructorTask
 from instructor_task.subtasks import (
     SubtaskStatus,
@@ -100,11 +102,19 @@ def _get_recipient_queryset(user_id, to_option, course_id, course_location):
     Recipients who are in more than one category (e.g. enrolled in the course and are staff or self)
     will be properly deduped.
     """
-    if to_option not in TO_OPTIONS:
+    if to_option.isdigit():
+        if not GroupedQuery.objects.filter(id=int(to_option)).exists():
+            message = "Bulk email TO_OPTION query id {query_id} does not exist".format(query_id=to_option)
+            log.error(message)
+            raise Exception(message)
+    elif to_option not in TO_OPTIONS:
         log.error("Unexpected bulk email TO_OPTION found: %s", to_option)
         raise Exception("Unexpected bulk email TO_OPTION found: {0}".format(to_option))
 
-    if to_option == SEND_TO_MYSELF:
+    if to_option.isdigit():
+        recipient_queryset = get_group_query_students(course_id, int(to_option))
+        return recipient_queryset
+    elif to_option == SEND_TO_MYSELF:
         recipient_qset = User.objects.filter(id=user_id)
     else:
         staff_qset = CourseStaffRole(course_id).users_with_role()
@@ -243,6 +253,10 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
         recipient_fields,
         settings.BULK_EMAIL_EMAILS_PER_TASK,
     )
+
+    # Cleanup for bulk email to saved queries
+    if to_option.isdigit():
+        delete_group_temp_queries_and_students(int(to_option))
 
     # We want to return progress here, as this is what will be stored in the
     # AsyncResult for the parent task as its return value.

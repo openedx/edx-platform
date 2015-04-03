@@ -244,6 +244,8 @@ define([
     "js/spec/views/modals/edit_xblock_spec",
     "js/spec/views/modals/validation_error_modal_spec",
 
+    "js/spec/views/settings/main_spec",
+
     "js/spec/factories/xblock_validation_spec",
 
     "js/spec/xblock/cms.runtime.v1_spec",

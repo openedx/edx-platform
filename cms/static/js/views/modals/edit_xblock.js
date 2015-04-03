@@ -9,7 +9,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
         var EditXBlockModal = BaseModal.extend({
             events : {
                 "click .action-save": "save",
-                "click .action-modes a": "changeMode"
+                'click .action-modes .action-item a': 'changeMode'
             },
 
             options: $.extend({}, BaseModal.prototype.options, {
@@ -38,6 +38,15 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
                 this.editOptions = options;
                 this.render();
                 this.show();
+                if (this.options.modalType === 'html') {
+                    this.$('.editor-modes a[rel="modal"]').attr('title', gettext('This link will open in a modal window')).leanModal({
+                        overlay: 0.50,
+                        closeButton: '.action-modal-close'
+                    });
+                    this.$('.action-modal-close').click(function(e) {
+                        e.preventDefault();
+                    });
+                }
 
                 // Hide the action bar until we know which buttons we want
                 this.getActionBar().hide();

@@ -29,6 +29,8 @@ from instructor_task.tasks_helper import (
     upload_students_csv,
     push_student_responses_to_s3,
     push_ora2_responses_to_s3,
+    push_course_forums_data_to_s3,
+    push_student_forums_data_to_s3,
     UPDATE_STATUS_FAILED,
     UPDATE_STATUS_SUCCEEDED,
 )
@@ -82,6 +84,54 @@ class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
 
         report_store = ReportStore.from_config()
         self.assertTrue(any('grade_report_err' in item[0] for item in report_store.links_for(self.course.id)))
+
+
+@ddt.ddt
+class TestReportStore(TestReportMixin, InstructorTaskCourseTestCase):
+    """Tests for the ReportStore model"""
+
+    def setUp(self):
+        self.course = CourseFactory.create()
+
+    def test_delete_report(self):
+        report_store = ReportStore.from_config()
+        task_input = {'features': []}
+
+        links = report_store.links_for(self.course.id)
+        self.assertEquals(len(links), 0)
+        with patch('instructor_task.tasks_helper._get_current_task'):
+            upload_students_csv(None, None, self.course.id, task_input, 'calculated')
+        links = report_store.links_for(self.course.id)
+        self.assertEquals(len(links), 1)
+
+        filename = links[0][0]
+        report_store.delete_file(self.course.id, filename)
+
+        links = report_store.links_for(self.course.id)
+        self.assertEquals(len(links), 0)
+
+    def test_reports_rev_chronologically_sorted(self):
+        report_store = ReportStore.from_config()
+        test_rows = [['row1_field1', 'row1_field2', 'row1_field3'], ['row2_field1', 'row2_field2', 'row2_field3']]
+        rev_chronological_filenames = [
+            'filename4_2015-03-10-0024.csv',
+            'filename3_2015-03-10-0023.csv',
+            'filename2_2015-03-10-0022.csv',
+            'filename1_2015-03-10-0021.csv',
+        ]
+
+        links = report_store.links_for(self.course.id)
+        self.assertEquals(len(links), 0)
+
+        report_store.store_rows(self.course.id, rev_chronological_filenames[1], test_rows)
+        report_store.store_rows(self.course.id, rev_chronological_filenames[3], test_rows)
+        report_store.store_rows(self.course.id, rev_chronological_filenames[0], test_rows)
+        report_store.store_rows(self.course.id, rev_chronological_filenames[2], test_rows)
+
+        links = report_store.links_for(self.course.id)
+        self.assertEquals(len(links), 4)
+        filenames = [link[0] for link in links]
+        self.assertEquals(filenames, rev_chronological_filenames)
 
 
 @ddt.ddt
@@ -202,3 +252,83 @@ class TestInstructorOra2Report(TestReportMixin, InstructorTaskCourseTestCase):
 
                     self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)
                     mock_store_rows.assert_called_once_with(self.course.id, filename, [test_header] + test_rows)
+
+
+class TestInstructorCourseForumsReport(TestReportMixin, InstructorTaskCourseTestCase):
+    """
+    Tests that course forums usage report generation works.
+    """
+    def setUp(self):
+        self.course = CourseFactory.create(org=TEST_COURSE_ORG,
+                                           number=TEST_COURSE_NUMBER,
+                                           display_name=TEST_COURSE_NAME)
+
+        self.current_task = Mock()
+        self.current_task.update_state = Mock()
+
+    def test_report_fails_if_error(self):
+        with patch('instructor_task.tasks_helper.collect_course_forums_data') as mock_collect_data:
+            mock_collect_data.side_effect = KeyError
+
+            with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
+                mock_current_task.return_value = self.current_task
+
+                self.assertEqual(push_course_forums_data_to_s3(None, None, self.course.id, None, 'generated'), UPDATE_STATUS_FAILED)
+
+    @patch('instructor_task.tasks_helper.datetime')
+    def test_report_stores_results(self, mock_time):
+        start_time = datetime.now(UTC)
+        mock_time.now.return_value = start_time
+
+        test_header = ['Date', 'Type', 'Number', 'Up Votes', 'Down Votes', 'Net Points']
+        test_rows = [['row1_field1', 'row1_field2'], ['row2_field1', 'row2_field2']]
+
+        with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
+            mock_current_task.return_value = self.current_task
+
+            with patch('instructor_task.tasks_helper.collect_course_forums_data') as mock_collect_data:
+                mock_collect_data.return_value = (test_header, test_rows)
+
+                with patch('instructor_task.models.LocalFSReportStore.store_rows'):
+                    return_val = push_course_forums_data_to_s3(None, None, self.course.id, None, 'generated')
+                    self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)
+
+
+class TestInstructorStudentForumsReport(TestReportMixin, InstructorTaskCourseTestCase):
+    """
+    Tests that Student forums usage report generation works.
+    """
+    def setUp(self):
+        self.course = CourseFactory.create(org=TEST_COURSE_ORG,
+                                           number=TEST_COURSE_NUMBER,
+                                           display_name=TEST_COURSE_NAME)
+
+        self.current_task = Mock()
+        self.current_task.update_state = Mock()
+
+    def test_report_fails_if_error(self):
+        with patch('instructor_task.tasks_helper.collect_student_forums_data') as mock_collect_data:
+            mock_collect_data.side_effect = KeyError
+
+            with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
+                mock_current_task.return_value = self.current_task
+
+                self.assertEqual(push_student_forums_data_to_s3(None, None, self.course.id, None, 'generated'), UPDATE_STATUS_FAILED)
+
+    @patch('instructor_task.tasks_helper.datetime')
+    def test_report_stores_results(self, mock_time):
+        start_time = datetime.now(UTC)
+        mock_time.now.return_value = start_time
+
+        test_header = ['Username', 'Posts', 'Points']
+        test_rows = [['row1_field1', 'row1_field2', 'row1_field3'], ['row2_field1', 'row2_field2', 'row2_field3']]
+
+        with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
+            mock_current_task.return_value = self.current_task
+
+            with patch('instructor_task.tasks_helper.collect_student_forums_data') as mock_collect_data:
+                mock_collect_data.return_value = (test_header, test_rows)
+
+                with patch('instructor_task.models.LocalFSReportStore.store_rows'):
+                    return_val = push_student_forums_data_to_s3(None, None, self.course.id, None, 'generated')
+                    self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)

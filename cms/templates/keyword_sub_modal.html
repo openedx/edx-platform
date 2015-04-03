@@ -1,0 +1,31 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%page args="keywords_supported, content_type"/>
+
+<div id="keyword-sub-modal" class="content-modal">
+  <a href="" rel="view" class="action action-modal-close">
+    <i class="icon-remove-sign"></i>
+    <span class="label">${_('close modal')}</span>
+  </a>
+
+  <h3 class="title">
+    ${_('Keyword Substitution')}
+    <span class="sr">,
+      ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
+      ${_('window open')}
+    </span>
+  </h3>
+  <hr/>
+
+  <p>
+    ${_("Copy and paste keywords on the left into your {content_type}. They will be replaced by the values on the right.").format(content_type=content_type)}
+  </p>
+  <table>
+    % for keyword in keywords_supported:
+      <tr>
+        <td><input type="text" value="${keyword['name']}" readonly="readonly" /></td>
+        <td>${_(keyword['desc'])}</td>
+      </tr>
+    % endfor
+  </table>
+
+</div>

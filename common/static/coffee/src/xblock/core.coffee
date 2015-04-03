@@ -22,7 +22,9 @@
         initargs = $(".xblock_json_init_args", element)
         if initargs.length == 0
           console.log("Warning: XBlock expects data parameters")
-        data = JSON.parse(initargs.text())
+          data = {}
+        else
+          data = JSON.parse(initargs.text())
         block = initFn(runtime, element, data) ? {}
       else
         block = initFn(runtime, element) ? {}

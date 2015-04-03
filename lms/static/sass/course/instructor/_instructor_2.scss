@@ -1164,6 +1164,56 @@ section.instructor-dashboard-content-2 {
         overflow-x: hidden !important;
       }
     }
+
+    .graph-forums{
+      cursor: pointer;
+      float:right;
+      padding-left: 25px;
+      padding-right: 10px;
+    }
+
+    .delete-report{
+      float: right;
+      margin-right: 10px;
+      text-decoration: underline;
+      color: $blue;
+    }
+
+    .delete-report:hover{
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+
+  }
+
+  .report-downloads-graph-block{
+    width:100%;
+  }
+  .report-downloads-graph-title{
+    text-align:center;
+    margin: 0 auto;
+  }
+
+  .report-downloads-graph{
+    width:100%;
+    margin-left: auto ;
+    margin-right: auto ;
+    font: 10px sans-serif;
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+
+    .bar {
+      fill: steelblue;
+    }
+
+    .x.axis path {
+      display: none;
+    }
   }
 }
 
