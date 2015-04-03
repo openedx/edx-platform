@@ -42,6 +42,11 @@
                 accountSettingsPageUrl: options['account_settings_page_url']
             });
 
+            var profileImageFieldView = new FieldsView.ImageFieldView({
+                    model: accountSettingsModel,
+                    valueAttribute: "profile_image",
+            });
+
             var usernameFieldView = new FieldsView.ReadonlyFieldView({
                     model: accountSettingsModel,
                     valueAttribute: "username",
@@ -50,6 +55,7 @@
 
             var sectionOneFieldViews = [
                 usernameFieldView,
+                profileImageFieldView,
                 new FieldsView.DropdownFieldView({
                     model: accountSettingsModel,
                     required: true,
@@ -93,6 +99,7 @@
                 accountSettingsModel: accountSettingsModel,
                 preferencesModel: accountPreferencesModel,
                 accountPrivacyFieldView: accountPrivacyFieldView,
+                profileImageFieldView: profileImageFieldView,
                 usernameFieldView: usernameFieldView,
                 sectionOneFieldViews: sectionOneFieldViews,
                 sectionTwoFieldViews: sectionTwoFieldViews

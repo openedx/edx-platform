@@ -22,6 +22,7 @@
                 bio: null,
                 language_proficiencies: [],
                 requires_parental_consent: true,
+                profile_image: null,
                 default_public_account_fields: []
             },
 
@@ -37,6 +38,11 @@
                 this.set({'profile_is_public': profileIsPublic}, { silent: true });
 
   	            return response;
+            },
+
+            has_profile_image: function () {
+                var profile_image = this.get('profile_image');
+                return (_.isObject(profile_image) && _.has(profile_image, 'has_profile') && profile_image['has_image']);
             },
 
             isAboveMinimumAge: function() {

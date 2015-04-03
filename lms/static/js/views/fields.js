@@ -495,6 +495,72 @@
             }
         });
 
+        FieldViews.ImageFieldView = FieldViews.FieldView.extend({
+
+            fieldType: 'image',
+
+            templateSelector: '#field_image-tpl',
+
+            titleAdd: 'upload a photo',
+            titleEdit: 'change photo',
+            titleRemove: 'remove',
+
+            iconUpload: '<i class="icon fa fa-camera" aria-hidden="true"></i>',
+            iconRemove: '<i class="icon fa fa-remove" aria-hidden="true"></i>',
+
+            events: {
+                'click .u-field-upload-button': 'clickedUploadButton',
+                'click .u-field-remove-button': 'clickedRemoveButton'
+            },
+
+            initialize: function (options) {
+                this._super(options);
+                _.bindAll(this, 'render');
+                this.listenTo(this.model, "change:" + this.options.valueAttribute, this.render);
+            },
+
+            render: function () {
+                this.$el.html(this.template({
+                    id: this.options.valueAttribute,
+                    imageLink: this.imageLink(),
+                    uploadButtonIcon: _.result(this, 'iconUpload'),
+                    uploadButtonTitle: _.result(this, 'uploadButtonTitle'),
+                    removeButtonIcon: _.result(this, 'iconRemove'),
+                    removeButtonTitle: _.result(this, 'removeButtonTitle')
+                }));
+                return this;
+            },
+
+            clickedUploadButton: function () {
+                console.log('upload');
+            },
+
+            clickedRemoveButton: function () {
+                console.log('remove');
+            },
+
+            hasImage: function () {
+                return false;
+            },
+
+            imageLink: function () {
+                return 'http://www.teachthought.com/wp-content/uploads/2012/07/edX-120x120.jpg';
+            },
+
+            uploadButtonTitle: function () {
+                if (this.hasImage()) {
+                    return _.result(this, 'titleEdit')
+                } else {
+                    return _.result(this, 'titleAdd')
+                }
+            },
+
+            removeButtonTitle: function () {
+                return this.titleRemove;
+            }
+
+        });
+
         return FieldViews;
     })
 }).call(this, define || RequireJS.define);

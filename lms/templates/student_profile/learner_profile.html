@@ -10,7 +10,7 @@
 <%block name="bodyclass">view-profile</%block>
 
 <%block name="header_extras">
-    % for template_name in ["field_dropdown", "field_textarea", "field_readonly"]:
+    % for template_name in ["field_dropdown", "field_image", "field_textarea", "field_readonly"]:
         <script type="text/template" id="${template_name}-tpl">
             <%static:include path="fields/${template_name}.underscore" />
         </script>
@@ -30,6 +30,8 @@
 </div>
 <%block name="headextra">
     <%static:css group='style-course'/>
+
+    <script type="text/javascript" src="${static.url('js/vendor/jQuery-File-Upload/js/jquery.fileupload.js')}"></script>
 
     <script>
           (function (require) {

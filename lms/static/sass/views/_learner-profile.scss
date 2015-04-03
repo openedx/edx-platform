@@ -7,7 +7,7 @@
 // * +Settings Section
 
 .view-profile {
-    $profile-photo-dimension: 120px;
+    $profile-image-dimension: 120px;
 
     .content-wrapper {
         background-color: $white;
@@ -21,6 +21,68 @@
         @include margin-left(auto);
         @include margin-right(auto);
         width: ($baseline*5);
+    }
+
+    .u-field-image {
+          width: $profile-image-dimension;
+
+         .image-frame {
+            position: relative;
+            height: $profile-image-dimension;
+            width: $profile-image-dimension;
+            vertical-align: top;
+        }
+
+        .u-field-img {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        .u-field-upload-button {
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            padding-top: 30%;
+            overflow: hidden;
+            text-align: center;
+            color: $white;
+
+            i {
+                color: $white;
+            }
+
+            .upload-button-title {
+                margin: ($baseline/4) ($baseline/2);
+            }
+
+            .upload-button-input {
+                opacity: 0;
+                position: absolute;
+                top: 0;
+                right: 0;
+                height: 100%;
+                cursor: pointer;
+                font-size: 100px;
+            }
+        }
+
+        .u-field-remove-button {
+            opacity: 0;
+            position: relative;
+            margin-top: 2px;
+            text-align: center;
+        }
+
+        &:hover {
+            .u-field-upload-button, .u-field-remove-button {
+                opacity: 1;
+            }
+        }
+
     }
 
     .wrapper-profile {
@@ -77,14 +139,6 @@
         width: 100%;
         display: inline-block;
         margin-top: ($baseline*1.5);
-
-        .profile-photo {
-            @include float(left);
-            height: $profile-photo-dimension;
-            width: $profile-photo-dimension;
-            display: inline-block;
-            vertical-align: top;
-        }
     }
 
     .profile-section-one-fields {

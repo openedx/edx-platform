@@ -1,0 +1,12 @@
+<div class="image-frame">
+    <img class="u-field-img" src="<%- gettext(imageLink) %>"/>
+    <div class="u-field-upload-button">
+        <div class="upload-button-icon"><%= uploadButtonIcon %></div>
+        <div class="upload-button-title"><%= uploadButtonTitle %></div>
+        <input class="upload-button-input" type="file" name="<%= id %>"/>
+    </div>
+</div>
+<div class="u-field-remove-button">
+    <span class="remove-button-icon"><%= removeButtonIcon %></span>
+    <span class="remove-button-title"><%= removeButtonTitle %></span>
+</div>
