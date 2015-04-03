@@ -157,7 +157,7 @@
     <% } %>
 
   <% if ( isActive ) { %>
-  <nav class="nav-wizard is-ready <% if ( isActive && !upgrade ) { %>center<% } %>">
+  <div class="nav-wizard is-ready <% if ( isActive && !upgrade ) { %>center<% } %>">
     <% if ( upgrade ) { %>
         <a class="next action-primary is-disabled right" id="pay_button" aria-disabled="true">
           <%- gettext( "Next: Make payment" ) %>
@@ -167,7 +167,7 @@
           <%- gettext( "Continue to payment" ) %>
         </a>
     <% } %>
-  </nav>
+  </div>
   <% } %>
 
   <form id="payment-processor-form"></form>
