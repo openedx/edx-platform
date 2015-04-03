@@ -442,7 +442,6 @@ define([
             expect(this.searchFacetView.facetViews.length).toBe(2);
             expect(customView.remove).toHaveBeenCalled();
         });
-
     });
 
     describe('ResultListView', function () {
