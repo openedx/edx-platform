@@ -14,7 +14,13 @@ from search.search_engine_base import SearchEngine
 # Use default index and document names for now
 INDEX_NAME = "courseware_index"
 DOCUMENT_TYPE = "courseware_content"
-REINDEX_AGE = timedelta(0, 60)
+
+# REINDEX_AGE is the default amount of time that we look back for changes
+# that might have happened. If we are provided with a time at which the
+# indexing is triggered, then we know it is safe to only index items
+# recently changed at that time. This is the time period that represents
+# how far back from the trigger point to look back in order to index
+REINDEX_AGE = timedelta(0, 60)  # 60 seconds
 
 log = logging.getLogger('edx.modulestore')
 
@@ -39,7 +45,8 @@ class CoursewareSearchIndexer(object):
     Class to perform indexing for courseware search from different modulestores
     """
 
-    def index_course(self, modulestore, course_key, triggered_at=None, reindex_age=REINDEX_AGE):
+    @classmethod
+    def index_course(cls, modulestore, course_key, triggered_at=None, reindex_age=REINDEX_AGE):
         """
         Process course for indexing
 
@@ -170,13 +177,13 @@ class CoursewareSearchIndexer(object):
         """
         (Re)index all content within the given course, tracking the fact that a full reindex has taking place
         """
-        indexer = cls()
-        indexed_count = indexer.index_course(modulestore, course_key)
+        indexed_count = cls.index_course(modulestore, course_key)
         if indexed_count:
-            indexer.track_index_request('edx.course.index.reindexed', indexed_count)
+            cls._track_index_request('edx.course.index.reindexed', indexed_count)
         return indexed_count
 
-    def track_index_request(self, event_name, indexed_count):
+    @classmethod
+    def _track_index_request(cls, event_name, indexed_count):
         """Track content index requests.
 
         Arguments:

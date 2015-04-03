@@ -85,7 +85,7 @@ def update_search_index(course_id, triggered_time):
     """ Updates course search index. """
     try:
         course_key = CourseKey.from_string(course_id)
-        CoursewareSearchIndexer().index_course(modulestore(), course_key, triggered_at=triggered_time)
+        CoursewareSearchIndexer.index_course(modulestore(), course_key, triggered_at=triggered_time)
 
     except SearchIndexingError as exc:
         LOGGER.error('Search indexing error for complete course %s - %s', course_id, unicode(exc))
