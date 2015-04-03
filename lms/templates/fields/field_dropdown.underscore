@@ -8,9 +8,9 @@
     <i class="u-field-icon icon fa <%- iconName %> fa-fw" area-hidden="true" ></i>
 <% } %>
 
-<span class="u-field-value">
+<span class="u-field-value" tabindex="0" role="listbox" aria-expanded="false">
     <% if (mode === 'edit') { %>
-        <select name="select" id="u-field-select-<%- id %>" aria-describedby="u-field-message-<%- id %>">
+        <select name="select" id="u-field-select-<%- id %>" aria-describedby="u-field-help-message-<%- id %>">
             <% if (!required) { %>
                 <option value=""></option>
             <% } %>
@@ -22,5 +22,6 @@
 </span>
 
 <span class="u-field-message" id="u-field-message-<%- id %>">
-    <%- gettext(message) %>
+    <span class="u-field-message-notification" aria-live="polite"></span>
+    <span class="u-field-message-help" id="u-field-help-message-<%- id %>"><%- gettext(message) %></span>
 </span>

@@ -2,8 +2,9 @@
     <%- gettext(title) %>
 </label>
 <span class="u-field-value">
-    <input id="u-field-input-<%- id %>" aria-describedby="u-field-message-<%- id %>" type="text" name="input" value="<%- gettext(value) %>">
+    <input id="u-field-input-<%- id %>" aria-describedby="u-field-help-message-<%- id %>" type="text" name="input" value="<%- gettext(value) %>">
 </span>
 <span class="u-field-message" id="u-field-message-<%- id %>">
-    <%- gettext(message) %>
+    <span class="u-field-message-notification" aria-live="polite"></span>
+    <span class="u-field-message-help" id="u-field-help-message-<%- id %>"> <%- gettext(message) %></span>
 </span>

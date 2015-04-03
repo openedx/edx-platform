@@ -20,12 +20,12 @@
             tagName: 'div',
 
             indicators: {
-                'canEdit': '<i class="icon fa fa-pencil message-can-edit" aria-hidden="true"></i>',
-                'error': '<i class="fa fa-exclamation-triangle message-error" aria-hidden="true"></i>',
-                'validationError': '<i class="fa fa-exclamation-triangle message-validation-error" aria-hidden="true"></i>',
-                'inProgress': '<i class="fa fa-spinner fa-pulse message-in-progress" aria-hidden="true"></i>',
-                'success': '<i class="fa fa-check message-success" aria-hidden="true"></i>',
-                'plus': '<i class="fa fa-plus placeholder" aria-hidden="true"></i>'
+                'canEdit': '<i class="icon fa fa-pencil message-can-edit" aria-hidden="true"><span class="sr">Editable</span></i>',
+                'error': '<i class="fa fa-exclamation-triangle message-error" aria-hidden="true"><span class="sr">Error</span></i>',
+                'validationError': '<i class="fa fa-exclamation-triangle message-validation-error" aria-hidden="true"><span class="sr"Validation Error</span></i>',
+                'inProgress': '<i class="fa fa-spinner fa-pulse message-in-progress" aria-hidden="true"><span class="sr">In Porgress</span></i>',
+                'success': '<i class="fa fa-check message-success" aria-hidden="true"><span class="sr">Success</span></i>',
+                'plus': '<i class="fa fa-plus placeholder" aria-hidden="true"><span class="sr">Placeholder</span></i>'
             },
 
             messages: {
@@ -55,8 +55,15 @@
                 return (this.modelValue() == true);
             },
 
-            message: function (message) {
-                return this.$('.u-field-message').html(message);
+            message: function (message, notification) {
+                notification = _.isUndefined(notification) ? true : notification;
+                if (notification) {
+                    this.$('.u-field-message-help').html('');
+                    return this.$('.u-field-message-notification').html(message);
+                } else {
+                    this.$('.u-field-message-notification').html('');
+                    return this.$('.u-field-message-help').html(message);
+                }
             },
 
             title: function (text) {
@@ -81,7 +88,7 @@
             },
 
             showHelpMessage: function () {
-                this.message(this.helpMessage);
+                this.message(this.helpMessage, false);
             },
 
             showInProgressMessage: function () {
@@ -345,6 +352,7 @@
                     if (this.modelValueIsSet() === false) {
                         value = this.options.placeholderValue || '';
                     }
+                    this.$('.u-field-value').attr('aria-label', this.options.valueAttribute.replace(/_/g , " "));
                     this.$('.u-field-value').html(Mustache.escapeHtml(value));
                     this.showDisplayMode(false);
                 } else {

@@ -88,7 +88,7 @@
     vertical-align: top;
     margin-bottom: 0;
 
-    label {
+    label, span {
         @include margin-left($baseline/2);
     }
 }
