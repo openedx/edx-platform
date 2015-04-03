@@ -425,9 +425,9 @@ class CapaMixin(CapaFields):
 
         # Apply customizations if present
         if 'custom_check' in self.text_customization:
-            check = _(self.text_customization.get('custom_check'))
+            check = _(self.text_customization.get('custom_check'))                # pylint: disable=translation-of-non-string
         if 'custom_final_check' in self.text_customization:
-            final_check = _(self.text_customization.get('custom_final_check'))
+            final_check = _(self.text_customization.get('custom_final_check'))    # pylint: disable=translation-of-non-string
         # TODO: need a way to get the customized words into the list of
         # words to be translated
 

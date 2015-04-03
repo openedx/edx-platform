@@ -275,7 +275,7 @@ def get_component_templates(courselike, library=False):
                 if not filter_templates or filter_templates(template, courselike):
                     templates_for_category.append(
                         create_template_dict(
-                            _(template['metadata'].get('display_name')),
+                            _(template['metadata'].get('display_name')),    # pylint: disable=translation-of-non-string
                             category,
                             template.get('template_id'),
                             template['metadata'].get('markdown') is not None
