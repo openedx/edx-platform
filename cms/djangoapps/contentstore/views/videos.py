@@ -73,7 +73,7 @@ class StatusDisplayStrings(object):
     @staticmethod
     def get(val_status):
         """Map a VAL status string to a localized display string"""
-        return _(StatusDisplayStrings._STATUS_MAP.get(val_status, StatusDisplayStrings._UNKNOWN))
+        return _(StatusDisplayStrings._STATUS_MAP.get(val_status, StatusDisplayStrings._UNKNOWN))    # pylint: disable=translation-of-non-string
 
 
 @expect_json
