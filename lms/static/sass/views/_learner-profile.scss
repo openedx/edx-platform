@@ -7,7 +7,7 @@
 // * +Settings Section
 
 .view-profile {
-    $profile-photo-dimension: 120px;
+    $profile-image-dimension: 120px;
 
     .content-wrapper {
         background-color: $white;
@@ -21,6 +21,75 @@
         @include margin-left(auto);
         @include margin-right(auto);
         width: ($baseline*5);
+    }
+
+    .profile-image-field {
+        @include float(left);
+
+        button {
+            background: transparent !important;
+            border: none !important;
+            padding: 0;
+        }
+
+        .u-field-image {
+            padding-top: 0;
+        }
+
+        .image-wrapper {
+            width: $profile-image-dimension;
+            position: relative;
+
+            .image-frame {
+                position: relative;
+                width: 120px;
+                height: 120px;
+            }
+
+            .u-field-upload-button {
+                width: 120px;
+                height: 120px;
+                position: absolute;
+                top: 0;
+                opacity: 0;
+
+                i {
+                    color: $white;
+                }
+            }
+
+            .upload-button-icon, .upload-button-title {
+                text-align: center;
+                transform: translateY(45px);
+                display: block;
+                color: $white;
+            }
+
+            .upload-button-input {
+                width: 120px;
+                height: 100%;
+                position: absolute;
+                top: 0;
+                left: 0;
+                opacity: 0;
+                cursor: pointer;
+            }
+
+            .u-field-remove-button {
+                width: 120px;
+                height: 20px;
+                opacity: 0;
+                position: relative;
+                margin-top: 2px;
+                text-align: center;
+            }
+
+            &:hover {
+                .u-field-upload-button, .u-field-remove-button {
+                    opacity: 1;
+                }
+            }
+        }
     }
 
     .wrapper-profile {
@@ -77,14 +146,6 @@
         width: 100%;
         display: inline-block;
         margin-top: ($baseline*1.5);
-
-        .profile-photo {
-            @include float(left);
-            height: $profile-photo-dimension;
-            width: $profile-photo-dimension;
-            display: inline-block;
-            vertical-align: top;
-        }
     }
 
     .profile-section-one-fields {
