@@ -30,7 +30,13 @@ from courseware.access import has_access, get_user_role
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache, DjangoKeyValueStore
 from lms.lib.xblock.field_data import LmsFieldData
-from lms.lib.xblock.runtime import LmsModuleSystem, SettingsService, unquote_slashes, quote_slashes
+from lms.lib.xblock.runtime import (
+    LmsModuleSystem,
+    SettingsService,
+    unquote_slashes,
+    quote_slashes
+)
+from xmodule.services import NotificationsService, CoursewareParentInfoService
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
@@ -543,6 +549,18 @@ def get_module_system_for_user(user, field_data_cache,
     else:
         anonymous_student_id = anonymous_id_for_user(user, None)
 
+    services_list = {
+        'i18n': ModuleI18nService(),
+        'fs': xblock.reference.plugins.FSService(),
+        'settings': SettingsService(),
+        'courseware_parent_info': CoursewareParentInfoService(),
+    }
+
+    if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
+        services_list.update({
+            "notifications": NotificationsService(),
+        })
+
     system = LmsModuleSystem(
         track_function=track_function,
         render_template=render_to_string,
@@ -584,11 +602,7 @@ def get_module_system_for_user(user, field_data_cache,
         mixins=descriptor.runtime.mixologist._mixins,  # pylint: disable=protected-access
         wrappers=block_wrappers,
         get_real_user=user_by_anonymous_id,
-        services={
-            'i18n': ModuleI18nService(),
-            'fs': xblock.reference.plugins.FSService(),
-            'settings': SettingsService(),
-        },
+        services=services_list,
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor.runtime,
         rebind_noauth_module_to_user=rebind_noauth_module_to_user,

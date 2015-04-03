@@ -21,6 +21,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@patch.dict(settings.FEATURES, {'SIGNAL_ON_SCORE_CHANGED': True})
 class GenerateGradebookEntriesTests(TestCase):
     """
     Test suite for grade generation script
