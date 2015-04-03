@@ -834,6 +834,17 @@ class CourseFields(object):
         scope=Scope.settings,
     )
 
+    social_sharing_url = String(
+        display_name=_("Social Media Sharing URL"),
+        help=_(
+            "If dashboard social sharing and custom course URLs are enabled, you can provide a URL "
+            "(such as the URL to a course About page) that social media sites can link to. URLs must "
+            "be fully qualified. For example: http://www.edx.org/course/Introduction-to-MOOCs-ITM001"
+        ),
+        default=None,
+        scope=Scope.settings,
+    )
+
 
 class CourseModule(CourseFields, SequenceModule):  # pylint: disable=abstract-method
     """
