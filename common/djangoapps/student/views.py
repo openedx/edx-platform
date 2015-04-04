@@ -498,6 +498,8 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
 def dashboard(request):
     user = request.user
 
+    platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
+
     # for microsites, we want to filter and only show enrollments for courses within
     # the microsites 'ORG'
     course_org_filter = microsite.get_value('course_org_filter')
@@ -541,7 +543,7 @@ def dashboard(request):
     if not user.is_active:
         message = render_to_string(
             'registration/activate_account_notice.html',
-            {'email': user.email, 'platform_name': settings.PLATFORM_NAME}
+            {'email': user.email, 'platform_name': platform_name}
         )
 
     # Global staff can see what courses errored on their dashboard
@@ -686,7 +688,7 @@ def dashboard(request):
         'user': user,
         'duplicate_provider': None,
         'logout_url': reverse(logout_user),
-        'platform_name': settings.PLATFORM_NAME,
+        'platform_name': platform_name,
         'enrolled_courses_either_paid': enrolled_courses_either_paid,
         'provider_states': [],
         'order_history_list': order_history_list,
@@ -726,9 +728,11 @@ def _create_recent_enrollment_message(course_enrollment_pairs, course_modes):
             for course, enrollment in recently_enrolled_courses
         ]
 
+        platform_name = microsite.get_value('platform_name', settings.PLATFORM_NAME)
+
         return render_to_string(
             'enrollment/course_enrollment_message.html',
-            {'course_enrollment_messages': messages, 'platform_name': settings.PLATFORM_NAME}
+            {'course_enrollment_messages': messages, 'platform_name': platform_name}
         )
 
 
