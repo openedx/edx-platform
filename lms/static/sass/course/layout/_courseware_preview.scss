@@ -4,7 +4,8 @@
   margin: 0 auto 0;
   padding: ($baseline*0.75);
   width: 100%;
-  background-color: $gray-l3;
+  background-color: $gray-d3;
+  border-bottom: 4px solid $course-instructor-menu-border;
 
   .preview-menu {
     @extend %inner-wrapper;
@@ -21,6 +22,8 @@
         margin-right: ($baseline/2);
         margin-bottom: 0;
         vertical-align: middle;
+        color: $white;
+        pointer-events: none;
       }
     }
   }
