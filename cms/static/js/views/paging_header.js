@@ -37,13 +37,11 @@ define(["underscore", "gettext", "js/views/baseview"], function(_, gettext, Base
                 if (this.view.collection.sortDirection === 'asc') {
                     // Translators: sample result:
                     // "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added ascending"
-                    message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, ' +
-                        'filtered by %(asset_type)s, sorted by %(sort_name)s ascending');
+                    message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, filtered by %(asset_type)s, sorted by %(sort_name)s ascending');
                 } else {
                     // Translators: sample result:
                     // "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added descending"
-                    message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, ' +
-                        'filtered by %(asset_type)s, sorted by %(sort_name)s descending');
+                    message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, filtered by %(asset_type)s, sorted by %(sort_name)s descending');
                 }
                 asset_type = this.filterNameLabel();
             }
@@ -51,13 +49,11 @@ define(["underscore", "gettext", "js/views/baseview"], function(_, gettext, Base
                 if (this.view.collection.sortDirection === 'asc') {
                     // Translators: sample result:
                     // "Showing 0-9 out of 25 total, sorted by Date Added ascending"
-                    message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, ' +
-                        'sorted by %(sort_name)s ascending');
+                    message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, sorted by %(sort_name)s ascending');
                 } else {
                     // Translators: sample result:
                     // "Showing 0-9 out of 25 total, sorted by Date Added descending"
-                    message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, ' +
-                        'sorted by %(sort_name)s descending');
+                    message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, sorted by %(sort_name)s descending');
                 }
             }
 
