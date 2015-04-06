@@ -40,9 +40,13 @@
   	            return response;
             },
 
-            has_profile_image: function () {
+            hasProfileImage: function () {
                 var profile_image = this.get('profile_image');
-                return (_.isObject(profile_image) && _.has(profile_image, 'has_profile') && profile_image['has_image']);
+                return (_.isObject(profile_image) && profile_image['has_image'] === true);
+            },
+
+            profileImageUrl: function () {
+                return this.get('profile_image')['image_url_large'];
             },
 
             isAboveMinimumAge: function() {

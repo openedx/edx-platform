@@ -44,7 +44,11 @@
                 }
 
                 this.$('.profile-section-one-fields').append(this.options.usernameFieldView.render().el);
-                this.$('.profile-image-field').append(this.options.profileImageFieldView.render().el);
+
+                var imageView = this.options.profileImageFieldView;
+                imageView.undelegateEvents();
+                this.$('.profile-image-field').append(imageView.render().el);
+                imageView.delegateEvents();
 
                 if (this.showFullProfile()) {
                     _.each(this.options.sectionOneFieldViews, function (fieldView, index) {
