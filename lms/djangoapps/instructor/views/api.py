@@ -803,12 +803,14 @@ def _process_new_query(course_id, query_incl, query_type, query_id, query_filter
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-@require_query_params(existing="Ids of previously issued queries")
+@require_post_params(existing="Ids of previously issued queries")
 def delete_temp_query_batch(request, course_id):  # pylint: disable=unused-argument
     """
+    Required POST params:
+       existing: comma separated list of existing temp queries to delete
     Deletes a temporary query that the user has entered along with the corresponding students
     """
-    existing = request.GET.get('existing')
+    existing = request.POST.get('existing')
     existing_queries = existing.split(',')
     if len(existing) == 0:
         return JsonResponse({
@@ -826,10 +828,18 @@ def delete_temp_query_batch(request, course_id):  # pylint: disable=unused-argum
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def delete_temp_query(request, course_id, query_to_delete):  # pylint: disable=unused-argument
+@require_post_params(query_id="Id of temporary query to delete")
+def delete_temp_query(request, course_id):  # pylint: disable=unused-argument
     """
+    Required POST params:
+       query_id: id of temporary query to delete
     Deletes a temporary query that the user has entered along with the corresponding students
     """
+    try:
+        query_to_delete = int(request.POST.get('query_id'))
+    except (ValueError, TypeError):
+        return JsonResponse({'success': False})
+
     data_access.delete_temporary_query(query_to_delete)
     response_payload = {
         'success': True,
@@ -840,10 +850,17 @@ def delete_temp_query(request, course_id, query_to_delete):  # pylint: disable=u
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def delete_saved_query(request, course_id, query_to_delete):  # pylint: disable=unused-argument
+@require_post_params(query_id="Id of saved query to delete")
+def delete_saved_query(request, course_id):  # pylint: disable=unused-argument
     """
+    Required POST params:
+       query_id: id of saved query to delete
     Deletes a grouped query that the user has saved along with the corresponding subqueries
     """
+    try:
+        query_to_delete = int(request.POST.get('query_id'))
+    except (ValueError, TypeError):
+        return JsonResponse({'success': False})
     data_access.delete_saved_query(query_to_delete)
     response_payload = {
         'success': True,
@@ -854,14 +871,17 @@ def delete_saved_query(request, course_id, query_to_delete):  # pylint: disable=
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
+@require_post_params(existing="id of temporary query to save")
 def save_query(request, course_id):
     """
+    Required POST params:
+       existing: id of temporary query to save
     Saves a group of queries and assigns them the same group ID
     """
     existing = request.POST.get('existing')
     saved_name = request.POST.get('savedName')
     existing_queries = existing.split(',')
-    if len(existing) == 0:
+    if existing is None or len(existing) == 0:
         return JsonResponse({
             'success': False,
         })
@@ -1126,6 +1146,10 @@ def list_course_problems(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
+@require_post_params(
+    group_id="id of group to rename",
+    group_name="the new name of the group query with id group_id"
+)
 def save_group_name(request, course_id):
     """
     Required POST params:
