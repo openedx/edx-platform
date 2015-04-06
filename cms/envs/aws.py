@@ -59,10 +59,13 @@ BROKER_HEARTBEAT_CHECKRATE = 2
 # Each worker should only fetch one message at a time
 CELERYD_PREFETCH_MULTIPLIER = 1
 
+if not 'SOUTH_MIGRATION_MODULES' in vars() and not 'SOUTH_MIGRATION_MODULES' in globals():
+    SOUTH_MIGRATION_MODULES = {}
+
 # Skip djcelery migrations, since we don't use the database as the broker
-SOUTH_MIGRATION_MODULES = {
+SOUTH_MIGRATION_MODULES.update({
     'djcelery': 'ignore',
-}
+})
 
 # Rename the exchange and queues for each variant
 
