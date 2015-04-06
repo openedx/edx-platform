@@ -192,6 +192,7 @@ class CourseTab(object):
             'notes': NotesTab,
             'edxnotes': EdxNotesTab,
             'syllabus': SyllabusTab,
+            'teams': TeamsTab,
             'instructor': InstructorTab,  # not persisted
         }
 
@@ -733,6 +734,22 @@ class InstructorTab(StaffTab):
         )
 
 
+class TeamsTab(AuthenticatedCourseTab):
+    """
+    A tab for team collaboration.
+    """
+    type = 'teams'
+
+    def __init__(self, tab_dict=None):  # pylint: disable=unused-argument
+        super(TeamsTab, self).__init__(
+            # Translators: 'Instructor' appears on the tab that leads to the instructor dashboard, which is
+            # a portal where an instructor can get data and perform various actions on their course
+            name=_('Teams'),
+            tab_id=self.type,
+            link_func=link_reverse_func('teams_dashboard'),
+        )
+
+
 class CourseTabList(List):
     """
     An XBlock field class that encapsulates a collection of Tabs in a course.
@@ -767,6 +784,7 @@ class CourseTabList(List):
         course.tabs.extend([
             TextbookTabs(),
             discussion_tab,
+            TeamsTab(),
             WikiTab(),
             ProgressTab(),
         ])

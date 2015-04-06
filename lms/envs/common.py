@@ -768,6 +768,8 @@ STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
 ]
+for ui_app in ["teams"]:
+    STATICFILES_DIRS += [ PROJECT_ROOT / "djangoapps" / ui_app / "static" ]
 
 FAVICON_PATH = 'images/favicon.ico'
 

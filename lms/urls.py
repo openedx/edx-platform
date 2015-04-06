@@ -420,6 +420,10 @@ if settings.COURSEWARE_ENABLED:
         # Student Notes
         url(r'^courses/{}/edxnotes'.format(settings.COURSE_ID_PATTERN),
             include('edxnotes.urls'), name="edxnotes_endpoints"),
+
+        # Teams endpoints
+        url(r'^courses/{}/teams'.format(settings.COURSE_ID_PATTERN),
+            include('teams.urls'), name="teams_endpoints"),
     )
 
     # allow course staff to change to student view of courseware
@@ -621,7 +625,7 @@ urlpatterns += (
 urlpatterns = patterns(*urlpatterns)
 
 if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT, show_indexes=True)
 
     # in debug mode, allow any template to be rendered (most useful for UX reference templates)
     urlpatterns += url(r'^template/(?P<template>.+)$', 'debug.views.show_reference_template'),

@@ -1,0 +1,25 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! import json %>
+<%namespace name='static' file='/static_content.html'/>
+<%inherit file="/main.html" />
+
+<%block name="bodyclass">view-teams is-in-course course</%block>
+<%block name="pagetitle">${_("Teams")}</%block>
+<%block name="headextra">
+<%static:css group='style-course'/>
+</%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page='teams'" />
+
+<div class="team-tab-content"></div>
+
+<%block name="js_extra">
+<script type="text/javascript">
+    (function (require) {
+        require(['teams/js/teams_tab_factory'], function (TeamsTabFactory) {
+            var pageView = new TeamsTabFactory({
+            });
+        });
+    }).call(this, require || RequireJS.require);
+</script>
+</%block>
