@@ -2,12 +2,4 @@
 edX Enrollment API Version 1
 ################################################
 
-.. toctree::
-    :maxdepth: 2
-    
-    read_me
-    preface
-    overview
-    authentication
-    endpoints
-    enrollment
+This documentation has moved. Enrollment API information is now included in the `EdX Platform APIs documentation <http://edx.readthedocs.org/projects/edx-platform-api/en/latest/>`_.
