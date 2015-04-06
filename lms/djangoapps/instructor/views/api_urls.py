@@ -48,6 +48,8 @@ urlpatterns = patterns('',  # nopep8
     # the parameter-less url is here as a convenience because we don't know the params at the time of calling 'reverse
     url(r'^delete_temp_query',
         'instructor.views.api.delete_temp_query', name="delete_temp_query"),
+    url(r'^save_group_name',
+        'instructor.views.api.save_group_name', name="save_group_name"),
     url(r'^get_students_features(?P<csv>/csv)?$',
         'instructor.views.api.get_students_features', name="get_students_features"),
     url(r'^get_purchase_transaction(?P<csv>/csv)?$',
