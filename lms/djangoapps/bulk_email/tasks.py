@@ -48,6 +48,7 @@ from instructor_task.subtasks import (
     update_subtask_status,
 )
 from util.query import use_read_replica_if_available
+from util.date_utils import get_default_time_display
 
 log = logging.getLogger('edx.celery.task')
 
@@ -146,6 +147,7 @@ def _get_course_email_context(course):
     """
     course_id = course.id.to_deprecated_string()
     course_title = course.display_name
+    course_end_date = get_default_time_display(course.end)
     course_url = 'https://{}{}'.format(
         settings.SITE_NAME,
         reverse('course_root', kwargs={'course_id': course_id})
@@ -155,6 +157,7 @@ def _get_course_email_context(course):
         'course_title': course_title,
         'course_url': course_url,
         'course_image_url': image_url,
+        'course_end_date': course_end_date,
         'account_settings_url': 'https://{}{}'.format(settings.SITE_NAME, reverse('dashboard')),
         'platform_name': settings.PLATFORM_NAME,
     }
