@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-03-30 12:56+0000\n"
-"PO-Revision-Date: 2015-03-30 12:56:18.929777\n"
+"POT-Creation-Date: 2015-04-06 12:55+0000\n"
+"PO-Revision-Date: 2015-04-06 12:55:07.357245\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -119,6 +119,15 @@ msgstr "Nämé Ⱡ'σяєм#"
 #: lms/templates/shoppingcart/receipt.html
 msgid "Status"
 msgstr "Stätüs Ⱡ'σяєм ιρѕ#"
+
+#: common/djangoapps/cors_csrf/models.py
+msgid ""
+"List of domains that are allowed to make cross-domain requests to this site."
+"  Please list each domain on its own line."
+msgstr ""
+"Lïst öf dömäïns thät äré ällöwéd tö mäké çröss-dömäïn réqüésts tö thïs sïté."
+"  Pléäsé lïst éäçh dömäïn ön ïts öwn lïné. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢т#"
 
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
@@ -386,8 +395,8 @@ msgid "Bachelor's degree"
 msgstr "Bäçhélör's dégréé Ⱡ'σ#"
 
 #: common/djangoapps/student/models.py
-msgid "Associate's degree"
-msgstr "Àssöçïäté's dégréé Ⱡ'σ#"
+msgid "Associate degree"
+msgstr "Àssöçïäté dégréé Ⱡ'σ#"
 
 #: common/djangoapps/student/models.py
 msgid "Secondary/high school"
@@ -1516,6 +1525,10 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: common/lib/xmodule/xmodule/capa_base.py
+msgid "Blank Advanced Problem"
+msgstr "Blänk Àdvänçéd Prößlém Ⱡ'σяє#"
+
+#: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Number of attempts taken by the student on this problem"
 msgstr ""
@@ -2125,22 +2138,26 @@ msgstr "Dïsçüssïön Bläçköüt Dätés Ⱡ'σяєм#"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter pairs of dates between which students cannot post to discussion "
-"forums. Each pair should be formatted as [\"YYYY-MM-DD\", \"YYYY-MM-DD\"]. "
-"To specify times as well as dates, format each pair as [\"YYYY-MM-"
-"DDTHH:MM\", \"YYYY-MM-DDTHH:MM\"] (be sure to include the \"T\" between the "
-"date and time). An entry defining more than one blackout period might look "
-"like this: [[\"2014-09-15\", \"2014-09-21\"], [\"2014-10-01\", "
-"\"2014-10-08\"]]"
+"forums. Inside the provided brackets, enter an additional set of square "
+"brackets surrounding each pair of dates you add. Format each pair of dates "
+"as [\"YYYY-MM-DD\", \"YYYY-MM-DD\"]. To specify times as well as dates, "
+"format each pair as [\"YYYY-MM-DDTHH:MM\", \"YYYY-MM-DDTHH:MM\"]. Be sure to"
+" include the \"T\" between the date and time. For example, an entry defining"
+" two blackout periods looks like this, including the outer pair of square "
+"brackets: [[\"2015-09-15\", \"2015-09-21\"], [\"2015-10-01\", "
+"\"2015-10-08\"]] "
 msgstr ""
 "Éntér päïrs öf dätés ßétwéén whïçh stüdénts çännöt pöst tö dïsçüssïön "
-"förüms. Éäçh päïr shöüld ßé förmättéd äs [\"ÝÝÝÝ-MM-DD\", \"ÝÝÝÝ-MM-DD\"]. "
-"Tö spéçïfý tïmés äs wéll äs dätés, förmät éäçh päïr äs [\"ÝÝÝÝ-MM-"
-"DDTHH:MM\", \"ÝÝÝÝ-MM-DDTHH:MM\"] (ßé süré tö ïnçlüdé thé \"T\" ßétwéén thé "
-"däté änd tïmé). Àn éntrý défïnïng möré thän öné ßläçköüt pérïöd mïght löök "
-"lïké thïs: [[\"2014-09-15\", \"2014-09-21\"], [\"2014-10-01\", "
-"\"2014-10-08\"]] Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, "
-"ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм "
-"α∂ #"
+"förüms. Ìnsïdé thé prövïdéd ßräçkéts, éntér än äddïtïönäl sét öf sqüäré "
+"ßräçkéts sürröündïng éäçh päïr öf dätés ýöü ädd. Förmät éäçh päïr öf dätés "
+"äs [\"ÝÝÝÝ-MM-DD\", \"ÝÝÝÝ-MM-DD\"]. Tö spéçïfý tïmés äs wéll äs dätés, "
+"förmät éäçh päïr äs [\"ÝÝÝÝ-MM-DDTHH:MM\", \"ÝÝÝÝ-MM-DDTHH:MM\"]. Bé süré tö"
+" ïnçlüdé thé \"T\" ßétwéén thé däté änd tïmé. För éxämplé, än éntrý défïnïng"
+" twö ßläçköüt pérïöds lööks lïké thïs, ïnçlüdïng thé öütér päïr öf sqüäré "
+"ßräçkéts: [[\"2015-09-15\", \"2015-09-21\"], [\"2015-10-01\", "
+"\"2015-10-08\"]]  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт,"
+" ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм "
+"α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαв#"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Topic Mapping"
@@ -2151,14 +2168,17 @@ msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
 "example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2014_T1\"}. The \"id\" value for each category "
-"must be unique."
+"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
+"must be unique. In \"id\" values, the only special characters that are "
+"supported are underscore, hyphen, and period."
 msgstr ""
 "Éntér dïsçüssïön çätégörïés ïn thé föllöwïng förmät: \"ÇätégörýNämé\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. För "
 "éxämplé, öné dïsçüssïön çätégörý mäý ßé \"Lýdïän Mödé\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2014_T1\"}. Thé \"ïd\" välüé för éäçh çätégörý "
-"müst ßé ünïqüé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, #"
+"UniversityX-MUS101-course-2015_T1\"}. Thé \"ïd\" välüé för éäçh çätégörý "
+"müst ßé ünïqüé. Ìn \"ïd\" välüés, thé önlý spéçïäl çhäräçtérs thät äré "
+"süppörtéd äré ündérsçöré, hýphén, änd pérïöd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт #"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Sorting Alphabetical"
@@ -3182,10 +3202,6 @@ msgid ""
 msgstr ""
 "Sét thïs välüé tö Trüé ïf thïs mödülé ïs éïthér ä grädéd ässïgnmént ör ä "
 "präçtïçé prößlém. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid "Course does not support Library tools."
-msgstr "Çöürsé döés nöt süppört Lïßrärý tööls. Ⱡ'σяєм ιρѕ#"
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "This component is out of date. The library has new content."
@@ -5500,8 +5516,8 @@ msgid "File is not attached."
 msgstr "Fïlé ïs nöt ättäçhéd. Ⱡ'σя#"
 
 #: lms/djangoapps/instructor/views/api.py
-msgid "Invoice number '{0}' does not exist."
-msgstr "Ìnvöïçé nümßér '{0}' döés nöt éxïst. Ⱡ'σяєм ιρ#"
+msgid "Invoice number '{num}' does not exist."
+msgstr "Ìnvöïçé nümßér '{num}' döés nöt éxïst. Ⱡ'σяєм ιρ#"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The sale associated with this invoice has already been invalidated."
@@ -7571,15 +7587,29 @@ msgstr "Ìmägé dätä ïs nöt välïd. Ⱡ'σяє#"
 msgid "Verification photos received"
 msgstr "Vérïfïçätïön phötös réçéïvéd Ⱡ'σяєм #"
 
+#: lms/djangoapps/verify_student/views.py
+msgid "No checkpoint found"
+msgstr "Nö çhéçkpöïnt föünd Ⱡ'σя#"
+
+#: lms/djangoapps/verify_student/views.py
+msgid "Invalid image data during photo verification."
+msgstr "Ìnvälïd ïmägé dätä dürïng phötö vérïfïçätïön. Ⱡ'σяєм ιρѕυм#"
+
+#: lms/djangoapps/verify_student/views.py
+msgid "Could not submit photos"
+msgstr "Çöüld nöt süßmït phötös Ⱡ'σяє#"
+
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This is the website name of www.facebook.com.  Please
 #. translate this the way that Facebook advertises in your language.
-#: lms/envs/common.py
+#: lms/envs/common.py lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Facebook"
 msgstr "Fäçéßöök #"
 
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This is the website name of www.twitter.com.  Please
 #. translate this the way that Twitter advertises in your language.
-#: lms/envs/common.py
+#: lms/envs/common.py lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Twitter"
 msgstr "Twïttér #"
 
@@ -8828,6 +8858,12 @@ msgstr "Fäïléd Ⱡ'σяєм ιρѕ#"
 msgid "Invalid Token"
 msgstr "Ìnvälïd Tökén Ⱡ'#"
 
+#. Translators: This is the status for a video that was included in a course
+#. import
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Imported"
+msgstr "Ìmpörtéd #"
+
 #. Translators: This is the status for a video that is in an unknown state
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Unknown"
@@ -9185,6 +9221,22 @@ msgid "Dashboard"
 msgstr "Däshßöärd #"
 
 #: lms/templates/dashboard.html
+msgid "Current Courses"
+msgstr "Çürrént Çöürsés Ⱡ'#"
+
+#: lms/templates/dashboard.html
+msgid "Looks like you haven't enrolled in any courses yet."
+msgstr "Lööks lïké ýöü hävén't énrölléd ïn äný çöürsés ýét. Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/templates/dashboard.html
+msgid "Find courses now!"
+msgstr "Fïnd çöürsés nöw! Ⱡ'σ#"
+
+#: lms/templates/dashboard.html
+msgid "Course-loading errors"
+msgstr "Çöürsé-löädïng érrörs Ⱡ'σя#"
+
+#: lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "edit"
 msgstr "édït Ⱡ'σяєм#"
@@ -9231,22 +9283,6 @@ msgstr "Ördér Hïstörý Ⱡ'#"
 #: lms/templates/dashboard.html
 msgid "Reset Password"
 msgstr "Rését Pässwörd Ⱡ'#"
-
-#: lms/templates/dashboard.html
-msgid "Current Courses"
-msgstr "Çürrént Çöürsés Ⱡ'#"
-
-#: lms/templates/dashboard.html
-msgid "Looks like you haven't enrolled in any courses yet."
-msgstr "Lööks lïké ýöü hävén't énrölléd ïn äný çöürsés ýét. Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/templates/dashboard.html
-msgid "Find courses now!"
-msgstr "Fïnd çöürsés nöw! Ⱡ'σ#"
-
-#: lms/templates/dashboard.html
-msgid "Course-loading errors"
-msgstr "Çöürsé-löädïng érrörs Ⱡ'σя#"
 
 #: lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
@@ -11438,10 +11474,6 @@ msgid "{course_number} Courseware"
 msgstr "{course_number} Çöürséwäré Ⱡ'#"
 
 #: lms/templates/courseware/courseware.html
-msgid "Return to Exam"
-msgstr "Rétürn tö Éxäm Ⱡ'#"
-
-#: lms/templates/courseware/courseware.html
 msgid "Course Search"
 msgstr "Çöürsé Séärçh Ⱡ'#"
 
@@ -11849,6 +11881,7 @@ msgid "About {course_id}"
 msgstr "Àßöüt {course_id} #"
 
 #: lms/templates/courseware/mktg_coming_soon.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Coming Soon"
 msgstr "Çömïng Söön Ⱡ#"
 
@@ -12105,20 +12138,71 @@ msgid "Enrolled as: "
 msgstr "Énrölléd äs:  Ⱡ'#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Course Completed - {end_date}"
-msgstr "Çöürsé Çömplétéd - {end_date} Ⱡ'σяє#"
+msgid "Ended - {end_date}"
+msgstr "Éndéd - {end_date} Ⱡ#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Course Started - {start_date}"
-msgstr "Çöürsé Stärtéd - {start_date} Ⱡ'σя#"
+msgid "Started - {start_date}"
+msgstr "Stärtéd - {start_date} Ⱡ'#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Course has not yet started"
-msgstr "Çöürsé häs nöt ýét stärtéd Ⱡ'σяєм#"
+msgid "Starts - {start_date}"
+msgstr "Stärts - {start_date} Ⱡ#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Course Starts - {start_date}"
-msgstr "Çöürsé Stärts - {start_date} Ⱡ'σя#"
+msgid "View Archived Course"
+msgstr "Vïéw Àrçhïvéd Çöürsé Ⱡ'σя#"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "View Course"
+msgstr "Vïéw Çöürsé Ⱡ#"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Facebook"
+msgstr "Shäré ön Fäçéßöök Ⱡ'σ#"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "I'm learning on {platform_name}:"
+msgstr "Ì'm léärnïng ön {platform_name}: Ⱡ'σя#"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Twitter"
+msgstr "Shäré ön Twïttér Ⱡ'σ#"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Course options dropdown"
+msgstr "Çöürsé öptïöns dröpdöwn Ⱡ'σяє#"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Additional Actions Menu"
+msgstr "Àddïtïönäl Àçtïöns Ménü Ⱡ'σяє#"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Available Actions"
+msgstr "Àväïläßlé Àçtïöns Ⱡ'σ#"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Are you sure you want to unenroll from the purchased course"
+msgstr ""
+"Àré ýöü süré ýöü wänt tö ünénröll fröm thé pürçhäséd çöürsé Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Are you sure you want to unenroll from"
+msgstr "Àré ýöü süré ýöü wänt tö ünénröll fröm Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"Are you sure you want to unenroll from the verified {cert_name_long} track "
+"of"
+msgstr ""
+"Àré ýöü süré ýöü wänt tö ünénröll fröm thé vérïfïéd {cert_name_long} träçk "
+"öf Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Email Settings"
+msgstr "Émäïl Séttïngs Ⱡ'#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Verification not yet complete."
@@ -12210,37 +12294,6 @@ msgstr ""
 "höldér{contact_link_end} tö réqüést päýmént, ör ýöü çän "
 "{unenroll_link_start}ünénröll{unenroll_link_end} fröm thïs çöürsé Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт,#"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "View Archived Course"
-msgstr "Vïéw Àrçhïvéd Çöürsé Ⱡ'σя#"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "View Course"
-msgstr "Vïéw Çöürsé Ⱡ#"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Are you sure you want to unenroll from the purchased course"
-msgstr ""
-"Àré ýöü süré ýöü wänt tö ünénröll fröm thé pürçhäséd çöürsé Ⱡ'σяєм ιρѕυм "
-"∂σłσ#"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Are you sure you want to unenroll from"
-msgstr "Àré ýöü süré ýöü wänt tö ünénröll fröm Ⱡ'σяєм ιρѕ#"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"Are you sure you want to unenroll from the verified {cert_name_long} track "
-"of"
-msgstr ""
-"Àré ýöü süré ýöü wänt tö ünénröll fröm thé vérïfïéd {cert_name_long} träçk "
-"öf Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Email Settings"
-msgstr "Émäïl Séttïngs Ⱡ'#"
 
 #: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
 #: lms/templates/verify_student/prompt_midcourse_reverify.html
@@ -16196,6 +16249,10 @@ msgstr ""
 msgid "Edit Your Full Name"
 msgstr "Édït Ýöür Füll Nämé Ⱡ'σя#"
 
+#: lms/templates/verify_student/incourse_reverify.html
+msgid "Verifying for \"{checkpoint_name}\" in course \"{course_name}\""
+msgstr "Vérïfýïng för \"{checkpoint_name}\" ïn çöürsé \"{course_name}\" Ⱡ'σяєм ιρ#"
+
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 msgid "Re-Verify"
 msgstr "Ré-Vérïfý #"
@@ -17952,39 +18009,44 @@ msgstr "Thïs mödülé ïs dïsäßléd ät thé mömént. Ⱡ'σяєм ιρѕ#
 
 #: cms/templates/group_configurations.html
 msgid ""
-"Use content groups to give groups of students access to a specific set of "
-"course content. In addition to course content that is intended for all "
-"students, each content group sees content that you specifically designate as"
-" visible to it. By associating a content group with one or more cohorts, you"
-" can customize the content that a particular cohort or cohorts sees in your "
-"course."
+"If you have cohorts enabled in your course, you can use content groups to "
+"create cohort-specific courseware. In other words, you can customize the "
+"content that particular cohorts see in your course."
 msgstr ""
-"Ûsé çöntént gröüps tö gïvé gröüps öf stüdénts äççéss tö ä spéçïfïç sét öf "
-"çöürsé çöntént. Ìn äddïtïön tö çöürsé çöntént thät ïs ïnténdéd för äll "
-"stüdénts, éäçh çöntént gröüp séés çöntént thät ýöü spéçïfïçällý désïgnäté äs"
-" vïsïßlé tö ït. Bý ässöçïätïng ä çöntént gröüp wïth öné ör möré çöhörts, ýöü"
-" çän çüstömïzé thé çöntént thät ä pärtïçülär çöhört ör çöhörts séés ïn ýöür "
-"çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ "
-"єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυ#"
+"Ìf ýöü hävé çöhörts énäßléd ïn ýöür çöürsé, ýöü çän üsé çöntént gröüps tö "
+"çréäté çöhört-spéçïfïç çöürséwäré. Ìn öthér wörds, ýöü çän çüstömïzé thé "
+"çöntént thät pärtïçülär çöhörts séé ïn ýöür çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ #"
+
+#: cms/templates/group_configurations.html
+msgid ""
+"Each content group that you create can be associated with one or more "
+"cohorts. In addition to course content that is intended for all students, "
+"you can designate some content as visible only to specified content groups. "
+"Only learners in the cohorts that are associated with the specified content "
+"groups see the additional content."
+msgstr ""
+"Éäçh çöntént gröüp thät ýöü çréäté çän ßé ässöçïätéd wïth öné ör möré "
+"çöhörts. Ìn äddïtïön tö çöürsé çöntént thät ïs ïnténdéd för äll stüdénts, "
+"ýöü çän désïgnäté sömé çöntént äs vïsïßlé önlý tö spéçïfïéd çöntént gröüps. "
+"Önlý léärnérs ïn thé çöhörts thät äré ässöçïätéd wïth thé spéçïfïéd çöntént "
+"gröüps séé thé äddïtïönäl çöntént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂#"
 
 #: cms/templates/group_configurations.html
 msgid ""
 "Click {em_start}New content group{em_end} to add a new content group. To "
 "edit the name of a content group, hover over its box and click "
-"{em_start}Edit{em_end}."
+"{em_start}Edit{em_end}. You can delete a content group only if it is not in "
+"use by a unit. To delete a content group, hover over its box and click the "
+"delete icon."
 msgstr ""
 "Çlïçk {em_start}Néw çöntént gröüp{em_end} tö ädd ä néw çöntént gröüp. Tö "
 "édït thé nämé öf ä çöntént gröüp, hövér övér ïts ßöx änd çlïçk "
-"{em_start}Édït{em_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: cms/templates/group_configurations.html
-msgid ""
-"You can delete a content group only if it is not in use by a unit. To delete"
-" a content group, hover over its box and click the delete icon."
-msgstr ""
-"Ýöü çän délété ä çöntént gröüp önlý ïf ït ïs nöt ïn üsé ßý ä ünït. Tö délété"
-" ä çöntént gröüp, hövér övér ïts ßöx änd çlïçk thé délété ïçön. Ⱡ'σяєм ιρѕυм"
-" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂#"
+"{em_start}Édït{em_end}. Ýöü çän délété ä çöntént gröüp önlý ïf ït ïs nöt ïn "
+"üsé ßý ä ünït. Tö délété ä çöntént gröüp, hövér övér ïts ßöx änd çlïçk thé "
+"délété ïçön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
+"∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂#"
 
 #: cms/templates/group_configurations.html
 msgid "Learn More"
@@ -17992,34 +18054,33 @@ msgstr "Léärn Möré Ⱡ#"
 
 #: cms/templates/group_configurations.html
 msgid ""
-"Use experiment group configurations to define how many groups of students "
-"are in a content experiment. When you create a content experiment for a "
-"course, you select the group configuration to use."
+"Use experiment group configurations if you are conducting content "
+"experiments, also known as A/B testing, in your course. Experiment group "
+"configurations define how many groups of students are in a content "
+"experiment. When you create a content experiment for a course, you select "
+"the group configuration to use."
 msgstr ""
-"Ûsé éxpérïmént gröüp çönfïgürätïöns tö défïné höw mäný gröüps öf stüdénts "
-"äré ïn ä çöntént éxpérïmént. Whén ýöü çréäté ä çöntént éxpérïmént för ä "
-"çöürsé, ýöü séléçt thé gröüp çönfïgürätïön tö üsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂#"
+"Ûsé éxpérïmént gröüp çönfïgürätïöns ïf ýöü äré çöndüçtïng çöntént "
+"éxpérïménts, älsö knöwn äs À/B téstïng, ïn ýöür çöürsé. Éxpérïmént gröüp "
+"çönfïgürätïöns défïné höw mäný gröüps öf stüdénts äré ïn ä çöntént "
+"éxpérïmént. Whén ýöü çréäté ä çöntént éxpérïmént för ä çöürsé, ýöü séléçt "
+"thé gröüp çönfïgürätïön tö üsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσя#"
 
 #: cms/templates/group_configurations.html
 msgid ""
 "Click {em_start}New Group Configuration{em_end} to add a new configuration. "
 "To edit a configuration, hover over its box and click "
-"{em_start}Edit{em_end}."
+"{em_start}Edit{em_end}. You can delete a group configuration only if it is "
+"not in use in an experiment. To delete a configuration, hover over its box "
+"and click the delete icon."
 msgstr ""
 "Çlïçk {em_start}Néw Gröüp Çönfïgürätïön{em_end} tö ädd ä néw çönfïgürätïön. "
 "Tö édït ä çönfïgürätïön, hövér övér ïts ßöx änd çlïçk "
-"{em_start}Édït{em_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: cms/templates/group_configurations.html
-msgid ""
-"You can delete a group configuration only if it is not in use in an "
-"experiment. To delete a configuration, hover over its box and click the "
-"delete icon."
-msgstr ""
-"Ýöü çän délété ä gröüp çönfïgürätïön önlý ïf ït ïs nöt ïn üsé ïn än "
-"éxpérïmént. Tö délété ä çönfïgürätïön, hövér övér ïts ßöx änd çlïçk thé "
-"délété ïçön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι#"
+"{em_start}Édït{em_end}. Ýöü çän délété ä gröüp çönfïgürätïön önlý ïf ït ïs "
+"nöt ïn üsé ïn än éxpérïmént. Tö délété ä çönfïgürätïön, hövér övér ïts ßöx "
+"änd çlïçk thé délété ïçön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт#"
 
 #: cms/templates/group_configurations.html cms/templates/settings.html
 #: cms/templates/settings_advanced.html cms/templates/settings_graders.html
@@ -18170,12 +18231,12 @@ msgstr "À Bröäd Lïßrärý öf Prößlém Týpés Ⱡ'σяєм ι#"
 
 #: cms/templates/howitworks.html
 msgid ""
-"It's more than just multiple choice. Studio supports more than a dozen types"
-" of problems to challenge your learners."
+"It's more than just multiple choice. {studio_name} supports more than a "
+"dozen types of problems to challenge your learners."
 msgstr ""
-"Ìt's möré thän jüst mültïplé çhöïçé. Stüdïö süppörts möré thän ä dözén týpés"
-" öf prößléms tö çhälléngé ýöür léärnérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢т#"
+"Ìt's möré thän jüst mültïplé çhöïçé. {studio_name} süppörts möré thän ä "
+"dözén týpés öf prößléms tö çhälléngé ýöür léärnérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢#"
 
 #: cms/templates/howitworks.html
 msgid ""
@@ -18502,11 +18563,11 @@ msgstr "Whý ïmpört ä lïßrärý? Ⱡ'σя#"
 msgid ""
 "You might want to update an existing library to a new version, or replace an"
 " existing library entirely. You might also have developed a library outside "
-"of Studio."
+"of {studio_name}."
 msgstr ""
 "Ýöü mïght wänt tö üpdäté än éxïstïng lïßrärý tö ä néw vérsïön, ör répläçé än"
 " éxïstïng lïßrärý éntïrélý. Ýöü mïght älsö hävé dévélöpéd ä lïßrärý öütsïdé "
-"öf Stüdïö. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιη#"
+"öf {studio_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ι#"
 
 #: cms/templates/import.html
 msgid "Note: Library content is not automatically updated in courses"
