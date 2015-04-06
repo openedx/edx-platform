@@ -1193,7 +1193,8 @@ class MetricsMixin(object):
                 u'action:render',
                 u'action_status:{}'.format(status),
                 u'course_id:{}'.format(course_id),
-                u'block_type:{}'.format(block.scope_ids.block_type)
+                u'block_type:{}'.format(block.scope_ids.block_type),
+                u'block_family:{}'.format(block.entry_point),
             ]
             dog_stats_api.increment(XMODULE_METRIC_NAME, tags=tags)
             dog_stats_api.histogram(
@@ -1220,7 +1221,8 @@ class MetricsMixin(object):
                 u'action:handle',
                 u'action_status:{}'.format(status),
                 u'course_id:{}'.format(course_id),
-                u'block_type:{}'.format(block.scope_ids.block_type)
+                u'block_type:{}'.format(block.scope_ids.block_type),
+                u'block_family:{}'.format(block.entry_point),
             ]
             dog_stats_api.increment(XMODULE_METRIC_NAME, tags=tags)
             dog_stats_api.histogram(
