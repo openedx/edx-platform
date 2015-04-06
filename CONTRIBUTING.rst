@@ -13,7 +13,7 @@ Step 0: Join the Conversation
 
 Got an idea for how to improve the codebase? Fantastic, we'd love to hear about
 it! Before you dive in and spend a lot of time and effort making a pull request,
-it's a good idea to discuss your idea with other interested developers and/or the 
+it's a good idea to discuss your idea with other interested developers and/or the
 edX product team. You may get some valuable feedback that changes how you think
 about your idea, or you may find other developers who have the same idea and want
 to work together.
@@ -66,7 +66,7 @@ For asynchronous conversation, we have several mailing lists on Google Groups:
 Byte-sized Tasks & Bugs
 -----------------------
 
-If you are contributing for the first time and want a gentle introduction, 
+If you are contributing for the first time and want a gentle introduction,
 or if you aren't sure what to work on, have a look at the list of
 `byte-sized bugs and tasks`_ in the tracker. These tasks are selected for their
 small size, and usually don't require a broad knowledge of the edX platform.
@@ -140,20 +140,15 @@ Step 5: Code Review by Core Committer(s)
 If your pull request meets the requirements listed in the
 `contributor documentation`_, and it hasn't been rejected by a product owner,
 then it will be scheduled for code review by one or more core committers. This
-process sometimes takes awhile: currently, all core committers on the project
+process sometimes takes awhile: most of the core committers on the project
 are employees of edX, and they have to balance their time between code review
-and new development. Please also read our `code ownership page`_, which
-lists areas and concepts in the codebase that are "owned" by certain developers.
-If your change touches one of these areas or concepts, that developer should be
-one of the reviewers.
+and new development.
 
 Once the code review process has started, please be responsive to comments on
 the pull request, so we can keep the review process moving forward.
 If you are unable to respond for a few days, that's fine, but
 please add a comment informing us of that -- otherwise, it looks like you're
 abandoning your work!
-
-.. _code ownership page: https://github.com/edx/edx-platform/wiki/Code-Ownership
 
 Step 6: Merge!
 ==============
