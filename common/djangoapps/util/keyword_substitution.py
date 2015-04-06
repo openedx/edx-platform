@@ -21,26 +21,19 @@ Usage:
 """
 
 from django.contrib.auth.models import User
+from student.models import anonymous_id_for_user
 from xmodule.modulestore.django import modulestore
 
-KEYWORD_FUNCTION_MAP = {}
 
-
-def keyword_function_map_is_empty():
+def anonymous_id_from_user_id(user_id):
     """
-    Checks if the keyword function map has been filled
+    Gets a user's anonymous id from their user id
     """
-    return not bool(KEYWORD_FUNCTION_MAP)
+    user = User.objects.get(id=user_id)
+    return anonymous_id_for_user(user, None)
 
 
-def add_keyword_function_map(mapping):
-    """
-    Attaches the given keyword-function mapping to the existing one
-    """
-    KEYWORD_FUNCTION_MAP.update(mapping)
-
-
-def substitute_keywords(string, user=None, course=None):
+def substitute_keywords(string, user_id, context):
     """
     Replaces all %%-encoded words using KEYWORD_FUNCTION_MAP mapping functions
 
@@ -48,35 +41,37 @@ def substitute_keywords(string, user=None, course=None):
     them by calling the corresponding functions stored in KEYWORD_FUNCTION_MAP.
 
     Functions stored in KEYWORD_FUNCTION_MAP must return a replacement string.
-    Also, functions imported from other modules must be wrapped in a
-    new function if they don't take in user_id and course_id. This simplifies
-    the loop below, and reduces the need for piling up if elif else statements
-    when the keyword pool grows.
     """
-    if user is None or course is None:
-        # Cannot proceed without course and user information
-        return string
 
-    for key, func in KEYWORD_FUNCTION_MAP.iteritems():
+    # do this lazily to avoid unneeded database hits
+    KEYWORD_FUNCTION_MAP = {
+        '%%USER_ID%%': lambda: anonymous_id_from_user_id(user_id),
+        '%%USER_FULLNAME%%': lambda: context.get('name'),
+        '%%COURSE_DISPLAY_NAME%%': lambda: context.get('course_title'),
+        '%%COURSE_END_DATE%%': lambda: context.get('course_end_date'),
+    }
+
+    for key in KEYWORD_FUNCTION_MAP.keys():
         if key in string:
-            substitutor = func(user, course)
-            string = string.replace(key, substitutor)
+            substitutor = KEYWORD_FUNCTION_MAP[key]
+            string = string.replace(key, substitutor())
 
     return string
 
 
-def substitute_keywords_with_data(string, user_id=None, course_id=None):
+def substitute_keywords_with_data(string, context):
     """
-    Given user and course ids, replaces all %%-encoded words in the given string
+    Given an email context, replaces all %%-encoded words in the given string
+    `context` is a dictionary that should include `user_id` and `course_title`
+    keys
     """
 
     # Do not proceed without parameters: Compatibility check with existing tests
     # that do not supply these parameters
-    if user_id is None or course_id is None:
+    user_id = context.get('user_id')
+    course_title = context.get('course_title')
+
+    if user_id is None or course_title is None:
         return string
 
-    # Grab user objects
-    user = User.objects.get(id=user_id)
-    course = modulestore().get_course(course_id, depth=0)
-
-    return substitute_keywords(string, user, course)
+    return substitute_keywords(string, user_id, context)
