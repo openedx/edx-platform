@@ -70,6 +70,7 @@ from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from util import milestones_helpers
 from util.module_utils import yield_dynamic_descriptor_descendents
+from verify_student.services import ReverificationService
 
 log = logging.getLogger(__name__)
 
@@ -618,6 +619,7 @@ def get_module_system_for_user(user, field_data_cache,
             'fs': xblock.reference.plugins.FSService(),
             'field-data': field_data,
             'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
+            "reverification": ReverificationService()
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
