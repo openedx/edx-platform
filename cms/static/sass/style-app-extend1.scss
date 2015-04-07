@@ -1,9 +1,9 @@
 // studio - css architecture
 // ====================
 
-// Table of Contents 
+// Table of Contents
 // * +Libs and Resets
-// * +Vendor and Rebase 
+// * +Vendor and Rebase
 // * +Base - Utilities
 // * +Base - Assets
 // * +Base - Starter
@@ -13,32 +13,32 @@
 
 
 // +Libs and Resets - *do not edit*
-// ==================== 
+// ====================
 @import 'bourbon/bourbon'; // lib - bourbon
 @import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
 
 // +Vendor and Rebase - *referenced/used vendor presentation and reset*
-// ==================== 
+// ====================
 @import 'reset';
 
 // +Base - Utilities
-// ==================== 
+// ====================
 @import 'variables';
 @import 'mixins';
 @import 'mixins-inherited';
 
 // +Base - Assets
-// ==================== 
+// ====================
 @import 'assets/fonts';
 @import 'assets/graphics'; // sprites, basic image/figure/svg styling
 @import 'assets/anims'; // animations
 
 // +Base - Starter
-// ==================== 
+// ====================
 @import 'base';
 
 // +Base - Elements
-// ==================== 
+// ====================
 @import 'elements/typography';
 @import 'elements/pagination'; // pagination
 @import 'elements/icons'; // references to icons used
@@ -49,7 +49,7 @@
 @import 'elements/uploaded-assets'; // layout for asset tables
 
 // +Base - Specific Views
-// ==================== 
+// ====================
 @import 'views/account';
 @import 'views/assets';
 @import 'views/updates';
@@ -69,9 +69,10 @@
 @import 'views/export-git';
 @import 'views/group-configuration';
 @import 'views/video-upload';
+@import 'views/certificates';
 
 // +Base - Contexts
-// ==================== 
+// ====================
 @import 'contexts/ie'; // ie-specific rules (mostly for known/older bugs)
 
 @import 'developer'; // used for any developer-created scss that needs further polish/refactoring
