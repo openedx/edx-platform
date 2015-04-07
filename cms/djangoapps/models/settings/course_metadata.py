@@ -43,6 +43,7 @@ class CourseMetadata(object):
         'entrance_exam_id',
         'is_entrance_exam',
         'in_entrance_exam',
+        'certificates',
     ]
 
     @classmethod
