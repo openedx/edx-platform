@@ -9,6 +9,7 @@ from bok_choy.web_app_test import WebAppTest
 from ...pages.lms.account_settings import AccountSettingsPage
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.dashboard import DashboardPage
+from ..helpers import EventsTestMixin
 
 from ..helpers import EventsTestMixin
 
@@ -206,6 +207,8 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             [u'another name', self.USERNAME],
         )
 
+        self.assert_event_emitted_num_times('edx.user.settings.changed', self.start_time, self.user_id, 2)
+
     def test_email_field(self):
         """
         Test behaviour of "Email" field.
@@ -287,6 +290,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             u'',
             [u'Bachelor\'s degree', u''],
         )
+        self.assert_event_emitted_num_times('edx.user.settings.changed', self.start_time, self.user_id, 2)
 
     def test_gender_field(self):
         """
@@ -298,11 +302,13 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             u'',
             [u'Female', u''],
         )
+        self.assert_event_emitted_num_times('edx.user.settings.changed', self.start_time, self.user_id, 2)
 
     def test_year_of_birth_field(self):
         """
         Test behaviour of "Year of Birth" field.
         """
+        # Note that when we clear the year_of_birth here we're firing an event.
         self.assertEqual(self.account_settings_page.value_for_dropdown_field('year_of_birth', ''), '')
         self._test_dropdown_field(
             u'year_of_birth',
@@ -310,6 +316,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             u'',
             [u'1980', u''],
         )
+        self.assert_event_emitted_num_times('edx.user.settings.changed', self.start_time, self.user_id, 3)
 
     def test_country_field(self):
         """
