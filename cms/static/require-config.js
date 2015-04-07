@@ -30,6 +30,7 @@ require.config({
         "underscore": "js/vendor/underscore-min",
         "underscore.string": "js/vendor/underscore.string.min",
         "backbone": "js/vendor/backbone-min",
+        "backbone-relational" : "js/vendor/backbone-relational.min",
         "backbone.associations": "js/vendor/backbone-associations-min",
         "backbone.paginator": "js/vendor/backbone.paginator.min",
         "tinymce": "js/vendor/tinymce/js/tinymce/tinymce.full.min",
