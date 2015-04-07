@@ -1,0 +1,18 @@
+     <div class="signatory-panel-default">
+       <div class="actions certificate-actions signatory-panel-edit">
+        <span class="action action-edit-signatory">
+            <a href="javascript:void(0);" class="edit-signatory"><i class="icon fa fa-pencil"></i> <%= gettext("Edit") %></a>
+        </span>
+        </div>
+       <div class="signatory-panel-header">Signatory <%= signatory_number %></div>
+       <div class="signatory-panel-body">
+                <div>
+                    <label><%= gettext("Name: ") %></label>
+                    <span class="signatory-name-value"><%= name %></span>
+                </div>
+                <div>
+                    <label><%= gettext("Title: ") %></label>
+                    <span class="signatory-title-value"><%= title %></span>
+                </div>
+       </div>
+     </div>

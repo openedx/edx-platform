@@ -1,0 +1,45 @@
+<form class="collection-edit-form certificate-edit-form">
+    <% if (error && error.message) { %>
+        <div class="certificate-edit-error message message-status message-status error is-shown" name="certificate-edit-error">
+          <%= gettext(error.message) %>
+        </div>
+    <% } %>
+    <div class="wrapper-form">
+        <fieldset class="collection-fields certificate-fields">
+            <legend class="sr"><%= gettext("Certificate Information") %></legend>
+            <div class="input-wrap field text required add-collection-name add-certificate-name <% if(error && error.attributes && error.attributes.name) { print('error'); } %>">
+                <label for="certificate-name-<%= uniqueId %>"><%= gettext("Certificate Name") %></label>
+                <% if (!_.isUndefined(id)) { %>
+                    <span class="certificate-id">
+                        <span class="certificate-label"><%= gettext('Certificate ID') %></span>
+                        <span class="certificate-value"><%= id %></span>
+                    </span>
+                <% } %>
+                <input id="certificate-name-<%= uniqueId %>" class="collection-name-input input-text" name="certificate-name" type="text" placeholder="<%= gettext("This is the Name of the Certificate") %>" value="<%= name %>">
+                <span class="tip tip-stacked"><%= gettext("Name or short description of the configuration") %></span>
+            </div>
+            <div class="input-wrap field text add-certificate-description">
+                <label for="certificate-description-<%= uniqueId %>"><%= gettext("Description") %></label>
+                <textarea id="certificate-description-<%= uniqueId %>" class="certificate-description-input text input-text" name="certificate-description" placeholder="<%= gettext("This is the Description of the Certificate") %>"><%= description %></textarea>
+                <span class="tip tip-stacked"><%= gettext("Optional long description") %></span>
+            </div>
+        </fieldset>
+         <header>
+           <label class="title-2"><%= gettext("Course Signatories") %></label>
+         </header>
+        <div class="signatory-edit-list"> </div>
+        <span>
+           <a class="button action-add-signatory" href="javascript:void(0);"><%= gettext("Add Signatory") %></a>
+           <span class="tip tip-stacked"><%= gettext("(max 4 signatories are allowed)") %></span>
+        </span>
+    </div>
+    <div class="actions">
+        <button class="action action-primary" type="submit"><% if (isNew) { print(gettext("Create")) } else { print(gettext("Save")) } %></button>
+        <button class="action action-secondary action-cancel"><%= gettext("Cancel") %></button>
+        <% if (!isNew) { %>
+            <span class="wrapper-delete-button">
+                <a class="button action-delete delete" href="#"><%= gettext("Delete") %></a>
+            </span>
+        <% } %>
+    </div>
+</form>
