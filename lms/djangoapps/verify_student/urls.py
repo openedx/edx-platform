@@ -143,7 +143,7 @@ urlpatterns = patterns(
     # Users are sent to this end-point from within courseware
     # to re-verify their identities by re-submitting face photos.
     url(
-        r'^reverify/{course_id}/{checkpoint}/$'.format(
+        r'^reverify/{course_id}/{checkpoint}/(?P<location>.*)/$'.format(
             course_id=settings.COURSE_ID_PATTERN, checkpoint=settings.CHECKPOINT_PATTERN
         ),
         views.InCourseReverifyView.as_view(),

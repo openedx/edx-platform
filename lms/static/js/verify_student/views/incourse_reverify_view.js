@@ -28,11 +28,13 @@
             this.courseKey = obj.courseKey || null;
             this.checkpointName = obj.checkpointName || null;
             this.platformName = obj.platformName || null;
+            this.location = obj.location || null;
 
 
             this.model = new edx.verify_student.ReverificationModel({
                 courseKey: this.courseKey,
-                checkpointName: this.checkpointName
+                checkpointName: this.checkpointName,
+                location: this.location
             });
 
             this.listenTo( this.model, 'sync', _.bind( this.handleSubmitPhotoSuccess, this ));
@@ -75,10 +77,10 @@
             this.model.save();
         },
 
-        handleSubmitPhotoSuccess: function() {
+        handleSubmitPhotoSuccess: function(redirect_url) {
             // Eventually this will be a redirect back into the courseware,
             // but for now we can return to the student dashboard.
-            window.location.href = '/dashboard';
+            window.location.href = redirect_url;
         },
 
         handleSubmissionError: function(xhr) {

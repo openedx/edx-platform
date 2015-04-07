@@ -60,7 +60,6 @@ from util.cache import cache, cache_if_anonymous
 from xblock.fragment import Fragment
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
-from xmodule.modulestore.search import path_to_location, navigation_index
 from xmodule.tabs import CourseTabList, StaffGradingTab, PeerGradingTab, OpenEndedGradingTab
 from xmodule.x_module import STUDENT_VIEW
 import shoppingcart
@@ -82,6 +81,7 @@ import survey.views
 from util.views import ensure_valid_course_key
 from eventtracking import tracker
 import analytics
+from courseware.url_helpers import get_redirect_url
 
 log = logging.getLogger("edx.courseware")
 
@@ -642,37 +642,13 @@ def jump_to(_request, course_id, location):
     except InvalidKeyError:
         raise Http404(u"Invalid course_key or usage_key")
     try:
-        (course_key, chapter, section, position) = path_to_location(modulestore(), usage_key)
+        redirect_url = get_redirect_url(course_key, usage_key)
     except ItemNotFoundError:
         raise Http404(u"No data at this location: {0}".format(usage_key))
     except NoPathToItem:
         raise Http404(u"This location is not in any class: {0}".format(usage_key))
 
-    # choose the appropriate view (and provide the necessary args) based on the
-    # args provided by the redirect.
-    # Rely on index to do all error handling and access control.
-    if chapter is None:
-        return redirect('courseware', course_id=unicode(course_key))
-    elif section is None:
-        return redirect('courseware_chapter', course_id=unicode(course_key), chapter=chapter)
-    elif position is None:
-        return redirect(
-            'courseware_section',
-            course_id=unicode(course_key),
-            chapter=chapter,
-            section=section
-        )
-    else:
-        # Here we use the navigation_index from the position returned from
-        # path_to_location - we can only navigate to the topmost vertical at the
-        # moment
-        return redirect(
-            'courseware_position',
-            course_id=unicode(course_key),
-            chapter=chapter,
-            section=section,
-            position=navigation_index(position)
-        )
+    return redirect(redirect_url)
 
 
 @ensure_csrf_cookie

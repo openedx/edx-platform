@@ -22,6 +22,7 @@
         courseKey: el.data('course-key'),
         checkpointName: el.data('checkpoint-name'),
         platformName: el.data('platform-name'),
+        location: el.data('location'),
         errorModel: errorView.model
     }).render();
 

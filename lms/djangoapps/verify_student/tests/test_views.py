@@ -20,7 +20,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core import mail
 from bs4 import BeautifulSoup
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -1701,19 +1701,41 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
     IMAGE_DATA = "abcd,1234"
     MIDTERM = "midterm"
 
-    def setUp(self):
-        super(TestInCourseReverifyView, self).setUp()
-
-        self.user = UserFactory.create(username="rusty", password="test")
-        self.client.login(username="rusty", password="test")
+    def build_course(self):
+        """
+        Build up a course tree with a Reverificaiton xBlock.
+        """
+        # pylint: disable=attribute-defined-outside-init
 
         self.course_key = SlashSeparatedCourseKey("Robot", "999", "Test_Course")
-        CourseFactory.create(org='Robot', number='999', display_name='Test Course')
+        self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
 
         # Create the course modes
         for mode in ('audit', 'honor', 'verified'):
             min_price = 0 if mode in ["honor", "audit"] else 1
             CourseModeFactory(mode_slug=mode, course_id=self.course_key, min_price=min_price)
+
+        # Create the 'edx-reverification-block' in course tree
+        section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
+        subsection = ItemFactory.create(parent=section, category='sequential', display_name='Test Subsection')
+        vertical = ItemFactory.create(parent=subsection, category='vertical', display_name='Test Unit')
+        reverification = ItemFactory.create(
+            parent=vertical,
+            category='edx-reverification-block',
+            display_name='Test Verification Block'
+        )
+        self.section_location = section.location
+        self.subsection_location = subsection.location
+        self.vertical_location = vertical.location
+        self.reverification_location = reverification.location
+
+    def setUp(self):
+        super(TestInCourseReverifyView, self).setUp()
+
+        self.build_course()
+
+        self.user = UserFactory.create(username="rusty", password="test")
+        self.client.login(username="rusty", password="test")
 
         # Enroll the user in the default mode (honor) to emulate
         CourseEnrollment.enroll(self.user, self.course_key, mode="verified")
@@ -1863,4 +1885,8 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
 
         """
         return reverse('verify_student_incourse_reverify',
-                       kwargs={"course_id": unicode(course_key), "checkpoint_name": checkpoint})
+                       kwargs={
+                           "course_id": unicode(course_key),
+                           "checkpoint_name": checkpoint,
+                           "location": unicode(self.reverification_location)
+                       })
