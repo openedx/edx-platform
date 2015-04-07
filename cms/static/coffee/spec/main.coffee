@@ -28,6 +28,7 @@ requirejs.config({
         "backbone": "xmodule_js/common_static/js/vendor/backbone-min",
         "backbone.associations": "xmodule_js/common_static/js/vendor/backbone-associations-min",
         "backbone.paginator": "xmodule_js/common_static/js/vendor/backbone.paginator.min",
+        "backbone-relational": "xmodule_js/common_static/js/vendor/backbone-relational.min",
         "tinymce": "xmodule_js/common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min",
         "jquery.tinymce": "xmodule_js/common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce",
         "xmodule": "xmodule_js/src/xmodule",
@@ -136,6 +137,9 @@ requirejs.config({
         "backbone.paginator": {
             deps: ["backbone"],
             exports: "Backbone.Paginator"
+        },
+        "backbone-relational": {
+            deps: ["backbone"],
         },
         "youtube": {
             exports: "YT"
@@ -267,6 +271,11 @@ define([
     "js/spec/factories/xblock_validation_spec",
 
     "js/spec/xblock/cms.runtime.v1_spec",
+
+    # Certificates application test suite mappings
+    "js/certificates/spec/models/certificate_spec",
+    "js/certificates/spec/views/certificate_details_spec",
+    "js/certificates/spec/views/certificate_editor_spec",
 
     # these tests are run separately in the cms-squire suite, due to process
     # isolation issues with Squire.js
