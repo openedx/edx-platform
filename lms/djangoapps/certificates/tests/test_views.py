@@ -204,6 +204,33 @@ class CertificatesViewsTests(ModuleStoreTestCase):
         )
         CertificateHtmlViewConfigurationFactory.create()
 
+    def _add_course_certificates(self, count=1, signatory_count=0):
+        """
+        Create certificate for the course.
+        """
+        signatories = [
+            {
+                'name': 'Name ' + str(i),
+                'title': 'Title ' + str(i),
+                'id': i
+            } for i in xrange(0, signatory_count)
+
+        ]
+
+        certificates = [
+            {
+                'id': i,
+                'name': 'Name ' + str(i),
+                'description': 'Description ' + str(i),
+                'signatories': signatories,
+                'version': 1
+            } for i in xrange(0, count)
+        ]
+
+        self.course.certificates = {'certificates': certificates}
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
+
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_valid_certificate(self):
         test_url = '/certificates/html?course={}'.format(unicode(self.course.id))
@@ -223,6 +250,22 @@ class CertificatesViewsTests(ModuleStoreTestCase):
         test_url = '/certificates/html?course={}'.format(unicode(self.course.id))
         response = self.client.get(test_url)
         self.assertIn(str(self.cert.verify_uuid), response.content)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_render_html_view_with_valid_signatories(self):
+        test_url = '/certificates/html?course={}'.format(unicode(self.course.id))
+        self._add_course_certificates(count=1, signatory_count=2)
+        response = self.client.get(test_url)
+        self.assertIn('Name 0', response.content)
+        self.assertIn('Title 0', response.content)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_render_html_view_without_signatories(self):
+        test_url = '/certificates/html?course={}'.format(unicode(self.course.id))
+        self._add_course_certificates(count=1, signatory_count=0)
+        response = self.client.get(test_url)
+        self.assertNotIn('Name 0', response.content)
+        self.assertNotIn('Title 0', response.content)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_DISABLED)
     def test_render_html_view_invalid_feature_flag(self):
