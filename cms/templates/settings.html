@@ -319,7 +319,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                             <label for="entrance-exam-enabled">${_("Require students to pass an exam before beginning the course.")}</label>
                         </div>
                          <div class="div-grade-requirements" hidden="hidden">
-                          <p><span class="tip tip-inline">${_("You can now view and author your course entrance exam from the ")}<a href='${course_handler_url}'>${_("Course Outline")}</a></span></p>
+                          <p><span class="tip tip-inline">${_("You can now view and author your course entrance exam from the {link_start}Course Outline{link_end}.").format(link_start="<a href='{}'>".format(course_handler_url), link_end="</a>")}</span></p>
                           <p><h3>${_("Grade Requirements")}</h3></p>
                           <p><div><input type="text" id="entrance-exam-minimum-score-pct" aria-describedby="min-score-format"><span id="min-score-format" class="tip tip-inline">${_(" %")}</span></div></p>
                           <p><span class="tip tip-inline">${_("The score student must meet in order to successfully complete the entrance exam. ")}</span></p>
