@@ -1,0 +1,40 @@
+<div class="collection-details wrapper-certificate">
+    <header class="collection-header">
+        <h3 class="title">
+            <a href="#" class="toggle detail-toggle <% if (showDetails){ print('hide'); } else { print('show'); } %>-details">
+                <i class="ui-toggle-expansion icon fa fa-caret-<% if (showDetails){ print('down'); } else { print('right'); } %>" aria-hidden="true"></i>
+                <%= name %>
+            </a>
+        </h3>
+    </header>
+
+   <ol class="collection-info certificate-info certificate-info-<% if(showDetails){ print('block'); } else { print('inline'); } %>">
+     <% if (!_.isUndefined(id)) { %>
+         <li class="certificate-id">
+            <span class="certificate-label"><%= gettext('ID') %>: </span>
+            <span class="certificate-value"><%= id %></span>
+        </li>
+     <% } %>
+     <% if (showDetails) { %>
+        <li class="collection-description certificate-description">
+            <%= description %>
+        </li>
+        <li class="collection-description certificate-description">
+         <header>
+           <span class="title-2"><%= gettext("Course Signatories") %></span>
+         </header>
+         <div class="signatory-details-list"></div>
+        </li>
+
+      <% } %>
+   </ol>
+
+    <ul class="actions certificate-actions">
+        <li class="action action-edit">
+            <button class="edit"><i class="icon fa fa-pencil" aria-hidden="true"></i> <%= gettext("Edit") %></button>
+        </li>
+        <li class="action action-delete wrapper-delete-button" data-tooltip="<%= gettext('Delete') %>">
+            <button class="delete action-icon"><i class="icon fa fa-trash-o" aria-hidden="true"></i><span><%= gettext("Delete") %></span></button>
+        </li>
+    </ul>
+</div>

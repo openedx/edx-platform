@@ -151,6 +151,9 @@ FEATURES = {
     # Enable course reruns, which will always use the split modulestore
     'ALLOW_COURSE_RERUNS': True,
 
+    # Certificates Web/HTML Views
+    'CERTIFICATES_HTML_VIEW': False,
+
     # Social Media Sharing on Student Dashboard
     'DASHBOARD_SHARE_SETTINGS': {
         # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in lms/envs/common.py
