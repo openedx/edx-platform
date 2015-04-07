@@ -73,11 +73,14 @@ class CoursewareSearchIndexer(object):
                             item.content_groups.append(name)
             return item
 
-        def index_item_location(item_location, current_start_date):
+        def index_item_location(item_location, current_start_date, content_groups=None):
             """ add this item to the search index """
             item = _fetch_item(item_location)
             if not item:
                 return
+
+            if content_groups and not getattr(item, 'content_groups', None):
+                item.content_groups = content_groups
 
             is_indexable = hasattr(item, "index_dictionary")
             # if it's not indexable and it does not have children, then ignore
@@ -90,11 +93,10 @@ class CoursewareSearchIndexer(object):
 
             if item.has_children:
                 for child_loc in item.children:
-                    index_item_location(child_loc, current_start_date)
+                    index_item_location(child_loc, current_start_date, item.content_groups)
 
             item_index = {}
             item_index_dictionary = item.index_dictionary() if is_indexable else None
-
             # if it has something to add to the index, then add it
             if item_index_dictionary:
                 try:
@@ -125,7 +127,7 @@ class CoursewareSearchIndexer(object):
             if delete:
                 remove_index_item_location(location)
             else:
-                index_item_location(location, None)
+                index_item_location(location, None, None)
             indexed_count += 1
         except Exception as err:  # pylint: disable=broad-except
             # broad exception so that index operation does not prevent the rest of the application from working
