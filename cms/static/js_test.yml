@@ -76,12 +76,14 @@ src_paths:
     - js
     - js/common_helpers
     - js/factories
+    - js/certificates
 
 # Paths to spec (test) JavaScript files
 spec_paths:
     - coffee/spec/main.js
     - coffee/spec
     - js/spec
+    - js/certificates/spec
 
 # Paths to fixture files (optional)
 # The fixture path will be set automatically when using jasmine-jquery.
