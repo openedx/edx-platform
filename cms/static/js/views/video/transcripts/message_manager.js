@@ -140,7 +140,7 @@ function($, Backbone, _, Utils, FileUploader, gettext) {
         importHandler: function (event) {
             event.preventDefault();
 
-            this.processCommand('replace', 'Error: Import failed.');
+            this.processCommand('replace', gettext('Error: Import failed.'));
         },
 
         /**
@@ -154,7 +154,7 @@ function($, Backbone, _, Utils, FileUploader, gettext) {
         replaceHandler: function (event) {
             event.preventDefault();
 
-            this.processCommand('replace', 'Error: Replacing failed.');
+            this.processCommand('replace', gettext('Error: Replacing failed.'));
         },
 
         /**
@@ -170,7 +170,7 @@ function($, Backbone, _, Utils, FileUploader, gettext) {
 
             var videoId = $(event.currentTarget).data('video-id');
 
-            this.processCommand('choose', 'Error: Choosing failed.', videoId);
+            this.processCommand('choose', gettext('Error: Choosing failed.'), videoId);
         },
 
         /**
@@ -184,7 +184,7 @@ function($, Backbone, _, Utils, FileUploader, gettext) {
         useExistingHandler: function (event) {
             event.preventDefault();
 
-            this.processCommand('rename', 'Error: Choosing failed.');
+            this.processCommand('rename', gettext('Error: Choosing failed.'));
         },
 
         /**
