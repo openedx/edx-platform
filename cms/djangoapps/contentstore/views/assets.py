@@ -18,6 +18,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
+from contentstore.views.exception import AssetNotFoundException
 from django.core.exceptions import PermissionDenied
 from opaque_keys.edx.keys import CourseKey, AssetKey
 
@@ -310,35 +311,11 @@ def _update_asset(request, course_key, asset_key):
     asset_path_encoding: the odd /c4x/org/course/category/name repr of the asset (used by Backbone as the id)
     """
     if request.method == 'DELETE':
-        # Make sure the item to delete actually exists.
         try:
-            content = contentstore().find(asset_key)
-        except NotFoundError:
+            delete_asset(course_key, asset_key)
+            return JsonResponse()
+        except AssetNotFoundException:
             return JsonResponse(status=404)
-
-        # ok, save the content into the trashcan
-        contentstore('trashcan').save(content)
-
-        # see if there is a thumbnail as well, if so move that as well
-        if content.thumbnail_location is not None:
-            # We are ignoring the value of the thumbnail_location-- we only care whether
-            # or not a thumbnail has been stored, and we can now easily create the correct path.
-            thumbnail_location = course_key.make_asset_key('thumbnail', asset_key.name)
-            try:
-                thumbnail_content = contentstore().find(thumbnail_location)
-                contentstore('trashcan').save(thumbnail_content)
-                # hard delete thumbnail from origin
-                contentstore().delete(thumbnail_content.get_id())
-                # remove from any caching
-                del_cached_content(thumbnail_location)
-            except:
-                logging.warning('Could not delete thumbnail: %s', thumbnail_location)
-
-        # delete the original
-        contentstore().delete(content.get_id())
-        # remove from cache
-        del_cached_content(content.location)
-        return JsonResponse()
 
     elif request.method in ('PUT', 'POST'):
         if 'file' in request.FILES:
@@ -353,6 +330,40 @@ def _update_asset(request, course_key, asset_key):
             # Delete the asset from the cache so we check the lock status the next time it is requested.
             del_cached_content(asset_key)
             return JsonResponse(modified_asset, status=201)
+
+
+def delete_asset(course_key, asset_key):
+    """
+    Deletes asset represented by given 'asset_key' in the course represented by given course_key.
+    """
+    # Make sure the item to delete actually exists.
+    try:
+        content = contentstore().find(asset_key)
+    except NotFoundError:
+        raise AssetNotFoundException
+
+    # ok, save the content into the trashcan
+    contentstore('trashcan').save(content)
+
+    # see if there is a thumbnail as well, if so move that as well
+    if content.thumbnail_location is not None:
+        # We are ignoring the value of the thumbnail_location-- we only care whether
+        # or not a thumbnail has been stored, and we can now easily create the correct path.
+        thumbnail_location = course_key.make_asset_key('thumbnail', asset_key.name)
+        try:
+            thumbnail_content = contentstore().find(thumbnail_location)
+            contentstore('trashcan').save(thumbnail_content)
+            # hard delete thumbnail from origin
+            contentstore().delete(thumbnail_content.get_id())
+            # remove from any caching
+            del_cached_content(thumbnail_location)
+        except Exception:  # pylint: disable=broad-except
+            logging.warning('Could not delete thumbnail: %s', thumbnail_location)
+
+    # delete the original
+    contentstore().delete(content.get_id())
+    # remove from cache
+    del_cached_content(content.location)
 
 
 def _get_asset_json(display_name, content_type, date, location, thumbnail_location, locked):

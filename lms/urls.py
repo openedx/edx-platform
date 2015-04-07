@@ -633,7 +633,8 @@ if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
 # Certificates Web/HTML View
 if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
     urlpatterns += (
-        url(r'^certificates/html', 'certificates.views.render_html_view', name='cert_html_view'),
+        url(r'^certificates/user/(?P<user_id>[^/]*)/course/{course_id}'.format(course_id=settings.COURSE_ID_PATTERN),
+            'certificates.views.render_html_view', name='cert_html_view'),
     )
 
 # XDomain proxy

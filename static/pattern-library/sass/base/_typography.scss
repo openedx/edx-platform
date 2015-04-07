@@ -1,0 +1,53 @@
+// ------------------------------
+// edX Pattern Library: Typography
+
+// About: Sass partial for basic typography rules and settings
+
+// #HEADINGS
+// #COPY
+// #METADATA
+
+
+// ----------------------------
+// #HEADINGS
+// ----------------------------
+h1, h2, h3, h4, h5, h6 {
+    @extend %reset-headings;
+}
+
+h1 {
+    font-size: font-size(xx-large);
+}
+
+h2 {
+    font-size: font-size(x-large);
+}
+
+h3 {
+    font-size: font-size(large);
+}
+
+h4 {
+    font-size: font-size(mid-large);
+}
+
+h5 {
+    font-size: font-size(base);
+}
+
+h6 {
+   font-size: font-size(small);
+}
+
+
+// ----------------------------
+// #COPY
+// ----------------------------
+.copy,
+p, ol, ul, dl, td, th {
+    @extend %reset-copy;
+}
+
+// ----------------------------
+// #METADATA
+// ----------------------------

@@ -1418,6 +1418,20 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-footer-edx-rtl.css'
     },
+    'style-certificates': {
+        'source_filenames': [
+            'certificates/sass/main-ltr.css',
+            'css/vendor/font-awesome.css',
+        ],
+        'output_filename': 'css/certificates-style.css'
+    },
+    'style-certificates-rtl': {
+        'source_filenames': [
+            'certificates/sass/main-rtl.css',
+            'css/vendor/font-awesome.css',
+        ],
+        'output_filename': 'css/certificates-style-rtl.css'
+    },
 }
 
 

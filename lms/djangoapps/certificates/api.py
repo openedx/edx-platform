@@ -5,6 +5,9 @@ Other Django apps should use the API functions defined in this module
 rather than importing Django models directly.
 """
 import logging
+
+from django.core.urlresolvers import reverse
+
 from certificates.models import (
     CertificateStatuses as cert_status,
     certificate_status_for_student,
@@ -185,3 +188,27 @@ def example_certificates_status(course_key):
 
     """
     return ExampleCertificateSet.latest_status(course_key)
+
+
+# pylint: disable=no-member
+def get_certificate_url(user_id, course_id):
+    """
+    :return certificate url
+    """
+    url = u'{url}'.format(url=reverse('cert_html_view',
+                                      kwargs=dict(
+                                          user_id=str(user_id),
+                                          course_id=unicode(course_id))))
+    return url
+
+
+def get_active_web_certificate(course, is_preview_mode=None):
+    """
+    Retrieves the active web certificate configuration for the specified course
+    """
+    certificates = getattr(course, 'certificates', '{}')
+    configurations = certificates.get('certificates', [])
+    for config in configurations:
+        if config.get('is_active') or is_preview_mode:
+            return config
+    return None

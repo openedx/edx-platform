@@ -12,30 +12,41 @@ class Migration(DataMigration):
         Bootstraps the HTML view template with some default configuration parameters
         """
         json_config = """{
-            {
-    "default": {
-        "accomplishment_class_append": "accomplishment-certificate",
-        "platform_name": "edX",
-        "company_privacy_url": "http://www.edx.org/edx-privacy-policy",
-        "company_tos_url": "http://www.edx.org/edx-terms-service",
-        "company_verified_certificate_url": "http://www.edx.org/verified-certificate",
-        "document_stylesheet_url_application": "/static/certificates/sass/main-ltr.css",
-        "logo_src": "/static/certificates/images/logo-edx.svg",
-        "logo_url": "http://www.edx.org"
-    },
-    "honor": {
-        "certificate_type": "Honor Code",
-        "document_body_class_append": "is-honorcode"
-    },
-    "verified": {
-        "certificate_type": "Verified",
-        "document_body_class_append": "is-idverified"
-    },
-    "xseries": {
-        "certificate_type": "XSeries",
-        "document_body_class_append": "is-xseries"
-    }
-}
+            "default": {
+                "accomplishment_class_append": "accomplishment-certificate",
+                "platform_name": "edX",
+                "company_about_url": "http://www.edx.org/about-us",
+                "company_privacy_url": "http://www.edx.org/edx-privacy-policy",
+                "company_tos_url": "http://www.edx.org/edx-terms-service",
+                "company_verified_certificate_url": "http://www.edx.org/verified-certificate",
+                "logo_src": "/static/certificates/images/logo-edx.svg",
+                "logo_url": "http://www.edx.org"
+            },
+            "honor": {
+                "certificate_type": "honor",
+                "certificate_title": "Honor Certificate",
+                "document_body_class_append": "is-honorcode"
+            },
+            "verified": {
+                "certificate_type": "verified",
+                "certificate_title": "Verified Certificate",
+                "document_body_class_append": "is-idverified"
+            },
+            "xseries": {
+                "certificate_type": "xseries",
+                "certificate_title": "XSeries Certificate",
+                "document_body_class_append": "is-xseries"
+            },
+            "base": {
+                "certificate_type": "base",
+                "certificate_title": "Certificate of Achievement",
+                "document_body_class_append": "is-base"
+            },
+            "distinguished": {
+                "certificate_type": "distinguished",
+                "certificate_title": "Distinguished Certificate of Achievement",
+                "document_body_class_append": "is-distinguished"
+            }
         }"""
         orm.CertificateHtmlViewConfiguration.objects.create(
             configuration=json_config,

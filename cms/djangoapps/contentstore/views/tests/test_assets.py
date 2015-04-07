@@ -4,6 +4,7 @@ Unit tests for the asset upload endpoint.
 from datetime import datetime
 from io import BytesIO
 from pytz import UTC
+from PIL import Image
 import json
 from django.conf import settings
 from contentstore.tests.utils import CourseTestCase
@@ -36,18 +37,31 @@ class AssetsTestCase(CourseTestCase):
         super(AssetsTestCase, self).setUp()
         self.url = reverse_course_url('assets_handler', self.course.id)
 
-    def upload_asset(self, name="asset-1", extension=".txt"):
+    def upload_asset(self, name="asset-1", asset_type='text'):
         """
         Post to the asset upload url
         """
-        f = self.get_sample_asset(name, extension)
-        return self.client.post(self.url, {"name": name, "file": f})
+        asset = self.get_sample_asset(name, asset_type)
+        response = self.client.post(self.url, {"name": name, "file": asset})
+        return response
 
-    def get_sample_asset(self, name, extension=".txt"):
-        """Returns an in-memory file with the given name for testing"""
-        f = BytesIO(name)
-        f.name = name + extension
-        return f
+    def get_sample_asset(self, name, asset_type='text'):
+        """
+        Returns an in-memory file of the specified type with the given name for testing
+        """
+        if asset_type == 'text':
+            sample_asset = BytesIO(name)
+            sample_asset.name = '{name}.txt'.format(name=name)
+        elif asset_type == 'image':
+            image = Image.new("RGB", size=(50, 50), color=(256, 0, 0))
+            sample_asset = BytesIO()
+            image.save(unicode(sample_asset), 'jpeg')
+            sample_asset.name = '{name}.jpg'.format(name=name)
+            sample_asset.seek(0)
+        elif asset_type == 'opendoc':
+            sample_asset = BytesIO(name)
+            sample_asset.name = '{name}.odt'.format(name=name)
+        return sample_asset
 
 
 class BasicAssetsTestCase(AssetsTestCase):
@@ -138,7 +152,7 @@ class PaginationTestCase(AssetsTestCase):
         self.upload_asset("asset-1")
         self.upload_asset("asset-2")
         self.upload_asset("asset-3")
-        self.upload_asset("asset-4", ".odt")
+        self.upload_asset("asset-4", "opendoc")
 
         # Verify valid page requests
         self.assert_correct_asset_response(self.url, 0, 4, 4)
@@ -257,6 +271,10 @@ class UploadTestCase(AssetsTestCase):
 
     def test_happy_path(self):
         resp = self.upload_asset()
+        self.assertEquals(resp.status_code, 200)
+
+    def test_upload_image(self):
+        resp = self.upload_asset("test_image", asset_type="image")
         self.assertEquals(resp.status_code, 200)
 
     def test_no_file(self):
@@ -409,3 +427,75 @@ class LockAssetTestCase(AssetsTestCase):
         resp_asset = post_asset_update(False, course)
         self.assertFalse(resp_asset['locked'])
         verify_asset_locked_state(False)
+
+
+class DeleteAssetTestCase(AssetsTestCase):
+    """
+    Unit test for removing an asset.
+    """
+    def setUp(self):
+        """ Scaffolding """
+        super(DeleteAssetTestCase, self).setUp()
+        self.url = reverse_course_url('assets_handler', self.course.id)
+        # First, upload something.
+        self.asset_name = 'delete_test'
+        self.asset = self.get_sample_asset(self.asset_name)
+
+        response = self.client.post(self.url, {"name": self.asset_name, "file": self.asset})
+        self.assertEquals(response.status_code, 200)
+        self.uploaded_url = json.loads(response.content)['asset']['url']
+
+        self.asset_location = AssetLocation.from_deprecated_string(self.uploaded_url)
+        self.content = contentstore().find(self.asset_location)
+
+    def test_delete_asset(self):
+        """ Tests the happy path :) """
+        test_url = reverse_course_url(
+            'assets_handler', self.course.id, kwargs={'asset_key_string': unicode(self.uploaded_url)})
+        resp = self.client.delete(test_url, HTTP_ACCEPT="application/json")
+        self.assertEquals(resp.status_code, 204)
+
+    def test_delete_image_type_asset(self):
+        """ Tests deletion of image type asset """
+        image_asset = self.get_sample_asset(self.asset_name, asset_type="image")
+        thumbnail_image_asset = self.get_sample_asset('delete_test_thumbnail', asset_type="image")
+
+        # upload image
+        response = self.client.post(self.url, {"name": "delete_image_test", "file": image_asset})
+        self.assertEquals(response.status_code, 200)
+        uploaded_image_url = json.loads(response.content)['asset']['url']
+
+        # upload image thumbnail
+        response = self.client.post(self.url, {"name": "delete_image_thumb_test", "file": thumbnail_image_asset})
+        self.assertEquals(response.status_code, 200)
+        thumbnail_url = json.loads(response.content)['asset']['url']
+        thumbnail_location = StaticContent.get_location_from_path(thumbnail_url)
+
+        image_asset_location = AssetLocation.from_deprecated_string(uploaded_image_url)
+        content = contentstore().find(image_asset_location)
+        content.thumbnail_location = thumbnail_location
+        contentstore().save(content)
+
+        with mock.patch('opaque_keys.edx.locator.CourseLocator.make_asset_key') as mock_asset_key:
+            mock_asset_key.return_value = thumbnail_location
+
+            test_url = reverse_course_url(
+                'assets_handler', self.course.id, kwargs={'asset_key_string': unicode(uploaded_image_url)})
+            resp = self.client.delete(test_url, HTTP_ACCEPT="application/json")
+            self.assertEquals(resp.status_code, 204)
+
+    def test_delete_asset_with_invalid_asset(self):
+        """ Tests the sad path :( """
+        test_url = reverse_course_url(
+            'assets_handler', self.course.id, kwargs={'asset_key_string': unicode("/c4x/edX/toy/asset/invalid.pdf")})
+        resp = self.client.delete(test_url, HTTP_ACCEPT="application/json")
+        self.assertEquals(resp.status_code, 404)
+
+    def test_delete_asset_with_invalid_thumbnail(self):
+        """ Tests the sad path :( """
+        test_url = reverse_course_url(
+            'assets_handler', self.course.id, kwargs={'asset_key_string': unicode(self.uploaded_url)})
+        self.content.thumbnail_location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/invalid')
+        contentstore().save(self.content)
+        resp = self.client.delete(test_url, HTTP_ACCEPT="application/json")
+        self.assertEquals(resp.status_code, 204)

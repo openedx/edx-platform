@@ -13,6 +13,7 @@ DEBUG = True
 USE_I18N = True
 TEMPLATE_DEBUG = True
 SITE_NAME = 'localhost:8000'
+PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', 'Devstack')
 # By default don't use a worker, execute tasks as if they were local functions
 CELERY_ALWAYS_EAGER = True
 
