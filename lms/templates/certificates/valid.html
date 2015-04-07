@@ -29,6 +29,9 @@
           </span>
           <span class="copy-context">${accomplishment_copy_course_description}</span>
         </p>
+          % if signatories:
+            <%include file="_certificate-signatories.html" />
+          % endif
       </div>
       <div class="accomplishment-details">
         <h3 class="title title-lvl2 sr">${accomplishment_more_title}</h3>
