@@ -68,6 +68,13 @@ class SettingsService(object):
         xblock_settings = settings.XBLOCK_SETTINGS if hasattr(settings, "XBLOCK_SETTINGS") else {}
         return xblock_settings.get(xblock_settings_bucket, actual_default)
 
+    def get(self, setting_name):
+        """
+        Temporary method available only on solutions branch until ooyala XBlock is updated
+        to use get_settings_bucket()
+        """
+        return getattr(settings, setting_name)
+
 
 class NotificationsService(object):
     """
