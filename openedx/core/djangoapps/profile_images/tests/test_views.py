@@ -2,13 +2,14 @@
 Test cases for the HTTP endpoints of the profile image api.
 """
 from contextlib import closing
+import datetime
+from pytz import UTC
 import unittest
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
 import mock
 from mock import patch
-
 from PIL import Image
 from rest_framework.test import APITestCase, APIClient
 
@@ -17,13 +18,14 @@ from student.tests.factories import UserFactory
 from ...user_api.accounts.image_helpers import (
     set_has_profile_image,
     get_profile_image_names,
-    get_profile_image_storage
+    get_profile_image_storage,
 )
 from ..images import create_profile_images, ImageValidationError
 from ..views import LOG_MESSAGE_CREATE, LOG_MESSAGE_DELETE
 from .helpers import make_image_file
 
 TEST_PASSWORD = "test"
+TEST_UPLOAD_DT = datetime.datetime(2002, 1, 9, 15, 43, 01, tzinfo=UTC)
 
 
 class ProfileImageEndpointTestCase(APITestCase):
@@ -121,7 +123,8 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
         self.assertEqual(401, response.status_code)
         self.assertFalse(mock_log.info.called)
 
-    def test_upload_self(self, mock_log):
+    @patch('openedx.core.djangoapps.profile_images.views._make_upload_dt', return_value=TEST_UPLOAD_DT)
+    def test_upload_self(self, mock_make_image_version, mock_log):  # pylint: disable=unused-argument
         """
         Test that an authenticated user can POST to their own upload endpoint.
         """
@@ -244,7 +247,7 @@ class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
         with make_image_file() as image_file:
             create_profile_images(image_file, get_profile_image_names(self.user.username))
             self.check_images()
-            set_has_profile_image(self.user.username, True)
+            set_has_profile_image(self.user.username, True, TEST_UPLOAD_DT)
 
     def test_unsupported_methods(self, mock_log):
         """

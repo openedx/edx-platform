@@ -69,14 +69,14 @@ class ProfileParentalControlsTest(TestCase):
         """Verify that a profile's image obeys parental controls."""
 
         # Verify that an image cannot be set for a user with no year of birth set
-        self.profile.has_profile_image = True
+        self.profile.profile_image_uploaded_at = datetime.datetime.now()
         self.profile.save()
         self.assertFalse(self.profile.has_profile_image)
 
         # Verify that an image can be set for an adult user
         current_year = datetime.datetime.now().year
         self.set_year_of_birth(current_year - 20)
-        self.profile.has_profile_image = True
+        self.profile.profile_image_uploaded_at = datetime.datetime.now()
         self.profile.save()
         self.assertTrue(self.profile.has_profile_image)
 
