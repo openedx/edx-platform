@@ -40,6 +40,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/backbone-min.js
     - xmodule_js/common_static/js/vendor/backbone-associations-min.js
     - xmodule_js/common_static/js/vendor/backbone.paginator.min.js
+    - xmodule_js/common_static/js/vendor/backbone-relational.min.js
     - xmodule_js/common_static/js/vendor/timepicker/jquery.timepicker.js
     - xmodule_js/common_static/js/vendor/jquery.leanModal.min.js
     - xmodule_js/common_static/js/vendor/jquery.ajaxQueue.js
@@ -76,12 +77,15 @@ src_paths:
     - js
     - js/common_helpers
     - js/factories
+    - js/certificates
 
 # Paths to spec (test) JavaScript files
+# We should define the custom path mapping in /coffee/spec/main.coffee as well e.g. certificates etc.
 spec_paths:
     - coffee/spec/main.js
     - coffee/spec
     - js/spec
+    - js/certificates/spec
 
 # Paths to fixture files (optional)
 # The fixture path will be set automatically when using jasmine-jquery.
