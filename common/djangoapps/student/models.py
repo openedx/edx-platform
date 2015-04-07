@@ -28,7 +28,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models, IntegrityError
 from django.db.models import Count
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver, Signal
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_noop
@@ -37,6 +37,7 @@ from config_models.models import ConfigurationModel
 from track import contexts
 from eventtracking import tracker
 from importlib import import_module
+from model_utils import FieldTracker
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
@@ -253,6 +254,9 @@ class UserProfile(models.Model):
     bio = models.TextField(blank=True, null=True)
     profile_image_uploaded_at = models.DateTimeField(null=True)
 
+    # Use FieldTracker to track changes to model instances.
+    tracker = FieldTracker()
+
     @property
     def has_profile_image(self):
         """
@@ -330,6 +334,57 @@ def user_profile_pre_save_callback(sender, **kwargs):
     # Remove profile images for users who require parental consent
     if user_profile.requires_parental_consent() and user_profile.has_profile_image:
         user_profile.profile_image_uploaded_at = None
+
+
+@receiver(post_save, sender=UserProfile)
+def user_profile_post_save_callback(sender, **kwargs):
+    """
+    Emit analytics events after saving the
+    """
+    user_profile = kwargs['instance']
+    # pylint: disable=protected-access
+    emit_field_changed_events(user_profile, user_profile.user, sender._meta.db_table)
+
+
+def emit_field_changed_events(instance, user, db_table):
+    """ For the given model instance, save the fields that have changed since the last save.
+
+    Requires that the Model uses 'model_utils.FieldTracker' and has assigned it to 'tracker'.
+
+    Args:
+        instance (Model instance): the model instance that is being saved
+        user (User): the user that this instance is associated with
+        db_table (str): the name of the table that we're modifying
+
+    Returns:
+        None
+    """
+    excluded_fields = ['meta', 'password']
+    changed_fields = instance.tracker.changed()
+    changed_settings = {}
+    for field in changed_fields:
+        if field not in excluded_fields:
+            field_dict = {
+                field: {
+                    'old_value': unicode(changed_fields[field]),
+                    'new_value': unicode(getattr(instance, field)),
+                }
+            }
+            changed_settings.update(field_dict)
+
+    # only emit events when something has changed
+    if len(changed_settings) > 0:
+        context = {'user_id': user.id}
+        event_name = 'edx.user.settings.changed'
+        with tracker.get_tracker().context(event_name, context):
+            tracker.emit(
+                event_name,
+                {
+                    "settings": changed_settings,
+                    "user_id": user.id,
+                    "table": db_table
+                }
+            )
 
 
 class UserSignupSource(models.Model):

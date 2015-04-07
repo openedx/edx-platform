@@ -277,8 +277,7 @@ class EventsTestMixin(object):
     def setUp(self):
         super(EventsTestMixin, self).setUp()
         self.event_collection = MongoClient()["test"]["events"]
-        self.event_collection.drop()
-        self.start_time = datetime.now()
+        self.reset_event_tracking()
 
     def assert_event_emitted_num_times(self, event_name, event_time, event_user_id, num_times_emitted):
         """
@@ -297,6 +296,13 @@ class EventsTestMixin(object):
                 }
             ).count(), num_times_emitted
         )
+
+    def reset_event_tracking(self):
+        """
+        Resets all event tracking so that previously captured events are removed.
+        """
+        self.event_collection.drop()
+        self.start_time = datetime.now()
 
 
 class UniqueCourseTest(WebAppTest):

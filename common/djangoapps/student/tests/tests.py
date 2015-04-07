@@ -485,11 +485,11 @@ class DashboardTest(ModuleStoreTestCase):
         self.assertContains(response, expected_url)
 
 
-class EnrollmentEventTestMixin(object):
-    """ Mixin with assertions for validating enrollment events. """
+class EventTestMixin(object):
+    """ Generic mixin for verifying that events were emitted during a test. """
 
     def setUp(self):
-        super(EnrollmentEventTestMixin, self).setUp()
+        super(EventTestMixin, self).setUp()
         patcher = patch('student.models.tracker')
         self.mock_tracker = patcher.start()
         self.addCleanup(patcher.stop)
@@ -498,6 +498,18 @@ class EnrollmentEventTestMixin(object):
         """Ensures no events were emitted since the last event related assertion"""
         self.assertFalse(self.mock_tracker.emit.called)  # pylint: disable=maybe-no-member
         self.mock_tracker.reset_mock()
+
+    def assert_event_emitted(self, event_name, **kwargs):
+        """ Verify that an event was emitted with the given parameters. """
+        self.mock_tracker.emit.assert_called_with(  # pylint: disable=maybe-no-member
+            event_name,
+            kwargs
+        )
+        self.mock_tracker.reset_mock()
+
+
+class EnrollmentEventTestMixin(EventTestMixin):
+    """ Mixin with assertions for validating enrollment events. """
 
     def assert_enrollment_mode_change_event_was_emitted(self, user, course_key, mode):
         """Ensures an enrollment mode change event was emitted"""
@@ -869,3 +881,28 @@ class AnonymousLookupTable(ModuleStoreTestCase):
         real_user = user_by_anonymous_id(anonymous_id)
         self.assertEqual(self.user, real_user)
         self.assertEqual(anonymous_id, anonymous_id_for_user(self.user, course2.id, save=False))
+
+
+class TestUserChangeEvents(EventTestMixin, TestCase):
+    """ Test that we are firing events correctly when the user data changes. """
+
+    def setUp(self):
+        super(TestUserChangeEvents, self).setUp()
+        self.user = UserFactory()
+
+    def test_change_name(self):
+        """ Test that we are emitting events on name change. """
+        old_name = self.user.profile.name
+        new_name = "New Name"
+        self.user.profile.name = new_name
+        self.user.profile.save()
+
+        settings_data = {
+            'name': {
+                'old_value': old_name,
+                'new_value': new_name,
+            }
+        }
+        user_id = self.user.id
+        db_table = 'auth_userprofile'
+        self.assert_event_emitted('edx.user.settings.changed', settings=settings_data, user_id=user_id, table=db_table)
