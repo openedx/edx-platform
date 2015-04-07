@@ -22,11 +22,12 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from student.models import (
     anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment, unique_id_for_user,
-    LinkedInAddToProfileConfiguration
+    LinkedInAddToProfileConfiguration, USER_SETTINGS_CHANGED_EVENT_NAME
 )
 from student.views import (process_survey_link, _cert_info,
                            change_enrollment, complete_course_mode_info)
 from student.tests.factories import UserFactory, CourseModeFactory
+from util.testing import EventTestMixin
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
@@ -485,19 +486,31 @@ class DashboardTest(ModuleStoreTestCase):
         self.assertContains(response, expected_url)
 
 
-class EnrollmentEventTestMixin(object):
-    """ Mixin with assertions for validating enrollment events. """
-
+class UserProfileEventTestMixin(EventTestMixin):
+    """
+    Mixin for verifying that UserProfile events were emitted during a test.
+    """
     def setUp(self):
-        super(EnrollmentEventTestMixin, self).setUp()
-        patcher = patch('student.models.tracker')
-        self.mock_tracker = patcher.start()
-        self.addCleanup(patcher.stop)
+        super(UserProfileEventTestMixin, self).setUp('student.models.tracker')
 
-    def assert_no_events_were_emitted(self):
-        """Ensures no events were emitted since the last event related assertion"""
-        self.assertFalse(self.mock_tracker.emit.called)  # pylint: disable=maybe-no-member
-        self.mock_tracker.reset_mock()
+    def assert_profile_event_emitted(self, **kwargs):
+        """
+        Helper method to assert that we emit the expected user settings events.
+
+        Expected settings are passed in via `kwargs`.
+        """
+        self.assert_event_emitted(
+            USER_SETTINGS_CHANGED_EVENT_NAME,
+            table='auth_userprofile',
+            user_id=self.user.id,
+            **kwargs
+        )
+
+
+class EnrollmentEventTestMixin(EventTestMixin):
+    """ Mixin with assertions for validating enrollment events. """
+    def setUp(self):
+        super(EnrollmentEventTestMixin, self).setUp('student.models.tracker')
 
     def assert_enrollment_mode_change_event_was_emitted(self, user, course_key, mode):
         """Ensures an enrollment mode change event was emitted"""

@@ -28,7 +28,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models, IntegrityError
 from django.db.models import Count
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver, Signal
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_noop
@@ -37,6 +37,7 @@ from config_models.models import ConfigurationModel
 from track import contexts
 from eventtracking import tracker
 from importlib import import_module
+from model_utils import FieldTracker
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
@@ -57,6 +58,7 @@ UNENROLL_DONE = Signal(providing_args=["course_enrollment", "skip_refund"])
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 SessionStore = import_module(settings.SESSION_ENGINE).SessionStore  # pylint: disable=invalid-name
+USER_SETTINGS_CHANGED_EVENT_NAME = 'edx.user.settings.changed'
 
 
 class AnonymousUserId(models.Model):
@@ -253,6 +255,9 @@ class UserProfile(models.Model):
     bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False)
     profile_image_uploaded_at = models.DateTimeField(null=True)
 
+    # Use FieldTracker to track changes to model instances.
+    tracker = FieldTracker()
+
     @property
     def has_profile_image(self):
         """
@@ -330,6 +335,50 @@ def user_profile_pre_save_callback(sender, **kwargs):
     # Remove profile images for users who require parental consent
     if user_profile.requires_parental_consent() and user_profile.has_profile_image:
         user_profile.profile_image_uploaded_at = None
+
+
+@receiver(post_save, sender=UserProfile)
+def user_profile_post_save_callback(sender, **kwargs):
+    """
+    Emit analytics events after saving the UserProfile.
+    """
+    user_profile = kwargs['instance']
+    # pylint: disable=protected-access
+    emit_field_changed_events(
+        user_profile, user_profile.user, USER_SETTINGS_CHANGED_EVENT_NAME, sender._meta.db_table, ['meta']
+    )
+
+
+def emit_field_changed_events(instance, user, event_name, db_table, excluded_fields=None):
+    """ For the given model instance, save the fields that have changed since the last save.
+
+    Requires that the Model uses 'model_utils.FieldTracker' and has assigned it to 'tracker'.
+
+    Args:
+        instance (Model instance): the model instance that is being saved
+        user (User): the user that this instance is associated with
+        event_name (str): the name of the event to be emitted
+        db_table (str): the name of the table that we're modifying
+        excluded_fields (list): a list of field names for which events should
+            not be emitted
+
+    Returns:
+        None
+    """
+    excluded_fields = excluded_fields or []
+    changed_fields = instance.tracker.changed()
+    for field in changed_fields:
+        if field not in excluded_fields:
+            tracker.emit(
+                event_name,
+                {
+                    "setting": field,
+                    'old': changed_fields[field],
+                    'new': getattr(instance, field),
+                    "user_id": user.id,
+                    "table": db_table
+                }
+            )
 
 
 class UserSignupSource(models.Model):
