@@ -44,6 +44,7 @@
                 @extend .container;
                 border: none;
                 box-shadow: none;
+                padding: 0 ($baseline*1.5);
             }
 
             .u-field-title {
@@ -69,6 +70,7 @@
 
     .wrapper-profile-sections {
         @extend .container;
+        padding: 0 ($baseline*1.5);
     }
 
     .wrapper-profile-section-one {
