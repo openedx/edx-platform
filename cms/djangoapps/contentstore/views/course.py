@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.views.decorators.http import require_http_methods, require_GET
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, resolve
 from django.http import HttpResponseBadRequest, HttpResponseNotFound, HttpResponse, Http404
 from util.json_request import JsonResponse, JsonResponseBadRequest
 from util.date_utils import get_default_time_display
@@ -137,7 +137,14 @@ def reindex_course_and_check_access(course_key, user):
     """
     if not has_course_author_access(user, course_key):
         raise PermissionDenied()
-    return CoursewareSearchIndexer.do_course_reindex(modulestore(), course_key)
+
+    course = modulestore().get_course(course_key)
+    groups_usage_info =  GroupConfiguration.get_content_groups_usage_info(modulestore(), course).items()
+    for name, group in groups_usage_info:
+        for module in group:
+            view, args, kwargs = resolve(module['url'])
+            module['usage_key_string'] = kwargs['usage_key_string']
+    return CoursewareSearchIndexer.do_course_reindex(modulestore(), course_key, groups_usage_info)
 
 
 @login_required

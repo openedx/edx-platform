@@ -33,7 +33,7 @@ class CoursewareSearchIndexer(object):
     """
 
     @staticmethod
-    def add_to_search_index(modulestore, location, delete=False, raise_on_error=False):
+    def add_to_search_index(modulestore, location, groups_usage_info, delete=False, raise_on_error=False):
         """
         Add to courseware search index from given location and its children
         """
@@ -64,13 +64,23 @@ class CoursewareSearchIndexer(object):
                 log.warning('Cannot find: %s', item_location)
                 return None
 
+            if groups_usage_info:
+                item.content_groups = []
+
+                for name, group in groups_usage_info:
+                    for module in group:
+                        if str(item_location) == str(module['usage_key_string']):
+                            item.content_groups.append(name)
             return item
 
-        def index_item_location(item_location, current_start_date):
+        def index_item_location(item_location, current_start_date, content_groups=None):
             """ add this item to the search index """
             item = _fetch_item(item_location)
             if not item:
                 return
+
+            if content_groups and not getattr(item, 'content_groups', None):
+                item.content_groups = content_groups
 
             is_indexable = hasattr(item, "index_dictionary")
             # if it's not indexable and it does not have children, then ignore
@@ -83,11 +93,10 @@ class CoursewareSearchIndexer(object):
 
             if item.has_children:
                 for child_loc in item.children:
-                    index_item_location(child_loc, current_start_date)
+                    index_item_location(child_loc, current_start_date, item.content_groups)
 
             item_index = {}
             item_index_dictionary = item.index_dictionary() if is_indexable else None
-
             # if it has something to add to the index, then add it
             if item_index_dictionary:
                 try:
@@ -96,7 +105,8 @@ class CoursewareSearchIndexer(object):
                     item_index['id'] = unicode(item.scope_ids.usage_id)
                     if current_start_date:
                         item_index['start_date'] = current_start_date
-
+                    if getattr(item, 'content_groups', None):
+                        item_index['content_groups'] = item.content_groups
                     searcher.index(DOCUMENT_TYPE, item_index)
                 except Exception as err:  # pylint: disable=broad-except
                     # broad exception so that index operation does not fail on one item of many
@@ -117,7 +127,7 @@ class CoursewareSearchIndexer(object):
             if delete:
                 remove_index_item_location(location)
             else:
-                index_item_location(location, None)
+                index_item_location(location, None, None)
             indexed_count += 1
         except Exception as err:  # pylint: disable=broad-except
             # broad exception so that index operation does not prevent the rest of the application from working
@@ -134,20 +144,20 @@ class CoursewareSearchIndexer(object):
         return indexed_count
 
     @classmethod
-    def do_publish_index(cls, modulestore, location, delete=False, raise_on_error=False):
+    def do_publish_index(cls, modulestore, location, groups_usage_info=None, delete=False, raise_on_error=False):
         """
         Add to courseware search index published section and children
         """
-        indexed_count = cls.add_to_search_index(modulestore, location, delete, raise_on_error)
+        indexed_count = cls.add_to_search_index(modulestore, location, groups_usage_info, delete, raise_on_error)
         cls._track_index_request('edx.course.index.published', indexed_count, str(location))
         return indexed_count
 
     @classmethod
-    def do_course_reindex(cls, modulestore, course_key):
+    def do_course_reindex(cls, modulestore, course_key, groups_usage_info):
         """
         (Re)index all content within the given course
         """
-        indexed_count = cls.add_to_search_index(modulestore, course_key, delete=False, raise_on_error=True)
+        indexed_count = cls.add_to_search_index(modulestore, course_key, groups_usage_info, delete=False, raise_on_error=True)
         cls._track_index_request('edx.course.index.reindexed', indexed_count)
         return indexed_count
 
