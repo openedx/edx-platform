@@ -5,7 +5,7 @@ Module for the dual-branch fall-back Draft->Published Versioning ModuleStore
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore, EXCLUDE_ALL
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.courseware_index import CoursewareSearchIndexer
+from xmodule.modulestore.search_index import get_indexer_for_location
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, ItemNotFoundError
 from xmodule.modulestore.draft_and_published import (
     ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES, UnsupportedRevisionError
@@ -138,7 +138,12 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             )
             self._auto_publish_no_children(item.location, item.location.category, user_id, **kwargs)
             descriptor.location = old_descriptor_locn
-            return item
+
+        indexer = get_indexer_for_location(item.location)
+        if indexer.index_on_update:
+            indexer.add_to_search_index(self, item.location)
+
+        return item
 
     def create_item(
         self, user_id, course_key, block_type, block_id=None,
@@ -159,7 +164,11 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             )
             if not skip_auto_publish:
                 self._auto_publish_no_children(item.location, item.location.category, user_id, **kwargs)
-            return item
+
+        indexer = get_indexer_for_location(item.location)
+        if indexer.index_on_create:
+            indexer.add_to_search_index(self, item.location)
+        return item
 
     def create_child(
             self, user_id, parent_usage_key, block_type, block_id=None,
@@ -217,9 +226,11 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 if branch == ModuleStoreEnum.BranchName.draft and branched_location.block_type in DIRECT_ONLY_CATEGORIES:
                     self.publish(parent_loc.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
 
-        # Remove this location from the courseware search index so that searches
+        # Remove this location from the search index so that searches
         # will refrain from showing it as a result
-        CoursewareSearchIndexer.add_to_search_index(self, location, delete=True)
+        indexer = get_indexer_for_location(location)
+        if indexer.index_on_delete:
+            indexer.add_to_search_index(self, location, delete=True)
 
     def _map_revision_to_branch(self, key, revision=None):
         """
@@ -367,7 +378,9 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         self._flag_publish_event(location.course_key)
 
         # Now it's been published, add the object to the courseware search index so that it appears in search results
-        CoursewareSearchIndexer.do_publish_index(self, location)
+        indexer = get_indexer_for_location(location)
+        if indexer.index_on_publish:
+            indexer.do_publish_index(self, location)
 
         return self.get_item(location.for_branch(ModuleStoreEnum.BranchName.published), **kwargs)
 

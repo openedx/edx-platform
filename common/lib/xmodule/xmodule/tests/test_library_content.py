@@ -18,6 +18,7 @@ from xmodule.modulestore.tests.utils import MixedSplitTestCase
 from xmodule.tests import get_test_system
 from xmodule.validation import StudioValidationMessage
 from xmodule.x_module import AUTHOR_VIEW
+from search.search_engine_base import SearchEngine
 
 dummy_render = lambda block, _: Fragment(block.data)  # pylint: disable=invalid-name
 
@@ -66,10 +67,17 @@ class LibraryContentTest(MixedSplitTestCase):
         module.xmodule_runtime = module_system
 
 
-class TestLibraryContentModule(LibraryContentTest):
+class LibraryContentModuleTestMixin(object):
     """
     Basic unit tests for LibraryContentModule
     """
+    problem_types = [
+        ["multiplechoiceresponse"], ["optionresponse"], ["optionresponse", "coderesponse"],
+        ["coderesponse", "optionresponse"]
+    ]
+
+    problem_type_lookup = {}
+
     def _get_capa_problem_type_xml(self, *args):
         """ Helper function to create empty CAPA problem definition """
         problem = "<problem>"
@@ -84,12 +92,10 @@ class TestLibraryContentModule(LibraryContentTest):
 
         Creates four blocks total.
         """
-        problem_types = [
-            ["multiplechoiceresponse"], ["optionresponse"], ["optionresponse", "coderesponse"],
-            ["coderesponse", "optionresponse"]
-        ]
-        for problem_type in problem_types:
-            self.make_block("problem", self.library, data=self._get_capa_problem_type_xml(*problem_type))
+        self.problem_type_lookup = {}
+        for problem_type in self.problem_types:
+            block = self.make_block("problem", self.library, data=self._get_capa_problem_type_xml(*problem_type))
+            self.problem_type_lookup[block.location] = problem_type
 
     def test_lib_content_block(self):
         """
@@ -234,6 +240,42 @@ class TestLibraryContentModule(LibraryContentTest):
         non_editable_metadata_fields = self.lc_block.non_editable_metadata_fields
         self.assertIn(LibraryContentDescriptor.mode, non_editable_metadata_fields)
         self.assertNotIn(LibraryContentDescriptor.display_name, non_editable_metadata_fields)
+
+
+@patch('xmodule.library_tools.SearchEngine.get_search_engine', Mock(return_value=None))
+class TestLibraryContentModuleNoSearchIndex(LibraryContentModuleTestMixin, LibraryContentTest):
+    """
+    Tests for library container when no search index is available.
+    Tests fallback low-level CAPA problem introspection
+    """
+    pass
+
+
+search_index_mock = Mock(spec=SearchEngine)  # pylint: disable=invalid-name
+
+
+@patch('xmodule.library_tools.SearchEngine.get_search_engine', Mock(return_value=search_index_mock))
+class TestLibraryContentModuleWithSearchIndex(LibraryContentModuleTestMixin, LibraryContentTest):
+    """
+    Tests for library container with mocked search engine response.
+    """
+    def _get_search_response(self, field_dictionary=None):
+        """ Mocks search response as returned by search engine """
+        target_type = field_dictionary.get('problem_types')
+        matched_block_locations = [
+            key for key, problem_types in
+            self.problem_type_lookup.items() if target_type in problem_types
+        ]
+        return {
+            'results': [
+                {'data': {'id': str(location)}} for location in matched_block_locations
+            ]
+        }
+
+    def setUp(self):
+        """ Sets up search engine mock """
+        super(TestLibraryContentModuleWithSearchIndex, self).setUp()
+        search_index_mock.search = Mock(side_effect=self._get_search_response)
 
 
 @patch(
