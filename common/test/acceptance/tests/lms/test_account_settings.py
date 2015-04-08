@@ -226,6 +226,7 @@ class AccountSettingsPageTest(WebAppTest):
         """
         Test behaviour of "Year of Birth" field.
         """
+        self.assertEqual(self.account_settings_page.value_for_dropdown_field('year_of_birth', ''), '')
         self._test_dropdown_field(
             u'year_of_birth',
             u'Year of Birth',

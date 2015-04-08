@@ -72,11 +72,12 @@ class LearnerProfilePageTest(WebAppTest):
         profile_page.value_for_dropdown_field('country', 'United Kingdom')
         profile_page.value_for_textarea_field('bio', 'Nothing Special')
 
-    def visit_my_profile_page(self, user, privacy=None):
+    def visit_my_profile_page(self, user, privacy=None, authenticate=True):
         """
         Visits a users profile page.
         """
-        self.authenticate_as_user(user)
+        if authenticate:
+            self.authenticate_as_user(user)
 
         self.my_profile_page.visit()
         self.my_profile_page.wait_for_page()
@@ -117,7 +118,7 @@ class LearnerProfilePageTest(WebAppTest):
         Verify age limit messages for a user.
         """
         self.set_birth_year(self.MY_USER, birth_year=birth_year)
-        self.visit_my_profile_page(self.MY_USER)
+        self.visit_my_profile_page(self.MY_USER, authenticate=False)
         self.assertTrue(self.my_profile_page.privacy_field_visible)
         self.assertEqual(self.my_profile_page.age_limit_message_present, message is not None)
         self.assertIn(message, self.my_profile_page.profile_forced_private_message)
