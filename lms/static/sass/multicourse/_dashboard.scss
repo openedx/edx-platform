@@ -18,7 +18,6 @@
   .profile-sidebar {
     background: transparent;
     @include float(right);
-    @include margin-left(flex-gutter());
     margin-top: ($baseline*2);
     width: flex-grid(3);
     box-shadow: 0 0 1px $shadow-l1;
