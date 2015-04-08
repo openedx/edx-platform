@@ -47,7 +47,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                             }
                         ]
                     }
-                ]
+                ];
 
                 var accountSettingsView = new AccountSettingsView({
                     el: $('.wrapper-account-settings'),

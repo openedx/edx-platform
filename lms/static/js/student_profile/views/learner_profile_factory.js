@@ -1,4 +1,4 @@
-;(function (define, undefined) {
+;(function (define) {
     'use strict';
     define([
         'gettext', 'jquery', 'underscore', 'backbone', 'logger',
@@ -13,6 +13,8 @@
 
         return function (options) {
 
+            var changeInitiatedAnalyticsName = 'edx.user.settings.change_initiated';
+            var profileUserId = options['profile_user_id'];    
             var learnerProfileElement = $('.wrapper-profile');
 
             var accountPreferencesModel = new AccountPreferencesModel();
@@ -37,7 +39,9 @@
                     ['all_users', gettext('Full Profile')]
                 ],
                 helpMessage: '',
-                accountSettingsPageUrl: options.account_settings_page_url
+                accountSettingsPageUrl: options.account_settings_page_url,
+                changeAnalyticsName: changeInitiatedAnalyticsName,
+                userID: profileUserId
             });
 
             var usernameFieldView = new FieldsView.ReadonlyFieldView({
@@ -57,7 +61,9 @@
                     placeholderValue: gettext('Add country'),
                     valueAttribute: "country",
                     options: options.country_options,
-                    helpMessage: ''
+                    helpMessage: '',
+                    changeAnalyticsName: changeInitiatedAnalyticsName,
+                    userID: profileUserId
                 }),
                 new AccountSettingsFieldViews.LanguageProficienciesFieldView({
                     model: accountSettingsModel,
@@ -68,7 +74,9 @@
                     placeholderValue: gettext('Add language'),
                     valueAttribute: "language_proficiencies",
                     options: options.language_options,
-                    helpMessage: ''
+                    helpMessage: '',
+                    changeAnalyticsName: changeInitiatedAnalyticsName,
+                    userID: profileUserId
                 })
             ];
 
@@ -80,7 +88,9 @@
                     title: gettext('About me'),
                     placeholderValue: gettext("Tell other edX learners a little about yourself: where you live, what your interests are, why you're taking courses on edX, or what you hope to learn."),
                     valueAttribute: "bio",
-                    helpMessage: ''
+                    helpMessage: '',
+                    changeAnalyticsName: changeInitiatedAnalyticsName,
+                    userID: profileUserId
                 })
             ];
 

@@ -3,10 +3,10 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
         'js/spec/student_account/helpers',
         'js/spec/student_account/account_settings_fields_helpers',
         'js/student_account/views/account_settings_factory',
-        'js/student_account/views/account_settings_view'
+        'logger'
         ],
     function (Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, Helpers,
-              AccountSettingsFieldViewSpecHelpers, AccountSettingsPage, AccountSettingsView) {
+              AccountSettingsFieldViewSpecHelpers, AccountSettingsPage, Logger) {
         'use strict';
 
         describe("edx.user.AccountSettingsFactory", function () {
@@ -44,7 +44,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                         'disconnect_url': 'yetanother2.com/auth/disconnect'
                     }
                 ]
-            }
+            };
 
             var requests;
 
@@ -55,6 +55,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 TemplateHelpers.installTemplate('templates/fields/field_link');
                 TemplateHelpers.installTemplate('templates/fields/field_text');
                 TemplateHelpers.installTemplate('templates/student_account/account_settings');
+                spyOn(Logger, 'log');
             });
 
             it("shows loading error when UserAccountModel fails to load", function() {
@@ -135,11 +136,12 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             });
 
             it("expects all fields to behave correctly", function () {
-
+                var userID = 13, i, view;
                 requests = AjaxHelpers.requests(this);
 
+
                 var context = AccountSettingsPage(
-                    FIELDS_DATA, AUTH_DATA, Helpers.USER_ACCOUNTS_API_URL, Helpers.USER_PREFERENCES_API_URL
+                    FIELDS_DATA, AUTH_DATA, Helpers.USER_ACCOUNTS_API_URL, Helpers.USER_PREFERENCES_API_URL, userID
                 );
                 var accountSettingsView = context.accountSettingsView;
 
@@ -151,41 +153,46 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 expect(sectionsData[0].fields.length).toBe(5);
 
                 var textFields = [sectionsData[0].fields[1], sectionsData[0].fields[2]];
-                for (var i = 0; i < textFields.length ; i++) {
+                for (i = 0; i < textFields.length ; i++) {
 
-                    var view = textFields[i].view;
+                    view = textFields[i].view;
+
                     FieldViewsSpecHelpers.verifyTextField(view, {
                         title: view.options.title,
                         valueAttribute: view.options.valueAttribute,
                         helpMessage: view.options.helpMessage,
                         validValue: 'My Name',
+                        oldValue: view.model.get(view.options.valueAttribute),
                         invalidValue1: '',
                         invalidValue2: '@',
-                        validationError: "Think again!"
+                        validationError: "Think again!",
+                        userID: userID
                     }, requests);
                 }
 
                 expect(sectionsData[1].fields.length).toBe(5);
-                for (var i = 0; i < 4; i++) {
+                for (i = 0; i < 4; i++) {
 
-                    var view = sectionsData[1].fields[i].view;
+                    view = sectionsData[1].fields[i].view;
                     FieldViewsSpecHelpers.verifyDropDownField(view, {
                         title: view.options.title,
                         valueAttribute: view.options.valueAttribute,
                         helpMessage: '',
                         validValue: Helpers.FIELD_OPTIONS[1][0],
+                        oldValue: view.model.get(view.options.valueAttribute),
                         invalidValue1: Helpers.FIELD_OPTIONS[2][0],
                         invalidValue2: Helpers.FIELD_OPTIONS[3][0],
-                        validationError: "Nope, this will not do!"
+                        validationError: "Nope, this will not do!",
+                        userID: userID
                     }, requests);
                 }
 
                 var section2Fields = sectionsData[2].fields;
                 expect(section2Fields.length).toBe(2);
-                for (var i = 0; i < section2Fields.length; i++) {
+                for (i = 0; i < section2Fields.length; i++) {
 
-                    var view = section2Fields[i].view;
-                    AccountSettingsFieldViewSpecHelpers.verifyAuthField(view, view.options, requests);
+                    view = section2Fields[i].view;
+                    AccountSettingsFieldViewSpecHelpers.verifyAuthField(view, view.options, requests, userID);
                 }
             });
         });
