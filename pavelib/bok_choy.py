@@ -82,7 +82,6 @@ def perf_report_bokchoy(options):
         'imports_dir': getattr(options, 'imports_dir', None),
         'verbosity': getattr(options, 'verbosity', 2),
         'test_dir': 'performance',
-        'ptests': True,
     }
     run_bokchoy(**opts)
 
