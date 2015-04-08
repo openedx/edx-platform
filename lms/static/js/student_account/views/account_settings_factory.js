@@ -1,4 +1,4 @@
-;(function (define, undefined) {
+;(function (define) {
     'use strict';
     define([
         'gettext', 'jquery', 'underscore', 'backbone',
@@ -10,8 +10,9 @@
     ], function (gettext, $, _, Backbone, FieldViews, UserAccountModel, UserPreferencesModel,
                  AccountSettingsFieldViews, AccountSettingsView) {
 
-        return function (fieldsData, authData, userAccountsApiUrl, userPreferencesApiUrl) {
+        return function (fieldsData, authData, userAccountsApiUrl, userPreferencesApiUrl, userID) {
 
+            var changeInitiatedAnalyticsName = 'edx.user.settings.change_initiated';
             var accountSettingsElement = $('.wrapper-account-settings');
 
             var userAccountModel = new UserAccountModel();
@@ -37,6 +38,8 @@
                                 model: userAccountModel,
                                 title: gettext('Full Name'),
                                 valueAttribute: 'name',
+                                changeAnalyticsName: changeInitiatedAnalyticsName,
+                                userID: userID,
                                 helpMessage: gettext('The name that appears on your edX certificates. Other learners never see your full name.')
                             })
                         },
@@ -45,6 +48,8 @@
                                 model: userAccountModel,
                                 title: gettext('Email Address'),
                                 valueAttribute: 'email',
+                                changeAnalyticsName: changeInitiatedAnalyticsName,
+                                userID: userID,
                                 helpMessage: gettext('The email address you use to sign in to edX. Communications from edX and your courses are sent to this address.')
                             })
                         },
@@ -56,6 +61,8 @@
                                 emailAttribute: 'email',
                                 linkTitle: gettext('Reset Password'),
                                 linkHref: fieldsData['password']['url'],
+                                changeAnalyticsName: changeInitiatedAnalyticsName,
+                                userID: userID,
                                 helpMessage: gettext('When you click "Reset Password", a message will be sent to your email address. Click the link in the message to reset your password.')
                             })
                         },
@@ -67,7 +74,9 @@
                                 required: true,
                                 refreshPageOnSave: true,
                                 helpMessage: gettext('The language used for the edX site. The site is currently available in a limited number of languages.'),
-                                options: fieldsData['language']['options']
+                                options: fieldsData['language']['options'],
+                                changeAnalyticsName: changeInitiatedAnalyticsName,
+                                userID: userID
                             })
                         }
                     ]
@@ -80,7 +89,9 @@
                                 model: userAccountModel,
                                 title: gettext('Education Completed'),
                                 valueAttribute: 'level_of_education',
-                                options: fieldsData['level_of_education']['options']
+                                options: fieldsData['level_of_education']['options'],
+                                changeAnalyticsName: changeInitiatedAnalyticsName,
+                                userID: userID
                             })
                         },
                         {
@@ -88,7 +99,9 @@
                                 model: userAccountModel,
                                 title: gettext('Gender'),
                                 valueAttribute: 'gender',
-                                options: fieldsData['gender']['options']
+                                options: fieldsData['gender']['options'],
+                                changeAnalyticsName: changeInitiatedAnalyticsName,
+                                userID: userID
                             })
                         },
                         {
@@ -96,7 +109,9 @@
                                 model: userAccountModel,
                                 title: gettext('Year of Birth'),
                                 valueAttribute: 'year_of_birth',
-                                options: fieldsData['year_of_birth']['options']
+                                options: fieldsData['year_of_birth']['options'],
+                                changeAnalyticsName: changeInitiatedAnalyticsName,
+                                userID: userID
                             })
                         },
                         {
@@ -104,7 +119,9 @@
                                 model: userAccountModel,
                                 title: gettext('Country or Region'),
                                 valueAttribute: 'country',
-                                options: fieldsData['country']['options']
+                                options: fieldsData['country']['options'],
+                                changeAnalyticsName: changeInitiatedAnalyticsName,
+                                userID: userID
                             })
                         },
                         {
@@ -112,7 +129,9 @@
                                 model: userAccountModel,
                                 title: gettext('Preferred Language'),
                                 valueAttribute: 'language_proficiencies',
-                                options: fieldsData['preferred_language']['options']
+                                options: fieldsData['preferred_language']['options'],
+                                changeAnalyticsName: changeInitiatedAnalyticsName,
+                                userID: userID
                             })
                         }
                     ]
@@ -130,7 +149,9 @@
                                 helpMessage: '',
                                 connected: provider['connected'],
                                 connectUrl: provider['connect_url'],
-                                disconnectUrl: provider['disconnect_url']
+                                disconnectUrl: provider['disconnect_url'],
+                                changeAnalyticsName: changeInitiatedAnalyticsName,
+                                userID: userID
                             })
                         }
                     })

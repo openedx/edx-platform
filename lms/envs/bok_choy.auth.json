@@ -49,6 +49,15 @@
         ],
         "port": 27017
     },
+    "TRACKING_BACKENDS": {
+        "mongo": {
+            "ENGINE": "track.backends.mongodb.MongoBackend",
+            "OPTIONS": {
+                "database": "test",
+                "collection": "user_events"
+            }
+        }
+    },
     "EVENT_TRACKING_BACKENDS": {
         "mongo": {
             "ENGINE": "eventtracking.backends.mongodb.MongoBackend",

@@ -3,10 +3,10 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
         'js/spec/views/fields_helpers',
         'js/spec/student_account/account_settings_fields_helpers',
         'js/student_account/views/account_settings_fields',
-        'js/student_account/models/user_account_model',
+        'logger',
         'string_utils'],
     function (Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpecHelpers,
-              AccountSettingsFieldViewSpecHelpers, AccountSettingsFieldViews, UserAccountModel) {
+              AccountSettingsFieldViewSpecHelpers, AccountSettingsFieldViews, Logger) {
         'use strict';
 
         describe("edx.AccountSettingsFieldViews", function () {
@@ -14,9 +14,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             var requests,
                 timerCallback;
 
-            var USERNAME = 'Legolas',
-                FULLNAME = 'Legolas Thranduil',
-                EMAIL = 'legolas@woodland.middlearth';
+            var EMAIL = 'legolas@woodland.middlearth';
 
             beforeEach(function () {
                 TemplateHelpers.installTemplate('templates/fields/field_readonly');
@@ -26,6 +24,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 timerCallback = jasmine.createSpy('timerCallback');
                 jasmine.Clock.useMock();
+                spyOn(Logger, 'log');
             });
 
             it("sends request to reset password on clicking link in PasswordFieldView", function() {
@@ -38,10 +37,36 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 var view = new AccountSettingsFieldViews.PasswordFieldView(fieldData).render();
                 view.$('.u-field-value > a').click();
+
+                // No event was emitted because changeAnalyticsName was not specified.
+                expect(Logger.log).not.toHaveBeenCalled();
+
                 AjaxHelpers.expectRequest(requests, 'POST', '/password_reset', "email=legolas%40woodland.middlearth");
-                AjaxHelpers.respondWithJson(requests, {"success": "true"})
+                AjaxHelpers.respondWithJson(requests, {"success": "true"});
                 FieldViewsSpecHelpers.expectMessageContains(view,
                     "We've sent a message to legolas@woodland.middlearth. Click the link in the message to reset your password."
+                );
+            });
+
+            it("can emit an event when clicking on reset password link in PasswordFieldView", function() {
+
+                var fieldData = FieldViewsSpecHelpers.createFieldData(AccountSettingsFieldViews.PasswordFieldView, {
+                    linkHref: '/password_reset',
+                    emailAttribute: 'email',
+                    changeAnalyticsName: 'change_initiated',
+                    userID: 1000
+                });
+
+                var view = new AccountSettingsFieldViews.PasswordFieldView(fieldData).render();
+                view.$('.u-field-value > a').click();
+
+                expect(Logger.log).toHaveBeenCalledWith(
+                    'change_initiated', {
+                        'user_id': 1000,
+                        'setting': 'password',
+                        'old': null,
+                        'new': null
+                    }
                 );
             });
 
@@ -58,6 +83,10 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 var data = {'language': FieldViewsSpecHelpers.SELECT_OPTIONS[2][0]};
                 view.$(selector).val(data[fieldData.valueAttribute]).change();
+
+                // No event was emitted because changeAnalyticsName was not specified.
+                expect(Logger.log).not.toHaveBeenCalled();
+
                 FieldViewsSpecHelpers.expectAjaxRequestWithData(requests, data);
                 AjaxHelpers.respondWithNoContent(requests);
 
@@ -65,7 +94,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 AjaxHelpers.respondWithNoContent(requests);
                 FieldViewsSpecHelpers.expectMessageContains(view, "Your changes have been saved.");
 
-                var data = {'language': FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]};
+                data = {'language': FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]};
                 view.$(selector).val(data[fieldData.valueAttribute]).change();
                 FieldViewsSpecHelpers.expectAjaxRequestWithData(requests, data);
                 AjaxHelpers.respondWithNoContent(requests);
@@ -73,6 +102,32 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 AjaxHelpers.expectRequest(requests, 'POST', '/i18n/setlang/', 'language=' + data[fieldData.valueAttribute]);
                 AjaxHelpers.respondWithError(requests, 500);
                 FieldViewsSpecHelpers.expectMessageContains(view, "You must sign out of edX and sign back in before your language changes take effect.");
+            });
+
+            it("can emit an event when changing language preference in LanguagePreferenceFieldView", function() {
+
+                var selector = '.u-field-value > select';
+                var fieldData = FieldViewsSpecHelpers.createFieldData(AccountSettingsFieldViews.DropdownFieldView, {
+                    valueAttribute: 'language',
+                    options: FieldViewsSpecHelpers.SELECT_OPTIONS,
+                    changeAnalyticsName: 'change_initiated',
+                    userID: 1000
+                });
+
+                var view = new AccountSettingsFieldViews.LanguagePreferenceFieldView(fieldData).render();
+
+                var newLanguage = FieldViewsSpecHelpers.SELECT_OPTIONS[2][0];
+                var data = {'language': newLanguage};
+                view.$(selector).val(data[fieldData.valueAttribute]).change();
+
+                expect(Logger.log).toHaveBeenCalledWith(
+                    'change_initiated', {
+                        'user_id': 1000,
+                        'setting': 'language',
+                        'old': 'si',
+                        'new': newLanguage
+                    }
+                );
             });
 
             it("reads and saves the value correctly for LanguageProficienciesFieldView", function() {
