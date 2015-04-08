@@ -160,8 +160,8 @@ class VideoFields(object):
         default=False
     )
     edx_video_id = String(
-        help=_("If you were assigned a Video ID by edX for the video to play in this component, enter the ID here. In this case, do not enter values in the Default Video URL, the Video File URLs, and the YouTube ID fields. If you were not assigned an edX Video ID, enter values in those other fields and ignore this field."),
-        display_name=_("EdX Video ID"),
+        help=_("If you were assigned a Video ID by edX for the video to play in this component, enter the ID here. In this case, do not enter values in the Default Video URL, the Video File URLs, and the YouTube ID fields. If you were not assigned a Video ID, enter values in those other fields and ignore this field."),  # pylint: disable=line-too-long
+        display_name=_("Video ID"),
         scope=Scope.settings,
         default="",
     )
