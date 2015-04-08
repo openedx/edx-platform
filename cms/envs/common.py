@@ -724,6 +724,7 @@ INSTALLED_APPS = (
     'edx_jsme',    # Molecular Structure
 
     'openedx.core.djangoapps.content.course_structures',
+    'oauth2_provider'
 )
 
 
