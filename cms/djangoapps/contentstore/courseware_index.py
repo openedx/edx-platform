@@ -10,10 +10,8 @@ from eventtracking import tracker
 from xmodule.modulestore import ModuleStoreEnum
 from search.search_engine_base import SearchEngine
 
+from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 
-# Use default index and document names for now
-INDEX_NAME = "courseware_index"
-DOCUMENT_TYPE = "courseware_content"
 
 # REINDEX_AGE is the default amount of time that we look back for changes
 # that might have happened. If we are provided with a time at which the
@@ -40,18 +38,56 @@ class SearchIndexingError(Exception):
         self.error_list = error_list
 
 
-class CoursewareSearchIndexer(object):
+class SearchIndexBase(object):
     """
     Class to perform indexing for courseware search from different modulestores
     """
 
+    INDEX_NAME = None
+    DOCUMENT_TYPE = None
+
+    INDEX_EVENT = {
+        'name': None,
+        'category': None
+    }
+
     @classmethod
-    def index_course(cls, modulestore, course_key, triggered_at=None, reindex_age=REINDEX_AGE):
+    def _fetch_top_level(self, modulestore, structure_key):
+        """ Fetch the item from the modulestore location """
+        raise NotImplementedError("Should be overridden in child classes")
+
+    @classmethod
+    def _get_location_info(self, structure_key):
+        """ Builds location info dictionary """
+        raise NotImplementedError("Should be overridden in child classes")
+
+    @classmethod
+    def _id_modifier(self, usage_id):
+        """ Modifies usage_id to submit to index """
+        return usage_id
+
+    @classmethod
+    def remove_deleted_items(cls, searcher, structure_key, exclude_items):
+        """
+        remove any item that is present in the search index that is not present in updated list of indexed items
+        as we find items we can shorten the set of items to keep
+        """
+        response = searcher.search(
+            doc_type=cls.DOCUMENT_TYPE,
+            field_dictionary=cls._get_location_info(structure_key),
+            exclude_ids=exclude_items
+        )
+        result_ids = [result["data"]["id"] for result in response["results"]]
+        for result_id in result_ids:
+            searcher.remove(cls.DOCUMENT_TYPE, result_id)
+
+    @classmethod
+    def index(cls, modulestore, structure_key, triggered_at=None, reindex_age=REINDEX_AGE):
         """
         Process course for indexing
 
         Arguments:
-        course_key (CourseKey) - course identifier
+        structure_key (CourseKey|LibraryKey) - course or library identifier
 
         triggered_at (datetime) - provides time at which indexing was triggered;
             useful for index updates - only things changed recently from that date
@@ -64,13 +100,11 @@ class CoursewareSearchIndexer(object):
         Number of items that have been added to the index
         """
         error_list = []
-        searcher = SearchEngine.get_search_engine(INDEX_NAME)
+        searcher = SearchEngine.get_search_engine(cls.INDEX_NAME)
         if not searcher:
             return
 
-        location_info = {
-            "course": unicode(course_key),
-        }
+        location_info = cls._get_location_info(structure_key)
 
         # Wrap counter in dictionary - otherwise we seem to lose scope inside the embedded function `index_item`
         indexed_count = {
@@ -101,7 +135,7 @@ class CoursewareSearchIndexer(object):
             if not item_index_dictionary and not item.has_children:
                 return
 
-            item_id = unicode(item.scope_ids.usage_id)
+            item_id = unicode(cls._id_modifier(item.scope_ids.usage_id))
             indexed_items.add(item_id)
             if item.has_children:
                 # determine if it's okay to skip adding the children herein based upon how recently any may have changed
@@ -122,38 +156,24 @@ class CoursewareSearchIndexer(object):
                 if item.start:
                     item_index['start_date'] = item.start
 
-                searcher.index(DOCUMENT_TYPE, item_index)
+                searcher.index(cls.DOCUMENT_TYPE, item_index)
                 indexed_count["count"] += 1
             except Exception as err:  # pylint: disable=broad-except
                 # broad exception so that index operation does not fail on one item of many
                 log.warning('Could not index item: %s - %r', item.location, err)
                 error_list.append(_('Could not index item: {}').format(item.location))
 
-        def remove_deleted_items():
-            """
-            remove any item that is present in the search index that is not present in updated list of indexed items
-            as we find items we can shorten the set of items to keep
-            """
-            response = searcher.search(
-                doc_type=DOCUMENT_TYPE,
-                field_dictionary={"course": unicode(course_key)},
-                exclude_ids=indexed_items
-            )
-            result_ids = [result["data"]["id"] for result in response["results"]]
-            for result_id in result_ids:
-                searcher.remove(DOCUMENT_TYPE, result_id)
-
         try:
             with modulestore.branch_setting(ModuleStoreEnum.RevisionOption.published_only):
-                course = modulestore.get_course(course_key, depth=None)
-                for item in course.get_children():
+                structure = cls._fetch_top_level(modulestore, structure_key)
+                for item in structure.get_children():
                     index_item(item)
-                remove_deleted_items()
+                cls.remove_deleted_items(searcher, structure_key, indexed_items)
         except Exception as err:  # pylint: disable=broad-except
             # broad exception so that index operation does not prevent the rest of the application from working
             log.exception(
                 "Indexing error encountered, courseware index may be out of date %s - %r",
-                course_key,
+                structure_key,
                 err
             )
             error_list.append(_('General indexing error occurred'))
@@ -164,31 +184,93 @@ class CoursewareSearchIndexer(object):
         return indexed_count["count"]
 
     @classmethod
-    def do_course_reindex(cls, modulestore, course_key):
+    def _do_reindex(cls, modulestore, structure_key):
         """
-        (Re)index all content within the given course, tracking the fact that a full reindex has taking place
+        (Re)index all content within the given structure (course or library),
+        tracking the fact that a full reindex has taken place
         """
-        indexed_count = cls.index_course(modulestore, course_key)
+        indexed_count = cls.index(modulestore, structure_key)
         if indexed_count:
-            cls._track_index_request('edx.course.index.reindexed', indexed_count)
+            cls._track_index_request(cls.INDEX_EVENT['name'], cls.INDEX_EVENT['category'], indexed_count)
         return indexed_count
 
     @classmethod
-    def _track_index_request(cls, event_name, indexed_count):
+    def _track_index_request(cls, event_name, category, indexed_count):
         """Track content index requests.
 
         Arguments:
             event_name (str):  Name of the event to be logged.
+            category (str): cat3gory of indexed items
+            indexed_count (int): number of indexed items
         Returns:
             None
 
         """
         data = {
             "indexed_count": indexed_count,
-            'category': 'courseware_index',
+            'category': category,
         }
 
         tracker.emit(
             event_name,
             data
         )
+
+
+class CoursewareSearchIndexer(SearchIndexBase):
+    INDEX_NAME = "courseware_index"
+    DOCUMENT_TYPE = "courseware_content"
+
+    INDEX_EVENT = {
+        'name': 'edx.course.index.reindexed',
+        'category': 'courseware_index'
+    }
+
+    @classmethod
+    def _fetch_top_level(self, modulestore, structure_key):
+        """ Fetch the item from the modulestore location """
+        return modulestore.get_course(structure_key, depth=None)
+
+    @classmethod
+    def _get_location_info(self, structure_key):
+        """ Builds location info dictionary """
+        return {"course": unicode(structure_key)}
+
+    @classmethod
+    def do_course_reindex(cls, modulestore, course_key):
+        """
+        (Re)index all content within the given course, tracking the fact that a full reindex has taken place
+        """
+        return cls._do_reindex(modulestore, course_key)
+
+
+class LibrarySearchIndexer(SearchIndexBase):
+    INDEX_NAME = "library_index"
+    DOCUMENT_TYPE = "library_content"
+
+    INDEX_EVENT = {
+        'name': 'edx.library.index.reindexed',
+        'category': 'library_index'
+    }
+
+    @classmethod
+    def _fetch_top_level(self, modulestore, structure_key):
+        """ Fetch the item from the modulestore location """
+        return modulestore.get_library(structure_key, depth=None)
+
+    @classmethod
+    def _get_location_info(self, structure_key):
+        """ Builds location info dictionary """
+        return {"library": unicode(structure_key.replace(version_guid=None, branch=None))}
+
+    @classmethod
+    def _id_modifier(self, usage_id):
+        """ Modifies usage_id to submit to index """
+        return usage_id.replace(library_key=(usage_id.library_key.replace(version_guid=None, branch=None)))
+
+    @classmethod
+    def do_library_reindex(cls, modulestore, library_key):
+        """
+        (Re)index all content within the given library, tracking the fact that a full reindex has taken place
+        """
+        return cls._do_reindex(modulestore, library_key)

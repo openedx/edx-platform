@@ -2,6 +2,7 @@
 Testing indexing of the courseware as it is changed
 """
 import ddt
+from lazy.lazy import lazy
 import time
 from datetime import datetime
 from mock import patch
@@ -15,15 +16,18 @@ from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.modulestore.tests.test_cross_modulestore_import_export import MongoContentstoreBuilder
 from xmodule.modulestore.tests.utils import create_modulestore_instance, LocationMixin, MixedSplitTestCase
 from xmodule.tests import DATA_DIR
 from xmodule.x_module import XModuleMixin
+
 from search.search_engine_base import SearchEngine
 
-from contentstore.courseware_index import CoursewareSearchIndexer, INDEX_NAME, DOCUMENT_TYPE, SearchIndexingError
+from contentstore.courseware_index import (
+    CoursewareSearchIndexer, LibrarySearchIndexer, SearchIndexingError, get_indexer_for_location
+)
 from contentstore.signals import listen_for_course_publish
 
 
@@ -123,9 +127,21 @@ class MixedWithOptionsTestCase(MixedSplitTestCase):
         """ base version of setup_course_base is a no-op """
         pass
 
+    @lazy
+    def searcher(self):
+        return self.get_search_engine()
+
+    def _get_default_search(self):
+        """ Returns field_dictionary for default search """
+        return {}
+
     def get_search_engine(self):
         """ Centralized call to getting the search engine for the test """
-        return SearchEngine.get_search_engine(INDEX_NAME)
+        return SearchEngine.get_search_engine(CoursewareSearchIndexer.INDEX_NAME)
+
+    def search(self, field_dictionary=None):
+        fields = field_dictionary if field_dictionary else self._get_default_search()
+        return self.searcher.search(field_dictionary=fields)
 
     def _perform_test_using_store(self, store_type, test_to_perform):
         """ Helper method to run a test function that uses a specific store """
@@ -217,38 +233,39 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
     def index_recent_changes(self, store, since_time):
         """ index course using recent changes """
         trigger_time = datetime.now(UTC)
-        return CoursewareSearchIndexer.index_course(
+        return CoursewareSearchIndexer.index(
             store,
             self.course.id,
             triggered_at=trigger_time,
             reindex_age=(trigger_time - since_time)
         )
 
+    def _get_default_search(self):
+        return {"course": unicode(self.course.id)}
+
     def _test_indexing_course(self, store):
         """ indexing course tests """
-        searcher = self.get_search_engine()
-        response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
+        response = self.search()
         self.assertEqual(response["total"], 0)
 
         # Only published modules should be in the index
         added_to_index = self.reindex_course(store)
         self.assertEqual(added_to_index, 3)
-        response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
+        response = self.search()
         self.assertEqual(response["total"], 3)
 
         # Publish the vertical as is, and any unpublished children should now be available
         self.publish_item(store, self.vertical.location)
         self.reindex_course(store)
-        response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
+        response = self.search()
         self.assertEqual(response["total"], 4)
 
     def _test_not_indexing_unpublished_content(self, store):
         """ add a new one, only appers in index once added """
-        searcher = self.get_search_engine()
         # Publish the vertical to start with
         self.publish_item(store, self.vertical.location)
         self.reindex_course(store)
-        response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
+        response = self.search()
         self.assertEqual(response["total"], 4)
 
         # Now add a new unit to the existing vertical
@@ -260,44 +277,42 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
             modulestore=store,
         )
         self.reindex_course(store)
-        response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
+        response = self.search()
         self.assertEqual(response["total"], 4)
 
         # Now publish it and we should find it
         # Publish the vertical as is, and everything should be available
         self.publish_item(store, self.vertical.location)
         self.reindex_course(store)
-        response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
+        response = self.search()
         self.assertEqual(response["total"], 5)
 
     def _test_deleting_item(self, store):
         """ test deleting an item """
-        searcher = self.get_search_engine()
         # Publish the vertical to start with
         self.publish_item(store, self.vertical.location)
         self.reindex_course(store)
-        response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
+        response = self.search()
         self.assertEqual(response["total"], 4)
 
         # just a delete should not change anything
         self.delete_item(store, self.html_unit.location)
         self.reindex_course(store)
-        response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
+        response = self.search()
         self.assertEqual(response["total"], 4)
 
         # but after publishing, we should no longer find the html_unit
         self.publish_item(store, self.vertical.location)
         self.reindex_course(store)
-        response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
+        response = self.search()
         self.assertEqual(response["total"], 3)
 
     def _test_not_indexable(self, store):
         """ test not indexable items """
-        searcher = self.get_search_engine()
         # Publish the vertical to start with
         self.publish_item(store, self.vertical.location)
         self.reindex_course(store)
-        response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
+        response = self.search()
         self.assertEqual(response["total"], 4)
 
         # Add a non-indexable item
@@ -309,25 +324,24 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
             modulestore=store,
         )
         self.reindex_course(store)
-        response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
+        response = self.search()
         self.assertEqual(response["total"], 4)
 
         # even after publishing, we should not find the non-indexable item
         self.publish_item(store, self.vertical.location)
         self.reindex_course(store)
-        response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
+        response = self.search()
         self.assertEqual(response["total"], 4)
 
     def _test_start_date_propagation(self, store):
         """ make sure that the start date is applied at the right level """
-        searcher = self.get_search_engine()
         early_date = self.course.start
         later_date = self.vertical.start
 
         # Publish the vertical
         self.publish_item(store, self.vertical.location)
         self.reindex_course(store)
-        response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
+        response = self.search()
         self.assertEqual(response["total"], 4)
 
         results = response["results"]
@@ -438,13 +452,13 @@ class TestLargeCourseDeletions(MixedWithOptionsTestCase):
     def _clean_course_id(self):
         """ Clean all documents from the index that have a specific course provided """
         if self.course_id:
-            searcher = self.get_search_engine()
-            response = searcher.search(field_dictionary={"course": self.course_id})
+            
+            response = self.searcher.search(field_dictionary={"course": self.course_id})
             while response["total"] > 0:
                 for item in response["results"]:
-                    searcher.remove(DOCUMENT_TYPE, item["data"]["id"])
-                    searcher.remove(DOCUMENT_TYPE, item["data"]["id"])
-                response = searcher.search(field_dictionary={"course": self.course_id})
+                    self.searcher.remove(TestCoursewareSearchIndexer.DOCUMENT_TYPE, item["data"]["id"])
+                    self.searcher.remove(TestCoursewareSearchIndexer.DOCUMENT_TYPE, item["data"]["id"])
+                response = self.searcher.search(field_dictionary={"course": self.course_id})
         self.course_id = None
 
     def setUp(self):
@@ -457,8 +471,8 @@ class TestLargeCourseDeletions(MixedWithOptionsTestCase):
 
     def assert_search_count(self, expected_count):
         """ Check that the search within this course will yield the expected number of results """
-        searcher = self.get_search_engine()
-        response = searcher.search(field_dictionary={"course": self.course_id})
+        
+        response = self.searcher.search(field_dictionary={"course": self.course_id})
         self.assertEqual(response["total"], expected_count)
 
     def _do_test_large_course_deletion(self, store, load_factor):
@@ -553,7 +567,7 @@ class TestTaskExecution(ModuleStoreTestCase):
 
     def test_task_indexing_course(self):
         """ Making sure that the receiver correctly fires off the task when invoked by signal """
-        searcher = SearchEngine.get_search_engine(INDEX_NAME)
+        searcher = SearchEngine.get_search_engine(CoursewareSearchIndexer.INDEX_NAME)
         response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
         self.assertEqual(response["total"], 0)
 
@@ -563,3 +577,173 @@ class TestTaskExecution(ModuleStoreTestCase):
         # Note that this test will only succeed if celery is working in inline mode
         response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
         self.assertEqual(response["total"], 3)
+
+
+@ddt.ddt
+class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
+    """ Tests the operation of the CoursewareSearchIndexer """
+
+    def setUp(self):
+        super(TestLibrarySearchIndexer, self).setUp()
+
+        self.library = None
+        self.html_unit1 = None
+        self.html_unit2 = None
+
+    def setup_course_base(self, store):
+        """
+        Set up the for the course outline tests.
+        """
+        self.library = LibraryFactory.create(modulestore=store)
+
+        self.html_unit1 = ItemFactory.create(
+            parent_location=self.library.location,
+            category="html",
+            display_name="Html Content",
+            modulestore=store,
+            publish_item=False,
+        )
+
+        self.html_unit2 = ItemFactory.create(
+            parent_location=self.library.location,
+            category="html",
+            display_name="Html Content 2",
+            modulestore=store,
+            publish_item=False,
+        )
+
+    def _get_default_search(self):
+        """ Returns field_dictionary for default search """
+        return {"library": unicode(self.library.location.replace(version_guid=None, branch=None))}
+
+    def reindex_library(self, store):
+        """ kick off complete reindex of the course """
+        return LibrarySearchIndexer.do_library_reindex(store, self.library.location.library_key)
+
+    def _get_contents(self, response):
+        """ Extracts contents from search response """
+        return [item['contents'] for item in response['results']]
+
+    def index_recent_changes(self, store, since_time):
+        """ index course using recent changes """
+        trigger_time = datetime.now(UTC)
+        return LibrarySearchIndexer.index(
+            store,
+            self.library.id,
+            triggered_at=trigger_time,
+            reindex_age=(trigger_time - since_time)
+        )
+
+    def _test_indexing_library(self, store):
+        """ indexing course tests """
+        response = self.search()
+        self.assertEqual(response["total"], 2)
+
+        added_to_index = self.reindex_library(store)
+        self.assertEqual(added_to_index, 2)
+        response = self.search()
+        self.assertEqual(response["total"], 2)
+
+    def _test_creating_item(self, store):
+        """ test updating an item """
+        response = self.search()
+        self.assertEqual(response["total"], 2)
+
+        # updating a library item causes immediate reindexing
+        data = "Some data"
+        ItemFactory.create(
+            parent_location=self.library.location,
+            category="html",
+            display_name="Html Content 3",
+            data=data,
+            modulestore=store,
+            publish_item=False,
+        )
+
+        response = self.search()
+        self.assertEqual(response["total"], 3)
+        html_contents = [cont['html_content'] for cont in self._get_contents(response)]
+        self.assertIn(data, html_contents)
+
+    def _test_updating_item(self, store):
+        """ test updating an item """
+        response = self.search()
+        self.assertEqual(response["total"], 2)
+
+        # updating a library item causes immediate reindexing
+        new_data = "I'm new data"
+        self.html_unit1.data = new_data
+        self.reindex_library(store)
+        response = self.search()
+        self.assertEqual(response["total"], 2)
+        html_contents = [cont['html_content'] for cont in self._get_contents(response)]
+        self.assertIn(new_data, html_contents)
+
+    def _test_deleting_item(self, store):
+        """ test deleting an item """
+        response = self.search()
+        self.assertEqual(response["total"], 2)
+
+        # deleting a library item causes immediate reindexing
+        self.delete_item(store, self.html_unit1.location)
+        self.reindex_library(store)
+        response = self.search()
+        self.assertEqual(response["total"], 1)
+
+    def _test_not_indexable(self, store):
+        """ test not indexable items """
+
+        response = self.search()
+        self.assertEqual(response["total"], 2)
+
+        # Add a non-indexable item
+        ItemFactory.create(
+            parent_location=self.library.location,
+            category="problem",
+            display_name="Some other content",
+            publish_item=False,
+            modulestore=store,
+        )
+        self.reindex_library(store)
+        response = self.search()
+        self.assertEqual(response["total"], 2)
+
+    @patch('django.conf.settings.SEARCH_ENGINE', None)
+    def _test_search_disabled(self, store):
+        """ if search setting has it as off, confirm that nothing is indexed """
+        indexed_count = self.reindex_library(store)
+        self.assertFalse(indexed_count)
+
+    @patch('django.conf.settings.SEARCH_ENGINE', 'search.tests.utils.ErroringIndexEngine')
+    def _test_exception(self, store):
+        """ Test that exception within indexing yields a SearchIndexingError """
+        with self.assertRaises(SearchIndexingError):
+            self.reindex_library(store)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_indexing_library(self, store_type):
+        self._perform_test_using_store(store_type, self._test_indexing_library)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_updating_item(self, store_type):
+        self._perform_test_using_store(store_type, self._test_updating_item)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_creating_item(self, store_type):
+        self._perform_test_using_store(store_type, self._test_creating_item)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_deleting_item(self, store_type):
+        self._perform_test_using_store(store_type, self._test_deleting_item)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_not_indexable(self, store_type):
+        self._perform_test_using_store(store_type, self._test_not_indexable)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_search_disabled(self, store_type):
+        self._perform_test_using_store(store_type, self._test_search_disabled)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_exception(self, store_type):
+        self._perform_test_using_store(store_type, self._test_exception)
