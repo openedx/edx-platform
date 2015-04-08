@@ -10,9 +10,6 @@ from eventtracking import tracker
 from xmodule.modulestore import ModuleStoreEnum
 from search.search_engine_base import SearchEngine
 
-from opaque_keys.edx.locator import CourseLocator, LibraryLocator
-
-
 # REINDEX_AGE is the default amount of time that we look back for changes
 # that might have happened. If we are provided with a time at which the
 # indexing is triggered, then we know it is safe to only index items
@@ -21,13 +18,6 @@ from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 REINDEX_AGE = timedelta(0, 60)  # 60 seconds
 
 log = logging.getLogger('edx.modulestore')
-
-
-def indexing_is_enabled():
-    """
-    Checks to see if the indexing feature is enabled
-    """
-    return settings.FEATURES.get('ENABLE_COURSEWARE_INDEX', False)
 
 
 class SearchIndexingError(Exception):
@@ -45,11 +35,19 @@ class SearchIndexBase(object):
 
     INDEX_NAME = None
     DOCUMENT_TYPE = None
+    ENABLE_INDEXING_KEY = None
 
     INDEX_EVENT = {
         'name': None,
         'category': None
     }
+
+    @classmethod
+    def indexing_is_enabled(cls):
+        """
+        Checks to see if the indexing feature is enabled
+        """
+        return settings.FEATURES.get(cls.ENABLE_INDEXING_KEY, False)
 
     @classmethod
     def _fetch_top_level(self, modulestore, structure_key):
@@ -220,6 +218,7 @@ class SearchIndexBase(object):
 class CoursewareSearchIndexer(SearchIndexBase):
     INDEX_NAME = "courseware_index"
     DOCUMENT_TYPE = "courseware_content"
+    ENABLE_INDEXING_KEY = 'ENABLE_COURSEWARE_INDEX'
 
     INDEX_EVENT = {
         'name': 'edx.course.index.reindexed',
@@ -247,6 +246,7 @@ class CoursewareSearchIndexer(SearchIndexBase):
 class LibrarySearchIndexer(SearchIndexBase):
     INDEX_NAME = "library_index"
     DOCUMENT_TYPE = "library_content"
+    ENABLE_INDEXING_KEY = 'ENABLE_LIBRARY_INDEX'
 
     INDEX_EVENT = {
         'name': 'edx.library.index.reindexed',

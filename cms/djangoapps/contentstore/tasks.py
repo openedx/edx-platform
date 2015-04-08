@@ -10,7 +10,7 @@ from pytz import UTC
 
 from django.contrib.auth.models import User
 
-from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
+from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer, SearchIndexingError
 from contentstore.utils import initialize_permissions
 from course_action_state.models import CourseRerunState
 from opaque_keys.edx.keys import CourseKey
@@ -98,3 +98,15 @@ def update_search_index(course_id, triggered_time_isoformat):
         LOGGER.error('Search indexing error for complete course %s - %s', course_id, unicode(exc))
     else:
         LOGGER.debug('Search indexing successful for complete course %s', course_id)
+
+@task()
+def update_library_index(library_id, triggered_time):
+    """ Updates course search index. """
+    try:
+        library_key = CourseKey.from_string(library_id)
+        LibrarySearchIndexed.indexindex_course(modulestore(), library_key, triggered_at=triggered_time)
+
+    except SearchIndexingError as exc:
+        LOGGER.error('Search indexing error for library %s - %s', library_id, unicode(exc))
+    else:
+        LOGGER.debug('Search indexing successful for library %s', library_id)

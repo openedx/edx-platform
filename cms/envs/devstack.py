@@ -80,6 +80,7 @@ FEATURES['ENTRANCE_EXAMS'] = True
 
 ################################ SEARCH INDEX ################################
 FEATURES['ENABLE_COURSEWARE_INDEX'] = True
+FEATURES['ENABLE_LIBRARY_INDEX'] = True
 SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
 
 ###############################################################################
