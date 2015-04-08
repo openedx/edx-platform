@@ -383,3 +383,39 @@ class StudentEngagementTests(TestCase):
             # shouldn't be anything in there because course is closed
             leaderboard = StudentSocialEngagementScore.generate_leaderboard(course2.id)
             self.assertEqual(len(leaderboard), 2)
+
+    def test_no_score(self):
+        """
+        Run the engagement calculation for a user in a course who has no score
+        """
+
+        self.assertEqual(get_notifications_count_for_user(self.user.id), 0)
+
+        with patch('social_engagement.engagement._get_user_social_stats') as mock_func:
+            mock_func.return_value = {
+                'num_threads': 0,
+                'num_comments': 0,
+                'num_replies': 0,
+                'num_upvotes': 0,
+                'num_thread_followers': 0,
+                'num_comments_generated': 0,
+            }
+
+            update_user_engagement_score(self.course.id, self.user.id)
+
+            leaderboard_position = StudentSocialEngagementScore.get_user_leaderboard_position(
+                self.course.id,
+                self.user.id
+            )
+
+            self.assertEqual(
+                leaderboard_position['score'],
+                0
+            )
+
+            self.assertEqual(
+                leaderboard_position['position'],
+                0
+            )
+
+            self.assertEqual(get_notifications_count_for_user(self.user.id), 0)
