@@ -164,8 +164,7 @@ class FieldDataCache(object):
         """
         if self.user.is_authenticated():
             for scope, fields in self._fields_to_cache(descriptors).items():
-                for field_object in self._retrieve_fields(scope, fields, descriptors):
-                    self.cache[self._cache_key_from_field_object(scope, field_object)] = field_object
+                self._cache_fields(scope, fields, descriptors)
 
     def add_descriptor_descendents(self, descriptor, depth=None, descriptor_filter=lambda descriptor: True):
         """
@@ -253,7 +252,7 @@ class FieldDataCache(object):
 
         return block_types
 
-    def _retrieve_fields(self, scope, fields, descriptors):
+    def _cache_fields(self, scope, fields, descriptors):
         """
         Queries the database for all of the fields in the specified scope
         """
@@ -264,14 +263,14 @@ class FieldDataCache(object):
                 self._all_usage_ids(descriptors),
                 self.select_for_update,
             )
-            return self.user_state_cache._data
+            field_objects = self.user_state_cache._data
         elif scope == Scope.user_state_summary:
             self.user_state_summary_cache = UserStateSummaryCache(
                 self._all_usage_ids(descriptors),
                 fields,
                 self.select_for_update,
             )
-            return self.user_state_summary_cache._data
+            field_objects = self.user_state_summary_cache._data
         elif scope == Scope.preferences:
             self.preferences_cache = PreferencesCache(
                 self.user,
@@ -279,16 +278,19 @@ class FieldDataCache(object):
                 fields,
                 self.select_for_update,
             )
-            return self.preferences_cache._data
+            field_objects = self.preferences_cache._data
         elif scope == Scope.user_info:
             self.user_info_cache = UserInfoCache(
                 self.user,
                 fields,
                 self.select_for_update,
             )
-            return self.user_info_cache._data
+            field_objects = self.user_info_cache._data
         else:
-            return []
+            field_objects = []
+
+        for field_object in field_objects:
+            self.cache[self._cache_key_from_field_object(scope, field_object)] = field_object
 
     def _fields_to_cache(self, descriptors):
         """
