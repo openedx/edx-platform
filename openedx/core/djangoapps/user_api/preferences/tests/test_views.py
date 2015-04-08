@@ -25,7 +25,7 @@ TOO_LONG_PREFERENCE_KEY = u"x" * 256
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestPreferencesAPI(UserAPITestCase):
     """
-    Unit tests /api/user/v0/accounts/{username}/
+    Unit tests /api/user/v1/accounts/{username}/
     """
     def setUp(self):
         super(TestPreferencesAPI, self).setUp()
@@ -342,7 +342,7 @@ class TestPreferencesAPITransactions(TransactionTestCase):
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestPreferencesDetailAPI(UserAPITestCase):
     """
-    Unit tests /api/user/v0/accounts/{username}/{preference_key}
+    Unit tests /api/user/v1/accounts/{username}/{preference_key}
     """
     def setUp(self):
         super(TestPreferencesDetailAPI, self).setUp()
