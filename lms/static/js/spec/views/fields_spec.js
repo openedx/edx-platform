@@ -1,8 +1,7 @@
 define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
-        'js/views/fields',
-        'js/spec/views/fields_helpers',
+        'js/views/fields', 'js/spec/views/fields_helpers', "logger",
         'string_utils'],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpecHelpers) {
+    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpecHelpers, Logger) {
         'use strict';
 
         var USERNAME = 'Legolas',
@@ -33,6 +32,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 timerCallback = jasmine.createSpy('timerCallback');
                 jasmine.Clock.useMock();
+
+                spyOn(Logger, 'log');
             });
 
             it("updates messages correctly for all fields", function() {
@@ -75,7 +76,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     title: 'Preferred Language',
                     valueAttribute: 'language',
                     helpMessage: 'Your preferred language.'
-                })
+                });
 
                 var view = new fieldViewClass(fieldData);
                 view.saveAttributes(
@@ -83,11 +84,40 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     {'headers': {'Priority': 'Urgent'}}
                 );
 
+                // No event was emitted because changeAnalyticsName was not specified.
+                expect(Logger.log).not.toHaveBeenCalled();
+
                 var request = requests[0];
                 expect(request.method).toBe('PATCH');
                 expect(request.requestHeaders['Content-Type']).toBe('application/merge-patch+json;charset=utf-8');
                 expect(request.requestHeaders['Priority']).toBe('Urgent');
                 expect(request.requestBody).toBe('{"language":"ur"}');
+            });
+
+            it("can emit an event when saveAttributes is called", function() {
+
+                var fieldViewClass = FieldViews.EditableFieldView;
+                var fieldData = FieldViewsSpecHelpers.createFieldData(fieldViewClass, {
+                    title: 'Preferred Language',
+                    valueAttribute: 'language',
+                    helpMessage: 'Your preferred language.',
+                    changeAnalyticsName: 'change_initiated',
+                    userID: 1000
+                });
+
+                var view = new fieldViewClass(fieldData);
+                view.saveAttributes(
+                    {'language': 'ur'}
+                );
+
+                expect(Logger.log).toHaveBeenCalledWith(
+                    'change_initiated', {
+                        'user_id': 1000,
+                        'settings': {
+                            'language': {'old_value': 'si', 'new_value': 'ur'}
+                        }
+                    }
+                );
             });
 
             it("correctly renders and updates ReadonlyFieldView", function() {

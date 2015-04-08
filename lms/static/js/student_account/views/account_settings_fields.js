@@ -51,7 +51,8 @@
 
             linkClicked: function (event) {
                 event.preventDefault();
-                this.resetPassword(event)
+                this.emitChangeInitiated({'password': null}, {'password': null});
+                this.resetPassword(event);
             },
 
             resetPassword: function (event) {
@@ -64,7 +65,7 @@
                     url: view.options.linkHref,
                     data: data,
                     success: function () {
-                        view.showSuccessMessage()
+                        view.showSuccessMessage();
                     },
                     error: function (xhr, status, error) {
                         view.showErrorMessage(xhr);
@@ -85,7 +86,7 @@
             modelValue: function () {
                 var modelValue = this.model.get(this.options.valueAttribute);
                 if (_.isArray(modelValue) && modelValue.length > 0) {
-                    return modelValue[0].code
+                    return modelValue[0].code;
                 } else {
                     return '';
                 }
@@ -120,6 +121,11 @@
 
             linkClicked: function (event) {
                 event.preventDefault();
+
+                var attributes = {}, old_values = {};
+                attributes[this.options.valueAttribute] = this.options.connected ? 'disconnected' : 'connected';
+                old_values[this.options.valueAttribute] = this.options.connected ? 'connected' : 'disconnected';
+                this.emitChangeInitiated(attributes, old_values);
 
                 this.showInProgressMessage();
 

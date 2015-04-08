@@ -1,8 +1,8 @@
-;(function (define, undefined) {
+;(function (define) {
     'use strict';
     define([
-        'gettext', 'jquery', 'underscore', 'backbone', 'js/mustache', 'backbone-super'
-    ], function (gettext, $, _, Backbone, RequireMustache) {
+        'gettext', 'jquery', 'underscore', 'backbone', 'js/mustache', 'logger', 'backbone-super'
+    ], function (gettext, $, _, Backbone, RequireMustache, Logger) {
 
         var Mustache = window.Mustache || RequireMustache;
 
@@ -42,6 +42,8 @@
 
                 this.helpMessage = this.options.helpMessage || '';
                 this.showMessages = _.isUndefined(this.options.showMessages) ? true : this.options.showMessages;
+                this.changeAnalyticsName = _.isUndefined(this.options.changeAnalyticsName) ? null : this.options.changeAnalyticsName;
+                this.userID = _.isUndefined(this.options.userID) ? null : this.options.userID;
 
                 _.bindAll(this, 'modelValue', 'modelValueIsSet', 'message', 'getMessage', 'title',
                           'showHelpMessage', 'showInProgressMessage', 'showSuccessMessage', 'showErrorMessage');
@@ -52,7 +54,7 @@
             },
 
             modelValueIsSet: function() {
-                return (this.modelValue() == true);
+                return (this.modelValue() === true);
             },
 
             message: function (message) {
@@ -121,7 +123,29 @@
                 } else {
                     this.message(this.getMessage('error'));
                 }
+            },
+
+            emitChangeInitiated: function (attributes, old_values) {
+                // If change analytics logging is desired, emit a changed_initiated event.
+                if (this.changeAnalyticsName) {
+                    var settings = {}, oldValue;
+                    for (var key in attributes) {
+                        if (old_values) {
+                            oldValue = old_values[key];
+                        }
+                        else {
+                            oldValue = this.model.get(key);
+                        }
+                        settings[key] = {old_value: oldValue, new_value: attributes[key]};
+                    }
+                    Logger.log(this.changeAnalyticsName, {
+                        user_id: this.userID,
+                        settings: settings
+                    });
+                }
+
             }
+
         });
 
         FieldViews.EditableFieldView = FieldViews.FieldView.extend({
@@ -153,6 +177,7 @@
                         view.showErrorMessage(xhr);
                     }
                 };
+                this.emitChangeInitiated(attributes);
                 this.showInProgressMessage();
                 this.model.save(attributes, _.extend(defaultOptions, options));
             },

@@ -5,13 +5,17 @@ End-to-end tests for the Account Settings page.
 from unittest import skip
 
 from bok_choy.web_app_test import WebAppTest
+from datetime import datetime
+from pytz import UTC
 
 from ...pages.lms.account_settings import AccountSettingsPage
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.dashboard import DashboardPage
+from ..helpers import EventsTestMixin
+from time import sleep
 
 
-class AccountSettingsPageTest(WebAppTest):
+class AccountSettingsPageTest(EventsTestMixin, WebAppTest):
     """
     Tests that verify behaviour of the Account Settings page.
     """
@@ -27,7 +31,9 @@ class AccountSettingsPageTest(WebAppTest):
         """
         super(AccountSettingsPageTest, self).setUp()
 
-        AutoAuthPage(self.browser, username=self.USERNAME, password=self.PASSWORD, email=self.EMAIL).visit()
+        self.user_id = AutoAuthPage(
+            self.browser, username=self.USERNAME, password=self.PASSWORD, email=self.EMAIL
+        ).visit().get_user_id()
 
         self.account_settings_page = AccountSettingsPage(self.browser)
         self.account_settings_page.visit()
@@ -93,8 +99,10 @@ class AccountSettingsPageTest(WebAppTest):
         """
         Test behaviour of a text field.
         """
-        self.assertEqual(self.account_settings_page.title_for_field(field_id), title)
-        self.assertEqual(self.account_settings_page.value_for_text_field(field_id), initial_value)
+        start_time = datetime.now(UTC)
+
+        #self.assertEqual(self.account_settings_page.title_for_field(field_id), title)
+        #self.assertEqual(self.account_settings_page.value_for_text_field(field_id), initial_value)
 
         self.assertEqual(
             self.account_settings_page.value_for_text_field(field_id, new_invalid_value), new_invalid_value
@@ -103,9 +111,20 @@ class AccountSettingsPageTest(WebAppTest):
         self.browser.refresh()
         self.assertNotEqual(self.account_settings_page.value_for_text_field(field_id), new_invalid_value)
 
+
+
         for new_value in new_valid_values:
             self.assertEqual(self.account_settings_page.value_for_text_field(field_id, new_value), new_value)
             self.account_settings_page.wait_for_messsage(field_id, success_message)
+            # sleep(5)
+            # self.assertEqual(
+            #     self.event_collection.find({
+            #         "name": "edx.user.settings.change_initiated",
+            #         "time": {"$gt": start_time},
+            #         "event.user_id": self.user_id,
+            #     }).count(),
+            #     1
+            # )
             if assert_after_reload:
                 self.browser.refresh()
                 self.assertEqual(self.account_settings_page.value_for_text_field(field_id), new_value)
