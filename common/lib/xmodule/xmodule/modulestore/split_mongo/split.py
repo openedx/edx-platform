@@ -269,6 +269,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
 
         if dirty and emit_signals:
             self.send_bulk_published_signal(bulk_write_record, course_key)
+            self.send_bulk_library_updated_signal(bulk_write_record, course_key)
 
     def get_course_index(self, course_key, ignore_case=False):
         """
@@ -1536,6 +1537,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                     block_id=block_key.id,
                 )
 
+            if isinstance(course_key, LibraryLocator):
+                self._flag_library_updated_event(course_key)
+
             # reconstruct the new_item from the cache
             return self.get_item(item_loc)
 
@@ -1890,6 +1894,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                     course_key = LibraryLocator(version_guid=new_id)
                 else:
                     course_key = CourseLocator(version_guid=new_id)
+
+                if isinstance(course_key, LibraryLocator):
+                    self._flag_library_updated_event(course_key)
 
                 # fetch and return the new item--fetching is unnecessary but a good qc step
                 new_locator = course_key.make_usage_key(block_key.type, block_key.id)
@@ -2391,6 +2398,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 result = usage_locator.course_key.for_version(new_id)
             else:
                 result = CourseLocator(version_guid=new_id)
+
+            if isinstance(usage_locator.course_key, LibraryLocator):
+                self._flag_library_updated_event(usage_locator.course_key)
 
             return result
 

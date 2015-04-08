@@ -476,6 +476,7 @@ class MongoBulkOpsMixin(BulkOperationsMixin):
 
             if emit_signals:
                 self.send_bulk_published_signal(bulk_ops_record, course_id)
+                self.send_bulk_library_updated_signal(bulk_ops_record, course_id)
 
             bulk_ops_record.dirty = False  # brand spanking clean now
 

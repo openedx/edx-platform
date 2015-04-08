@@ -1,4 +1,4 @@
-""" receiver of course_published events in order to trigger indexing task """
+""" receivers of course_published and library_updated events in order to trigger indexing task """
 from datetime import datetime
 from pytz import UTC
 
@@ -20,7 +20,7 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
 
 
 @receiver(SignalHandler.library_updated)
-def listen_for_course_publish(sender, library_key, **kwargs):  # pylint: disable=unused-argument
+def listen_for_library_update(sender, library_key, **kwargs):  # pylint: disable=unused-argument
     """
     Receives signal and kicks off celery task to update search index
     """

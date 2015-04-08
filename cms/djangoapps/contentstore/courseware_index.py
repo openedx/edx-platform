@@ -30,7 +30,7 @@ class SearchIndexingError(Exception):
 
 class SearchIndexBase(object):
     """
-    Class to perform indexing for courseware search from different modulestores
+    Base class to perform indexing for courseware or library search from different modulestores
     """
 
     INDEX_NAME = None
@@ -50,17 +50,22 @@ class SearchIndexBase(object):
         return settings.FEATURES.get(cls.ENABLE_INDEXING_KEY, False)
 
     @classmethod
-    def _fetch_top_level(self, modulestore, structure_key):
+    def _normalize_structure_key(cls, structure_key):
+        """ Normalizes structure key for use in indexing """
+        raise NotImplementedError("Should be overridden in child classes")
+
+    @classmethod
+    def _fetch_top_level(cls, modulestore, structure_key):
         """ Fetch the item from the modulestore location """
         raise NotImplementedError("Should be overridden in child classes")
 
     @classmethod
-    def _get_location_info(self, structure_key):
+    def _get_location_info(cls, normalized_structure_key):
         """ Builds location info dictionary """
         raise NotImplementedError("Should be overridden in child classes")
 
     @classmethod
-    def _id_modifier(self, usage_id):
+    def _id_modifier(cls, usage_id):
         """ Modifies usage_id to submit to index """
         return usage_id
 
@@ -102,6 +107,7 @@ class SearchIndexBase(object):
         if not searcher:
             return
 
+        structure_key = cls._normalize_structure_key(structure_key)
         location_info = cls._get_location_info(structure_key)
 
         # Wrap counter in dictionary - otherwise we seem to lose scope inside the embedded function `index_item`
@@ -216,6 +222,9 @@ class SearchIndexBase(object):
 
 
 class CoursewareSearchIndexer(SearchIndexBase):
+    """
+    Class to perform indexing for courseware search from different modulestores
+    """
     INDEX_NAME = "courseware_index"
     DOCUMENT_TYPE = "courseware_content"
     ENABLE_INDEXING_KEY = 'ENABLE_COURSEWARE_INDEX'
@@ -226,14 +235,19 @@ class CoursewareSearchIndexer(SearchIndexBase):
     }
 
     @classmethod
-    def _fetch_top_level(self, modulestore, structure_key):
+    def _normalize_structure_key(cls, structure_key):
+        """ Normalizes structure key for use in indexing """
+        return structure_key
+
+    @classmethod
+    def _fetch_top_level(cls, modulestore, structure_key):
         """ Fetch the item from the modulestore location """
         return modulestore.get_course(structure_key, depth=None)
 
     @classmethod
-    def _get_location_info(self, structure_key):
+    def _get_location_info(cls, normalized_structure_key):
         """ Builds location info dictionary """
-        return {"course": unicode(structure_key)}
+        return {"course": unicode(normalized_structure_key)}
 
     @classmethod
     def do_course_reindex(cls, modulestore, course_key):
@@ -244,6 +258,9 @@ class CoursewareSearchIndexer(SearchIndexBase):
 
 
 class LibrarySearchIndexer(SearchIndexBase):
+    """
+    Base class to perform indexing for library search from different modulestores
+    """
     INDEX_NAME = "library_index"
     DOCUMENT_TYPE = "library_content"
     ENABLE_INDEXING_KEY = 'ENABLE_LIBRARY_INDEX'
@@ -254,17 +271,22 @@ class LibrarySearchIndexer(SearchIndexBase):
     }
 
     @classmethod
-    def _fetch_top_level(self, modulestore, structure_key):
+    def _normalize_structure_key(cls, structure_key):
+        """ Normalizes structure key for use in indexing """
+        return structure_key.replace(version_guid=None, branch=None)
+
+    @classmethod
+    def _fetch_top_level(cls, modulestore, structure_key):
         """ Fetch the item from the modulestore location """
         return modulestore.get_library(structure_key, depth=None)
 
     @classmethod
-    def _get_location_info(self, structure_key):
+    def _get_location_info(cls, normalized_structure_key):
         """ Builds location info dictionary """
-        return {"library": unicode(structure_key.replace(version_guid=None, branch=None))}
+        return {"library": unicode(normalized_structure_key)}
 
     @classmethod
-    def _id_modifier(self, usage_id):
+    def _id_modifier(cls, usage_id):
         """ Modifies usage_id to submit to index """
         return usage_id.replace(library_key=(usage_id.library_key.replace(version_guid=None, branch=None)))
 

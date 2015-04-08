@@ -92,19 +92,25 @@ def update_search_index(course_id, triggered_time_isoformat):
             triggered_time_isoformat.split('+')[0],
             "%Y-%m-%dT%H:%M:%S.%f"
         ).replace(tzinfo=UTC)
-        CoursewareSearchIndexer.index_course(modulestore(), course_key, triggered_at=triggered_time)
+        CoursewareSearchIndexer.index(modulestore(), course_key, triggered_at=triggered_time)
 
     except SearchIndexingError as exc:
         LOGGER.error('Search indexing error for complete course %s - %s', course_id, unicode(exc))
     else:
         LOGGER.debug('Search indexing successful for complete course %s', course_id)
 
+
 @task()
-def update_library_index(library_id, triggered_time):
+def update_library_index(library_id, triggered_time_isoformat):
     """ Updates course search index. """
     try:
         library_key = CourseKey.from_string(library_id)
-        LibrarySearchIndexed.indexindex_course(modulestore(), library_key, triggered_at=triggered_time)
+        triggered_time = datetime.strptime(
+            # remove the +00:00 from the end of the formats generated within the system
+            triggered_time_isoformat.split('+')[0],
+            "%Y-%m-%dT%H:%M:%S.%f"
+        ).replace(tzinfo=UTC)
+        LibrarySearchIndexer.index(modulestore(), library_key, triggered_at=triggered_time)
 
     except SearchIndexingError as exc:
         LOGGER.error('Search indexing error for library %s - %s', library_id, unicode(exc))
