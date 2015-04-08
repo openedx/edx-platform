@@ -24,6 +24,7 @@ __test__ = False  # do not collect
     ('fasttest', 'a', 'Skip some setup'),
     ('extra_args=', 'e', 'adds as extra args to the test command'),
     ('default_store=', 's', 'Default modulestore'),
+    ('test_dir=', 'd', 'Directory for finding tests (relative to common/test/acceptance)'),
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity"),
@@ -55,7 +56,7 @@ def test_bokchoy(options):
         'default_store': getattr(options, 'default_store', 'split'),
         'verbosity': getattr(options, 'verbosity', 2),
         'extra_args': getattr(options, 'extra_args', ''),
-        'test_dir': 'tests',
+        'test_dir': getattr(options, 'test_dir', 'tests'),
     }
     run_bokchoy(**opts)
 
