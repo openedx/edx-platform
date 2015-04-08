@@ -916,3 +916,5 @@ ELASTIC_FIELD_MAPPINGS = {
         "type": "date"
     }
 }
+
+OAUTH_OIDC_ISSUER = "https://http://54.171.219.192/oauth2"
