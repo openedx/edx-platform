@@ -207,6 +207,12 @@ def handle_progress_post_save_signal(sender, instance, **kwargs):
             get_aggregate_exclusion_user_ids(instance.course_id)
         )['position']
 
+        if leaderboard_rank == 0:
+            # quick escape when user is not in the leaderboard
+            # which means rank = 0. Trouble is 0 < 3, so unfortunately
+            # the semantics around 0 don't match the logic below
+            return
+
         # logic for Notification trigger is when a user enters into the Leaderboard
         leaderboard_size = getattr(settings, 'LEADERBOARD_SIZE', 3)
         presave_leaderboard_rank = instance.presave_leaderboard_rank if instance.presave_leaderboard_rank else sys.maxint
