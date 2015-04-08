@@ -574,7 +574,9 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
         duplicate_metadata = {}
         for field in source_item.fields.values():
             if field.scope == Scope.settings and field.is_set_on(source_item):
-                duplicate_metadata[field.name] = field.read_from(source_item)
+                # Do not duplicate 'discussion_id' TNL-1754
+                if field.name != 'discussion_id':
+                    duplicate_metadata[field.name] = field.read_from(source_item)
         if display_name is not None:
             duplicate_metadata['display_name'] = display_name
         else:
