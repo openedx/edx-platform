@@ -58,21 +58,3 @@ class HelpModalTests(ModuleStoreTestCase):
         url = reverse('info', args=[self.course.id.to_deprecated_string()])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
-
-
-class KeywordSubConfigTests(TestCase):
-    """ Tests for configuring keyword substitution feature """
-
-    def test_keyword_map_not_empty(self):
-        """ Ensure that the keyword subsitution map is non-empty """
-        self.assertFalse(keyword_substitution.keyword_function_map_is_empty())
-
-    def test_adding_keyword_map_is_noop(self):
-        """ Test that trying to add a new keyword mapping is a no-op """
-
-        existing_map = keyword_substitution.KEYWORD_FUNCTION_MAP
-        keyword_substitution.add_keyword_function_map({
-            '%%USER_ID%%': lambda x: x,
-            '%%USER_FULLNAME%%': lambda x: x,
-        })
-        self.assertDictEqual(existing_map, keyword_substitution.KEYWORD_FUNCTION_MAP)

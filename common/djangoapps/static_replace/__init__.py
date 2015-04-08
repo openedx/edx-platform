@@ -9,6 +9,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.contentstore.content import StaticContent
 
+from opaque_keys.edx.locator import AssetLocator
+
 log = logging.getLogger(__name__)
 
 
@@ -152,7 +154,6 @@ def replace_static_urls(text, data_directory=None, course_id=None, static_asset_
         """
         Replace a single matched url.
         """
-
         # Don't mess with things that end in '?raw'
         if rest.endswith('?raw'):
             return original
@@ -180,6 +181,10 @@ def replace_static_urls(text, data_directory=None, course_id=None, static_asset_
                 # if not, then assume it's courseware specific content and then look in the
                 # Mongo-backed database
                 url = StaticContent.convert_legacy_static_url_with_course_id(rest, course_id)
+
+                if AssetLocator.CANONICAL_NAMESPACE in url:
+                    url = url.replace('block@', 'block/', 1)
+
         # Otherwise, look the file up in staticfiles_storage, and append the data directory if needed
         else:
             course_path = "/".join((static_asset_path or data_directory, rest))
