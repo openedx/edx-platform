@@ -41,6 +41,12 @@ class DiscussionFields(object):
     )
     sort_key = String(scope=Scope.settings)
 
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super(DiscussionFields, self).non_editable_metadata_fields
+        non_editable_fields.append(DiscussionFields.data)
+        return non_editable_fields
+
 
 class DiscussionModule(DiscussionFields, XModule):
     js = {

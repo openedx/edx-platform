@@ -15,6 +15,12 @@ class RawDescriptor(XmlDescriptor, XMLEditingDescriptor):
     """
     data = String(help="XML data for the module", default="", scope=Scope.content)
 
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super(RawDescriptor, self).non_editable_metadata_fields
+        non_editable_fields.append(RawDescriptor.data)
+        return non_editable_fields
+
     @classmethod
     def definition_from_xml(cls, xml_object, system):
         return {'data': etree.tostring(xml_object, pretty_print=True, encoding='unicode')}, []
@@ -43,6 +49,12 @@ class EmptyDataRawDescriptor(XmlDescriptor, XMLEditingDescriptor):
     but use XMLEditingDescriptor for import/export handling.
     """
     data = String(default='', scope=Scope.content)
+
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super(EmptyDataRawDescriptor, self).non_editable_metadata_fields
+        non_editable_fields.append(EmptyDataRawDescriptor.data)
+        return non_editable_fields
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
