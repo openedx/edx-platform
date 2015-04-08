@@ -25,10 +25,9 @@ from xmodule.x_module import XModuleMixin
 
 from search.search_engine_base import SearchEngine
 
-from contentstore.courseware_index import (
-    CoursewareSearchIndexer, LibrarySearchIndexer, SearchIndexingError, get_indexer_for_location
-)
+from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer, SearchIndexingError
 from contentstore.signals import listen_for_course_publish
+
 
 
 COURSE_CHILD_STRUCTURE = {
@@ -177,6 +176,8 @@ class MixedWithOptionsTestCase(MixedSplitTestCase):
 @ddt.ddt
 class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
     """ Tests the operation of the CoursewareSearchIndexer """
+
+    WORKS_WITH_STORES = (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
 
     def setUp(self):
         super(TestCoursewareSearchIndexer, self).setUp()
@@ -411,35 +412,35 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         with self.assertRaises(SearchIndexingError):
             self.reindex_course(store)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(*WORKS_WITH_STORES)
     def test_indexing_course(self, store_type):
         self._perform_test_using_store(store_type, self._test_indexing_course)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(*WORKS_WITH_STORES)
     def test_not_indexing_unpublished_content(self, store_type):
         self._perform_test_using_store(store_type, self._test_not_indexing_unpublished_content)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(*WORKS_WITH_STORES)
     def test_deleting_item(self, store_type):
         self._perform_test_using_store(store_type, self._test_deleting_item)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(*WORKS_WITH_STORES)
     def test_not_indexable(self, store_type):
         self._perform_test_using_store(store_type, self._test_not_indexable)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(*WORKS_WITH_STORES)
     def test_start_date_propagation(self, store_type):
         self._perform_test_using_store(store_type, self._test_start_date_propagation)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(*WORKS_WITH_STORES)
     def test_search_disabled(self, store_type):
         self._perform_test_using_store(store_type, self._test_search_disabled)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(*WORKS_WITH_STORES)
     def test_time_based_index(self, store_type):
         self._perform_test_using_store(store_type, self._test_time_based_index)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(*WORKS_WITH_STORES)
     def test_exception(self, store_type):
         self._perform_test_using_store(store_type, self._test_exception)
 
@@ -449,10 +450,12 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
 class TestLargeCourseDeletions(MixedWithOptionsTestCase):
     """ Tests to excerise deleting items from a course """
 
+    WORKS_WITH_STORES = (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+
     def _clean_course_id(self):
         """ Clean all documents from the index that have a specific course provided """
         if self.course_id:
-            
+
             response = self.searcher.search(field_dictionary={"course": self.course_id})
             while response["total"] > 0:
                 for item in response["results"]:
@@ -471,7 +474,7 @@ class TestLargeCourseDeletions(MixedWithOptionsTestCase):
 
     def assert_search_count(self, expected_count):
         """ Check that the search within this course will yield the expected number of results """
-        
+
         response = self.searcher.search(field_dictionary={"course": self.course_id})
         self.assertEqual(response["total"], expected_count)
 
@@ -518,7 +521,7 @@ class TestLargeCourseDeletions(MixedWithOptionsTestCase):
 
     @skip(("This test is to see how we handle very large courses, to ensure that the delete"
            "procedure works smoothly - too long to run during the normal course of things"))
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(*WORKS_WITH_STORES)
     def test_large_course_deletion(self, store_type):
         self._perform_test_using_store(store_type, self._test_large_course_deletion)
 
@@ -582,6 +585,9 @@ class TestTaskExecution(ModuleStoreTestCase):
 @ddt.ddt
 class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
     """ Tests the operation of the CoursewareSearchIndexer """
+
+    # libraries work only with split, so do library indexer
+    WORKS_WITH_STORES = (ModuleStoreEnum.Type.split, )
 
     def setUp(self):
         super(TestLibrarySearchIndexer, self).setUp()
@@ -720,30 +726,30 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
         with self.assertRaises(SearchIndexingError):
             self.reindex_library(store)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(*WORKS_WITH_STORES)
     def test_indexing_library(self, store_type):
         self._perform_test_using_store(store_type, self._test_indexing_library)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(*WORKS_WITH_STORES)
     def test_updating_item(self, store_type):
         self._perform_test_using_store(store_type, self._test_updating_item)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(*WORKS_WITH_STORES)
     def test_creating_item(self, store_type):
         self._perform_test_using_store(store_type, self._test_creating_item)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(*WORKS_WITH_STORES)
     def test_deleting_item(self, store_type):
         self._perform_test_using_store(store_type, self._test_deleting_item)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(*WORKS_WITH_STORES)
     def test_not_indexable(self, store_type):
         self._perform_test_using_store(store_type, self._test_not_indexable)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(*WORKS_WITH_STORES)
     def test_search_disabled(self, store_type):
         self._perform_test_using_store(store_type, self._test_search_disabled)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(*WORKS_WITH_STORES)
     def test_exception(self, store_type):
         self._perform_test_using_store(store_type, self._test_exception)
