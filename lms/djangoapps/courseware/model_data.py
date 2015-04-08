@@ -81,13 +81,17 @@ class UserStateCache(object):
             course_id=course_id,
             student=user.pk,
         )
+        self.course_id = course_id
+
+    def cache_key_for_field_object(self, field_object):
+        return (Scope.user_state, field_object.module_state_key.map_into_course(self.course_id))
 
 
 class UserStateSummaryCache(object):
     """
     Cache for Scope.user_state_summary xblock field data.
     """
-    def __init__(self, usage_keys, fields, select_for_update=False):
+    def __init__(self, course_id, usage_keys, fields, select_for_update=False):
         self._data = _chunked_query(
             XModuleUserStateSummaryField,
             select_for_update,
@@ -95,6 +99,10 @@ class UserStateSummaryCache(object):
             usage_keys,
             field_name__in=set(field.name for field in fields),
         )
+        self.course_id = course_id
+
+    def cache_key_for_field_object(self, field_object):
+        return (Scope.user_state_summary, field_object.usage_id.map_into_course(self.course_id), field_object.field_name)
 
 
 class PreferencesCache(object):
@@ -111,6 +119,9 @@ class PreferencesCache(object):
             field_name__in=set(field.name for field in fields),
         )
 
+    def cache_key_for_field_object(self, field_object):
+        return (Scope.preferences, field_object.module_type, field_object.field_name)
+
 
 class UserInfoCache(object):
     """
@@ -123,6 +134,9 @@ class UserInfoCache(object):
             student=user.pk,
             field_name__in=set(field.name for field in fields),
         )
+
+    def cache_key_for_field_object(self, field_object):
+        return (Scope.user_info, field_object.field_name)
 
 
 class FieldDataCache(object):
@@ -257,40 +271,37 @@ class FieldDataCache(object):
         Queries the database for all of the fields in the specified scope
         """
         if scope == Scope.user_state:
-            self.user_state_cache = UserStateCache(
+            cache = self.user_state_cache = UserStateCache(
                 self.user,
                 self.course_id,
                 self._all_usage_ids(descriptors),
                 self.select_for_update,
             )
-            field_objects = self.user_state_cache._data
         elif scope == Scope.user_state_summary:
-            self.user_state_summary_cache = UserStateSummaryCache(
+            cache = self.user_state_summary_cache = UserStateSummaryCache(
+                self.course_id,
                 self._all_usage_ids(descriptors),
                 fields,
                 self.select_for_update,
             )
-            field_objects = self.user_state_summary_cache._data
         elif scope == Scope.preferences:
-            self.preferences_cache = PreferencesCache(
+            cache = self.preferences_cache = PreferencesCache(
                 self.user,
                 self._all_block_types(descriptors),
                 fields,
                 self.select_for_update,
             )
-            field_objects = self.preferences_cache._data
         elif scope == Scope.user_info:
-            self.user_info_cache = UserInfoCache(
+            cache = self.user_info_cache = UserInfoCache(
                 self.user,
                 fields,
                 self.select_for_update,
             )
-            field_objects = self.user_info_cache._data
         else:
-            field_objects = []
+            return
 
-        for field_object in field_objects:
-            self.cache[self._cache_key_from_field_object(scope, field_object)] = field_object
+        for field_object in cache._data:
+            self.cache[cache.cache_key_for_field_object(field_object)] = field_object
 
     def _fields_to_cache(self, descriptors):
         """
@@ -314,20 +325,6 @@ class FieldDataCache(object):
             return (key.scope, BlockTypeKeyV1(key.block_family, key.block_scope_id), key.field_name)
         elif key.scope == Scope.user_info:
             return (key.scope, key.field_name)
-
-    def _cache_key_from_field_object(self, scope, field_object):
-        """
-        Return the key used in the FieldDataCache for the specified scope and
-        field
-        """
-        if scope == Scope.user_state:
-            return (scope, field_object.module_state_key.map_into_course(self.course_id))
-        elif scope == Scope.user_state_summary:
-            return (scope, field_object.usage_id.map_into_course(self.course_id), field_object.field_name)
-        elif scope == Scope.preferences:
-            return (scope, field_object.module_type, field_object.field_name)
-        elif scope == Scope.user_info:
-            return (scope, field_object.field_name)
 
     def find(self, key):
         '''
