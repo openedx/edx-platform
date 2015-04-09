@@ -42,7 +42,8 @@ var edx = edx || {};
             var view = this;
             return $.Deferred(
                 function( defer ) {
-                    var paymentOrderNum = $.url( '?payment-order-num' );
+                    var basketNum = $.url('?basket-num');
+                    var paymentOrderNum = basketNum ? basketNum : $.url( '?payment-order-num' );
                     if ( paymentOrderNum ) {
                         // If there is a payment order number, try to retrieve
                         // the receipt information from the shopping cart.

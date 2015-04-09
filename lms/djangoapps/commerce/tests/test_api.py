@@ -23,6 +23,7 @@ class EcommerceAPITests(EcommerceApiTestMixin, TestCase):
     """ Tests for the E-Commerce API client. """
 
     SKU = '1234'
+    BASKET_NUMBER = '10001'
 
     def setUp(self):
         super(EcommerceAPITests, self).setUp()
@@ -61,6 +62,37 @@ class EcommerceAPITests(EcommerceApiTestMixin, TestCase):
         self.assertEqual(number, self.ORDER_NUMBER)
         self.assertEqual(status, OrderStatus.COMPLETE)
         self.assertEqual(body, self.ECOMMERCE_API_SUCCESSFUL_BODY)
+
+    @httpretty.activate
+    def test_get_order(self):
+        """ Verify the method makes a call to the E-Commerce API with the correct headers and data. """
+        self._mock_ecommerce_api(method=httpretty.GET)
+        number, status, body = self.api.get_order(self.user, self.SKU)
+
+        # Validate the request sent to the E-Commerce API endpoint.
+        request = httpretty.last_request()
+        self.assertValidOrderRequest(request, self.user, self.ECOMMERCE_API_SIGNING_KEY, self.SKU)
+
+        # Validate the data returned by the method
+        self.assertEqual(number, self.ORDER_NUMBER)
+        self.assertEqual(status, OrderStatus.COMPLETE)
+        self.assertEqual(body, self.ECOMMERCE_API_SUCCESSFUL_BODY)
+
+    @httpretty.activate
+    def test_get_basket(self):
+        """ Verify the method makes a call to the E-Commerce API with the correct headers and data. """
+        self._mock_ecommerce_api(
+            body=self.ECOMMERCE_API_SUCCESSFUL_BASKET_BODY_JSON, uri='/baskets/', method=httpretty.GET
+        )
+        number, body = self.api.get_basket(self.user, self.BASKET_NUMBER)
+
+        # Validate the request sent to the E-Commerce API endpoint.
+        request = httpretty.last_request()
+        self.assertValidOrderRequest(request, self.user, self.ECOMMERCE_API_SIGNING_KEY, self.SKU)
+
+        # Validate the data returned by the method
+        self.assertEqual(number, self.BASKET_NUMBER)
+        self.assertEqual(body, self.ECOMMERCE_API_SUCCESSFUL_BASKET_BODY)
 
     @httpretty.activate
     @data(400, 401, 405, 406, 429, 500, 503)

@@ -948,21 +948,24 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
             "unit_price_excl_tax": 40.0
         }
 
+        BASKET = {
+            'order': ORDER
+        }
+
         def __init__(self, **kwargs):
 
-            result = copy.deepcopy(self.ORDER)
-            result['lines'] = [copy.deepcopy(self.LINE) for _ in xrange(kwargs['num_items'])]
+            result = copy.deepcopy(self.BASKET)
+            result['order']['lines'] = [copy.deepcopy(self.LINE) for _ in xrange(kwargs['num_items'])]
             default_kwargs = {
                 'return_value': (
-                    EcommerceApiTestMixin.ORDER_NUMBER,
-                    OrderStatus.COMPLETE,
+                    '10001',
                     result,
                 )
             }
 
             default_kwargs.update(kwargs)
 
-            self.patch = mock.patch.object(EcommerceAPI, 'get_order', mock.Mock(**default_kwargs))
+            self.patch = mock.patch.object(EcommerceAPI, 'get_basket', mock.Mock(**default_kwargs))
 
         def __enter__(self):
             self.patch.start()

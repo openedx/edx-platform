@@ -15,13 +15,19 @@ class EcommerceApiTestMixin(object):
     ECOMMERCE_API_URL = 'http://example.com/api'
     ECOMMERCE_API_SIGNING_KEY = 'edx'
     ORDER_NUMBER = '100004'
+    BASKET_NUMBER = '10001'
     ECOMMERCE_API_SUCCESSFUL_BODY = {
         'status': OrderStatus.COMPLETE,
         'number': ORDER_NUMBER,
         'payment_processor': 'cybersource',
         'payment_parameters': {'orderNumber': ORDER_NUMBER}
     }
+    ECOMMERCE_API_SUCCESSFUL_BASKET_BODY = {
+        'order': ECOMMERCE_API_SUCCESSFUL_BODY,
+    }
     ECOMMERCE_API_SUCCESSFUL_BODY_JSON = json.dumps(ECOMMERCE_API_SUCCESSFUL_BODY)  # pylint: disable=invalid-name
+    # pylint: disable=invalid-name
+    ECOMMERCE_API_SUCCESSFUL_BASKET_BODY_JSON = json.dumps(ECOMMERCE_API_SUCCESSFUL_BASKET_BODY)
 
     def assertValidJWTAuthHeader(self, request, user, key):
         """ Verifies that the JWT Authorization header is correct. """
@@ -35,7 +41,7 @@ class EcommerceApiTestMixin(object):
         self.assertEqual(request.body, '{{"sku": "{}"}}'.format(sku))
         self.assertEqual(request.headers['Content-Type'], 'application/json')
 
-    def _mock_ecommerce_api(self, status=200, body=None):
+    def _mock_ecommerce_api(self, status=200, body=None, uri='/orders/', method=httpretty.POST):
         """
         Mock calls to the E-Commerce API.
 
@@ -43,9 +49,9 @@ class EcommerceApiTestMixin(object):
         """
         self.assertTrue(httpretty.is_enabled(), 'Test is missing @httpretty.activate decorator.')
 
-        url = self.ECOMMERCE_API_URL + '/orders/'
+        url = self.ECOMMERCE_API_URL + uri
         body = body or self.ECOMMERCE_API_SUCCESSFUL_BODY_JSON
-        httpretty.register_uri(httpretty.POST, url, status=status, body=body)
+        httpretty.register_uri(method, url, status=status, body=body)
 
     class mock_create_order(object):    # pylint: disable=invalid-name
         """ Mocks calls to EcommerceAPI.create_order. """

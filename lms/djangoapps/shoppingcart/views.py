@@ -842,15 +842,15 @@ def show_receipt(request, ordernum):
         return _show_receipt_html(request, order)
 
 
-def _get_external_order(request, order_number):
-    """Get the order context from the external E-Commerce Service.
+def _get_external_order(request, basket_number):
+    """Get the order context from a basket in the external E-Commerce Service.
 
-    Get information about an order. This function makes a request to the E-Commerce Service to see if there is
-    order information that can be used to render a receipt for the user.
+    Get information about an order via the associated basket in the E-Commerce Service.. This function makes a request
+    to the E-Commerce Service to see if there is order information that can be used to render a receipt for the user.
 
     Args:
         request (Request): The request for the the receipt.
-        order_number (str) : The order number.
+        basket_number (str) : The basket number.
 
     Returns:
         dict: A serializable dictionary of the receipt page context based on an order returned from the E-Commerce
@@ -859,7 +859,8 @@ def _get_external_order(request, order_number):
     """
     try:
         api = EcommerceAPI()
-        order_number, order_status, order_data = api.get_order(request.user, order_number)
+        basket_number, basket_data = api.get_basket(request.user, basket_number)
+        order_data = basket_data['order']
         billing = order_data.get('billing_address', {})
         country = billing.get('country', {})
 
@@ -872,9 +873,9 @@ def _get_external_order(request, order_number):
         payment_date = sorted(payment_dates, reverse=True).pop()
 
         order_info = {
-            'orderNum': order_number,
+            'orderNum': order_data['number'],
             'currency': order_data['currency'],
-            'status': order_status,
+            'status': order_data['status'],
             'purchase_datetime': get_default_time_display(payment_date),
             'total_cost': order_data['total_excl_tax'],
             'billed_to': {
@@ -899,8 +900,8 @@ def _get_external_order(request, order_number):
         }
         return JsonResponse(order_info)
     except InvalidConfigurationError:
-        msg = u"E-Commerce API not setup. Cannot request Order [{order_number}] for User [{user_id}] ".format(
-            user_id=request.user.id, order_number=order_number
+        msg = u"E-Commerce API not setup. Cannot request Basket [{basket_number}] for User [{user_id}] ".format(
+            user_id=request.user.id, basket_number=basket_number
         )
         log.debug(msg)
         return JsonResponse(status=500, object={'error_message': msg})

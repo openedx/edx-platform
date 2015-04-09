@@ -42,9 +42,30 @@ class EcommerceAPI(object):
         }
         return jwt.encode(data, self.key)
 
+    def get_basket(self, user, basket_number):
+        """
+        Retrieve a basket.
+
+        Arguments
+            user             --  User associated with the requested basket.
+            basket_number    --  The unique identifier for the basket.
+
+        Returns a tuple with the basket number and API response data.
+        """
+        def get():
+            """Internal service call to retrieve an order. """
+            headers = {
+                'Content-Type': 'application/json',
+                'Authorization': 'JWT {}'.format(self._get_jwt(user))
+            }
+            url = '{base_url}/baskets/{basket_number}/'.format(base_url=self.url, basket_number=basket_number)
+            return requests.get(url, headers=headers, timeout=self.timeout)
+        data = self._call_ecommerce_service(get)
+        return data['number'], data
+
     def get_order(self, user, order_number):
         """
-        Retrieve a paid order.
+        Retrieve an order.
 
         Arguments
             user             --  User associated with the requested order.
@@ -60,7 +81,8 @@ class EcommerceAPI(object):
             }
             url = '{base_url}/orders/{order_number}/'.format(base_url=self.url, order_number=order_number)
             return requests.get(url, headers=headers, timeout=self.timeout)
-        return self._call_ecommerce_service(get)
+        data = self._call_ecommerce_service(get)
+        return data['number'], data['status'], data
 
     def create_order(self, user, sku):
         """
@@ -80,7 +102,8 @@ class EcommerceAPI(object):
             }
             url = '{}/orders/'.format(self.url)
             return requests.post(url, data=json.dumps({'sku': sku}), headers=headers, timeout=self.timeout)
-        return self._call_ecommerce_service(create)
+        data = self._call_ecommerce_service(create)
+        return data['number'], data['status'], data
 
     @staticmethod
     def _call_ecommerce_service(call):
@@ -92,7 +115,7 @@ class EcommerceAPI(object):
         Arguments
             call    --  A callable function that makes a request to the E-Commerce Service.
 
-        Returns a tuple with the order number, order status, API response data.
+        Returns API response data.
         """
         try:
             response = call()
@@ -109,7 +132,7 @@ class EcommerceAPI(object):
         status_code = response.status_code
 
         if status_code == HTTP_200_OK:
-            return data['number'], data['status'], data
+            return data
         else:
             msg = u'Response from E-Commerce API was invalid: (%(status)d) - %(msg)s'
             msg_kwargs = {
