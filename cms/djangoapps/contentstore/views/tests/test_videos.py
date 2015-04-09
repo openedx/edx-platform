@@ -40,20 +40,7 @@ class VideoUploadTestMixin(object):
             "course_video_upload_token": self.test_token,
         }
         self.save_course()
-        self.profiles = [
-            {
-                "profile_name": "profile1",
-                "extension": "mp4",
-                "width": 640,
-                "height": 480,
-            },
-            {
-                "profile_name": "profile2",
-                "extension": "mp4",
-                "width": 1920,
-                "height": 1080,
-            },
-        ]
+        self.profiles = ["profile1", "profile2"]
         self.previous_uploads = [
             {
                 "edx_video_id": "test1",
@@ -302,12 +289,12 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
                 headers={"Content-Type": file_info["content_type"]}
             )
 
-            # Ensure asset store was updated
-            self.assertIsNotNone(
-                modulestore().find_asset_metadata(
-                    self.course.id.make_asset_key(VIDEO_ASSET_TYPE, video_id)
-                )
+            # Ensure asset store was updated and the created_by field was set
+            asset_metadata = modulestore().find_asset_metadata(
+                self.course.id.make_asset_key(VIDEO_ASSET_TYPE, video_id)
             )
+            self.assertIsNotNone(asset_metadata)
+            self.assertEquals(asset_metadata.created_by, self.user.id)
 
             # Ensure VAL was updated
             val_info = get_video_info(video_id)

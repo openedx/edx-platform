@@ -727,6 +727,7 @@ class StartDateTests(ModuleStoreTestCase):
         self.assertIn("2015-JULY-17", text)
 
 
+@ddt.ddt
 class ProgressPageTests(ModuleStoreTestCase):
     """
     Tests that verify that the progress page works correctly.
@@ -757,8 +758,39 @@ class ProgressPageTests(ModuleStoreTestCase):
         resp = views.progress(self.request, course_id=self.course.id.to_deprecated_string())
         self.assertEqual(resp.status_code, 200)
 
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_student_progress_with_valid_and_invalid_id(self, default_store):
+        """
+         Check that invalid 'student_id' raises Http404 for both old mongo and
+         split mongo courses.
+        """
+
+        # Create new course with respect to 'default_store'
+        self.course = CourseFactory.create(default_store=default_store)
+
+        # Invalid Student Ids (Integer and Non-int)
+        invalid_student_ids = [
+            991021,
+            'azU3N_8$',
+        ]
+        for invalid_id in invalid_student_ids:
+
+            self.assertRaises(
+                Http404, views.progress,
+                self.request,
+                course_id=unicode(self.course.id),
+                student_id=invalid_id
+            )
+
+        # Enroll student into course
+        CourseEnrollment.enroll(self.user, self.course.id, mode='honor')
+        resp = views.progress(self.request, course_id=self.course.id.to_deprecated_string(), student_id=self.user.id)
+        # Assert that valid 'student_id' returns 200 status
+        self.assertEqual(resp.status_code, 200)
+
     def test_non_asci_grade_cutoffs(self):
         resp = views.progress(self.request, course_id=self.course.id.to_deprecated_string())
+
         self.assertEqual(resp.status_code, 200)
 
     def test_generate_cert_config(self):

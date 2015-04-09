@@ -32,7 +32,7 @@
     }
 
     function initArgs(element) {
-        var initargs = $('.xblock_json_init_args', element).text();
+        var initargs = $(element).children('.xblock-json-init-args').remove().text();
         return initargs ? JSON.parse(initargs) : {};
     }
 

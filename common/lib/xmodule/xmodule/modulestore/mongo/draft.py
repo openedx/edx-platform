@@ -47,7 +47,7 @@ class DraftModuleStore(MongoModuleStore):
     This module also includes functionality to promote DRAFT modules (and their children)
     to published modules.
     """
-    def get_item(self, usage_key, depth=0, revision=None, **kwargs):
+    def get_item(self, usage_key, depth=0, revision=None, using_descriptor_system=None, **kwargs):
         """
         Returns an XModuleDescriptor instance for the item at usage_key.
 
@@ -70,6 +70,9 @@ class DraftModuleStore(MongoModuleStore):
                 Note: If the item is in DIRECT_ONLY_CATEGORIES, then returns only the PUBLISHED
                 version regardless of the revision.
 
+            using_descriptor_system (CachingDescriptorSystem): The existing CachingDescriptorSystem
+                to add data to, and to load the XBlocks from.
+
         Raises:
             xmodule.modulestore.exceptions.InsufficientSpecificationError
             if any segment of the usage_key is None except revision
@@ -78,10 +81,14 @@ class DraftModuleStore(MongoModuleStore):
             is found at that usage_key
         """
         def get_published():
-            return wrap_draft(super(DraftModuleStore, self).get_item(usage_key, depth=depth))
+            return wrap_draft(super(DraftModuleStore, self).get_item(
+                usage_key, depth=depth, using_descriptor_system=using_descriptor_system
+            ))
 
         def get_draft():
-            return wrap_draft(super(DraftModuleStore, self).get_item(as_draft(usage_key), depth=depth))
+            return wrap_draft(super(DraftModuleStore, self).get_item(
+                as_draft(usage_key), depth=depth, using_descriptor_system=using_descriptor_system
+            ))
 
         # return the published version if ModuleStoreEnum.RevisionOption.published_only is requested
         if revision == ModuleStoreEnum.RevisionOption.published_only:
@@ -439,7 +446,15 @@ class DraftModuleStore(MongoModuleStore):
         # convert the subtree using the original item as the root
         self._breadth_first(convert_item, [location])
 
-    def update_item(self, xblock, user_id, allow_not_found=False, force=False, isPublish=False, **kwargs):
+    def update_item(
+            self,
+            xblock,
+            user_id,
+            allow_not_found=False,
+            force=False,
+            isPublish=False,
+            child_update=False,
+            **kwargs):
         """
         See superclass doc.
         In addition to the superclass's behavior, this method converts the unit to draft if it's not
@@ -451,9 +466,8 @@ class DraftModuleStore(MongoModuleStore):
         if draft_loc.revision == MongoRevisionKey.published:
             item = super(DraftModuleStore, self).update_item(xblock, user_id, allow_not_found)
             course_key = xblock.location.course_key
-            bulk_record = self._get_bulk_ops_record(course_key)
-            if self.signal_handler and not bulk_record.active:
-                self.signal_handler.send("course_published", course_key=course_key)
+            if isPublish or (item.category in DIRECT_ONLY_CATEGORIES and not child_update):
+                self._flag_publish_event(course_key)
             return item
 
         if not super(DraftModuleStore, self).has_item(draft_loc):
@@ -532,7 +546,8 @@ class DraftModuleStore(MongoModuleStore):
             parent_block = super(DraftModuleStore, self).get_item(parent_location)
             parent_block.children.remove(location)
             parent_block.location = parent_location  # ensure the location is with the correct revision
-            self.update_item(parent_block, user_id)
+            self.update_item(parent_block, user_id, child_update=True)
+        self._flag_publish_event(location.course_key)
 
         if is_item_direct_only or revision == ModuleStoreEnum.RevisionOption.all:
             as_functions = [as_draft, as_published]
@@ -728,8 +743,7 @@ class DraftModuleStore(MongoModuleStore):
             bulk_record.dirty = True
             self.collection.remove({'_id': {'$in': to_be_deleted}})
 
-        if self.signal_handler and not bulk_record.active:
-            self.signal_handler.send("course_published", course_key=course_key)
+        self._flag_publish_event(course_key)
 
         # Now it's been published, add the object to the courseware search index so that it appears in search results
         CoursewareSearchIndexer.do_publish_index(self, location)
@@ -747,9 +761,7 @@ class DraftModuleStore(MongoModuleStore):
         self._convert_to_draft(location, user_id, delete_published=True)
 
         course_key = location.course_key
-        bulk_record = self._get_bulk_ops_record(course_key)
-        if self.signal_handler and not bulk_record.active:
-            self.signal_handler.send("course_published", course_key=course_key)
+        self._flag_publish_event(course_key)
 
     def revert_to_published(self, location, user_id=None):
         """

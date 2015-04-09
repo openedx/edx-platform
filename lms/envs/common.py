@@ -364,6 +364,13 @@ FEATURES = {
 
     # Certificates Web/HTML Views
     'CERTIFICATES_HTML_VIEW': False,
+
+    # Social Media Sharing on Student Dashboard
+    'DASHBOARD_SHARE_SETTINGS': {
+        'FACEBOOK_SHARING': False,
+        'TWITTER_SHARING': False,
+        'TWITTER_SHARING_TEXT': None
+    },
 }
 
 # Ignore static asset files on import which match this pattern
@@ -1180,6 +1187,15 @@ verify_student_js = [
     'js/verify_student/pay_and_verify.js',
 ]
 
+reverify_js = [
+    'js/verify_student/views/error_view.js',
+    'js/verify_student/views/image_input_view.js',
+    'js/verify_student/views/webcam_photo_view.js',
+    'js/verify_student/models/reverification_model.js',
+    'js/verify_student/views/incourse_reverify_view.js',
+    'js/verify_student/incourse_reverify.js',
+]
+
 PIPELINE_CSS = {
     'style-vendor': {
         'source_filenames': [
@@ -1369,6 +1385,10 @@ PIPELINE_JS = {
     'verify_student': {
         'source_filenames': verify_student_js,
         'output_filename': 'js/verify_student.js'
+    },
+    'reverify': {
+        'source_filenames': reverify_js,
+        'output_filename': 'js/reverify.js'
     }
 }
 
@@ -2193,3 +2213,6 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
 ECOMMERCE_API_URL = None
 ECOMMERCE_API_SIGNING_KEY = None
 ECOMMERCE_API_TIMEOUT = 5
+
+# Reverification checkpoint name pattern
+CHECKPOINT_PATTERN = r'(?P<checkpoint_name>\w+)'

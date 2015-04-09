@@ -27,7 +27,7 @@ def add_page(step):
 def see_a_static_page_named_foo(step, name):
     pages_css = 'div.xmodule_StaticTabModule'
     page_name_html = world.css_html(pages_css)
-    assert_equal(page_name_html, '\n    {name}\n'.format(name=name))
+    assert_equal(page_name_html.strip(), name)
 
 
 @step(u'I should not see any static pages$')

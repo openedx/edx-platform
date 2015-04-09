@@ -41,6 +41,7 @@
         }
 
         $('.message.is-expandable .wrapper-tip').bind('click', toggleExpandMessage);
+        $('.action-more').bind('click', toggleCourseActionsDropdown);
 
         // Track clicks of the upgrade button. The `trackLink` method is a helper that makes
         // a `track` call whenever a bound link is clicked. Usually the page would change before
@@ -95,6 +96,29 @@
             });
         }
 
+        function toggleCourseActionsDropdown(event) {
+            var dashboard_index = $(this).data('dashboard-index');
+
+            // Toggle the visibility control for the selected element and set the focus
+            var dropdown_selector = 'div#actions-dropdown-' + dashboard_index;
+            var dropdown = $(dropdown_selector);
+            dropdown.toggleClass('is-visible');
+            if (dropdown.hasClass('is-visible')) {
+                dropdown.attr('tabindex', -1);
+            } else {
+                dropdown.removeAttr('tabindex');
+            }
+
+            // Inform the ARIA framework that the dropdown has been expanded
+            var anchor_selector = 'a#actions-dropdown-link-' + dashboard_index;
+            var anchor = $(anchor_selector);
+            var aria_expanded_state = (anchor.attr('aria-expanded') === 'true');
+            anchor.attr('aria-expanded', !aria_expanded_state);
+
+            // Suppress the actual click event from the browser
+            event.preventDefault();
+        }
+
         $("#failed-verification-button-dismiss").click(function() {
             $.ajax({
                 url: urls.verifyToggleBannerFailedOff,
@@ -110,7 +134,7 @@
             Logger.log('edx.course.enrollment.upgrade.clicked', [user, course], null);
         });
 
-        $(".email-settings").click(function(event) {
+        $(".action-email-settings").click(function(event) {
             $("#email_settings_course_id").val( $(event.target).data("course-id") );
             $("#email_settings_course_number").text( $(event.target).data("course-number") );
             if($(event.target).data("optout") === "False") {
@@ -118,7 +142,7 @@
             }
         });
 
-        $(".unenroll").click(function(event) {
+        $(".action-unenroll").click(function(event) {
             $("#unenroll_course_id").val( $(event.target).data("course-id") );
             $("#unenroll_course_number").text( $(event.target).data("course-number") );
         });
@@ -235,8 +259,8 @@
             "#dashboard-main"
         );
 
-        $(".email-settings").each(function(index){
-            $(this).attr("id", "unenroll-" + index);
+        $(".action-email-settings").each(function(index){
+            $(this).attr("id", "email-settings-" + index);
             // a bit of a hack, but gets the unique selector for the modal trigger
             var trigger = "#" + $(this).attr("id");
             accessibleModal(
@@ -247,8 +271,8 @@
             );
         });
 
-        $(".unenroll").each(function(index){
-            $(this).attr("id", "email-settings-" + index);
+        $(".action-unenroll").each(function(index){
+            $(this).attr("id", "unenroll-" + index);
             // a bit of a hack, but gets the unique selector for the modal trigger
             var trigger = "#" + $(this).attr("id");
             accessibleModal(

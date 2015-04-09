@@ -8,6 +8,7 @@ import mock
 
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.x_module import XModuleMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.mongo import DraftMongoModuleStore
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
@@ -41,7 +42,7 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
         'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': '',
         'render_template': mock.Mock(return_value=""),
-        'xblock_mixins': (InheritanceMixin,)
+        'xblock_mixins': (InheritanceMixin, XModuleMixin)
     }
 
     split_course_key = CourseLocator('test_org', 'test_course', 'runid', branch=ModuleStoreEnum.BranchName.draft)

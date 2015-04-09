@@ -21,6 +21,7 @@
 # Bentsi Magidovich <bentsi@yeda.org.il>, 2015
 # dotanlaks <dotanlaks6@gmail.com>, 2014
 # dotanlaks <dotanlaks6@gmail.com>, 2014
+# Nadav Stark <nadav@yeda.org.il>, 2015
 # Shay Nativ <shay@yeda.org.il>, 2015
 # yuval zana, 2015
 # yuval zana, 2015
@@ -47,12 +48,13 @@
 # Translators:
 # Bentsi Magidovich <bentsi@yeda.org.il>, 2015
 # Ido, 2014
+# Nadav Stark <nadav@yeda.org.il>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-03-30 12:44+0000\n"
-"PO-Revision-Date: 2015-03-30 08:21+0000\n"
+"POT-Creation-Date: 2015-04-06 12:41+0000\n"
+"PO-Revision-Date: 2015-03-31 17:04+0000\n"
 "Last-Translator: Bentsi Magidovich <bentsi@yeda.org.il>\n"
 "Language-Team: Hebrew (http://www.transifex.com/projects/p/edx-platform/language/he/)\n"
 "MIME-Version: 1.0\n"
@@ -132,6 +134,12 @@ msgstr ""
 #: lms/templates/open_ended_problems/open_ended_problems.html
 #: lms/templates/shoppingcart/receipt.html
 msgid "Status"
+msgstr ""
+
+#: common/djangoapps/cors_csrf/models.py
+msgid ""
+"List of domains that are allowed to make cross-domain requests to this site."
+"  Please list each domain on its own line."
 msgstr ""
 
 #: common/djangoapps/course_modes/models.py
@@ -338,7 +346,7 @@ msgstr ""
 
 #: common/djangoapps/student/forms.py
 msgid "Username and password fields cannot match"
-msgstr ""
+msgstr "שם משתמש וסיסמה לא יכולים להיות זהים"
 
 #: common/djangoapps/student/forms.py common/djangoapps/student/views.py
 msgid "Password: "
@@ -381,7 +389,7 @@ msgid "Bachelor's degree"
 msgstr ""
 
 #: common/djangoapps/student/models.py
-msgid "Associate's degree"
+msgid "Associate degree"
 msgstr ""
 
 #: common/djangoapps/student/models.py
@@ -1420,6 +1428,10 @@ msgid "This name appears in the horizontal navigation at the top of the page."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
+msgid "Blank Advanced Problem"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Number of attempts taken by the student on this problem"
 msgstr ""
@@ -1929,12 +1941,14 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter pairs of dates between which students cannot post to discussion "
-"forums. Each pair should be formatted as [\"YYYY-MM-DD\", \"YYYY-MM-DD\"]. "
-"To specify times as well as dates, format each pair as [\"YYYY-MM-"
-"DDTHH:MM\", \"YYYY-MM-DDTHH:MM\"] (be sure to include the \"T\" between the "
-"date and time). An entry defining more than one blackout period might look "
-"like this: [[\"2014-09-15\", \"2014-09-21\"], [\"2014-10-01\", "
-"\"2014-10-08\"]]"
+"forums. Inside the provided brackets, enter an additional set of square "
+"brackets surrounding each pair of dates you add. Format each pair of dates "
+"as [\"YYYY-MM-DD\", \"YYYY-MM-DD\"]. To specify times as well as dates, "
+"format each pair as [\"YYYY-MM-DDTHH:MM\", \"YYYY-MM-DDTHH:MM\"]. Be sure to"
+" include the \"T\" between the date and time. For example, an entry defining"
+" two blackout periods looks like this, including the outer pair of square "
+"brackets: [[\"2015-09-15\", \"2015-09-21\"], [\"2015-10-01\", "
+"\"2015-10-08\"]] "
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -1946,8 +1960,9 @@ msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
 "example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2014_T1\"}. The \"id\" value for each category "
-"must be unique."
+"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
+"must be unique. In \"id\" values, the only special characters that are "
+"supported are underscore, hyphen, and period."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2789,10 +2804,6 @@ msgstr ""
 msgid ""
 "Set this value to True if this module is either a graded assignment or a "
 "practice problem."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid "Course does not support Library tools."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -3862,7 +3873,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Download Transcript Allowed"
-msgstr ""
+msgstr "אפשר הורדת תמליל"
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid ""
@@ -3935,7 +3946,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Upload Handout"
-msgstr ""
+msgstr "העלה דף מידע"
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid ""
@@ -4744,7 +4755,7 @@ msgid "File is not attached."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
-msgid "Invoice number '{0}' does not exist."
+msgid "Invoice number '{num}' does not exist."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -6458,53 +6469,65 @@ msgstr ""
 msgid "Verification photos received"
 msgstr ""
 
+#: lms/djangoapps/verify_student/views.py
+msgid "No checkpoint found"
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
+msgid "Invalid image data during photo verification."
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
+msgid "Could not submit photos"
+msgstr ""
+
 #. Translators: This is the website name of www.facebook.com.  Please
 #. translate this the way that Facebook advertises in your language.
 #: lms/envs/common.py
 msgid "Facebook"
-msgstr ""
+msgstr "Facebook"
 
 #. Translators: This is the website name of www.twitter.com.  Please
 #. translate this the way that Twitter advertises in your language.
 #: lms/envs/common.py
 msgid "Twitter"
-msgstr ""
+msgstr "Twitter"
 
 #. Translators: This is the website name of www.linkedin.com.  Please
 #. translate this the way that LinkedIn advertises in your language.
 #: lms/envs/common.py
 msgid "LinkedIn"
-msgstr ""
+msgstr "LinkedIn"
 
 #. Translators: This is the website name of plus.google.com.  Please
 #. translate this the way that Google+ advertises in your language.
 #: lms/envs/common.py
 msgid "Google+"
-msgstr ""
+msgstr "Google+"
 
 #. Translators: This is the website name of www.tumblr.com.  Please
 #. translate this the way that Tumblr advertises in your language.
 #: lms/envs/common.py
 msgid "Tumblr"
-msgstr ""
+msgstr "Tumblr"
 
 #. Translators: This is the website name of www.meetup.com.  Please
 #. translate this the way that MeetUp advertises in your language.
 #: lms/envs/common.py
 msgid "Meetup"
-msgstr ""
+msgstr "Meetup"
 
 #. Translators: This is the website name of www.reddit.com.  Please
 #. translate this the way that Reddit advertises in your language.
 #: lms/envs/common.py
 msgid "Reddit"
-msgstr ""
+msgstr "Reddit"
 
 #. Translators: This is the website name of www.youtube.com.  Please
 #. translate this the way that YouTube advertises in your language.
 #: lms/envs/common.py
 msgid "Youtube"
-msgstr ""
+msgstr "Youtube"
 
 #: lms/envs/common.py
 msgid "Taiwan"
@@ -7587,6 +7610,12 @@ msgstr ""
 msgid "Invalid Token"
 msgstr ""
 
+#. Translators: This is the status for a video that was included in a course
+#. import
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Imported"
+msgstr ""
+
 #. Translators: This is the status for a video that is in an unknown state
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Unknown"
@@ -7926,6 +7955,22 @@ msgid "Dashboard"
 msgstr ""
 
 #: lms/templates/dashboard.html
+msgid "Current Courses"
+msgstr ""
+
+#: lms/templates/dashboard.html
+msgid "Looks like you haven't enrolled in any courses yet."
+msgstr ""
+
+#: lms/templates/dashboard.html
+msgid "Find courses now!"
+msgstr ""
+
+#: lms/templates/dashboard.html
+msgid "Course-loading errors"
+msgstr ""
+
+#: lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "edit"
 msgstr ""
@@ -7971,22 +8016,6 @@ msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Reset Password"
-msgstr ""
-
-#: lms/templates/dashboard.html
-msgid "Current Courses"
-msgstr ""
-
-#: lms/templates/dashboard.html
-msgid "Looks like you haven't enrolled in any courses yet."
-msgstr ""
-
-#: lms/templates/dashboard.html
-msgid "Find courses now!"
-msgstr ""
-
-#: lms/templates/dashboard.html
-msgid "Course-loading errors"
 msgstr ""
 
 #: lms/templates/dashboard.html
@@ -8654,6 +8683,9 @@ msgid ""
 " fix it as soon as possible. Please email us at {tech_support_email} to "
 "report any problems or downtime."
 msgstr ""
+"אנחנו מתנצלים, המודל הזה הזאת לא זמינה באופן זמני. הצוות שלנו עובד על תיקון "
+"הבעיה מוקדם ככל שניתן. אנא שלח לנו הודעת דואר אלקטרוני לכתובת "
+"{tech_support_email} בכדי לדווח על בעיות או השבתה של השירותים. "
 
 #: lms/templates/module-error.html
 msgid "Raw data:"
@@ -9397,7 +9429,7 @@ msgstr ""
 
 #: lms/templates/video.html
 msgid "Download Handout"
-msgstr ""
+msgstr "הורד דף מידע"
 
 #: lms/templates/word_cloud.html
 msgid "Your words:"
@@ -9954,7 +9986,7 @@ msgstr ""
 
 #: lms/templates/courseware/courses.html
 msgid "Explore courses from {platform_name}."
-msgstr ""
+msgstr "סייר בקורסים מ{platform_name}."
 
 #: lms/templates/courseware/courses.html
 msgid "{platform_name} Logo"
@@ -9966,13 +9998,12 @@ msgid ""
 " fix it as soon as possible. Please email us at {tech_support_email}' to "
 "report any problems or downtime."
 msgstr ""
+"אנחנו מתנצלים, המודולה הזאת לא זמינה באופן זמני. הצוות שלנו עובד על תיקון "
+"הבעיה בהקדם האפשרי. אנא שלח לנו הודעת דואר אלקטרוני ל-{tech_support_email}' "
+"בכדי לדווח על בעיות או השבתות. "
 
 #: lms/templates/courseware/courseware.html
 msgid "{course_number} Courseware"
-msgstr ""
-
-#: lms/templates/courseware/courseware.html
-msgid "Return to Exam"
 msgstr ""
 
 #: lms/templates/courseware/courseware.html
@@ -10011,6 +10042,9 @@ msgid ""
 " fix it as soon as possible. Please email us at {link_to_support_email} to "
 "report any problems or downtime."
 msgstr ""
+"אנחנו מתנצלים, המודולה הזאת לא זמינה באופן זמני. הצוות שלנו עובד על תיקון "
+"הבעיה בהקדם האפשרי. אנא שלח לנו הודעת דואר אלקטרוני "
+"ל-{link_to_support_email}  בכדי לדווח על בעיות או השבתות. "
 
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
@@ -10044,11 +10078,11 @@ msgstr ""
 
 #: lms/templates/courseware/info.html
 msgid "Handout Navigation"
-msgstr ""
+msgstr "ניווט דפי מידע"
 
 #: lms/templates/courseware/info.html
 msgid "Course Handouts"
-msgstr ""
+msgstr "דפי מידע של הקורס"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Legacy Instructor Dashboard"
@@ -10337,6 +10371,7 @@ msgid "About {course_id}"
 msgstr ""
 
 #: lms/templates/courseware/mktg_coming_soon.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Coming Soon"
 msgstr ""
 
@@ -10561,19 +10596,66 @@ msgid "Enrolled as: "
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Course Completed - {end_date}"
+msgid "Ended - {end_date}"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Course Started - {start_date}"
+msgid "Started - {start_date}"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Course has not yet started"
+msgid "Starts - {start_date}"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Course Starts - {start_date}"
+msgid "View Archived Course"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "View Course"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Facebook"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "I'm learning on {platform_name}:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Twitter"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Course options dropdown"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Additional Actions Menu"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Available Actions"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Are you sure you want to unenroll from the purchased course"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Are you sure you want to unenroll from"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"Are you sure you want to unenroll from the verified {cert_name_long} track "
+"of"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Email Settings"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -10649,33 +10731,6 @@ msgid ""
 "received. You can {contact_link_start}contact the account "
 "holder{contact_link_end} to request payment, or you can "
 "{unenroll_link_start}unenroll{unenroll_link_end} from this course"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "View Archived Course"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "View Course"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Are you sure you want to unenroll from the purchased course"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Are you sure you want to unenroll from"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"Are you sure you want to unenroll from the verified {cert_name_long} track "
-"of"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Email Settings"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
@@ -12883,7 +12938,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Reload Graphs"
-msgstr ""
+msgstr "רענן גרפים"
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Subsection Data"
@@ -13644,15 +13699,15 @@ msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Credit Card Number"
-msgstr ""
+msgstr "מספר כרטיס אשראי"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Address 1"
-msgstr ""
+msgstr "כתובת 1"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Address 2"
-msgstr ""
+msgstr "כתובת 2"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "State"
@@ -14076,6 +14131,10 @@ msgstr ""
 
 #: lms/templates/verify_student/face_upload.html
 msgid "Edit Your Full Name"
+msgstr ""
+
+#: lms/templates/verify_student/incourse_reverify.html
+msgid "Verifying for \"{checkpoint_name}\" in course \"{course_name}\""
 msgstr ""
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
@@ -15548,25 +15607,27 @@ msgstr ""
 
 #: cms/templates/group_configurations.html
 msgid ""
-"Use content groups to give groups of students access to a specific set of "
-"course content. In addition to course content that is intended for all "
-"students, each content group sees content that you specifically designate as"
-" visible to it. By associating a content group with one or more cohorts, you"
-" can customize the content that a particular cohort or cohorts sees in your "
-"course."
+"If you have cohorts enabled in your course, you can use content groups to "
+"create cohort-specific courseware. In other words, you can customize the "
+"content that particular cohorts see in your course."
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid ""
+"Each content group that you create can be associated with one or more "
+"cohorts. In addition to course content that is intended for all students, "
+"you can designate some content as visible only to specified content groups. "
+"Only learners in the cohorts that are associated with the specified content "
+"groups see the additional content."
 msgstr ""
 
 #: cms/templates/group_configurations.html
 msgid ""
 "Click {em_start}New content group{em_end} to add a new content group. To "
 "edit the name of a content group, hover over its box and click "
-"{em_start}Edit{em_end}."
-msgstr ""
-
-#: cms/templates/group_configurations.html
-msgid ""
-"You can delete a content group only if it is not in use by a unit. To delete"
-" a content group, hover over its box and click the delete icon."
+"{em_start}Edit{em_end}. You can delete a content group only if it is not in "
+"use by a unit. To delete a content group, hover over its box and click the "
+"delete icon."
 msgstr ""
 
 #: cms/templates/group_configurations.html
@@ -15575,23 +15636,20 @@ msgstr ""
 
 #: cms/templates/group_configurations.html
 msgid ""
-"Use experiment group configurations to define how many groups of students "
-"are in a content experiment. When you create a content experiment for a "
-"course, you select the group configuration to use."
+"Use experiment group configurations if you are conducting content "
+"experiments, also known as A/B testing, in your course. Experiment group "
+"configurations define how many groups of students are in a content "
+"experiment. When you create a content experiment for a course, you select "
+"the group configuration to use."
 msgstr ""
 
 #: cms/templates/group_configurations.html
 msgid ""
 "Click {em_start}New Group Configuration{em_end} to add a new configuration. "
 "To edit a configuration, hover over its box and click "
-"{em_start}Edit{em_end}."
-msgstr ""
-
-#: cms/templates/group_configurations.html
-msgid ""
-"You can delete a group configuration only if it is not in use in an "
-"experiment. To delete a configuration, hover over its box and click the "
-"delete icon."
+"{em_start}Edit{em_end}. You can delete a group configuration only if it is "
+"not in use in an experiment. To delete a configuration, hover over its box "
+"and click the delete icon."
 msgstr ""
 
 #: cms/templates/group_configurations.html cms/templates/settings.html
@@ -15722,8 +15780,8 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid ""
-"It's more than just multiple choice. Studio supports more than a dozen types"
-" of problems to challenge your learners."
+"It's more than just multiple choice. {studio_name} supports more than a "
+"dozen types of problems to challenge your learners."
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -15986,7 +16044,7 @@ msgstr ""
 msgid ""
 "You might want to update an existing library to a new version, or replace an"
 " existing library entirely. You might also have developed a library outside "
-"of Studio."
+"of {studio_name}."
 msgstr ""
 
 #: cms/templates/import.html
@@ -17433,11 +17491,11 @@ msgstr ""
 
 #: wiki/forms.py
 msgid "Contents"
-msgstr ""
+msgstr "תוכן"
 
 #: wiki/forms.py
 msgid "Summary"
-msgstr ""
+msgstr "סיכום"
 
 #: wiki/forms.py
 msgid ""
@@ -17760,6 +17818,8 @@ msgid ""
 "The revision of this attachment currently in use (on all articles using the "
 "attachment)"
 msgstr ""
+"גירסה של הקובץ המצורף נמצאת בשימוש כעת (לכל המאמרים העושים שימוש בקובץ "
+"המצורף)"
 
 #: wiki/plugins/attachments/models.py
 msgid "original filename"
@@ -17925,7 +17985,7 @@ msgstr ""
 
 #: wiki/plugins/notifications/models.py
 msgid "Article deleted: %s"
-msgstr ""
+msgstr "מאמר נמחק: %s"
 
 #: wiki/plugins/notifications/models.py
 msgid "Article modified: %s"
@@ -17985,7 +18045,7 @@ msgstr ""
 
 #: wiki/views/article.py
 msgid "Restoring article"
-msgstr ""
+msgstr "משחזר מאמר"
 
 #: wiki/views/article.py
 msgid "The article \"%s\" and its children are now restored."

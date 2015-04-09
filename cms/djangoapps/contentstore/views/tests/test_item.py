@@ -5,6 +5,7 @@ import ddt
 
 from mock import patch, Mock, PropertyMock
 from pytz import UTC
+from pyquery import PyQuery
 from webob import Response
 
 from django.http import Http404
@@ -1026,7 +1027,8 @@ class TestEditItemSplitMongo(TestEditItemSetup):
         for __ in xrange(3):
             resp = self.client.get(view_url, HTTP_ACCEPT='application/json')
             self.assertEqual(resp.status_code, 200)
-            self.assertEqual(resp.content.count('xblock-{}'.format(STUDIO_VIEW)), 1)
+            content = json.loads(resp.content)
+            self.assertEqual(len(PyQuery(content['html'])('.xblock-{}'.format(STUDIO_VIEW))), 1)
 
 
 class TestEditSplitModule(ItemTest):

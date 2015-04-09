@@ -567,12 +567,12 @@ class CombinedOpenEndedV1Module(object):
             'state': self.state,
             'task_count': len(self.task_xml),
             'task_number': self.current_task_number + 1,
-            'status': ugettext(self.get_status(False)),
+            'status': ugettext(self.get_status(False)),    # pylint: disable=translation-of-non-string
             'display_name': self.display_name,
             'accept_file_upload': self.accept_file_upload,
             'location': self.location,
             'legend_list': LEGEND_LIST,
-            'human_state': ugettext(HUMAN_STATES.get(self.state, "Not started.")),
+            'human_state': ugettext(HUMAN_STATES.get(self.state, HUMAN_STATES["intitial"])),    # pylint: disable=translation-of-non-string
             'is_staff': self.system.user_is_staff,
         }
 
@@ -1020,7 +1020,7 @@ class CombinedOpenEndedV1Module(object):
         current_task_human_name = ""
         for i in xrange(0, len(self.task_xml)):
             human_task_name = self.extract_human_name_from_task(self.task_xml[i])
-            human_task_name = ugettext(human_task_name)
+            human_task_name = ugettext(human_task_name)    # pylint: disable=translation-of-non-string
             # Extract the name of the current task for screen readers.
             if self.current_task_number == i:
                 current_task_human_name = human_task_name

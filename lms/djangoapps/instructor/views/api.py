@@ -926,7 +926,7 @@ def sale_validation(request, course_id):
         )
         obj_invoice = obj_invoice.invoice
     except CourseRegistrationCodeInvoiceItem.DoesNotExist:  # Check for old type invoices
-        return HttpResponseNotFound(_("Invoice number '{0}' does not exist.".format(invoice_number)))
+        return HttpResponseNotFound(_("Invoice number '{num}' does not exist.").format(num=invoice_number))
 
     if event_type == "invalidate":
         return invalidate_invoice(obj_invoice)

@@ -12,6 +12,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.utils.timezone import UTC
 
 from opaque_keys.edx.keys import CourseKey, UsageKey
+
 from xblock.core import XBlock
 
 from xmodule.course_module import (
@@ -25,12 +26,13 @@ from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPa
 from external_auth.models import ExternalAuthMap
 from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
 from student import auth
+from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from student.roles import (
     GlobalStaff, CourseStaffRole, CourseInstructorRole,
     OrgStaffRole, OrgInstructorRole, CourseBetaTesterRole
 )
-from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from util.milestones_helpers import get_pre_requisite_courses_not_completed
+
 import dogstats_wrapper as dog_stats_api
 
 DEBUG_ACCESS = False

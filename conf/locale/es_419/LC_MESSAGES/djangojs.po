@@ -82,8 +82,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-03-30 12:42+0000\n"
-"PO-Revision-Date: 2015-03-27 18:32+0000\n"
+"POT-Creation-Date: 2015-04-06 12:39+0000\n"
+"PO-Revision-Date: 2015-04-06 13:02+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
@@ -175,7 +175,7 @@ msgstr "Subir archivo"
 #: lms/static/js/groups/views/cohort_discussions_course_wide.js
 #: lms/static/js/groups/views/cohort_discussions_inline.js
 msgid "Your changes have been saved."
-msgstr ""
+msgstr "Sus cambios han sido guardados."
 
 #. Translators: This message will be added to the front of messages of type
 #. error,
@@ -273,12 +273,6 @@ msgstr "Mostrar Respuesta"
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Answer hidden"
 msgstr "Respuesta oculta"
-
-#. Translators: the word unanswered here is about answering a problem the
-#. student must solve.;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "unanswered"
-msgstr "sin responder"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Status: unsubmitted"
@@ -3443,6 +3437,16 @@ msgstr "Error en subir imagen"
 msgid "Please verify that you have uploaded a valid image (PNG and JPEG)."
 msgstr "Por favor verifique que haya cargado una imagen válida (PNG y JPEG)"
 
+#: lms/static/js/verify_student/views/incourse_reverify_view.js
+#: lms/static/js/verify_student/views/review_photos_step_view.js
+msgid "An error has occurred. Please try again later."
+msgstr "Ocurrió un error. Por favor intente nuevamente mas tarde."
+
+#: lms/static/js/verify_student/views/incourse_reverify_view.js
+#: lms/static/js/verify_student/views/review_photos_step_view.js
+msgid "Could not submit photos"
+msgstr "No se publicaron las fotos"
+
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "An error has occurred. Please try again."
 msgstr "Ocurrió un error. Por favor intente nuevamente."
@@ -3454,14 +3458,6 @@ msgstr "No se pudo publicar su petición"
 #: lms/static/js/verify_student/views/payment_confirmation_step_view.js
 msgid "Could not retrieve payment information"
 msgstr "No se pudo conseguir la información del pago"
-
-#: lms/static/js/verify_student/views/review_photos_step_view.js
-msgid "An error has occurred. Please try again later."
-msgstr "Ocurrió un error. Por favor intente nuevamente mas tarde."
-
-#: lms/static/js/verify_student/views/review_photos_step_view.js
-msgid "Could not submit photos"
-msgstr "No se publicaron las fotos"
 
 #: lms/static/js/verify_student/views/step_view.js
 msgid "An error has occurred. Please try reloading the page."
@@ -4439,13 +4435,6 @@ msgstr ""
 msgid "Upload translation"
 msgstr "Subir traducción"
 
-#: cms/templates/js/course-outline.underscore cms/templates/js/list.underscore
-#: cms/templates/js/publish-xblock.underscore
-#: cms/templates/js/xblock-outline.underscore
-#: lms/templates/courseware_search/search_list.underscore
-msgid "gettext("
-msgstr "gettext("
-
 #: cms/templates/js/previous-video-upload-list.underscore
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
@@ -4494,6 +4483,12 @@ msgstr "(esta publicación es sobre %(courseware_title_linked)s)"
 #: lms/templates/courseware_search/search_error.underscore
 msgid "There was an error, try searching again."
 msgstr "Hubo un error, intente buscar de nuevo."
+
+#: lms/templates/courseware_search/search_list.underscore
+msgid "Load next %(num_items) result"
+msgid_plural "Load next %(num_items) results"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/templates/courseware_search/search_list.underscore
 msgid "Sorry, no results were found."
@@ -4923,10 +4918,12 @@ msgid "Error:"
 msgstr "Error:"
 
 #: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Take Your Photo"
 msgstr "Tome su fotografía"
 
 #: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
 msgid ""
 "Use your webcam to take a photo of your face. We will match this photo with "
 "the photo on your ID."
@@ -4936,24 +4933,29 @@ msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Tips on taking a successful photo"
 msgstr "Consejos para tomar una foto exitosamente"
 
 #: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Make sure your face is well-lit"
 msgstr "Asegurese de que su rostro esté bien iluminado"
 
 #: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Be sure your entire face is inside the frame"
 msgstr "Verifique que su cara está completamente dentro del marco de la foto"
 
 #: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Once in position, use the camera button %(icon)s to capture your photo"
 msgstr ""
 "Una vez en posición, use el botón de la cámara %(icon)s para capturar su "
 "foto"
 
 #: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Can we match the photo you took with the one on your ID?"
 msgstr ""
 "¿Podemos verificar la foto que usted acaba de tomar contra la foto en su "
@@ -4961,21 +4963,25 @@ msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Use the retake photo button if you are not pleased with your photo"
 msgstr "Utilice el botón retomar foto si usted no está satisfecho con su foto"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Frequently Asked Questions"
 msgstr "Preguntas frecuentes"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Why does %(platformName)s need my photo?"
 msgstr "Por qué %(platformName)s necesita mi foto ?"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
 msgid ""
 "As part of the verification process, you take a photo of both your face and "
 "a government-issued photo ID. Our authorization service confirms your "
@@ -4988,11 +4994,13 @@ msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
 msgid "What does %(platformName)s do with this photo?"
 msgstr "¿Qué hace %(platformName)s con esta imagen?"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
 msgid ""
 "We use the highest levels of security available to encrypt your photo and "
 "send it to our authorization service for review. Your photo and information "
@@ -5055,6 +5063,14 @@ msgstr "Vista previa de imagen subida"
 #: lms/templates/verify_student/image_input.underscore
 msgid "Upload an image or capture one with your web or phone camera."
 msgstr "Subir una imagen o captura con tu camara web o del teléfono"
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Course key:"
+msgstr ""
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Checkpoint name:"
+msgstr ""
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: %(courseName)s"
@@ -5493,6 +5509,11 @@ msgid "Unpublished changes to content that will release in the future"
 msgstr "Cambios no publicados del contenido que será liberado en el futuro"
 
 #: cms/templates/js/course-outline.underscore
+#: cms/templates/js/xblock-outline.underscore
+msgid "Collapse/Expand this %(xblock_type)s"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
 msgid "Display Name"
 msgstr "Nombre para mostrar:"
 
@@ -5536,6 +5557,11 @@ msgstr "Fecha de entrega:"
 #: cms/templates/js/xblock-outline.underscore
 msgid "You haven't added any content to this course yet."
 msgstr "Todavía no ha añadido ningún contenido a este curso."
+
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/xblock-outline.underscore
+msgid "Click to add a new %(xblock_type)s"
+msgstr ""
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Assignment Type Name"
@@ -5741,6 +5767,14 @@ msgstr ""
 msgid "delete group"
 msgstr "borrar grupo"
 
+#: cms/templates/js/list.underscore
+msgid "Add your first %(item_type)s"
+msgstr ""
+
+#: cms/templates/js/list.underscore
+msgid "New %(item_type)s"
+msgstr ""
+
 #: cms/templates/js/metadata-dict-entry.underscore
 #: cms/templates/js/metadata-list-entry.underscore
 #: cms/templates/js/video/metadata-translations-entry.underscore
@@ -5851,6 +5885,10 @@ msgid "Draft saved on %(last_saved_date)s by %(edit_username)s"
 msgstr "Borrador guardado el %(last_saved_date)s por %(edit_username)s"
 
 #: cms/templates/js/publish-xblock.underscore
+msgid "with %(release_date_from)s"
+msgstr ""
+
+#: cms/templates/js/publish-xblock.underscore
 msgid "Is Visible To:"
 msgstr "Es visible para:"
 
@@ -5861,6 +5899,10 @@ msgstr "Será visible para:"
 #: cms/templates/js/publish-xblock.underscore
 msgid "Staff Only"
 msgstr "Solo equipo del curso"
+
+#: cms/templates/js/publish-xblock.underscore
+msgid "with %(section_or_subsection)s"
+msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Staff and Students"

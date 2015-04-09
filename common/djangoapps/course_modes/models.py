@@ -57,12 +57,13 @@ class CourseMode(models.Model):
     # WARNING: will not be localized
     description = models.TextField(null=True, blank=True)
 
-    #optional SKU for Oscar integration
+    # Optional SKU for integration with the ecommerce service
     sku = models.CharField(
         max_length=255,
         null=True,
         blank=True,
-        help_text="This is the SKU(stock keeping unit) of this mode in external services."
+        verbose_name="SKU",
+        help_text="This is the SKU (stock keeping unit) of this mode in the external ecommerce service."
     )
 
     HONOR = 'honor'

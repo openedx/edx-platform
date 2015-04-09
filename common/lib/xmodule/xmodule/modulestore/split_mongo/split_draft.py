@@ -58,7 +58,11 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         course_id = self._map_revision_to_branch(course_id)
         return super(DraftVersioningModuleStore, self).get_course(course_id, depth=depth, **kwargs)
 
-    def get_library(self, library_id, depth=0, **kwargs):
+    def get_library(self, library_id, depth=0, head_validation=True, **kwargs):
+        if not head_validation and library_id.version_guid:
+            return SplitMongoModuleStore.get_library(
+                self, library_id, depth=depth, head_validation=head_validation, **kwargs
+            )
         library_id = self._map_revision_to_branch(library_id)
         return super(DraftVersioningModuleStore, self).get_library(library_id, depth=depth, **kwargs)
 
@@ -100,7 +104,10 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         """
         source_keys = [self._map_revision_to_branch(key) for key in source_keys]
         dest_key = self._map_revision_to_branch(dest_key)
-        new_keys = super(DraftVersioningModuleStore, self).copy_from_template(source_keys, dest_key, user_id)
+        head_validation = kwargs.get('head_validation')
+        new_keys = super(DraftVersioningModuleStore, self).copy_from_template(
+            source_keys, dest_key, user_id, head_validation
+        )
         if dest_key.branch == ModuleStoreEnum.BranchName.draft:
             # Check if any of new_keys or their descendants need to be auto-published.
             # We don't use _auto_publish_no_children since children may need to be published.
@@ -201,6 +208,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                     ]
                 )
 
+            self._flag_publish_event(location.course_key)
             for branch in branches_to_delete:
                 branched_location = location.for_branch(branch)
                 parent_loc = self.get_parent_location(branched_location)
@@ -355,6 +363,8 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             [location],
             blacklist=blacklist
         )
+
+        self._flag_publish_event(location.course_key)
 
         # Now it's been published, add the object to the courseware search index so that it appears in search results
         CoursewareSearchIndexer.do_publish_index(self, location)

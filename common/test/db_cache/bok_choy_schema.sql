@@ -396,7 +396,7 @@ CREATE TABLE `auth_permission` (
   UNIQUE KEY `content_type_id` (`content_type_id`,`codename`),
   KEY `auth_permission_e4470c6e` (`content_type_id`),
   CONSTRAINT `content_type_id_refs_id_728de91f` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=499 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=511 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -623,6 +623,20 @@ CREATE TABLE `certificates_certificategenerationcoursesetting` (
   KEY `certificates_certificategenerationcoursesetting_b4b47e7a` (`course_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `certificates_certificatehtmlviewconfiguration`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `certificates_certificatehtmlviewconfiguration` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `change_date` datetime NOT NULL,
+  `changed_by_id` int(11) DEFAULT NULL,
+  `enabled` tinyint(1) NOT NULL,
+  `configuration` longtext NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `certificates_certificatehtmlviewconfiguration_16905482` (`changed_by_id`),
+  CONSTRAINT `changed_by_id_refs_id_8584db17` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `certificates_certificatewhitelist`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -770,6 +784,31 @@ CREATE TABLE `course_creators_coursecreator` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`),
   CONSTRAINT `user_id_refs_id_6a0e6044` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `course_groups_coursecohort`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `course_groups_coursecohort` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `course_user_group_id` int(11) NOT NULL,
+  `assignment_type` varchar(20) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `course_user_group_id` (`course_user_group_id`),
+  CONSTRAINT `course_user_group_id_refs_id_8febc00f` FOREIGN KEY (`course_user_group_id`) REFERENCES `course_groups_courseusergroup` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `course_groups_coursecohortssettings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `course_groups_coursecohortssettings` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `is_cohorted` tinyint(1) NOT NULL,
+  `course_id` varchar(255) NOT NULL,
+  `cohorted_discussions` longtext,
+  `always_cohort_inline_discussions` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `course_id` (`course_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `course_groups_courseusergroup`;
@@ -1031,8 +1070,8 @@ CREATE TABLE `django_admin_log` (
   PRIMARY KEY (`id`),
   KEY `django_admin_log_fbfc09f1` (`user_id`),
   KEY `django_admin_log_e4470c6e` (`content_type_id`),
-  CONSTRAINT `user_id_refs_id_c8665aa` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`),
-  CONSTRAINT `content_type_id_refs_id_288599e6` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
+  CONSTRAINT `content_type_id_refs_id_288599e6` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`),
+  CONSTRAINT `user_id_refs_id_c8665aa` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_comment_client_permission`;
@@ -1094,7 +1133,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `app_label` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=166 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=170 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -1294,9 +1333,9 @@ DROP TABLE IF EXISTS `edxval_profile`;
 CREATE TABLE `edxval_profile` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `profile_name` varchar(50) NOT NULL,
-  `extension` varchar(10) NOT NULL,
-  `width` int(10) unsigned NOT NULL,
-  `height` int(10) unsigned NOT NULL,
+  `extension` varchar(10) DEFAULT 'mp4',
+  `width` int(10) unsigned DEFAULT '1',
+  `height` int(10) unsigned DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `profile_name` (`profile_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
@@ -1649,6 +1688,20 @@ CREATE TABLE `milestones_usermilestone` (
   KEY `milestones_usermilestone_9cfa291f` (`milestone_id`),
   CONSTRAINT `milestone_id_refs_id_af7fa460` FOREIGN KEY (`milestone_id`) REFERENCES `milestones_milestone` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `mobile_api_mobileapiconfig`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `mobile_api_mobileapiconfig` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `change_date` datetime NOT NULL,
+  `changed_by_id` int(11) DEFAULT NULL,
+  `enabled` tinyint(1) NOT NULL,
+  `video_profiles` longtext NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `mobile_api_mobileapiconfig_16905482` (`changed_by_id`),
+  CONSTRAINT `changed_by_id_refs_id_97c2f4c8` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `notes_note`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2245,7 +2298,7 @@ CREATE TABLE `south_migrationhistory` (
   `migration` varchar(255) NOT NULL,
   `applied` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=222 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=228 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `splash_splashconfig`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;

@@ -1,10 +1,11 @@
 .. _edX Enrollment API Endpoints:
 
 ################################################
-edX Enrollment API Endpoints
+Enrollment API Endpoints
 ################################################
 
-The edX Platform API allows you to view information about users and their course enrollments, course information, and videos and transcripts.
+You use the Enrollment API to view information about users and
+their course enrollments, course information, and videos and transcripts.
 
 The following tasks and endpoints are currently supported. 
 

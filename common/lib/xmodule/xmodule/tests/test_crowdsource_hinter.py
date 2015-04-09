@@ -7,7 +7,7 @@ import unittest
 import copy
 
 from xmodule.crowdsource_hinter import CrowdsourceHinterModule
-from xmodule.vertical_module import VerticalModule, VerticalDescriptor
+from xmodule.vertical_block import VerticalBlock
 from xmodule.x_module import STUDENT_VIEW
 from xblock.field_data import DictFieldData
 from xblock.fragment import Fragment
@@ -203,8 +203,8 @@ class VerticalWithModulesFactory(object):
         """Make a vertical."""
         field_data = {'data': VerticalWithModulesFactory.sample_problem_xml}
         system = get_test_system()
-        descriptor = VerticalDescriptor.from_xml(VerticalWithModulesFactory.sample_problem_xml, system)
-        module = VerticalModule(system, descriptor, field_data)
+        descriptor = VerticalBlock.parse_xml(VerticalWithModulesFactory.sample_problem_xml, system)
+        module = VerticalBlock(system, descriptor, field_data)
 
         return module
 

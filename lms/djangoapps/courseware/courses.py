@@ -23,10 +23,8 @@ from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
 from student.models import CourseEnrollment
 import branding
-from util.milestones_helpers import get_required_content, calculate_entrance_exam_score
-from util.module_utils import yield_dynamic_descriptor_descendents
+
 from opaque_keys.edx.keys import UsageKey
-from .module_render import get_module_for_descriptor
 
 log = logging.getLogger(__name__)
 
@@ -449,47 +447,3 @@ def get_problems_in_section(section):
                     problem_descriptors[unicode(component.location)] = component
 
     return problem_descriptors
-
-
-def get_entrance_exam_score(request, course):
-    """
-    Get entrance exam score
-    """
-    exam_key = UsageKey.from_string(course.entrance_exam_id)
-    exam_descriptor = modulestore().get_item(exam_key)
-
-    def inner_get_module(descriptor):
-        """
-        Delegate to get_module_for_descriptor.
-        """
-        field_data_cache = FieldDataCache([descriptor], course.id, request.user)
-        return get_module_for_descriptor(request.user, request, descriptor, field_data_cache, course.id)
-
-    exam_module_generators = yield_dynamic_descriptor_descendents(
-        exam_descriptor,
-        inner_get_module
-    )
-    exam_modules = [module for module in exam_module_generators]
-    return calculate_entrance_exam_score(request.user, course, exam_modules)
-
-
-def get_entrance_exam_content_info(request, course):
-    """
-    Get the entrance exam content information e.g. chapter, exam passing state.
-    return exam chapter and its passing state.
-    """
-    required_content = get_required_content(course, request.user)
-    exam_chapter = None
-    is_exam_passed = True
-    # Iterating the list of required content of this course.
-    for content in required_content:
-        # database lookup to required content pointer
-        usage_key = course.id.make_usage_key_from_deprecated_string(content)
-        module_item = modulestore().get_item(usage_key)
-        if not module_item.hide_from_toc and module_item.is_entrance_exam:
-            # Here we are looking for entrance exam module/chapter in required_content.
-            # If module_item is an entrance exam chapter then set and return its info e.g. exam chapter, exam state.
-            exam_chapter = module_item
-            is_exam_passed = False
-            break
-    return exam_chapter, is_exam_passed

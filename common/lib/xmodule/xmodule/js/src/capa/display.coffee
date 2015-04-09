@@ -468,7 +468,6 @@ class @Problem
       $(element).find('input').on 'input', ->
         $p = $(element).find('p.status')
         `// Translators: the word unanswered here is about answering a problem the student must solve.`
-        $p.text gettext("unanswered")
         $p.parent().removeClass().addClass "unanswered"
 
     choicegroup: (element) ->
@@ -497,7 +496,6 @@ class @Problem
       $(element).find('input').on 'input', ->
         $p = $(element).find('p.status')
         `// Translators: the word unanswered here is about answering a problem the student must solve.`
-        $p.text gettext("unanswered")
         $p.parent().removeClass("correct incorrect").addClass "unanswered"
 
   inputtypeSetupMethods:
