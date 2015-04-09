@@ -344,6 +344,13 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
         result_obj = UserOrgTag.objects.get(user=user, org=course.id.org, key='email-optin')
         self.assertEqual(result_obj.value, u"True")
 
+    def test_update_email_optin_anonymous_user(self):
+        """Verify that the API raises an exception for a user with no profile."""
+        course = CourseFactory.create()
+        no_profile_user, __ = User.objects.get_or_create(username="no_profile_user", password=self.PASSWORD)
+        with self.assertRaises(UserNotFound):
+            update_email_opt_in(no_profile_user, course.id.org, True)
+
     @ddt.data(
         # Check that a 27 year old can opt-in, then out.
         (27, True, False, u"False"),
