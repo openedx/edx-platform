@@ -1,16 +1,16 @@
 ;(function (define, undefined) {
     'use strict';
     define([
-        'gettext', 'jquery', 'underscore', 'backbone',
+        'gettext', 'jquery', 'underscore', 'backbone', 'logger',
         'js/views/fields',
         'js/student_account/models/user_account_model',
         'js/student_account/models/user_preferences_model',
         'js/student_account/views/account_settings_fields',
         'js/student_account/views/account_settings_view'
-    ], function (gettext, $, _, Backbone, FieldViews, UserAccountModel, UserPreferencesModel,
+    ], function (gettext, $, _, Backbone, Logger, FieldViews, UserAccountModel, UserPreferencesModel,
                  AccountSettingsFieldViews, AccountSettingsView) {
 
-        return function (fieldsData, authData, userAccountsApiUrl, userPreferencesApiUrl) {
+        return function (fieldsData, authData, userAccountsApiUrl, userPreferencesApiUrl, accountUserId) {
 
             var accountSettingsElement = $('.wrapper-account-settings');
 
@@ -29,7 +29,7 @@
                                 model: userAccountModel,
                                 title: gettext('Username'),
                                 valueAttribute: 'username',
-                                helpMessage: 'The name that identifies you on the edX site. You cannot change your username.'
+                                helpMessage: gettext('The name that identifies you on the edX site. You cannot change your username.')
                             })
                         },
                         {
@@ -55,7 +55,7 @@
                                 valueAttribute: 'password',
                                 emailAttribute: 'email',
                                 linkTitle: gettext('Reset Password'),
-                                linkHref: fieldsData['password']['url'],
+                                linkHref: fieldsData.password.url,
                                 helpMessage: gettext('When you click "Reset Password", a message will be sent to your email address. Click the link in the message to reset your password.')
                             })
                         },
@@ -67,7 +67,7 @@
                                 required: true,
                                 refreshPageOnSave: true,
                                 helpMessage: gettext('The language used for the edX site. The site is currently available in a limited number of languages.'),
-                                options: fieldsData['language']['options']
+                                options: fieldsData.language.options
                             })
                         }
                     ]
@@ -80,7 +80,7 @@
                                 model: userAccountModel,
                                 title: gettext('Education Completed'),
                                 valueAttribute: 'level_of_education',
-                                options: fieldsData['level_of_education']['options']
+                                options: fieldsData.level_of_education.options
                             })
                         },
                         {
@@ -88,7 +88,7 @@
                                 model: userAccountModel,
                                 title: gettext('Gender'),
                                 valueAttribute: 'gender',
-                                options: fieldsData['gender']['options']
+                                options: fieldsData.gender.options
                             })
                         },
                         {
@@ -96,7 +96,7 @@
                                 model: userAccountModel,
                                 title: gettext('Year of Birth'),
                                 valueAttribute: 'year_of_birth',
-                                options: fieldsData['year_of_birth']['options']
+                                options: fieldsData.year_of_birth.options
                             })
                         },
                         {
@@ -104,7 +104,7 @@
                                 model: userAccountModel,
                                 title: gettext('Country or Region'),
                                 valueAttribute: 'country',
-                                options: fieldsData['country']['options']
+                                options: fieldsData.country.options
                             })
                         },
                         {
@@ -112,7 +112,7 @@
                                 model: userAccountModel,
                                 title: gettext('Preferred Language'),
                                 valueAttribute: 'language_proficiencies',
-                                options: fieldsData['preferred_language']['options']
+                                options: fieldsData.preferred_language.options
                             })
                         }
                     ]
@@ -125,20 +125,22 @@
                     fields: _.map(authData.providers, function(provider) {
                         return {
                             'view': new AccountSettingsFieldViews.AuthFieldView({
-                                title: provider['name'],
-                                valueAttribute: 'auth-' + provider['name'].toLowerCase(),
+                                title: provider.name,
+                                valueAttribute: 'auth-' + provider.name.toLowerCase(),
                                 helpMessage: '',
-                                connected: provider['connected'],
-                                connectUrl: provider['connect_url'],
-                                disconnectUrl: provider['disconnect_url']
+                                connected: provider.connected,
+                                connectUrl: provider.connect_url,
+                                disconnectUrl: provider.disconnect_url
                             })
-                        }
+                        };
                     })
                 };
                 sectionsData.push(accountsSectionData);
             }
 
             var accountSettingsView = new AccountSettingsView({
+                model: userAccountModel,
+                accountUserId: accountUserId,
                 el: accountSettingsElement,
                 sectionsData: sectionsData
             });
@@ -149,14 +151,25 @@
                 accountSettingsView.showLoadingError();
             };
 
+            var showAccountFields = function () {
+                // Record that the account settings page was viewed.
+                Logger.log('edx.user.settings.viewed', {
+                    page: "account",
+                    visibility: null,
+                    user_id: accountUserId
+                });
+
+                // Render the fields
+                accountSettingsView.renderFields();
+            };
+
             userAccountModel.fetch({
                 success: function () {
+                    // Fetch the user preferences model
                     userPreferencesModel.fetch({
-                        success: function () {
-                            accountSettingsView.renderFields();
-                        },
+                        success: showAccountFields,
                         error: showLoadingError
-                    })
+                    });
                 },
                 error: showLoadingError
             });
@@ -167,5 +180,5 @@
                 accountSettingsView: accountSettingsView
             };
         };
-    })
+    });
 }).call(this, define || RequireJS.define);
