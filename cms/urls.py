@@ -194,5 +194,5 @@ urlpatterns += (
 
 # Oauth2 provider
 urlpatterns += (
-   url(r'^oauth2/', include('oauth2_provider.urls')),
+   url(r'^oauth2/', include('oauth2_provider.urls', namespace='oauth2')),
 )
