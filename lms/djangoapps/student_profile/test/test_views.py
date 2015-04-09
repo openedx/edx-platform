@@ -67,3 +67,11 @@ class LearnerProfileViewTest(UrlResetMixin, TestCase):
 
         for attribute in self.CONTEXT_DATA:
             self.assertIn(attribute, response.content)
+
+    def test_undefined_profile_page(self):
+        """
+        Verify that a 404 is returned for a non-existent profile page.
+        """
+        profile_path = reverse('learner_profile', kwargs={'username': "no_such_user"})
+        response = self.client.get(path=profile_path)
+        self.assertEqual(404, response.status_code)
