@@ -109,7 +109,7 @@ class UserStateCache(object):
         self.select_for_update = select_for_update
 
     def cache_fields(self, fields, descriptors, aside_types):
-        self._data = _chunked_query(
+        data = _chunked_query(
             StudentModule,
             self.select_for_update,
             'module_state_key__in',
@@ -117,6 +117,8 @@ class UserStateCache(object):
             course_id=self.course_id,
             student=self.user.pk,
         )
+        for field_object in data:
+            self._cache[self.cache_key_for_field_object(field_object)] = field_object
 
     def cache_key_for_field_object(self, field_object):
         return field_object.module_state_key.map_into_course(self.course_id)
@@ -140,13 +142,15 @@ class UserStateSummaryCache(object):
         self.select_for_update = select_for_update
 
     def cache_fields(self, fields, descriptors, aside_types):
-        self._data = _chunked_query(
+        data = _chunked_query(
             XModuleUserStateSummaryField,
             self.select_for_update,
             'usage_id__in',
             _all_usage_keys(descriptors, aside_types),
             field_name__in=set(field.name for field in fields),
         )
+        for field_object in data:
+            self._cache[self.cache_key_for_field_object(field_object)] = field_object
 
     def cache_key_for_field_object(self, field_object):
         return (field_object.usage_id.map_into_course(self.course_id), field_object.field_name)
@@ -171,7 +175,7 @@ class PreferencesCache(object):
         self._cache = {}
 
     def cache_fields(self, fields, descriptors, aside_types):
-        self._data = _chunked_query(
+        data = _chunked_query(
             XModuleStudentPrefsField,
             self.select_for_update,
             'module_type__in',
@@ -179,6 +183,8 @@ class PreferencesCache(object):
             student=self.user.pk,
             field_name__in=set(field.name for field in fields),
         )
+        for field_object in data:
+            self._cache[self.cache_key_for_field_object(field_object)] = field_object
 
     def cache_key_for_field_object(self, field_object):
         return (field_object.module_type, field_object.field_name)
@@ -203,12 +209,14 @@ class UserInfoCache(object):
         self.select_for_update = select_for_update
 
     def cache_fields(self, fields, descriptors, aside_types):
-        self._data = _query(
+        data = _query(
             XModuleStudentInfoField,
             self.select_for_update,
             student=self.user.pk,
             field_name__in=set(field.name for field in fields),
         )
+        for field_object in data:
+            self._cache[self.cache_key_for_field_object(field_object)] = field_object
 
     def cache_key_for_field_object(self, field_object):
         return field_object.field_name
@@ -283,7 +291,7 @@ class FieldDataCache(object):
                 if scope not in self.cache:
                     continue
 
-                self._cache_fields(scope, fields, descriptors)
+                self.cache[scope].cache_fields(fields, descriptors, self.asides)
 
     def add_descriptor_descendents(self, descriptor, depth=None, descriptor_filter=lambda descriptor: True):
         """
@@ -342,15 +350,6 @@ class FieldDataCache(object):
         cache = FieldDataCache([], course_id, user, select_for_update, asides=asides)
         cache.add_descriptor_descendents(descriptor, depth, descriptor_filter)
         return cache
-
-
-    def _cache_fields(self, scope, fields, descriptors):
-        """
-        Queries the database for all of the fields in the specified scope
-        """
-        self.cache[scope].cache_fields(fields, descriptors, self.asides)
-        for field_object in self.cache[scope]._data:
-            self.cache[scope].set(self.cache[scope].cache_key_for_field_object(field_object), field_object)
 
     def _fields_to_cache(self, descriptors):
         """
