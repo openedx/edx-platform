@@ -3,6 +3,7 @@ Classes to provide the LMS runtime data storage to XBlocks
 """
 
 import json
+from abc import abstractmethod, ABCMeta
 from collections import defaultdict
 from itertools import chain
 from .models import (
@@ -98,137 +99,238 @@ def _all_block_types(descriptors, aside_types):
     return block_types
 
 
-class UserStateCache(object):
+class DjangoOrmFieldCache(object):
+    """
+    Baseclass for Scope-specific field cache objects that are based on
+    single-row-per-field Django ORM objects.
+    """
+    __metaclass__ = ABCMeta
+
+    def __init__(self):
+        self._cache = {}
+
+    def cache_fields(self, fields, xblocks, aside_types):
+        """
+        Load all fields specified by ``fields`` for the supplied ``xblocks``
+        and ``aside_types`` into this cache.
+
+        Arguments:
+            fields (list of str): Field names to cache.
+            xblocks (list of :class:`XBlock`): XBlocks to cache fields for.
+            aside_types (list of str): Aside types to cache fields for.
+        """
+        for field_object in self._read_objects(fields, xblocks, aside_types):
+            self._cache[self._cache_key_for_field_object(field_object)] = field_object
+
+    def get(self, cache_key):
+        return self._cache.get(cache_key)
+
+    def set(self, cache_key, value):
+        self._cache[cache_key] = value
+
+    def __len__(self):
+        return len(self._cache)
+
+    @abstractmethod
+    def _create_object(self, kvs_key, value):
+        """
+        Create a new object to add to the cache (which should record
+        the specified field ``value`` for the field identified by
+        ``kvs_key``).
+
+        Arguments:
+            kvs_key (:class:`DjangoKeyValueStore.Key`): Which field to create an entry for
+            value: What value to record in the field
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def _read_objects(self, fields, xblocks, aside_types):
+        """
+        Return an iterator for all objects stored in the underlying datastore
+        for the ``fields`` on the ``xblocks`` and the ``aside_types`` associated
+        with them.
+
+        Arguments:
+            fields (list of str): Field names to return values for
+            xblocks (list of :class:`~XBlock`): XBlocks to load fields for
+            aside_types (list of str): Asides to load field for (which annotate the supplied
+                xblocks).
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def _cache_key_for_field_object(self, field_object):
+        """
+        Return the key used in this DjangoOrmFieldCache to store the specified field_object.
+
+        Arguments:
+            field_object: A Django model instance that stores the data for fields in this cache
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def _cache_key_for_kvs_key(self, key):
+        """
+        Return the key used in this DjangoOrmFieldCache for the specified KeyValueStore key.
+
+        Arguments:
+            key (:class:`~DjangoKeyValueStore.Key`): The key representing the cached field
+        """
+        raise NotImplementedError()
+
+
+class UserStateCache(DjangoOrmFieldCache):
     """
     Cache for Scope.user_state xblock field data.
     """
     def __init__(self, user, course_id, select_for_update=False):
+        super(UserStateCache, self).__init__()
         self.course_id = course_id
-        self._cache = {}
         self.user = user
         self.select_for_update = select_for_update
 
-    def cache_fields(self, fields, descriptors, aside_types):
-        data = _chunked_query(
+    def _read_objects(self, fields, xblocks, aside_types):
+        """
+        Return an iterator for all objects stored in the underlying datastore
+        for the ``fields`` on the ``xblocks`` and the ``aside_types`` associated
+        with them.
+
+        Arguments:
+            fields (list of str): Field names to return values for
+            xblocks (list of :class:`~XBlock`): XBlocks to load fields for
+            aside_types (list of str): Asides to load field for (which annotate the supplied
+                xblocks).
+        """
+        return _chunked_query(
             StudentModule,
             self.select_for_update,
             'module_state_key__in',
-            _all_usage_keys(descriptors, aside_types),
+            _all_usage_keys(xblocks, aside_types),
             course_id=self.course_id,
             student=self.user.pk,
         )
-        for field_object in data:
-            self._cache[self.cache_key_for_field_object(field_object)] = field_object
 
-    def cache_key_for_field_object(self, field_object):
+    def _cache_key_for_field_object(self, field_object):
         return field_object.module_state_key.map_into_course(self.course_id)
 
-    def get(self, cache_key):
-        return self._cache.get(cache_key)
 
-    def set(self, cache_key, value):
-        self._cache[cache_key] = value
-
-    def __len__(self):
-        return len(self._cache)
-
-class UserStateSummaryCache(object):
+class UserStateSummaryCache(DjangoOrmFieldCache):
     """
     Cache for Scope.user_state_summary xblock field data.
     """
     def __init__(self, course_id, select_for_update=False):
+        super(UserStateSummaryCache, self).__init__()
         self.course_id = course_id
-        self._cache = {}
         self.select_for_update = select_for_update
 
-    def cache_fields(self, fields, descriptors, aside_types):
-        data = _chunked_query(
+    def _read_objects(self, fields, xblocks, aside_types):
+        """
+        Return an iterator for all objects stored in the underlying datastore
+        for the ``fields`` on the ``xblocks`` and the ``aside_types`` associated
+        with them.
+
+        Arguments:
+            fields (list of str): Field names to return values for
+            xblocks (list of :class:`~XBlock`): XBlocks to load fields for
+            aside_types (list of str): Asides to load field for (which annotate the supplied
+                xblocks).
+        """
+        return _chunked_query(
             XModuleUserStateSummaryField,
             self.select_for_update,
             'usage_id__in',
-            _all_usage_keys(descriptors, aside_types),
+            _all_usage_keys(xblocks, aside_types),
             field_name__in=set(field.name for field in fields),
         )
-        for field_object in data:
-            self._cache[self.cache_key_for_field_object(field_object)] = field_object
 
-    def cache_key_for_field_object(self, field_object):
+    def _cache_key_for_field_object(self, field_object):
+        """
+        Return the key used in this DjangoOrmFieldCache to store the specified field_object.
+
+        Arguments:
+            field_object: A Django model instance that stores the data for fields in this cache
+        """
         return (field_object.usage_id.map_into_course(self.course_id), field_object.field_name)
 
-    def get(self, cache_key):
-        return self._cache.get(cache_key)
 
-    def set(self, cache_key, value):
-        self._cache[cache_key] = value
-
-    def __len__(self):
-        return len(self._cache)
-
-
-class PreferencesCache(object):
+class PreferencesCache(DjangoOrmFieldCache):
     """
     Cache for Scope.preferences xblock field data.
     """
     def __init__(self, user, select_for_update=False):
+        super(PreferencesCache, self).__init__()
         self.user = user
         self.select_for_update = select_for_update
-        self._cache = {}
 
-    def cache_fields(self, fields, descriptors, aside_types):
-        data = _chunked_query(
+    def _read_objects(self, fields, xblocks, aside_types):
+        """
+        Return an iterator for all objects stored in the underlying datastore
+        for the ``fields`` on the ``xblocks`` and the ``aside_types`` associated
+        with them.
+
+        Arguments:
+            fields (list of str): Field names to return values for
+            xblocks (list of :class:`~XBlock`): XBlocks to load fields for
+            aside_types (list of str): Asides to load field for (which annotate the supplied
+                xblocks).
+        """
+        return _chunked_query(
             XModuleStudentPrefsField,
             self.select_for_update,
             'module_type__in',
-            _all_block_types(descriptors, aside_types),
+            _all_block_types(xblocks, aside_types),
             student=self.user.pk,
             field_name__in=set(field.name for field in fields),
         )
-        for field_object in data:
-            self._cache[self.cache_key_for_field_object(field_object)] = field_object
 
-    def cache_key_for_field_object(self, field_object):
+    def _cache_key_for_field_object(self, field_object):
+        """
+        Return the key used in this DjangoOrmFieldCache to store the specified field_object.
+
+        Arguments:
+            field_object: A Django model instance that stores the data for fields in this cache
+        """
         return (field_object.module_type, field_object.field_name)
 
-    def get(self, cache_key):
-        return self._cache.get(cache_key)
 
-    def set(self, cache_key, value):
-        self._cache[cache_key] = value
-
-    def __len__(self):
-        return len(self._cache)
-
-
-class UserInfoCache(object):
+class UserInfoCache(DjangoOrmFieldCache):
     """
     Cache for Scope.user_info xblock field data
     """
     def __init__(self, user, select_for_update=False):
-        self._cache = {}
+        super(UserInfoCache, self).__init__()
         self.user = user
         self.select_for_update = select_for_update
 
-    def cache_fields(self, fields, descriptors, aside_types):
-        data = _query(
+    def _read_objects(self, fields, xblocks, aside_types):
+        """
+        Return an iterator for all objects stored in the underlying datastore
+        for the ``fields`` on the ``xblocks`` and the ``aside_types`` associated
+        with them.
+
+        Arguments:
+            fields (list of str): Field names to return values for
+            xblocks (list of :class:`~XBlock`): XBlocks to load fields for
+            aside_types (list of str): Asides to load field for (which annotate the supplied
+                xblocks).
+        """
+        return _query(
             XModuleStudentInfoField,
             self.select_for_update,
             student=self.user.pk,
             field_name__in=set(field.name for field in fields),
         )
-        for field_object in data:
-            self._cache[self.cache_key_for_field_object(field_object)] = field_object
 
-    def cache_key_for_field_object(self, field_object):
+    def _cache_key_for_field_object(self, field_object):
+        """
+        Return the key used in this DjangoOrmFieldCache to store the specified field_object.
+
+        Arguments:
+            field_object: A Django model instance that stores the data for fields in this cache
+        """
         return field_object.field_name
 
-    def get(self, cache_key):
-        return self._cache.get(cache_key)
-
-    def set(self, cache_key, value):
-        self._cache[cache_key] = value
-
-    def __len__(self):
-        return len(self._cache)
 
 
 class FieldDataCache(object):
