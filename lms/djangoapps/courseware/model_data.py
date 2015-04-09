@@ -16,6 +16,7 @@ import logging
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.block_types import BlockTypeKeyV1
 from opaque_keys.edx.asides import AsideUsageKeyV1
+from contracts import contract
 
 from django.db import DatabaseError
 
@@ -99,6 +100,127 @@ def _all_block_types(descriptors, aside_types):
     return block_types
 
 
+class DjangoKeyValueStore(KeyValueStore):
+    """
+    This KeyValueStore will read and write data in the following scopes to django models
+        Scope.user_state_summary
+        Scope.user_state
+        Scope.preferences
+        Scope.user_info
+
+    Access to any other scopes will raise an InvalidScopeError
+
+    Data for Scope.user_state is stored as StudentModule objects via the django orm.
+
+    Data for the other scopes is stored in individual objects that are named for the
+    scope involved and have the field name as a key
+
+    If the key isn't found in the expected table during a read or a delete, then a KeyError will be raised
+    """
+
+    _allowed_scopes = (
+        Scope.user_state_summary,
+        Scope.user_state,
+        Scope.preferences,
+        Scope.user_info,
+    )
+
+    def __init__(self, field_data_cache):
+        self._field_data_cache = field_data_cache
+
+    def get(self, key):
+        if key.scope not in self._allowed_scopes:
+            raise InvalidScopeError(key)
+
+        field_object = self._field_data_cache.find(key)
+        if field_object is None:
+            raise KeyError(key.field_name)
+
+        if key.scope == Scope.user_state:
+            return json.loads(field_object.state)[key.field_name]
+        else:
+            return json.loads(field_object.value)
+
+    def set(self, key, value):
+        """
+        Set a single value in the KeyValueStore
+        """
+        self.set_many({key: value})
+
+    def set_many(self, kv_dict):
+        """
+        Provide a bulk save mechanism.
+
+        `kv_dict`: A dictionary of dirty fields that maps
+          xblock.KvsFieldData._key : value
+
+        """
+        saved_fields = []
+        # field_objects maps a field_object to a list of associated fields
+        field_objects = dict()
+        for field in kv_dict:
+            # Check field for validity
+            if field.scope not in self._allowed_scopes:
+                raise InvalidScopeError(field)
+
+            # If the field is valid and isn't already in the dictionary, add it.
+            field_object = self._field_data_cache.find_or_create(field)
+            if field_object not in field_objects.keys():
+                field_objects[field_object] = []
+            # Update the list of associated fields
+            field_objects[field_object].append(field)
+
+            # Special case when scope is for the user state, because this scope saves fields in a single row
+            if field.scope == Scope.user_state:
+                state = json.loads(field_object.state)
+                state[field.field_name] = kv_dict[field]
+                field_object.state = json.dumps(state)
+            else:
+                # The remaining scopes save fields on different rows, so
+                # we don't have to worry about conflicts
+                field_object.value = json.dumps(kv_dict[field])
+
+        for field_object in field_objects:
+            try:
+                # Save the field object that we made above
+                field_object.save()
+                # If save is successful on this scope, add the saved fields to
+                # the list of successful saves
+                saved_fields.extend([field.field_name for field in field_objects[field_object]])
+            except DatabaseError:
+                log.exception('Error saving fields %r', field_objects[field_object])
+                raise KeyValueMultiSaveError(saved_fields)
+
+    def delete(self, key):
+        if key.scope not in self._allowed_scopes:
+            raise InvalidScopeError(key)
+
+        field_object = self._field_data_cache.find(key)
+        if field_object is None:
+            raise KeyError(key.field_name)
+
+        if key.scope == Scope.user_state:
+            state = json.loads(field_object.state)
+            del state[key.field_name]
+            field_object.state = json.dumps(state)
+            field_object.save()
+        else:
+            field_object.delete()
+
+    def has(self, key):
+        if key.scope not in self._allowed_scopes:
+            raise InvalidScopeError(key)
+
+        field_object = self._field_data_cache.find(key)
+        if field_object is None:
+            return False
+
+        if key.scope == Scope.user_state:
+            return key.field_name in json.loads(field_object.state)
+        else:
+            return True
+
+
 class DjangoOrmFieldCache(object):
     """
     Baseclass for Scope-specific field cache objects that are based on
@@ -122,11 +244,13 @@ class DjangoOrmFieldCache(object):
         for field_object in self._read_objects(fields, xblocks, aside_types):
             self._cache[self._cache_key_for_field_object(field_object)] = field_object
 
-    def get(self, cache_key):
-        return self._cache.get(cache_key)
+    @contract(kvs_key=DjangoKeyValueStore.Key)
+    def get(self, kvs_key):
+        return self._cache.get(self._cache_key_for_kvs_key(kvs_key))
 
-    def set(self, cache_key, value):
-        self._cache[cache_key] = value
+    @contract(kvs_key=DjangoKeyValueStore.Key)
+    def set(self, kvs_key, value):
+        self._cache[self._cache_key_for_kvs_key(kvs_key)] = value
 
     def __len__(self):
         return len(self._cache)
@@ -214,6 +338,15 @@ class UserStateCache(DjangoOrmFieldCache):
     def _cache_key_for_field_object(self, field_object):
         return field_object.module_state_key.map_into_course(self.course_id)
 
+    def _cache_key_for_kvs_key(self, key):
+        """
+        Return the key used in this DjangoOrmFieldCache for the specified KeyValueStore key.
+
+        Arguments:
+            key (:class:`~DjangoKeyValueStore.Key`): The key representing the cached field
+        """
+        return key.block_scope_id
+
 
 class UserStateSummaryCache(DjangoOrmFieldCache):
     """
@@ -252,6 +385,15 @@ class UserStateSummaryCache(DjangoOrmFieldCache):
             field_object: A Django model instance that stores the data for fields in this cache
         """
         return (field_object.usage_id.map_into_course(self.course_id), field_object.field_name)
+
+    def _cache_key_for_kvs_key(self, key):
+        """
+        Return the key used in this DjangoOrmFieldCache for the specified KeyValueStore key.
+
+        Arguments:
+            key (:class:`~DjangoKeyValueStore.Key`): The key representing the cached field
+        """
+        return (key.block_scope_id, key.field_name)
 
 
 class PreferencesCache(DjangoOrmFieldCache):
@@ -293,6 +435,15 @@ class PreferencesCache(DjangoOrmFieldCache):
         """
         return (field_object.module_type, field_object.field_name)
 
+    def _cache_key_for_kvs_key(self, key):
+        """
+        Return the key used in this DjangoOrmFieldCache for the specified KeyValueStore key.
+
+        Arguments:
+            key (:class:`~DjangoKeyValueStore.Key`): The key representing the cached field
+        """
+        return (BlockTypeKeyV1(key.block_family, key.block_scope_id), key.field_name)
+
 
 class UserInfoCache(DjangoOrmFieldCache):
     """
@@ -331,6 +482,14 @@ class UserInfoCache(DjangoOrmFieldCache):
         """
         return field_object.field_name
 
+    def _cache_key_for_kvs_key(self, key):
+        """
+        Return the key used in this DjangoOrmFieldCache for the specified KeyValueStore key.
+
+        Arguments:
+            key (:class:`~DjangoKeyValueStore.Key`): The key representing the cached field
+        """
+        return key.field_name
 
 
 class FieldDataCache(object):
@@ -463,18 +622,6 @@ class FieldDataCache(object):
                 scope_map[field.scope].add(field)
         return scope_map
 
-    def _cache_key_from_kvs_key(self, key):
-        """
-        Return the key used in the FieldDataCache for the specified KeyValueStore key
-        """
-        if key.scope == Scope.user_state:
-            return key.block_scope_id
-        elif key.scope == Scope.user_state_summary:
-            return (key.block_scope_id, key.field_name)
-        elif key.scope == Scope.preferences:
-            return (BlockTypeKeyV1(key.block_family, key.block_scope_id), key.field_name)
-        elif key.scope == Scope.user_info:
-            return key.field_name
 
     def find(self, key):
         '''
@@ -492,7 +639,7 @@ class FieldDataCache(object):
         if key.scope not in self.cache:
             return None
 
-        return self.cache[key.scope].get(self._cache_key_from_kvs_key(key))
+        return self.cache[key.scope].get(key)
 
     def find_or_create(self, key):
         '''
@@ -534,127 +681,5 @@ class FieldDataCache(object):
         if key.scope not in self.cache:
             return
 
-        cache_key = self._cache_key_from_kvs_key(key)
-        self.cache[key.scope].set(cache_key, field_object)
+        self.cache[key.scope].set(key, field_object)
         return field_object
-
-
-class DjangoKeyValueStore(KeyValueStore):
-    """
-    This KeyValueStore will read and write data in the following scopes to django models
-        Scope.user_state_summary
-        Scope.user_state
-        Scope.preferences
-        Scope.user_info
-
-    Access to any other scopes will raise an InvalidScopeError
-
-    Data for Scope.user_state is stored as StudentModule objects via the django orm.
-
-    Data for the other scopes is stored in individual objects that are named for the
-    scope involved and have the field name as a key
-
-    If the key isn't found in the expected table during a read or a delete, then a KeyError will be raised
-    """
-
-    _allowed_scopes = (
-        Scope.user_state_summary,
-        Scope.user_state,
-        Scope.preferences,
-        Scope.user_info,
-    )
-
-    def __init__(self, field_data_cache):
-        self._field_data_cache = field_data_cache
-
-    def get(self, key):
-        if key.scope not in self._allowed_scopes:
-            raise InvalidScopeError(key)
-
-        field_object = self._field_data_cache.find(key)
-        if field_object is None:
-            raise KeyError(key.field_name)
-
-        if key.scope == Scope.user_state:
-            return json.loads(field_object.state)[key.field_name]
-        else:
-            return json.loads(field_object.value)
-
-    def set(self, key, value):
-        """
-        Set a single value in the KeyValueStore
-        """
-        self.set_many({key: value})
-
-    def set_many(self, kv_dict):
-        """
-        Provide a bulk save mechanism.
-
-        `kv_dict`: A dictionary of dirty fields that maps
-          xblock.KvsFieldData._key : value
-
-        """
-        saved_fields = []
-        # field_objects maps a field_object to a list of associated fields
-        field_objects = dict()
-        for field in kv_dict:
-            # Check field for validity
-            if field.scope not in self._allowed_scopes:
-                raise InvalidScopeError(field)
-
-            # If the field is valid and isn't already in the dictionary, add it.
-            field_object = self._field_data_cache.find_or_create(field)
-            if field_object not in field_objects.keys():
-                field_objects[field_object] = []
-            # Update the list of associated fields
-            field_objects[field_object].append(field)
-
-            # Special case when scope is for the user state, because this scope saves fields in a single row
-            if field.scope == Scope.user_state:
-                state = json.loads(field_object.state)
-                state[field.field_name] = kv_dict[field]
-                field_object.state = json.dumps(state)
-            else:
-                # The remaining scopes save fields on different rows, so
-                # we don't have to worry about conflicts
-                field_object.value = json.dumps(kv_dict[field])
-
-        for field_object in field_objects:
-            try:
-                # Save the field object that we made above
-                field_object.save()
-                # If save is successful on this scope, add the saved fields to
-                # the list of successful saves
-                saved_fields.extend([field.field_name for field in field_objects[field_object]])
-            except DatabaseError:
-                log.exception('Error saving fields %r', field_objects[field_object])
-                raise KeyValueMultiSaveError(saved_fields)
-
-    def delete(self, key):
-        if key.scope not in self._allowed_scopes:
-            raise InvalidScopeError(key)
-
-        field_object = self._field_data_cache.find(key)
-        if field_object is None:
-            raise KeyError(key.field_name)
-
-        if key.scope == Scope.user_state:
-            state = json.loads(field_object.state)
-            del state[key.field_name]
-            field_object.state = json.dumps(state)
-            field_object.save()
-        else:
-            field_object.delete()
-
-    def has(self, key):
-        if key.scope not in self._allowed_scopes:
-            raise InvalidScopeError(key)
-
-        field_object = self._field_data_cache.find(key)
-        if field_object is None:
-            return False
-
-        if key.scope == Scope.user_state:
-            return key.field_name in json.loads(field_object.state)
-        else:
-            return True
