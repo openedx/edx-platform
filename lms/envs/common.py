@@ -138,7 +138,7 @@ FEATURES = {
     'SHIB_DISABLE_TOS': False,
 
     # Toggles OAuth2 authentication provider
-    'ENABLE_OAUTH2_PROVIDER': False,
+    'ENABLE_OAUTH2_PROVIDER': True,
 
     # Allows to enable an API endpoint to serve XBlock view, used for example by external applications.
     # See jquey-xblock: https://github.com/edx-solutions/jquery-xblock
@@ -1639,6 +1639,11 @@ INSTALLED_APPS = (
 
     'openedx.core.djangoapps.content.course_structures',
     'course_structure_api',
+
+    'provider',
+    'provider.oauth2',
+    'oauth2_provider'
+
 )
 
 ######################### MARKETING SITE ###############################
