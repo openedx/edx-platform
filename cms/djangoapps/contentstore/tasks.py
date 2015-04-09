@@ -82,7 +82,7 @@ def deserialize_fields(json_fields):
 
 
 @task()
-def update_search_index(course_id, triggered_time_isoformat, store=modulestore()):
+def update_search_index(course_id, triggered_time_isoformat):
     """ Updates course search index. """
     try:
         course_key = CourseKey.from_string(course_id)
@@ -91,7 +91,7 @@ def update_search_index(course_id, triggered_time_isoformat, store=modulestore()
             triggered_time_isoformat.split('+')[0],
             "%Y-%m-%dT%H:%M:%S.%f"
         ).replace(tzinfo=UTC)
-        CoursewareSearchIndexer.index_course(store, course_key, triggered_at=triggered_time)
+        CoursewareSearchIndexer.index_course(modulestore(), course_key, triggered_at=triggered_time)
 
     except SearchIndexingError as exc:
         LOGGER.error('Search indexing error for complete course %s - %s', course_id, unicode(exc))

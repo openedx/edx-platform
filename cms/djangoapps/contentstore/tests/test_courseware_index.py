@@ -10,20 +10,22 @@ from uuid import uuid4
 from unittest import skip
 
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import SignalHandler
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.mixed import MixedModuleStore
-from xmodule.modulestore.tests.utils import MixedSplitTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.test_cross_modulestore_import_export import MongoContentstoreBuilder
-from xmodule.modulestore.tests.utils import create_modulestore_instance, LocationMixin
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from xmodule.modulestore.tests.test_cross_modulestore_import_export import MongoContentstoreBuilder
+from xmodule.modulestore.tests.utils import create_modulestore_instance, LocationMixin, MixedSplitTestCase
 from xmodule.tests import DATA_DIR
 from xmodule.x_module import XModuleMixin
 from search.search_engine_base import SearchEngine
 
 from contentstore.courseware_index import CoursewareSearchIndexer, INDEX_NAME, DOCUMENT_TYPE, SearchIndexingError
 from contentstore.signals import listen_for_course_publish
+
 
 COURSE_CHILD_STRUCTURE = {
     "course": "chapter",
@@ -393,18 +395,6 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         with self.assertRaises(SearchIndexingError):
             self.reindex_course(store)
 
-    def _test_task_indexing_course(self, store):
-        """ Making sure that the receiver correctly fires off the task when invoked by signal """
-        searcher = SearchEngine.get_search_engine(INDEX_NAME)
-        response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
-        self.assertEqual(response["total"], 0)
-
-        listen_for_course_publish(self, self.course.id, store=store)
-
-        # Note that this test will only succeed if celery is working in inline mode
-        response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
-        self.assertEqual(response["total"], 3)
-
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_indexing_course(self, store_type):
         self._perform_test_using_store(store_type, self._test_indexing_course)
@@ -519,3 +509,59 @@ class TestLargeCourseDeletions(MixedWithOptionsTestCase):
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_large_course_deletion(self, store_type):
         self._perform_test_using_store(store_type, self._test_large_course_deletion)
+
+
+class TestTaskExecution(ModuleStoreTestCase):
+    """
+    Set of tests to ensure that the task code will do the right thing when
+    executed directly. The test course gets created without the listener
+    being present, which allows us to ensure that when the listener is
+    executed, it is done as expected.
+    """
+
+    def setUp(self):
+        super(TestTaskExecution, self).setUp()
+        SignalHandler.course_published.disconnect(listen_for_course_publish)
+        self.course = CourseFactory.create(start=datetime(2015, 3, 1, tzinfo=UTC))
+
+        self.chapter = ItemFactory.create(
+            parent_location=self.course.location,
+            category='chapter',
+            display_name="Week 1",
+            publish_item=True,
+            start=datetime(2015, 3, 1, tzinfo=UTC),
+        )
+        self.sequential = ItemFactory.create(
+            parent_location=self.chapter.location,
+            category='sequential',
+            display_name="Lesson 1",
+            publish_item=True,
+            start=datetime(2015, 3, 1, tzinfo=UTC),
+        )
+        self.vertical = ItemFactory.create(
+            parent_location=self.sequential.location,
+            category='vertical',
+            display_name='Subsection 1',
+            publish_item=True,
+            start=datetime(2015, 4, 1, tzinfo=UTC),
+        )
+        # unspecified start - should inherit from container
+        self.html_unit = ItemFactory.create(
+            parent_location=self.vertical.location,
+            category="html",
+            display_name="Html Content",
+            publish_item=False,
+        )
+
+    def test_task_indexing_course(self):
+        """ Making sure that the receiver correctly fires off the task when invoked by signal """
+        searcher = SearchEngine.get_search_engine(INDEX_NAME)
+        response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
+        self.assertEqual(response["total"], 0)
+
+        #update_search_index(unicode(self.course.id), datetime.now(UTC).isoformat())
+        listen_for_course_publish(self, self.course.id)
+
+        # Note that this test will only succeed if celery is working in inline mode
+        response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
+        self.assertEqual(response["total"], 3)
