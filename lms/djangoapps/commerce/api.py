@@ -42,6 +42,26 @@ class EcommerceAPI(object):
         }
         return jwt.encode(data, self.key)
 
+    def get_order(self, user, order_number):
+        """
+        Retrieve a paid order.
+
+        Arguments
+            user             --  User associated with the requested order.
+            order_number     --  The unique identifier for the order.
+
+        Returns a tuple with the order number, order status, API response data.
+        """
+        def get():
+            """Internal service call to retrieve an order. """
+            headers = {
+                'Content-Type': 'application/json',
+                'Authorization': 'JWT {}'.format(self._get_jwt(user))
+            }
+            url = '{base_url}/orders/{order_number}/'.format(base_url=self.url, order_number=order_number)
+            return requests.get(url, headers=headers, timeout=self.timeout)
+        return self._call_ecommerce_service(get)
+
     def create_order(self, user, sku):
         """
         Create a new order.
@@ -52,21 +72,35 @@ class EcommerceAPI(object):
 
         Returns a tuple with the order number, order status, API response data.
         """
-        headers = {
-            'Content-Type': 'application/json',
-            'Authorization': 'JWT {}'.format(self._get_jwt(user))
-        }
+        def create():
+            """Internal service call to create an order. """
+            headers = {
+                'Content-Type': 'application/json',
+                'Authorization': 'JWT {}'.format(self._get_jwt(user))
+            }
+            url = '{}/orders/'.format(self.url)
+            return requests.post(url, data=json.dumps({'sku': sku}), headers=headers, timeout=self.timeout)
+        return self._call_ecommerce_service(create)
 
-        url = '{}/orders/'.format(self.url)
+    @staticmethod
+    def _call_ecommerce_service(call):
+        """
+        Makes a call to the E-Commerce Service. There are a number of common errors that could occur across any
+        request to the E-Commerce Service that this helper method can wrap each call with. This method helps ensure
+        calls to the E-Commerce Service will conform to the same output.
 
+        Arguments
+            call    --  A callable function that makes a request to the E-Commerce Service.
+
+        Returns a tuple with the order number, order status, API response data.
+        """
         try:
-            response = requests.post(url, data=json.dumps({'sku': sku}), headers=headers, timeout=self.timeout)
+            response = call()
             data = response.json()
         except Timeout:
             msg = 'E-Commerce API request timed out.'
             log.error(msg)
             raise TimeoutError(msg)
-
         except ValueError:
             msg = 'E-Commerce API response is not valid JSON.'
             log.exception(msg)
