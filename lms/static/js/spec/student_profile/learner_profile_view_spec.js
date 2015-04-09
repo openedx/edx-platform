@@ -93,8 +93,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 return new LearnerProfileView(
                     {
                         el: $('.wrapper-profile'),
-                        own_profile: ownProfile,
-                        has_preferences_access: true,
+                        ownProfile: ownProfile,
+                        hasPreferencesAccess: true,
                         accountSettingsModel: accountSettingsModel,
                         preferencesModel: accountPreferencesModel,
                         accountPrivacyFieldView: accountPrivacyFieldView,
