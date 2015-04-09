@@ -41,7 +41,7 @@
                 var authData = ${ json.dumps(auth) };
 
                 setupAccountSettingsSection(
-                        fieldsData, authData, '${user_accounts_api_url}', '${user_preferences_api_url}'
+                        fieldsData, authData, '${user_accounts_api_url}', '${user_preferences_api_url}', ${user.id}
                 );
             });
           }).call(this, require || RequireJS.require);

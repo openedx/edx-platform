@@ -10,8 +10,10 @@ from ...pages.lms.account_settings import AccountSettingsPage
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.dashboard import DashboardPage
 
+from ..helpers import EventsTestMixin
 
-class AccountSettingsPageTest(WebAppTest):
+
+class AccountSettingsPageTest(EventsTestMixin, WebAppTest):
     """
     Tests that verify behaviour of the Account Settings page.
     """
@@ -27,15 +29,46 @@ class AccountSettingsPageTest(WebAppTest):
         """
         super(AccountSettingsPageTest, self).setUp()
 
-        AutoAuthPage(self.browser, username=self.USERNAME, password=self.PASSWORD, email=self.EMAIL).visit()
+        self.user_id = AutoAuthPage(
+            self.browser, username=self.USERNAME, password=self.PASSWORD, email=self.EMAIL
+        ).visit().get_user_id()
 
+    def visit_account_settings_page(self):
+        """
+        Visit the account settings page for the current user.
+        """
         self.account_settings_page = AccountSettingsPage(self.browser)
         self.account_settings_page.visit()
 
+    def test_page_view_event(self):
+        """
+        Scenario: An event should be recorded when the "Account Settings"
+           page is viewed.
+
+        Given that I am a registered user
+        And I visit my account settings page
+        Then a page view analytics event should be recorded
+        """
+        self.visit_account_settings_page()
+        self.verify_browser_events(
+            u"edx.user.settings.viewed",
+            [{
+                u"user_id": int(self.user_id),
+                u"page": u"account",
+                u"visibility": None,
+                u"requires_parental_consent": False,
+            }]
+        )
+
     def test_link_on_dashboard_works(self):
         """
-        Scenario: Verify that account settings link is present in dashboard
-        page and we can use it to navigate to the page.
+        Scenario: Verify that the "Account Settings" link works from the dashboard.
+
+
+        Given that I am a registered user
+        And I visit my dashboard
+        And I click on "Account Settings" in the top drop down
+        Then I should see my account settings page
         """
         dashboard_page = DashboardPage(self.browser)
         dashboard_page.visit()
@@ -77,6 +110,7 @@ class AccountSettingsPageTest(WebAppTest):
             }
         ]
 
+        self.visit_account_settings_page()
         self.assertEqual(self.account_settings_page.sections_structure(), expected_sections_structure)
 
     def _test_readonly_field(self, field_id, title, value):
@@ -141,6 +175,7 @@ class AccountSettingsPageTest(WebAppTest):
         """
         Test behaviour of "Username" field.
         """
+        self.visit_account_settings_page()
         self._test_readonly_field(
             'username',
             'Username',
@@ -151,6 +186,7 @@ class AccountSettingsPageTest(WebAppTest):
         """
         Test behaviour of "Full Name" field.
         """
+        self.visit_account_settings_page()
         self._test_text_field(
             u'name',
             u'Full Name',
@@ -163,6 +199,7 @@ class AccountSettingsPageTest(WebAppTest):
         """
         Test behaviour of "Email" field.
         """
+        self.visit_account_settings_page()
         self._test_text_field(
             u'email',
             u'Email Address',
@@ -177,6 +214,7 @@ class AccountSettingsPageTest(WebAppTest):
         """
         Test behaviour of "Password" field.
         """
+        self.visit_account_settings_page()
         self._test_link_field(
             u'password',
             u'Password',
@@ -192,6 +230,7 @@ class AccountSettingsPageTest(WebAppTest):
         """
         Test behaviour of "Language" field.
         """
+        self.visit_account_settings_page()
         self._test_dropdown_field(
             u'pref-lang',
             u'Language',
@@ -204,6 +243,7 @@ class AccountSettingsPageTest(WebAppTest):
         """
         Test behaviour of "Education Completed" field.
         """
+        self.visit_account_settings_page()
         self._test_dropdown_field(
             u'level_of_education',
             u'Education Completed',
@@ -215,6 +255,7 @@ class AccountSettingsPageTest(WebAppTest):
         """
         Test behaviour of "Gender" field.
         """
+        self.visit_account_settings_page()
         self._test_dropdown_field(
             u'gender',
             u'Gender',
@@ -226,6 +267,7 @@ class AccountSettingsPageTest(WebAppTest):
         """
         Test behaviour of "Year of Birth" field.
         """
+        self.visit_account_settings_page()
         self.assertEqual(self.account_settings_page.value_for_dropdown_field('year_of_birth', ''), '')
         self._test_dropdown_field(
             u'year_of_birth',
@@ -238,6 +280,7 @@ class AccountSettingsPageTest(WebAppTest):
         """
         Test behaviour of "Country or Region" field.
         """
+        self.visit_account_settings_page()
         self._test_dropdown_field(
             u'country',
             u'Country or Region',
@@ -245,10 +288,11 @@ class AccountSettingsPageTest(WebAppTest):
             [u'Pakistan', u''],
         )
 
-    def test_prefered_language_field(self):
+    def test_preferred_language_field(self):
         """
         Test behaviour of "Preferred Language" field.
         """
+        self.visit_account_settings_page()
         self._test_dropdown_field(
             u'language_proficiencies',
             u'Preferred Language',
@@ -263,6 +307,7 @@ class AccountSettingsPageTest(WebAppTest):
         Currently there is no way to test the whole authentication process
         because that would require accounts with the providers.
         """
+        self.visit_account_settings_page()
         for field_id, title, link_title in [
             ['auth-facebook', 'Facebook', 'Link'],
             ['auth-google', 'Google', 'Link'],
