@@ -190,3 +190,9 @@ urlpatterns += (
     url(r'404', handler404),
     url(r'500', handler500),
 )
+
+
+# Oauth2 provider
+urlpatterns += (
+   url(r'^oauth2/', include('oauth2_provider.urls')),
+)
