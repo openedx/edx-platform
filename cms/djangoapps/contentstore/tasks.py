@@ -98,3 +98,13 @@ def update_search_index(course_id, triggered_time_isoformat):
         LOGGER.error('Search indexing error for complete course %s - %s', course_id, unicode(exc))
     else:
         LOGGER.debug('Search indexing successful for complete course %s', course_id)
+
+
+@task()
+def push_course_update_task(course_key_string, course_subscription_id, course_display_name):
+    """
+    Sends a push notification for a course update.
+    """
+    # TODO Use edx-notifications library instead (MA-638).
+    from .push_notification import send_push_course_update
+    send_push_course_update(course_key_string, course_subscription_id, course_display_name)
