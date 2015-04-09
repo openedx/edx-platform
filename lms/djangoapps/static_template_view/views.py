@@ -62,8 +62,8 @@ def render_press_release(request, slug):
 
 
 def render_404(request):
-    return HttpResponseNotFound(render_to_string('static_templates/404.html', {}))
+    return HttpResponseNotFound(render_to_string('static_templates/404-plain.html', {}))
 
 
 def render_500(request):
-    return HttpResponseServerError(render_to_string('static_templates/server-error.html', {}))
+    return HttpResponseServerError(render_to_string('static_templates/server-error-plain.html', {}))
