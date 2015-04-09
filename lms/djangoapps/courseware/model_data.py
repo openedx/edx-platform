@@ -68,6 +68,36 @@ def _chunked_query(model_class, select_for_update, chunk_field, items, chunk_siz
     return res
 
 
+def _all_usage_keys(descriptors, aside_types):
+    """
+    Return a set of all usage_ids for the `descriptors` and for
+    as all asides in `aside_types` for those descriptors.
+    """
+    usage_ids = set()
+    for descriptor in descriptors:
+        usage_ids.add(descriptor.scope_ids.usage_id)
+
+        for aside_type in aside_types:
+            usage_ids.add(AsideUsageKeyV1(descriptor.scope_ids.usage_id, aside_type))
+
+    return usage_ids
+
+
+def _all_block_types(descriptors, aside_types):
+    """
+    Return a set of all block_types for the supplied `descriptors` and for
+    the asides types in `aside_types` associated with those descriptors.
+    """
+    block_types = set()
+    for descriptor in descriptors:
+        block_types.add(BlockTypeKeyV1(descriptor.entry_point, descriptor.scope_ids.block_type))
+
+    for aside_type in aside_types:
+        block_types.add(BlockTypeKeyV1(XBlockAside.entry_point, aside_type))
+
+    return block_types
+
+
 class UserStateCache(object):
     """
     Cache for Scope.user_state xblock field data.
@@ -266,33 +296,6 @@ class FieldDataCache(object):
         return cache
 
 
-    def _all_usage_ids(self, descriptors):
-        """
-        Return a set of all usage_ids for the descriptors that this FieldDataCache is caching
-        against, and well as all asides for those descriptors.
-        """
-        usage_ids = set()
-        for descriptor in descriptors:
-            usage_ids.add(descriptor.scope_ids.usage_id)
-
-            for aside_type in self.asides:
-                usage_ids.add(AsideUsageKeyV1(descriptor.scope_ids.usage_id, aside_type))
-
-        return usage_ids
-
-    def _all_block_types(self, descriptors):
-        """
-        Return a set of all block_types that are cached by this FieldDataCache.
-        """
-        block_types = set()
-        for descriptor in descriptors:
-            block_types.add(BlockTypeKeyV1(descriptor.entry_point, descriptor.scope_ids.block_type))
-
-        for aside_type in self.asides:
-            block_types.add(BlockTypeKeyV1(XBlockAside.entry_point, aside_type))
-
-        return block_types
-
     def _cache_fields(self, scope, fields, descriptors):
         """
         Queries the database for all of the fields in the specified scope
@@ -301,19 +304,19 @@ class FieldDataCache(object):
             cache = self.user_state_cache = UserStateCache(
                 self.user,
                 self.course_id,
-                self._all_usage_ids(descriptors),
+                _all_usage_keys(descriptors, self.asides),
                 self.select_for_update,
             )
         elif scope == Scope.user_state_summary:
             cache = self.user_state_summary_cache = UserStateSummaryCache(
                 self.course_id,
-                self._all_usage_ids(descriptors),
+                _all_usage_keys(descriptors, self.asides),
                 self.select_for_update,
             )
         elif scope == Scope.preferences:
             cache = self.preferences_cache = PreferencesCache(
                 self.user,
-                self._all_block_types(descriptors),
+                _all_block_types(descriptors, self.asides),
                 self.select_for_update,
             )
         elif scope == Scope.user_info:
