@@ -73,15 +73,21 @@ class UserStateCache(object):
     Cache for Scope.user_state xblock field data.
     """
     def __init__(self, user, course_id, usage_keys, select_for_update=False):
+        self.course_id = course_id
+        self._cache = {}
+        self.user = user
+        self.usage_keys = usage_keys
+        self.select_for_update = select_for_update
+
+    def cache_fields(self, fields):
         self._data = _chunked_query(
             StudentModule,
-            select_for_update,
+            self.select_for_update,
             'module_state_key__in',
-            usage_keys,
-            course_id=course_id,
-            student=user.pk,
+            self.usage_keys,
+            course_id=self.course_id,
+            student=self.user.pk,
         )
-        self.course_id = course_id
 
     def cache_key_for_field_object(self, field_object):
         return field_object.module_state_key.map_into_course(self.course_id)
@@ -91,15 +97,20 @@ class UserStateSummaryCache(object):
     """
     Cache for Scope.user_state_summary xblock field data.
     """
-    def __init__(self, course_id, usage_keys, fields, select_for_update=False):
+    def __init__(self, course_id, usage_keys, select_for_update=False):
+        self.usage_keys = usage_keys
+        self.course_id = course_id
+        self._cache = {}
+        self.select_for_update = select_for_update
+
+    def cache_fields(self, fields):
         self._data = _chunked_query(
             XModuleUserStateSummaryField,
-            select_for_update,
+            self.select_for_update,
             'usage_id__in',
-            usage_keys,
+            self.usage_keys,
             field_name__in=set(field.name for field in fields),
         )
-        self.course_id = course_id
 
     def cache_key_for_field_object(self, field_object):
         return (field_object.usage_id.map_into_course(self.course_id), field_object.field_name)
@@ -109,13 +120,19 @@ class PreferencesCache(object):
     """
     Cache for Scope.preferences xblock field data.
     """
-    def __init__(self, user, block_types, fields, select_for_update=False):
+    def __init__(self, user, block_types, select_for_update=False):
+        self.user = user
+        self.block_types = block_types
+        self.select_for_update = select_for_update
+        self._cache = {}
+
+    def cache_fields(self, fields):
         self._data = _chunked_query(
             XModuleStudentPrefsField,
-            select_for_update,
+            self.select_for_update,
             'module_type__in',
-            block_types,
-            student=user.pk,
+            self.block_types,
+            student=self.user.pk,
             field_name__in=set(field.name for field in fields),
         )
 
@@ -127,11 +144,16 @@ class UserInfoCache(object):
     """
     Cache for Scope.user_info xblock field data
     """
-    def __init__(self, user, fields, select_for_update=False):
+    def __init__(self, user, select_for_update=False):
+        self._cache = {}
+        self.user = user
+        self.select_for_update = select_for_update
+
+    def cache_fields(self, fields):
         self._data = _query(
             XModuleStudentInfoField,
-            select_for_update,
-            student=user.pk,
+            self.select_for_update,
+            student=self.user.pk,
             field_name__in=set(field.name for field in fields),
         )
 
@@ -286,25 +308,23 @@ class FieldDataCache(object):
             cache = self.user_state_summary_cache = UserStateSummaryCache(
                 self.course_id,
                 self._all_usage_ids(descriptors),
-                fields,
                 self.select_for_update,
             )
         elif scope == Scope.preferences:
             cache = self.preferences_cache = PreferencesCache(
                 self.user,
                 self._all_block_types(descriptors),
-                fields,
                 self.select_for_update,
             )
         elif scope == Scope.user_info:
             cache = self.user_info_cache = UserInfoCache(
                 self.user,
-                fields,
                 self.select_for_update,
             )
         else:
             return
 
+        cache.cache_fields(fields)
         for field_object in cache._data:
             self.cache[scope][cache.cache_key_for_field_object(field_object)] = field_object
 
