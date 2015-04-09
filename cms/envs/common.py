@@ -919,4 +919,4 @@ ELASTIC_FIELD_MAPPINGS = {
     }
 }
 
-OAUTH_OIDC_ISSUER = "https://http://54.171.219.192:18010/oauth2"
+OAUTH_OIDC_ISSUER = "https://54.171.219.192:18010/oauth2"
