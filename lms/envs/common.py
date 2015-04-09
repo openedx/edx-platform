@@ -2100,6 +2100,7 @@ ALL_LANGUAGES = (
 ### Apps only installed in some instances
 OPTIONAL_APPS = (
     'mentoring',
+    'problem_builder',
     'edx_sga',
 
     # edx-ora2
