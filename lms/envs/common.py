@@ -690,17 +690,9 @@ CMS_BASE = 'localhost:8001'
 
 # Site info
 SITE_ID = 1
-SITE_NAME = "beta.upex.edu.ec"
 HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 # NOTE: Please set ALLOWED_HOSTS to some sane value, as we do not allow the default '*'
-#ALLOWED_HOSTS = [
-#    'beta.cms.iaen.edu.ec',
-#    'beta.evex.iaen.edu.ec',
-#    'upex.iaen.edu.ec',
-#    'cms.iaen.edu.ec'
-#    ]
-
 # Platform Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'registration@example.com'
