@@ -16,4 +16,4 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
     # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
     from .tasks import update_search_index
     if indexing_is_enabled():
-        update_search_index.delay(unicode(course_key), datetime.now(UTC))
+        update_search_index.delay(unicode(course_key), datetime.now(UTC).isoformat(), **kwargs)

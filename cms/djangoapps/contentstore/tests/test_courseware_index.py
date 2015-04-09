@@ -23,6 +23,7 @@ from xmodule.x_module import XModuleMixin
 from search.search_engine_base import SearchEngine
 
 from contentstore.courseware_index import CoursewareSearchIndexer, INDEX_NAME, DOCUMENT_TYPE, SearchIndexingError
+from contentstore.signals import listen_for_course_publish
 
 COURSE_CHILD_STRUCTURE = {
     "course": "chapter",
@@ -392,6 +393,18 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         with self.assertRaises(SearchIndexingError):
             self.reindex_course(store)
 
+    def _test_task_indexing_course(self, store):
+        """ Making sure that the receiver correctly fires off the task when invoked by signal """
+        searcher = SearchEngine.get_search_engine(INDEX_NAME)
+        response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
+        self.assertEqual(response["total"], 0)
+
+        listen_for_course_publish(self, self.course.id, store=store)
+
+        # Note that this test will only succeed if celery is working in inline mode
+        response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
+        self.assertEqual(response["total"], 3)
+
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_indexing_course(self, store_type):
         self._perform_test_using_store(store_type, self._test_indexing_course)
@@ -423,6 +436,10 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_exception(self, store_type):
         self._perform_test_using_store(store_type, self._test_exception)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_task_indexing_course(self, store_type):
+        self._perform_test_using_store(store_type, self._test_task_indexing_course)
 
 
 @patch('django.conf.settings.SEARCH_ENGINE', 'search.tests.utils.ForceRefreshElasticSearchEngine')

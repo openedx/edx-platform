@@ -1,21 +1,22 @@
 """
 This file contains celery tasks for contentstore views
 """
-
-from celery.task import task
-from celery.utils.log import get_task_logger
-from django.contrib.auth.models import User
 import json
 import logging
-from xmodule.modulestore.django import modulestore
-from xmodule.course_module import CourseFields
+from celery.task import task
+from celery.utils.log import get_task_logger
+from datetime import datetime
+from pytz import UTC
 
-from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
-from course_action_state.models import CourseRerunState
-from contentstore.utils import initialize_permissions
-from opaque_keys.edx.keys import CourseKey
+from django.contrib.auth.models import User
 
 from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
+from contentstore.utils import initialize_permissions
+from course_action_state.models import CourseRerunState
+from opaque_keys.edx.keys import CourseKey
+from xmodule.course_module import CourseFields
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
 
 LOGGER = get_task_logger(__name__)
 FULL_COURSE_REINDEX_THRESHOLD = 1
@@ -81,11 +82,16 @@ def deserialize_fields(json_fields):
 
 
 @task()
-def update_search_index(course_id, triggered_time):
+def update_search_index(course_id, triggered_time_isoformat, store=modulestore()):
     """ Updates course search index. """
     try:
         course_key = CourseKey.from_string(course_id)
-        CoursewareSearchIndexer.index_course(modulestore(), course_key, triggered_at=triggered_time)
+        triggered_time = datetime.strptime(
+            # remove the +00:00 from the end of the formats generated within the system
+            triggered_time_isoformat.split('+')[0],
+            "%Y-%m-%dT%H:%M:%S.%f"
+        ).replace(tzinfo=UTC)
+        CoursewareSearchIndexer.index_course(store, course_key, triggered_at=triggered_time)
 
     except SearchIndexingError as exc:
         LOGGER.error('Search indexing error for complete course %s - %s', course_id, unicode(exc))
