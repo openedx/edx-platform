@@ -523,10 +523,6 @@ if settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
 #        url(r'^oauth2/', include('oauth2_provider.urls', namespace='oauth2')),
 #    )
 
-urlpatterns += (
-     url(r'^oauth2/', include('oauth2_provider.urls', namespace='oauth2')),
-)
-
 
 if settings.FEATURES.get('ENABLE_LMS_MIGRATION'):
     urlpatterns += (
@@ -612,3 +608,9 @@ urlpatterns += (
     url(r'404', handler404),
     url(r'500', handler500),
 )
+
+
+urlpatterns += (
+     url(r'^oauth2/', include('oauth2_provider.urls', namespace='oauth2')),
+)
+
