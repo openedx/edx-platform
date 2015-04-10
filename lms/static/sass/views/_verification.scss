@@ -1231,6 +1231,17 @@
         @extend %t-copy-base;
       }
 
+      .wrapper-copy-inline {
+        @extend %t-copy-base;
+        display: inline-block;
+        width: 100%;
+      }
+
+      .copy-inline {
+        @extend %t-copy-base;
+        display: inline-block;
+      }
+
       .action-select {
         @include fill-parent;
 
@@ -2413,6 +2424,10 @@
     @include font-size(16);
     margin-top: 18px;
     color: $m-blue-d1;
+  }
+
+  .title {
+    font-weight: 400;
   }
 
   // progress nav

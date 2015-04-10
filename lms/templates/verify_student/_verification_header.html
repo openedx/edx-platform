@@ -2,71 +2,28 @@
 
 <%namespace name='static' file='../static_content.html'/>
 
-<header class="page-header">
-    <h2 class="title">
-        <span class="wrapper-sts">
-            <% organization = '<span class="sts-course-org">' + course_org + '</span>' %>
-            <% course_name_html = '<span class="sts-course-number">' + course_num + '</span> <span class="sts-course-name">' + course_name + '</span>' %>
-            % if upgrade:
-                <span class="sts-label">
-                    ${_("You are upgrading your enrollment for {organization}'s {course_name}").format(
-                        organization=organization,
-                        course_name=course_name_html
-                    )}
-                </span>
-            % elif reverify:
-                <span class="sts-label">
-                    ${_("You are re-verifying for {organization}'s {course_name}").format(
-                        organization=organization,
-                        course_name=course_name_html
-                    )}
-                </span>
-            % elif modes_dict and "professional" in modes_dict:
-                <span class="sts-label">
-                    ${_("You are enrolling in {organization}'s {course_name}").format(
-                        organization=organization,
-                        course_name=course_name_html
-                    )}
-                </span>
-            % else:
-                <span class="sts-label">
-                    ${_("Congrats! You are now enrolled in {organization}'s {course_name}").format(
-                        organization=organization,
-                        course_name=course_name_html
-                    )}
-                </span>
-            % endif
-        </span>
-
-        % if modes_dict and "professional" in modes_dict:
-            <span class="sts-track professional-ed">
-                <span class="sts-track-value">
-                    ${_("Professional Education")}
-                </span>
-            </span>
+<header class="page-header content-main">
+    <h3 class="title">
+        <% course_name_html = '<span class="sts-course-name">' + course_num + '</span>' %>
+        <% course_display_html = course_org + "'s " + course_num + " " + course_name %>
+        % if upgrade:
+            ${_("You are upgrading your enrollment for: {course_name}").format(
+                course_name=course_name_html
+            )}
+        % elif reverify:
+            ${_("You are re-verifying for: {course_name}").format(
+                course_name=course_name_html
+            )}
+        % elif modes_dict and "professional" in modes_dict:
+            ${_("You are enrolling in: {course_name}").format(
+                course_name=course_name_html
+            )}
         % else:
-            <span class="sts-track">
-                <span class="sts-track-value">
-                    % if upgrade:
-                        ${_("{span_start}Upgrading to:{span_end} Verified").format(
-                            span_start='<span class="context">',
-                            span_end='</span>'
-                        )}
-                    % elif reverify:
-                        ${_("{span_start}Re-verifying for:{span_end} Verified").format(
-                            span_start='<span class="context">',
-                            span_end='</span>'
-                        )}
-                    % else:
-                        ${_("{span_start}Enrolling as:{span_end} Verified").format(
-                            span_start='<span class="context">',
-                            span_end='</span>'
-                        )}
-                    % endif
-                </span>
-            </span>
+            ${_("Congratulations! You are now enrolled in {course_display}").format(
+                course_display=course_display_html
+            )}
         % endif
-    </h2>
+    </h3>
 </header>
 
 <%block name="js_extra">

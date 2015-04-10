@@ -74,6 +74,8 @@ from verify_student.views import PayAndVerifyView
       data-requirements='${json.dumps(requirements)}'
       data-msg-key='${message_key}'
       data-is-active='${is_active}'
+      data-already-verified='${already_verified}'
+      data-verification-good-until='${verification_good_until}'
     ></div>
 
     % if is_active:
