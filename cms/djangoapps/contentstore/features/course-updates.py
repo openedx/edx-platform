@@ -45,37 +45,37 @@ def check_no_update(_step, text):
 
 @step(u'I modify the text to "([^"]*)"$')
 def modify_update(_step, text):
-    button_css = 'div.post-preview a.edit-button'
+    button_css = 'div.post-preview .edit-button'
     world.css_click(button_css)
     change_text(text)
 
 
 @step(u'I change the update from "([^"]*)" to "([^"]*)"$')
 def change_existing_update(_step, before, after):
-    verify_text_in_editor_and_update('div.post-preview a.edit-button', before, after)
+    verify_text_in_editor_and_update('div.post-preview .edit-button', before, after)
 
 
 @step(u'I change the handout from "([^"]*)" to "([^"]*)"$')
 def change_existing_handout(_step, before, after):
-    verify_text_in_editor_and_update('div.course-handouts a.edit-button', before, after)
+    verify_text_in_editor_and_update('div.course-handouts .edit-button', before, after)
 
 
 @step(u'I delete the update$')
 def click_button(_step):
-    button_css = 'div.post-preview a.delete-button'
+    button_css = 'div.post-preview .delete-button'
     world.css_click(button_css)
 
 
 @step(u'I edit the date to "([^"]*)"$')
 def change_date(_step, new_date):
-    button_css = 'div.post-preview a.edit-button'
+    button_css = 'div.post-preview .edit-button'
     world.css_click(button_css)
     date_css = 'input.date'
     date = world.css_find(date_css)
     for i in range(len(date.value)):
         date._element.send_keys(Keys.END, Keys.BACK_SPACE)
     date._element.send_keys(new_date)
-    save_css = 'a.save-button'
+    save_css = '.save-button'
     world.css_click(save_css)
 
 
@@ -87,7 +87,7 @@ def check_date(_step, date):
 
 @step(u'I modify the handout to "([^"]*)"$')
 def edit_handouts(_step, text):
-    edit_css = 'div.course-handouts > a.edit-button'
+    edit_css = 'div.course-handouts > .edit-button'
     world.css_click(edit_css)
     change_text(text)
 
@@ -114,7 +114,7 @@ def check_handout_error(_step):
 
 @step(u'I see handout save button disabled')
 def check_handout_error(_step):
-    handout_save_button = 'form.edit-handouts-form a.save-button'
+    handout_save_button = 'form.edit-handouts-form .save-button'
     assert world.css_has_class(handout_save_button, 'is-disabled')
 
 
@@ -125,19 +125,19 @@ def edit_handouts(_step, text):
 
 @step(u'I see handout save button re-enabled')
 def check_handout_error(_step):
-    handout_save_button = 'form.edit-handouts-form a.save-button'
+    handout_save_button = 'form.edit-handouts-form .save-button'
     assert not world.css_has_class(handout_save_button, 'is-disabled')
 
 
 @step(u'I save handout edit')
 def check_handout_error(_step):
-    save_css = 'a.save-button'
+    save_css = '.save-button'
     world.css_click(save_css)
 
 
 def change_text(text):
     type_in_codemirror(0, text)
-    save_css = 'a.save-button'
+    save_css = '.save-button'
     world.css_click(save_css)
 
 
