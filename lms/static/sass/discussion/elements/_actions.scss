@@ -80,7 +80,7 @@
       &:after,
       &:before {
         bottom: 100%;
-        right: 6px;
+        @include right(6px);
         border: solid transparent;
         content: " ";
         height: 0;

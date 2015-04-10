@@ -995,6 +995,13 @@
     background: $gray-l5;
     border-radius: ($baseline/10);
 
+    input[type="button"].add {
+          @include idashbutton($blue);
+          position: absolute;
+          @include right($baseline);
+        }
+      }
+
 
     .icon {
       @include margin-right($baseline/4);

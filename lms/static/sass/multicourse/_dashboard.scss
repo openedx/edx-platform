@@ -363,18 +363,23 @@
         @include margin-right(flex-gutter());
         width: flex-grid(3);
 
-        .cover {
-          @include box-sizing(border-box);
-          @include transition(all 0.15s linear 0s);
-          @include float(left);
-          overflow: hidden;
-          position: relative;
-          max-height: 120px;
-          border-radius: ($baseline/5);
-          border: 1px solid $dashboard-course-cover-border;
-          border-bottom: 4px solid $dashboard-course-cover-border;
+      .cover {
+        @include box-sizing(border-box);
+        @include transition(all 0.15s linear 0s);
+        overflow: hidden;
+        position: relative;
+        @include float(left);
+        height: 100%;
+        max-height: 100%;
+        width: 200px;
+        height: 120px;
+        margin: 0;
+        border-radius: ($baseline/10);
+        border: 1px solid $dashboard-course-cover-border;
+        border-bottom: 4px solid $dashboard-course-cover-border;
+        padding: ($baseline/10);
 
-          .course-image {
+        .course-image {
             width: 100%;
           }
         }
@@ -382,6 +387,12 @@
         // "enrolled as" status
         .sts-enrollment {
           @include float(left);
+      .info {
+        @include clearfix;
+        @include padding(0, 10px, 0, 230px);
+
+        > hgroup {
+          padding: 0;
           width: 100%;
           position: relative;
           bottom: 15px;
@@ -396,6 +407,12 @@
             position: absolute;
             top: -5px;
             @include right(0);
+            top: 0;
+            right: 0;
+            font-family: $sans-serif;
+            font-size: 13px;
+            font-style: italic;
+            color: $lighter-base-font-color;
           }
 
           .sts-enrollment-value {

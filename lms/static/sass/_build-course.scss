@@ -1,5 +1,7 @@
 // ------------------------------
 // LMS Courseware: Shared Build Compile
+@import 'bourbon/bourbon';
+@import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
 
 // About: Sass compile for the LMS Courseware Elements that are shared between LTR and RTL UI. Configuration and vendor specific imports happen before this shared set of imports are compiled in the lms-course-*.scss files.
 

@@ -8,6 +8,8 @@
   width: 31%;
   border: 1px solid #aaa;
   border-radius: 3px;
+}
+
 div.discussion-course, div.content-wrapper {
   section.discussion {
     div.forum-nav {
@@ -285,7 +287,6 @@ div.discussion-course, div.content-wrapper {
     @include font-size(14);
 
     &:before {
-
       @include rtl {
         @include transform(scale(-1, 1)); // RTL for font awesome question mark
       }

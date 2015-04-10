@@ -529,7 +529,6 @@ p, ul, ol, dl {
   position: absolute;
   top: 5px;
   @include right(5px);
-
   .edit-button,
   .delete-button,
   .visibility-toggle {

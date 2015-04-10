@@ -279,7 +279,27 @@ $link-color: rgb(26, 161, 222) !default;
   &:hover,
   &:active {
 
-  }
+      &.prev {
+        @include left(-10px);
+        @include border-radius(35px 0 0 35px);
+
+        a {
+          background-image: $prev-icon;
+          background-position: center 15px;
+        }
+      }
+
+      &.next {
+        @include right(-10px);
+        @include border-radius(0 35px 35px 0);
+
+        a {
+          @include margin-left(30px);
+          background-image: $next-icon;
+          background-position: center 15px;
+        }
+      }
+    }
 
   &.disabled {
     cursor: normal;
@@ -299,6 +319,79 @@ nav.sequence-bottom {
 
   @media print {
     display: none;
+
+    ul {
+      @include clearfix();
+      display: inline-block;
+
+      li {
+        @include float(left);
+        width: 50px;
+        height: 44px;
+        border: 1px solid $gray-l3;
+        @include linear-gradient(top, #eee, #ddd);
+        box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset;
+
+        &.prev, &.next {
+          margin-bottom: 0;
+
+          a {
+            background-position: center center;
+            background-repeat: no-repeat;
+            border: none;
+            display: block;
+            padding: lh(0.5) 4px;
+            text-indent: -9999px;
+            overflow: hidden;
+            @include transition(all .2s $ease-in-out-quad 0s);
+
+            &:hover, &:focus {
+              opacity: 0.5;
+              background-position: center 15px;
+            }
+
+            &.disabled {
+              opacity: 0.4;
+            }
+
+            /*          &:focus {
+                        outline: 0;
+                      }
+            */
+          }
+        }
+
+        $prev-icon: url('../images/sequence-nav/previous-icon.png');
+        $next-icon: url('../images/sequence-nav/next-icon.png');
+
+        &.prev {
+          @include border-radius(35px 0 0 35px);
+
+          a {
+            background-image: $prev-icon;
+            background-position: center 15px;
+          }
+        }
+
+        &.next {
+          @include border-radius(0 35px 35px 0);
+          @include border-left(none);
+
+          a {
+            background-image: $next-icon;
+            background-position: center 15px;
+
+            @include ltr {
+              background-image: $next-icon;
+            }
+
+            @include rtl {
+              background-image: $prev-icon;
+            }
+          }
+        }
+      }
+    }
   }
 }
 

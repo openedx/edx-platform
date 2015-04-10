@@ -219,8 +219,8 @@
         height: 0px;
         position: absolute;
         @include transform(rotate(-45deg));
-        @include right(7px);
-        top: -5px;
+        @include right(12px);
+        top: -6px;
         width: 0px;
       }
 

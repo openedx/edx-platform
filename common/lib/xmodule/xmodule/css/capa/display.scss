@@ -162,6 +162,7 @@ div.problem {
     label {
       @include box-sizing(border-box);
       display: inline-block;
+      @include float(left);
       clear: both;
       margin-bottom: ($baseline/2);
       border: 2px solid $gray-l4;
@@ -216,19 +217,26 @@ div.problem {
       }
     }
 
-    .indicator-container {
+
+    .indicator_container {
       display: inline-block;
-      min-height: 1px;
+      @include float(left);
       width: 25px;
+      height: 1px;
+      @include margin-right(15px);
     }
 
     fieldset {
       @include box-sizing(border-box);
+      margin: 0px 0px $baseline;
+      @include padding-left($baseline);
+      @include border-left(1px solid #ddd);
     }
 
     input[type="radio"],
     input[type="checkbox"] {
       @include margin(($baseline/4) ($baseline/2) ($baseline/4) ($baseline/4));
+      @include float(left);
     }
 
     text {
@@ -970,6 +978,42 @@ div.problem {
     margin: lh() 0;
     padding: lh();
     border: 1px solid $gray-l3;
+  }
+
+  div.action {
+    margin-top: $baseline;
+
+    .save, .check, .show, .reset {
+      height: ($baseline*2);
+      vertical-align: middle;
+      font-weight: 600;
+    }
+
+    .save {
+      @extend .blue-button !optional;
+    }
+
+    .show {
+
+      .show-label {
+        font-weight: 600;
+        font-size: 1.0em;
+      }
+    }
+
+    .submission_feedback {
+      // background: #F3F3F3;
+      // border: 1px solid #ddd;
+      // border-radius: 3px;
+      // padding: 8px 12px;
+      // margin-top: ($baseline/2);
+      display: inline-block;
+      margin-top: 8px;
+      @include margin-left($baseline/2);
+      color: #666;
+      font-style: italic;
+      -webkit-font-smoothing: antialiased;
+    }
   }
 
   .detailed-solution {
