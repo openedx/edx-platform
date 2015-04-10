@@ -203,7 +203,7 @@ class PaymentFakeView(View):
         that triggers a POST request to `callback_url`.
 
         The POST params are described in the CyberSource documentation:
-        http://apps.cybersource.com/library/documentation/dev_guides/HOP_UG/html/wwhelp/wwhimpl/js/html/wwhelp.htm
+        http://apps.cybersource.com/library/documentation/dev_guides/Secure_Acceptance_WM/Secure_Acceptance_WM.pdf
 
         To figure out the POST params to send to the callback,
         we either:
