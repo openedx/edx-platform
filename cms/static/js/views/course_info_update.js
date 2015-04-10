@@ -3,6 +3,7 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
     function(BaseView, CodeMirror, CourseUpdateModel, PromptView, NotificationView, CourseInfoHelper, ModalUtils) {
 
     var CourseInfoUpdateView = BaseView.extend({
+
         // collection is CourseUpdateCollection
         events: {
             "click .new-update-button" : "onNew",
@@ -29,7 +30,7 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
                 try {
                     CourseInfoHelper.changeContentToPreview(
                         update, 'content', self.options['base_asset_url']);
-                    var newEle = self.template({ updateModel : update });
+                    var newEle = self.template({ updateModel : update, push_notification_enabled : false });
                     $(updateEle).append(newEle);
                 } catch (e) {
                     // ignore
@@ -47,7 +48,12 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
             var newModel = new CourseUpdateModel();
             this.collection.add(newModel, {at : 0});
 
-            var $newForm = $(this.template({ updateModel : newModel }));
+            var $newForm = $(
+                this.template({
+                    updateModel : newModel,
+                    push_notification_enabled : this.options.push_notification_enabled
+                })
+            );
 
             var updateEle = this.$el.find("#course-update-list");
             $(updateEle).prepend($newForm);
@@ -74,7 +80,11 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
         onSave: function(event) {
             event.preventDefault();
             var targetModel = this.eventModel(event);
-            targetModel.set({ date : this.dateEntry(event).val(), content : this.$codeMirror.getValue() });
+            targetModel.set({
+                date : this.dateEntry(event).val(),
+                content : this.$codeMirror.getValue(),
+                push_notification_selected : this.push_notification_selected(event)
+            });
             // push change to display, hide the editor, submit the change
             var saving = new NotificationView.Mini({
                 title: gettext('Saving')
@@ -89,6 +99,9 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
                     ele.remove();
                 }
             });
+            var push_notification_ele = ele.find(".new-update-push-notification");
+            if (push_notification_ele)
+                push_notification_ele.hide();
             this.closeEditor(false);
 
             analytics.track('Saved Course Update', {
@@ -222,16 +235,15 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
             if (li) return $(li).find(".date").first();
         },
 
-        contentEntry: function(event) {
-            return $(event.currentTarget).closest("li").find(".new-update-content").first();
-        },
-
-        dateDisplay: function(event) {
-            return $(event.currentTarget).closest("li").find("#date-display").first();
-        },
-
-        contentDisplay: function(event) {
-            return $(event.currentTarget).closest("li").find(".update-contents").first();
+        push_notification_selected: function(event) {
+            var push_notification_checkbox;
+            var li = $(event.currentTarget).closest("li");
+            if (li) {
+                push_notification_checkbox = li.find(".new-update-push-notification .toggle-checkbox");
+                if (push_notification_checkbox) {
+                    return push_notification_checkbox.is(":checked");
+                }
+            }
         }
 
     });

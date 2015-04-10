@@ -11,8 +11,14 @@
 		</div>
 		<div class="row">
 			<!-- cid rather than id b/c new ones have cid's not id's -->
-			<a href="#" class="save-button" name="<%= updateModel.cid %>">Save</a>
+			<a href="#" class="save-button" name="<%= updateModel.cid %>">Post</a>
 			<a href="#" class="cancel-button" name="<%= updateModel.cid %>">Cancel</a>
+            <%if (push_notification_enabled) { %>
+                <div class="new-update-push-notification">
+                    <label class="inline-label">Send push notification</label>
+                    <input type="checkbox" class="toggle-checkbox" data-tooltip="<%= gettext('Send push notification to mobile devices') %>" checked />
+                </div>
+            <% } %>
 		</div>
 	</form>
 	<div class="post-preview">
