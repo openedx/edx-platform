@@ -62,7 +62,9 @@ def create_large_course(store, load_factor):
     sequentials, 1000 verticals, 10000 html blocks
     """
     course = CourseFactory.create(modulestore=store, start=datetime(2015, 3, 1, tzinfo=UTC))
-    return course, create_children(store, course, COURSE_CHILD_STRUCTURE["course"], load_factor)
+    with store.bulk_operations(course.id):
+        child_count = create_children(store, course, COURSE_CHILD_STRUCTURE["course"], load_factor)
+    return course, child_count
 
 
 class MixedWithOptionsTestCase(MixedSplitTestCase):
@@ -426,10 +428,6 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_exception(self, store_type):
         self._perform_test_using_store(store_type, self._test_exception)
-
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_task_indexing_course(self, store_type):
-        self._perform_test_using_store(store_type, self._test_task_indexing_course)
 
 
 @patch('django.conf.settings.SEARCH_ENGINE', 'search.tests.utils.ForceRefreshElasticSearchEngine')
