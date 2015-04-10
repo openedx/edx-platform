@@ -24,9 +24,10 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys import InvalidKeyError
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 
 from edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings, update_account_settings
@@ -55,7 +56,7 @@ from util.json_request import JsonResponse
 from util.date_utils import get_default_time_display
 from eventtracking import tracker
 import analytics
-
+from courseware.url_helpers import get_redirect_url
 
 log = logging.getLogger(__name__)
 
@@ -1114,7 +1115,7 @@ class InCourseReverifyView(View):
     Does not need to worry about pricing
     """
     @method_decorator(login_required)
-    def get(self, request, course_id, checkpoint_name):
+    def get(self, request, course_id, checkpoint_name, location):
         """ Display the view for face photo submission"""
         # Check the in-course re-verification is enabled or not
         incourse_reverify_enabled = InCourseReverificationConfiguration.current().enabled
@@ -1145,11 +1146,12 @@ class InCourseReverifyView(View):
             'course_name': course.display_name_with_default,
             'checkpoint_name': checkpoint_name,
             'platform_name': settings.PLATFORM_NAME,
+            'location': location
         }
         return render_to_response("verify_student/incourse_reverify.html", context)
 
     @method_decorator(login_required)
-    def post(self, request, course_id, checkpoint_name):
+    def post(self, request, course_id, checkpoint_name, location):
         """Submits the re-verification attempt to SoftwareSecure
 
         Args:
@@ -1168,7 +1170,11 @@ class InCourseReverifyView(View):
             raise Http404
 
         user = request.user
-        course_key = CourseKey.from_string(course_id)
+        try:
+            course_key = CourseKey.from_string(course_id)
+            usage_key = UsageKey.from_string(location).replace(course_key=course_key)
+        except InvalidKeyError:
+            raise Http404(u"Invalid course_key or usage_key")
         course = modulestore().get_course(course_key)
         checkpoint = VerificationCheckpoint.get_verification_checkpoint(course_key, checkpoint_name)
         if checkpoint is None:
@@ -1181,6 +1187,7 @@ class InCourseReverifyView(View):
                 'error': True,
                 'errorMsg': _("No checkpoint found"),
                 'platform_name': settings.PLATFORM_NAME,
+                'location': location
             }
             return render_to_response("verify_student/incourse_reverify.html", context)
         init_verification = SoftwareSecurePhotoVerification.get_initial_verification(user)
@@ -1200,12 +1207,20 @@ class InCourseReverifyView(View):
                 EVENT_NAME_USER_SUBMITTED_INCOURSE_REVERIFY, user.id, course_id, checkpoint_name
             )
 
-            return HttpResponse()
+            try:
+                redirect_url = get_redirect_url(course_key, usage_key)
+            except (ItemNotFoundError, NoPathToItem):
+                redirect_url = reverse("courseware", args=(unicode(course_key),))
+
+            return JsonResponse({'url': redirect_url})
+        except Http404 as expt:
+            log.exception("Invalid location during photo verification.")
+            return HttpResponseBadRequest(expt.message)
         except IndexError:
             log.exception("Invalid image data during photo verification.")
             return HttpResponseBadRequest(_("Invalid image data during photo verification."))
         except Exception:  # pylint: disable=broad-except
-            log.exception("Could not submit verification attempt for user {}.").format(request.user.id)
+            log.exception("Could not submit verification attempt for user %s.", request.user.id)
             msg = _("Could not submit photos")
             return HttpResponseBadRequest(msg)
 

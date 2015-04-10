@@ -18,18 +18,20 @@ var edx = edx || {};
             courseKey: '',
             checkpointName: '',
             faceImage: '',
+            location: ''
         },
 
         sync: function( method ) {
             var model = this;
             var headers = { 'X-CSRFToken': $.cookie( 'csrftoken' ) },
                 data = {
-                    face_image: model.get( 'faceImage' ),
+                    face_image: model.get( 'faceImage' )
                 },
                 url = _.str.sprintf(
-                    '/verify_student/reverify/%(courseKey)s/%(checkpointName)s/', {
+                    '/verify_student/reverify/%(courseKey)s/%(checkpointName)s/%(location)s/', {
                         courseKey: model.get('courseKey'),
-                        checkpointName: model.get('checkpointName')
+                        checkpointName: model.get('checkpointName'),
+                        location: model.get('location')
                     }
                 );
 
@@ -38,8 +40,8 @@ var edx = edx || {};
                 type: 'POST',
                 data: data,
                 headers: headers,
-                success: function() {
-                    model.trigger( 'sync' );
+                success: function(response) {
+                    model.trigger( 'sync', response.url);
                 },
                 error: function( error ) {
                     model.trigger( 'error', error );

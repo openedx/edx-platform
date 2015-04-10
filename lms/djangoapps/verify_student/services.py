@@ -34,7 +34,7 @@ class ReverificationService(object):
         except ObjectDoesNotExist:
             return None
 
-    def start_verification(self, course_id, checkpoint_name, item_id):  # pylint: disable=W0613
+    def start_verification(self, course_id, checkpoint_name, item_id):
         """ Get or create the verification checkpoint and return the re-verification link
 
         Args:
@@ -46,5 +46,5 @@ class ReverificationService(object):
         """
         course_key = CourseKey.from_string(course_id)
         VerificationCheckpoint.objects.get_or_create(course_id=course_key, checkpoint_name=checkpoint_name)
-        re_verification_link = reverse("verify_student_incourse_reverify", args=(course_id, checkpoint_name))
+        re_verification_link = reverse("verify_student_incourse_reverify", args=(course_id, checkpoint_name, item_id))
         return re_verification_link
