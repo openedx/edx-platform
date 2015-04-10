@@ -10,13 +10,14 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from api_manager.courseware_access import get_course_key, get_aggregate_exclusion_user_ids
+from api_manager.courseware_access import get_course_key
 from organizations.models import Organization
 from api_manager.users.serializers import UserSerializer, SimpleUserSerializer
 from api_manager.groups.serializers import GroupSerializer
 from api_manager.utils import str2bool
 from gradebook.models import StudentGradebook
 from student.models import CourseEnrollment
+from student.roles import get_aggregate_exclusion_user_ids
 
 from .serializers import OrganizationSerializer
 

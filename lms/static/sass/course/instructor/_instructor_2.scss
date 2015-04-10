@@ -951,7 +951,7 @@
         input[type="button"].add {
           @include idashbutton($blue);
           position: absolute;
-          #{$right}: $baseline;
+          @include right($baseline);
         }
       }
 

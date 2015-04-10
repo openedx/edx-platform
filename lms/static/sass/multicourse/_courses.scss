@@ -42,10 +42,10 @@
 
         .logo {
           display: inline-block;
-          #{$border-right}: 1px solid $light-gray;
+          @include border-right(1px solid $light-gray);
           height: 80px;
-          #{$margin-right}: 30px;
-          #{$padding-right}: 30px;
+          @include margin-right(30px);
+          @include padding-right(30px);
           position: relative;
           vertical-align: middle;
 

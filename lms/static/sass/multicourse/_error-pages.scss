@@ -1,6 +1,6 @@
 section.outside-app {
   @extend .container;
-  text-align: flip(left, right);
+  @include float(left);
   padding: ($baseline*4) 0;
 
   h1 {

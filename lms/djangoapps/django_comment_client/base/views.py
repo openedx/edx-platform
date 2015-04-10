@@ -35,10 +35,6 @@ from django_comment_client.utils import (
     JsonError,
     JsonResponse,
     prepare_content,
-    get_discussion_categories_ids,
-    get_discussion_categories_ids,
-    permalink,
-    add_thread_group_name,
     get_group_id_for_comments_service,
     get_discussion_categories_ids
 )
@@ -180,8 +176,7 @@ def create_thread(request, course_id, commentable_id):
     # call into the social_engagement django app to
     # rescore this user
     _update_user_engagement_score(course_key, request.user.id)
-    
-    add_thread_group_name(data, course_key)
+
     add_courseware_context([data], course)
     if request.is_ajax():
         return ajax_content_response(request, course_key, data)

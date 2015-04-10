@@ -35,10 +35,10 @@
     .new-button {
       @extend %btn-primary-green;
       @extend %t-action3;
-      #{$margin-left}: $baseline;
+      @include margin-left($baseline);
 
       .icon {
-        #@include margin-right($baseline/2);
+        @include margin-right($baseline/2);
       }
     }
   }

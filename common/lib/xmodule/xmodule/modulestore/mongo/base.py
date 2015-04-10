@@ -38,7 +38,7 @@ from xblock.exceptions import InvalidScopeError
 from xblock.fields import Scope, ScopeIds, Reference, ReferenceList, ReferenceValueDict
 from xblock.runtime import KvsFieldData
 
-from xmodule.assetstore import AssetMetadata, AssetThumbnailMetadata, CourseAssetsFromStorage
+from xmodule.assetstore import AssetMetadata, CourseAssetsFromStorage
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
 from xmodule.exceptions import HeartbeatFailure
