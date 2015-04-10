@@ -113,11 +113,11 @@ def _compute_social_engagement_score(social_metrics):
         'SOCIAL_METRIC_POINTS',
         {
             'num_threads': 10,
-            'num_comments': 2,
-            'num_replies': 1,
-            'num_upvotes': 5,
+            'num_comments': 15,
+            'num_replies': 15,
+            'num_upvotes': 25,
             'num_thread_followers': 5,
-            'num_comments_generated': 1,
+            'num_comments_generated': 15,
         }
     )
 
