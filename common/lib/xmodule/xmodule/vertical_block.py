@@ -128,3 +128,23 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         # TODO: Remove this when studio better supports editing of pure XBlocks.
         fragment.add_javascript('VerticalBlock = XModule.Descriptor;')
         return fragment
+
+    def index_dictionary(self):
+        """
+        Return dictionary prepared with module content and type for indexing.
+        """
+        # return key/value fields in a Python dict object
+        # values may be numeric / string or dict
+        # default implementation is an empty dict
+        xblock_body = super(VerticalBlock, self).index_dictionary()
+        index_body = {
+            "display_name": self.display_name,
+        }
+        if "content" in xblock_body:
+            xblock_body["content"].update(index_body)
+        else:
+            xblock_body["content"] = index_body
+        # We use "Sequence" for sequentials and verticals
+        xblock_body["content_type"] = "Sequence"
+
+        return xblock_body

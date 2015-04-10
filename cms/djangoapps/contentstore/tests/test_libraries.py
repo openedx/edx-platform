@@ -459,6 +459,7 @@ class TestLibraries(LibraryTestCase):
 
 
 @ddt.ddt
+@patch('django.conf.settings.SEARCH_ENGINE', None)
 class TestLibraryAccess(SignalDisconnectTestMixin, LibraryTestCase):
     """
     Test Roles and Permissions related to Content Libraries

@@ -1,20 +1,25 @@
 """
 This file contains celery tasks for contentstore views
 """
-
-from celery.task import task
-from django.contrib.auth.models import User
 import json
 import logging
-from xmodule.modulestore.django import modulestore
-from xmodule.course_module import CourseFields
+from celery.task import task
+from celery.utils.log import get_task_logger
+from datetime import datetime
+from pytz import UTC
 
-from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
-from course_action_state.models import CourseRerunState
+from django.contrib.auth.models import User
+
+from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from contentstore.utils import initialize_permissions
+from course_action_state.models import CourseRerunState
 from opaque_keys.edx.keys import CourseKey
+from xmodule.course_module import CourseFields
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
 
-from edxval.api import copy_course_videos
+LOGGER = get_task_logger(__name__)
+FULL_COURSE_REINDEX_THRESHOLD = 1
 
 
 @task()
@@ -22,6 +27,9 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
     """
     Reruns a course in a new celery task.
     """
+    # import here, at top level this import prevents the celery workers from starting up correctly
+    from edxval.api import copy_course_videos
+
     try:
         # deserialize the payload
         source_course_key = CourseKey.from_string(source_course_key_string)
@@ -72,3 +80,21 @@ def deserialize_fields(json_fields):
     for field_name, value in fields.iteritems():
         fields[field_name] = getattr(CourseFields, field_name).from_json(value)
     return fields
+
+
+@task()
+def update_search_index(course_id, triggered_time_isoformat):
+    """ Updates course search index. """
+    try:
+        course_key = CourseKey.from_string(course_id)
+        triggered_time = datetime.strptime(
+            # remove the +00:00 from the end of the formats generated within the system
+            triggered_time_isoformat.split('+')[0],
+            "%Y-%m-%dT%H:%M:%S.%f"
+        ).replace(tzinfo=UTC)
+        CoursewareSearchIndexer.index_course(modulestore(), course_key, triggered_at=triggered_time)
+
+    except SearchIndexingError as exc:
+        LOGGER.error('Search indexing error for complete course %s - %s', course_id, unicode(exc))
+    else:
+        LOGGER.debug('Search indexing successful for complete course %s', course_id)
