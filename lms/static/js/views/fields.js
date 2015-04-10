@@ -225,6 +225,7 @@
                     value: this.modelValue(),
                     message: this.helpMessage
                 }));
+                this.delegateEvents();
                 return this;
             },
 
@@ -260,6 +261,7 @@
                     value: this.modelValue(),
                     message: this.helpMessage
                 }));
+                this.delegateEvents();
                 return this;
             },
 
@@ -308,7 +310,7 @@
                     selectOptions: this.options.options,
                     message: this.helpMessage
                 }));
-
+                this.delegateEvents();
                 this.updateValueInField();
 
                 if (this.editable === 'toggle') {
@@ -415,7 +417,7 @@
                     value: value,
                     message: this.helpMessage
                 }));
-
+                this.delegateEvents();
                 this.title((this.modelValue() || this.mode === 'edit') ? this.options.title : this.indicators['plus'] + this.options.title);
 
                 if (this.editable === 'toggle') {
@@ -491,6 +493,7 @@
                     linkHref: this.options.linkHref,
                     message: this.helpMessage
                 }));
+                this.delegateEvents();
                 return this;
             },
 
@@ -523,7 +526,8 @@
 
             events: {
                 'click .u-field-upload-button': 'clickedUploadButton',
-                'click .u-field-remove-button': 'clickedRemoveButton'
+                'click .u-field-remove-button': 'clickedRemoveButton',
+                'click .upload-submit': 'clickedUploadButton'
             },
 
             initialize: function (options) {
@@ -543,6 +547,7 @@
                     removeButtonIcon: _.result(this, 'iconRemove'),
                     removeButtonTitle: _.result(this, 'removeButtonTitle')
                 }));
+                this.delegateEvents();
                 this.updateButtonsVisibility();
                 this.watchForPageUnload();
                 return this;
@@ -558,9 +563,9 @@
 
             uploadButtonTitle: function () {
                 if (this.isShowingPlaceholder()) {
-                    return _.result(this, 'titleAdd')
+                    return _.result(this, 'titleAdd');
                 } else {
-                    return _.result(this, 'titleEdit')
+                    return _.result(this, 'titleEdit');
                 }
             },
 
@@ -569,7 +574,7 @@
             },
 
             isEditingAllowed: function () {
-                return true
+                return true;
             },
 
             isShowingPlaceholder: function () {
@@ -594,7 +599,7 @@
                 }
             },
 
-            clickedUploadButton: function (e, data) {
+            clickedUploadButton: function () {
                 $(this.uploadButtonSelector).fileupload({
                     url: this.options.imageUploadUrl,
                     type: 'POST',
@@ -604,24 +609,22 @@
                 });
             },
 
-            clickedRemoveButton: function (e, data) {
+            clickedRemoveButton: function () {
                 var view = this;
                 this.setCurrentStatus('removing');
                 this.setUploadButtonVisibility('none');
                 this.showRemovalInProgressMessage();
-                 $.ajax({
+                $.ajax({
                     type: 'POST',
-                    url: this.options.imageRemoveUrl,
-                    success: function (data, status, xhr) {
-                        view.imageChangeSucceeded();
-                    },
-                    error: function (xhr, status, error) {
-                       view.showImageChangeFailedMessage(xhr.status, xhr.responseText);
-                    }
+                    url: this.options.imageRemoveUrl
+                }).done(function () {
+                    view.imageChangeSucceeded();
+                }).fail(function (jqXHR) {
+                    view.showImageChangeFailedMessage(jqXHR.status, jqXHR.responseText);
                 });
             },
 
-            imageChangeSucceeded: function (e, data) {
+            imageChangeSucceeded: function () {
                 this.render();
             },
 
@@ -645,11 +648,19 @@
                 var humanReadableSize;
                 if (imageBytes < this.options.imageMinBytes) {
                     humanReadableSize = this.bytesToHumanReadable(this.options.imageMinBytes);
-                    this.showErrorMessage(interpolate_text(gettext("Your image must be at least {size} in size."), {size: humanReadableSize}));
+                    this.showErrorMessage(
+                        interpolate_text(
+                            gettext("Your image must be at least {size} in size."), {size: humanReadableSize}
+                        )
+                    );
                     return false;
                 } else if (imageBytes > this.options.imageMaxBytes) {
                     humanReadableSize = this.bytesToHumanReadable(this.options.imageMaxBytes);
-                    this.showErrorMessage(interpolate_text(gettext("Your image must be smaller than {size} in size."), {size: humanReadableSize}));
+                    this.showErrorMessage(
+                        interpolate_text(
+                            gettext("Your image must be smaller than {size} in size."), {size: humanReadableSize}
+                        )
+                    );
                     return false;
                 }
                 return true;
@@ -675,27 +686,25 @@
                 return this.$('.image-wrapper').attr('data-status');
             },
 
-            inProgress: function() {
-                var status = this.getCurrentStatus();
-                return _.isUndefined(status) ? false : true;
-            },
-
             watchForPageUnload: function () {
                 $(window).on('beforeunload', this.onBeforeUnload);
             },
 
             onBeforeUnload: function () {
-                console.log('Do you really want to go away?');
                 var status = this.getCurrentStatus();
                 if (status === 'uploading') {
-                    return gettext("Upload is in progress. To avoid errors, stay on this page until the process is complete.");
+                    return gettext(
+                        "Upload is in progress. To avoid errors, stay on this page until the process is complete."
+                    );
                 } else if (status === 'removing') {
-                    return gettext("Removal is in progress. To avoid errors, stay on this page until the process is complete.");
+                    return gettext(
+                        "Removal is in progress. To avoid errors, stay on this page until the process is complete."
+                    );
                 }
             },
 
             bytesToHumanReadable: function (size) {
-                var units = ['Bytes', 'KB', 'MB'];
+                var units = ['bytes', 'KB', 'MB'];
                 var i = 0;
                 while(size >= 1024) {
                     size /= 1024;
