@@ -33,6 +33,68 @@ from ...fixtures.discussion import (
 from .helpers import BaseDiscussionMixin
 
 
+THREAD_CONTENT_WITH_LATEX = """Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                               ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                               ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                               reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur.
+                               \n\n----------\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                               ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                               ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                               reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur. (b).\n\n
+                               **(a)** $H_1(e^{j\\omega}) = \\sum_{n=-\\infty}^{\\infty}h_1[n]e^{-j\\omega n} =
+                               \\sum_{n=-\\infty} ^{\\infty}h[n]e^{-j\\omega n}+\\delta_2e^{-j\\omega n_0}$
+                               $= H(e^{j\\omega})+\\delta_2e^{-j\\omega n_0}=A_e (e^{j\\omega}) e^{-j\\omega n_0}
+                               +\\delta_2e^{-j\\omega n_0}=e^{-j\\omega n_0} (A_e(e^{j\\omega})+\\delta_2)
+                               $H_3(e^{j\\omega})=A_e(e^{j\\omega})+\\delta_2$. Dummy $A_e(e^{j\\omega})$ dummy post $.
+                               $A_e(e^{j\\omega}) \\ge -\\delta_2$, it follows that $H_3(e^{j\\omega})$ is real and
+                               $H_3(e^{j\\omega})\\ge 0$.\n\n**(b)** Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                               ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                               ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                               reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur.\n\n
+                               **Case 1:** If $re^{j\\theta}$ is a Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                               ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                               ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                               reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur.
+                               \n\n**Case 3:** Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                               ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                               ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                               reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur.
+                               Lorem $H_3(e^{j\\omega}) = P(cos\\omega)(cos\\omega - cos\\theta)^k$,
+                               Lorem Lorem Lorem Lorem Lorem Lorem $P(cos\\omega)$ has no
+                               $(cos\\omega - cos\\theta)$ factor.
+                               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                               ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                               ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                               reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur.
+                               $P(cos\\theta) \\neq 0$. Since $P(cos\\omega)$ this is a dummy data post $\\omega$,
+                               dummy $\\delta > 0$ such that for all $\\omega$ dummy $|\\omega - \\theta|
+                               < \\delta$, $P(cos\\omega)$ Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                               sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+                               veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+                               consequat. Duis aute irure dolor in reprehenderit in voluptate velit sse cillum dolore
+                               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                               ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                               ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                               reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur.
+                               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                               ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                               ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                               reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur.
+                               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                               ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                               ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                               reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur.
+                               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                               ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                               ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                               reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur.
+                               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                               ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                               ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                               reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur.
+                               """
+
+
 class DiscussionResponsePaginationTestMixin(BaseDiscussionMixin):
     """
     A mixin containing tests for response pagination for use by both inline
@@ -152,6 +214,23 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
     def setup_thread_page(self, thread_id):
         self.thread_page = self.create_single_thread_page(thread_id)  # pylint: disable=attribute-defined-outside-init
         self.thread_page.visit()
+
+    def test_mathjax_rendering(self):
+        thread_id = "test_thread_{}".format(uuid4().hex)
+
+        thread_fixture = SingleThreadViewFixture(
+            Thread(
+                id=thread_id,
+                body=THREAD_CONTENT_WITH_LATEX,
+                commentable_id=self.discussion_id,
+                thread_type="discussion"
+            )
+        )
+        thread_fixture.push()
+        self.setup_thread_page(thread_id)
+        self.assertTrue(self.thread_page.is_discussion_body_visible())
+        self.assertTrue(self.thread_page.is_mathjax_preview_available())
+        self.assertTrue(self.thread_page.is_mathjax_rendered())
 
     def test_marked_answer_comments(self):
         thread_id = "test_thread_{}".format(uuid4().hex)
