@@ -131,6 +131,14 @@ MOCK_SEARCH_BACKING_FILE = (
 import uuid
 SECRET_KEY = uuid.uuid4().hex
 
+# Set dummy values for profile image settings.
+PROFILE_IMAGE_BACKEND = {
+    'class': 'storages.backends.overwrite.OverwriteStorage',
+    'options': {
+        'location': os.path.join(MEDIA_ROOT, 'profile-images/'),
+        'base_url': os.path.join(MEDIA_URL, 'profile-images/'),
+    },
+}
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:

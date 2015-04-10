@@ -6,14 +6,18 @@
 
         var MessageBannerView = Backbone.View.extend({
 
-            initialize: function (options) {
+            initialize: function () {
                 this.template = _.template($('#message_banner-tpl').text());
             },
 
             render: function () {
-                this.$el.html(this.template({
-                    message: this.message
-                }));
+                if (_.isUndefined(this.message) || _.isNull(this.message)) {
+                    this.$el.html('');
+                } else {
+                    this.$el.html(this.template({
+                        message: this.message
+                    }));
+                }
                 return this;
             },
 
@@ -23,10 +27,11 @@
             },
 
             hideMessage: function () {
-                this.$el.html('');
+                this.message = null;
+                this.render();
             }
         });
 
         return MessageBannerView;
-    })
+    });
 }).call(this, define || RequireJS.define);
