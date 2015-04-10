@@ -43,7 +43,9 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
         """
         self._auto_auth()
         self.assertEqual(User.objects.count(), 1)
-        self.assertTrue(User.objects.all()[0].is_active)
+        user = User.objects.all()[0]
+        self.assertTrue(user.is_active)
+        self.assertFalse(user.profile.requires_parental_consent())
 
     def test_create_same_user(self):
         self._auto_auth(username='test')

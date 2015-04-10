@@ -1,9 +1,6 @@
 """HTTP end-points for the User API. """
 import copy
-from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from opaque_keys import InvalidKeyError
-import third_party_auth
-
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponse
@@ -21,12 +18,14 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.exceptions import ParseError
 from django_countries import countries
-from django_comment_common.models import Role
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from edxmako.shortcuts import marketing_link
 
+from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
+import third_party_auth
+from django_comment_common.models import Role
+from edxmako.shortcuts import marketing_link
 from student.views import create_account_with_params, set_marketing_cookie
-from util.authentication import SessionAuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
 from util.json_request import JsonResponse
 from .preferences.api import update_email_opt_in
 from .helpers import FormDescription, shim_student_view, require_post_params
@@ -309,7 +308,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a field on the registration form
@@ -339,7 +338,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a field on the registration form
@@ -372,7 +371,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a field on the registration form
@@ -409,7 +408,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a field on the registration form
@@ -434,7 +433,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a dropdown menu on the registration
@@ -457,7 +456,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a dropdown menu on the registration
@@ -480,7 +479,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a dropdown menu on the registration
@@ -504,7 +503,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a field on the registration form
@@ -525,7 +524,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This phrase appears above a field on the registration form
@@ -548,7 +547,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a field on the registration form
@@ -568,7 +567,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a dropdown menu on the registration
@@ -604,7 +603,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Separate terms of service and honor code checkboxes
@@ -658,7 +657,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This is a legal document users must agree to

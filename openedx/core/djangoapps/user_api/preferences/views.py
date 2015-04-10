@@ -7,13 +7,17 @@ https://openedx.atlassian.net/wiki/display/TNL/User+API
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from util.authentication import SessionAuthenticationAllowInactiveUser, OAuth2AuthenticationAllowInactiveUser
 from rest_framework import permissions
 
 from django.db import transaction
 from django.utils.translation import ugettext as _
 
+from openedx.core.lib.api.authentication import (
+    SessionAuthenticationAllowInactiveUser,
+    OAuth2AuthenticationAllowInactiveUser,
+)
 from openedx.core.lib.api.parsers import MergePatchParser
+from openedx.core.lib.api.permissions import IsUserInUrlOrStaff
 from ..errors import UserNotFound, UserNotAuthorized, PreferenceValidationError, PreferenceUpdateError
 from .api import (
     get_user_preference, get_user_preferences, set_user_preference, update_user_preferences, delete_user_preference
@@ -29,9 +33,9 @@ class PreferencesView(APIView):
 
         **Example Requests**:
 
-            GET /api/user/v0/preferences/{username}/
+            GET /api/user/v1/preferences/{username}/
 
-            PATCH /api/user/v0/preferences/{username}/ with content_type "application/merge-patch+json"
+            PATCH /api/user/v1/preferences/{username}/ with content_type "application/merge-patch+json"
 
         **Response Value for GET**
 
@@ -45,7 +49,8 @@ class PreferencesView(APIView):
         **Response for PATCH**
 
             Users can only modify their own preferences. If the requesting user does not have username
-            "username", this method will return with a status of 404.
+            "username", this method will return with a status of 403 for staff access but a 404 for ordinary
+            users to avoid leaking the existence of the account.
 
             This method will also return a 404 if no user exists with username "username".
 
@@ -61,23 +66,25 @@ class PreferencesView(APIView):
 
     """
     authentication_classes = (OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated, IsUserInUrlOrStaff)
     parser_classes = (MergePatchParser,)
 
     def get(self, request, username):
         """
-        GET /api/user/v0/preferences/{username}/
+        GET /api/user/v1/preferences/{username}/
         """
         try:
             user_preferences = get_user_preferences(request.user, username=username)
-        except (UserNotFound, UserNotAuthorized):
+        except UserNotAuthorized:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        except UserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         return Response(user_preferences)
 
     def patch(self, request, username):
         """
-        PATCH /api/user/v0/preferences/{username}/
+        PATCH /api/user/v1/preferences/{username}/
         """
         if not request.DATA or not getattr(request.DATA, "keys", None):
             error_message = _("No data provided for user preference update")
@@ -91,7 +98,9 @@ class PreferencesView(APIView):
         try:
             with transaction.commit_on_success():
                 update_user_preferences(request.user, request.DATA, username=username)
-        except (UserNotFound, UserNotAuthorized):
+        except UserNotAuthorized:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        except UserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
         except PreferenceValidationError as error:
             return Response(
@@ -117,11 +126,11 @@ class PreferencesDetailView(APIView):
 
         **Example Requests**:
 
-            GET /api/user/v0/preferences/{username}/{preference_key}
+            GET /api/user/v1/preferences/{username}/{preference_key}
 
-            PUT /api/user/v0/preferences/{username}/{preference_key}
+            PUT /api/user/v1/preferences/{username}/{preference_key}
 
-            DELETE /api/user/v0/preferences/{username}/{preference_key}
+            DELETE /api/user/v1/preferences/{username}/{preference_key}
 
         **Response Values for GET**
 
@@ -136,38 +145,50 @@ class PreferencesDetailView(APIView):
 
             A successful put returns a 204 and no content.
 
-            If the specified username or preference does not exist, this method returns a 404.
+            Users can only update their own preferences. If the requesting user does not have username
+            "username", this method will return with a status of 403 for staff access but a 404 for ordinary
+            users to avoid leaking the existence of the account.
+
+            If the specified preference does not exist, this method returns a 404.
 
         **Response for DELETE**
 
             A successful delete returns a 204 and no content.
 
-            If the specified username or preference does not exist, this method returns a 404.
+            Users can only delete their own preferences. If the requesting user does not have username
+            "username", this method will return with a status of 403 for staff access but a 404 for ordinary
+            users to avoid leaking the existence of the account.
+
+            If the specified preference does not exist, this method returns a 404.
 
     """
     authentication_classes = (OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated, IsUserInUrlOrStaff)
 
     def get(self, request, username, preference_key):
         """
-        GET /api/user/v0/preferences/{username}/{preference_key}
+        GET /api/user/v1/preferences/{username}/{preference_key}
         """
         try:
             value = get_user_preference(request.user, preference_key, username=username)
             # There was no preference with that key, raise a 404.
             if value is None:
                 return Response(status=status.HTTP_404_NOT_FOUND)
-        except (UserNotFound, UserNotAuthorized):
+        except UserNotAuthorized:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        except UserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(value)
 
     def put(self, request, username, preference_key):
         """
-        PUT /api/user/v0/preferences/{username}/{preference_key}
+        PUT /api/user/v1/preferences/{username}/{preference_key}
         """
         try:
             set_user_preference(request.user, preference_key, request.DATA, username=username)
-        except (UserNotFound, UserNotAuthorized):
+        except UserNotAuthorized:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        except UserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
         except PreferenceValidationError as error:
             return Response(
@@ -189,11 +210,13 @@ class PreferencesDetailView(APIView):
 
     def delete(self, request, username, preference_key):
         """
-        DELETE /api/user/v0/preferences/{username}/{preference_key}
+        DELETE /api/user/v1/preferences/{username}/{preference_key}
         """
         try:
             preference_existed = delete_user_preference(request.user, preference_key, username=username)
-        except (UserNotFound, UserNotAuthorized):
+        except UserNotAuthorized:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        except UserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
         except PreferenceUpdateError as error:
             return Response(

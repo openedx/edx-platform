@@ -28,6 +28,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models, IntegrityError
 from django.db.models import Count
+from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver, Signal
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_noop
@@ -36,6 +37,7 @@ from config_models.models import ConfigurationModel
 from track import contexts
 from eventtracking import tracker
 from importlib import import_module
+from model_utils import FieldTracker
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
@@ -56,6 +58,7 @@ UNENROLL_DONE = Signal(providing_args=["course_enrollment", "skip_refund"])
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 SessionStore = import_module(settings.SESSION_ENGINE).SessionStore  # pylint: disable=invalid-name
+USER_SETTINGS_CHANGED_EVENT_NAME = 'edx.user.settings.changed'
 
 
 class AnonymousUserId(models.Model):
@@ -249,6 +252,19 @@ class UserProfile(models.Model):
     country = CountryField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
+    bio = models.TextField(blank=True, null=True)
+    profile_image_uploaded_at = models.DateTimeField(null=True)
+
+    # Use FieldTracker to track changes to model instances.
+    tracker = FieldTracker()
+
+    @property
+    def has_profile_image(self):
+        """
+        Convenience method that returns a boolean indicating whether or not
+        this user has uploaded a profile image.
+        """
+        return self.profile_image_uploaded_at is not None
 
     def get_meta(self):  # pylint: disable=missing-docstring
         js_str = self.meta
@@ -275,6 +291,101 @@ class UserProfile(models.Model):
         meta['session_id'] = session_id
         self.set_meta(meta)
         self.save()
+
+    def requires_parental_consent(self, date=None, age_limit=None, default_requires_consent=True):
+        """Returns true if this user requires parental consent.
+
+        Args:
+            date (Date): The date for which consent needs to be tested (defaults to now).
+            age_limit (int): The age limit at which parental consent is no longer required.
+                This defaults to the value of the setting 'PARENTAL_CONTROL_AGE_LIMIT'.
+            default_requires_consent (bool): True if users require parental consent if they
+                have no specified year of birth (default is True).
+
+        Returns:
+             True if the user requires parental consent.
+        """
+        if age_limit is None:
+            age_limit = getattr(settings, 'PARENTAL_CONSENT_AGE_LIMIT', None)
+            if age_limit is None:
+                return False
+
+        # Return True if either:
+        # a) The user has a year of birth specified and that year is fewer years in the past than the limit.
+        # b) The user has no year of birth specified and the default is to require consent.
+        #
+        # Note: we have to be conservative using the user's year of birth as their birth date could be
+        # December 31st. This means that if the number of years since their birth year is exactly equal
+        # to the age limit then we have to assume that they might still not be old enough.
+        year_of_birth = self.year_of_birth
+        if year_of_birth is None:
+            return default_requires_consent
+        if date is None:
+            date = datetime.now(UTC)
+        return date.year - year_of_birth <= age_limit    # pylint: disable=maybe-no-member
+
+
+@receiver(pre_save, sender=UserProfile)
+def user_profile_pre_save_callback(sender, **kwargs):
+    """
+    Ensure consistency of a user profile before saving it.
+    """
+    user_profile = kwargs['instance']
+
+    # Remove profile images for users who require parental consent
+    if user_profile.requires_parental_consent() and user_profile.has_profile_image:
+        user_profile.profile_image_uploaded_at = None
+
+
+@receiver(post_save, sender=UserProfile)
+def user_profile_post_save_callback(sender, **kwargs):
+    """
+    Emit analytics events after saving the
+    """
+    user_profile = kwargs['instance']
+    # pylint: disable=protected-access
+    emit_field_changed_events(user_profile, user_profile.user, sender._meta.db_table)
+
+
+def emit_field_changed_events(instance, user, db_table):
+    """ For the given model instance, save the fields that have changed since the last save.
+
+    Requires that the Model uses 'model_utils.FieldTracker' and has assigned it to 'tracker'.
+
+    Args:
+        instance (Model instance): the model instance that is being saved
+        user (User): the user that this instance is associated with
+        db_table (str): the name of the table that we're modifying
+
+    Returns:
+        None
+    """
+    excluded_fields = ['meta', 'password']
+    changed_fields = instance.tracker.changed()
+    changed_settings = {}
+    for field in changed_fields:
+        if field not in excluded_fields:
+            field_dict = {
+                field: {
+                    'old_value': unicode(changed_fields[field]),
+                    'new_value': unicode(getattr(instance, field)),
+                }
+            }
+            changed_settings.update(field_dict)
+
+    # only emit events when something has changed
+    if len(changed_settings) > 0:
+        context = {'user_id': user.id}
+        event_name = USER_SETTINGS_CHANGED_EVENT_NAME
+        with tracker.get_tracker().context(event_name, context):
+            tracker.emit(
+                event_name,
+                {
+                    "settings": changed_settings,
+                    "user_id": user.id,
+                    "table": db_table
+                }
+            )
 
 
 class UserSignupSource(models.Model):
@@ -1561,3 +1672,19 @@ class EntranceExamConfiguration(models.Model):
             except EntranceExamConfiguration.DoesNotExist:
                 can_skip = False
         return can_skip
+
+
+class LanguageProficiency(models.Model):
+    """
+    Represents a user's language proficiency.
+    """
+    class Meta:
+        unique_together = (('code', 'user_profile'),)
+
+    user_profile = models.ForeignKey(UserProfile, db_index=True, related_name='language_proficiencies')
+    code = models.CharField(
+        max_length=16,
+        blank=False,
+        choices=settings.ALL_LANGUAGES,
+        help_text=ugettext_lazy("The ISO 639-1 language code for this language.")
+    )

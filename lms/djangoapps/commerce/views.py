@@ -15,7 +15,7 @@ from course_modes.models import CourseMode
 from courseware import courses
 from enrollment.api import add_enrollment
 from student.models import CourseEnrollment
-from util.authentication import SessionAuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
 
 
 log = logging.getLogger(__name__)

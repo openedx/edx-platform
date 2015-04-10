@@ -620,39 +620,10 @@ def dashboard(request):
 
     enrolled_courses_either_paid = frozenset(course.id for course, _enrollment in course_enrollment_pairs
                                              if _enrollment.is_paid_course())
-    # get info w.r.t ExternalAuthMap
-    external_auth_map = None
-    try:
-        external_auth_map = ExternalAuthMap.objects.get(user=user)
-    except ExternalAuthMap.DoesNotExist:
-        pass
 
     # If there are *any* denied reverifications that have not been toggled off,
     # we'll display the banner
     denied_banner = any(item.display for item in reverifications["denied"])
-
-    language_options = DarkLangConfig.current().released_languages_list
-
-    # add in the default language if it's not in the list of released languages
-    if settings.LANGUAGE_CODE not in language_options:
-        language_options.append(settings.LANGUAGE_CODE)
-        # Re-alphabetize language options
-        language_options.sort()
-
-    # try to get the preferred language for the user
-    preferred_language_code = preferences_api.get_user_preference(request.user, LANGUAGE_KEY)
-    # try and get the current language of the user
-    current_language_code = get_language()
-    if preferred_language_code and preferred_language_code in settings.LANGUAGE_DICT:
-        # if the user has a preference, get the name from the code
-        current_language = settings.LANGUAGE_DICT[preferred_language_code]
-    elif current_language_code in settings.LANGUAGE_DICT:
-        # if the user's browser is showing a particular language,
-        # use that as the current language
-        current_language = settings.LANGUAGE_DICT[current_language_code]
-    else:
-        # otherwise, use the default language
-        current_language = settings.LANGUAGE_DICT[settings.LANGUAGE_CODE]
 
     # Populate the Order History for the side-bar.
     order_history_list = order_history(user, course_org_filter=course_org_filter, org_filter_out_set=org_filter_out_set)
@@ -667,7 +638,6 @@ def dashboard(request):
         'course_enrollment_pairs': course_enrollment_pairs,
         'course_optouts': course_optouts,
         'message': message,
-        'external_auth_map': external_auth_map,
         'staff_access': staff_access,
         'errored_courses': errored_courses,
         'show_courseware_links_for': show_courseware_links_for,
@@ -682,11 +652,7 @@ def dashboard(request):
         'block_courses': block_courses,
         'denied_banner': denied_banner,
         'billing_email': settings.PAYMENT_SUPPORT_EMAIL,
-        'language_options': language_options,
-        'current_language': current_language,
-        'current_language_code': current_language_code,
         'user': user,
-        'duplicate_provider': None,
         'logout_url': reverse(logout_user),
         'platform_name': platform_name,
         'enrolled_courses_either_paid': enrolled_courses_either_paid,
@@ -694,10 +660,6 @@ def dashboard(request):
         'order_history_list': order_history_list,
         'courses_requirements_not_met': courses_requirements_not_met,
     }
-
-    if third_party_auth.is_enabled():
-        context['duplicate_provider'] = pipeline.get_duplicate_provider(messages.get_messages(request))
-        context['provider_user_states'] = pipeline.get_provider_user_states(user)
 
     return render_to_response('dashboard.html', context)
 
@@ -1746,13 +1708,14 @@ def auto_auth(request):
     # If successful, this will return a tuple containing
     # the new user object.
     try:
-        user, _profile, reg = _do_create_account(form)
+        user, profile, reg = _do_create_account(form)
     except AccountValidationError:
         # Attempt to retrieve the existing user.
         user = User.objects.get(username=username)
         user.email = email
         user.set_password(password)
         user.save()
+        profile = UserProfile.objects.get(user=user)
         reg = Registration.objects.get(user=user)
 
     # Set the user's global staff bit
@@ -1763,6 +1726,12 @@ def auto_auth(request):
     # Activate the user
     reg.activate()
     reg.save()
+
+    # ensure parental consent threshold is met
+    year = datetime.date.today().year
+    age_limit = settings.PARENTAL_CONSENT_AGE_LIMIT
+    profile.year_of_birth = (year - age_limit) - 1
+    profile.save()
 
     # Enroll the user in a course
     if course_key is not None:

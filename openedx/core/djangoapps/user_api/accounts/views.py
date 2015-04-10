@@ -8,12 +8,16 @@ from django.db import transaction
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from util.authentication import SessionAuthenticationAllowInactiveUser, OAuth2AuthenticationAllowInactiveUser
 from rest_framework import permissions
 
+from openedx.core.lib.api.authentication import (
+    SessionAuthenticationAllowInactiveUser,
+    OAuth2AuthenticationAllowInactiveUser,
+)
 from ..errors import UserNotFound, UserNotAuthorized, AccountUpdateError, AccountValidationError
 from openedx.core.lib.api.parsers import MergePatchParser
 from .api import get_account_settings, update_account_settings
+from .serializers import PROFILE_IMAGE_KEY_PREFIX
 
 
 class AccountView(APIView):
@@ -24,9 +28,9 @@ class AccountView(APIView):
 
         **Example Requests**:
 
-            GET /api/user/v0/accounts/{username}/[?view=shared]
+            GET /api/user/v1/accounts/{username}/[?view=shared]
 
-            PATCH /api/user/v0/accounts/{username}/{"key":"value"} "application/merge-patch+json"
+            PATCH /api/user/v1/accounts/{username}/{"key":"value"} "application/merge-patch+json"
 
         **Response Values for GET**
 
@@ -38,25 +42,24 @@ class AccountView(APIView):
 
                 * name: The full name of the user.
 
-                * email: The confirmed email address for the user. The request
-                  will not return an unconfirmed email address.
+                * email: email for the user (the new email address must be
+                    confirmed via a confirmation email, so GET will not reflect
+                    the change until the address has been confirmed).
 
-                * date_joined: The date the account was created, in
-                  the string format provided by datetime (for example,
-                  "2014-08-26T17:52:11Z").
+                * date_joined: The date the account was created, in the string
+                    format provided by datetime.
+                    For example, "2014-08-26T17:52:11Z".
 
-                * gender: One of the fullowing values:
-
-                  * "m"
-                  * "f"
-                  * "o"
-                  * null
+                * gender: One of the following values:
+                    * "m"
+                    * "f"
+                    * "o"
+                    * null
 
                 * year_of_birth: The year the user was born, as an integer, or
-                  null.
+                    null.
 
                 * level_of_education: One of the following values:
-
                     * "p": PhD or Doctorate
                     * "m": Master's or professional degree
                     * "b": Bachelor's degree
@@ -70,12 +73,43 @@ class AccountView(APIView):
 
                 * language: The user's preferred language, or null.
 
+                * country: null (not set), or a Country corresponding to one of
+                    the ISO 3166-1 countries.
+
                 * country: A ISO 3166 country code or null.
 
                 * mailing_address: The textual representation of the user's
-                  mailing address, or null.
+                    mailing address, or null.
 
                 * goals: The textual representation of the user's goals, or null.
+
+                * bio: null or textural representation of user biographical
+                    information ("about me").
+
+                * is_active: boolean representation of whether a user is active.
+
+                * profile_image: JSON representation of a user's profile image
+                    information. The keys are:
+                    the user's profile image:
+                    * "has_image": boolean indicating whether the user has
+                        a profile image.
+                    * "image_url_*": absolute URL to various sizes of a user's
+                        profile image, where '*' matches a representation of
+                        the corresponding image size such as 'small', 'medium',
+                        'large', and 'full'. These are configurable via
+                        PROFILE_IMAGE_SIZES_MAP.
+
+                * requires_parental_consent: true if the user is a minor
+                    requiring parental consent.
+
+                * language_proficiencies: array of language preferences.
+                    Each preference is a JSON object with the following keys:
+                    * "code": string ISO 639-1 language code e.g. "en".
+
+            For all text fields, clients rendering the values should take care
+            to HTML escape them to avoid script injections, as the data is
+            stored exactly as specified. The intention is that plain text is
+            supported, not HTML.
 
             If a user who does not have "is_staff" access requests account
             information for a different user, only a subset of these fields is
@@ -92,8 +126,10 @@ class AccountView(APIView):
 
         **Response Values for PATCH**
 
-            Users can modify only their own account information. If the user
-            attempts to modify another user's account, a 404 error is returned.
+            Users can only modify their own account information. If the requesting
+            user does not have username "username", this method will return with
+            a status of 403 for staff access but a 404 for ordinary users
+            to avoid leaking the existence of the account.
 
             If no user exists with the specified username, a 404 error is
             returned.
@@ -118,18 +154,22 @@ class AccountView(APIView):
 
     def get(self, request, username):
         """
-        GET /api/user/v0/accounts/{username}/
+        GET /api/user/v1/accounts/{username}/
         """
         try:
             account_settings = get_account_settings(request.user, username, view=request.QUERY_PARAMS.get('view'))
+            # Account for possibly relative URLs.
+            for key, value in account_settings['profile_image'].items():
+                if key.startswith(PROFILE_IMAGE_KEY_PREFIX):
+                    account_settings['profile_image'][key] = request.build_absolute_uri(value)
         except UserNotFound:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_403_FORBIDDEN if request.user.is_staff else status.HTTP_404_NOT_FOUND)
 
         return Response(account_settings)
 
     def patch(self, request, username):
         """
-        PATCH /api/user/v0/accounts/{username}/
+        PATCH /api/user/v1/accounts/{username}/
 
         Note that this implementation is the "merge patch" implementation proposed in
         https://tools.ietf.org/html/rfc7396. The content_type must be "application/merge-patch+json" or
@@ -138,7 +178,9 @@ class AccountView(APIView):
         try:
             with transaction.commit_on_success():
                 update_account_settings(request.user, request.DATA, username=username)
-        except (UserNotFound, UserNotAuthorized):
+        except UserNotAuthorized:
+            return Response(status=status.HTTP_403_FORBIDDEN if request.user.is_staff else status.HTTP_404_NOT_FOUND)
+        except UserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
         except AccountValidationError as err:
             return Response({"field_errors": err.field_errors}, status=status.HTTP_400_BAD_REQUEST)
