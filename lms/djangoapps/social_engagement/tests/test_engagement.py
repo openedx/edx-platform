@@ -215,7 +215,7 @@ class StudentEngagementTests(TestCase):
 
             self.assertEqual(
                 leaderboard_position['score'],
-                24
+                85
             )
 
             self.assertEqual(
@@ -264,7 +264,7 @@ class StudentEngagementTests(TestCase):
 
         self.assertEqual(
             leaderboard_position['score'],
-            24
+            85
         )
 
         # user should be in place #2
@@ -282,7 +282,7 @@ class StudentEngagementTests(TestCase):
 
         self.assertEqual(
             leaderboard_position['score'],
-            48
+            170
         )
 
         # user2 should be in place #1
