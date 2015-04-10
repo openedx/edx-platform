@@ -58,6 +58,7 @@ UNENROLL_DONE = Signal(providing_args=["course_enrollment", "skip_refund"])
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 SessionStore = import_module(settings.SESSION_ENGINE).SessionStore  # pylint: disable=invalid-name
+USER_SETTINGS_CHANGED_EVENT_NAME = 'edx.user.settings.changed'
 
 
 class AnonymousUserId(models.Model):
@@ -375,7 +376,7 @@ def emit_field_changed_events(instance, user, db_table):
     # only emit events when something has changed
     if len(changed_settings) > 0:
         context = {'user_id': user.id}
-        event_name = 'edx.user.settings.changed'
+        event_name = USER_SETTINGS_CHANGED_EVENT_NAME
         with tracker.get_tracker().context(event_name, context):
             tracker.emit(
                 event_name,
