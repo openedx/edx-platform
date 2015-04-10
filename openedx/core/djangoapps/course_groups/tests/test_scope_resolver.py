@@ -5,7 +5,7 @@ Test cases for scope_resolver.py
 from django.test import TestCase
 from student.tests.factories import UserFactory
 
-from course_groups.scope_resolver import CourseGroupScopeResolver
+from ..scope_resolver import CourseGroupScopeResolver
 from .test_views import CohortFactory
 
 

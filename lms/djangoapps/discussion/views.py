@@ -7,59 +7,49 @@ from contextlib import contextmanager
 from functools import wraps
 from sets import Set
 
+import django_comment_client.utils as utils
+import newrelic.agent
+from courseware.access import has_access
+from courseware.courses import get_course_with_access
+from courseware.views.views import CourseTabView
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
 from django.http import Http404, HttpResponseServerError
 from django.shortcuts import render_to_response
 from django.template.loader import render_to_string
 from django.utils.translation import get_language_bidi
 from django.views.decorators.csrf import ensure_csrf_cookie
-from rest_framework import status
-from web_fragments.fragment import Fragment
-
 from django.views.decorators.http import require_GET, require_http_methods
-import newrelic.agent
-
-from courseware.courses import get_course_with_access
-from courseware.views.views import CourseTabView
-from openedx.core.djangoapps.course_groups.cohorts import (
-    get_cohort_id,
-    is_commentable_cohorted,
-    get_cohorted_commentables,
-    get_cohorted_threads_privacy,
-)
-from courseware.access import has_access
-
-from django_comment_client.permissions import has_permission, get_team
 from django_comment_client.constants import TYPE_ENTRY
+from django_comment_client.permissions import has_permission, get_team
 from django_comment_client.utils import (
-    add_courseware_context,
     available_division_schemes,
     course_discussion_division_enabled,
-    extract,
     get_group_id_for_comments_service,
     get_group_id_for_user,
     get_group_names_by_id,
-    is_commentable_divided,
-    merge_dict,
-    strip_none
+    is_commentable_divided
 )
 from django_comment_client.utils import (merge_dict, extract, strip_none, add_courseware_context, add_thread_group_name)
-import django_comment_client.utils as utils
-import lms.lib.comment_client as cc
-
 from django_comment_common.utils import ThreadContext, get_course_discussion_settings, set_course_discussion_settings
-from lms.djangoapps.courseware.views.views import check_and_get_upgrade_link, get_cosmetic_verified_display_price
-from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
+from opaque_keys.edx.keys import CourseKey
+from rest_framework import status
 from student.models import CourseEnrollment
 from util.json_request import JsonResponse, expect_json
+from web_fragments.fragment import Fragment
 from xmodule.modulestore.django import modulestore
 
-from opaque_keys.edx.keys import CourseKey
+import lms.lib.comment_client as cc
+from lms.djangoapps.courseware.views.views import check_and_get_upgrade_link, get_cosmetic_verified_display_price
+from openedx.core.djangoapps.course_groups.cohorts import (
+    get_cohort_id,
+    get_cohorted_threads_privacy,
+)
+from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 
 log = logging.getLogger("edx.discussions")
 try:
@@ -124,7 +114,7 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
     default_query_params = {
         'page': 1,
         'per_page': per_page,
-        'sort_key': 'activity',
+        'sort_key': 'date',
         'text': '',
         'course_id': unicode(course.id),
         'commentable_id': discussion_id,
@@ -549,7 +539,15 @@ def user_profile(request, course_key, user_id):
                 'django_user_roles': user_roles,
                 'profiled_user': profiled_user.to_dict(),
                 'threads': threads,
-                'user_group_id': user_group_id,
+                'user_info': user_info,
+                'roles': utils.get_role_ids(course_key),
+                'can_create_comment': has_permission(request.user, "create_comment", course.id),
+                'can_create_subcomment': has_permission(request.user, "create_sub_comment", course.id),
+                'can_create_thread': has_permission(request.user, "create_thread", course.id),
+                'flag_moderator': bool(
+                    has_permission(request.user, 'openclose_thread', course.id) or
+                    has_access(request.user, 'staff', course)
+                ),
                 'annotated_content_info': annotated_content_info,
                 'page': query_params['page'],
                 'num_pages': query_params['num_pages'],
@@ -604,6 +602,7 @@ def followed_threads(request, course_key, user_id):
         paginated_results = profiled_user.subscribed_threads(query_params)
         print "\n \n \n paginated results \n \n \n "
         print paginated_results
+
         query_params['page'] = paginated_results.page
         query_params['num_pages'] = paginated_results.num_pages
         user_info = cc.User.from_django_user(request.user).to_dict()
@@ -618,9 +617,8 @@ def followed_threads(request, course_key, user_id):
             is_staff = has_permission(request.user, 'openclose_thread', course.id)
             return utils.JsonResponse({
                 'annotated_content_info': annotated_content_info,
-                'discussion_data': [
-                    utils.prepare_content(thread, course_key, is_staff) for thread in paginated_results.collection
-                ],
+                'discussion_data': [utils.prepare_content(thread, course_key, is_staff) for thread in
+                                    paginated_results.collection],
                 'page': query_params['page'],
                 'num_pages': query_params['num_pages'],
             })
