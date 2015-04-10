@@ -1,0 +1,52 @@
+nav.course-material {
+  @include clearfix();
+  @include box-sizing(border-box);
+  background: none;
+  margin: 0px auto 0px;
+  padding: 0px;
+  width: 100%;
+
+  .inner-wrapper {
+    margin: 0 auto;
+    max-width: 1200px;
+    width: flex-grid(12);
+  }
+
+  ol.course-tabs {
+    @include border-top-radius(4px);
+    @include clearfix();
+    padding: 10px 0 0 0;
+
+    li {
+      float: left;
+      list-style: none;
+
+      a {
+        color: darken($lighter-base-font-color, 20%);
+        display: block;
+        text-align: center;
+        padding: 8px 13px 12px;
+        font-size: 14px;
+        font-weight: 400;
+        text-decoration: none;
+        text-shadow: 0 1px rgb(255,255,255);
+
+        &:hover, &:focus {
+          color: $base-font-color;
+        }
+
+        &.active {
+          color: $blue;
+        }
+      }
+    }
+  }
+}
+
+.course-content {
+  margin-top: ($baseline*1.5);
+
+  .courseware {
+    min-height: 300px;
+  }
+}

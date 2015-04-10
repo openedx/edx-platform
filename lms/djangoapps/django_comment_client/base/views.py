@@ -314,7 +314,6 @@ def create_thread(request, course_id, commentable_id):
 
     add_courseware_context([data], course, user)
     add_thread_group_name(data, course_key)
-    add_courseware_context([data], course)
     if request.is_ajax():
         return ajax_content_response(request, course_key, data)
     else:

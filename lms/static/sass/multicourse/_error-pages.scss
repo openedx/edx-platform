@@ -1,6 +1,7 @@
 section.outside-app {
   @extend .container;
   @include text-align(left);
+  @include float(left);
   padding: ($baseline*4) 0;
 
   h1 {
