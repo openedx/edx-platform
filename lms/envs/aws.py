@@ -517,3 +517,7 @@ PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM = ENV_TOKENS.get(
 if FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
     # Use ElasticSearch as the search engine herein
     SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
+
+
+OAUTH_OIDC_ISSUER = "https://kilian-lms.raccoongang.com/oauth2"
+
