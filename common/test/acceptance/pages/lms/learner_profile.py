@@ -5,6 +5,8 @@ from . import BASE_URL
 from bok_choy.page_object import PageObject
 from .fields import FieldsMixin
 from bok_choy.promise import EmptyPromise
+from .instructor_dashboard import InstructorDashboardPage
+from selenium.webdriver import ActionChains
 
 
 PROFILE_VISIBILITY_SELECTOR = '#u-field-select-account_privacy option[value="{}"]'
@@ -165,3 +167,94 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         """
         self.wait_for_ajax()
         return self.q(css='#u-field-message-account_privacy').visible
+
+    @property
+    def profile_has_default_image(self):
+        """
+        Return list of visible fields.
+        """
+        self.wait_for_field('image')
+        default_links = self.q(css='.image-frame').attrs('src')
+        return 'default-profile' in default_links[0] if default_links else False
+
+    def mouse_hover(self, element):
+        """
+        Mouse over on given element.
+        """
+        mouse_hover_action = ActionChains(self.browser).move_to_element(element)
+        mouse_hover_action.perform()
+
+    @property
+    def profile_has_image_with_public_access(self):
+        """
+        Check if image is present with remove/upload access.
+        """
+        self.wait_for_field('image')
+
+        self.mouse_hover(self.browser.find_element_by_css_selector('.image-wrapper'))
+        self.wait_for_element_visibility('.u-field-upload-button', "upload button is visible")
+        return self.q(css='.u-field-upload-button').visible
+
+    @property
+    def profile_has_image_with_private_access(self):
+        """
+        Check if image is present with remove/upload access.
+        """
+        self.wait_for_field('image')
+        return self.q(css='.u-field-upload-button').visible
+
+    def _upload_file(self, filename):
+        """
+        Helper method to upload a image file.
+        """
+        self.wait_for_element_visibility('.u-field-upload-button', "upload button is visible")
+        file_path = InstructorDashboardPage.get_asset_path(filename)
+
+        # make the elements visible.
+        self.browser.execute_script('$(".u-field-upload-button").css("opacity",1);')
+        self.browser.execute_script('$(".upload-button-input").css("opacity",1);')
+
+        self.wait_for_element_visibility('.upload-button-input', "upload button is visible")
+
+        self.browser.execute_script('$(".upload-submit").show();')
+        self.q(css='.upload-button-input').results[0].send_keys(file_path)
+
+        self.q(css='.upload-submit').first.click()
+
+        self.wait_for_ajax()
+
+    def upload_correct_image_file(self, filename):
+        """
+        Selects the correct file and clicks the upload button.
+        """
+        self._upload_file(filename)
+
+    @property
+    def image_upload_success(self):
+        """
+        Returns the bool, if image is updated or not.
+        """
+        self.wait_for_field('image')
+        self.wait_for_ajax()
+        image_link = self.q(css='.image-frame').attrs('src')
+        return 'profile-images' in image_link[0] if image_link else False
+
+    @property
+    def profile_image_message(self):
+        """
+        Returns the text message for profile image.
+        """
+        self.wait_for_field('image')
+        self.wait_for_ajax()
+        return self.q(css='.message-banner p').text[0]
+
+    def remove_profile_image(self):
+        """
+        Removes the profile image.
+        """
+        self.wait_for_field('image')
+        self.wait_for_ajax()
+        self.browser.execute_script('$(".u-field-remove-button").css("opacity",1);')
+        self.q(css='.u-field-remove-button').first.click()
+        self.wait_for_element_visibility('.u-field-upload-button', "upload button is visible")
+

@@ -123,6 +123,14 @@ class LearnerProfilePageTest(WebAppTest):
         self.assertEqual(self.my_profile_page.age_limit_message_present, message is not None)
         self.assertIn(message, self.my_profile_page.profile_forced_private_message)
 
+    def assert_default_image_has_public_access(self):
+        """
+        Assert that profile image has public access.
+        """
+        self.visit_my_profile_page(self.MY_USER, privacy=self.PRIVACY_PUBLIC)
+        self.assertTrue(self.my_profile_page.profile_has_default_image)
+        self.assertTrue(self.my_profile_page.profile_has_image_with_public_access)
+
     def test_dashboard_learner_profile_link(self):
         """
         Scenario: Verify that my profile link is present on dashboard page and we can navigate to correct page.
@@ -348,3 +356,143 @@ class LearnerProfilePageTest(WebAppTest):
         Then i should see message `You must be over 13 to share a full profile.`
         """
         self.verify_profile_forced_private_message('2010', message='You must be over 13 to share a full profile.')
+
+    def test_user_can_only_see_default_image_for_private_profile(self):
+        """
+        Scenario: Default profile image behaves correctly for under age user.
+
+        Given that I am on my profile page with private access
+        And I can see default image
+        When I move my cursor to the image
+        Then i cannot see the upload/remove image text
+        And i cannot upload/remove the image.
+        """
+        self.visit_my_profile_page(self.MY_USER, privacy=self.PRIVACY_PRIVATE)
+
+        self.verify_profile_forced_private_message('2010', message='You must be over 13 to share a full profile.')
+        self.assertTrue(self.my_profile_page.profile_has_default_image)
+        self.assertFalse(self.my_profile_page.profile_has_image_with_private_access)
+
+    def test_user_can_see_default_image_for_public_profile(self):
+        """
+        Scenario: Default profile image behaves correctly for public profile.
+
+        Given that I am on my profile page with public access
+        And I can see default image
+        When I move my cursor to the image
+        Then i can see the upload/remove image text
+        And i am able to upload new image
+        """
+        self.assert_default_image_has_public_access()
+
+    def test_user_can_upload_the_profile_image_with_success(self):
+        """
+        Scenario: Upload profile image works correctly.
+
+        Given that I am on my profile page with public access
+        And I can see default image
+        When I move my cursor to the image
+        Then i can see the upload/remove image text
+        When i upload new image via file uploader
+        Then i can see the changed image
+        And i can also see the latest image after reload.
+        """
+        self.assert_default_image_has_public_access()
+
+        self.my_profile_page.upload_correct_image_file(filename='image.jpg')
+        self.assertTrue(self.my_profile_page.image_upload_success)
+        self.my_profile_page.visit()
+        self.assertTrue(self.my_profile_page.image_upload_success)
+
+    def test_user_can_see_error_for_exceeding_max_file_size_limit(self):
+        """
+        Scenario: Upload profile image does not work for > 1MB image file.
+
+        Given that I am on my profile page with public access
+        And I can see default image
+        When I move my cursor to the image
+        Then i can see the upload/remove image text
+        When i upload new > 1MB image via file uploader
+        Then i can see the error message for file size limit
+        And i can still see the default image after page reload.
+        """
+        self.assert_default_image_has_public_access()
+
+        self.my_profile_page.upload_correct_image_file(filename='larger_image.jpg')
+        self.assertEqual(self.my_profile_page.profile_image_message, "Your image must be smaller than 1 MB in size.")
+        self.my_profile_page.visit()
+        self.assertTrue(self.my_profile_page.profile_has_default_image)
+
+    def test_user_can_see_error_for_file_size_below_the_min_limit(self):
+        """
+        Scenario: Upload profile image does not work for < 100 Bytes image file.
+
+        Given that I am on my profile page with public access
+        And I can see default image
+        When I move my cursor to the image
+        Then i can see the upload/remove image text
+        When i upload new < 100 Bytes image via file uploader
+        Then i can see the error message for minimum file size limit
+        And i can still see the default image after page reload.
+        """
+        self.assert_default_image_has_public_access()
+
+        self.my_profile_page.upload_correct_image_file(filename='list-icon-visited.png')
+        self.assertEqual(self.my_profile_page.profile_image_message, "Your image must be at least 100 Bytes in size.")
+        self.my_profile_page.visit()
+        self.assertTrue(self.my_profile_page.profile_has_default_image)
+
+    def test_user_can_see_error_for_wrong_file_type(self):
+        """
+        Scenario: Upload profile image does not work for wrong file types.
+
+        Given that I am on my profile page with public access
+        And I can see default image
+        When I move my cursor to the image
+        Then i can see the upload/remove image text
+        When i upload new csv file via file uploader
+        Then i can see the error message for wrong/unsupported file type
+        And i can still see the default image after page reload.
+        """
+        self.assert_default_image_has_public_access()
+
+        self.my_profile_page.upload_correct_image_file(filename='cohort_users_only_username.csv')
+        self.assertEqual(self.my_profile_page.profile_image_message, "Unsupported file type.")
+        self.my_profile_page.visit()
+        self.assertTrue(self.my_profile_page.profile_has_default_image)
+
+    def test_user_can_remove_profile_image(self):
+        """
+        Scenario: Remove profile image works correctly.
+
+        Given that I am on my profile page with public access
+        And I can see default image
+        When I move my cursor to the image
+        Then i can see the upload/remove image text
+        When i click on the remove image link
+        Then i can see the default image
+        And i can still see the default image after page reload.
+        """
+        self.assert_default_image_has_public_access()
+
+        self.my_profile_page.upload_correct_image_file(filename='image.jpg')
+        self.assertTrue(self.my_profile_page.remove_profile_image())
+        self.assertTrue(self.my_profile_page.profile_has_default_image)
+        self.my_profile_page.visit()
+        self.assertTrue(self.my_profile_page.profile_has_default_image)
+
+    def test_user_cannot_remove_default_image(self):
+        """
+        Scenario: Remove profile image does not works for default images.
+
+        Given that I am on my profile page with public access
+        And I can see default image
+        When I move my cursor to the image
+        Then i can see only the upload image text
+        And i cannot see the remove image text
+        """
+        self.assert_default_image_has_public_access()
+
+        self.my_profile_page.upload_correct_image_file(filename='image.jpg')
+        self.assertTrue(self.my_profile_page.remove_profile_image())
+        self.assertTrue(self.my_profile_page.profile_has_default_image)

@@ -519,7 +519,8 @@
 
             events: {
                 'click .u-field-upload-button': 'clickedUploadButton',
-                'click .u-field-remove-button': 'clickedRemoveButton'
+                'click .u-field-remove-button': 'clickedRemoveButton',
+                'click .upload-submit': 'clickedUploadButton'
             },
 
             initialize: function (options) {
