@@ -158,7 +158,8 @@
     var data = {event: event_name, id: id, expgroup: expgroup, value: value, page: "html5vid"};
     $.ajax({method: "POST", url: "/performance", data: data});
   }
-  var cdnStartTime, salt = Math.floor((1 + Math.random()) * 0x100000).toString(36);
+  var cdnStartTime;
+  var salt = Math.floor((1 + Math.random()) * 0x100000).toString(36);
   function initializeCDNExperiment() {
     sendPerformanceBeacon("${id}", ${cdn_exp_group}, "", "load");
     cdnStartTime = Date.now();
