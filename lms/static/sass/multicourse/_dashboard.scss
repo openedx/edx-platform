@@ -1058,289 +1058,286 @@
 
 // +Misc - Uncategorized
 // ====================
-.dashboard .my-courses {
+// status - language
+.status-language {
 
-  // status - language
-  .status-language {
+  .icon {
+    @include font-size(17);
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: ($baseline/4);
+    color: $black;
+  }
 
-    .icon {
-      @include font-size(17);
-      display: inline-block;
-      vertical-align: middle;
-      margin-right: ($baseline/4);
-      color: $black;
-    }
+  .title .icon {
+    opacity: 0.75; // needed to overcome bad specificity elsewhere
+  }
+}
 
-    .title .icon {
-      opacity: 0.75; // needed to overcome bad specificity elsewhere
+// status - verification
+.status-verification {
+
+  .status-title {
+    margin: 0 0 ($baseline/4) 26px;
+  }
+
+  .status-data {
+    margin: 0 0 ($baseline/2) 26px;
+    width: 80%;
+  }
+
+  .status-data-message {
+    @extend %t-copy-sub1;
+    @extend %t-weight4;
+    margin-bottom: ($baseline/2);
+  }
+
+  .list-actions {
+    @extend %ui-no-list;
+
+    .action {
+      @extend %t-weight4;
+      display: block;
+      @include font-size(14);
     }
   }
 
-  // status - verification
-  .status-verification {
+  .status-note {
+    @extend %t-copy-sub2;
+    position: relative;
+    margin-top: $baseline;
+    border-top: 1px solid $black-t0;
+    padding-top: ($baseline/2);
 
-    .status-title {
-      margin: 0 0 ($baseline/4) 26px;
+    p {
+      @extend %t-copy-sub2;
     }
 
-    .status-data {
-      margin: 0 0 ($baseline/2) 26px;
-      width: 80%;
+    .deco-arrow {
+      @include triangle(($baseline/2), $m-gray-d3, up);
+      position: absolute;
+      left: 45%;
+      top: -($baseline/2);
     }
+  }
+
+  // CASE: is denied
+  &.is-denied {
 
     .status-data-message {
-      @extend %t-copy-sub1;
-      @extend %t-weight4;
-      margin-bottom: ($baseline/2);
-    }
-
-    .list-actions {
-      @extend %ui-no-list;
-
-      .action {
-        @extend %t-weight4;
-        display: block;
-        @include font-size(14);
-      }
+      color: $error-color;
+      border-bottom-color: rgba($error-color, 0.25);
     }
 
     .status-note {
-      @extend %t-copy-sub2;
-      position: relative;
-      margin-top: $baseline;
-      border-top: 1px solid $black-t0;
-      padding-top: ($baseline/2);
-
-      p {
-        @extend %t-copy-sub2;
-      }
-
-      .deco-arrow {
-        @include triangle(($baseline/2), $m-gray-d3, up);
-        position: absolute;
-        left: 45%;
-        top: -($baseline/2);
-      }
+      color: desaturate($error-color, 65%);
+      border-top-color: rgba($error-color, 0.25);
     }
 
-    // CASE: is denied
-    &.is-denied {
-
-      .status-data-message {
-        color: $error-color;
-        border-bottom-color: rgba($error-color, 0.25);
-      }
-
-      .status-note {
-        color: desaturate($error-color, 65%);
-        border-top-color: rgba($error-color, 0.25);
-      }
-
-      .action-reverify {
-        @extend %btn-primary-error;
-        @extend %t-weight4;
-        display: block;
-        @include font-size(14);
-      }
-
-      .deco-arrow {
-        @include triangle(($baseline/2), $error-color, up);
-      }
+    .action-reverify {
+      @extend %btn-primary-error;
+      @extend %t-weight4;
+      display: block;
+      @include font-size(14);
     }
 
-    // CASE: is accepted
-    &.is-accepted {
-
-      .status-data-message {
-        color: $verified-color-lvl1;
-        border-bottom-color: $verified-color-lvl4;
-      }
-
-      .status-note {
-        color: $m-gray-l1;
-        border-top-color: $verified-color-lvl4;
-      }
-
-      .deco-arrow {
-        @include triangle(($baseline/2), $verified-color-lvl4, up);
-      }
-    }
-
-    // CASE: is pending
-    &.is-pending {
-
-      .status-data-message {
-        color: $m-gray-d3;
-        border-bottom-color: $m-gray-l4;
-      }
-
-      .status-note {
-        color: $m-gray-l1;
-        border-top-color: $m-gray-d3;
-      }
+    .deco-arrow {
+      @include triangle(($baseline/2), $error-color, up);
     }
   }
 
-  // status - verification
-  .status--verification {
+  // CASE: is accepted
+  &.is-accepted {
 
-    .data {
-      white-space: normal !important;
-      text-overflow: no !important;
-      overflow: visible !important;
+    .status-data-message {
+      color: $verified-color-lvl1;
+      border-bottom-color: $verified-color-lvl4;
     }
 
-    .list--nav {
-      margin-left: 26px;
+    .status-note {
+      color: $m-gray-l1;
+      border-top-color: $verified-color-lvl4;
     }
 
-    // STATE: is denied
-    &.is-denied {
-
-      .data {
-        color: $error-color !important;
-      }
+    .deco-arrow {
+      @include triangle(($baseline/2), $verified-color-lvl4, up);
     }
   }
 
-  // message
-  .msg {
-    margin: ($baseline/2) 0 ($baseline/2) 26px;
-  }
+  // CASE: is pending
+  &.is-pending {
 
-  .msg__title {
-    @extend %hd-lv5;
-    color: $lighter-base-font-color;
-  }
-
-  .msg__copy {
-    @extend %copy-metadata;
-    color: $lighter-base-font-color;
-
-    p {
-      @extend %t-copy;
+    .status-data-message {
+      color: $m-gray-d3;
+      border-bottom-color: $m-gray-l4;
     }
-  }
-   p.course-block{
-    border-style: solid;
-    border-color: #E3DC86;
-    padding: ($baseline/4);
-    border-width: 1px;
-    background: #FDFBE4;
 
-  }
-  .enter-course-blocked{
-
-    @include box-sizing(border-box);
-    @include float(left);
-    display: block;
-    font: normal 15px/1.6rem $sans-serif;
-    letter-spacing: 0;
-    padding: 6px 32px 7px;
-    text-align: center;
-    margin-top: 16px;
-    opacity:0.5;
-    background:#808080;
-    border:0;
-    color:white;
-    box-shadow:none;
-
-    &.archived {
-      @include button(simple, $button-archive-color);
-      font: normal 15px/1.6rem $sans-serif;
-      padding: 6px 32px 7px;
-
-      &:hover, &:focus {
-        text-decoration: none;
-      }
+    .status-note {
+      color: $m-gray-l1;
+      border-top-color: $m-gray-d3;
     }
-  }
-
-  a.disable-look{
-    color: #808080;
-  }
-
-  a.fade-cover{
-    @extend .cover;
-    opacity: 0.5;
   }
 }
+
+// status - verification
+.status--verification {
+
+  .data {
+    white-space: normal !important;
+    text-overflow: no !important;
+    overflow: visible !important;
+  }
+
+  .list--nav {
+    margin-left: 26px;
+  }
+
+  // STATE: is denied
+  &.is-denied {
+
+    .data {
+      color: $error-color !important;
+    }
+  }
+}
+
+// message
+.msg {
+  margin: ($baseline/2) 0 ($baseline/2) 26px;
+}
+
+.msg__title {
+  @extend %hd-lv5;
+  color: $lighter-base-font-color;
+}
+
+.msg__copy {
+  @extend %copy-metadata;
+  color: $lighter-base-font-color;
+
+  p {
+    @extend %t-copy;
+  }
+}
+ p.course-block{
+  border-style: solid;
+  border-color: #E3DC86;
+  padding: ($baseline/4);
+  border-width: 1px;
+  background: #FDFBE4;
+
+}
+.enter-course-blocked{
+
+  @include box-sizing(border-box);
+  @include float(left);
+  display: block;
+  font: normal 15px/1.6rem $sans-serif;
+  letter-spacing: 0;
+  padding: 6px 32px 7px;
+  text-align: center;
+  margin-top: 16px;
+  opacity:0.5;
+  background:#808080;
+  border:0;
+  color:white;
+  box-shadow:none;
+
+  &.archived {
+    @include button(simple, $button-archive-color);
+    font: normal 15px/1.6rem $sans-serif;
+    padding: 6px 32px 7px;
+
+    &:hover, &:focus {
+      text-decoration: none;
+    }
+  }
+}
+
+a.disable-look{
+  color: #808080;
+}
+
+a.fade-cover{
+  @extend .cover;
+  opacity: 0.5;
+}
+
 
 // +Dashboard - Banner
 // ====================
-.dashboard .my-courses {
-  .dashboard-banner {
+.dashboard-banner {
 
-    &:empty {
-      display: none;
-    }
+  &:empty {
+    display: none;
+  }
 
-    .wrapper-msg {
-      padding-bottom: 0;
+  .wrapper-msg {
+    padding-bottom: 0;
 
-      .msg {
-        @include clearfix();
-        font-family: $sans-serif;
-        padding-bottom: $baseline;
-        border-bottom: thin solid $gray;
+    .msg {
+      @include clearfix();
+      font-family: $sans-serif;
+      padding-bottom: $baseline;
+      border-bottom: thin solid $gray;
 
-        &.title {
-          @extend %t-title5;
-          @extend %t-weight4;
-          font-family: $f-sans-serif;
+      &.title {
+        @extend %t-title5;
+        @extend %t-weight4;
+        font-family: $f-sans-serif;
 
-          // Overriding Platform h2 styles
-          text-transform: none;
-          letter-spacing: 0;
+        // Overriding Platform h2 styles
+        text-transform: none;
+        letter-spacing: 0;
+      }
+
+      &.has-actions {
+
+        .donate-content {
+          width: flex-grid(8, 12);
         }
 
-        &.has-actions {
+        .donate-actions {
+          width: flex-grid(4, 12);
+          vertical-align: bottom;
+          display: inline-block;
 
-          .donate-content {
-            width: flex-grid(8, 12);
+          .monetary-symbol {
+            vertical-align: middle;
+            color: $white;
+            font-weight: 600;
           }
 
-          .donate-actions {
-            width: flex-grid(4, 12);
-            vertical-align: bottom;
-            display: inline-block;
+          .amount {
+            height: 40px;
+            width: 80px;
+            vertical-align: middle;
+            text-align: left;
+            border: 2px solid $white;
 
-            .monetary-symbol {
-              vertical-align: middle;
-              color: $white;
-              font-weight: 600;
+            &.validation-error {
+              border: 2px solid $error-color;
             }
+          }
 
-            .amount {
-              height: 40px;
-              width: 80px;
-              vertical-align: middle;
-              text-align: left;
-              border: 2px solid $white;
+          .action-donate {
+            @extend %btn-primary-blue;
+            vertical-align: middle;
+            padding-top: ($baseline/2);
+            padding-bottom: ($baseline/2);
+            text-shadow: none;
+            text-transform: none;
+            letter-spacing: 0;
+            color: $white;
+            font-weight: 600;
+          }
 
-              &.validation-error {
-                border: 2px solid $error-color;
-              }
-            }
-
-            .action-donate {
-              @extend %btn-primary-blue;
-              vertical-align: middle;
-              padding-top: ($baseline/2);
-              padding-bottom: ($baseline/2);
-              text-shadow: none;
-              text-transform: none;
-              letter-spacing: 0;
-              color: $white;
-              font-weight: 600;
-            }
-
-            .donation-error-msg {
-              padding: ($baseline/2) 0;
-            }
+          .donation-error-msg {
+            padding: ($baseline/2) 0;
           }
         }
       }
     }
   }
 }
+
