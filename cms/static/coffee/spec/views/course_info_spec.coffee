@@ -22,7 +22,7 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
             delete window.analytics
             delete window.course_location_analytics
 
-        describe "Course Updates", ->
+        describe "Course Updates without Push notification", ->
             courseInfoTemplate = readFixtures('course_info_update.underscore')
 
             beforeEach ->
@@ -100,7 +100,7 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
                     else
                         modalCover.click()
 
-            it "does not rewrite links on save", ->
+            it "does send expected data on save", ->
                 requests = AjaxHelpers["requests"](this)
 
                 # Create a new update, verifying that the model is created
@@ -116,9 +116,12 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
                 @courseInfoEdit.$el.find('.save-button').click()
                 expect(model.save).toHaveBeenCalled()
 
-                # Verify content sent to server does not have rewritten links.
-                contentSaved = JSON.parse(requests[requests.length - 1].requestBody).content
-                expect(contentSaved).toEqual('/static/image.jpg')
+                # Verify push_notification_selected is set to false.
+                requestSent = JSON.parse(requests[requests.length - 1].requestBody)
+                expect(requestSent.push_notification_selected).toEqual(false)
+
+                # Verify the link is not rewritten when saved.
+                expect(requestSent.content).toEqual('/static/image.jpg')
 
             it "does rewrite links for preview", ->
                 # Create a new update.
@@ -146,6 +149,41 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
 
             it "does not remove existing course info on click outside modal", ->
                 @cancelExistingCourseInfo(false)
+
+        describe "Course Updates WITH Push notification", ->
+            courseInfoTemplate = readFixtures('course_info_update.underscore')
+
+            beforeEach ->
+                setFixtures($("<script>", {id: "course_info_update-tpl", type: "text/template"}).text(courseInfoTemplate))
+                appendSetFixtures courseInfoPage
+                @collection = new CourseUpdateCollection()
+                @collection.url = 'course_info_update/'
+                @courseInfoEdit = new CourseInfoUpdateView({
+                    el: $('.course-updates'),
+                    collection: @collection,
+                    base_asset_url : 'base-asset-url/',
+                    push_notification_enabled : true
+                })
+                @courseInfoEdit.render()
+                @event = {preventDefault : () -> 'no op'}
+                @courseInfoEdit.onNew(@event)
+                @requests = AjaxHelpers["requests"](this)
+
+            it "shows push notification checkbox as selected by default", ->
+                expect(@courseInfoEdit.$el.find('.toggle-checkbox')).toBeChecked()
+
+            it "sends correct default value for push_notification_selected", ->
+                @courseInfoEdit.$el.find('.save-button').click()
+                requestSent = JSON.parse(@requests[@requests.length - 1].requestBody)
+                expect(requestSent.push_notification_selected).toEqual(true)
+
+            it "sends correct value for push_notification_selected when it is unselected", ->
+                # unselect push notification
+                @courseInfoEdit.$el.find('.toggle-checkbox').attr('checked', false);
+
+                @courseInfoEdit.$el.find('.save-button').click()
+                requestSent = JSON.parse(@requests[@requests.length - 1].requestBody)
+                expect(requestSent.push_notification_selected).toEqual(false)
 
         describe "Course Handouts", ->
             handoutsTemplate = readFixtures('course_info_handouts.underscore')
