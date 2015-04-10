@@ -19,14 +19,17 @@ import newrelic.agent
 
 from edxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
+from courseware.tabs import EnrolledTab
 from openedx.core.djangoapps.course_groups.cohorts import (
     is_course_cohorted,
     get_cohort_id,
     get_course_cohorts,
     is_commentable_cohorted,
     get_cohorted_threads_privacy,
-    get_cohorted_commentables)
-from courseware.tabs import EnrolledTab
+    get_cohorted_commentables,
+    get_cohort_by_id
+)
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from courseware.access import has_access
 from xmodule.modulestore.django import modulestore
 from ccx.overrides import get_current_ccx
@@ -227,7 +230,7 @@ def inline_discussion(request, course_key, discussion_id):
 
     try:
         threads, query_params = get_threads(request, course, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
-    except ValueError:
+    except (ValueError, CourseUserGroup.DoesNotExist):
         return HttpResponseBadRequest("Invalid group_id")
 
     with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
@@ -269,7 +272,7 @@ def forum_form_discussion(request, course_key):
     except cc.utils.CommentClientMaintenanceError:
         log.warning("Forum is in maintenance mode")
         return render_to_response('discussion/maintenance.html', {})
-    except ValueError:
+    except (ValueError, CourseUserGroup.DoesNotExist):
         return HttpResponseBadRequest("Invalid group_id")
 
     with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):

@@ -47,6 +47,7 @@ body.discussion, .discussion-module, div.discussion-course {
       @include right($baseline);
       top: ($baseline);
       @include float(right);
+      width: flex-grid(3,12);
     }
   }
 

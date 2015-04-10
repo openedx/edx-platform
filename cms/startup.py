@@ -13,7 +13,7 @@ from openedx.core.lib.django_startup import autostartup
 from edx_notifications import startup
 from monkey_patch import django_utils_translation
 
-from course_groups.scope_resolver import CourseGroupScopeResolver
+from openedx.core.djangoapps.course_groups.scope_resolver import CourseGroupScopeResolver
 from student.scope_resolver import CourseEnrollmentsScopeResolver, StudentEmailScopeResolver
 from projects.scope_resolver import GroupProjectParticipantsScopeResolver
 from edx_notifications.scopes import register_user_scope_resolver

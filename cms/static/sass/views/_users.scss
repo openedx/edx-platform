@@ -127,7 +127,7 @@
 
       // ELEM: item - metadata
       .item-metadata {
-        width: flex-grid(4, 9);
+        width: flex-grid(5, 9);
         @include margin-right(flex-gutter());
 
         .user-username, .user-email {
