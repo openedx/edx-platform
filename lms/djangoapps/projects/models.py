@@ -26,6 +26,19 @@ class Project(TimeStampedModel):
         """ Meta class for defining additional model characteristics """
         unique_together = ("course_id", "content_id", "organization")
 
+    @classmethod
+    def get_user_ids_in_project_by_content_id(cls, course_id, content_id):
+        """
+        Returns a database cursor for all users associated with a project
+        specified by a content_id
+        """
+
+        query = Project.objects.select_related('workgroups__users').values_list('workgroups__users', flat=True).filter(
+            course_id=course_id,
+            content_id=content_id
+        )
+
+        return query
 
 class Workgroup(TimeStampedModel):
     """
@@ -62,6 +75,19 @@ class Workgroup(TimeStampedModel):
     def remove_user(self, user):
         workgroup_user = WorkgroupUser.objects.get(workgroup=self, user=user)
         workgroup_user.delete()
+
+    @classmethod
+    def get_user_ids_in_workgroup(cls, workgroup_id):
+        """
+        Returns a database cursor for all users associated with a project
+        specified by a content_id
+        """
+
+        query = Workgroup.objects.select_related('users').values_list('users', flat=True).filter(
+            id=workgroup_id
+        )
+
+        return query
 
 
 class WorkgroupUser(models.Model):

@@ -20,6 +20,7 @@ from xblock.runtime import KvsFieldData
 from xblock.django.request import webob_to_django_response, django_to_webob_request
 from xblock.exceptions import NoSuchHandlerError
 from xblock.fragment import Fragment
+from xmodule.services import SettingsService, NotificationsService, CoursewareParentInfoService
 
 from lms.lib.xblock.field_data import LmsFieldData
 from cms.lib.xblock.field_data import CmsFieldData
@@ -109,6 +110,24 @@ class StudioUserService(object):
         return self._request.user.id
 
 
+def get_available_xblock_services():
+    """
+    Returns a dict of available services for xBlocks
+    """
+
+    services = {
+        "i18n": ModuleI18nService(),
+        "settings": SettingsService(),
+        "courseware_parent_info": CoursewareParentInfoService(),
+    }
+
+    if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
+        services.update({
+            "notifications": NotificationsService()
+        })
+
+    return services
+
 def _preview_module_system(request, descriptor):
     """
     Returns a ModuleSystem for the specified descriptor that is specialized for
@@ -139,6 +158,8 @@ def _preview_module_system(request, descriptor):
 
     descriptor.runtime._services['user'] = StudioUserService(request)  # pylint: disable=protected-access
 
+    services = get_available_xblock_services()
+
     return PreviewModuleSystem(
         static_url=settings.STATIC_URL,
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
@@ -159,9 +180,7 @@ def _preview_module_system(request, descriptor):
         error_descriptor_class=ErrorDescriptor,
         get_user_role=lambda: get_user_role(request.user, course_id),
         descriptor_runtime=descriptor.runtime,
-        services={
-            "i18n": ModuleI18nService(),
-        },
+        services=services,
     )
 
 
