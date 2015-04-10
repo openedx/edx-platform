@@ -5,6 +5,7 @@
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "updates" %></%def>
 <%namespace name='static' file='static_content.html'/>
+<%! import json %>
 
 <!-- TODO decode course # from context_course into title -->
 <%block name="title">${_("Course Updates")}</%block>
@@ -21,7 +22,12 @@
 
 <%block name="requirejs">
   require(["js/factories/course_info"], function(CourseInfoFactory) {
-      CourseInfoFactory("${updates_url}", "${handouts_locator | escapejs}", "${base_asset_url}");
+      CourseInfoFactory(
+        "${updates_url}",
+        "${handouts_locator | escapejs}",
+        "${base_asset_url}",
+        ${json.dumps(push_notification_enabled)}
+       );
   });
 </%block>
 
