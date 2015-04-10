@@ -26,6 +26,12 @@
     .profile-image-field {
         @include float(left);
 
+        button {
+            background: transparent !important;
+            border: none !important;
+            padding: 0;
+        }
+
         .u-field-image {
             padding-top: 0;
         }
@@ -46,7 +52,6 @@
                 position: absolute;
                 top: 0;
                 opacity: 0;
-                color: $white;
 
                 i {
                     color: $white;
@@ -56,6 +61,8 @@
             .upload-button-icon, .upload-button-title {
                 text-align: center;
                 transform: translateY(45px);
+                display: block;
+                color: $white;
             }
 
             .upload-button-input {
@@ -75,8 +82,6 @@
                 position: relative;
                 margin-top: 2px;
                 text-align: center;
-                cursor: pointer;
-                display: block;
             }
 
             &:hover {

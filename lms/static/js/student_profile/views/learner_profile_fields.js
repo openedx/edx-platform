@@ -43,15 +43,12 @@
 
         LearnerProfileFieldViews.ProfileImageFieldView = FieldViews.ImageFieldView.extend({
 
-            titleAdd: gettext("upload a photo"),
-            titleEdit: gettext("change photo"),
-
             imageUrl: function () {
                 return this.model.profileImageUrl();
             },
 
             imageAltText: function () {
-                return interpolate_text(gettext("Profile photo for {username}"), {username: this.model.get('username')});
+                return interpolate_text(gettext("Profile image for {username}"), {username: this.model.get('username')});
             },
 
             imageChangeSucceeded: function (e, data) {

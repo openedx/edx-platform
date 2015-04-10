@@ -502,18 +502,18 @@
             templateSelector: '#field_image-tpl',
             uploadButtonSelector: '.upload-button-input',
 
-            titleAdd: gettext("upload an image"),
-            titleEdit: gettext("change image"),
-            titleRemove: gettext("remove"),
+            titleAdd: gettext("Upload an image"),
+            titleEdit: gettext("Change image"),
+            titleRemove: gettext("Remove"),
 
             titleUploading: gettext("Uploading"),
             titleRemoving: gettext("Removing"),
 
             titleImageAlt: '',
 
-            iconUpload: '<i class="icon fa fa-camera" aria-hidden="true"></i><span class="sr">Upload Profile Image</span>',
-            iconRemove: '<i class="icon fa fa-remove" aria-hidden="true"></i><span class="sr">Remove Profile Image</span>',
-            iconProgress: '<i class="icon fa fa-spinner fa-pulse fa-spin" aria-hidden="true"></i></i><span class="sr">In Progress</span>',
+            iconUpload: '<i class="icon fa fa-camera" aria-hidden="true"></i>',
+            iconRemove: '<i class="icon fa fa-remove" aria-hidden="true"></i>',
+            iconProgress: '<i class="icon fa fa-spinner fa-pulse fa-spin" aria-hidden="true"></i>',
 
             errorMessage: gettext("An error has occurred. Refresh the page, and then try again."),
 
