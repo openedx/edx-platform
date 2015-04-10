@@ -2078,3 +2078,6 @@ PROFILE_CONFIGURATION = {
         'profile_image',
     ],
 }
+
+OAUTH_OIDC_ISSUER = "https://kilian-lms.raccoongang.com/oauth2"
+
