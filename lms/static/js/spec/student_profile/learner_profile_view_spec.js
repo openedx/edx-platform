@@ -8,8 +8,9 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
         'js/student_profile/views/learner_profile_view',
         'js/student_account/views/account_settings_fields'
        ],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers, FieldViews, UserAccountModel,
-                AccountPreferencesModel, LearnerProfileFields, LearnerProfileView, AccountSettingsFieldViews) {
+    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers, FieldViews,
+              UserAccountModel, AccountPreferencesModel, LearnerProfileFields, LearnerProfileView,
+              AccountSettingsFieldViews) {
         'use strict';
 
         describe("edx.user.LearnerProfileView", function () {
@@ -18,8 +19,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 var accountSettingsModel = new UserAccountModel();
                 var accountSettingsData = Helpers.USER_ACCOUNTS_DATA;
-                accountSettingsData['year_of_birth'] = 1989;
-                accountSettingsData['requires_parental_consent'] = false;
+                accountSettingsData.year_of_birth = 1989;
+                accountSettingsData.requires_parental_consent = false;
                 accountSettingsModel.set(accountSettingsData);
                 accountSettingsModel.set({'profile_is_public': profileIsPublic});
 
@@ -84,7 +85,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                         editable: editable,
                         showMessages: false,
                         title: 'About me',
-                        placeholderValue: "Tell other edX learners a little about yourself: where you live, what your interests are, why you're taking courses on edX, or what you hope to learn.",
+                        placeholderValue: "Tell other edX learners a little about yourself: where you live, " +
+                            "what your interests are, why you're taking courses on edX, or what you hope to learn.",
                         valueAttribute: "bio",
                         helpMessage: ''
                     })
@@ -102,7 +104,6 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                         sectionOneFieldViews: sectionOneFieldViews,
                         sectionTwoFieldViews: sectionTwoFieldViews
                     });
-
             };
 
             beforeEach(function () {
@@ -162,7 +163,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 learnerProfileView.render();
 
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
-                LearnerProfileHelpers.expectProfileSectionsAndFieldsToBeRendered(learnerProfileView, true)
+                LearnerProfileHelpers.expectProfileSectionsAndFieldsToBeRendered(learnerProfileView, true);
             });
 
             it("renders the fields as expected for others with limited access", function() {

@@ -46,7 +46,10 @@ define(['underscore'], function(_) {
         expect(sectionOneFieldElements.length).toBe(learnerProfileView.options.sectionOneFieldViews.length);
 
         _.each(sectionOneFieldElements, function (sectionFieldElement, fieldIndex) {
-            expectProfileElementContainsField(sectionFieldElement, learnerProfileView.options.sectionOneFieldViews[fieldIndex]);
+            expectProfileElementContainsField(
+                sectionFieldElement,
+                learnerProfileView.options.sectionOneFieldViews[fieldIndex]
+            );
         });
     };
 
@@ -58,7 +61,10 @@ define(['underscore'], function(_) {
         expect(sectionTwoFieldElements.length).toBe(learnerProfileView.options.sectionTwoFieldViews.length);
 
          _.each(sectionTwoFieldElements, function (sectionFieldElement, fieldIndex) {
-            expectProfileElementContainsField(sectionFieldElement, learnerProfileView.options.sectionTwoFieldViews[fieldIndex]);
+            expectProfileElementContainsField(
+                sectionFieldElement,
+                learnerProfileView.options.sectionTwoFieldViews[fieldIndex]
+            );
         });
     };
 
@@ -75,13 +81,17 @@ define(['underscore'], function(_) {
 
         expect(sectionOneFieldElements.length).toBe(1);
         _.each(sectionOneFieldElements, function (sectionFieldElement, fieldIndex) {
-            expectProfileElementContainsField(sectionFieldElement, learnerProfileView.options.sectionOneFieldViews[fieldIndex]);
+            expectProfileElementContainsField(
+                sectionFieldElement,
+                learnerProfileView.options.sectionOneFieldViews[fieldIndex]
+            );
         });
 
         if (othersProfile) {
-            expect($('.profile-private--message').text()).toBe('This edX learner is currently sharing a limited profile.')
+            expect($('.profile-private--message').text())
+                .toBe('This edX learner is currently sharing a limited profile.');
         } else {
-            expect($('.profile-private--message').text()).toBe('You are currently sharing a limited profile.')
+            expect($('.profile-private--message').text()).toBe('You are currently sharing a limited profile.');
         }
     };
 

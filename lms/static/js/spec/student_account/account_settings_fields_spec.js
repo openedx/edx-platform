@@ -6,17 +6,13 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
         'js/student_account/models/user_account_model',
         'string_utils'],
     function (Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpecHelpers,
-              AccountSettingsFieldViewSpecHelpers, AccountSettingsFieldViews, UserAccountModel) {
+              AccountSettingsFieldViewSpecHelpers, AccountSettingsFieldViews) {
         'use strict';
 
         describe("edx.AccountSettingsFieldViews", function () {
 
             var requests,
                 timerCallback;
-
-            var USERNAME = 'Legolas',
-                FULLNAME = 'Legolas Thranduil',
-                EMAIL = 'legolas@woodland.middlearth';
 
             beforeEach(function () {
                 TemplateHelpers.installTemplate('templates/fields/field_readonly');
@@ -39,9 +35,11 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 var view = new AccountSettingsFieldViews.PasswordFieldView(fieldData).render();
                 view.$('.u-field-value > a').click();
                 AjaxHelpers.expectRequest(requests, 'POST', '/password_reset', "email=legolas%40woodland.middlearth");
-                AjaxHelpers.respondWithJson(requests, {"success": "true"})
-                FieldViewsSpecHelpers.expectMessageContains(view,
-                    "We've sent a message to legolas@woodland.middlearth. Click the link in the message to reset your password."
+                AjaxHelpers.respondWithJson(requests, {"success": "true"});
+                FieldViewsSpecHelpers.expectMessageContains(
+                    view,
+                    "We've sent a message to legolas@woodland.middlearth. " +
+                    "Click the link in the message to reset your password."
                 );
             });
 
@@ -61,18 +59,31 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 FieldViewsSpecHelpers.expectAjaxRequestWithData(requests, data);
                 AjaxHelpers.respondWithNoContent(requests);
 
-                AjaxHelpers.expectRequest(requests, 'POST', '/i18n/setlang/', 'language=' + data[fieldData.valueAttribute]);
+                AjaxHelpers.expectRequest(
+                    requests,
+                    'POST',
+                    '/i18n/setlang/',
+                    'language=' + data[fieldData.valueAttribute]
+                );
                 AjaxHelpers.respondWithNoContent(requests);
                 FieldViewsSpecHelpers.expectMessageContains(view, "Your changes have been saved.");
 
-                var data = {'language': FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]};
+                data = {'language': FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]};
                 view.$(selector).val(data[fieldData.valueAttribute]).change();
                 FieldViewsSpecHelpers.expectAjaxRequestWithData(requests, data);
                 AjaxHelpers.respondWithNoContent(requests);
 
-                AjaxHelpers.expectRequest(requests, 'POST', '/i18n/setlang/', 'language=' + data[fieldData.valueAttribute]);
+                AjaxHelpers.expectRequest(
+                    requests,
+                    'POST',
+                    '/i18n/setlang/',
+                    'language=' + data[fieldData.valueAttribute]
+                );
                 AjaxHelpers.respondWithError(requests, 500);
-                FieldViewsSpecHelpers.expectMessageContains(view, "You must sign out of edX and sign back in before your language changes take effect.");
+                FieldViewsSpecHelpers.expectMessageContains(
+                    view,
+                    "You must sign out of edX and sign back in before your language changes take effect."
+                );
             });
 
             it("reads and saves the value correctly for LanguageProficienciesFieldView", function() {

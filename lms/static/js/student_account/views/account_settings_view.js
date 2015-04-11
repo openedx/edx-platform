@@ -6,7 +6,7 @@
 
         var AccountSettingsView = Backbone.View.extend({
 
-            initialize: function (options) {
+            initialize: function () {
                 this.template = _.template($('#account_settings-tpl').text());
                 _.bindAll(this, 'render', 'renderFields', 'showLoadingError');
             },
