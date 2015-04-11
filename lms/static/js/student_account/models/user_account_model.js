@@ -1,7 +1,7 @@
 ;(function (define, undefined) {
     'use strict';
     define([
-        'gettext', 'underscore', 'backbone',
+        'gettext', 'underscore', 'backbone'
     ], function (gettext, _, Backbone) {
 
         var UserAccountModel = Backbone.Model.extend({
@@ -25,7 +25,7 @@
                 default_public_account_fields: []
             },
 
-            parse : function(response, xhr) {
+            parse : function(response) {
                 if (_.isNull(response)) {
                     return {};
                 }

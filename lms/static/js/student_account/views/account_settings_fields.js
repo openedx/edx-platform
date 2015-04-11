@@ -4,8 +4,6 @@
         'gettext', 'jquery', 'underscore', 'backbone', 'js/mustache', 'js/views/fields'
     ], function (gettext, $, _, Backbone, RequireMustache, FieldViews) {
 
-        var Mustache = window.Mustache || RequireMustache;
-
         var AccountSettingsFieldViews = {};
 
         AccountSettingsFieldViews.EmailFieldView = FieldViews.TextFieldView.extend({
@@ -31,7 +29,7 @@
                     url: '/i18n/setlang/',
                     data: data,
                     dataType: 'html',
-                    success: function (data, status, xhr) {
+                    success: function () {
                         view.showSuccessMessage();
                     },
                     error: function (xhr, status, error) {
@@ -65,7 +63,7 @@
                     type: 'POST',
                     url: view.options.linkHref,
                     data: data,
-                    success: function (data, status, xhr) {
+                    success: function () {
                         view.showSuccessMessage()
                     },
                     error: function (xhr, status, error) {
@@ -79,7 +77,7 @@
                     gettext('We\'ve sent a message to {email_address}. Click the link in the message to reset your password.'),
                     {'email_address': this.model.get(this.options.emailAttribute)}
                 );
-            },
+            }
         });
 
         AccountSettingsFieldViews.LanguageProficienciesFieldView = FieldViews.DropdownFieldView.extend({
@@ -149,7 +147,7 @@
                     url: this.options.disconnectUrl,
                     data: data,
                     dataType: 'html',
-                    success: function (data, status, xhr) {
+                    success: function () {
                         view.options.connected = false;
                         view.render();
                         view.showSuccessMessage();
@@ -166,7 +164,7 @@
 
             successMessage: function() {
                 return this.indicators['success'] + gettext('Successfully unlinked.');
-            },
+            }
         });
 
         return AccountSettingsFieldViews;
