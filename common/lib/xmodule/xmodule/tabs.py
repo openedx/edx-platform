@@ -193,6 +193,7 @@ class CourseTab(object):
             'edxnotes': EdxNotesTab,
             'syllabus': SyllabusTab,
             'instructor': InstructorTab,  # not persisted
+            'ccx_coach': CcxCoachTab,  # not persisted
         }
 
         tab_type = tab_dict.get('type')
@@ -375,6 +376,10 @@ class DiscussionTab(EnrolledOrStaffTab):
         )
 
     def can_display(self, course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):
+        if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
+            from ccx.overrides import get_current_ccx  # pylint: disable=import-error
+            if get_current_ccx():
+                return False
         super_can_display = super(DiscussionTab, self).can_display(
             course, settings, is_user_authenticated, is_user_staff, is_user_enrolled
         )
@@ -733,6 +738,42 @@ class InstructorTab(StaffTab):
         )
 
 
+class CcxCoachTab(CourseTab):
+    """
+    A tab for the custom course coaches.
+    """
+    type = 'ccx_coach'
+
+    def __init__(self, tab_dict=None):  # pylint: disable=unused-argument
+        super(CcxCoachTab, self).__init__(
+            name=_('CCX Coach'),
+            tab_id=self.type,
+            link_func=link_reverse_func('ccx_coach_dashboard'),
+        )
+
+    def can_display(self, course, settings, *args, **kw):
+        """
+        Since we don't get the user here, we use a thread local defined in the ccx
+        overrides to get it, then use the course to get the coach role and find out if
+        the user is one.
+        """
+        user_is_coach = False
+        if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
+            from opaque_keys.edx.locations import SlashSeparatedCourseKey
+            from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
+            from ccx.overrides import get_current_request  # pylint: disable=import-error
+            course_id = course.id.to_deprecated_string()
+            course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+            role = CourseCcxCoachRole(course_key)
+            request = get_current_request()
+            if request is not None:
+                user_is_coach = role.has_user(request.user)
+        super_can_display = super(CcxCoachTab, self).can_display(
+            course, settings, *args, **kw
+        )
+        return user_is_coach and super_can_display
+
+
 class CourseTabList(List):
     """
     An XBlock field class that encapsulates a collection of Tabs in a course.
@@ -833,6 +874,9 @@ class CourseTabList(List):
         instructor_tab = InstructorTab()
         if instructor_tab.can_display(course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):
             yield instructor_tab
+        ccx_coach_tab = CcxCoachTab()
+        if ccx_coach_tab.can_display(course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):
+            yield ccx_coach_tab
 
     @staticmethod
     def iterate_displayable_cms(

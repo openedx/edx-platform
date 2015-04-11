@@ -11,7 +11,7 @@ from datetime import datetime
 import dateutil.parser
 from lazy import lazy
 
-
+from xmodule.exceptions import UndefinedContext
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.graders import grader_from_conf
 from xmodule.tabs import CourseTabList
@@ -835,8 +835,16 @@ class CourseFields(object):
     )
 
 
+class CourseModule(CourseFields, SequenceModule):  # pylint: disable=abstract-method
+    """
+    The CourseDescriptor needs its module_class to be a SequenceModule, but some code that
+    expects a CourseDescriptor to have all its fields can fail if it gets a SequenceModule instead.
+    This class is to make sure that all the fields are present in all cases.
+    """
+
+
 class CourseDescriptor(CourseFields, SequenceDescriptor):
-    module_class = SequenceModule
+    module_class = CourseModule
 
     def __init__(self, *args, **kwargs):
         """
@@ -1213,6 +1221,14 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
 
         """
+        # If this descriptor has been bound to a student, return the corresponding
+        # XModule. If not, just use the descriptor itself
+        try:
+            module = getattr(self, '_xmodule', None)
+            if not module:
+                module = self
+        except UndefinedContext:
+            module = self
 
         all_descriptors = []
         graded_sections = {}

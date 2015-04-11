@@ -243,5 +243,18 @@
       data-add-button-label="${_("Add Community TA")}"
     ></div>
   %endif
-
+  
+  %if section_data['access']['instructor'] and settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
+    <div class="auth-list-container"
+      data-rolename="ccx_coach"
+      data-display-name="${_("CCX Coaches")}"
+      data-info-text="
+        ${_("CCX Coaches are able to create their own Custom Courses "
+            "based on this course, which they can use to provide personalized "
+            "instruction to their own students based in this course material.")}"
+      data-list-endpoint="${section_data['list_course_role_members_url']}"
+      data-modify-endpoint="${section_data['modify_access_url']}"
+      data-add-button-label="${_("Add CCX Coach")}"
+    ></div>
+  %endif
 </div>

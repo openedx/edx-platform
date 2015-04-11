@@ -50,6 +50,9 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.fields import Date
+
+from courseware.models import StudentFieldOverride
 
 import instructor_task.api
 import instructor.views.api
@@ -61,8 +64,8 @@ from instructor_task.api_helper import AlreadyRunningError
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
 
 from .test_tools import msk_from_problem_urlname
-from ..views.tools import get_extended_due
 
+DATE_FIELD = Date()
 EXPECTED_CSV_HEADER = (
     '"code","redeem_code_url","course_id","company_name","created_by","redeemed_by","invoice_id","purchaser",'
     '"customer_reference_number","internal_reference"'
@@ -3112,6 +3115,23 @@ class TestInstructorAPIHelpers(TestCase):
     def test_msk_from_problem_urlname_error(self):
         args = ('notagoodcourse', 'L2Node1')
         msk_from_problem_urlname(*args)
+
+
+def get_extended_due(course, unit, user):
+    """
+    Gets the overridden due date for the given user on the given unit.  Returns
+    `None` if there is no override set.
+    """
+    try:
+        override = StudentFieldOverride.objects.get(
+            course_id=course.id,
+            student=user,
+            location=unit.location,
+            field='due'
+        )
+        return DATE_FIELD.from_json(json.loads(override.value))
+    except StudentFieldOverride.DoesNotExist:
+        return None
 
 
 class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):

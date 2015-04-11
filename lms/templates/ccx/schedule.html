@@ -1,0 +1,128 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="jsextra">
+  <script>  
+    var save_url = '${save_url}';
+    var schedule = ${schedule};
+  </script>
+    <script src="${static.url('js/vendor/backbone-min.js')}"></script>
+  <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
+  <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+  <style>
+    .ui-timepicker-list { z-index: 100000; }
+    .ui-datepicker { z-index: 100000 !important; }
+    input.date, input.time { width: auto !important; display: inline !important; }
+  </style>
+  <%static:js group='ccx'/>
+</%block>
+
+%for template_name in ["schedule"]:
+  <script type="text/template" id="ccx-${template_name}-template">
+    <%static:include path="ccx/${template_name}.underscore" />
+  </script>
+%endfor
+
+<div class="ccx-schedule-container">
+  <div id="ccx-schedule"></div>
+  <div id="new-ccx-schedule"></div>
+</div>
+
+<section id="enter-date-modal" class="modal" aria-hidden="true">
+  <div class="inner-wrapper" role="dialog">
+    <button class="close-modal">
+      <i class="fa-remove"></i>
+      <span class="sr">
+        ${_("Close")}
+      </span>
+    </button>
+    <header>
+      <h2></h2>
+    </header>
+    <form role="form">
+      <div class="field datepair">
+        <label></label>
+        <input placeholder="Date" class="date" type="text" name="date"/ size="11">
+        <input placeholder="Time" class="time" type="text" name="time"/ size="6">
+      </div>
+      <div class="field">
+        <button type="submit" class="btn btn-primary">${_('Set date')}</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<div class="ccx-schedule-sidebar">
+  <div class="ccx-sidebar-panel" id="dirty-schedule">
+    <h2>${_('Save changes')}</h2>
+    <form role="form">
+      <p>${_("You have unsaved changes.")}</p>
+      <div class="field">
+        <br/>
+        <button id="save-changes">${_("Save changes")}</button>
+      </div>
+    </form>
+  </div>
+  <div class="ccx-sidebar-panel" id="ajax-error">
+    <h2>${_('Error')}</h2>
+    <p>${_("There was an error saving changes.")}</p>
+  </div>
+  <div class="ccx-sidebar-panel">
+    <h2>${_('Schedule a Unit')}</h2>
+    <form role="form" id="add-unit" name="add-unit" class="ccx-form">
+      <div class="field">
+        <b>${_('Section')}</b><br/>
+        <select name="chapter"></select>
+      </div>
+      <div class="field">
+        <b>${_('Subsection')}</b><br/>
+        <select name="sequential"></select>
+      </div>
+      <div class="field">
+        <b>${_('Unit')}</b><br/>
+        <select name="vertical"></select>
+      </div>
+      <div class="field datepair">
+        <b>${_('Start Date')}</b><br/>
+        <input placeholder="Date" type="date" class="date" name="start_date"/>
+        <input placeholder="time" type="time" class="time" name="start_time"/>
+      </div>
+      <div class="field datepair">
+        <b>${_('Due Date')}</b> ${_('(Optional)')}<br/>
+        <input placeholder="Date" type="date" class="date" name="due_date"/>
+        <input placeholder="time" type="time" class="time" name="due_time"/>
+      </div>
+      <div class="field">
+        <br/>
+        <button id="add-unit-button">${_('Add Unit')}</button>
+      </div>
+      <div class="field">
+        <br/>
+        <button id="add-all">${_('Add All Units')}</button>
+      </div>
+    </form>
+    <div id="all-units-added">
+      ${_("All units have been added.")}
+    </div>
+  </div>
+</div>
+
+<script>
+$(function() {
+    schedule_template = _.template($('#ccx-schedule-template').html());
+    var view = new edx.ccx.schedule.ScheduleView({
+        el: $('#new-ccx-schedule')
+    });
+    view.render();
+    //ccx_schedule.render();
+    $('.datepair .time').timepicker({
+        'showDuration': true,
+        'timeFormat': 'G:i'
+    });
+    $('.datepair .date').datepicker({
+        'dateFormat': 'yy-mm-dd',
+        'autoclose': true
+    });
+});
+</script>

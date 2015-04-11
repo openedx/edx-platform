@@ -54,7 +54,6 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.util.duedate import get_extended_due_date
 from xmodule_modifiers import (
     replace_course_urls,
     replace_jump_to_id_urls,
@@ -71,6 +70,8 @@ from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from util import milestones_helpers
 from util.module_utils import yield_dynamic_descriptor_descendents
 from verify_student.services import ReverificationService
+
+from .field_overrides import OverrideFieldData
 
 log = logging.getLogger(__name__)
 
@@ -171,7 +172,7 @@ def toc_for_course(request, course, active_chapter, active_section, field_data_c
                     sections.append({'display_name': section.display_name_with_default,
                                      'url_name': section.url_name,
                                      'format': section.format if section.format is not None else '',
-                                     'due': get_extended_due_date(section),
+                                     'due': section.due,
                                      'active': active,
                                      'graded': section.graded,
                                      })
@@ -497,10 +498,16 @@ def get_module_system_for_user(user, field_data_cache,
             request_token=request_token
         )
         # rebinds module to a different student.  We'll change system, student_data, and scope_ids
+        authored_data = OverrideFieldData.wrap(
+            real_user, module.descriptor._field_data  # pylint: disable=protected-access
+        )
         module.descriptor.bind_for_student(
             inner_system,
-            LmsFieldData(module.descriptor._field_data, inner_student_data),  # pylint: disable=protected-access
+            LmsFieldData(authored_data, inner_student_data),
             real_user.id,
+        )
+        module.descriptor.scope_ids = (
+            module.descriptor.scope_ids._replace(user_id=real_user.id)  # pylint: disable=protected-access
         )
         module.scope_ids = module.descriptor.scope_ids  # this is needed b/c NamedTuples are immutable
         # now bind the module to the new ModuleSystem instance and vice-versa
@@ -670,13 +677,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         request_token (str): A unique token for this request, used to isolate xblock rendering
     """
 
-    # Do not check access when it's a noauth request.
-    if getattr(user, 'known', True):
-        # Short circuit--if the user shouldn't have access, bail without doing any work
-        if not has_access(user, 'load', descriptor, course_id):
-            return None
-
-    (system, field_data) = get_module_system_for_user(
+    (system, student_data) = get_module_system_for_user(
         user=user,
         field_data_cache=field_data_cache,  # These have implicit user bindings, the rest of args are considered not to
         descriptor=descriptor,
@@ -691,7 +692,18 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         request_token=request_token
     )
 
-    descriptor.bind_for_student(system, field_data, user.id)  # pylint: disable=protected-access
+    authored_data = OverrideFieldData.wrap(user, descriptor._field_data)  # pylint: disable=protected-access
+    descriptor.bind_for_student(system, LmsFieldData(authored_data, student_data), user.id)
+    descriptor.scope_ids = descriptor.scope_ids._replace(user_id=user.id)  # pylint: disable=protected-access
+
+    # Do not check access when it's a noauth request.
+    # Not that the access check needs to happen after the descriptor is bound
+    # for the student, since there may be field override data for the student
+    # that affects xblock visibility.
+    if getattr(user, 'known', True):
+        if not has_access(user, 'load', descriptor, course_id):
+            return None
+
     return descriptor
 
 

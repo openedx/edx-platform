@@ -208,7 +208,14 @@ FEATURES = {
     'ENABLE_INSTRUCTOR_BACKGROUND_TASKS': True,
 
     # Enable instructor to assign individual due dates
+    # Note: In order for this feature to work, you must also add
+    # 'courseware.student_field_overrides.IndividualStudentOverrideProvider' to
+    # the setting FIELD_OVERRIDE_PROVIDERS, in addition to setting this flag to
+    # True.
     'INDIVIDUAL_DUE_DATES': False,
+
+    # Enable Custom Courses for EdX
+    'CUSTOM_COURSES_EDX': False,
 
     # Enable legacy instructor dashboard
     'ENABLE_INSTRUCTOR_LEGACY_DASHBOARD': True,
@@ -1196,6 +1203,9 @@ reverify_js = [
     'js/verify_student/incourse_reverify.js',
 ]
 
+ccx_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/ccx/**/*.js'))
+
+
 PIPELINE_CSS = {
     'style-vendor': {
         'source_filenames': [
@@ -1389,6 +1399,10 @@ PIPELINE_JS = {
     'reverify': {
         'source_filenames': reverify_js,
         'output_filename': 'js/reverify.js'
+    },
+    'ccx': {
+        'source_filenames': ccx_js,
+        'output_filename': 'js/ccx.js'
     }
 }
 
@@ -2216,3 +2230,9 @@ ECOMMERCE_API_TIMEOUT = 5
 
 # Reverification checkpoint name pattern
 CHECKPOINT_PATTERN = r'(?P<checkpoint_name>\w+)'
+
+# For the fields override feature
+# If using FEATURES['INDIVIDUAL_DUE_DATES'], you should add
+# 'courseware.student_field_overrides.IndividualStudentOverrideProvider' to
+# this setting.
+FIELD_OVERRIDE_PROVIDERS = ()

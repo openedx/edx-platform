@@ -73,7 +73,7 @@ from instructor.enrollment import (
     send_beta_role_email,
     unenroll_email,
 )
-from instructor.access import list_with_level, allow_access, revoke_access, update_forum_role
+from instructor.access import list_with_level, allow_access, revoke_access, ROLES, update_forum_role
 from instructor.offline_gradecalc import student_grades
 import instructor_analytics.basic
 import instructor_analytics.distributions
@@ -679,7 +679,7 @@ def bulk_beta_modify_access(request, course_id):
 @common_exceptions_400
 @require_query_params(
     unique_student_identifier="email or username of user to change access",
-    rolename="'instructor', 'staff', or 'beta'",
+    rolename="'instructor', 'staff', 'beta', or 'ccx_coach'",
     action="'allow' or 'revoke'"
 )
 def modify_access(request, course_id):
@@ -691,7 +691,7 @@ def modify_access(request, course_id):
 
     Query parameters:
     unique_student_identifer is the target user's username or email
-    rolename is one of ['instructor', 'staff', 'beta']
+    rolename is one of ['instructor', 'staff', 'beta', 'ccx_coach']
     action is one of ['allow', 'revoke']
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
@@ -720,10 +720,10 @@ def modify_access(request, course_id):
     rolename = request.GET.get('rolename')
     action = request.GET.get('action')
 
-    if rolename not in ['instructor', 'staff', 'beta']:
-        return HttpResponseBadRequest(strip_tags(
-            "unknown rolename '{}'".format(rolename)
-        ))
+    if rolename not in ROLES:
+        error = strip_tags("unknown rolename '{}'".format(rolename))
+        log.error(error)
+        return HttpResponseBadRequest(error)
 
     # disallow instructors from removing their own instructor access.
     if rolename == 'instructor' and user == request.user and action != 'allow':
@@ -762,7 +762,7 @@ def list_course_role_members(request, course_id):
     List instructors and staff.
     Requires instructor access.
 
-    rolename is one of ['instructor', 'staff', 'beta']
+    rolename is one of ['instructor', 'staff', 'beta', 'ccx_coach']
 
     Returns JSON of the form {
         "course_id": "some/course/id",
@@ -783,7 +783,7 @@ def list_course_role_members(request, course_id):
 
     rolename = request.GET.get('rolename')
 
-    if rolename not in ['instructor', 'staff', 'beta']:
+    if rolename not in ROLES:
         return HttpResponseBadRequest()
 
     def extract_user_info(user):

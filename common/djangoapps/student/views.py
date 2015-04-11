@@ -662,6 +662,17 @@ def dashboard(request):
                                              if course.pre_requisite_courses)
     courses_requirements_not_met = get_pre_requisite_courses_not_completed(user, courses_having_prerequisites)
 
+    ccx_membership_triplets = []
+    if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
+        from ccx import ACTIVE_CCX_KEY
+        from ccx.utils import get_ccx_membership_triplets
+        ccx_membership_triplets = get_ccx_membership_triplets(
+            user, course_org_filter, org_filter_out_set
+        )
+        # should we deselect any active CCX at this time so that we don't have
+        # to change the URL for viewing a course?  I think so.
+        request.session[ACTIVE_CCX_KEY] = None
+
     context = {
         'enrollment_message': enrollment_message,
         'course_enrollment_pairs': course_enrollment_pairs,
@@ -693,6 +704,7 @@ def dashboard(request):
         'provider_states': [],
         'order_history_list': order_history_list,
         'courses_requirements_not_met': courses_requirements_not_met,
+        'ccx_membership_triplets': ccx_membership_triplets,
     }
 
     if third_party_auth.is_enabled():
@@ -1809,6 +1821,16 @@ def activate_account(request, key):
             for cea in ceas:
                 if cea.auto_enroll:
                     CourseEnrollment.enroll(student[0], cea.course_id)
+
+            # enroll student in any pending CCXs he/she may have if auto_enroll flag is set
+            if settings.FEATURES.get('CUSTOM_COURSES_EDX'):
+                from ccx.models import CcxMembership, CcxFutureMembership
+                ccxfms = CcxFutureMembership.objects.filter(
+                    email=student[0].email
+                )
+                for ccxfm in ccxfms:
+                    if ccxfm.auto_enroll:
+                        CcxMembership.auto_enroll(student[0], ccxfm)
 
         resp = render_to_response(
             "registration/activation_complete.html",
