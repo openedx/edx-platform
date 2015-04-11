@@ -4,7 +4,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
         'js/student_account/models/user_account_model',
         'js/student_account/views/account_settings_view'
        ],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, FieldViews, UserAccountModel, AccountSettingsView) {
+    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, FieldViews, UserAccountModel,
+              AccountSettingsView) {
         'use strict';
 
         describe("edx.user.AccountSettingsView", function () {
@@ -47,7 +48,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                             }
                         ]
                     }
-                ]
+                ];
 
                 var accountSettingsView = new AccountSettingsView({
                     el: $('.wrapper-account-settings'),
@@ -94,7 +95,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 accountSettingsView.renderFields();
                 Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, false);
                 Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
-                Helpers.expectSettingsSectionsAndFieldsToBeRendered(accountSettingsView)
+                Helpers.expectSettingsSectionsAndFieldsToBeRendered(accountSettingsView);
             });
 
         });

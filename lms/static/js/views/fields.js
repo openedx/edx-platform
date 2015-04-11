@@ -52,7 +52,7 @@
             },
 
             modelValueIsSet: function() {
-                return (this.modelValue() == true);
+                return (this.modelValue() === true);
             },
 
             message: function (message) {
@@ -102,7 +102,7 @@
                 this.lastSuccessMessageContext = context;
 
                 setTimeout(function () {
-                    if ((context === view.lastSuccessMessageContext) && (view.message().html() == successMessage)) {
+                    if ((context === view.lastSuccessMessageContext) && (view.message().html() === successMessage)) {
                         view.showHelpMessage();
                     }
                 }, messageRevertDelay);
@@ -111,9 +111,11 @@
             showErrorMessage: function (xhr) {
                 if (xhr.status === 400) {
                     try {
-                        var errors = JSON.parse(xhr.responseText);
-                        var validationErrorMessage = Mustache.escapeHtml(errors['field_errors'][this.options.valueAttribute]['user_message']);
-                        var message = this.indicators['validationError'] + validationErrorMessage;
+                        var errors = JSON.parse(xhr.responseText),
+                            validationErrorMessage = Mustache.escapeHtml(
+                                errors.field_errors[this.options.valueAttribute].user_message
+                            ),
+                            message = this.indicators.validationError + validationErrorMessage;
                         this.message(message);
                     } catch (error) {
                         this.message(this.getMessage('error'));
@@ -127,7 +129,9 @@
         FieldViews.EditableFieldView = FieldViews.FieldView.extend({
 
             initialize: function (options) {
-                _.bindAll(this, 'saveAttributes', 'saveSucceeded', 'showDisplayMode', 'showEditMode', 'startEditing', 'finishEditing');
+                _.bindAll(this, 'saveAttributes', 'saveSucceeded', 'showDisplayMode', 'showEditMode',
+                    'startEditing', 'finishEditing'
+                );
                 this._super(options);
 
                 this.editable = _.isUndefined(this.options.editable) ? 'always': this.options.editable;
@@ -183,13 +187,13 @@
                 this.$el.addClass('mode-edit');
             },
 
-            startEditing: function (event) {
+            startEditing: function () {
                 if (this.editable === 'toggle' && this.mode !== 'edit') {
                     this.showEditMode(true);
                 }
             },
 
-            finishEditing: function(event) {
+            finishEditing: function() {
                 if (this.fieldValue() !== this.modelValue()) {
                     this.saveValue();
                 } else {
@@ -268,7 +272,7 @@
                 this.$('.u-field-value input').val(Mustache.escapeHtml(value));
             },
 
-            saveValue: function (event) {
+            saveValue: function () {
                 var attributes = {};
                 attributes[this.options.valueAttribute] = this.fieldValue();
                 this.saveAttributes(attributes);
@@ -315,15 +319,15 @@
 
             modelValueIsSet: function() {
                 var value = this.modelValue();
-                if (_.isUndefined(value) || _.isNull(value) || value == '') {
+                if (_.isUndefined(value) || _.isNull(value) || value === '') {
                     return false;
                 } else {
-                    return !(_.isUndefined(this.optionForValue(value)))
+                    return !(_.isUndefined(this.optionForValue(value)));
                 }
             },
 
             optionForValue: function(value) {
-                return _.find(this.options.options, function(option) { return option[0] == value; })
+                return _.find(this.options.options, function(option) { return option[0] === value; });
             },
 
             fieldValue: function () {
@@ -420,7 +424,7 @@
                 return this;
             },
 
-            adjustTextareaHeight: function(event) {
+            adjustTextareaHeight: function() {
                 var textarea = this.$('textarea');
                 textarea.css('height', 'auto').css('height', textarea.prop('scrollHeight') + 10);
             },
@@ -490,11 +494,11 @@
                 return this;
             },
 
-            linkClicked: function () {
+            linkClicked: function (event) {
                 event.preventDefault();
             }
         });
 
         return FieldViews;
-    })
+    });
 }).call(this, define || RequireJS.define);
