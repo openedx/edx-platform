@@ -50,13 +50,13 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
         };
 
         var createErrorMessage = function(attribute, user_message) {
-            var field_errors = {}
+            var field_errors = {};
             field_errors[attribute] = {
                 "user_message": user_message
-            }
+            };
             return {
                 "field_errors": field_errors
-            }
+            };
         };
 
         var expectTitleToBe = function(view, expectedTitle) {
@@ -80,7 +80,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
         var verifyMessageUpdates = function (view, data, timerCallback) {
 
-            var message = 'Here to help!'
+            var message = 'Here to help!';
 
             view.message(message);
             expectMessageContains(view, message);
@@ -89,11 +89,11 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             expectMessageContains(view, view.helpMessage);
 
             view.showInProgressMessage();
-            expectMessageContains(view, view.indicators['inProgress']);
-            expectMessageContains(view, view.messages['inProgress']);
+            expectMessageContains(view, view.indicators.inProgress);
+            expectMessageContains(view, view.messages.inProgress);
 
             view.showSuccessMessage();
-            expectMessageContains(view, view.indicators['success']);
+            expectMessageContains(view, view.indicators.success);
             expectMessageContains(view, view.getMessage('success'));
 
             expect(timerCallback).not.toHaveBeenCalled();
@@ -102,24 +102,24 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 responseText: JSON.stringify(createErrorMessage(data.valueAttribute, 'Ops, try again!.')),
                 status: 400
             });
-            expectMessageContains(view, view.indicators['validationError']);
+            expectMessageContains(view, view.indicators.validationError);
 
             view.showErrorMessage({status: 500});
-            expectMessageContains(view, view.indicators['error']);
-            expectMessageContains(view, view.indicators['error']);
+            expectMessageContains(view, view.indicators.error);
+            expectMessageContains(view, view.indicators.error);
         };
 
-        var verifySuccessMessageReset = function (view, data, timerCallback) {
+        var verifySuccessMessageReset = function (view) {
             view.showHelpMessage();
             expectMessageContains(view, view.helpMessage);
             view.showSuccessMessage();
-            expectMessageContains(view, view.indicators['success']);
+            expectMessageContains(view, view.indicators.success);
             jasmine.Clock.tick(5000);
             // Message gets reset
             expectMessageContains(view, view.helpMessage);
 
             view.showSuccessMessage();
-            expectMessageContains(view, view.indicators['success']);
+            expectMessageContains(view, view.indicators.success);
             // But if we change the message, it should not get reset.
             view.message("Do not reset this!");
             jasmine.Clock.tick(5000);
@@ -133,7 +133,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             if (data.editable === 'toggle') {
                 expect(view.el).toHaveClass('mode-placeholder');
                 expectTitleToBe(view, data.title);
-                expectMessageContains(view, view.indicators['canEdit']);
+                expectMessageContains(view, view.indicators.canEdit);
                 view.$el.click();
             } else {
                 expectTitleAndMessageToBe(view, data.title, data.helpMessage);
@@ -145,8 +145,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             view.$(data.valueInputSelector).val(data.validValue).change();
             // When the value in the field is changed
             expect(view.fieldValue()).toBe(data.validValue);
-            expectMessageContains(view, view.indicators['inProgress']);
-            expectMessageContains(view, view.messages['inProgress']);
+            expectMessageContains(view, view.indicators.inProgress);
+            expectMessageContains(view, view.messages.inProgress);
             request_data[data.valueAttribute] = data.validValue;
             AjaxHelpers.expectJsonRequest(
                 requests, 'PATCH', url, request_data
@@ -158,7 +158,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 expect(view.el).toHaveClass('mode-display');
                 view.$el.click();
             } else {
-                expectMessageContains(view, view.indicators['success']);
+                expectMessageContains(view, view.indicators.success);
             }
 
             view.$(data.valueInputSelector).val(data.invalidValue1).change();
@@ -168,8 +168,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             );
             AjaxHelpers.respondWithError(requests, 500);
             // When server returns a 500 error
-            expectMessageContains(view, view.indicators['error']);
-            expectMessageContains(view, view.messages['error']);
+            expectMessageContains(view, view.indicators.error);
+            expectMessageContains(view, view.messages.error);
             expect(view.el).toHaveClass('mode-edit');
 
             view.$(data.valueInputSelector).val(data.invalidValue2).change();
@@ -179,7 +179,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             );
             AjaxHelpers.respondWithError(requests, 400, createErrorMessage(data.valueAttribute, data.validationError));
             // When server returns a validation error
-            expectMessageContains(view, view.indicators['validationError']);
+            expectMessageContains(view, view.indicators.validationError);
             expectMessageContains(view, data.validationError);
             expect(view.el).toHaveClass('mode-edit');
 
@@ -200,22 +200,20 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
         };
 
         var verifyTextField = function (view, data, requests) {
-            var selector = '.u-field-value > input';
             verifyEditableField(view, _.extend({
                     valueSelector: '.u-field-value',
                     valueInputSelector: '.u-field-value > input'
                 }, data
             ), requests);
-        }
+        };
 
         var verifyDropDownField = function (view, data, requests) {
-            var selector = '.u-field-value > select';
             verifyEditableField(view, _.extend({
                     valueSelector: '.u-field-value',
                     valueInputSelector: '.u-field-value > select'
                 }, data
             ), requests);
-        }
+        };
 
         return {
             SELECT_OPTIONS: SELECT_OPTIONS,

@@ -8,8 +8,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
         'js/student_profile/views/learner_profile_fields',
         'js/student_profile/views/learner_profile_factory'
         ],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers, FieldViews, UserAccountModel, UserPreferencesModel,
-              LearnerProfileView, LearnerProfileFields, LearnerProfilePage) {
+    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers, FieldViews,
+              UserAccountModel, UserPreferencesModel, LearnerProfileView, LearnerProfileFields, LearnerProfilePage) {
         'use strict';
 
         describe("edx.user.LearnerProfileFactory", function () {
@@ -33,7 +33,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     'country_options': Helpers.FIELD_OPTIONS,
                     'language_options': Helpers.FIELD_OPTIONS,
                     'has_preferences_access': true
-                })
+                });
             };
 
             it("show loading error when UserAccountModel fails to load", function() {
@@ -91,7 +91,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 AjaxHelpers.respondWithJson(requests, Helpers.USER_PREFERENCES_DATA);
 
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
-                LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView)
+                LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView);
             });
             
             it("renders the full profile after models are successfully fetched", function() {
@@ -102,15 +102,15 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     learnerProfileView = context.learnerProfileView;
 
                 var accountSettingsData = Helpers.USER_ACCOUNTS_DATA;
-                accountSettingsData['year_of_birth'] = 1989;
-                accountSettingsData['requires_parental_consent'] = false;
+                accountSettingsData.year_of_birth = 1989;
+                accountSettingsData.requires_parental_consent = false;
 
                 AjaxHelpers.respondWithJson(requests, accountSettingsData);
                 AjaxHelpers.respondWithJson(requests, Helpers.USER_PREFERENCES_DATA);
 
                 // sets the profile for full view.
                 context.accountPreferencesModel.set({account_privacy: 'all_users'});
-                LearnerProfileHelpers.expectProfileSectionsAndFieldsToBeRendered(learnerProfileView, false)
+                LearnerProfileHelpers.expectProfileSectionsAndFieldsToBeRendered(learnerProfileView, false);
             });
 
             it("renders the limited profile for undefined 'year_of_birth'", function() {
@@ -123,7 +123,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 AjaxHelpers.respondWithJson(requests, Helpers.USER_ACCOUNTS_DATA);
                 AjaxHelpers.respondWithJson(requests, Helpers.USER_PREFERENCES_DATA);
 
-                LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView)
+                LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView);
             });
 
             it("renders the limited profile for under 13 users", function() {
@@ -134,12 +134,12 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     learnerProfileView = context.learnerProfileView;
 
                 var accountSettingsData = Helpers.USER_ACCOUNTS_DATA;
-                accountSettingsData['requires_parental_consent'] = true;
+                accountSettingsData.requires_parental_consent = true;
 
                 AjaxHelpers.respondWithJson(requests, accountSettingsData);
                 AjaxHelpers.respondWithJson(requests, Helpers.USER_PREFERENCES_DATA);
 
-                LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView)
+                LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView);
             });
         });
     });

@@ -45,5 +45,5 @@
             }
         });
         return UserAccountModel;
-    })
+    });
 }).call(this, define || RequireJS.define);
