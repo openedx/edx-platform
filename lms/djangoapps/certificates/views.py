@@ -342,7 +342,7 @@ def render_html_view(request):
     )
 
     # Translators:  Certificate Types correspond to the different enrollment options available for a given course
-    context['certificate_type_title'] = _('{certificate_type} Certfificate').format(
+    context['certificate_type_title'] = _('{certificate_type} Certificate').format(
         certificate_type=context.get('certificate_type')
     )
 
