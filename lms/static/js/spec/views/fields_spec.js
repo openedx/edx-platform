@@ -6,8 +6,6 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
         'use strict';
 
         var USERNAME = 'Legolas',
-            FULLNAME = 'Legolas Thranduil',
-            EMAIL = 'legolas@woodland.middlearth',
             BIO = "My Name is Theon Greyjoy. I'm member of House Greyjoy";
 
         describe("edx.FieldViews", function () {
@@ -75,7 +73,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     title: 'Preferred Language',
                     valueAttribute: 'language',
                     helpMessage: 'Your preferred language.'
-                })
+                });
 
                 var view = new fieldViewClass(fieldData);
                 view.saveAttributes(
@@ -86,7 +84,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 var request = requests[0];
                 expect(request.method).toBe('PATCH');
                 expect(request.requestHeaders['Content-Type']).toBe('application/merge-patch+json;charset=utf-8');
-                expect(request.requestHeaders['Priority']).toBe('Urgent');
+                expect(request.requestHeaders.Priority).toBe('Urgent');
                 expect(request.requestBody).toBe('{"language":"ur"}');
             });
 
@@ -199,7 +197,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     title: 'About me',
                     valueAttribute: 'bio',
                     helpMessage: 'Wicked is good',
-                    placeholderValue: "Tell other edX learners a little about yourself: where you live, what your interests are, why you’re taking courses on edX, or what you hope to learn.",
+                    placeholderValue: "Tell other edX learners a little about yourself: where you live, " +
+                        "what your interests are, why you’re taking courses on edX, or what you hope to learn.",
                     editable: 'never'
                 });
 
@@ -210,7 +209,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 expect(view.el).toHaveClass('mode-hidden');
                 expect(view.$('.u-field-value').text()).toBe(fieldData.placeholderValue);
 
-                var bio = 'Too much to tell!'
+                var bio = 'Too much to tell!';
                 view.model.set({'bio': bio});
                 expect(view.el).toHaveClass('mode-display');
                 expect(view.$('.u-field-value').text()).toBe(bio);
@@ -222,12 +221,13 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 requests = AjaxHelpers.requests(this);
 
-                var valueInputSelector = '.u-field-value > textarea'
+                var valueInputSelector = '.u-field-value > textarea';
                 var fieldData = FieldViewsSpecHelpers.createFieldData(FieldViews.TextareaFieldView, {
                     title: 'About me',
                     valueAttribute: 'bio',
                     helpMessage: 'Wicked is good',
-                    placeholderValue: "Tell other edX learners a little about yourself: where you live, what your interests are, why you’re taking courses on edX, or what you hope to learn.",
+                    placeholderValue: "Tell other edX learners a little about yourself: where you live, " +
+                        "what your interests are, why you’re taking courses on edX, or what you hope to learn.",
                     editable: 'toggle'
 
                 });
@@ -236,7 +236,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 var view = new FieldViews.TextareaFieldView(fieldData).render();
 
                 FieldViewsSpecHelpers.expectTitleToBe(view, fieldData.title);
-                FieldViewsSpecHelpers.expectMessageContains(view, view.indicators['canEdit']);
+                FieldViewsSpecHelpers.expectMessageContains(view, view.indicators.canEdit);
                 expect(view.el).toHaveClass('mode-placeholder');
                 expect(view.$('.u-field-value').text()).toBe(fieldData.placeholderValue);
 

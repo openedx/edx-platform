@@ -6,7 +6,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
         'js/student_account/views/account_settings_view'
         ],
     function (Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, Helpers,
-              AccountSettingsFieldViewSpecHelpers, AccountSettingsPage, AccountSettingsView) {
+              AccountSettingsFieldViewSpecHelpers, AccountSettingsPage) {
         'use strict';
 
         describe("edx.user.AccountSettingsFactory", function () {
@@ -44,7 +44,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                         'disconnect_url': 'yetanother2.com/auth/disconnect'
                     }
                 ]
-            }
+            };
 
             var requests;
 
@@ -103,7 +103,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
                 Helpers.expectSettingsSectionsButNotFieldsToBeRendered(accountSettingsView);
 
-                var request = requests[1];
+                request = requests[1];
                 expect(request.method).toBe('GET');
                 expect(request.url).toBe(Helpers.USER_PREFERENCES_API_URL);
 
@@ -131,7 +131,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, false);
                 Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
-                Helpers.expectSettingsSectionsAndFieldsToBeRendered(accountSettingsView)
+                Helpers.expectSettingsSectionsAndFieldsToBeRendered(accountSettingsView);
             });
 
             it("expects all fields to behave correctly", function () {

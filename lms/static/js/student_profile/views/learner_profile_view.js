@@ -6,7 +6,7 @@
 
         var LearnerProfileView = Backbone.View.extend({
 
-            initialize: function (options) {
+            initialize: function () {
                 this.template = _.template($('#learner_profile-tpl').text());
                 _.bindAll(this, 'showFullProfile', 'render', 'renderFields', 'showLoadingError');
                 this.listenTo(this.options.preferencesModel, "change:" + 'account_privacy', this.render);

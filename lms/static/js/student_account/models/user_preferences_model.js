@@ -12,5 +12,5 @@
         });
 
         return UserPreferencesModel;
-    })
+    });
 }).call(this, define || RequireJS.define);

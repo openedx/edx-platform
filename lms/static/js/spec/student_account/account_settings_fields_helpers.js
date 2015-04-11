@@ -22,7 +22,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             view.$(selector).click();
             FieldViewsSpecHelpers.expectMessageContains(view, 'Linking');
             expect(view.redirect_to).toHaveBeenCalledWith(data.connectUrl);
-        }
+        };
 
         return {
             verifyAuthField: verifyAuthField

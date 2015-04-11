@@ -78,7 +78,10 @@
                     editable: editable,
                     showMessages: false,
                     title: gettext('About me'),
-                    placeholderValue: gettext("Tell other edX learners a little about yourself: where you live, what your interests are, why you're taking courses on edX, or what you hope to learn."),
+                    placeholderValue: gettext(
+                        "Tell other edX learners a little about yourself: where you live, what your interests are, " +
+                        "why you're taking courses on edX, or what you hope to learn."
+                    ),
                     valueAttribute: "bio",
                     helpMessage: ''
                 })
@@ -86,7 +89,7 @@
 
             var learnerProfileView = new LearnerProfileView({
                 el: learnerProfileElement,
-                ownProfile: options.own_profile,
+                own_profile: options.own_profile,
                 has_preferences_access: options.has_preferences_access,
                 accountSettingsModel: accountSettingsModel,
                 preferencesModel: accountPreferencesModel,
