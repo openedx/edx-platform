@@ -33,7 +33,7 @@ class CourseEnrollmentsScopeResolver(NotificationUserScopeResolver):
         The entry point to resolve a scope_name with a given scope_context
         """
 
-        if scope_name != 'course_enrollments':
+        if scope_name != 'course_enrollments' and scope_name != 'namespace_scope':
             # we can't resolve any other scopes
             return None
 
@@ -51,10 +51,37 @@ class CourseEnrollmentsScopeResolver(NotificationUserScopeResolver):
         else:
             course_key = course_id
 
-        return CourseEnrollment.objects.values_list('user_id', flat=True).filter(
-            is_active=1,
-            course_id=course_key
-        )
+        if scope_name == 'course_enrollments':
+            return CourseEnrollment.objects.values_list('user_id', flat=True).filter(
+                is_active=1,
+                course_id=course_key
+            )
+        elif scope_name == 'namespace_scope':
+
+            query = User.objects.select_related('courseenrollment')
+
+            if 'fields' in scope_context:
+                fields = []
+                if scope_context['fields'].get('id'):
+                    fields.append('id')
+
+                if scope_context['fields'].get('email'):
+                    fields.append('email')
+
+                if scope_context['fields'].get('first_name'):
+                    fields.append('first_name')
+
+                if scope_context['fields'].get('last_name'):
+                    fields.append('last_name')
+            else:
+                fields =['id', 'email', 'first_name', 'last_name']
+
+            query = query.values(*fields)
+            query = query.filter(
+                courseenrollment__is_active=1,
+                courseenrollment__course_id=course_key
+            )
+            return query
 
 
 class StudentEmailScopeResolver(NotificationUserScopeResolver):
