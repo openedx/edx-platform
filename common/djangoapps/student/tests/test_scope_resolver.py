@@ -60,6 +60,73 @@ class StudentTasksTestCase(ModuleStoreTestCase):
         self.assertIsNone(resolver.resolve('bad', {'course_id': 'foo'}, None))
         self.assertIsNone(resolver.resolve('course_enrollments', {'bad': 'foo'}, None))
 
+    def test_namespace_scope(self):
+        """
+        Make sure that we handle resolving namespaces correctly
+        """
+
+        test_user_1 = UserFactory.create(
+            password='test_pass',
+            email='user1@foo.com',
+            first_name='user',
+            last_name='one'
+        )
+        CourseEnrollmentFactory(user=test_user_1, course_id=self.course.id)
+
+        test_user_2 = UserFactory.create(
+            password='test_pass',
+            email='user2@foo.com',
+            first_name='John',
+            last_name='Smith'
+        )
+        CourseEnrollmentFactory(user=test_user_2, course_id=self.course.id)
+
+        test_user_3 = UserFactory.create(password='test_pass')
+        enrollment = CourseEnrollmentFactory(user=test_user_3, course_id=self.course.id)
+
+        # unenroll #3
+
+        enrollment.is_active = False
+        enrollment.save()
+
+        resolver = CourseEnrollmentsScopeResolver()
+
+        users = resolver.resolve(
+            'namespace_scope',
+            {
+                'course_id': self.course.id,
+                'fields': {
+                    'id': True,
+                    'email': True,
+                    'first_name': True,
+                    'last_name': True,
+                }
+            },
+            None
+        )
+
+        _users = [user for user in users]
+
+        self.assertEqual(len(_users), 2)
+
+        self.assertIn('id', _users[0])
+        self.assertIn('email', _users[0])
+        self.assertIn('first_name', _users[0])
+        self.assertIn('last_name', _users[0])
+        self.assertEquals(_users[0]['id'], test_user_1.id)
+        self.assertEquals(_users[0]['email'], test_user_1.email)
+        self.assertEquals(_users[0]['first_name'], test_user_1.first_name)
+        self.assertEquals(_users[0]['last_name'], test_user_1.last_name)
+
+        self.assertIn('id', _users[1])
+        self.assertIn('email', _users[1])
+        self.assertIn('first_name', _users[1])
+        self.assertIn('last_name', _users[1])
+        self.assertEquals(_users[1]['id'], test_user_2.id)
+        self.assertEquals(_users[1]['email'], test_user_2.email)
+        self.assertEquals(_users[1]['first_name'], test_user_2.first_name)
+        self.assertEquals(_users[1]['last_name'], test_user_2.last_name)
+
     def test_email_resolver(self):
         """
         Make sure we can resolve emails
