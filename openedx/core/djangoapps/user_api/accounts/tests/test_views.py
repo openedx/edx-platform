@@ -366,7 +366,7 @@ class TestAccountAPI(UserAPITestCase):
         ("name", u"ȻħȺɍłɇs", "z   ", u"The name field must be at least 2 characters long."),
         ("goals", "Smell the roses"),
         ("mailing_address", "Sesame Street"),
-        ("bio", "Lacrosse-playing superhero"),
+        ("bio", "Lacrosse-playing superhero", "z" * 3001, u"Ensure this value has at most 3000 characters (it has 3001)."),
         ("bio", u"壓是進界推日不復女"),
         # Note that we store the raw data, so it is up to client to escape the HTML.
         ("bio", "<html>fancy text</html>"),
@@ -401,7 +401,7 @@ class TestAccountAPI(UserAPITestCase):
             self.send_patch(client, {field: ""})
 
             get_response = self.send_get(client)
-            self.assertEqual("", get_response.data[field])
+            self.assertFalse("", get_response.data[field])
 
     def test_patch_inactive_user(self):
         """ Verify that a user can patch her own account, even if inactive. """

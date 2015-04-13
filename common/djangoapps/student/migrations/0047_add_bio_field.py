@@ -10,7 +10,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding field 'UserProfile.bio'
         db.add_column('auth_userprofile', 'bio',
-                      self.gf('django.db.models.fields.TextField')(null=True, blank=True),
+                      self.gf('django.db.models.fields.CharField')(max_length=3000, null=True, blank=True),
                       keep_default=False)
 
 
