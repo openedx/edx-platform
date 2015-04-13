@@ -277,7 +277,7 @@ from student.helpers import (
             <p class="message-copy">${_('Thanks for your patience as we process your request.')}</p>
           % elif verification_status['status'] == VERIFY_STATUS_APPROVED:
             <h4 class="message-title">${_('You have already verified your ID!')}</h4>
-            % if verification_status['verification_good_until'] is not None:
+            % if verification_status.get('verification_good_until') is not None:
               <p class="message-copy">${_('Your verification status is good until {date}.').format(date=verification_status['verification_good_until'])}
             % endif
           % elif verification_status['status'] == VERIFY_STATUS_NEED_TO_REVERIFY:
