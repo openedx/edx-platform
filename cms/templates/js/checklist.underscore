@@ -7,7 +7,17 @@
     <% } %>
     id="<%= 'course-checklist' + checklistIndex %>">
     <span class="viz viz-checklist-status"><span class="viz value viz-checklist-status-value" style="width: <%= percentChecked %>%;">
-        <%= _.template(gettext("{number}% of checklists completed"), {number: '<span class="int">' + percentChecked + '</span>'}, {interpolate: /\{(.+?)\}/g}) %>
+        <%= _.template(
+                // Translators: The {pct_sign} here represents the percent sign, i.e., '%'
+                // in many languages. This is used to avoid Transifex's misinterpreting of
+                // '% o'. The percent sign is also translatable as a standalone string.
+                gettext("{number}{pct_sign} of checklists completed"),
+                // Translators: This is the percent sign. It will be used to represent a
+				// percent value out of 100, e.g. "58%" means "58/100".
+                {number: '<span class="int">' + percentChecked + '</span>', pct_sign: gettext('%')},
+                {interpolate: /\{(.+?)\}/g}
+            )
+        %>
     </span></span>
     <header>
         <h3 class="checklist-title title-2 is-selectable" title="Collapse/Expand this Checklist">

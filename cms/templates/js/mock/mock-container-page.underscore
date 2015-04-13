@@ -67,12 +67,12 @@
                     <div id="publish-history"></div>
                 </aside>
                 <div class="unit-location">
-                        <h4 class="header">${_("Unit Location")}</h4>
+                        <h4 class="header">Unit Location</h4>
                         <div class="wrapper-unit-id content-bit">
                             <h5 class="title">Unit Location ID</h5>
                             <p class="unit-id">
                                 <span class="unit-id-value" id="unit-location-id-input">${unit.location.name}</span>
-                                <span class="tip"><span class="sr">Tip: </span>${_("Use this ID when you create links to this unit from other course content. You enter the ID in the URL field.")}</span>
+                                <span class="tip"><span class="sr">Tip: </span>Use this ID when you create links to this unit from other course content. You enter the ID in the URL field.</span>
                             </p>
                         </div>
                         <div class="wrapper-unit-tree-location bar-mod-content">

@@ -813,8 +813,14 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         if parent_xblock is None:
             parent_xblock = get_parent_xblock(xblock)
 
-        explanatory_message = _('Students must score {score}% or higher to access course materials.').format(
-            score=int(parent_xblock.entrance_exam_minimum_score_pct * 100))
+        # Translators: The {pct_sign} here represents the percent sign, i.e., '%'
+        # in many languages. This is used to avoid Transifex's misinterpreting of
+        # '% o'. The percent sign is also translatable as a standalone string.
+        explanatory_message = _('Students must score {score}{pct_sign} or higher to access course materials.').format(
+            score=int(parent_xblock.entrance_exam_minimum_score_pct * 100),
+            # Translators: This is the percent sign. It will be used to represent
+            # a percent value out of 100, e.g. "58%" means "58/100".
+            pct_sign=_('%'))
 
     xblock_info = {
         "id": unicode(xblock.location),

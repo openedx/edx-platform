@@ -74,17 +74,17 @@
                     <span class="tip tip-inline">Course that students must complete before beginning this course</span>
                     <button type="submit" class="sr" name="submit" value="submit">set pre-requisite course</button>
     </li>
-        <h3 id="heading-entrance-exam">${_("Entrance Exam")}</h3>
+        <h3 id="heading-entrance-exam">Entrance Exam</h3>
             <div class="show-data">
                 <div class="heading">
                     <input type="checkbox" id="entrance-exam-enabled" />
-                    <label for="entrance-exam-enabled">${_("Require students to pass an exam before beginning the course.")}</label>
+                    <label for="entrance-exam-enabled">Require students to pass an exam before beginning the course.</label>
                 </div>
                 <div class="div-grade-requirements">
-                    <p><span class="tip tip-inline">${_("To create your course entrance exam, go to the ")}<a href='${course_handler_url}'>${_("Course Outline")}</a>${_(". An Entrance Exam section will be created automatically.")}</span></p>
-                    <p><label for="entrance-exam-minimum-score-pct">${_("Minimum Passing Score")}</label></p>
-                    <p><div><input type="text" id="entrance-exam-minimum-score-pct" aria-describedby="min-score-format min-score-tip"><span id="min-score-format" class="tip tip-inline">${_(" %")}</span></div></p>
-                    <p><span class="tip tip-inline" id="min-score-tip">${_("The minimum score a student must receive to pass the entrance exam.")}</span></p>
+                    <p><span class="tip tip-inline">To create your course entrance exam, go to the <a href='${course_handler_url}'>Course Outline</a>. An Entrance Exam section will be created automatically.</span></p>
+                    <p><label for="entrance-exam-minimum-score-pct">Minimum Passing Score</label></p>
+                    <p><div><input type="text" id="entrance-exam-minimum-score-pct" aria-describedby="min-score-format min-score-tip"><span id="min-score-format" class="tip tip-inline"> %</span></div></p>
+                    <p><span class="tip tip-inline" id="min-score-tip">The minimum score a student must receive to pass the entrance exam.</span></p>
                 </div>
             </div>
     </li>
