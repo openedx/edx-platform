@@ -9,10 +9,12 @@ define(['underscore'], function(_) {
             expect(fieldTitle).toBe(view.options.title);
         }
 
-        if ('fieldValue' in view) {
+        if ('fieldValue' in view || 'imageUrl' in view) {
             expect(view.model.get(view.options.valueAttribute)).toBeTruthy();
 
-            if (view.fieldValue()) {
+            if ('imageUrl' in view) {
+                expect($($element.find('.image-frame')[0]).attr('src')).toBe(view.imageUrl());
+            } else if (view.fieldValue()) {
                 expect(view.fieldValue()).toBe(view.modelValue());
 
             } else if ('optionForValue' in view) {
@@ -43,9 +45,11 @@ define(['underscore'], function(_) {
 
         var sectionOneFieldElements = $(learnerProfileView.$('.wrapper-profile-section-one')).find('.u-field');
 
-        expect(sectionOneFieldElements.length).toBe(learnerProfileView.options.sectionOneFieldViews.length);
+        expect(sectionOneFieldElements.length).toBe(4);
+        expectProfileElementContainsField(sectionOneFieldElements[0], learnerProfileView.options.profileImageFieldView);
+        expectProfileElementContainsField(sectionOneFieldElements[1], learnerProfileView.options.usernameFieldView);
 
-        _.each(sectionOneFieldElements, function (sectionFieldElement, fieldIndex) {
+        _.each(_.rest(sectionOneFieldElements, 2) , function (sectionFieldElement, fieldIndex) {
             expectProfileElementContainsField(
                 sectionFieldElement,
                 learnerProfileView.options.sectionOneFieldViews[fieldIndex]
@@ -79,13 +83,15 @@ define(['underscore'], function(_) {
 
         var sectionOneFieldElements = $(learnerProfileView.$('.wrapper-profile-section-one')).find('.u-field');
 
-        expect(sectionOneFieldElements.length).toBe(1);
-        _.each(sectionOneFieldElements, function (sectionFieldElement, fieldIndex) {
-            expectProfileElementContainsField(
-                sectionFieldElement,
-                learnerProfileView.options.sectionOneFieldViews[fieldIndex]
-            );
-        });
+        expect(sectionOneFieldElements.length).toBe(2);
+        expectProfileElementContainsField(
+            sectionOneFieldElements[0],
+            learnerProfileView.options.profileImageFieldView
+        );
+        expectProfileElementContainsField(
+            sectionOneFieldElements[1],
+            learnerProfileView.options.usernameFieldView
+        );
 
         if (othersProfile) {
             expect($('.profile-private--message').text())
