@@ -1,8 +1,8 @@
-;(function (define, undefined) {
+;(function (define) {
     'use strict';
     define([
-        'gettext', 'jquery', 'underscore', 'backbone', 'js/mustache', 'backbone-super'
-    ], function (gettext, $, _, Backbone, RequireMustache) {
+        'gettext', 'jquery', 'underscore', 'backbone', 'js/mustache', 'logger', 'backbone-super'
+    ], function (gettext, $, _, Backbone, RequireMustache, Logger) {
 
         var Mustache = window.Mustache || RequireMustache;
 
@@ -42,6 +42,8 @@
 
                 this.helpMessage = this.options.helpMessage || '';
                 this.showMessages = _.isUndefined(this.options.showMessages) ? true : this.options.showMessages;
+                this.changeAnalyticsName = _.isUndefined(this.options.changeAnalyticsName) ? null : this.options.changeAnalyticsName;
+                this.userID = _.isUndefined(this.options.userID) ? null : this.options.userID;
 
                 _.bindAll(this, 'modelValue', 'modelValueIsSet', 'message', 'getMessage', 'title',
                           'showHelpMessage', 'showInProgressMessage', 'showSuccessMessage', 'showErrorMessage');
@@ -52,7 +54,7 @@
             },
 
             modelValueIsSet: function() {
-                return (this.modelValue() == true);
+                return (this.modelValue() === true);
             },
 
             message: function (message) {
@@ -121,7 +123,38 @@
                 } else {
                     this.message(this.getMessage('error'));
                 }
+            },
+
+            emitChangeInitiated: function (attributes, old_values) {
+                /**
+                 * If changeAnalyticsName and userID have been specified, emit an event.
+                 *
+                 * If old_values dict has not been supplied, get the old values for changed
+                 * attributes directly from the model.
+                 */
+                if (this.changeAnalyticsName && this.userID) {
+                    var event, oldValue;
+                    // Note that we are eventing each changed attribute separately. In our current UI,
+                    // fields can only be changed one at a time. If this ever changes, we may wish to
+                    // event a "master event" before individual change events.
+                    for (var key in attributes) {
+                        if (old_values) {
+                            oldValue = old_values[key];
+                        }
+                        else {
+                            oldValue = this.model.get(key);
+                        }
+                        event = {
+                            setting: key,
+                            old: oldValue,
+                            new: attributes[key],
+                            user_id: this.userID
+                        };
+                        Logger.log(this.changeAnalyticsName, event);
+                    }
+                }
             }
+
         });
 
         FieldViews.EditableFieldView = FieldViews.FieldView.extend({
@@ -153,6 +186,7 @@
                         view.showErrorMessage(xhr);
                     }
                 };
+                this.emitChangeInitiated(attributes);
                 this.showInProgressMessage();
                 this.model.save(attributes, _.extend(defaultOptions, options));
             },
@@ -327,7 +361,8 @@
             },
 
             fieldValue: function () {
-                return this.$('.u-field-value select').val();
+                var selectedValue = this.$('.u-field-value select').val();
+                return selectedValue === "" ? null : selectedValue;
             },
 
             displayValue: function (value) {
@@ -374,6 +409,23 @@
 
             disableField: function(disable) {
                 this.$('.u-field-value select').prop('disabled', disable);
+            }
+        });
+
+        FieldViews.IntegerFieldView = FieldViews.DropdownFieldView.extend({
+            initialize: function (options) {
+                this._super(options);
+                _.bindAll(this, 'fieldValue', 'modelValue');
+            },
+
+            modelValue: function () {
+                var modelValue = this.model.get(this.options.valueAttribute);
+                return modelValue === "" ? null : parseInt(modelValue);
+            },
+
+            fieldValue: function () {
+                var selectedValue = this.$('.u-field-value select').val();
+                return selectedValue === "" ? null : parseInt(selectedValue);
             }
         });
 

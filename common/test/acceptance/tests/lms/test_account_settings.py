@@ -138,6 +138,8 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         """
         Test behaviour of a text field.
         """
+        self.reset_event_tracking()
+        expected_events = []
         self.assertEqual(self.account_settings_page.title_for_field(field_id), title)
         self.assertEqual(self.account_settings_page.value_for_text_field(field_id), initial_value)
 
@@ -147,40 +149,86 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         self.account_settings_page.wait_for_indicator(field_id, 'validation-error')
         self.browser.refresh()
         self.assertNotEqual(self.account_settings_page.value_for_text_field(field_id), new_invalid_value)
+        expected_events.append({
+            u"user_id": int(self.user_id),
+            u"setting": field_id,
+            u"old": initial_value,
+            u"new": new_invalid_value
+        })
 
         for new_value in new_valid_values:
             self.assertEqual(self.account_settings_page.value_for_text_field(field_id, new_value), new_value)
             self.account_settings_page.wait_for_messsage(field_id, success_message)
+
+            expected_events.append({
+                u"user_id": int(self.user_id),
+                u"setting": field_id,
+                u"old": initial_value,
+                u"new": new_value
+            })
+            initial_value = new_value
+
             if assert_after_reload:
                 self.browser.refresh()
                 self.assertEqual(self.account_settings_page.value_for_text_field(field_id), new_value)
 
+        self.verify_browser_events("edx.user.settings.change_initiated", expected_events)
+
     def _test_dropdown_field(
-            self, field_id, title, initial_value, new_values, success_message=SUCCESS_MESSAGE, reloads_on_save=False
+            self, field_id, title, initial_value, initial_evented_value, new_values, new_evented_values,
+            success_message=SUCCESS_MESSAGE, reloads_on_save=False
     ):
         """
         Test behaviour of a dropdown field.
         """
+        self.reset_event_tracking()
+        expected_events = []
+
         self.assertEqual(self.account_settings_page.title_for_field(field_id), title)
         self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id), initial_value)
 
-        for new_value in new_values:
-            self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id, new_value), new_value)
+        for index, new_value in enumerate(new_values):
+            self.assertEqual(
+                self.account_settings_page.value_for_dropdown_field(field_id, new_value), new_value
+            )
             self.account_settings_page.wait_for_messsage(field_id, success_message)
+
+            if new_evented_values:
+                expected_events.append({
+                    u"user_id": int(self.user_id),
+                    u"setting": field_id,
+                    u"old": initial_evented_value,
+                    u"new": new_evented_values[index]
+                })
+                initial_evented_value = new_evented_values[index]
+
             if reloads_on_save:
                 self.account_settings_page.wait_for_loading_indicator()
             else:
                 self.browser.refresh()
             self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id), new_value)
 
-    def _test_link_field(self, field_id, title, link_title, success_message):
+        if new_evented_values:
+            self.verify_browser_events("edx.user.settings.change_initiated", expected_events)
+
+    def _test_password_link_field(self, field_id, title, link_title, success_message):
         """
-        Test behaviour a link field.
+        Test behaviour a password link field.
         """
         self.assertEqual(self.account_settings_page.title_for_field(field_id), title)
         self.assertEqual(self.account_settings_page.link_title_for_link_field(field_id), link_title)
         self.account_settings_page.click_on_link_in_link_field(field_id)
         self.account_settings_page.wait_for_messsage(field_id, success_message)
+
+        self.verify_browser_events(
+            "edx.user.settings.change_initiated",
+            [{
+                u"user_id": int(self.user_id),
+                u"setting": field_id,
+                u"old": None,
+                u"new": None
+            }]
+        )
 
     def test_username_field(self):
         """
@@ -222,7 +270,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         """
         Test behaviour of "Password" field.
         """
-        self._test_link_field(
+        self._test_password_link_field(
             u'password',
             u'Password',
             u'Reset Password',
@@ -253,7 +301,9 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             u'level_of_education',
             u'Education Completed',
             u'',
+            None,
             [u'Bachelor\'s degree', u''],
+            [u'b', None]
         )
 
     def test_gender_field(self):
@@ -264,7 +314,9 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             u'gender',
             u'Gender',
             u'',
+            None,
             [u'Female', u''],
+            [u'f', None]
         )
 
     def test_year_of_birth_field(self):
@@ -276,7 +328,9 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             u'year_of_birth',
             u'Year of Birth',
             u'',
-            [u'1980', u''],
+            None,
+            ['1980', u''],
+            [1980, None]
         )
 
     def test_country_field(self):
@@ -287,7 +341,10 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             u'country',
             u'Country or Region',
             u'',
+            None,
             [u'Pakistan', u''],
+            None  # Don't test eventing because in Jenkins events are being fired twice for country (though it works
+                  # fine locally).
         )
 
     def test_preferred_language_field(self):
@@ -298,7 +355,9 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             u'language_proficiencies',
             u'Preferred Language',
             u'',
+            [],
             [u'Pushto', u''],
+            [[{u'code': u'ps'}], []]
         )
 
     def test_connected_accounts(self):

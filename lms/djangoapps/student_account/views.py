@@ -345,7 +345,7 @@ def account_settings_context(request):
         )
     ]
 
-    year_of_birth_options = [(unicode(year), unicode(year)) for year in UserProfile.VALID_YEARS]
+    year_of_birth_options = [(year, unicode(year)) for year in UserProfile.VALID_YEARS]
 
     context = {
         'auth': {},

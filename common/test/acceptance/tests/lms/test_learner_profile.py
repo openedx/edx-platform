@@ -320,6 +320,45 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         )
         self.verify_profile_page_view_event(user_id, visibility=self.PRIVACY_PRIVATE)
 
+    def test_eventing(self):
+        """
+        Scenario: research change_initiated events should be emitted when the user changes profile fields
+
+        Given that I am a registered user over 13 years of age
+        When I change my language, bio, and privacy settings
+        Then appropriate changed_initiated research events should be emitted
+        """
+        username, user_id = self.log_in_as_unique_user()
+        profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
+
+        expected_events = []
+
+        profile_page.value_for_dropdown_field('language_proficiencies', 'French')
+        expected_events.append({
+            u"user_id": int(user_id),
+            u"setting": u"language_proficiencies",
+            u"old": [{u'code': u'en'}],
+            u"new": [{u'code': u'fr'}]
+        })
+
+        profile_page.value_for_textarea_field('bio', 'Vacationing')
+        expected_events.append({
+            u"user_id": int(user_id),
+            u"setting": u"bio",
+            u"old": u"Nothing Special",
+            u"new": u"Vacationing"
+        })
+
+        profile_page.privacy = self.PRIVACY_PRIVATE
+        expected_events.append({
+            u"user_id": int(user_id),
+            u"setting": u"account_privacy",
+            u"old": u"all_users",
+            u"new": u"private"
+        })
+
+        self.verify_browser_events("edx.user.settings.change_initiated", expected_events)
+
 
 class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
     """

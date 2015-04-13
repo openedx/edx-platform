@@ -14,7 +14,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
         describe("edx.user.LearnerProfileFactory", function () {
 
-            var requests;
+            var requests, userID = 13;
 
             beforeEach(function () {
                 setFixtures('<div class="wrapper-profile"><div class="ui-loading-indicator"><p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">Loading</span></p></div><div class="ui-loading-error is-hidden"><i class="fa fa-exclamation-triangle message-error" aria-hidden=true></i><span class="copy">An error occurred. Please reload the page.</span></div></div>');
@@ -25,15 +25,16 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             });
 
             var createProfilePage = function(ownProfile) {
-                return LearnerProfilePage({
+                return new LearnerProfilePage({
                     'accounts_api_url': Helpers.USER_ACCOUNTS_API_URL,
                     'preferences_api_url': Helpers.USER_PREFERENCES_API_URL,
                     'own_profile': ownProfile,
+                    'profile_user_id': userID,
                     'account_settings_page_url': Helpers.USER_ACCOUNTS_API_URL,
                     'country_options': Helpers.FIELD_OPTIONS,
                     'language_options': Helpers.FIELD_OPTIONS,
                     'has_preferences_access': true
-                })
+                });
             };
 
             it("show loading error when UserAccountModel fails to load", function() {
@@ -91,7 +92,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 AjaxHelpers.respondWithJson(requests, Helpers.USER_PREFERENCES_DATA);
 
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
-                LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView)
+                LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView);
             });
             
             it("renders the full profile after models are successfully fetched", function() {
@@ -110,7 +111,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 // sets the profile for full view.
                 context.accountPreferencesModel.set({account_privacy: 'all_users'});
-                LearnerProfileHelpers.expectProfileSectionsAndFieldsToBeRendered(learnerProfileView, false)
+                LearnerProfileHelpers.expectProfileSectionsAndFieldsToBeRendered(learnerProfileView, false);
             });
 
             it("renders the limited profile for undefined 'year_of_birth'", function() {
@@ -123,7 +124,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 AjaxHelpers.respondWithJson(requests, Helpers.USER_ACCOUNTS_DATA);
                 AjaxHelpers.respondWithJson(requests, Helpers.USER_PREFERENCES_DATA);
 
-                LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView)
+                LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView);
             });
 
             it("renders the limited profile for under 13 users", function() {
@@ -139,7 +140,29 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 AjaxHelpers.respondWithJson(requests, accountSettingsData);
                 AjaxHelpers.respondWithJson(requests, Helpers.USER_PREFERENCES_DATA);
 
-                LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView)
+                LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView);
+            });
+
+            it("passes change event configuration to all fields", function() {
+                var context = createProfilePage(true), learnerProfileView = context.learnerProfileView,
+                    eventName = "edx.user.settings.change_initiated", fieldViews = [], fieldView;
+
+                fieldViews.push(learnerProfileView.options.accountPrivacyFieldView);
+                fieldViews = fieldViews.concat(learnerProfileView.options.sectionOneFieldViews);
+                fieldViews = fieldViews.concat(learnerProfileView.options.sectionTwoFieldViews);
+
+                // Privacy, name, language, country, and bio fields.
+                // TODO: Add check for profile picture.
+                expect(fieldViews.length).toBe(5);
+
+                for (var i = 0; i < fieldViews.length; i++){
+                    fieldView = fieldViews[i];
+                    // Includes the read-only name field.
+                    if (!(fieldView instanceof FieldViews.ReadonlyFieldView)) {
+                        expect(fieldViews[i].changeAnalyticsName).toBe(eventName);
+                        expect(fieldViews[i].userID).toBe(userID);
+                    }
+                }
             });
         });
     });

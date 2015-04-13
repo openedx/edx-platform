@@ -1,7 +1,7 @@
 define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
-        'js/views/fields',
+        'js/views/fields', 'logger',
         'string_utils'],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews) {
+    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, Logger) {
         'use strict';
 
         var API_URL = '/api/end_point/v1';
@@ -50,13 +50,13 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
         };
 
         var createErrorMessage = function(attribute, user_message) {
-            var field_errors = {}
+            var field_errors = {};
             field_errors[attribute] = {
                 "user_message": user_message
-            }
+            };
             return {
                 "field_errors": field_errors
-            }
+            };
         };
 
         var expectTitleToBe = function(view, expectedTitle) {
@@ -80,7 +80,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
         var verifyMessageUpdates = function (view, data, timerCallback) {
 
-            var message = 'Here to help!'
+            var message = 'Here to help!';
 
             view.message(message);
             expectMessageContains(view, message);
@@ -126,7 +126,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             expectMessageContains(view, "Do not reset this!");
         };
 
-        var verifyEditableField = function (view, data, requests) {
+        var verifyEditableField = function (view, data, requests, allowEmptyString) {
             var request_data = {};
             var url = view.model.url;
 
@@ -145,6 +145,20 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             view.$(data.valueInputSelector).val(data.validValue).change();
             // When the value in the field is changed
             expect(view.fieldValue()).toBe(data.validValue);
+
+            if (data.oldValue !== undefined && data.userID) {
+                var eventData = {
+                    'setting': data.valueAttribute,
+                    'old': data.oldValue,
+                    'new': data.validValue,
+                    'user_id': data.userID
+                };
+                expect(Logger.log).toHaveBeenCalledWith('edx.user.settings.change_initiated', eventData);
+            }
+            else {
+                expect(Logger.log).not.toHaveBeenCalled();
+            }
+
             expectMessageContains(view, view.indicators['inProgress']);
             expectMessageContains(view, view.messages['inProgress']);
             request_data[data.valueAttribute] = data.validValue;
@@ -185,8 +199,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
             view.$(data.valueInputSelector).val('').change();
             // When the value in the field is changed
-            expect(view.fieldValue()).toBe('');
-            request_data[data.valueAttribute] = '';
+            expect(view.fieldValue()).toBe(allowEmptyString ? "" : null);
+            request_data[data.valueAttribute] = allowEmptyString ? "" : null;
             AjaxHelpers.expectJsonRequest(
                 requests, 'PATCH', url, request_data
             );
@@ -200,22 +214,20 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
         };
 
         var verifyTextField = function (view, data, requests) {
-            var selector = '.u-field-value > input';
             verifyEditableField(view, _.extend({
                     valueSelector: '.u-field-value',
                     valueInputSelector: '.u-field-value > input'
                 }, data
-            ), requests);
-        }
+            ), requests, true);
+        };
 
         var verifyDropDownField = function (view, data, requests) {
-            var selector = '.u-field-value > select';
             verifyEditableField(view, _.extend({
                     valueSelector: '.u-field-value',
                     valueInputSelector: '.u-field-value > select'
                 }, data
-            ), requests);
-        }
+            ), requests, false);
+        };
 
         return {
             SELECT_OPTIONS: SELECT_OPTIONS,
