@@ -1,7 +1,9 @@
+"""
+Synchronizes a mailchimp list with the students of a course.
+"""
 import logging
 import math
 import random
-import time
 import itertools
 from itertools import chain
 from optparse import make_option
@@ -27,6 +29,9 @@ FIELD_TYPES = {'EDX_ID': 'text'}
 
 
 class Command(BaseCommand):
+    """
+    Synchronizes a mailchimp list with the students of a course.
+    """
     args = '<mailchimp_key mailchimp_list course_id>'
     help = 'Synchronizes a mailchimp list with the students of a course.'
 
@@ -56,6 +61,7 @@ class Command(BaseCommand):
                 options['course_id'], options['segments'])
 
     def handle(self, *args, **options):
+        """Synchronizes a mailchimp list with the students of a course."""
         key, list_id, course_id, nsegments = self.parse_options(options)
 
         log.info('Syncronizing email list for %s', course_id)
@@ -86,8 +92,11 @@ class Command(BaseCommand):
         make_segments(mailchimp, list_id, nsegments, subscribed)
 
 
-def connect_mailchimp(key):
-    mailchimp = MailSnake(key)
+def connect_mailchimp(api_key):
+    """
+    Initializes connection to the mailchimp api
+    """
+    mailchimp = MailSnake(api_key)
     result = mailchimp.ping()
     log.debug(result)
 
@@ -95,6 +104,10 @@ def connect_mailchimp(key):
 
 
 def verify_list(mailchimp, list_id, course_id):
+    """
+    Verifies that the given list_id corresponds to the course_id
+    Returns boolean: whether or not course_id matches list_id
+    """
     lists = mailchimp.lists(filters={'list_id': list_id})['data']
 
     if len(lists) != 1:
@@ -103,7 +116,7 @@ def verify_list(mailchimp, list_id, course_id):
 
     list_name = lists[0]['name']
 
-    log.debug('list name: %s' % list_name)
+    log.debug('list name: %s', list_name)
 
     # check that we are connecting to the correct list
     parts = course_id.replace('_', ' ').replace('/', ' ').split()
@@ -128,7 +141,7 @@ def get_student_data(students, exclude=None):
         e = {'EMAIL': v['user__email'],
              'FULLNAME': v['name'].title()}
 
-        fake_user = FakeUser(v['user_id'], v['user__username'], lambda:True)
+        fake_user = FakeUser(v['user_id'], v['user__username'], lambda: True)
         e['EDX_ID'] = unique_id_for_user(fake_user)
 
         return e
@@ -231,8 +244,10 @@ def subscribe_with_data(mailchimp, list_id, user_data):
                                               batch=batch,
                                               double_optin=False,
                                               update_existing=True)
-        log.debug("Added: {} Error on: {}".format(
-            result['add_count'], result['error_count']))
+            
+        log.debug(
+            "Added: %s Error on: %s", result['add_count'], result['error_count']
+        )
 
 
 def make_segments(mailchimp, list_id, count, emails):
@@ -247,17 +262,19 @@ def make_segments(mailchimp, list_id, count, emails):
         emails = list(emails)
         random.shuffle(emails)
 
-        chunk_size = int(math.ceil(float(len(emails))/count))
+        chunk_size = int(math.ceil(float(len(emails)) / count))
         chunks = list(chunk(emails, chunk_size))
 
         # create segments and add emails
-        for n in xrange(count):
-            name = 'random_{0:002}'.format(n)
+        for seg in xrange(count):
+            name = 'random_{0:002}'.format(seg)
             seg_id = mailchimp.listStaticSegmentAdd(id=list_id, name=name)
-            for batch in batches(chunks[n], BATCH_SIZE):
-                mailchimp.listStaticSegmentMembersAdd(id=list_id,
-                                                      seg_id=seg_id,
-                                                      batch=batch)
+            for batch in batches(chunks[seg], BATCH_SIZE):
+                mailchimp.listStaticSegmentMembersAdd(
+                    id=list_id,
+                    seg_id=seg_id,
+                    batch=batch
+                )
 
 
 def name_to_tag(name):
@@ -271,4 +288,4 @@ def batches(iterable, size):
 
 def chunk(l, n):
     for i in xrange(0, len(l), n):
-        yield l[i:i+n]
+        yield l[i:i + n]

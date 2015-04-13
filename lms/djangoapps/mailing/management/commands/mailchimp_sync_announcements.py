@@ -1,28 +1,28 @@
+"""
+Synchronizes the announcement list with all active students.
+"""
 import logging
-import math
-import random
-import itertools
-from itertools import chain
 from optparse import make_option
-from collections import namedtuple
-
 
 from django.core.management.base import BaseCommand, CommandError
 
-from mailsnake import MailSnake
-
 from django.contrib.auth.models import User
 
-from .mailchimp_sync_course import (connect_mailchimp, get_subscribed,
-                                    get_unsubscribed, get_cleaned,
-                                    subscribe_with_data)
+from .mailchimp_sync_course import (
+    connect_mailchimp, get_cleaned,
+    get_subscribed, get_unsubscribed,
+    subscribe_with_data
+)
 
 log = logging.getLogger('edx.mailchimp')
 
 
 class Command(BaseCommand):
+    """
+    Synchronizes the announcement list with all active students.
+    """
     args = '<mailchimp_key mailchimp_list course_id>'
-    help = 'Synchronizes a mailchimp list with the students of a course.'
+    help = 'Synchronizes the announcement list with all active students.'
 
     option_list = BaseCommand.option_list + (
         make_option('--key', action='store', help='mailchimp api key'),
@@ -59,11 +59,21 @@ class Command(BaseCommand):
 
 
 def get_enrolled():
-    # cdodge: filter out all users who signed up via a Microsite, which UserSignupSource tracks
+    """
+    Filter out all users who signed up via a Microsite, which UserSignupSource tracks
+    """
+    ## TODO (Feanil) This grabs all INactive students and MUST be changed
+    ## TODO (Feanil) blame cdodge for your troubles
     return User.objects.raw('SELECT * FROM auth_user where id not in (SELECT user_id from student_usersignupsource)')
 
 
 def get_data(users, exclude=None):
+    """
+    users: set of Django users
+    exclude [optional]: set of Django users to exclude
+
+    returns: {'EMAIL': u.email} for all users in users less those in `exclude`
+    """
     exclude = exclude if exclude else set()
     emails = (u.email for u in users)
     return ({'EMAIL': e} for e in emails if e not in exclude)

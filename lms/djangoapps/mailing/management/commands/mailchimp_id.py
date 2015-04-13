@@ -1,3 +1,7 @@
+"""
+mailchimp_id: Returns whether or not a given mailchimp key represents
+a valid list.
+"""
 import sys
 from optparse import make_option
 
@@ -7,6 +11,10 @@ from mailsnake import MailSnake
 
 
 class Command(BaseCommand):
+    """
+    Given a mailchimp key, validates that a list with that key
+    exists in mailchimp.
+    """
     args = '<mailchimp_key web_id>'
     help = 'Get the list id from a web_id'
 
@@ -26,6 +34,9 @@ class Command(BaseCommand):
         return options['key'], options['web_id']
 
     def handle(self, *args, **options):
+        """
+        Validates that the id passed in exists in mailchimp.
+        """
         key, web_id = self.parse_options(options)
 
         mailchimp = MailSnake(key)
