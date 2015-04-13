@@ -159,7 +159,7 @@ class CoursewareSearchIndexer(object):
             error_list.append(_('General indexing error occurred'))
 
         if error_list:
-            raise SearchIndexingError(_('Error(s) present during indexing'), error_list)
+            raise SearchIndexingError('Error(s) present during indexing', error_list)
 
         return indexed_count["count"]
 
