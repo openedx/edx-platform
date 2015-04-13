@@ -3,7 +3,8 @@
 <%! from django.core.urlresolvers import reverse %>
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
-
+<link rel="stylesheet" href="/static/css/idangerous.swiper.css" />
+<link rel="stylesheet" href="/static/css/style.css" />
 <%! from microsite_configuration import microsite %>
 
 <%
@@ -16,7 +17,7 @@
   show_partners = microsite.get_value('show_partners', True)
 
 %>
-
+<!--
 <section class="home">
   <header>
     <div class="outer-wrapper">
@@ -77,7 +78,231 @@
     <iframe width="640" height="360" src="//www.youtube.com/embed/${youtube_video_id}?showinfo=0" frameborder="0" allowfullscreen></iframe>
   </div>
 </section>
+-->
 
+	<!-- 메인 visual 부분 -->
+	<div class="main-visual">
+		<p>아시아 최고의 기업가정신<br />교육을 무료로,</p>
+		<p>아케데미X는 국내 최고의 실무 경험을 지닌 교수진과<br />한국의 스타트업 생태계를 이끌어가는 전문 기업이 모여서 만든 교육 플랫폼으로,<br />기술혁신과 기업가정신 교육을 온라인으로 무료로 제공하고<br />오프라인 교육을 유로로 제공하는 회사입니다.</p>
+	</div>
+	<!-- //메인 visual 부분 -->
+
+	<!-- 추천 과정 부분 -->
+	<div class="sub-con">
+		<dl>
+		<dt><h2>추천 과정</h2></dt>
+		<dd>아카데미X는 온라인 미디어 인터넷 기술과 디지털 지식에 뿌리를 두고 있습니다. &nbsp;<a href="#">자세히보기</a></dd>
+		<dd class="professor-list">
+			<a href="#none" class="arrow-left">이전</a>
+			<a href="#none" class="arrow-right">다음</a>
+			<div class="swiper-container">
+				<ul class="swiper-wrapper">
+				<li class="swiper-slide">
+					<div class="xcover">
+						<a href="#">
+							<em>비즈니스 모델과<br />고객가치명제 디자인</em>
+							<span>컴퓨터그래픽스 종합</span>
+							<span>황병선 교수님</span>
+						</a>
+						<img src="static/images/ximg/img_professor01.jpg" alt="" />
+					</div>
+				</li>
+				<li class="swiper-slide">
+					<div class="xcover">
+						<a href="#">
+							<em>O2O 트렌드로 배우는<br />서비스 전략의 이해</em>
+							<span>컴퓨터그래픽스 종합</span>
+							<span>황병선 교수님</span>
+						</a>
+						<img src="static/images/ximg/img_professor02.jpg" alt="" />
+					</div>
+				</li>
+				<li class="swiper-slide">
+					<div class="xcover">
+						<a href="#">
+							<em>3컴퓨터그래픽스<br />운용기능사 완전 정복<br />개념부터 완성까지</em>
+							<span>컴퓨터그래픽스 종합</span>
+							<span>황병선 교수님</span>
+						</a>
+						<img src="static/images/ximg/img_professor01.jpg" alt="" />
+					</div>
+				</li>
+				<li class="swiper-slide">
+					<div class="xcover">
+						<a href="#">
+							<em>4컴퓨터그래픽스<br />운용기능사 완전 정복<br />개념부터 완성까지</em>
+							<span>컴퓨터그래픽스 종합</span>
+							<span>황병선 교수님</span>
+						</a>
+						<img src="static/images/ximg/img_professor02.jpg" alt="" />
+					</div>
+				</li>
+				</ul>
+			</div>
+			<div class="pagination"></div>
+		</dd>
+		</dl>
+	</div>
+	<!-- //추천 과정 부분 -->
+
+	<!-- 바로 신청 가능한 과정 부분 -->
+	<div class="sub-con">
+		<dl>
+		<dt><h2>바로 신청 가능한 과정</h2></dt>
+		<dd>아카데미 엑스는 온라인 미디어 인터넷 기술과 디지털 지식에 뿌리를 두고 있습니다. &nbsp;<a href="#">자세히보기</a></dd>
+		<dd class="class-list">
+			<ul>
+			<li>
+				<a href="#">
+					<em>웹디자인 기능사 자격증<br />실기/필기 종합세트</em>
+					<span>컴퓨터그래픽스 종합</span>
+					<span>황병선 교수님</span>
+				</a>
+				<img src="static/images/ximg/img_professor02_01.jpg" alt="" />
+			</li>
+			<li>
+				<a href="#">
+					<em>컴퓨터그래픽스<br />운용기능사 완전 정복<br />개념부터 완성까지<br />7일 코스</em>
+					<span>컴퓨터그래픽스 종합</span>
+					<span>황병선 교수님</span>
+				</a>
+				<img src="static/images/ximg/img_professor02_02.jpg" alt="" />
+			</li>
+			<li>
+				<a href="#">
+					<em>컴퓨터그래픽스<br />운용기능사 완전 정복<br />개념부터 완성까지</em>
+					<span>컴퓨터그래픽스 종합</span>
+					<span>황병선 교수님</span>
+				</a>
+				<img src="static/images/ximg/img_professor02_03.jpg" alt="" />
+			</li>
+			<li>
+				<a href="#">
+					<em>컴퓨터그래픽스<br />운용기능사 완전 정복<br />개념부터 완성까지</em>
+					<span>컴퓨터그래픽스 종합</span>
+					<span>황병선 교수님</span>
+				</a>
+				<img src="static/images/ximg/img_professor02_04.jpg" alt="" />
+			</li>
+			</ul>
+		</dd>
+		</dl>
+	</div>
+	<!-- //바로 신청 가능한 과정 부분 -->
+
+	<!-- 아카데미X 소개 부분 -->
+	<div class="sub-con v2">
+		<dl>
+		<dt><h2>아카데미X 소개</h2></dt>
+		<dd>혁신적인 교육 플랫폼으로 파트너 기업과 함께 아시아 창업 생태계의 활성화를 이룹니다. &nbsp;<a href="#">자세히보기</a></dd>
+		<dd class="introduce-list">
+			<ul>
+			<li>
+				<dl>
+				<dt>온라인 학습 무료제공</dt>
+				<dd>언제 어디서나 학습 가능한 동영상과 교재를<br />온라인으로 무료로 제공합니다.</dd>
+				</dl>
+			</li>
+			<li>
+				<dl>
+				<dt>실무 경력의 교수진</dt>
+				<dd>모두 10년 이상의 실무 경험을 지닌<br />교수진이 직접 교육내용을 제작하였습니다.</dd>
+				</dl>
+			</li>
+			<li>
+				<dl>
+				<dt>신뢰받는 수료증 발급</dt>
+				<dd>학습한 과정에 대해서 유료로 수료증을<br />발급받으면 협력 기관에서 인정합니다.</dd>
+				</dl>
+			</li>
+			<li>
+				<dl>
+				<dt>온라인/오프라인 연계 학습</dt>
+				<dd>온라인에서 무료 학습 이후 오프라인에서<br />실습 위주의 캠프로 효율적인 학습 효과를<br />얻을 수 있습니다.</dd>
+				</dl>
+			</li>
+			</ul>
+		</dd>
+		</dl>
+	</div>
+	<!-- //아카데미X 소개 부분 -->
+
+	<!-- 파트너와 협력 기관 부분 -->
+	<!--<div class="sub-con v3">
+		<dl>
+		<dt><h2>파트너와 협력 기관</h2></dt>
+		<dd>파트너와 멤버제도로 다양한 기업/기관을 참여 시키는 교육플랫으로 확장합니다. &nbsp;<a href="#">자세히보기</a></dd>
+		<dd>
+			<ul>
+			<li>
+				<img src="static/images/ximg/img_vendor01.png" alt="Massachusetts Institute of Technology" />
+			</li>
+			<li>
+				<img src="static/images/ximg/img_vendor02.png" alt="HARVARD UNIVERSITY" />
+			</li>
+			<li>
+				<img src="static/images/ximg/img_vendor03.png" alt="Berkeley UNIVERSITY OF CALIFORNIA" />
+			</li>
+			<li>
+				<img src="static/images/ximg/img_vendor04.png" alt="THE UNIVERSITY OF TEXAS SYSTEM" />
+			</li>
+			<li>
+				<img src="static/images/ximg/img_vendor05.png" alt="Australian National University" />
+			</li>
+			<li>
+				<img src="static/images/ximg/img_vendor06.png" alt="BOSTON UNIVERSITY" />
+			</li>
+			<li>
+				<img src="static/images/ximg/img_vendor07.png" alt="SORBONNE UNIVERSITES" />
+			</li>
+			<li>
+				<img src="static/images/ximg/img_vendor08.png" alt="TUDelft" />
+			</li>
+			</ul>
+		</dd>
+		</dl>
+	</div>-->
+	<div class="sub-con v3">
+		<dl>
+		<dt><h2>파트너와 협력 기관</h2></dt>
+		<dd>파트너와 멤버제도로 다양한 기업/기관을 참여 시키는 교육플랫으로 확장합니다. &nbsp;<a href="#">자세히보기</a></dd>
+		<dd style="text-align:center">
+			<span><img src="static/images/ximg/img_vendor01.gif" alt="Rehoboth" /></span>
+			<span><img src="static/images/ximg/img_vendor02.gif" alt="ROA CONSULTING" /></span>
+			<span><img src="static/images/ximg/img_vendor03.gif" alt="SOCIAL MOBILE" /></span>
+			<span><img src="static/images/ximg/img_vendor04.gif" alt="MEET ADVISOR" /></span>
+			<span><img src="static/images/ximg/img_vendor05.gif" alt="PAG&Partners" /></span>
+			<span><img src="static/images/ximg/img_vendor06.gif" alt="VENTURE SQUARE" /></span>
+			<span><img src="static/images/ximg/img_vendor07.gif" alt="BIGBANG ANGELS" /></span>
+			<span><img src="static/images/ximg/img_vendor08.gif" alt="경기콘텐츠진흥원" /></span>
+			<span><img src="static/images/ximg/img_vendor09.gif" alt="D.FY" /></span>
+			<span><img src="static/images/ximg/img_vendor10.gif" alt="UNIVISTA" /></span>
+		</dd>
+		</dl>
+	</div>
+	<!-- //파트너와 협력 기관 부분 -->
+<!-- 메인 슬라이더 스크립트 -->
+<script type="text/javascript" src="static/js/idangerous.swiper.min.js"></script>
+<script type="text/javascript">
+	var mySwiper = new Swiper('.swiper-container',{
+		pagination: '.pagination',
+		paginationClickable: true,
+		slidesPerView: 2, //보여질 메뉴 갯수
+		initialSlide: 0,  //첫번째로 보여질 메뉴
+		//autoplay: true,
+		speed : 1500,
+		loop: true
+	})
+	  $('.arrow-left').on('click', function(e){
+		e.preventDefault()
+		mySwiper.swipePrev()
+	  })
+	  $('.arrow-right').on('click', function(e){
+		e.preventDefault()
+		mySwiper.swipeNext()
+	  })
+</script>
+<!-- //메인 슬라이더 스크립트 -->
 <%block name="js_extra">
    <script type="text/javascript">
       $(window).load(function() {

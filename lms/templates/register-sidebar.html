@@ -11,7 +11,7 @@ from django.core.urlresolvers import reverse
 </header>
 
 % if has_extauth_info is UNDEFINED:
-
+<!--
 <div class="cta cta-login">
   <h3 class="title">${_("Already registered?")}</h3>
   <p class="instructions">
@@ -20,18 +20,31 @@ from django.core.urlresolvers import reverse
     </a>
   </p>
 </div>
+-->
+<div class="cta cta-login">
+	<h3 class="title">아카데미X 계정을 갖고 계신가요?</h3>
+	<p class="instructions">
+		<a class="cta-login-action" href="login.html">로그인하기</a>
+	</p>
+</div>
 
 % endif
 
 ## TODO: Use a %block tag or something to allow themes to
 ##       override in a more generalizable fashion.
 % if not stanford_theme_enabled():
+<!--
   <div class="cta cta-welcome">
     <h3>${_("Welcome to {platform_name}").format(platform_name=platform_name)}</h3>
     <p>${_("Registering with {platform_name} gives you access to all of our current and future free courses. Not ready to take a course just yet? Registering puts you on our mailing list - we will update you as courses are added.").format(platform_name=platform_name)}</p>
   </div>
+-->
+<div class="cta cta-welcome">
+	<h3>아카데미X 에 오신 것을 환영합니다.</h3>
+	<p>아카데미X 계정 생성을 하면, <br />아카데미X에서 제공하는 교육과정을 <br />들으실 수 있습니다.</p>
+</div>
 % endif
-
+<!--
 <div class="cta cta-nextsteps">
   <h3>${_("Next Steps")}</h3>
   % if stanford_theme_enabled():
@@ -51,3 +64,4 @@ from django.core.urlresolvers import reverse
       ${_("Once registered, most questions can be answered in the course specific discussion forums or through the FAQs.")}</p>
   </div>
 % endif
+-->
