@@ -277,7 +277,6 @@ class EventsTestMixin(object):
     def setUp(self):
         super(EventsTestMixin, self).setUp()
         self.event_collection = MongoClient()["test"]["events"]
-        self.browser_event_collection = MongoClient()["test"]["browser_events"]
         self.reset_event_tracking()
 
     def assert_event_emitted_num_times(self, event_name, event_time, event_user_id, num_times_emitted):
@@ -303,20 +302,19 @@ class EventsTestMixin(object):
         Resets all event tracking so that previously captured events are removed.
         """
         self.event_collection.drop()
-        self.browser_event_collection.drop()
         self.start_time = datetime.now()
 
-    def get_matching_browser_events(self, event_type):
+    def get_matching_events(self, event_type):
         """
         Returns a cursor for the matching browser events.
         """
-        return self.browser_event_collection.find({
+        return self.event_collection.find({
             "event_type": event_type,
             "time": {"$gt": self.start_time},
         })
 
-    def verify_browser_events(self, event_type, expected_events):
-        """Verify that the expected browser events were logged.
+    def verify_events_of_type(self, event_type, expected_events):
+        """Verify that the expected events of a given type were logged.
 
         Args:
             event_type (str): The type of event to be verified.
@@ -324,12 +322,12 @@ class EventsTestMixin(object):
                 have been fired.
         """
         EmptyPromise(
-            lambda: self.get_matching_browser_events(event_type).count() >= len(expected_events),
-            "Waiting for the minimum number of browser events to have been recorded"
+            lambda: self.get_matching_events(event_type).count() >= len(expected_events),
+            "Waiting for the minimum number of events of type {type} to have been recorded".format(type=event_type)
         ).fulfill()
 
         # Verify that the correct events were fired
-        cursor = self.get_matching_browser_events(event_type)
+        cursor = self.get_matching_events(event_type)
         actual_events = []
         for i in range(0, cursor.count()):
             raw_event = cursor.next()
