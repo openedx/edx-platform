@@ -58,7 +58,7 @@ mongoengine==0.7.10
 networkx==1.7
 nltk==2.0.5
 nose==1.3.3
-oauthlib==0.6.3
+oauthlib==0.7.2
 paramiko==1.9.0
 path.py==7.2
 Pillow==2.7.0
