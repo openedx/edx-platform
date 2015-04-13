@@ -14,7 +14,7 @@ from PIL import Image
 from rest_framework.test import APITestCase, APIClient
 
 from student.tests.factories import UserFactory
-from student.tests.tests import UserProfileEventTestMixin
+from student.tests.tests import UserSettingsEventTestMixin
 
 from ...user_api.accounts.image_helpers import (
     set_has_profile_image,
@@ -29,7 +29,7 @@ TEST_PASSWORD = "test"
 TEST_UPLOAD_DT = datetime.datetime(2002, 1, 9, 15, 43, 01, tzinfo=UTC)
 
 
-class ProfileImageEndpointTestCase(UserProfileEventTestMixin, APITestCase):
+class ProfileImageEndpointTestCase(UserSettingsEventTestMixin, APITestCase):
     """
     Base class / shared infrastructure for tests of profile_image "upload" and
     "remove" endpoints.
@@ -114,7 +114,7 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
         Make sure we emit a UserProfile event corresponding to the
         profile_image_uploaded_at field changing.
         """
-        self.assert_profile_event_emitted(
+        self.assert_user_setting_event_emitted(
             setting='profile_image_uploaded_at', old=None, new=TEST_UPLOAD_DT
         )
 
@@ -279,7 +279,7 @@ class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
         Make sure we emit a UserProfile event corresponding to the
         profile_image_uploaded_at field changing.
         """
-        self.assert_profile_event_emitted(
+        self.assert_user_setting_event_emitted(
             setting='profile_image_uploaded_at', old=TEST_UPLOAD_DT, new=None
         )
 

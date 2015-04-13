@@ -486,27 +486,6 @@ class DashboardTest(ModuleStoreTestCase):
         self.assertContains(response, expected_url)
 
 
-class UserProfileEventTestMixin(EventTestMixin):
-    """
-    Mixin for verifying that UserProfile events were emitted during a test.
-    """
-    def setUp(self):
-        super(UserProfileEventTestMixin, self).setUp('student.models.tracker')
-
-    def assert_profile_event_emitted(self, **kwargs):
-        """
-        Helper method to assert that we emit the expected user settings events.
-
-        Expected settings are passed in via `kwargs`.
-        """
-        self.assert_event_emitted(
-            USER_SETTINGS_CHANGED_EVENT_NAME,
-            table='auth_userprofile',
-            user_id=self.user.id,
-            **kwargs
-        )
-
-
 class EnrollmentEventTestMixin(EventTestMixin):
     """ Mixin with assertions for validating enrollment events. """
     def setUp(self):

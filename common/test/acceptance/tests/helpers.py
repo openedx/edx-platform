@@ -279,23 +279,24 @@ class EventsTestMixin(object):
         self.event_collection = MongoClient()["test"]["events"]
         self.reset_event_tracking()
 
-    def assert_event_emitted_num_times(self, event_name, event_time, event_user_id, num_times_emitted):
+    def assert_event_emitted_num_times(self, event_name, event_time, event_user_id, num_times_emitted, **kwargs):
         """
         Tests the number of times a particular event was emitted.
+
+        Extra kwargs get passed to the mongo query.
+
         :param event_name: Expected event name (e.g., "edx.course.enrollment.activated")
         :param event_time: Latest expected time, after which the event would fire (e.g., the beginning of the test case)
         :param event_user_id: user_id expected in the event
         :param num_times_emitted: number of times the event is expected to appear since the event_time
         """
-        self.assertEqual(
-            self.event_collection.find(
-                {
-                    "name": event_name,
-                    "time": {"$gt": event_time},
-                    "event.user_id": int(event_user_id),
-                }
-            ).count(), num_times_emitted
-        )
+        find_kwargs = {
+            "name": event_name,
+            "time": {"$gt": event_time},
+            "event.user_id": int(event_user_id),
+        }
+        find_kwargs.update({"event.{}".format(key): value for key, value in kwargs.items()})
+        self.assertEqual(self.event_collection.find(find_kwargs).count(), num_times_emitted)
 
     def reset_event_tracking(self):
         """
