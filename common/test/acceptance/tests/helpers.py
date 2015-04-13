@@ -325,7 +325,7 @@ class EventsTestMixin(object):
         """
         EmptyPromise(
             lambda: self.get_matching_browser_events(event_type).count() >= len(expected_events),
-            "Waiting for the correct number of browser events to have been recorded"
+            "Waiting for the minimum number of browser events to have been recorded"
         ).fulfill()
 
         # Verify that the correct events were fired

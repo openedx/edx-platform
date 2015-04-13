@@ -14,9 +14,9 @@ from ...pages.lms.dashboard import DashboardPage
 from ..helpers import EventsTestMixin
 
 
-class LearnerProfilePageTest(EventsTestMixin, WebAppTest):
+class LearnerProfileTestMixin(EventsTestMixin):
     """
-    Tests that verify Student's Profile Page.
+    Mixin with helper methods for testing learner profile pages.
     """
 
     PRIVACY_PUBLIC = 'all_users'
@@ -82,17 +82,7 @@ class LearnerProfilePageTest(EventsTestMixin, WebAppTest):
             str(birth_year)
         )
 
-    def verify_profile_forced_private_message(self, username, birth_year, message=None):
-        """
-        Verify age limit messages for a user.
-        """
-        self.set_birth_year(birth_year=birth_year if birth_year is not None else "")
-        profile_page = self.visit_profile_page(username)
-        self.assertTrue(profile_page.privacy_field_visible)
-        self.assertEqual(profile_page.age_limit_message_present, message is not None)
-        self.assertIn(message, profile_page.profile_forced_private_message)
-
-    def verify_profile_page_view_event(self, profile_user_id, visibility=None, requires_parental_consent=False):
+    def verify_profile_page_view_event(self, profile_user_id, visibility=None):
         """
         Verifies that the correct view event was captured for the profile page.
         """
@@ -102,9 +92,24 @@ class LearnerProfilePageTest(EventsTestMixin, WebAppTest):
                 u"user_id": int(profile_user_id),
                 u"page": u"profile",
                 u"visibility": unicode(visibility),
-                u"requires_parental_consent": requires_parental_consent,
             }]
         )
+
+
+class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
+    """
+    Tests that verify a student's own profile page.
+    """
+
+    def verify_profile_forced_private_message(self, username, birth_year, message=None):
+        """
+        Verify age limit messages for a user.
+        """
+        self.set_birth_year(birth_year=birth_year if birth_year is not None else "")
+        profile_page = self.visit_profile_page(username)
+        self.assertTrue(profile_page.privacy_field_visible)
+        self.assertEqual(profile_page.age_limit_message_present, message is not None)
+        self.assertIn(message, profile_page.profile_forced_private_message)
 
     def test_dashboard_learner_profile_link(self):
         """
@@ -166,62 +171,6 @@ class LearnerProfilePageTest(EventsTestMixin, WebAppTest):
         self.assertEqual(profile_page.editable_fields, self.PUBLIC_PROFILE_EDITABLE_FIELDS)
 
         self.verify_profile_page_view_event(user_id, visibility=self.PRIVACY_PUBLIC)
-
-    def test_fields_on_others_private_profile(self):
-        """
-        Scenario: Verify that desired fields are shown when looking at another user's private profile.
-
-        Given that I am a registered user.
-        And I visit others private profile page.
-        Then I shouldn't see the profile visibility selector dropdown.
-        Then I see some of the profile fields are shown.
-        """
-        other_username, other_user_id = self._initialize_other_user(privacy=self.PRIVACY_PRIVATE)
-        self.log_in_as_unique_user()
-        profile_page = self.visit_profile_page(other_username)
-
-        self.assertFalse(profile_page.privacy_field_visible)
-        self.assertEqual(profile_page.visible_fields, self.PRIVATE_PROFILE_FIELDS)
-        self.verify_profile_page_view_event(other_user_id, visibility=self.PRIVACY_PRIVATE)
-
-    def test_fields_on_others_public_profile(self):
-        """
-        Scenario: Verify that desired fields are shown when looking at another user's public profile.
-
-        Given that I am a registered user.
-        And I visit others public profile page.
-        Then I shouldn't see the profile visibility selector dropdown.
-        Then all the profile fields are shown.
-        Then I shouldn't see the profile visibility selector dropdown.
-        Also `location`, `language` and `about me` fields are not editable.
-        """
-        other_username, other_user_id = self._initialize_other_user(privacy=self.PRIVACY_PUBLIC)
-        self.log_in_as_unique_user()
-        profile_page = self.visit_profile_page(other_username)
-        profile_page.wait_for_public_fields()
-        self.assertFalse(profile_page.privacy_field_visible)
-        fields_to_check = self.PUBLIC_PROFILE_FIELDS
-        self.assertEqual(profile_page.visible_fields, fields_to_check)
-        self.assertEqual(profile_page.editable_fields, [])
-        self.verify_profile_page_view_event(other_user_id, visibility=self.PRIVACY_PUBLIC)
-
-    def _initialize_other_user(self, privacy=None):
-        """
-        Initialize the profile page for the other test user
-        """
-        username, user_id = self.log_in_as_unique_user()
-
-        if privacy is None:
-            privacy = self.PRIVACY_PUBLIC
-
-        # Set the user's birth year and privacy policy
-        self.set_birth_year(birth_year=1990)
-        self.visit_profile_page(username, privacy=privacy)
-
-        # Log the other user out
-        LogoutPage(self.browser).visit()
-
-        return username, user_id
 
     def _test_dropdown_field(self, profile_page, field_id, new_value, displayed_value, mode):
         """
@@ -350,12 +299,8 @@ class LearnerProfilePageTest(EventsTestMixin, WebAppTest):
         """
         username, user_id = self.log_in_as_unique_user()
         message = "You must specify your birth year before you can share your full profile."
-        self.verify_profile_forced_private_message(username, None, message=message)
-        self.verify_profile_page_view_event(
-            user_id,
-            visibility=self.PRIVACY_PRIVATE,
-            requires_parental_consent=True
-        )
+        self.verify_profile_forced_private_message(username, birth_year=None, message=message)
+        self.verify_profile_page_view_event(user_id, visibility=self.PRIVACY_PRIVATE)
 
     def test_user_is_under_age(self):
         """
@@ -369,11 +314,66 @@ class LearnerProfilePageTest(EventsTestMixin, WebAppTest):
         username, user_id = self.log_in_as_unique_user()
         under_age_birth_year = datetime.now().year - 10
         self.verify_profile_forced_private_message(
-            username, under_age_birth_year,
+            username,
+            birth_year=under_age_birth_year,
             message='You must be over 13 to share a full profile.'
         )
-        self.verify_profile_page_view_event(
-            user_id,
-            visibility=self.PRIVACY_PRIVATE,
-            requires_parental_consent=True
-        )
+        self.verify_profile_page_view_event(user_id, visibility=self.PRIVACY_PRIVATE)
+
+
+class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
+    """
+    Tests that verify viewing the profile page of a different user.
+    """
+    def test_different_user_private_profile(self):
+        """
+        Scenario: Verify that desired fields are shown when looking at a different user's private profile.
+
+        Given that I am a registered user.
+        And I visit a different user's private profile page.
+        Then I shouldn't see the profile visibility selector dropdown.
+        Then I see some of the profile fields are shown.
+        """
+        different_username, different_user_id = self._initialize_different_user(privacy=self.PRIVACY_PRIVATE)
+        self.log_in_as_unique_user()
+        profile_page = self.visit_profile_page(different_username)
+
+        self.assertFalse(profile_page.privacy_field_visible)
+        self.assertEqual(profile_page.visible_fields, self.PRIVATE_PROFILE_FIELDS)
+        self.verify_profile_page_view_event(different_user_id, visibility=self.PRIVACY_PRIVATE)
+
+    def test_different_user_public_profile(self):
+        """
+        Scenario: Verify that desired fields are shown when looking at a different user's public profile.
+
+        Given that I am a registered user.
+        And I visit a different user's public profile page.
+        Then I shouldn't see the profile visibility selector dropdown.
+        Then all the profile fields are shown.
+        Then I shouldn't see the profile visibility selector dropdown.
+        Also `location`, `language` and `about me` fields are not editable.
+        """
+        different_username, different_user_id = self._initialize_different_user(privacy=self.PRIVACY_PUBLIC)
+        self.log_in_as_unique_user()
+        profile_page = self.visit_profile_page(different_username)
+        profile_page.wait_for_public_fields()
+        self.assertFalse(profile_page.privacy_field_visible)
+        self.assertEqual(profile_page.visible_fields, self.PUBLIC_PROFILE_FIELDS)
+        self.assertEqual(profile_page.editable_fields, [])
+        self.verify_profile_page_view_event(different_user_id, visibility=self.PRIVACY_PUBLIC)
+
+    def _initialize_different_user(self, privacy=None):
+        """
+        Initialize the profile page for a different test user
+        """
+        username, user_id = self.log_in_as_unique_user()
+
+        # Set the privacy for the new user
+        if privacy is None:
+            privacy = self.PRIVACY_PUBLIC
+        self.visit_profile_page(username, privacy=privacy)
+
+        # Log the user out
+        LogoutPage(self.browser).visit()
+
+        return username, user_id

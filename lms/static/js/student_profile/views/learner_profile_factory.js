@@ -113,8 +113,7 @@
                 Logger.log('edx.user.settings.viewed', {
                     page: "profile",
                     visibility: getProfileVisibility(),
-                    user_id: options.profile_user_id,
-                    requires_parental_consent: options.profile_requires_parental_consent
+                    user_id: options.profile_user_id
                 });
 
                 // Render the view for the first time
