@@ -6,6 +6,7 @@ import unittest
 import functools
 import requests
 import os
+import time
 from datetime import datetime
 from path import path
 from bok_choy.javascript import js_defined
@@ -278,6 +279,16 @@ class EventsTestMixin(object):
         super(EventsTestMixin, self).setUp()
         self.event_collection = MongoClient()["test"]["events"]
         self.event_collection.drop()
+        self.browser_event_collection = MongoClient()["test"]["user_events"]
+        self.browser_event_collection.drop()
+        self.start_time = datetime.now()
+
+    def reset_event_tracking(self):
+        """
+        Resets all event tracking so that previously captured events are removed.
+        """
+        self.event_collection.drop()
+        self.browser_event_collection.drop()
         self.start_time = datetime.now()
 
     def assert_event_emitted_num_times(self, event_name, event_time, event_user_id, num_times_emitted):
@@ -297,6 +308,37 @@ class EventsTestMixin(object):
                 }
             ).count(), num_times_emitted
         )
+
+    def get_matching_browser_events(self, event_type):
+        """
+        Returns a cursor for the matching browser events.
+        """
+        return self.browser_event_collection.find({
+            "event_type": event_type,
+            "time": {"$gt": self.start_time},
+        })
+
+    def verify_browser_events(self, event_type, expected_events):
+        """Verify that the expected browser events were logged.
+        Args:
+            event_type (str): The type of event to be verified.
+            expected_events (list): A list of dicts representing the events that should
+                have been fired.
+        """
+        EmptyPromise(
+            lambda: self.get_matching_browser_events(event_type).count() >= len(expected_events),
+            "Waiting for enough browser events to be emitted"
+        ).fulfill()
+
+        # Verify that the correct number of events were found
+        cursor = self.get_matching_browser_events(event_type)
+
+        actual_events = []
+        for i in range(0, cursor.count()):
+            raw_event = cursor.next()
+            actual_events.append(json.loads(raw_event["event"]))
+
+        self.assertEqual(actual_events, expected_events)
 
 
 class UniqueCourseTest(WebAppTest):
