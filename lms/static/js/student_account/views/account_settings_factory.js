@@ -156,8 +156,7 @@
                 Logger.log('edx.user.settings.viewed', {
                     page: "account",
                     visibility: null,
-                    user_id: accountUserId,
-                    requires_parental_consent: userAccountModel.get('requires_parental_consent')
+                    user_id: accountUserId
                 });
 
                 // Render the fields

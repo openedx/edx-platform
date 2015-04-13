@@ -13,12 +13,11 @@ from ...pages.lms.dashboard import DashboardPage
 from ..helpers import EventsTestMixin
 
 
-class AccountSettingsPageTest(EventsTestMixin, WebAppTest):
+class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
     """
-    Tests that verify behaviour of the Account Settings page.
+    Mixin with helper methods to test the account settings page.
     """
 
-    SUCCESS_MESSAGE = 'Your changes have been saved.'
     USERNAME = "test"
     PASSWORD = "testpass"
     EMAIL = "test@example.com"
@@ -27,39 +26,17 @@ class AccountSettingsPageTest(EventsTestMixin, WebAppTest):
         """
         Initialize account and pages.
         """
-        super(AccountSettingsPageTest, self).setUp()
+        super(AccountSettingsTestMixin, self).setUp()
 
         self.user_id = AutoAuthPage(
             self.browser, username=self.USERNAME, password=self.PASSWORD, email=self.EMAIL
         ).visit().get_user_id()
 
-    def visit_account_settings_page(self):
-        """
-        Visit the account settings page for the current user.
-        """
-        self.account_settings_page = AccountSettingsPage(self.browser)
-        self.account_settings_page.visit()
 
-    def test_page_view_event(self):
-        """
-        Scenario: An event should be recorded when the "Account Settings"
-           page is viewed.
-
-        Given that I am a registered user
-        And I visit my account settings page
-        Then a page view analytics event should be recorded
-        """
-        self.visit_account_settings_page()
-        self.verify_browser_events(
-            u"edx.user.settings.viewed",
-            [{
-                u"user_id": int(self.user_id),
-                u"page": u"account",
-                u"visibility": None,
-                u"requires_parental_consent": False,
-            }]
-        )
-
+class DashboardMenuTest(AccountSettingsTestMixin, WebAppTest):
+    """
+    Tests that the dashboard menu works correctly with the account settings page.
+    """
     def test_link_on_dashboard_works(self):
         """
         Scenario: Verify that the "Account Settings" link works from the dashboard.
@@ -75,6 +52,41 @@ class AccountSettingsPageTest(EventsTestMixin, WebAppTest):
         dashboard_page.click_username_dropdown()
         self.assertIn('Account Settings', dashboard_page.username_dropdown_link_text)
         dashboard_page.click_account_settings_link()
+
+
+class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
+    """
+    Tests that verify behaviour of the Account Settings page.
+    """
+    SUCCESS_MESSAGE = 'Your changes have been saved.'
+
+    def setUp(self):
+        """
+        Initialize account and pages.
+        """
+        super(AccountSettingsPageTest, self).setUp()
+
+        # Visit the account settings page for the current user.
+        self.account_settings_page = AccountSettingsPage(self.browser)
+        self.account_settings_page.visit()
+
+    def test_page_view_event(self):
+        """
+        Scenario: An event should be recorded when the "Account Settings"
+           page is viewed.
+
+        Given that I am a registered user
+        And I visit my account settings page
+        Then a page view analytics event should be recorded
+        """
+        self.verify_browser_events(
+            u"edx.user.settings.viewed",
+            [{
+                u"user_id": int(self.user_id),
+                u"page": u"account",
+                u"visibility": None,
+            }]
+        )
 
     def test_all_sections_and_fields_are_present(self):
         """
@@ -110,7 +122,6 @@ class AccountSettingsPageTest(EventsTestMixin, WebAppTest):
             }
         ]
 
-        self.visit_account_settings_page()
         self.assertEqual(self.account_settings_page.sections_structure(), expected_sections_structure)
 
     def _test_readonly_field(self, field_id, title, value):
@@ -175,7 +186,6 @@ class AccountSettingsPageTest(EventsTestMixin, WebAppTest):
         """
         Test behaviour of "Username" field.
         """
-        self.visit_account_settings_page()
         self._test_readonly_field(
             'username',
             'Username',
@@ -186,7 +196,6 @@ class AccountSettingsPageTest(EventsTestMixin, WebAppTest):
         """
         Test behaviour of "Full Name" field.
         """
-        self.visit_account_settings_page()
         self._test_text_field(
             u'name',
             u'Full Name',
@@ -199,7 +208,6 @@ class AccountSettingsPageTest(EventsTestMixin, WebAppTest):
         """
         Test behaviour of "Email" field.
         """
-        self.visit_account_settings_page()
         self._test_text_field(
             u'email',
             u'Email Address',
@@ -214,7 +222,6 @@ class AccountSettingsPageTest(EventsTestMixin, WebAppTest):
         """
         Test behaviour of "Password" field.
         """
-        self.visit_account_settings_page()
         self._test_link_field(
             u'password',
             u'Password',
@@ -230,7 +237,6 @@ class AccountSettingsPageTest(EventsTestMixin, WebAppTest):
         """
         Test behaviour of "Language" field.
         """
-        self.visit_account_settings_page()
         self._test_dropdown_field(
             u'pref-lang',
             u'Language',
@@ -243,7 +249,6 @@ class AccountSettingsPageTest(EventsTestMixin, WebAppTest):
         """
         Test behaviour of "Education Completed" field.
         """
-        self.visit_account_settings_page()
         self._test_dropdown_field(
             u'level_of_education',
             u'Education Completed',
@@ -255,7 +260,6 @@ class AccountSettingsPageTest(EventsTestMixin, WebAppTest):
         """
         Test behaviour of "Gender" field.
         """
-        self.visit_account_settings_page()
         self._test_dropdown_field(
             u'gender',
             u'Gender',
@@ -267,7 +271,6 @@ class AccountSettingsPageTest(EventsTestMixin, WebAppTest):
         """
         Test behaviour of "Year of Birth" field.
         """
-        self.visit_account_settings_page()
         self.assertEqual(self.account_settings_page.value_for_dropdown_field('year_of_birth', ''), '')
         self._test_dropdown_field(
             u'year_of_birth',
@@ -280,7 +283,6 @@ class AccountSettingsPageTest(EventsTestMixin, WebAppTest):
         """
         Test behaviour of "Country or Region" field.
         """
-        self.visit_account_settings_page()
         self._test_dropdown_field(
             u'country',
             u'Country or Region',
@@ -292,7 +294,6 @@ class AccountSettingsPageTest(EventsTestMixin, WebAppTest):
         """
         Test behaviour of "Preferred Language" field.
         """
-        self.visit_account_settings_page()
         self._test_dropdown_field(
             u'language_proficiencies',
             u'Preferred Language',
@@ -307,7 +308,6 @@ class AccountSettingsPageTest(EventsTestMixin, WebAppTest):
         Currently there is no way to test the whole authentication process
         because that would require accounts with the providers.
         """
-        self.visit_account_settings_page()
         for field_id, title, link_title in [
             ['auth-facebook', 'Facebook', 'Link'],
             ['auth-google', 'Google', 'Link'],
