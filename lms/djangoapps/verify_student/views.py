@@ -1115,9 +1115,10 @@ class InCourseReverifyView(View):
     Does not need to worry about pricing
     """
     @method_decorator(login_required)
-    def get(self, request, course_id, checkpoint_name, location):
+    def get(self, request, course_id, checkpoint_name, usage_id):
         """ Display the view for face photo submission"""
         # Check the in-course re-verification is enabled or not
+
         incourse_reverify_enabled = InCourseReverificationConfiguration.current().enabled
         if not incourse_reverify_enabled:
             raise Http404
@@ -1146,12 +1147,12 @@ class InCourseReverifyView(View):
             'course_name': course.display_name_with_default,
             'checkpoint_name': checkpoint_name,
             'platform_name': settings.PLATFORM_NAME,
-            'location': location
+            'usage_id': usage_id
         }
         return render_to_response("verify_student/incourse_reverify.html", context)
 
     @method_decorator(login_required)
-    def post(self, request, course_id, checkpoint_name, location):
+    def post(self, request, course_id, checkpoint_name, usage_id):
         """Submits the re-verification attempt to SoftwareSecure
 
         Args:
@@ -1172,7 +1173,7 @@ class InCourseReverifyView(View):
         user = request.user
         try:
             course_key = CourseKey.from_string(course_id)
-            usage_key = UsageKey.from_string(location).replace(course_key=course_key)
+            usage_key = UsageKey.from_string(usage_id).replace(course_key=course_key)
         except InvalidKeyError:
             raise Http404(u"Invalid course_key or usage_key")
         course = modulestore().get_course(course_key)
@@ -1187,7 +1188,7 @@ class InCourseReverifyView(View):
                 'error': True,
                 'errorMsg': _("No checkpoint found"),
                 'platform_name': settings.PLATFORM_NAME,
-                'location': location
+                'usage_id': usage_id
             }
             return render_to_response("verify_student/incourse_reverify.html", context)
         init_verification = SoftwareSecurePhotoVerification.get_initial_verification(user)

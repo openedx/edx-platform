@@ -28,13 +28,13 @@
             this.courseKey = obj.courseKey || null;
             this.checkpointName = obj.checkpointName || null;
             this.platformName = obj.platformName || null;
-            this.location = obj.location || null;
+            this.usageId = obj.usageId || null;
 
 
             this.model = new edx.verify_student.ReverificationModel({
                 courseKey: this.courseKey,
                 checkpointName: this.checkpointName,
-                location: this.location
+                usageId: this.usageId
             });
 
             this.listenTo( this.model, 'sync', _.bind( this.handleSubmitPhotoSuccess, this ));
