@@ -1,0 +1,15 @@
+<article class="course">
+  <a href="/courses/<%- course %>/info">
+    <header class="course-image">
+      <div class="cover-image">
+        <img src="<%- image_url %>" />
+      </div>
+    </header>
+    <section class="course-info">
+      <div class="course-organization"><%= org %></div>
+      <div class="course-code"><%= content.number %></div>
+      <div class="course-title"><%= content.display_name %></div>
+      <div class="course-date"><%= interpolate(gettext("Starts: %(date)s"), {'date': start}, true) %></div>
+    </section>
+  </a>
+</article>

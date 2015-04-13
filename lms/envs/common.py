@@ -1246,6 +1246,8 @@ reverify_js = [
 
 ccx_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/ccx/**/*.js'))
 
+discovery_js = ['js/discovery/main.js']
+
 
 PIPELINE_CSS = {
     'style-vendor': {
@@ -1420,6 +1422,10 @@ PIPELINE_JS = {
     'ccx': {
         'source_filenames': ccx_js,
         'output_filename': 'js/ccx.js'
+    },
+    'discovery': {
+        'source_filenames': discovery_js,
+        'output_filename': 'js/discovery.js'
     }
 }
 
