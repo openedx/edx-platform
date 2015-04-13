@@ -361,7 +361,8 @@
             },
 
             fieldValue: function () {
-                return this.$('.u-field-value select').val();
+                var selectedValue = this.$('.u-field-value select').val();
+                return selectedValue === "" ? null : selectedValue;
             },
 
             displayValue: function (value) {

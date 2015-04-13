@@ -303,7 +303,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             u'',
             None,
             [u'Bachelor\'s degree', u''],
-            [u'b', u'']
+            [u'b', None]
         )
 
     def test_gender_field(self):
@@ -316,7 +316,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             u'',
             None,
             [u'Female', u''],
-            [u'f', u'']
+            [u'f', None]
         )
 
     def test_year_of_birth_field(self):
@@ -331,7 +331,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             '',
             ['1980', u''],
             None  # TODO: disabling year_of_birth testing because of mismatch between ints and strings
-            # [1980, u'']  # TODO: should we emit None instead of '' for combos when "nothing" is selected? See what happens with server event.
+            # [1980, None]
         )
 
     def test_country_field(self):

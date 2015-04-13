@@ -126,7 +126,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             expectMessageContains(view, "Do not reset this!");
         };
 
-        var verifyEditableField = function (view, data, requests) {
+        var verifyEditableField = function (view, data, requests, allowEmptyString) {
             var request_data = {};
             var url = view.model.url;
 
@@ -146,7 +146,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             // When the value in the field is changed
             expect(view.fieldValue()).toBe(data.validValue);
 
-            if (data.oldValue && data.userID) {
+            if (data.oldValue !== undefined && data.userID) {
                 var eventData = {
                     'setting': data.valueAttribute,
                     'old': data.oldValue,
@@ -199,8 +199,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
             view.$(data.valueInputSelector).val('').change();
             // When the value in the field is changed
-            expect(view.fieldValue()).toBe('');
-            request_data[data.valueAttribute] = '';
+            expect(view.fieldValue()).toBe(allowEmptyString ? "" : null);
+            request_data[data.valueAttribute] = allowEmptyString ? "" : null;
             AjaxHelpers.expectJsonRequest(
                 requests, 'PATCH', url, request_data
             );
@@ -218,7 +218,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     valueSelector: '.u-field-value',
                     valueInputSelector: '.u-field-value > input'
                 }, data
-            ), requests);
+            ), requests, true);
         };
 
         var verifyDropDownField = function (view, data, requests) {
@@ -226,7 +226,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     valueSelector: '.u-field-value',
                     valueInputSelector: '.u-field-value > select'
                 }, data
-            ), requests);
+            ), requests, false);
         };
 
         return {

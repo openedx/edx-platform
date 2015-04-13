@@ -88,7 +88,7 @@
                 if (_.isArray(modelValue) && modelValue.length > 0) {
                     return modelValue[0].code;
                 } else {
-                    return '';
+                    return null;
                 }
             },
 
