@@ -486,14 +486,14 @@ class DashboardTest(ModuleStoreTestCase):
         self.assertContains(response, expected_url)
 
 
-class UserProfileEventTestMixin(EventTestMixin):
+class UserSettingsEventTestMixin(EventTestMixin):
     """
-    Mixin for verifying that UserProfile events were emitted during a test.
+    Mixin for verifying that user setting events were emitted during a test.
     """
     def setUp(self):
-        super(UserProfileEventTestMixin, self).setUp('student.models.tracker')
+        super(UserSettingsEventTestMixin, self).setUp('util.model_utils.tracker')
 
-    def assert_profile_event_emitted(self, **kwargs):
+    def assert_user_setting_event_emitted(self, **kwargs):
         """
         Helper method to assert that we emit the expected user settings events.
 
@@ -501,7 +501,7 @@ class UserProfileEventTestMixin(EventTestMixin):
         """
         self.assert_event_emitted(
             USER_SETTINGS_CHANGED_EVENT_NAME,
-            table='auth_userprofile',
+            table=self.table,  # pylint: disable=no-member
             user_id=self.user.id,
             **kwargs
         )
