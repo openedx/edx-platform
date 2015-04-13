@@ -24,6 +24,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 accountSettingsData.requires_parental_consent = false;
                 accountSettingsModel.set(accountSettingsData);
                 accountSettingsModel.set({'profile_is_public': profileIsPublic});
+                accountSettingsModel.set({'profile_image': Helpers.PROFILE_IMAGE});
 
                 var accountPreferencesModel = new AccountPreferencesModel();
                 accountPreferencesModel.set({account_privacy: accountPrivacy});
@@ -51,7 +52,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     el: $('.message-banner')
                 });
 
-                var profileImageFieldView = new FieldsView.ImageFieldView({
+                var profileImageFieldView = new LearnerProfileFields.ProfileImageFieldView({
                     model: accountSettingsModel,
                     valueAttribute: "profile_image",
                     editable: editable,
@@ -69,7 +70,6 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 });
 
                 var sectionOneFieldViews = [
-                    usernameFieldView,
                     new FieldViews.DropdownFieldView({
                         model: accountSettingsModel,
                         required: false,
@@ -117,6 +117,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                         preferencesModel: accountPreferencesModel,
                         accountPrivacyFieldView: accountPrivacyFieldView,
                         usernameFieldView: usernameFieldView,
+                        profileImageFieldView: profileImageFieldView,
                         sectionOneFieldViews: sectionOneFieldViews,
                         sectionTwoFieldViews: sectionTwoFieldViews
                     });
@@ -128,7 +129,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 TemplateHelpers.installTemplate('templates/fields/field_dropdown');
                 TemplateHelpers.installTemplate('templates/fields/field_textarea');
                 TemplateHelpers.installTemplate('templates/fields/field_image');
-                TemplateHelpers.installTemplate('templates/message_banner');
+                TemplateHelpers.installTemplate('templates/fields/message_banner');
                 TemplateHelpers.installTemplate('templates/student_profile/learner_profile');
             });
 

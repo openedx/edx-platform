@@ -598,6 +598,7 @@
         'lms/include/js/spec/views/fields_spec.js',
         'lms/include/js/spec/student_profile/learner_profile_factory_spec.js',
         'lms/include/js/spec/student_profile/learner_profile_view_spec.js',
+        'lms/include/js/spec/student_profile/learner_profile_fields_spec.js',
         'lms/include/js/spec/verify_student/pay_and_verify_view_spec.js',
         'lms/include/js/spec/verify_student/webcam_photo_view_spec.js',
         'lms/include/js/spec/verify_student/image_input_spec.js',

@@ -70,9 +70,14 @@
 
             imageChangeFailed: function (e, data) {
                 this.setCurrentStatus('');
-                 if (_.contains([400, 404], data.jqXHR.status)) {
+                this.showImageChangeFailedMessage(data.jqXHR.status, data.jqXHR.responseText);
+                this.render();
+            },
+
+            showImageChangeFailedMessage: function (status, responseText) {
+                if (_.contains([400, 404], status)) {
                     try {
-                        var errors = JSON.parse(data.jqXHR.responseText);
+                        var errors = JSON.parse(responseText);
                         this.showErrorMessage(errors.user_message);
                     } catch (error) {
                         this.showErrorMessage(this.errorMessage);
@@ -80,7 +85,6 @@
                 } else {
                     this.showErrorMessage(this.errorMessage);
                 }
-                this.render();
             },
 
             showErrorMessage: function (message) {
