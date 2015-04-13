@@ -498,10 +498,6 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 draft_course = course_key.for_branch(ModuleStoreEnum.BranchName.draft)
                 with self.branch_setting(ModuleStoreEnum.Branch.draft_preferred, draft_course):
                     draft_block = self.import_xblock(user_id, draft_course, block_type, block_id, fields, runtime)
-                    # if block was published once and now it is in draft state then return draft version
-                    # as current state of block is draft state
-                    if self.has_published_version(draft_block) and block_type not in DIRECT_ONLY_CATEGORIES:
-                        return draft_block
                     return self.publish(draft_block.location.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
 
             # do the import
