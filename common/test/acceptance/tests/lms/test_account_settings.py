@@ -79,7 +79,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         And I visit my account settings page
         Then a page view analytics event should be recorded
         """
-        self.verify_browser_events(
+        self.verify_events_of_type(
             u"edx.user.settings.viewed",
             [{
                 u"user_id": int(self.user_id),
