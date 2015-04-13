@@ -11,9 +11,13 @@
             },
 
             render: function () {
-                this.$el.html(this.template({
-                    message: this.message
-                }));
+                if (this.message === null) {
+                    this.$el.html('');
+                } else {
+                    this.$el.html(this.template({
+                        message: this.message
+                    }));
+                }
                 return this;
             },
 
@@ -23,7 +27,8 @@
             },
 
             hideMessage: function () {
-                this.$el.html('');
+                this.message = null;
+                this.render();
             }
         });
 
