@@ -544,7 +544,8 @@
                 return this;
             },
 
-            showErrorMessage: function () {
+            showErrorMessage: function (message) {
+                return message;
             },
 
             imageUrl: function () {
@@ -589,7 +590,7 @@
                 }
             },
 
-            clickedUploadButton: function () {
+            clickedUploadButton: function (e, data) {
                 $(this.uploadButtonSelector).fileupload({
                     url: this.options.imageUploadUrl,
                     type: 'POST',
@@ -599,7 +600,7 @@
                 });
             },
 
-            clickedRemoveButton: function () {
+            clickedRemoveButton: function (e, data) {
                 var view = this;
                 this.setCurrentStatus('removing');
                 this.setUploadButtonVisibility('none');
@@ -611,7 +612,7 @@
                         view.imageChangeSucceeded();
                     },
                     error: function (xhr, status, error) {
-                       view.imageChangeFailed();
+                       view.showImageChangeFailedMessage(xhr.status, xhr.responseText);
                     }
                 });
             },
@@ -623,8 +624,11 @@
             imageChangeFailed: function (e, data) {
             },
 
+            showImageChangeFailedMessage: function (status, responseText) {
+            },
+
             fileSelected: function (e, data) {
-                if (this.validateImageSize(data.files[0].size)) {
+                if (_.isUndefined(data.files[0].size) || this.validateImageSize(data.files[0].size)) {
                     data.formData = {file: data.files[0]};
                     this.setCurrentStatus('uploading');
                     this.setRemoveButtonVisibility('none');
@@ -677,6 +681,7 @@
             },
 
             onBeforeUnload: function () {
+                console.log('Do you really want to go away?');
                 var status = this.getCurrentStatus();
                 if (status === 'uploading') {
                     return gettext("Upload is in progress. To avoid errors, stay on this page until the process is complete.");

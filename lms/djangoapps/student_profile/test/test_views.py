@@ -53,6 +53,26 @@ class LearnerProfileViewTest(UrlResetMixin, TestCase):
             reverse('preferences_api', kwargs={'username': self.user.username})
         )
 
+        self.assertEqual(
+            context['data']['profile_image_upload_url'],
+            reverse("profile_image_upload", kwargs={'username': self.user.username})
+        )
+
+        self.assertEqual(
+            context['data']['profile_image_remove_url'],
+            reverse('profile_image_remove', kwargs={'username': self.user.username})
+        )
+
+        self.assertEqual(
+            context['data']['profile_image_max_bytes'],
+            settings.PROFILE_IMAGE_MAX_BYTES
+        )
+
+        self.assertEqual(
+            context['data']['profile_image_min_bytes'],
+            settings.PROFILE_IMAGE_MIN_BYTES
+        )
+
         self.assertEqual(context['data']['account_settings_page_url'], reverse('account_settings'))
 
         for attribute in self.CONTEXT_DATA:
