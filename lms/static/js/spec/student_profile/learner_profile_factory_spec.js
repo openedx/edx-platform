@@ -6,7 +6,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
         'js/student_account/models/user_preferences_model',
         'js/student_profile/views/learner_profile_view',
         'js/student_profile/views/learner_profile_fields',
-        'js/student_profile/views/learner_profile_factory'
+        'js/student_profile/views/learner_profile_factory',
+        'js/views/message_banner'
         ],
     function (Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers, FieldViews,
               UserAccountModel, UserPreferencesModel, LearnerProfileView, LearnerProfileFields, LearnerProfilePage) {
@@ -17,10 +18,12 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             var requests;
 
             beforeEach(function () {
-                setFixtures('<div class="wrapper-profile"><div class="ui-loading-indicator"><p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">Loading</span></p></div><div class="ui-loading-error is-hidden"><i class="fa fa-exclamation-triangle message-error" aria-hidden=true></i><span class="copy">An error occurred. Please reload the page.</span></div></div>');
+                setFixtures('<div class="message-banner"></div><div class="wrapper-profile"><div class="ui-loading-indicator"><p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">Loading</span></p></div><div class="ui-loading-error is-hidden"><i class="fa fa-exclamation-triangle message-error" aria-hidden=true></i><span class="copy">An error occurred. Please reload the page.</span></div></div>');
                 TemplateHelpers.installTemplate('templates/fields/field_readonly');
                 TemplateHelpers.installTemplate('templates/fields/field_dropdown');
                 TemplateHelpers.installTemplate('templates/fields/field_textarea');
+                TemplateHelpers.installTemplate('templates/fields/field_image');
+                TemplateHelpers.installTemplate('templates/fields/message_banner');
                 TemplateHelpers.installTemplate('templates/student_profile/learner_profile');
             });
 
@@ -32,7 +35,11 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     'account_settings_page_url': Helpers.USER_ACCOUNTS_API_URL,
                     'country_options': Helpers.FIELD_OPTIONS,
                     'language_options': Helpers.FIELD_OPTIONS,
-                    'has_preferences_access': true
+                    'has_preferences_access': true,
+                    'profile_image_max_bytes': Helpers.IMAGE_MAX_BYTES,
+                    'profile_image_min_bytes': Helpers.IMAGE_MIN_BYTES,
+                    'profile_image_upload_url': Helpers.IMAGE_UPLOAD_API_URL,
+                    'profile_image_remove_url': Helpers.IMAGE_REMOVE_API_URL
                 });
             };
 
