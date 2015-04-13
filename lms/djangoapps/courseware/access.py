@@ -32,7 +32,10 @@ from student.roles import (
     GlobalStaff, CourseStaffRole, CourseInstructorRole,
     OrgStaffRole, OrgInstructorRole, CourseBetaTesterRole
 )
-from util.milestones_helpers import get_pre_requisite_courses_not_completed
+from util.milestones_helpers import (
+    get_pre_requisite_courses_not_completed,
+    any_unfulfilled_milestones,
+)
 
 import dogstats_wrapper as dog_stats_api
 
@@ -173,7 +176,12 @@ def _has_access_course_desc(user, action, course):
             # check start date
             can_load() and
             # check mobile_available flag
-            is_mobile_available_for_user(user, course)
+            is_mobile_available_for_user(user, course) and
+            # check staff access, if not then check for unfulfilled milestones
+            (
+                _has_staff_access_to_descriptor(user, course, course.id) or
+                not any_unfulfilled_milestones(course.id, user.id)
+            )
         )
 
     def can_enroll():

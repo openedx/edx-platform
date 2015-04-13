@@ -3,6 +3,8 @@ Tests for the milestones helpers library, which is the integration point for the
 """
 
 from mock import patch
+
+from milestones.exceptions import InvalidCourseKeyException, InvalidUserException
 from util import milestones_helpers
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -85,3 +87,11 @@ class MilestonesHelpersTestCase(ModuleStoreTestCase):
     def test_add_user_milestone_returns_none_when_app_disabled(self):
         response = milestones_helpers.add_user_milestone(self.user, self.milestone)
         self.assertIsNone(response)
+
+    @patch.dict('django.conf.settings.FEATURES', {'MILESTONES_APP': True})
+    def test_any_unfulfilled_milestones(self):
+        """ Tests any_unfulfilled_milestones for invalid arguments """
+        with self.assertRaises(InvalidCourseKeyException):
+            milestones_helpers.any_unfulfilled_milestones(None, self.user)
+        with self.assertRaises(InvalidUserException):
+            milestones_helpers.any_unfulfilled_milestones(self.course.id, None)
