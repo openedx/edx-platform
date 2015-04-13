@@ -328,10 +328,9 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             u'year_of_birth',
             u'Year of Birth',
             u'',
-            '',
+            None,
             ['1980', u''],
-            None  # TODO: disabling year_of_birth testing because of mismatch between ints and strings
-            # [1980, None]
+            [1980, None]
         )
 
     def test_country_field(self):

@@ -105,7 +105,7 @@
                             })
                         },
                         {
-                            view: new FieldViews.DropdownFieldView({
+                            view: new FieldViews.IntegerFieldView({
                                 model: userAccountModel,
                                 title: gettext('Year of Birth'),
                                 valueAttribute: 'year_of_birth',

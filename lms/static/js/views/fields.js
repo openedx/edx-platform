@@ -412,6 +412,23 @@
             }
         });
 
+        FieldViews.IntegerFieldView = FieldViews.DropdownFieldView.extend({
+            initialize: function (options) {
+                this._super(options);
+                _.bindAll(this, 'fieldValue', 'modelValue');
+            },
+
+            modelValue: function () {
+                var modelValue = this.model.get(this.options.valueAttribute);
+                return modelValue === "" ? null : parseInt(modelValue);
+            },
+
+            fieldValue: function () {
+                var selectedValue = this.$('.u-field-value select').val();
+                return selectedValue === "" ? null : parseInt(selectedValue);
+            }
+        });
+
         FieldViews.TextareaFieldView = FieldViews.EditableFieldView.extend({
 
             fieldType: 'textarea',
