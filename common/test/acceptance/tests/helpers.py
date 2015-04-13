@@ -279,23 +279,25 @@ class EventsTestMixin(object):
         self.event_collection = MongoClient()["test"]["events"]
         self.reset_event_tracking()
 
-    def assert_event_emitted_num_times(self, event_name, event_time, event_user_id, num_times_emitted):
+    def assert_event_emitted_num_times(self, event_name, event_time, event_user_id, num_times_emitted, **kwargs):
         """
         Tests the number of times a particular event was emitted.
+
+        Extra kwargs get passed to the mongo query in the form: "event.<key>: value".
+
         :param event_name: Expected event name (e.g., "edx.course.enrollment.activated")
         :param event_time: Latest expected time, after which the event would fire (e.g., the beginning of the test case)
         :param event_user_id: user_id expected in the event
         :param num_times_emitted: number of times the event is expected to appear since the event_time
         """
-        self.assertEqual(
-            self.event_collection.find(
-                {
-                    "name": event_name,
-                    "time": {"$gt": event_time},
-                    "event.user_id": int(event_user_id),
-                }
-            ).count(), num_times_emitted
-        )
+        find_kwargs = {
+            "name": event_name,
+            "time": {"$gt": event_time},
+            "event.user_id": int(event_user_id),
+        }
+        find_kwargs.update({"event.{}".format(key): value for key, value in kwargs.items()})
+        matching_events = self.event_collection.find(find_kwargs)
+        self.assertEqual(matching_events.count(), num_times_emitted, '\n'.join(str(event) for event in matching_events))
 
     def reset_event_tracking(self):
         """
@@ -315,7 +317,6 @@ class EventsTestMixin(object):
 
     def verify_events_of_type(self, event_type, expected_events, expected_referers=None):
         """Verify that the expected events of a given type were logged.
-
         Args:
             event_type (str): The type of event to be verified.
             expected_events (list): A list of dicts representing the events that should

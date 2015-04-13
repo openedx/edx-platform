@@ -6,6 +6,7 @@ import datetime
 import logging
 
 from django.utils.translation import ugettext as _
+from django.utils.timezone import utc
 from rest_framework import permissions, status
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
@@ -31,7 +32,7 @@ def _make_upload_dt():
     Generate a server-side timestamp for the upload.  This is in a separate
     function so its behavior can be overridden in tests.
     """
-    return datetime.datetime.utcnow()
+    return datetime.datetime.utcnow().replace(tzinfo=utc)
 
 
 class ProfileImageUploadView(APIView):
