@@ -21,8 +21,11 @@ from courseware.courses import course_image_url, get_course_about_section
              alt="${course.display_number_with_default | h} ${get_course_about_section(course, 'title')} Cover Image"/>
       </div>
       <div class="enrollment-details">
-        <div class="sub-title">${_("Confirm your enrollment for:")}
-          <span class="course-date-label">${_("course dates")}</span>
+        <div class="sub-title">
+          ${_("Confirm your enrollment for: {span_start}course dates{span_end}").format(
+              span_start='<span class="course-date-label">',
+              span_end='</span>'
+            )}
 
           <div class="clearfix"></div>
         </div>
@@ -37,11 +40,14 @@ from courseware.courses import course_image_url, get_course_about_section
         <hr>
         <div>
           % if reg_code_already_redeemed:
-          <% dashboard_url = reverse('dashboard')%>
           <p class="enrollment-text">
             ${_("You've clicked a link for an enrollment code that has already been used."
-            " Check your <a href={dashboard_url}>course dashboard</a> to see if you're enrolled in the course,"
-            " or contact your company's administrator.").format(dashboard_url=dashboard_url)}
+            " Check your {link_start}course dashboard{link_end} to see if you're enrolled in the course,"
+            " or contact your company's administrator."
+            ).format(
+              link_start=u'<a href="{url}">'.format(url=reverse('dashboard')),
+              link_end='</a>'
+            )}
           </p>
           % elif redemption_success:
           <p class="enrollment-text">
@@ -49,23 +55,23 @@ from courseware.courses import course_image_url, get_course_about_section
             " This course has now been added to your dashboard.").format(course_name=course.display_name)}
           </p>
           % elif registered_for_course:
-          <% dashboard_url = reverse('dashboard')%>
           <p class="enrollment-text">
             ${_("You're already enrolled for this course."
-            " Visit your <a href={dashboard_url}>dashboard</a> to see the course.").format(dashboard_url=dashboard_url)}
+            " Visit your {link_start}dashboard{link_end} to see the course."
+            ).format(
+              link_start=u'<a href="{url}">'.format(url=reverse('dashboard')),
+              link_end='</a>'
+            )}
           </p>
           % elif course_full:
-          <% dashboard_url = reverse('dashboard')%>
           <p class="enrollment-text">
             ${_("The course you are enrolling for is full.")}
           </p>
           % elif enrollment_closed:
-          <% dashboard_url = reverse('dashboard')%>
           <p class="enrollment-text">
             ${_("The course you are enrolling for is closed.")}
           </p>
           % elif redeem_code_error:
-          <% dashboard_url = reverse('dashboard')%>
           <p class="enrollment-text">
             ${_("There was an error processing your redeem code.")}
           </p>

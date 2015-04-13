@@ -24,8 +24,11 @@ from courseware.courses import course_image_url, get_course_about_section
             )}" />
       </div>
       <div class="enrollment-details">
-        <div class="sub-title">${_("Confirm your enrollment for:")}
-          <span class="course-date-label">${_("course dates")}</span>
+        <div class="sub-title">
+          ${_("Confirm your enrollment for: {span_start}course dates{span_end}").format(
+              span_start='<span class="course-date-label">',
+              span_end='</span>'
+            )}
 
           <div class="clearfix"></div>
         </div>
@@ -50,7 +53,7 @@ from courseware.courses import course_image_url, get_course_about_section
               "to see if you're enrolled in the course, or contact your "
               "company's administrator."
             ).format(
-              link_start='<a href="{url}">'.format(url=reverse('dashboard')),
+              link_start=u'<a href="{url}">'.format(url=reverse('dashboard')),
               link_end='</a>',
             )}
           </p>
@@ -69,7 +72,7 @@ from courseware.courses import course_image_url, get_course_about_section
               "You're already enrolled for this course. "
               "Visit your {link_start}dashboard{link_end} to see the course."
             ).format(
-              link_start='<a href="{url}">'.format(url=reverse('dashboard')),
+              link_start=u'<a href="{url}">'.format(url=reverse('dashboard')),
               link_end='</a>',
             )}
           </p>
