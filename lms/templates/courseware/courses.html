@@ -6,6 +6,18 @@
 
 <%namespace name='static' file='../static_content.html'/>
 
+<%block name="header_extras">
+  % for template_name in ["result_item"]:
+  <script type="text/template" id="${template_name}-tpl">
+      <%static:include path="discovery/${template_name}.underscore" />
+  </script>
+  % endfor
+</%block>
+
+<%block name="js_extra">
+  <%static:js group='discovery'/>
+</%block>
+
 <%block name="pagetitle">${_("Courses")}</%block>
 <%
   platform_name = microsite.get_value('platform_name', settings.PLATFORM_NAME)
@@ -45,9 +57,19 @@
   </header>
 
   <section class="courses-container">
+
+    <div id="discovery-search">
+      <form>
+        <input placeholder="${_('Search for a course')}" type="text"/>
+        <button type="submit" class="button postfix" aria-label="${_('Search')}">
+          <i class="icon fa fa-search" aria-hidden="true"></i>
+        </button>
+      </form>
+    </div>
+
     <section class="courses">
       <ul class="courses-listing">
-	%for course in courses:
+	      %for course in courses:
         <li class="courses-listing-item">
           <%include file="../course.html" args="course=course" />
         </li>
