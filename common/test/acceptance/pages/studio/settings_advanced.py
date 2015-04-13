@@ -196,4 +196,5 @@ class AdvancedSettingsPage(CoursePage):
             'static_asset_path',
             'text_customization',
             'annotation_storage_url',
+            'social_sharing_url',
         ]

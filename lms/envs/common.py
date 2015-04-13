@@ -374,6 +374,8 @@ FEATURES = {
 
     # Social Media Sharing on Student Dashboard
     'DASHBOARD_SHARE_SETTINGS': {
+        # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in cms/envs/common.py
+        'CUSTOM_COURSE_URLS': False,
         'FACEBOOK_SHARING': False,
         'TWITTER_SHARING': False,
         'TWITTER_SHARING_TEXT': None

@@ -175,3 +175,11 @@ class DashboardPage(PageObject):
         Verify if pre-requisite course messages are being displayed.
         """
         return self.q(css='li.prerequisites > .tip').visible
+
+    def get_course_listings(self):
+        """Retrieve the list of course DOM elements"""
+        return self.q(css='ul.listing-courses')
+
+    def get_course_social_sharing_widget(self, widget_name):
+        """ Retrieves the specified social sharing widget by its classification """
+        return self.q(css='a.action-{}'.format(widget_name))

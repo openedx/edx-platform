@@ -117,10 +117,18 @@ from student.helpers import (
               % endif
 
               % if share_settings:
-                <% share_url = urllib.quote_plus(request.build_absolute_uri(reverse('about_course', args=[unicode(course.id)]))) %>
-                <% share_window_name = 'shareWindow' %>
-                <% share_window_config = 'toolbar=no, location=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=640, height=480' %>
-                % if share_settings.get('FACEBOOK_SHARING', False):
+                <%
+                  if share_settings.get("CUSTOM_COURSE_URLS", False):
+                    if course.social_sharing_url:
+                      share_url = urllib.quote_plus(course.social_sharing_url)
+                    else:
+                      share_url = ''
+                  else:
+                    share_url = urllib.quote_plus(request.build_absolute_uri(reverse('about_course', args=[unicode(course.id)])))
+                  share_window_name = 'shareWindow'
+                  share_window_config = 'toolbar=no, location=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=640, height=480'
+                %>
+                % if share_url and share_settings.get('FACEBOOK_SHARING', False):
                   <% facebook_url = 'https://www.facebook.com/sharer/sharer.php?u=' + share_url %>
                     <a
                       data-tooltip="${_('Share on Facebook')}"
@@ -135,9 +143,9 @@ from student.helpers import (
                       <i class="fa fa-facebook" aria-hidden="true"></i>
                     </a>
                 % endif
-                % if share_settings.get('TWITTER_SHARING', False):
+                % if share_url and share_settings.get('TWITTER_SHARING', False):
                   <% share_text_default = _("I'm learning on {platform_name}:").format(platform_name=settings.PLATFORM_NAME) %>
-                  <% share_text = share_settings.get('TWITTER_SHARING_TEXT', share_text_default) %>
+                  <% share_text = urllib.quote_plus(share_settings.get('TWITTER_SHARING_TEXT', share_text_default)) %>
                   <% twitter_url = 'https://twitter.com/intent/tweet?text=' + share_text + '%20' + share_url %>
                     <a
                       data-tooltip="${_('Share on Twitter')}"
@@ -147,9 +155,6 @@ from student.helpers import (
                       href="${twitter_url}"
                       target="_blank"
                       title="${_('Share on Twitter')}"
-                      href="${twitter_url}"
-                      target="_blank"
-                      title="Tweet"
                       onclick="window.open('${twitter_url}', '${share_window_name}', '${share_window_config}'); return false;">
                       <span class="sr">${_('Twitter')}</span>
                       <i class="fa fa-twitter" aria-hidden="true"></i>
