@@ -249,7 +249,7 @@ class BulkOperationsMixin(object):
         if bulk_ops_record.is_root:
             self._start_outermost_bulk_operation(bulk_ops_record, course_key)
 
-    def _end_outermost_bulk_operation(self, bulk_ops_record, course_key, emit_signals=True):
+    def _end_outermost_bulk_operation(self, bulk_ops_record, structure_key, emit_signals=True):
         """
         The outermost nested bulk_operation call: do the actual end of the bulk operation.
 
@@ -257,12 +257,12 @@ class BulkOperationsMixin(object):
         """
         pass
 
-    def _end_bulk_operation(self, course_key, emit_signals=True):
+    def _end_bulk_operation(self, structure_key, emit_signals=True):
         """
-        End the active bulk operation on course_key.
+        End the active bulk operation on structure_key (course or library key).
         """
         # If no bulk op is active, return
-        bulk_ops_record = self._get_bulk_ops_record(course_key)
+        bulk_ops_record = self._get_bulk_ops_record(structure_key)
         if not bulk_ops_record.active:
             return
 
@@ -273,9 +273,9 @@ class BulkOperationsMixin(object):
         if bulk_ops_record.active:
             return
 
-        self._end_outermost_bulk_operation(bulk_ops_record, course_key, emit_signals)
+        self._end_outermost_bulk_operation(bulk_ops_record, structure_key, emit_signals)
 
-        self._clear_bulk_ops_record(course_key)
+        self._clear_bulk_ops_record(structure_key)
 
     def _is_in_bulk_operation(self, course_key, ignore_case=False):
         """

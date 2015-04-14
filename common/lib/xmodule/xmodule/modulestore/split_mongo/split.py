@@ -229,9 +229,9 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         # Ensure that any edits to the index don't pollute the initial_index
         bulk_write_record.index = copy.deepcopy(bulk_write_record.initial_index)
 
-    def _end_outermost_bulk_operation(self, bulk_write_record, course_key, emit_signals=True):
+    def _end_outermost_bulk_operation(self, bulk_write_record, structure_key, emit_signals=True):
         """
-        End the active bulk write operation on course_key.
+        End the active bulk write operation on structure_key (course or library key).
         """
 
         dirty = False
@@ -268,8 +268,8 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
                 self.db_connection.update_course_index(bulk_write_record.index, from_index=bulk_write_record.initial_index)
 
         if dirty and emit_signals:
-            self.send_bulk_published_signal(bulk_write_record, course_key)
-            self.send_bulk_library_updated_signal(bulk_write_record, course_key)
+            self.send_bulk_published_signal(bulk_write_record, structure_key)
+            self.send_bulk_library_updated_signal(bulk_write_record, structure_key)
 
     def get_course_index(self, course_key, ignore_case=False):
         """
