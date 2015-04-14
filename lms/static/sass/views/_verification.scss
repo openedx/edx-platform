@@ -1431,7 +1431,7 @@
       }
     }
 
-    @include media( $desktop ) {
+    @include media( $bp-large ) {
       .contribution-options {
         .field {
           width: auto;
@@ -1454,7 +1454,7 @@
       }
     }
 
-    @include media( $xl-desktop ) {
+    @include media( $bp-huge ) {
       .register-choice {
         .list-actions {
           float: right;

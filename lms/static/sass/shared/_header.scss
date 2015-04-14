@@ -765,7 +765,7 @@ header.global-new {
       }
     }
 
-    @include media( $desktop ) {
+    @include media( $bp-large ) {
       .wrapper-header {
         width: 100%;
         min-width: 800px;
@@ -828,7 +828,7 @@ header.global-new {
       }
     }
 
-    @include media( $xl-desktop ) {
+    @include media( $bp-huge ) {
       .wrapper-header {
         padding: 17px 0;
       }

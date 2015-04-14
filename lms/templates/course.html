@@ -5,35 +5,28 @@ from django.core.urlresolvers import reverse
 from courseware.courses import course_image_url, get_course_about_section
 %>
 <%page args="course" />
-<article id="${course.id | h}" class="course">
-  %if course.is_newish:
-    <span class="status">${_("New")}</span>
-  %endif
+<article class="course" id="${course.id | h}" role="region" aria-label="${get_course_about_section(course, 'title')}">
   <a href="${reverse('about_course', args=[course.id.to_deprecated_string()])}">
-  <div class="inner-wrapper">
-      <header class="course-preview">
-        <hgroup>
-          <h2><span class="course-number">${course.display_number_with_default | h}</span> ${get_course_about_section(course, 'title')}</h2>
-        </hgroup>
-        <div class="info-link">&#x2794;</div>
-      </header>
-      <section class="info">
-        <div class="cover-image">
-          <img src="${course_image_url(course)}" alt="${course.display_number_with_default | h} ${get_course_about_section(course, 'title')} Cover Image" />
-        </div>
-        <div class="desc">
-          <p>${get_course_about_section(course, 'short_description')}</p>
-        </div>
-        <div class="bottom">
-          <span class="university">${get_course_about_section(course, 'university')}</span>
-          % if not course.start_date_is_still_default:
-          <span class="start-date">${course.start_datetime_text()}</span>
-          % endif
-        </div>
-      </section>
-    </div>
-    <div class="meta-info">
-      <p class="university">${get_course_about_section(course, 'university')}</p>
+    <header class="course-image">
+      <div class="cover-image">
+        <img src="${course_image_url(course)}" alt="${get_course_about_section(course, 'title')} ${course.display_number_with_default}" />
+        <div class="learn-more" aria-hidden=true>${_("LEARN MORE")}</div>
+      </div>
+    </header>
+    <section class="course-info" aria-hidden=true>
+      <h2 class="course-name">
+        <span class="course-organization">${get_course_about_section(course, 'university')}</span>
+        <span class="course-code">${course.display_number_with_default}</span>
+        <span class="course-title">${get_course_about_section(course, 'title')}</span>
+      </h2>
+      <div class="course-date" aria-hidden="true">${_("Starts")}: ${course.start_datetime_text()}</div>
+    </section>
+    <div class="sr">
+      <ul>
+      <li>${get_course_about_section(course, 'university')}</li>
+      <li>${course.display_number_with_default}</li>
+      <li>${_("Starts")}: <time itemprop="startDate" datetime="${course.start_datetime_text()}">${course.start_datetime_text()}</time></li>
+    </ul>
     </div>
   </a>
 </article>

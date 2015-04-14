@@ -48,19 +48,23 @@
       % endif
     </div>
   </header>
-  <section class="container">
+  <section class="courses-container">
     <section class="highlighted-courses">
 
       % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
         <section class="courses">
             <ul class="courses-listing">
-            %for course in courses:
+            ## cap for showing 9 or less courses
+            %for course in courses[:9]:
               <li class="courses-listing-item">
                 <%include file="course.html" args="course=course" />
               </li>
             %endfor
             </ul>
         </section>
+        <div class="courses-more">
+          <a class="courses-more-cta" href="${marketing_link('COURSES')}" > ${_("View all Courses")} </a>
+        </div>
       % endif
 
     </section>

@@ -4,10 +4,13 @@
 $max-width: 1200px;
 /* Override the default global box-sizing */
 $border-box-sizing: false;
+/* Grid width variables */
+$large-min-width: 769px;
 
 
 /* Breakpoints */
-$mobile: new-breakpoint(max-width 320px 4);
-$tablet: new-breakpoint(min-width 321px max-width 768px, 8);
-$desktop: new-breakpoint(min-width 769px 12);
-$xl-desktop:  new-breakpoint(min-width 980px 12);
+$bp-tiny: new-breakpoint(max-width 320px 4);
+$bp-small: new-breakpoint(min-width 321px max-width 540px, 4);
+$bp-medium: new-breakpoint(min-width 541px max-width 768px, 8);
+$bp-large: new-breakpoint(min-width $large-min-width max-width 979px, 12);
+$bp-huge:  new-breakpoint(min-width 980px 12);

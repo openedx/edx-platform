@@ -202,9 +202,9 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         ((template, context), _) = RENDER_MOCK.call_args  # pylint: disable=unpacking-non-sequence
         self.assertEqual(template, 'index.html')
 
-        # Now the courses will be stored in their announcement dates.
-        self.assertEqual(context['courses'][0].id, self.starting_later.id)
-        self.assertEqual(context['courses'][1].id, self.starting_earlier.id)
+        # by default the courses will be sorted by their creation dates, earliest first.
+        self.assertEqual(context['courses'][0].id, self.starting_earlier.id)
+        self.assertEqual(context['courses'][1].id, self.starting_later.id)
         self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
 
         # check the /courses view
@@ -213,23 +213,23 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         ((template, context), _) = RENDER_MOCK.call_args  # pylint: disable=unpacking-non-sequence
         self.assertEqual(template, 'courseware/courses.html')
 
-        # Now the courses will be stored in their announcement dates.
-        self.assertEqual(context['courses'][0].id, self.starting_later.id)
-        self.assertEqual(context['courses'][1].id, self.starting_earlier.id)
+        # by default the courses will be sorted by their creation dates, earliest first.
+        self.assertEqual(context['courses'][0].id, self.starting_earlier.id)
+        self.assertEqual(context['courses'][1].id, self.starting_later.id)
         self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
 
     @patch('student.views.render_to_response', RENDER_MOCK)
     @patch('courseware.views.render_to_response', RENDER_MOCK)
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_SORTING_BY_START_DATE': True})
-    def test_course_cards_sorted_by_start_date_show_earliest_first(self):
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_SORTING_BY_START_DATE': False})
+    def test_course_cards_sorted_by_start_date_disabled(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
         ((template, context), _) = RENDER_MOCK.call_args  # pylint: disable=unpacking-non-sequence
         self.assertEqual(template, 'index.html')
 
-        # now the courses will be sorted by their creation dates, earliest first.
-        self.assertEqual(context['courses'][0].id, self.starting_earlier.id)
-        self.assertEqual(context['courses'][1].id, self.starting_later.id)
+        # now the courses will be sorted by their announcement dates.
+        self.assertEqual(context['courses'][0].id, self.starting_later.id)
+        self.assertEqual(context['courses'][1].id, self.starting_earlier.id)
         self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
 
         # check the /courses view as well
@@ -238,7 +238,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         ((template, context), _) = RENDER_MOCK.call_args  # pylint: disable=unpacking-non-sequence
         self.assertEqual(template, 'courseware/courses.html')
 
-        # now the courses will be sorted by their creation dates, earliest first.
-        self.assertEqual(context['courses'][0].id, self.starting_earlier.id)
-        self.assertEqual(context['courses'][1].id, self.starting_later.id)
+        # now the courses will be sorted by their announcement dates.
+        self.assertEqual(context['courses'][0].id, self.starting_later.id)
+        self.assertEqual(context['courses'][1].id, self.starting_earlier.id)
         self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
