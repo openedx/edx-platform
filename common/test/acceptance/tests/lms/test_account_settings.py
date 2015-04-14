@@ -10,13 +10,14 @@ from ...pages.lms.account_settings import AccountSettingsPage
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.dashboard import DashboardPage
 
+from ..helpers import EventsTestMixin
 
-class AccountSettingsPageTest(WebAppTest):
+
+class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
     """
-    Tests that verify behaviour of the Account Settings page.
+    Mixin with helper methods to test the account settings page.
     """
 
-    SUCCESS_MESSAGE = 'Your changes have been saved.'
     USERNAME = "test"
     PASSWORD = "testpass"
     EMAIL = "test@example.com"
@@ -25,23 +26,67 @@ class AccountSettingsPageTest(WebAppTest):
         """
         Initialize account and pages.
         """
-        super(AccountSettingsPageTest, self).setUp()
+        super(AccountSettingsTestMixin, self).setUp()
 
-        AutoAuthPage(self.browser, username=self.USERNAME, password=self.PASSWORD, email=self.EMAIL).visit()
+        self.user_id = AutoAuthPage(
+            self.browser, username=self.USERNAME, password=self.PASSWORD, email=self.EMAIL
+        ).visit().get_user_id()
 
-        self.account_settings_page = AccountSettingsPage(self.browser)
-        self.account_settings_page.visit()
 
+class DashboardMenuTest(AccountSettingsTestMixin, WebAppTest):
+    """
+    Tests that the dashboard menu works correctly with the account settings page.
+    """
     def test_link_on_dashboard_works(self):
         """
-        Scenario: Verify that account settings link is present in dashboard
-        page and we can use it to navigate to the page.
+        Scenario: Verify that the "Account Settings" link works from the dashboard.
+
+
+        Given that I am a registered user
+        And I visit my dashboard
+        And I click on "Account Settings" in the top drop down
+        Then I should see my account settings page
         """
         dashboard_page = DashboardPage(self.browser)
         dashboard_page.visit()
         dashboard_page.click_username_dropdown()
         self.assertIn('Account Settings', dashboard_page.username_dropdown_link_text)
         dashboard_page.click_account_settings_link()
+
+
+class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
+    """
+    Tests that verify behaviour of the Account Settings page.
+    """
+    SUCCESS_MESSAGE = 'Your changes have been saved.'
+
+    def setUp(self):
+        """
+        Initialize account and pages.
+        """
+        super(AccountSettingsPageTest, self).setUp()
+
+        # Visit the account settings page for the current user.
+        self.account_settings_page = AccountSettingsPage(self.browser)
+        self.account_settings_page.visit()
+
+    def test_page_view_event(self):
+        """
+        Scenario: An event should be recorded when the "Account Settings"
+           page is viewed.
+
+        Given that I am a registered user
+        And I visit my account settings page
+        Then a page view analytics event should be recorded
+        """
+        self.verify_events_of_type(
+            u"edx.user.settings.viewed",
+            [{
+                u"user_id": int(self.user_id),
+                u"page": u"account",
+                u"visibility": None,
+            }]
+        )
 
     def test_all_sections_and_fields_are_present(self):
         """
@@ -245,7 +290,7 @@ class AccountSettingsPageTest(WebAppTest):
             [u'Pakistan', u''],
         )
 
-    def test_prefered_language_field(self):
+    def test_preferred_language_field(self):
         """
         Test behaviour of "Preferred Language" field.
         """
