@@ -9,7 +9,6 @@ from itertools import chain
 from optparse import make_option
 from collections import namedtuple
 
-
 from django.core.management.base import BaseCommand, CommandError
 
 from mailsnake import MailSnake
@@ -48,6 +47,7 @@ class Command(BaseCommand):
     )
 
     def parse_options(self, options):
+        """Parses `options` of the command."""
         if not options['key']:
             raise CommandError('missing key')
 
@@ -131,29 +131,50 @@ def verify_list(mailchimp, list_id, course_id):
 
 
 def get_student_data(students, exclude=None):
+    """
+    Given a QuerySet of Django users, extracts id, username, and is_anonymous data.
+    Excludes any users provided in the optional `exclude` set.
+
+    Returns a list of dictionaries for each user, where the dictionary has keys
+    'EMAIL', 'FULLNAME', and 'EDX_ID'.
+    """
     # To speed the query, we won't retrieve the full User object, only
     # two of its values. The namedtuple simulates the User object.
-    FakeUser = namedtuple('Fake', 'id username is_anonymous')
+    FakeUser = namedtuple('Fake', 'id username is_anonymous')  # pylint: disable=invalid-name
 
     exclude = exclude if exclude else set()
 
-    def make(v):
-        e = {'EMAIL': v['user__email'],
-             'FULLNAME': v['name'].title()}
+    def make(svalue):
+        """
+        Given a User value entry `svalue`, extracts the student's email and fullname,
+        and provides a unique id for the user.
 
-        fake_user = FakeUser(v['user_id'], v['user__username'], lambda: True)
-        e['EDX_ID'] = unique_id_for_user(fake_user)
+        Returns a dictionary with keys 'EMAIL', 'FULLNAME', and 'EDX_ID'.
+        """
+        fake_user = FakeUser(svalue['user_id'], svalue['user__username'], lambda: True)
 
-        return e
+        entry = {
+            'EMAIL': svalue['user__email'],
+            'FULLNAME': svalue['name'].title(),
+            'EDX_ID': unique_id_for_user(fake_user)
+        }
+
+        return entry
 
     fields = 'user__email', 'name', 'user_id', 'user__username'
     values = students.values(*fields)
 
+    # TODO: Since `students` is a QuerySet, can we chain a filter here that would be more
+    # performant than calling a lambda for every user?
     exclude_func = lambda s: s['user__email'] in exclude
     return [make(s) for s in values if not exclude_func(s)]
 
 
 def get_enrolled_students(course_id):
+    """
+    Given a course_id, returns a QuerySet of all the active students
+    in the course.
+    """
     objects = UserProfile.objects
     course_key = CourseKey.from_string(course_id)
     students = objects.filter(user__courseenrollment__course_id=course_key,
@@ -162,18 +183,32 @@ def get_enrolled_students(course_id):
 
 
 def get_subscribed(mailchimp, list_id):
+    """Returns a set of email addresses subscribed to `list_id`"""
     return get_members(mailchimp, list_id, 'subscribed')
 
 
 def get_unsubscribed(mailchimp, list_id):
+    """Returns a set of email addresses that have unsubscribed from `list_id`"""
     return get_members(mailchimp, list_id, 'unsubscribed')
 
 
 def get_cleaned(mailchimp, list_id):
+    """
+    Returns a set of email addresses that have been cleaned from `list_id`
+
+    These email addresses may be invalid or have caused bounces, so you don't want
+    to re-add them back to the list.
+    """
     return get_members(mailchimp, list_id, 'cleaned')
 
 
 def get_members(mailchimp, list_id, status):
+    """
+    Given a mailchimp list id and a user status to filter on, returns all
+    members of the mailchimp list with that status.
+
+    Returns a set of email addresses.
+    """
     mc_get_members = mailchimp.listMembers
     members = set()
 
@@ -193,6 +228,10 @@ def get_members(mailchimp, list_id, status):
 
 
 def unsubscribe(mailchimp, list_id, emails):
+    """
+    Batch unsubscribe the given email addresses from the list represented
+    by `list_id`
+    """
     batch_unsubscribe = mailchimp.listBatchUnsubscribe
     result = batch_unsubscribe(id=list_id,
                                emails=emails,
@@ -202,6 +241,15 @@ def unsubscribe(mailchimp, list_id, emails):
 
 
 def update_merge_tags(mailchimp, list_id, tag_names):
+    """
+    This function is rather inscrutable. Given tag_names, which
+    in this code seems to be a list of ['FULLNAME', 'EMAIL', 'EDX_ID'],
+    we grab tags from the mailchimp list, then we verify tag_names has
+    'FULLNAME' and 'EMAIL' present, we get more data from mailchimp, then
+    sync the variables up to mailchimp using `listMergeVarAdd`.
+
+    The purpose of this function is unclear.
+    """
     mc_vars = mailchimp.listMergeVars(id=list_id)
     mc_names = set(v['name'] for v in mc_vars)
 
@@ -213,6 +261,9 @@ def update_merge_tags(mailchimp, list_id, tag_names):
         tag = name_to_tag(name)
 
         # verify FULLNAME is present
+        # TODO: Why is this under the for loop? It does nothing with the loop
+        # variable and seems like things would work if this was executed before or
+        # after the loop.
         if 'FULLNAME' not in tags:
             result = mc_merge(id=list_id,
                               tag='FULLNAME',
@@ -235,6 +286,13 @@ def update_merge_tags(mailchimp, list_id, tag_names):
 
 
 def subscribe_with_data(mailchimp, list_id, user_data):
+    """
+    Given user_data in the form of a list of dictionaries for each user,
+    where the dictionary has keys 'EMAIL', 'FULLNAME', and 'EDX_ID', batch
+    subscribe the users to the given `list_id` via a Mailchimp api method.
+
+    Returns None
+    """
     format_entry = lambda e: {name_to_tag(k): v for k, v in e.iteritems()}
     formated_data = list(format_entry(e) for e in user_data)
 
@@ -244,23 +302,37 @@ def subscribe_with_data(mailchimp, list_id, user_data):
                                               batch=batch,
                                               double_optin=False,
                                               update_existing=True)
-            
+
         log.debug(
             "Added: %s Error on: %s", result['add_count'], result['error_count']
         )
 
 
 def make_segments(mailchimp, list_id, count, emails):
+    """
+    Segments the list of email addresses `emails` into `count` segments,
+    if count is nonzero.
+
+    For unknown historical reasons, lost to the winds of time, this is done with
+    a random order to the email addresses.
+
+    First, existing 'random_' mailchimp segments are deleted.
+
+    Then, the list of emails (the whole, large list) is shuffled.
+
+    Finally, the shuffled emails are chunked into `count` segments and re-uploaded
+    to mailchimp as 'random_'-prefixed segments.
+    """
     if count > 0:
         # reset segments
         segments = mailchimp.listStaticSegments(id=list_id)
-        for s in segments:
-            if s['name'].startswith('random'):
-                mailchimp.listStaticSegmentDel(id=list_id, seg_id=s['id'])
+        for seg in segments:
+            if seg['name'].startswith('random'):
+                mailchimp.listStaticSegmentDel(id=list_id, seg_id=seg['id'])
 
         # shuffle and split emails
         emails = list(emails)
-        random.shuffle(emails)
+        random.shuffle(emails)  # Why do we do this?
 
         chunk_size = int(math.ceil(float(len(emails)) / count))
         chunks = list(chunk(emails, chunk_size))
@@ -278,7 +350,13 @@ def make_segments(mailchimp, list_id, count, emails):
 
 
 def name_to_tag(name):
-    return (name[:10] if len(name) > 10 else name).replace(' ', '_').strip()
+    """
+    Returns sanitized str `name`: no more than 10 characters,
+    with spaces replaced with `_`
+    """
+    if len(name) > 10:
+        name = name[:10]
+    return name.replace(' ', '_').strip()
 
 
 def chunk(elist, size):

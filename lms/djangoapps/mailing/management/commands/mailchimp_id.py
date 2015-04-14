@@ -25,6 +25,7 @@ class Command(BaseCommand):
     )
 
     def parse_options(self, options):
+        """Parses `options` of the command."""
         if not options['key']:
             raise CommandError('missing key')
 

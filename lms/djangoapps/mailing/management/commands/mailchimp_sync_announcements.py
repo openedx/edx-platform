@@ -31,6 +31,7 @@ class Command(BaseCommand):
     )
 
     def parse_options(self, options):
+        """Parses `options` of the command."""
         if not options['key']:
             raise CommandError('missing key')
 
@@ -62,8 +63,7 @@ def get_enrolled():
     """
     Filter out all users who signed up via a Microsite, which UserSignupSource tracks
     """
-    ## TODO (Feanil) This grabs all INactive students and MUST be changed
-    ## TODO (Feanil) blame cdodge for your troubles
+    ## TODO (Feanil) This grabs all inactive students and MUST be changed (or, could exclude inactive users in get_data)
     return User.objects.raw('SELECT * FROM auth_user where id not in (SELECT user_id from student_usersignupsource)')
 
 
