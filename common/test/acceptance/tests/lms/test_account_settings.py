@@ -20,7 +20,9 @@ class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
 
     USERNAME = "test"
     PASSWORD = "testpass"
-    EMAIL = "test@example.com"
+    EMAIL = u"test@example.com"
+    CHANGE_INITIATED_EVENT_NAME = u"edx.user.settings.change_initiated"
+    ACCOUNT_SETTINGS_REFERER = u"/account/settings"
 
     def setUp(self):
         """
@@ -218,6 +220,25 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             assert_after_reload=False
         )
 
+        self.verify_events_of_type(
+            self.CHANGE_INITIATED_EVENT_NAME,
+            [
+                {
+                    u"user_id": int(self.user_id),
+                    u"setting": u"email",
+                    u"old": self.EMAIL,
+                    u"new": u'me@here.com'
+                },
+                {
+                    u"user_id": int(self.user_id),
+                    u"setting": u"email",
+                    u"old": self.EMAIL,  # NOTE the first email change was never confirmed, so old has not changed.
+                    u"new": u'you@there.com'
+                }
+            ],
+            [self.ACCOUNT_SETTINGS_REFERER, self.ACCOUNT_SETTINGS_REFERER]
+        )
+
     def test_password_field(self):
         """
         Test behaviour of "Password" field.
@@ -227,6 +248,17 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             u'Password',
             u'Reset Password',
             success_message='Click the link in the message to reset your password.',
+        )
+
+        self.verify_events_of_type(
+            self.CHANGE_INITIATED_EVENT_NAME,
+            [{
+                u"user_id": int(self.user_id),
+                u"setting": "password",
+                u"old": None,
+                u"new": None
+            }],
+            [self.ACCOUNT_SETTINGS_REFERER]
         )
 
     @skip(
