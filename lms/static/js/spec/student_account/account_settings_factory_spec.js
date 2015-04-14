@@ -23,7 +23,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 }, 'password': {
                     'url': '/password_reset',
                 }, 'year_of_birth': {
-                    'options': Helpers.FIELD_OPTIONS,
+                    'options': Helpers.INTEGER_FIELD_OPTIONS,
                 }, 'preferred_language': {
                     'options': Helpers.FIELD_OPTIONS,
                 }
@@ -174,18 +174,17 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 for (i = 0; i < 4; i++) {
 
                     view = sectionsData[1].fields[i].view;
-                    // TODO: struggling with treating all field dropdowns the same way.
-//                    FieldViewsSpecHelpers.verifyDropDownField(view, {
-//                        title: view.options.title,
-//                        valueAttribute: view.options.valueAttribute,
-//                        helpMessage: '',
-//                        validValue: Helpers.FIELD_OPTIONS[1][0],
-//                        oldValue: view.model.get(view.options.valueAttribute),
-//                        invalidValue1: Helpers.FIELD_OPTIONS[2][0],
-//                        invalidValue2: Helpers.FIELD_OPTIONS[3][0],
-//                        validationError: "Nope, this will not do!",
-//                        userID: userID
-//                    }, requests);
+                    FieldViewsSpecHelpers.verifyDropDownField(view, {
+                        title: view.options.title,
+                        valueAttribute: view.options.valueAttribute,
+                        helpMessage: '',
+                        validValue: view.options.options[1][0],
+                        oldValue: view.model.get(view.options.valueAttribute),
+                        invalidValue1: view.options.options[2][0],
+                        invalidValue2: view.options.options[3][0],
+                        validationError: "Nope, this will not do!",
+                        userID: userID
+                    }, requests);
                 }
 
                 var section2Fields = sectionsData[2].fields;

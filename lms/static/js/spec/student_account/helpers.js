@@ -11,7 +11,7 @@ define(['underscore'], function(_) {
 
         level_of_education: '0',
         gender: '0',
-        year_of_birth: '0',
+        year_of_birth: 1950,
         country: '0',
         language: '0',
         bio: "About the student",
@@ -28,6 +28,13 @@ define(['underscore'], function(_) {
         ['1', 'Option 1'],
         ['2', 'Option 2'],
         ['3', 'Option 3'],
+    ];
+
+    var INTEGER_FIELD_OPTIONS = [
+        [1950, '1950'],
+        [1951, '1951'],
+        [1952, '1952'],
+        [1953, '1953'],
     ];
 
     var expectLoadingIndicatorIsVisible = function (view, visible) {
@@ -54,8 +61,7 @@ define(['underscore'], function(_) {
 
         if ('fieldValue' in view) {
             expect(view.model.get(view.options.valueAttribute)).toBeTruthy();
-            // TODO: struggling with treating all field dropdowns the same way.
-            // expect(view.fieldValue()).toBe(view.modelValue());
+            expect(view.fieldValue()).toBe(view.modelValue());
         } else if (view.fieldType === 'link') {
             expect($(element).find('a').length).toBe(1);
         } else {
@@ -96,6 +102,7 @@ define(['underscore'], function(_) {
         USER_ACCOUNTS_DATA: USER_ACCOUNTS_DATA,
         USER_PREFERENCES_DATA: USER_PREFERENCES_DATA,
         FIELD_OPTIONS: FIELD_OPTIONS,
+        INTEGER_FIELD_OPTIONS: INTEGER_FIELD_OPTIONS,
         expectLoadingIndicatorIsVisible: expectLoadingIndicatorIsVisible,
         expectLoadingErrorIsVisible: expectLoadingErrorIsVisible,
         expectElementContainsField: expectElementContainsField,
