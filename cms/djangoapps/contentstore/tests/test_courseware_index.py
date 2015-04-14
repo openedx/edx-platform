@@ -26,7 +26,7 @@ from xmodule.x_module import XModuleMixin
 from search.search_engine_base import SearchEngine
 
 from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer, SearchIndexingError
-from contentstore.signals import listen_for_course_publish
+from contentstore.signals import listen_for_course_publish, listen_for_library_update
 
 
 
@@ -539,6 +539,7 @@ class TestTaskExecution(ModuleStoreTestCase):
     def setUp(self):
         super(TestTaskExecution, self).setUp()
         SignalHandler.course_published.disconnect(listen_for_course_publish)
+        SignalHandler.library_updated.disconnect(listen_for_library_update)
         self.course = CourseFactory.create(start=datetime(2015, 3, 1, tzinfo=UTC))
 
         self.chapter = ItemFactory.create(
@@ -570,6 +571,22 @@ class TestTaskExecution(ModuleStoreTestCase):
             publish_item=False,
         )
 
+        self.library = LibraryFactory.create()
+
+        self.library_block1 = ItemFactory.create(
+            parent_location=self.library.location,
+            category="html",
+            display_name="Html Content",
+            publish_item=False,
+        )
+
+        self.library_block2 = ItemFactory.create(
+            parent_location=self.library.location,
+            category="html",
+            display_name="Html Content 2",
+            publish_item=False,
+        )
+
     def test_task_indexing_course(self):
         """ Making sure that the receiver correctly fires off the task when invoked by signal """
         searcher = SearchEngine.get_search_engine(CoursewareSearchIndexer.INDEX_NAME)
@@ -582,6 +599,20 @@ class TestTaskExecution(ModuleStoreTestCase):
         # Note that this test will only succeed if celery is working in inline mode
         response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
         self.assertEqual(response["total"], 3)
+
+    def test_task_library_update(self):
+        """ Making sure that the receiver correctly fires off the task when invoked by signal """
+        searcher = SearchEngine.get_search_engine(CoursewareSearchIndexer.INDEX_NAME)
+        library_search_key = unicode(self.library.location.library_key.replace(version_guid=None, branch=None))
+        response = searcher.search(field_dictionary={"library": library_search_key})
+        self.assertEqual(response["total"], 0)
+
+        #update_search_index(unicode(self.course.id), datetime.now(UTC).isoformat())
+        listen_for_library_update(self, self.library.location)
+
+        # Note that this test will only succeed if celery is working in inline mode
+        response = response = searcher.search(field_dictionary={"library": library_search_key})
+        self.assertEqual(response["total"], 2)
 
 
 @ddt.ddt
