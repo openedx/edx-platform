@@ -71,12 +71,16 @@ class CourseMode(models.Model):
     VERIFIED = "verified"
     AUDIT = "audit"
     NO_ID_PROFESSIONAL_MODE = "no-id-professional"
+    CREDIT_MODE = "credit"
 
     DEFAULT_MODE = Mode(HONOR, _('Honor Code Certificate'), 0, '', 'usd', None, None, None)
     DEFAULT_MODE_SLUG = HONOR
 
     # Modes that allow a student to pursue a verified certificate
     VERIFIED_MODES = [VERIFIED, PROFESSIONAL]
+
+    # Modes that allow a student to earn credit with a university partner
+    CREDIT_MODES = [CREDIT_MODE]
 
     class Meta:
         """ meta attributes of this model """
@@ -162,23 +166,45 @@ class CourseMode(models.Model):
         return [mode.to_tuple() for mode in found_course_modes]
 
     @classmethod
-    def modes_for_course(cls, course_id):
+    def modes_for_course(cls, course_id, only_selectable=True):
         """
         Returns a list of the non-expired modes for a given course id
 
         If no modes have been set in the table, returns the default mode
+
+        Arguments:
+            course_id (CourseKey): Search for course modes for this course.
+
+        Keyword Arguments:
+            only_selectable (bool): If True, include only modes that are shown
+                to users on the track selection page.  (Currently, "credit" modes
+                aren't available to users until they complete the course, so
+                they are hidden in track selection.)
+
+        Returns:
+            list of `Mode` tuples
+
         """
         now = datetime.now(pytz.UTC)
-        found_course_modes = cls.objects.filter(Q(course_id=course_id) &
-                                                (Q(expiration_datetime__isnull=True) |
-                                                Q(expiration_datetime__gte=now)))
+        found_course_modes = cls.objects.filter(
+            Q(course_id=course_id) & (Q(expiration_datetime__isnull=True) | Q(expiration_datetime__gte=now))
+        )
+
+        # Credit course modes are currently not shown on the track selection page;
+        # they're available only when students complete a course.  For this reason,
+        # we exclude them from the list if we're only looking for selectable modes
+        # (e.g. on the track selection page or in the payment/verification flows).
+        if only_selectable:
+            found_course_modes = found_course_modes.exclude(mode_slug__in=cls.CREDIT_MODES)
+
         modes = ([mode.to_tuple() for mode in found_course_modes])
         if not modes:
             modes = [cls.DEFAULT_MODE]
+
         return modes
 
     @classmethod
-    def modes_for_course_dict(cls, course_id, modes=None):
+    def modes_for_course_dict(cls, course_id, modes=None, only_selectable=True):
         """Returns the non-expired modes for a particular course.
 
         Arguments:
@@ -189,12 +215,18 @@ class CourseMode(models.Model):
                 of course modes.  This can be used to avoid an additional
                 database query if you have already loaded the modes list.
 
+            only_selectable (bool): If True, include only modes that are shown
+                to users on the track selection page.  (Currently, "credit" modes
+                aren't available to users until they complete the course, so
+                they are hidden in track selection.)
+
         Returns:
             dict: Keys are mode slugs, values are lists of `Mode` namedtuples.
 
         """
         if modes is None:
-            modes = cls.modes_for_course(course_id)
+            modes = cls.modes_for_course(course_id, only_selectable=only_selectable)
+
         return {mode.slug: mode for mode in modes}
 
     @classmethod
@@ -348,6 +380,15 @@ class CourseMode(models.Model):
 
         """
         return mode_slug in cls.VERIFIED_MODES
+
+    @classmethod
+    def is_credit_mode(cls, course_mode_tuple):
+        """Check whether this is a credit mode.
+
+        Students enrolled in a credit mode are eligible to
+        receive university credit upon completion of a course.
+        """
+        return course_mode_tuple.slug in cls.CREDIT_MODES
 
     @classmethod
     def has_payment_options(cls, course_id):

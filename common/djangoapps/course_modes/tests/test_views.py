@@ -131,6 +131,26 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         # TODO: Fix it so that response.templates works w/ mako templates, and then assert
         # that the right template rendered
 
+    @ddt.data(
+        (['honor', 'verified', 'credit'], True),
+        (['honor', 'verified'], False),
+    )
+    @ddt.unpack
+    def test_credit_upsell_message(self, available_modes, show_upsell):
+        # Create the course modes
+        for mode in available_modes:
+            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+
+        # Check whether credit upsell is shown on the page
+        # This should *only* be shown when a credit mode is available
+        url = reverse('course_modes_choose', args=[unicode(self.course.id)])
+        response = self.client.get(url)
+
+        if show_upsell:
+            self.assertContains(response, "Credit")
+        else:
+            self.assertNotContains(response, "Credit")
+
     @ddt.data('professional', 'no-id-professional')
     def test_professional_enrollment(self, mode):
         # The only course mode is professional ed

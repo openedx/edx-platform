@@ -71,19 +71,44 @@
                             <div class="register-choice register-choice-certificate">
                                 <div class="wrapper-copy">
                                     <span class="deco-ribbon"></span>
-                                    <h4 class="title">${_("Pursue a Verified Certificate")}</h4>
+                                    % if has_credit_upsell:
+                                    <h4 class="title">${_("Pursue Academic Credit with a Verified Certificate")}</h4>
 
                                     <div class="copy">
-                                        <p>${_("Highlight you new knowledge and skills with a verified certificate. Use this valuable credential to improve your job prospects and advance your career, or highlight your certificate in school applications.")}</p>
+                                        <p>${_("Become eligible for academic credit and highlight your new skills and knowledge with a verified certificate. Use this valuable credential to qualify for academic credit from {org}, advance your career, or strengthen your school applications.").format(org=course_org)}</p>
                                         <p>
                                             <div class="wrapper-copy-inline">
                                                 <div class="copy-inline">
-                                                    <h4>
-                                                        ${_("Benefits of a verified Certificate")}
-                                                    </h4>
+                                                    <h4>${_("Benefits of a Verified Certificate")}</h4>
+                                                    <ul>
+                                                        <li>${_("{b_start}Eligible for credit:{b_end} Receive academic credit after successfully completing the course").format(b_start='<b>', b_end='</b>')}</li>
+                                                        <li>${_("{b_start}Official:{b_end} Receive an instructor-signed certificate with the institution's logo").format(b_start='<b>', b_end='</b>')}</li>
+                                                        <li>${_("{b_start}Easily shareable:{b_end} Add the certificate to your CV or resume, or post it directly on LinkedIn").format(b_start='<b>', b_end='</b>')}</li>
+                                                    </ul>
+                                                </div>
+                                                <div class="copy-inline list-actions">
+                                                    <ul class="list-actions">
+                                                        <li class="action action-select">
+                                                            <input type="hidden" name="contribution" value="${min_price}" />
+                                                            <input type="submit" name="verified_mode" value="${_('Pursue a Verified Certificate')} ($${min_price})" />
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </p>
+                                    </div>
+                                    % else:
+                                    <h4 class="title">${_("Pursue a Verified Certificate")}</h4>
+
+                                    <div class="copy">
+                                        <p>${_("Highlight your new knowledge and skills with a verified certificate. Use this valuable credential to improve your job prospects and advance your career, or highlight your certificate in school applications.")}</p>
+                                        <p>
+                                            <div class="wrapper-copy-inline">
+                                                <div class="copy-inline">
+                                                    <h4>${_("Benefits of a Verified Certificate")}</h4>
                                                     <ul>
                                                         <li>${_("{b_start}Official: {b_end}Receive an instructor-signed certificate with the institution's logo").format(b_start='<b>', b_end='</b>')}</li>
-                                                        <li>${_("{b_start}Easily sharable: {b_end}Add the certificate to your CV or resume, or post it directly on LinkedIn").format(b_start='<b>', b_end='</b>')}</li>
+                                                        <li>${_("{b_start}Easily shareable: {b_end}Add the certificate to your CV or resume, or post it directly on LinkedIn").format(b_start='<b>', b_end='</b>')}</li>
                                                         <li>${_("{b_start}Motivating: {b_end}Give yourself an additional incentive to complete the course").format(b_start='<b>', b_end='</b>')}</li>
                                                     </ul>
                                                 </div>
@@ -98,6 +123,7 @@
                                             </div>
                                         </p>
                                     </div>
+                                    % endif
                                 </div>
                             </div>
                         % endif
