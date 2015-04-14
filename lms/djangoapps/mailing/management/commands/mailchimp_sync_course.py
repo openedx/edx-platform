@@ -239,7 +239,7 @@ def subscribe_with_data(mailchimp, list_id, user_data):
     formated_data = list(format_entry(e) for e in user_data)
 
     # send the updates in batches of a fixed size
-    for batch in batches(formated_data, SUBSCRIBE_BATCH_SIZE):
+    for batch in chunk(formated_data, SUBSCRIBE_BATCH_SIZE):
         result = mailchimp.listBatchSubscribe(id=list_id,
                                               batch=batch,
                                               double_optin=False,
@@ -269,7 +269,7 @@ def make_segments(mailchimp, list_id, count, emails):
         for seg in xrange(count):
             name = 'random_{0:002}'.format(seg)
             seg_id = mailchimp.listStaticSegmentAdd(id=list_id, name=name)
-            for batch in batches(chunks[seg], BATCH_SIZE):
+            for batch in chunk(chunks[seg], BATCH_SIZE):
                 mailchimp.listStaticSegmentMembersAdd(
                     id=list_id,
                     seg_id=seg_id,
@@ -281,11 +281,10 @@ def name_to_tag(name):
     return (name[:10] if len(name) > 10 else name).replace(' ', '_').strip()
 
 
-def batches(iterable, size):
-    slices = range(0, len(iterable), size)
-    return [iterable[slice(i, i + size)] for i in slices]
-
-
-def chunk(l, n):
-    for i in xrange(0, len(l), n):
-        yield l[i:i + n]
+def chunk(elist, size):
+    """
+    Generator. Yields a list of size `size` of the given list `elist`,
+    or a shorter list if at the end of the input.
+    """
+    for i in xrange(0, len(elist), size):
+        yield elist[i:i + size]
