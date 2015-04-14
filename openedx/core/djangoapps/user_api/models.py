@@ -1,8 +1,12 @@
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.db import models
+from django.db.models.signals import pre_delete, post_delete, pre_save, post_save
+from django.dispatch import receiver
 from model_utils.models import TimeStampedModel
 
+from student.models import USER_SETTINGS_CHANGED_EVENT_NAME
+from util.model_utils import get_changed_fields_dict, emit_setting_changed_event
 from xmodule_django.models import CourseKeyField
 
 # Currently, the "student" app is responsible for
@@ -45,6 +49,39 @@ class UserPreference(models.Model):
             return user_preference.value
         except cls.DoesNotExist:
             return None
+
+
+@receiver(pre_save, sender=UserPreference)
+def pre_save_callback(sender, **kwargs):
+    """
+    Event changes to user preferences.
+    """
+    user_preference = kwargs["instance"]
+    user_preference._old_value = get_changed_fields_dict(user_preference, sender).get("value", None)
+
+@receiver(post_save, sender=UserPreference)
+def post_save_callback(sender, **kwargs):
+    """
+    Event changes to user preferences.
+    """
+    user_preference = kwargs["instance"]
+    emit_setting_changed_event(
+        user_preference.user, USER_SETTINGS_CHANGED_EVENT_NAME, sender._meta.db_table,
+        user_preference.key, user_preference._old_value, user_preference.value
+    )
+    user_preference._old_value = None
+
+
+@receiver(post_delete, sender=UserPreference)
+def post_delete_callback(sender, **kwargs):
+    """
+    Event changes to user preferences.
+    """
+    user_preference = kwargs["instance"]
+    emit_setting_changed_event(
+        user_preference.user, USER_SETTINGS_CHANGED_EVENT_NAME, sender._meta.db_table,
+        user_preference.key, user_preference.value, None
+    )
 
 
 class UserCourseTag(models.Model):
