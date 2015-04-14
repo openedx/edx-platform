@@ -129,6 +129,8 @@ AUDIT_LOG = logging.getLogger("audit")
 
 ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')  # pylint: disable=invalid-name
 
+SETTING_CHANGE_INITIATED = 'edx.user.settings.change_initiated'
+
 
 def csrf_token(context):
     """A csrf token that can be included in a form."""
@@ -1833,6 +1835,18 @@ def password_reset(request):
                   from_email=settings.DEFAULT_FROM_EMAIL,
                   request=request,
                   domain_override=request.get_host())
+        # When password change is complete, a "edx.user.settings.changed" event will be emitted.
+        # But because changing the password is multi-step, we also emit an event here so that we can
+        # track where the request was initiated.
+        tracker.emit(
+            SETTING_CHANGE_INITIATED,
+            {
+                "setting": "password",
+                "old": None,
+                "new": None,
+                "user_id": request.user.id,
+            }
+        )
     else:
         # bad user? tick the rate limiter counter
         AUDIT_LOG.info("Bad password_reset user passed in.")
@@ -2048,6 +2062,19 @@ def do_email_change_request(user, new_email, activation_key=uuid.uuid4().hex):
     except Exception:  # pylint: disable=broad-except
         log.error(u'Unable to send email activation link to user from "%s"', from_address, exc_info=True)
         raise ValueError(_('Unable to send email activation link. Please try again later.'))
+
+    # When the email address change is complete, a "edx.user.settings.changed" event will be emitted.
+    # But because changing the email address is multi-step, we also emit an event here so that we can
+    # track where the request was initiated.
+    tracker.emit(
+        SETTING_CHANGE_INITIATED,
+        {
+            "setting": "email",
+            "old": context['old_email'],
+            "new": context['new_email'],
+            "user_id": user.id,
+        }
+    )
 
 
 @ensure_csrf_cookie

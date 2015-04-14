@@ -5,7 +5,8 @@ import unittest
 
 from student.tests.factories import UserFactory, RegistrationFactory, PendingEmailChangeFactory
 from student.views import (
-    reactivation_email_for_user, change_email_request, do_email_change_request, confirm_email_change
+    reactivation_email_for_user, change_email_request, do_email_change_request, confirm_email_change,
+    SETTING_CHANGE_INITIATED
 )
 from student.models import UserProfile, PendingEmailChange
 from django.core.urlresolvers import reverse
@@ -19,6 +20,7 @@ from django.conf import settings
 from edxmako.shortcuts import render_to_string
 from edxmako.tests import mako_middleware_process_request
 from util.request import safe_get_host
+from util.testing import EventTestMixin
 
 
 class TestException(Exception):
@@ -198,10 +200,11 @@ class ReactivationEmailTests(EmailTestMixin, TestCase):
         self.assertTrue(response_data['success'])
 
 
-class EmailChangeRequestTests(TestCase):
+class EmailChangeRequestTests(EventTestMixin, TestCase):
     """Test changing a user's email address"""
 
     def setUp(self):
+        super(EmailChangeRequestTests, self).setUp('student.views.tracker')
         self.user = UserFactory.create()
         self.new_email = 'new.email@edx.org'
         self.req_factory = RequestFactory()
@@ -275,6 +278,7 @@ class EmailChangeRequestTests(TestCase):
         send_mail.side_effect = [Exception, None]
         self.request.POST['new_email'] = "valid@email.com"
         self.assertFailedRequest(self.run_request(), 'Unable to send email activation link. Please try again later.')
+        self.assert_no_events_were_emitted()
 
     @patch('django.core.mail.send_mail')
     @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
@@ -294,6 +298,9 @@ class EmailChangeRequestTests(TestCase):
             mock_render_to_string('emails/email_change.txt', context),
             settings.DEFAULT_FROM_EMAIL,
             [new_email]
+        )
+        self.assert_event_emitted(
+            SETTING_CHANGE_INITIATED, user_id=self.user.id, setting=u'email', old=old_email, new=new_email
         )
 
 
