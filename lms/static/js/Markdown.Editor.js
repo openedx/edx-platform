@@ -1018,8 +1018,13 @@
 
         // These variables need to be declared at this level since they are used
         // in multiple functions.
-        var dialog;         // The dialog box.
-        var input;         // The text box where you enter the hyperlink.
+        var dialog;                     // The dialog box.
+        var form;                       // The form inside dialog box.
+        var input;                      // The text box where you enter the hyperlink.
+        var description;                // The text box where you enter description of image.
+        var decorativeCheckBox;         // The Checkbox to check whether image is decorative or not.
+        var formError;                  // The span to show error on image dialog box.
+        var descriptionHelp;            // The span to show description help text.
 
 
         if (defaultInputText === undefined) {
@@ -1044,6 +1049,8 @@
 
             if (isCancel) {
                 text = null;
+                dialog.parentNode.removeChild(dialog);
+                callback(text, "", false);
             }
             else {
                 // Fixes common pasting errors.
@@ -1054,13 +1061,44 @@
                 }
             }
 
-            dialog.parentNode.removeChild(dialog);
 
-            callback(text);
+            if (imageUploadHandler){
+                var descriptionText = description.value;
+                if (decorativeCheckBox.checked || descriptionText != "") {
+                    dialog.parentNode.removeChild(dialog);
+                    callback(text, descriptionText, decorativeCheckBox.checked);
+                }
+                else{
+                    if (!dialog.contains(formError)){
+                        formError = doc.createElement("span");
+                        style = formError.style;
+                        style.width = "85%";
+                        style.display = "inline-block";
+                        style.fontSize = "85%";
+                        style.marginLeft = "30px";
+                        var errorMsg = doc.createTextNode("you either have to give description or select checkbox");
+                        formError.appendChild(errorMsg);
+                        formError.appendChild(doc.createElement("br"));
+                        dialog.insertBefore(formError, form);
+                    }
+                }
+            }
+            else{
+                dialog.parentNode.removeChild(dialog);
+                callback(text, "", false);
+            }
             return false;
         };
 
 
+        var decorative = function (isDecorative) {
+            if (isDecorative) {
+                $(description).hide();
+            }
+            else{
+                $(description).show();
+            }
+        };
 
         // Create the text input box form/window.
         var createDialog = function () {
@@ -1081,7 +1119,7 @@
             dialog.appendChild(question);
 
             // The web form container for the text box and buttons.
-            var form = doc.createElement("form"),
+            form = doc.createElement("form"),
                 style = form.style;
             form.onsubmit = function () { return close(false); };
             style.padding = "0";
@@ -1102,7 +1140,8 @@
             style.marginLeft = style.marginRight = "auto";
             form.appendChild(input);
 
-            // The choose file button if prompt type is 'image'
+            // The choose file button, image description and decorative image checkbox
+            // if prompt type is 'image'
 
             if (imageUploadHandler) {
               var chooseFile = doc.createElement("input");
@@ -1114,8 +1153,59 @@
               };
               form.appendChild(doc.createElement("br"));
               form.appendChild(chooseFile);
-            }
+              description = doc.createElement("input");
+              description.type = "text";
+              description.placeholder = "Description";
+              style = description.style;
+              style.display = "block";
+              style.width = "80%";
+              style.marginLeft = style.marginRight = "auto";
+              description.setAttribute("aria-describedby", "description-help");
 
+              descriptionHelp = doc.createElement("span");
+              descriptionHelp.id = "description-help";
+              descriptionHelp.style.display = "inline-block";
+              descriptionHelp.style.marginLeft = descriptionHelp.style.marginRight = "auto";
+              descriptionHelp.style.width = "85%";
+              var initialText = doc.createTextNode("The value of the ");
+              var altTagCode = doc.createElement("code");
+              altTagCode.appendChild(doc.createTextNode("alt"));
+              var subsequentText = doc.createTextNode(" attribute is helpful for users who cannot see the image. ");
+              var altDocLink = doc.createElement("a");
+              altDocLink.href = "http://www.w3.org/TR/html5/embedded-content-0.html#alt";
+              altDocLink.target = "_blank";
+              var altLinkText = doc.createTextNode("How to create useful text alternatives");
+              altDocLink.appendChild(altLinkText);
+              descriptionHelp.appendChild(initialText);
+              descriptionHelp.appendChild(altTagCode);
+              descriptionHelp.appendChild(subsequentText);
+              descriptionHelp.appendChild(altDocLink);
+
+              var checkBoxLabel = doc.createElement("label");
+              checkBoxLabel.className = "decorative-checkbox";
+              checkBoxLabel.onclick = function () {return decorative(decorativeCheckBox.checked);};
+              var style = checkBoxLabel.style;
+              style.display = "block";
+              style.marginLeft = style.marginRight = "auto";
+              style.fontSize = "85%";
+
+              decorativeCheckBox = doc.createElement("input");
+              decorativeCheckBox.type = "checkbox";
+              decorativeCheckBox.onclick = function () { return decorative(decorativeCheckBox.checked); };
+              decorativeCheckBox.className = "decorative-checkbox";
+              style = decorativeCheckBox.style;
+              style.display = "inline-block";
+              style.marginRight = "5px";
+
+              labelText = doc.createTextNode("This image is decorative and does not require a description");
+              checkBoxLabel.appendChild(decorativeCheckBox);
+              checkBoxLabel.appendChild(labelText);
+              form.appendChild(description);
+              form.appendChild(doc.createElement("br"));
+              form.appendChild(descriptionHelp);
+              form.appendChild(doc.createElement("br"));
+              form.appendChild(checkBoxLabel);
+            }
 
             // The ok button
             var okButton = doc.createElement("input");
@@ -1715,7 +1805,7 @@
             var that = this;
             // The function to be executed when you enter a link and press OK or Cancel.
             // Marks up the link and adds the ref.
-            var linkEnteredCallback = function (link) {
+            var linkEnteredCallback = function (link, description, isDecorative) {
 
                 background.parentNode.removeChild(background);
 
@@ -1748,10 +1838,25 @@
 
                     if (!chunk.selection) {
                         if (isImage) {
-                            chunk.selection = gettext("enter image description here");
+                            if (!isDecorative) {
+                                chunk.selection = gettext(description);
+                            }
+                            else{
+                                chunk.selection = gettext("");
+                            }
                         }
                         else {
                             chunk.selection = gettext("enter link description here");
+                        }
+                    }
+                    else{
+                        if (isImage) {
+                            if (!isDecorative) {
+                                chunk.selection = gettext(description);
+                            }
+                            else {
+                                chunk.selection = gettext("");
+                            }
                         }
                     }
                 }
