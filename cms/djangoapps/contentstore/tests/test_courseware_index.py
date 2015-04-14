@@ -10,6 +10,7 @@ from pytz import UTC
 from uuid import uuid4
 from unittest import skip
 
+from xmodule.library_tools import normalize_key_for_search
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler
 from xmodule.modulestore.edit_info import EditInfoMixin
@@ -27,7 +28,6 @@ from search.search_engine_base import SearchEngine
 
 from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer, SearchIndexingError
 from contentstore.signals import listen_for_course_publish, listen_for_library_update
-
 
 
 COURSE_CHILD_STRUCTURE = {
@@ -531,7 +531,7 @@ class TestLargeCourseDeletions(MixedWithOptionsTestCase):
 class TestTaskExecution(ModuleStoreTestCase):
     """
     Set of tests to ensure that the task code will do the right thing when
-    executed directly. The test course gets created without the listener
+    executed directly. The test course and library gets created without the listeners
     being present, which allows us to ensure that when the listener is
     executed, it is done as expected.
     """
@@ -593,7 +593,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
         self.assertEqual(response["total"], 0)
 
-        #update_search_index(unicode(self.course.id), datetime.now(UTC).isoformat())
+        # update_search_index(unicode(self.course.id), datetime.now(UTC).isoformat())
         listen_for_course_publish(self, self.course.id)
 
         # Note that this test will only succeed if celery is working in inline mode
@@ -602,16 +602,16 @@ class TestTaskExecution(ModuleStoreTestCase):
 
     def test_task_library_update(self):
         """ Making sure that the receiver correctly fires off the task when invoked by signal """
-        searcher = SearchEngine.get_search_engine(CoursewareSearchIndexer.INDEX_NAME)
-        library_search_key = unicode(self.library.location.library_key.replace(version_guid=None, branch=None))
+        searcher = SearchEngine.get_search_engine(LibrarySearchIndexer.INDEX_NAME)
+        library_search_key = unicode(normalize_key_for_search(self.library.location.library_key))
         response = searcher.search(field_dictionary={"library": library_search_key})
         self.assertEqual(response["total"], 0)
 
-        #update_search_index(unicode(self.course.id), datetime.now(UTC).isoformat())
-        listen_for_library_update(self, self.library.location)
+        # update_search_index(unicode(self.library.location.library_key), datetime.now(UTC).isoformat())
+        listen_for_library_update(self, self.library.location.library_key)
 
         # Note that this test will only succeed if celery is working in inline mode
-        response = response = searcher.search(field_dictionary={"library": library_search_key})
+        response = searcher.search(field_dictionary={"library": library_search_key})
         self.assertEqual(response["total"], 2)
 
 

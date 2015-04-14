@@ -8,6 +8,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from eventtracking import tracker
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.library_tools import normalize_key_for_search
 from search.search_engine_base import SearchEngine
 
 # REINDEX_AGE is the default amount of time that we look back for changes
@@ -50,7 +51,7 @@ class SearchIndexerBase(object):
         return settings.FEATURES.get(cls.ENABLE_INDEXING_KEY, False)
 
     @classmethod
-    def _normalize_structure_key(cls, structure_key):
+    def normalize_structure_key(cls, structure_key):
         """ Normalizes structure key for use in indexing """
         raise NotImplementedError("Should be overridden in child classes")
 
@@ -107,7 +108,7 @@ class SearchIndexerBase(object):
         if not searcher:
             return
 
-        structure_key = cls._normalize_structure_key(structure_key)
+        structure_key = cls.normalize_structure_key(structure_key)
         location_info = cls._get_location_info(structure_key)
 
         # Wrap counter in dictionary - otherwise we seem to lose scope inside the embedded function `index_item`
@@ -235,7 +236,7 @@ class CoursewareSearchIndexer(SearchIndexerBase):
     }
 
     @classmethod
-    def _normalize_structure_key(cls, structure_key):
+    def normalize_structure_key(cls, structure_key):
         """ Normalizes structure key for use in indexing """
         return structure_key
 
@@ -271,9 +272,9 @@ class LibrarySearchIndexer(SearchIndexerBase):
     }
 
     @classmethod
-    def _normalize_structure_key(cls, structure_key):
+    def normalize_structure_key(cls, structure_key):
         """ Normalizes structure key for use in indexing """
-        return structure_key.replace(version_guid=None, branch=None)
+        return normalize_key_for_search(structure_key)
 
     @classmethod
     def _fetch_top_level(cls, modulestore, structure_key):

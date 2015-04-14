@@ -10,6 +10,11 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.capa_module import CapaDescriptor
 
 
+def normalize_key_for_search(library_key):
+    """ Normalizes library key for use with search indexing """
+    return library_key.replace(version_guid=None, branch=None)
+
+
 class LibraryToolsService(object):
     """
     Service that allows LibraryContentModule to interact with libraries in the
@@ -92,6 +97,7 @@ class LibraryToolsService(object):
         search_engine = SearchEngine.get_search_engine(index="library_index")
         if search_engine:
             filter_clause = {
+                "library": unicode(normalize_key_for_search(library.location.library_key)),
                 "content_type": CapaDescriptor.INDEX_CONTENT_TYPE,
                 "problem_types": capa_type
             }

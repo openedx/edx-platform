@@ -82,17 +82,21 @@ def deserialize_fields(json_fields):
     return fields
 
 
+def _parse_time(time_isoformat):
+    """ Parses time from iso format """
+    return datetime.strptime(
+        # remove the +00:00 from the end of the formats generated within the system
+        time_isoformat.split('+')[0],
+        "%Y-%m-%dT%H:%M:%S.%f"
+    ).replace(tzinfo=UTC)
+
+
 @task()
 def update_search_index(course_id, triggered_time_isoformat):
     """ Updates course search index. """
     try:
         course_key = CourseKey.from_string(course_id)
-        triggered_time = datetime.strptime(
-            # remove the +00:00 from the end of the formats generated within the system
-            triggered_time_isoformat.split('+')[0],
-            "%Y-%m-%dT%H:%M:%S.%f"
-        ).replace(tzinfo=UTC)
-        CoursewareSearchIndexer.index(modulestore(), course_key, triggered_at=triggered_time)
+        CoursewareSearchIndexer.index(modulestore(), course_key, triggered_at=(_parse_time(triggered_time_isoformat)))
 
     except SearchIndexingError as exc:
         LOGGER.error('Search indexing error for complete course %s - %s', course_id, unicode(exc))
@@ -105,12 +109,7 @@ def update_library_index(library_id, triggered_time_isoformat):
     """ Updates course search index. """
     try:
         library_key = CourseKey.from_string(library_id)
-        triggered_time = datetime.strptime(
-            # remove the +00:00 from the end of the formats generated within the system
-            triggered_time_isoformat.split('+')[0],
-            "%Y-%m-%dT%H:%M:%S.%f"
-        ).replace(tzinfo=UTC)
-        LibrarySearchIndexer.index(modulestore(), library_key, triggered_at=triggered_time)
+        LibrarySearchIndexer.index(modulestore(), library_key, triggered_at=(_parse_time(triggered_time_isoformat)))
 
     except SearchIndexingError as exc:
         LOGGER.error('Search indexing error for library %s - %s', library_id, unicode(exc))
