@@ -28,7 +28,7 @@ class SearchIndexingError(Exception):
         self.error_list = error_list
 
 
-class SearchIndexBase(object):
+class SearchIndexerBase(object):
     """
     Base class to perform indexing for courseware or library search from different modulestores
     """
@@ -204,7 +204,7 @@ class SearchIndexBase(object):
 
         Arguments:
             event_name (str):  Name of the event to be logged.
-            category (str): cat3gory of indexed items
+            category (str): category of indexed items
             indexed_count (int): number of indexed items
         Returns:
             None
@@ -221,7 +221,7 @@ class SearchIndexBase(object):
         )
 
 
-class CoursewareSearchIndexer(SearchIndexBase):
+class CoursewareSearchIndexer(SearchIndexerBase):
     """
     Class to perform indexing for courseware search from different modulestores
     """
@@ -257,7 +257,7 @@ class CoursewareSearchIndexer(SearchIndexBase):
         return cls._do_reindex(modulestore, course_key)
 
 
-class LibrarySearchIndexer(SearchIndexBase):
+class LibrarySearchIndexer(SearchIndexerBase):
     """
     Base class to perform indexing for library search from different modulestores
     """

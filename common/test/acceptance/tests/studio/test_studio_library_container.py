@@ -7,7 +7,7 @@ import textwrap
 
 from .base_studio_test import StudioLibraryTest
 from ...fixtures.course import CourseFixture
-from ..helpers import UniqueCourseTest
+from ..helpers import UniqueCourseTest, TestWithSearchIndexMixin
 from ...pages.studio.library import StudioLibraryContentEditor, StudioLibraryContainerXBlockWrapper
 from ...pages.studio.overview import CourseOutlinePage
 from ...fixtures.course import XBlockFixtureDesc
@@ -18,7 +18,7 @@ UNIT_NAME = 'Test Unit'
 
 
 @ddt.ddt
-class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
+class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest, TestWithSearchIndexMixin):
     """
     Test Library Content block in LMS
     """
@@ -26,6 +26,7 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
         """
         Install library with some content and a course using fixtures
         """
+        self._create_search_index()
         super(StudioLibraryContainerTest, self).setUp()
         # Also create a course:
         self.course_fixture = CourseFixture(
@@ -41,6 +42,11 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
         self.outline.visit()
         subsection = self.outline.section(SECTION_NAME).subsection(SUBSECTION_NAME)
         self.unit_page = subsection.expand_subsection().unit(UNIT_NAME).go_to()
+
+    def tearDown(self):
+        """ Tear down method: remove search index backing file """
+        self._cleanup_index_file()
+        super(StudioLibraryContainerTest, self).tearDown()
 
     def populate_library_fixture(self, library_fixture):
         """
