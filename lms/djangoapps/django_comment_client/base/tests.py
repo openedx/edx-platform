@@ -45,7 +45,7 @@ from edx_notifications.startup import initialize as initialize_notifications
 
 from social_engagement.models import StudentSocialEngagementScore
 
-from openedx.core.djangoapps.course_groups.cohorts import is_commentable_cohorted, add_cohort, add_user_to_cohort, is_user_in_cohort
+from openedx.core.djangoapps.course_groups.cohorts import is_commentable_cohorted, add_cohort, add_user_to_cohort
 
 from edx_notifications.lib.consumer import get_notifications_for_user, get_notifications_count_for_user
 from edx_notifications.startup import initialize  as initialize_notifications
