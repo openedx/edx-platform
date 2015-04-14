@@ -171,7 +171,7 @@ class LearnerProfilePage(FieldsMixin, PageObject):
     @property
     def profile_has_default_image(self):
         """
-        Return list of visible fields.
+        Return bool if image field has default photo or not.
         """
         self.wait_for_field('image')
         default_links = self.q(css='.image-frame').attrs('src')
@@ -184,7 +184,6 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         mouse_hover_action = ActionChains(self.browser).move_to_element(element)
         mouse_hover_action.perform()
 
-    @property
     def profile_has_image_with_public_access(self):
         """
         Check if image is present with remove/upload access.
@@ -195,7 +194,6 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         self.wait_for_element_visibility('.u-field-upload-button', "upload button is visible")
         return self.q(css='.u-field-upload-button').visible
 
-    @property
     def profile_has_image_with_private_access(self):
         """
         Check if image is present with remove/upload access.
@@ -203,9 +201,9 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         self.wait_for_field('image')
         return self.q(css='.u-field-upload-button').visible
 
-    def _upload_file(self, filename):
+    def upload_file(self, filename):
         """
-        Helper method to upload a image file.
+        Helper method to upload an image file.
         """
         self.wait_for_element_visibility('.u-field-upload-button', "upload button is visible")
         file_path = InstructorDashboardPage.get_asset_path(filename)
@@ -217,9 +215,11 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         self.wait_for_element_visibility('.upload-button-input', "upload button is visible")
 
         self.browser.execute_script('$(".upload-submit").show();')
-        self.q(css='.upload-button-input').results[0].send_keys(file_path)
 
+        # First send_keys will initialize the jquery auto upload plugin.
+        self.q(css='.upload-button-input').results[0].send_keys(file_path)
         self.q(css='.upload-submit').first.click()
+        self.q(css='.upload-button-input').results[0].send_keys(file_path)
 
         self.wait_for_ajax()
 

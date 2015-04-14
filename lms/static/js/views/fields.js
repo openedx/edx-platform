@@ -688,7 +688,6 @@
             },
 
             onBeforeUnload: function () {
-                console.log('Do you really want to go away?');
                 var status = this.getCurrentStatus();
                 if (status === 'uploading') {
                     return gettext(

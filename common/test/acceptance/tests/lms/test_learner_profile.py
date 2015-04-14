@@ -3,6 +3,7 @@
 End-to-end tests for Student's Profile Page.
 """
 
+from datetime import datetime
 from ...pages.lms.account_settings import AccountSettingsPage
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.learner_profile import LearnerProfilePage
@@ -129,7 +130,7 @@ class LearnerProfilePageTest(WebAppTest):
         """
         self.visit_my_profile_page(self.MY_USER, privacy=self.PRIVACY_PUBLIC)
         self.assertTrue(self.my_profile_page.profile_has_default_image)
-        self.assertTrue(self.my_profile_page.profile_has_image_with_public_access)
+        self.assertTrue(self.my_profile_page.profile_has_image_with_public_access())
 
     def test_dashboard_learner_profile_link(self):
         """
@@ -355,7 +356,11 @@ class LearnerProfilePageTest(WebAppTest):
         And i visit my profile page.
         Then i should see message `You must be over 13 to share a full profile.`
         """
-        self.verify_profile_forced_private_message('2010', message='You must be over 13 to share a full profile.')
+        year_of_birth = datetime.now().year - 5
+        self.verify_profile_forced_private_message(
+            str(year_of_birth),
+            message='You must be over 13 to share a full profile.'
+        )
 
     def test_user_can_only_see_default_image_for_private_profile(self):
         """
@@ -368,10 +373,13 @@ class LearnerProfilePageTest(WebAppTest):
         And i cannot upload/remove the image.
         """
         self.visit_my_profile_page(self.MY_USER, privacy=self.PRIVACY_PRIVATE)
-
-        self.verify_profile_forced_private_message('2010', message='You must be over 13 to share a full profile.')
+        year_of_birth = datetime.now().year - 5
+        self.verify_profile_forced_private_message(
+            str(year_of_birth),
+            message='You must be over 13 to share a full profile.'
+        )
         self.assertTrue(self.my_profile_page.profile_has_default_image)
-        self.assertFalse(self.my_profile_page.profile_has_image_with_private_access)
+        self.assertFalse(self.my_profile_page.profile_has_image_with_private_access())
 
     def test_user_can_see_default_image_for_public_profile(self):
         """
@@ -399,7 +407,7 @@ class LearnerProfilePageTest(WebAppTest):
         """
         self.assert_default_image_has_public_access()
 
-        self.my_profile_page.upload_correct_image_file(filename='image.jpg')
+        self.my_profile_page.upload_file(filename='image.jpg')
         self.assertTrue(self.my_profile_page.image_upload_success)
         self.my_profile_page.visit()
         self.assertTrue(self.my_profile_page.image_upload_success)
@@ -418,7 +426,7 @@ class LearnerProfilePageTest(WebAppTest):
         """
         self.assert_default_image_has_public_access()
 
-        self.my_profile_page.upload_correct_image_file(filename='larger_image.jpg')
+        self.my_profile_page.upload_file(filename='larger_image.jpg')
         self.assertEqual(self.my_profile_page.profile_image_message, "Your image must be smaller than 1 MB in size.")
         self.my_profile_page.visit()
         self.assertTrue(self.my_profile_page.profile_has_default_image)
@@ -437,7 +445,7 @@ class LearnerProfilePageTest(WebAppTest):
         """
         self.assert_default_image_has_public_access()
 
-        self.my_profile_page.upload_correct_image_file(filename='list-icon-visited.png')
+        self.my_profile_page.upload_file(filename='list-icon-visited.png')
         self.assertEqual(self.my_profile_page.profile_image_message, "Your image must be at least 100 Bytes in size.")
         self.my_profile_page.visit()
         self.assertTrue(self.my_profile_page.profile_has_default_image)
@@ -456,7 +464,7 @@ class LearnerProfilePageTest(WebAppTest):
         """
         self.assert_default_image_has_public_access()
 
-        self.my_profile_page.upload_correct_image_file(filename='cohort_users_only_username.csv')
+        self.my_profile_page.upload_file(filename='cohort_users_only_username.csv')
         self.assertEqual(self.my_profile_page.profile_image_message, "Unsupported file type.")
         self.my_profile_page.visit()
         self.assertTrue(self.my_profile_page.profile_has_default_image)
@@ -475,7 +483,7 @@ class LearnerProfilePageTest(WebAppTest):
         """
         self.assert_default_image_has_public_access()
 
-        self.my_profile_page.upload_correct_image_file(filename='image.jpg')
+        self.my_profile_page.upload_file(filename='image.jpg')
         self.assertTrue(self.my_profile_page.remove_profile_image())
         self.assertTrue(self.my_profile_page.profile_has_default_image)
         self.my_profile_page.visit()
@@ -493,6 +501,6 @@ class LearnerProfilePageTest(WebAppTest):
         """
         self.assert_default_image_has_public_access()
 
-        self.my_profile_page.upload_correct_image_file(filename='image.jpg')
+        self.my_profile_page.upload_file(filename='image.jpg')
         self.assertTrue(self.my_profile_page.remove_profile_image())
         self.assertTrue(self.my_profile_page.profile_has_default_image)
