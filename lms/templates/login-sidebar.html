@@ -14,7 +14,7 @@ from django.core.urlresolvers import reverse
   <a class="action action-login-openid" href="#">${_("Login via OpenID")}</a>
 </div> -->
 % endif
-
+<!--
 <div class="cta cta-help">
   <h3>${_("Not Enrolled?")}</h3>
   <p><a href="${reverse('register_user')}">${_("Sign up for {platform_name} today!").format(platform_name=platform_name)}</a></p>
@@ -27,4 +27,14 @@ from django.core.urlresolvers import reverse
         ${_("View our help section for answers to commonly asked questions.")}
     </a></p>
   % endif
+</div>
+-->
+<div class="cta cta-help">
+	<h3>아카데미X 회원이 아니신가요?</h3>
+	<p><a href="/register">아카데미X 회원가입</a></p>
+
+	<!--<h3>Need Help?</h3>
+	<p>Looking for help in logging in or with your Your Platform Name Here account?
+		<a href="/faq">View our help section for answers to commonly asked questions.</a>
+	</p>-->
 </div>

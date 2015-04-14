@@ -36,7 +36,7 @@ site_status_msg = get_site_status_msg(course_id)
 </div>
 % endif
 </%block>
-
+<!--
   <header id="global-navigation" class="global ${"slim" if course else ""}" >
     <nav aria-label="${_('Global')}">
     <h1 class="logo">
@@ -148,6 +148,28 @@ site_status_msg = get_site_status_msg(course_id)
     </ol>
     % endif
   </nav>
+</header>
+-->
+<header class="global-x" aria-label="Global Navigation">
+	<nav>
+		<h1 class="logo">
+		<a href="/">
+			<img src="/static/images/ximg/logo.png" alt="AcademyX"/>
+		</a>
+		</h1>
+		<ul class="gnb">
+		<li><a href="/courses/">교육과정</a></li>
+		<!--<li class="on"><a href="/">교육과정</a></li> 선택시-->
+		<li><a href="/">교수진</a></li>
+		<li><a href="/">서비스 소개</a></li>
+		<li><a href="/">파트너</a></li>
+		</ul>
+		<ul class="gnb-blobal">
+		<li><a href="/register">회원가입</a></li>
+		<!--<li class="on"><a href="register.html">회원가입</a></li> 선택시-->
+		<li><a href="/login">로그인</a></li>
+		</ul>
+	</nav>
 </header>
 % if course:
 <!--[if lte IE 8]>

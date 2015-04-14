@@ -30,30 +30,99 @@
 
     logo_alt_text = _("{platform_name} Logo").format(platform_name=platform_name)
 %>
+<div class="region-columns region-container container">
+	<div class="region-container-inner">
+		<div id="columns" class="columns clearfix">
+			<div id="content-column" class="content-column" role="main" aria-label="Content">
+				<div class="content-inner">
+					<!-- region: Highlighted -->
+					<section id="main-content">
+						<header id="main-content-header" class="clearfix">
+							<h1 id="page-title">Find Courses</h1>
+						</header>
 
-<section class="find-courses">
+						<!-- region: Main Content -->
+						<div id="content" class="region">
+							<div itemprop="video" itemscope itemtype="http://schema.org/VideoObject">
+								<div class="region-container-inner">
+									<div id="block-system-main" class="block block-system no-title" >
+										<header class="search-header">
+											<h2 class="hide-phone">전체 교육과정 <span class="result-count">126</span>개</h2>
+											<div class="block block-customizable-search course-search-bar course-list-search-bar">
+												<form action="/course" method="post" id="customizable-search-block-form" accept-charset="UTF-8">
+													<div><label for="edit-search-query" class="element-invisible">검색</label>
+														<div class="form-item form-type-textfield form-item-search-query">
+															<input placeholder="검색어를 입력해 주세요." type="text" id="edit-search-query" name="search_query" value="" size="60" maxlength="128" class="form-text tt-input" />
+														</div>
+														<input class="fa fa-search btn btn-blue form-submit" aria-label="Submit" type="submit" id="edit-submit" name="op" value="https://www.edx.org/sites/default/files/course/image/promoted/inclusive_leadership_378x225.jpg" />
+														<button class="fa fa-search btn btn-blue form-submit" aria-label="Submit" type="submit" id="edit-submit" name="op">검색하기</button>
+														<input type="hidden" name="form_build_id" value="form-B7lssV_iSxuyalIDQhaJy6roR9dU_xKRLMhyt1tfsQg" />
+														<input type="hidden" name="form_id" value="customizable_search_block_form" />
+													</div>
+												</form>
+												<a href="#" class="facet-toggle show-phone">
+													<i class="fa fa-filter"></i>
+												</a>
+											</div>
 
-  <header class="search">
-    <div class="inner-wrapper main-search">
-      <hgroup>
-        <div class="logo">
-          <img src="${logo_file}" alt="${logo_alt_text}" />
-        </div>
-        <h2>${course_index_overlay_text}</h2>
-      </hgroup>
-    </div>
-  </header>
+											<div class="filters hide-phone collapsed">
+												<ul class="active-filters facet-list"></ul>
+												<span>
+													<a href="#" class="clear-filters flt-right">CLEAR ALL</a>
+												</span>
+											</div>
+										</header>
 
-  <section class="container">
-    <section class="courses">
-      <ul class="courses-listing">
-	%for course in courses:
-        <li class="courses-listing-item">
-          <%include file="../course.html" args="course=course" />
-        </li>
-        %endfor
-      </ul>
-    </section>
-  </section>
+										<div class="search-header mobile">
+											<h2>전체 교육과정 <span class="result-count">126</span>개</h2>
+											<div class="filters collapsed">
+												<ul class="active-filters facet-list"></ul>
+												<span>
+													<a href="#" class="clear-filters flt-right">CLEAR ALL</a>
+												</span>
+											</div>
+										</div>
 
-</section>
+										<section class="search-results" aria-label="Search Results">
+											<div class="no-results hidden">
+												<h3>We couldn't find any results for "<span class="query-str"></span>".</h3>
+												<ul>
+													<li>Try searching for a related term.</li>
+													<li>Browse all of our courses, using filters to refine your options.</li>
+												</ul>
+											</div>
+											<!-- 추천교육과정 -->
+											<div class="view view-featured-courses-on-search view-id-featured_courses_on_search view-display-id-block_1 card-listing collapsed view-dom-id-c4d3fdb29b2facf62276e9b0c78b461e" aria-hidden="true">
+												<div class="view-header">
+													<h3>추천 교육과정</h3>
+												</div>
+												<div class="view-content">
+													<%include file="../course.html" args="course=course" />
+												</div>
+											</div>
+											<!-- //추천교육과정 -->
+											<div class="filtered">
+												<%include file="../course.html" args="course=course" />
+											</div>
+											<div class="loading hidden">
+												<p>
+													<i class="fa fa-refresh fa-spin"></i>
+													Loading...
+												</p>
+											</div>
+										</section>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- Feed icons (RSS, Atom icons etc -->
+					</section><!-- /end #main-content -->
+				<!-- region: Content Aside -->
+
+				</div><!-- /end .content-inner -->
+			</div><!-- /end #content-column -->
+		<!-- regions: Sidebar first and Sidebar second -->
+
+		 </div><!-- /end #columns -->
+	</div><!-- /end .region-container-inner -->
+</div><!-- /end #region-columns -->
