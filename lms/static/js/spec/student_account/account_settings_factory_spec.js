@@ -148,7 +148,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 var sectionsData = accountSettingsView.options.sectionsData;
 
-                expect(sectionsData[0].fields.length).toBe(5);
+                expect(sectionsData[0].fields.length).toBe(6);
 
                 var textFields = [sectionsData[0].fields[1], sectionsData[0].fields[2]];
                 for (var i = 0; i < textFields.length ; i++) {
@@ -165,10 +165,14 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     }, requests);
                 }
 
-                expect(sectionsData[1].fields.length).toBe(5);
-                for (var i = 0; i < 4; i++) {
-
-                    var view = sectionsData[1].fields[i].view;
+                expect(sectionsData[1].fields.length).toBe(4);
+                var dropdownFields = [
+                    sectionsData[1].fields[0],
+                    sectionsData[1].fields[1],
+                    sectionsData[1].fields[2]
+                ];
+                _.each(dropdownFields, function(field) {
+                    var view = field.view;
                     FieldViewsSpecHelpers.verifyDropDownField(view, {
                         title: view.options.title,
                         valueAttribute: view.options.valueAttribute,
@@ -178,7 +182,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                         invalidValue2: Helpers.FIELD_OPTIONS[3][0],
                         validationError: "Nope, this will not do!"
                     }, requests);
-                }
+                });
 
                 var section2Fields = sectionsData[2].fields;
                 expect(section2Fields.length).toBe(2);
