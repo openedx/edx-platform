@@ -5,7 +5,7 @@ This file contains celery tasks for student course enrollment
 from celery.task import task
 from .models import CourseUserGroup
 from edx_notifications.lib.publisher import bulk_publish_notification_to_users
-from student.models import CourseEnrollment
+
 import logging
 
 log = logging.getLogger(__name__)
@@ -25,7 +25,7 @@ def publish_course_group_notification_task(course_group_id, notification_msg, ex
 
     try:
         bulk_publish_notification_to_users(user_ids, notification_msg, exclude_user_ids=exclude_user_ids)
-    except Exception, ex:
+    except Exception, ex:  # pylint: disable=broad-except
         # Notifications are never critical, so we don't want to disrupt any
         # other logic processing. So log and continue.
         log.exception(ex)
