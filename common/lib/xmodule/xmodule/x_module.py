@@ -39,6 +39,7 @@ log = logging.getLogger(__name__)
 
 XMODULE_METRIC_NAME = 'edxapp.xmodule'
 XMODULE_DURATION_METRIC_NAME = XMODULE_METRIC_NAME + '.duration'
+XMODULE_METRIC_SAMPLE_RATE = 0.1
 
 # Stats event sent to DataDog in order to determine if old XML parsing can be deprecated.
 DEPRECATION_VSCOMPAT_EVENT = 'deprecation.vscompat'
@@ -1195,11 +1196,12 @@ class MetricsMixin(object):
                 u'course_id:{}'.format(course_id),
                 u'block_type:{}'.format(block.scope_ids.block_type)
             ]
-            dog_stats_api.increment(XMODULE_METRIC_NAME, tags=tags)
+            dog_stats_api.increment(XMODULE_METRIC_NAME, tags=tags, sample_rate=XMODULE_METRIC_SAMPLE_RATE)
             dog_stats_api.histogram(
                 XMODULE_DURATION_METRIC_NAME,
                 end_time - start_time,
-                tags=tags
+                tags=tags,
+                sample_rate=XMODULE_METRIC_SAMPLE_RATE,
             )
 
     def handle(self, block, handler_name, request, suffix=''):
@@ -1222,11 +1224,12 @@ class MetricsMixin(object):
                 u'course_id:{}'.format(course_id),
                 u'block_type:{}'.format(block.scope_ids.block_type)
             ]
-            dog_stats_api.increment(XMODULE_METRIC_NAME, tags=tags)
+            dog_stats_api.increment(XMODULE_METRIC_NAME, tags=tags, sample_rate=XMODULE_METRIC_SAMPLE_RATE)
             dog_stats_api.histogram(
                 XMODULE_DURATION_METRIC_NAME,
                 end_time - start_time,
-                tags=tags
+                tags=tags,
+                sample_rate=XMODULE_METRIC_SAMPLE_RATE
             )
 
 
