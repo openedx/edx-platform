@@ -408,9 +408,9 @@ class LearnerProfilePageTest(WebAppTest):
         self.assert_default_image_has_public_access()
 
         self.my_profile_page.upload_file(filename='image.jpg')
-        self.assertTrue(self.my_profile_page.image_upload_success)
+        self.assertIsNone(self.my_profile_page.image_upload_success)
         self.my_profile_page.visit()
-        self.assertTrue(self.my_profile_page.image_upload_success)
+        self.assertIsNone(self.my_profile_page.image_upload_success)
 
     def test_user_can_see_error_for_exceeding_max_file_size_limit(self):
         """
@@ -484,6 +484,7 @@ class LearnerProfilePageTest(WebAppTest):
         self.assert_default_image_has_public_access()
 
         self.my_profile_page.upload_file(filename='image.jpg')
+        self.assertIsNone(self.my_profile_page.image_upload_success)
         self.assertTrue(self.my_profile_page.remove_profile_image())
         self.assertTrue(self.my_profile_page.profile_has_default_image)
         self.my_profile_page.visit()
@@ -500,7 +501,4 @@ class LearnerProfilePageTest(WebAppTest):
         And i cannot see the remove image text
         """
         self.assert_default_image_has_public_access()
-
-        self.my_profile_page.upload_file(filename='image.jpg')
-        self.assertTrue(self.my_profile_page.remove_profile_image())
-        self.assertTrue(self.my_profile_page.profile_has_default_image)
+        self.assertFalse(self.my_profile_page.remove_link_present)
