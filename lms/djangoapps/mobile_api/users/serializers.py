@@ -60,6 +60,7 @@ class CourseField(serializers.RelatedField):
             "course_updates": course_updates_url,
             "course_handouts": course_handouts_url,
             "course_about": course_about_url,
+            "subscription_id": course.clean_id(padding_char='_'),
         }
 
 

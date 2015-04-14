@@ -60,6 +60,7 @@ class TestUserEnrollmentApi(MobileAPITestCase, MobileAuthUserTestMixin, MobileEn
         self.assertTrue('course_handouts' in found_course)
         self.assertEqual(found_course['id'], unicode(self.course.id))
         self.assertEqual(courses[0]['mode'], 'honor')
+        self.assertEqual(courses[0]['course']['subscription_id'], self.course.clean_id(padding_char='_'))
 
     def verify_failure(self, response):
         self.assertEqual(response.status_code, 200)
