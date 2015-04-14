@@ -8,12 +8,14 @@ from mock import patch
 from contentstore.utils import reverse_course_url, reverse_usage_url
 from contentstore.views.component import SPLIT_TEST_COMPONENT_TYPE
 from contentstore.views.course import GroupConfiguration
+from contentstore.views.certificates import CERTIFICATE_SCHEMA_VERSION
 from contentstore.tests.utils import CourseTestCase
 from xmodule.partitions.partitions import Group, UserPartition
 from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
+from contentstore.views.exception import CertificateValidationError
 
 GROUP_CONFIGURATION_JSON = {
     u'name': u'Test name',
@@ -31,6 +33,11 @@ GROUP_CONFIGURATION_JSON = {
     ],
 }
 
+CERTIFICATE_JSON = {
+    u'name': u'Test certificate',
+    u'description': u'Test description',
+    u'version': CERTIFICATE_SCHEMA_VERSION
+}
 
 # pylint: disable=no-member
 class HelperMethods(object):
@@ -127,6 +134,22 @@ class HelperMethods(object):
             ) for i in xrange(0, count)
         ]
         self.course.user_partitions = partitions
+        self.save_course()
+
+    def _add_course_certificates(self, count=1):
+        """
+        Create certificate for the course.
+        """
+        certificates = [
+            {
+                'id': i,
+                'name': 'Name ' + str(i),
+                'description': 'description ' + str(i),
+                'version': CERTIFICATE_SCHEMA_VERSION
+            } for i in xrange(0, count)
+        ]
+
+        self.course.certificates = {'certificates': certificates}
         self.save_course()
 
 
@@ -912,3 +935,211 @@ class GroupConfigurationsValidationTestCase(CourseTestCase, HelperMethods):
         Tests if validation message is not present when updating usage info.
         """
         self.verify_validation_update_usage_info(None, None)  # pylint: disable=no-value-for-parameter
+
+
+# pylint: disable=no-member
+class CertificatesBaseTestCase(object):
+    """
+    Mixin with base test cases for the certificates.
+    """
+
+    def _remove_ids(self, content):
+        """
+        Remove ids from the response. We cannot predict IDs, because they're
+        generated randomly.
+        We use this method to clean up response when creating new certificate.
+        """
+        certificate_id = content.pop("id")
+        return certificate_id
+
+    def test_required_fields_are_absent(self):
+        """
+        Test required fields are absent.
+        """
+        bad_jsons = [
+            # must have name of the certificate
+            {
+                u'description': 'Test description',
+                u'version': CERTIFICATE_SCHEMA_VERSION
+            },
+
+            # an empty json
+            {},
+        ]
+
+        for bad_json in bad_jsons:
+            response = self.client.post(
+                self._url(),
+                data=json.dumps(bad_json),
+                content_type="application/json",
+                HTTP_ACCEPT="application/json",
+                HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            )
+
+            self.assertEqual(response.status_code, 400)
+            self.assertNotIn("Location", response)
+            content = json.loads(response.content)
+            self.assertIn("error", content)
+
+    def test_invalid_json(self):
+        """
+        Test invalid json handling.
+        """
+        # Invalid JSON.
+        invalid_json = "{u'name': 'Test Name', u'description': 'Test description'," \
+                       " u'version': "+str(CERTIFICATE_SCHEMA_VERSION)+", []}"
+
+        response = self.client.post(
+            self._url(),
+            data=invalid_json,
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertNotIn("Location", response)
+        content = json.loads(response.content)
+        self.assertIn("error", content)
+
+
+# pylint: disable=no-member
+class CertificatesListHandlerTestCase(CourseTestCase, CertificatesBaseTestCase):
+    """
+    Test cases for certificates_list_handler.
+    """
+    def setUp(self):
+        """
+        Set up CertificatesListHandlerTestCase.
+        """
+        super(CertificatesListHandlerTestCase, self).setUp()
+
+    def _url(self):
+        """
+        Return url for the handler.
+        """
+        return reverse_course_url('certificates.certificates_list_handler', self.course.id)
+
+    def test_can_create_certificate(self):
+        """
+        Test that you can create a certificate.
+        """
+        expected = {
+            u'version': CERTIFICATE_SCHEMA_VERSION,
+            u'name': u'Test certificate',
+            u'description': u'Test description'
+        }
+        response = self.client.ajax_post(
+            self._url(),
+            data=CERTIFICATE_JSON
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertIn("Location", response)
+        content = json.loads(response.content)
+        self._remove_ids(content)  # pylint: disable=unused-variable
+        self.assertEqual(content, expected)
+
+    def test_certificate_info_in_response(self):
+        """
+        Test that certificate has been created and rendered properly.
+        """
+        response = self.client.ajax_post(
+            self._url(),
+            data=CERTIFICATE_JSON
+        )
+
+        self.assertEqual(response.status_code, 201)
+
+        # in html response
+        result = self.client.get_html(self._url())
+        self.assertIn('Test certificate', result.content)
+        self.assertIn('Test description', result.content)
+
+        # in JSON response
+        response = self.client.get_json(self._url())
+        data = json.loads(response.content)
+        self.assertEquals(len(data), 1)
+        self.assertEqual(data[0]['name'], 'Test certificate')
+        self.assertEqual(data[0]['description'], 'Test description')
+        self.assertEqual(data[0]['version'], CERTIFICATE_SCHEMA_VERSION)
+
+    def test_unsupported_http_accept_header(self):
+        """
+        Test if not allowed header present in request.
+        """
+        response = self.client.get(
+            self._url(),
+            HTTP_ACCEPT="text/plain",
+        )
+        self.assertEqual(response.status_code, 406)
+
+
+class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase, HelperMethods):
+    """
+    Test cases for CertificatesDetailHandlerTestCase.
+    """
+
+    ID = 0
+
+    def _url(self, cid=-1):
+        """
+        Return url for the handler.
+        """
+        cid = cid if cid > 0 else self.ID
+        return reverse_course_url(
+            'certificates.certificates_detail_handler',
+            self.course.id,
+            kwargs={'certificate_id': cid},
+        )
+
+    def test_can_create_new_certificate_if_it_does_not_exist(self):
+        """
+        PUT/POST new certificate.
+        """
+        expected = {
+            u'id': 666,
+            u'version': CERTIFICATE_SCHEMA_VERSION,
+            u'name': u'Test certificate',
+            u'description': u'Test description'
+        }
+
+        response = self.client.put(
+            self._url(cid=666),
+            data=json.dumps(expected),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        content = json.loads(response.content)
+        self.assertEqual(content, expected)
+
+    def test_can_edit_certificate(self):
+        """
+        Edit certificate, check its id and modified fields.
+        """
+        self._add_course_certificates(count=2)
+
+        expected = {
+            u'id': 1,
+            u'version': CERTIFICATE_SCHEMA_VERSION,
+            u'name': u'New test certificate',
+            u'description': u'New test description'
+        }
+
+        response = self.client.put(
+            self._url(cid=1),
+            data=json.dumps(expected),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        content = json.loads(response.content)
+        self.assertEqual(content, expected)
+        self.reload_course()
+
+        # Verify that certificate is properly updated in the course.
+        course_certificates = self.course.certificates['certificates']
+        self.assertEqual(len(course_certificates), 2)
+        self.assertEqual(course_certificates[1].get('name'), u'New test certificate')
+        self.assertEqual(course_certificates[1].get('description'), 'New test description')

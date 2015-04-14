@@ -25,7 +25,7 @@ from util.db import generate_int_id, MYSQL_MAX_INT
 from util.json_request import JsonResponse
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
-
+from contentstore.views.exception import CertificateValidationError
 
 # Three headers to track down -- settings, settings_graders, settings_advanced (check group_configs as well)
 # backbone app static/js/certificates  (use group configs as guide)
@@ -46,13 +46,6 @@ def get_course_and_check_access(course_key, user, depth=0):
         raise PermissionDenied()
     course_module = modulestore().get_course(course_key, depth=depth)
     return course_module
-
-
-class CertificateValidationError(Exception):
-    """
-    An exception raised when certificate information is invalid.
-    """
-    pass
 
 
 class CertificateManager(object):
@@ -137,7 +130,7 @@ class CertificateManager(object):
         # Ensure the schema fieldset meets our expectations
         for key in ("name", "description", "version"):
             if key not in value:
-                raise TypeError("Certificate dict {0} missing value key '{1}'".format(value, key))
+                raise CertificateValidationError(_("Certificate dict {0} missing value key '{1}'".format(value, key)))
 
         # Load up the Certificate data
         certificate_data = CertificateManager.parse(value)
@@ -276,7 +269,11 @@ def certificates_detail_handler(request, course_key_string, certificate_id):
     store = modulestore()
     with store.bulk_operations(course_key):
         course = get_course_and_check_access(course_key, request.user)
-        certificates_list = course.certificates['certificates']
+        certificates_list = []
+        if course.certificates.get('certificates') is not None:
+            certificates_list = course.certificates['certificates']
+        else:
+            course.certificates['certificates'] = []
 
         match_index = None
         match_cert = None
