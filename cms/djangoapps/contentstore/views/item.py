@@ -511,11 +511,24 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
         if grader_type is not None:
             result.update(CourseGradingModel.update_section_grader_type(xblock, grader_type, user))
 
-        # notify the xblocks that they have been published
-        _notify_xblocks(xblock, xblock.location.course_key, 'on_studio_published')
 
-    # Note that children aren't being returned until we have a use case.
-    return JsonResponse(result, encoder=EdxJSONEncoder)
+        # If publish is set to 'republish' and this item is not in direct only categories and has previously been published,
+        # then this item should be republished. This is used by staff locking to ensure that changing the draft
+        # value of the staff lock will also update the published version, but only at the unit level.
+        if publish == 'republish' and xblock.category not in DIRECT_ONLY_CATEGORIES:
+            if modulestore().has_published_version(xblock):
+                publish = 'make_public'
+
+        # Make public after updating the xblock, in case the caller asked for both an update and a publish.
+        # Used by Bok Choy tests and by republishing of staff locks.
+        if publish == 'make_public':
+            modulestore().publish(xblock.location, user.id)
+
+            # notify the xblocks that they have been published
+            _notify_xblocks(xblock, xblock.location.course_key, 'on_studio_published')
+
+        # Note that children aren't being returned until we have a use case.
+        return JsonResponse(result, encoder=EdxJSONEncoder)
 
 
 def _notify_xblocks(xblock, course_id, callback_name):
