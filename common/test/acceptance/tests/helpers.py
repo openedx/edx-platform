@@ -313,13 +313,18 @@ class EventsTestMixin(object):
             "time": {"$gt": self.start_time},
         })
 
-    def verify_events_of_type(self, event_type, expected_events):
+    def verify_events_of_type(self, event_type, expected_events, expected_referers=None):
         """Verify that the expected events of a given type were logged.
 
         Args:
             event_type (str): The type of event to be verified.
             expected_events (list): A list of dicts representing the events that should
                 have been fired.
+            expected_referers (list): A list of strings representing the referers for each event
+                that should been fired (optional). If present, the actual referers compared
+                with this list, checking that the expected_referers are the suffixes of
+                actual_referers. For example, if one event is expected, specifying ["/account/settings"]
+                will verify that the referer for the single event ends with "/account/settings".
         """
         EmptyPromise(
             lambda: self.get_matching_events(event_type).count() >= len(expected_events),
@@ -329,10 +334,22 @@ class EventsTestMixin(object):
         # Verify that the correct events were fired
         cursor = self.get_matching_events(event_type)
         actual_events = []
-        for i in range(0, cursor.count()):
-            raw_event = cursor.next()
-            actual_events.append(json.loads(raw_event["event"]))
+        actual_referers = []
+        for __ in range(0, cursor.count()):
+            emitted_data = cursor.next()
+            event = emitted_data["event"]
+            if emitted_data["event_source"] == "browser":
+                event = json.loads(event)
+            actual_events.append(event)
+            actual_referers.append(emitted_data["referer"])
         self.assertEqual(expected_events, actual_events)
+        if expected_referers is not None:
+            self.assertEqual(len(expected_referers), len(actual_referers), "Number of expected referers is incorrect")
+            for index, actual_referer in enumerate(actual_referers):
+                self.assertTrue(
+                    actual_referer.endswith(expected_referers[index]),
+                    "Refer '{0}' does not have correct suffix, '{1}'.".format(actual_referer, expected_referers[index])
+                )
 
 
 class UniqueCourseTest(WebAppTest):
