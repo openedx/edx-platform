@@ -509,7 +509,8 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
         if grader_type is not None:
             result.update(CourseGradingModel.update_section_grader_type(xblock, grader_type, user))
 
-        # If publish is set to 'republish' and this item is not in direct only categories and has previously been published,
+        # If publish is set to 'republish' and this item is not in direct only categories
+        # and has previously been published,
         # then this item should be republished. This is used by staff locking to ensure that changing the draft
         # value of the staff lock will also update the published version, but only at the unit level.
         if publish == 'republish' and xblock.category not in DIRECT_ONLY_CATEGORIES:

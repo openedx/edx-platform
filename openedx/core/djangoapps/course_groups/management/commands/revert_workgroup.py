@@ -1,4 +1,7 @@
-from django.core.management.base import BaseCommand, CommandError
+"""
+Django management command to Revert the multiple cohorts feature.
+"""
+from django.core.management.base import BaseCommand
 from django.core.exceptions import MultipleObjectsReturned
 from optparse import make_option
 
@@ -6,9 +9,8 @@ from django.contrib.auth.models import User
 
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
-from course_groups.models import CourseUserGroup
-from course_groups.cohorts import (
-    get_cohort,
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup
+from openedx.core.djangoapps.course_groups.cohorts import (
     get_cohort_by_name,
     add_cohort,
     add_user_to_cohort,
@@ -18,12 +20,17 @@ from student.models import CourseEnrollment
 
 
 class Command(BaseCommand):
+    """
+    Command to revert multiple cohorts feature
+    """
     option_list = BaseCommand.option_list + (
-        make_option('--fix',
+        make_option(
+            '--fix',
             action='store_true',
             dest='fix',
             default=False,
-            help='Apply possible fixes automatically'),
+            help='Apply possible fixes automatically'
+        ),
     )
     help = 'Revert the multiple cohorts feature.'
 
@@ -70,8 +77,10 @@ class Command(BaseCommand):
                             default_cohort = get_cohort_by_name(course.id, CourseUserGroup.default_cohort_name)
                         except CourseUserGroup.DoesNotExist:
                             default_cohort = add_cohort(course.id, CourseUserGroup.default_cohort_name)
-                            self.stdout.write('Default cohort "{}" created for course "{}"'.format(
-                                default_cohort.name, course.display_name)
+                            self.stdout.write(
+                                'Default cohort "{}" created for course "{}"'.format(
+                                    default_cohort.name, course.display_name
+                                )
                             )
                         add_user_to_cohort(default_cohort, user.username)
                         self.stdout.write(
@@ -92,13 +101,13 @@ class Command(BaseCommand):
                     if options['fix']:
                         user_cohorts = CourseUserGroup.objects.filter(course_id=course.id,
                                                                       users__id=user.id).all()
-                        user_cohort = user_cohorts[0]
                         for cohort in user_cohorts[1:]:
                             remove_user_from_cohort(cohort, user.username)
-                            self.stdout.write("User '{}' has been removed from cohort '{}' in course '{}'.\n".format(
-                                user.username, cohort.name, course.display_name)
+                            self.stdout.write(
+                                "User '{}' has been removed from cohort '{}' in course '{}'.\n".format(
+                                    user.username, cohort.name, course.display_name
+                                )
                             )
-
                         self.stdout.write("User '{}' is now only in cohort '{}' in course '{}'.\n".format(
                             user.username, cohort.name, course.display_name)
                         )
