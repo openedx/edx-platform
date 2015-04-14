@@ -30,35 +30,6 @@
 
     logo_alt_text = _("{platform_name} Logo").format(platform_name=platform_name)
 %>
-
-<!-- 주석 처리 했는데 위에 나오네요;;
-<section class="find-courses">
-
-  <header class="search">
-    <div class="inner-wrapper main-search">
-      <hgroup>
-        <div class="logo">
-          <img src="${logo_file}" alt="${logo_alt_text}" />
-        </div>
-        <h2>${course_index_overlay_text}</h2>
-      </hgroup>
-    </div>
-  </header>
-
-  <section class="container">
-    <section class="courses">
-      <ul class="courses-listing">
-	%for course in courses:
-        <li class="courses-listing-item">
-          <%include file="../course.html" args="course=course" />
-        </li>
-        %endfor
-      </ul>
-    </section>
-  </section>
-
-</section>
--->
 <div class="region-columns region-container container">
 	<div class="region-container-inner">
 		<div id="columns" class="columns clearfix">
