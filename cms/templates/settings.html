@@ -297,7 +297,6 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                 </li>
                 % if settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES'):
                 <li class="field field-select" id="field-pre-requisite-course">
-                  <form action="#" class="pre-requisite-course-form" method="post">
                     <label for="pre-requisite-course">${_("Prerequisite Course")}</label>
                     <select class="input" id="pre-requisite-course">
                         <option value="">${_("None")}</option>
@@ -307,7 +306,6 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                     </select>
                     <span class="tip tip-inline">${_("Course that students must complete before beginning this course")}</span>
                     <button type="submit" class="sr" name="submit" value="submit">${_("set pre-requisite course")}</button>
-                   </form>
                 </li>
                 % endif
                 % if settings.FEATURES.get('ENTRANCE_EXAMS'):
