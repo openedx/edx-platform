@@ -75,7 +75,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     title: 'Preferred Language',
                     valueAttribute: 'language',
                     helpMessage: 'Your preferred language.'
-                })
+                });
 
                 var view = new fieldViewClass(fieldData);
                 view.saveAttributes(
@@ -98,7 +98,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 });
                 var view = new FieldViews.ReadonlyFieldView(fieldData).render();
 
-                FieldViewsSpecHelpers.expectTitleAndMessageToBe(view, fieldData.title, fieldData.helpMessage);
+                FieldViewsSpecHelpers.expectTitleAndMessageToContain(view, fieldData.title, fieldData.helpMessage, false);
                 expect(view.$('.u-field-value input').val().trim()).toBe(USERNAME);
 
                 view.model.set({'username': 'bookworm'});
@@ -139,7 +139,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 });
                 var view = new FieldViews.DropdownFieldView(fieldData).render();
-                FieldViewsSpecHelpers.expectTitleAndMessageToBe(view, fieldData.title, fieldData.helpMessage);
+                FieldViewsSpecHelpers.expectTitleAndMessageToContain(view, fieldData.title, fieldData.helpMessage, false);
                 expect(view.el).toHaveClass('mode-hidden');
 
                 view.model.set({'name': fieldData.options[1][0]});
@@ -206,14 +206,14 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 // set bio to empty to see the placeholder.
                 fieldData.model.set({bio: ''});
                 var view = new FieldViews.TextareaFieldView(fieldData).render();
-                FieldViewsSpecHelpers.expectTitleAndMessageToBe(view, fieldData.title, fieldData.helpMessage);
+                FieldViewsSpecHelpers.expectTitleAndMessageToContain(view, fieldData.title, fieldData.helpMessage, false);
                 expect(view.el).toHaveClass('mode-hidden');
-                expect(view.$('.u-field-value').text()).toBe(fieldData.placeholderValue);
+                expect(view.$('.u-field-value .u-field-value-readonly').text()).toBe(fieldData.placeholderValue);
 
-                var bio = 'Too much to tell!'
+                var bio = 'Too much to tell!';
                 view.model.set({'bio': bio});
                 expect(view.el).toHaveClass('mode-display');
-                expect(view.$('.u-field-value').text()).toBe(bio);
+                expect(view.$('.u-field-value .u-field-value-readonly').text()).toBe(bio);
                 view.$el.click();
                 expect(view.el).toHaveClass('mode-display');
             });
@@ -222,7 +222,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 requests = AjaxHelpers.requests(this);
 
-                var valueInputSelector = '.u-field-value > textarea'
+                var valueInputSelector = '.u-field-value > textarea';
                 var fieldData = FieldViewsSpecHelpers.createFieldData(FieldViews.TextareaFieldView, {
                     title: 'About me',
                     valueAttribute: 'bio',
@@ -235,10 +235,10 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 var view = new FieldViews.TextareaFieldView(fieldData).render();
 
-                FieldViewsSpecHelpers.expectTitleToBe(view, fieldData.title);
+                FieldViewsSpecHelpers.expectTitleToContain(view, fieldData.title);
                 FieldViewsSpecHelpers.expectMessageContains(view, view.indicators['canEdit']);
                 expect(view.el).toHaveClass('mode-placeholder');
-                expect(view.$('.u-field-value').text()).toBe(fieldData.placeholderValue);
+                expect(view.$('.u-field-value .u-field-value-readonly').text()).toBe(fieldData.placeholderValue);
 
                 view.$('.wrapper-u-field').click();
                 expect(view.el).toHaveClass('mode-edit');
@@ -254,19 +254,20 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 view.$(valueInputSelector).val('').focusout();
                 AjaxHelpers.respondWithNoContent(requests);
                 expect(view.el).toHaveClass('mode-placeholder');
-                expect(view.$('.u-field-value').text()).toBe(fieldData.placeholderValue);
+                expect(view.$('.u-field-value .u-field-value-readonly').text()).toBe(fieldData.placeholderValue);
             });
 
             it("correctly renders LinkFieldView", function() {
                 var fieldData = FieldViewsSpecHelpers.createFieldData(FieldViews.LinkFieldView, {
                     title: 'Title',
                     linkTitle: 'Link title',
-                    helpMessage: 'Click the link.'
+                    helpMessage: 'Click the link.',
+                    valueAttribute: 'blah'
                 });
                 var view = new FieldViews.LinkFieldView(fieldData).render();
 
-                FieldViewsSpecHelpers.expectTitleAndMessageToBe(view, fieldData.title, fieldData.helpMessage);
-                expect(view.$('.u-field-value > a').text().trim()).toBe(fieldData.linkTitle);
+                FieldViewsSpecHelpers.expectTitleAndMessageToContain(view, fieldData.title, fieldData.helpMessage, false);
+                expect(view.$('.u-field-value > a .u-field-link-title-' + view.options.valueAttribute).text().trim()).toBe(fieldData.linkTitle);
             });
         });
     });
