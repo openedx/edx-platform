@@ -10,14 +10,19 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
         describe("edx.user.LearnerProfileFields", function () {
 
-            var createImageView = function (ownProfile, hasImage, imageMaxBytes, imageMinBytes, yearOfBirth) {
+            var MOCK_YEAR_OF_BIRTH = 1989;
+            var MOCK_IMAGE_MAX_BYTES = 64;
+            var MOCK_IMAGE_MIN_BYTES = 16;
+
+            var createImageView = function (options) {
+                var yearOfBirth = _.isUndefined(options.yearOfBirth) ? MOCK_YEAR_OF_BIRTH : options.yearOfBirth;
+                var imageMaxBytes = _.isUndefined(options.imageMaxBytes) ? MOCK_IMAGE_MAX_BYTES : options.imageMaxBytes;
+                var imageMinBytes = _.isUndefined(options.imageMinBytes) ? MOCK_IMAGE_MIN_BYTES : options.imageMinBytes;
 
                 var imageData = {
                     image_url_large: '/media/profile-images/default.jpg',
-                    has_image: hasImage ? true : false
+                    has_image: options.hasImage ? true : false
                 };
-
-                yearOfBirth = _.isUndefined(yearOfBirth) ? 1989 : yearOfBirth;
 
                 var accountSettingsModel = new UserAccountModel();
                 accountSettingsModel.set({'profile_image': imageData});
@@ -30,15 +35,10 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     el: $('.message-banner')
                 });
 
-                imageMaxBytes = imageMaxBytes || 64;
-                imageMinBytes = imageMinBytes || 16;
-
-                var editable = ownProfile ? 'toggle' : 'never';
-
                 return new LearnerProfileFields.ProfileImageFieldView({
                     model: accountSettingsModel,
                     valueAttribute: "profile_image",
-                    editable: editable === 'toggle',
+                    editable: options.ownProfile,
                     messageView: messageView,
                     imageMaxBytes: imageMaxBytes,
                     imageMinBytes: imageMinBytes,
@@ -48,7 +48,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             };
 
             beforeEach(function () {
-                setFixtures('<div class="message-banner"></div><div class="wrapper-profile"><div class="ui-loading-indicator"><p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">Loading</span></p></div><div class="ui-loading-error is-hidden"><i class="fa fa-exclamation-triangle message-error" aria-hidden=true></i><span class="copy">An error occurred. Please reload the page.</span></div></div>');
+                loadFixtures('js/fixtures/student_profile/student_profile.html');
                 TemplateHelpers.installTemplate('templates/student_profile/learner_profile');
                 TemplateHelpers.installTemplate('templates/fields/field_image');
                 TemplateHelpers.installTemplate("templates/fields/message_banner");
@@ -62,215 +62,230 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 );
             };
 
-            it("can upload profile image", function() {
-
-                var imageView = createImageView(true, false);
-                imageView.render();
-
-                var requests = AjaxHelpers.requests(this);
-
-                var imageName = 'profile_image.jpg';
-
-                // Initialize jquery file uploader
-                imageView.$('.upload-button-input').fileupload({
+            var initializeUploader = function (view) {
+                view.$('.upload-button-input').fileupload({
                     url: Helpers.IMAGE_UPLOAD_API_URL,
                     type: 'POST',
-                    add: imageView.fileSelected,
-                    done: imageView.imageChangeSucceeded,
-                    fail: imageView.imageChangeFailed
+                    add: view.fileSelected,
+                    done: view.imageChangeSucceeded,
+                    fail: view.imageChangeFailed
+                });
+            };
+
+            describe("ProfileImageFieldView", function () {
+
+                var verifyImageUploadButtonMessage = function (view, inProgress) {
+                    var iconName = inProgress ? 'fa-spinner' : 'fa-camera';
+                    var message = inProgress ? view.titleUploading : view.uploadButtonTitle();
+                    expect(view.$('.upload-button-icon i').attr('class')).toContain(iconName);
+                    expect(view.$('.upload-button-title').text().trim()).toBe(message);
+                };
+
+                var verifyImageRemoveButtonMessage = function (view, inProgress) {
+                    var iconName = inProgress ? 'fa-spinner' : 'fa-remove';
+                    var message = inProgress ? view.titleRemoving : view.removeButtonTitle();
+                    expect(view.$('.remove-button-icon i').attr('class')).toContain(iconName);
+                    expect(view.$('.remove-button-title').text().trim()).toBe(message);
+                };
+
+                it("can upload profile image", function() {
+
+                    var imageView = createImageView({ownProfile: true, hasImage: false});
+                    imageView.render();
+
+                    var requests = AjaxHelpers.requests(this);
+                    var imageName = 'profile_image.jpg';
+
+                    initializeUploader(imageView);
+
+                    // Remove button should not be present for default image
+                    expect(imageView.$('.u-field-remove-button').css('display') === 'none').toBeTruthy();
+
+                    // For default image, image title should be `Upload an image`
+                    verifyImageUploadButtonMessage(imageView, false);
+
+                    // Add image to upload queue. Validate the image size and send POST request to upload image
+                    imageView.$('.upload-button-input').fileupload('add', {files: [createFakeImageFile(60)]});
+
+                    // Verify image upload progress message
+                    verifyImageUploadButtonMessage(imageView, true);
+
+                    // Verify if POST request received for image upload
+                    AjaxHelpers.expectRequest(requests, 'POST', Helpers.IMAGE_UPLOAD_API_URL, new FormData());
+
+                    // Send 204 NO CONTENT to confirm the image upload success
+                    AjaxHelpers.respondWithNoContent(requests);
+
+                    // Upon successful image upload, account settings model will be fetched to
+                    // get the url for newly uploaded image, So we need to send the response for that GET
+                    var data = {profile_image: {
+                        image_url_large: '/media/profile-images/' + imageName,
+                        has_image: true
+                    }};
+                    AjaxHelpers.respondWithJson(requests, data);
+
+                    // Verify uploaded image name
+                    expect(imageView.$('.image-frame').attr('src')).toContain(imageName);
+
+                    // Remove button should be present after successful image upload
+                    expect(imageView.$('.u-field-remove-button').css('display') !== 'none').toBeTruthy();
+
+                    // After image upload, image title should be `Change image`
+                    verifyImageUploadButtonMessage(imageView, false);
                 });
 
-                // Remove button should not be present for default image
-                expect(imageView.$('.u-field-remove-button').css('display') === 'none').toBeTruthy();
+                it("can remove profile image", function() {
 
-                // For default image, image title should be `Upload an image`
-                expect(imageView.$('.upload-button-title').text().trim()).toBe(imageView.titleAdd);
+                    var imageView = createImageView({ownProfile: true, hasImage: false});
+                    imageView.render();
 
-                // Add image to upload queue, this will validate the image size and send POST request to upload image
-                imageView.$('.upload-button-input').fileupload('add', {files: [createFakeImageFile(60)]});
+                    var requests = AjaxHelpers.requests(this);
 
-                // Verify image upload progress message
-                expect(imageView.$('.upload-button-title').text().trim()).toBe(imageView.titleUploading);
+                    // Verify image remove title
+                    verifyImageRemoveButtonMessage(imageView, false);
 
-                // Verify if POST request received for image upload
-                AjaxHelpers.expectRequest(requests, 'POST', Helpers.IMAGE_UPLOAD_API_URL, new FormData());
+                    imageView.$('.u-field-remove-button').click();
 
-                // Send 204 NO CONTENT to confirm the image upload success
-                AjaxHelpers.respondWithNoContent(requests);
+                    // Verify image remove progress message
+                    verifyImageRemoveButtonMessage(imageView, true);
 
-                // Upon successful image upload, account settings model will be fetched to get the url for newly uploaded image
-                // So we need to send the response for that GET
-                var data = {profile_image: {
-                    image_url_large: '/media/profile-images/' + imageName,
-                    has_image: true
-                }};
-                AjaxHelpers.respondWithJson(requests, data);
+                    // Verify if POST request received for image remove
+                    AjaxHelpers.expectRequest(requests, 'POST', Helpers.IMAGE_REMOVE_API_URL, null);
 
-                // Verify uploaded image name
-                expect(imageView.$('.image-frame').attr('src')).toContain(imageName);
+                    // Send 204 NO CONTENT to confirm the image removal success
+                    AjaxHelpers.respondWithNoContent(requests);
 
-                // Remove button should be present after successful image upload
-                expect(imageView.$('.u-field-remove-button').css('display') !== 'none').toBeTruthy();
+                    // Upon successful image removal, account settings model will be fetched to get default image url
+                    // So we need to send the response for that GET
+                    var data = {profile_image: {
+                        image_url_large: '/media/profile-images/default.jpg',
+                        has_image: false
+                    }};
+                    AjaxHelpers.respondWithJson(requests, data);
 
-                // After image upload, image title should be `Change image`
-                expect(imageView.$('.upload-button-title').text().trim()).toBe(imageView.titleEdit);
-            });
-
-            it("can remove profile image", function() {
-                var imageView = createImageView(true, true);
-                imageView.render();
-
-                var requests = AjaxHelpers.requests(this);
-
-                imageView.$('.u-field-remove-button').click();
-
-                // Verify image remove progress message
-                expect(imageView.$('.remove-button-title').text().trim()).toBe(imageView.titleRemoving);
-
-                // Verify if POST request received for image remove
-                AjaxHelpers.expectRequest(requests, 'POST', Helpers.IMAGE_REMOVE_API_URL, null);
-
-                // Send 204 NO CONTENT to confirm the image removal success
-                AjaxHelpers.respondWithNoContent(requests);
-
-                // Upon successful image removal, account settings model will be fetched to get the default image url
-                // So we need to send the response for that GET
-                var data = {profile_image: {
-                    image_url_large: '/media/profile-images/default.jpg',
-                    has_image: false
-                }};
-                AjaxHelpers.respondWithJson(requests, data);
-
-                // Remove button should not be present for default image
-                expect(imageView.$('.u-field-remove-button').css('display') === 'none').toBeTruthy();
-            });
-
-            it("can't remove default profile image", function() {
-                var imageView = createImageView(true, false);
-                imageView.render();
-
-                spyOn(imageView, 'clickedRemoveButton');
-
-                // Remove button should not be present for default image
-                expect(imageView.$('.u-field-remove-button').css('display') === 'none').toBeTruthy();
-
-                imageView.$('.u-field-remove-button').click();
-
-                // Remove button click handler should not be called
-                expect(imageView.clickedRemoveButton).not.toHaveBeenCalled();
-            });
-
-            it("can't upload image having size greater than max size", function() {
-                var imageView = createImageView(true, false);
-                imageView.render();
-
-                // Initialize jquery file uploader
-                imageView.$('.upload-button-input').fileupload({
-                    url: Helpers.IMAGE_UPLOAD_API_URL,
-                    type: 'POST',
-                    add: imageView.fileSelected,
-                    done: imageView.imageChangeSucceeded,
-                    fail: imageView.imageChangeFailed
+                    // Remove button should not be present for default image
+                    expect(imageView.$('.u-field-remove-button').css('display') === 'none').toBeTruthy();
                 });
 
-                // Add image to upload queue, this will validate the image size
-                imageView.$('.upload-button-input').fileupload('add', {files: [createFakeImageFile(70)]});
+                it("can't remove default profile image", function() {
 
-                // Verify error message
-                expect($('.message-banner').text().trim()).toBe('Your image must be smaller than 64 Bytes in size.');
-            });
+                    var imageView = createImageView({ownProfile: true, hasImage: false});
+                    imageView.render();
 
-            it("can't upload image having size less than min size", function() {
-                var imageView = createImageView(true, false);
-                imageView.render();
+                    spyOn(imageView, 'clickedRemoveButton');
 
-                // Initialize jquery file uploader
-                imageView.$('.upload-button-input').fileupload({
-                    url: Helpers.IMAGE_UPLOAD_API_URL,
-                    type: 'POST',
-                    add: imageView.fileSelected,
-                    done: imageView.imageChangeSucceeded,
-                    fail: imageView.imageChangeFailed
+                    // Remove button should not be present for default image
+                    expect(imageView.$('.u-field-remove-button').css('display') === 'none').toBeTruthy();
+
+                    imageView.$('.u-field-remove-button').click();
+
+                    // Remove button click handler should not be called
+                    expect(imageView.clickedRemoveButton).not.toHaveBeenCalled();
                 });
 
-                // Add image to upload queue, this will validate the image size
-                imageView.$('.upload-button-input').fileupload('add', {files: [createFakeImageFile(10)]});
+                it("can't upload image having size greater than max size", function() {
 
-                // Verify error message
-                expect($('.message-banner').text().trim()).toBe('Your image must be at least 16 Bytes in size.');
-            });
+                    var imageView = createImageView({ownProfile: true, hasImage: false});
+                    imageView.render();
 
-            it("can't upload/remove image if parental consent required", function() {
-                var imageView = createImageView(true, false, 64, 16, '');
-                imageView.render();
+                    initializeUploader(imageView);
 
-                spyOn(imageView, 'clickedUploadButton');
-                spyOn(imageView, 'clickedRemoveButton');
+                    // Add image to upload queue, this will validate the image size
+                    imageView.$('.upload-button-input').fileupload('add', {files: [createFakeImageFile(70)]});
 
-                expect(imageView.$('.u-field-upload-button').css('display') === 'none').toBeTruthy();
-                expect(imageView.$('.u-field-remove-button').css('display') === 'none').toBeTruthy();
-
-                imageView.$('.u-field-upload-button').click();
-                imageView.$('.u-field-remove-button').click();
-
-                expect(imageView.clickedUploadButton).not.toHaveBeenCalled();
-                expect(imageView.clickedRemoveButton).not.toHaveBeenCalled();
-            });
-
-            it("can't upload image on others profile", function() {
-                var imageView = createImageView(false);
-                imageView.render();
-
-                spyOn(imageView, 'clickedUploadButton');
-                spyOn(imageView, 'clickedRemoveButton');
-
-                expect(imageView.$('.u-field-upload-button').css('display') === 'none').toBeTruthy();
-                expect(imageView.$('.u-field-remove-button').css('display') === 'none').toBeTruthy();
-
-                imageView.$('.u-field-upload-button').click();
-                imageView.$('.u-field-remove-button').click();
-
-                expect(imageView.clickedUploadButton).not.toHaveBeenCalled();
-                expect(imageView.clickedRemoveButton).not.toHaveBeenCalled();
-            });
-
-            it("shows message if we try to navigate away during image upload/remove", function() {
-                var imageView = createImageView(true, false);
-                spyOn(imageView, 'onBeforeUnload');
-                imageView.render();
-
-                // Initialize jquery file uploader
-                imageView.$('.upload-button-input').fileupload({
-                    url: Helpers.IMAGE_UPLOAD_API_URL,
-                    type: 'POST',
-                    add: imageView.fileSelected,
-                    done: imageView.imageChangeSucceeded,
-                    fail: imageView.imageChangeFailed
+                    // Verify error message
+                    expect($('.message-banner').text().trim())
+                        .toBe('Your image must be smaller than 64 Bytes in size.');
                 });
 
-                // Add image to upload queue, this will validate the image size and send POST request to upload image
-                imageView.$('.upload-button-input').fileupload('add', {files: [createFakeImageFile(60)]});
+                it("can't upload image having size less than min size", function() {
+                    var imageView = createImageView({ownProfile: true, hasImage: false});
+                    imageView.render();
 
-                // Verify image upload progress message
-                expect(imageView.$('.upload-button-title').text().trim()).toBe(imageView.titleUploading);
+                    initializeUploader(imageView);
 
-                $(window).trigger('beforeunload');
+                    // Add image to upload queue, this will validate the image size
+                    imageView.$('.upload-button-input').fileupload('add', {files: [createFakeImageFile(10)]});
 
-                expect(imageView.onBeforeUnload).toHaveBeenCalled();
-            });
-
-            it('renders message correctly', function() {
-                var messageSelector = '.message-banner';
-                var messageView = new MessageBannerView({
-                    el: $(messageSelector)
+                    // Verify error message
+                    expect($('.message-banner').text().trim()).toBe('Your image must be at least 16 Bytes in size.');
                 });
 
-                messageView.showMessage('I am message view');
-                // Verify error message
-                expect($(messageSelector).text().trim()).toBe('I am message view');
+                it("can't upload and remove image if parental consent required", function() {
 
-                messageView.hideMessage();
-                expect($(messageSelector).text().trim()).toBe('');
+                    var imageView = createImageView({ownProfile: true, hasImage: false, yearOfBirth: ''});
+                    imageView.render();
+
+                    spyOn(imageView, 'clickedUploadButton');
+                    spyOn(imageView, 'clickedRemoveButton');
+
+                    expect(imageView.$('.u-field-upload-button').css('display') === 'none').toBeTruthy();
+                    expect(imageView.$('.u-field-remove-button').css('display') === 'none').toBeTruthy();
+
+                    imageView.$('.u-field-upload-button').click();
+                    imageView.$('.u-field-remove-button').click();
+
+                    expect(imageView.clickedUploadButton).not.toHaveBeenCalled();
+                    expect(imageView.clickedRemoveButton).not.toHaveBeenCalled();
+                });
+
+                it("can't upload and remove image on others profile", function() {
+
+                    var imageView = createImageView({ownProfile: false});
+                    imageView.render();
+
+                    spyOn(imageView, 'clickedUploadButton');
+                    spyOn(imageView, 'clickedRemoveButton');
+
+                    expect(imageView.$('.u-field-upload-button').css('display') === 'none').toBeTruthy();
+                    expect(imageView.$('.u-field-remove-button').css('display') === 'none').toBeTruthy();
+
+                    imageView.$('.u-field-upload-button').click();
+                    imageView.$('.u-field-remove-button').click();
+
+                    expect(imageView.clickedUploadButton).not.toHaveBeenCalled();
+                    expect(imageView.clickedRemoveButton).not.toHaveBeenCalled();
+                });
+
+                it("shows message if we try to navigate away during image upload/remove", function() {
+                    var imageView = createImageView({ownProfile: true, hasImage: false});
+                    spyOn(imageView, 'onBeforeUnload');
+                    imageView.render();
+
+                    initializeUploader(imageView);
+
+                    // Add image to upload queue, this will validate image size and send POST request to upload image
+                    imageView.$('.upload-button-input').fileupload('add', {files: [createFakeImageFile(60)]});
+
+                    // Verify image upload progress message
+                    verifyImageUploadButtonMessage(imageView, true);
+
+                    $(window).trigger('beforeunload');
+                    expect(imageView.onBeforeUnload).toHaveBeenCalled();
+                });
+
+                it("shows error message for HTTP 500", function() {
+                    var imageView = createImageView({ownProfile: true, hasImage: false});
+                    imageView.render();
+
+                    var requests = AjaxHelpers.requests(this);
+
+                    initializeUploader(imageView);
+
+                    // Add image to upload queue. Validate the image size and send POST request to upload image
+                    imageView.$('.upload-button-input').fileupload('add', {files: [createFakeImageFile(60)]});
+
+                    // Verify image upload progress message
+                    verifyImageUploadButtonMessage(imageView, true);
+
+                    // Verify if POST request received for image upload
+                    AjaxHelpers.expectRequest(requests, 'POST', Helpers.IMAGE_UPLOAD_API_URL, new FormData());
+
+                    // Send HTTP 500
+                    AjaxHelpers.respondWithError(requests);
+
+                    expect($('.message-banner').text().trim()).toBe(imageView.errorMessage);
+                });
             });
         });
     });

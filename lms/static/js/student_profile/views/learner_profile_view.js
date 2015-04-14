@@ -46,7 +46,6 @@
                 this.$('.profile-section-one-fields').append(this.options.usernameFieldView.render().el);
 
                 var imageView = this.options.profileImageFieldView;
-                imageView.undelegateEvents();
                 this.$('.profile-image-field').append(imageView.render().el);
                 imageView.delegateEvents();
 

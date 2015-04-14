@@ -257,4 +257,3 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         self.browser.execute_script('$(".u-field-remove-button").css("opacity",1);')
         self.q(css='.u-field-remove-button').first.click()
         self.wait_for_element_visibility('.u-field-upload-button', "upload button is visible")
-
