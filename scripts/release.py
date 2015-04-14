@@ -405,7 +405,7 @@ def generate_pr_table(start_ref, end_ref):
             rows.append("| {merged_by} | {author} | {title} | {pull_request} | {jira} | {verified} |".format(
                 merged_by=email if i == 0 else "",
                 author=user_link.format(user=author) if author else "",
-                title=title.replace("|", "\|"),
+                title=title.replace("|", "\|").replace('{', '\{').replace('}', '\}'),
                 pull_request=pr_link.format(num=pull_request),
                 jira=", ".join(parse_ticket_references(body)),
                 verified="",
