@@ -8,6 +8,7 @@ from django.core.validators import validate_email, validate_slug, ValidationErro
 
 from student.models import User, UserProfile, Registration, USER_SETTINGS_CHANGED_EVENT_NAME
 from student import views as student_views
+from util.model_utils import emit_setting_changed_event
 
 from ..errors import (
     AccountUpdateError, AccountValidationError, AccountUsernameInvalid, AccountPasswordInvalid,
@@ -24,7 +25,6 @@ from . import (
     USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH
 )
 from .serializers import AccountLegacyProfileSerializer, AccountUserSerializer
-from eventtracking import tracker
 
 
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
@@ -199,15 +199,13 @@ def update_account_settings(requesting_user, update, username=None):
 
         if "language_proficiencies" in update:
             new_language_proficiencies = legacy_profile_serializer.data["language_proficiencies"]
-            tracker.emit(
-                USER_SETTINGS_CHANGED_EVENT_NAME,
-                {
-                    "setting": "language_proficiencies",
-                    "old": old_language_proficiencies,
-                    "new": new_language_proficiencies,
-                    "user_id": existing_user.id,
-                    "table": existing_user_profile.language_proficiencies.model._meta.db_table,
-                }
+            emit_setting_changed_event(
+                user=existing_user,
+                event_name=USER_SETTINGS_CHANGED_EVENT_NAME,
+                db_table=existing_user_profile.language_proficiencies.model._meta.db_table,
+                setting_name="language_proficiencies",
+                old_value=old_language_proficiencies,
+                new_value=new_language_proficiencies,
             )
 
         # If the name was changed, store information about the change operation. This is outside of the

@@ -201,11 +201,12 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         self.wait_for_field('image')
         return self.q(css='.u-field-upload-button').visible
 
-    def upload_file(self, filename):
+    def upload_file(self, filename, wait_for_upload_button=True):
         """
         Helper method to upload an image file.
         """
-        self.wait_for_element_visibility('.u-field-upload-button', "upload button is visible")
+        if wait_for_upload_button:
+            self.wait_for_element_visibility('.u-field-upload-button', "upload button is visible")
         file_path = InstructorDashboardPage.get_asset_path(filename)
 
         # make the elements visible.

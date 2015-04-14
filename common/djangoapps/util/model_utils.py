@@ -3,6 +3,7 @@ Utilities for django models.
 """
 from eventtracking import tracker
 
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields.related import RelatedField
 
@@ -46,9 +47,7 @@ def get_changed_fields_dict(instance, model_class):
 
 
 def emit_field_changed_events(instance, user, event_name, db_table, excluded_fields=None, hidden_fields=None):
-    """
-    For the given model instance, emit a setting changed event the fields that
-    have changed since the last save.
+    """Emits an event for each field that has changed.
 
     Note that this function expects that a `_changed_fields` dict has been set
     as an attribute on `instance` (see `get_changed_fields_dict`.
@@ -87,16 +86,61 @@ def emit_field_changed_events(instance, user, event_name, db_table, excluded_fie
     changed_fields = getattr(instance, '_changed_fields', {})
     for field_name in changed_fields:
         if field_name not in excluded_fields:
-            tracker.emit(
-                event_name,
-                {
-                    "setting": field_name,
-                    'old': clean_field(field_name, changed_fields[field_name]),
-                    'new': clean_field(field_name, getattr(instance, field_name)),
-                    "user_id": user.id,
-                    "table": db_table
-                }
-            )
+            old_value = clean_field(field_name, changed_fields[field_name])
+            new_value = clean_field(field_name, getattr(instance, field_name))
+            emit_setting_changed_event(user, event_name, db_table, field_name, old_value, new_value)
     # Remove the now inaccurate _changed_fields attribute.
-    if getattr(instance, '_changed_fields', None):
+    if hasattr(instance, '_changed_fields'):
         del instance._changed_fields
+
+
+def emit_setting_changed_event(user, event_name, db_table, setting_name, old_value, new_value):
+    """Emits an event for a change in a setting.
+
+    Args:
+        user (User): the user that this setting is associated with.
+        event_name (str): the name of the event to be emitted.
+        db_table (str): the name of the table that we're modifying.
+        setting_name (str): the name of the setting being changed.
+        old_value (object): the value before the change.
+        new_value (object): the new value being saved.
+
+    Returns:
+        None
+    """
+    # Compute the maximum value length so that two copies can fit into the maximum event size
+    # in addition to all the other fields recorded.
+    max_value_length = settings.TRACK_MAX_EVENT / 4
+
+    serialized_old_value, old_was_truncated = _get_truncated_setting_value(old_value, max_length=max_value_length)
+    serialized_new_value, new_was_truncated = _get_truncated_setting_value(new_value, max_length=max_value_length)
+    truncated_values = []
+    if old_was_truncated:
+        truncated_values.append("old")
+    if new_was_truncated:
+        truncated_values.append("new")
+    tracker.emit(
+        event_name,
+        {
+            "setting": setting_name,
+            "old": serialized_old_value,
+            "new": serialized_new_value,
+            "truncated": truncated_values,
+            "user_id": user.id,
+            "table": db_table,
+        }
+    )
+
+
+def _get_truncated_setting_value(value, max_length=None):
+    """
+    Returns the truncated form of a setting value.
+
+    Returns:
+        truncated_value (object): the possibly truncated version of the value.
+        was_truncated (bool): returns true if the serialized value was truncated.
+    """
+    if isinstance(value, basestring) and max_length is not None and len(value) > max_length:
+        return value[0:max_length], True
+    else:
+        return value, False

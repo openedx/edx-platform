@@ -47,8 +47,10 @@ class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
         """
         expected_referers = [self.ACCOUNT_SETTINGS_REFERER] * len(events)
         for event in events:
-            event[u'user_id'] = long(user_id)
-            event[u'table'] = u"auth_userprofile" if table is None else table
+            event[u"user_id"] = long(user_id)
+            event[u"table"] = u"auth_userprofile" if table is None else table
+            event[u"truncated"] = []
+
         self.verify_events_of_type(
             username, self.USER_SETTINGS_CHANGED_EVENT_NAME, events,
             expected_referers=expected_referers
@@ -233,16 +235,18 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
 
         self.verify_settings_changed_events(
             self.username, self.user_id,
-            [{
-                u"setting": u"name",
-                u"old": self.username,
-                u"new": u"another name",
-            },
-            {
-                u"setting": u"name",
-                u"old": u'another name',
-                u"new": self.username,
-            }]
+            [
+                {
+                    u"setting": u"name",
+                    u"old": self.username,
+                    u"new": u"another name",
+                },
+                {
+                    u"setting": u"name",
+                    u"old": u'another name',
+                    u"new": self.username,
+                }
+            ]
         )
 
     def test_email_field(self):
@@ -339,16 +343,18 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         )
         self.verify_settings_changed_events(
             self.username, self.user_id,
-            [{
-                u"setting": u"level_of_education",
-                u"old": None,
-                u"new": u'b',
-            },
-            {
-                u"setting": u"level_of_education",
-                u"old": u'b',
-                u"new": None,
-            }]
+            [
+                {
+                    u"setting": u"level_of_education",
+                    u"old": None,
+                    u"new": u'b',
+                },
+                {
+                    u"setting": u"level_of_education",
+                    u"old": u'b',
+                    u"new": None,
+                }
+            ]
         )
 
     def test_gender_field(self):
@@ -363,16 +369,18 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         )
         self.verify_settings_changed_events(
             self.username, self.user_id,
-            [{
-                u"setting": u"gender",
-                u"old": None,
-                u"new": u'f',
-            },
-            {
-                u"setting": u"gender",
-                u"old": u'f',
-                u"new": None,
-            }]
+            [
+                {
+                    u"setting": u"gender",
+                    u"old": None,
+                    u"new": u'f',
+                },
+                {
+                    u"setting": u"gender",
+                    u"old": u'f',
+                    u"new": None,
+                }
+            ]
         )
 
     def test_year_of_birth_field(self):
@@ -390,16 +398,18 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         )
         self.verify_settings_changed_events(
             self.username, self.user_id,
-            [{
-                u"setting": u"year_of_birth",
-                u"old": None,
-                u"new": 1980,
-            },
-            {
-                u"setting": u"year_of_birth",
-                u"old": 1980,
-                u"new": None,
-            }]
+            [
+                {
+                    u"setting": u"year_of_birth",
+                    u"old": None,
+                    u"new": 1980L,
+                },
+                {
+                    u"setting": u"year_of_birth",
+                    u"old": 1980L,
+                    u"new": None,
+                }
+            ]
         )
 
     def test_country_field(self):
@@ -441,16 +451,19 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         )
 
         self.verify_settings_changed_events(
-            [{
-                u"setting": u"language_proficiencies",
-                u"old": [],
-                u"new": [{u"code": u"ps"}],
-            },
-            {
-                u"setting": u"language_proficiencies",
-                u"old": [{u"code": u"ps"}],
-                u"new": [],
-            }],
+            self.username, self.user_id,
+            [
+                {
+                    u"setting": u"language_proficiencies",
+                    u"old": [],
+                    u"new": [{u"code": u"ps"}],
+                },
+                {
+                    u"setting": u"language_proficiencies",
+                    u"old": [{u"code": u"ps"}],
+                    u"new": [],
+                }
+            ],
             table=u"student_languageproficiency"
         )
 
