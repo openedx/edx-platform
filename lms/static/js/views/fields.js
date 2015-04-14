@@ -221,6 +221,7 @@
                     value: this.modelValue(),
                     message: this.helpMessage
                 }));
+                this.delegateEvents();
                 return this;
             },
 
@@ -256,6 +257,7 @@
                     value: this.modelValue(),
                     message: this.helpMessage
                 }));
+                this.delegateEvents();
                 return this;
             },
 
@@ -304,7 +306,7 @@
                     selectOptions: this.options.options,
                     message: this.helpMessage
                 }));
-
+                this.delegateEvents();
                 this.updateValueInField();
 
                 if (this.editable === 'toggle') {
@@ -411,7 +413,7 @@
                     value: value,
                     message: this.helpMessage
                 }));
-
+                this.delegateEvents();
                 this.title((this.modelValue() || this.mode === 'edit') ? this.options.title : this.indicators['plus'] + this.options.title);
 
                 if (this.editable === 'toggle') {
@@ -487,6 +489,7 @@
                     linkHref: this.options.linkHref,
                     message: this.helpMessage
                 }));
+                this.delegateEvents();
                 return this;
             },
 
@@ -540,6 +543,7 @@
                     removeButtonIcon: _.result(this, 'iconRemove'),
                     removeButtonTitle: _.result(this, 'removeButtonTitle')
                 }));
+                this.delegateEvents();
                 this.updateButtonsVisibility();
                 this.watchForPageUnload();
                 return this;

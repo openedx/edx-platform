@@ -47,19 +47,14 @@
 
                 var imageView = this.options.profileImageFieldView;
                 this.$('.profile-image-field').append(imageView.render().el);
-                imageView.delegateEvents();
 
                 if (this.showFullProfile()) {
                     _.each(this.options.sectionOneFieldViews, function (fieldView, index) {
-                        fieldView.undelegateEvents();
                         view.$('.profile-section-one-fields').append(fieldView.render().el);
-                        fieldView.delegateEvents();
                     });
 
                     _.each(this.options.sectionTwoFieldViews, function (fieldView, index) {
-                        fieldView.undelegateEvents();
                         view.$('.profile-section-two-fields').append(fieldView.render().el);
-                        fieldView.delegateEvents();
                     });
                 }
             },
