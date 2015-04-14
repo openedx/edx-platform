@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-03-26 14:56+0000\n"
-"PO-Revision-Date: 2015-03-26 14:59:54.469683\n"
+"POT-Creation-Date: 2015-04-14 23:50+0000\n"
+"PO-Revision-Date: 2015-04-14 23:53:54.736947\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -43,7 +43,7 @@ msgstr ""
 msgid "close"
 msgstr ""
 
-#: cms/templates/base.html:51 lms/templates/main.html:140
+#: cms/templates/base.html:51 lms/templates/main.html:144
 msgid "Skip to this view's content"
 msgstr ""
 

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-03-26 14:56+0000\n"
-"PO-Revision-Date: 2015-03-26 14:59:53.875260\n"
+"POT-Creation-Date: 2015-04-14 23:50+0000\n"
+"PO-Revision-Date: 2015-04-14 23:53:54.161385\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -154,62 +154,62 @@ msgstr ""
 msgid "Disabled Account"
 msgstr ""
 
-#: common/djangoapps/student/models.py:222
+#: common/djangoapps/student/models.py:223
 msgid "Male"
 msgstr ""
 
-#: common/djangoapps/student/models.py:223
+#: common/djangoapps/student/models.py:224
 msgid "Female"
 msgstr ""
 
 #. Translators: 'Other' refers to the student's gender
 #. Translators: 'Other' refers to the student's level of education
-#: common/djangoapps/student/models.py:225
-#: common/djangoapps/student/models.py:246
+#: common/djangoapps/student/models.py:226
+#: common/djangoapps/student/models.py:247
 msgid "Other"
 msgstr ""
 
-#: common/djangoapps/student/models.py:236
+#: common/djangoapps/student/models.py:237
 msgid "Doctorate"
 msgstr ""
 
-#: common/djangoapps/student/models.py:237
+#: common/djangoapps/student/models.py:238
 msgid "Master's or professional degree"
 msgstr ""
 
-#: common/djangoapps/student/models.py:238
+#: common/djangoapps/student/models.py:239
 msgid "Bachelor's degree"
 msgstr ""
 
-#: common/djangoapps/student/models.py:239
+#: common/djangoapps/student/models.py:240
 msgid "Associate's degree"
 msgstr ""
 
-#: common/djangoapps/student/models.py:240
+#: common/djangoapps/student/models.py:241
 msgid "Secondary/high school"
 msgstr ""
 
-#: common/djangoapps/student/models.py:241
+#: common/djangoapps/student/models.py:242
 msgid "Junior secondary/junior high/middle school"
 msgstr ""
 
-#: common/djangoapps/student/models.py:242
+#: common/djangoapps/student/models.py:243
 msgid "Elementary/primary school"
 msgstr ""
 
 #. Translators: 'None' refers to the student's level of education
-#: common/djangoapps/student/models.py:244
+#: common/djangoapps/student/models.py:245
 #: common/lib/xmodule/xmodule/course_module.py:880
 msgid "None"
 msgstr ""
 
 #: common/djangoapps/student/validators.py:10
-msgid "Identificador no debe contener caracteres."
+msgid "Error en identificador."
 msgstr ""
 
 #: common/djangoapps/student/validators.py:16
-#: common/djangoapps/student/views.py:2274
-#: common/djangoapps/student/views.py:2291
+#: common/djangoapps/student/views.py:2273
+#: common/djangoapps/student/views.py:2290
 msgid "Invalid ID"
 msgstr ""
 
@@ -320,112 +320,116 @@ msgstr ""
 msgid "An account with the Email '{email}' already exists."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1515
+#: common/djangoapps/student/views.py:1503
 msgid "Error (401 {field}). E-mail us."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1521
+#: common/djangoapps/student/views.py:1509
 msgid "To enroll, you must follow the honor code."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1537
+#: common/djangoapps/student/views.py:1525
 msgid "You must accept the terms of service."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1561
+#: common/djangoapps/student/views.py:1549
 msgid "Username must be minimum of two characters long"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1562
+#: common/djangoapps/student/views.py:1550
 msgid "A properly formatted e-mail is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1563
+#: common/djangoapps/student/views.py:1551
 msgid "Your legal name must be a minimum of two characters long"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1564
+#: common/djangoapps/student/views.py:1552
 msgid "A valid password is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1565
+#: common/djangoapps/student/views.py:1553
 msgid "Accepting Terms of Service is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1566
+#: common/djangoapps/student/views.py:1554
 msgid "Agreeing to the Honor Code is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1567
+#: common/djangoapps/student/views.py:1555
 msgid "A level of education is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1568
+#: common/djangoapps/student/views.py:1556
 msgid "Your gender is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1569
+#: common/djangoapps/student/views.py:1557
 msgid "Your year of birth is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1570
+#: common/djangoapps/student/views.py:1558
 msgid "Your mailing address is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1571
+#: common/djangoapps/student/views.py:1559
 msgid "A description of your goals is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1572
+#: common/djangoapps/student/views.py:1560
 msgid "A city is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1573
+#: common/djangoapps/student/views.py:1561
 msgid "A country is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1579
+#: common/djangoapps/student/views.py:1567
 msgid "You are missing one or more required fields"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1589
-msgid "A valid ID is required."
-msgstr ""
-
-#: common/djangoapps/student/views.py:1599
+#: common/djangoapps/student/views.py:1578
 msgid "Username cannot be more than {num} characters long"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1600
+#: common/djangoapps/student/views.py:1579
 msgid "Email cannot be more than {num} characters long"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1609
+#: common/djangoapps/student/views.py:1590
+msgid "A valid ID is required."
+msgstr ""
+
+#: common/djangoapps/student/views.py:1600
+msgid "CEDULA/PASAPORTE Existente"
+msgstr ""
+
+#: common/djangoapps/student/views.py:1608
 msgid "Valid e-mail is required."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1616
+#: common/djangoapps/student/views.py:1615
 msgid "Username should only consist of A-Z and 0-9, with no spaces."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1630
-#: common/djangoapps/student/views.py:1981
+#: common/djangoapps/student/views.py:1629
+#: common/djangoapps/student/views.py:1980
 msgid "Password: "
 msgstr ""
 
-#: common/djangoapps/student/views.py:1650
+#: common/djangoapps/student/views.py:1649
 msgid "Username and password fields cannot match"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1731
+#: common/djangoapps/student/views.py:1730
 msgid "Could not send activation e-mail."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1922
+#: common/djangoapps/student/views.py:1921
 msgid "Unknown error. Please e-mail us to let us know how it happened."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1990
+#: common/djangoapps/student/views.py:1989
 msgid ""
 "You are re-using a password that you have used recently. You must have {num}"
 " distinct password before reusing a previous password."
@@ -435,7 +439,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: common/djangoapps/student/views.py:1999
+#: common/djangoapps/student/views.py:1998
 msgid ""
 "You are resetting passwords too frequently. Due to security policies, {num} "
 "day must elapse between password resets."
@@ -445,39 +449,39 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: common/djangoapps/student/views.py:2010
+#: common/djangoapps/student/views.py:2009
 msgid "Password reset unsuccessful"
 msgstr ""
 
-#: common/djangoapps/student/views.py:2047
+#: common/djangoapps/student/views.py:2046
 msgid "No inactive user with this e-mail exists"
 msgstr ""
 
-#: common/djangoapps/student/views.py:2065
+#: common/djangoapps/student/views.py:2064
 msgid "Unable to send reactivation email"
 msgstr ""
 
-#: common/djangoapps/student/views.py:2084
+#: common/djangoapps/student/views.py:2083
 msgid "Invalid password"
 msgstr ""
 
-#: common/djangoapps/student/views.py:2093
+#: common/djangoapps/student/views.py:2092
 msgid "Valid e-mail address required."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2100
+#: common/djangoapps/student/views.py:2099
 msgid "An account with this e-mail already exists."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2118
+#: common/djangoapps/student/views.py:2117
 msgid "Old email is the same as the new email."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2142
+#: common/djangoapps/student/views.py:2141
 msgid "Unable to send email activation link. Please try again later."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2231
+#: common/djangoapps/student/views.py:2230
 msgid "Name required"
 msgstr ""
 
@@ -5849,7 +5853,7 @@ msgstr ""
 msgid "Verification photos received"
 msgstr ""
 
-#: lms/envs/common.py:2015
+#: lms/envs/common.py:2008
 msgid "Taiwan"
 msgstr ""
 
