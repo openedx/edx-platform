@@ -6,7 +6,7 @@
         'js/student_account/models/user_account_model',
         'js/student_account/models/user_preferences_model',
         'js/student_account/views/account_settings_fields',
-        'js/student_account/views/account_settings_view',
+        'js/student_account/views/account_settings_view'
     ], function (gettext, $, _, Backbone, FieldViews, UserAccountModel, UserPreferencesModel,
                  AccountSettingsFieldViews, AccountSettingsView) {
 
@@ -116,7 +116,7 @@
                             })
                         }
                     ]
-                },
+                }
             ];
 
             if (_.isArray(authData.providers)) {
@@ -145,14 +145,14 @@
 
             accountSettingsView.render();
 
-            var showLoadingError = function (model, response, options) {
+            var showLoadingError = function () {
                 accountSettingsView.showLoadingError();
             };
 
             userAccountModel.fetch({
-                success: function (model, response, options) {
+                success: function () {
                     userPreferencesModel.fetch({
-                        success: function (model, response, options) {
+                        success: function () {
                             accountSettingsView.renderFields();
                         },
                         error: showLoadingError

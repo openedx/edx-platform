@@ -93,6 +93,10 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         """ Converts empty string to None, to indicate not set. Replaced by to_representation in version 3. """
         return AccountLegacyProfileSerializer.convert_empty_to_None(value)
 
+    def transform_bio(self, user_profile, value):
+        """ Converts empty string to None, to indicate not set. Replaced by to_representation in version 3. """
+        return AccountLegacyProfileSerializer.convert_empty_to_None(value)
+
     @staticmethod
     def convert_empty_to_None(value):
         """ Helper method to convert empty string to None (other values pass through). """

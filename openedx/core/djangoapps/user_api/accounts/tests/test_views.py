@@ -366,10 +366,8 @@ class TestAccountAPI(UserAPITestCase):
         ("name", u"ȻħȺɍłɇs", "z   ", u"The name field must be at least 2 characters long."),
         ("goals", "Smell the roses"),
         ("mailing_address", "Sesame Street"),
-        ("bio", "Lacrosse-playing superhero"),
-        ("bio", u"壓是進界推日不復女"),
         # Note that we store the raw data, so it is up to client to escape the HTML.
-        ("bio", "<html>fancy text</html>"),
+        ("bio", u"<html>Lacrosse-playing superhero 壓是進界推日不復女</html>", "z" * 3001, u"Ensure this value has at most 3000 characters (it has 3001)."),
         # Note that email is tested below, as it is not immediately updated.
         # Note that language_proficiencies is tested below as there are multiple error and success conditions.
     )
