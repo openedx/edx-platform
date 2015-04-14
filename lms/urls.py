@@ -636,6 +636,11 @@ if settings.FEATURES["CUSTOM_COURSES_EDX"]:
             include('ccx.urls')),
     )
 
+# Access to courseware as an LTI provider
+if settings.FEATURES.get("ENABLE_LTI_PROVIDER"):
+    urlpatterns += (
+        url(r'^lti_provider/', include('lti_provider.urls')),
+    )
 
 urlpatterns = patterns(*urlpatterns)
 
