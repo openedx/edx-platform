@@ -101,6 +101,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
                     'Email Address',
                     'Password',
                     'Language',
+                    'Country or Region'
                 ]
             },
             {
@@ -109,7 +110,6 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
                     'Education Completed',
                     'Gender',
                     'Year of Birth',
-                    'Country or Region',
                     'Preferred Language',
                 ]
             },
@@ -286,8 +286,8 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         self._test_dropdown_field(
             u'country',
             u'Country or Region',
-            u'',
-            [u'Pakistan', u''],
+            u'Afghanistan',
+            [u'Pakistan', u'Palau'],
         )
 
     def test_preferred_language_field(self):
