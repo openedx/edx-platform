@@ -10,8 +10,6 @@ import itertools
 import mimetypes
 from unittest import skip
 from uuid import uuid4
-from shutil import rmtree
-from tempfile import mkdtemp
 
 # Mixed modulestore depends on django, so we'll manually configure some django settings
 # before importing the module
@@ -29,7 +27,6 @@ from xmodule.modulestore.tests.test_cross_modulestore_import_export import Mongo
 from xmodule.contentstore.content import StaticContent
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.xml_importer import import_course_from_xml
-from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.django import SignalHandler
 
 if not settings.configured:
@@ -156,8 +153,6 @@ class TestMixedModuleStore(CourseComparisonTest):
         self.course_locations = {}
 
         self.user_id = ModuleStoreEnum.UserID.test
-        self.export_dir = mkdtemp()
-        self.addCleanup(rmtree, self.export_dir, ignore_errors=True)
 
     # pylint: disable=invalid-name
     def _create_course(self, course_key):
@@ -510,56 +505,6 @@ class TestMixedModuleStore(CourseComparisonTest):
         # Publish and verify again
         component = self.store.publish(component.location, self.user_id)
         self.assertFalse(self.store.has_changes(component))
-
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_has_changes_before_export_and_after_import(self, default_ms):
-        """
-        Tests that an unpublished unit remains with no changes across export and re-import.
-        """
-        with MongoContentstoreBuilder().build() as contentstore:
-            # initialize the mixed modulestore
-            self._initialize_mixed(contentstore=contentstore, mappings={})
-
-            with self.store.default_store(default_ms):
-
-                source_course_key = self.store.make_course_key("org.source", "course.source", "run.source")
-                self._create_course(source_course_key)
-
-                # Create a dummy component to test against
-                xblock = self.store.create_item(
-                    self.user_id,
-                    self.course.id,
-                    'vertical',
-                    block_id='test_vertical'
-                )
-
-                # Not yet published, so changes are present
-                self.assertTrue(self.store.has_changes(xblock))
-
-                export_course_to_xml(
-                    self.store,
-                    contentstore,
-                    source_course_key,
-                    self.export_dir,
-                    'exported_source_course',
-                )
-
-                import_course_from_xml(
-                    self.store,
-                    'test_user',
-                    self.export_dir,
-                    source_dirs=['exported_source_course'],
-                    static_content_store=contentstore,
-                    target_id=source_course_key,
-                    create_if_not_present=True,
-                    raise_on_failure=True,
-                )
-
-                # Get the xblock from the imported course.
-                component = self.store.get_item(xblock.location)
-
-                # Verify that it still is a draft, i.e. has changes.
-                self.assertTrue(self.store.has_changes(component))
 
     def _has_changes(self, location):
         """
