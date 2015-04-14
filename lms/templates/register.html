@@ -345,7 +345,7 @@
 -->
           % endif
           % if settings.REGISTRATION_EXTRA_FIELDS['year_of_birth'] != 'hidden':
-<!--
+
           <li class="field-group field-yob">
             <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['year_of_birth']} select" id="field-yob">
               <label for="yob">${_("Year of Birth")}</label>
@@ -358,10 +358,10 @@
             </div>
             % endif
           </li>
--->
+
         </ol>
       </div>
-<!--
+
       <div class="group group-form group-form-personalinformation2">
         <ol class="list-input">
           % if settings.REGISTRATION_EXTRA_FIELDS['mailing_address'] != 'hidden':
@@ -379,7 +379,7 @@
           % endif
         </ol>
       </div>
--->
+
       <div class="group group-form group-form-accountacknowledgements">
         <h2 class="sr">${_("Account Acknowledgements")}</h2>
 
@@ -387,14 +387,14 @@
           <li class="field-group">
 
             % if has_extauth_info is UNDEFINED or ask_for_tos :
-<!--
+
             <div class="field required checkbox" id="field-tos">
               <input id="tos-yes" type="checkbox" name="terms_of_service" value="true" required aria-required="true" />
               <label for="tos-yes">${_('I agree to the {link_start}Terms of Service{link_end}').format(
                 link_start='<a href="{url}" class="new-vp" tabindex="-1">'.format(url=marketing_link('TOS')),
                 link_end='</a>')}</label>
             </div>
--->
+
 			<div class="field required checkbox" id="field-tos">
 				<span class="chk_area"><input id="tos-yes" type="checkbox" name="terms_of_service" value="true" required aria-required="true" /><span></span></span>
 				<label for="tos-yes" class="after-none"><a href="/tos" class="new-vp" tabindex="-1">이용약관 및 규정</a> 동의</label>
@@ -404,7 +404,7 @@
             % if settings.REGISTRATION_EXTRA_FIELDS['honor_code'] != 'hidden':
             ## If the stanford theme isn't enabled, check if we have an Honor Code link in our marketing map
             % if not self.stanford_theme_enabled() and marketing_link('HONOR') and marketing_link('HONOR') != '#':
-<!--
+
             <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['honor_code']} checkbox" id="field-honorcode">
               <input id="honorcode-yes" type="checkbox" name="honor_code" value="true" />
               <%
@@ -418,7 +418,7 @@
                 link_start='<a href="{url}" class="new-vp" tabindex="-1">'.format(url=honor_code_path),
                 link_end='</a>')}</label>
             </div>
--->
+
 			<div class="field required checkbox" id="field-honorcode">
 				<span class="chk_area"><input id="honorcode-yes" type="checkbox" name="honor_code" value="true" /><span></span></span>
 				<label for="honorcode-yes" class="after-none">메일링 서비스 신청</label>
