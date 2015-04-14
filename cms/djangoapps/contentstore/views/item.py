@@ -593,8 +593,8 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
         # notify the xblocks that they have been published
         _notify_xblocks(xblock, xblock.location.course_key, 'on_studio_published')
 
-    # Note that children aren't being returned until we have a use case.
-    return JsonResponse(result, encoder=EdxJSONEncoder)
+        # Note that children aren't being returned until we have a use case.
+        return JsonResponse(result, encoder=EdxJSONEncoder)
 
 
 def _notify_xblocks(xblock, course_id, callback_name):
