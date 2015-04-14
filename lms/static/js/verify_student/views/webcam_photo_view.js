@@ -305,6 +305,11 @@
                 .toggleClass( 'is-disabled', !isEnabled )
                 .prop( 'disabled', !isEnabled )
                 .attr('aria-disabled', !isEnabled);
+        },
+
+        isMobileDevice: function() {
+            // Check whether user is using mobile device or not
+            return ( navigator.userAgent.match(/(Android|iPad|iPhone|iPod)/g) ? true : false );
         }
     });
 
@@ -333,6 +338,16 @@
         obj.backendName = "flash";
         view = new edx.verify_student.WebcamPhotoView( obj );
         if ( view.isSupported() ) {
+            return view;
+        }
+        // If user is not using mobile device and Flash is not available
+        // then show user error message for Flash
+        if (!view.isMobileDevice() && !view.isSupported()) {
+            view.backend.trigger(
+                'error',
+                gettext( "No Flash Detected" ),
+                gettext( "You don't seem to have Flash installed. Get Flash to continue your verification." )
+            );
             return view;
         }
 
