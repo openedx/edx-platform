@@ -665,16 +665,6 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
         """ Extracts contents from search response """
         return [item['data']['content'] for item in response['results']]
 
-    def index_recent_changes(self, store, since_time):
-        """ index course using recent changes """
-        trigger_time = datetime.now(UTC)
-        return LibrarySearchIndexer.index(
-            store,
-            self.library.id,
-            triggered_at=trigger_time,
-            reindex_age=(trigger_time - since_time)
-        )
-
     def _test_indexing_library(self, store):
         """ indexing course tests """
         self.reindex_library(store)
