@@ -15,7 +15,8 @@ from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
-from contentstore.views.exception import CertificateValidationError
+from student.models import CourseEnrollment
+from contentstore.views.certificates import CertificateManager
 
 GROUP_CONFIGURATION_JSON = {
     u'name': u'Test name',
@@ -38,6 +39,7 @@ CERTIFICATE_JSON = {
     u'description': u'Test description',
     u'version': CERTIFICATE_SCHEMA_VERSION
 }
+
 
 # pylint: disable=no-member
 class HelperMethods(object):
@@ -144,7 +146,7 @@ class HelperMethods(object):
             {
                 'id': i,
                 'name': 'Name ' + str(i),
-                'description': 'description ' + str(i),
+                'description': 'Description ' + str(i),
                 'version': CERTIFICATE_SCHEMA_VERSION
             } for i in xrange(0, count)
         ]
@@ -249,7 +251,8 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         """
 
         self.course.user_partitions = [
-            UserPartition(0, 'First name', 'First description', [Group(0, 'Group A'), Group(1, 'Group B'), Group(2, 'Group C')]),
+            UserPartition(0, 'First name', 'First description',
+                          [Group(0, 'Group A'), Group(1, 'Group B'), Group(2, 'Group C')]),
         ]
         self.save_course()
 
@@ -325,13 +328,13 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
     Test cases for group_configurations_detail_handler.
     """
 
-    ID = 0
+    _id = 0
 
     def _url(self, cid=-1):
         """
         Return url for the handler.
         """
-        cid = cid if cid > 0 else self.ID
+        cid = cid if cid > 0 else self._id
         return reverse_course_url(
             'group_configurations_detail_handler',
             self.course.id,
@@ -380,7 +383,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         self.save_course()
 
         expected = {
-            u'id': self.ID,
+            u'id': self._id,
             u'name': u'New Test name',
             u'scheme': u'cohort',
             u'description': u'New Test description',
@@ -519,7 +522,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         self.save_course()
 
         expected = {
-            u'id': self.ID,
+            u'id': self._id,
             u'name': u'New Test name',
             u'scheme': u'random',
             u'description': u'New Test description',
@@ -987,7 +990,7 @@ class CertificatesBaseTestCase(object):
         """
         # Invalid JSON.
         invalid_json = "{u'name': 'Test Name', u'description': 'Test description'," \
-                       " u'version': "+str(CERTIFICATE_SCHEMA_VERSION)+", []}"
+                       " u'version': " + str(CERTIFICATE_SCHEMA_VERSION) + ", []}"
 
         response = self.client.post(
             self._url(),
@@ -1002,9 +1005,33 @@ class CertificatesBaseTestCase(object):
         content = json.loads(response.content)
         self.assertIn("error", content)
 
+    def test_certificate_data_validation(self):
+        #Test certificate schema version
+        json_data_1 = {
+            u'version': 100,
+            u'name': u'Test certificate',
+            u'description': u'Test description'
+        }
+
+        with self.assertRaises(Exception) as context:
+            CertificateManager.validate(json_data_1)
+
+        self.assertTrue('Certificate dict has unexpected version 100' in context.exception)
+
+        #Test certificate name is missing
+        json_data_2 = {
+            u'version': CERTIFICATE_SCHEMA_VERSION,
+            u'description': u'Test description'
+        }
+
+        with self.assertRaises(Exception) as context:
+            CertificateManager.validate(json_data_2)
+
+        self.assertTrue('must have name of the certificate' in context.exception)
+
 
 # pylint: disable=no-member
-class CertificatesListHandlerTestCase(CourseTestCase, CertificatesBaseTestCase):
+class CertificatesListHandlerTestCase(CourseTestCase, CertificatesBaseTestCase, HelperMethods):
     """
     Test cases for certificates_list_handler.
     """
@@ -1074,19 +1101,62 @@ class CertificatesListHandlerTestCase(CourseTestCase, CertificatesBaseTestCase):
         )
         self.assertEqual(response.status_code, 406)
 
+    def test_certificate_unsupported_method(self):
+        """
+        Unit Test: test_certificate_unsupported_method
+        """
+        resp = self.client.put(self._url())
+        self.assertEqual(resp.status_code, 405)
+
+    def test_not_permitted(self):
+        """
+        Test that when user has not read access to course then permission denied exception should raised.
+        """
+        test_user_client, test_user = self.create_non_staff_authed_user_client()
+        CourseEnrollment.enroll(test_user, self.course.id)
+        response = test_user_client.ajax_post(
+            self._url(),
+            data=CERTIFICATE_JSON
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertIn("error", response.content)
+
+    def test_assign_unique_identifier_to_certificates(self):
+        """
+        Test certificates have unique ids
+        """
+        self._add_course_certificates(count=2)
+        json_data = {
+            u'version': CERTIFICATE_SCHEMA_VERSION,
+            u'name': u'New test certificate',
+            u'description': u'New test description'
+        }
+
+        response = self.client.post(
+            self._url(),
+            data=json.dumps(json_data),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+
+        new_certificate = json.loads(response.content)
+        for prev_certificate in self.course.certificates['certificates']:
+            self.assertNotEqual(new_certificate.get('id'), prev_certificate.get('id'))
+
 
 class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase, HelperMethods):
     """
     Test cases for CertificatesDetailHandlerTestCase.
     """
 
-    ID = 0
+    _id = 0
 
     def _url(self, cid=-1):
         """
         Return url for the handler.
         """
-        cid = cid if cid > 0 else self.ID
+        cid = cid if cid > 0 else self._id
         return reverse_course_url(
             'certificates.certificates_detail_handler',
             self.course.id,
@@ -1143,3 +1213,35 @@ class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase
         self.assertEqual(len(course_certificates), 2)
         self.assertEqual(course_certificates[1].get('name'), u'New test certificate')
         self.assertEqual(course_certificates[1].get('description'), 'New test description')
+
+    def test_can_delete_certificate(self):
+        """
+        Delete certificate
+        """
+        self._add_course_certificates(count=2)
+        response = self.client.delete(
+            self._url(cid=1),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 204)
+        self.reload_course()
+        # Verify that certificates are properly updated in the course.
+        certificates = self.course.certificates['certificates']
+        self.assertEqual(len(certificates), 1)
+        self.assertEqual(certificates[0].get('name'), 'Name 0')
+        self.assertEqual(certificates[0].get('description'), 'Description 0')
+
+    def test_delete_non_existing_certificate(self):
+        """
+        Try to delete a non existing certificate. It should return status code 404 Not found.
+        """
+        self._add_course_certificates(count=2)
+        response = self.client.delete(
+            self._url(cid=100),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 404)
