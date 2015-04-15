@@ -343,26 +343,8 @@ if settings.COURSEWARE_ENABLED:
         # For the instructor
         url(r'^courses/{}/instructor$'.format(settings.COURSE_ID_PATTERN),
             'instructor.views.instructor_dashboard.instructor_dashboard_2', name="instructor_dashboard"),
-        url(r'^courses/{}/ccx_coach$'.format(settings.COURSE_ID_PATTERN),
-            'ccx.views.dashboard', name='ccx_coach_dashboard'),
-        url(r'^courses/{}/create_ccx$'.format(settings.COURSE_ID_PATTERN),
-            'ccx.views.create_ccx', name='create_ccx'),
-        url(r'^courses/{}/save_ccx$'.format(settings.COURSE_ID_PATTERN),
-            'ccx.views.save_ccx', name='save_ccx'),
-        url(r'^courses/{}/ccx_invite$'.format(settings.COURSE_ID_PATTERN),
-            'ccx.views.ccx_invite', name='ccx_invite'),
-        url(r'^courses/{}/ccx_schedule$'.format(settings.COURSE_ID_PATTERN),
-            'ccx.views.ccx_schedule', name='ccx_schedule'),
-        url(r'^courses/{}/ccx_manage_student$'.format(settings.COURSE_ID_PATTERN),
-            'ccx.views.ccx_student_management', name='ccx_manage_student'),
-        url(r'^courses/{}/ccx_gradebook$'.format(settings.COURSE_ID_PATTERN),
-            'ccx.views.ccx_gradebook', name='ccx_gradebook'),
-        url(r'^courses/{}/ccx_grades.csv$'.format(settings.COURSE_ID_PATTERN),
-            'ccx.views.ccx_grades_csv', name='ccx_grades_csv'),
-        url(r'^courses/{}/ccx_set_grading_policy$'.format(settings.COURSE_ID_PATTERN),
-            'ccx.views.set_grading_policy', name='ccx_set_grading_policy'),
-        url(r'^courses/{}/switch_ccx(?:/(?P<ccx_id>[\d]+))?$'.format(settings.COURSE_ID_PATTERN),
-            'ccx.views.switch_active_ccx', name='switch_active_ccx'),
+
+
         url(r'^courses/{}/set_course_mode_price$'.format(settings.COURSE_ID_PATTERN),
             'instructor.views.instructor_dashboard.set_course_mode_price', name="set_course_mode_price"),
         url(r'^courses/{}/instructor/api/'.format(settings.COURSE_ID_PATTERN),
@@ -642,6 +624,14 @@ if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
 urlpatterns += (
     url(r'^xdomain_proxy.html$', 'cors_csrf.views.xdomain_proxy', name='xdomain_proxy'),
 )
+
+# Custom courses on edX (CCX) URLs
+if settings.FEATURES["CUSTOM_COURSES_EDX"]:
+    urlpatterns += (
+        url(r'^courses/{}/'.format(settings.COURSE_ID_PATTERN),
+            include('ccx.urls')),
+    )
+
 
 urlpatterns = patterns(*urlpatterns)
 
