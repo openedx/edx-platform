@@ -4,6 +4,7 @@ consist primarily of authentication, request validation, and serialization.
 
 """
 from ipware.ip import get_ip
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
 from opaque_keys import InvalidKeyError
 from course_modes.models import CourseMode
@@ -24,6 +25,7 @@ from enrollment.errors import (
     CourseNotFoundError, CourseEnrollmentError,
     CourseModeNotFoundError, CourseEnrollmentExistsError
 )
+from student.models import User
 
 
 class EnrollmentCrossDomainSessionAuth(SessionAuthenticationAllowInactiveUser, SessionAuthenticationCrossDomainCsrf):
@@ -104,11 +106,10 @@ class EnrollmentView(APIView, ApiKeyPermissionMixIn):
     permission_classes = ApiKeyHeaderPermissionIsAuthenticated,
     throttle_classes = EnrollmentUserThrottle,
 
-    # Since the course about page on the marketing site
-    # uses this API to auto-enroll users, we need to support
-    # cross-domain CSRF.
+    # Since the course about page on the marketing site uses this API to auto-enroll users,
+    # we need to support cross-domain CSRF.
     @method_decorator(ensure_csrf_cookie_cross_domain)
-    def get(self, request, course_id=None, user=None):
+    def get(self, request, course_id=None, username=None):
         """Create, read, or update enrollment information for a user.
 
         HTTP Endpoint for all CRUD operations for a user course enrollment. Allows creation, reading, and
@@ -119,27 +120,29 @@ class EnrollmentView(APIView, ApiKeyPermissionMixIn):
                 information for the current user and the specified course.
             course_id (str): URI element specifying the course location. Enrollment information will be
                 returned, created, or updated for this particular course.
-            user (str): The user username associated with this enrollment request.
+            username (str): The username associated with this enrollment request.
 
         Return:
             A JSON serialized representation of the course enrollment.
 
         """
-        user = user if user else request.user.username
-        if request.user.username != user and not self.has_api_key_permissions(request):
+        username = username or request.user.username
+
+        if request.user.username != username and not self.has_api_key_permissions(request):
             # Return a 404 instead of a 403 (Unauthorized). If one user is looking up
             # other users, do not let them deduce the existence of an enrollment.
             return Response(status=status.HTTP_404_NOT_FOUND)
+
         try:
-            return Response(api.get_enrollment(user, course_id))
+            return Response(api.get_enrollment(username, course_id))
         except CourseEnrollmentError:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
                 data={
                     "message": (
                         u"An error occurred while retrieving enrollments for user "
-                        u"'{user}' in course '{course_id}'"
-                    ).format(user=user, course_id=course_id)
+                        u"'{username}' in course '{course_id}'"
+                    ).format(username=username, course_id=course_id)
                 }
             )
 
@@ -295,20 +298,20 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         """
             Gets a list of all course enrollments for the currently logged in user.
         """
-        user = request.GET.get('user', request.user.username)
-        if request.user.username != user and not self.has_api_key_permissions(request):
+        username = request.GET.get('user', request.user.username)
+        if request.user.username != username and not self.has_api_key_permissions(request):
             # Return a 404 instead of a 403 (Unauthorized). If one user is looking up
             # other users, do not let them deduce the existence of an enrollment.
             return Response(status=status.HTTP_404_NOT_FOUND)
         try:
-            return Response(api.get_enrollments(user))
+            return Response(api.get_enrollments(username))
         except CourseEnrollmentError:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
                 data={
                     "message": (
-                        u"An error occurred while retrieving enrollments for user '{user}'"
-                    ).format(user=user)
+                        u"An error occurred while retrieving enrollments for user '{username}'"
+                    ).format(username=username)
                 }
             )
 
@@ -317,14 +320,15 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
             Enrolls the currently logged in user in a course.
         """
         # Get the User, Course ID, and Mode from the request.
-        user = request.DATA.get('user', request.user.username)
+        username = request.DATA.get('user', request.user.username)
+        course_id = request.DATA.get('course_details', {}).get('course_id')
 
-        if 'course_details' not in request.DATA or 'course_id' not in request.DATA['course_details']:
+        if not course_id:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
                 data={"message": u"Course ID must be specified to create a new enrollment."}
             )
-        course_id = request.DATA['course_details']['course_id']
+
         try:
             course_id = CourseKey.from_string(course_id)
         except InvalidKeyError:
@@ -340,9 +344,9 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         has_api_key_permissions = self.has_api_key_permissions(request)
 
         # Check that the user specified is either the same user, or this is a server-to-server request.
-        if not user:
-            user = request.user.username
-        if user != request.user.username and not has_api_key_permissions:
+        if not username:
+            username = request.user.username
+        if username != request.user.username and not has_api_key_permissions:
             # Return a 404 instead of a 403 (Unauthorized). If one user is looking up
             # other users, do not let them deduce the existence of an enrollment.
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -357,14 +361,22 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 }
             )
 
+        try:
+            # Lookup the user, instead of using request.user, since request.user may not match the username POSTed.
+            user = User.objects.get(username=username)
+        except ObjectDoesNotExist:
+            return Response(
+                status=status.HTTP_406_NOT_ACCEPTABLE,
+                data={
+                    'message': u'The user {} does not exist.'.format(username)
+                }
+            )
+
         # Check whether any country access rules block the user from enrollment
         # We do this at the view level (rather than the Python API level)
         # because this check requires information about the HTTP request.
         redirect_url = embargo_api.redirect_if_blocked(
-            course_id, user=user,
-            ip_address=get_ip(request),
-            url=request.path
-        )
+            course_id, user=user, ip_address=get_ip(request), url=request.path)
         if redirect_url:
             return Response(
                 status=status.HTTP_403_FORBIDDEN,
@@ -384,11 +396,11 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
             # Only server-to-server calls will currently be allowed to modify the mode for existing enrollments. All
             # other requests will go through add_enrollment(), which will allow creating of new enrollments, and
             # re-activating enrollments
-            enrollment = api.get_enrollment(user, unicode(course_id))
+            enrollment = api.get_enrollment(username, unicode(course_id))
             if has_api_key_permissions and enrollment and enrollment['mode'] != mode:
-                response = api.update_enrollment(user, unicode(course_id), mode=mode)
+                response = api.update_enrollment(username, unicode(course_id), mode=mode)
             else:
-                response = api.add_enrollment(user, unicode(course_id), mode=mode)
+                response = api.add_enrollment(username, unicode(course_id), mode=mode)
             email_opt_in = request.DATA.get('email_opt_in', None)
             if email_opt_in is not None:
                 org = course_id.org
@@ -418,7 +430,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 data={
                     "message": (
                         u"An error occurred while creating the new course enrollment for user "
-                        u"'{user}' in course '{course_id}'"
-                    ).format(user=user, course_id=course_id)
+                        u"'{username}' in course '{course_id}'"
+                    ).format(username=username, course_id=course_id)
                 }
             )
