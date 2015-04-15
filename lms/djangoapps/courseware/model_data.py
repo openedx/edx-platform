@@ -132,14 +132,7 @@ class DjangoKeyValueStore(KeyValueStore):
         if key.scope not in self._allowed_scopes:
             raise InvalidScopeError(key)
 
-        field_object = self._field_data_cache.find(key)
-        if field_object is None:
-            raise KeyError(key.field_name)
-
-        if key.scope == Scope.user_state:
-            return json.loads(field_object.state)[key.field_name]
-        else:
-            return json.loads(field_object.value)
+        return self._field_data_cache.get(key)
 
     def set(self, key, value):
         """
@@ -622,6 +615,25 @@ class FieldDataCache(object):
                 scope_map[field.scope].add(field)
         return scope_map
 
+    @contract(key=DjangoKeyValueStore.Key)
+    def get(self, key):
+        '''
+        Load the field value specified by `key`.
+
+        Arguments:
+            key (`DjangoKeyValueStore.Key`): The field value to load
+
+        Returns: The found value
+        Raises: KeyError if key isn't found in the cache
+        '''
+        field_object = self.find(key)
+        if field_object is None:
+            raise KeyError(key.field_name)
+
+        if key.scope == Scope.user_state:
+            return json.loads(field_object.state)[key.field_name]
+        else:
+            return json.loads(field_object.value)
 
     def find(self, key):
         '''
