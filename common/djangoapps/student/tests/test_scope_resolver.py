@@ -7,7 +7,11 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from student.models import CourseEnrollment
-from student.scope_resolver import CourseEnrollmentsScopeResolver, StudentEmailScopeResolver
+from student.scope_resolver import (
+    CourseEnrollmentsScopeResolver,
+    StudentEmailScopeResolver,
+    NamespaceEnrollmentsScopeResolver
+)
 
 
 class StudentTasksTestCase(ModuleStoreTestCase):
@@ -89,12 +93,12 @@ class StudentTasksTestCase(ModuleStoreTestCase):
         enrollment.is_active = False
         enrollment.save()
 
-        resolver = CourseEnrollmentsScopeResolver()
+        resolver = NamespaceEnrollmentsScopeResolver()
 
         users = resolver.resolve(
             'namespace_scope',
             {
-                'course_id': self.course.id,
+                'namespace': self.course.id,
                 'fields': {
                     'id': True,
                     'email': True,
