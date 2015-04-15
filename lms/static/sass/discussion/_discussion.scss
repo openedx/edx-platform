@@ -1,5 +1,6 @@
 // forums - main app styling
 // ====================
+
 body.discussion {
 
   .course-tabs .right {
@@ -71,7 +72,7 @@ body.discussion {
   .thread-title {
     display: block;
     margin-bottom: $baseline;
-    color: #333;
+    color: $gray-d3;
     font-weight: 700;
     font-size: 21px;
   }
@@ -119,11 +120,11 @@ body.discussion {
   }
 
   .wmd-input {
-    border: 1px solid #c8c8c8;
+    border: 1px solid $gray-l3;
     border-radius: 3px 3px 0 0;
     width: 100%;
     height: 150px;
-    background-color: #e9e9e9;
+    background-color: $gray-l4;
     font-style: normal;
     font-size: 0.8em;
     font-family: Monaco, 'Lucida Console', monospace;
@@ -209,7 +210,7 @@ body.discussion {
 
     > form > input[type="text"] {
       border-radius: 3px;
-      color: #333;
+      color: $gray-d3;
     }
 
     > form > input[type="button"] {
@@ -327,13 +328,13 @@ body.discussion {
     .home-helpgrid {
       border-bottom: none;
       border-radius: 3px;
-      border: 1px solid #b2b2b2;
+      border: 1px solid $gray-l2;
       box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
     }
   }
 
   .helpgrid-row {
-      border-bottom: 1px solid #b2b2b2;
+      border-bottom: 1px solid $gray-l2;
 
       .row-title {
         padding: 30px $baseline;
@@ -432,7 +433,7 @@ body.discussion {
 
     .posted-details {
       font-size: 12px;
-      color: #888;
+      color: $gray-l1;
 
       .username {
         font-weight: 700;
@@ -446,7 +447,10 @@ body.discussion {
     .post-context{
       margin-top: $baseline;
       font-size: 12px;
-      color: #888;
+      color: $gray-d1;
+      padding: ($baseline*0.75);
+      background-color: $gray-l6;
+      border-radius: 3px;
     }
 
     p + p {
@@ -471,8 +475,8 @@ body.discussion {
     > li {
       @include animation(fadeIn .3s);
       position: relative;
-      margin: 0 -10px 30px;
-      border: 1px solid #b2b2b2;
+      margin: 0 -($baseline/2) ($baseline*1.5);
+      border: 1px solid $gray-l2;
       border-radius: 3px;
       box-shadow: 0 0 1px $shadow;
 
@@ -492,7 +496,7 @@ body.discussion {
         left: 0;
         width: 100%;
         height: 14px;
-        padding: 1px 5px;
+        padding: 1px ($baseline/4);
         @include box-sizing(border-box);
         border-radius: 2px 2px 0 0;
         background: #009fe2;
@@ -508,7 +512,7 @@ body.discussion {
         left: 0;
         width: 100%;
         height: 14px;
-        padding: 1px 5px;
+        padding: 1px ($baseline/4);
         @include box-sizing(border-box);
         border-radius: 2px 2px 0 0;
         background: $forum-color-community-ta;
@@ -551,9 +555,9 @@ body.discussion {
 
     .add-response-btn {
       @include white-button;
-      @include linear-gradient(top, $white 35%, #ebebeb);
+      @include linear-gradient(top, $white 35%, $gray-l4);
       position: relative;
-      border: 1px solid #b2b2b2;
+      border: 1px solid $gray-l2;
       padding: 0 18px;
       width: 100%;
       box-shadow: 0 1px 1px $shadow-l1;
@@ -604,7 +608,7 @@ body.discussion {
     height: 31px;
     padding: 0 ($baseline/2);
     @include box-sizing(border-box);
-    border: 1px solid #b2b2b2;
+    border: 1px solid $gray-l2;
     border-radius: 3px;
     box-shadow: 0 1px 3px $shadow-l1 inset;
     @include transition(border-color .1s linear 0s);
@@ -687,7 +691,7 @@ body.discussion {
 
     button.add-response-btn {
       @include white-button;
-      @include linear-gradient(top, $white 35%, #ebebeb);
+      @include linear-gradient(top, $white 35%, $gray-l4);
       position: relative;
       padding-left: ($baseline*1.5);
       width: 100%;
@@ -906,7 +910,7 @@ body.discussion {
       display: block;
       margin-bottom: $baseline;
       font-size: 21px;
-      color: #333;
+      color: $gray-d3;
       font-weight: 700;
     }
   }
@@ -948,13 +952,13 @@ body.discussion {
           &.current-page span {
             display: inline-block;
             height: 35px;
-            padding: 0 15px;
+            padding: 0 ($baseline*0.75);
             border: 1px solid $gray-l3;
             border-radius: 3px;
             font-size: 13px;
             font-weight: 700;
             line-height: 32px;
-            color: #333;
+            color: $gray-d3;
             text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
           }
         }
@@ -975,14 +979,14 @@ body.discussion {
     .post-cancel {
       @include white-button;
       float: left;
-      margin: $baseline/2 0 0 15px;
+      margin: ($baseline/2) 0 0 ($baseline*0.75);
     }
 
     .post-update {
       @include blue-button;
       float: left;
       height: 37px;
-      margin-top: $baseline/2;
+      margin-top: ($baseline/2);
       padding-bottom: 2px;
 
       &:hover, &:focus {
@@ -993,13 +997,13 @@ body.discussion {
     .edit-post-title {
       width: 100%;
       height: 40px;
-      padding: 0 $baseline/2;
+      padding: 0 ($baseline/2);
       @include box-sizing(border-box);
       border-radius: 3px;
       border: 1px solid #aaa;
       font-size: 16px;
       font-family: $sans-serif;
-      color: #333;
+      color: $gray-d3;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
     }
   }
@@ -1042,17 +1046,17 @@ body.discussion {
 
   .load-response-button {
     @include white-button;
-    @include linear-gradient(top, $white 35%, #ebebeb);
+    @include linear-gradient(top, $white 35%, $gray-l4);
     position: relative;
     margin: ($baseline/2) 0;
-    border: 1px solid #b2b2b2;
+    border: 1px solid $gray-l2;
     width: 100%;
     box-shadow: 0 1px 1px $shadow-l1;
     text-align: left;
     font-weight: normal;
 
     span.add-response-btn-text {
-      padding-left: 4px;
+      padding-left: ($baseline/5);
     }
   }
 }

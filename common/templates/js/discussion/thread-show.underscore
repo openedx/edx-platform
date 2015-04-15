@@ -68,7 +68,7 @@
         <div class="post-context">
             <%=
             interpolate(
-                _.escape(gettext('(this post is about %(courseware_title_linked)s)')),
+                _.escape(gettext('Related to: %(courseware_title_linked)s')),
                 {courseware_title_linked: courseware_title_linked},
                 true
             )
