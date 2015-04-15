@@ -159,17 +159,7 @@ class DjangoKeyValueStore(KeyValueStore):
         if key.scope not in self._allowed_scopes:
             raise InvalidScopeError(key)
 
-        field_object = self._field_data_cache.find(key)
-        if field_object is None:
-            raise KeyError(key.field_name)
-
-        if key.scope == Scope.user_state:
-            state = json.loads(field_object.state)
-            del state[key.field_name]
-            field_object.state = json.dumps(state)
-            field_object.save()
-        else:
-            field_object.delete()
+        self._field_data_cache.delete(key)
 
     def has(self, key):
         if key.scope not in self._allowed_scopes:
@@ -650,6 +640,28 @@ class FieldDataCache(object):
             except DatabaseError:
                 log.exception('Error saving fields %r', field_objects[field_object])
                 raise KeyValueMultiSaveError(saved_fields)
+
+    @contract(key=DjangoKeyValueStore.Key)
+    def delete(self, key):
+        """
+        Delete the value specified by `key`.
+
+        Arguments:
+            key (`DjangoKeyValueStore.Key`): The field value to delete
+
+        Raises: KeyError if key isn't found in the cache
+        """
+        field_object = self.find(key)
+        if field_object is None:
+            raise KeyError(key.field_name)
+
+        if key.scope == Scope.user_state:
+            state = json.loads(field_object.state)
+            del state[key.field_name]
+            field_object.state = json.dumps(state)
+            field_object.save()
+        else:
+            field_object.delete()
 
     def find(self, key):
         '''
