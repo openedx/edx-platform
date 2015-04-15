@@ -509,3 +509,46 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.assertTrue(self.video.is_captions_visible())
         unicode_text = "莎拉·佩林 (Sarah Palin)".decode('utf-8')
         self.assertIn(unicode_text, self.video.captions_lines())
+
+    def test_simplified_and_traditional_chinese_transcripts_uploading(self):
+        """
+        Scenario: Translations uploading works correctly
+
+        Given I have created a Video component
+        And I edit the component
+        And I open tab "Advanced"
+        And I upload transcript file "simplified_chinese.srt" for "zh_HANS" language code
+        And I save changes
+        Then when I view the video it does show the captions
+        And I see "在线学习是革" text in the captions
+
+        And I edit the component
+        And I open tab "Advanced"
+        And I upload transcript file "traditional_chinese.srt" for "zh_HANT" language code
+        And I save changes
+        Then when I view the video it does show the captions
+        And I see "在線學習是革" text in the captions
+
+        And video subtitle menu has 'zh_HANS', 'zh_HANT' translations for 'Simplified Chinese'
+        and 'Traditional Chinese' respectively
+        """
+        self._create_video_component()
+
+        langs_info = [
+            ('zh_HANS', 'simplified_chinese.srt', '在线学习是革'),
+            ('zh_HANT', 'traditional_chinese.srt', '在線學習是革')
+        ]
+
+        for lang_code, lang_file, lang_text in langs_info:
+            self.edit_component()
+            self.open_advanced_tab()
+            self.video.upload_translation(lang_file, lang_code)
+            self.save_unit_settings()
+            self.assertTrue(self.video.is_captions_visible())
+            # If there is only one language then there will be no subtitle/captions menu
+            if lang_code == 'zh_HANT':
+                self.video.select_language(lang_code)
+            unicode_text = lang_text.decode('utf-8')
+            self.assertIn(unicode_text, self.video.captions_text)
+
+        self.assertEqual(self.video.caption_languages, {'zh_HANS': 'Simplified Chinese', 'zh_HANT': 'Traditional Chinese'})

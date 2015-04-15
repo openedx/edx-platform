@@ -679,6 +679,36 @@ class YouTubeVideoTest(VideoBaseTest):
 
         self.assertGreaterEqual(self.video.seconds, 10)
 
+    def test_simplified_and_traditional_chinese_transcripts(self):
+        """
+        Scenario: Simplified and Traditional Chinese transcripts work as expected in Youtube mode
+
+        Given the course has a Video component in "Youtube" mode
+        And I have defined a Simplified Chinese transcript for the video
+        And I have defined a Traditional Chinese transcript for the video
+        Then I see the correct subtitle language options in cc menu
+        Then I see the correct text in the captions for Simplified and Traditional Chinese transcripts
+        And I can download the transcripts for Simplified and Traditional Chinese
+        And video subtitle menu has 'zh_HANS', 'zh_HANT' translations for 'Simplified Chinese'
+        and 'Traditional Chinese' respectively
+        """
+        data = {
+            'download_track': True,
+            'transcripts': {'zh_HANS': 'simplified_chinese.srt', 'zh_HANT': 'traditional_chinese.srt'}
+        }
+        self.metadata = self.metadata_for_mode('youtube', data)
+        self.assets.extend(['simplified_chinese.srt', 'traditional_chinese.srt'])
+        self.navigate_to_video()
+
+        langs = {'zh_HANS': '在线学习是革', 'zh_HANT': '在線學習是革'}
+        for lang_code, text in langs.items():
+            self.assertTrue(self.video.select_language(lang_code))
+            unicode_text = text.decode('utf-8')
+            self.assertIn(unicode_text, self.video.captions_text)
+            self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
+
+        self.assertEqual(self.video.caption_languages, {'zh_HANS': 'Simplified Chinese', 'zh_HANT': 'Traditional Chinese'})
+
 
 class YouTubeHtml5VideoTest(VideoBaseTest):
     """ Test YouTube HTML5 Video Player """
