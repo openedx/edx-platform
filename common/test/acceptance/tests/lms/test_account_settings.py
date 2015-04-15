@@ -342,9 +342,8 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             u'Country or Region',
             u'',
             None,
-            [u'Pakistan', u''],
-            None  # Don't test eventing because in Jenkins events are being fired twice for country (though it works
-                  # fine locally).
+            [u'Pakistan', u'Palau'],
+            [u'PK', u'PW']
         )
 
     def test_preferred_language_field(self):
