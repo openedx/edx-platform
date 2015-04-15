@@ -222,6 +222,18 @@ class DjangoOrmFieldCache(object):
         field_object.delete()
         del self._cache[cache_key]
 
+    @contract(kvs_key=DjangoKeyValueStore.Key, returns=bool)
+    def has(self, kvs_key):
+        """
+        Return whether the specified `kvs_key` is set.
+
+        Arguments:
+            kvs_key (`DjangoKeyValueStore.Key`): The field value to delete
+
+        Returns: bool
+        """
+        return self._cache_key_for_kvs_key(kvs_key) in self._cache
+
     def __len__(self):
         return len(self._cache)
 
@@ -337,6 +349,21 @@ class UserStateCache(DjangoOrmFieldCache):
         field_object.state = json.dumps(state)
         field_object.save()
 
+    @contract(kvs_key=DjangoKeyValueStore.Key, returns=bool)
+    def has(self, kvs_key):
+        """
+        Return whether the specified `kvs_key` is set.
+
+        Arguments:
+            kvs_key (`DjangoKeyValueStore.Key`): The field value to delete
+
+        Returns: bool
+        """
+        field_object = self._cache.get(self._cache_key_for_kvs_key(kvs_key))
+        if field_object is None:
+            return False
+
+        return kvs_key.field_name in json.loads(field_object.state)
 
 class UserStateSummaryCache(DjangoOrmFieldCache):
     """
@@ -724,14 +751,7 @@ class FieldDataCache(object):
         if key.scope not in self.cache:
             return False
 
-        field_object = self.cache[key.scope].get(key)
-        if field_object is None:
-            return False
-
-        if key.scope == Scope.user_state:
-            return key.field_name in json.loads(field_object.state)
-        else:
-            return True
+        return self.cache[key.scope].has(key)
 
     def find_or_create(self, key):
         '''
