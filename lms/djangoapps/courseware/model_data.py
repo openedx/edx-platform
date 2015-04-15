@@ -16,7 +16,7 @@ import logging
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.block_types import BlockTypeKeyV1
 from opaque_keys.edx.asides import AsideUsageKeyV1
-from contracts import contract
+from contracts import contract, new_contract
 
 from django.db import DatabaseError
 
@@ -148,41 +148,12 @@ class DjangoKeyValueStore(KeyValueStore):
           xblock.KvsFieldData._key : value
 
         """
-        saved_fields = []
-        # field_objects maps a field_object to a list of associated fields
-        field_objects = dict()
-        for field in kv_dict:
-            # Check field for validity
-            if field.scope not in self._allowed_scopes:
-                raise InvalidScopeError(field)
+        for key in kv_dict:
+            # Check key for validity
+            if key.scope not in self._allowed_scopes:
+                raise InvalidScopeError(key)
 
-            # If the field is valid and isn't already in the dictionary, add it.
-            field_object = self._field_data_cache.find_or_create(field)
-            if field_object not in field_objects.keys():
-                field_objects[field_object] = []
-            # Update the list of associated fields
-            field_objects[field_object].append(field)
-
-            # Special case when scope is for the user state, because this scope saves fields in a single row
-            if field.scope == Scope.user_state:
-                state = json.loads(field_object.state)
-                state[field.field_name] = kv_dict[field]
-                field_object.state = json.dumps(state)
-            else:
-                # The remaining scopes save fields on different rows, so
-                # we don't have to worry about conflicts
-                field_object.value = json.dumps(kv_dict[field])
-
-        for field_object in field_objects:
-            try:
-                # Save the field object that we made above
-                field_object.save()
-                # If save is successful on this scope, add the saved fields to
-                # the list of successful saves
-                saved_fields.extend([field.field_name for field in field_objects[field_object]])
-            except DatabaseError:
-                log.exception('Error saving fields %r', field_objects[field_object])
-                raise KeyValueMultiSaveError(saved_fields)
+        self._field_data_cache.set_many(kv_dict)
 
     def delete(self, key):
         if key.scope not in self._allowed_scopes:
@@ -212,6 +183,9 @@ class DjangoKeyValueStore(KeyValueStore):
             return key.field_name in json.loads(field_object.state)
         else:
             return True
+
+new_contract("DjangoKeyValueStore", DjangoKeyValueStore)
+new_contract("DjangoKeyValueStore_Key", DjangoKeyValueStore.Key)
 
 
 class DjangoOrmFieldCache(object):
@@ -634,6 +608,48 @@ class FieldDataCache(object):
             return json.loads(field_object.state)[key.field_name]
         else:
             return json.loads(field_object.value)
+
+    @contract(kv_dict="dict(DjangoKeyValueStore_Key: *)")
+    def set_many(self, kv_dict):
+        """
+        Set all of the fields specified by the keys of `kv_dict` to the values
+        in that dict.
+
+        Arguments:
+            kv_dict (dict): dict mapping from `DjangoKeyValueStore.Key`s to field values
+        Raises: DatabaseError if any fields fail to save
+        """
+        saved_fields = []
+        # field_objects maps a field_object to a list of associated fields
+        field_objects = dict()
+        for field in kv_dict:
+            # If the field is valid and isn't already in the dictionary, add it.
+            field_object = self.find_or_create(field)
+            if field_object not in field_objects.keys():
+                field_objects[field_object] = []
+            # Update the list of associated fields
+            field_objects[field_object].append(field)
+
+            # Special case when scope is for the user state, because this scope saves fields in a single row
+            if field.scope == Scope.user_state:
+                state = json.loads(field_object.state)
+                state[field.field_name] = kv_dict[field]
+                field_object.state = json.dumps(state)
+            else:
+                # The remaining scopes save fields on different rows, so
+                # we don't have to worry about conflicts
+                field_object.value = json.dumps(kv_dict[field])
+
+        for field_object in field_objects:
+            try:
+                # Save the field object that we made above
+                field_object.save()
+                # If save is successful on this scope, add the saved fields to
+                # the list of successful saves
+                saved_fields.extend([field.field_name for field in field_objects[field_object]])
+            except DatabaseError:
+                log.exception('Error saving fields %r', field_objects[field_object])
+                raise KeyValueMultiSaveError(saved_fields)
 
     def find(self, key):
         '''
