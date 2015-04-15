@@ -113,16 +113,14 @@ from django.utils.translation import ugettext as _
                   ${form_html}
                 </div>
                 <p>
-                    ${_('After this purchase is complete,')}<br/><b>${order.user.username}</b>
-                    ${_('will be enrolled in this course.')}
+                    ${_('After this purchase is complete, {username} will be enrolled in this course.').format(username=u'<br/><b>{username}</b>'.format(username=order.user.username))}
                 </p>
               </div>
              % else:
               <div name="payment">
                 ${form_html}
                 <p>
-                    ${_('After this purchase is complete,')}<br/><b>${order.user.username}</b>
-                    ${_('will be enrolled in this course.')}
+                    ${_('After this purchase is complete, {username} will be enrolled in this course.').format(username=u'<br/><b>{username}</b>'.format(username=order.user.username))}
                 </p>
               </div>
               <div name="billing" class="hidden">

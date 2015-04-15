@@ -593,16 +593,25 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
             runtime=source_item.runtime,
         )
 
+        children_handled = False
+
+        if hasattr(dest_module, 'studio_post_duplicate'):
+            # Allow an XBlock to do anything fancy it may need to when duplicated from another block.
+            # These blocks may handle their own children or parenting if needed. Let them return booleans to
+            # let us know if we need to handle these or not.
+            children_handled = dest_module.studio_post_duplicate(store, source_item)
+
         # Children are not automatically copied over (and not all xblocks have a 'children' attribute).
         # Because DAGs are not fully supported, we need to actually duplicate each child as well.
-        if source_item.has_children:
-            dest_module.children = []
+        if source_item.has_children and not children_handled:
+            dest_module.children = dest_module.children or []
             for child in source_item.children:
                 dupe = _duplicate_item(dest_module.location, child, user=user)
                 if dupe not in dest_module.children:  # _duplicate_item may add the child for us.
                     dest_module.children.append(dupe)
             store.update_item(dest_module, user.id)
 
+        # pylint: disable=protected-access
         if 'detached' not in source_item.runtime.load_block_type(category)._class_tags:
             parent = store.get_item(parent_usage_key)
             # If source was already a child of the parent, add duplicate immediately afterward.
@@ -804,8 +813,14 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         if parent_xblock is None:
             parent_xblock = get_parent_xblock(xblock)
 
-        explanatory_message = _('Students must score {score}% or higher to access course materials.').format(
-            score=int(parent_xblock.entrance_exam_minimum_score_pct * 100))
+        # Translators: The {pct_sign} here represents the percent sign, i.e., '%'
+        # in many languages. This is used to avoid Transifex's misinterpreting of
+        # '% o'. The percent sign is also translatable as a standalone string.
+        explanatory_message = _('Students must score {score}{pct_sign} or higher to access course materials.').format(
+            score=int(parent_xblock.entrance_exam_minimum_score_pct * 100),
+            # Translators: This is the percent sign. It will be used to represent
+            # a percent value out of 100, e.g. "58%" means "58/100".
+            pct_sign=_('%'))
 
     xblock_info = {
         "id": unicode(xblock.location),

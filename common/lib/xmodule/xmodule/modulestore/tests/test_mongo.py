@@ -41,8 +41,10 @@ from git.test.lib.asserts import assert_not_none
 from xmodule.x_module import XModuleMixin
 from xmodule.modulestore.mongo.base import as_draft
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from xmodule.modulestore.tests.utils import LocationMixin
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.inheritance import InheritanceMixin
 
 
 log = logging.getLogger(__name__)
@@ -124,7 +126,7 @@ class TestMongoModuleStoreBase(unittest.TestCase):
             doc_store_config, FS_ROOT, RENDER_TEMPLATE,
             default_class=DEFAULT_CLASS,
             branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred,
-            xblock_mixins=(EditInfoMixin,)
+            xblock_mixins=(EditInfoMixin, InheritanceMixin, LocationMixin, XModuleMixin)
 
         )
         import_course_from_xml(

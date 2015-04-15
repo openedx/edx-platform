@@ -77,5 +77,8 @@
 @import "course/instructor/email";
 @import "xmodule/descriptors/css/module-styles.scss";
 
-// course - discussion
+// course - ccx_coach
+@import "course/ccx_coach/dashboard";
+
+// discussion
 @import "course/discussion/form-wmd-toolbar";

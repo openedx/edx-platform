@@ -13,7 +13,7 @@ from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 from courseware.courses import get_course_by_id
-from xmodule import seq_module, vertical_module
+from xmodule import seq_module, vertical_block
 from logging import getLogger
 logger = getLogger(__name__)
 
@@ -181,7 +181,7 @@ def get_courseware_with_tabs(course_id):
         }, {
             'clickable_tab_count': 1,
             'section_name': 'System Usage Sequence',
-            'tab_classes': ['VerticalDescriptor']
+            'tab_classes': ['VerticalBlock']
         }, {
             'clickable_tab_count': 0,
             'section_name': 'Lab0: Using the tools',
@@ -196,7 +196,7 @@ def get_courseware_with_tabs(course_id):
         'sections': [{
             'clickable_tab_count': 4,
             'section_name': 'Administrivia and Circuit Elements',
-            'tab_classes': ['VerticalDescriptor', 'VerticalDescriptor', 'VerticalDescriptor', 'VerticalDescriptor']
+            'tab_classes': ['VerticalBlock', 'VerticalBlock', 'VerticalBlock', 'VerticalBlock']
         }, {
             'clickable_tab_count': 0,
             'section_name': 'Basic Circuit Analysis',
@@ -215,7 +215,7 @@ def get_courseware_with_tabs(course_id):
         'sections': [{
             'clickable_tab_count': 2,
             'section_name': 'Midterm Exam',
-            'tab_classes': ['VerticalDescriptor', 'VerticalDescriptor']
+            'tab_classes': ['VerticalBlock', 'VerticalBlock']
         }]
     }]
     """
@@ -228,7 +228,7 @@ def get_courseware_with_tabs(course_id):
             'section_name': s.display_name_with_default,
             'clickable_tab_count': len(s.get_children()) if (type(s) == seq_module.SequenceDescriptor) else 0,
             'tabs': [{
-                'children_count': len(t.get_children()) if (type(t) == vertical_module.VerticalDescriptor) else 0,
+                'children_count': len(t.get_children()) if (type(t) == vertical_block.VerticalBlock) else 0,
                 'class': t.__class__.__name__} for t in s.get_children()
             ]
         } for s in c.get_children() if not s.hide_from_toc]

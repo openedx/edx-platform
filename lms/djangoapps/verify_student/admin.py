@@ -1,4 +1,5 @@
 from ratelimitbackend import admin
-from verify_student.models import SoftwareSecurePhotoVerification
+from verify_student.models import SoftwareSecurePhotoVerification, InCourseReverificationConfiguration
 
 admin.site.register(SoftwareSecurePhotoVerification)
+admin.site.register(InCourseReverificationConfiguration)

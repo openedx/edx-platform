@@ -39,7 +39,6 @@ class BokChoyTestSuite(TestSuite):
         self.default_store = kwargs.get('default_store', None)
         self.verbosity = kwargs.get('verbosity', 2)
         self.extra_args = kwargs.get('extra_args', '')
-        self.ptests = kwargs.get('ptests', False)
         self.har_dir = self.log_dir / 'hars'
         self.imports_dir = kwargs.get('imports_dir', None)
 

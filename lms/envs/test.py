@@ -445,7 +445,6 @@ MONGODB_LOG = {
     'db': 'xlog',
 }
 
-
 # Enable EdxNotes for tests.
 FEATURES['ENABLE_EDXNOTES'] = True
 
@@ -469,3 +468,7 @@ FACEBOOK_API_VERSION = "v2.2"
 
 # Certificates Views
 FEATURES['CERTIFICATES_HTML_VIEW'] = True
+
+######### custom courses #########
+INSTALLED_APPS += ('ccx',)
+MIDDLEWARE_CLASSES += ('ccx.overrides.CcxMiddleware',)

@@ -94,54 +94,6 @@ ${page_title_breadcrumbs(course_name())}
       });
   </script>
 
-% if timer_expiration_duration:
-  <script type="text/javascript">
-    var timer = {
-      timer_inst : null,
-      end_time : null,
-      get_remaining_secs : function(endTime) {
-        var currentTime = new Date();
-        var remaining_secs = Math.floor((endTime - currentTime)/1000);
-        return remaining_secs;
-      },
-      get_time_string : function() {
-        function pretty_time_string(num) {
-          return ( num < 10 ? "0" : "" ) + num;
-        }
-        // count down in terms of hours, minutes, and seconds:
-        var hours = pretty_time_string(Math.floor(remaining_secs / 3600));
-        remaining_secs = remaining_secs % 3600;
-        var minutes = pretty_time_string(Math.floor(remaining_secs / 60));
-        remaining_secs = remaining_secs % 60;
-        var seconds = pretty_time_string(Math.floor(remaining_secs));
-
-        var remainingTimeString = hours + ":" + minutes + ":" + seconds;
-        return remainingTimeString;
-      },
-      update_time : function(self) {
-        remaining_secs = self.get_remaining_secs(self.end_time);
-        if (remaining_secs <= 0) {
-          self.end(self);
-        }
-        $('#exam_timer').text(self.get_time_string(remaining_secs));
-      },
-      start : function() { var that = this;
-        // set the end time when the template is rendered.
-        // This value should be UTC time as number of milliseconds since epoch.
-        this.end_time = new Date((new Date()).getTime() + ${timer_expiration_duration});
-        this.timer_inst = setInterval(function(){ that.update_time(that); }, 1000);
-      },
-      end : function(self) {
-        clearInterval(self.timer_inst);
-        // redirect to specified URL:
-        window.location = "${time_expired_redirect_url}";
-      }
-    }
-    // start timer right away:
-    timer.start();
-  </script>
-% endif
-
 % if show_chat:
   <script type="text/javascript" src="${static.url('js/vendor/candy_libs/libs.min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/candy.min.js')}"></script>
@@ -179,17 +131,6 @@ ${page_title_breadcrumbs(course_name())}
 ${fragment.foot_html()}
 
 </%block>
-
-% if timer_expiration_duration:
-<div class="timer-main">
-  <div id="timer_wrapper">
-    % if timer_navigation_return_url:
-    <a href="${timer_navigation_return_url}" class="timer_return_url">${_("Return to Exam")}</a>
-    % endif
-    <div class="timer_label">Time Remaining:</div> <div id="exam_timer" class="timer_value">&nbsp;</div>
-  </div>
-</div>
-% endif
 
 <%include file="/dashboard/_dashboard_prompt_midcourse_reverify.html" />
 % if default_tab:

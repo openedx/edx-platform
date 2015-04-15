@@ -2,6 +2,7 @@
 Acceptance tests for Content Libraries in Studio
 """
 from ddt import ddt, data
+from flaky import flaky
 
 from .base_studio_test import StudioLibraryTest
 from ...fixtures.course import XBlockFixtureDesc
@@ -517,6 +518,7 @@ class LibraryUsersPageTest(StudioLibraryTest):
         """
         self.page = LibraryUsersPage(self.browser, self.library_key).wait_for_page()
 
+    @flaky  # TODO fix this, see SOL-618
     def test_user_management(self):
         """
         Scenario: Ensure that we can edit the permissions of users.

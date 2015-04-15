@@ -976,7 +976,7 @@ class RegistrationViewTest(ApiTestCase):
                     {"value": "p", "name": "Doctorate"},
                     {"value": "m", "name": "Master's or professional degree"},
                     {"value": "b", "name": "Bachelor's degree"},
-                    {"value": "a", "name": "Associate's degree"},
+                    {"value": "a", "name": "Associate degree"},
                     {"value": "hs", "name": "Secondary/high school"},
                     {"value": "jhs", "name": "Junior secondary/junior high/middle school"},
                     {"value": "el", "name": "Elementary/primary school"},

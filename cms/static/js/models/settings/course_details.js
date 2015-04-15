@@ -53,8 +53,7 @@ var CourseDetails = Backbone.Model.extend({
                 max: 100
             };
             if(!ValidationHelpers.validateIntegerRange(newattrs.entrance_exam_minimum_score_pct, range)){
-                errors.entrance_exam_minimum_score_pct = gettext("Please enter an integer between "
-                    + range.min +" and "+ range.max +".");
+                errors.entrance_exam_minimum_score_pct = interpolate(gettext("Please enter an integer between %(min)s and %(max)s."), range, true);
             }
         }
         if (!_.isEmpty(errors)) return errors;

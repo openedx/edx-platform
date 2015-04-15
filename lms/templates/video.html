@@ -154,19 +154,22 @@
 </div>
 % if cdn_eval:
 <script>
-  function sendPerformanceBeacon(id, expgroup, value) {
-    var data = {event: "canplaythrough", id: id, expgroup: expgroup, value: value, page: "html5vid"};
+  function sendPerformanceBeacon(id, expgroup, value, event_name) {
+    var data = {event: event_name, id: id, expgroup: expgroup, value: value, page: "html5vid"};
     $.ajax({method: "POST", url: "/performance", data: data});
   }
-  var cdnStartTime, beaconSent = false;
+  var cdnStartTime;
+  var salt = Math.floor((1 + Math.random()) * 0x100000).toString(36);
   function initializeCDNExperiment() {
+    sendPerformanceBeacon("${id}", ${cdn_exp_group}, "", "load");
     cdnStartTime = Date.now();
-    $("#video_${id}").bind("html5:canplaythrough", null, function() {
-      if (!beaconSent) {
+    $.each(['loadstart', 'abort', 'error', 'stalled', 'loadedmetadata',
+                    'loadeddata', 'canplay', 'canplaythrough', 'seeked'],
+                    function(index, eventName) {
+      $("#video_${id}").bind("html5:" + eventName, null, function() {
         timeElapsed = Date.now() - cdnStartTime;
-        sendPerformanceBeacon("${id}", ${cdn_exp_group}, timeElapsed);
-      }
-      beaconSent = true;
+        sendPerformanceBeacon("${id}_" + salt, ${cdn_exp_group}, timeElapsed, eventName);
+      });
     });
   }
   $("#video_${id}").bind("initialize", null, initializeCDNExperiment);

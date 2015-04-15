@@ -13,6 +13,7 @@ from status.status import get_site_status_msg
 
 <%! from microsite_configuration import microsite %>
 <%! from microsite_configuration.templatetags.microsite import platform_name %>
+<%! from ccx.overrides import get_current_ccx %>
 
 ## Provide a hook for themes to inject branding on top.
 <%block name="navigation_top" />
@@ -47,7 +48,16 @@ site_status_msg = get_site_status_msg(course_id)
     </h1>
 
     % if course:
-    <h2><span class="provider">${course.display_org_with_default | h}:</span> ${course.display_number_with_default | h} ${course.display_name_with_default}</h2>
+    <h2><span class="provider">${course.display_org_with_default | h}:</span> 
+      ${course.display_number_with_default | h}
+      <%
+        display_name = course.display_name_with_default
+        if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
+          ccx = get_current_ccx()
+          if ccx:
+            display_name = ccx.display_name
+      %>
+      ${display_name}</h2>
     % endif
 
     % if user.is_authenticated():
@@ -60,7 +70,8 @@ site_status_msg = get_site_status_msg(course_id)
         % endif
         %if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD','') and user.is_staff:
           <li>
-            <a href="${reverse('sysadmin')}">Sysadmin</a>
+            ## Translators: This is short for "System administration".
+            <a href="${reverse('sysadmin')}">${_("Sysadmin")}</a>
           </li>
         %endif
       </%block>

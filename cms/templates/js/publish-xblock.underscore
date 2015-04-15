@@ -48,7 +48,9 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
             <% if (releaseDate) { %>
                 <span class="release-date"><%= releaseDate %></span>
                 <span class="release-with">
-                    <%= interpolate(gettext('with %(release_date_from)s'), { release_date_from: releaseDateFrom }, true) %>
+                    <%= interpolate(
+                        gettext('with %(release_date_from)s'), { release_date_from: releaseDateFrom }, true
+                    ) %>
                 </span>
 
             <% } else { %>
@@ -70,7 +72,9 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
                 <%= gettext("Staff Only") %>
                 <% if (!hasExplicitStaffLock) { %>
                     <span class="inherited-from">
-                        <%= interpolate(gettext("with %(section_or_subsection)s"),{ section_or_subsection: staffLockFrom }, true) %>
+                        <%= interpolate(
+                            gettext("with %(section_or_subsection)s"),{ section_or_subsection: staffLockFrom }, true
+                        ) %>
                     </span>
                 <% } %>
             </p>

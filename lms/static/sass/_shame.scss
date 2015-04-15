@@ -258,13 +258,6 @@ footer .references {
 
 // ====================
 
-// poor cascade made worse by CSS splitting requires us to redefine the dashboard views' visual top padding
-.dashboard {
-  padding-top: 60px;
-}
-
-// ====================
-
 // poor definition/scope on ul elements inside .vert-mod element in courseware - override needed for inline discussion editing
 .course-content .discussion-post.edit-post-form .topic-menu {
   padding-left: 0;

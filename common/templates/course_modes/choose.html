@@ -62,13 +62,9 @@
 
     <div class="container">
         <section class="wrapper">
-            <%include file="/verify_student/_verification_header.html" args="course_name=course_name" />
-
             <div class="wrapper-register-choose wrapper-content-main">
                 <article class="register-choose content-main">
-                    % if not upgrade:
-                        <h3 class="title">${_("Now choose your course track:")}</h3>
-                    % endif
+                    <%include file="/verify_student/_verification_header.html" args="course_name=course_name" />
 
                     <form class="form-register-choose" method="post" name="enrollment_mode_form" id="enrollment_mode_form">
                         % if "verified" in modes:
@@ -77,39 +73,31 @@
                                     <span class="deco-ribbon"></span>
                                     <h4 class="title">${_("Pursue a Verified Certificate")}</h4>
 
-                                    % if upgrade:
-                                        <div class="copy">
-                                            <p>${_("Plan to use your completed coursework for job applications, career advancement, or school applications? Upgrade to work toward a Verified Certificate of Achievement to document your accomplishment. A minimum fee applies.")}</p>
-                                        </div>
-                                    % else:
-                                        <div class="copy">
-                                            <p>${_("Plan to use your completed coursework for job applications, career advancement, or school applications? Then work toward a Verified Certificate of Achievement to document your accomplishment. A minimum fee applies.")}</p>
-                                        </div>
-                                    % endif
-                                </div>
-
-                                <div class="field field-certificate-contribution">
-                                    <h5 class="label">${_("Select your contribution for this course (min. $")} ${min_price} <span class="denomination-name">${currency}</span>${_("):")}</h5>
-
-                                    % if error:
-                                        <div class="msg msg-error msg-inline">
-                                            <div class="copy">
-                                                <p><i class="msg-icon icon fa fa-exclamation-triangle"></i> ${error}</p>
+                                    <div class="copy">
+                                        <p>${_("Highlight you new knowledge and skills with a verified certificate. Use this valuable credential to improve your job prospects and advance your career, or highlight your certificate in school applications.")}</p>
+                                        <p>
+                                            <div class="wrapper-copy-inline">
+                                                <div class="copy-inline">
+                                                    <h4>
+                                                        ${_("Benefits of a verified Certificate")}
+                                                    </h4>
+                                                    <ul>
+                                                        <li><b>${_("Official")}: </b>${_("Receive an instructor-signed certificate with the institution's logo")}</li>
+                                                        <li><b>${_("Easily sharable")}: </b>${_("Add the certificate to your CV or resume, or post it directly on LinkedIn")}</li>
+                                                        <li><b>${_("Motivating")}: </b>${_("Give yourself an additional incentive to complete the course")}</li>
+                                                    </ul>
+                                                </div>
+                                                <div class="copy-inline list-actions">
+                                                    <ul class="list-actions">
+                                                        <li class="action action-select">
+                                                            <input type="hidden" name="contribution" value="${min_price}" />
+                                                            <input type="submit" name="verified_mode" value="${_('Pursue a Verified Certificate')} ($${min_price})" />
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                             </div>
-                                        </div>
-                                    % endif
-
-                                    <%include file="_contribution.html" args="suggested_prices=suggested_prices, currency=currency, chosen_price=chosen_price, min_price=min_price"/>
-
-                                    <ul class="list-actions">
-                                        <li class="action action-select">
-                                            % if upgrade:
-                                                <input type="submit" name="verified_mode" value="${_('Upgrade Your Enrollment')}" />
-                                            % else:
-                                                <input type="submit" name="verified_mode" value="${_('Pursue a Verified Certificate')}" />
-                                            % endif
-                                        </li>
-                                    </ul>
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         % endif
@@ -131,7 +119,7 @@
 
                                     <ul class="list-actions">
                                         <li class="action action-select">
-                                            <input type="submit" name="honor_mode" value="${_('Pursue an Honor Code Certificate')}" />
+                                            <input type="submit" name="honor_mode" value="${_('Audit This Course')}" />
                                         </li>
                                     </ul>
                                 </div>

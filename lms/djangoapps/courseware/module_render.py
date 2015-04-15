@@ -23,12 +23,17 @@ from django.core.context_processors import csrf
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
+from django.test.client import RequestFactory
 from django.views.decorators.csrf import csrf_exempt
 
 from capa.xqueue_interface import XQueueInterface
 from courseware.access import has_access, get_user_role
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache, DjangoKeyValueStore
+from courseware.entrance_exams import (
+    get_entrance_exam_score,
+    user_must_complete_entrance_exam
+)
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, unquote_slashes, quote_slashes
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
@@ -36,6 +41,7 @@ from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
 from student.models import anonymous_id_for_user, user_by_anonymous_id
+from student.roles import CourseBetaTesterRole
 from xblock.core import XBlock
 from xblock.fields import Scope
 from xblock.runtime import KvsFieldData, KeyValueStore
@@ -48,7 +54,6 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.util.duedate import get_extended_due_date
 from xmodule_modifiers import (
     replace_course_urls,
     replace_jump_to_id_urls,
@@ -64,6 +69,9 @@ from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from util import milestones_helpers
 from util.module_utils import yield_dynamic_descriptor_descendents
+from verify_student.services import ReverificationService
+
+from .field_overrides import OverrideFieldData
 
 log = logging.getLogger(__name__)
 
@@ -132,11 +140,17 @@ def toc_for_course(request, course, active_chapter, active_section, field_data_c
         if course_module is None:
             return None
 
-        # Check to see if the course is gated on milestone-required content (such as an Entrance Exam)
+        toc_chapters = list()
+        chapters = course_module.get_display_items()
+
+        # See if the course is gated by one or more content milestones
         required_content = milestones_helpers.get_required_content(course, request.user)
 
-        chapters = list()
-        for chapter in course_module.get_display_items():
+        # The user may not actually have to complete the entrance exam, if one is required
+        if not user_must_complete_entrance_exam(request, request.user, course):
+            required_content = [content for content in required_content if not content == course.entrance_exam_id]
+
+        for chapter in chapters:
             # Only show required content, if there is required content
             # chapter.hide_from_toc is read-only (boo)
             local_hide_from_toc = False
@@ -158,15 +172,17 @@ def toc_for_course(request, course, active_chapter, active_section, field_data_c
                     sections.append({'display_name': section.display_name_with_default,
                                      'url_name': section.url_name,
                                      'format': section.format if section.format is not None else '',
-                                     'due': get_extended_due_date(section),
+                                     'due': section.due,
                                      'active': active,
                                      'graded': section.graded,
                                      })
-            chapters.append({'display_name': chapter.display_name_with_default,
-                             'url_name': chapter.url_name,
-                             'sections': sections,
-                             'active': chapter.url_name == active_chapter})
-        return chapters
+            toc_chapters.append({
+                'display_name': chapter.display_name_with_default,
+                'url_name': chapter.url_name,
+                'sections': sections,
+                'active': chapter.url_name == active_chapter
+            })
+        return toc_chapters
 
 
 def get_module(user, request, usage_key, field_data_cache,
@@ -361,20 +377,6 @@ def get_module_system_for_user(user, field_data_cache,
             request_token=request_token,
         )
 
-    def _calculate_entrance_exam_score(user, course_descriptor):
-        """
-        Internal helper to calculate a user's score for a course's entrance exam
-        """
-        exam_key = UsageKey.from_string(course_descriptor.entrance_exam_id)
-        exam_descriptor = modulestore().get_item(exam_key)
-        exam_module_generators = yield_dynamic_descriptor_descendents(
-            exam_descriptor,
-            inner_get_module
-        )
-        exam_modules = [module for module in exam_module_generators]
-        exam_score = milestones_helpers.calculate_entrance_exam_score(user, course_descriptor, exam_modules)
-        return exam_score
-
     def _fulfill_content_milestones(user, course_key, content_key):
         """
         Internal helper to handle milestone fulfillments for the specified content module
@@ -388,7 +390,10 @@ def get_module_system_for_user(user, field_data_cache,
             entrance_exam_enabled = getattr(course, 'entrance_exam_enabled', False)
             in_entrance_exam = getattr(content, 'in_entrance_exam', False)
             if entrance_exam_enabled and in_entrance_exam:
-                exam_pct = _calculate_entrance_exam_score(user, course)
+                # We don't have access to the true request object in this context, but we can use a mock
+                request = RequestFactory().request()
+                request.user = user
+                exam_pct = get_entrance_exam_score(request, course)
                 if exam_pct >= course.entrance_exam_minimum_score_pct:
                     exam_key = UsageKey.from_string(course.entrance_exam_id)
                     relationship_types = milestones_helpers.get_milestone_relationship_types()
@@ -398,7 +403,7 @@ def get_module_system_for_user(user, field_data_cache,
                         relationship=relationship_types['FULFILLS']
                     )
                     # Add each milestone to the user's set...
-                    user = {'id': user.id}
+                    user = {'id': request.user.id}
                     for milestone in content_milestones:
                         milestones_helpers.add_user_milestone(user, milestone)
 
@@ -437,15 +442,13 @@ def get_module_system_for_user(user, field_data_cache,
 
         dog_stats_api.increment("lms.courseware.question_answered", tags=tags)
 
-        # If we're using the awesome edx-milestones app, we need to cycle
-        # through the fulfillment scenarios to see if any are now applicable
+        # Cycle through the milestone fulfillment scenarios to see if any are now applicable
         # thanks to the updated grading information that was just submitted
-        if settings.FEATURES.get('MILESTONES_APP', False):
-            _fulfill_content_milestones(
-                user,
-                course_id,
-                descriptor.location,
-            )
+        _fulfill_content_milestones(
+            user,
+            course_id,
+            descriptor.location,
+        )
 
     def publish(block, event_type, event):
         """A function that allows XModules to publish events."""
@@ -495,10 +498,16 @@ def get_module_system_for_user(user, field_data_cache,
             request_token=request_token
         )
         # rebinds module to a different student.  We'll change system, student_data, and scope_ids
+        authored_data = OverrideFieldData.wrap(
+            real_user, module.descriptor._field_data  # pylint: disable=protected-access
+        )
         module.descriptor.bind_for_student(
             inner_system,
-            LmsFieldData(module.descriptor._field_data, inner_student_data),  # pylint: disable=protected-access
+            LmsFieldData(authored_data, inner_student_data),
             real_user.id,
+        )
+        module.descriptor.scope_ids = (
+            module.descriptor.scope_ids._replace(user_id=real_user.id)  # pylint: disable=protected-access
         )
         module.scope_ids = module.descriptor.scope_ids  # this is needed b/c NamedTuples are immutable
         # now bind the module to the new ModuleSystem instance and vice-versa
@@ -617,6 +626,7 @@ def get_module_system_for_user(user, field_data_cache,
             'fs': xblock.reference.plugins.FSService(),
             'field-data': field_data,
             'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
+            "reverification": ReverificationService()
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
@@ -642,6 +652,8 @@ def get_module_system_for_user(user, field_data_cache,
 
     system.set(u'user_is_staff', user_is_staff)
     system.set(u'user_is_admin', has_access(user, u'staff', 'global'))
+    system.set(u'user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
+    system.set(u'days_early_for_beta', getattr(descriptor, 'days_early_for_beta'))
 
     # make an ErrorDescriptor -- assuming that the descriptor's system is ok
     if has_access(user, u'staff', descriptor.location, course_id):
@@ -665,13 +677,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         request_token (str): A unique token for this request, used to isolate xblock rendering
     """
 
-    # Do not check access when it's a noauth request.
-    if getattr(user, 'known', True):
-        # Short circuit--if the user shouldn't have access, bail without doing any work
-        if not has_access(user, 'load', descriptor, course_id):
-            return None
-
-    (system, field_data) = get_module_system_for_user(
+    (system, student_data) = get_module_system_for_user(
         user=user,
         field_data_cache=field_data_cache,  # These have implicit user bindings, the rest of args are considered not to
         descriptor=descriptor,
@@ -686,7 +692,18 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         request_token=request_token
     )
 
-    descriptor.bind_for_student(system, field_data, user.id)  # pylint: disable=protected-access
+    authored_data = OverrideFieldData.wrap(user, descriptor._field_data)  # pylint: disable=protected-access
+    descriptor.bind_for_student(system, LmsFieldData(authored_data, student_data), user.id)
+    descriptor.scope_ids = descriptor.scope_ids._replace(user_id=user.id)  # pylint: disable=protected-access
+
+    # Do not check access when it's a noauth request.
+    # Not that the access check needs to happen after the descriptor is bound
+    # for the student, since there may be field override data for the student
+    # that affects xblock visibility.
+    if getattr(user, 'known', True):
+        if not has_access(user, 'load', descriptor, course_id):
+            return None
+
     return descriptor
 
 

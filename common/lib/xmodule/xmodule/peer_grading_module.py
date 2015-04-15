@@ -11,7 +11,6 @@ from xmodule.fields import Date, Timedelta
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.raw_module import RawDescriptor
 from xmodule.timeinfo import TimeInfo
-from xmodule.util.duedate import get_extended_due_date
 from xmodule.x_module import XModule, module_attr
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, MockPeerGradingService
 
@@ -52,14 +51,6 @@ class PeerGradingFields(object):
     due = Date(
         help=_("Due date that should be displayed."),
         scope=Scope.settings)
-    extended_due = Date(
-        help=_("Date that this problem is due by for a particular student. This "
-               "can be set by an instructor, and will override the global due "
-               "date if it is set to a date that is later than the global due "
-               "date."),
-        default=None,
-        scope=Scope.user_state,
-    )
     graceperiod = Timedelta(
         help=_("Amount of grace to give on the due date."),
         scope=Scope.settings
@@ -141,8 +132,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 self.linked_problem = self.system.get_module(linked_descriptors[0])
 
         try:
-            self.timeinfo = TimeInfo(
-                get_extended_due_date(self), self.graceperiod)
+            self.timeinfo = TimeInfo(self.due, self.graceperiod)
         except Exception:
             log.error("Error parsing due date information in location {0}".format(self.location))
             raise
@@ -570,7 +560,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             except (NoPathToItem, ItemNotFoundError):
                 continue
             if descriptor:
-                problem['due'] = get_extended_due_date(descriptor)
+                problem['due'] = descriptor.due
                 grace_period = descriptor.graceperiod
                 try:
                     problem_timeinfo = TimeInfo(problem['due'], grace_period)

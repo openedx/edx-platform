@@ -7,6 +7,7 @@ from mock import patch
 from pytz import UTC
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from reverification.tests.factories import MidcourseReverificationWindowFactory
 
 from student.helpers import (
     VERIFY_STATUS_NEED_TO_VERIFY,
@@ -223,6 +224,56 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
 
         # Expect that the user's displayed enrollment mode is verified.
         self._assert_course_verification_status(VERIFY_STATUS_APPROVED)
+
+    def test_with_two_verifications(self):
+        # checking if a user has two verification and but most recent verification course deadline is expired
+
+        self._setup_mode_and_enrollment(self.FUTURE, "verified")
+
+        # The student has an approved verification
+        attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
+        attempt.mark_ready()
+        attempt.submit()
+        attempt.approve()
+        # Making created at to previous date to differentiate with 2nd attempt.
+        attempt.created_at = datetime.now(UTC) - timedelta(days=1)
+        attempt.save()
+
+        # Expect that the successfully verified message is shown
+        self._assert_course_verification_status(VERIFY_STATUS_APPROVED)
+
+        # Check that the "verification good until" date is displayed
+        response = self.client.get(self.dashboard_url)
+        self.assertContains(response, attempt.expiration_datetime.strftime("%m/%d/%Y"))
+
+        # Adding another verification with different course.
+        # Its created_at is greater than course deadline.
+        course2 = CourseFactory.create()
+        CourseModeFactory(
+            course_id=course2.id,
+            mode_slug="verified",
+            expiration_datetime=self.PAST
+        )
+        CourseEnrollmentFactory(
+            course_id=course2.id,
+            user=self.user,
+            mode="verified"
+        )
+
+        window = MidcourseReverificationWindowFactory(course_id=course2.id)
+        # The student has an approved verification
+        attempt2 = SoftwareSecurePhotoVerification.objects.create(user=self.user)
+        attempt2.mark_ready()
+        attempt2.submit()
+        attempt2.approve()
+        attempt2.window = window
+        attempt2.save()
+
+        # Mark the attemp2 as approved so its date will appear on dasboard.
+        self._assert_course_verification_status(VERIFY_STATUS_APPROVED)
+        response2 = self.client.get(self.dashboard_url)
+        self.assertContains(response2, attempt2.expiration_datetime.strftime("%m/%d/%Y"))
+        self.assertEqual(response2.content.count(attempt2.expiration_datetime.strftime("%m/%d/%Y")), 2)
 
     def _setup_mode_and_enrollment(self, deadline, enrollment_mode):
         """Create a course mode and enrollment.

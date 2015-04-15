@@ -208,7 +208,14 @@ FEATURES = {
     'ENABLE_INSTRUCTOR_BACKGROUND_TASKS': True,
 
     # Enable instructor to assign individual due dates
+    # Note: In order for this feature to work, you must also add
+    # 'courseware.student_field_overrides.IndividualStudentOverrideProvider' to
+    # the setting FIELD_OVERRIDE_PROVIDERS, in addition to setting this flag to
+    # True.
     'INDIVIDUAL_DUE_DATES': False,
+
+    # Enable Custom Courses for EdX
+    'CUSTOM_COURSES_EDX': False,
 
     # Enable legacy instructor dashboard
     'ENABLE_INSTRUCTOR_LEGACY_DASHBOARD': True,
@@ -364,6 +371,13 @@ FEATURES = {
 
     # Certificates Web/HTML Views
     'CERTIFICATES_HTML_VIEW': False,
+
+    # Social Media Sharing on Student Dashboard
+    'DASHBOARD_SHARE_SETTINGS': {
+        'FACEBOOK_SHARING': False,
+        'TWITTER_SHARING': False,
+        'TWITTER_SHARING_TEXT': None
+    },
 }
 
 # Ignore static asset files on import which match this pattern
@@ -1180,6 +1194,18 @@ verify_student_js = [
     'js/verify_student/pay_and_verify.js',
 ]
 
+reverify_js = [
+    'js/verify_student/views/error_view.js',
+    'js/verify_student/views/image_input_view.js',
+    'js/verify_student/views/webcam_photo_view.js',
+    'js/verify_student/models/reverification_model.js',
+    'js/verify_student/views/incourse_reverify_view.js',
+    'js/verify_student/incourse_reverify.js',
+]
+
+ccx_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/ccx/**/*.js'))
+
+
 PIPELINE_CSS = {
     'style-vendor': {
         'source_filenames': [
@@ -1369,6 +1395,14 @@ PIPELINE_JS = {
     'verify_student': {
         'source_filenames': verify_student_js,
         'output_filename': 'js/verify_student.js'
+    },
+    'reverify': {
+        'source_filenames': reverify_js,
+        'output_filename': 'js/reverify.js'
+    },
+    'ccx': {
+        'source_filenames': ccx_js,
+        'output_filename': 'js/ccx.js'
     }
 }
 
@@ -2193,3 +2227,12 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
 ECOMMERCE_API_URL = None
 ECOMMERCE_API_SIGNING_KEY = None
 ECOMMERCE_API_TIMEOUT = 5
+
+# Reverification checkpoint name pattern
+CHECKPOINT_PATTERN = r'(?P<checkpoint_name>\w+)'
+
+# For the fields override feature
+# If using FEATURES['INDIVIDUAL_DUE_DATES'], you should add
+# 'courseware.student_field_overrides.IndividualStudentOverrideProvider' to
+# this setting.
+FIELD_OVERRIDE_PROVIDERS = ()

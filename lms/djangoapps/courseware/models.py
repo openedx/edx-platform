@@ -18,7 +18,9 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from xmodule_django.models import CourseKeyField, LocationKeyField, BlockTypeKeyField
+from model_utils.models import TimeStampedModel
+
+from xmodule_django.models import CourseKeyField, LocationKeyField, BlockTypeKeyField  # pylint: disable=import-error
 
 
 class StudentModule(models.Model):
@@ -35,8 +37,7 @@ class StudentModule(models.Model):
                     ('course', 'course'),
                     ('chapter', 'Section'),
                     ('sequential', 'Subsection'),
-                    ('library_content', 'Library Content'),
-                    )
+                    ('library_content', 'Library Content'))
     ## These three are the key for the object
     module_type = models.CharField(max_length=32, choices=MODULE_TYPES, default='problem', db_index=True)
 
@@ -86,7 +87,7 @@ class StudentModule(models.Model):
         return 'StudentModule<%r>' % ({
             'course_id': self.course_id,
             'module_type': self.module_type,
-            'student': self.student.username,
+            'student': self.student.username,  # pylint: disable=no-member
             'module_state_key': self.module_state_key,
             'state': str(self.state)[:20],
         },)
@@ -230,3 +231,20 @@ class OfflineComputedGradeLog(models.Model):
 
     def __unicode__(self):
         return "[OCGLog] %s: %s" % (self.course_id.to_deprecated_string(), self.created)  # pylint: disable=no-member
+
+
+class StudentFieldOverride(TimeStampedModel):
+    """
+    Holds the value of a specific field overriden for a student.  This is used
+    by the code in the `courseware.student_field_overrides` module to provide
+    overrides of xblock fields on a per user basis.
+    """
+    course_id = CourseKeyField(max_length=255, db_index=True)
+    location = LocationKeyField(max_length=255, db_index=True)
+    student = models.ForeignKey(User, db_index=True)
+
+    class Meta(object):   # pylint: disable=missing-docstring
+        unique_together = (('course_id', 'field', 'location', 'student'),)
+
+    field = models.CharField(max_length=255)
+    value = models.TextField(default='null')

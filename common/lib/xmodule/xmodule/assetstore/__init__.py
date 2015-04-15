@@ -195,6 +195,9 @@ class AssetMetadata(object):
                 elif tag == 'locked':
                     # Boolean.
                     value = True if value == "true" else False
+                elif value == 'None':
+                    # None.
+                    value = None
                 elif tag in ('created_on', 'edited_on'):
                     # ISO datetime.
                     value = dateutil.parser.parse(value)
@@ -204,9 +207,6 @@ class AssetMetadata(object):
                 elif tag == 'fields':
                     # Dictionary.
                     value = json.loads(value)
-                elif value == 'None':
-                    # None.
-                    value = None
                 setattr(self, tag, value)
 
     @contract(node='AssetElement')

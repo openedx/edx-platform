@@ -23,7 +23,7 @@ from django.core.urlresolvers import reverse
 from django.core.validators import validate_email, ValidationError
 from django.db import IntegrityError, transaction
 from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
-                         Http404)
+                         HttpResponseServerError, Http404)
 from django.shortcuts import redirect
 from django.utils.translation import ungettext
 from django_future.csrf import ensure_csrf_cookie
@@ -498,6 +498,8 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
 def dashboard(request):
     user = request.user
 
+    platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
+
     # for microsites, we want to filter and only show enrollments for courses within
     # the microsites 'ORG'
     course_org_filter = microsite.get_value('course_org_filter')
@@ -541,7 +543,7 @@ def dashboard(request):
     if not user.is_active:
         message = render_to_string(
             'registration/activate_account_notice.html',
-            {'email': user.email, 'platform_name': settings.PLATFORM_NAME}
+            {'email': user.email, 'platform_name': platform_name}
         )
 
     # Global staff can see what courses errored on their dashboard
@@ -660,6 +662,17 @@ def dashboard(request):
                                              if course.pre_requisite_courses)
     courses_requirements_not_met = get_pre_requisite_courses_not_completed(user, courses_having_prerequisites)
 
+    ccx_membership_triplets = []
+    if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
+        from ccx import ACTIVE_CCX_KEY
+        from ccx.utils import get_ccx_membership_triplets
+        ccx_membership_triplets = get_ccx_membership_triplets(
+            user, course_org_filter, org_filter_out_set
+        )
+        # should we deselect any active CCX at this time so that we don't have
+        # to change the URL for viewing a course?  I think so.
+        request.session[ACTIVE_CCX_KEY] = None
+
     context = {
         'enrollment_message': enrollment_message,
         'course_enrollment_pairs': course_enrollment_pairs,
@@ -686,11 +699,12 @@ def dashboard(request):
         'user': user,
         'duplicate_provider': None,
         'logout_url': reverse(logout_user),
-        'platform_name': settings.PLATFORM_NAME,
+        'platform_name': platform_name,
         'enrolled_courses_either_paid': enrolled_courses_either_paid,
         'provider_states': [],
         'order_history_list': order_history_list,
         'courses_requirements_not_met': courses_requirements_not_met,
+        'ccx_membership_triplets': ccx_membership_triplets,
     }
 
     if third_party_auth.is_enabled():
@@ -726,9 +740,11 @@ def _create_recent_enrollment_message(course_enrollment_pairs, course_modes):
             for course, enrollment in recently_enrolled_courses
         ]
 
+        platform_name = microsite.get_value('platform_name', settings.PLATFORM_NAME)
+
         return render_to_string(
             'enrollment/course_enrollment_message.html',
-            {'course_enrollment_messages': messages, 'platform_name': settings.PLATFORM_NAME}
+            {'course_enrollment_messages': messages, 'platform_name': platform_name}
         )
 
 
@@ -1408,6 +1424,19 @@ def create_account_with_params(request, params):
     Raises AccountValidationError if an account with the username or email
     specified by params already exists, or ValidationError if any of the given
     parameters is invalid for any other reason.
+
+    Issues with this code:
+    * It is not transactional. If there is a failure part-way, an incomplete
+      account will be created and left in the database.
+    * Third-party auth passwords are not verified. There is a comment that
+      they are unused, but it would be helpful to have a sanity check that
+      they are sane.
+    * It is over 300 lines long (!) and includes disprate functionality, from
+      registration e-mails to all sorts of other things. It should be broken
+      up into semantically meaningful functions.
+    * The user-facing text is rather unfriendly (e.g. "Username must be a
+      minimum of two characters long" rather than "Please use a username of
+      at least two characters").
     """
     # Copy params so we can modify it; we can't just do dict(params) because if
     # params is request.POST, that results in a dict containing lists of values
@@ -1555,9 +1584,19 @@ def create_account_with_params(request, params):
     subject = ''.join(subject.splitlines())
     message = render_to_string('emails/activation_email.txt', context)
 
-    # don't send email if we are doing load testing or random user generation for some reason
-    # or external auth with bypass activated
+    # Don't send email if we are:
+    #
+    # 1. Doing load testing.
+    # 2. Random user generation for other forms of testing.
+    # 3. External auth bypassing activation.
+    # 4. Have the platform configured to not require e-mail activation.
+    #
+    # Note that this feature is only tested as a flag set one way or
+    # the other for *new* systems. we need to be careful about
+    # changing settings on a running system to make sure no users are
+    # left in an inconsistent state (or doing a migration if they are).
     send_email = (
+        not settings.FEATURES.get('SKIP_EMAIL_VALIDATION', None) and
         not settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING') and
         not (do_external_auth and settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'))
     )
@@ -1576,6 +1615,8 @@ def create_account_with_params(request, params):
                 user.email_user(subject, message, from_address)
         except Exception:  # pylint: disable=broad-except
             log.error(u'Unable to send activation email to user from "%s"', from_address, exc_info=True)
+    else:
+        registration.activate()
 
     # Immediately after a user creates an account, we log them in. They are only
     # logged in until they close the browser. They can't log in again until they click
@@ -1781,6 +1822,16 @@ def activate_account(request, key):
                 if cea.auto_enroll:
                     CourseEnrollment.enroll(student[0], cea.course_id)
 
+            # enroll student in any pending CCXs he/she may have if auto_enroll flag is set
+            if settings.FEATURES.get('CUSTOM_COURSES_EDX'):
+                from ccx.models import CcxMembership, CcxFutureMembership
+                ccxfms = CcxFutureMembership.objects.filter(
+                    email=student[0].email
+                )
+                for ccxfm in ccxfms:
+                    if ccxfm.auto_enroll:
+                        CcxMembership.auto_enroll(student[0], ccxfm)
+
         resp = render_to_response(
             "registration/activation_complete.html",
             {
@@ -1794,7 +1845,7 @@ def activate_account(request, key):
             "registration/activation_invalid.html",
             {'csrf': csrf(request)['csrf_token']}
         )
-    return HttpResponse(_("Unknown error. Please e-mail us to let us know how it happened."))
+    return HttpResponseServerError(_("Unknown error. Please e-mail us to let us know how it happened."))
 
 
 @csrf_exempt

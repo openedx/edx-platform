@@ -106,6 +106,8 @@ def check_verify_status_by_course(user, course_enrollment_pairs, all_course_mode
         user, queryset=verifications
     )
 
+    recent_verification_datetime = None
+
     for course, enrollment in course_enrollment_pairs:
 
         # Get the verified mode (if any) for this course
@@ -122,7 +124,16 @@ def check_verify_status_by_course(user, course_enrollment_pairs, all_course_mode
         # verification status.
         if verified_mode is not None and enrollment.mode in CourseMode.VERIFIED_MODES:
             deadline = verified_mode.expiration_datetime
+
             relevant_verification = SoftwareSecurePhotoVerification.verification_for_datetime(deadline, verifications)
+
+            # Picking the max verification datetime on each iteration only with approved status
+            if relevant_verification is not None and relevant_verification.status == "approved":
+                recent_verification_datetime = max(
+                    recent_verification_datetime if recent_verification_datetime is not None
+                    else relevant_verification.expiration_datetime,
+                    relevant_verification.expiration_datetime
+                )
 
             # By default, don't show any status related to verification
             status = None
@@ -173,19 +184,18 @@ def check_verify_status_by_course(user, course_enrollment_pairs, all_course_mode
             # Otherwise, leave the course out of the dictionary.
             if status is not None:
                 days_until_deadline = None
-                verification_good_until = None
 
                 now = datetime.now(UTC)
                 if deadline is not None and deadline > now:
                     days_until_deadline = (deadline - now).days
 
-                if relevant_verification is not None:
-                    verification_good_until = relevant_verification.expiration_datetime.strftime("%m/%d/%Y")
-
                 status_by_course[course.id] = {
                     'status': status,
-                    'days_until_deadline': days_until_deadline,
-                    'verification_good_until': verification_good_until
+                    'days_until_deadline': days_until_deadline
                 }
+
+    if recent_verification_datetime:
+        for key, value in status_by_course.iteritems():  # pylint: disable=unused-variable
+            status_by_course[key]['verification_good_until'] = recent_verification_datetime.strftime("%m/%d/%Y")
 
     return status_by_course

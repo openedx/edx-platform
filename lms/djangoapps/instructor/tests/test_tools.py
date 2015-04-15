@@ -3,15 +3,15 @@ Tests for views/tools.py.
 """
 
 import datetime
-import functools
 import mock
 import json
 import unittest
 
 from django.utils.timezone import utc
+from django.test.utils import override_settings
 
-from courseware.models import StudentModule
-from student.tests.factories import UserFactory
+from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
+from student.tests.factories import UserFactory  # pylint: disable=import-error
 from xmodule.fields import Date
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -180,6 +180,10 @@ class TestTitleOrUrl(unittest.TestCase):
         self.assertEquals(tools.title_or_url(unit), 'test:hello')
 
 
+@override_settings(
+    FIELD_OVERRIDE_PROVIDERS=(
+        'courseware.student_field_overrides.IndividualStudentOverrideProvider',),
+)
 class TestSetDueDateExtension(ModuleStoreTestCase):
     """
     Test the set_due_date_extensions function.
@@ -189,53 +193,60 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         Fixtures.
         """
         super(TestSetDueDateExtension, self).setUp()
+        OverrideFieldData.provider_classes = None
 
-        due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
+        self.due = due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
         course = CourseFactory.create()
         week1 = ItemFactory.create(due=due, parent=course)
         week2 = ItemFactory.create(due=due, parent=course)
         week3 = ItemFactory.create(parent=course)
-
-        homework = ItemFactory.create(
-            parent=week1,
-            due=due
-        )
+        homework = ItemFactory.create(parent=week1)
+        assignment = ItemFactory.create(parent=homework, due=due)
 
         user = UserFactory.create()
-        StudentModule(
-            state='{}',
-            student_id=user.id,
-            course_id=course.id,
-            module_state_key=week1.location).save()
-        StudentModule(
-            state='{}',
-            student_id=user.id,
-            course_id=course.id,
-            module_state_key=homework.location).save()
 
         self.course = course
         self.week1 = week1
         self.homework = homework
+        self.assignment = assignment
         self.week2 = week2
         self.week3 = week3
         self.user = user
 
-        self.extended_due = functools.partial(
-            tools.get_extended_due, course, student=user)
+        # Apparently the test harness doesn't use LmsFieldStorage, and I'm not
+        # sure if there's a way to poke the test harness to do so.  So, we'll
+        # just inject the override field storage in this brute force manner.
+        for block in (course, week1, week2, week3, homework, assignment):
+            block._field_data = OverrideFieldData.wrap(  # pylint: disable=protected-access
+                user, block._field_data)  # pylint: disable=protected-access
+
+    def tearDown(self):
+        super(TestSetDueDateExtension, self).tearDown()
+        OverrideFieldData.provider_classes = None
+
+    def _clear_field_data_cache(self):
+        """
+        Clear field data cache for xblocks under test. Normally this would be
+        done by virtue of the fact that xblocks are reloaded on subsequent
+        requests.
+        """
+        for block in (self.week1, self.week2, self.week3,
+                      self.homework, self.assignment):
+            block.fields['due']._del_cached_value(block)  # pylint: disable=protected-access
 
     def test_set_due_date_extension(self):
         extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=utc)
         tools.set_due_date_extension(self.course, self.week1, self.user, extended)
-        self.assertEqual(self.extended_due(self.week1), extended)
-        self.assertEqual(self.extended_due(self.homework), extended)
+        self._clear_field_data_cache()
+        self.assertEqual(self.week1.due, extended)
+        self.assertEqual(self.homework.due, extended)
+        self.assertEqual(self.assignment.due, extended)
 
-    def test_set_due_date_extension_create_studentmodule(self):
+    def test_set_due_date_extension_num_queries(self):
         extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=utc)
-        user = UserFactory.create()  # No student modules for this user
-        tools.set_due_date_extension(self.course, self.week1, user, extended)
-        extended_due = functools.partial(tools.get_extended_due, self.course, student=user)
-        self.assertEqual(extended_due(self.week1), extended)
-        self.assertEqual(extended_due(self.homework), extended)
+        with self.assertNumQueries(4):
+            tools.set_due_date_extension(self.course, self.week1, self.user, extended)
+            self._clear_field_data_cache()
 
     def test_set_due_date_extension_invalid_date(self):
         extended = datetime.datetime(2009, 1, 1, 0, 0, tzinfo=utc)
@@ -251,8 +262,7 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=utc)
         tools.set_due_date_extension(self.course, self.week1, self.user, extended)
         tools.set_due_date_extension(self.course, self.week1, self.user, None)
-        self.assertEqual(self.extended_due(self.week1), None)
-        self.assertEqual(self.extended_due(self.homework), None)
+        self.assertEqual(self.week1.due, self.due)
 
 
 class TestDataDumps(ModuleStoreTestCase):
@@ -270,7 +280,6 @@ class TestDataDumps(ModuleStoreTestCase):
         course = CourseFactory.create()
         week1 = ItemFactory.create(due=due, parent=course)
         week2 = ItemFactory.create(due=due, parent=course)
-        week3 = ItemFactory.create(due=due, parent=course)
 
         homework = ItemFactory.create(
             parent=week1,
@@ -278,51 +287,7 @@ class TestDataDumps(ModuleStoreTestCase):
         )
 
         user1 = UserFactory.create()
-        StudentModule(
-            state='{}',
-            student_id=user1.id,
-            course_id=course.id,
-            module_state_key=week1.location).save()
-        StudentModule(
-            state='{}',
-            student_id=user1.id,
-            course_id=course.id,
-            module_state_key=week2.location).save()
-        StudentModule(
-            state='{}',
-            student_id=user1.id,
-            course_id=course.id,
-            module_state_key=week3.location).save()
-        StudentModule(
-            state='{}',
-            student_id=user1.id,
-            course_id=course.id,
-            module_state_key=homework.location).save()
-
         user2 = UserFactory.create()
-        StudentModule(
-            state='{}',
-            student_id=user2.id,
-            course_id=course.id,
-            module_state_key=week1.location).save()
-        StudentModule(
-            state='{}',
-            student_id=user2.id,
-            course_id=course.id,
-            module_state_key=homework.location).save()
-
-        user3 = UserFactory.create()
-        StudentModule(
-            state='{}',
-            student_id=user3.id,
-            course_id=course.id,
-            module_state_key=week1.location).save()
-        StudentModule(
-            state='{}',
-            student_id=user3.id,
-            course_id=course.id,
-            module_state_key=homework.location).save()
-
         self.course = course
         self.week1 = week1
         self.homework = homework

@@ -152,7 +152,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-03-30 12:44+0000\n"
+"POT-Creation-Date: 2015-04-06 12:41+0000\n"
 "PO-Revision-Date: 2015-01-05 17:31+0000\n"
 "Last-Translator: Mariangeles Fernandez <mariangelesfm@gmail.com>\n"
 "Language-Team: Spanish (Spain) (http://www.transifex.com/projects/p/edx-platform/language/es_ES/)\n"
@@ -239,6 +239,12 @@ msgstr "Nombre"
 #: lms/templates/shoppingcart/receipt.html
 msgid "Status"
 msgstr "Estado"
+
+#: common/djangoapps/cors_csrf/models.py
+msgid ""
+"List of domains that are allowed to make cross-domain requests to this site."
+"  Please list each domain on its own line."
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
@@ -495,8 +501,8 @@ msgid "Bachelor's degree"
 msgstr "Título de bachillerato"
 
 #: common/djangoapps/student/models.py
-msgid "Associate's degree"
-msgstr "Título universitario"
+msgid "Associate degree"
+msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Secondary/high school"
@@ -1611,6 +1617,10 @@ msgstr ""
 "página."
 
 #: common/lib/xmodule/xmodule/capa_base.py
+msgid "Blank Advanced Problem"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Number of attempts taken by the student on this problem"
 msgstr "Número de intentos realizados por el alumno en este problema"
@@ -2191,20 +2201,15 @@ msgstr "Fechas de periodo de bloqueo del foro"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter pairs of dates between which students cannot post to discussion "
-"forums. Each pair should be formatted as [\"YYYY-MM-DD\", \"YYYY-MM-DD\"]. "
-"To specify times as well as dates, format each pair as [\"YYYY-MM-"
-"DDTHH:MM\", \"YYYY-MM-DDTHH:MM\"] (be sure to include the \"T\" between the "
-"date and time). An entry defining more than one blackout period might look "
-"like this: [[\"2014-09-15\", \"2014-09-21\"], [\"2014-10-01\", "
-"\"2014-10-08\"]]"
+"forums. Inside the provided brackets, enter an additional set of square "
+"brackets surrounding each pair of dates you add. Format each pair of dates "
+"as [\"YYYY-MM-DD\", \"YYYY-MM-DD\"]. To specify times as well as dates, "
+"format each pair as [\"YYYY-MM-DDTHH:MM\", \"YYYY-MM-DDTHH:MM\"]. Be sure to"
+" include the \"T\" between the date and time. For example, an entry defining"
+" two blackout periods looks like this, including the outer pair of square "
+"brackets: [[\"2015-09-15\", \"2015-09-21\"], [\"2015-10-01\", "
+"\"2015-10-08\"]] "
 msgstr ""
-"Introduce los pares de fechas entre los que los alumnos no pueden escribir "
-"en los foros. Cada par debe tener el formato [\"YYYY-MM-DD\", \"YYYY-MM-"
-"DD\"]. Para especificar horas además de fechas, el formato de cada par debe "
-"ser [\"YYYY-MM-DDTHH:MM\", \"YYYY-MM-DDTHH:MM\"] (asegúrate de incluir la "
-"\"T\" entre la fecha y la hora). Una entrada que defina más de un periodo de"
-" bloqueo quedaría tal que: [[\"2014-09-15\", \"2014-09-21\"], "
-"[\"2014-10-01\", \"2014-10-08\"]]"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Topic Mapping"
@@ -2215,14 +2220,10 @@ msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
 "example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2014_T1\"}. The \"id\" value for each category "
-"must be unique."
+"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
+"must be unique. In \"id\" values, the only special characters that are "
+"supported are underscore, hyphen, and period."
 msgstr ""
-"Introduce categorías de discusiones en el formato siguiente: "
-"\"NombreCategoria\": {\"id\": \"i4x-InstitutionName-CourseNumber-course-"
-"CourseRun\"}. Por ejemplo, una categoría de discusión podría ser "
-"\"Metodologías Ágiles\": {\"id\": \"i4x-UniversityX-MUS101-course-"
-"2014_T1\"}. El valor \"id\" para cada categoría debe ser único"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Sorting Alphabetical"
@@ -3185,10 +3186,6 @@ msgid ""
 msgstr ""
 "Asigna este valor a Verdadero si este módulo es o bien una actividad "
 "calificada o un ejercicio práctico."
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid "Course does not support Library tools."
-msgstr ""
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "This component is out of date. The library has new content."
@@ -5376,8 +5373,8 @@ msgid "File is not attached."
 msgstr "No se adjuntó archivo."
 
 #: lms/djangoapps/instructor/views/api.py
-msgid "Invoice number '{0}' does not exist."
-msgstr "La factura número '{0}' no existe."
+msgid "Invoice number '{num}' does not exist."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The sale associated with this invoice has already been invalidated."
@@ -7348,6 +7345,18 @@ msgstr "Archivo de imagen no es válido"
 msgid "Verification photos received"
 msgstr "Verficación de fotos recibida"
 
+#: lms/djangoapps/verify_student/views.py
+msgid "No checkpoint found"
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
+msgid "Invalid image data during photo verification."
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
+msgid "Could not submit photos"
+msgstr ""
+
 #. Translators: This is the website name of www.facebook.com.  Please
 #. translate this the way that Facebook advertises in your language.
 #: lms/envs/common.py
@@ -8601,6 +8610,12 @@ msgstr ""
 msgid "Invalid Token"
 msgstr "Elemento inválido"
 
+#. Translators: This is the status for a video that was included in a course
+#. import
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Imported"
+msgstr ""
+
 #. Translators: This is the status for a video that is in an unknown state
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Unknown"
@@ -8952,6 +8967,22 @@ msgid "Dashboard"
 msgstr "Panel de control"
 
 #: lms/templates/dashboard.html
+msgid "Current Courses"
+msgstr "Cursos activos"
+
+#: lms/templates/dashboard.html
+msgid "Looks like you haven't enrolled in any courses yet."
+msgstr "Parece que aún no te has inscrito en ningún curso."
+
+#: lms/templates/dashboard.html
+msgid "Find courses now!"
+msgstr "¡Encuentra cursos ahora!"
+
+#: lms/templates/dashboard.html
+msgid "Course-loading errors"
+msgstr "Errores en la carga del curso"
+
+#: lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "edit"
 msgstr "editar"
@@ -8998,22 +9029,6 @@ msgstr "Historial de pedidos"
 #: lms/templates/dashboard.html
 msgid "Reset Password"
 msgstr "Restablecer contraseña"
-
-#: lms/templates/dashboard.html
-msgid "Current Courses"
-msgstr "Cursos activos"
-
-#: lms/templates/dashboard.html
-msgid "Looks like you haven't enrolled in any courses yet."
-msgstr "Parece que aún no te has inscrito en ningún curso."
-
-#: lms/templates/dashboard.html
-msgid "Find courses now!"
-msgstr "¡Encuentra cursos ahora!"
-
-#: lms/templates/dashboard.html
-msgid "Course-loading errors"
-msgstr "Errores en la carga del curso"
 
 #: lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
@@ -11159,10 +11174,6 @@ msgid "{course_number} Courseware"
 msgstr "Material del curso {course_number}"
 
 #: lms/templates/courseware/courseware.html
-msgid "Return to Exam"
-msgstr "Volver al examen"
-
-#: lms/templates/courseware/courseware.html
 msgid "Course Search"
 msgstr "Buscador de cursos"
 
@@ -11562,6 +11573,7 @@ msgid "About {course_id}"
 msgstr "Acerca de {course_id}"
 
 #: lms/templates/courseware/mktg_coming_soon.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Coming Soon"
 msgstr "Próximamente"
 
@@ -11808,20 +11820,68 @@ msgid "Enrolled as: "
 msgstr "Inscrito como:"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Course Completed - {end_date}"
-msgstr "Curso completado - {end_date}"
+msgid "Ended - {end_date}"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Course Started - {start_date}"
-msgstr "Curso iniciado - {start_date}"
+msgid "Started - {start_date}"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Course has not yet started"
-msgstr "El curso todavía no ha comenzado"
+msgid "Starts - {start_date}"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Course Starts - {start_date}"
-msgstr "Inicio del curso - {start_date}"
+msgid "View Archived Course"
+msgstr "Ver curso archivado"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "View Course"
+msgstr "Ver curso"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Facebook"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "I'm learning on {platform_name}:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Twitter"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Course options dropdown"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Additional Actions Menu"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Available Actions"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Are you sure you want to unenroll from the purchased course"
+msgstr "¿Seguro que quieres borrarte del curso adquirido?"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Are you sure you want to unenroll from"
+msgstr "¿Seguro que quieres borrarte de"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"Are you sure you want to unenroll from the verified {cert_name_long} track "
+"of"
+msgstr ""
+"¿Seguro que quieres borrarte de la ruta {cert_name_long} verificada de"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Email Settings"
+msgstr "Configuración de e-mail"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Verification not yet complete."
@@ -11905,34 +11965,6 @@ msgstr ""
 "Puedes {contact_link_start}contactar con el titular de la "
 "cuenta{contact_link_end} para requerir el pago o puedes "
 "{unenroll_link_start}borrarte{unenroll_link_end} de este curso."
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "View Archived Course"
-msgstr "Ver curso archivado"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "View Course"
-msgstr "Ver curso"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Are you sure you want to unenroll from the purchased course"
-msgstr "¿Seguro que quieres borrarte del curso adquirido?"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Are you sure you want to unenroll from"
-msgstr "¿Seguro que quieres borrarte de"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"Are you sure you want to unenroll from the verified {cert_name_long} track "
-"of"
-msgstr ""
-"¿Seguro que quieres borrarte de la ruta {cert_name_long} verificada de"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Email Settings"
-msgstr "Configuración de e-mail"
 
 #: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
 #: lms/templates/verify_student/prompt_midcourse_reverify.html
@@ -15750,6 +15782,10 @@ msgstr ""
 msgid "Edit Your Full Name"
 msgstr "Edita tu nombre completo"
 
+#: lms/templates/verify_student/incourse_reverify.html
+msgid "Verifying for \"{checkpoint_name}\" in course \"{course_name}\""
+msgstr ""
+
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 msgid "Re-Verify"
 msgstr "Re-verificando"
@@ -17451,38 +17487,28 @@ msgstr "Este módulo se encuentra desactivado en este momento."
 
 #: cms/templates/group_configurations.html
 msgid ""
-"Use content groups to give groups of students access to a specific set of "
-"course content. In addition to course content that is intended for all "
-"students, each content group sees content that you specifically designate as"
-" visible to it. By associating a content group with one or more cohorts, you"
-" can customize the content that a particular cohort or cohorts sees in your "
-"course."
+"If you have cohorts enabled in your course, you can use content groups to "
+"create cohort-specific courseware. In other words, you can customize the "
+"content that particular cohorts see in your course."
 msgstr ""
-"Utiliza grupos de contenido para dar a los grupos de alumnos acceso a un "
-"conjunto de contenidos específicos del curso. Además de los contenidos del "
-"curso que están dirigidos a todos los alumnos, cada grupo de contenido ve "
-"contenido que has asignado específicamente como visible. Al asociar un grupo"
-" de contenido con uno o más grupos, se puede personalizar el contenido que "
-"el grupo o grupos ven en tus cursos."
+
+#: cms/templates/group_configurations.html
+msgid ""
+"Each content group that you create can be associated with one or more "
+"cohorts. In addition to course content that is intended for all students, "
+"you can designate some content as visible only to specified content groups. "
+"Only learners in the cohorts that are associated with the specified content "
+"groups see the additional content."
+msgstr ""
 
 #: cms/templates/group_configurations.html
 msgid ""
 "Click {em_start}New content group{em_end} to add a new content group. To "
 "edit the name of a content group, hover over its box and click "
-"{em_start}Edit{em_end}."
+"{em_start}Edit{em_end}. You can delete a content group only if it is not in "
+"use by a unit. To delete a content group, hover over its box and click the "
+"delete icon."
 msgstr ""
-"Haz clic en {em_start}Nuevo grupo de contenido{em_end} para añadir un nuevo "
-"grupo de contenido. Para editar el nombre de un grupo de contenido, coloca "
-"el cursor sobre su caja y haz clic en {em_start}Editar{em_end}."
-
-#: cms/templates/group_configurations.html
-msgid ""
-"You can delete a content group only if it is not in use by a unit. To delete"
-" a content group, hover over its box and click the delete icon."
-msgstr ""
-"Solo puedes eliminar un grupo de contenido si no está en uso por una unidad."
-" Para eliminar un grupo de contenido, coloca el cursor sobre su caja y haz "
-"clic en el icono de borrar."
 
 #: cms/templates/group_configurations.html
 msgid "Learn More"
@@ -17490,30 +17516,21 @@ msgstr "Aprender más"
 
 #: cms/templates/group_configurations.html
 msgid ""
-"Use experiment group configurations to define how many groups of students "
-"are in a content experiment. When you create a content experiment for a "
-"course, you select the group configuration to use."
+"Use experiment group configurations if you are conducting content "
+"experiments, also known as A/B testing, in your course. Experiment group "
+"configurations define how many groups of students are in a content "
+"experiment. When you create a content experiment for a course, you select "
+"the group configuration to use."
 msgstr ""
 
 #: cms/templates/group_configurations.html
 msgid ""
 "Click {em_start}New Group Configuration{em_end} to add a new configuration. "
 "To edit a configuration, hover over its box and click "
-"{em_start}Edit{em_end}."
+"{em_start}Edit{em_end}. You can delete a group configuration only if it is "
+"not in use in an experiment. To delete a configuration, hover over its box "
+"and click the delete icon."
 msgstr ""
-"Pincha {em_start}Configuración de nuevo grupo{em_end} para añadir una nueva "
-"configuración. Para editar una configuración, pasa el ratón sobre su caja y "
-"pincha {em_start}Editar{em_end}."
-
-#: cms/templates/group_configurations.html
-msgid ""
-"You can delete a group configuration only if it is not in use in an "
-"experiment. To delete a configuration, hover over its box and click the "
-"delete icon."
-msgstr ""
-"Puedes borrar la configuración de un grupo sólo si no se está usando en un "
-"experimento. Para borrar una configuración, pasa el ratón sobre su caja y "
-"pincha el icono borrar."
 
 #: cms/templates/group_configurations.html cms/templates/settings.html
 #: cms/templates/settings_advanced.html cms/templates/settings_graders.html
@@ -17662,11 +17679,9 @@ msgstr "Una amplia biblioteca de tipos de ejercicios"
 
 #: cms/templates/howitworks.html
 msgid ""
-"It's more than just multiple choice. Studio supports more than a dozen types"
-" of problems to challenge your learners."
+"It's more than just multiple choice. {studio_name} supports more than a "
+"dozen types of problems to challenge your learners."
 msgstr ""
-"Es más que elección múltiple. Studio mantiene más de una docena de tipos de "
-"ejercicios para retar a tus alumnos."
 
 #: cms/templates/howitworks.html
 msgid ""
@@ -17964,7 +17979,7 @@ msgstr "¿Por qué importar una biblioteca?"
 msgid ""
 "You might want to update an existing library to a new version, or replace an"
 " existing library entirely. You might also have developed a library outside "
-"of Studio."
+"of {studio_name}."
 msgstr ""
 
 #: cms/templates/import.html

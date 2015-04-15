@@ -84,17 +84,11 @@ class CoursewareSearchTest(UniqueCourseTest):
         AutoAuthPage(self.browser, username=username, email=email,
                      course_id=self.course_id, staff=staff).visit()
 
-    def test_page_existence(self):
-        """
-        Make sure that the page is accessible.
-        """
-        self._auto_auth(self.USERNAME, self.EMAIL, False)
-        self.courseware_search_page.visit()
-
     def _studio_publish_content(self, section_index):
         """
         Publish content on studio course page under specified section
         """
+        self._auto_auth(self.STAFF_USERNAME, self.STAFF_EMAIL, True)
         self.course_outline.visit()
         subsection = self.course_outline.section_at(section_index).subsection_at(0)
         subsection.expand_subsection()
@@ -105,6 +99,7 @@ class CoursewareSearchTest(UniqueCourseTest):
         """
         Edit chapter name on studio course page under specified section
         """
+        self._auto_auth(self.STAFF_USERNAME, self.STAFF_EMAIL, True)
         self.course_outline.visit()
         section = self.course_outline.section_at(section_index)
         section.change_name(self.EDITED_CHAPTER_NAME)
@@ -114,6 +109,7 @@ class CoursewareSearchTest(UniqueCourseTest):
         Add content on studio course page under specified section
         """
 
+        self._auto_auth(self.STAFF_USERNAME, self.STAFF_EMAIL, True)
         # create a unit in course outline
         self.course_outline.visit()
         subsection = self.course_outline.section_at(section_index).subsection_at(0)
@@ -140,30 +136,44 @@ class CoursewareSearchTest(UniqueCourseTest):
         self.course_outline.start_reindex()
         self.course_outline.wait_for_ajax()
 
+    def _search_for_content(self, search_term):
+        """
+        Login and search for specific content
+
+        Arguments:
+            search_term - term to be searched for
+
+        Returns:
+            (bool) True if search term is found in resulting content; False if not found
+        """
+        self._auto_auth(self.USERNAME, self.EMAIL, False)
+        self.courseware_search_page.visit()
+        self.courseware_search_page.search_for_term(search_term)
+        return search_term in self.courseware_search_page.search_results.html[0]
+
+    def test_page_existence(self):
+        """
+        Make sure that the page is accessible.
+        """
+        self._auto_auth(self.USERNAME, self.EMAIL, False)
+        self.courseware_search_page.visit()
+
     def test_search(self):
         """
         Make sure that you can search for something.
         """
 
         # Create content in studio without publishing.
-        self._auto_auth(self.STAFF_USERNAME, self.STAFF_EMAIL, True)
         self._studio_add_content(0)
 
         # Do a search, there should be no results shown.
-        self._auto_auth(self.USERNAME, self.EMAIL, False)
-        self.courseware_search_page.visit()
-        self.courseware_search_page.search_for_term(self.SEARCH_STRING)
-        assert self.SEARCH_STRING not in self.courseware_search_page.search_results.html[0]
+        self.assertFalse(self._search_for_content(self.SEARCH_STRING))
 
         # Publish in studio to trigger indexing.
-        self._auto_auth(self.STAFF_USERNAME, self.STAFF_EMAIL, True)
         self._studio_publish_content(0)
 
         # Do the search again, this time we expect results.
-        self._auto_auth(self.USERNAME, self.EMAIL, False)
-        self.courseware_search_page.visit()
-        self.courseware_search_page.search_for_term(self.SEARCH_STRING)
-        assert self.SEARCH_STRING in self.courseware_search_page.search_results.html[0]
+        self.assertTrue(self._search_for_content(self.SEARCH_STRING))
 
     def test_reindex(self):
         """
@@ -171,24 +181,24 @@ class CoursewareSearchTest(UniqueCourseTest):
         """
 
         # Create content in studio without publishing.
-        self._auto_auth(self.STAFF_USERNAME, self.STAFF_EMAIL, True)
         self._studio_add_content(1)
+
+        # Do a search, there should be no results shown.
+        self.assertFalse(self._search_for_content(self.EDITED_SEARCH_STRING))
 
         # Publish in studio to trigger indexing, and edit chapter name afterwards.
         self._studio_publish_content(1)
+
+        # Do a ReIndex from studio to ensure that our stuff is updated before the next stage of the test
+        self._studio_reindex()
+
+        # Search after publish, there should still be no results shown.
+        self.assertFalse(self._search_for_content(self.EDITED_SEARCH_STRING))
+
         self._studio_edit_chapter_name(1)
 
-        # Do a search, there should be no results shown.
-        self._auto_auth(self.USERNAME, self.EMAIL, False)
-        self.courseware_search_page.visit()
-        self.courseware_search_page.search_for_term(self.EDITED_SEARCH_STRING)
-        assert self.EDITED_SEARCH_STRING not in self.courseware_search_page.search_results.html[0]
-
-        # Do a ReIndex from studio, to add edited chapter name
+        # Do a ReIndex from studio to ensure that our stuff is updated before the next stage of the test
         self._studio_reindex()
 
         # Do the search again, this time we expect results.
-        self._auto_auth(self.USERNAME, self.EMAIL, False)
-        self.courseware_search_page.visit()
-        self.courseware_search_page.search_for_term(self.EDITED_SEARCH_STRING)
-        assert self.EDITED_SEARCH_STRING in self.courseware_search_page.search_results.html[0]
+        self.assertTrue(self._search_for_content(self.EDITED_SEARCH_STRING))

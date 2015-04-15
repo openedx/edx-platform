@@ -15,7 +15,23 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 log = logging.getLogger(__name__)
 
 ABOUT_ATTRIBUTES = [
-    'effort'
+    'effort',
+    'overview',
+    'title',
+    'university',
+    'number',
+    'short_description',
+    'description',
+    'key_dates',
+    'video',
+    'course_staff_short',
+    'course_staff_extended',
+    'requirements',
+    'syllabus',
+    'textbook',
+    'faq',
+    'more_info',
+    'ocw_links',
 ]
 
 

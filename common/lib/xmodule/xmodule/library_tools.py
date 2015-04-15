@@ -4,6 +4,7 @@ XBlock runtime services for LibraryContentModule
 from django.core.exceptions import PermissionDenied
 from opaque_keys.edx.locator import LibraryLocator
 from xmodule.library_content_module import ANY_CAPA_TYPE_VALUE
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.capa_module import CapaDescriptor
 
@@ -21,14 +22,17 @@ class LibraryToolsService(object):
         Given a library key like "library-v1:ProblemX+PR0B", return the
         'library' XBlock with meta-information about the library.
 
+        A specific version may be specified.
+
         Returns None on error.
         """
         if not isinstance(library_key, LibraryLocator):
             library_key = LibraryLocator.from_string(library_key)
-        assert library_key.version_guid is None
 
         try:
-            return self.store.get_library(library_key, remove_version=False, remove_branch=False)
+            return self.store.get_library(
+                library_key, remove_version=False, remove_branch=False, head_validation=False
+            )
         except ItemNotFoundError:
             return None
 
@@ -102,7 +106,7 @@ class LibraryToolsService(object):
         """
         return self.store.check_supports(block.location.course_key, 'copy_from_template')
 
-    def update_children(self, dest_block, user_id, user_perms=None):
+    def update_children(self, dest_block, user_id, user_perms=None, version=None):
         """
         This method is to be used when the library that a LibraryContentModule
         references has been updated. It will re-fetch all matching blocks from
@@ -123,6 +127,8 @@ class LibraryToolsService(object):
 
         source_blocks = []
         library_key = dest_block.source_library_key
+        if version:
+            library_key = library_key.replace(branch=ModuleStoreEnum.BranchName.library, version_guid=version)
         library = self._get_library(library_key)
         if library is None:
             raise ValueError("Requested library not found.")
@@ -138,7 +144,10 @@ class LibraryToolsService(object):
         with self.store.bulk_operations(dest_block.location.course_key):
             dest_block.source_library_version = unicode(library.location.library_key.version_guid)
             self.store.update_item(dest_block, user_id)
-            dest_block.children = self.store.copy_from_template(source_blocks, dest_block.location, user_id)
+            head_validation = not version
+            dest_block.children = self.store.copy_from_template(
+                source_blocks, dest_block.location, user_id, head_validation=head_validation
+            )
             # ^-- copy_from_template updates the children in the DB
             # but we must also set .children here to avoid overwriting the DB again
 

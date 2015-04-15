@@ -34,6 +34,15 @@ def i18n_extract(options):
 
 
 @task
+def i18n_fastgenerate():
+    """
+    Compile localizable strings from sources without re-extracting strings first.
+    """
+    cmd = "i18n_tool generate"
+    sh(cmd)
+
+
+@task
 @needs("pavelib.i18n.i18n_extract")
 def i18n_generate():
     """

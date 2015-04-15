@@ -175,7 +175,7 @@ class TestCreateAccount(TestCase):
         profile = self.create_account_and_fetch_profile()
         self.assertIsNone(profile.year_of_birth)
 
-    def base_extauth_bypass_sending_activation_email(self, bypass_activation_email_for_extauth_setting):
+    def base_extauth_bypass_sending_activation_email(self, bypass_activation_email):
         """
         Tests user creation without sending activation email when
         doing external auth
@@ -196,7 +196,7 @@ class TestCreateAccount(TestCase):
             student.views.create_account(request)
 
         # check that send_mail is called
-        if bypass_activation_email_for_extauth_setting:
+        if bypass_activation_email:
             self.assertFalse(mock_send_mail.called)
         else:
             self.assertTrue(mock_send_mail.called)
@@ -218,6 +218,15 @@ class TestCreateAccount(TestCase):
         settings.FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH']=False and doing external auth
         """
         self.base_extauth_bypass_sending_activation_email(False)
+
+    @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
+    @mock.patch.dict(settings.FEATURES, {'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False, 'AUTOMATIC_AUTH_FOR_TESTING': False, 'SKIP_EMAIL_VALIDATION': True})
+    def test_extauth_bypass_sending_activation_email_without_bypass(self):
+        """
+        Tests user creation without sending activation email when
+        settings.FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH']=False and doing external auth
+        """
+        self.base_extauth_bypass_sending_activation_email(True)
 
     @ddt.data(True, False)
     def test_discussions_email_digest_pref(self, digest_enabled):

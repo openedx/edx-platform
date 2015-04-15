@@ -85,6 +85,14 @@
       bottom: lh(.75);
       text-transform: uppercase;
     }
+    .search-results-ellipsis {
+      @extend %t-copy-sub2;
+      color: $gray;
+
+      &:after {
+        content: '\2026';
+      }
+    }
   }
 
   .search-load-next {
