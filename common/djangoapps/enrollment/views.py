@@ -81,7 +81,13 @@ class EnrollmentView(APIView, ApiKeyPermissionMixIn):
 
                 * course_id: The unique identifier for the course.
 
-                * enrollment_end: The date and time after which users cannot enroll for the course.
+                * enrollment_start: The date and time that users can begin enrolling in the course.  If null, enrollment opens immediately when the course is created.
+
+                * enrollment_end: The date and time after which users cannot enroll for the course.  If null, the enrollment period never ends.
+
+                * course_start: The date and time at which the course opens.  If null, the course opens immediately when created.
+
+                * course_end: The date and time at which the course closes.  If null, the course never ends.
 
                 * course_modes: An array of data about the enrollment modes supported for the course. Each enrollment mode collection includes:
 
@@ -92,8 +98,6 @@ class EnrollmentView(APIView, ApiKeyPermissionMixIn):
                     * currency: The currency of the listed prices.
                     * expiration_datetime: The date and time after which users cannot enroll in the course in this mode.
                     * description: A description of this mode.
-
-                * enrollment_start: The date and time that users can begin enrolling in the course.
 
                 * invite_only: Whether students must be invited to enroll in the course; true or false.
 
@@ -164,7 +168,13 @@ class EnrollmentCourseDetailView(APIView):
 
                 * course_id: The unique identifier of the course.
 
-                * enrollment_end: The date and time after which users cannot enroll for the course.
+                * enrollment_start: The date and time that users can begin enrolling in the course.  If null, enrollment opens immediately when the course is created.
+
+                * enrollment_end: The date and time after which users cannot enroll for the course.  If null, the enrollment period never ends.
+
+                * course_start: The date and time at which the course opens.  If null, the course opens immediately when created.
+
+                * course_end: The date and time at which the course closes.  If null, the course never ends.
 
                 * course_modes: An array of data about the enrollment modes supported for the course. Each enrollment mode collection includes:
 
@@ -175,8 +185,6 @@ class EnrollmentCourseDetailView(APIView):
                         * currency: The currency of the listed prices.
                         * expiration_datetime: The date and time after which users cannot enroll in the course in this mode.
                         * description: A description of this mode.
-
-                * enrollment_start: The date and time that users can begin enrolling in the course.
 
                 * invite_only: Whether students must be invited to enroll in the course; true or false.
     """
@@ -264,7 +272,13 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
 
                     * course_id:  The unique identifier for the course.
 
-                    * enrollment_end: The date and time after which users cannot enroll for the course.
+                    * enrollment_start: The date and time that users can begin enrolling in the course.  If null, enrollment opens immediately when the course is created.
+
+                    * enrollment_end: The date and time after which users cannot enroll for the course.  If null, the enrollment period never ends.
+
+                    * course_start: The date and time at which the course opens.  If null, the course opens immediately when created.
+
+                    * course_end: The date and time at which the course closes.  If null, the course never ends.
 
                     * course_modes: An array of data about the enrollment modes supported for the course. Each enrollment mode collection includes:
 
@@ -276,7 +290,6 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                         * expiration_datetime: The date and time after which users cannot enroll in the course in this mode.
                         * description: A description of this mode.
 
-                    * enrollment_start: The date and time that users can begin enrolling in the course.
 
                     * invite_only: Whether students must be invited to enroll in the course; true or false.
 
