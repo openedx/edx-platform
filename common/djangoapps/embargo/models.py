@@ -140,6 +140,14 @@ class RestrictedCourse(models.Model):
         help_text=ugettext_lazy(u"The message to show when a user is blocked from accessing a course.")
     )
 
+    disable_access_check = models.BooleanField(
+        default=False,
+        help_text=ugettext_lazy(
+            u"Allow users who enrolled in an allowed country "
+            u"to access restricted courses from excluded countries."
+        )
+    )
+
     @classmethod
     def is_restricted_course(cls, course_id):
         """
