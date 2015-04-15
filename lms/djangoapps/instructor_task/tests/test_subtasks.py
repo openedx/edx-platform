@@ -54,6 +54,7 @@ class TestSubtasks(InstructorTaskCourseTestCase):
                 item_querysets=task_querysets,
                 item_fields=[],
                 items_per_task=items_per_task,
+                total_num_items=initial_count,
             )
 
     def test_queue_subtasks_for_query1(self):
