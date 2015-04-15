@@ -698,7 +698,6 @@ class CourseFields(object):
         scope=Scope.settings,
     )
 
-
     # An extra property is used rather than the wiki_slug/number because
     # there are courses that change the number for different runs. This allows
     # courses to share the same css_class across runs even if they have

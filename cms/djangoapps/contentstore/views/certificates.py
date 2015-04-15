@@ -14,10 +14,9 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods, require_GET
+from django.views.decorators.http import require_http_methods
 
 from contentstore.utils import reverse_course_url
-from django_future.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.keys import CourseKey
 from student.auth import has_studio_read_access
@@ -26,6 +25,7 @@ from util.json_request import JsonResponse
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
 from contentstore.views.exception import CertificateValidationError
+from django.core.exceptions import PermissionDenied
 
 # Three headers to track down -- settings, settings_graders, settings_advanced (check group_configs as well)
 # backbone app static/js/certificates  (use group configs as guide)
@@ -36,6 +36,7 @@ from contentstore.views.exception import CertificateValidationError
 
 CERTIFICATE_SCHEMA_VERSION = 1
 CERTIFICATE_MINIMUM_ID = 100
+
 
 def get_course_and_check_access(course_key, user, depth=0):
     """
@@ -72,7 +73,7 @@ class CertificateManager(object):
         """
         # Ensure the schema version meets our expectations
         if certificate_data.get("version") != CERTIFICATE_SCHEMA_VERSION:
-            raise TypeError("Certificate dict {0} has unexpected version".format(value))
+            raise TypeError("Certificate dict has unexpected version {0}".format(certificate_data.get("version")))
 
         if not certificate_data.get("name"):
             raise CertificateValidationError(_("must have name of the certificate"))
@@ -130,7 +131,7 @@ class CertificateManager(object):
         # Ensure the schema fieldset meets our expectations
         for key in ("name", "description", "version"):
             if key not in value:
-                raise CertificateValidationError(_("Certificate dict {0} missing value key '{1}'".format(value, key)))
+                raise CertificateValidationError(_("Certificate dict {0} missing value key '{1}'").format(value, key))
 
         # Load up the Certificate data
         certificate_data = CertificateManager.parse(value)
@@ -139,10 +140,7 @@ class CertificateManager(object):
         certificate = Certificate(course, certificate_data)
 
         # Return a new Certificate object instance
-        return Certificate(
-            course=course,
-            certificate_data=certificate_data
-        )
+        return certificate
 
     @staticmethod
     def get_certificate(course, json_string, certificate_id=None):
@@ -167,7 +165,6 @@ class CertificateManager(object):
         """
         Remove certificate from the course
         """
-        match_index = None
         for index, cert in enumerate(course.certificates['certificates']):
             if int(cert['id']) == int(certificate_id):
                 course.certificates['certificates'].pop(index)
@@ -195,9 +192,6 @@ class Certificate(object):
         return self.certificate_data
 
 
-
-
-
 @csrf_exempt
 @login_required
 @require_http_methods(("GET", "POST"))
@@ -214,7 +208,12 @@ def certificates_list_handler(request, course_key_string):
     course_key = CourseKey.from_string(course_key_string)
     store = modulestore()
     with store.bulk_operations(course_key):
-        course = get_course_and_check_access(course_key, request.user)
+        try:
+            course = get_course_and_check_access(course_key, request.user)
+        except PermissionDenied:
+            msg = _('PermissionDenied: Failed in authenticating {user}').format(user=request.user)
+            return JsonResponse({"error": msg}, status=403)
+
         if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
             certificate_url = reverse_course_url('certificates.certificates_list_handler', course_key)
             course_outline_url = reverse_course_url('course_handler', course_key)
@@ -247,8 +246,6 @@ def certificates_list_handler(request, course_key_string):
                 )
                 store.update_item(course, request.user.id)
                 return response
-            else:
-                return HttpResponse(status=406)
         else:
             return HttpResponse(status=406)
 
