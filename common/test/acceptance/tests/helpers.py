@@ -317,7 +317,6 @@ class EventsTestMixin(object):
 
     def verify_events_of_type(self, event_type, expected_events, expected_referers=None):
         """Verify that the expected events of a given type were logged.
-
         Args:
             event_type (str): The type of event to be verified.
             expected_events (list): A list of dicts representing the events that should

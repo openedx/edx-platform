@@ -25,7 +25,7 @@ def get_changed_fields_dict(instance, model_class):
 
     Returns:
         dict: a mapping of field names to current database values of those
-            fields
+            fields, or an empty dicit if the model is new
     """
     try:
         old_model = model_class.objects.get(pk=instance.pk)
@@ -34,10 +34,8 @@ def get_changed_fields_dict(instance, model_class):
         # an empty dict as a default value.
         return {}
     else:
-        # Don't consider related fields
         field_names = [
             field[0].name for field in model_class._meta.get_fields_with_model()
-            if not isinstance(field[0], RelatedField)
         ]
         changed_fields = {
             field_name: getattr(old_model, field_name) for field_name in field_names
@@ -49,8 +47,8 @@ def get_changed_fields_dict(instance, model_class):
 
 def emit_field_changed_events(instance, user, event_name, db_table, excluded_fields=None, hidden_fields=None):
     """
-    For the given model instance, save the fields that have changed since the
-    last save.
+    For the given model instance, emit a setting changed event the fields that
+    have changed since the last save.
 
     Note that this function expects that a `_changed_fields` dict has been set
     as an attribute on `instance` (see `get_changed_fields_dict`.
@@ -76,7 +74,7 @@ def emit_field_changed_events(instance, user, event_name, db_table, excluded_fie
         """
         if field_name in hidden_fields:
             return None
-        # Country is not JSON serializable.  Return their country code.
+        # Country is not JSON serializable.  Return the country code.
         if isinstance(value, Country):
             return value.code
         return value
@@ -96,6 +94,6 @@ def emit_field_changed_events(instance, user, event_name, db_table, excluded_fie
                     "table": db_table
                 }
             )
-    # Remove the now innacurate _changed_fields attribute.
+    # Remove the now inaccurate _changed_fields attribute.
     if getattr(instance, '_changed_fields', None):
         del instance._changed_fields

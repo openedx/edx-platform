@@ -4,7 +4,9 @@ Test that various events are fired for models in the student app.
 """
 from django.test import TestCase
 
-from student.models import USER_SETTINGS_CHANGED_EVENT_NAME
+from django_countries.fields import Country
+
+from student.models import PasswordHistory, USER_SETTINGS_CHANGED_EVENT_NAME
 from student.tests.factories import UserFactory
 from util.testing import EventTestMixin
 
@@ -50,6 +52,11 @@ class TestUserProfileEvents(UserSettingsEventTestMixin, TestCase):
         self.profile.save()
         self.assert_user_setting_event_emitted(setting='year_of_birth', old=None, new=self.profile.year_of_birth)
 
+        # Verify that we remove the temporary `_changed_fields` property from
+        # the model after we're done emitting events.
+        with self.assertRaises(AttributeError):
+            getattr(self.profile, '_changed_fields')
+
     def test_change_many_fields(self):
         """
         Verify that we emit one event per field when many fields change on the
@@ -69,6 +76,23 @@ class TestUserProfileEvents(UserSettingsEventTestMixin, TestCase):
         self.profile.name = u'Dånîél'
         self.profile.save()
         self.assert_user_setting_event_emitted(setting='name', old=old_name, new=self.profile.name)
+
+    def test_country(self):
+        """
+        Verify that we properly serialize the JSON-unfriendly Country field.
+        """
+        old_country = self.profile.country
+        self.profile.country = Country(u'AL', 'dummy_flag_url')
+        self.profile.save()
+        self.assert_user_setting_event_emitted(setting='country', old=old_country, new=self.profile.country)
+
+    def test_excluded_field(self):
+        """
+        Verify that we don't emit events for ignored fields.
+        """
+        self.profile.meta = {u'foo': u'bar'}
+        self.profile.save()
+        self.assert_no_events_were_emitted()
 
 
 class TestUserEvents(UserSettingsEventTestMixin, TestCase):
@@ -110,3 +134,11 @@ class TestUserEvents(UserSettingsEventTestMixin, TestCase):
         self.user.password = u'new password'
         self.user.save()
         self.assert_user_setting_event_emitted(setting='password', old=None, new=None)
+
+    def test_related_fields_ignored(self):
+        """
+        Verify that we don't emit events for related fields.
+        """
+        self.user.passwordhistory_set.add(PasswordHistory(password='new_password'))
+        self.user.save()
+        self.assert_no_events_were_emitted()
