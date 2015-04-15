@@ -69,14 +69,24 @@ def get_template_path(relative_path):
     if not is_request_in_microsite():
         return relative_path
 
-    microsite_template_path = str(get_value('template_dir'))
+    if get_value('stored_in_db'):
+        # This path renders a microsite defined in the db
+        template_dir = str(get_value('template_dir'))
+        if template_dir:
+            microsite_template_path = settings.MICROSITE_ROOT_DIR / str(get_value('template_dir')) / 'templates'
+        else:
+            microsite_template_path = None
+    else:
+        # This path renders the regular microsite defined in the settings
+        microsite_template_path = str(get_value('template_dir'))
+        template_dir = get_value('microsite_name')
 
     if microsite_template_path:
         search_path = os.path.join(microsite_template_path, relative_path)
 
         if os.path.isfile(search_path):
             path = '/{0}/templates/{1}'.format(
-                get_value('microsite_name'),
+                template_dir,
                 relative_path
             )
             return path
@@ -187,7 +197,9 @@ def set_from_db_by_domain(domain):
     for microsite in candidates:
         subdomain = microsite.subdomain
         if subdomain and domain.startswith(subdomain):
-            _set_current_microsite_from_obj(subdomain, domain, json.loads(microsite.values))
+            values = json.loads(microsite.values)
+            values['stored_in_db'] = True
+            _set_current_microsite_from_obj(subdomain, domain, values)
             return
 
     set_by_domain(domain)
