@@ -344,6 +344,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             u'Afghanistan',
             [u'Pakistan', u'Palau'],
         )
+        self.assert_event_emitted_num_times('country', 2)
 
     def test_preferred_language_field(self):
         """

@@ -296,7 +296,8 @@ class EventsTestMixin(object):
             "event.user_id": int(event_user_id),
         }
         find_kwargs.update({"event.{}".format(key): value for key, value in kwargs.items()})
-        self.assertEqual(self.event_collection.find(find_kwargs).count(), num_times_emitted)
+        matching_events = self.event_collection.find(find_kwargs)
+        self.assertEqual(matching_events.count(), num_times_emitted, '\n'.join(str(event) for event in matching_events))
 
     def reset_event_tracking(self):
         """
