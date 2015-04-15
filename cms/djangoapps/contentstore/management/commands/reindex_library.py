@@ -1,3 +1,4 @@
+""" Management command to update libraries' search index """
 from django.core.management import BaseCommand, CommandError
 from optparse import make_option
 from textwrap import dedent
@@ -61,10 +62,8 @@ class Command(BaseCommand):
         store = modulestore()
 
         if options.get('all', False):
-            if query_yes_no(
-                "Reindexing all libraries might be a time consuming operation. Do you want to continue?",
-                default="no"
-            ):
+            if query_yes_no("Reindexing all libraries might be a time consuming operation. Do you want to continue?",
+                            default="no"):
                 library_keys = [library.location.library_key for library in store.get_libraries()]
             else:
                 return
