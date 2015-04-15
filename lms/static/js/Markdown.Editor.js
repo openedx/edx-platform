@@ -1842,7 +1842,7 @@
                                 chunk.selection = gettext(description);
                             }
                             else{
-                                chunk.selection = gettext("");
+                                chunk.selection = "";
                             }
                         }
                         else {
@@ -1855,7 +1855,7 @@
                                 chunk.selection = gettext(description);
                             }
                             else {
-                                chunk.selection = gettext("");
+                                chunk.selection = "";
                             }
                         }
                     }
