@@ -14,19 +14,21 @@ class TestPaverBokChoyCmd(unittest.TestCase):
     def _expected_command(self, expected_text_append, expected_default_store=None):
         if expected_text_append:
             expected_text_append = "/" + expected_text_append
+        shard = os.environ.get('SHARD')
         expected_statement = (
             "DEFAULT_STORE={default_store} "
-            "SCREENSHOT_DIR='{repo_dir}/test_root/log' "
-            "BOK_CHOY_HAR_DIR='{repo_dir}/test_root/log/hars' "
-            "SELENIUM_DRIVER_LOG_DIR='{repo_dir}/test_root/log' "
+            "SCREENSHOT_DIR='{repo_dir}/test_root/log{shard}' "
+            "BOK_CHOY_HAR_DIR='{repo_dir}/test_root/log{shard}/hars' "
+            "SELENIUM_DRIVER_LOG_DIR='{repo_dir}/test_root/log{shard}' "
             "nosetests {repo_dir}/common/test/acceptance/tests{exp_text} "
             "--with-xunit "
-            "--xunit-file={repo_dir}/reports/bok_choy/xunit.xml "
-            "--verbosity=2"
+            "--xunit-file={repo_dir}/reports/bok_choy{shard}/xunit.xml "
+            "--verbosity=2 "
         ).format(
             default_store=expected_default_store,
             repo_dir=REPO_DIR,
             exp_text=expected_text_append,
+            shard='/shard_' + shard if shard else '',
         )
         return expected_statement.strip()
 
