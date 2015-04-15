@@ -472,3 +472,4 @@ FEATURES['CERTIFICATES_HTML_VIEW'] = True
 ######### custom courses #########
 INSTALLED_APPS += ('ccx',)
 MIDDLEWARE_CLASSES += ('ccx.overrides.CcxMiddleware',)
+FEATURES['CUSTOM_COURSES_EDX'] = True
