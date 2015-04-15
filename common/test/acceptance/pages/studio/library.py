@@ -257,7 +257,9 @@ class StudioLibraryContainerXBlockWrapper(XBlockWrapper):
 
         # This causes a reload (see cms/static/xmodule_js/public/js/library_content_edit.js)
         self.wait_for(lambda: self.is_browser_on_page(), 'StudioLibraryContainerXBlockWrapper has reloaded.')
-        self.wait_for(lambda: self.is_finished_loading(), 'Loading indicator is not visible.')
+        # Wait longer than the default 60 seconds, because this was intermittently failing on jenkins
+        # with the screenshot showing that the Loading indicator was still visible. See TE-745.
+        self.wait_for(lambda: self.is_finished_loading(), 'Loading indicator is not visible.', timeout=120)
 
         # And wait to make sure the ajax post has finished.
         self.wait_for_ajax()
