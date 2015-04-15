@@ -196,6 +196,42 @@ function (Sjson, AsyncProcess) {
         },
 
         /**
+         * @desc Gets the correct start and end times from the state configuration
+         *
+         * @returns {array} if [startTime, endTime] are defined
+         */
+        getStartEndTimes: function () {
+            // due to the way config.startTime/endTime are
+            // processed in 03_video_player.js, we assume
+            // endTime can be an integer or null,
+            // and startTime is an integer > 0
+            var config = this.state.config;
+            var startTime = config.startTime * 1000;
+            var endTime = (config.endTime !== null) ? config.endTime * 1000 : null;
+            return [startTime, endTime];
+        },
+
+        /**
+         * @desc Gets captions within the start / end times stored within this.state.config
+         *
+         * @returns {object} {start, captions} parallel arrays of
+         *    start times and corresponding captions
+         */
+        getBoundedCaptions: function () {
+            // get start and caption. If startTime and endTime
+            // are specified, filter by that range.
+            var times = this.getStartEndTimes();
+            var results = this.sjson.filter.apply(this.sjson, times);
+            var start = results.start;
+            var captions = results.captions;
+
+            return {
+              'start': start,
+              'captions': captions
+            };
+        },
+
+        /**
         * @desc Fetch the caption file specified by the user. Upon successful
         *     receipt of the file, the captions will be rendered.
         *
@@ -244,9 +280,9 @@ function (Sjson, AsyncProcess) {
                 data: data,
                 success: function (sjson) {
                     self.sjson = new Sjson(sjson);
-
-                    var start = self.sjson.getStartTimes(),
-                        captions = self.sjson.getCaptions();
+                    var results = self.getBoundedCaptions();
+                    var start = results.start;
+                    var captions = results.captions;
 
                     if (self.loaded) {
                         if (self.rendered) {
@@ -622,11 +658,12 @@ function (Sjson, AsyncProcess) {
         *
         */
         play: function () {
+            var startAndCaptions, start, end;
             if (this.loaded) {
                 if (!this.rendered) {
-                    var start = this.sjson.getStartTimes(),
-                        captions = this.sjson.getCaptions();
-
+                    startAndCaptions = this.getBoundedCaptions();
+                    start = startAndCaptions.start;
+                    captions = startAndCaptions.captions;
                     this.renderCaption(start, captions);
                 }
 
@@ -652,6 +689,9 @@ function (Sjson, AsyncProcess) {
         */
         updatePlayTime: function (time) {
             var state = this.state,
+                startTime,
+                endTime,
+                params,
                 newIndex;
 
             if (this.loaded) {
@@ -660,7 +700,11 @@ function (Sjson, AsyncProcess) {
                 }
 
                 time = Math.round(time * 1000 + 100);
-                newIndex = this.sjson.search(time);
+                var times = this.getStartEndTimes();
+                // if start and end times are defined, limit search.
+                // else, use the entire list of video captions
+                params = [time].concat(times);
+                newIndex = this.sjson.search.apply(this.sjson, params);
 
                 if (
                     typeof newIndex !== 'undefined' &&

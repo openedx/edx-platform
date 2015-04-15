@@ -52,13 +52,21 @@ class VideoFields(object):
         default=""
     )
     start_time = RelativeTime(  # datetime.timedelta object
-        help=_("Time you want the video to start if you don't want the entire video to play. Formatted as HH:MM:SS. The maximum value is 23:59:59."),
+        help=_(
+            "Time you want the video to start if you don't want the entire video to play. "
+            "Not supported in the native mobile app: the full video file will play. "
+            "Formatted as HH:MM:SS. The maximum value is 23:59:59."
+        ),
         display_name=_("Video Start Time"),
         scope=Scope.settings,
         default=datetime.timedelta(seconds=0)
     )
     end_time = RelativeTime(  # datetime.timedelta object
-        help=_("Time you want the video to stop if you don't want the entire video to play. Formatted as HH:MM:SS. The maximum value is 23:59:59."),
+        help=_(
+            "Time you want the video to stop if you don't want the entire video to play. "
+            "Not supported in the native mobile app: the full video file will play. "
+            "Formatted as HH:MM:SS. The maximum value is 23:59:59."
+        ),
         display_name=_("Video Stop Time"),
         scope=Scope.settings,
         default=datetime.timedelta(seconds=0)

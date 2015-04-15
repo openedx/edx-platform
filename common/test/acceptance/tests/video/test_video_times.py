@@ -160,28 +160,3 @@ class VideoTimesTest(VideoBaseTest):
         self.video.wait_for_state('pause')
 
         self.assertIn(self.video.position, ('0:35', '0:36'))
-
-    @flaky  # TODO fix this, see TNL-1619
-    def test_video_finish_time_with_seek(self):
-        """
-        Scenario: Finish Time works for Youtube video.
-        Given it has a video in "Youtube" mode with end-time at 1:00, the video starts playing from 2:15
-        And I seek video to "2:15" position
-        And I click video button "play"
-        And I wait until video stop playing
-        Then I see video slider at "2:20" position
-        """
-        data = {'end_time': '00:01:00'}
-        self.metadata = self.metadata_for_mode('youtube', additional_data=data)
-
-        # go to video
-        self.navigate_to_video()
-
-        self.video.seek('2:15')
-
-        self.video.click_player_button('play')
-
-        # wait until video stop playing
-        self.video.wait_for_state('finished')
-
-        self.assertEqual(self.video.position, '2:20')

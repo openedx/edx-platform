@@ -799,6 +799,10 @@
                         state.videoCaption.updatePlayTime(25.000);
                         expect(state.videoCaption.currentIndex).toEqual(5);
 
+                        // To test speed, don't use start / end times.
+                        state.config.startTime = 0;
+                        state.config.endTime = null;
+
                         // Flash mode
                         state.speed = '2.0';
                         spyOn(state, 'isFlashMode').andReturn(true);

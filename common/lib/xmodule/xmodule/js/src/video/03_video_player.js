@@ -320,7 +320,6 @@ function (HTML5Video, Resizer) {
                 // When the video will start playing again from the start, the
                 // start-time and end-time will come back into effect.
                 this.videoPlayer.goToStartTime = true;
-                this.videoPlayer.stopAtEndTime = true;
             }
 
             this.videoPlayer.player.playVideo();
@@ -340,11 +339,9 @@ function (HTML5Video, Resizer) {
             // than end-time. Also, we must make sure that this is only done
             // once per video playing from start to end.
             if (
-                this.videoPlayer.stopAtEndTime &&
                 this.videoPlayer.endTime !== null &&
                 this.videoPlayer.endTime <= this.videoPlayer.currentTime
             ) {
-                this.videoPlayer.stopAtEndTime = false;
 
                 this.videoPlayer.pause();
 
@@ -463,9 +460,6 @@ function (HTML5Video, Resizer) {
         // After the user seeks, the video will start playing from
         // the sought point, and stop playing at the end.
         this.videoPlayer.goToStartTime = false;
-        if (time > this.videoPlayer.endTime || this.videoPlayer.endTime === null) {
-            this.videoPlayer.stopAtEndTime = false;
-        }
 
         this.videoPlayer.seekTo(time);
         this.videoPlayer.log(
@@ -769,7 +763,6 @@ function (HTML5Video, Resizer) {
             videoPlayer.endTime <= videoPlayer.startTime ||
             videoPlayer.endTime >= duration
         ) {
-            videoPlayer.stopAtEndTime = false;
             videoPlayer.endTime = null;
         } else if (this.isFlashMode()) {
             videoPlayer.endTime /= Number(this.speed);
@@ -822,14 +815,18 @@ function (HTML5Video, Resizer) {
 
     function updatePlayTime(time, skip_seek) {
         var videoPlayer = this.videoPlayer,
-            duration = this.videoPlayer.duration(),
+            endTime = this.videoPlayer.duration(),
             youTubeId;
+
+        if (this.config.endTime) {
+            endTime = Math.min(this.config.endTime, endTime);
+        }
 
         this.trigger(
             'videoProgressSlider.updatePlayTime',
             {
                 time: time,
-                duration: duration
+                duration: endTime
             }
         );
 
@@ -837,7 +834,7 @@ function (HTML5Video, Resizer) {
             'videoControl.updateVcrVidTime',
             {
                 time: time,
-                duration: duration
+                duration: endTime
             }
         );
 
