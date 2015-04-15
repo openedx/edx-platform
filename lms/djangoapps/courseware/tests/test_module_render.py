@@ -48,7 +48,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory, check_mongo_calls
-from xmodule.x_module import XModuleDescriptor, XModule, STUDENT_VIEW, CombinedSystem
+from xmodule.x_module import XModuleDescriptor, XModule, STUDENT_VIEW, CombinedSystem, DescriptorSystem
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -1063,7 +1063,7 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
             location=location,
             static_asset_path=None,
             _runtime=Mock(
-                spec=Runtime,
+                spec=DescriptorSystem,
                 resources_fs=None,
                 mixologist=Mock(_mixins=(), name='mixologist'),
                 name='runtime',
