@@ -203,6 +203,25 @@ class DjangoOrmFieldCache(object):
     def set(self, kvs_key, value):
         self._cache[self._cache_key_for_kvs_key(kvs_key)] = value
 
+    @contract(kvs_key=DjangoKeyValueStore.Key)
+    def delete(self, kvs_key):
+        """
+        Delete the value specified by `kvs_key`.
+
+        Arguments:
+            kvs_key (`DjangoKeyValueStore.Key`): The field value to delete
+
+        Raises: KeyError if key isn't found in the cache
+        """
+
+        cache_key = self._cache_key_for_kvs_key(kvs_key)
+        field_object = self._cache.get(cache_key)
+        if field_object is None:
+            raise KeyError(kvs_key.field_name)
+
+        field_object.delete()
+        del self._cache[cache_key]
+
     def __len__(self):
         return len(self._cache)
 
@@ -297,6 +316,26 @@ class UserStateCache(DjangoOrmFieldCache):
             key (:class:`~DjangoKeyValueStore.Key`): The key representing the cached field
         """
         return key.block_scope_id
+
+    @contract(kvs_key=DjangoKeyValueStore.Key)
+    def delete(self, kvs_key):
+        """
+        Delete the value specified by `kvs_key`.
+
+        Arguments:
+            kvs_key (`DjangoKeyValueStore.Key`): The field value to delete
+
+        Raises: KeyError if key isn't found in the cache
+        """
+
+        field_object = self._cache.get(self._cache_key_for_kvs_key(kvs_key))
+        if field_object is None:
+            raise KeyError(kvs_key.field_name)
+
+        state = json.loads(field_object.state)
+        del state[kvs_key.field_name]
+        field_object.state = json.dumps(state)
+        field_object.save()
 
 
 class UserStateSummaryCache(DjangoOrmFieldCache):
@@ -664,17 +703,7 @@ class FieldDataCache(object):
         if key.scope not in self.cache:
             raise KeyError(key.field_name)
 
-        field_object = self.cache[key.scope].get(key)
-        if field_object is None:
-            raise KeyError(key.field_name)
-
-        if key.scope == Scope.user_state:
-            state = json.loads(field_object.state)
-            del state[key.field_name]
-            field_object.state = json.dumps(state)
-            field_object.save()
-        else:
-            field_object.delete()
+        self.cache[key.scope].delete(key)
 
     @contract(key=DjangoKeyValueStore.Key, returns=bool)
     def has(self, key):
