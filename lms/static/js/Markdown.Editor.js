@@ -1094,9 +1094,11 @@
         var decorative = function (isDecorative) {
             if (isDecorative) {
                 $(description).hide();
+                $(descriptionHelp).hide();
             }
             else{
                 $(description).show();
+                $(descriptionHelp).show();
             }
         };
 
@@ -1837,26 +1839,17 @@
                     chunk.endTag = "][" + num + "]";
 
                     if (!chunk.selection) {
-                        if (isImage) {
-                            if (!isDecorative) {
-                                chunk.selection = gettext(description);
-                            }
-                            else{
-                                chunk.selection = "";
-                            }
-                        }
-                        else {
+                        if (!isImage) {
                             chunk.selection = gettext("enter link description here");
+
                         }
                     }
-                    else{
-                        if (isImage) {
-                            if (!isDecorative) {
-                                chunk.selection = gettext(description);
-                            }
-                            else {
-                                chunk.selection = "";
-                            }
+                    if (isImage){
+                        if (!isDecorative) {
+                            chunk.selection = gettext(description);
+                        }
+                        else{
+                            chunk.selection = "";
                         }
                     }
                 }
