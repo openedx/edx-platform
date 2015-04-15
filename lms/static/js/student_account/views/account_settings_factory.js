@@ -81,6 +81,15 @@
                                 ),
                                 options: fieldsData.language.options
                             })
+                        },
+                        {
+                            view: new FieldViews.DropdownFieldView({
+                                model: userAccountModel,
+                                required: true,
+                                title: gettext('Country or Region'),
+                                valueAttribute: 'country',
+                                options: fieldsData['country']['options']
+                            })
                         }
                     ]
                 },
@@ -108,15 +117,7 @@
                                 model: userAccountModel,
                                 title: gettext('Year of Birth'),
                                 valueAttribute: 'year_of_birth',
-                                options: fieldsData.year_of_birth.options
-                            })
-                        },
-                        {
-                            view: new FieldViews.DropdownFieldView({
-                                model: userAccountModel,
-                                title: gettext('Country or Region'),
-                                valueAttribute: 'country',
-                                options: fieldsData.country.options
+                                options: fieldsData['year_of_birth']['options']
                             })
                         },
                         {
