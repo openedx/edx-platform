@@ -76,7 +76,10 @@ def emit_field_changed_events(instance, user, event_name, db_table, excluded_fie
             return None
         # Country is not JSON serializable.  Return the country code.
         if isinstance(value, Country):
-            return value.code
+            if value.code:
+                return value.code
+            else:
+                return None
         return value
 
     excluded_fields = excluded_fields or []

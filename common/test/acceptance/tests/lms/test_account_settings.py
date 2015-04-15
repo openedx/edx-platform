@@ -403,7 +403,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         self.verify_settings_changed_events(
             [{
                 u"setting": u"country",
-                u"old": u'',
+                u"old": None,
                 u"new": u'PK',
             },
             {

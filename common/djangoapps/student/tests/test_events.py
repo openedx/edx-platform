@@ -8,28 +8,7 @@ from django_countries.fields import Country
 
 from student.models import PasswordHistory, USER_SETTINGS_CHANGED_EVENT_NAME
 from student.tests.factories import UserFactory
-from util.testing import EventTestMixin
-
-
-class UserSettingsEventTestMixin(EventTestMixin):
-    """
-    Mixin for verifying that user setting events were emitted during a test.
-    """
-    def setUp(self):
-        super(UserSettingsEventTestMixin, self).setUp('util.model_utils.tracker')
-
-    def assert_user_setting_event_emitted(self, **kwargs):
-        """
-        Helper method to assert that we emit the expected user settings events.
-
-        Expected settings are passed in via `kwargs`.
-        """
-        self.assert_event_emitted(
-            USER_SETTINGS_CHANGED_EVENT_NAME,
-            table=self.table,  # pylint: disable=no-member
-            user_id=self.user.id,
-            **kwargs
-        )
+from student.tests.tests import UserSettingsEventTestMixin
 
 
 class TestUserProfileEvents(UserSettingsEventTestMixin, TestCase):
@@ -81,10 +60,9 @@ class TestUserProfileEvents(UserSettingsEventTestMixin, TestCase):
         """
         Verify that we properly serialize the JSON-unfriendly Country field.
         """
-        old_country = self.profile.country
         self.profile.country = Country(u'AL', 'dummy_flag_url')
         self.profile.save()
-        self.assert_user_setting_event_emitted(setting='country', old=old_country, new=self.profile.country)
+        self.assert_user_setting_event_emitted(setting='country', old=None, new=self.profile.country)
 
     def test_excluded_field(self):
         """

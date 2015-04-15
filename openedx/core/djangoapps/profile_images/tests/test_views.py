@@ -47,6 +47,7 @@ class ProfileImageEndpointTestCase(UserSettingsEventTestMixin, APITestCase):
         self.url = reverse(self._view_name, kwargs={'username': self.user.username})
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         self.storage = get_profile_image_storage()
+        self.table = 'auth_userprofile'
         # this assertion is made here as a sanity check because all tests
         # assume user.profile.has_profile_image is False by default
         self.assertFalse(self.user.profile.has_profile_image)
