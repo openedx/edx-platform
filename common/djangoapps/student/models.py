@@ -338,6 +338,7 @@ def user_profile_pre_save_callback(sender, **kwargs):
     # old field values.
     user_profile._changed_fields = get_changed_fields_dict(user_profile, sender)
 
+
 @receiver(post_save, sender=UserProfile)
 def user_profile_post_save_callback(sender, **kwargs):
     """
