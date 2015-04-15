@@ -1,8 +1,9 @@
 """ Code to allow module store to interface with courseware index """
 from __future__ import absolute_import
-
+from abc import ABCMeta, abstractmethod
 from datetime import timedelta
 import logging
+from six import add_metaclass
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
@@ -29,10 +30,12 @@ class SearchIndexingError(Exception):
         self.error_list = error_list
 
 
+@add_metaclass(ABCMeta)
 class SearchIndexerBase(object):
     """
     Base class to perform indexing for courseware or library search from different modulestores
     """
+    __metaclass__ = ABCMeta
 
     INDEX_NAME = None
     DOCUMENT_TYPE = None
@@ -51,19 +54,19 @@ class SearchIndexerBase(object):
         return settings.FEATURES.get(cls.ENABLE_INDEXING_KEY, False)
 
     @classmethod
+    @abstractmethod
     def normalize_structure_key(cls, structure_key):
         """ Normalizes structure key for use in indexing """
-        raise NotImplementedError("Should be overridden in child classes")
 
     @classmethod
+    @abstractmethod
     def _fetch_top_level(cls, modulestore, structure_key):
         """ Fetch the item from the modulestore location """
-        raise NotImplementedError("Should be overridden in child classes")
 
     @classmethod
+    @abstractmethod
     def _get_location_info(cls, normalized_structure_key):
         """ Builds location info dictionary """
-        raise NotImplementedError("Should be overridden in child classes")
 
     @classmethod
     def _id_modifier(cls, usage_id):
