@@ -126,6 +126,7 @@ class LearnerProfileTestMixin(EventsTestMixin):
         # pylint disable=no-member
         super(LearnerProfileTestMixin, self).assert_event_emitted_num_times(
             self.USER_SETTINGS_CHANGED_EVENT_NAME, self.start_time, profile_user_id, num_times, setting=setting
+        )
 
     def verify_user_preference_changed_event(self, username, user_id, setting, old_value=None, new_value=None):
         """
@@ -184,7 +185,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         profile_page.privacy = self.PRIVACY_PUBLIC
         self.verify_user_preference_changed_event(
             username, user_id, "account_privacy",
-            old_value=None,
+            old_value=None,    # Note: no old value as the default preference is private
             new_value=self.PRIVACY_PUBLIC,
         )
 

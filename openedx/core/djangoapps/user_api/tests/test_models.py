@@ -10,8 +10,10 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from ..tests.factories import UserPreferenceFactory, UserCourseTagFactory, UserOrgTagFactory
-from ..models import UserPreference, USER_PREFERENCE_TABLE_NAME
+from ..models import UserPreference
 from ..preferences.api import set_user_preference
+
+USER_PREFERENCE_TABLE_NAME = "user_api_userpreference"
 
 
 class UserPreferenceModelTest(ModuleStoreTestCase):
@@ -105,7 +107,7 @@ class TestUserPreferenceEvents(EventTestMixin, TestCase):
 
     def test_create_user_preference(self):
         """
-        Verify that we emit an event when a user preference is deleted.
+        Verify that we emit an event when a user preference is created.
         """
         UserPreference.objects.create(user=self.user, key="new key", value="new value")
         self.assert_user_preference_event_emitted(
@@ -114,7 +116,7 @@ class TestUserPreferenceEvents(EventTestMixin, TestCase):
 
     def test_update_user_preference(self):
         """
-        Verify that we emit an event when a user preference is deleted.
+        Verify that we emit an event when a user preference is updated.
         """
         self.user_preference.value = "new value"
         self.user_preference.save()
@@ -158,7 +160,7 @@ class TestUserPreferenceEvents(EventTestMixin, TestCase):
         self.assert_user_preference_event_emitted(
             key=self.TEST_KEY,
             old=self.TEST_VALUE,
-            new="z" * (MAX_STRING_LENGTH - 3) + "...",
+            new="z" * MAX_STRING_LENGTH,
             truncated=["new"],
         )
 
@@ -166,7 +168,7 @@ class TestUserPreferenceEvents(EventTestMixin, TestCase):
         self.user_preference.save()
         self.assert_user_preference_event_emitted(
             key=self.TEST_KEY,
-            old="z" * (MAX_STRING_LENGTH - 3) + "...",
-            new="x" * (MAX_STRING_LENGTH - 3) + "...",
+            old="z" * MAX_STRING_LENGTH,
+            new="x" * MAX_STRING_LENGTH,
             truncated=["old", "new"],
         )

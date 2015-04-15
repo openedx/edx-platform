@@ -140,9 +140,7 @@ def _get_truncated_setting_value(value, max_length=None):
         truncated_value (object): the possibly truncated version of the value.
         was_truncated (bool): returns true if the serialized value was truncated.
     """
-    if isinstance(value, unicode) and max_length is not None and len(value) > max_length:
-        return u'{string}...'.format(string=value[0:max_length - 3]), True
-    elif isinstance(value, str) and max_length is not None and len(value) > max_length:
-        return '{string}...'.format(string=value[0:max_length - 3]), True
+    if isinstance(value, basestring) and max_length is not None and len(value) > max_length:
+        return value[0:max_length], True
     else:
         return value, False

@@ -17,8 +17,6 @@ from xmodule_django.models import CourseKeyField
 # create an alias in "user_api".
 from student.models import UserProfile, Registration, PendingEmailChange  # pylint: disable=unused-import
 
-USER_PREFERENCE_TABLE_NAME = "user_api_userpreference"
-
 
 class UserPreference(models.Model):
     """A user's preference, stored as generic text to be processed by client"""
@@ -68,7 +66,7 @@ def post_save_callback(sender, **kwargs):
     """
     user_preference = kwargs["instance"]
     emit_setting_changed_event(
-        user_preference.user, USER_SETTINGS_CHANGED_EVENT_NAME, USER_PREFERENCE_TABLE_NAME,
+        user_preference.user, USER_SETTINGS_CHANGED_EVENT_NAME, sender._meta.db_table,
         user_preference.key, user_preference._old_value, user_preference.value
     )
     user_preference._old_value = None
@@ -81,7 +79,7 @@ def post_delete_callback(sender, **kwargs):
     """
     user_preference = kwargs["instance"]
     emit_setting_changed_event(
-        user_preference.user, USER_SETTINGS_CHANGED_EVENT_NAME, USER_PREFERENCE_TABLE_NAME,
+        user_preference.user, USER_SETTINGS_CHANGED_EVENT_NAME, sender._meta.db_table,
         user_preference.key, user_preference.value, None
     )
 
