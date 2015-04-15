@@ -163,23 +163,23 @@ END
         case "$SHARD" in
 
             "all")
-                paver test_bokchoy || { EXIT=1; }
+                SELENIUM_BROWSER=chrome && paver test_bokchoy || { EXIT=1; }
                 ;;
 
             "1")
-                paver test_bokchoy --extra_args="-a shard_1 --with-flaky" || { EXIT=1; }
+                SELENIUM_BROWSER=chrome && paver test_bokchoy --extra_args="-a shard_1 --with-flaky" || { EXIT=1; }
                 ;;
 
             "2")
-                paver test_bokchoy --extra_args="-a 'shard_2' --with-flaky" || { EXIT=1; }
+                SELENIUM_BROWSER=chrome && paver test_bokchoy --extra_args="-a 'shard_2' --with-flaky" || { EXIT=1; }
                 ;;
 
             "3")
-                paver test_bokchoy --extra_args="-a 'shard_3' --with-flaky" || { EXIT=1; }
+                SELENIUM_BROWSER=chrome && paver test_bokchoy --extra_args="-a 'shard_3' --with-flaky" || { EXIT=1; }
                 ;;
 
             "4")
-                paver test_bokchoy --extra_args="-a shard_1=False,shard_2=False,shard_3=False --with-flaky" || { EXIT=1; }
+                SELENIUM_BROWSER=chrome && paver test_bokchoy --extra_args="-a shard_1=False,shard_2=False,shard_3=False --with-flaky" || { EXIT=1; }
                 ;;
 
             # Default case because if we later define another bok-choy shard on Jenkins
