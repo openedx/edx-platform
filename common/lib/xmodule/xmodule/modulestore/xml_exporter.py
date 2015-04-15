@@ -204,7 +204,7 @@ class CourseExportManager(ExportManager):
         if not os.path.isdir(asset_dir):
             os.makedirs(asset_dir)
         asset_root = lxml.etree.Element(AssetMetadata.ALL_ASSETS_XML_TAG)
-        course_assets = self.modulestore.get_all_asset_metadata(self.courselike_key, None)
+        course_assets = self.modulestore.get_all_asset_metadata(self.courselike_key, 'asset')
         for asset_md in course_assets:
             # All asset types are exported using the "asset" tag - but their asset type is specified in each asset key.
             asset = lxml.etree.SubElement(asset_root, AssetMetadata.ASSET_XML_TAG)  # pylint: disable=no-member
