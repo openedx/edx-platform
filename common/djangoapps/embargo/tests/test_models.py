@@ -119,20 +119,28 @@ class RestrictedCourseTest(TestCase):
         # Warm the cache
         with self.assertNumQueries(1):
             RestrictedCourse.is_restricted_course(course_id)
+            RestrictedCourse.is_disabled_access_check(course_id)
 
         # it should come from cache
         with self.assertNumQueries(0):
             RestrictedCourse.is_restricted_course(course_id)
+            RestrictedCourse.is_disabled_access_check(course_id)
+
+        self.assertFalse(RestrictedCourse.is_disabled_access_check(course_id))
 
         # add new the course so the cache must get delete and again hit the db
         new_course_id = CourseLocator('def', '123', 'doremi')
-        RestrictedCourse.objects.create(course_key=new_course_id)
+        RestrictedCourse.objects.create(course_key=new_course_id, disable_access_check=True)
         with self.assertNumQueries(1):
             RestrictedCourse.is_restricted_course(new_course_id)
+            RestrictedCourse.is_disabled_access_check(new_course_id)
 
         # it should come from cache
         with self.assertNumQueries(0):
             RestrictedCourse.is_restricted_course(new_course_id)
+            RestrictedCourse.is_disabled_access_check(new_course_id)
+
+        self.assertTrue(RestrictedCourse.is_disabled_access_check(new_course_id))
 
         # deleting an object will delete cache also.and hit db on
         # get the is_restricted course
