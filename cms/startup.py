@@ -17,6 +17,7 @@ from openedx.core.djangoapps.course_groups.scope_resolver import CourseGroupScop
 from student.scope_resolver import CourseEnrollmentsScopeResolver, StudentEmailScopeResolver
 from projects.scope_resolver import GroupProjectParticipantsScopeResolver
 from edx_notifications.scopes import register_user_scope_resolver
+from edx_notifications.namespaces import register_namespace_resolver
 from util.namespace_resolver import CourseNamespaceResolver
 
 log = logging.getLogger(__name__)
