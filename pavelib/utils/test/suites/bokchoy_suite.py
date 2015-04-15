@@ -128,6 +128,7 @@ class BokChoyTestSuite(TestSuite):
             "--with-xunit",
             "--xunit-file={}".format(self.xunit_report),
             "--verbosity={}".format(self.verbosity),
+            "--pdb" if self.pdb else "",
             self.extra_args,
         ]
 

@@ -90,6 +90,9 @@ class NoseTestSuite(TestSuite):
         if self.fail_fast or env_fail_fast_set:
             opts += " --stop"
 
+        if self.pdb:
+            opts += " --pdb"
+
         return opts
 
 
