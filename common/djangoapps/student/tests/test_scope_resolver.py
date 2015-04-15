@@ -166,7 +166,7 @@ class StudentTasksTestCase(ModuleStoreTestCase):
         users = resolver.resolve(
             'namespace_scope',
             {
-                'course_id': self.course.id,
+                'namespace': self.course.id,
                 'fields': {
                     'id': True,
                     'email': True,

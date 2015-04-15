@@ -62,3 +62,5 @@ class CourseNamespaceResolver(NotificationNamespaceResolver):
             },
             'default_user_resolver': NamespaceEnrollmentsScopeResolver(),
         }
+
+
