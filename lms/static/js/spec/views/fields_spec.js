@@ -192,6 +192,34 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 }, requests);
             });
 
+            it("only shows empty option in DropdownFieldView if required is false or model value is not set", function() {
+                requests = AjaxHelpers.requests(this);
+
+                var editableOptions = ['toggle', 'always'];
+                _.each(editableOptions, function(editable) {
+                    var fieldData = FieldViewsSpecHelpers.createFieldData(FieldViews.DropdownFieldView, {
+                        title: 'Drop Down Field',
+                        valueAttribute: 'drop-down',
+                        helpMessage: 'edX drop down',
+                        editable: editable,
+                        required:true
+                    });
+                    var view = new FieldViews.DropdownFieldView(fieldData).render();
+
+                    expect(view.modelValueIsSet()).toBe(false);
+                    expect(view.displayValue()).toBe('');
+
+                    if(editable === 'toggle') { view.showEditMode(true); }
+                    view.$('.u-field-value > select').val(FieldViewsSpecHelpers.SELECT_OPTIONS[0]).change();
+                    expect(view.fieldValue()).toBe(FieldViewsSpecHelpers.SELECT_OPTIONS[0][0]);
+
+                    AjaxHelpers.respondWithNoContent(requests);
+                    if(editable === 'toggle') { view.showEditMode(true); }
+                    // When server returns success, there should no longer be an empty option.
+                    expect($(view.$('.u-field-value option')[0]).val()).toBe('si');
+                });
+            });
+
             it("correctly renders and updates TextAreaFieldView when editable == never", function() {
                 var fieldData = FieldViewsSpecHelpers.createFieldData(FieldViews.TextareaFieldView, {
                     title: 'About me',

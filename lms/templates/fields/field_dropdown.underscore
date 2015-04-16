@@ -10,8 +10,8 @@
 
 <span class="u-field-value">
     <% if (mode === 'edit') { %>
-        <select name="select" id="u-field-select-<%- id %>" aria-describedby="u-field-help-message-<%- id %>">
-            <% if (!required) { %>
+        <select name="select" id="u-field-select-<%- id %>" aria-describedby="u-field-message-<%- id %>">
+            <% if (showBlankOption) { %>
                 <option value=""></option>
             <% } %>
             <% _.each(selectOptions, function(selectOption) { %>
