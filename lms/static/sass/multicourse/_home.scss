@@ -1,5 +1,5 @@
 $title-left-margin: grid-width(2) + $gw-gutter;
-$course-search-input-width: calc(100% - 60px);
+$title-width: flex-grid(6);
 $course-search-input-height: ($baseline*2.8);
 
 .home {
@@ -46,7 +46,7 @@ $course-search-input-height: ($baseline*2.8);
       border: 1px solid $border-color-3;
       box-shadow: 0 4px 25px 0 rgba(0,0,0, 0.5);
       background: $white;
-      width: flex-grid(6);
+      width: $title-width;
       min-height: ($baseline*6);
       vertical-align: top;
 
@@ -85,9 +85,10 @@ $course-search-input-height: ($baseline*2.8);
     .course-search {
       .course-search-bar {
         @include margin-left($title-left-margin);
-        width: flex-grid(6);
+        width: $title-width;
 
         .search-input {
+          @include float(left);
           @include padding-left($baseline*0.5);
           @extend %ui-depth1;
           @extend %t-icon4;
@@ -95,7 +96,7 @@ $course-search-input-height: ($baseline*2.8);
           border: 2px solid $gray-l3;
           border-radius: 3px;
           box-shadow: none;
-          width: $course-search-input-width;
+          width: 100%;
           height: $course-search-input-height;
           color: $black;
           font-style: normal;
@@ -106,27 +107,27 @@ $course-search-input-height: ($baseline*2.8);
             border-color: $m-blue-d1;
           }
         }
+      }
 
-        .search-button {
-          @include left(-$baseline*2.75);
-          @extend %ui-depth2;
-          @extend %t-icon3;
-          @extend %t-strong;
-          position: relative;
-          top: 0;
-          border: 2px solid $m-blue-d1;
-          border-radius: ($baseline*0.1);
-          box-shadow: none;
-          background: $m-blue-d5;
-          padding: 0 ($baseline*0.7);
-          height: $course-search-input-height;
-          color: $white;
-          text-shadow: none;
+      .search-button {
+        @include left(-$baseline*2.75);
+        @extend %ui-depth2;
+        @extend %t-icon3;
+        @extend %t-strong;
+        position: relative;
+        top: 0;
+        border: 2px solid $m-blue-d1;
+        border-radius: ($baseline*0.1);
+        box-shadow: none;
+        background: $m-blue-d5;
+        padding: 0 ($baseline*0.7);
+        height: $course-search-input-height;
+        color: $white;
+        text-shadow: none;
 
-          // STATE: hover and focus
-          &:hover, &:focus {
-            background: $m-blue-l1;
-          }
+        // STATE: hover and focus
+        &:hover, &:focus {
+          background: $m-blue-l1;
         }
       }
     }
