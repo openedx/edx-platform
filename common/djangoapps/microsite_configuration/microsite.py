@@ -121,7 +121,7 @@ def get_value_for_org(org, val_name, default=None):
 
 def get_all_orgs():
     """
-    This returns a set of orgs that are considered within a microsite. This can be used,
+    This returns a set of orgs that are considered within all microsites. This can be used,
     for example, to do filtering
     """
     org_filter_set = set()

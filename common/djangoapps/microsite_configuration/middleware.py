@@ -6,8 +6,12 @@ A microsite enables the following features:
 2) Present a landing page with a listing of courses that are specific to the 'brand'
 3) Ability to swap out some branding elements in the website
 """
+import re
 
 from django.conf import settings
+from django.http import Http404
+
+from opaque_keys.edx.keys import CourseKey
 from microsite_configuration import microsite
 
 
@@ -100,3 +104,34 @@ class DatabaseMicrositeMiddleware(MicrositeMiddleware):
         domain = request.META.get('HTTP_HOST', None)
         microsite.set_from_db_by_domain(domain)
         return None
+
+
+# Todo select a better name
+class MicrositeFilterSecurityMiddleware():
+    """
+    """
+    def process_request(self, request):
+        """
+        """
+        path = request.path_info
+        p = re.compile('/courses/{}/'.format(settings.COURSE_ID_PATTERN))
+        m = p.match(path)
+
+        # If there is no match, then we are not in a ORG-restricted area
+        if m is None:
+            return None
+
+        course_id =  m.group('course_id')
+        course_key = CourseKey.from_string(course_id)
+
+        # If the course org is the same as the current microsite
+        if microsite.get_value('course_org_filter') == course_key.org:
+            return None
+
+        # If the course does not belong to an ORG defined in a microsite
+        all_orgs = microsite.get_all_orgs()
+        if course_key.org not in all_orgs:
+            return None
+
+        # We could log some of the output here for forensic analysis
+        raise Http404
