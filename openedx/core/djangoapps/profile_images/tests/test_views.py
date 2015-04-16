@@ -27,6 +27,7 @@ from .helpers import make_image_file
 
 TEST_PASSWORD = "test"
 TEST_UPLOAD_DT = datetime.datetime(2002, 1, 9, 15, 43, 01, tzinfo=UTC)
+TEST_UPLOAD_DT2 = datetime.datetime(2003, 1, 9, 15, 43, 01, tzinfo=UTC)
 
 
 class ProfileImageEndpointTestCase(UserSettingsEventTestMixin, APITestCase):
@@ -110,13 +111,13 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
     """
     _view_name = "profile_image_upload"
 
-    def check_upload_event_emitted(self):
+    def check_upload_event_emitted(self, old=None, new=TEST_UPLOAD_DT):
         """
         Make sure we emit a UserProfile event corresponding to the
         profile_image_uploaded_at field changing.
         """
         self.assert_user_setting_event_emitted(
-            setting='profile_image_uploaded_at', old=None, new=TEST_UPLOAD_DT
+            setting='profile_image_uploaded_at', old=old, new=new
         )
 
     def test_unsupported_methods(self, mock_log):
@@ -140,7 +141,7 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
         self.assertFalse(mock_log.info.called)
         self.assert_no_events_were_emitted()
 
-    @patch('openedx.core.djangoapps.profile_images.views._make_upload_dt', return_value=TEST_UPLOAD_DT)
+    @patch('openedx.core.djangoapps.profile_images.views._make_upload_dt', side_effect=[TEST_UPLOAD_DT, TEST_UPLOAD_DT2])
     def test_upload_self(self, mock_make_image_version, mock_log):  # pylint: disable=unused-argument
         """
         Test that an authenticated user can POST to their own upload endpoint.
@@ -155,6 +156,13 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
             {'image_names': get_profile_image_names(self.user.username).values(), 'user_id': self.user.id}
         )
         self.check_upload_event_emitted()
+
+        # Try another upload and make sure that a second event is emitted.
+        with make_image_file() as image_file:
+            response = self.client.post(self.url, {'file': image_file}, format='multipart')
+            self.check_response(response, 204)
+
+        self.check_upload_event_emitted(old=TEST_UPLOAD_DT, new=TEST_UPLOAD_DT2)
 
     def test_upload_other(self, mock_log):
         """
