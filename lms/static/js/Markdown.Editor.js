@@ -1040,6 +1040,28 @@
             }
         };
 
+        // Add error msg in hyperlink input box if there isn't any error msg already
+        var addFormError = function (isImage){
+            if (!dialog.contains(formError)) {
+                formError = doc.createElement("span");
+                style = formError.style;
+                style.width = "85%";
+                style.display = "inline-block";
+                style.fontSize = "85%";
+                style.marginLeft = "30px";
+                var errorMsg;
+                if (isImage) {
+                    errorMsg = doc.createTextNode("You either have to give description or select checkbox");
+                }
+                else {
+                    errorMsg = doc.createTextNode("You have to give description");
+                }
+                formError.appendChild(errorMsg);
+                formError.appendChild(doc.createElement("br"));
+                dialog.insertBefore(formError, form);
+            }
+        };
+
         // Dismisses the hyperlink input box.
         // isCancel is true if we don't care about the input text.
         // isCancel is false if we are going to keep the text.
@@ -1061,35 +1083,29 @@
                 }
             }
 
+            var descriptionText = description.value;
 
             if (imageUploadHandler){
-                var descriptionText = description.value;
+
                 if (decorativeCheckBox.checked || descriptionText != "") {
                     dialog.parentNode.removeChild(dialog);
                     callback(text, descriptionText, decorativeCheckBox.checked);
                 }
                 else{
-                    if (!dialog.contains(formError)){
-                        formError = doc.createElement("span");
-                        style = formError.style;
-                        style.width = "85%";
-                        style.display = "inline-block";
-                        style.fontSize = "85%";
-                        style.marginLeft = "30px";
-                        var errorMsg = doc.createTextNode("you either have to give description or select checkbox");
-                        formError.appendChild(errorMsg);
-                        formError.appendChild(doc.createElement("br"));
-                        dialog.insertBefore(formError, form);
-                    }
+                    addFormError(true);
                 }
             }
             else{
-                dialog.parentNode.removeChild(dialog);
-                callback(text, "", false);
+                if (descriptionText != "") {
+                    dialog.parentNode.removeChild(dialog);
+                    callback(text, descriptionText, false);
+                }
+                else {
+                    addFormError(false);
+                }
             }
             return false;
         };
-
 
         var decorative = function (isDecorative) {
             if (isDecorative) {
@@ -1142,6 +1158,14 @@
             style.marginLeft = style.marginRight = "auto";
             form.appendChild(input);
 
+            description = doc.createElement("input");
+            description.type = "text";
+            description.placeholder = "Description";
+            style = description.style;
+            style.display = "block";
+            style.width = "80%";
+            style.marginLeft = style.marginRight = "auto";
+
             // The choose file button, image description and decorative image checkbox
             // if prompt type is 'image'
 
@@ -1155,13 +1179,6 @@
               };
               form.appendChild(doc.createElement("br"));
               form.appendChild(chooseFile);
-              description = doc.createElement("input");
-              description.type = "text";
-              description.placeholder = "Description";
-              style = description.style;
-              style.display = "block";
-              style.width = "80%";
-              style.marginLeft = style.marginRight = "auto";
               description.setAttribute("aria-describedby", "description-help");
 
               descriptionHelp = doc.createElement("span");
@@ -1207,6 +1224,10 @@
               form.appendChild(descriptionHelp);
               form.appendChild(doc.createElement("br"));
               form.appendChild(checkBoxLabel);
+            }
+            else {
+              form.appendChild(doc.createElement("br"));
+              form.appendChild(description);
             }
 
             // The ok button
@@ -1838,12 +1859,6 @@
                     chunk.startTag = isImage ? "![" : "[";
                     chunk.endTag = "][" + num + "]";
 
-                    if (!chunk.selection) {
-                        if (!isImage) {
-                            chunk.selection = gettext("enter link description here");
-
-                        }
-                    }
                     if (isImage){
                         if (!isDecorative) {
                             chunk.selection = gettext(description);
@@ -1852,6 +1867,11 @@
                             chunk.selection = "";
                         }
                     }
+
+                    else {
+                        chunk.selection = gettext(description);
+                    }
+
                 }
                 postProcessing();
             };
