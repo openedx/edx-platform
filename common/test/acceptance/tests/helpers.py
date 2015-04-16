@@ -283,7 +283,7 @@ class EventsTestMixin(object):
         """
         Tests the number of times a particular event was emitted.
 
-        Extra kwargs get passed to the mongo query.
+        Extra kwargs get passed to the mongo query in the form: "event.<key>: value".
 
         :param event_name: Expected event name (e.g., "edx.course.enrollment.activated")
         :param event_time: Latest expected time, after which the event would fire (e.g., the beginning of the test case)
