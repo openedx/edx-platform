@@ -56,7 +56,7 @@ def intercept_errors(api_error, ignore_errors=None):
                             func_name=func.func_name,
                             args=args,
                             kwargs=kwargs,
-                            exception=repr(ex)
+                            exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex)
                         )
                         LOGGER.warning(msg)
                         raise
@@ -70,7 +70,7 @@ def intercept_errors(api_error, ignore_errors=None):
                     func_name=func.func_name,
                     args=args,
                     kwargs=kwargs,
-                    exception=repr(ex)
+                    exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex)
                 )
                 LOGGER.exception(msg)
                 raise api_error(msg)
