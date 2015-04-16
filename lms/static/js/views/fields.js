@@ -318,7 +318,7 @@
                     title: this.options.title,
                     screenReaderTitle: this.options.screenReaderTitle || this.options.title,
                     iconName: this.options.iconName,
-                    required: this.options.required,
+                    showBlankOption: (!this.options.required || !this.modelValueIsSet()),
                     selectOptions: this.options.options,
                     message: this.helpMessage
                 }));
@@ -385,10 +385,12 @@
             },
 
             saveSucceeded: function() {
-                this._super();
                 if (this.editable === 'toggle') {
                     this.showDisplayMode(true);
+                } else {
+                    this.showEditMode(true);
                 }
+                this._super();
             },
 
             disableField: function(disable) {

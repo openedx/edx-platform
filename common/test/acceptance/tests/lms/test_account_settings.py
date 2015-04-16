@@ -318,7 +318,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         self._test_dropdown_field(
             u'country',
             u'Country or Region',
-            u'Afghanistan',
+            u'',
             [u'Pakistan', u'Palau'],
         )
 
