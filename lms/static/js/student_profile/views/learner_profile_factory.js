@@ -95,10 +95,7 @@
                     editable: editable,
                     showMessages: false,
                     title: gettext('About me'),
-                    placeholderValue: gettext(
-                        "Tell other edX learners a little about yourself: where you live, what your interests are, " +
-                        "why you're taking courses on edX, or what you hope to learn."
-                    ),
+                    placeholderValue: gettext("Tell other edX learners a little about yourself: where you live, what your interests are, why you're taking courses on edX, or what you hope to learn."),
                     valueAttribute: "bio",
                     helpMessage: ''
                 })

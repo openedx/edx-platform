@@ -37,10 +37,7 @@
                                 model: userAccountModel,
                                 title: gettext('Full Name'),
                                 valueAttribute: 'name',
-                                helpMessage: gettext(
-                                    'The name that appears on your edX certificates. Other learners never see ' +
-                                    'your full name.'
-                                )
+                                helpMessage: gettext('The name that appears on your edX certificates. Other learners never see your full name.')
                             })
                         },
                         {
@@ -48,10 +45,7 @@
                                 model: userAccountModel,
                                 title: gettext('Email Address'),
                                 valueAttribute: 'email',
-                                helpMessage: gettext(
-                                    'The email address you use to sign in to edX. Communications ' +
-                                    'from edX and your courses are sent to this address.'
-                                )
+                                helpMessage: gettext('The email address you use to sign in to edX. Communications from edX and your courses are sent to this address.')
                             })
                         },
                         {
@@ -62,24 +56,19 @@
                                 valueAttribute: 'password',
                                 emailAttribute: 'email',
                                 linkTitle: gettext('Reset Password'),
-                                linkHref: fieldsData['password']['url'],
-                                helpMessage: gettext(
-                                    'When you click "Reset Password", a message will be sent to your email address. ' +
-                                    'Click the link in the message to reset your password.'
-                                )
+                                linkHref: fieldsData.password.url,
+                                helpMessage: gettext('When you click "Reset Password", a message will be sent to your email address. Click the link in the message to reset your password.')
                             })
                         },
                         {
                             view: new AccountSettingsFieldViews.LanguagePreferenceFieldView({
                                 model: userPreferencesModel,
-                                title: 'Language',
+                                title: gettext('Language'),
                                 valueAttribute: 'pref-lang',
                                 required: true,
                                 refreshPageOnSave: true,
-                                helpMessage: gettext(
-                                    'The language used for the edX site. The site is currently available in a ' +
-                                    'limited number of languages.'
-                                ),
+                                helpMessage:
+                                    gettext('The language used for the edX site. The site is currently available in a limited number of languages.'),
                                 options: fieldsData.language.options
                             })
                         },

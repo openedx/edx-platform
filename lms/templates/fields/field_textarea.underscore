@@ -3,7 +3,7 @@
         <label class="u-field-title" for="u-field-textarea-<%- id %>" id="u-field-title-<%- id %>" aria-describedby="u-field-message-help-<%- id %>"></label>
         <span class="u-field-message" id="u-field-message-<%- id %>">
             <span class="u-field-message-notification" aria-live="polite"></span>
-            <span class="u-field-message-help" id="u-field-message-help-<%- id %>"> <%- gettext(message) %></span>
+            <span class="u-field-message-help" id="u-field-message-help-<%- id %>"> <%- message %></span>
         </span>
     </div>
 
@@ -11,8 +11,8 @@
         if (mode === 'edit') {
             %><textarea id="u-field-textarea-<%- id %>" rows="4" aria-describedby="u-field-placeholder-value-<%- id %>"><%- value %></textarea><%
         } else {
-            %><a href="#" class="u-field-value-display"><span class="sr"><%- gettext(screenReaderTitle) %></span><span class="u-field-value-readonly" aria-hidden="false" aria-describedby="u-field-placeholder-value-<%- id %>"><%- value %></span><span class="sr"><%- gettext('Click to edit') %></span></a><%
+            %><a href="#" class="u-field-value-display"><span class="sr"><%- screenReaderTitle %></span><span class="u-field-value-readonly" aria-hidden="false" aria-describedby="u-field-placeholder-value-<%- id %>"><%- value %></span><span class="sr"><%- gettext('Click to edit') %></span></a><%
         }
-        %><span class="sr" id="u-field-placeholder-value-<%- id %>"><%- gettext(placeholderValue) %></span>
+        %><span class="sr" id="u-field-placeholder-value-<%- id %>"><%- placeholderValue %></span>
     </div>
 </div>

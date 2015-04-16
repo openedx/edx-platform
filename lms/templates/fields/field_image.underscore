@@ -1,5 +1,5 @@
 <div class="image-wrapper">
-    <img class="image-frame" src="<%- gettext(imageUrl) %>"  alt="<%=imageAltText%>"/>
+    <img class="image-frame" src="<%- imageUrl %>"  alt="<%=imageAltText%>"/>
     <div class="u-field-actions">
         <label class="u-field-upload-button">
             <span class="upload-button-icon" aria-hidden="true"><%= uploadButtonIcon %></span>

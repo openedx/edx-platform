@@ -12,6 +12,8 @@ from django.views.decorators.http import require_http_methods
 from edxmako.shortcuts import render_to_response
 from student.models import User
 
+from django.utils.translation import ugettext as _
+
 
 @login_required
 @require_http_methods(['GET'])
@@ -55,10 +57,9 @@ def learner_profile_context(logged_in_username, profile_username, user_is_staff)
         ObjectDoesNotExist: the specified profile_username does not exist.
     """
     profile_user = User.objects.get(username=profile_username)
-    language_options = [language for language in settings.ALL_LANGUAGES]
 
     country_options = [
-        (country_code, unicode(country_name))
+        (country_code, _(country_name))  # pylint: disable=translation-of-non-string
         for country_code, country_name in sorted(
             countries.countries, key=lambda(__, name): unicode(name)
         )
@@ -78,7 +79,7 @@ def learner_profile_context(logged_in_username, profile_username, user_is_staff)
             'has_preferences_access': (logged_in_username == profile_username or user_is_staff),
             'own_profile': (logged_in_username == profile_username),
             'country_options': country_options,
-            'language_options': language_options,
+            'language_options': settings.ALL_LANGUAGES,
         }
     }
 
