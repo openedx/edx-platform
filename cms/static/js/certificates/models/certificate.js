@@ -12,6 +12,13 @@ function(Backbone, _, str, gettext) {
             description: 'Default Description',
             version: 1
         },
+
+        initialize: function(attributes, options) {
+            console.log('certificate_model.initialize');
+            this.canBeEmpty = options && options.canBeEmpty;
+            this.setOriginalAttributes();
+            return this;
+        },
         parse: function (response) {
             console.log(response.id + " got parse called!");
             return response;
@@ -20,6 +27,10 @@ function(Backbone, _, str, gettext) {
         setOriginalAttributes: function() {
             console.log('certificate_model.setOriginalAttributes');
             this._originalAttributes = this.parse(this.toJSON());
+        },
+
+        reset: function() {
+            this.set(this._originalAttributes, { parse: true, validate: true });
         }
     });
 
