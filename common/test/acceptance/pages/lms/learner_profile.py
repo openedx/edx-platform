@@ -223,12 +223,6 @@ class LearnerProfilePage(FieldsMixin, PageObject):
 
         self.wait_for_ajax()
 
-    def upload_correct_image_file(self, filename):
-        """
-        Selects the correct file and clicks the upload button.
-        """
-        self._upload_file(filename)
-
     @property
     def image_upload_success(self):
         """
