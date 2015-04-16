@@ -7,18 +7,16 @@ paver test_system -s lms --test_id=lms/djangoapps/social_engagements/tests/test_
 from django.conf import settings
 from django.db import IntegrityError
 
-from mock import MagicMock, patch
+from mock import patch
 from datetime import datetime, timedelta
 import pytz
 
-from django.test import TestCase
 from django.test.utils import override_settings
 
-
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 
 from social_engagement.models import StudentSocialEngagementScore, StudentSocialEngagementScoreHistory
 
@@ -29,11 +27,13 @@ from social_engagement.engagement import update_all_courses_engagement_scores
 from edx_notifications.startup import initialize as initialize_notifications
 from edx_notifications.lib.consumer import get_notifications_count_for_user
 
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @patch.dict(settings.FEATURES, {'ENABLE_NOTIFICATIONS': True})
 @patch.dict(settings.FEATURES, {'ENABLE_SOCIAL_ENGAGEMENT': True})
-class StudentEngagementTests(TestCase):
+class StudentEngagementTests(ModuleStoreTestCase):
     """ Test suite for CourseModuleCompletion """
 
     def setUp(self):
