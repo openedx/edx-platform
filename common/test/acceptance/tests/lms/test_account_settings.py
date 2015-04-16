@@ -46,14 +46,14 @@ class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
             self.USER_SETTINGS_CHANGED_EVENT_NAME, self.start_time, self.user_id, num_times, setting=setting
         )
 
-    def verify_settings_changed_events(self, events):
+    def verify_settings_changed_events(self, events, table=None):
         """
         Verify a particular set of account settings change events were fired.
         """
         expected_referers = [self.ACCOUNT_SETTINGS_REFERER] * len(events)
         for event in events:
             event[u'user_id'] = long(self.user_id)
-            event[u'table'] = u"auth_userprofile"
+            event[u'table'] = u"auth_userprofile" if table is None else table
         self.verify_events_of_type(self.USER_SETTINGS_CHANGED_EVENT_NAME, events, expected_referers=expected_referers)
 
 
@@ -422,6 +422,20 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             u'Preferred Language',
             u'',
             [u'Pushto', u''],
+        )
+
+        self.verify_settings_changed_events(
+            [{
+                u"setting": u"language_proficiencies",
+                u"old": [],
+                u"new": [{u"code": u"ps"}],
+            },
+            {
+                u"setting": u"language_proficiencies",
+                u"old": [{u"code": u"ps"}],
+                u"new": [],
+            }],
+            table=u"student_languageproficiency"
         )
 
     def test_connected_accounts(self):
