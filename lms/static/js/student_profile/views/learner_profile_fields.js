@@ -48,6 +48,68 @@
             }
         });
 
+        LearnerProfileFieldViews.ProfileImageFieldView = FieldViews.ImageFieldView.extend({
+
+            imageUrl: function () {
+                return this.model.profileImageUrl();
+            },
+
+            imageAltText: function () {
+                return interpolate_text(gettext("Profile image for {username}"), {username: this.model.get('username')});
+            },
+
+            imageChangeSucceeded: function (e, data) {
+                var view = this;
+                // Update model to get the latest urls of profile image.
+                this.model.fetch().done(function () {
+                    view.setCurrentStatus('');
+                }).fail(function () {
+                    view.showErrorMessage(view.errorMessage);
+                });
+            },
+
+            imageChangeFailed: function (e, data) {
+                this.setCurrentStatus('');
+                this.showImageChangeFailedMessage(data.jqXHR.status, data.jqXHR.responseText);
+                this.render();
+            },
+
+            showImageChangeFailedMessage: function (status, responseText) {
+                if (_.contains([400, 404], status)) {
+                    try {
+                        var errors = JSON.parse(responseText);
+                        this.showErrorMessage(errors.user_message);
+                    } catch (error) {
+                        this.showErrorMessage(this.errorMessage);
+                    }
+                } else {
+                    this.showErrorMessage(this.errorMessage);
+                }
+            },
+
+            showErrorMessage: function (message) {
+                this.options.messageView.showMessage(message);
+            },
+
+            isEditingAllowed: function () {
+                return this.model.isAboveMinimumAge();
+            },
+
+            isShowingPlaceholder: function () {
+                return !this.model.hasProfileImage();
+            },
+
+            clickedRemoveButton: function (e, data) {
+                this.options.messageView.hideMessage();
+                this._super(e, data);
+            },
+
+            fileSelected: function (e, data) {
+                this.options.messageView.hideMessage();
+                this._super(e, data);
+            }
+        });
+
         return LearnerProfileFieldViews;
     });
 }).call(this, define || RequireJS.define);

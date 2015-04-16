@@ -3,8 +3,7 @@
 
     <div class="wrapper-profile-sections account-settings-container">
         <div class="wrapper-profile-section-one">
-            <div class="profile-photo">
-                <img src="<%- profilePhoto %>" alt="Profile image for <%- username %>">
+            <div class="profile-image-field">
             </div>
 
             <div class="profile-section-one-fields">
