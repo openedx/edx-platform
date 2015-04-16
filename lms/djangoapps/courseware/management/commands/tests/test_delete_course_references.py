@@ -7,12 +7,13 @@ import uuid
 
 from django.conf import settings
 from django.contrib.auth.models import Group, User
-from django.test import TestCase
 from django.test.utils import override_settings
 
 from courseware.management.commands import delete_course_references
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
 if settings.FEATURES.get('API', False):
     from api_manager.models import GroupProfile, CourseGroupRelationship, CourseContentGroupRelationship
@@ -27,8 +28,8 @@ if settings.FEATURES.get('STUDENT_PROGRESS', False):
     from progress import models as progress_models
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class DeleteCourseReferencesTests(TestCase):
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
+class DeleteCourseReferencesTests(ModuleStoreTestCase):
     """
     Test suite for course reference deletion script
     """
