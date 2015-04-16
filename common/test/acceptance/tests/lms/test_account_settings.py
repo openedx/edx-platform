@@ -412,18 +412,21 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             u'Afghanistan',
             [u'Pakistan', u'Palau'],
         )
+
+    def test_country_field_events(self):
+        """
+        Test that saving the country field records the correct events.
+        """
+        self.reset_event_tracking()
+        self.assertEqual(self.account_settings_page.value_for_dropdown_field(u'country', u'Pakistan'), u'Pakistan')
+        self.account_settings_page.wait_for_messsage(u'country', self.SUCCESS_MESSAGE)
         self.verify_settings_changed_events(
             self.username, self.user_id,
             [{
                 u"setting": u"country",
                 u"old": None,
                 u"new": u'PK',
-            },
-            {
-                u"setting": u"country",
-                u"old": u'PK',
-                u"new": u'PW',
-            }]
+            }],
         )
 
     def test_preferred_language_field(self):
