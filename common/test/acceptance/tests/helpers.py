@@ -306,18 +306,20 @@ class EventsTestMixin(object):
         self.event_collection.drop()
         self.start_time = datetime.now()
 
-    def get_matching_events(self, event_type):
+    def get_matching_events(self, username, event_type):
         """
         Returns a cursor for the matching browser events.
         """
         return self.event_collection.find({
+            "username": username,
             "event_type": event_type,
             "time": {"$gt": self.start_time},
         })
 
-    def verify_events_of_type(self, event_type, expected_events, expected_referers=None):
+    def verify_events_of_type(self, username, event_type, expected_events, expected_referers=None):
         """Verify that the expected events of a given type were logged.
         Args:
+            username (str): The name of the authenticated user.
             event_type (str): The type of event to be verified.
             expected_events (list): A list of dicts representing the events that should
                 have been fired.
@@ -328,12 +330,12 @@ class EventsTestMixin(object):
                 will verify that the referer for the single event ends with "/account/settings".
         """
         EmptyPromise(
-            lambda: self.get_matching_events(event_type).count() >= len(expected_events),
+            lambda: self.get_matching_events(username, event_type).count() >= len(expected_events),
             "Waiting for the minimum number of events of type {type} to have been recorded".format(type=event_type)
         ).fulfill()
 
         # Verify that the correct events were fired
-        cursor = self.get_matching_events(event_type)
+        cursor = self.get_matching_events(username, event_type)
         actual_events = []
         actual_referers = []
         for __ in range(0, cursor.count()):
