@@ -109,7 +109,9 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
 
         # There should be only one query to load a single descriptor with a single user_state field
         with self.assertNumQueries(1):
-            self.field_data_cache = FieldDataCache([mock_descriptor([mock_field(Scope.user_state, 'a_field')])], course_id, self.user)
+            self.field_data_cache = FieldDataCache(
+                [mock_descriptor([mock_field(Scope.user_state, 'a_field')])], course_id, self.user
+            )
 
         self.kvs = DjangoKeyValueStore(self.field_data_cache)
 
@@ -347,7 +349,7 @@ class StorageTestBase(object):
 
         # Each field is a separate row in the database, hence
         # a separate query
-        with self.assertNumQueries(len(kv_dict)*3):
+        with self.assertNumQueries(len(kv_dict) * 3):
             self.kvs.set_many(kv_dict)
         for key in kv_dict:
             self.assertEquals(self.kvs.get(key), kv_dict[key])
