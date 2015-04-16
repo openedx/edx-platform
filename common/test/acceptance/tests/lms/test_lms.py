@@ -30,11 +30,31 @@ from ...pages.lms.problem import ProblemPage
 from ...pages.lms.video.video import VideoPage
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.studio.settings import SettingsPage
-from ...pages.lms.login_and_register import CombinedLoginAndRegisterPage
+from ...pages.lms.login_and_register import CombinedLoginAndRegisterPage, ResetPasswordPage
 from ...pages.lms.track_selection import TrackSelectionPage
 from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
 from ...pages.lms.course_wiki import CourseWikiPage, CourseWikiEditPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
+
+
+@attr('shard_1')
+class ForgotPasswordPageTest(UniqueCourseTest):
+    """
+    Test that forgot password forms is rendered if url contains 'forgot-password-modal'
+    in hash.
+    """
+
+    def setUp(self):
+        """ Initialize the page object """
+        super(ForgotPasswordPageTest, self).setUp()
+        self.reset_password_page = ResetPasswordPage(self.browser)
+
+    def test_reset_password_form_visibility(self):
+        # Navigate to the password reset page
+        self.reset_password_page.visit()
+
+        # Expect that reset password form is visible on the page
+        self.assertTrue(self.reset_password_page.is_form_visible())
 
 
 @attr('shard_1')

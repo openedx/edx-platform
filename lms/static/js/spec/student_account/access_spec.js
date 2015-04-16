@@ -149,8 +149,11 @@ define([
                 // Simulate a click on the reset password link
                 view.resetPassword();
 
-                // Verify that the password reset wrapper is populated
-                expect($('#password-reset-wrapper')).not.toBeEmpty();
+                // Verify that the login-anchor is hidden
+                expect($("#login-anchor")).toHaveClass('hidden');
+
+                // Verify that the password reset form is not hidden
+                expect($("#password-reset-form")).not.toHaveClass('hidden');
             });
 
             it('enrolls the user on auth complete', function() {

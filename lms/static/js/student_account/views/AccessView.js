@@ -82,8 +82,12 @@ var edx = edx || {};
         },
 
         postRender: function() {
-            // Load the default form
-            this.loadForm( this.activeForm );
+            //get & check current url hash part & load form accordingly
+            if (Backbone.history.getHash() === "forgot-password-modal") {
+                this.resetPassword();
+            } else {
+                this.loadForm(this.activeForm);
+            }
         },
 
         loadForm: function( type ) {
