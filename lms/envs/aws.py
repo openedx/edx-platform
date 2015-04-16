@@ -598,7 +598,6 @@ if FEATURES.get('INDIVIDUAL_DUE_DATES'):
     FIELD_OVERRIDE_PROVIDERS += (
         'courseware.student_field_overrides.IndividualStudentOverrideProvider',
     )
-    
 
 # PROFILE IMAGE CONFIG
 PROFILE_IMAGE_BACKEND = ENV_TOKENS.get('PROFILE_IMAGE_BACKEND', PROFILE_IMAGE_BACKEND)
