@@ -140,7 +140,7 @@ class StudentTasksTestCase(ModuleStoreTestCase):
         resolver = StudentEmailScopeResolver()
 
         emails_resultset = resolver.resolve(
-            'student_email_resolver',
+            'user_email_resolver',
             {
                 'user_id': test_user_1.id,
             },

@@ -168,7 +168,7 @@ def startup_notification_subsystem():
         register_user_scope_resolver('course_group', CourseGroupScopeResolver())
         register_user_scope_resolver('group_project_participants', GroupProjectParticipantsScopeResolver())
         register_user_scope_resolver('group_project_workgroup', GroupProjectParticipantsScopeResolver())
-        register_user_scope_resolver('student_email_resolver', StudentEmailScopeResolver())
+        register_user_scope_resolver('user_email_resolver', StudentEmailScopeResolver())
 
         # register namespace resolver
         register_namespace_resolver(CourseNamespaceResolver())
