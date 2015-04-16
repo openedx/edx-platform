@@ -112,6 +112,16 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         """Returns true if the response editor is present, false otherwise"""
         return self._is_element_visible(".response_{} .edit-post-body".format(response_id))
 
+    @wait_for_js
+    def is_discussion_body_visible(self):
+        return self._is_element_visible(".post-body")
+
+    def is_mathjax_preview_available(self):
+        return self.q(css=".MathJax_Preview").text[0] == ""
+
+    def is_mathjax_rendered(self):
+        return self._is_element_visible(".MathJax")
+
     def is_response_visible(self, comment_id):
         """Returns true if the response is viewable onscreen"""
         return self._is_element_visible(".response_{} .response-body".format(comment_id))
