@@ -9,7 +9,6 @@ from bok_choy.web_app_test import WebAppTest
 from ...pages.lms.account_settings import AccountSettingsPage
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.dashboard import DashboardPage
-from ..helpers import EventsTestMixin
 
 from ..helpers import EventsTestMixin
 
@@ -19,42 +18,41 @@ class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
     Mixin with helper methods to test the account settings page.
     """
 
-    USERNAME = u"test"
-    PASSWORD = "testpass"
-    EMAIL = u"test@example.com"
     CHANGE_INITIATED_EVENT_NAME = u"edx.user.settings.change_initiated"
     USER_SETTINGS_CHANGED_EVENT_NAME = 'edx.user.settings.changed'
     ACCOUNT_SETTINGS_REFERER = u"/account/settings"
 
-    def setUp(self):
+    def log_in_as_unique_user(self, email=None):
         """
-        Initialize account and pages.
+        Create a unique user and return the account's username and id.
         """
-        super(AccountSettingsTestMixin, self).setUp()
+        username = "test_{uuid}".format(uuid=self.unique_id[0:6])
+        auto_auth_page = AutoAuthPage(self.browser, username=username, email=email).visit()
+        user_id = auto_auth_page.get_user_id()
+        return username, user_id
 
-        self.user_id = AutoAuthPage(
-            self.browser, username=self.USERNAME, password=self.PASSWORD, email=self.EMAIL
-        ).visit().get_user_id()
-
-    def assert_event_emitted_num_times(self, setting, num_times):
+    def assert_event_emitted_num_times(self, user_id, setting, num_times):
         """
         Verify a particular user settings change event was emitted a certain
         number of times.
         """
         # pylint disable=no-member
         super(AccountSettingsTestMixin, self).assert_event_emitted_num_times(
-            self.USER_SETTINGS_CHANGED_EVENT_NAME, self.start_time, self.user_id, num_times, setting=setting
+            self.USER_SETTINGS_CHANGED_EVENT_NAME, self.start_time, user_id, num_times, setting=setting
         )
 
-    def verify_settings_changed_events(self, events, table=None):
+    def verify_settings_changed_events(self, username, user_id, events, table=None):
         """
         Verify a particular set of account settings change events were fired.
         """
         expected_referers = [self.ACCOUNT_SETTINGS_REFERER] * len(events)
         for event in events:
-            event[u'user_id'] = long(self.user_id)
+            event[u'user_id'] = long(user_id)
             event[u'table'] = u"auth_userprofile" if table is None else table
-        self.verify_events_of_type(self.USER_SETTINGS_CHANGED_EVENT_NAME, events, expected_referers=expected_referers)
+        self.verify_events_of_type(
+            username, self.USER_SETTINGS_CHANGED_EVENT_NAME, events,
+            expected_referers=expected_referers
+        )
 
 
 class DashboardMenuTest(AccountSettingsTestMixin, WebAppTest):
@@ -71,6 +69,7 @@ class DashboardMenuTest(AccountSettingsTestMixin, WebAppTest):
         And I click on "Account Settings" in the top drop down
         Then I should see my account settings page
         """
+        self.log_in_as_unique_user()
         dashboard_page = DashboardPage(self.browser)
         dashboard_page.visit()
         dashboard_page.click_username_dropdown()
@@ -89,10 +88,16 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         Initialize account and pages.
         """
         super(AccountSettingsPageTest, self).setUp()
+        self.username, self.user_id = self.log_in_as_unique_user()
+        self.visit_account_settings_page()
 
-        # Visit the account settings page for the current user.
+    def visit_account_settings_page(self):
+        """
+        Visit the account settings page for the current user.
+        """
         self.account_settings_page = AccountSettingsPage(self.browser)
         self.account_settings_page.visit()
+        self.account_settings_page.wait_for_ajax()
 
     def test_page_view_event(self):
         """
@@ -104,9 +109,10 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         Then a page view analytics event should be recorded
         """
         self.verify_events_of_type(
+            self.username,
             u"edx.user.settings.viewed",
             [{
-                u"user_id": int(self.user_id),
+                u"user_id": long(self.user_id),
                 u"page": u"account",
                 u"visibility": None,
             }]
@@ -195,6 +201,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
                 self.account_settings_page.wait_for_loading_indicator()
             else:
                 self.browser.refresh()
+                self.account_settings_page.wait_for_page()
             self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id), new_value)
 
     def _test_link_field(self, field_id, title, link_title, success_message):
@@ -210,11 +217,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         """
         Test behaviour of "Username" field.
         """
-        self._test_readonly_field(
-            'username',
-            'Username',
-            self.USERNAME,
-        )
+        self._test_readonly_field('username', 'Username', self.username)
 
     def test_full_name_field(self):
         """
@@ -223,21 +226,22 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         self._test_text_field(
             u'name',
             u'Full Name',
-            self.USERNAME,
+            self.username,
             u'@',
-            [u'another name', self.USERNAME],
+            [u'another name', self.username],
         )
 
         self.verify_settings_changed_events(
+            self.username, self.user_id,
             [{
                 u"setting": u"name",
-                u"old": self.USERNAME,
+                u"old": self.username,
                 u"new": u"another name",
             },
             {
                 u"setting": u"name",
                 u"old": u'another name',
-                u"new": self.USERNAME,
+                u"new": self.username,
             }]
         )
 
@@ -245,10 +249,13 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         """
         Test behaviour of "Email" field.
         """
+        EMAIL = u"test@example.com"
+        username, user_id = self.log_in_as_unique_user(email=EMAIL)
+        self.visit_account_settings_page()
         self._test_text_field(
             u'email',
             u'Email Address',
-            self.EMAIL,
+            EMAIL,
             u'@',
             [u'me@here.com', u'you@there.com'],
             success_message='Click the link in the message to update your email address.',
@@ -256,18 +263,19 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         )
 
         self.verify_events_of_type(
+            username,
             self.CHANGE_INITIATED_EVENT_NAME,
             [
                 {
-                    u"user_id": int(self.user_id),
+                    u"user_id": long(user_id),
                     u"setting": u"email",
-                    u"old": self.EMAIL,
+                    u"old": EMAIL,
                     u"new": u'me@here.com'
                 },
                 {
-                    u"user_id": int(self.user_id),
+                    u"user_id": long(user_id),
                     u"setting": u"email",
-                    u"old": self.EMAIL,  # NOTE the first email change was never confirmed, so old has not changed.
+                    u"old": EMAIL,  # NOTE the first email change was never confirmed, so old has not changed.
                     u"new": u'you@there.com'
                 }
             ],
@@ -275,7 +283,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         )
         # Email is not saved until user confirms, so no events should have been
         # emitted.
-        self.assert_event_emitted_num_times('email', 0)
+        self.assert_event_emitted_num_times(user_id, 'email', 0)
 
     def test_password_field(self):
         """
@@ -289,6 +297,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         )
 
         self.verify_events_of_type(
+            self.username,
             self.CHANGE_INITIATED_EVENT_NAME,
             [{
                 u"user_id": int(self.user_id),
@@ -300,7 +309,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         )
         # Like email, since the user has not confirmed their password change,
         # the field has not yet changed, so no events will have been emitted.
-        self.assert_event_emitted_num_times('password', 0)
+        self.assert_event_emitted_num_times(self.user_id, 'password', 0)
 
     @skip(
         'On bokchoy test servers, language changes take a few reloads to fully realize '
@@ -329,6 +338,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             [u'Bachelor\'s degree', u''],
         )
         self.verify_settings_changed_events(
+            self.username, self.user_id,
             [{
                 u"setting": u"level_of_education",
                 u"old": None,
@@ -352,6 +362,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             [u'Female', u''],
         )
         self.verify_settings_changed_events(
+            self.username, self.user_id,
             [{
                 u"setting": u"gender",
                 u"old": None,
@@ -378,6 +389,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             [u'1980', u''],
         )
         self.verify_settings_changed_events(
+            self.username, self.user_id,
             [{
                 u"setting": u"year_of_birth",
                 u"old": None,
@@ -400,17 +412,21 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             u'',
             [u'Pakistan', u'Palau'],
         )
+
+    def test_country_field_events(self):
+        """
+        Test that saving the country field records the correct events.
+        """
+        self.reset_event_tracking()
+        self.assertEqual(self.account_settings_page.value_for_dropdown_field(u'country', u'Pakistan'), u'Pakistan')
+        self.account_settings_page.wait_for_messsage(u'country', self.SUCCESS_MESSAGE)
         self.verify_settings_changed_events(
+            self.username, self.user_id,
             [{
                 u"setting": u"country",
                 u"old": None,
                 u"new": u'PK',
-            },
-            {
-                u"setting": u"country",
-                u"old": u'PK',
-                u"new": u'PW',
-            }]
+            }],
         )
 
     def test_preferred_language_field(self):
