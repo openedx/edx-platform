@@ -89,19 +89,20 @@ class LearnerProfileTestMixin(EventsTestMixin):
         Verify that the profile page is currently public.
         :return:
         """
-        self.assertTrue(profile_page.privacy_field_visible)
         self.assertEqual(profile_page.visible_fields, self.PUBLIC_PROFILE_FIELDS)
         if is_editable:
+            self.assertTrue(profile_page.privacy_field_visible)
             self.assertEqual(profile_page.editable_fields, self.PUBLIC_PROFILE_EDITABLE_FIELDS)
         else:
             self.assertEqual(profile_page.editable_fields, [])
 
-    def verify_profile_page_is_private(self, profile_page):
+    def verify_profile_page_is_private(self, profile_page, is_editable=True):
         """
         Verify that the profile page is currently private.
         :return:
         """
-        self.assertTrue(profile_page.privacy_field_visible)
+        if is_editable:
+            self.assertTrue(profile_page.privacy_field_visible)
         self.assertEqual(profile_page.visible_fields, self.PRIVATE_PROFILE_FIELDS)
 
     def verify_profile_page_view_event(self, requesting_username, profile_user_id, visibility=None):
@@ -133,7 +134,7 @@ class LearnerProfileTestMixin(EventsTestMixin):
         Verifies that the correct user preference changed event was recorded.
         """
         self.verify_events_of_type(
-            username, user_id,
+            username,
             u"edx.user.settings.changed",
             [{
                 u"user_id": long(user_id),
@@ -142,7 +143,7 @@ class LearnerProfileTestMixin(EventsTestMixin):
                 u"old": old_value,
                 u"new": new_value,
                 u"truncated": [],
-            },],
+            }],
             expected_referers=["/u/{username}".format(username=username)],
         )
 
@@ -627,7 +628,7 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         different_username, different_user_id = self._initialize_different_user(privacy=self.PRIVACY_PRIVATE)
         username, __ = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(different_username)
-        self.verify_profile_page_is_private(profile_page)
+        self.verify_profile_page_is_private(profile_page, is_editable=False)
         self.verify_profile_page_view_event(username, different_user_id, visibility=self.PRIVACY_PRIVATE)
 
     def test_different_user_public_profile(self):
