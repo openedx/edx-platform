@@ -42,7 +42,7 @@
     i {
       color: $gray-l2;
       vertical-align:text-bottom;
-      margin-right: 5px;
+      @include margin-right(5px);
     }
 
     .message-can-edit {
@@ -70,7 +70,7 @@
     input[type="text"],
     input[type="text"]:focus {
         background-color: transparent;
-        padding: 0px;
+        padding: 0;
         border: none;
         box-shadow: none;
     }
