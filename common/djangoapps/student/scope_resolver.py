@@ -127,7 +127,7 @@ class StudentEmailScopeResolver(NotificationUserScopeResolver):
         The entry point to resolve a scope_name with a given scope_context
         """
 
-        if scope_name != 'student_email_resolver':
+        if scope_name != 'user_email_resolver':
             # we can't resolve any other scopes
             return None
 
