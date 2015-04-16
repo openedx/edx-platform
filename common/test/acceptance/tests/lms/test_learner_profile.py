@@ -27,6 +27,8 @@ class LearnerProfileTestMixin(EventsTestMixin):
 
     PUBLIC_PROFILE_EDITABLE_FIELDS = ['country', 'language_proficiencies', 'bio']
 
+    USER_SETTINGS_CHANGED_EVENT_NAME = u"edx.user.settings.changed"
+
     def log_in_as_unique_user(self):
         """
         Create a unique user and return the account's username and id.
@@ -93,6 +95,16 @@ class LearnerProfileTestMixin(EventsTestMixin):
                 u"page": u"profile",
                 u"visibility": unicode(visibility),
             }]
+        )
+
+    def assert_event_emitted_num_times(self, profile_user_id, setting, num_times):
+        """
+        Verify a particular user settings change event was emitted a certain
+        number of times.
+        """
+        # pylint disable=no-member
+        super(LearnerProfileTestMixin, self).assert_event_emitted_num_times(
+            self.USER_SETTINGS_CHANGED_EVENT_NAME, self.start_time, profile_user_id, num_times, setting=setting
         )
 
 
@@ -399,6 +411,8 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         profile_page.visit()
         self.assertTrue(profile_page.image_upload_success)
 
+        self.assert_event_emitted_num_times(user_id, 'profile_image_uploaded_at', 1)
+
     def test_user_can_see_error_for_exceeding_max_file_size_limit(self):
         """
         Scenario: Upload profile image does not work for > 1MB image file.
@@ -420,6 +434,8 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self.assertEqual(profile_page.profile_image_message, "Your image must be smaller than 1 MB in size.")
         profile_page.visit()
         self.assertTrue(profile_page.profile_has_default_image)
+
+        self.assert_event_emitted_num_times(user_id, 'profile_image_uploaded_at', 0)
 
     def test_user_can_see_error_for_file_size_below_the_min_limit(self):
         """
@@ -443,6 +459,8 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         profile_page.visit()
         self.assertTrue(profile_page.profile_has_default_image)
 
+        self.assert_event_emitted_num_times(user_id, 'profile_image_uploaded_at', 0)
+
     def test_user_can_see_error_for_wrong_file_type(self):
         """
         Scenario: Upload profile image does not work for wrong file types.
@@ -464,6 +482,8 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self.assertEqual(profile_page.profile_image_message, "Unsupported file type.")
         profile_page.visit()
         self.assertTrue(profile_page.profile_has_default_image)
+
+        self.assert_event_emitted_num_times(user_id, 'profile_image_uploaded_at', 0)
 
     def test_user_can_remove_profile_image(self):
         """
@@ -489,6 +509,8 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         profile_page.visit()
         self.assertTrue(profile_page.profile_has_default_image)
 
+        self.assert_event_emitted_num_times(user_id, 'profile_image_uploaded_at', 1)
+
     def test_user_cannot_remove_default_image(self):
         """
         Scenario: Remove profile image does not works for default images.
@@ -504,6 +526,21 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
 
         self.assert_default_image_has_public_access(profile_page)
         self.assertFalse(profile_page.remove_link_present)
+
+    def test_eventing_after_multiple_uploads(self):
+        """
+        Scenario: An event is fired when a user with a profile image uploads another image
+
+        Given that I am on my profile page with public access
+        And I upload a new image via file uploader
+        When I upload another image via the file uploader
+        Then two upload events have been emitted
+        """
+        username, user_id = self.log_in_as_unique_user()
+        profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
+        profile_page.upload_file(filename='image.jpg')
+        profile_page.upload_file(filename='image.jpg')
+        self.assert_event_emitted_num_times(user_id, 'profile_image_uploaded_at', 2)
 
 
 class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
