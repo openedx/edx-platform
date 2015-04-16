@@ -63,6 +63,7 @@
             .upload-button-icon, .upload-button-title {
                 text-align: center;
                 transform: translateY(35px);
+                -webkit-transform: translateY(35px);
                 display: block;
                 color: $white;
                 margin-bottom: ($baseline/4);
@@ -74,7 +75,7 @@
                 height: 100%;
                 position: absolute;
                 top: 0;
-                left: 0;
+                @include left(0);
                 opacity: 0;
                 cursor: pointer;
             }
@@ -160,7 +161,7 @@
     }
 
     .profile-section-one-fields {
-        float: left;
+        @include float(left);
         width: flex-grid(4, 12);
         @include margin-left($baseline*1.5);
 
@@ -243,7 +244,7 @@
             border: 2px dashed $gray-l3;
             i {
               font-size: 12px;
-              padding-right: 5px;
+              @include padding-right(5px);
               vertical-align: middle;
               color: $gray;
             }
