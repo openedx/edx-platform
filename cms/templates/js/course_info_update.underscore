@@ -9,16 +9,16 @@
 		<div class="row">
 			<textarea class="new-update-content text-editor"><%= updateModel.get('content') %></textarea>
 		</div>
+        <%if (push_notification_enabled) { %>
+    		<div class="row new-update-push-notification">
+                <input type="checkbox" class="toggle-checkbox" data-tooltip="<%= gettext('Send push notification to mobile apps') %>" checked />
+                <label class="inline-label"><%= gettext('Send notification to mobile apps') %></label>
+            </div>
+        <% } %>
 		<div class="row">
 			<!-- cid rather than id b/c new ones have cid's not id's -->
-			<a href="#" class="save-button" name="<%= updateModel.cid %>">Post</a>
-			<a href="#" class="cancel-button" name="<%= updateModel.cid %>">Cancel</a>
-            <%if (push_notification_enabled) { %>
-                <div class="new-update-push-notification">
-                    <label class="inline-label">Send push notification</label>
-                    <input type="checkbox" class="toggle-checkbox" data-tooltip="<%= gettext('Send push notification to mobile devices') %>" checked />
-                </div>
-            <% } %>
+			<a href="#" class="save-button" name="<%= updateModel.cid %>"><%= gettext('Post') %></a>
+			<a href="#" class="cancel-button" name="<%= updateModel.cid %>"><%= gettext('Cancel') %></a>
 		</div>
 	</form>
 	<div class="post-preview">

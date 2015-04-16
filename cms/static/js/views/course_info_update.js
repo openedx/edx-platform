@@ -30,6 +30,7 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
                 try {
                     CourseInfoHelper.changeContentToPreview(
                         update, 'content', self.options['base_asset_url']);
+                    // push notification is always disabled for existing updates
                     var newEle = self.template({ updateModel : update, push_notification_enabled : false });
                     $(updateEle).append(newEle);
                 } catch (e) {
@@ -99,9 +100,6 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
                     ele.remove();
                 }
             });
-            var push_notification_ele = ele.find(".new-update-push-notification");
-            if (push_notification_ele)
-                push_notification_ele.hide();
             this.closeEditor(false);
 
             analytics.track('Saved Course Update', {
@@ -209,6 +207,11 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
                 }
                 this.$currentPost.find('form').hide();
                 this.$currentPost.find('.CodeMirror').remove();
+
+                // hide the push notification checkbox for subsequent edits to the Post
+                var push_notification_ele = this.$currentPost.find(".new-update-push-notification");
+                if (push_notification_ele)
+                    push_notification_ele.hide();
             }
 
             ModalUtils.hideModalCover(this.$modalCover);

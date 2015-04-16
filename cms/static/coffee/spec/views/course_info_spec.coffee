@@ -169,15 +169,15 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
                 @courseInfoEdit.onNew(@event)
                 @requests = AjaxHelpers["requests"](this)
 
-            it "shows push notification checkbox", ->
+            it "shows push notification checkbox as selected by default", ->
                 expect(@courseInfoEdit.$el.find('.toggle-checkbox')).toBeChecked()
 
-            it "sends correct value if push notification is selected", ->
+            it "sends correct default value for push_notification_selected", ->
                 @courseInfoEdit.$el.find('.save-button').click()
                 requestSent = JSON.parse(@requests[@requests.length - 1].requestBody)
                 expect(requestSent.push_notification_selected).toEqual(true)
 
-            it "sends correct value if push notification is unselected", ->
+            it "sends correct value for push_notification_selected when it is unselected", ->
                 # unselect push notification
                 @courseInfoEdit.$el.find('.toggle-checkbox').attr('checked', false);
 
