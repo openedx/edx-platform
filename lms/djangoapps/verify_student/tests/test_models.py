@@ -128,7 +128,8 @@ def mock_software_secure_post_unavailable(url, headers=None, data=None, **kwargs
 @patch('verify_student.models.S3Connection', new=MockS3Connection)
 @patch('verify_student.models.Key', new=MockKey)
 @patch('verify_student.models.requests.post', new=mock_software_secure_post)
-class TestPhotoVerification(TestCase):
+@ddt.ddt
+class TestPhotoVerification(ModuleStoreTestCase):
 
     def test_state_transitions(self):
         """
@@ -504,6 +505,29 @@ class TestPhotoVerification(TestCase):
         query = SoftwareSecurePhotoVerification.objects.filter(user=user)
         result = SoftwareSecurePhotoVerification.verification_for_datetime(deadline, query)
         self.assertEqual(result, second_attempt)
+
+    @ddt.unpack
+    @ddt.data(
+        {'enrollment_mode': 'honor', 'status': (None, None), 'output': 'N/A'},
+        {'enrollment_mode': 'verified', 'status': (False, False), 'output': 'Not ID Verified'},
+        {'enrollment_mode': 'verified', 'status': (True, True), 'output': 'ID Verified'},
+        {'enrollment_mode': 'verified', 'status': (True, False), 'output': 'ID Verification Expired'}
+    )
+    def test_verification_status_for_user(self, enrollment_mode, status, output):
+        """
+        Verify verification_status_for_user returns correct status.
+        """
+        user = UserFactory.create()
+        course = CourseFactory.create()
+
+        user_reverified_path = 'verify_student.models.SoftwareSecurePhotoVerification.user_is_reverified_for_all'
+        with patch('verify_student.models.SoftwareSecurePhotoVerification.user_is_verified') as mock_verification:
+            with patch(user_reverified_path) as mock_re_verification:
+                mock_verification.return_value = status[0]
+                mock_re_verification.return_value = status[1]
+
+                status = SoftwareSecurePhotoVerification.verification_status_for_user(user, course.id, enrollment_mode)
+                self.assertEqual(status, output)
 
 
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)

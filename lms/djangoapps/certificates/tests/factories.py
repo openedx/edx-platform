@@ -1,6 +1,8 @@
 from factory.django import DjangoModelFactory
 
-from certificates.models import GeneratedCertificate, CertificateStatuses, CertificateHtmlViewConfiguration
+from certificates.models import (
+    GeneratedCertificate, CertificateStatuses, CertificateHtmlViewConfiguration, CertificateWhitelist
+)
 
 
 # Factories are self documenting
@@ -13,6 +15,14 @@ class GeneratedCertificateFactory(DjangoModelFactory):
     status = CertificateStatuses.unavailable
     mode = GeneratedCertificate.MODES.honor
     name = ''
+
+
+class CertificateWhitelistFactory(DjangoModelFactory):
+
+    FACTORY_FOR = CertificateWhitelist
+
+    course_id = None
+    whitelist = True
 
 
 class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):

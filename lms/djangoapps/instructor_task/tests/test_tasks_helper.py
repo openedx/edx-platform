@@ -11,18 +11,21 @@ from mock import Mock, patch
 import tempfile
 import unicodecsv
 
-from xmodule.modulestore.tests.factories import CourseFactory
-from student.tests.factories import UserFactory
-from student.models import CourseEnrollment
-from xmodule.partitions.partitions import Group, UserPartition
-
+from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from certificates.tests.factories import GeneratedCertificateFactory, CertificateWhitelistFactory
+from course_modes.models import CourseMode
+from instructor_task.models import ReportStore
+from instructor_task.tasks_helper import cohort_students_and_upload, upload_grades_csv, upload_students_csv
+from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin, InstructorTaskModuleTestCase
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
-from instructor_task.models import ReportStore
-from instructor_task.tasks_helper import cohort_students_and_upload, upload_grades_csv, upload_students_csv
-from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin
+from student.tests.factories import UserFactory
+from student.models import CourseEnrollment
+from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.partitions.partitions import Group, UserPartition
 
 
 @ddt.ddt
@@ -250,7 +253,7 @@ class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
         mock_iterate_grades_for.return_value = [
             (
                 self.create_student('username', 'student@example.com'),
-                {'section_breakdown': [{'label': u'\u8282\u540e\u9898 01'}], 'percent': 0},
+                {'section_breakdown': [{'label': u'\u8282\u540e\u9898 01'}], 'percent': 0, 'grade': None},
                 'Cannot grade student'
             )
         ]
@@ -538,3 +541,141 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             ],
             verify_order=False
         )
+
+
+@ddt.ddt
+@patch('instructor_task.tasks_helper.DefaultStorage', new=MockDefaultStorage)
+class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTaskModuleTestCase):
+    """
+    Test that grade report has correct user enrolment, verification, and certificate information.
+    """
+    def setUp(self):
+        super(TestGradeReportEnrollmentAndCertificateInfo, self).setUp()
+
+        self.initialize_course()
+
+        self.create_problem()
+
+        self.columns_to_check = [
+            'Enrollment Track',
+            'Verification Status',
+            'Certificate Eligible',
+            'Certificate Delivered',
+            'Certificate Type'
+        ]
+
+    def create_problem(self, problem_display_name='test_problem', parent=None):
+        """
+        Create a multiple choice response problem.
+        """
+        if parent is None:
+            parent = self.problem_section
+
+        factory = MultipleChoiceResponseXMLFactory()
+        args = {'choices': [False, True, False]}
+        problem_xml = factory.build_xml(**args)
+        ItemFactory.create(
+            parent_location=parent.location,
+            parent=parent,
+            category="problem",
+            display_name=problem_display_name,
+            data=problem_xml
+        )
+
+    def user_is_embargoed(self, user, is_embargoed):
+        """
+        Set a users emabargo state.
+        """
+        user_profile = UserFactory(username=user.username, email=user.email).profile
+        user_profile.allow_certificate = not is_embargoed
+        user_profile.save()
+
+    def _verify_csv_data(self, username, expected_data):
+        """
+        Verify grade report data.
+        """
+        with patch('instructor_task.tasks_helper._get_current_task'):
+            upload_grades_csv(None, None, self.course.id, None, 'graded')
+            report_store = ReportStore.from_config()
+            report_csv_filename = report_store.links_for(self.course.id)[0][0]
+            with open(report_store.path_to(self.course.id, report_csv_filename)) as csv_file:
+                for row in unicodecsv.DictReader(csv_file):
+                    if row.get('username') == username:
+                        csv_row_data = [row[column] for column in self.columns_to_check]
+                        self.assertEqual(csv_row_data, expected_data)
+
+    def _create_user_data(self,
+                          user_enroll_mode,
+                          has_passed,
+                          whitelisted,
+                          is_embargoed,
+                          verification_status,
+                          certificate_status,
+                          certificate_mode):
+        """
+        Create user data to be used during grade report generation.
+        """
+
+        user = self.create_student('u1', mode=user_enroll_mode)
+
+        if has_passed:
+            self.submit_student_answer('u1', 'test_problem', ['choice_1'])
+
+        CertificateWhitelistFactory.create(user=user, course_id=self.course.id, whitelist=whitelisted)
+
+        self.user_is_embargoed(user, is_embargoed)
+
+        if user_enroll_mode in CourseMode.VERIFIED_MODES:
+            SoftwareSecurePhotoVerificationFactory.create(user=user, status=verification_status)
+
+        GeneratedCertificateFactory.create(
+            user=user,
+            course_id=self.course.id,
+            status=certificate_status,
+            mode=certificate_mode
+        )
+
+        return user
+
+    @ddt.data(
+        (
+            'verified', False, False, False, 'approved', 'notpassing', 'honor',
+            ['verified', 'ID Verified', 'N', 'N', 'N/A']
+        ),
+        (
+            'verified', False, True, False, 'approved', 'downloadable', 'verified',
+            ['verified', 'ID Verified', 'Y', 'Y', 'verified']
+        ),
+        (
+            'honor', True, True, True, 'approved', 'restricted', 'honor',
+            ['honor', 'N/A', 'N', 'N', 'N/A']
+        ),
+        (
+            'verified', True, True, False, 'must_retry', 'downloadable', 'honor',
+            ['verified', 'Not ID Verified', 'Y', 'Y', 'honor']
+        ),
+    )
+    @ddt.unpack
+    def test_grade_report_enrollment_and_certificate_info(
+            self,
+            user_enroll_mode,
+            has_passed,
+            whitelisted,
+            is_embargoed,
+            verification_status,
+            certificate_status,
+            certificate_mode,
+            expected_output
+    ):
+
+        user = self._create_user_data(
+            user_enroll_mode,
+            has_passed,
+            whitelisted,
+            is_embargoed,
+            verification_status,
+            certificate_status,
+            certificate_mode
+        )
+
+        self._verify_csv_data(user.username, expected_output)

@@ -10,9 +10,11 @@ import unicodecsv
 from uuid import uuid4
 
 from celery.states import SUCCESS, FAILURE
+from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.test.testcases import TestCase
 from django.contrib.auth.models import User
+from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
@@ -147,21 +149,21 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
             self.login(InstructorTaskCourseTestCase.get_user_email(username), "test")
             self.current_user = username
 
-    def _create_user(self, username, email=None, is_staff=False):
+    def _create_user(self, username, email=None, is_staff=False, mode='honor'):
         """Creates a user and enrolls them in the test course."""
         if email is None:
             email = InstructorTaskCourseTestCase.get_user_email(username)
         thisuser = UserFactory.create(username=username, email=email, is_staff=is_staff)
-        CourseEnrollmentFactory.create(user=thisuser, course_id=self.course.id)
+        CourseEnrollmentFactory.create(user=thisuser, course_id=self.course.id, mode=mode)
         return thisuser
 
     def create_instructor(self, username, email=None):
         """Creates an instructor for the test course."""
         return self._create_user(username, email, is_staff=True)
 
-    def create_student(self, username, email=None):
+    def create_student(self, username, email=None, mode='honor'):
         """Creates a student for the test course."""
-        return self._create_user(username, email, is_staff=False)
+        return self._create_user(username, email, is_staff=False, mode=mode)
 
     @staticmethod
     def get_task_status(task_id):
@@ -236,6 +238,40 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
                                          module_state_key=descriptor.location,
                                          )
 
+    def submit_student_answer(self, username, problem_url_name, responses):
+        """
+        Use ajax interface to submit a student answer.
+
+        Assumes the input list of responses has two values.
+        """
+        def get_input_id(response_id):
+            """Creates input id using information about the test course and the current problem."""
+            # Note that this is a capa-specific convention.  The form is a version of the problem's
+            # URL, modified so that it can be easily stored in html, prepended with "input-" and
+            # appended with a sequence identifier for the particular response the input goes to.
+            return 'input_i4x-{0}-{1}-problem-{2}_{3}'.format(TEST_COURSE_ORG.lower(),
+                                                              TEST_COURSE_NUMBER.replace('.', '_'),
+                                                              problem_url_name, response_id)
+
+        # make sure that the requested user is logged in, so that the ajax call works
+        # on the right problem:
+        self.login_username(username)
+        # make ajax call:
+        modx_url = reverse('xblock_handler', kwargs={
+            'course_id': self.course.id.to_deprecated_string(),
+            'usage_id': quote_slashes(
+                InstructorTaskModuleTestCase.problem_location(problem_url_name).to_deprecated_string()
+            ),
+            'handler': 'xmodule_handler',
+            'suffix': 'problem_check',
+        })
+
+        # assign correct identifier to each response.
+        resp = self.client.post(modx_url, {
+            get_input_id('{}_1').format(index): response for index, response in enumerate(responses, 2)
+        })
+        return resp
+
 
 class TestReportMixin(object):
     """
@@ -246,7 +282,7 @@ class TestReportMixin(object):
         if os.path.exists(reports_download_path):
             shutil.rmtree(reports_download_path)
 
-    def verify_rows_in_csv(self, expected_rows, verify_order=True):
+    def verify_rows_in_csv(self, expected_rows, verify_order=True, ignore_other_columns=False):
         """
         Verify that the last ReportStore CSV contains the expected content.
 
@@ -259,12 +295,20 @@ class TestReportMixin(object):
                 content and order of `expected_rows` matches the
                 actual csv rows.  When False (default), we only verify
                 that the content matches.
+            ignore_other_columns (boolean): When True, we verify that `expected_rows`
+                contain data which is the subset of actual csv rows.
         """
         report_store = ReportStore.from_config()
         report_csv_filename = report_store.links_for(self.course.id)[0][0]
         with open(report_store.path_to(self.course.id, report_csv_filename)) as csv_file:
             # Expand the dict reader generator so we don't lose it's content
             csv_rows = [row for row in unicodecsv.DictReader(csv_file)]
+
+            if ignore_other_columns:
+                csv_rows = [
+                    {key: row.get(key) for key in expected_rows[index].keys()} for index, row in enumerate(csv_rows)
+                ]
+
             if verify_order:
                 self.assertEqual(csv_rows, expected_rows)
             else:
