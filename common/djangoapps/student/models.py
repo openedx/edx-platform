@@ -1671,6 +1671,13 @@ class EntranceExamConfiguration(models.Model):
 class LanguageProficiency(models.Model):
     """
     Represents a user's language proficiency.
+
+    Note that we have not found a way to emit analytics change events by using signals directly on this
+    model or on UserProfile. Therefore if you are changing LanguageProficiency values, it is important
+    to go through the accounts API (AccountsView) defined in
+    /edx-platform/openedx/core/djangoapps/user_api/accounts/views.py or the AccountLegacyProfileSerializer
+    in /edx-platform/openedx/core/djangoapps/user_api/accounts/serializers.py so that the events are
+    emitted.
     """
     class Meta:
         unique_together = (('code', 'user_profile'),)

@@ -15,7 +15,7 @@ from student.tests.factories import UserFactory
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
-from student.models import PendingEmailChange
+from student.models import PendingEmailChange, USER_SETTINGS_CHANGED_EVENT_NAME
 from ...errors import (
     UserNotFound, UserNotAuthorized, AccountUpdateError, AccountValidationError,
     AccountUserAlreadyExists, AccountUsernameInvalid, AccountEmailInvalid, AccountPasswordInvalid, AccountRequestError
@@ -24,6 +24,7 @@ from ..api import (
     get_account_settings, update_account_settings, create_account, activate_account, request_password_change
 )
 from .. import USERNAME_MAX_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MAX_LENGTH
+from util.testing import EventTestMixin
 
 
 def mock_render_to_string(template_name, context):
@@ -32,7 +33,7 @@ def mock_render_to_string(template_name, context):
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
-class TestAccountApi(TestCase):
+class TestAccountApi(EventTestMixin, TestCase):
     """
     These tests specifically cover the parts of the API methods that are not covered by test_views.py.
     This includes the specific types of error raised, and default behavior when optional arguments
@@ -41,7 +42,7 @@ class TestAccountApi(TestCase):
     password = "test"
 
     def setUp(self):
-        super(TestAccountApi, self).setUp()
+        super(TestAccountApi, self).setUp('openedx.core.djangoapps.user_api.accounts.api.tracker')
         self.user = UserFactory.create(password=self.password)
         self.different_user = UserFactory.create(password=self.password)
         self.staff_user = UserFactory(is_staff=True, password=self.password)
@@ -190,6 +191,31 @@ class TestAccountApi(TestCase):
         # Verify that no email change request was initiated.
         pending_change = PendingEmailChange.objects.filter(user=self.user)
         self.assertEqual(0, len(pending_change))
+
+    def test_language_proficiency_eventing(self):
+        """
+        Test that eventing of language proficiencies, which happens update_account_settings method, behaves correctly.
+        """
+        def verify_event_emitted(new_value, old_value):
+            update_account_settings(self.user, {"language_proficiencies": new_value})
+            self.assert_event_emitted(
+                USER_SETTINGS_CHANGED_EVENT_NAME, setting="language_proficiencies",
+                old=old_value, new=new_value, user_id=self.user.id, table="student_languageproficiency"
+            )
+            self.reset_tracker()
+
+        # First, test that no event is emitted if language_proficiencies is not included.
+        update_account_settings(self.user, {"year_of_birth": 900})
+        account_settings = get_account_settings(self.user)
+        self.assertEqual(900, account_settings["year_of_birth"])
+        self.assert_no_events_were_emitted()
+
+        # New change language_proficiencies and verify events are fired.
+        verify_event_emitted([{"code": "en"}], [])
+        verify_event_emitted([{"code": "en"}, {"code": "fr"}], [{"code": "en"}])
+        # Note that events are fired even if there has been no actual change.
+        verify_event_emitted([{"code": "en"}, {"code": "fr"}], [{"code": "en"}, {"code": "fr"}])
+        verify_event_emitted([], [{"code": "en"}, {"code": "fr"}])
 
 
 @patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
