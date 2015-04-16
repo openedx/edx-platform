@@ -5,11 +5,11 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
         'use strict';
 
         var verifyAuthField = function (view, data, requests) {
-            var selector = '.u-field-value > a';
+            var selector = '.u-field-value .u-field-link-title-' + view.options.valueAttribute;
 
             spyOn(view, 'redirect_to');
 
-            FieldViewsSpecHelpers.expectTitleAndMessageToBe(view, data.title, data.helpMessage);
+            FieldViewsSpecHelpers.expectTitleAndMessageToContain(view, data.title, data.helpMessage);
             expect(view.$(selector).text().trim()).toBe('Unlink');
             view.$(selector).click();
             FieldViewsSpecHelpers.expectMessageContains(view, 'Unlinking');

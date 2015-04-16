@@ -182,7 +182,7 @@ class FieldsMixin(object):
         """
         self.wait_for_field(field_id)
 
-        return self.q(css='.u-field-{} .u-field-value'.format(field_id)).text[0]
+        return self.q(css='.u-field-{} .u-field-value .u-field-value-readonly'.format(field_id)).text[0]
 
     def value_for_dropdown_field(self, field_id, value=None):
         """
@@ -210,7 +210,7 @@ class FieldsMixin(object):
         """
         self.wait_for_field(field_id)
 
-        query = self.q(css='.u-field-{} a'.format(field_id))
+        query = self.q(css='.u-field-link-title-{}'.format(field_id))
         return query.text[0] if query.present else None
 
     def click_on_link_in_link_field(self, field_id):
