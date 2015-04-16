@@ -181,6 +181,9 @@ INSTALLED_APPS += ('external_auth', )
 # Add milestones to Installed apps for testing
 INSTALLED_APPS += ('milestones', 'openedx.core.djangoapps.call_stack_manager')
 
+# Add projects, organizations,'api_manager', 'progress', 'gradebook to Installed apps for testing
+INSTALLED_APPS += ('projects', 'organizations', 'api_manager', 'progress', 'gradebook', )
+
 # hide ratelimit warnings while running tests
 filterwarnings('ignore', message='No request passed to the backend, unable to rate-limit')
 
