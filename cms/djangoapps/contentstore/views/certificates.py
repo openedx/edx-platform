@@ -124,9 +124,6 @@ class CertificateManager(object):
         Deserialize from a JSON representation into a Certificate object.
         'value' should be either a Certificate instance, or a valid JSON string
         """
-        # If the value is already a Certificate object instance, just hand that back
-        if isinstance(value, Certificate):
-            return value
 
         # Ensure the schema fieldset meets our expectations
         for key in ("name", "description", "version"):
@@ -143,7 +140,7 @@ class CertificateManager(object):
         return certificate
 
     @staticmethod
-    def get_certificate(course, json_string, certificate_id=None):
+    def get_certificate(course, json_string):
         """
         Returns a Certificate object instance given a valid course and JSON representation
         """
