@@ -15,7 +15,8 @@ from student.tests.factories import UserFactory
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
-from student.models import PendingEmailChange, USER_SETTINGS_CHANGED_EVENT_NAME
+from student.models import PendingEmailChange
+from student.tests.tests import UserSettingsEventTestMixin
 from ...errors import (
     UserNotFound, UserNotAuthorized, AccountUpdateError, AccountValidationError,
     AccountUserAlreadyExists, AccountUsernameInvalid, AccountEmailInvalid, AccountPasswordInvalid, AccountRequestError
@@ -24,7 +25,6 @@ from ..api import (
     get_account_settings, update_account_settings, create_account, activate_account, request_password_change
 )
 from .. import USERNAME_MAX_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MAX_LENGTH
-from util.testing import EventTestMixin
 
 
 def mock_render_to_string(template_name, context):
@@ -33,7 +33,7 @@ def mock_render_to_string(template_name, context):
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
-class TestAccountApi(EventTestMixin, TestCase):
+class TestAccountApi(UserSettingsEventTestMixin, TestCase):
     """
     These tests specifically cover the parts of the API methods that are not covered by test_views.py.
     This includes the specific types of error raised, and default behavior when optional arguments
@@ -42,10 +42,12 @@ class TestAccountApi(EventTestMixin, TestCase):
     password = "test"
 
     def setUp(self):
-        super(TestAccountApi, self).setUp('openedx.core.djangoapps.user_api.accounts.api.tracker')
+        super(TestAccountApi, self).setUp()
+        self.table = "student_languageproficiency"
         self.user = UserFactory.create(password=self.password)
         self.different_user = UserFactory.create(password=self.password)
         self.staff_user = UserFactory(is_staff=True, password=self.password)
+        self.reset_tracker()
 
     def test_get_username_provided(self):
         """Test the difference in behavior when a username is supplied to get_account_settings."""
@@ -198,19 +200,10 @@ class TestAccountApi(EventTestMixin, TestCase):
         """
         def verify_event_emitted(new_value, old_value):
             update_account_settings(self.user, {"language_proficiencies": new_value})
-            self.assert_event_emitted(
-                USER_SETTINGS_CHANGED_EVENT_NAME, setting="language_proficiencies",
-                old=old_value, new=new_value, user_id=self.user.id, table="student_languageproficiency"
-            )
+            self.assert_user_setting_event_emitted(setting='language_proficiencies', old=old_value, new=new_value)
             self.reset_tracker()
 
-        # First, test that no event is emitted if language_proficiencies is not included.
-        update_account_settings(self.user, {"year_of_birth": 900})
-        account_settings = get_account_settings(self.user)
-        self.assertEqual(900, account_settings["year_of_birth"])
-        self.assert_no_events_were_emitted()
-
-        # New change language_proficiencies and verify events are fired.
+        # Change language_proficiencies and verify events are fired.
         verify_event_emitted([{"code": "en"}], [])
         verify_event_emitted([{"code": "en"}, {"code": "fr"}], [{"code": "en"}])
         # Note that events are fired even if there has been no actual change.

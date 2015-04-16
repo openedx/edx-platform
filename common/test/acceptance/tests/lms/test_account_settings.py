@@ -253,13 +253,13 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         """
         Test behaviour of "Email" field.
         """
-        EMAIL = u"test@example.com"
-        username, user_id = self.log_in_as_unique_user(email=EMAIL)
+        email = u"test@example.com"
+        username, user_id = self.log_in_as_unique_user(email=email)
         self.visit_account_settings_page()
         self._test_text_field(
             u'email',
             u'Email Address',
-            EMAIL,
+            email,
             u'@',
             [u'me@here.com', u'you@there.com'],
             success_message='Click the link in the message to update your email address.',
@@ -273,13 +273,13 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
                 {
                     u"user_id": long(user_id),
                     u"setting": u"email",
-                    u"old": EMAIL,
+                    u"old": email,
                     u"new": u'me@here.com'
                 },
                 {
                     u"user_id": long(user_id),
                     u"setting": u"email",
-                    u"old": EMAIL,  # NOTE the first email change was never confirmed, so old has not changed.
+                    u"old": email,  # NOTE the first email change was never confirmed, so old has not changed.
                     u"new": u'you@there.com'
                 }
             ],
@@ -421,22 +421,6 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             u'Country or Region',
             u'',
             [u'Pakistan', u'Palau'],
-        )
-
-    def test_country_field_events(self):
-        """
-        Test that saving the country field records the correct events.
-        """
-        self.reset_event_tracking()
-        self.assertEqual(self.account_settings_page.value_for_dropdown_field(u'country', u'Pakistan'), u'Pakistan')
-        self.account_settings_page.wait_for_messsage(u'country', self.SUCCESS_MESSAGE)
-        self.verify_settings_changed_events(
-            self.username, self.user_id,
-            [{
-                u"setting": u"country",
-                u"old": None,
-                u"new": u'PK',
-            }],
         )
 
     def test_preferred_language_field(self):

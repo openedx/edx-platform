@@ -6,7 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.core.validators import validate_email, validate_slug, ValidationError
 
-from student.models import User, UserProfile, Registration, USER_SETTINGS_CHANGED_EVENT_NAME
+from student.models import User, UserProfile, Registration
 from student import views as student_views
 from util.model_utils import emit_setting_changed_event
 
@@ -201,7 +201,6 @@ def update_account_settings(requesting_user, update, username=None):
             new_language_proficiencies = legacy_profile_serializer.data["language_proficiencies"]
             emit_setting_changed_event(
                 user=existing_user,
-                event_name=USER_SETTINGS_CHANGED_EVENT_NAME,
                 db_table=existing_user_profile.language_proficiencies.model._meta.db_table,
                 setting_name="language_proficiencies",
                 old_value=old_language_proficiencies,

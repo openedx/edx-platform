@@ -9,6 +9,9 @@ from django.db.models.fields.related import RelatedField
 
 from django_countries.fields import Country
 
+# The setting name used for events when "settings" (account settings, preferences, profile information) change.
+USER_SETTINGS_CHANGED_EVENT_NAME = u'edx.user.settings.changed'
+
 
 def get_changed_fields_dict(instance, model_class):
     """
@@ -26,7 +29,7 @@ def get_changed_fields_dict(instance, model_class):
 
     Returns:
         dict: a mapping of field names to current database values of those
-            fields, or an empty dicit if the model is new
+            fields, or an empty dict if the model is new
     """
     try:
         old_model = model_class.objects.get(pk=instance.pk)
@@ -46,8 +49,8 @@ def get_changed_fields_dict(instance, model_class):
         return changed_fields
 
 
-def emit_field_changed_events(instance, user, event_name, db_table, excluded_fields=None, hidden_fields=None):
-    """Emits an event for each field that has changed.
+def emit_field_changed_events(instance, user, db_table, excluded_fields=None, hidden_fields=None):
+    """Emits a settings changed event for each field that has changed.
 
     Note that this function expects that a `_changed_fields` dict has been set
     as an attribute on `instance` (see `get_changed_fields_dict`.
@@ -55,7 +58,6 @@ def emit_field_changed_events(instance, user, event_name, db_table, excluded_fie
     Args:
         instance (Model instance): the model instance that is being saved
         user (User): the user that this instance is associated with
-        event_name (str): the name of the event to be emitted
         db_table (str): the name of the table that we're modifying
         excluded_fields (list): a list of field names for which events should
             not be emitted
@@ -88,18 +90,17 @@ def emit_field_changed_events(instance, user, event_name, db_table, excluded_fie
         if field_name not in excluded_fields:
             old_value = clean_field(field_name, changed_fields[field_name])
             new_value = clean_field(field_name, getattr(instance, field_name))
-            emit_setting_changed_event(user, event_name, db_table, field_name, old_value, new_value)
+            emit_setting_changed_event(user, db_table, field_name, old_value, new_value)
     # Remove the now inaccurate _changed_fields attribute.
     if hasattr(instance, '_changed_fields'):
         del instance._changed_fields
 
 
-def emit_setting_changed_event(user, event_name, db_table, setting_name, old_value, new_value):
+def emit_setting_changed_event(user, db_table, setting_name, old_value, new_value):
     """Emits an event for a change in a setting.
 
     Args:
         user (User): the user that this setting is associated with.
-        event_name (str): the name of the event to be emitted.
         db_table (str): the name of the table that we're modifying.
         setting_name (str): the name of the setting being changed.
         old_value (object): the value before the change.
@@ -120,7 +121,7 @@ def emit_setting_changed_event(user, event_name, db_table, setting_name, old_val
     if new_was_truncated:
         truncated_values.append("new")
     tracker.emit(
-        event_name,
+        USER_SETTINGS_CHANGED_EVENT_NAME,
         {
             "setting": setting_name,
             "old": serialized_old_value,

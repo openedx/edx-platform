@@ -5,7 +5,6 @@ from django.db.models.signals import pre_delete, post_delete, pre_save, post_sav
 from django.dispatch import receiver
 from model_utils.models import TimeStampedModel
 
-from student.models import USER_SETTINGS_CHANGED_EVENT_NAME
 from util.model_utils import get_changed_fields_dict, emit_setting_changed_event
 from xmodule_django.models import CourseKeyField
 
@@ -59,6 +58,7 @@ def pre_save_callback(sender, **kwargs):
     user_preference = kwargs["instance"]
     user_preference._old_value = get_changed_fields_dict(user_preference, sender).get("value", None)
 
+
 @receiver(post_save, sender=UserPreference)
 def post_save_callback(sender, **kwargs):
     """
@@ -66,8 +66,8 @@ def post_save_callback(sender, **kwargs):
     """
     user_preference = kwargs["instance"]
     emit_setting_changed_event(
-        user_preference.user, USER_SETTINGS_CHANGED_EVENT_NAME, sender._meta.db_table,
-        user_preference.key, user_preference._old_value, user_preference.value
+        user_preference.user, sender._meta.db_table, user_preference.key,
+        user_preference._old_value, user_preference.value
     )
     user_preference._old_value = None
 
@@ -79,8 +79,7 @@ def post_delete_callback(sender, **kwargs):
     """
     user_preference = kwargs["instance"]
     emit_setting_changed_event(
-        user_preference.user, USER_SETTINGS_CHANGED_EVENT_NAME, sender._meta.db_table,
-        user_preference.key, user_preference.value, None
+        user_preference.user, sender._meta.db_table, user_preference.key, user_preference.value, None
     )
 
 
