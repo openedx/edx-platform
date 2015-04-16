@@ -84,14 +84,15 @@ class LearnerProfileTestMixin(EventsTestMixin):
             str(birth_year)
         )
 
-    def verify_profile_page_view_event(self, profile_user_id, visibility=None):
+    def verify_profile_page_view_event(self, requesting_username, profile_user_id, visibility=None):
         """
         Verifies that the correct view event was captured for the profile page.
         """
         self.verify_events_of_type(
+            requesting_username,
             u"edx.user.settings.viewed",
             [{
-                u"user_id": int(profile_user_id),
+                u"user_id": long(profile_user_id),
                 u"page": u"profile",
                 u"visibility": unicode(visibility),
             }]
@@ -180,7 +181,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self.assertTrue(profile_page.privacy_field_visible)
         self.assertEqual(profile_page.visible_fields, self.PRIVATE_PROFILE_FIELDS)
 
-        self.verify_profile_page_view_event(user_id, visibility=self.PRIVACY_PRIVATE)
+        self.verify_profile_page_view_event(username, user_id, visibility=self.PRIVACY_PRIVATE)
 
     def test_fields_on_my_public_profile(self):
         """
@@ -202,7 +203,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
 
         self.assertEqual(profile_page.editable_fields, self.PUBLIC_PROFILE_EDITABLE_FIELDS)
 
-        self.verify_profile_page_view_event(user_id, visibility=self.PRIVACY_PUBLIC)
+        self.verify_profile_page_view_event(username, user_id, visibility=self.PRIVACY_PUBLIC)
 
     def _test_dropdown_field(self, profile_page, field_id, new_value, displayed_value, mode):
         """
@@ -332,7 +333,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         username, user_id = self.log_in_as_unique_user()
         message = "You must specify your birth year before you can share your full profile."
         self.verify_profile_forced_private_message(username, birth_year=None, message=message)
-        self.verify_profile_page_view_event(user_id, visibility=self.PRIVACY_PRIVATE)
+        self.verify_profile_page_view_event(username, user_id, visibility=self.PRIVACY_PRIVATE)
 
     def test_user_is_under_age(self):
         """
@@ -350,7 +351,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
             birth_year=under_age_birth_year,
             message='You must be over 13 to share a full profile.'
         )
-        self.verify_profile_page_view_event(user_id, visibility=self.PRIVACY_PRIVATE)
+        self.verify_profile_page_view_event(username, user_id, visibility=self.PRIVACY_PRIVATE)
 
     def test_user_can_only_see_default_image_for_private_profile(self):
         """
@@ -557,12 +558,12 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         Then I see some of the profile fields are shown.
         """
         different_username, different_user_id = self._initialize_different_user(privacy=self.PRIVACY_PRIVATE)
-        self.log_in_as_unique_user()
+        username, __ = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(different_username)
 
         self.assertFalse(profile_page.privacy_field_visible)
         self.assertEqual(profile_page.visible_fields, self.PRIVATE_PROFILE_FIELDS)
-        self.verify_profile_page_view_event(different_user_id, visibility=self.PRIVACY_PRIVATE)
+        self.verify_profile_page_view_event(username, different_user_id, visibility=self.PRIVACY_PRIVATE)
 
     def test_different_user_under_age(self):
         """
@@ -597,13 +598,13 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         Also `location`, `language` and `about me` fields are not editable.
         """
         different_username, different_user_id = self._initialize_different_user(privacy=self.PRIVACY_PUBLIC)
-        self.log_in_as_unique_user()
+        username, __ = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(different_username)
         profile_page.wait_for_public_fields()
         self.assertFalse(profile_page.privacy_field_visible)
         self.assertEqual(profile_page.visible_fields, self.PUBLIC_PROFILE_FIELDS)
         self.assertEqual(profile_page.editable_fields, [])
-        self.verify_profile_page_view_event(different_user_id, visibility=self.PRIVACY_PUBLIC)
+        self.verify_profile_page_view_event(username, different_user_id, visibility=self.PRIVACY_PUBLIC)
 
     def _initialize_different_user(self, privacy=None, birth_year=None):
         """
