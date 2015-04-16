@@ -397,17 +397,7 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         When I view the Advanced Settings screen for the course
         The total number of fields displayed matches the number I expect
         And the actual fields displayed match the fields I expect to see
-
-        Note that this test will NOT fail if fields that we expect to see are
-        not displayed, only if fields show up that we did not expect to see.
         """
         expected_fields = self.advanced_settings.expected_settings_names
         displayed_fields = self.advanced_settings.displayed_settings_names
-        unexpectedly_displayed = set(displayed_fields) - set(expected_fields)
-        self.assertEquals(
-            len(unexpectedly_displayed),
-            0,
-            "The following fields were unexpectedly displayed: {fields}".format(
-                fields=", ".join(unexpectedly_displayed)
-            )
-        )
+        self.assertEquals(set(displayed_fields), set(expected_fields))
