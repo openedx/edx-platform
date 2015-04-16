@@ -6,9 +6,11 @@ from django.test import TestCase
 
 from django_countries.fields import Country
 
-from student.models import PasswordHistory, USER_SETTINGS_CHANGED_EVENT_NAME
+from student.models import PasswordHistory
 from student.tests.factories import UserFactory
 from student.tests.tests import UserSettingsEventTestMixin
+import mock
+from django.db.utils import IntegrityError
 
 
 class TestUserProfileEvents(UserSettingsEventTestMixin, TestCase):
@@ -72,6 +74,18 @@ class TestUserProfileEvents(UserSettingsEventTestMixin, TestCase):
         self.profile.save()
         self.assert_no_events_were_emitted()
 
+    @mock.patch('student.models.UserProfile.save', side_effect=IntegrityError)
+    def test_no_event_if_save_failed(self, _save_mock):
+        """
+        Verify no event is triggered if the save does not complete. Note that the pre_save
+        signal is not called in this case either, but the intent is to make it clear that this model
+        should never emit an event if save fails.
+        """
+        self.profile.gender = "unknown"
+        with self.assertRaises(IntegrityError):
+            self.profile.save()
+        self.assert_no_events_were_emitted()
+
 
 class TestUserEvents(UserSettingsEventTestMixin, TestCase):
     """
@@ -119,4 +133,16 @@ class TestUserEvents(UserSettingsEventTestMixin, TestCase):
         """
         self.user.passwordhistory_set.add(PasswordHistory(password='new_password'))
         self.user.save()
+        self.assert_no_events_were_emitted()
+
+    @mock.patch('django.contrib.auth.models.User.save', side_effect=IntegrityError)
+    def test_no_event_if_save_failed(self, _save_mock):
+        """
+        Verify no event is triggered if the save does not complete. Note that the pre_save
+        signal is not called in this case either, but the intent is to make it clear that this model
+        should never emit an event if save fails.
+        """
+        self.user.password = u'new password'
+        with self.assertRaises(IntegrityError):
+            self.user.save()
         self.assert_no_events_were_emitted()

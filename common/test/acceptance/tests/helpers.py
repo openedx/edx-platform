@@ -308,7 +308,7 @@ class EventsTestMixin(object):
 
     def get_matching_events(self, username, event_type):
         """
-        Returns a cursor for the matching browser events.
+        Returns a cursor for the matching browser events related emitted for the specified username.
         """
         return self.event_collection.find({
             "username": username,
@@ -319,7 +319,7 @@ class EventsTestMixin(object):
     def verify_events_of_type(self, username, event_type, expected_events, expected_referers=None):
         """Verify that the expected events of a given type were logged.
         Args:
-            username (str): The name of the authenticated user.
+            username (str): The name of the user for which events will be tested.
             event_type (str): The type of event to be verified.
             expected_events (list): A list of dicts representing the events that should
                 have been fired.

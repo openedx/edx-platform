@@ -3,17 +3,14 @@ import json
 from django.db import IntegrityError
 from django.test import TestCase
 
-from student.models import USER_SETTINGS_CHANGED_EVENT_NAME
 from student.tests.factories import UserFactory
-from util.testing import EventTestMixin
+from student.tests.tests import UserSettingsEventTestMixin
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from ..tests.factories import UserPreferenceFactory, UserCourseTagFactory, UserOrgTagFactory
 from ..models import UserPreference
 from ..preferences.api import set_user_preference
-
-USER_PREFERENCE_TABLE_NAME = "user_api_userpreference"
 
 
 class UserPreferenceModelTest(ModuleStoreTestCase):
@@ -93,12 +90,13 @@ class UserPreferenceModelTest(ModuleStoreTestCase):
         self.assertIsNone(pref)
 
 
-class TestUserPreferenceEvents(EventTestMixin, TestCase):
+class TestUserPreferenceEvents(UserSettingsEventTestMixin, TestCase):
     """
     Mixin for verifying that user preference events are fired correctly.
     """
     def setUp(self):
-        super(TestUserPreferenceEvents, self).setUp('util.model_utils.tracker')
+        super(TestUserPreferenceEvents, self).setUp()
+        self.table = "user_api_userpreference"
         self.user = UserFactory.create()
         self.TEST_KEY = "test key"
         self.TEST_VALUE = "test value"
@@ -110,9 +108,7 @@ class TestUserPreferenceEvents(EventTestMixin, TestCase):
         Verify that we emit an event when a user preference is created.
         """
         UserPreference.objects.create(user=self.user, key="new key", value="new value")
-        self.assert_user_preference_event_emitted(
-            key="new key", old=None, new="new value"
-        )
+        self.assert_user_setting_event_emitted(setting='new key', old=None, new="new value")
 
     def test_update_user_preference(self):
         """
@@ -120,34 +116,14 @@ class TestUserPreferenceEvents(EventTestMixin, TestCase):
         """
         self.user_preference.value = "new value"
         self.user_preference.save()
-        self.assert_user_preference_event_emitted(
-            key=self.TEST_KEY, old=self.TEST_VALUE, new="new value"
-        )
+        self.assert_user_setting_event_emitted(setting=self.TEST_KEY, old=self.TEST_VALUE, new="new value")
 
     def test_delete_user_preference(self):
         """
         Verify that we emit an event when a user preference is deleted.
         """
         self.user_preference.delete()
-        self.assert_user_preference_event_emitted(
-            key=self.TEST_KEY, old=self.TEST_VALUE, new=None
-        )
-
-    def assert_user_preference_event_emitted(self, key, old, new, truncated=[]):
-        """
-        Helper method to assert that we emit the expected user preference events.
-
-        Expected settings are passed in via `kwargs`.
-        """
-        self.assert_event_emitted(
-            USER_SETTINGS_CHANGED_EVENT_NAME,
-            table=USER_PREFERENCE_TABLE_NAME,
-            user_id=self.user.id,
-            setting=key,
-            old=old,
-            new=new,
-            truncated=truncated,
-        )
+        self.assert_user_setting_event_emitted(setting=self.TEST_KEY, old=self.TEST_VALUE, new=None)
 
     def test_truncated_user_preference_event(self):
         """
@@ -157,18 +133,12 @@ class TestUserPreferenceEvents(EventTestMixin, TestCase):
         OVERSIZE_STRING_LENGTH = MAX_STRING_LENGTH + 10
         self.user_preference.value = "z" * OVERSIZE_STRING_LENGTH
         self.user_preference.save()
-        self.assert_user_preference_event_emitted(
-            key=self.TEST_KEY,
-            old=self.TEST_VALUE,
-            new="z" * MAX_STRING_LENGTH,
-            truncated=["new"],
+        self.assert_user_setting_event_emitted(
+            setting=self.TEST_KEY, old=self.TEST_VALUE, new="z" * MAX_STRING_LENGTH, truncated=["new"]
         )
 
         self.user_preference.value = "x" * OVERSIZE_STRING_LENGTH
         self.user_preference.save()
-        self.assert_user_preference_event_emitted(
-            key=self.TEST_KEY,
-            old="z" * MAX_STRING_LENGTH,
-            new="x" * MAX_STRING_LENGTH,
-            truncated=["old", "new"],
+        self.assert_user_setting_event_emitted(
+            setting=self.TEST_KEY, old="z" * MAX_STRING_LENGTH, new="x" * MAX_STRING_LENGTH, truncated=["old", "new"]
         )

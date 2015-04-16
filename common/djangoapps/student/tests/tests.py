@@ -21,13 +21,13 @@ from mock import Mock, patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from student.models import (
-    anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment, unique_id_for_user,
-    LinkedInAddToProfileConfiguration, USER_SETTINGS_CHANGED_EVENT_NAME
+    anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment, unique_id_for_user, LinkedInAddToProfileConfiguration
 )
 from student.views import (process_survey_link, _cert_info,
                            change_enrollment, complete_course_mode_info)
 from student.tests.factories import UserFactory, CourseModeFactory
 from util.testing import EventTestMixin
+from util.model_utils import USER_SETTINGS_CHANGED_EVENT_NAME
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
@@ -499,6 +499,8 @@ class UserSettingsEventTestMixin(EventTestMixin):
 
         Expected settings are passed in via `kwargs`.
         """
+        if 'truncated' not in kwargs:
+            kwargs['truncated'] = []
         self.assert_event_emitted(
             USER_SETTINGS_CHANGED_EVENT_NAME,
             table=self.table,  # pylint: disable=no-member

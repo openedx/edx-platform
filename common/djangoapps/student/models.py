@@ -58,7 +58,6 @@ UNENROLL_DONE = Signal(providing_args=["course_enrollment", "skip_refund"])
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 SessionStore = import_module(settings.SESSION_ENGINE).SessionStore  # pylint: disable=invalid-name
-USER_SETTINGS_CHANGED_EVENT_NAME = 'edx.user.settings.changed'
 
 
 class AnonymousUserId(models.Model):
@@ -349,7 +348,6 @@ def user_profile_post_save_callback(sender, **kwargs):
     emit_field_changed_events(
         user_profile,
         user_profile.user,
-        USER_SETTINGS_CHANGED_EVENT_NAME,
         sender._meta.db_table,
         excluded_fields=['meta']
     )
@@ -375,7 +373,6 @@ def user_post_save_callback(sender, **kwargs):
     emit_field_changed_events(
         user,
         user,
-        USER_SETTINGS_CHANGED_EVENT_NAME,
         sender._meta.db_table,
         excluded_fields=['last_login'],
         hidden_fields=['password']
@@ -1675,9 +1672,8 @@ class LanguageProficiency(models.Model):
     Note that we have not found a way to emit analytics change events by using signals directly on this
     model or on UserProfile. Therefore if you are changing LanguageProficiency values, it is important
     to go through the accounts API (AccountsView) defined in
-    /edx-platform/openedx/core/djangoapps/user_api/accounts/views.py or the AccountLegacyProfileSerializer
-    in /edx-platform/openedx/core/djangoapps/user_api/accounts/serializers.py so that the events are
-    emitted.
+    /edx-platform/openedx/core/djangoapps/user_api/accounts/views.py or its associated api method
+    (update_account_settings) so that the events are emitted.
     """
     class Meta:
         unique_together = (('code', 'user_profile'),)
