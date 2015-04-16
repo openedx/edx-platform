@@ -9,7 +9,6 @@ from bok_choy.web_app_test import WebAppTest
 from ...pages.lms.account_settings import AccountSettingsPage
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.dashboard import DashboardPage
-from ..helpers import EventsTestMixin
 
 from ..helpers import EventsTestMixin
 
@@ -93,6 +92,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         # Visit the account settings page for the current user.
         self.account_settings_page = AccountSettingsPage(self.browser)
         self.account_settings_page.visit()
+        self.account_settings_page.wait_for_ajax()
 
     def test_page_view_event(self):
         """
@@ -195,6 +195,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
                 self.account_settings_page.wait_for_loading_indicator()
             else:
                 self.browser.refresh()
+                self.account_settings_page.wait_for_page()
             self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id), new_value)
 
     def _test_link_field(self, field_id, title, link_title, success_message):
@@ -400,17 +401,19 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             u'Afghanistan',
             [u'Pakistan', u'Palau'],
         )
+
+    def test_country_field_events(self):
+        """
+        Test that saving the country field records the correct events
+        """
+        self.assertEqual(self.account_settings_page.value_for_dropdown_field(u'country', u'Pakistan'), u'Pakistan')
+        self.account_settings_page.wait_for_messsage(u'country', self.SUCCESS_MESSAGE)
         self.verify_settings_changed_events(
             [{
                 u"setting": u"country",
                 u"old": None,
                 u"new": u'PK',
-            },
-            {
-                u"setting": u"country",
-                u"old": u'PK',
-                u"new": u'PW',
-            }]
+            }],
         )
 
     def test_preferred_language_field(self):

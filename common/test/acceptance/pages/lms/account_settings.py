@@ -17,7 +17,7 @@ class AccountSettingsPage(FieldsMixin, PageObject):
     url = "{base}/{settings}".format(base=BASE_URL, settings='account/settings')
 
     def is_browser_on_page(self):
-        return 'Account Settings' in self.browser.title
+        return self.q(css='.account-settings-container').present
 
     def sections_structure(self):
         """
@@ -31,8 +31,6 @@ class AccountSettingsPage(FieldsMixin, PageObject):
             ...
         ]
         """
-        self.wait_for_ajax()
-
         structure = []
 
         sections = self.q(css='.section')
