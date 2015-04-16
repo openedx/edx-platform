@@ -423,13 +423,14 @@ def get_module_system_for_user(user, field_data_cache,
             block_scope_id=descriptor.location,
             field_name='grade'
         )
-
-        student_module = field_data_cache.find_or_create(key)
-        # Update the grades
-        student_module.grade = event.get('value')
-        student_module.max_grade = event.get('max_value')
-        # Save all changes to the underlying KeyValueStore
-        student_module.save()
+        StudentModule.objects.filter(
+            student__id=user_id,
+            module_state_key=descriptor.location,
+            course_id=course_id,
+        ).update(
+            grade=event.get('value'),
+            max_grade=event.get('max_value')
+        )
 
         # Bin score into range and increment stats
         score_bucket = get_score_bucket(student_module.grade, student_module.max_grade)

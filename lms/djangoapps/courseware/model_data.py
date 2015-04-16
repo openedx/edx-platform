@@ -682,23 +682,64 @@ class FieldDataCache(object):
         saved_fields = []
         # field_objects maps a field_object to a list of associated fields
         field_objects = dict()
-        for field in kv_dict:
+        for key in kv_dict:
             # If the field is valid and isn't already in the dictionary, add it.
-            field_object = self.find_or_create(field)
+
+            if key.scope.user == UserScope.ONE and not self.user.is_anonymous():
+                # If we're getting user data, we expect that the key matches the
+                # user we were constructed for.
+                assert key.user_id == self.user.id
+
+            if key.scope not in self.cache:
+                continue
+
+            field_object = self.cache[key.scope].get(key)
+
+            if field_object is None:
+                if key.scope == Scope.user_state:
+                    field_object, __ = StudentModule.objects.get_or_create(
+                        course_id=self.course_id,
+                        student_id=key.user_id,
+                        module_state_key=key.block_scope_id,
+                        defaults={
+                            'state': json.dumps({}),
+                            'module_type': key.block_scope_id.block_type,
+                        },
+                    )
+                elif key.scope == Scope.user_state_summary:
+                    field_object, __ = XModuleUserStateSummaryField.objects.get_or_create(
+                        field_name=key.field_name,
+                        usage_id=key.block_scope_id
+                    )
+                elif key.scope == Scope.preferences:
+                    field_object, __ = XModuleStudentPrefsField.objects.get_or_create(
+                        field_name=key.field_name,
+                        module_type=BlockTypeKeyV1(key.block_family, key.block_scope_id),
+                        student_id=key.user_id,
+                    )
+                elif key.scope == Scope.user_info:
+                    field_object, __ = XModuleStudentInfoField.objects.get_or_create(
+                        field_name=key.field_name,
+                        student_id=key.user_id,
+                    )
+
+                self.cache[key.scope].set(key, field_object)
+
             if field_object not in field_objects.keys():
                 field_objects[field_object] = []
+
             # Update the list of associated fields
-            field_objects[field_object].append(field)
+            field_objects[field_object].append(key)
 
             # Special case when scope is for the user state, because this scope saves fields in a single row
-            if field.scope == Scope.user_state:
+            if key.scope == Scope.user_state:
                 state = json.loads(field_object.state)
-                state[field.field_name] = kv_dict[field]
+                state[key.field_name] = kv_dict[key]
                 field_object.state = json.dumps(state)
             else:
                 # The remaining scopes save fields on different rows, so
                 # we don't have to worry about conflicts
-                field_object.value = json.dumps(kv_dict[field])
+                field_object.value = json.dumps(kv_dict[key])
 
         for field_object in field_objects:
             try:
@@ -706,7 +747,7 @@ class FieldDataCache(object):
                 field_object.save()
                 # If save is successful on this scope, add the saved fields to
                 # the list of successful saves
-                saved_fields.extend([field.field_name for field in field_objects[field_object]])
+                saved_fields.extend([key.field_name for key in field_objects[field_object]])
             except DatabaseError:
                 log.exception('Error saving fields %r', field_objects[field_object])
                 raise KeyValueMultiSaveError(saved_fields)
@@ -752,52 +793,3 @@ class FieldDataCache(object):
             return False
 
         return self.cache[key.scope].has(key)
-
-    def find_or_create(self, key):
-        '''
-        Find a model data object in this cache, or create a new one if it doesn't
-        exist
-        '''
-
-        if key.scope.user == UserScope.ONE and not self.user.is_anonymous():
-            # If we're getting user data, we expect that the key matches the
-            # user we were constructed for.
-            assert key.user_id == self.user.id
-
-        if key.scope not in self.cache:
-            return
-
-        field_object = self.cache[key.scope].get(key)
-
-        if field_object is not None:
-            return field_object
-
-        if key.scope == Scope.user_state:
-            field_object, __ = StudentModule.objects.get_or_create(
-                course_id=self.course_id,
-                student_id=key.user_id,
-                module_state_key=key.block_scope_id,
-                defaults={
-                    'state': json.dumps({}),
-                    'module_type': key.block_scope_id.block_type,
-                },
-            )
-        elif key.scope == Scope.user_state_summary:
-            field_object, __ = XModuleUserStateSummaryField.objects.get_or_create(
-                field_name=key.field_name,
-                usage_id=key.block_scope_id
-            )
-        elif key.scope == Scope.preferences:
-            field_object, __ = XModuleStudentPrefsField.objects.get_or_create(
-                field_name=key.field_name,
-                module_type=BlockTypeKeyV1(key.block_family, key.block_scope_id),
-                student_id=key.user_id,
-            )
-        elif key.scope == Scope.user_info:
-            field_object, __ = XModuleStudentInfoField.objects.get_or_create(
-                field_name=key.field_name,
-                student_id=key.user_id,
-            )
-
-        self.cache[key.scope].set(key, field_object)
-        return field_object
