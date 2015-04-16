@@ -6,20 +6,22 @@ Run these tests @ Devstack:
 from datetime import datetime
 import uuid
 
-from django.contrib.auth.models import Group, User
-from django.test import TestCase
+from django.conf import settings
+from django.contrib.auth.models import User
 from django.test.utils import override_settings
 
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 
 from util.signals import course_deleted
 
 from student.models import CourseAccessRole
 
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class InstructorReceiversTests(TestCase):
+
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
+class InstructorReceiversTests(ModuleStoreTestCase):
     """ Test suite for signal receivers """
 
     def setUp(self):
