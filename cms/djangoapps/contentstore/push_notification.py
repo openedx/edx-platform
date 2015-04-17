@@ -16,6 +16,7 @@ from xmodule.modulestore.django import modulestore
 # routing of messages or other types of group behaviors
 COURSE_UPDATE_NOTIFICATION_TYPE_NAME = 'open-edx.mobile.course-update'
 
+
 def push_notification_enabled():
     """
     Returns whether the push notification feature is enabled.

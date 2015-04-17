@@ -77,7 +77,7 @@ CELERYD_PREFETCH_MULTIPLIER = 1
 # don't clobber any SOUTH_MIGRATION_MODULES configuration that might have
 # been set elsewhere, like in common.py
 #
-if not 'SOUTH_MIGRATION_MODULES' in vars() and not 'SOUTH_MIGRATION_MODULES' in globals():
+if not 'SOUTH_MIGRATION_MODULES' in vars() and 'SOUTH_MIGRATION_MODULES' not in globals():
     SOUTH_MIGRATION_MODULES = {}
 
 SOUTH_MIGRATION_MODULES.update({

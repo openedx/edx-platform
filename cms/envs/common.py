@@ -947,7 +947,7 @@ NOTIFICATION_STORE_PROVIDER = {
     }
 }
 
-if not 'SOUTH_MIGRATION_MODULES' in vars() and not 'SOUTH_MIGRATION_MODULES' in globals():
+if not 'SOUTH_MIGRATION_MODULES' in vars() and 'SOUTH_MIGRATION_MODULES' not in globals():
     SOUTH_MIGRATION_MODULES = {}
 
 # We have to point edx-notfications south migrations to a
