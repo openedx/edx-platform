@@ -958,7 +958,7 @@ SOUTH_MIGRATION_MODULES.update({
 
 
 # list all known channel providers
-# this can be overriden in aws.py via lms.env.json
+# this can be overriden in aws.py via lms.auth.json
 NOTIFICATION_CHANNEL_PROVIDERS = {
     # right now by default we map all notifications to the NullNotificationChannel
     # which drops all notifications
