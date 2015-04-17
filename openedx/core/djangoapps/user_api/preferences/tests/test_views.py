@@ -25,7 +25,7 @@ TOO_LONG_PREFERENCE_KEY = u"x" * 256
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestPreferencesAPI(UserAPITestCase):
     """
-    Unit tests /api/user/v0/accounts/{username}/
+    Unit tests /api/user/v1/accounts/{username}/
     """
     def setUp(self):
         super(TestPreferencesAPI, self).setUp()
@@ -160,7 +160,7 @@ class TestPreferencesAPI(UserAPITestCase):
                 "dict_pref": {"int_key": 10},
                 "string_pref": "value",
             },
-            expected_status=404,
+            expected_status=403 if user == "staff_user" else 404,
         )
 
     def test_update_preferences(self):
@@ -288,7 +288,7 @@ class TestPreferencesAPI(UserAPITestCase):
                 "new_pref": "new_value",
                 "extra_pref": None,
             },
-            expected_status=404
+            expected_status=403 if user == "staff_user" else 404
         )
 
 
@@ -342,7 +342,7 @@ class TestPreferencesAPITransactions(TransactionTestCase):
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestPreferencesDetailAPI(UserAPITestCase):
     """
-    Unit tests /api/user/v0/accounts/{username}/{preference_key}
+    Unit tests /api/user/v1/accounts/{username}/{preference_key}
     """
     def setUp(self):
         super(TestPreferencesDetailAPI, self).setUp()
@@ -503,7 +503,7 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         self._set_url("new_key")
         client = self.login_client(api_client, user)
         new_value = "new value"
-        self.send_put(client, new_value, expected_status=404)
+        self.send_put(client, new_value, expected_status=403 if user == "staff_user" else 404)
 
     @ddt.data(
         (u"new value",),
@@ -531,7 +531,7 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         """
         client = self.login_client(api_client, user)
         new_value = "new value"
-        self.send_put(client, new_value, expected_status=404)
+        self.send_put(client, new_value, expected_status=403 if user == "staff_user" else 404)
 
     @ddt.data(
         (None,),
@@ -578,4 +578,4 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         Test that a client (logged in) cannot delete a preference for another user.
         """
         client = self.login_client(api_client, user)
-        self.send_delete(client, expected_status=404)
+        self.send_delete(client, expected_status=403 if user == "staff_user" else 404)

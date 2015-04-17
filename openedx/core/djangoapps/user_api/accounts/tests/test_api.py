@@ -16,6 +16,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
 from student.models import PendingEmailChange
+from student.tests.tests import UserSettingsEventTestMixin
 from ...errors import (
     UserNotFound, UserNotAuthorized, AccountUpdateError, AccountValidationError,
     AccountUserAlreadyExists, AccountUsernameInvalid, AccountEmailInvalid, AccountPasswordInvalid, AccountRequestError
@@ -32,7 +33,7 @@ def mock_render_to_string(template_name, context):
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
-class TestAccountApi(TestCase):
+class TestAccountApi(UserSettingsEventTestMixin, TestCase):
     """
     These tests specifically cover the parts of the API methods that are not covered by test_views.py.
     This includes the specific types of error raised, and default behavior when optional arguments
@@ -42,9 +43,11 @@ class TestAccountApi(TestCase):
 
     def setUp(self):
         super(TestAccountApi, self).setUp()
+        self.table = "student_languageproficiency"
         self.user = UserFactory.create(password=self.password)
         self.different_user = UserFactory.create(password=self.password)
         self.staff_user = UserFactory(is_staff=True, password=self.password)
+        self.reset_tracker()
 
     def test_get_username_provided(self):
         """Test the difference in behavior when a username is supplied to get_account_settings."""
@@ -117,6 +120,26 @@ class TestAccountApi(TestCase):
         with self.assertRaises(AccountValidationError):
             update_account_settings(self.user, {"gender": "undecided"})
 
+        with self.assertRaises(AccountValidationError):
+            update_account_settings(
+                self.user,
+                {"profile_image": {"has_image": "not_allowed", "image_url": "not_allowed"}}
+            )
+
+        # Check the various language_proficiencies validation failures.
+        # language_proficiencies must be a list of dicts, each containing a
+        # unique 'code' key representing the language code.
+        with self.assertRaises(AccountValidationError):
+            update_account_settings(
+                self.user,
+                {"language_proficiencies": "not_a_list"}
+            )
+        with self.assertRaises(AccountValidationError):
+            update_account_settings(
+                self.user,
+                {"language_proficiencies": [{}]}
+            )
+
     def test_update_multiple_validation_errors(self):
         """Test that all validation errors are built up and returned at once"""
         # Send a read-only error, serializer error, and email validation error.
@@ -171,8 +194,30 @@ class TestAccountApi(TestCase):
         pending_change = PendingEmailChange.objects.filter(user=self.user)
         self.assertEqual(0, len(pending_change))
 
+    def test_language_proficiency_eventing(self):
+        """
+        Test that eventing of language proficiencies, which happens update_account_settings method, behaves correctly.
+        """
+        def verify_event_emitted(new_value, old_value):
+            update_account_settings(self.user, {"language_proficiencies": new_value})
+            self.assert_user_setting_event_emitted(setting='language_proficiencies', old=old_value, new=new_value)
+            self.reset_tracker()
 
+        # Change language_proficiencies and verify events are fired.
+        verify_event_emitted([{"code": "en"}], [])
+        verify_event_emitted([{"code": "en"}, {"code": "fr"}], [{"code": "en"}])
+        # Note that events are fired even if there has been no actual change.
+        verify_event_emitted([{"code": "en"}, {"code": "fr"}], [{"code": "en"}, {"code": "fr"}])
+        verify_event_emitted([], [{"code": "en"}, {"code": "fr"}])
+
+
+@patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
+@patch.dict(
+    'openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP', {'full': 50, 'small': 10}, clear=True
+)
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
 class AccountSettingsOnCreationTest(TestCase):
+    # pylint: disable=missing-docstring
 
     USERNAME = u'frank-underwood'
     PASSWORD = u'ṕáśśẃőŕd'
@@ -196,13 +241,20 @@ class AccountSettingsOnCreationTest(TestCase):
             'email': self.EMAIL,
             'name': u'',
             'gender': None,
-            'language': u'',
             'goals': None,
             'is_active': False,
             'level_of_education': None,
             'mailing_address': None,
             'year_of_birth': None,
             'country': None,
+            'bio': None,
+            'profile_image': {
+                'has_image': False,
+                'image_url_full': '/static/default_50.png',
+                'image_url_small': '/static/default_10.png',
+            },
+            'requires_parental_consent': True,
+            'language_proficiencies': [],
         })
 
 

@@ -43,6 +43,7 @@
 @import 'elements/controls';
 
 // shared - course
+@import 'shared/fields';
 @import 'shared/forms';
 @import 'shared/footer';
 @import 'shared/header';

@@ -16,33 +16,13 @@
   padding: ($baseline*2) 0 0 0;
 
   .profile-sidebar {
-    @include float(right);
-    @include margin-left(flex-gutter());
-    width: flex-grid(3);
     background: transparent;
-
-    .profile {
-      @include box-sizing(border-box);
-      border: 1px solid $border-color-2;
-      border-radius: ($baseline/4) ($baseline/4) 0 0;
-      width: flex-grid(12);
-
-      .username-header {
-        margin-bottom: 0;
-      }
-
-      .username-label {
-        @extend %t-title7;
-        @extend %t-ultrastrong;
-        @extend %cont-truncated;
-        text-align: center;
-        display: block;
-        margin: 0;
-        padding: ($baseline*0.75) $baseline;
-        color: $base-font-color;
-        text-transform: none;
-      }
-    }
+    @include float(right);
+    margin-top: ($baseline*2);
+    width: flex-grid(3);
+    box-shadow: 0 0 1px $shadow-l1;
+    border: 1px solid $border-color-2;
+    border-radius: 3px;
 
     .user-info {
       @include clearfix();
@@ -51,12 +31,8 @@
         @include box-sizing(border-box);
         @include clearfix();
         margin: 0;
-        border: 1px solid $border-color-2;
-        border-top: none;
-        border-radius: 0 0 ($baseline/4) ($baseline/4);
         padding: $baseline;
         width: flex-grid(12);
-        background: $white;
 
         li {
           @include clearfix();
@@ -79,17 +55,20 @@
 
           span {
             display: block;
+            margin-bottom: ($baseline/4);
           }
 
           span.title {
-            color: $gray;
-            font-family: $sans-serif;
-            font-size: 13px;
-            text-transform: uppercase;
+            @extend %t-copy-sub1;
+            @extend %t-strong;
 
             a {
               text-transform: none;
             }
+          }
+
+          span.copy {
+            @extend %t-copy-sub1;
           }
 
           span.data {
@@ -104,40 +83,6 @@
               font-weight: inherit;
             }
 
-            .auth-provider {
-              width: flex-grid(12);
-              display: block;
-              margin-top: ($baseline/4);
-
-              .status {
-                width: flex-grid(1);
-                display: inline-block;
-                color: $gray-l2;
-
-                .fa-link {
-                  color: $base-font-color;
-                }
-
-                .copy {
-                  @extend %text-sr;
-                }
-              }
-
-              .provider {
-                width: flex-grid(9);
-                display: inline-block;
-              }
-
-              .control {
-                width: flex-grid(2);
-                display: inline-block;
-                text-align: right;
-
-                a:link, a:visited {
-                  @extend %t-copy-sub2;
-                }
-              }
-            }
           }
         }
 
@@ -145,6 +90,17 @@
           span a {
             font-size: 13px;
             line-height: 20px;
+          }
+        }
+
+        .heads-up {
+          .title {
+            display: inline;
+          }
+
+          .copy {
+            @extend %t-copy-sub2;
+            display: inline;
           }
         }
       }

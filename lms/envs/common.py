@@ -317,9 +317,6 @@ FEATURES = {
     # Set to True to change the course sorting behavior by their start dates, latest first.
     'ENABLE_COURSE_SORTING_BY_START_DATE': True,
 
-    # Flag to enable new user account APIs.
-    'ENABLE_USER_REST_API': False,
-
     # Expose Mobile REST API. Note that if you use this, you must also set
     # ENABLE_OAUTH2_PROVIDER to True
     'ENABLE_MOBILE_REST_API': False,
@@ -780,6 +777,10 @@ STATICFILES_DIRS = [
 
 FAVICON_PATH = 'images/favicon.ico'
 
+# User-uploaded content
+MEDIA_ROOT = '/edx/var/edxapp/media/'
+MEDIA_URL = '/media/'
+
 # Locale/Internationalization
 TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -986,6 +987,12 @@ MOCK_STAFF_GRADING = False
 EDXNOTES_INTERFACE = {
     'url': 'http://localhost:8120/api/v1',
 }
+
+########################## Parental controls config  #######################
+
+# The age at which a learner no longer requires parental consent, or None
+# if parental consent is never required.
+PARENTAL_CONSENT_AGE_LIMIT = 13
 
 ################################# Jasmine ##################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
@@ -1544,7 +1551,7 @@ BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS = 0.02
 ############################# Email Opt In ####################################
 
 # Minimum age for organization-wide email opt in
-EMAIL_OPTIN_MINIMUM_AGE = 13
+EMAIL_OPTIN_MINIMUM_AGE = PARENTAL_CONSENT_AGE_LIMIT
 
 ############################## Video ##########################################
 
@@ -1918,6 +1925,8 @@ TIME_ZONE_DISPLAYED_FOR_DEADLINES = 'UTC'
 
 # Source:
 # http://loc.gov/standards/iso639-2/ISO-639-2_utf-8.txt according to http://en.wikipedia.org/wiki/ISO_639-1
+# Note that this is used as the set of choices to the `code` field of the
+# `LanguageProficiency` model.
 ALL_LANGUAGES = (
     [u"aa", u"Afar"],
     [u"ab", u"Abkhazian"],
@@ -2216,7 +2225,7 @@ ONLOAD_BEACON_SAMPLE_RATE = 0.0
 ACCOUNT_VISIBILITY_CONFIGURATION = {
     # Default visibility level for accounts without a specified value
     # The value is one of: 'all_users', 'private'
-    "default_visibility": "private",
+    "default_visibility": "all_users",
 
     # The list of all fields that can be shared with other users
     "shareable_fields": [
@@ -2224,7 +2233,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         'profile_image',
         'country',
         'time_zone',
-        'languages',
+        'language_proficiencies',
         'bio',
     ],
 
@@ -2248,3 +2257,29 @@ CHECKPOINT_PATTERN = r'(?P<checkpoint_name>\w+)'
 # 'courseware.student_field_overrides.IndividualStudentOverrideProvider' to
 # this setting.
 FIELD_OVERRIDE_PROVIDERS = ()
+
+# PROFILE IMAGE CONFIG
+# WARNING: Certain django storage backends do not support atomic
+# file overwrites (including the default, OverwriteStorage) - instead
+# there are separate calls to delete and then write a new file in the
+# storage backend.  This introduces the risk of a race condition
+# occurring when a user uploads a new profile image to replace an
+# earlier one (the file will temporarily be deleted).
+PROFILE_IMAGE_BACKEND = {
+    'class': 'storages.backends.overwrite.OverwriteStorage',
+    'options': {
+        'location': os.path.join(MEDIA_ROOT, 'profile-images/'),
+        'base_url': os.path.join(MEDIA_URL, 'profile-images/'),
+    },
+}
+PROFILE_IMAGE_DEFAULT_FILENAME = (
+    'images/edx-theme/default-profile' if FEATURES['IS_EDX_DOMAIN'] else 'images/default-theme/default-profile'
+)
+PROFILE_IMAGE_DEFAULT_FILE_EXTENSION = 'png'
+# This secret key is used in generating unguessable URLs to users'
+# profile images.  Once it has been set, changing it will make the
+# platform unaware of current image URLs, resulting in reverting all
+# users' profile images to the default placeholder image.
+PROFILE_IMAGE_SECRET_KEY = 'placeholder secret key'
+PROFILE_IMAGE_MAX_BYTES = 1024 * 1024
+PROFILE_IMAGE_MIN_BYTES = 100

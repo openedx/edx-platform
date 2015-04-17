@@ -9,20 +9,24 @@ import json
 import mock
 import ddt
 import markupsafe
-from django.test import TestCase
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core import mail
+from django.contrib import messages
+from django.contrib.messages.middleware import MessageMiddleware
+from django.test import TestCase
 from django.test.utils import override_settings
+from django.test.client import RequestFactory
 
-from util.testing import UrlResetMixin
-from third_party_auth.tests.testutil import simulate_running_pipeline
 from embargo.test_utils import restrict_course
 from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH
+from student.tests.factories import CourseModeFactory, UserFactory
+from student_account.views import account_settings_context
+from third_party_auth.tests.testutil import simulate_running_pipeline
+from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from student.tests.factories import CourseModeFactory
 
 
 @ddt.ddt
@@ -499,3 +503,66 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
             url=reverse("social:begin", kwargs={"backend": backend_name}),
             params=urlencode(params)
         )
+
+
+class AccountSettingsViewTest(TestCase):
+    """ Tests for the account settings view. """
+
+    USERNAME = 'student'
+    PASSWORD = 'password'
+    FIELDS = [
+        'country',
+        'gender',
+        'language',
+        'level_of_education',
+        'password',
+        'year_of_birth',
+        'preferred_language',
+    ]
+
+    @mock.patch("django.conf.settings.MESSAGE_STORAGE", 'django.contrib.messages.storage.cookie.CookieStorage')
+    def setUp(self):
+        super(AccountSettingsViewTest, self).setUp()
+        self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
+        self.client.login(username=self.USERNAME, password=self.PASSWORD)
+
+        self.request = RequestFactory()
+        self.request.user = self.user
+
+        # Python-social saves auth failure notifcations in Django messages.
+        # See pipeline.get_duplicate_provider() for details.
+        self.request.COOKIES = {}
+        MessageMiddleware().process_request(self.request)
+        messages.error(self.request, 'Facebook is already in use.', extra_tags='Auth facebook')
+
+    def test_context(self):
+
+        context = account_settings_context(self.request)
+
+        user_accounts_api_url = reverse("accounts_api", kwargs={'username': self.user.username})
+        self.assertEqual(context['user_accounts_api_url'], user_accounts_api_url)
+
+        user_preferences_api_url = reverse('preferences_api', kwargs={'username': self.user.username})
+        self.assertEqual(context['user_preferences_api_url'], user_preferences_api_url)
+
+        for attribute in self.FIELDS:
+            self.assertIn(attribute, context['fields'])
+
+        self.assertEqual(
+            context['user_accounts_api_url'], reverse("accounts_api", kwargs={'username': self.user.username})
+        )
+        self.assertEqual(
+            context['user_preferences_api_url'], reverse('preferences_api', kwargs={'username': self.user.username})
+        )
+
+        self.assertEqual(context['duplicate_provider'].BACKEND_CLASS.name, 'facebook')
+        self.assertEqual(context['auth']['providers'][0]['name'], 'Facebook')
+        self.assertEqual(context['auth']['providers'][1]['name'], 'Google')
+
+    def test_view(self):
+
+        view_path = reverse('account_settings')
+        response = self.client.get(path=view_path)
+
+        for attribute in self.FIELDS:
+            self.assertIn(attribute, response.content)

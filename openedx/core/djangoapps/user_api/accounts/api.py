@@ -8,6 +8,7 @@ from django.core.validators import validate_email, validate_slug, ValidationErro
 
 from student.models import User, UserProfile, Registration
 from student import views as student_views
+from util.model_utils import emit_setting_changed_event
 
 from ..errors import (
     AccountUpdateError, AccountValidationError, AccountUsernameInvalid, AccountPasswordInvalid,
@@ -19,7 +20,7 @@ from ..helpers import intercept_errors
 from ..models import UserPreference
 
 from . import (
-    ACCOUNT_VISIBILITY_PREF_KEY, ALL_USERS_VISIBILITY,
+    ACCOUNT_VISIBILITY_PREF_KEY, ALL_USERS_VISIBILITY, PRIVATE_VISIBILITY,
     EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH,
     USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH
 )
@@ -76,12 +77,8 @@ def get_account_settings(requesting_user, username=None, configuration=None, vie
 
     visible_settings = {}
 
-    # Calling UserPreference directly because the requesting user may be different from existing_user
-    # (and does not have to be is_staff).
-    profile_privacy = UserPreference.get_value(existing_user, ACCOUNT_VISIBILITY_PREF_KEY)
-    privacy_setting = profile_privacy if profile_privacy else configuration.get('default_visibility')
-
-    if privacy_setting == ALL_USERS_VISIBILITY:
+    profile_visibility = _get_profile_visibility(existing_user_profile, configuration)
+    if profile_visibility == ALL_USERS_VISIBILITY:
         field_names = configuration.get('shareable_fields')
     else:
         field_names = configuration.get('public_fields')
@@ -90,6 +87,17 @@ def get_account_settings(requesting_user, username=None, configuration=None, vie
         visible_settings[field_name] = account_settings.get(field_name, None)
 
     return visible_settings
+
+
+def _get_profile_visibility(user_profile, configuration):
+    """Returns the visibility level for the specified user profile."""
+    if user_profile.requires_parental_consent():
+        return PRIVATE_VISIBILITY
+
+    # Calling UserPreference directly because the requesting user may be different from existing_user
+    # (and does not have to be is_staff).
+    profile_privacy = UserPreference.get_value(user_profile.user, ACCOUNT_VISIBILITY_PREF_KEY)
+    return profile_privacy if profile_privacy else configuration.get('default_visibility')
 
 
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
@@ -104,7 +112,7 @@ def update_account_settings(requesting_user, update, username=None):
         requesting_user (User): The user requesting to modify account information. Only the user with username
             'username' has permissions to modify account information.
         update (dict): The updated account field values.
-        username (string): Optional username specifying which account should be updated. If not specified,
+        username (str): Optional username specifying which account should be updated. If not specified,
             `requesting_user.username` is assumed.
 
     Raises:
@@ -144,7 +152,7 @@ def update_account_settings(requesting_user, update, username=None):
 
     # Check for fields that are not editable. Marking them read-only causes them to be ignored, but we wish to 400.
     read_only_fields = set(update.keys()).intersection(
-        AccountUserSerializer.Meta.read_only_fields + AccountLegacyProfileSerializer.Meta.read_only_fields
+        AccountUserSerializer.get_read_only_fields() + AccountLegacyProfileSerializer.get_read_only_fields()
     )
 
     # Build up all field errors, whether read-only, validation, or email errors.
@@ -154,7 +162,7 @@ def update_account_settings(requesting_user, update, username=None):
         for read_only_field in read_only_fields:
             field_errors[read_only_field] = {
                 "developer_message": u"This field is not editable via this API",
-                "user_message": _(u"Field '{field_name}' cannot be edited.").format(field_name=read_only_field)
+                "user_message": _(u"The '{field_name}' field cannot be edited.").format(field_name=read_only_field)
             }
             del update[read_only_field]
 
@@ -180,8 +188,24 @@ def update_account_settings(requesting_user, update, username=None):
 
     try:
         # If everything validated, go ahead and save the serializers.
+
+        # We have not found a way using signals to get the language proficiency changes (grouped by user).
+        # As a workaround, store old and new values here and emit them after save is complete.
+        if "language_proficiencies" in update:
+            old_language_proficiencies = legacy_profile_serializer.data["language_proficiencies"]
+
         for serializer in user_serializer, legacy_profile_serializer:
             serializer.save()
+
+        if "language_proficiencies" in update:
+            new_language_proficiencies = legacy_profile_serializer.data["language_proficiencies"]
+            emit_setting_changed_event(
+                user=existing_user,
+                db_table=existing_user_profile.language_proficiencies.model._meta.db_table,
+                setting_name="language_proficiencies",
+                old_value=old_language_proficiencies,
+                new_value=new_language_proficiencies,
+            )
 
         # If the name was changed, store information about the change operation. This is outside of the
         # serializer so that we can store who requested the change.
@@ -239,7 +263,7 @@ def _add_serializer_errors(update, serializer, field_errors):
                 "developer_message": u"Value '{field_value}' is not valid for field '{field_name}': {error}".format(
                     field_value=field_value, field_name=key, error=error
                 ),
-                "user_message": _(u"Value '{field_value}' is not valid for field '{field_name}'.").format(
+                "user_message": _(u"This value is invalid.").format(
                     field_value=field_value, field_name=key
                 ),
             }
@@ -372,9 +396,9 @@ def request_password_change(email, orig_host, is_secure):
     Users must confirm the password change before we update their information.
 
     Args:
-        email (string): An email address
-        orig_host (string): An originating host, extracted from a request with get_host
-        is_secure (Boolean): Whether the request was made with HTTPS
+        email (str): An email address
+        orig_host (str): An originating host, extracted from a request with get_host
+        is_secure (bool): Whether the request was made with HTTPS
 
     Returns:
         None

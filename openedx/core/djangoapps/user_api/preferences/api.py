@@ -1,21 +1,16 @@
 """
 API for managing user preferences.
 """
-import datetime
 import logging
-import string
 import analytics
 from eventtracking import tracker
-from pytz import UTC
 
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.utils.translation import ugettext as _
+from student.models import User, UserProfile
 from django.utils.translation import ugettext_noop
-
-from student.models import UserProfile
 
 from ..errors import (
     UserAPIInternalError, UserAPIRequestError, UserNotFound, UserNotAuthorized,
@@ -35,7 +30,7 @@ def get_user_preference(requesting_user, preference_key, username=None):
     Args:
         requesting_user (User): The user requesting the user preferences. Only the user with username
             `username` or users with "is_staff" privileges can access the preferences.
-        preference_key (string): The key for the user preference.
+        preference_key (str): The key for the user preference.
         username (str): Optional username for which to look up the preferences. If not specified,
             `requesting_user.username` is assumed.
 
@@ -92,7 +87,7 @@ def update_user_preferences(requesting_user, update, username=None):
             Some notes:
                 Values are expected to be strings. Non-string values will be converted to strings.
                 Null values for a preference will be treated as a request to delete the key in question.
-        username (string): Optional username specifying which account should be updated. If not specified,
+        username (str): Optional username specifying which account should be updated. If not specified,
             `requesting_user.username` is assumed.
 
     Raises:
@@ -148,9 +143,9 @@ def set_user_preference(requesting_user, preference_key, preference_value, usern
     Arguments:
         requesting_user (User): The user requesting to modify account information. Only the user with username
             'username' has permissions to modify account information.
-        preference_key (string): The key for the user preference.
-        preference_value (string): The value to be stored. Non-string values will be converted to strings.
-        username (string): Optional username specifying which account should be updated. If not specified,
+        preference_key (str): The key for the user preference.
+        preference_value (str): The value to be stored. Non-string values will be converted to strings.
+        username (str): Optional username specifying which account should be updated. If not specified,
             `requesting_user.username` is assumed.
 
     Raises:
@@ -182,8 +177,8 @@ def delete_user_preference(requesting_user, preference_key, username=None):
     Arguments:
         requesting_user (User): The user requesting to delete the preference. Only the user with username
             'username' has permissions to delete their own preference.
-        preference_key (string): The key for the user preference.
-        username (string): Optional username specifying which account should be updated. If not specified,
+        preference_key (str): The key for the user preference.
+        username (str): Optional username specifying which account should be updated. If not specified,
             `requesting_user.username` is assumed.
 
     Returns:
@@ -218,7 +213,7 @@ def delete_user_preference(requesting_user, preference_key, username=None):
 
 
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
-def update_email_opt_in(user, org, optin):
+def update_email_opt_in(user, org, opt_in):
     """Updates a user's preference for receiving org-wide emails.
 
     Sets a User Org Tag defining the choice to opt in or opt out of organization-wide
@@ -227,37 +222,36 @@ def update_email_opt_in(user, org, optin):
     Arguments:
         user (User): The user to set a preference for.
         org (str): The org is used to determine the organization this setting is related to.
-        optin (Boolean): True if the user is choosing to receive emails for this organization. If the user is not
-            the correct age to receive emails, email-optin is set to False regardless.
+        opt_in (bool): True if the user is choosing to receive emails for this organization.
+            If the user requires parental consent then email-optin is set to False regardless.
 
     Returns:
         None
 
+    Raises:
+         UserNotFound: no user profile exists for the specified user.
     """
-    # Avoid calling get_account_settings because it introduces circularity for many callers who need both
-    # preferences and account information.
+    preference, _ = UserOrgTag.objects.get_or_create(
+        user=user, org=org, key='email-optin'
+    )
+
+    # If the user requires parental consent, then don't allow opt-in
     try:
         user_profile = UserProfile.objects.get(user=user)
     except ObjectDoesNotExist:
         raise UserNotFound()
+    if user_profile.requires_parental_consent(
+        age_limit=getattr(settings, 'EMAIL_OPTIN_MINIMUM_AGE', 13),
+        default_requires_consent=False,
+    ):
+        opt_in = False
 
-    year_of_birth = user_profile.year_of_birth
-    of_age = (
-        year_of_birth is None or  # If year of birth is not set, we assume user is of age.
-        datetime.datetime.now(UTC).year - year_of_birth >  # pylint: disable=maybe-no-member
-        getattr(settings, 'EMAIL_OPTIN_MINIMUM_AGE', 13)
-    )
-
+    # Update the preference and save it
+    preference.value = str(opt_in)
     try:
-        preference, _ = UserOrgTag.objects.get_or_create(
-            user=user, org=org, key='email-optin'
-        )
-        preference.value = str(optin and of_age)
         preference.save()
-
         if settings.FEATURES.get('SEGMENT_IO_LMS') and settings.SEGMENT_IO_LMS_KEY:
-            _track_update_email_opt_in(user.id, org, optin)
-
+            _track_update_email_opt_in(user.id, org, opt_in)
     except IntegrityError as err:
         log.warn(u"Could not update organization wide preference due to IntegrityError: {}".format(err.message))
 
@@ -268,7 +262,7 @@ def _track_update_email_opt_in(user_id, organization, opt_in):
     Arguments:
         user_id (str): The ID of the user making the preference change.
         organization (str): The organization whose emails are being opted into or out of by the user.
-        opt_in (Boolean): Whether the user has chosen to opt-in to emails from the organization.
+        opt_in (bool): Whether the user has chosen to opt-in to emails from the organization.
 
     Returns:
         None
@@ -317,8 +311,8 @@ def create_user_preference_serializer(user, preference_key, preference_value):
 
     Arguments:
         user (User): The user whose preference is being serialized.
-        preference_key (string): The key for the user preference.
-        preference_value (string): The value to be stored. Non-string values will be converted to strings.
+        preference_key (str): The key for the user preference.
+        preference_value (str): The value to be stored. Non-string values will be converted to strings.
 
     Returns:
         A serializer that can be used to save the user preference.
@@ -344,8 +338,8 @@ def validate_user_preference_serializer(serializer, preference_key, preference_v
 
     Arguments:
         serializer (UserPreferenceSerializer): The serializer to be validated.
-        preference_key (string): The key for the user preference.
-        preference_value (string): The value to be stored. Non-string values will be converted to strings.
+        preference_key (str): The key for the user preference.
+        preference_value (str): The value to be stored. Non-string values will be converted to strings.
 
     Raises:
         PreferenceValidationError: the supplied key and/or value for a user preference are invalid.

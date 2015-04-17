@@ -19,6 +19,7 @@ from social.apps.django_app import utils as social_utils
 from social.apps.django_app import views as social_views
 from student import models as student_models
 from student import views as student_views
+from student_account.views import account_settings_context
 
 from third_party_auth import middleware, pipeline
 from third_party_auth import settings as auth_settings
@@ -110,41 +111,25 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.client = test.Client()
         self.request_factory = test.RequestFactory()
 
-    def assert_dashboard_response_looks_correct(self, response, user, duplicate=False, linked=None):
-        """Asserts the user's dashboard is in the expected state.
+    def assert_account_settings_context_looks_correct(self, context, user, duplicate=False, linked=None):
+        """Asserts the user's account settings page context is in the expected state.
 
-        We check unconditionally that the dashboard 200s and contains the
-        user's info. If duplicate is True, we expect the duplicate account
-        association error to be present. If linked is passed, we conditionally
-        check the content and controls in the Account Links section of the
-        sidebar.
+        If duplicate is True, we expect context['duplicate_provider'] to contain
+        the duplicate provider object. If linked is passed, we conditionally
+        check that the provider is included in context['auth']['providers'] and
+        its connected state is correct.
         """
-        duplicate_account_error_needle = '<section class="dashboard-banner third-party-auth">'
-        assert_duplicate_presence_fn = self.assertIn if duplicate else self.assertNotIn
-
-        self.assertEqual(200, response.status_code)
-        self.assertIn(user.email, response.content.decode('UTF-8'))
-        self.assertIn(user.username, response.content.decode('UTF-8'))
-        assert_duplicate_presence_fn(duplicate_account_error_needle, response.content)
+        if duplicate:
+            self.assertEqual(context['duplicate_provider'].NAME, self.PROVIDER_CLASS.NAME)
+        else:
+            self.assertIsNone(context['duplicate_provider'])
 
         if linked is not None:
-
-            if linked:
-                expected_control_text = pipeline.ProviderUserState(
-                    self.PROVIDER_CLASS, user, False).get_unlink_form_name()
-            else:
-                expected_control_text = pipeline.get_login_url(self.PROVIDER_CLASS.NAME, pipeline.AUTH_ENTRY_DASHBOARD)
-
-            provider_name = re.search(r'<span class="provider">([^<]+)', response.content, re.DOTALL).groups()[0]
-
-            self.assertIn(expected_control_text, response.content)
-            if linked:
-                self.assertIn("fa fa-link", response.content)
-                self.assertNotIn("fa fa-unlink", response.content)
-            else:
-                self.assertNotIn("fa fa-link", response.content)
-                self.assertIn("fa fa-unlink", response.content)
-            self.assertEqual(self.PROVIDER_CLASS.NAME, provider_name)
+            expected_provider = [
+                provider for provider in context['auth']['providers'] if provider['name'] == self.PROVIDER_CLASS.NAME
+            ][0]
+            self.assertIsNotNone(expected_provider)
+            self.assertEqual(expected_provider['connected'], linked)
 
     def assert_exception_redirect_looks_correct(self, expected_uri, auth_entry=None):
         """Tests middleware conditional redirection.
@@ -406,6 +391,11 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
     def test_canceling_authentication_redirects_to_login_when_auth_register_2(self):
         self.assert_exception_redirect_looks_correct('/account/register/', auth_entry=pipeline.AUTH_ENTRY_REGISTER_2)
 
+    def test_canceling_authentication_redirects_to_account_settings_when_auth_entry_account_settings(self):
+        self.assert_exception_redirect_looks_correct(
+            '/account/settings', auth_entry=pipeline.AUTH_ENTRY_ACCOUNT_SETTINGS
+        )
+
     def test_canceling_authentication_redirects_to_root_when_auth_entry_not_set(self):
         self.assert_exception_redirect_looks_correct('/')
 
@@ -432,7 +422,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
 
         # First we expect that we're in the unlinked state, and that there
         # really is no association in the backend.
-        self.assert_dashboard_response_looks_correct(student_views.dashboard(request), request.user, linked=False)
+        self.assert_account_settings_context_looks_correct(account_settings_context(request), request.user, linked=False)
         self.assert_social_auth_does_not_exist_for_user(request.user, strategy)
 
         # We should be redirected back to the complete page, setting
@@ -452,7 +442,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
 
         # Now we expect to be in the linked state, with a backend entry.
         self.assert_social_auth_exists_for_user(request.user, strategy)
-        self.assert_dashboard_response_looks_correct(student_views.dashboard(request), request.user, linked=True)
+        self.assert_account_settings_context_looks_correct(account_settings_context(request), request.user, linked=True)
 
     def test_full_pipeline_succeeds_for_unlinking_account(self):
         # First, create, the request and strategy that store pipeline state,
@@ -479,7 +469,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         actions.do_complete(strategy, social_views._do_login, user=user)  # pylint: disable-msg=protected-access
 
         # First we expect that we're in the linked state, with a backend entry.
-        self.assert_dashboard_response_looks_correct(student_views.dashboard(request), user, linked=True)
+        self.assert_account_settings_context_looks_correct(account_settings_context(request), user, linked=True)
         self.assert_social_auth_exists_for_user(request.user, strategy)
 
         # Fire off the disconnect pipeline to unlink.
@@ -487,7 +477,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
             request.social_strategy, request.user, None, redirect_field_name=auth.REDIRECT_FIELD_NAME))
 
         # Now we expect to be in the unlinked state, with no backend entry.
-        self.assert_dashboard_response_looks_correct(student_views.dashboard(request), user, linked=False)
+        self.assert_account_settings_context_looks_correct(account_settings_context(request), user, linked=False)
         self.assert_social_auth_does_not_exist_for_user(user, strategy)
 
     def test_linking_already_associated_account_raises_auth_already_associated(self):
@@ -541,8 +531,8 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
             request,
             exceptions.AuthAlreadyAssociated(self.PROVIDER_CLASS.BACKEND_CLASS.name, 'account is already in use.'))
 
-        self.assert_dashboard_response_looks_correct(
-            student_views.dashboard(request), user, duplicate=True, linked=True)
+        self.assert_account_settings_context_looks_correct(
+            account_settings_context(request), user, duplicate=True, linked=True)
 
     def test_full_pipeline_succeeds_for_signing_in_to_existing_active_account(self):
         # First, create, the request and strategy that store pipeline state,
@@ -593,7 +583,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
 
         self.assert_redirect_to_dashboard_looks_correct(
             actions.do_complete(strategy, social_views._do_login, user=user))
-        self.assert_dashboard_response_looks_correct(student_views.dashboard(request), user)
+        self.assert_account_settings_context_looks_correct(account_settings_context(request), user)
 
     def test_signin_fails_if_account_not_active(self):
         _, strategy = self.get_request_and_strategy(
@@ -710,7 +700,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.assert_redirect_to_dashboard_looks_correct(
             actions.do_complete(strategy, social_views._do_login, user=created_user))
         self.assert_social_auth_exists_for_user(created_user, strategy)
-        self.assert_dashboard_response_looks_correct(student_views.dashboard(request), created_user, linked=True)
+        self.assert_account_settings_context_looks_correct(account_settings_context(request), created_user, linked=True)
 
     def test_new_account_registration_assigns_distinct_username_on_collision(self):
         original_username = self.get_username()

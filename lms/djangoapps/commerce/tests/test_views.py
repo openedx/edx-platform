@@ -77,6 +77,9 @@ class OrdersViewTests(EnrollmentEventTestMixin, EcommerceApiTestMixin, ModuleSto
                 sku=uuid4().hex.decode('ascii')
             )
 
+        # Ignore events fired from UserFactory creation
+        self.reset_tracker()
+
     def test_login_required(self):
         """
         The view should return HTTP 403 status if the user is not logged in.

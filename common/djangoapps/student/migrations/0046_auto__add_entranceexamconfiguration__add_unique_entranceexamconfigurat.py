@@ -121,9 +121,11 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'LinkedInAddToProfileConfiguration'},
             'change_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'changed_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True', 'on_delete': 'models.PROTECT'}),
-            'dashboard_tracking_code': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'company_identifier': ('django.db.models.fields.TextField', [], {}),
+            'dashboard_tracking_code': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
             'enabled': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'trk_partner_name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '10', 'blank': 'True'})
         },
         'student.loginfailures': {
             'Meta': {'object_name': 'LoginFailures'},

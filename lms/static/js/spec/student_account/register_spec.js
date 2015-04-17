@@ -99,7 +99,7 @@ define([
                             {value: "", name: "--"},
                             {value: "p", name: "Doctorate"},
                             {value: "m", name: "Master's or professional degree"},
-                            {value: "b", name: "Bachelor's degree"},
+                            {value: "b", name: "Bachelor's degree"}
                         ],
                         required: false,
                         instructions: 'Select your education level.',
@@ -115,7 +115,7 @@ define([
                             {value: "", name: "--"},
                             {value: "m", name: "Male"},
                             {value: "f", name: "Female"},
-                            {value: "o", name: "Other"},
+                            {value: "o", name: "Other"}
                         ],
                         required: false,
                         instructions: 'Select your gender.',
@@ -131,7 +131,7 @@ define([
                             {value: "", name: "--"},
                             {value: 1900, name: "1900"},
                             {value: 1950, name: "1950"},
-                            {value: 2014, name: "2014"},
+                            {value: 2014, name: "2014"}
                         ],
                         required: false,
                         instructions: 'Select your year of birth.',

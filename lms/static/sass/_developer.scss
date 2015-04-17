@@ -28,14 +28,9 @@
   @include animation(rotateCW $tmg-s1 linear infinite);
 }
 
-.ui-loading {
+.ui-loading-base {
   @include animation(fadeIn $tmg-f2 linear 1);
-  @extend %ui-well;
   @extend %t-copy-base;
-  opacity: .6;
-  background-color: $white;
-  padding: ($baseline*1.5) $baseline;
-  text-align: center;
 
   .spin {
     @extend %anim-rotateCW;
@@ -45,4 +40,13 @@
   .copy {
     padding-left: ($baseline/4);
   }
+}
+
+.ui-loading {
+  @extend .ui-loading-base;
+  @extend %ui-well;
+  opacity: 0.6;
+  background-color: $white;
+  padding: ($baseline*1.5) $baseline;
+  text-align: center;
 }

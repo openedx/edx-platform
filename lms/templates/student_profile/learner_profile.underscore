@@ -1,0 +1,28 @@
+<div class="profile <%- ownProfile ? 'profile-self' : 'profile-other' %>">
+    <div class="wrapper-profile-field-account-privacy"></div>
+
+    <div class="wrapper-profile-sections account-settings-container">
+        <div class="wrapper-profile-section-one">
+            <div class="profile-image-field">
+            </div>
+
+            <div class="profile-section-one-fields">
+            </div>
+        </div>
+        <div class="ui-loading-error is-hidden">
+            <i class="fa fa-exclamation-triangle message-error" aria-hidden=true></i>
+            <span class="copy"><%- gettext("An error occurred. Please reload the page.") %></span>
+        </div>
+        <div class="wrapper-profile-section-two">
+            <div class="profile-section-two-fields">
+                <% if (!showFullProfile) { %>
+                    <% if(ownProfile) { %>
+                        <span class="profile-private--message" tabindex="0"><%- gettext("You are currently sharing a limited profile.") %></span>
+                    <% } else {  %>
+                        <span class="profile-private--message" tabindex="0"><%- gettext("This edX learner is currently sharing a limited profile.") %></span>
+                    <% } %>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,19 +1,32 @@
 # -*- coding: utf-8 -*-
-import unittest
+import datetime
+from copy import deepcopy
 import ddt
+import hashlib
 import json
 from mock import patch
+from pytz import UTC
+import unittest
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.testcases import TransactionTestCase
+from django.test.utils import override_settings
 from rest_framework.test import APITestCase, APIClient
 
 from student.tests.factories import UserFactory
-from student.models import UserProfile, PendingEmailChange
+from student.models import UserProfile, LanguageProficiency, PendingEmailChange
 from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KEY
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from .. import PRIVATE_VISIBILITY, ALL_USERS_VISIBILITY
+
+TEST_PROFILE_IMAGE_UPLOADED_AT = datetime.datetime(2002, 1, 9, 15, 43, 01, tzinfo=UTC)
+
+
+# this is used in one test to check the behavior of profile image url
+# generation with a relative url in the config.
+TEST_PROFILE_IMAGE_BACKEND = deepcopy(settings.PROFILE_IMAGE_BACKEND)
+TEST_PROFILE_IMAGE_BACKEND['options']['base_url'] = '/profile-images/'
 
 
 class UserAPITestCase(APITestCase):
@@ -82,14 +95,22 @@ class UserAPITestCase(APITestCase):
         legacy_profile = UserProfile.objects.get(id=user.id)
         legacy_profile.country = "US"
         legacy_profile.level_of_education = "m"
-        legacy_profile.year_of_birth = 1900
+        legacy_profile.year_of_birth = 2000
         legacy_profile.goals = "world peace"
         legacy_profile.mailing_address = "Park Ave"
+        legacy_profile.gender = "f"
+        legacy_profile.bio = "Tired mother of twins"
+        legacy_profile.profile_image_uploaded_at = TEST_PROFILE_IMAGE_UPLOADED_AT
+        legacy_profile.language_proficiencies.add(LanguageProficiency(code='en'))
         legacy_profile.save()
 
 
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+@patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
+@patch.dict(
+    'openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP', {'full': 50, 'small': 10}, clear=True
+)
 class TestAccountAPI(UserAPITestCase):
     """
     Unit tests for the Account API.
@@ -99,6 +120,32 @@ class TestAccountAPI(UserAPITestCase):
 
         self.url = reverse("accounts_api", kwargs={'username': self.user.username})
 
+    def _verify_profile_image_data(self, data, has_profile_image):
+        """
+        Verify the profile image data in a GET response for self.user
+        corresponds to whether the user has or hasn't set a profile
+        image.
+        """
+        template = '{root}/{filename}_{{size}}.{extension}'
+        if has_profile_image:
+            url_root = 'http://example-storage.com/profile-images'
+            filename = hashlib.md5('secret' + self.user.username).hexdigest()
+            file_extension = 'jpg'
+            template += '?v={}'.format(TEST_PROFILE_IMAGE_UPLOADED_AT.strftime("%s"))
+        else:
+            url_root = 'http://testserver/static'
+            filename = 'default'
+            file_extension = 'png'
+        template = template.format(root=url_root, filename=filename, extension=file_extension)
+        self.assertEqual(
+            data['profile_image'],
+            {
+                'has_image': has_profile_image,
+                'image_url_full': template.format(size=50),
+                'image_url_small': template.format(size=10),
+            }
+        )
+
     def _verify_full_shareable_account_response(self, response):
         """
         Verify that the shareable fields from the account are returned
@@ -107,38 +154,41 @@ class TestAccountAPI(UserAPITestCase):
         self.assertEqual(6, len(data))
         self.assertEqual(self.user.username, data["username"])
         self.assertEqual("US", data["country"])
-        self.assertIsNone(data["profile_image"])
+        self._verify_profile_image_data(data, True)
         self.assertIsNone(data["time_zone"])
-        self.assertIsNone(data["languages"])
-        self.assertIsNone(data["bio"])
+        self.assertEqual([{"code": "en"}], data["language_proficiencies"])
+        self.assertEqual("Tired mother of twins", data["bio"])
 
-    def _verify_private_account_response(self, response):
+    def _verify_private_account_response(self, response, requires_parental_consent=False):
         """
         Verify that only the public fields are returned if a user does not want to share account fields
         """
         data = response.data
         self.assertEqual(2, len(data))
         self.assertEqual(self.user.username, data["username"])
-        self.assertIsNone(data["profile_image"])
+        self._verify_profile_image_data(data, not requires_parental_consent)
 
-    def _verify_full_account_response(self, response):
+    def _verify_full_account_response(self, response, requires_parental_consent=False):
         """
         Verify that all account fields are returned (even those that are not shareable).
         """
         data = response.data
-        self.assertEqual(12, len(data))
+        self.assertEqual(15, len(data))
         self.assertEqual(self.user.username, data["username"])
         self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
         self.assertEqual("US", data["country"])
-        self.assertEqual("", data["language"])
-        self.assertEqual("m", data["gender"])
-        self.assertEqual(1900, data["year_of_birth"])
+        self.assertEqual("f", data["gender"])
+        self.assertEqual(2000, data["year_of_birth"])
         self.assertEqual("m", data["level_of_education"])
         self.assertEqual("world peace", data["goals"])
         self.assertEqual("Park Ave", data['mailing_address'])
         self.assertEqual(self.user.email, data["email"])
         self.assertTrue(data["is_active"])
         self.assertIsNotNone(data["date_joined"])
+        self.assertEqual("Tired mother of twins", data["bio"])
+        self._verify_profile_image_data(data, not requires_parental_consent)
+        self.assertEquals(requires_parental_consent, data["requires_parental_consent"])
+        self.assertEqual([{"code": "en"}], data["language_proficiencies"])
 
     def test_anonymous_access(self):
         """
@@ -167,7 +217,7 @@ class TestAccountAPI(UserAPITestCase):
         """
         client = self.login_client(api_client, user)
         response = client.get(reverse("accounts_api", kwargs={'username': "does_not_exist"}))
-        self.assertEqual(404, response.status_code)
+        self.assertEqual(403 if user == "staff_user" else 404, response.status_code)
 
     # Note: using getattr so that the patching works even if there is no configuration.
     # This is needed when testing CMS as the patching is still executed even though the
@@ -240,19 +290,20 @@ class TestAccountAPI(UserAPITestCase):
         def verify_get_own_information():
             response = self.send_get(self.client)
             data = response.data
-            self.assertEqual(12, len(data))
+            self.assertEqual(15, len(data))
             self.assertEqual(self.user.username, data["username"])
             self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
-            for empty_field in ("year_of_birth", "level_of_education", "mailing_address"):
+            for empty_field in ("year_of_birth", "level_of_education", "mailing_address", "bio"):
                 self.assertIsNone(data[empty_field])
             self.assertIsNone(data["country"])
-            # TODO: what should the format of this be?
-            self.assertEqual("", data["language"])
             self.assertEqual("m", data["gender"])
             self.assertEqual("Learn a lot", data["goals"])
             self.assertEqual(self.user.email, data["email"])
             self.assertIsNotNone(data["date_joined"])
             self.assertEqual(self.user.is_active, data["is_active"])
+            self._verify_profile_image_data(data, False)
+            self.assertTrue(data["requires_parental_consent"])
+            self.assertEqual([], data["language_proficiencies"])
 
         self.client.login(username=self.user.username, password=self.test_password)
         verify_get_own_information()
@@ -288,7 +339,7 @@ class TestAccountAPI(UserAPITestCase):
         is_staff access).
         """
         client = self.login_client(api_client, user)
-        self.send_patch(client, {}, expected_status=404)
+        self.send_patch(client, {}, expected_status=403 if user == "staff_user" else 404)
 
     @ddt.data(
         ("client", "user"),
@@ -313,10 +364,12 @@ class TestAccountAPI(UserAPITestCase):
         ("year_of_birth", 2009, "not_an_int", u"Enter a whole number."),
         ("name", "bob", "z" * 256, u"Ensure this value has at most 255 characters (it has 256)."),
         ("name", u"ȻħȺɍłɇs", "z   ", u"The name field must be at least 2 characters long."),
-        ("language", "Creole"),
         ("goals", "Smell the roses"),
         ("mailing_address", "Sesame Street"),
+        # Note that we store the raw data, so it is up to client to escape the HTML.
+        ("bio", u"<html>Lacrosse-playing superhero 壓是進界推日不復女</html>", "z" * 3001, u"Ensure this value has at most 3000 characters (it has 3001)."),
         # Note that email is tested below, as it is not immediately updated.
+        # Note that language_proficiencies is tested below as there are multiple error and success conditions.
     )
     @ddt.unpack
     def test_patch_account(self, field, value, fails_validation_value=None, developer_validation_message=None):
@@ -332,7 +385,7 @@ class TestAccountAPI(UserAPITestCase):
         if fails_validation_value:
             error_response = self.send_patch(client, {field: fails_validation_value}, expected_status=400)
             self.assertEqual(
-                u"Value '{0}' is not valid for field '{1}'.".format(fails_validation_value, field),
+                u'This value is invalid.',
                 error_response.data["field_errors"][field]["user_message"]
             )
             self.assertEqual(
@@ -369,11 +422,11 @@ class TestAccountAPI(UserAPITestCase):
                 "This field is not editable via this API", data["field_errors"][field_name]["developer_message"]
             )
             self.assertEqual(
-                "Field '{0}' cannot be edited.".format(field_name), data["field_errors"][field_name]["user_message"]
+                "The '{0}' field cannot be edited.".format(field_name), data["field_errors"][field_name]["user_message"]
             )
 
-        for field_name in ["username", "date_joined", "is_active"]:
-            response = self.send_patch(client, {field_name: "will_error", "gender": "f"}, expected_status=400)
+        for field_name in ["username", "date_joined", "is_active", "profile_image", "requires_parental_consent"]:
+            response = self.send_patch(client, {field_name: "will_error", "gender": "o"}, expected_status=400)
             verify_error_response(field_name, response.data)
 
         # Make sure that gender did not change.
@@ -497,6 +550,42 @@ class TestAccountAPI(UserAPITestCase):
         )
         self.assertEqual("Valid e-mail address required.", field_errors["email"]["user_message"])
 
+    def test_patch_language_proficiencies(self):
+        """
+        Verify that patching the language_proficiencies field of the user
+        profile completely overwrites the previous value.
+        """
+        client = self.login_client("client", "user")
+
+        # Patching language_proficiencies exercises the
+        # `LanguageProficiencySerializer.get_identity` method, which compares
+        # identifies language proficiencies based on their language code rather
+        # than django model id.
+        for proficiencies in ([{"code": "en"}, {"code": "fr"}, {"code": "es"}], [{"code": "fr"}], [{"code": "aa"}], []):
+            self.send_patch(client, {"language_proficiencies": proficiencies})
+            response = self.send_get(client)
+            self.assertItemsEqual(response.data["language_proficiencies"], proficiencies)
+
+    @ddt.data(
+        (u"not_a_list", [{u'non_field_errors': [u'Expected a list of items.']}]),
+        ([u"not_a_JSON_object"], [{u'non_field_errors': [u'Invalid data']}]),
+        ([{}], [{"code": [u"This field is required."]}]),
+        ([{u"code": u"invalid_language_code"}], [{'code': [u'Select a valid choice. invalid_language_code is not one of the available choices.']}]),
+        ([{u"code": u"kw"}, {u"code": u"el"}, {u"code": u"kw"}], [u'The language_proficiencies field must consist of unique languages']),
+    )
+    @ddt.unpack
+    def test_patch_invalid_language_proficiencies(self, patch_value, expected_error_message):
+        """
+        Verify we handle error cases when patching the language_proficiencies
+        field.
+        """
+        client = self.login_client("client", "user")
+        response = self.send_patch(client, {"language_proficiencies": patch_value}, expected_status=400)
+        self.assertEqual(
+            response.data["field_errors"]["language_proficiencies"]["developer_message"],
+            u"Value '{patch_value}' is not valid for field 'language_proficiencies': {error_message}".format(patch_value=patch_value, error_message=expected_error_message)
+        )
+
     @patch('openedx.core.djangoapps.user_api.accounts.serializers.AccountUserSerializer.save')
     def test_patch_serializer_save_fails(self, serializer_save):
         """
@@ -510,6 +599,68 @@ class TestAccountAPI(UserAPITestCase):
             error_response.data["developer_message"]
         )
         self.assertIsNone(error_response.data["user_message"])
+
+    @override_settings(PROFILE_IMAGE_BACKEND=TEST_PROFILE_IMAGE_BACKEND)
+    def test_convert_relative_profile_url(self):
+        """
+        Test that when TEST_PROFILE_IMAGE_BACKEND['base_url'] begins
+        with a '/', the API generates the full URL to profile images based on
+        the URL of the request.
+        """
+        self.client.login(username=self.user.username, password=self.test_password)
+        response = self.send_get(self.client)
+        # pylint: disable=no-member
+        self.assertEqual(
+            response.data["profile_image"],
+            {
+                "has_image": False,
+                "image_url_full": "http://testserver/static/default_50.png",
+                "image_url_small": "http://testserver/static/default_10.png"
+            }
+        )
+
+    @ddt.data(
+        ("client", "user", True),
+        ("different_client", "different_user", False),
+        ("staff_client", "staff_user", True),
+    )
+    @ddt.unpack
+    def test_parental_consent(self, api_client, requesting_username, has_full_access):
+        """
+        Verifies that under thirteens never return a public profile.
+        """
+        client = self.login_client(api_client, requesting_username)
+
+        # Set the user to be ten years old with a public profile
+        legacy_profile = UserProfile.objects.get(id=self.user.id)
+        current_year = datetime.datetime.now().year
+        legacy_profile.year_of_birth = current_year - 10
+        legacy_profile.save()
+        set_user_preference(self.user, ACCOUNT_VISIBILITY_PREF_KEY, ALL_USERS_VISIBILITY)
+
+        # Verify that the default view is still private (except for clients with full access)
+        response = self.send_get(client)
+        if has_full_access:
+            data = response.data
+            self.assertEqual(15, len(data))
+            self.assertEqual(self.user.username, data["username"])
+            self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
+            self.assertEqual(self.user.email, data["email"])
+            self.assertEqual(current_year - 10, data["year_of_birth"])
+            for empty_field in ("country", "level_of_education", "mailing_address", "bio"):
+                self.assertIsNone(data[empty_field])
+            self.assertEqual("m", data["gender"])
+            self.assertEqual("Learn a lot", data["goals"])
+            self.assertTrue(data["is_active"])
+            self.assertIsNotNone(data["date_joined"])
+            self._verify_profile_image_data(data, False)
+            self.assertTrue(data["requires_parental_consent"])
+        else:
+            self._verify_private_account_response(response, requires_parental_consent=True)
+
+        # Verify that the shared view is still private
+        response = self.send_get(client, query_parameters='view=shared')
+        self._verify_private_account_response(response, requires_parental_consent=True)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
