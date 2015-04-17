@@ -3,6 +3,7 @@ Tests for user enrollment.
 """
 import json
 import unittest
+import datetime
 
 import ddt
 from django.core.cache import cache
@@ -304,6 +305,46 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
         self.assertEqual(mode['slug'], CourseMode.HONOR)
         self.assertEqual(mode['sku'], '123')
         self.assertEqual(mode['name'], CourseMode.HONOR)
+
+    @ddt.data(
+        # NOTE: Studio requires a start date, but this is not
+        # enforced at the data layer, so we need to handle the case
+        # in which no dates are specified.
+        (None, None, None, None),
+        (datetime.datetime(2015, 1, 2, 3, 4, 5), None, "2015-01-02T03:04:05Z", None),
+        (None, datetime.datetime(2015, 1, 2, 3, 4, 5), None, "2015-01-02T03:04:05Z"),
+        (datetime.datetime(2014, 6, 7, 8, 9, 10), datetime.datetime(2015, 1, 2, 3, 4, 5), "2014-06-07T08:09:10Z", "2015-01-02T03:04:05Z"),
+    )
+    @ddt.unpack
+    def test_get_course_details_course_dates(self, start_datetime, end_datetime, expected_start, expected_end):
+        course = CourseFactory.create(start=start_datetime, end=end_datetime)
+        self._create_enrollment(course_id=unicode(course.id))
+
+        # Check course details
+        url = reverse('courseenrollmentdetails', kwargs={"course_id": unicode(course.id)})
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = json.loads(resp.content)
+        self.assertEqual(data['course_start'], expected_start)
+        self.assertEqual(data['course_end'], expected_end)
+
+        # Check enrollment course details
+        url = reverse('courseenrollment', kwargs={"course_id": unicode(course.id)})
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = json.loads(resp.content)
+        self.assertEqual(data['course_details']['course_start'], expected_start)
+        self.assertEqual(data['course_details']['course_end'], expected_end)
+
+        # Check enrollment list course details
+        resp = self.client.get(reverse('courseenrollments'))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = json.loads(resp.content)
+        self.assertEqual(data[0]['course_details']['course_start'], expected_start)
+        self.assertEqual(data[0]['course_details']['course_end'], expected_end)
 
     def test_with_invalid_course_id(self):
         self.assert_enrollment_status(course_id='entirely/fake/course', expected_status=status.HTTP_400_BAD_REQUEST)
