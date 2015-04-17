@@ -8,19 +8,26 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'InCourseReverificationConfiguration'
-        db.create_table('verify_student_incoursereverificationconfiguration', (
+        # Adding model 'SkippedReverification'
+        db.create_table('verify_student_skippedreverification', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('change_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('changed_by', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, on_delete=models.PROTECT)),
-            ('enabled', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('course_id', self.gf('xmodule_django.models.CourseKeyField')(max_length=255, db_index=True)),
+            ('checkpoint', self.gf('django.db.models.fields.related.ForeignKey')(related_name='skipped_checkpoint', to=orm['verify_student.VerificationCheckpoint'])),
+            ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
         ))
-        db.send_create_signal('verify_student', ['InCourseReverificationConfiguration'])
+        db.send_create_signal('verify_student', ['SkippedReverification'])
+
+        # Adding unique constraint on 'SkippedReverification', fields ['user', 'course_id']
+        db.create_unique('verify_student_skippedreverification', ['user_id', 'course_id'])
 
 
     def backwards(self, orm):
-        # Deleting model 'InCourseReverificationConfiguration'
-        db.delete_table('verify_student_incoursereverificationconfiguration')
+        # Removing unique constraint on 'SkippedReverification', fields ['user', 'course_id']
+        db.delete_unique('verify_student_skippedreverification', ['user_id', 'course_id'])
+
+        # Deleting model 'SkippedReverification'
+        db.delete_table('verify_student_skippedreverification')
 
 
     models = {
@@ -74,6 +81,14 @@ class Migration(SchemaMigration):
             'enabled': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         },
+        'verify_student.skippedreverification': {
+            'Meta': {'unique_together': "(('user', 'course_id'),)", 'object_name': 'SkippedReverification'},
+            'checkpoint': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'skipped_checkpoint'", 'to': "orm['verify_student.VerificationCheckpoint']"}),
+            'course_id': ('xmodule_django.models.CourseKeyField', [], {'max_length': '255', 'db_index': 'True'}),
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
+        },
         'verify_student.softwaresecurephotoverification': {
             'Meta': {'ordering': "['-created_at']", 'object_name': 'SoftwareSecurePhotoVerification'},
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'db_index': 'True', 'blank': 'True'}),
@@ -85,7 +100,7 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
             'photo_id_image_url': ('django.db.models.fields.URLField', [], {'max_length': '255', 'blank': 'True'}),
             'photo_id_key': ('django.db.models.fields.TextField', [], {'max_length': '1024'}),
-            'receipt_id': ('django.db.models.fields.CharField', [], {'default': "'8a3c9d8a-b885-480e-8e1e-ca111326db42'", 'max_length': '255', 'db_index': 'True'}),
+            'receipt_id': ('django.db.models.fields.CharField', [], {'default': "'aaa24e01-3318-4707-a3ed-74d0f1c1ed15'", 'max_length': '255', 'db_index': 'True'}),
             'reviewing_service': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
             'reviewing_user': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'related_name': "'photo_verifications_reviewed'", 'null': 'True', 'to': "orm['auth.User']"}),
             'status': ('model_utils.fields.StatusField', [], {'default': "'created'", 'max_length': '100', u'no_check_for_status': 'True'}),
@@ -104,7 +119,7 @@ class Migration(SchemaMigration):
         },
         'verify_student.verificationstatus': {
             'Meta': {'object_name': 'VerificationStatus'},
-            'checkpoint': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['verify_student.VerificationCheckpoint']"}),
+            'checkpoint': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'checkpoint_status'", 'to': "orm['verify_student.VerificationCheckpoint']"}),
             'error': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'response': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),

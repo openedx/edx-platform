@@ -1061,3 +1061,19 @@ class InCourseReverificationConfiguration(ConfigurationModel):
 
     """
     pass
+
+
+class SkippedReverification(models.Model):
+    """
+    Model for tracking skipped Reverification of a user against a specific
+    course.
+    If user skipped the Reverification for a specific course then in future
+    user cannot see the reverification link.
+    """
+    user = models.ForeignKey(User)
+    course_id = CourseKeyField(max_length=255, db_index=True)
+    checkpoint = models.ForeignKey(VerificationCheckpoint, related_name="skipped_checkpoint")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:  # pylint: disable=missing-docstring, old-style-class
+        unique_together = (('user', 'course_id'),)
