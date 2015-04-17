@@ -385,7 +385,7 @@ class TestAccountAPI(UserAPITestCase):
         if fails_validation_value:
             error_response = self.send_patch(client, {field: fails_validation_value}, expected_status=400)
             self.assertEqual(
-                u"Value '{0}' is not valid for field '{1}'.".format(fails_validation_value, field),
+                u'This value is invalid.',
                 error_response.data["field_errors"][field]["user_message"]
             )
             self.assertEqual(
@@ -422,7 +422,7 @@ class TestAccountAPI(UserAPITestCase):
                 "This field is not editable via this API", data["field_errors"][field_name]["developer_message"]
             )
             self.assertEqual(
-                "Field '{0}' cannot be edited.".format(field_name), data["field_errors"][field_name]["user_message"]
+                "The '{0}' field cannot be edited.".format(field_name), data["field_errors"][field_name]["user_message"]
             )
 
         for field_name in ["username", "date_joined", "is_active", "profile_image", "requires_parental_consent"]:

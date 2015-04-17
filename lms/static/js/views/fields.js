@@ -668,7 +668,7 @@
                     humanReadableSize = this.bytesToHumanReadable(this.options.imageMinBytes);
                     this.showErrorMessage(
                         interpolate_text(
-                            gettext("Your image must be at least {size} in size."), {size: humanReadableSize}
+                            gettext("The file must be at least {size} in size."), {size: humanReadableSize}
                         )
                     );
                     return false;
@@ -676,7 +676,7 @@
                     humanReadableSize = this.bytesToHumanReadable(this.options.imageMaxBytes);
                     this.showErrorMessage(
                         interpolate_text(
-                            gettext("Your image must be smaller than {size} in size."), {size: humanReadableSize}
+                            gettext("The file must be smaller than {size} in size."), {size: humanReadableSize}
                         )
                     );
                     return false;
