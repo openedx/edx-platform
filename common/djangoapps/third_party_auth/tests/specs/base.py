@@ -111,42 +111,6 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.client = test.Client()
         self.request_factory = test.RequestFactory()
 
-    def assert_dashboard_response_looks_correct(self, response, user, duplicate=False, linked=None):
-        """Asserts the user's dashboard is in the expected state.
-
-        We check unconditionally that the dashboard 200s and contains the
-        user's info. If duplicate is True, we expect the duplicate account
-        association error to be present. If linked is passed, we conditionally
-        check the content and controls in the Account Links section of the
-        sidebar.
-        """
-        duplicate_account_error_needle = '<section class="dashboard-banner third-party-auth">'
-        assert_duplicate_presence_fn = self.assertIn if duplicate else self.assertNotIn
-
-        self.assertEqual(200, response.status_code)
-        self.assertIn(user.email, response.content.decode('UTF-8'))
-        self.assertIn(user.username, response.content.decode('UTF-8'))
-        assert_duplicate_presence_fn(duplicate_account_error_needle, response.content)
-
-        if linked is not None:
-
-            if linked:
-                expected_control_text = pipeline.ProviderUserState(
-                    self.PROVIDER_CLASS, user, False).get_unlink_form_name()
-            else:
-                expected_control_text = pipeline.get_login_url(self.PROVIDER_CLASS.NAME, pipeline.AUTH_ENTRY_DASHBOARD)
-
-            provider_name = re.search(r'<span class="provider">([^<]+)', response.content, re.DOTALL).groups()[0]
-
-            self.assertIn(expected_control_text, response.content)
-            if linked:
-                self.assertIn("fa fa-link", response.content)
-                self.assertNotIn("fa fa-unlink", response.content)
-            else:
-                self.assertNotIn("fa fa-link", response.content)
-                self.assertIn("fa fa-unlink", response.content)
-            self.assertEqual(self.PROVIDER_CLASS.NAME, provider_name)
-
     def assert_account_settings_context_looks_correct(self, context, user, duplicate=False, linked=None):
         """Asserts the user's account settings page context is in the expected state.
 
