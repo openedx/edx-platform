@@ -1,11 +1,21 @@
 """
 Models for the custom course feature
 """
+from datetime import datetime
+import logging
+
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils.timezone import UTC
 
 from student.models import CourseEnrollment, AlreadyEnrolledError  # pylint: disable=import-error
 from xmodule_django.models import CourseKeyField, LocationKeyField  # pylint: disable=import-error
+from xmodule.error_module import ErrorDescriptor
+from xmodule.modulestore.django import modulestore
+
+
+log = logging.getLogger("edx.ccx")
+_MARKER = object()
 
 
 class CustomCourseForEdX(models.Model):
@@ -15,6 +25,71 @@ class CustomCourseForEdX(models.Model):
     course_id = CourseKeyField(max_length=255, db_index=True)
     display_name = models.CharField(max_length=255)
     coach = models.ForeignKey(User, db_index=True)
+
+    _course = None
+    _start = None
+    _due = _MARKER
+
+    @property
+    def course(self):
+        if self._course is None:
+            store = modulestore()
+            with store.bulk_operations(self.course_id):
+                course = store.get_course(self.course_id)
+                if course and not isinstance(course, ErrorDescriptor):
+                    self._course = course
+                else:
+                    log.error("CCX {0} from {2} course {1}".format(  # pylint: disable=logging-format-interpolation
+                        self.display_name, self.course_id, "broken" if course else "non-existent"
+                    ))
+
+        return self._course
+
+    @property
+    def start(self):
+        if self._start is None:
+            # avoid circular import problems
+            from .overrides import get_override_for_ccx
+            start = get_override_for_ccx(self, self.course, 'start')
+            self._start = start
+        return self._start
+
+    @property
+    def due(self):
+        if self._due is _MARKER:
+            # avoid circular import problems
+            from .overrides import get_override_for_ccx
+            due = get_override_for_ccx(self, self.course, 'due')
+            self._due = due
+        return self._due
+
+    def has_started(self):
+        return datetime.now(UTC()) > self.start
+
+    def has_ended(self):
+        if self.due is None:
+            return False
+
+        return datetime.now(UTC()) > self.due
+
+    def start_datetime_text(self, format_string="SHORT_DATE"):
+        i18n = self.course.runtime.service(self.course, "i18n")
+        strftime = i18n.strftime
+        value = strftime(self.start, format_string)
+        if format_string == 'DATE_TIME':
+            value += u' UTC'
+        return value
+
+    def end_datetime_text(self, format_string="SHORT_DATE"):
+        if self.due is None:
+            return ''
+
+        i18n = self.course.runtime.service(self.course, "i18n")
+        strftime = i18n.strftime
+        value = strftime(self.due, format_string)
+        if format_string == 'DATE_TIME':
+            value += u' UTC'
+        return value
 
 
 class CcxMembership(models.Model):
