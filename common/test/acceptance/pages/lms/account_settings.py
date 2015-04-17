@@ -17,7 +17,7 @@ class AccountSettingsPage(FieldsMixin, PageObject):
     url = "{base}/{settings}".format(base=BASE_URL, settings='account/settings')
 
     def is_browser_on_page(self):
-        return 'Account Settings' in self.browser.title
+        return 'Account Settings' in self.browser.title and self.q(css='.wrapper-account-settings').present
 
     def sections_structure(self):
         """
