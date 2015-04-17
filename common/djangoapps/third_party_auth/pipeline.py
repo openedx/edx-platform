@@ -114,9 +114,9 @@ AUTH_EMAIL_OPT_IN_KEY = 'email_opt_in'
 
 
 # The following are various possible values for the AUTH_ENTRY_KEY.
-AUTH_ENTRY_DASHBOARD = 'dashboard'
 AUTH_ENTRY_LOGIN = 'login'
 AUTH_ENTRY_REGISTER = 'register'
+AUTH_ENTRY_ACCOUNT_SETTINGS = 'account_settings'
 
 # This is left-over from an A/B test
 # of the new combined login/registration page (ECOM-369)
@@ -142,9 +142,9 @@ def is_api(auth_entry):
 # We don't use "reverse" here because doing so may cause modules
 # to load that depend on this module.
 AUTH_DISPATCH_URLS = {
-    AUTH_ENTRY_DASHBOARD: '/dashboard',
     AUTH_ENTRY_LOGIN: '/login',
     AUTH_ENTRY_REGISTER: '/register',
+    AUTH_ENTRY_ACCOUNT_SETTINGS: '/account/settings',
 
     # This is left-over from an A/B test
     # of the new combined login/registration page (ECOM-369)
@@ -156,9 +156,9 @@ AUTH_DISPATCH_URLS = {
 }
 
 _AUTH_ENTRY_CHOICES = frozenset([
-    AUTH_ENTRY_DASHBOARD,
     AUTH_ENTRY_LOGIN,
     AUTH_ENTRY_REGISTER,
+    AUTH_ENTRY_ACCOUNT_SETTINGS,
 
     # This is left-over from an A/B test
     # of the new combined login/registration page (ECOM-369)
@@ -577,7 +577,7 @@ def login_analytics(strategy, auth_entry, *args, **kwargs):
     event_name = None
     if auth_entry in [AUTH_ENTRY_LOGIN, AUTH_ENTRY_LOGIN_2]:
         event_name = 'edx.bi.user.account.authenticated'
-    elif auth_entry in [AUTH_ENTRY_DASHBOARD]:
+    elif auth_entry in [AUTH_ENTRY_ACCOUNT_SETTINGS]:
         event_name = 'edx.bi.user.account.linked'
 
     if event_name is not None:
@@ -623,7 +623,7 @@ def change_enrollment(strategy, auth_entry=None, user=None, *args, **kwargs):
         user (User): The user being authenticated.
     """
     # We skip enrollment if the user entered the flow from the "link account"
-    # button on the student dashboard.  At this point, either:
+    # button on the account settings page.  At this point, either:
     #
     # 1) The user already had a linked account when they started the enrollment flow,
     # in which case they would have been enrolled during the normal authentication process.
@@ -633,7 +633,7 @@ def change_enrollment(strategy, auth_entry=None, user=None, *args, **kwargs):
     # args when sending users to this page, successfully authenticating through this page
     # would also enroll the student in the course.
     enroll_course_id = strategy.session_get('enroll_course_id')
-    if enroll_course_id and auth_entry != AUTH_ENTRY_DASHBOARD:
+    if enroll_course_id and auth_entry != AUTH_ENTRY_ACCOUNT_SETTINGS:
         course_id = CourseKey.from_string(enroll_course_id)
         modes = CourseMode.modes_for_course_dict(course_id)
 

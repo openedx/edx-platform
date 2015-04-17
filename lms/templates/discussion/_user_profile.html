@@ -1,7 +1,7 @@
 <%! from django.utils.translation import ugettext as _, ungettext %>
 <%def name="span(num)"><span>${num}</span></%def>
 <div class="user-profile">
-  <div class="sidebar-username">${django_user.username | h}</div>
+  <div class="sidebar-username"><a class="leaner-profile-link" href="${learner_profile_page_url}">${django_user.username | h}</a></div>
   <div class="sidebar-user-roles">
       ${_(', ').join(sorted(set(map(_, [role.name for role in django_user.roles.all()]))))}
   </div>
