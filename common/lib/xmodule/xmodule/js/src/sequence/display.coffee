@@ -4,7 +4,7 @@ class @Sequence
     @el = $(element).find('.sequence')
     @contents = @$('.seq_contents')
     @content_container = @$('#seq_content')
-    @sr_container = @$('#sr-is-focusable')
+    @sr_container = @$('.sr-is-focusable')
     @num_contents = @contents.length
     @id = @el.data('id')
     @ajaxUrl = @el.data('ajax-url')
