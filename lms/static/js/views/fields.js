@@ -20,12 +20,12 @@
             tagName: 'div',
 
             indicators: {
-                'canEdit': '<i class="icon fa fa-pencil message-can-edit" aria-hidden="true"></i><span class="sr">gettext("Editable")</span>',
-                'error': '<i class="fa fa-exclamation-triangle message-error" aria-hidden="true"></i><span class="sr">gettext("Error")</span>',
-                'validationError': '<i class="fa fa-exclamation-triangle message-validation-error" aria-hidden="true"></i><span class="sr">gettext("Validation Error")</span>',
-                'inProgress': '<i class="fa fa-spinner fa-pulse message-in-progress" aria-hidden="true"></i><span class="sr">gettext("In Progress")</span>',
-                'success': '<i class="fa fa-check message-success" aria-hidden="true"></i><span class="sr">gettext("Success")</span>',
-                'plus': '<i class="fa fa-plus placeholder" aria-hidden="true"></i><span class="sr">gettext("Placeholder")</span>'
+                'canEdit': '<i class="icon fa fa-pencil message-can-edit" aria-hidden="true"></i><span class="sr">' + gettext("Editable") + '</span>',
+                'error': '<i class="fa fa-exclamation-triangle message-error" aria-hidden="true"></i><span class="sr">' + gettext("Error") + '</span>',
+                'validationError': '<i class="fa fa-exclamation-triangle message-validation-error" aria-hidden="true"></i><span class="sr">' + gettext("Validation Error") + '</span>',
+                'inProgress': '<i class="fa fa-spinner fa-pulse message-in-progress" aria-hidden="true"></i><span class="sr">' + gettext("In Progress") + '</span>',
+                'success': '<i class="fa fa-check message-success" aria-hidden="true"></i><span class="sr">' + gettext("Success") + '</span>',
+                'plus': '<i class="fa fa-plus placeholder" aria-hidden="true"></i><span class="sr">' + gettext("Placeholder")+ '</span>'
             },
 
             messages: {
@@ -711,18 +711,14 @@
             onBeforeUnload: function () {
                 var status = this.getCurrentStatus();
                 if (status === 'uploading') {
-                    return gettext(
-                        "Upload is in progress. To avoid errors, stay on this page until the process is complete."
-                    );
+                    return gettext("Upload is in progress. To avoid errors, stay on this page until the process is complete.");
                 } else if (status === 'removing') {
-                    return gettext(
-                        "Removal is in progress. To avoid errors, stay on this page until the process is complete."
-                    );
+                    return gettext("Removal is in progress. To avoid errors, stay on this page until the process is complete.");
                 }
             },
 
             bytesToHumanReadable: function (size) {
-                var units = ['bytes', 'KB', 'MB'];
+                var units = [gettext('bytes'), gettext('KB'), gettext('MB')];
                 var i = 0;
                 while(size >= 1024) {
                     size /= 1024;

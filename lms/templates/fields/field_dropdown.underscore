@@ -1,6 +1,6 @@
 <% if (title) { %>
     <label class="u-field-title" for="u-field-select-<%- id %>">
-        <%- gettext(title) %>
+        <%- title %>
     </label>
 <% } %>
 
@@ -20,7 +20,7 @@
         </select>
     <% } else { %>
         <a href="#" class="u-field-value-display">
-            <span class="sr"><%- gettext(screenReaderTitle) %></span>
+            <span class="sr"><%- screenReaderTitle %></span>
             <span class="u-field-value-readonly"></span>
             <span class="sr"><%- gettext('Click to edit') %></span>
         </a>
@@ -29,5 +29,5 @@
 
 <span class="u-field-message" id="u-field-message-<%- id %>">
     <span class="u-field-message-notification" aria-live="polite"></span>
-    <span class="u-field-message-help" id="u-field-help-message-<%- id %>"><%- gettext(message) %></span>
+    <span class="u-field-message-help" id="u-field-help-message-<%- id %>"><%- message %></span>
 </span>
