@@ -298,8 +298,19 @@ class CourseUpdateTest(CourseTestCase):
         self.post_course_update(send_push_notification=True)
         self.assertTrue(mock_push_update.called)
 
-    @override_settings(PARSE_KEYS={"APPLICATION_ID": "TEST_APPLICATION_ID", "REST_API_KEY": "TEST_REST_API_KEY"})
-    @patch("contentstore.push_notification.Push")
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_NOTIFICATIONS': True})
+    @patch("edx_notifications.channels.parse_push.Push")
+    @override_settings(
+        NOTIFICATION_CHANNEL_PROVIDERS={
+            'parse-push': {
+                'class': 'edx_notifications.channels.parse_push.ParsePushNotificationChannelProvider',
+                'options': {
+                    'application_id': 'test_application_id',
+                    'rest_api_key': 'test_rest_api_key',
+                }
+            },
+        }
+    )
     def test_notifications_sent_to_parse(self, mock_parse_push):
         PushNotificationConfig(enabled=True).save()
         self.post_course_update(send_push_notification=True)
