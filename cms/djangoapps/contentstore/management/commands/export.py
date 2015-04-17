@@ -28,6 +28,10 @@ class Command(BaseCommand):
         except InvalidKeyError:
             course_key = SlashSeparatedCourseKey.from_deprecated_string(args[0])
 
+        if not modulestore().has_course(course_key):
+            print("No course found for course key: {}".format(course_key))
+            return
+            
         output_path = args[1]
 
         print("Exporting course id = {0} to {1}".format(course_key, output_path))
