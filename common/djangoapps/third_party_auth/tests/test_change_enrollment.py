@@ -145,9 +145,9 @@ class PipelineEnrollmentTest(UrlResetMixin, ModuleStoreTestCase):
         strategy = self._fake_strategy()
         strategy.session_set('enroll_course_id', unicode(self.course.id))
 
-        # Simulate completing the pipeline from the student dashboard's
+        # Simulate completing the pipeline from the student account settings
         # "link account" button.
-        result = pipeline.change_enrollment(strategy, 1, user=self.user, auth_entry=pipeline.AUTH_ENTRY_DASHBOARD)  # pylint: disable=assignment-from-no-return,redundant-keyword-arg
+        result = pipeline.change_enrollment(strategy, 1, user=self.user, auth_entry=pipeline.AUTH_ENTRY_ACCOUNT_SETTINGS)  # pylint: disable=assignment-from-no-return,redundant-keyword-arg
 
         # Verify that we were NOT enrolled
         self.assertEqual(result, {})
