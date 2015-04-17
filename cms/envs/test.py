@@ -267,6 +267,7 @@ VIDEO_CDN_URL = {
 
 # Courseware Search Index
 FEATURES['ENABLE_COURSEWARE_INDEX'] = True
+FEATURES['ENABLE_LIBRARY_INDEX'] = True
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 
 # Dummy secret key for dev/test

@@ -2,11 +2,17 @@
 XBlock runtime services for LibraryContentModule
 """
 from django.core.exceptions import PermissionDenied
-from opaque_keys.edx.locator import LibraryLocator
+from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator
+from search.search_engine_base import SearchEngine
 from xmodule.library_content_module import ANY_CAPA_TYPE_VALUE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.capa_module import CapaDescriptor
+
+
+def normalize_key_for_search(library_key):
+    """ Normalizes library key for use with search indexing """
+    return library_key.replace(version_guid=None, branch=None)
 
 
 class LibraryToolsService(object):
@@ -86,13 +92,25 @@ class LibraryToolsService(object):
             result_json.append(info)
         return result_json
 
+    def _problem_type_filter(self, library, capa_type):
+        """ Filters library children by capa type"""
+        search_engine = SearchEngine.get_search_engine(index="library_index")
+        if search_engine:
+            filter_clause = {
+                "library": unicode(normalize_key_for_search(library.location.library_key)),
+                "content_type": CapaDescriptor.INDEX_CONTENT_TYPE,
+                "problem_types": capa_type
+            }
+            search_result = search_engine.search(field_dictionary=filter_clause)
+            results = search_result.get('results', [])
+            return [LibraryUsageLocator.from_string(item['data']['id']) for item in results]
+        else:
+            return [key for key in library.children if self._filter_child(key, capa_type)]
+
     def _filter_child(self, usage_key, capa_type):
         """
         Filters children by CAPA problem type, if configured
         """
-        if capa_type == ANY_CAPA_TYPE_VALUE:
-            return True
-
         if usage_key.block_type != "problem":
             return False
 
@@ -137,7 +155,7 @@ class LibraryToolsService(object):
         filter_children = (dest_block.capa_type != ANY_CAPA_TYPE_VALUE)
         if filter_children:
             # Apply simple filtering based on CAPA problem types:
-            source_blocks.extend([key for key in library.children if self._filter_child(key, dest_block.capa_type)])
+            source_blocks.extend(self._problem_type_filter(library, dest_block.capa_type))
         else:
             source_blocks.extend(library.children)
 

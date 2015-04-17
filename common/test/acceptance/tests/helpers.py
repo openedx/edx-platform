@@ -417,3 +417,17 @@ def create_user_partition_json(partition_id, name, description, groups, scheme="
     return UserPartition(
         partition_id, name, description, groups, MockUserPartitionScheme(scheme)
     ).to_json()
+
+
+class TestWithSearchIndexMixin(object):
+    """ Mixin encapsulating search index creation """
+    TEST_INDEX_FILENAME = "test_root/index_file.dat"
+
+    def _create_search_index(self):
+        """ Creates search index backing file """
+        with open(self.TEST_INDEX_FILENAME, "w+") as index_file:
+            json.dump({}, index_file)
+
+    def _cleanup_index_file(self):
+        """ Removes search index backing file """
+        os.remove(self.TEST_INDEX_FILENAME)

@@ -1659,18 +1659,26 @@ class CapaModuleTest(unittest.TestCase):
 
 @ddt.ddt
 class CapaDescriptorTest(unittest.TestCase):
-    def _create_descriptor(self, xml):
+    def _create_descriptor(self, xml, name=None):
         """ Creates a CapaDescriptor to run test against """
         descriptor = CapaDescriptor(get_test_system(), scope_ids=1)
         descriptor.data = xml
+        if name:
+            descriptor.display_name = name
         return descriptor
 
     @ddt.data(*responsetypes.registry.registered_tags())
     def test_all_response_types(self, response_tag):
         """ Tests that every registered response tag is correctly returned """
         xml = "<problem><{response_tag}></{response_tag}></problem>".format(response_tag=response_tag)
-        descriptor = self._create_descriptor(xml)
+        name = "Some Capa Problem"
+        descriptor = self._create_descriptor(xml, name=name)
         self.assertEquals(descriptor.problem_types, {response_tag})
+        self.assertEquals(descriptor.index_dictionary(), {
+            'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
+            'display_name': name,
+            'problem_types': [response_tag]
+        })
 
     def test_response_types_ignores_non_response_tags(self):
         xml = textwrap.dedent("""
@@ -1687,8 +1695,14 @@ class CapaDescriptorTest(unittest.TestCase):
             </multiplechoiceresponse>
             </problem>
         """)
-        descriptor = self._create_descriptor(xml)
+        name = "Test Capa Problem"
+        descriptor = self._create_descriptor(xml, name=name)
         self.assertEquals(descriptor.problem_types, {"multiplechoiceresponse"})
+        self.assertEquals(descriptor.index_dictionary(), {
+            'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
+            'display_name': name,
+            'problem_types': ["multiplechoiceresponse"]
+        })
 
     def test_response_types_multiple_tags(self):
         xml = textwrap.dedent("""
@@ -1710,8 +1724,16 @@ class CapaDescriptorTest(unittest.TestCase):
                 </optionresponse>
             </problem>
         """)
-        descriptor = self._create_descriptor(xml)
+        name = "Other Test Capa Problem"
+        descriptor = self._create_descriptor(xml, name=name)
         self.assertEquals(descriptor.problem_types, {"multiplechoiceresponse", "optionresponse"})
+        self.assertEquals(
+            descriptor.index_dictionary(), {
+                'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
+                'display_name': name,
+                'problem_types': ["optionresponse", "multiplechoiceresponse"]
+            }
+        )
 
 
 class ComplexEncoderTest(unittest.TestCase):

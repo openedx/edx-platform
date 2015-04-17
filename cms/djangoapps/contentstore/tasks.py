@@ -10,7 +10,7 @@ from pytz import UTC
 
 from django.contrib.auth.models import User
 
-from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
+from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer, SearchIndexingError
 from contentstore.utils import initialize_permissions
 from course_action_state.models import CourseRerunState
 from opaque_keys.edx.keys import CourseKey
@@ -82,19 +82,36 @@ def deserialize_fields(json_fields):
     return fields
 
 
+def _parse_time(time_isoformat):
+    """ Parses time from iso format """
+    return datetime.strptime(
+        # remove the +00:00 from the end of the formats generated within the system
+        time_isoformat.split('+')[0],
+        "%Y-%m-%dT%H:%M:%S.%f"
+    ).replace(tzinfo=UTC)
+
+
 @task()
 def update_search_index(course_id, triggered_time_isoformat):
     """ Updates course search index. """
     try:
         course_key = CourseKey.from_string(course_id)
-        triggered_time = datetime.strptime(
-            # remove the +00:00 from the end of the formats generated within the system
-            triggered_time_isoformat.split('+')[0],
-            "%Y-%m-%dT%H:%M:%S.%f"
-        ).replace(tzinfo=UTC)
-        CoursewareSearchIndexer.index_course(modulestore(), course_key, triggered_at=triggered_time)
+        CoursewareSearchIndexer.index(modulestore(), course_key, triggered_at=(_parse_time(triggered_time_isoformat)))
 
     except SearchIndexingError as exc:
         LOGGER.error('Search indexing error for complete course %s - %s', course_id, unicode(exc))
     else:
         LOGGER.debug('Search indexing successful for complete course %s', course_id)
+
+
+@task()
+def update_library_index(library_id, triggered_time_isoformat):
+    """ Updates course search index. """
+    try:
+        library_key = CourseKey.from_string(library_id)
+        LibrarySearchIndexer.index(modulestore(), library_key, triggered_at=(_parse_time(triggered_time_isoformat)))
+
+    except SearchIndexingError as exc:
+        LOGGER.error('Search indexing error for library %s - %s', library_id, unicode(exc))
+    else:
+        LOGGER.debug('Search indexing successful for library %s', library_id)
