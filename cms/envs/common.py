@@ -119,6 +119,9 @@ FEATURES = {
     # Turn off Advanced Security by default
     'ADVANCED_SECURITY': False,
 
+    # Modulestore to use for new courses
+    'DEFAULT_STORE_FOR_NEW_COURSE': None,
+
     # Turn off Video Upload Pipeline through Studio, by default
     'ENABLE_VIDEO_UPLOAD_PIPELINE': False,
 
@@ -181,9 +184,6 @@ FEATURES = {
 
     # Can the visibility of the discussion tab be configured on a per-course basis?
     'ALLOW_HIDING_DISCUSSION_TAB': False,
-
-    # Modulestore to use for new courses
-    'DEFAULT_STORE_FOR_NEW_COURSE': 'mongo',
 
     # edx-notifications subsystem
     'ENABLE_NOTIFICATIONS': False,
