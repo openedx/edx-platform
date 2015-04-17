@@ -593,7 +593,6 @@ class TestTaskExecution(ModuleStoreTestCase):
         response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
         self.assertEqual(response["total"], 0)
 
-        # update_search_index(unicode(self.course.id), datetime.now(UTC).isoformat())
         listen_for_course_publish(self, self.course.id)
 
         # Note that this test will only succeed if celery is working in inline mode
@@ -607,7 +606,6 @@ class TestTaskExecution(ModuleStoreTestCase):
         response = searcher.search(field_dictionary={"library": library_search_key})
         self.assertEqual(response["total"], 0)
 
-        # update_search_index(unicode(self.library.location.library_key), datetime.now(UTC).isoformat())
         listen_for_library_update(self, self.library.location.library_key)
 
         # Note that this test will only succeed if celery is working in inline mode
