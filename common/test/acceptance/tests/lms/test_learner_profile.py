@@ -111,6 +111,19 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self.assertEqual(profile_page.age_limit_message_present, message is not None)
         self.assertIn(message, profile_page.profile_forced_private_message)
 
+    def test_profile_defaults_to_public(self):
+        """
+        Scenario: Verify that a new user's profile defaults to public.
+
+        Given that I am a new user.
+        When I go to my profile page.
+        Then I see that the profile visibility is set to public.
+        """
+        username, user_id = self.log_in_as_unique_user()
+        profile_page = self.visit_profile_page(username)
+        self.assertTrue(profile_page.privacy_field_visible)
+        self.assertEquals(profile_page.privacy, self.PRIVACY_PUBLIC)
+
     def assert_default_image_has_public_access(self, profile_page):
         """
         Assert that profile image has public access.
@@ -514,6 +527,27 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self.assertEqual(profile_page.visible_fields, self.PRIVATE_PROFILE_FIELDS)
         self.verify_profile_page_view_event(different_user_id, visibility=self.PRIVACY_PRIVATE)
 
+    def test_different_user_under_age(self):
+        """
+        Scenario: Verify that desired fields are shown when looking at a different user's private profile.
+
+        Given that I am a registered user.
+        And I visit an under age user's profile page.
+        Then I shouldn't see the profile visibility selector dropdown.
+        Then I see some of the profile fields are shown.
+        """
+        under_age_birth_year = datetime.now().year - 10
+        different_username, different_user_id = self._initialize_different_user(
+            privacy=self.PRIVACY_PUBLIC,
+            birth_year=under_age_birth_year
+        )
+        self.log_in_as_unique_user()
+        profile_page = self.visit_profile_page(different_username)
+
+        self.assertFalse(profile_page.privacy_field_visible)
+        self.assertEqual(profile_page.visible_fields, self.PRIVATE_PROFILE_FIELDS)
+        self.verify_profile_page_view_event(different_user_id, visibility=self.PRIVACY_PRIVATE)
+
     def test_different_user_public_profile(self):
         """
         Scenario: Verify that desired fields are shown when looking at a different user's public profile.
@@ -534,7 +568,7 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self.assertEqual(profile_page.editable_fields, [])
         self.verify_profile_page_view_event(different_user_id, visibility=self.PRIVACY_PUBLIC)
 
-    def _initialize_different_user(self, privacy=None):
+    def _initialize_different_user(self, privacy=None, birth_year=None):
         """
         Initialize the profile page for a different test user
         """
@@ -544,6 +578,10 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         if privacy is None:
             privacy = self.PRIVACY_PUBLIC
         self.visit_profile_page(username, privacy=privacy)
+
+        # Set the user's year of birth
+        if birth_year:
+            self.set_birth_year(birth_year)
 
         # Log the user out
         LogoutPage(self.browser).visit()

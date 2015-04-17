@@ -19,10 +19,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             var createLearnerProfileView = function (ownProfile, accountPrivacy, profileIsPublic) {
 
                 var accountSettingsModel = new UserAccountModel();
-                var accountSettingsData = Helpers.USER_ACCOUNTS_DATA;
-                accountSettingsData.year_of_birth = 1989;
-                accountSettingsData.requires_parental_consent = false;
-                accountSettingsModel.set(accountSettingsData);
+                accountSettingsModel.set(Helpers.createAccountSettingsData());
                 accountSettingsModel.set({'profile_is_public': profileIsPublic});
                 accountSettingsModel.set({'profile_image': Helpers.PROFILE_IMAGE});
 
@@ -76,7 +73,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                         editable: editable,
                         showMessages: false,
                         iconName: 'fa-map-marker',
-                        placeholderValue: 'Add country',
+                        placeholderValue: '',
                         valueAttribute: "country",
                         options: Helpers.FIELD_OPTIONS,
                         helpMessage: ''

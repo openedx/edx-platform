@@ -69,6 +69,7 @@ def learner_profile_context(logged_in_username, profile_username, user_is_staff)
         'data': {
             'profile_user_id': profile_user.id,
             'default_public_account_fields': settings.ACCOUNT_VISIBILITY_CONFIGURATION['public_fields'],
+            'default_visibility': settings.ACCOUNT_VISIBILITY_CONFIGURATION['default_visibility'],
             'accounts_api_url': reverse("accounts_api", kwargs={'username': profile_username}),
             'preferences_api_url': reverse('preferences_api', kwargs={'username': profile_username}),
             'profile_image_upload_url': reverse('profile_image_upload', kwargs={'username': profile_username}),

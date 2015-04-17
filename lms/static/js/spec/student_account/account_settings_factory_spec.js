@@ -13,19 +13,19 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
             var FIELDS_DATA = {
                 'country': {
-                    'options': Helpers.FIELD_OPTIONS,
+                    'options': Helpers.FIELD_OPTIONS
                 }, 'gender': {
-                    'options': Helpers.FIELD_OPTIONS,
+                    'options': Helpers.FIELD_OPTIONS
                 }, 'language': {
-                    'options': Helpers.FIELD_OPTIONS,
+                    'options': Helpers.FIELD_OPTIONS
                 }, 'level_of_education': {
-                    'options': Helpers.FIELD_OPTIONS,
+                    'options': Helpers.FIELD_OPTIONS
                 }, 'password': {
-                    'url': '/password_reset',
+                    'url': '/password_reset'
                 }, 'year_of_birth': {
-                    'options': Helpers.FIELD_OPTIONS,
+                    'options': Helpers.FIELD_OPTIONS
                 }, 'preferred_language': {
-                    'options': Helpers.FIELD_OPTIONS,
+                    'options': Helpers.FIELD_OPTIONS
                 }
             };
 
@@ -98,7 +98,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 expect(request.method).toBe('GET');
                 expect(request.url).toBe(Helpers.USER_ACCOUNTS_API_URL);
 
-                AjaxHelpers.respondWithJson(requests, Helpers.USER_ACCOUNTS_DATA);
+                AjaxHelpers.respondWithJson(requests, Helpers.createAccountSettingsData());
                 Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, true);
                 Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
                 Helpers.expectSettingsSectionsButNotFieldsToBeRendered(accountSettingsView);
@@ -126,8 +126,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
                 Helpers.expectSettingsSectionsButNotFieldsToBeRendered(accountSettingsView);
 
-                AjaxHelpers.respondWithJson(requests, Helpers.USER_ACCOUNTS_DATA);
-                AjaxHelpers.respondWithJson(requests, Helpers.USER_PREFERENCES_DATA);
+                AjaxHelpers.respondWithJson(requests, Helpers.createAccountSettingsData());
+                AjaxHelpers.respondWithJson(requests, Helpers.createUserPreferencesData());
 
                 Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, false);
                 Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
@@ -143,8 +143,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 );
                 var accountSettingsView = context.accountSettingsView;
 
-                AjaxHelpers.respondWithJson(requests, Helpers.USER_ACCOUNTS_DATA);
-                AjaxHelpers.respondWithJson(requests, Helpers.USER_PREFERENCES_DATA);
+                AjaxHelpers.respondWithJson(requests, Helpers.createAccountSettingsData());
+                AjaxHelpers.respondWithJson(requests, Helpers.createUserPreferencesData());
 
                 var sectionsData = accountSettingsView.options.sectionsData;
 

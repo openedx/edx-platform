@@ -11,23 +11,31 @@ define(['underscore'], function(_) {
         has_image: true
     };
 
-    var USER_ACCOUNTS_DATA = {
+    var DEFAULT_ACCOUNT_SETTINGS_DATA = {
         username: 'student',
         name: 'Student',
         email: 'student@edx.org',
-        level_of_education: '0',
-        gender: '0',
-        year_of_birth: '0',
-        country: '0',
-        language: '0',
+        level_of_education: '',
+        gender: '',
+        year_of_birth: '3',    // Note: test birth year range is a string from 0-3
+        requires_parental_consent: false,
+        country: '',
+        language: '',
         bio: "About the student",
         language_proficiencies: [{code: '1'}],
-        requires_parental_consent: true,
         profile_image: PROFILE_IMAGE
     };
 
-    var USER_PREFERENCES_DATA = {
+    var createAccountSettingsData = function(options) {
+        return _.extend(_.extend({}, DEFAULT_ACCOUNT_SETTINGS_DATA), options);
+    };
+
+    var DEFAULT_USER_PREFERENCES_DATA = {
         'pref-lang': '2'
+    };
+
+    var createUserPreferencesData = function(options) {
+        return _.extend(_.extend({}, DEFAULT_USER_PREFERENCES_DATA), options);
     };
 
     var FIELD_OPTIONS = [
@@ -63,7 +71,6 @@ define(['underscore'], function(_) {
         expect(fieldTitle).toBe(view.options.title);
 
         if ('fieldValue' in view) {
-            expect(view.model.get(view.options.valueAttribute)).toBeTruthy();
             expect(view.fieldValue()).toBe(view.modelValue());
         } else if (view.fieldType === 'link') {
             expect($(element).find('a').length).toBe(1);
@@ -107,8 +114,8 @@ define(['underscore'], function(_) {
         IMAGE_MAX_BYTES: IMAGE_MAX_BYTES,
         IMAGE_MIN_BYTES: IMAGE_MIN_BYTES,
         PROFILE_IMAGE: PROFILE_IMAGE,
-        USER_ACCOUNTS_DATA: USER_ACCOUNTS_DATA,
-        USER_PREFERENCES_DATA: USER_PREFERENCES_DATA,
+        createAccountSettingsData: createAccountSettingsData,
+        createUserPreferencesData: createUserPreferencesData,
         FIELD_OPTIONS: FIELD_OPTIONS,
         expectLoadingIndicatorIsVisible: expectLoadingIndicatorIsVisible,
         expectLoadingErrorIsVisible: expectLoadingErrorIsVisible,

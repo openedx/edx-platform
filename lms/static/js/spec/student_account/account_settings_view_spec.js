@@ -13,7 +13,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             var createAccountSettingsView = function () {
 
                 var model = new UserAccountModel();
-                model.set(Helpers.USER_ACCOUNTS_DATA);
+                model.set(Helpers.createAccountSettingsData());
 
                 var sectionsData = [
                     {
