@@ -8,6 +8,7 @@ from django.core.validators import validate_email, validate_slug, ValidationErro
 
 from student.models import User, UserProfile, Registration
 from student import views as student_views
+from util.model_utils import emit_setting_changed_event
 
 from ..errors import (
     AccountUpdateError, AccountValidationError, AccountUsernameInvalid, AccountPasswordInvalid,
@@ -187,8 +188,24 @@ def update_account_settings(requesting_user, update, username=None):
 
     try:
         # If everything validated, go ahead and save the serializers.
+
+        # We have not found a way using signals to get the language proficiency changes (grouped by user).
+        # As a workaround, store old and new values here and emit them after save is complete.
+        if "language_proficiencies" in update:
+            old_language_proficiencies = legacy_profile_serializer.data["language_proficiencies"]
+
         for serializer in user_serializer, legacy_profile_serializer:
             serializer.save()
+
+        if "language_proficiencies" in update:
+            new_language_proficiencies = legacy_profile_serializer.data["language_proficiencies"]
+            emit_setting_changed_event(
+                user=existing_user,
+                db_table=existing_user_profile.language_proficiencies.model._meta.db_table,
+                setting_name="language_proficiencies",
+                old_value=old_language_proficiencies,
+                new_value=new_language_proficiencies,
+            )
 
         # If the name was changed, store information about the change operation. This is outside of the
         # serializer so that we can store who requested the change.

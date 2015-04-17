@@ -201,11 +201,12 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         self.wait_for_field('image')
         return self.q(css='.u-field-upload-button').visible
 
-    def upload_file(self, filename):
+    def upload_file(self, filename, wait_for_upload_button=True):
         """
         Helper method to upload an image file.
         """
-        self.wait_for_element_visibility('.u-field-upload-button', "upload button is visible")
+        if wait_for_upload_button:
+            self.wait_for_element_visibility('.u-field-upload-button', "upload button is visible")
         file_path = InstructorDashboardPage.get_asset_path(filename)
 
         # make the elements visible.
@@ -222,12 +223,6 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         self.q(css='.upload-button-input').results[0].send_keys(file_path)
 
         self.wait_for_ajax()
-
-    def upload_correct_image_file(self, filename):
-        """
-        Selects the correct file and clicks the upload button.
-        """
-        self._upload_file(filename)
 
     @property
     def image_upload_success(self):
@@ -264,6 +259,7 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         self.wait_for_element_visibility('.u-field-remove-button', "remove button is visible")
         self.q(css='.u-field-remove-button').first.click()
 
+        self.wait_for_ajax()
         self.mouse_hover(self.browser.find_element_by_css_selector('.image-wrapper'))
         self.wait_for_element_visibility('.u-field-upload-button', "upload button is visible")
         return True

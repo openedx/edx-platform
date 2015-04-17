@@ -14,6 +14,7 @@ from PIL import Image
 from rest_framework.test import APITestCase, APIClient
 
 from student.tests.factories import UserFactory
+from student.tests.tests import UserSettingsEventTestMixin
 
 from ...user_api.accounts.image_helpers import (
     set_has_profile_image,
@@ -26,9 +27,10 @@ from .helpers import make_image_file
 
 TEST_PASSWORD = "test"
 TEST_UPLOAD_DT = datetime.datetime(2002, 1, 9, 15, 43, 01, tzinfo=UTC)
+TEST_UPLOAD_DT2 = datetime.datetime(2003, 1, 9, 15, 43, 01, tzinfo=UTC)
 
 
-class ProfileImageEndpointTestCase(APITestCase):
+class ProfileImageEndpointTestCase(UserSettingsEventTestMixin, APITestCase):
     """
     Base class / shared infrastructure for tests of profile_image "upload" and
     "remove" endpoints.
@@ -46,9 +48,14 @@ class ProfileImageEndpointTestCase(APITestCase):
         self.url = reverse(self._view_name, kwargs={'username': self.user.username})
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         self.storage = get_profile_image_storage()
+        self.table = 'auth_userprofile'
         # this assertion is made here as a sanity check because all tests
         # assume user.profile.has_profile_image is False by default
         self.assertFalse(self.user.profile.has_profile_image)
+
+        # Reset the mock event tracker so that we're not considering the
+        # initial profile creation events.
+        self.reset_tracker()
 
     def tearDown(self):
         super(ProfileImageEndpointTestCase, self).tearDown()
@@ -104,6 +111,15 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
     """
     _view_name = "profile_image_upload"
 
+    def check_upload_event_emitted(self, old=None, new=TEST_UPLOAD_DT):
+        """
+        Make sure we emit a UserProfile event corresponding to the
+        profile_image_uploaded_at field changing.
+        """
+        self.assert_user_setting_event_emitted(
+            setting='profile_image_uploaded_at', old=old, new=new
+        )
+
     def test_unsupported_methods(self, mock_log):
         """
         Test that GET, PUT, PATCH, and DELETE are not supported.
@@ -113,6 +129,7 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
         self.assertEqual(405, self.client.patch(self.url).status_code)
         self.assertEqual(405, self.client.delete(self.url).status_code)
         self.assertFalse(mock_log.info.called)
+        self.assert_no_events_were_emitted()
 
     def test_anonymous_access(self, mock_log):
         """
@@ -122,8 +139,9 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
         response = anonymous_client.post(self.url)
         self.assertEqual(401, response.status_code)
         self.assertFalse(mock_log.info.called)
+        self.assert_no_events_were_emitted()
 
-    @patch('openedx.core.djangoapps.profile_images.views._make_upload_dt', return_value=TEST_UPLOAD_DT)
+    @patch('openedx.core.djangoapps.profile_images.views._make_upload_dt', side_effect=[TEST_UPLOAD_DT, TEST_UPLOAD_DT2])
     def test_upload_self(self, mock_make_image_version, mock_log):  # pylint: disable=unused-argument
         """
         Test that an authenticated user can POST to their own upload endpoint.
@@ -137,12 +155,22 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
             LOG_MESSAGE_CREATE,
             {'image_names': get_profile_image_names(self.user.username).values(), 'user_id': self.user.id}
         )
+        self.check_upload_event_emitted()
+
+        # Try another upload and make sure that a second event is emitted.
+        with make_image_file() as image_file:
+            response = self.client.post(self.url, {'file': image_file}, format='multipart')
+            self.check_response(response, 204)
+
+        self.check_upload_event_emitted(old=TEST_UPLOAD_DT, new=TEST_UPLOAD_DT2)
 
     def test_upload_other(self, mock_log):
         """
         Test that an authenticated user cannot POST to another user's upload endpoint.
         """
         different_user = UserFactory.create(password=TEST_PASSWORD)
+        # Ignore UserProfileFactory creation events.
+        self.reset_tracker()
         different_client = APIClient()
         different_client.login(username=different_user.username, password=TEST_PASSWORD)
         with make_image_file() as image_file:
@@ -151,12 +179,15 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
             self.check_images(False)
             self.check_has_profile_image(False)
         self.assertFalse(mock_log.info.called)
+        self.assert_no_events_were_emitted()
 
     def test_upload_staff(self, mock_log):
         """
         Test that an authenticated staff cannot POST to another user's upload endpoint.
         """
         staff_user = UserFactory(is_staff=True, password=TEST_PASSWORD)
+        # Ignore UserProfileFactory creation events.
+        self.reset_tracker()
         staff_client = APIClient()
         staff_client.login(username=staff_user.username, password=TEST_PASSWORD)
         with make_image_file() as image_file:
@@ -165,6 +196,7 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
             self.check_images(False)
             self.check_has_profile_image(False)
         self.assertFalse(mock_log.info.called)
+        self.assert_no_events_were_emitted()
 
     def test_upload_missing_file(self, mock_log):
         """
@@ -179,6 +211,7 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
         self.check_images(False)
         self.check_has_profile_image(False)
         self.assertFalse(mock_log.info.called)
+        self.assert_no_events_were_emitted()
 
     def test_upload_not_a_file(self, mock_log):
         """
@@ -194,6 +227,7 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
         self.check_images(False)
         self.check_has_profile_image(False)
         self.assertFalse(mock_log.info.called)
+        self.assert_no_events_were_emitted()
 
     def test_upload_validation(self, mock_log):
         """
@@ -214,6 +248,7 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
                 self.check_images(False)
                 self.check_has_profile_image(False)
         self.assertFalse(mock_log.info.called)
+        self.assert_no_events_were_emitted()
 
     @patch('PIL.Image.open')
     def test_upload_failure(self, image_open, mock_log):
@@ -228,6 +263,7 @@ class ProfileImageUploadTestCase(ProfileImageEndpointTestCase):
             self.check_images(False)
             self.check_has_profile_image(False)
         self.assertFalse(mock_log.info.called)
+        self.assert_no_events_were_emitted()
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
@@ -244,6 +280,17 @@ class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
             create_profile_images(image_file, get_profile_image_names(self.user.username))
             self.check_images()
             set_has_profile_image(self.user.username, True, TEST_UPLOAD_DT)
+            # Ignore previous event
+            self.reset_tracker()
+
+    def check_remove_event_emitted(self):
+        """
+        Make sure we emit a UserProfile event corresponding to the
+        profile_image_uploaded_at field changing.
+        """
+        self.assert_user_setting_event_emitted(
+            setting='profile_image_uploaded_at', old=TEST_UPLOAD_DT, new=None
+        )
 
     def test_unsupported_methods(self, mock_log):
         """
@@ -254,6 +301,7 @@ class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
         self.assertEqual(405, self.client.patch(self.url).status_code)
         self.assertEqual(405, self.client.delete(self.url).status_code)
         self.assertFalse(mock_log.info.called)
+        self.assert_no_events_were_emitted()
 
     def test_anonymous_access(self, mock_log):
         """
@@ -264,6 +312,7 @@ class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
             response = request(self.url)
             self.assertEqual(401, response.status_code)
         self.assertFalse(mock_log.info.called)
+        self.assert_no_events_were_emitted()
 
     def test_remove_self(self, mock_log):
         """
@@ -278,6 +327,7 @@ class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
             LOG_MESSAGE_DELETE,
             {'image_names': get_profile_image_names(self.user.username).values(), 'user_id': self.user.id}
         )
+        self.check_remove_event_emitted()
 
     def test_remove_other(self, mock_log):
         """
@@ -285,6 +335,8 @@ class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
         profile images.
         """
         different_user = UserFactory.create(password=TEST_PASSWORD)
+        # Ignore UserProfileFactory creation events.
+        self.reset_tracker()
         different_client = APIClient()
         different_client.login(username=different_user.username, password=TEST_PASSWORD)
         response = different_client.post(self.url)
@@ -292,6 +344,7 @@ class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
         self.check_images(True)  # thumbnails should remain intact.
         self.check_has_profile_image(True)
         self.assertFalse(mock_log.info.called)
+        self.assert_no_events_were_emitted()
 
     def test_remove_staff(self, mock_log):
         """
@@ -309,6 +362,7 @@ class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
             LOG_MESSAGE_DELETE,
             {'image_names': get_profile_image_names(self.user.username).values(), 'user_id': self.user.id}
         )
+        self.check_remove_event_emitted()
 
     @patch('student.models.UserProfile.save')
     def test_remove_failure(self, user_profile_save, mock_log):
@@ -322,3 +376,4 @@ class ProfileImageRemoveTestCase(ProfileImageEndpointTestCase):
         self.check_images(True)  # thumbnails should remain intact.
         self.check_has_profile_image(True)
         self.assertFalse(mock_log.info.called)
+        self.assert_no_events_were_emitted()

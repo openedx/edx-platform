@@ -28,7 +28,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models, IntegrityError
 from django.db.models import Count
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver, Signal
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_noop
@@ -41,6 +41,7 @@ from importlib import import_module
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 import lms.lib.comment_client as cc
+from util.model_utils import emit_field_changed_events, get_changed_fields_dict
 from util.query import use_read_replica_if_available
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -330,6 +331,52 @@ def user_profile_pre_save_callback(sender, **kwargs):
     # Remove profile images for users who require parental consent
     if user_profile.requires_parental_consent() and user_profile.has_profile_image:
         user_profile.profile_image_uploaded_at = None
+
+    # Cache "old" field values on the model instance so that they can be
+    # retrieved in the post_save callback when we emit an event with new and
+    # old field values.
+    user_profile._changed_fields = get_changed_fields_dict(user_profile, sender)
+
+
+@receiver(post_save, sender=UserProfile)
+def user_profile_post_save_callback(sender, **kwargs):
+    """
+    Emit analytics events after saving the UserProfile.
+    """
+    user_profile = kwargs['instance']
+    # pylint: disable=protected-access
+    emit_field_changed_events(
+        user_profile,
+        user_profile.user,
+        sender._meta.db_table,
+        excluded_fields=['meta']
+    )
+
+
+@receiver(pre_save, sender=User)
+def user_pre_save_callback(sender, **kwargs):
+    """
+    Capture old fields on the user instance before save and cache them as a
+    private field on the current model for use in the post_save callback.
+    """
+    user = kwargs['instance']
+    user._changed_fields = get_changed_fields_dict(user, sender)
+
+
+@receiver(post_save, sender=User)
+def user_post_save_callback(sender, **kwargs):
+    """
+    Emit analytics events after saving the User.
+    """
+    user = kwargs['instance']
+    # pylint: disable=protected-access
+    emit_field_changed_events(
+        user,
+        user,
+        sender._meta.db_table,
+        excluded_fields=['last_login'],
+        hidden_fields=['password']
+    )
 
 
 class UserSignupSource(models.Model):
@@ -1621,6 +1668,12 @@ class EntranceExamConfiguration(models.Model):
 class LanguageProficiency(models.Model):
     """
     Represents a user's language proficiency.
+
+    Note that we have not found a way to emit analytics change events by using signals directly on this
+    model or on UserProfile. Therefore if you are changing LanguageProficiency values, it is important
+    to go through the accounts API (AccountsView) defined in
+    /edx-platform/openedx/core/djangoapps/user_api/accounts/views.py or its associated api method
+    (update_account_settings) so that the events are emitted.
     """
     class Meta:
         unique_together = (('code', 'user_profile'),)

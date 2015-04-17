@@ -279,23 +279,25 @@ class EventsTestMixin(object):
         self.event_collection = MongoClient()["test"]["events"]
         self.reset_event_tracking()
 
-    def assert_event_emitted_num_times(self, event_name, event_time, event_user_id, num_times_emitted):
+    def assert_event_emitted_num_times(self, event_name, event_time, event_user_id, num_times_emitted, **kwargs):
         """
         Tests the number of times a particular event was emitted.
+
+        Extra kwargs get passed to the mongo query in the form: "event.<key>: value".
+
         :param event_name: Expected event name (e.g., "edx.course.enrollment.activated")
         :param event_time: Latest expected time, after which the event would fire (e.g., the beginning of the test case)
         :param event_user_id: user_id expected in the event
         :param num_times_emitted: number of times the event is expected to appear since the event_time
         """
-        self.assertEqual(
-            self.event_collection.find(
-                {
-                    "name": event_name,
-                    "time": {"$gt": event_time},
-                    "event.user_id": int(event_user_id),
-                }
-            ).count(), num_times_emitted
-        )
+        find_kwargs = {
+            "name": event_name,
+            "time": {"$gt": event_time},
+            "event.user_id": int(event_user_id),
+        }
+        find_kwargs.update({"event.{}".format(key): value for key, value in kwargs.items()})
+        matching_events = self.event_collection.find(find_kwargs)
+        self.assertEqual(matching_events.count(), num_times_emitted, '\n'.join(str(event) for event in matching_events))
 
     def reset_event_tracking(self):
         """
@@ -304,19 +306,20 @@ class EventsTestMixin(object):
         self.event_collection.drop()
         self.start_time = datetime.now()
 
-    def get_matching_events(self, event_type):
+    def get_matching_events(self, username, event_type):
         """
-        Returns a cursor for the matching browser events.
+        Returns a cursor for the matching browser events related emitted for the specified username.
         """
         return self.event_collection.find({
+            "username": username,
             "event_type": event_type,
             "time": {"$gt": self.start_time},
         })
 
-    def verify_events_of_type(self, event_type, expected_events, expected_referers=None):
+    def verify_events_of_type(self, username, event_type, expected_events, expected_referers=None):
         """Verify that the expected events of a given type were logged.
-
         Args:
+            username (str): The name of the user for which events will be tested.
             event_type (str): The type of event to be verified.
             expected_events (list): A list of dicts representing the events that should
                 have been fired.
@@ -327,12 +330,12 @@ class EventsTestMixin(object):
                 will verify that the referer for the single event ends with "/account/settings".
         """
         EmptyPromise(
-            lambda: self.get_matching_events(event_type).count() >= len(expected_events),
+            lambda: self.get_matching_events(username, event_type).count() >= len(expected_events),
             "Waiting for the minimum number of events of type {type} to have been recorded".format(type=event_type)
         ).fulfill()
 
         # Verify that the correct events were fired
-        cursor = self.get_matching_events(event_type)
+        cursor = self.get_matching_events(username, event_type)
         actual_events = []
         actual_referers = []
         for __ in range(0, cursor.count()):
