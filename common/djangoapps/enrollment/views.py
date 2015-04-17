@@ -384,7 +384,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     "message": (
                         u"Users from this location cannot access the course '{course_id}'."
                     ).format(course_id=course_id),
-                    "user_message_url": redirect_url
+                    "user_message_url": request.build_absolute_uri(redirect_url)
                 }
             )
 

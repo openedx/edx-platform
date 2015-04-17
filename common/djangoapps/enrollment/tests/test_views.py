@@ -495,7 +495,11 @@ class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestC
             'user': self.user.username
         })
 
-    def assert_access_denied(self, user_message_url):
+    def _get_absolute_url(self, path):
+        """ Generate an absolute URL for a resource on the test server. """
+        return u'http://testserver/{}'.format(path.lstrip('/'))
+
+    def assert_access_denied(self, user_message_path):
         """
         Verify that the view returns HTTP status 403 and includes a URL in the response, and no enrollment is created.
         """
@@ -507,6 +511,7 @@ class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestC
 
         # Expect that the redirect URL is included in the response
         resp_data = json.loads(response.content)
+        user_message_url = self._get_absolute_url(user_message_path)
         self.assertEqual(resp_data['user_message_url'], user_message_url)
 
         # Verify that we were not enrolled
@@ -517,8 +522,8 @@ class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestC
         """ Validates that enrollment changes are blocked if the request originates from an embargoed country. """
 
         # Use the helper to setup the embargo and simulate a request from a blocked IP address.
-        with restrict_course(self.course.id) as redirect_url:
-            self.assert_access_denied(redirect_url)
+        with restrict_course(self.course.id) as redirect_path:
+            self.assert_access_denied(redirect_path)
 
     def _setup_embargo(self):
         restricted_course = RestrictedCourse.objects.create(course_key=self.course.id)
@@ -548,9 +553,8 @@ class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestC
         self.user.profile.country = restricted_country.country
         self.user.profile.save()
 
-        user_message_url = reverse('embargo_blocked_message',
-                                   kwargs={'access_point': 'enrollment', 'message_key': 'default'})
-        self.assert_access_denied(user_message_url)
+        path = reverse('embargo_blocked_message', kwargs={'access_point': 'enrollment', 'message_key': 'default'})
+        self.assert_access_denied(path)
 
     @override_settings(EDX_API_KEY=EnrollmentTestMixin.API_KEY)
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
