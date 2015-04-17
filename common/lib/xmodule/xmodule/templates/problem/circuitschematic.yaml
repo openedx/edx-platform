@@ -3,9 +3,22 @@ metadata:
     display_name: Circuit Schematic Builder
     markdown: !!null
 data: |
-      <problem >
-        Please make a voltage divider that splits the provided voltage evenly.
-    
+      <problem>
+        <p>
+        Circuit schematic problems allow students to create virtual circuits by 
+        arranging elements such as voltage sources, capacitors, resistors, and 
+        MOSFETs on an interactive grid. The system evaluates a DC, AC, or 
+        transient analysis of the circuit.
+        </p>
+        <p>
+        For more information, see 
+        <a href="http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/circuit_schematic_builder.html" target="_blank">
+        Circuit Schematic Builder Problem</a> in <i>Building and Running an edX Course</i>.</p>
+        <p>When you add the problem, be sure to select <strong>Settings</strong> 
+        to specify a <strong>Display Name</strong> and other values that apply.</p>
+        <p>You can use the following example problems as models.</p>
+        <fieldset>
+          <legend>Make a voltage divider that splits the provided voltage evenly.</legend>
       <schematicresponse>
       <center>
       <schematic height="500" width="600" parts="g,r" analyses="dc"
@@ -25,8 +38,10 @@ data: |
         correct = ['incorrect']
       </answer>
       </schematicresponse>
+      </fieldset>
+      <fieldset>
+      <legend>Make a high-pass filter.</legend>
       <schematicresponse>
-      <p>Make a high pass filter</p>
       <center>
       <schematic height="500" width="600" parts="g,r,s,c" analyses="ac"
       submit_analyses="{&quot;ac&quot;:[[&quot;NodeA&quot;,1,9]]}"
@@ -47,13 +62,14 @@ data: |
         correct = ['incorrect']
       </answer>
       </schematicresponse>
+      </fieldset>
     
           <solution>
               <div class="detailed-solution">
                   <p>Explanation</p>
-                  <p>A voltage divider that evenly divides the input voltage can be formed with two identically valued resistors, with the sampled voltage taken in between the two.</p>
+                  <p>You can form a voltage divider that evenly divides the input voltage with two identically valued resistors, with the sampled voltage taken in between the two.</p>
                   <p><img src="/static/images/voltage_divider.png"/></p>
-                  <p>A simple high-pass filter without any further constaints can be formed by simply putting a resister in series with a capacitor. The actual values of the components do not really matter in order to meet the constraints of the problem.</p>
+                  <p>You can form a simple high-pass filter without any further constraints by simply putting a resistor in series with a capacitor. The actual values of the components do not really matter in this problem.</p>
                   <p><img src="/static/images/high_pass_filter.png"/></p>
               </div>
           </solution>
