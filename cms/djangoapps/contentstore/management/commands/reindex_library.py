@@ -39,6 +39,8 @@ class Command(BaseCommand):
             help='Reindex all libraries'
         ),)
 
+    CONFIRMATION_PROMPT = u"Reindexing all libraries might be a time consuming operation. Do you want to continue?"
+
     def _parse_library_key(self, raw_value):
         """ Parses library key from string """
         try:
@@ -47,7 +49,7 @@ class Command(BaseCommand):
             result = SlashSeparatedCourseKey.from_deprecated_string(raw_value)
 
         if not isinstance(result, LibraryLocator):
-            raise CommandError("Argument {0} is not a library key".format(raw_value))
+            raise CommandError(u"Argument {0} is not a library key".format(raw_value))
 
         return result
 
@@ -57,14 +59,13 @@ class Command(BaseCommand):
         So, there could be no better docstring than emphasize this once again.
         """
         if len(args) == 0 and not options.get('all', False):
-            raise CommandError("reindex_library requires one or more arguments: <library_id>")
+            raise CommandError(u"reindex_library requires one or more arguments: <library_id>")
 
         store = modulestore()
 
         if options.get('all', False):
-            if query_yes_no("Reindexing all libraries might be a time consuming operation. Do you want to continue?",
-                            default="no"):
-                library_keys = [library.location.library_key for library in store.get_libraries()]
+            if query_yes_no(self.CONFIRMATION_PROMPT, default="no"):
+                library_keys = [library.location.library_key.replace(branch=None) for library in store.get_libraries()]
             else:
                 return
         else:
