@@ -90,7 +90,7 @@ def startup_notification_subsystem():
         # in-browser notifications
         startup.initialize(register_system_types=False)
 
-    except Exception, ex:
+    except Exception, ex:  # pylint: disable=broad-except
         # Note this will fail when we try to run migrations as manage.py will call startup.py
         # and startup.initialze() will try to manipulate some database tables.
         # We need to research how to identify when we are being started up as part of
@@ -98,5 +98,6 @@ def startup_notification_subsystem():
         log.error(
             'There was a problem initializing notifications subsystem. '
             'This could be because the database tables have not yet been created and '
-            './manage.py lms syncdb needs to run setup.py. Error was "{err_msg}". Continuing...'.format(err_msg=str(ex))
+            './manage.py lms syncdb needs to run setup.py. Error was "{err_msg}". '
+            'Continuing...'.format(err_msg=str(ex))  # pylint: disable=logging-format-interpolation
         )
