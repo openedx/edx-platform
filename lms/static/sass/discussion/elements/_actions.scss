@@ -58,7 +58,7 @@
       &:after,
       &:before {
         bottom: 100%;
-        @include right(3px);
+        right: 6px;
         border: solid transparent;
         content: " ";
         height: 0;
