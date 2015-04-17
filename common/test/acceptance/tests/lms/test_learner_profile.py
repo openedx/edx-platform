@@ -510,7 +510,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self.assert_default_image_has_public_access(profile_page)
 
         profile_page.upload_file(filename='larger_image.jpg')
-        self.assertEqual(profile_page.profile_image_message, "Your image must be smaller than 1 MB in size.")
+        self.assertEqual(profile_page.profile_image_message, "The file must be smaller than 1 MB in size.")
         profile_page.visit()
         self.assertTrue(profile_page.profile_has_default_image)
 
@@ -534,7 +534,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self.assert_default_image_has_public_access(profile_page)
 
         profile_page.upload_file(filename='list-icon-visited.png')
-        self.assertEqual(profile_page.profile_image_message, "Your image must be at least 100 bytes in size.")
+        self.assertEqual(profile_page.profile_image_message, "The file must be at least 100 bytes in size.")
         profile_page.visit()
         self.assertTrue(profile_page.profile_has_default_image)
 
@@ -558,7 +558,10 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self.assert_default_image_has_public_access(profile_page)
 
         profile_page.upload_file(filename='cohort_users_only_username.csv')
-        self.assertEqual(profile_page.profile_image_message, "Unsupported file type.")
+        self.assertEqual(
+            profile_page.profile_image_message,
+            "The file must be one of the following types: .gif, .png, .jpeg, .jpg."
+        )
         profile_page.visit()
         self.assertTrue(profile_page.profile_has_default_image)
 

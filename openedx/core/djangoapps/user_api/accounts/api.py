@@ -162,7 +162,7 @@ def update_account_settings(requesting_user, update, username=None):
         for read_only_field in read_only_fields:
             field_errors[read_only_field] = {
                 "developer_message": u"This field is not editable via this API",
-                "user_message": _(u"Field '{field_name}' cannot be edited.").format(field_name=read_only_field)
+                "user_message": _(u"The '{field_name}' field cannot be edited.").format(field_name=read_only_field)
             }
             del update[read_only_field]
 
@@ -263,7 +263,7 @@ def _add_serializer_errors(update, serializer, field_errors):
                 "developer_message": u"Value '{field_value}' is not valid for field '{field_name}': {error}".format(
                     field_value=field_value, field_name=key, error=error
                 ),
-                "user_message": _(u"Value '{field_value}' is not valid for field '{field_name}'.").format(
+                "user_message": _(u"This value is invalid.").format(
                     field_value=field_value, field_name=key
                 ),
             }

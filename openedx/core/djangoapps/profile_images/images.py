@@ -11,11 +11,55 @@ from PIL import Image
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage
 
 
-FILE_UPLOAD_TOO_LARGE = _noop('Maximum file size exceeded.')
-FILE_UPLOAD_TOO_SMALL = _noop('Minimum file size not met.')
-FILE_UPLOAD_BAD_TYPE = _noop('Unsupported file type.')
-FILE_UPLOAD_BAD_EXT = _noop('File extension does not match data.')
-FILE_UPLOAD_BAD_MIMETYPE = _noop('Content-Type header does not match data.')
+IMAGE_TYPES = {
+    'jpeg': {
+        'extension': [".jpeg", ".jpg"],
+        'mimetypes': ['image/jpeg', 'image/pjpeg'],
+        'magic': ["ffd8"]
+    },
+    'png': {
+        'extension': [".png"],
+        'mimetypes': ['image/png'],
+        'magic': ["89504e470d0a1a0a"]
+    },
+    'gif': {
+        'extension': [".gif"],
+        'mimetypes': ['image/gif'],
+        'magic': ["474946383961", "474946383761"]
+    }
+}
+
+
+def user_friendly_size(size):
+    """
+    Convert size in bytes to user friendly size.
+
+    Arguments:
+        size (int): size in bytes
+
+    Returns:
+        user friendly size
+    """
+    units = [_('bytes'), _('KB'), _('MB')]
+    i = 0
+    while size >= 1024:
+        size /= 1024
+        i += 1
+    return u'{} {}'.format(size, units[i])
+
+
+def get_valid_file_types():
+    """
+    Return comma separated string of valid file types.
+    """
+    return ', '.join([', '.join(IMAGE_TYPES[ft]['extension']) for ft in IMAGE_TYPES.keys()])
+
+
+FILE_UPLOAD_TOO_LARGE = _noop(u'The file must be smaller than {image_max_size} in size.'.format(image_max_size=user_friendly_size(settings.PROFILE_IMAGE_MAX_BYTES)))  # pylint: disable=line-too-long
+FILE_UPLOAD_TOO_SMALL = _noop(u'The file must be at least {image_min_size} in size.'.format(image_min_size=user_friendly_size(settings.PROFILE_IMAGE_MIN_BYTES)))  # pylint: disable=line-too-long
+FILE_UPLOAD_BAD_TYPE = _noop(u'The file must be one of the following types: {valid_file_types}.'.format(valid_file_types=get_valid_file_types()))  # pylint: disable=line-too-long
+FILE_UPLOAD_BAD_EXT = _noop(u'The file name extension for this file does not match the file data. The file may be corrupted.')  # pylint: disable=line-too-long
+FILE_UPLOAD_BAD_MIMETYPE = _noop(u'The Content-Type header for this file does not match the file data. The file may be corrupted.')  # pylint: disable=line-too-long
 
 
 class ImageValidationError(Exception):
@@ -37,26 +81,10 @@ def validate_uploaded_image(uploaded_file):
     uploaded file as the source image for a user's profile image.  Otherwise,
     returns nothing.
     """
+
     # validation code by @pmitros,
     # adapted from https://github.com/pmitros/ProfileXBlock
     # see also: http://en.wikipedia.org/wiki/Magic_number_%28programming%29
-    image_types = {
-        'jpeg': {
-            'extension': [".jpeg", ".jpg"],
-            'mimetypes': ['image/jpeg', 'image/pjpeg'],
-            'magic': ["ffd8"]
-        },
-        'png': {
-            'extension': [".png"],
-            'mimetypes': ['image/png'],
-            'magic': ["89504e470d0a1a0a"]
-        },
-        'gif': {
-            'extension': [".gif"],
-            'mimetypes': ['image/gif'],
-            'magic': ["474946383961", "474946383761"]
-        }
-    }
 
     if uploaded_file.size > settings.PROFILE_IMAGE_MAX_BYTES:
         raise ImageValidationError(FILE_UPLOAD_TOO_LARGE)
@@ -65,17 +93,17 @@ def validate_uploaded_image(uploaded_file):
 
     # check the file extension looks acceptable
     filename = unicode(uploaded_file.name).lower()
-    filetype = [ft for ft in image_types if any(filename.endswith(ext) for ext in image_types[ft]['extension'])]
+    filetype = [ft for ft in IMAGE_TYPES if any(filename.endswith(ext) for ext in IMAGE_TYPES[ft]['extension'])]
     if not filetype:
         raise ImageValidationError(FILE_UPLOAD_BAD_TYPE)
     filetype = filetype[0]
 
     # check mimetype matches expected file type
-    if uploaded_file.content_type not in image_types[filetype]['mimetypes']:
+    if uploaded_file.content_type not in IMAGE_TYPES[filetype]['mimetypes']:
         raise ImageValidationError(FILE_UPLOAD_BAD_MIMETYPE)
 
     # check magic number matches expected file type
-    headers = image_types[filetype]['magic']
+    headers = IMAGE_TYPES[filetype]['magic']
     if uploaded_file.read(len(headers[0]) / 2).encode('hex') not in headers:
         raise ImageValidationError(FILE_UPLOAD_BAD_EXT)
     # avoid unexpected errors from subsequent modules expecting the fp to be at 0
