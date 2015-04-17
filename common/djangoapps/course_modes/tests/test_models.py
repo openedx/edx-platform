@@ -298,6 +298,28 @@ class CourseModeModelTest(TestCase):
                 self._enrollment_display_modes_dicts(mode)
             )
 
+    @ddt.data(
+        (['honor', 'verified', 'credit'], ['honor', 'verified']),
+        (['professional', 'credit'], ['professional']),
+    )
+    @ddt.unpack
+    def test_hide_credit_modes(self, available_modes, expected_selectable_modes):
+        # Create the course modes
+        for mode in available_modes:
+            CourseMode.objects.create(
+                course_id=self.course_key,
+                mode_display_name=mode,
+                mode_slug=mode,
+            )
+
+        # Check the selectable modes, which should exclude credit
+        selectable_modes = CourseMode.modes_for_course_dict(self.course_key)
+        self.assertItemsEqual(selectable_modes.keys(), expected_selectable_modes)
+
+        # When we get all unexpired modes, we should see credit as well
+        all_modes = CourseMode.modes_for_course_dict(self.course_key, only_selectable=False)
+        self.assertItemsEqual(all_modes.keys(), available_modes)
+
     def _enrollment_display_modes_dicts(self, dict_type):
         """
         Helper function to generate the enrollment display mode dict.
