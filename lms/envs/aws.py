@@ -204,9 +204,13 @@ BULK_EMAIL_INFINITE_RETRY_CAP = ENV_TOKENS.get('BULK_EMAIL_INFINITE_RETRY_CAP', 
 BULK_EMAIL_LOG_SENT_EMAILS = ENV_TOKENS.get('BULK_EMAIL_LOG_SENT_EMAILS', BULK_EMAIL_LOG_SENT_EMAILS)
 BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS = ENV_TOKENS.get('BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS', BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS)
 # We want Bulk Email running on the high-priority queue, so we define the
-# routing key that points to it.  At the moment, the name is the same.
+# routing key that points to it. At the moment, the name is the same.
 # We have to reset the value here, since we have changed the value of the queue name.
 BULK_EMAIL_ROUTING_KEY = HIGH_PRIORITY_QUEUE
+
+# We can run smaller jobs on the low priority queue. See note above for why
+# we have to reset the value here.
+BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = LOW_PRIORITY_QUEUE
 
 # Theme overrides
 THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)

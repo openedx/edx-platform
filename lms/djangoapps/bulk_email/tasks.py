@@ -222,6 +222,20 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     to_option = email_obj.to_option
     global_email_context = _get_course_email_context(course)
 
+    recipient_qsets = _get_recipient_querysets(user_id, to_option, course_id)
+    recipient_fields = ['profile__name', 'email']
+
+    log.info(u"Task %s: Preparing to queue subtasks for sending emails for course %s, email %s, to_option %s",
+             task_id, course_id, email_id, to_option)
+
+    total_recipients = sum([recipient_queryset.count() for recipient_queryset in recipient_qsets])
+
+    routing_key = settings.BULK_EMAIL_ROUTING_KEY
+    # if there are few enough emails, send them through a different queue
+    # to avoid large courses blocking emails to self and staff
+    if total_recipients <= settings.BULK_EMAIL_JOB_SIZE_THRESHOLD:
+        routing_key = settings.BULK_EMAIL_ROUTING_KEY_SMALL_JOBS
+
     def _create_send_email_subtask(to_list, initial_subtask_status):
         """Creates a subtask to send email to a given recipient list."""
         subtask_id = initial_subtask_status.task_id
@@ -234,15 +248,9 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
                 initial_subtask_status.to_dict(),
             ),
             task_id=subtask_id,
-            routing_key=settings.BULK_EMAIL_ROUTING_KEY,
+            routing_key=routing_key,
         )
         return new_subtask
-
-    recipient_qsets = _get_recipient_querysets(user_id, to_option, course_id)
-    recipient_fields = ['profile__name', 'email']
-
-    log.info(u"Task %s: Preparing to queue subtasks for sending emails for course %s, email %s, to_option %s",
-             task_id, course_id, email_id, to_option)
 
     progress = queue_subtasks_for_query(
         entry,
@@ -251,6 +259,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
         recipient_qsets,
         recipient_fields,
         settings.BULK_EMAIL_EMAILS_PER_TASK,
+        total_recipients,
     )
 
     # We want to return progress here, as this is what will be stored in the

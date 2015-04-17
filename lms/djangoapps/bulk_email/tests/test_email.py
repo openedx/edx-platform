@@ -179,6 +179,13 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
         )
 
+    @override_settings(BULK_EMAIL_JOB_SIZE_THRESHOLD=1)
+    def test_send_to_all_high_queue(self):
+        """
+        Test that email is still sent when the high priority queue is used
+        """
+        self.test_send_to_all()
+
     def test_no_duplicate_emails_staff_instructor(self):
         """
         Test that no duplicate emails are sent to a course instructor that is
