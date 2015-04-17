@@ -163,13 +163,38 @@ class RestrictedCourse(models.Model):
         return unicode(course_id) in cls._get_restricted_courses_from_cache()
 
     @classmethod
+    def is_disabled_access_check(cls, course_id):
+        """
+        Check if the course is in restricted list has disabled_access_check
+
+        Args:
+            course_id (str): course_id to look for
+
+        Returns:
+            Boolean
+            disabled_access_check attribute of restricted course
+        """
+
+        # checking is_restricted_course method also here to make sure course exists in the list otherwise in case of
+        # no course found it will throw the key not found error on 'disable_access_check'
+        return (
+            cls.is_restricted_course(unicode(course_id))
+            and cls._get_restricted_courses_from_cache().get(unicode(course_id))["disable_access_check"]
+        )
+
+    @classmethod
     def _get_restricted_courses_from_cache(cls):
         """
-        Cache all restricted courses and returns the list of course_keys that are restricted
+        Cache all restricted courses and returns the dict of course_keys and disable_access_check that are restricted
         """
         restricted_courses = cache.get(cls.COURSE_LIST_CACHE_KEY)
         if restricted_courses is None:
-            restricted_courses = list(RestrictedCourse.objects.values_list('course_key', flat=True))
+            restricted_courses = {
+                unicode(course.course_key): {
+                    'disable_access_check': course.disable_access_check
+                }
+                for course in RestrictedCourse.objects.all()
+            }
             cache.set(cls.COURSE_LIST_CACHE_KEY, restricted_courses)
         return restricted_courses
 

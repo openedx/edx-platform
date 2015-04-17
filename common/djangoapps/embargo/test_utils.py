@@ -10,7 +10,7 @@ from embargo.models import Country, CountryAccessRule, RestrictedCourse
 
 
 @contextlib.contextmanager
-def restrict_course(course_key, access_point="enrollment"):
+def restrict_course(course_key, access_point="enrollment", disable_access_check=False):
     """Simulate that a course is restricted.
 
     This does two things:
@@ -58,6 +58,7 @@ def restrict_course(course_key, access_point="enrollment"):
         restricted_course, __ = RestrictedCourse.objects.get_or_create(course_key=course_key)
         restricted_course.enroll_msg_key = 'default'
         restricted_course.access_msg_key = 'default'
+        restricted_course.disable_access_check = disable_access_check
         restricted_course.save()
 
         # Ensure that there is a blacklist rule for the country
