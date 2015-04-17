@@ -1,7 +1,7 @@
 <div class="status already-authenticated-msg hidden">
     <% if (context.currentProvider) { %>
         <p class="message-copy">
-            <%- _.sprintf( gettext("You've successfully signed into %(currentProvider)s, but your %(currentProvider)s account isn't linked with an %(platformName)s account. To link your accounts, go to your %(platformName)s dashboard."), context ) %>
+            <%- _.sprintf( gettext("You've successfully signed into %(currentProvider)s, but your %(currentProvider)s account isn't linked with an %(platformName)s account. To link your accounts, go to your %(platformName)s account settings."), context ) %>
         </p>
     <% } %>
 </div>
