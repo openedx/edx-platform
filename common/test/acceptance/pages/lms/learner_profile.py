@@ -83,7 +83,6 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         Returns:
             True/False
         """
-        self.wait_for_ajax()
         return self.q(css='.u-field-{}'.format(field_id)).visible
 
     def field_is_editable(self, field_id):
@@ -115,7 +114,6 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         """
         Return list of editable fields currently shown on page.
         """
-        self.wait_for_ajax()
         self.wait_for_element_visibility('.u-field-username', 'username is not visible')
 
         fields = ['country', 'language_proficiencies', 'bio']
@@ -129,7 +127,6 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         Returns:
             True/False
         """
-        self.wait_for_ajax()
         return self.q(css='#u-field-select-account_privacy').visible
 
     def field_icon_present(self, field_id):

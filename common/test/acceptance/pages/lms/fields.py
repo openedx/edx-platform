@@ -16,8 +16,6 @@ class FieldsMixin(object):
         """
         Return field with field_id.
         """
-        self.wait_for_ajax()
-
         query = self.q(css='.u-field-{}'.format(field_id))
         return query.text[0] if query.present else None
 
