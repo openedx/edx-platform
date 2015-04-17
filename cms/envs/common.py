@@ -155,7 +155,10 @@ FEATURES = {
     'DASHBOARD_SHARE_SETTINGS': {
         # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in lms/envs/common.py
         'CUSTOM_COURSE_URLS': False
-    }
+    },
+
+    # Enable notifications via edx-notifications
+    'ENABLE_NOTIFICATIONS': False,
 }
 
 ENABLE_JASMINE = False
@@ -939,4 +942,44 @@ ELASTIC_FIELD_MAPPINGS = {
     "start_date": {
         "type": "date"
     }
+}
+
+
+#
+######## EDX-NOTIFICATIONS CONFIGURATION ########
+#
+INSTALLED_APPS += (
+    'edx_notifications',
+)
+
+NOTIFICATION_STORE_PROVIDER = {
+    "class": "edx_notifications.stores.sql.store_provider.SQLNotificationStoreProvider",
+    "options": {
+    }
+}
+
+if 'SOUTH_MIGRATION_MODULES' not in vars() and 'SOUTH_MIGRATION_MODULES' not in globals():
+    SOUTH_MIGRATION_MODULES = {}
+
+# We have to point edx-notfications south migrations to a
+# subdirectory
+SOUTH_MIGRATION_MODULES.update({
+    'edx_notifications': 'edx_notifications.stores.sql.migrations',
+})
+
+
+# list all known channel providers
+# this can be overriden in aws.py via lms.auth.json
+NOTIFICATION_CHANNEL_PROVIDERS = {
+    # right now by default we map all notifications to the NullNotificationChannel
+    # which drops all notifications
+    'null': {
+        'class': 'edx_notifications.channels.null.NullNotificationChannel',
+        'options': {}
+    }
+}
+
+# list all of the mappings of notification types to channel
+NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = {
+    '*': 'null',  # default global mapping
 }
