@@ -75,10 +75,18 @@ BROKER_HEARTBEAT_CHECKRATE = 2
 # Each worker should only fetch one message at a time
 CELERYD_PREFETCH_MULTIPLIER = 1
 
+#
 # Skip djcelery migrations, since we don't use the database as the broker
-SOUTH_MIGRATION_MODULES = {
+#
+# don't clobber any SOUTH_MIGRATION_MODULES configuration that might have
+# been set elsewhere, like in common.py
+#
+if not 'SOUTH_MIGRATION_MODULES' in vars() and not 'SOUTH_MIGRATION_MODULES' in globals():
+    SOUTH_MIGRATION_MODULES = {}
+
+SOUTH_MIGRATION_MODULES.update({
     'djcelery': 'ignore',
-}
+})
 
 # Rename the exchange and queues for each variant
 
@@ -590,3 +598,16 @@ if FEATURES.get('INDIVIDUAL_DUE_DATES'):
     FIELD_OVERRIDE_PROVIDERS += (
         'courseware.student_field_overrides.IndividualStudentOverrideProvider',
     )
+
+##### EDX-NOTIFICATIONS OVERRIDES #####
+
+# NOTE: We override STORE_PROVIDER and CHANNEL_PROVIDERS in *.auth.json files since
+# they can contain credentials or other confidential information
+NOTIFICATION_STORE_PROVIDER = AUTH_TOKENS.get('NOTIFICATION_STORE_PROVIDER', NOTIFICATION_STORE_PROVIDER)
+NOTIFICATION_CHANNEL_PROVIDERS = AUTH_TOKENS.get('NOTIFICATION_CHANNEL_PROVIDERS', NOTIFICATION_CHANNEL_PROVIDERS)
+
+# PROVIDER_TYPE_MAPS are not sensitive information so they go in *.env.json files
+NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = ENV_TOKENS.get(
+    'NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS',
+    NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS
+)
