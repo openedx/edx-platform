@@ -10,8 +10,6 @@ define(['underscore'], function(_) {
         }
 
         if ('fieldValue' in view || 'imageUrl' in view) {
-            expect(view.model.get(view.options.valueAttribute)).toBeTruthy();
-
             if ('imageUrl' in view) {
                 expect($($element.find('.image-frame')[0]).attr('src')).toBe(view.imageUrl());
             } else if (view.fieldValue()) {
@@ -111,6 +109,5 @@ define(['underscore'], function(_) {
         expectLimitedProfileSectionsAndFieldsToBeRendered: expectLimitedProfileSectionsAndFieldsToBeRendered,
         expectProfileSectionsAndFieldsToBeRendered: expectProfileSectionsAndFieldsToBeRendered,
         expectProfileSectionsNotToBeRendered: expectProfileSectionsNotToBeRendered
-
     };
 });

@@ -15,8 +15,13 @@
         return function (options) {
 
             var learnerProfileElement = $('.wrapper-profile');
-
-            var accountPreferencesModel = new AccountPreferencesModel();
+            var defaultVisibility = options.default_visibility;
+            var AccountPreferencesModelWithDefaults = AccountPreferencesModel.extend({
+                defaults: {
+                    account_privacy: defaultVisibility
+                }
+            });
+            var accountPreferencesModel = new AccountPreferencesModelWithDefaults();
             accountPreferencesModel.url = options.preferences_api_url;
 
             var accountSettingsModel = new AccountSettingsModel({
@@ -70,7 +75,7 @@
                     editable: editable,
                     showMessages: false,
                     iconName: 'fa-map-marker',
-                    placeholderValue: gettext('Add country'),
+                    placeholderValue: '',
                     valueAttribute: "country",
                     options: options.country_options,
                     helpMessage: ''
@@ -143,7 +148,12 @@
                     // Fetch the preferences model if the user has access
                     if (options.has_preferences_access) {
                         accountPreferencesModel.fetch({
-                            success: showLearnerProfileView,
+                            success: function() {
+                                if (accountSettingsModel.get('requires_parental_consent')) {
+                                    accountPreferencesModel.set('account_privacy', 'private');
+                                }
+                                showLearnerProfileView();
+                            },
                             error: showLoadingError
                         });
                     }

@@ -63,7 +63,7 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         Arguments:
             privacy (str): 'all_users' or 'private'
         """
-        self.wait_for_element_visibility('select#u-field-select-account_privacy', 'Privacy dropdown is visiblie')
+        self.wait_for_element_visibility('select#u-field-select-account_privacy', 'Privacy dropdown is visible')
 
         if privacy != self.privacy:
             self.q(css=PROFILE_VISIBILITY_SELECTOR.format(privacy)).first.click()
