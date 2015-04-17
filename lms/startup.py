@@ -1,3 +1,4 @@
+# pylint: disable=logging-format-interpolation
 """
 Module for code that should run during LMS startup
 """
@@ -169,5 +170,5 @@ def startup_notification_subsystem():
             'There was a problem initializing notifications subsystem. '
             'This could be because the database tables have not yet been created and '
             './manage.py lms syncdb needs to run setup.py. Error was "{err_msg}". '
-            'Continuing...'.format(err_msg=str(ex))  # pylint: disable=logging-format-interpolation
+            'Continuing...'.format(err_msg=str(ex))
         )
