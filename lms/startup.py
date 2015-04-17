@@ -1,3 +1,4 @@
+# pylint: disable=logging-format-interpolation
 """
 Module for code that should run during LMS startup
 """
@@ -14,7 +15,7 @@ import edxmako
 import logging
 from monkey_patch import django_utils_translation
 import analytics
-
+from edx_notifications import startup
 
 log = logging.getLogger(__name__)
 
@@ -42,6 +43,9 @@ def run():
     # every 50 messages thereafter, or if 10 seconds have passed since last flush
     if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
         analytics.init(settings.SEGMENT_IO_LMS_KEY, flush_at=50)
+
+    if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
+        startup_notification_subsystem()
 
 
 def add_mimetypes():
@@ -142,3 +146,29 @@ def enable_third_party_auth():
 
     from third_party_auth import settings as auth_settings
     auth_settings.apply_settings(settings.THIRD_PARTY_AUTH, settings)
+
+
+def startup_notification_subsystem():
+    """
+    Initialize the Notification subsystem
+    """
+    try:
+        # startup the Notification subsystem
+        # note, since we are initially just support ephemeral
+        # push notifications to mobile devices
+        # we don't need to register pre-defined
+        # msg_types which are oriented towards durable
+        # in-browser notifications
+        startup.initialize(register_system_types=False)
+
+    except Exception, ex:  # pylint: disable=broad-except
+        # Note this will fail when we try to run migrations as manage.py will call startup.py
+        # and startup.initialze() will try to manipulate some database tables.
+        # We need to research how to identify when we are being started up as part of
+        # a migration script
+        log.error(
+            'There was a problem initializing notifications subsystem. '
+            'This could be because the database tables have not yet been created and '
+            './manage.py lms syncdb needs to run setup.py. Error was "{err_msg}". '
+            'Continuing...'.format(err_msg=str(ex))
+        )

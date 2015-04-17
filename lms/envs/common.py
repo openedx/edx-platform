@@ -380,6 +380,9 @@ FEATURES = {
         'TWITTER_SHARING': False,
         'TWITTER_SHARING_TEXT': None
     },
+
+    # Enable notifications via edx-notifications
+    'ENABLE_NOTIFICATIONS': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -2238,3 +2241,43 @@ CHECKPOINT_PATTERN = r'(?P<checkpoint_name>\w+)'
 # 'courseware.student_field_overrides.IndividualStudentOverrideProvider' to
 # this setting.
 FIELD_OVERRIDE_PROVIDERS = ()
+
+
+#
+######## EDX-NOTIFICATIONS CONFIGURATION ########
+#
+INSTALLED_APPS += (
+    'edx_notifications',
+)
+
+NOTIFICATION_STORE_PROVIDER = {
+    "class": "edx_notifications.stores.sql.store_provider.SQLNotificationStoreProvider",
+    "options": {
+    }
+}
+
+if 'SOUTH_MIGRATION_MODULES' not in vars() and 'SOUTH_MIGRATION_MODULES' not in globals():
+    SOUTH_MIGRATION_MODULES = {}
+
+# We have to point edx-notfications south migrations to a
+# subdirectory
+SOUTH_MIGRATION_MODULES.update({
+    'edx_notifications': 'edx_notifications.stores.sql.migrations',
+})
+
+
+# list all known channel providers
+# this can be overriden in aws.py via lms.auth.json
+NOTIFICATION_CHANNEL_PROVIDERS = {
+    # right now by default we map all notifications to the NullNotificationChannel
+    # which drops all notifications
+    'null': {
+        'class': 'edx_notifications.channels.null.NullNotificationChannel',
+        'options': {}
+    }
+}
+
+# list all of the mappings of notification types to channel
+NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = {
+    '*': 'null',  # default global mapping
+}
