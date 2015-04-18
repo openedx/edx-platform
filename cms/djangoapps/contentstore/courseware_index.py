@@ -7,10 +7,12 @@ from six import add_metaclass
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
+from django.core.urlresolvers import resolve
 from eventtracking import tracker
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.library_tools import normalize_key_for_search
 from search.search_engine_base import SearchEngine
+from contentstore.course_group_config import GroupConfiguration
 
 # REINDEX_AGE is the default amount of time that we look back for changes
 # that might have happened. If we are provided with a time at which the
@@ -125,7 +127,7 @@ class SearchIndexerBase(object):
         # list - those are ready to be destroyed
         indexed_items = set()
 
-        def index_item(item, skip_index=False):
+        def index_item(item, skip_index=False, groups_usage_info=None, content_groups=None):
             """
             Add this item to the search index and indexed_items list
 
@@ -143,6 +145,16 @@ class SearchIndexerBase(object):
             if not item_index_dictionary and not item.has_children:
                 return
 
+            if groups_usage_info:
+                item.content_groups = []
+                for name, group in groups_usage_info:
+                    for module in group:
+                        if str(item.location) == str(module['usage_key_string']):
+                            item.content_groups.append(name)
+
+            if content_groups and not getattr(item, 'content_groups', None):
+                item.content_groups = content_groups
+
             item_id = unicode(cls._id_modifier(item.scope_ids.usage_id))
             indexed_items.add(item_id)
             if item.has_children:
@@ -150,7 +162,13 @@ class SearchIndexerBase(object):
                 skip_child_index = skip_index or \
                     (triggered_at is not None and (triggered_at - item.subtree_edited_on) > reindex_age)
                 for child_item in item.get_children():
-                    index_item(child_item, skip_index=skip_child_index)
+                    temp_content = getattr(item, 'content_groups', None)
+                    if temp_content and temp_content is not []:
+                        index_item(child_item, skip_index=skip_child_index,
+                                   groups_usage_info=groups_usage_info, content_groups=item.content_groups)
+                    else:
+                        index_item(child_item, skip_index=skip_child_index,
+                                   groups_usage_info=groups_usage_info)
 
             if skip_index or not item_index_dictionary:
                 return
@@ -163,7 +181,9 @@ class SearchIndexerBase(object):
                 item_index['id'] = item_id
                 if item.start:
                     item_index['start_date'] = item.start
-
+                item_index['content_groups'] = getattr(item, 'content_groups', None)
+                if item_index['content_groups'] == []:
+                    item_index['content_groups'] = None
                 searcher.index(cls.DOCUMENT_TYPE, item_index)
                 indexed_count["count"] += 1
             except Exception as err:  # pylint: disable=broad-except
@@ -174,8 +194,16 @@ class SearchIndexerBase(object):
         try:
             with modulestore.branch_setting(ModuleStoreEnum.RevisionOption.published_only):
                 structure = cls._fetch_top_level(modulestore, structure_key)
+                groups_usage_info = None
+                if cls.DOCUMENT_TYPE == "courseware_content":
+                    groups_usage_info = GroupConfiguration.get_content_groups_usage_info(modulestore, structure).items()
+                    if groups_usage_info:
+                        for name, group in groups_usage_info:  # pylint: disable=unused-variable
+                            for module in group:
+                                view, args, kwargs = resolve(module['url'])  # pylint: disable=unused-variable
+                                module['usage_key_string'] = kwargs['usage_key_string']
                 for item in structure.get_children():
-                    index_item(item)
+                    index_item(item, False, groups_usage_info)
                 cls.remove_deleted_items(searcher, structure_key, indexed_items)
         except Exception as err:  # pylint: disable=broad-except
             # broad exception so that index operation does not prevent the rest of the application from working
