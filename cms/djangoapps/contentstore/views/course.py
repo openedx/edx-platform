@@ -69,6 +69,7 @@ from contentstore.views.entrance_exam import (
 
 from .library import LIBRARIES_ENABLED
 from .item import create_xblock_info
+from contentstore.push_notification import push_notification_enabled
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 from contentstore import utils
 from student.roles import (
@@ -778,7 +779,8 @@ def course_info_handler(request, course_key_string):
                     'context_course': course_module,
                     'updates_url': reverse_course_url('course_info_update_handler', course_key),
                     'handouts_locator': course_key.make_usage_key('course_info', 'handouts'),
-                    'base_asset_url': StaticContent.get_base_url_path_for_course_assets(course_module.id)
+                    'base_asset_url': StaticContent.get_base_url_path_for_course_assets(course_module.id),
+                    'push_notification_enabled': push_notification_enabled()
                 }
             )
         else:
