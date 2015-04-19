@@ -6,6 +6,7 @@ import json
 import logging
 import urllib
 import requests
+import urlparse
 
 from requests.exceptions import RequestException
 
@@ -36,7 +37,7 @@ def create_youtube_string(module):
 
 # def get_video_from_cdn(cdn_base_url, original_video_url, cdn_branding_logo_url):
 # Not sure if this third variable is necessary...
-def get_video_from_cdn(cdn_base_url, original_video_url):
+def get_video_from_cdn(cdn_base_url, original_video_url, **kwargs):
     """
     Get video URL from CDN.
 
@@ -53,7 +54,36 @@ def get_video_from_cdn(cdn_base_url, original_video_url):
         }
     where `s3_url` is requested original video url and `sources` is the list of
     alternative links.
+
+    kwargs may contain:
+        play_video_local (bool): whether to play video from locally hosted server, for exaple Nginx.
+
+        How-to:
+            1. Download all videos from the course.
+            2. Install and setup Nginx. Actually even w/o additional modules for video streaming nginx will work. Setup nginx: if, for example, root entry point is /Users/kry/repos/edx/videos, then, in default nginx config, set
+
+                    location / {
+                       root   /Users/kry/repos/edx/videos;
+                       index  index.html index.htm;
+                       autoindex on;
+                    }
+
+            4. If Open edX video has url:
+                    https://s3.amazonaws.com/edx-course-videos/edx-intro/video.mp4,
+                then create subfolders
+                    edx-course-videos/edx-intro,
+                and copy video to the inner, so path to video on local drive will be:
+                    /Users/kry/repos/edx/videos/edx-course-videos/edx-intro/video.mp4
+            5. To enable feature add
+                    "PLAY_VIDEO_LOCAL": "http://localhost:8080/folder_with_video/"
+               to FEATURES dict in lms and cms .env.json files,
+               where http://localhost:8080 is url for Nginx site with hosted videos
     """
+    if kwargs.get('play_video_local'):
+        scheme, netloc = kwargs.get('play_video_local').rstrip('/').split('://')
+        parsed = urlparse.urlparse(original_video_url)
+        replaced = parsed._replace(netloc=netloc, scheme=scheme)
+        return replaced.geturl()
 
     if not cdn_base_url:
         return None

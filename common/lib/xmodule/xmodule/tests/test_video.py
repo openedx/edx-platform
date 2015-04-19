@@ -720,6 +720,17 @@ class VideoCdnTest(unittest.TestCase):
         fake_cdn_url = 'http://fake_cdn.com/'
         self.assertIsNone(get_video_from_cdn(fake_cdn_url, original_video_url))
 
+    def test_video_play_local(self):
+        """
+        Test video url substitution for local video playback.
+        """
+        original_video_url = "http://www.original_video.com/folder1/folder2/original_video.mp4"
+        play_video_local = "http://local_server:3000/static/edx-videos"
+        self.assertEqual(
+            get_video_from_cdn(None, original_video_url, play_video_local=play_video_local),
+            "http://local_server:3000/static/edx-videos/folder1/folder2/original_video.mp4"
+        )
+
 
 class VideoDescriptorIndexingTestCase(unittest.TestCase):
     """

@@ -377,6 +377,9 @@ FEATURES = {
         'TWITTER_SHARING': False,
         'TWITTER_SHARING_TEXT': None
     },
+
+    # Play video from locally hosted server, for example, 'PLAY_VIDEO_LOCAL': "http://192.168.xxx.xxx/static/edx-videos".
+    'PLAY_VIDEO_LOCAL' : "http://localhost:8080/static/edx-videos"
 }
 
 # Ignore static asset files on import which match this pattern

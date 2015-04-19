@@ -155,7 +155,10 @@ FEATURES = {
     'DASHBOARD_SHARE_SETTINGS': {
         # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in lms/envs/common.py
         'CUSTOM_COURSE_URLS': False
-    }
+    },
+
+    # Play video from locally hosted server, for example, value can be "http://192.168.xxx.xxx/static/edx-videos"
+    'PLAY_VIDEO_LOCAL' : "http://localhost:8080/static/edx-videos"
 }
 
 ENABLE_JASMINE = False
