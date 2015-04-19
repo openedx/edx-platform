@@ -1717,6 +1717,7 @@ CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
 EDXMKTG_COOKIE_NAME = 'edxloggedin'
 MKTG_URLS = {}
 MKTG_URL_LINK_MAP = {
+    'A11Y': 'accessibility',
     'ABOUT': 'about',
     'CONTACT': 'contact',
     'FAQ': 'help',
