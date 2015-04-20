@@ -1,6 +1,7 @@
-<label class="u-field-title" for="u-field-input-<%- id %>">
-    <%- gettext(title) %>
+<label class="u-field-title" aria-hidden="true">
+    <%- title %>
 </label>
+<span class="sr" for="u-field-input-<%- id %>"><%- screenReaderTitle %></span>
 <span class="u-field-value">
     <input id="u-field-input-<%- id %>" aria-describedby="u-field-message-<%- id %>" type="text" name="input" readonly=true value="<%- value %>">
 </span>

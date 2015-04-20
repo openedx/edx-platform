@@ -59,7 +59,10 @@
                 // Update model to get the latest urls of profile image.
                 this.model.fetch().done(function () {
                     view.setCurrentStatus('');
+                    view.render();
+                    view.$('.u-field-upload-button').focus();
                 }).fail(function () {
+                    view.setCurrentStatus('');
                     view.showErrorMessage(view.errorMessage);
                 });
             },
@@ -67,7 +70,6 @@
             imageChangeFailed: function (e, data) {
                 this.setCurrentStatus('');
                 this.showImageChangeFailedMessage(data.jqXHR.status, data.jqXHR.responseText);
-                this.render();
             },
 
             showImageChangeFailedMessage: function (status, responseText) {

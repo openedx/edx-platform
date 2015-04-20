@@ -121,7 +121,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     validValue: 'My Name',
                     invalidValue1: 'Your Name',
                     invalidValue2: 'Her Name',
-                    validationError: "Think again!"
+                    validationError: "Think again!",
+                    defaultValue: ''
                 }, requests);
             });
 
@@ -164,7 +165,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     validValue: FieldViewsSpecHelpers.SELECT_OPTIONS[0][0],
                     invalidValue1: FieldViewsSpecHelpers.SELECT_OPTIONS[1][0],
                     invalidValue2: FieldViewsSpecHelpers.SELECT_OPTIONS[2][0],
-                    validationError: "Nope, this will not do!"
+                    validationError: "Nope, this will not do!",
+                    defaultValue: null
                 }, requests);
             });
 
@@ -188,7 +190,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     validValue: FieldViewsSpecHelpers.SELECT_OPTIONS[0][0],
                     invalidValue1: FieldViewsSpecHelpers.SELECT_OPTIONS[1][0],
                     invalidValue2: FieldViewsSpecHelpers.SELECT_OPTIONS[2][0],
-                    validationError: "Nope, this will not do!"
+                    validationError: "Nope, this will not do!",
+                    defaultValue: null
                 }, requests);
             });
 

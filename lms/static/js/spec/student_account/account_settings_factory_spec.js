@@ -161,7 +161,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                         validValue: 'My Name',
                         invalidValue1: '',
                         invalidValue2: '@',
-                        validationError: "Think again!"
+                        validationError: "Think again!",
+                        defaultValue: ''
                     }, requests);
                 }
 
@@ -180,7 +181,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                         validValue: Helpers.FIELD_OPTIONS[1][0],
                         invalidValue1: Helpers.FIELD_OPTIONS[2][0],
                         invalidValue2: Helpers.FIELD_OPTIONS[3][0],
-                        validationError: "Nope, this will not do!"
+                        validationError: "Nope, this will not do!",
+                        defaultValue: null
                     }, requests);
                 });
 

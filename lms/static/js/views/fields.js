@@ -6,7 +6,7 @@
 
         var Mustache = window.Mustache || RequireMustache;
 
-        var messageRevertDelay = 4000;
+        var messageRevertDelay = 6000;
         var FieldViews = {};
 
         FieldViews.FieldView = Backbone.View.extend({
@@ -176,15 +176,18 @@
                 this.showSuccessMessage();
             },
 
-            showDisplayMode: function(render) {
-                this.mode = 'display';
-                if (render) { this.render(); }
-
+            updateDisplayModeClass: function() {
                 this.$el.removeClass('mode-edit');
 
                 this.$el.toggleClass('mode-hidden', (this.editable === 'never' && !this.modelValueIsSet()));
                 this.$el.toggleClass('mode-placeholder', (this.editable === 'toggle' && !this.modelValueIsSet()));
                 this.$el.toggleClass('mode-display', (this.modelValueIsSet()));
+            },
+
+            showDisplayMode: function(render) {
+                this.mode = 'display';
+                if (render) { this.render(); }
+                this.updateDisplayModeClass();
             },
 
             showEditMode: function(render) {
@@ -233,6 +236,7 @@
                 this.$el.html(this.template({
                     id: this.options.valueAttribute,
                     title: this.options.title,
+                    screenReaderTitle: this.options.screenReaderTitle || this.options.title,
                     value: this.modelValue(),
                     message: this.helpMessage
                 }));
@@ -345,7 +349,8 @@
             },
 
             fieldValue: function () {
-                return this.$('.u-field-value select').val();
+                var value = this.$('.u-field-value select').val();
+                return value === '' ? null : value;
             },
 
             displayValue: function (value) {
@@ -358,16 +363,17 @@
             },
 
             updateValueInField: function () {
+                this.$('.u-field-value select').val(this.modelValue() || '');
+
+                var value = this.displayValue(this.modelValue() || '');
+                if (this.modelValueIsSet() === false) {
+                    value = this.options.placeholderValue || '';
+                }
+                this.$('.u-field-value').attr('aria-label', this.options.title);
+                this.$('.u-field-value-readonly').html(Mustache.escapeHtml(value));
+
                 if (this.mode === 'display') {
-                    var value = this.displayValue(this.modelValue() || '');
-                    if (this.modelValueIsSet() === false) {
-                        value = this.options.placeholderValue || '';
-                    }
-                    this.$('.u-field-value').attr('aria-label', this.options.title);
-                    this.$('.u-field-value-readonly').html(Mustache.escapeHtml(value));
-                    this.showDisplayMode(false);
-                } else {
-                    this.$('.u-field-value select').val(this.modelValue() || '');
+                    this.updateDisplayModeClass();
                 }
             },
 
@@ -375,6 +381,13 @@
                 var attributes = {};
                 attributes[this.options.valueAttribute] = this.fieldValue();
                 this.saveAttributes(attributes);
+            },
+
+            showDisplayMode: function(render) {
+                this._super(render);
+                if (this.editable === 'toggle') {
+                    this.$('.u-field-value a').focus();
+                }
             },
 
             showEditMode: function(render) {
@@ -386,10 +399,13 @@
 
             saveSucceeded: function() {
                 if (this.editable === 'toggle') {
-                    this.showDisplayMode(true);
-                } else {
-                    this.showEditMode(true);
+                    this.showDisplayMode();
                 }
+
+                if (this.options.required && this.modelValueIsSet()) {
+                    this.$('option[value=""]').remove();
+                }
+
                 this._super();
             },
 
@@ -410,13 +426,13 @@
                 'focusout textarea': 'finishEditing',
                 'change textarea': 'adjustTextareaHeight',
                 'keyup textarea': 'adjustTextareaHeight',
-                'keydown textarea': 'adjustTextareaHeight',
+                'keydown textarea': 'onKeyDown',
                 'paste textarea': 'adjustTextareaHeight',
                 'cut textarea': 'adjustTextareaHeight'
             },
 
             initialize: function (options) {
-                _.bindAll(this, 'render', 'adjustTextareaHeight', 'fieldValue', 'saveValue', 'updateView');
+                _.bindAll(this, 'render', 'onKeyDown', 'adjustTextareaHeight', 'fieldValue', 'saveValue', 'updateView');
                 this._super(options);
                 this.listenTo(this.model, "change:" + this.options.valueAttribute, this.updateView);
             },
@@ -441,6 +457,15 @@
                     this.showCanEditMessage(this.mode === 'display');
                 }
                 return this;
+            },
+
+            onKeyDown: function (event) {
+                if (event.keyCode === 13) {
+                    event.preventDefault();
+                    this.finishEditing(event);
+                } else {
+                    this.adjustTextareaHeight();
+                }
             },
 
             adjustTextareaHeight: function() {
@@ -483,6 +508,7 @@
                 this._super();
                 if (this.editable === 'toggle') {
                     this.showDisplayMode(true);
+                    this.$('a').focus();
                 }
             }
         });
@@ -552,7 +578,6 @@
                 this._super(options);
                 _.bindAll(this, 'render', 'imageChangeSucceeded', 'imageChangeFailed', 'fileSelected',
                           'watchForPageUnload', 'onBeforeUnload');
-                this.listenTo(this.model, "change:" + this.options.valueAttribute, this.render);
             },
 
             render: function () {
