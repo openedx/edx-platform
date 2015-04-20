@@ -62,9 +62,11 @@
             %endfor
             </ul>
         </section>
-        <div class="courses-more">
-          <a class="courses-more-cta" href="${marketing_link('COURSES')}" > ${_("View all Courses")} </a>
-        </div>
+        % if len(courses) > 9:
+          <div class="courses-more">
+            <a class="courses-more-cta" href="${marketing_link('COURSES')}" > ${_("View all Courses")} </a>
+          </div>
+        % endif
       % endif
 
     </section>
