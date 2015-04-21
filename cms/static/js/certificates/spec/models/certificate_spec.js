@@ -1,33 +1,19 @@
-define([
-    'backbone', 'coffee/src/main', 'js/certificates/models', 'squire'
-], function(
-    Backbone, main, CertificateModel, Squire
-) {
+define(['js/certificates/models/certificate'],
+    function(CertificateModel) {
     'use strict';
-    beforeEach(function() {
-      this.addMatchers({
-        toBeInstanceOf: function(expected) {
-          return this.actual instanceof expected;
-        },
-        toBeEmpty: function() {
-            return this.actual.length === 0;
-        }
-      });
-    });
 
     describe('CertificateModel', function() {
         beforeEach(function() {
-            main();
             this.model = new CertificateModel();
         });
 
         describe('Basic', function() {
-            it('should have an empty name by default', function() {
-                expect(this.model.get('name')).toEqual('');
+            it('should have name by default', function() {
+                expect(this.model.get('name')).toEqual('Default Name');
             });
 
-            it('should have an empty description by default', function() {
-                expect(this.model.get('description')).toEqual('');
+            it('should have description by default', function() {
+                expect(this.model.get('description')).toEqual('Default Description');
             });
 
             it('should be able to reset itself', function() {
@@ -35,27 +21,7 @@ define([
                     model = new CertificateModel({name: originalName});
                 model.set({name: 'New Name'});
                 model.reset();
-
                 expect(model.get('name')).toEqual(originalName);
-            });
-
-            it('should be dirty after it\'s been changed', function() {
-                this.model.set('name', 'foobar');
-
-                expect(this.model.isDirty()).toBeTruthy();
-            });
-
-            describe('should not be dirty', function () {
-                it('by default', function() {
-                    expect(this.model.isDirty()).toBeFalsy();
-                });
-
-                it('after calling setOriginalAttributes', function() {
-                    this.model.set('name', 'foobar');
-                    this.model.setOriginalAttributes();
-
-                    expect(this.model.isDirty()).toBeFalsy();
-                });
             });
         });
 
@@ -84,13 +50,13 @@ define([
                         'id': 10,
                         'name': 'My Certificate',
                         'description': 'Some description',
-                        'version': 2,
+                        'version': 2
                     },
                     clientModelSpec = {
                         'id': 10,
                         'name': 'My Certificate',
                         'description': 'Some description',
-                        'version': 2,
+                        'version': 2
                     },
                     model = new CertificateModel(
                         serverModelSpec, { parse: true }
