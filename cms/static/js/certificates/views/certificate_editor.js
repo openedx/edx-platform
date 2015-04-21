@@ -2,7 +2,7 @@
  * This class defines an editing view for course certificates.
  * It is expected to be backed by a Certificate model.
  */
-define(['js/views/list_item_editor', 'underscore', 'jquery', 'gettext',],
+define(['js/views/list_item_editor', 'underscore', 'jquery', 'gettext'],
 function(ListItemEditorView, _, $, gettext) {
     'use strict';
     console.log('certificate_editor.start');
