@@ -299,24 +299,22 @@ nav.sequence-nav {
       $next-icon: url('../images/sequence-nav/next-icon.png');
 
       &.prev {
-        left: flip(-10px, auto);
-        right: flip(auto, -10px);
-        border-radius: flip(35px 0 0 35px, 0 35px 35px 0);
+        @include left(-10px);
+        @include border-radius(35px 0 0 35px);
 
         a {
-          background-image: flip($prev-icon, $next-icon);
+          background-image: $prev-icon;
           background-position: center 15px;
         }
       }
 
       &.next {
-        left: flip(auto, -10px);
-        right: flip(-10px, auto);
-        border-radius: flip(0 35px 35px 0, 35px 0 0 35px);
+        @include right(-10px);
+        @include border-radius(0 35px 35px 0);
 
         a {
-          #{$margin-left}: 30px;
-          background-image: flip($next-icon, $prev-icon);
+          @include margin-left(30px);
+          background-image: $next-icon;
           background-position: center 15px;
         }
       }
@@ -341,7 +339,7 @@ nav.sequence-bottom {
     display: inline-block;
 
     li {
-      float: flip(left, right);
+      @include float(left);
       width: 50px;
       height: 44px;
       border: 1px solid $gray-l3;
@@ -380,10 +378,10 @@ nav.sequence-bottom {
       $next-icon: url('../images/sequence-nav/next-icon.png');
 
       &.prev {
-        border-radius: flip(35px 0 0 35px, 0 35px 35px 0);
+        @include border-radius(35px 0 0 35px);
 
         a {
-          background-image: flip($prev-icon, $next-icon);
+          background-image: $prev-icon;
           background-position: center 15px;
         }
       }
@@ -393,15 +391,15 @@ nav.sequence-bottom {
         @include border-left(none);
 
         a {
-          background-image: flip($next-icon, $prev-icon);
+          background-image: $next-icon;
           background-position: center 15px;
 
           @include ltr {
-            background-image: url('../images/sequence-nav/next-icon.png');
+            background-image: $next-icon;
           }
 
           @include rtl {
-            background-image: url('../images/sequence-nav/previous-icon.png');
+            background-image: $prev-icon;
           }
         }
       }

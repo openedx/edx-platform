@@ -5,19 +5,20 @@ Run these tests @ Devstack:
 from datetime import datetime
 import uuid
 
-from django.contrib.auth.models import Group, User
-from django.test import TestCase
+from django.conf import settings
+from django.contrib.auth.models import User
 from django.test.utils import override_settings
 
 from api_manager.management.commands import migrate_courseids
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from projects.models import Project, Workgroup, WorkgroupReview, WorkgroupSubmission, WorkgroupSubmissionReview
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from django.db import connection
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class MigrateCourseIdsTests(TestCase):
+
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
+class MigrateCourseIdsTests(ModuleStoreTestCase):
     """
     Test suite for data migration script
     """

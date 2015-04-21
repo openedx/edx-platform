@@ -8,13 +8,12 @@ from django.conf import settings
 
 from mock import MagicMock, patch
 
-from django.test import TestCase
 from django.test.utils import override_settings
 
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 
 from social_engagement.models import StudentSocialEngagementScore, StudentSocialEngagementScoreHistory
 from social_engagement.engagement import update_user_engagement_score
@@ -26,11 +25,13 @@ from edx_notifications.lib.consumer import get_notifications_count_for_user
 
 from social_engagement.management.commands.generate_engagement_entries import Command
 
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @patch.dict(settings.FEATURES, {'ENABLE_NOTIFICATIONS': True})
 @patch.dict(settings.FEATURES, {'ENABLE_SOCIAL_ENGAGEMENT': True})
-class StudentEngagementTests(TestCase):
+class StudentEngagementTests(ModuleStoreTestCase):
     """ Test suite for CourseModuleCompletion """
 
     def setUp(self):

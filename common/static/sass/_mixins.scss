@@ -1,7 +1,7 @@
 // studio - utilities - mixins and extends
 // ====================
 
-// Table of Contents 
+// Table of Contents
 // * +Font Sizing - Mixin
 // * +Line Height - Mixin
 // * +Sizing - Mixin
@@ -25,63 +25,34 @@
 // * +Content - Text Truncate - Extend
 
 // +Font Sizing - Mixin
-// ==================== 
-// right to left mixins and variables
-// thanks to https://gist.github.com/Integralist/7269907
-@function flip($value_ltr, $value_rtl) {
-  @if $rtl { @return $value_rtl; }
-  @else { @return $value_ltr; }
-}
-
-$padding-left:    padding-left;
-$padding-right:   padding-right;
-$margin-left:     margin-left;
-$margin-right:    margin-right;
-$border-left:     border-left;
-$border-right:    border-right;
-$left:            left;
-$right:           right;
-
-@if $rtl {
-  $padding-left:  padding-right;
-  $padding-right: padding-left;
-  $margin-left:   margin-right;
-  $margin-right:  margin-left;
-  $border-left:   border-right;
-  $border-right:  border-left;
-  $left:          right;
-  $right:         left;
-}
-
-
-// mixins - font sizing
+// ====================
 @mixin font-size($sizeValue: 16){
   font-size: $sizeValue + px;
   font-size: ($sizeValue/10) + rem;
 }
 
 // +Line Height - Mixin
-// ==================== 
+// ====================
 @mixin line-height($fontSize: auto){
   line-height: ($fontSize*1.48) + px;
   line-height: (($fontSize/10)*1.48) + rem;
 }
 
 // +Sizing - Mixin
-// ==================== 
+// ====================
 @mixin size($width: $baseline, $height: $baseline) {
   height: $height;
   width: $width;
 }
 
 // +Square - Mixin
-// ==================== 
+// ====================
 @mixin square($size: $baseline) {
   @include size($size);
 }
 
 // +Placeholder Styling - Mixin
-// ==================== 
+// ====================
 @mixin placeholder($color) {
   :-moz-placeholder {
     color: $color;
@@ -95,7 +66,7 @@ $right:           right;
 }
 
 // +Flex Support - Mixin
-// ==================== 
+// ====================
 @mixin ui-flexbox() {
   display: -webkit-box;
   display: -moz-box;
@@ -105,7 +76,7 @@ $right:           right;
 }
 
 // +Flex PolyFill - Extends
-// ==================== 
+// ====================
 
 // justify-content right for display:flex alignment in older browsers
 %ui-justify-right-flex {
@@ -135,7 +106,7 @@ $right:           right;
 
 
 // +UI - Wrapper - Extends
-// ==================== 
+// ====================
 // used for page/view-level wrappers (for centering/grids)
 %ui-wrapper {
   @include clearfix();
@@ -146,17 +117,17 @@ $right:           right;
 // layout placeholders
 .ui-col-wide  {
   width: flex-grid(9, 12);
-  #{$margin-right}: flex-gutter();
-  float: flip(left, right);
+  @include margin-right(flex-gutter());
+  @include float(left);
 }
 
 .ui-col-narrow  {
   width: flex-grid(3, 12);
-  float: flip(left, right);
+  @include float(left);
 }
 
 // +UI - Window - Extends
-// ==================== 
+// ====================
 %ui-window {
   @include clearfix();
   border-radius: ($baseline/10);
@@ -172,13 +143,13 @@ $right:           right;
 }
 
 // +UI - Visual Link - Extends
-// ==================== 
+// ====================
 %ui-fake-link {
   cursor: pointer;
 }
 
 // +UI - Functional Disable - Extends
-// ==================== 
+// ====================
 %ui-disabled {
   pointer-events: none;
   outline: none;
@@ -186,7 +157,7 @@ $right:           right;
 }
 
 // +UI - Depth Levels - Extends
-// ==================== 
+// ====================
 %ui-depth0 { z-index: 0; }
 %ui-depth1 { z-index: 10; }
 %ui-depth2 { z-index: 100; }
@@ -196,7 +167,7 @@ $right:           right;
 
 
 // +UI - Clear Children - Extends
-// ==================== 
+// ====================
 // extends - UI - utility - first child clearing
 %wipe-first-child {
 
@@ -218,7 +189,7 @@ $right:           right;
 }
 
 // +UI - Buttons - Extends
-// ==================== 
+// ====================
 %ui-btn {
   @include box-sizing(border-box);
   @include transition(color $tmg-f2 ease-in-out 0s, border-color $tmg-f2 ease-in-out 0s, background $tmg-f2 ease-in-out 0s, box-shadow $tmg-f2 ease-in-out 0s);
@@ -357,7 +328,7 @@ $right:           right;
 }
 
 // +UI - Well Archetype - Extends
-// ==================== 
+// ====================
 %ui-well {
   box-shadow: inset 0 1px 2px 1px $shadow;
   padding: ($baseline*0.75) $baseline;
@@ -406,7 +377,7 @@ $right:           right;
 }
 
 // +Content - No List - Extends
-// ==================== 
+// ====================
 // removes list styling/spacing when using uls, ols for navigation and less content-centric cases
 %cont-no-list {
   list-style: none;
@@ -421,7 +392,7 @@ $right:           right;
 }
 
 // +Content - Hidden Image Text - Extend
-// ==================== 
+// ====================
 // image-replacement hidden text
 %cont-text-hide {
   text-indent: 100%;
@@ -430,7 +401,7 @@ $right:           right;
 }
 
 // +Content - Screenreader Text - Extend
-// ==================== 
+// ====================
 %cont-text-sr {
   border: 0;
   clip: rect(0 0 0 0);
@@ -443,13 +414,13 @@ $right:           right;
 }
 
 // +Content - Text Wrap - Extend
-// ==================== 
+// ====================
 %cont-text-wrap {
   word-wrap: break-word;
 }
 
 // +Content - Text Truncate - Extend
-// ==================== 
+// ====================
 %cont-truncated {
   @include box-sizing(border-box);
   overflow: hidden;

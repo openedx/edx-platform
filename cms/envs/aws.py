@@ -63,10 +63,13 @@ BROKER_HEARTBEAT_CHECKRATE = 2
 # Each worker should only fetch one message at a time
 CELERYD_PREFETCH_MULTIPLIER = 1
 
+if 'SOUTH_MIGRATION_MODULES' not in vars() and 'SOUTH_MIGRATION_MODULES' not in globals():
+    SOUTH_MIGRATION_MODULES = {}
+
 # Skip djcelery migrations, since we don't use the database as the broker
-SOUTH_MIGRATION_MODULES = {
+SOUTH_MIGRATION_MODULES.update({
     'djcelery': 'ignore',
-}
+})
 
 # Rename the exchange and queues for each variant
 
@@ -323,3 +326,5 @@ NOTIFICATION_MAX_LIST_SIZE = ENV_TOKENS.get('NOTIFICATION_MAX_LIST_SIZE', NOTIFI
 #date format the api will be formatting the datetime values
 API_DATE_FORMAT = '%Y-%m-%d'
 API_DATE_FORMAT = ENV_TOKENS.get('API_DATE_FORMAT', API_DATE_FORMAT)
+
+XBLOCK_SETTINGS = ENV_TOKENS.get('XBLOCK_SETTINGS', {})

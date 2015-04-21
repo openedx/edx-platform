@@ -118,7 +118,7 @@ header.global.slim {
 
   h1.logo {
     margin: 0 10px 0 13px;
-    #{$padding-right}: 20px;
+    @include padding-right(20px);
 
     &:before {
       @extend %faded-vertical-divider;
@@ -126,7 +126,7 @@ header.global.slim {
       display: block;
       height: 35px;
       position: absolute;
-      #{$right}: 3px;
+      @include right(3px);
       top: 0;
       width: 1px;
     }
@@ -154,7 +154,7 @@ header.global.slim {
   h2 {
     display: block;
     width: 700px;
-    float: flip(left, right);
+    @include float(left);
     font-size: 0.9em;
     font-weight: 600;
     color: $lighter-base-font-color;

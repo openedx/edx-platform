@@ -20,15 +20,12 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     is_course_cohorted,
     get_cohort_id,
     get_course_cohorts,
-    is_commentable_cohorted,
-    get_cohorted_threads_privacy,
     get_cohorted_commentables,
-    get_cohort_by_id,
-    
     is_commentable_cohorted,
     get_cohorted_threads_privacy,
     get_cohort_by_id
 )
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from courseware.access import has_access
 from xmodule.modulestore.django import modulestore
 
@@ -69,7 +66,7 @@ def make_course_settings(course):
         'is_cohorted': is_course_cohorted(course.id),
         'allow_anonymous': course.allow_anonymous,
         'allow_anonymous_to_peers': course.allow_anonymous_to_peers,
-        'cohorts': [{"id": str(g.id), "name": g.name} for g in get_course_cohorts(course.id)],
+        'cohorts': [{"id": str(g.id), "name": g.name} for g in get_course_cohorts(course)],
         'category_map': utils.get_discussion_category_map(course)
     }
 
@@ -203,7 +200,7 @@ def inline_discussion(request, course_key, discussion_id):
 
     try:
         threads, query_params = get_threads(request, course_key, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
-    except ValueError:
+    except (ValueError, CourseUserGroup.DoesNotExist):
         return HttpResponseBadRequest("Invalid group_id")
 
     with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
@@ -213,7 +210,7 @@ def inline_discussion(request, course_key, discussion_id):
     with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
         add_courseware_context(threads, course)
     return utils.JsonResponse({
-        'is_commentable_cohorted': is_commentable_cohorted(course_id, discussion_id),
+        'is_commentable_cohorted': is_commentable_cohorted(course_key, discussion_id),
         'discussion_data': threads,
         'user_info': user_info,
         'annotated_content_info': annotated_content_info,
@@ -245,7 +242,7 @@ def forum_form_discussion(request, course_key):
     except cc.utils.CommentClientMaintenanceError:
         log.warning("Forum is in maintenance mode")
         return render_to_response('discussion/maintenance.html', {})
-    except ValueError:
+    except (ValueError, CourseUserGroup.DoesNotExist):
         return HttpResponseBadRequest("Invalid group_id")
 
     with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
