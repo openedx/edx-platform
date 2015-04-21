@@ -1990,8 +1990,11 @@ html[dir='rtl'] #documentPropertiesOverlay .row > * {
 }
 
 .toolbarButton#openFile,
+.toolbarButton#print,
 .toolbarButton#download,
 .secondaryToolbarButton#secondaryOpenFile,
-.secondaryToolbarButton#secondaryDownload {
+.secondaryToolbarButton#secondaryPrint,
+.secondaryToolbarButton#secondaryDownload,
+.horizontalToolbarSeparator.visibleLargeView {
     display: none;
 }
