@@ -1049,7 +1049,7 @@ TEMPLATE_LOADERS = (
 
 MIDDLEWARE_CLASSES = (
     'request_cache.middleware.RequestCache',
-    'microsite_configuration.middleware.MicrositeMiddleware',
+    'microsite_configuration.middleware.DatabaseMicrositeMiddleware',
     'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -1110,6 +1110,8 @@ MIDDLEWARE_CLASSES = (
 
     'course_wiki.middleware.WikiAccessMiddleware',
 
+    # to have a course render fail with 404 if it is in the wrong microsite
+    'microsite_configuration.middleware.MicrositeCrossBrandingFilterMiddleware',
     # This must be last
     'microsite_configuration.middleware.MicrositeSessionCookieDomainMiddleware',
 )
