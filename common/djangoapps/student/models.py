@@ -688,6 +688,7 @@ class LoginFailures(models.Model):
             return False
 
     @classmethod
+    @transaction.commit_on_success
     def increment_lockout_counter(cls, user):
         """
         Ticks the failed attempt counter
