@@ -31,7 +31,7 @@ class CourseSerializer(serializers.Serializer):
     start = serializers.DateTimeField()
     end = serializers.DateTimeField()
     short_description = serializers.SerializerMethodField('get_short_description')
-    media = serializers.SerializerMethodFIeld('get_media')
+    media = serializers.SerializerMethodField('get_media')
     staff = serializers.SerializerMethodField('get_staff')
 
 
