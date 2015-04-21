@@ -1431,7 +1431,7 @@
       }
     }
 
-    @include media( $bp-large ) {
+    @include media( $edx-bp-large ) {
       .contribution-options {
         .field {
           width: auto;
@@ -1454,7 +1454,7 @@
       }
     }
 
-    @include media( $bp-huge ) {
+    @include media( $edx-bp-huge ) {
       .register-choice {
         .list-actions {
           float: right;

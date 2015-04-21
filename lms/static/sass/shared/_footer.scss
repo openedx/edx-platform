@@ -445,10 +445,10 @@ $edx-footer-bg-color: rgb(252,252,252);
       @include span-columns(12);
     }
 
-    @include media( $bp-medium ) {
+    @include media( $edx-bp-medium ) {
     }
 
-    @include media( $bp-large ) {
+    @include media( $edx-bp-large ) {
       .footer-about {
         @include span-columns(6);
       }
