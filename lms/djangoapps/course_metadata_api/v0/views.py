@@ -12,6 +12,12 @@ from openedx.core.lib.api.serializers import PaginationSerializer
 
 from course_metadata_api.v0 import serializers
 
+class CourseViewMixin(object):
+    """
+    Mixin 
+    """
+    True
+
 class CourseList(ListAPIView):
     """
     **Use Case**
@@ -84,6 +90,7 @@ class CourseList(ListAPIView):
             # Sort the results in a predictable manner.
 
         # Return response to caller
+        True
 
 
 class CourseDetail(CourseViewMixin, RetrieveAPIView):
@@ -127,3 +134,4 @@ class CourseDetail(CourseViewMixin, RetrieveAPIView):
     def get_object(self, queryset=None):
         # Pass baton to api.py for processing
         # Return response to caller
+        True
