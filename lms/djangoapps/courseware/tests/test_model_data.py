@@ -373,7 +373,7 @@ class StorageTestBase(object):
 
         exception = exception_context.exception
         self.assertEquals(len(exception.saved_field_names), 1)
-        self.assertEquals(exception.saved_field_names[0], 'other_existing_field')
+        self.assertIn(exception.saved_field_names[0], ('existing_field', 'other_existing_field'))
 
 
 class TestUserStateSummaryStorage(StorageTestBase, TestCase):
