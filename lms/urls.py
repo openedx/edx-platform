@@ -443,6 +443,7 @@ if settings.COURSEWARE_ENABLED:
     # discussion forums live within courseware, so courseware must be enabled first
     if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
         urlpatterns += (
+            url(r'^api/discussion/', include('discussion_api.urls')),
             url(r'^courses/{}/discussion/'.format(settings.COURSE_ID_PATTERN),
                 include('django_comment_client.urls')),
             url(r'^notification_prefs/enable/', 'notification_prefs.views.ajax_enable'),
