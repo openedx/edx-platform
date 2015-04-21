@@ -234,6 +234,7 @@ class DjangoOrmFieldCache(object):
             kv_dict (dict): A dictionary mapping :class:`~DjangoKeyValueStore.Key`
                 objects to values to set.
         """
+        saved_fields = []
         for kvs_key, value in sorted(kv_dict.items()):
             cache_key = self._cache_key_for_kvs_key(kvs_key)
             field_object = self._cache.get(cache_key)
@@ -242,7 +243,13 @@ class DjangoOrmFieldCache(object):
                 self._cache[cache_key] = field_object = self._create_object(kvs_key)
 
             self._set_field_value(field_object, kvs_key, value)
-            field_object.save()
+
+            try:
+                field_object.save()
+                saved_fields.append(kvs_key.field_name)
+            except DatabaseError:
+                log.exception("Saving field %r failed", kvs_key.field_name)
+                raise KeyValueMultiSaveError(saved_fields)
 
     @contract(kvs_key=DjangoKeyValueStore.Key)
     def delete(self, kvs_key):
@@ -402,7 +409,7 @@ class UserStateCache(DjangoOrmFieldCache):
             kv_dict (dict): A dictionary mapping :class:`~DjangoKeyValueStore.Key`
                 objects to values to set.
         """
-        dirty_field_objects = set()
+        dirty_field_objects = defaultdict(set)
         for kvs_key, value in kv_dict.items():
             cache_key = self._cache_key_for_kvs_key(kvs_key)
             field_object = self._cache.get(cache_key)
@@ -411,10 +418,16 @@ class UserStateCache(DjangoOrmFieldCache):
                 self._cache[cache_key] = field_object = self._create_object(kvs_key)
 
             self._set_field_value(field_object, kvs_key, value)
-            dirty_field_objects.add(field_object)
+            dirty_field_objects[field_object].add(kvs_key.field_name)
 
-        for field_object in sorted(dirty_field_objects):
-            field_object.save()
+        saved_fields = []
+        for field_object, fields in sorted(dirty_field_objects.iteritems()):
+            try:
+                field_object.save()
+                saved_fields.extend(fields)
+            except DatabaseError:
+                log.exception("Saving fields %r failed", fields)
+                raise KeyValueMultiSaveError(saved_fields)
 
     @contract(kvs_key=DjangoKeyValueStore.Key)
     def get(self, kvs_key):
@@ -832,8 +845,8 @@ class FieldDataCache(object):
         """
 
         saved_fields = []
-        for key in kv_dict:
-            # If the field is valid and isn't already in the dictionary, add it.
+        by_scope = defaultdict(dict)
+        for key, value in kv_dict.iteritems():
 
             if key.scope.user == UserScope.ONE and not self.user.is_anonymous():
                 # If we're getting user data, we expect that the key matches the
@@ -843,14 +856,17 @@ class FieldDataCache(object):
             if key.scope not in self.cache:
                 continue
 
+            by_scope[key.scope][key] = value
+
+        for scope, set_many_data in by_scope.iteritems():
             try:
-                self.cache[key.scope].set(key, kv_dict[key])
-                # If save is successful on this field, add it to
+                self.cache[scope].set_many(set_many_data)
+                # If save is successful on these fields, add it to
                 # the list of successful saves
-                saved_fields.append(key.field_name)
-            except DatabaseError:
-                log.exception('Error saving field %r', key)
-                raise KeyValueMultiSaveError(saved_fields)
+                saved_fields.extend(key.field_name for key in set_many_data)
+            except KeyValueMultiSaveError as exc:
+                log.exception('Error saving fields %r', [key.field_name for key in set_many_data])
+                raise KeyValueMultiSaveError(saved_fields + exc.saved_field_names)
 
     @contract(key=DjangoKeyValueStore.Key)
     def delete(self, key):
