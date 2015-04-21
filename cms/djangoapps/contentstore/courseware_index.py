@@ -163,7 +163,7 @@ class SearchIndexerBase(object):
                     (triggered_at is not None and (triggered_at - item.subtree_edited_on) > reindex_age)
                 for child_item in item.get_children():
                     temp_content = getattr(item, 'content_groups', None)
-                    if temp_content and temp_content is not []:
+                    if temp_content and temp_content != []:
                         index_item(child_item, skip_index=skip_child_index,
                                    groups_usage_info=groups_usage_info, content_groups=item.content_groups)
                     else:
@@ -203,7 +203,7 @@ class SearchIndexerBase(object):
                                 view, args, kwargs = resolve(module['url'])  # pylint: disable=unused-variable
                                 module['usage_key_string'] = kwargs['usage_key_string']
                 for item in structure.get_children():
-                    index_item(item, False, groups_usage_info)
+                    index_item(item, groups_usage_info=groups_usage_info)
                 cls.remove_deleted_items(searcher, structure_key, indexed_items)
         except Exception as err:  # pylint: disable=broad-except
             # broad exception so that index operation does not prevent the rest of the application from working
