@@ -32,6 +32,7 @@ Experimental APIs
 .. toctree::
     :maxdepth: 2
     
+    course_metadata/index
     course_structure/index
     user/index
 

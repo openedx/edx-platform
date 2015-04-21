@@ -170,7 +170,9 @@ MOCK_MODULES = [
     'student.roles',
     'embargo.models',
     'xmodule.vertical_block',
-    'vertical_block'
+    'vertical_block',
+    'CourseViewMixin'
+    
 ]
 
 for mod_name in MOCK_MODULES:
