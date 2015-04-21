@@ -197,10 +197,26 @@ class DjangoOrmFieldCache(object):
 
     @contract(kvs_key=DjangoKeyValueStore.Key)
     def get(self, kvs_key):
+        """
+        Return the django model object specified by `kvs_key` from
+        the cache.
+
+        Arguments:
+            kvs_key (`DjangoKeyValueStore.Key`): The field value to delete
+
+        Returns: A django orm object from the cache
+        """
         return self._cache.get(self._cache_key_for_kvs_key(kvs_key))
 
     @contract(kvs_key=DjangoKeyValueStore.Key)
     def set(self, kvs_key, value):
+        """
+        Set the specified `kvs_key` to the django model object `value`.
+
+        Arguments:
+            kvs_key (`DjangoKeyValueStore.Key`): The field value to delete
+            value: The django orm object to be stored in the cache
+        """
         self._cache[self._cache_key_for_kvs_key(kvs_key)] = value
 
     @contract(kvs_key=DjangoKeyValueStore.Key)
