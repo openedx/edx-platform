@@ -217,14 +217,26 @@ class DjangoOrmFieldCache(object):
             kvs_key (`DjangoKeyValueStore.Key`): The field value to delete
             value: The field value to store
         """
-        cache_key = self._cache_key_for_kvs_key(kvs_key)
-        field_object = self._cache.get(cache_key)
+        self.set_many({kvs_key: value})
 
-        if field_object is None:
-            self._cache[cache_key] = field_object = self._create_object(kvs_key)
+    @contract(kv_dict="dict(DjangoKeyValueStore_Key: *)")
+    def set_many(self, kv_dict):
+        """
+        Set the specified fields to the supplied values.
 
-        self._set_field_value(field_object, kvs_key, value)
-        field_object.save()
+        Arguments:
+            kv_dict (dict): A dictionary mapping :class:`~DjangoKeyValueStore.Key`
+                objects to values to set.
+        """
+        for kvs_key, value in sorted(kv_dict.items()):
+            cache_key = self._cache_key_for_kvs_key(kvs_key)
+            field_object = self._cache.get(cache_key)
+
+            if field_object is None:
+                self._cache[cache_key] = field_object = self._create_object(kvs_key)
+
+            self._set_field_value(field_object, kvs_key, value)
+            field_object.save()
 
     @contract(kvs_key=DjangoKeyValueStore.Key)
     def delete(self, kvs_key):
@@ -374,6 +386,29 @@ class UserStateCache(DjangoOrmFieldCache):
             key (:class:`~DjangoKeyValueStore.Key`): The key representing the cached field
         """
         return key.block_scope_id
+
+    @contract(kv_dict="dict(DjangoKeyValueStore_Key: *)")
+    def set_many(self, kv_dict):
+        """
+        Set the specified fields to the supplied values.
+
+        Arguments:
+            kv_dict (dict): A dictionary mapping :class:`~DjangoKeyValueStore.Key`
+                objects to values to set.
+        """
+        dirty_field_objects = set()
+        for kvs_key, value in kv_dict.items():
+            cache_key = self._cache_key_for_kvs_key(kvs_key)
+            field_object = self._cache.get(cache_key)
+
+            if field_object is None:
+                self._cache[cache_key] = field_object = self._create_object(kvs_key)
+
+            self._set_field_value(field_object, kvs_key, value)
+            dirty_field_objects.add(field_object)
+
+        for field_object in sorted(dirty_field_objects):
+            field_object.save()
 
     @contract(kvs_key=DjangoKeyValueStore.Key)
     def delete(self, kvs_key):
