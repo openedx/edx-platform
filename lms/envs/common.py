@@ -1957,6 +1957,8 @@ ALL_LANGUAGES = (
     [u"ch", u"Chamorro"],
     [u"ce", u"Chechen"],
     [u"zh", u"Chinese"],
+    [u"zh_HANS", u"Simplified Chinese"],
+    [u"zh_HANT", u"Traditional Chinese"],
     [u"cu", u"Church Slavic"],
     [u"cv", u"Chuvash"],
     [u"kw", u"Cornish"],
