@@ -1,6 +1,9 @@
 """ Commerce views. """
 import logging
 
+from django.conf import settings
+from django.views.decorators.cache import cache_page
+
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.permissions import IsAuthenticated
@@ -13,7 +16,9 @@ from commerce.exceptions import ApiError, InvalidConfigurationError
 from commerce.http import DetailResponse, InternalRequestErrorResponse
 from course_modes.models import CourseMode
 from courseware import courses
+from edxmako.shortcuts import render_to_response
 from enrollment.api import add_enrollment
+from microsite_configuration import microsite
 from student.models import CourseEnrollment
 from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
 
@@ -123,3 +128,10 @@ class OrdersView(APIView):
         except ApiError as err:
             # The API will handle logging of the error.
             return InternalRequestErrorResponse(err.message)
+
+
+@cache_page(1800)
+def checkout_cancel(_request):
+    """ Checkout/payment cancellation view. """
+    context = {'payment_support_email': microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)}
+    return render_to_response("commerce/checkout_cancel.html", context)
