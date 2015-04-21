@@ -223,7 +223,8 @@ class DjangoOrmFieldCache(object):
         if field_object is None:
             self._cache[cache_key] = field_object = self._create_object(kvs_key)
 
-        self._set_field_value(kvs_key, value)
+        self._set_field_value(field_object, kvs_key, value)
+        field_object.save()
 
     @contract(kvs_key=DjangoKeyValueStore.Key)
     def delete(self, kvs_key):
@@ -257,9 +258,7 @@ class DjangoOrmFieldCache(object):
         return self._cache_key_for_kvs_key(kvs_key) in self._cache
 
     @contract(kvs_key=DjangoKeyValueStore.Key)
-    def _set_field_value(self, kvs_key, value):
-        cache_key = self._cache_key_for_kvs_key(kvs_key)
-        field_object = self._cache.get(cache_key)
+    def _set_field_value(self, field_object, kvs_key, value):
         field_object.value = json.dumps(value)
 
     def __len__(self):
@@ -413,9 +412,7 @@ class UserStateCache(DjangoOrmFieldCache):
         return kvs_key.field_name in json.loads(field_object.state)
 
     @contract(kvs_key=DjangoKeyValueStore.Key)
-    def _set_field_value(self, kvs_key, value):
-        cache_key = self._cache_key_for_kvs_key(kvs_key)
-        field_object = self._cache.get(cache_key)
+    def _set_field_value(self, field_object, kvs_key, value):
         state = json.loads(field_object.state)
         state[kvs_key.field_name] = value
         field_object.state = json.dumps(state)
@@ -782,8 +779,6 @@ class FieldDataCache(object):
         """
 
         saved_fields = []
-        # field_objects maps a field_object to a list of associated fields
-        field_objects = dict()
         for key in kv_dict:
             # If the field is valid and isn't already in the dictionary, add it.
 
@@ -795,27 +790,13 @@ class FieldDataCache(object):
             if key.scope not in self.cache:
                 continue
 
-            self.cache[key.scope].set(key, kv_dict[key])
-
-            field_object = self.cache[key.scope].get(key)
-
-
-            if field_object not in field_objects.keys():
-                field_objects[field_object] = []
-
-            # Update the list of associated fields
-            field_objects[field_object].append(key)
-
-
-        for field_object in field_objects:
             try:
-                # Save the field object that we made above
-                field_object.save()
-                # If save is successful on this scope, add the saved fields to
+                self.cache[key.scope].set(key, kv_dict[key])
+                # If save is successful on this field, add it to
                 # the list of successful saves
-                saved_fields.extend([key.field_name for key in field_objects[field_object]])
+                saved_fields.append(key.field_name)
             except DatabaseError:
-                log.exception('Error saving fields %r', field_objects[field_object])
+                log.exception('Error saving field %r', key)
                 raise KeyValueMultiSaveError(saved_fields)
 
     @contract(key=DjangoKeyValueStore.Key)
