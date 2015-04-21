@@ -54,7 +54,7 @@ from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
 
 from .preview import get_available_xblock_services
 
-__all__ = ['orphan_handler', 'xblock_handler', 'xblock_view_handler', 'xblock_outline_handler']
+__all__ = ['orphan_handler', 'xblock_handler', 'xblock_view_handler', 'xblock_outline_handler', 'xblock_container_handler']
 
 log = logging.getLogger(__name__)
 
