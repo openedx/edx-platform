@@ -238,7 +238,14 @@ class CourseFinanceAdminRole(CourseRole):
         super(CourseFinanceAdminRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
-@register_access_role
+class CourseObserverRole(CourseRole):
+    """A course Observer"""
+    ROLE = 'observer'
+
+    def __init__(self, *args, **kwargs):
+        super(CourseObserverRole, self).__init__(self.ROLE, *args, **kwargs)
+
+
 class CourseSalesAdminRole(CourseRole):
     """A course staff member with privileges to perform sales operations. """
     ROLE = 'sales_admin'
@@ -369,7 +376,7 @@ class UserBasedRole(object):
         return CourseAccessRole.objects.filter(role=self.role, user=self.user)
 
 
-def get_aggregate_exclusion_user_ids(course_key):
+def get_aggregate_exclusion_user_ids(course_key):  # pylint: disable=invalid-name
     """
     This helper method will return the list of user ids that are marked in roles
     that can be excluded from certain aggregate queries. The list of roles to exclude

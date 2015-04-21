@@ -15,7 +15,6 @@ from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.library_tools import LibraryToolsService
-from xmodule.services import SettingsService
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryUsageLocator
@@ -143,7 +142,7 @@ class StudioPermissionsService(object):
         return has_studio_write_access(self._request.user, course_key)
 
 
-def get_available_xblock_services(field_data, user):
+def get_available_xblock_services():
     """
     Returns a dict of available services for xBlocks
     """
@@ -152,9 +151,7 @@ def get_available_xblock_services(field_data, user):
         "i18n": ModuleI18nService(),
         "settings": SettingsService(),
         "courseware_parent_info": CoursewareParentInfoService(),
-        "field-data": field_data,
         "library_tools": LibraryToolsService(modulestore()),
-        "user": DjangoXBlockUserService(user),
     }
 
     if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
@@ -165,7 +162,7 @@ def get_available_xblock_services(field_data, user):
     return services
 
 
-def _preview_module_system(request, descriptor, field_data):
+def _preview_module_system(request, descriptor):
     """
     Returns a ModuleSystem for the specified descriptor that is specialized for
     rendering module previews.
@@ -195,7 +192,7 @@ def _preview_module_system(request, descriptor, field_data):
 
     descriptor.runtime._services['studio_user_permissions'] = StudioPermissionsService(request)  # pylint: disable=protected-access
 
-    services = get_available_xblock_services(field_data, request.user)
+    services = get_available_xblock_services()
 
     return PreviewModuleSystem(
         static_url=settings.STATIC_URL,
@@ -236,7 +233,7 @@ def _load_preview_module(request, descriptor):
     else:
         field_data = LmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
     descriptor.bind_for_student(
-        _preview_module_system(request, descriptor, field_data),
+        _preview_module_system(request, descriptor),
         field_data,
         request.user.id
     )

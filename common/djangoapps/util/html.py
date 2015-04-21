@@ -10,10 +10,12 @@ class MLStripper(HTMLParser):
     Overrides HTMLParser which returns a string with the HTML
     stripped out
     """
+
     def __init__(self):
         """
-        Initializer
-        """
+            Initializer
+            """
+        HTMLParser.__init__(self)
         self.reset()
         self.fed = []
 
@@ -34,6 +36,6 @@ def strip_tags(html):
     """
     Calls into the MLStripper to return a string with HTML stripped out
     """
-    s = MLStripper()
-    s.feed(html)
-    return s.get_data()
+    stripper = MLStripper()
+    stripper.feed(html)
+    return stripper.get_data()

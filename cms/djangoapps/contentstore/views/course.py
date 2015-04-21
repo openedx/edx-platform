@@ -119,6 +119,7 @@ from student.tasks import publish_course_notifications_task
 from edx_notifications.data import NotificationMessage
 from edx_notifications.lib.publisher import get_notification_type
 
+
 class AccessListFallback(Exception):
     """
     An exception that is raised whenever we need to `fall back` to fetching *all* courses
@@ -851,7 +852,7 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
                     excerpt = strip_tags(request.json['content'])
 
                     excerpt = excerpt.strip()
-                    excerpt = excerpt.replace('\n','').replace('\r','')
+                    excerpt = excerpt.replace('\n', '').replace('\r', '')
 
                     announcement_date = request.json['date']
 
@@ -868,7 +869,8 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
 
                         if parsed_html.body:
                             title_tag_name = getattr(settings, 'NOTIFICATIONS_ANNOUNCEMENT_TITLE_TAG', 'p')
-                            title_tag_class = getattr(settings, 'NOTIFICATIONS_ACCOUNCEMENT_TITLE_CLASS', 'announcement-title')
+                            title_tag_class = getattr(settings, 'NOTIFICATIONS_ACCOUNCEMENT_TITLE_CLASS',
+                                                      'announcement-title')
                             title_tag = parsed_html.body.find(title_tag_name, attrs={'class': title_tag_class})
 
                             if title_tag:
@@ -879,7 +881,7 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
                                 # count towards the length limit
                                 excerpt = excerpt.replace(title, '')
 
-                    except Exception, ex:
+                    except Exception, ex:  # pylint: disable=broad-except
                         log.exception(ex)
 
                     if not title:
@@ -922,7 +924,7 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
                         publish_course_notifications_task.delay(course_key, notification_msg)
                     else:
                         publish_course_notifications_task(course_key, notification_msg)
-                except Exception, ex:
+                except Exception, ex:  # pylint: disable=broad-except
                     # Notifications aren't considered critical, so it's OK to fail
                     # log and then continue
                     log.exception(ex)
