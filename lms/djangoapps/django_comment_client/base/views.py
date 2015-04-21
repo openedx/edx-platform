@@ -216,7 +216,6 @@ def create_thread(request, course_id, commentable_id):
             is_anonymous_user=anonymous or anonymous_to_peers
         )
 
-    add_courseware_context([data], course)
     if request.is_ajax():
         return ajax_content_response(request, course_key, data)
     else:

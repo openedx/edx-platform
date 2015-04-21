@@ -162,7 +162,7 @@ def get_available_xblock_services():
     return services
 
 
-def _preview_module_system(request, descriptor):
+def _preview_module_system(request, descriptor, field_data):
     """
     Returns a ModuleSystem for the specified descriptor that is specialized for
     rendering module previews.
@@ -193,6 +193,10 @@ def _preview_module_system(request, descriptor):
     descriptor.runtime._services['studio_user_permissions'] = StudioPermissionsService(request)  # pylint: disable=protected-access
 
     services = get_available_xblock_services()
+    services.update({
+        'user': DjangoXBlockUserService(request.user),
+        'field-data': field_data,
+    })
 
     return PreviewModuleSystem(
         static_url=settings.STATIC_URL,
@@ -233,7 +237,7 @@ def _load_preview_module(request, descriptor):
     else:
         field_data = LmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
     descriptor.bind_for_student(
-        _preview_module_system(request, descriptor),
+        _preview_module_system(request, descriptor, field_data),
         field_data,
         request.user.id
     )
