@@ -2,7 +2,6 @@
 This file contains implementation override of SearchFilterGenerator which will allow
     * Filter by all courses in which the user is enrolled in
 """
-
 from student.models import CourseEnrollment
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
