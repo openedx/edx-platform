@@ -43,8 +43,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-04-06 12:39+0000\n"
-"PO-Revision-Date: 2015-04-06 13:02+0000\n"
+"POT-Creation-Date: 2015-04-21 13:42+0000\n"
+"PO-Revision-Date: 2015-04-21 13:46+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Persian (Iran) (http://www.transifex.com/projects/p/edx-platform/language/fa_IR/)\n"
 "MIME-Version: 1.0\n"
@@ -53,6 +53,21 @@ msgstr ""
 "Generated-By: Babel 1.3\n"
 "Language: fa_IR\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+
+#: cms/static/coffee/src/views/tabs.js
+#: cms/static/coffee/src/xblock/cms.runtime.v1.js
+#: cms/static/js/models/section.js cms/static/js/utils/drag_and_drop.js
+#: cms/static/js/views/asset.js cms/static/js/views/container.js
+#: cms/static/js/views/course_info_handout.js
+#: cms/static/js/views/course_info_update.js
+#: cms/static/js/views/edit_textbook.js
+#: cms/static/js/views/list_item_editor.js cms/static/js/views/overview.js
+#: cms/static/js/views/overview_assignment_grader.js
+#: cms/static/js/views/modals/edit_xblock.js
+#: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
+#: lms/static/js/views/fields.js
+msgid "Saving"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -78,6 +93,7 @@ msgstr ""
 #: cms/templates/js/add-xblock-component-menu.underscore
 #: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/course_info_handouts.underscore
+#: cms/templates/js/course_info_update.underscore
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/group-configuration-editor.underscore
 #: cms/templates/js/section-name-edit.underscore
@@ -89,6 +105,12 @@ msgstr ""
 #: cms/static/js/base.js lms/static/js/verify_student/photocapture.js
 #: cms/templates/js/checklist.underscore
 msgid "This link will open in a new browser window/tab"
+msgstr ""
+
+#. Translators: This is the status of an active video upload
+#: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
+#: lms/static/js/views/fields.js
+msgid "Uploading"
 msgstr ""
 
 #: cms/static/js/views/asset.js cms/static/js/views/list_item.js
@@ -135,6 +157,7 @@ msgstr ""
 #: cms/static/js/views/validation.js
 #: lms/static/js/groups/views/cohort_discussions_course_wide.js
 #: lms/static/js/groups/views/cohort_discussions_inline.js
+#: lms/static/js/views/fields.js
 msgid "Your changes have been saved."
 msgstr ""
 
@@ -144,6 +167,7 @@ msgstr ""
 #: cms/static/js/views/xblock_validation.js
 #: lms/static/js/verify_student/views/payment_confirmation_step_view.js
 #: lms/static/js/verify_student/views/step_view.js
+#: lms/static/js/views/fields.js
 msgid "Error"
 msgstr ""
 
@@ -2131,8 +2155,6 @@ msgstr ""
 #: cms/templates/js/metadata-number-entry.underscore
 #: cms/templates/js/metadata-option-entry.underscore
 #: cms/templates/js/metadata-string-entry.underscore
-#: cms/templates/js/mock/mock-xmodule-editor.underscore
-#: cms/templates/js/mock/mock-xmodule-settings-only-editor.underscore
 #: cms/templates/js/video/metadata-translations-entry.underscore
 msgid "Clear"
 msgstr ""
@@ -2175,6 +2197,7 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 #: lms/templates/courseware_search/search_loading.underscore
+#: lms/templates/student_account/account_settings.underscore
 msgid "Loading"
 msgstr ""
 
@@ -2217,6 +2240,7 @@ msgid "<%= num_students %> students scored."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Username"
 msgstr ""
 
@@ -2272,6 +2296,7 @@ msgid "The following warnings were generated:"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/views/fields.js
 msgid "Success"
 msgstr ""
 
@@ -2900,6 +2925,35 @@ msgstr ""
 msgid "Failed to rescore problem."
 msgstr ""
 
+#: lms/static/js/ccx/schedule.js lms/static/js/student_account/account.js
+#: lms/static/js/student_profile/profile.js
+msgid "The data could not be saved."
+msgstr ""
+
+#: lms/static/js/ccx/schedule.js
+msgid "All subsections"
+msgstr ""
+
+#: lms/static/js/ccx/schedule.js
+msgid "All units"
+msgstr ""
+
+#: lms/static/js/ccx/schedule.js
+msgid "Select a chapter"
+msgstr ""
+
+#: lms/static/js/ccx/schedule.js lms/static/js/ccx/schedule.js.c
+msgid "Save changes"
+msgstr ""
+
+#: lms/static/js/ccx/schedule.js
+msgid "Enter Due Date"
+msgstr ""
+
+#: lms/static/js/ccx/schedule.js
+msgid "Enter Start Date"
+msgstr ""
+
 #: lms/static/js/dashboard/donation.js
 msgid "Please enter a valid donation amount."
 msgstr ""
@@ -2910,16 +2964,6 @@ msgstr ""
 
 #: lms/static/js/dashboard/legacy.js
 msgid "An error occurred. Please try again later."
-msgstr ""
-
-#: lms/static/js/dashboard/legacy.js
-msgid "Please verify your new email address"
-msgstr ""
-
-#: lms/static/js/dashboard/legacy.js
-msgid ""
-"You'll receive a confirmation in your inbox. Please follow the link in the "
-"email to confirm your email address change."
 msgstr ""
 
 #: lms/static/js/edxnotes/plugins/accessibility.js
@@ -3118,11 +3162,6 @@ msgid "Error getting entrance exam task history for student '{student_id}'. "
 msgstr ""
 
 #: lms/static/js/student_account/account.js
-#: lms/static/js/student_profile/profile.js
-msgid "The data could not be saved."
-msgstr ""
-
-#: lms/static/js/student_account/account.js
 msgid "Please enter a valid email address"
 msgstr ""
 
@@ -3144,6 +3183,133 @@ msgstr ""
 msgid "Please check your email to confirm the change"
 msgstr ""
 
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Basic Account Information (required)"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"The name that identifies you on the edX site. You cannot change your "
+"username."
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+#: lms/templates/student_profile/profile.underscore
+msgid "Full Name"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"The name that appears on your edX certificates. Other learners never see "
+"your full name."
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Email Address"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"The email address you use to sign in to edX. Communications from edX and "
+"your courses are sent to this address."
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+#: lms/templates/student_account/account.underscore
+msgid "Password"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Reset your Password"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+#: lms/templates/student_account/account.underscore
+msgid "Reset Password"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"When you click \"Reset Password\", a message will be sent to your email "
+"address. Click the link in the message to reset your password."
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Language"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"The language used for the edX site. The site is currently available in a "
+"limited number of languages."
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Country or Region"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Additional Information (optional)"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Education Completed"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Gender"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Year of Birth"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+#: lms/static/js/student_profile/views/learner_profile_factory.js
+#: lms/templates/student_profile/profile.underscore
+msgid "Preferred Language"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Connected Accounts"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Connect your {accountName} account"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_fields.js
+msgid "We've sent a confirmation message to {new_email_address}. "
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_fields.js
+msgid "You must sign out of edX and sign back in before your language "
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_fields.js
+msgid "We've sent a message to {email_address}. "
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_fields.js
+msgid "Unlink"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_fields.js
+msgid "Link"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_fields.js
+msgid "Unlinking"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_fields.js
+msgid "Linking"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_fields.js
+msgid "Successfully unlinked."
+msgstr ""
+
 #: lms/static/js/student_profile/profile.js
 msgid "Full name cannot be blank"
 msgstr ""
@@ -3158,6 +3324,56 @@ msgstr ""
 
 #: lms/static/js/student_profile/profile.js
 msgid "Saved"
+msgstr ""
+
+#: lms/static/js/student_profile/views/learner_profile_factory.js
+msgid "edX learners can see my:"
+msgstr ""
+
+#: lms/static/js/student_profile/views/learner_profile_factory.js
+msgid "Limited Profile"
+msgstr ""
+
+#: lms/static/js/student_profile/views/learner_profile_factory.js
+msgid "Full Profile"
+msgstr ""
+
+#: lms/static/js/student_profile/views/learner_profile_factory.js
+msgid "Location"
+msgstr ""
+
+#: lms/static/js/student_profile/views/learner_profile_factory.js
+msgid "Add language"
+msgstr ""
+
+#: lms/static/js/student_profile/views/learner_profile_factory.js
+msgid "About me"
+msgstr ""
+
+#: lms/static/js/student_profile/views/learner_profile_factory.js
+msgid ""
+"Tell other edX learners a little about yourself: where you live, what your "
+"interests are, why you're taking courses on edX, or what you hope to learn."
+msgstr ""
+
+#: lms/static/js/student_profile/views/learner_profile_fields.js
+msgid "Account Settings page."
+msgstr ""
+
+#: lms/static/js/student_profile/views/learner_profile_fields.js
+msgid ""
+"You must specify your birth year before you can share your full profile. To "
+"specify your birth year, go to the {account_settings_page_link}"
+msgstr ""
+
+#: lms/static/js/student_profile/views/learner_profile_fields.js
+msgid ""
+"You must be over 13 to share a full profile. If you are over 13, make sure "
+"that you have specified a birth year on the {account_settings_page_link}"
+msgstr ""
+
+#: lms/static/js/student_profile/views/learner_profile_fields.js
+msgid "Profile image for {username}"
 msgstr ""
 
 #: lms/static/js/verify_student/views/image_input_view.js
@@ -3216,6 +3432,89 @@ msgstr ""
 msgid "Double-check that your webcam is connected and working to continue."
 msgstr ""
 
+#: lms/static/js/verify_student/views/webcam_photo_view.js
+msgid "No Flash Detected"
+msgstr ""
+
+#: lms/static/js/verify_student/views/webcam_photo_view.js
+msgid ""
+"You don't seem to have Flash installed. Get Flash to continue your "
+"verification."
+msgstr ""
+
+#: lms/static/js/views/fields.js
+msgid "Editable"
+msgstr ""
+
+#: lms/static/js/views/fields.js
+msgid "Validation Error"
+msgstr ""
+
+#: lms/static/js/views/fields.js
+msgid "In Progress"
+msgstr ""
+
+#: lms/static/js/views/fields.js
+msgid "Placeholder"
+msgstr ""
+
+#: lms/static/js/views/fields.js
+msgid "An error occurred. Please try again."
+msgstr ""
+
+#: lms/static/js/views/fields.js
+msgid "Upload an image"
+msgstr ""
+
+#: lms/static/js/views/fields.js
+msgid "Change image"
+msgstr ""
+
+#: lms/static/js/views/fields.js
+#: cms/templates/js/video/metadata-translations-item.underscore
+msgid "Remove"
+msgstr ""
+
+#: lms/static/js/views/fields.js
+msgid "Removing"
+msgstr ""
+
+#: lms/static/js/views/fields.js
+msgid "An error has occurred. Refresh the page, and then try again."
+msgstr ""
+
+#: lms/static/js/views/fields.js
+msgid "The file must be at least {size} in size."
+msgstr ""
+
+#: lms/static/js/views/fields.js
+msgid "The file must be smaller than {size} in size."
+msgstr ""
+
+#: lms/static/js/views/fields.js
+msgid ""
+"Upload is in progress. To avoid errors, stay on this page until the process "
+"is complete."
+msgstr ""
+
+#: lms/static/js/views/fields.js
+msgid ""
+"Removal is in progress. To avoid errors, stay on this page until the process"
+" is complete."
+msgstr ""
+
+#: lms/static/js/views/fields.js
+msgid "bytes"
+msgstr ""
+
+#: lms/static/js/views/fields.js
+msgid "KB"
+msgstr ""
+
+#: lms/static/js/views/fields.js
+msgid "MB"
+msgstr ""
+
 #: lms/static/js/views/file_uploader.js
 msgid "Your upload of '{file}' succeeded."
 msgstr ""
@@ -3255,20 +3554,6 @@ msgstr ""
 
 #: cms/static/coffee/src/main.js
 msgid "Studio's having trouble saving your work"
-msgstr ""
-
-#: cms/static/coffee/src/views/tabs.js
-#: cms/static/coffee/src/xblock/cms.runtime.v1.js
-#: cms/static/js/models/section.js cms/static/js/utils/drag_and_drop.js
-#: cms/static/js/views/asset.js cms/static/js/views/container.js
-#: cms/static/js/views/course_info_handout.js
-#: cms/static/js/views/course_info_update.js
-#: cms/static/js/views/edit_textbook.js
-#: cms/static/js/views/list_item_editor.js cms/static/js/views/overview.js
-#: cms/static/js/views/overview_assignment_grader.js
-#: cms/static/js/views/modals/edit_xblock.js
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "Saving"
 msgstr ""
 
 #: cms/static/coffee/src/views/tabs.js
@@ -3437,11 +3722,6 @@ msgstr ""
 msgid "Queued"
 msgstr ""
 
-#. Translators: This is the status of an active video upload
-#: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
-msgid "Uploading"
-msgstr ""
-
 #. Translators: This is the status of a video upload that has
 #. completed successfully
 #: cms/static/js/models/active_video_upload.js
@@ -3524,7 +3804,7 @@ msgid "Key should only contain letters, numbers, _, or -"
 msgstr ""
 
 #: cms/static/js/models/settings/course_details.js
-msgid "Please enter an integer between "
+msgid "Please enter an integer between %(min)s and %(max)s."
 msgstr ""
 
 #: cms/static/js/models/settings/course_grader.js
@@ -3632,7 +3912,6 @@ msgstr ""
 
 #: cms/static/js/views/content_group_details.js
 #: cms/static/js/views/group_configuration_details.js
-#: cms/templates/js/mock/mock-settings-page.underscore
 msgid "Course Outline"
 msgstr ""
 
@@ -3799,15 +4078,35 @@ msgstr ""
 #. Translators: sample result:
 #. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
 #. ascending"
+#: cms/static/js/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, filtered by "
+"%(asset_type)s, sorted by %(sort_name)s ascending"
+msgstr ""
+
 #. Translators: sample result:
 #. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
 #. descending"
+#: cms/static/js/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, filtered by "
+"%(asset_type)s, sorted by %(sort_name)s descending"
+msgstr ""
+
 #. Translators: sample result:
 #. "Showing 0-9 out of 25 total, sorted by Date Added ascending"
+#: cms/static/js/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s ascending"
+msgstr ""
+
 #. Translators: sample result:
 #. "Showing 0-9 out of 25 total, sorted by Date Added descending"
 #: cms/static/js/views/paging_header.js
-msgid "Showing %(current_item_range)s out of %(total_items_count)s, "
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s descending"
 msgstr ""
 
 #. Translators: turns into "25 total" to be used in other sentences, e.g.
@@ -4094,6 +4393,46 @@ msgstr ""
 msgid "Upload translation"
 msgstr ""
 
+#: cms/static/js/views/video/transcripts/file_uploader.js
+msgid "Please select a file in .srt format."
+msgstr ""
+
+#: cms/static/js/views/video/transcripts/file_uploader.js
+msgid "Error: Uploading failed."
+msgstr ""
+
+#: cms/static/js/views/video/transcripts/message_manager.js
+msgid "Error: Import failed."
+msgstr ""
+
+#: cms/static/js/views/video/transcripts/message_manager.js
+msgid "Error: Replacing failed."
+msgstr ""
+
+#: cms/static/js/views/video/transcripts/message_manager.js
+msgid "Error: Choosing failed."
+msgstr ""
+
+#: cms/static/js/views/video/transcripts/metadata_videolist.js
+msgid "Error: Connection with server failed."
+msgstr ""
+
+#: cms/static/js/views/video/transcripts/metadata_videolist.js
+msgid "No sources"
+msgstr ""
+
+#: cms/static/js/views/video/transcripts/metadata_videolist.js
+msgid "Link types should be unique."
+msgstr ""
+
+#: cms/static/js/views/video/transcripts/metadata_videolist.js
+msgid "Links should be unique."
+msgstr ""
+
+#: cms/static/js/views/video/transcripts/metadata_videolist.js
+msgid "Incorrect url format."
+msgstr ""
+
 #: cms/templates/js/previous-video-upload-list.underscore
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
@@ -4136,7 +4475,27 @@ msgid "Closed"
 msgstr ""
 
 #: common/templates/js/discussion/thread-show.underscore
-msgid "(this post is about %(courseware_title_linked)s)"
+msgid "Related to: %(courseware_title_linked)s"
+msgstr ""
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Unit"
+msgstr ""
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Start Date"
+msgstr ""
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Due Date"
+msgstr ""
+
+#: lms/templates/ccx/schedule.underscore
+msgid "remove all"
+msgstr ""
+
+#: lms/templates/ccx/schedule.underscore
+msgid "remove"
 msgstr ""
 
 #: lms/templates/courseware_search/search_error.underscore
@@ -4144,8 +4503,8 @@ msgid "There was an error, try searching again."
 msgstr ""
 
 #: lms/templates/courseware_search/search_list.underscore
-msgid "Load next %(num_items) result"
-msgid_plural "Load next %(num_items) results"
+msgid "Load next %(num_items)s result"
+msgid_plural "Load next %(num_items)s results"
 msgstr[0] ""
 
 #: lms/templates/courseware_search/search_list.underscore
@@ -4190,6 +4549,16 @@ msgstr ""
 
 #: lms/templates/edxnotes/tab-item.underscore
 msgid "Clear search results"
+msgstr ""
+
+#: lms/templates/fields/field_dropdown.underscore
+#: lms/templates/fields/field_textarea.underscore
+msgid "Click to edit"
+msgstr ""
+
+#: lms/templates/fields/field_readonly.underscore
+#: lms/templates/fields/field_text.underscore
+msgid "title"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
@@ -4382,15 +4751,27 @@ msgid "New Address"
 msgstr ""
 
 #: lms/templates/student_account/account.underscore
-msgid "Password"
-msgstr ""
-
-#: lms/templates/student_account/account.underscore
 msgid "Change My Email Address"
 msgstr ""
 
-#: lms/templates/student_account/account.underscore
-msgid "Reset Password"
+#: lms/templates/student_account/account_settings.underscore
+msgid "Account Settings"
+msgstr ""
+
+#: lms/templates/student_account/account_settings.underscore
+msgid ""
+"These settings include basic information about your account. You can also "
+"specify additional information and see your linked social accounts on this "
+"page."
+msgstr ""
+
+#: lms/templates/student_account/account_settings.underscore
+msgid "section.title"
+msgstr ""
+
+#: lms/templates/student_account/account_settings.underscore
+#: lms/templates/student_profile/learner_profile.underscore
+msgid "An error occurred. Please reload the page."
 msgstr ""
 
 #: lms/templates/student_account/form_field.underscore
@@ -4401,7 +4782,7 @@ msgstr ""
 msgid ""
 "You've successfully signed into %(currentProvider)s, but your "
 "%(currentProvider)s account isn't linked with an %(platformName)s account. "
-"To link your accounts, go to your %(platformName)s dashboard."
+"To link your accounts, go to your %(platformName)s account settings."
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
@@ -4491,12 +4872,12 @@ msgstr ""
 msgid "Already have an account?"
 msgstr ""
 
-#: lms/templates/student_profile/profile.underscore
-msgid "Full Name"
+#: lms/templates/student_profile/learner_profile.underscore
+msgid "You are currently sharing a limited profile."
 msgstr ""
 
-#: lms/templates/student_profile/profile.underscore
-msgid "Preferred Language"
+#: lms/templates/student_profile/learner_profile.underscore
+msgid "This edX learner is currently sharing a limited profile."
 msgstr ""
 
 #: lms/templates/student_profile/profile.underscore
@@ -4750,29 +5131,22 @@ msgid "Government-Issued Photo ID"
 msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore
-msgid "Choose your contribution for your Verified Track upgrade"
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid "Enter Your Contribution Level"
+msgid ""
+"ID-Verification is not required for this Professional Education course."
 msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
-"Please confirm your contribution for this course (min. %(minPrice)s "
-"%(currency)s)"
+"All professional education courses are fee-based, and require payment to "
+"complete the enrollment process."
 msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore
-msgid "Your Total Contribution"
+msgid "You have already verified your ID!"
 msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore
-msgid "To complete your enrollment, you will need to pay:"
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid "Next: Make payment"
+msgid "Your verification status is good until %(verificationGoodUntil)s."
 msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore
@@ -5011,7 +5385,11 @@ msgid "Lock/unlock file"
 msgstr ""
 
 #: cms/templates/js/checklist.underscore
-msgid "{number}% of checklists completed"
+msgid "{number}{pct_sign} of checklists completed"
+msgstr ""
+
+#: cms/templates/js/checklist.underscore
+msgid "%"
 msgstr ""
 
 #: cms/templates/js/checklist.underscore
@@ -5190,6 +5568,18 @@ msgid ""
 " HTML."
 msgstr ""
 
+#: cms/templates/js/course_info_update.underscore
+msgid "Send push notification to mobile apps"
+msgstr ""
+
+#: cms/templates/js/course_info_update.underscore
+msgid "Send notification to mobile apps"
+msgstr ""
+
+#: cms/templates/js/course_info_update.underscore
+msgid "Post"
+msgstr ""
+
 #: cms/templates/js/due-date-editor.underscore
 msgid "Due Date:"
 msgstr ""
@@ -5353,8 +5743,6 @@ msgstr ""
 #: cms/templates/js/metadata-number-entry.underscore
 #: cms/templates/js/metadata-option-entry.underscore
 #: cms/templates/js/metadata-string-entry.underscore
-#: cms/templates/js/mock/mock-xmodule-editor.underscore
-#: cms/templates/js/mock/mock-xmodule-settings-only-editor.underscore
 #: cms/templates/js/video/metadata-translations-entry.underscore
 msgid "Clear Value"
 msgstr ""
@@ -5516,7 +5904,7 @@ msgstr ""
 msgid ""
 "If you make this %(xblockType)s visible to students, students will be able "
 "to see its content after the release date has passed and you have published "
-"the unit(s)."
+"the unit."
 msgstr ""
 
 #: cms/templates/js/staff-lock-editor.underscore
@@ -5565,12 +5953,6 @@ msgstr ""
 
 #: cms/templates/js/validation-error-modal.underscore
 msgid ""
-"There were {strong_start}{num_errors} validation error(s){strong_end} while "
-"trying to save the course setting(s) in the database."
-msgstr ""
-
-#: cms/templates/js/validation-error-modal.underscore
-msgid ""
 "Please check the following validation feedbacks and reflect them in your "
 "course settings:"
 msgstr ""
@@ -5587,56 +5969,6 @@ msgstr ""
 msgid "formLabel"
 msgstr ""
 
-#: cms/templates/js/mock/mock-container-page.underscore
-msgid "Unit Location"
-msgstr ""
-
-#: cms/templates/js/mock/mock-container-page.underscore
-msgid ""
-"Use this ID when you create links to this unit from other course content. "
-"You enter the ID in the URL field."
-msgstr ""
-
-#: cms/templates/js/mock/mock-index-page.underscore
-msgid "Courses"
-msgstr ""
-
-#: cms/templates/js/mock/mock-index-page.underscore
-msgid "Libraries"
-msgstr ""
-
-#: cms/templates/js/mock/mock-settings-page.underscore
-msgid "Entrance Exam"
-msgstr ""
-
-#: cms/templates/js/mock/mock-settings-page.underscore
-msgid "Require students to pass an exam before beginning the course."
-msgstr ""
-
-#: cms/templates/js/mock/mock-settings-page.underscore
-msgid "To create your course entrance exam, go to the"
-msgstr ""
-
-#: cms/templates/js/mock/mock-settings-page.underscore
-msgid ". An Entrance Exam section will be created automatically."
-msgstr ""
-
-#: cms/templates/js/mock/mock-settings-page.underscore
-msgid "Minimum Passing Score"
-msgstr ""
-
-#: cms/templates/js/mock/mock-settings-page.underscore
-msgid "%"
-msgstr ""
-
-#: cms/templates/js/mock/mock-settings-page.underscore
-msgid "The minimum score a student must receive to pass the entrance exam."
-msgstr ""
-
-#: cms/templates/js/video/metadata-translations-item.underscore
-msgid "Remove"
-msgstr ""
-
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid "Add URLs for additional versions"
 msgstr ""
@@ -5646,7 +5978,7 @@ msgid ""
 "To be sure all students can access the video, we recommend providing both an"
 " .mp4 and a .webm version of your video. Click below to add a URL for "
 "another version. These URLs cannot be YouTube URLs. The first listed video "
-"that\\'s compatible with the student\\'s computer will play."
+"that's compatible with the student's computer will play."
 msgstr ""
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
@@ -5679,7 +6011,7 @@ msgid "Error."
 msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
-msgid "Timed Transcript from"
+msgid "Timed Transcript from %(filename)s"
 msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
@@ -5718,9 +6050,9 @@ msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
 msgid ""
-"EdX doesn\\'t have a timed transcript for this video in Studio, but we found"
-" a transcript on YouTube. You can import the YouTube transcript or upload "
-"your own .srt transcript file."
+"EdX doesn't have a timed transcript for this video in Studio, but we found a"
+" transcript on YouTube. You can import the YouTube transcript or upload your"
+" own .srt transcript file."
 msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
