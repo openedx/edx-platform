@@ -106,12 +106,15 @@ class DatabaseMicrositeMiddleware(MicrositeMiddleware):
         return None
 
 
-# Todo select a better name
-class MicrositeFilterSecurityMiddleware():
+class MicrositeCrossBrandingFilterMiddleware():
     """
+    Middleware class that prevents a course defined in a branded ORG trough a microsite, to be displayed
+    on a different microsite with a different branding.
     """
     def process_request(self, request):
         """
+        Raise an 404 exception if the course being rendered belongs to an ORG in a
+        microsite, but it is not the current microsite
         """
         path = request.path_info
         p = re.compile('/courses/{}/'.format(settings.COURSE_ID_PATTERN))
