@@ -206,7 +206,13 @@ class DjangoOrmFieldCache(object):
 
         Returns: A django orm object from the cache
         """
-        return self._cache.get(self._cache_key_for_kvs_key(kvs_key))
+        cache_key = self._cache_key_for_kvs_key(kvs_key)
+        if cache_key not in self._cache:
+            raise KeyError(kvs_key.field_name)
+
+        field_object = self._cache[cache_key]
+
+        return json.loads(field_object.value)
 
     @contract(kvs_key=DjangoKeyValueStore.Key)
     def set(self, kvs_key, value):
@@ -409,6 +415,25 @@ class UserStateCache(DjangoOrmFieldCache):
 
         for field_object in sorted(dirty_field_objects):
             field_object.save()
+
+    @contract(kvs_key=DjangoKeyValueStore.Key)
+    def get(self, kvs_key):
+        """
+        Return the django model object specified by `kvs_key` from
+        the cache.
+
+        Arguments:
+            kvs_key (`DjangoKeyValueStore.Key`): The field value to delete
+
+        Returns: A django orm object from the cache
+        """
+        cache_key = self._cache_key_for_kvs_key(kvs_key)
+        if cache_key not in self._cache:
+            raise KeyError(kvs_key.field_name)
+
+        field_object = self._cache[cache_key]
+
+        return json.loads(field_object.state)[kvs_key.field_name]
 
     @contract(kvs_key=DjangoKeyValueStore.Key)
     def delete(self, kvs_key):
@@ -793,14 +818,7 @@ class FieldDataCache(object):
         if key.scope not in self.cache:
             raise KeyError(key.field_name)
 
-        field_object = self.cache[key.scope].get(key)
-        if field_object is None:
-            raise KeyError(key.field_name)
-
-        if key.scope == Scope.user_state:
-            return json.loads(field_object.state)[key.field_name]
-        else:
-            return json.loads(field_object.value)
+        return self.cache[key.scope].get(key)
 
     @contract(kv_dict="dict(DjangoKeyValueStore_Key: *)")
     def set_many(self, kv_dict):
