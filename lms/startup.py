@@ -126,7 +126,7 @@ def enable_microsites():
             del microsite_config_dict[ms_name]
 
     # if we have any valid microsites defined, let's wire in the Mako and STATIC_FILES search paths
-    if microsite_config_dict:
+    if microsite_config_dict or "microsite_configuration.middleware.DatabaseMicrositeMiddleware" in settings.MIDDLEWARE_CLASSES:
         settings.TEMPLATE_DIRS.append(microsites_root)
         edxmako.paths.add_lookup('main', microsites_root)
 
