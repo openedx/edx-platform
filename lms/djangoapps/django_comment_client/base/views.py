@@ -23,8 +23,7 @@ from edx_notifications.lib.publisher import (
 )
 from edx_notifications.data import NotificationMessage
 from courseware.courses import get_course_with_access, get_course_by_id
-from course_groups.cohorts import get_cohort_id, is_commentable_cohorted, get_cohort_by_id
-from course_groups.tasks import publish_course_group_notification_task
+from openedx.core.djangoapps.course_groups.tasks import publish_course_group_notification_task
 import django_comment_client.settings as cc_settings
 from django_comment_client.utils import (
     add_courseware_context,
@@ -42,9 +41,6 @@ from util.html import strip_tags
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
 from eventtracking import tracker
 import lms.lib.comment_client as cc
-
-from social_engagement.engagement import update_user_engagement_score
-
 log = logging.getLogger(__name__)
 
 TRACKING_MAX_FORUM_BODY = 2000
@@ -220,10 +216,6 @@ def create_thread(request, course_id, commentable_id):
             is_anonymous_user=anonymous or anonymous_to_peers
         )
 
-    # call into the social_engagement django app to
-    # rescore this user
-    _update_user_engagement_score(course_key, request.user.id)
-
     add_courseware_context([data], course)
     if request.is_ajax():
         return ajax_content_response(request, course_key, data)
@@ -232,16 +224,16 @@ def create_thread(request, course_id, commentable_id):
 
 
 def _send_discussion_notification(
-    type_name,
-    course_id,
-    thread,
-    request_user,
-    excerpt=None,
-    recipient_user_id=None,
-    recipient_group_id=None,
-    recipient_exclude_user_ids=None,
-    extra_payload=None,
-    is_anonymous_user=False
+        type_name,
+        course_id,
+        thread,
+        request_user,
+        excerpt=None,
+        recipient_user_id=None,
+        recipient_group_id=None,
+        recipient_exclude_user_ids=None,
+        extra_payload=None,
+        is_anonymous_user=False
 ):
     """
     Helper method to consolidate Notification trigger workflow
@@ -250,7 +242,6 @@ def _send_discussion_notification(
         # is Notifications feature enabled?
         if not settings.FEATURES.get("ENABLE_NOTIFICATIONS", False):
             return
-
 
         if is_anonymous_user:
             action_username = _('An anonymous user')
@@ -315,10 +306,11 @@ def _send_discussion_notification(
                     msg,
                     exclude_user_ids=recipient_exclude_user_ids
                 )
-    except Exception, ex:
+    except Exception, ex:  # pylint: disable=broad-except
         # Notifications are never critical, so we don't want to disrupt any
         # other logic processing. So log and continue.
         log.exception(ex)
+
 
 @require_POST
 @login_required
@@ -406,18 +398,13 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
 
     track_forum_event(request, event_name, course, comment, event_data)
 
-
     #
     # Update social stats
     #
     # NOTE: We do a check for NOTIFICATIONS enablement, because we
     # need some of the variables (e.g. replying_to_id) below to be set
     #
-    if settings.FEATURES.get("ENABLE_SOCIAL_ENGAGEMENT", False) or settings.FEATURES.get("ENABLE_NOTIFICATIONS", False):
-        # call into the social_engagement django app to
-        # rescore this user who created the comment
-        _update_user_engagement_score(course_key, request.user.id)
-
+    if settings.FEATURES.get("ENABLE_NOTIFICATIONS", False):
         # a response is a reply to a thread
         # a comment is a reply to a response
         is_comment = not thread_id and parent_id
@@ -430,19 +417,12 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
             thread_id = comment.thread_id
             replying_to_id = comment.user_id
 
-            # update the engagement of the author of the response
-            _update_user_engagement_score(course_key, replying_to_id)
-
         thread = cc.Thread.find(thread_id)
 
         # IMPORTANT: we have to use getattr here as
         # otherwise the property will not get fetched
         # from cs_comment_service
         thread_user_id = int(getattr(thread, 'user_id', 0))
-
-        # update the engagement score of the thread creator
-        # as well
-        _update_user_engagement_score(course_key, thread_user_id)
 
     #
     # Send notification
@@ -455,7 +435,7 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
         if not replying_to_id:
             # we must be creating a Reponse on a thread,
             # so the original poster is the author of the thread
-            replying_to_id =thread_user_id
+            replying_to_id = thread_user_id
 
         #
         # IMPORTANT: We have to use getattr() here so that the
@@ -628,7 +608,7 @@ def vote_for_comment(request, course_id, comment_id, value):
     user.vote(comment, value)
 
     # Feature Flag to check that notifications are enabled or not.
-    if value=='up' and settings.FEATURES.get("ENABLE_NOTIFICATIONS", False):
+    if value == 'up' and settings.FEATURES.get("ENABLE_NOTIFICATIONS", False):
         action_user_id = request.user.id
         original_poster_id = int(comment.user_id)
 
@@ -653,13 +633,8 @@ def vote_for_comment(request, course_id, comment_id, value):
                 }
             )
 
-    if value=='up':
-        # call into the social_engagement django app to
-        # rescore this user
-        _update_user_engagement_score(course_key, comment.user_id)
-    
     return JsonResponse(prepare_content(comment.to_dict(), course_key))
-    
+
 
 @require_POST
 @login_required
@@ -689,12 +664,8 @@ def vote_for_thread(request, course_id, thread_id, value):
     thread = cc.Thread.find(thread_id)
     user.vote(thread, value)
 
-    # call into the social_engagement django app to
-    # rescore this user
-    _update_user_engagement_score(course_key, thread.user_id)
-
     # Feature Flag to check that notifications are enabled or not.
-    if value=='up' and settings.FEATURES.get("ENABLE_NOTIFICATIONS", False):
+    if value == 'up' and settings.FEATURES.get("ENABLE_NOTIFICATIONS", False):
         action_user_id = request.user.id
         original_poster_id = int(thread.user_id)
 
@@ -869,7 +840,7 @@ def follow_thread(request, course_id, thread_id):
                         'num_followers': num_followers,
                     }
                 )
-        except Exception, ex:
+        except Exception, ex:  # pylint: disable=broad-except
             # sending notifications is not critical,
             # so log error and continue
             log.exception(ex)
@@ -880,7 +851,7 @@ def follow_thread(request, course_id, thread_id):
 @require_POST
 @login_required
 @permitted
-def follow_commentable(request, course_id, commentable_id):
+def follow_commentable(request, course_id, commentable_id):  # pylint: disable=unused-argument
     """
     given a course_id and commentable id, follow this commentable
     ajax only
@@ -894,7 +865,10 @@ def follow_commentable(request, course_id, commentable_id):
 @require_POST
 @login_required
 @permitted
-def follow_user(request, course_id, followed_user_id):
+def follow_user(request, course_id, followed_user_id):  # pylint: disable=unused-argument
+    """
+    follow user's thread
+    """
     user = cc.User.from_django_user(request.user)
     followed_user = cc.User.find(followed_user_id)
     user.follow(followed_user)
@@ -1036,13 +1010,3 @@ def users(request, course_id):
     except User.DoesNotExist:
         pass
     return JsonResponse({"users": user_objs})
-
-
-def _update_user_engagement_score(course_key, user_id):
-    """
-    Helper to call down into the Social Engagement app to recalc the passed in user's
-    Social Engagement score
-    """
-
-    if settings.FEATURES.get('ENABLE_SOCIAL_ENGAGEMENT', False):
-        update_user_engagement_score(course_key, user_id)

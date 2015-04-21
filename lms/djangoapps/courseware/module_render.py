@@ -37,13 +37,13 @@ from courseware.entrance_exams import (
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, unquote_slashes, quote_slashes
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
-from lms.lib.xblock.field_data import LmsFieldData
-from lms.lib.xblock.runtime import (
-    LmsModuleSystem,
-    SettingsService,
-    unquote_slashes,
-    quote_slashes
-)
+# from lms.lib.xblock.field_data import LmsFieldData
+# from lms.lib.xblock.runtime import (
+#     LmsModuleSystem,
+#     SettingsService,
+#     unquote_slashes,
+#     quote_slashes
+# )
 from xmodule.services import NotificationsService, CoursewareParentInfoService
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
@@ -586,12 +586,11 @@ def get_module_system_for_user(user, field_data_cache,
     field_data = LmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
 
     user_is_staff = has_access(user, u'staff', descriptor.location, course_id)
-    
+
     services_list = {
         'i18n': ModuleI18nService(),
         'fs': xblock.reference.plugins.FSService(),
         'field-data': field_data,
-        'settings': SettingsService(),
         'courseware_parent_info': CoursewareParentInfoService(),
         'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
         "reverification": ReverificationService()

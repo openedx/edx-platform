@@ -516,9 +516,9 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
         # Used by Bok Choy tests and by republishing of staff locks.
         if publish == 'make_public':
             modulestore().publish(xblock.location, user.id)
-            
-             # notify the xblocks that they have been published
-        _notify_xblocks(xblock, xblock.location.course_key, 'on_studio_published')
+
+            # notify the xblocks that they have been published
+            _notify_xblocks(xblock, xblock.location.course_key, 'on_studio_published')
 
     # Note that children aren't being returned until we have a use case.
     return JsonResponse(result, encoder=EdxJSONEncoder)
@@ -540,7 +540,7 @@ def _notify_xblocks(xblock, course_id, callback_name):
         # then notify parent, if they have implemented the callback_name
         # function
         if hasattr(parent_xblock, callback_name):
-            log.info('Notifying xblock {loc} on {name}...'.format(loc=parent_xblock.location, name=callback_name))
+            log.debug("Notifying xblock %s on %s...", parent_xblock.location, callback_name)
             func = getattr(parent_xblock, callback_name)
             func(course_id, xblock_services)
 
@@ -558,9 +558,9 @@ def _notify_xblocks_by_usage_key(user, usage_key, course_id, callback_name):
         xblock = store.get_item(usage_key, depth=None)
         _notify_xblocks(xblock, course_id, callback_name)
     except ItemNotFoundError:
-        log.error("_notify_xblocks_by_usage_key(): Can't find item at usage_key {}".format(usage_key))
+        log.debug("_notify_xblocks_by_usage_key(): Can't find item at usage_key %s", usage_key)
     except InvalidLocationError:
-        log.error("_notify_xblocks_by_usage_key(): Can't find item by location {}.".format(usage_key))
+        log.debug("_notify_xblocks_by_usage_key(): Can't find item by location %s.", usage_key)
 
 
 @login_required

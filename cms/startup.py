@@ -10,15 +10,12 @@ from django.conf import settings
 settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
 from openedx.core.lib.django_startup import autostartup
-from django_startup import autostartup
 from edx_notifications import startup
 from monkey_patch import django_utils_translation
-from edx_notifications import startup
 
 log = logging.getLogger(__name__)
-from course_groups.scope_resolver import CourseGroupScopeResolver
+from openedx.core.djangoapps.course_groups.scope_resolver import CourseGroupScopeResolver
 from student.scope_resolver import CourseEnrollmentsScopeResolver, StudentEmailScopeResolver
-from projects.scope_resolver import GroupProjectParticipantsScopeResolver
 from edx_notifications.scopes import register_user_scope_resolver
 
 
@@ -97,10 +94,8 @@ def startup_notification_subsystem():
         # to edx-notifications
         register_user_scope_resolver('course_enrollments', CourseEnrollmentsScopeResolver())
         register_user_scope_resolver('course_group', CourseGroupScopeResolver())
-        register_user_scope_resolver('group_project_participants', GroupProjectParticipantsScopeResolver())
-        register_user_scope_resolver('group_project_workgroup', GroupProjectParticipantsScopeResolver())
         register_user_scope_resolver('student_email_resolver', StudentEmailScopeResolver())
-    except Exception, ex:
+    except Exception, ex:  # pylint: disable=broad-except
         # Note this will fail when we try to run migrations as manage.py will call startup.py
         # and startup.initialze() will try to manipulate some database tables.
         # We need to research how to identify when we are being started up as part of

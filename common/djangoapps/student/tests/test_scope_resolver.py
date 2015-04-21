@@ -6,7 +6,6 @@ from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from student.models import CourseEnrollment
 from student.scope_resolver import CourseEnrollmentsScopeResolver, StudentEmailScopeResolver
 
 
@@ -37,7 +36,7 @@ class StudentTasksTestCase(ModuleStoreTestCase):
         # unenroll #3
 
         enrollment.is_active = False
-        enrollment.save()
+        enrollment.save()  # pylint: disable=no-member
 
         resolver = CourseEnrollmentsScopeResolver()
 

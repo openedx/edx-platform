@@ -24,7 +24,7 @@ def publish_course_notifications_task(course_id, notification_msg, exclude_user_
 
     try:
         bulk_publish_notification_to_users(user_ids, notification_msg, exclude_user_ids=exclude_user_ids)
-    except Exception, ex:
+    except Exception, ex:  # pylint: disable=broad-except
         # Notifications are never critical, so we don't want to disrupt any
         # other logic processing. So log and continue.
         log.exception(ex)

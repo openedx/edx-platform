@@ -159,7 +159,7 @@ FEATURES = {
 
     # Enable notifications via edx-notifications
     'ENABLE_NOTIFICATIONS': False,
-    
+
     # Modulestore to use for new courses
     'DEFAULT_STORE_FOR_NEW_COURSE': 'mongo',
 
