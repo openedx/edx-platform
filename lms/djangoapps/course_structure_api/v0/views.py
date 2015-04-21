@@ -11,7 +11,8 @@ from rest_framework.response import Response
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import CourseKey
 
-from course_structure_api.v0 import serializers
+from course_structure_api.v0 import api, serializers
+from course_structure_api.v0.errors import CourseNotFoundError, CourseStructureNotAvailableError
 from courseware import courses
 from courseware.access import has_access
 from openedx.core.djangoapps.content.course_structures import models, tasks
@@ -40,12 +41,36 @@ class CourseViewMixin(object):
             course_id = self.kwargs.get('course_id')
             course_key = CourseKey.from_string(course_id)
             course = courses.get_course(course_key)
-
-            self.check_course_permissions(self.request.user, course)
+            self.check_course_permissions(self.request.user, course_key)
 
             return course
         except ValueError:
             raise Http404
+
+    @staticmethod
+    def course_check(func):
+        """Decorator responsible for catching errors finding and returning a 404 if the user does not have access
+        to the API function.
+
+        :param func: function to be wrapped
+        :returns: the wrapped function
+        """
+        def func_wrapper(self, *args, **kwargs):
+            """Wrapper function for this decorator.
+
+            :param *args: the arguments passed into the function
+            :param **kwargs: the keyword arguments passed into the function
+            :returns: the result of the wrapped function
+            """
+            try:
+                course_id = self.kwargs.get('course_id')
+                self.course_key = CourseKey.from_string(course_id)
+                self.check_course_permissions(self.request.user, self.course_key)
+                return func(self, *args, **kwargs)
+            except CourseNotFoundError:
+                raise Http404
+
+        return func_wrapper
 
     def user_can_access_course(self, user, course):
         """
@@ -185,7 +210,6 @@ class CourseDetail(CourseViewMixin, RetrieveAPIView):
         * end: The course end date. If course end date is not specified, the
           value is null.
     """
-
     serializer_class = serializers.CourseSerializer
 
     def get_object(self, queryset=None):
@@ -227,22 +251,16 @@ class CourseStructure(CourseViewMixin, RetrieveAPIView):
           * children: If the block has child blocks, a list of IDs of the child
             blocks.
     """
-    serializer_class = serializers.CourseStructureSerializer
-    course = None
 
-    def retrieve(self, request, *args, **kwargs):
+    @CourseViewMixin.course_check
+    def get(self, request, course_id=None):
         try:
-            return super(CourseStructure, self).retrieve(request, *args, **kwargs)
-        except models.CourseStructure.DoesNotExist:
-            # If we don't have data stored, generate it and return a 503.
-            tasks.update_course_structure.delay(unicode(self.course.id))
+            return Response(api.course_structure(self.course_key))
+        except CourseStructureNotAvailableError:
+            # If we don't have data stored, we will try to regenerate it, so
+            # return a 503 and as them to retry in 2 minutes.
             return Response(status=503, headers={'Retry-After': '120'})
 
-    def get_object(self, queryset=None):
-        # Make sure the course exists and the user has permissions to view it.
-        self.course = self.get_course_or_404()
-        course_structure = models.CourseStructure.objects.get(course_id=self.course.id)
-        return course_structure.structure
 
 
 class CourseGradingPolicy(CourseViewMixin, ListAPIView):
@@ -269,11 +287,8 @@ class CourseGradingPolicy(CourseViewMixin, ListAPIView):
           final grade.
     """
 
-    serializer_class = serializers.GradingPolicySerializer
     allow_empty = False
 
-    def get_queryset(self):
-        course = self.get_course_or_404()
-
-        # Return the raw data. The serializer will handle the field mappings.
-        return course.raw_grader
+    @CourseViewMixin.course_check
+    def get(self, request, course_id=None):
+        return Response(api.course_grading_policy(self.course_key))
