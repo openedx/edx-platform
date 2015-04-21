@@ -2,7 +2,7 @@
 <div class="collection-details wrapper-certificate">
     <header class="collection-header">
         <h3 class="title">
-            <a href="#" class="toggle detail-toggle <% if (showDetails){ print('hide'); } else { print('show'); } %>-details>
+            <a href="#" class="toggle detail-toggle <% if (showDetails){ print('hide'); } else { print('show'); } %>-details">
                 <i class="ui-toggle-expansion icon fa fa-caret-<% if (showDetails){ print('down'); } else { print('right'); } %>"></i>
                 <%= name %>
             </a>
@@ -16,6 +16,11 @@
             <span class="certificate-value"><%= id %></span>
         </li>
      <% } %>
+     <% if (showDetails) { %>
+        <li class="collection-description certificate-description">
+            <%= description %>
+        </li>
+      <% } %>
    </ol>
 
     <ul class="actions certificate-actions">

@@ -29,6 +29,16 @@ function(Backbone, _, str, gettext) {
             this._originalAttributes = this.parse(this.toJSON());
         },
 
+        validate: function(attrs) {
+            console.log('certificate_model.validate');
+            if (!_.str.trim(attrs.name)) {
+                return {
+                    message: gettext('Certificate name is required.'),
+                    attributes: {name: true}
+                };
+            }
+        },
+
         reset: function() {
             this.set(this._originalAttributes, { parse: true, validate: true });
         }
