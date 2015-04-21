@@ -6,12 +6,13 @@ import datetime
 from xblock.fields import Scope, String, Float, Boolean, List, Dict
 
 from xmodule.fields import RelativeTime
+from xmodule.mixin import LicenseMixin
 
 # Make '_' a no-op so we can scrape strings
 _ = lambda text: text
 
 
-class VideoFields(object):
+class VideoFields(LicenseMixin):
     """Fields for `VideoModule` and `VideoDescriptor`."""
     display_name = String(
         help=_("The name students see. This name appears in the course ribbon and as a header for the video."),

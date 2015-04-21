@@ -487,6 +487,16 @@ class XBlockWrapper(PageObject):
         """
         type_in_codemirror(self, index, text, find_prefix='$("{}").find'.format(self.editor_selector))
 
+    def set_license(self, license_type):
+        css_selector = (
+            "ul.license-types li[data-license={license_type}] button"
+        ).format(license_type=license_type)
+        self.wait_for_element_presence(
+            css_selector,
+            "{license_type} button is present".format(license_type=license_type)
+        )
+        self.q(css=css_selector).click()
+
     def save_settings(self):
         """
         Click on settings Save button.
