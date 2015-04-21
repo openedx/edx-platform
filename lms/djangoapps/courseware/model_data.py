@@ -211,13 +211,19 @@ class DjangoOrmFieldCache(object):
     @contract(kvs_key=DjangoKeyValueStore.Key)
     def set(self, kvs_key, value):
         """
-        Set the specified `kvs_key` to the django model object `value`.
+        Set the specified `kvs_key` to the field value `value`.
 
         Arguments:
             kvs_key (`DjangoKeyValueStore.Key`): The field value to delete
-            value: The django orm object to be stored in the cache
+            value: The field value to store
         """
-        self._cache[self._cache_key_for_kvs_key(kvs_key)] = value
+        cache_key = self._cache_key_for_kvs_key(kvs_key)
+        field_object = self._cache.get(cache_key)
+
+        if field_object is None:
+            self._cache[cache_key] = field_object = self._create_object(kvs_key)
+
+        self._set_field_value(kvs_key, value)
 
     @contract(kvs_key=DjangoKeyValueStore.Key)
     def delete(self, kvs_key):
@@ -250,11 +256,17 @@ class DjangoOrmFieldCache(object):
         """
         return self._cache_key_for_kvs_key(kvs_key) in self._cache
 
+    @contract(kvs_key=DjangoKeyValueStore.Key)
+    def _set_field_value(self, kvs_key, value):
+        cache_key = self._cache_key_for_kvs_key(kvs_key)
+        field_object = self._cache.get(cache_key)
+        field_object.value = json.dumps(value)
+
     def __len__(self):
         return len(self._cache)
 
     @abstractmethod
-    def _create_object(self, kvs_key, value):
+    def _create_object(self, kvs_key):
         """
         Create a new object to add to the cache (which should record
         the specified field ``value`` for the field identified by
@@ -262,7 +274,6 @@ class DjangoOrmFieldCache(object):
 
         Arguments:
             kvs_key (:class:`DjangoKeyValueStore.Key`): Which field to create an entry for
-            value: What value to record in the field
         """
         raise NotImplementedError()
 
@@ -311,6 +322,26 @@ class UserStateCache(DjangoOrmFieldCache):
         self.course_id = course_id
         self.user = user
         self.select_for_update = select_for_update
+
+    def _create_object(self, kvs_key):
+        """
+        Create a new object to add to the cache (which should record
+        the specified field ``value`` for the field identified by
+        ``kvs_key``).
+
+        Arguments:
+            kvs_key (:class:`DjangoKeyValueStore.Key`): Which field to create an entry for
+        """
+        field_object, __ = StudentModule.objects.get_or_create(
+            course_id=self.course_id,
+            student_id=kvs_key.user_id,
+            module_state_key=kvs_key.block_scope_id,
+            defaults={
+                'state': json.dumps({}),
+                'module_type': kvs_key.block_scope_id.block_type,
+            },
+        )
+        return field_object
 
     def _read_objects(self, fields, xblocks, aside_types):
         """
@@ -381,6 +412,15 @@ class UserStateCache(DjangoOrmFieldCache):
 
         return kvs_key.field_name in json.loads(field_object.state)
 
+    @contract(kvs_key=DjangoKeyValueStore.Key)
+    def _set_field_value(self, kvs_key, value):
+        cache_key = self._cache_key_for_kvs_key(kvs_key)
+        field_object = self._cache.get(cache_key)
+        state = json.loads(field_object.state)
+        state[kvs_key.field_name] = value
+        field_object.state = json.dumps(state)
+
+
 class UserStateSummaryCache(DjangoOrmFieldCache):
     """
     Cache for Scope.user_state_summary xblock field data.
@@ -389,6 +429,21 @@ class UserStateSummaryCache(DjangoOrmFieldCache):
         super(UserStateSummaryCache, self).__init__()
         self.course_id = course_id
         self.select_for_update = select_for_update
+
+    def _create_object(self, kvs_key):
+        """
+        Create a new object to add to the cache (which should record
+        the specified field ``value`` for the field identified by
+        ``kvs_key``).
+
+        Arguments:
+            kvs_key (:class:`DjangoKeyValueStore.Key`): Which field to create an entry for
+        """
+        field_object, __ = XModuleUserStateSummaryField.objects.get_or_create(
+            field_name=kvs_key.field_name,
+            usage_id=kvs_key.block_scope_id
+        )
+        return field_object
 
     def _read_objects(self, fields, xblocks, aside_types):
         """
@@ -438,6 +493,22 @@ class PreferencesCache(DjangoOrmFieldCache):
         self.user = user
         self.select_for_update = select_for_update
 
+    def _create_object(self, kvs_key):
+        """
+        Create a new object to add to the cache (which should record
+        the specified field ``value`` for the field identified by
+        ``kvs_key``).
+
+        Arguments:
+            kvs_key (:class:`DjangoKeyValueStore.Key`): Which field to create an entry for
+        """
+        field_object, __ = XModuleStudentPrefsField.objects.get_or_create(
+            field_name=kvs_key.field_name,
+            module_type=BlockTypeKeyV1(kvs_key.block_family, kvs_key.block_scope_id),
+            student_id=kvs_key.user_id,
+        )
+        return field_object
+
     def _read_objects(self, fields, xblocks, aside_types):
         """
         Return an iterator for all objects stored in the underlying datastore
@@ -486,6 +557,21 @@ class UserInfoCache(DjangoOrmFieldCache):
         super(UserInfoCache, self).__init__()
         self.user = user
         self.select_for_update = select_for_update
+
+    def _create_object(self, kvs_key):
+        """
+        Create a new object to add to the cache (which should record
+        the specified field ``value`` for the field identified by
+        ``kvs_key``).
+
+        Arguments:
+            kvs_key (:class:`DjangoKeyValueStore.Key`): Which field to create an entry for
+        """
+        field_object, __ = XModuleStudentInfoField.objects.get_or_create(
+            field_name=kvs_key.field_name,
+            student_id=kvs_key.user_id,
+        )
+        return field_object
 
     def _read_objects(self, fields, xblocks, aside_types):
         """
@@ -709,37 +795,10 @@ class FieldDataCache(object):
             if key.scope not in self.cache:
                 continue
 
+            self.cache[key.scope].set(key, kv_dict[key])
+
             field_object = self.cache[key.scope].get(key)
 
-            if field_object is None:
-                if key.scope == Scope.user_state:
-                    field_object, __ = StudentModule.objects.get_or_create(
-                        course_id=self.course_id,
-                        student_id=key.user_id,
-                        module_state_key=key.block_scope_id,
-                        defaults={
-                            'state': json.dumps({}),
-                            'module_type': key.block_scope_id.block_type,
-                        },
-                    )
-                elif key.scope == Scope.user_state_summary:
-                    field_object, __ = XModuleUserStateSummaryField.objects.get_or_create(
-                        field_name=key.field_name,
-                        usage_id=key.block_scope_id
-                    )
-                elif key.scope == Scope.preferences:
-                    field_object, __ = XModuleStudentPrefsField.objects.get_or_create(
-                        field_name=key.field_name,
-                        module_type=BlockTypeKeyV1(key.block_family, key.block_scope_id),
-                        student_id=key.user_id,
-                    )
-                elif key.scope == Scope.user_info:
-                    field_object, __ = XModuleStudentInfoField.objects.get_or_create(
-                        field_name=key.field_name,
-                        student_id=key.user_id,
-                    )
-
-                self.cache[key.scope].set(key, field_object)
 
             if field_object not in field_objects.keys():
                 field_objects[field_object] = []
@@ -747,15 +806,6 @@ class FieldDataCache(object):
             # Update the list of associated fields
             field_objects[field_object].append(key)
 
-            # Special case when scope is for the user state, because this scope saves fields in a single row
-            if key.scope == Scope.user_state:
-                state = json.loads(field_object.state)
-                state[key.field_name] = kv_dict[key]
-                field_object.state = json.dumps(state)
-            else:
-                # The remaining scopes save fields on different rows, so
-                # we don't have to worry about conflicts
-                field_object.value = json.dumps(kv_dict[key])
 
         for field_object in field_objects:
             try:
