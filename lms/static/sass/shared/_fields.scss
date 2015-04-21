@@ -121,3 +121,13 @@
         color: $gray-l1;
     }
 }
+
+.u-field-dropdown {
+    &.mode-display select, &.mode-placeholder select {
+        display: none;
+    }
+
+    &.mode-edit a.u-field-value-display {
+        display: none;
+    }
+}

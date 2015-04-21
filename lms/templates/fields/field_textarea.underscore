@@ -11,7 +11,7 @@
         if (mode === 'edit') {
             %><textarea id="u-field-textarea-<%- id %>" rows="4" aria-describedby="u-field-placeholder-value-<%- id %>"><%- value %></textarea><%
         } else {
-            %><a href="#" class="u-field-value-display"><span class="sr"><%- screenReaderTitle %></span><span class="u-field-value-readonly" aria-hidden="false" aria-describedby="u-field-placeholder-value-<%- id %>"><%- value %></span><span class="sr"><%- gettext('Click to edit') %></span></a><%
+            %><a href="#"><span class="sr"><%- screenReaderTitle %></span><span class="u-field-value-readonly" aria-hidden="false" aria-describedby="u-field-placeholder-value-<%- id %>"><%- value %></span><span class="sr"><%- gettext('Click to edit') %></span></a><%
         }
         %><span class="sr" id="u-field-placeholder-value-<%- id %>"><%- placeholderValue %></span>
     </div>
