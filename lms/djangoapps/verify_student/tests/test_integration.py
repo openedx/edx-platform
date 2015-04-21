@@ -58,4 +58,4 @@ class TestProfEdVerification(ModuleStoreTestCase):
 
         # On the first page of the flow, verify that there's a button allowing the user
         # to proceed to the payment processor; this is the only action the user is allowed to take.
-        self.assertContains(resp, 'pay_button')
+        self.assertContains(resp, 'payment-button')

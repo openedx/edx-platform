@@ -3,31 +3,31 @@ import logging
 
 from django.conf import settings
 from django.views.decorators.cache import cache_page
-
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_202_ACCEPTED, HTTP_409_CONFLICT
+from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_409_CONFLICT
 from rest_framework.views import APIView
 
 from commerce.api import EcommerceAPI
-from commerce.constants import OrderStatus, Messages
-from commerce.exceptions import ApiError, InvalidConfigurationError
+from commerce.constants import Messages
+from commerce.exceptions import ApiError, InvalidConfigurationError, InvalidResponseError
 from commerce.http import DetailResponse, InternalRequestErrorResponse
 from course_modes.models import CourseMode
 from courseware import courses
 from edxmako.shortcuts import render_to_response
 from enrollment.api import add_enrollment
 from microsite_configuration import microsite
-from student.models import CourseEnrollment
 from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
+from student.models import CourseEnrollment
+from util.json_request import JsonResponse
 
 
 log = logging.getLogger(__name__)
 
 
-class OrdersView(APIView):
-    """ Creates an order with a course seat and enrolls users. """
+class BasketsView(APIView):
+    """ Creates a basket with a course seat and enrolls users. """
 
     # LMS utilizes User.user_is_active to indicate email verification, not whether an account is active. Sigh!
     authentication_classes = (SessionAuthenticationAllowInactiveUser,)
@@ -63,7 +63,7 @@ class OrdersView(APIView):
 
     def post(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """
-        Attempt to create the order and enroll the user.
+        Attempt to create the basket and enroll the user.
         """
         user = request.user
         valid, course_key, error = self._is_data_valid(request)
@@ -103,28 +103,31 @@ class OrdersView(APIView):
 
         # Make the API call
         try:
-            order_number, order_status, _body = api.create_order(user, honor_mode.sku)
-            if order_status == OrderStatus.COMPLETE:
-                msg = Messages.ORDER_COMPLETED.format(order_number=order_number)
+            response_data = api.create_basket(
+                user,
+                honor_mode.sku,
+                payment_processor="cybersource",
+            )
+            payment_data = response_data["payment_data"]
+            if payment_data is not None:
+                # it is time to start the payment flow.
+                # NOTE this branch does not appear to be used at the moment.
+                return JsonResponse(payment_data)
+            elif response_data['order']:
+                # the order was completed immediately because there was no charge.
+                msg = Messages.ORDER_COMPLETED.format(order_number=response_data['order']['number'])
                 log.debug(msg)
                 return DetailResponse(msg)
             else:
-                # TODO Before this functionality is fully rolled-out, this branch should be updated to NOT enroll the
-                # user. Enrollments must be initiated by the E-Commerce API only.
+                # Enroll in the honor mode directly as a failsafe.
+                # This MUST be removed when this code handles paid modes.
                 self._enroll(course_key, user)
-                msg = u'Order %(order_number)s was received with %(status)s status. Expected %(complete_status)s. ' \
-                      u'User %(username)s was enrolled in %(course_id)s by LMS.'
-                msg_kwargs = {
-                    'order_number': order_number,
-                    'status': order_status,
-                    'complete_status': OrderStatus.COMPLETE,
-                    'username': user.username,
-                    'course_id': course_id,
-                }
-                log.error(msg, msg_kwargs)
-
-                msg = Messages.ORDER_INCOMPLETE_ENROLLED.format(order_number=order_number)
-                return DetailResponse(msg, status=HTTP_202_ACCEPTED)
+                msg = u'Unexpected response from basket endpoint.'
+                log.error(
+                    msg + u' Could not enroll user %(username)s in course %(course_id)s.',
+                    {'username': user.id, 'course_id': course_id},
+                )
+                raise InvalidResponseError(msg)
         except ApiError as err:
             # The API will handle logging of the error.
             return InternalRequestErrorResponse(err.message)

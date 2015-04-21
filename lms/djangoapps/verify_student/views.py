@@ -380,6 +380,14 @@ class PayAndVerifyView(View):
         # Determine the photo verification status
         verification_good_until = self._verification_valid_until(request.user)
 
+        # get available payment processors
+        if unexpired_paid_course_mode.sku:
+            # transaction will be conducted via ecommerce service
+            processors = EcommerceAPI().get_processors(request.user)
+        else:
+            # transaction will be conducted using legacy shopping cart
+            processors = [settings.CC_PROCESSOR_NAME]
+
         # Render the top-level page
         context = {
             'contribution_amount': contribution_amount,
@@ -393,7 +401,7 @@ class PayAndVerifyView(View):
             'is_active': json.dumps(request.user.is_active),
             'message_key': message,
             'platform_name': settings.PLATFORM_NAME,
-            'purchase_endpoint': get_purchase_endpoint(),
+            'processors': processors,
             'requirements': requirements,
             'user_full_name': full_name,
             'verification_deadline': (
@@ -644,26 +652,59 @@ class PayAndVerifyView(View):
         return (has_paid, bool(is_active))
 
 
-def create_order_with_ecommerce_service(user, course_key, course_mode):     # pylint: disable=invalid-name
-    """ Create a new order using the E-Commerce API. """
+def checkout_with_ecommerce_service(user, course_key, course_mode, processor):     # pylint: disable=invalid-name
+    """ Create a new basket and trigger immediate checkout, using the E-Commerce API. """
     try:
         api = EcommerceAPI()
         # Make an API call to create the order and retrieve the results
-        _order_number, _order_status, data = api.create_order(user, course_mode.sku)
-
+        response_data = api.create_basket(user, course_mode.sku, processor)
         # Pass the payment parameters directly from the API response.
-        return HttpResponse(json.dumps(data['payment_parameters']), content_type='application/json')
+        return response_data.get('payment_data')
     except ApiError:
         params = {'username': user.username, 'mode': course_mode.slug, 'course_id': unicode(course_key)}
         log.error('Failed to create order for %(username)s %(mode)s mode of %(course_id)s', params)
         raise
 
 
+def checkout_with_shoppingcart(request, user, course_key, course_mode, amount):
+    """ Create an order and trigger checkout using shoppingcart."""
+    cart = Order.get_cart_for_user(user)
+    cart.clear()
+    enrollment_mode = course_mode.slug
+    CertificateItem.add_to_order(cart, course_key, amount, enrollment_mode)
+
+    # Change the order's status so that we don't accidentally modify it later.
+    # We need to do this to ensure that the parameters we send to the payment system
+    # match what we store in the database.
+    # (Ordinarily we would do this client-side when the user submits the form, but since
+    # the JavaScript on this page does that immediately, we make the change here instead.
+    # This avoids a second AJAX call and some additional complication of the JavaScript.)
+    # If a user later re-enters the verification / payment flow, she will create a new order.
+    cart.start_purchase()
+
+    callback_url = request.build_absolute_uri(
+        reverse("shoppingcart.views.postpay_callback")
+    )
+
+    payment_data = {
+        'payment_processor_name': settings.CC_PROCESSOR_NAME,
+        'payment_page_url': get_purchase_endpoint(),
+        'payment_form_data': get_signed_purchase_params(
+            cart,
+            callback_url=callback_url,
+            extra_data=[unicode(course_key), course_mode.slug]
+        ),
+    }
+    return payment_data
+
+
 @require_POST
 @login_required
 def create_order(request):
     """
-    Submit PhotoVerification and create a new Order for this verified cert
+    This endpoint is named 'create_order' for backward compatibility, but its
+    actual use is to add a single product to the user's cart and request
+    immediate checkout.
     """
     # Only submit photos if photo data is provided by the client.
     # TODO (ECOM-188): Once the A/B test of decoupling verified / payment
@@ -724,35 +765,23 @@ def create_order(request):
         return HttpResponseBadRequest(_("No selected price or selected price is below minimum."))
 
     if current_mode.sku:
-        return create_order_with_ecommerce_service(request.user, course_id, current_mode)
+        # if request.POST doesn't contain 'processor' then the service's default payment processor will be used.
+        payment_data = checkout_with_ecommerce_service(
+            request.user,
+            course_id,
+            current_mode,
+            request.POST.get('processor')
+        )
+    else:
+        payment_data = checkout_with_shoppingcart(request, request.user, course_id, current_mode, amount)
 
-    # I know, we should check this is valid. All kinds of stuff missing here
-    cart = Order.get_cart_for_user(request.user)
-    cart.clear()
-    enrollment_mode = current_mode.slug
-    CertificateItem.add_to_order(cart, course_id, amount, enrollment_mode)
-
-    # Change the order's status so that we don't accidentally modify it later.
-    # We need to do this to ensure that the parameters we send to the payment system
-    # match what we store in the database.
-    # (Ordinarily we would do this client-side when the user submits the form, but since
-    # the JavaScript on this page does that immediately, we make the change here instead.
-    # This avoids a second AJAX call and some additional complication of the JavaScript.)
-    # If a user later re-enters the verification / payment flow, she will create a new order.
-    cart.start_purchase()
-
-    callback_url = request.build_absolute_uri(
-        reverse("shoppingcart.views.postpay_callback")
-    )
-
-    params = get_signed_purchase_params(
-        cart,
-        callback_url=callback_url,
-        extra_data=[unicode(course_id), current_mode.slug]
-    )
-
-    params['success'] = True
-    return HttpResponse(json.dumps(params), content_type="text/json")
+    if 'processor' not in request.POST:
+        # (XCOM-214) To be removed after release.
+        # the absence of this key in the POST payload indicates that the request was initiated from
+        # a stale js client, which expects a response containing only the 'payment_form_data' part of
+        # the payment data result.
+        payment_data = payment_data['payment_form_data']
+    return HttpResponse(json.dumps(payment_data), content_type="application/json")
 
 
 @require_POST

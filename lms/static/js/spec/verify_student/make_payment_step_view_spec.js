@@ -11,8 +11,6 @@ define([
 
         describe( 'edx.verify_student.MakePaymentStepView', function() {
 
-            var PAYMENT_URL = "/pay";
-
             var PAYMENT_PARAMS = {
                 orderId: "test-order",
                 signature: "abcd1234"
@@ -21,7 +19,7 @@ define([
             var STEP_DATA = {
                 minPrice: "12",
                 currency: "usd",
-                purchaseEndpoint: PAYMENT_URL,
+                processors: ["test-payment-processor"],
                 courseKey: "edx/test/test",
                 courseModeSlug: 'verified'
             };
@@ -50,15 +48,16 @@ define([
             };
 
             var expectPaymentButtonEnabled = function( isEnabled ) {
-                var appearsDisabled = $( '#pay_button' ).hasClass( 'is-disabled' ),
-                    isDisabled = $( '#pay_button' ).prop( 'disabled' );
+                var el = $( '.payment-button'),
+                    appearsDisabled = el.hasClass( 'is-disabled' ),
+                    isDisabled = el.prop( 'disabled' );
 
                 expect( !appearsDisabled ).toEqual( isEnabled );
                 expect( !isDisabled ).toEqual( isEnabled );
             };
 
             var expectPaymentDisabledBecauseInactive = function() {
-                var payButton = $( '#pay_button' );
+                var payButton = $( '.payment_button' );
 
                 // Payment button should be hidden
                 expect( payButton.length ).toEqual(0);
@@ -67,21 +66,22 @@ define([
             var goToPayment = function( requests, kwargs ) {
                 var params = {
                     contribution: kwargs.amount || "",
-                    course_id: kwargs.courseId || ""
+                    course_id: kwargs.courseId || "",
+                    processor: kwargs.processor || ""
                 };
 
                 // Click the "go to payment" button
-                $( '#pay_button' ).click();
+                $( '.payment-button' ).click();
 
                 // Verify that the request was made to the server
-                AjaxHelpers.expectRequest(
-                    requests, "POST", "/verify_student/create_order/",
-                    $.param( params )
+                AjaxHelpers.expectPostRequest(
+                    requests, "/verify_student/create_order/", $.param( params )
                 );
 
                 // Simulate the server response
                 if ( kwargs.succeeds ) {
-                    AjaxHelpers.respondWithJson( requests, PAYMENT_PARAMS );
+                    // TODO put fixture responses in the right place
+                    AjaxHelpers.respondWithJson( requests, {payment_page_url: 'http://payment-page-url/', payment_form_data: {foo: 'bar'}} );
                 } else {
                     AjaxHelpers.respondWithTextError( requests, 400, SERVER_ERROR_MSG );
                 }
@@ -95,7 +95,7 @@ define([
 
                 expect(form.serialize()).toEqual($.param(params));
                 expect(form.attr('method')).toEqual("POST");
-                expect(form.attr('action')).toEqual(PAYMENT_URL);
+                expect(form.attr('action')).toEqual('http://payment-page-url/');
             };
 
             beforeEach(function() {
@@ -114,9 +114,10 @@ define([
                 goToPayment( requests, {
                     amount: STEP_DATA.minPrice,
                     courseId: STEP_DATA.courseKey,
+                    processor: STEP_DATA.processors[0],
                     succeeds: true
                 });
-                expectPaymentSubmitted( view, PAYMENT_PARAMS );
+                expectPaymentSubmitted( view, {foo: 'bar'} );
             });
 
             it( 'by default minimum price is selected if no suggested prices are given', function() {
@@ -129,9 +130,10 @@ define([
                 goToPayment( requests, {
                     amount: STEP_DATA.minPrice,
                     courseId: STEP_DATA.courseKey,
+                    processor: STEP_DATA.processors[0],
                     succeeds: true
                 });
-                expectPaymentSubmitted( view, PAYMENT_PARAMS );
+                expectPaymentSubmitted( view, {foo: 'bar'} );
             });
 
             it( 'min price is always selected even if contribution amount is provided', function() {
@@ -156,6 +158,7 @@ define([
                 goToPayment( requests, {
                     amount: STEP_DATA.minPrice,
                     courseId: STEP_DATA.courseKey,
+                    processor: STEP_DATA.processors[0],
                     succeeds: false
                 });
 

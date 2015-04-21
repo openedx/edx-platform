@@ -52,6 +52,8 @@ def mock_render_to_response(*args, **kwargs):
 
 render_mock = Mock(side_effect=mock_render_to_response)
 
+PAYMENT_DATA_KEYS = {'payment_processor_name', 'payment_page_url', 'payment_form_data'}
+
 
 class StartView(TestCase):
     def start_url(self, course_id=""):
@@ -849,166 +851,159 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         self.assertEqual(response_dict['course_name'], mode_display_name)
 
 
-class TestCreateOrder(EcommerceApiTestMixin, ModuleStoreTestCase):
+class CheckoutTestMixin(object):
     """
-    Tests for the create order view.
+    Mixin implementing test methods that should behave identically regardless
+    of which backend is used (shoppingcart or ecommerce service).  Subclasses
+    immediately follow for each backend, which inherit from TestCase and
+    define methods needed to customize test parameters, and patch the
+    appropriate checkout method.
+
+    Though the view endpoint under test is named 'create_order' for backward-
+    compatibility, the effect of using this endpoint is to choose a specific product
+    (i.e. course mode) and trigger immediate checkout.
     """
     def setUp(self):
         """ Create a user and course. """
-        super(TestCreateOrder, self).setUp()
+        super(CheckoutTestMixin, self).setUp()
 
         self.user = UserFactory.create(username="test", password="test")
         self.course = CourseFactory.create()
         for mode, min_price in (('audit', 0), ('honor', 0), ('verified', 100)):
-            # Set SKU to empty string to ensure view knows how to handle such values
-            CourseModeFactory(mode_slug=mode, course_id=self.course.id, min_price=min_price, sku='')
+            CourseModeFactory(mode_slug=mode, course_id=self.course.id, min_price=min_price, sku=self.make_sku())
         self.client.login(username="test", password="test")
 
-    def _post(self, data):
+    def _assert_checked_out(
+            self,
+            post_params,
+            patched_create_order,
+            expected_course_key,
+            expected_mode_slug,
+            expected_status_code=200
+    ):
         """
-        POST to the view being tested and return the response.
+        DRY helper.
+
+        Ensures that checkout functions were invoked as
+        expected during execution of the create_order endpoint.
         """
-        url = reverse('verify_student_create_order')
-        return self.client.post(url, data)
+        post_params.setdefault('processor', None)
+        response = self.client.post(reverse('verify_student_create_order'), post_params)
+        self.assertEqual(response.status_code, expected_status_code)
+        if expected_status_code == 200:
+            # ensure we called checkout at all
+            self.assertTrue(patched_create_order.called)
+            # ensure checkout args were correct
+            args = self._get_checkout_args(patched_create_order)
+            self.assertEqual(args['user'], self.user)
+            self.assertEqual(args['course_key'], expected_course_key)
+            self.assertEqual(args['course_mode'].slug, expected_mode_slug)
+            # ensure response data was correct
+            data = json.loads(response.content)
+            self.assertEqual(set(data.keys()), PAYMENT_DATA_KEYS)
+        else:
+            self.assertFalse(patched_create_order.called)
 
-    def test_create_order_already_verified(self):
-        # Verify the student so we don't need to submit photos
-        self._verify_student()
-
+    def test_create_order(self, patched_create_order):
         # Create an order
         params = {
             'course_id': unicode(self.course.id),
-            'contribution': 100
+            'contribution': 100,
         }
-        response = self._post(params)
-        self.assertEqual(response.status_code, 200)
+        self._assert_checked_out(params, patched_create_order, self.course.id, 'verified')
 
-        # Verify that the information will be sent to the correct callback URL
-        # (configured by test settings)
-        data = json.loads(response.content)
-        self.assertEqual(data['override_custom_receipt_page'], "http://testserver/shoppingcart/postpay_callback/")
-
-        # Verify that the course ID and transaction type are included in "merchant-defined data"
-        self.assertEqual(data['merchant_defined_data1'], unicode(self.course.id))
-        self.assertEqual(data['merchant_defined_data2'], "verified")
-
-    def test_create_order_already_verified_prof_ed(self):
-        # Verify the student so we don't need to submit photos
-        self._verify_student()
-
+    def test_create_order_prof_ed(self, patched_create_order):
         # Create a prof ed course
         course = CourseFactory.create()
-        CourseModeFactory(mode_slug="professional", course_id=course.id, min_price=10)
-
+        CourseModeFactory(mode_slug="professional", course_id=course.id, min_price=10, sku=self.make_sku())
         # Create an order for a prof ed course
         params = {'course_id': unicode(course.id)}
-        response = self._post(params)
-        self.assertEqual(response.status_code, 200)
+        self._assert_checked_out(params, patched_create_order, course.id, 'professional')
 
-        # Verify that the course ID and transaction type are included in "merchant-defined data"
-        data = json.loads(response.content)
-        self.assertEqual(data['merchant_defined_data1'], unicode(course.id))
-        self.assertEqual(data['merchant_defined_data2'], "professional")
-
-    def test_create_order_for_no_id_professional(self):
-
+    def test_create_order_no_id_professional(self, patched_create_order):
         # Create a no-id-professional ed course
         course = CourseFactory.create()
-        CourseModeFactory(mode_slug="no-id-professional", course_id=course.id, min_price=10)
-
+        CourseModeFactory(mode_slug="no-id-professional", course_id=course.id, min_price=10, sku=self.make_sku())
         # Create an order for a prof ed course
         params = {'course_id': unicode(course.id)}
-        response = self._post(params)
-        self.assertEqual(response.status_code, 200)
+        self._assert_checked_out(params, patched_create_order, course.id, 'no-id-professional')
 
-        # Verify that the course ID and transaction type are included in "merchant-defined data"
-        data = json.loads(response.content)
-        self.assertEqual(data['merchant_defined_data1'], unicode(course.id))
-        self.assertEqual(data['merchant_defined_data2'], "no-id-professional")
-
-    def test_create_order_for_multiple_paid_modes(self):
-
+    def test_create_order_for_multiple_paid_modes(self, patched_create_order):
         # Create a no-id-professional ed course
         course = CourseFactory.create()
-        CourseModeFactory(mode_slug="no-id-professional", course_id=course.id, min_price=10)
-        CourseModeFactory(mode_slug="professional", course_id=course.id, min_price=10)
-
+        CourseModeFactory(mode_slug="no-id-professional", course_id=course.id, min_price=10, sku=self.make_sku())
+        CourseModeFactory(mode_slug="professional", course_id=course.id, min_price=10, sku=self.make_sku())
         # Create an order for a prof ed course
         params = {'course_id': unicode(course.id)}
-        response = self._post(params)
-        self.assertEqual(response.status_code, 200)
+        # TODO jsa - is this the intended behavior?
+        self._assert_checked_out(params, patched_create_order, course.id, 'no-id-professional')
 
-        # Verify that the course ID and transaction type are included in "merchant-defined data"
-        data = json.loads(response.content)
-        self.assertEqual(data['merchant_defined_data1'], unicode(course.id))
-        self.assertEqual(data['merchant_defined_data2'], "no-id-professional")
-
-    def test_create_order_set_donation_amount(self):
-        # Verify the student so we don't need to submit photos
-        self._verify_student()
-
+    def test_create_order_bad_donation_amount(self, patched_create_order):
         # Create an order
         params = {
             'course_id': unicode(self.course.id),
-            'contribution': '1.23'
+            'contribution': '99.9'
         }
-        self._post(params)
+        self._assert_checked_out(params, patched_create_order, None, None, expected_status_code=400)
 
-        # Verify that the client's session contains the new donation amount
-        self.assertNotIn('donation_for_course', self.client.session)
+    def test_create_order_good_donation_amount(self, patched_create_order):
+        # Create an order
+        params = {
+            'course_id': unicode(self.course.id),
+            'contribution': '100.0'
+        }
+        self._assert_checked_out(params, patched_create_order, self.course.id, 'verified')
 
-    def _verify_student(self):
-        """ Simulate that the student's identity has already been verified. """
-        attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
-        attempt.mark_ready()
-        attempt.submit()
-        attempt.approve()
-
-    @override_settings(ECOMMERCE_API_URL=EcommerceApiTestMixin.ECOMMERCE_API_URL,
-                       ECOMMERCE_API_SIGNING_KEY=EcommerceApiTestMixin.ECOMMERCE_API_SIGNING_KEY)
-    def test_create_order_with_ecommerce_api(self):
-        """ Verifies that the view communicates with the E-Commerce API to create orders. """
-        # Keep track of the original number of orders to verify the old code is not being called.
-        order_count = Order.objects.count()
-
-        # Add SKU to CourseModes
-        for course_mode in CourseMode.objects.filter(course_id=self.course.id):
-            course_mode.sku = uuid4().hex.decode('ascii')
-            course_mode.save()
-
-        # Mock the E-Commerce Service response
-        with self.mock_create_order():
-            self._verify_student()
-            params = {'course_id': unicode(self.course.id), 'contribution': 100}
-            response = self._post(params)
-
-        # Verify the response is correct.
+    def test_old_clients(self, patched_create_order):
+        # ensure the response to a request from a stale js client is modified so as
+        # not to break behavior in the browser.
+        # (XCOM-214) remove after release.
+        expected_payment_data = EcommerceApiTestMixin.PAYMENT_DATA.copy()
+        expected_payment_data['payment_form_data'].update({'foo': 'bar'})
+        patched_create_order.return_value = expected_payment_data
+        # there is no 'processor' parameter in the post payload, so the response should only contain payment form data.
+        params = {'course_id': unicode(self.course.id), 'contribution': 100}
+        response = self.client.post(reverse('verify_student_create_order'), params)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['Content-Type'], 'application/json')
-        self.assertEqual(json.loads(response.content), self.ECOMMERCE_API_SUCCESSFUL_BODY['payment_parameters'])
+        self.assertTrue(patched_create_order.called)
+        # ensure checkout args were correct
+        args = self._get_checkout_args(patched_create_order)
+        self.assertEqual(args['user'], self.user)
+        self.assertEqual(args['course_key'], self.course.id)
+        self.assertEqual(args['course_mode'].slug, 'verified')
+        # ensure response data was correct
+        data = json.loads(response.content)
+        self.assertEqual(data, {'foo': 'bar'})
 
-        # Verify old code is not called (e.g. no Order object created in LMS)
-        self.assertEqual(order_count, Order.objects.count())
 
-    def _add_course_mode_skus(self):
-        """ Add SKUs to the CourseMode objects for self.course. """
-        for course_mode in CourseMode.objects.filter(course_id=self.course.id):
-            course_mode.sku = uuid4().hex.decode('ascii')
-            course_mode.save()
+@patch('verify_student.views.checkout_with_shoppingcart', return_value=EcommerceApiTestMixin.PAYMENT_DATA)
+class TestCreateOrderShoppingCart(CheckoutTestMixin, ModuleStoreTestCase):
+    """ Test view behavior when the shoppingcart is used. """
 
-    @override_settings(ECOMMERCE_API_URL=EcommerceApiTestMixin.ECOMMERCE_API_URL,
-                       ECOMMERCE_API_SIGNING_KEY=EcommerceApiTestMixin.ECOMMERCE_API_SIGNING_KEY)
-    def test_create_order_with_ecommerce_api_errors(self):
-        """
-        Verifies that the view communicates with the E-Commerce API to create orders, and handles errors
-        appropriately.
-        """
-        self._add_course_mode_skus()
+    def make_sku(self):
+        """ Checkout is handled by shoppingcart when the course mode's sku is empty. """
+        return ''
 
-        with self.mock_create_order(side_effect=ApiError):
-            self._verify_student()
-            params = {'course_id': unicode(self.course.id), 'contribution': 100}
-            self.assertRaises(ApiError, self._post, params)
+    def _get_checkout_args(self, patched_create_order):
+        """ Assuming patched_create_order was called, return a mapping containing the call arguments."""
+        return dict(zip(('request', 'user', 'course_key', 'course_mode', 'amount'), patched_create_order.call_args[0]))
+
+
+@override_settings(
+    ECOMMERCE_API_URL=EcommerceApiTestMixin.ECOMMERCE_API_URL,
+    ECOMMERCE_API_SIGNING_KEY=EcommerceApiTestMixin.ECOMMERCE_API_SIGNING_KEY
+)
+@patch('verify_student.views.checkout_with_ecommerce_service', return_value=EcommerceApiTestMixin.PAYMENT_DATA)
+class TestCreateOrderEcommerceService(CheckoutTestMixin, EcommerceApiTestMixin, ModuleStoreTestCase):
+    """ Test view behavior when the ecommerce service is used. """
+
+    def make_sku(self):
+        """ Checkout is handled by the ecommerce service when the course mode's sku is nonempty. """
+        return uuid4().hex.decode('ascii')
+
+    def _get_checkout_args(self, patched_create_order):
+        """ Assuming patched_create_order was called, return a mapping containing the call arguments."""
+        return dict(zip(('user', 'course_key', 'course_mode', 'processor'), patched_create_order.call_args[0]))
 
 
 class TestCreateOrderView(ModuleStoreTestCase):
@@ -1099,7 +1094,7 @@ class TestCreateOrderView(ModuleStoreTestCase):
             photo_id_image=self.IMAGE_DATA
         )
         json_response = json.loads(response.content)
-        self.assertIsNotNone(json_response.get('orderNumber'))
+        self.assertIsNotNone(json_response['payment_form_data'].get('orderNumber'))  # TODO not canonical
 
         # Verify that the order exists and is configured correctly
         order = Order.objects.get(user=self.user)
@@ -1135,7 +1130,8 @@ class TestCreateOrderView(ModuleStoreTestCase):
         url = reverse('verify_student_create_order')
         data = {
             'contribution': contribution,
-            'course_id': course_id
+            'course_id': course_id,
+            'processor': None,
         }
 
         if face_image is not None:
@@ -1149,9 +1145,9 @@ class TestCreateOrderView(ModuleStoreTestCase):
         if expect_status_code == 200:
             json_response = json.loads(response.content)
             if expect_success:
-                self.assertTrue(json_response.get('success'))
+                self.assertEqual(set(json_response.keys()), PAYMENT_DATA_KEYS)
             else:
-                self.assertFalse(json_response.get('success'))
+                self.assertFalse(json_response['success'])
 
         return response
 
