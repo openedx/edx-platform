@@ -1,19 +1,15 @@
 define([
     'underscore', 'js/models/course',
-    'js/certificates/collections/certificates',
     'js/certificates/models/certificate',
-    'js/certificates/views/certificate_details',
+    'js/certificates/collections/certificates',
     'js/certificates/views/certificate_editor',
-    'js/certificates/views/certificate_item',
-    'js/certificates/views/certificates_list',
     'js/views/feedback_notification',
     'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
-    'js/spec_helpers/view_helpers', 'js/spec_helpers/assertion_helpers', 'js/spec_helpers/validation_helpers'
+    'js/spec_helpers/view_helpers', 'js/spec_helpers/validation_helpers', 'js/certificates/spec/custom_matchers',
     'jasmine-stealth'
 ], function(
-    _, Course, CertificateModel, CertificatesCollection,
-    CertificateDetailsView, CertificatesListView, CertificateEditorView, CertificateItemView,
-    Notification, AjaxHelpers, TemplateHelpers, ViewHelpers, ValidationHelpers
+    _, Course, CertificateModel, CertificatesCollection, CertificateEditorView,
+    Notification, AjaxHelpers, TemplateHelpers, ViewHelpers, ValidationHelpers, CustomMatchers
 ) {
     'use strict';
     var SELECTORS = {
@@ -23,12 +19,24 @@ define([
         name: '.certificate-name',
         description: '.certificate-description',
         errorMessage: '.certificate-edit-error',
-        inputName: '.collection-name-input',
-        inputDescription: '.certificate-description-input',
+        inputCertificateName: '.collection-name-input',
+        inputCertificateDescription: '.certificate-description-input',
         warningMessage: '.certificate-validation-text',
         warningIcon: '.wrapper-certificate-validation > i',
         note: '.wrapper-delete-button'
     };
+
+    var submitForm = function (view, requests, notificationSpy) {
+        view.$('form').submit();
+        ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
+    };
+
+    var submitAndVerifyFormError = function (view, requests, notificationSpy) {
+            view.$('form').submit();
+            ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
+            AjaxHelpers.respondWithError(requests);
+            ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
+        };
 
 
     beforeEach(function() {
@@ -41,178 +49,87 @@ define([
             revision: 'course_rev'
         });
 
-        this.addMatchers({
-            toContainText: function(text) {
-                var trimmedText = $.trim(this.actual.text());
 
-                if (text && $.isFunction(text.test)) {
-                    return text.test(trimmedText);
-                } else {
-                    return trimmedText.indexOf(text) !== -1;
-                }
-            },
-            toBeCorrectValuesInInputs: function (values) {
-                var expected = {
-                    name: this.actual.$(SELECTORS.inputName).val(),
-                    description: this.actual
-                        .$(SELECTORS.inputDescription).val()
-                };
-
-                return _.isEqual(values, expected);
-            },
-            toBeCorrectValuesInModel: function (values) {
-                return _.every(values, function (value, key) {
-                    return this.actual.get(key) === value;
-                }.bind(this));
-            },
-            toHaveDefaultNames: function (values) {
-                var actualValues = $.map(this.actual, function (item) {
-                    return $(item).val();
-                });
-
-                return _.isEqual(actualValues, values);
-            }
-        });
     });
 
     afterEach(function() {
         delete window.course;
     });
 
-    describe('Experiment group configurations group editor view', function() {
-        beforeEach(function() {
-            TemplateHelpers.installTemplate('group-edit', true);
+    describe('Experiment certificate editor view', function() {
 
-            this.model = new GroupModel({
-                name: 'Group A'
+        var setValuesToInputs = function (view, values) {
+            _.each(values, function (value, selector) {
+                if (SELECTORS[selector]) {
+                    view.$(SELECTORS[selector]).val(value);
+                }
             });
-
-            this.collection = new GroupCollection([this.model]);
-
-            this.view = new ExperimentGroupEditView({
-                model: this.model
-            });
-        });
-
-        describe('Basic', function () {
-            it('can render properly', function() {
-                this.view.render();
-                expect(this.view.$('.group-name').val()).toBe('Group A');
-                expect(this.view.$('.group-allocation')).toContainText('100%');
-            });
-
-            it ('can delete itself', function() {
-                this.view.render().$('.action-close').click();
-                expect(this.collection.length).toEqual(0);
-            });
-        });
-    });
-
-    describe('Experiment group configurations group editor view', function() {
-        beforeEach(function() {
-            TemplateHelpers.installTemplate('group-edit', true);
-
-            this.model = new GroupModel({
-                name: 'Group A'
-            });
-
-            this.collection = new GroupCollection([this.model]);
-
-            this.view = new ExperimentGroupEditView({
-                model: this.model
-            });
-        });
-
-        describe('Basic', function () {
-            it('can render properly', function() {
-                this.view.render();
-                expect(this.view.$('.group-name').val()).toBe('Group A');
-                expect(this.view.$('.group-allocation')).toContainText('100%');
-            });
-
-            it ('can delete itself', function() {
-                this.view.render().$('.action-close').click();
-                expect(this.collection.length).toEqual(0);
-            });
-        });
-
-
-    describe('Content groups editor view', function() {
+        };
 
         beforeEach(function() {
             ViewHelpers.installViewTemplates();
-            TemplateHelpers.installTemplates(['content-group-editor']);
+            TemplateHelpers.installTemplate('certificate-editor', true);
 
-            this.model = new GroupModel({name: 'Content Group', id: 0});
-
-            this.saveableModel = new GroupConfigurationModel({
-                name: 'Content Group Configuration',
+             this.model = new CertificateModel({
                 id: 0,
-                scheme:'cohort',
-                groups: new GroupCollection([this.model]),
-                editing:true
+                name: 'Test Name',
+                description: 'Test Description'
             });
 
-            this.collection = new GroupConfigurationCollection([ this.saveableModel ]);
-            this.collection.outlineUrl = '/outline';
-            this.collection.url = '/group_configurations';
-
-            this.view = new ContentGroupEditorView({
+            this.collection = new CertificatesCollection();
+            this.collection.add(this.model);
+            this.collection.url = '/certificates/edX/DemoX/Demo_Course';
+            this.view = new CertificateEditorView({
                 model: this.model
+
             });
             appendSetFixtures(this.view.render().el);
+            CustomMatchers(this);
         });
 
-        it('should save properly', function() {
-            var requests = AjaxHelpers.requests(this),
-                notificationSpy = ViewHelpers.createNotificationSpy();
-
-            this.view.$('.action-add').click();
-            this.view.$(SELECTORS.inputName).val('New Content Group');
-
-            submitAndVerifyFormSuccess(this.view, requests, notificationSpy);
-
-            expect(this.model).toBeCorrectValuesInModel({
-                name: 'New Content Group'
+        describe('Basic', function () {
+            it('can render properly', function() {
+                expect(this.view.$("[name='certificate-name']").val()).toBe('Test Name')
+                expect(this.view.$("[name='certificate-description']").val()).toBe('Test Description')
+                expect(this.view.$('.action-delete')).toExist();
             });
-            expect(this.view.$el).not.toExist();
-        });
 
-        it('does not hide saving message if failure', function() {
-            var requests = AjaxHelpers.requests(this),
-                notificationSpy = ViewHelpers.createNotificationSpy();
-            this.view.$(SELECTORS.inputName).val('New Content Group')
-
-            submitAndVerifyFormError(this.view, requests, notificationSpy)
-        });
-
-        it('does not save on cancel', function() {
-            expect(this.view.$('.action-add'));
-            this.view.$('.action-add').click();
-            this.view.$(SELECTORS.inputName).val('New Content Group');
-
-            this.view.$('.action-cancel').click();
-            expect(this.model).toBeCorrectValuesInModel({
-                name: 'Content Group',
+            it('should save properly', function() {
+                var requests = AjaxHelpers.requests(this),
+                    notificationSpy = ViewHelpers.createNotificationSpy();
+                this.view.$('.action-add').click();
+                this.view.$(SELECTORS.inputCertificateName).val('New Test Name');
+                this.view.$(SELECTORS.inputCertificateDescription).val('New Test Description');
+                submitForm(this.view, requests, notificationSpy);
+                expect(this.model).toBeCorrectValuesInModel({
+                    name: 'New Test Name',
+                    description: 'New Test Description'
+                });
             });
-            // Model is still exist in the collection
-            expect(this.collection.indexOf(this.saveableModel)).toBeGreaterThan(-1);
-            expect(this.collection.length).toBe(1);
+
+            it('does not hide saving message if failure', function() {
+                var requests = AjaxHelpers.requests(this),
+                    notificationSpy = ViewHelpers.createNotificationSpy();
+                this.view.$(SELECTORS.inputCertificateName).val('New Test Name')
+                this.view.$(SELECTORS.inputCertificateDescription).val('New Test Description')
+                submitAndVerifyFormError(this.view, requests, notificationSpy)
+            });
+
+            it('does not save on cancel', function() {
+                expect(this.view.$('.action-add'));
+                this.view.$('.action-add').click();
+                this.view.$(SELECTORS.inputCertificateName).val('New Certificate');
+                this.view.$(SELECTORS.inputCertificateDescription).val('New Certificate Description');
+
+                this.view.$('.action-cancel').click();
+                expect(this.model).toBeCorrectValuesInModel({
+                    name: 'Test Name',
+                    description: 'Test Description'
+                })
+
+                // Model is still exist in the collection
+                expect(this.collection.length).toBe(1);
+            });
         });
-
-        it('cannot be deleted if it is in use', function () {
-            assertCannotDeleteUsed(
-                this,
-                'Cannot delete when in use by a unit',
-                'This content group is used in one or more units.'
-            );
-        });
-
-        it('does not contain warning message if it is not in use', function () {
-            assertUnusedOptions(this);
-        });
-    });
-
-
     });
 });

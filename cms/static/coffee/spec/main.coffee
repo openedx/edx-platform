@@ -268,6 +268,12 @@ define([
 
     "js/spec/xblock/cms.runtime.v1_spec",
 
+    # Certificates spec files mapping.
+    # We are defining the path to certificate spec (test) files.
+    "js/certificates/spec/views/certificate_editor_spec",
+    "js/certificates/spec/views/certificate_details_spec",
+    "js/certificates/spec/models/certificate_spec",
+
     # these tests are run separately in the cms-squire suite, due to process
     # isolation issues with Squire.js
     # "coffee/spec/views/assets_spec"

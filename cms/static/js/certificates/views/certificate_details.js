@@ -55,7 +55,7 @@ function(BaseView, _, gettext, str) {
             console.log('certificate_details.render');
             var attrs = $.extend({}, this.model.attributes, {
                 index: this.model.collection.indexOf(this.model),
-                showDetails: showDetails || false,
+                showDetails: showDetails || false
             });
 
             this.$el.html(this.template(attrs));

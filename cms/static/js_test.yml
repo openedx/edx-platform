@@ -79,6 +79,7 @@ src_paths:
     - js/certificates
 
 # Paths to spec (test) JavaScript files
+# We should define the custom path mapping in /coffee/spec/main.coffee as well e.g. certificates etc.
 spec_paths:
     - coffee/spec/main.js
     - coffee/spec
