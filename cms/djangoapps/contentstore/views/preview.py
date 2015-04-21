@@ -15,7 +15,6 @@ from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.library_tools import LibraryToolsService
-from xmodule.services import SettingsService
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryUsageLocator
@@ -26,6 +25,7 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock.fragment import Fragment
 from student.auth import has_studio_read_access, has_studio_write_access
 from xblock_django.user_service import DjangoXBlockUserService
+from xmodule.services import SettingsService, NotificationsService, CoursewareParentInfoService
 
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from cms.lib.xblock.field_data import CmsFieldData
@@ -142,6 +142,26 @@ class StudioPermissionsService(object):
         return has_studio_write_access(self._request.user, course_key)
 
 
+def get_available_xblock_services():
+    """
+    Returns a dict of available services for xBlocks
+    """
+
+    services = {
+        "i18n": ModuleI18nService(),
+        "settings": SettingsService(),
+        "courseware_parent_info": CoursewareParentInfoService(),
+        "library_tools": LibraryToolsService(modulestore()),
+    }
+
+    if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
+        services.update({
+            "notifications": NotificationsService()
+        })
+
+    return services
+
+
 def _preview_module_system(request, descriptor, field_data):
     """
     Returns a ModuleSystem for the specified descriptor that is specialized for
@@ -172,6 +192,12 @@ def _preview_module_system(request, descriptor, field_data):
 
     descriptor.runtime._services['studio_user_permissions'] = StudioPermissionsService(request)  # pylint: disable=protected-access
 
+    services = get_available_xblock_services()
+    services.update({
+        'user': DjangoXBlockUserService(request.user),
+        'field-data': field_data,
+    })
+
     return PreviewModuleSystem(
         static_url=settings.STATIC_URL,
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
@@ -192,15 +218,8 @@ def _preview_module_system(request, descriptor, field_data):
         wrappers=wrappers,
         error_descriptor_class=ErrorDescriptor,
         get_user_role=lambda: get_user_role(request.user, course_id),
-        # Get the raw DescriptorSystem, not the CombinedSystem
-        descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
-        services={
-            "i18n": ModuleI18nService(),
-            "field-data": field_data,
-            "library_tools": LibraryToolsService(modulestore()),
-            "settings": SettingsService(),
-            "user": DjangoXBlockUserService(request.user),
-        },
+        descriptor_runtime=descriptor.runtime,
+        services=services,
     )
 
 

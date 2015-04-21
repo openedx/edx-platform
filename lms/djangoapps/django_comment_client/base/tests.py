@@ -21,7 +21,6 @@ from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-
 log = logging.getLogger(__name__)
 
 CS_PREFIX = "http://localhost:4567/api/v1"
@@ -495,7 +494,8 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
             "read": False,
             "comments_count": 0,
         })
-        url = reverse('flag_abuse_for_thread', kwargs={'thread_id': '518d4237b023791dca00000d', 'course_id': self.course_id.to_deprecated_string()})
+        url = reverse('flag_abuse_for_thread', kwargs={'thread_id': '518d4237b023791dca00000d',
+                                                       'course_id': self.course_id.to_deprecated_string()})
         response = self.client.post(url)
         assert_true(mock_request.called)
 
