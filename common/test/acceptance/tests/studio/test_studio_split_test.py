@@ -8,6 +8,8 @@ from unittest import skip
 from nose.plugins.attrib import attr
 from selenium.webdriver.support.ui import Select
 
+from flaky import flaky
+
 from xmodule.partitions.partitions import Group
 from bok_choy.promise import Promise, EmptyPromise
 
@@ -1044,6 +1046,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         rendered_group_names = self.get_select_options(page=courseware_page, selector=".split-test-select")
         self.assertListEqual(group_names, rendered_group_names)
 
+    @flaky  # TODO fix this, see TNL-2035
     def test_split_test_LMS_staff_view(self):
         """
         Scenario: Ensure that split test is correctly rendered in LMS staff mode as it is
