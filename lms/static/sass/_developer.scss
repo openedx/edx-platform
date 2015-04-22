@@ -1,6 +1,6 @@
 // edX LMS - developer
 // ====================
-// NOTE: use this area for any developer-needed or created styling that needs to be refactored into patterns or visually polished. Please list any template/view that your styles reference when definining them (example below):
+// NOTE: use this area for any developer-needed or created styling that needs to be refactored into patterns or visually polished. Please list any template/view that your styles reference when defining them (example below):
 
 // Views: Login, Sign Up
 // .crazy-new-feature {
@@ -49,4 +49,16 @@
   background-color: $white;
   padding: ($baseline*1.5) $baseline;
   text-align: center;
+}
+
+
+// Views: Checkout Cancel Page
+.checkout-error {
+  .heading {
+    @extend h1;
+  }
+
+  .body {
+    @extend .text-center;
+  }
 }

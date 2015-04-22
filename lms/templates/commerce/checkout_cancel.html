@@ -5,8 +5,10 @@
 <%block name="pagetitle">${_("Checkout Cancelled")}</%block>
 
 
-<section class="container">
-    <h1>${_("Checkout Cancelled")}</h1>
-    ${ _(u"Your transaction has been cancelled. If you feel an error has occurred, contact {email}.").format(
-    email="<a href=\"mailto:{email}\">{email}</a>".format(email=payment_support_email)) }
+<section class="container checkout-error">
+    <div class="heading">${_("Checkout Cancelled")}</div>
+    <div class="body">
+        ${ _(u"Your transaction has been cancelled. If you feel an error has occurred, contact {email}.").format(
+        email="<a href=\"mailto:{email}\">{email}</a>".format(email=payment_support_email)) }
+    </div>
 </section>
