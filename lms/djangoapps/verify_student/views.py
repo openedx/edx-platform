@@ -806,6 +806,8 @@ def submit_photos_for_verification(request):
     attempt.mark_ready()
     attempt.submit()
 
+    log.info(u"Submitted initial verification attempt for user %s", request.user.id)
+
     account_settings = get_account_settings(request.user)
 
     # Send a confirmation email to the user
@@ -1120,21 +1122,32 @@ class InCourseReverifyView(View):
         # Check the in-course re-verification is enabled or not
         incourse_reverify_enabled = InCourseReverificationConfiguration.current().enabled
         if not incourse_reverify_enabled:
+            log.error(
+                u"In-course reverification is not enabled.  "
+                u"You can enable it in Django admin by setting "
+                u"InCourseReverificationConfiguration to enabled."
+            )
             raise Http404
 
         user = request.user
         course_key = CourseKey.from_string(course_id)
         course = modulestore().get_course(course_key)
         if course is None:
+            log.error(u"Could not find course %s for in-course reverification.", course_key)
             raise Http404
 
         checkpoint = VerificationCheckpoint.get_verification_checkpoint(course_key, checkpoint_name)
         if checkpoint is None:
+            log.error(
+                u"No verification checkpoint exists for the "
+                u"course %s and checkpoint name %s.",
+                course_key, checkpoint_name
+            )
             raise Http404
 
         init_verification = SoftwareSecurePhotoVerification.get_initial_verification(user)
         if not init_verification:
-            return redirect(reverse('verify_student_verify_later', kwargs={'course_id': unicode(course_key)}))
+            return self._redirect_no_initial_verification(user, course_key)
 
         # emit the reverification event
         self._track_reverification_events(
@@ -1175,6 +1188,7 @@ class InCourseReverifyView(View):
             usage_key = UsageKey.from_string(location).replace(course_key=course_key)
         except InvalidKeyError:
             raise Http404(u"Invalid course_key or usage_key")
+
         course = modulestore().get_course(course_key)
         checkpoint = VerificationCheckpoint.get_verification_checkpoint(course_key, checkpoint_name)
         if checkpoint is None:
@@ -1190,10 +1204,10 @@ class InCourseReverifyView(View):
                 'location': location
             }
             return render_to_response("verify_student/incourse_reverify.html", context)
+
         init_verification = SoftwareSecurePhotoVerification.get_initial_verification(user)
         if not init_verification:
-            log.error("Could not submit verification attempt for user %s", request.user.id)
-            return redirect(reverse('verify_student_verify_later', kwargs={'course_id': unicode(course_key)}))
+            return self._redirect_no_initial_verification(user, course_key)
 
         try:
             attempt = SoftwareSecurePhotoVerification.submit_faceimage(
@@ -1210,6 +1224,10 @@ class InCourseReverifyView(View):
             try:
                 redirect_url = get_redirect_url(course_key, usage_key)
             except (ItemNotFoundError, NoPathToItem):
+                log.warning(
+                    u"Could not find redirect URL for location %s in course %s",
+                    course_key, usage_key
+                )
                 redirect_url = reverse("courseware", args=(unicode(course_key),))
 
             return JsonResponse({'url': redirect_url})
@@ -1235,6 +1253,11 @@ class InCourseReverifyView(View):
             None
 
         """
+        log.info(
+            u"In-course reverification: event %s occurred for user %s in course %s at checkpoint %s",
+            event_name, user_id, course_id, checkpoint
+        )
+
         if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
             tracking_context = tracker.get_tracker().resolve_context()
             analytics.track(
@@ -1251,3 +1274,29 @@ class InCourseReverifyView(View):
                     }
                 }
             )
+
+    def _redirect_no_initial_verification(self, user, course_key):
+        """Redirect because the user does not have an initial verification.
+
+        NOTE: currently, we assume that courses are configured such that
+        the first re-verification always occurs AFTER the initial verification
+        deadline.  Later, we may want to allow users to upgrade to a verified
+        track, then submit an initial verification that also counts
+        as a verification for the checkpoint in the course.
+
+        Arguments:
+            user (User): The user who made the request.
+            course_key (CourseKey): The identifier for the course for which
+                the user is attempting to re-verify.
+
+        Returns:
+            HttpResponse
+
+        """
+        log.warning(
+            u"User %s does not have an initial verification, so "
+            u"he/she will be redirected to the \"verify later\" flow "
+            u"for the course %s.",
+            user.id, course_key
+        )
+        return redirect(reverse('verify_student_verify_later', kwargs={'course_id': unicode(course_key)}))
