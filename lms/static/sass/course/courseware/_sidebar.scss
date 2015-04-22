@@ -17,43 +17,36 @@
   }
 
   div#accordion {
+    @extend %t-copy-sub1;
     width: auto;
-    font-size: 14px;
 
     h3 {
-      border-radius: 0;
-      margin: 0;
+      @extend %t-title6;
+      @include padding-left($baseline);
       overflow: visible;
-      font-size: 16px;
+      margin: 0;
+      border-radius: 0;
+      box-shadow: none;
+      color: $link-color;
 
       &:first-child {
         border: none;
       }
 
-      &:hover, &:focus {
-        color: #666;
-      }
-
-      &.ui-state-hover, &.ui-state-focus {
-        a {
-          color: #666;
-        }
-      }
-
       &.ui-accordion-header {
+        @extend %t-regular;
         border-bottom: none;
-        color: $black;
 
         a {
+          @include padding-left($baseline);
           border-radius: 0;
           box-shadow: none;
-          @include padding-left(19px);
           color: $link-color;
         }
 
         &.ui-state-active {
-          @extend .active;
           border-bottom: none;
+          color: $base-font-color;
 
           &:hover, &:focus {
             background: none;
@@ -61,9 +54,9 @@
         }
 
         span.ui-icon {
-          @include left(0);
-          opacity: 0.3;
+          @include left($baseline);
           background-image: url("/static/images/ui-icons_222222_256x240.png");  // jQuery UI sprite
+          opacity: 0.3;
 
           &.ui-icon-triangle-1-e {
 
@@ -82,25 +75,24 @@
     }
 
     .chapter {
-      width: 100% !important;
       @include box-sizing(border-box);
-      padding: 11px 14px;
       @include linear-gradient(top, $sidebar-chapter-bg-top, $sidebar-chapter-bg-bottom);
-      background-color: $sidebar-chapter-bg;
-      box-shadow: 0 1px 0 $white inset, 0 -1px 0 $shadow-l1 inset;
       @include transition(background-color .1s linear 0s);
+      width: 100% !important;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      box-shadow: 0 1px 0 $white inset, 0 -1px 0 $shadow-l1 inset;
+      background-color: $sidebar-chapter-bg;
+      color: $link-color;
+
+      h3 {
+        padding: ($baseline*.75) $baseline ($baseline*.75) ($baseline*2);
+      }
 
       &.is-open {
         background: $white;
-      }
-
-      &:first-child {
-        border-radius: 3px 0 0 0;
-      }
-
-      &:last-child {
-        border-radius: 0 0 0 3px;
-        box-shadow: 0 1px 0 $white inset;
+        box-shadow: none;
       }
 
       &:hover, &:focus {
@@ -108,41 +100,47 @@
       }
     }
 
-    ul.ui-accordion-content {
-      background: transparent;
+    div.chapter-content-container{
+      display: none;
+      padding: 0 14px ($baseline/2) 14px;
+      border-bottom: 1px solid $shadow-l1;
+      background: $white;
+    }
+
+    div.ui-accordion-content {
+      margin: 0;
+      padding: 0 ($baseline*.75);
       border: none;
       border-radius: 0;
-      margin: 0;
-      padding: 9px 0 9px 9px;
-      overflow: auto;
-      width: 100%;
+      background: transparent;
 
       li {
+        margin: ($baseline/5) 0;
+        // margin-bottom: ($baseline/5);
         border-bottom: 0;
         border-radius: 0;
-        margin-bottom: ($baseline/5);
 
         a {
-          background: transparent;
-          border-radius: 4px;
-          display: block;
-          @include padding( ($baseline/4), ($baseline*1.5), ($baseline/4), ($baseline/2));
+          @extend %t-strong;
+          @include padding(($baseline/4) ($baseline/2));
           position: relative;
+          display: block;
+          border-radius: ($baseline/5);
+          background: transparent;
           text-decoration: none;
 
           p {
-            font-weight: bold;
-            font-family: $sans-serif;
+            @extend %t-action3;
+            @extend %t-strong;
             margin-bottom: 0;
-            line-height: 1.3;
+            font-family: $sans-serif;
 
             &.subtitle {
-              @extend %t-copy-sub2;
-              @extend %t-weight2;
-              display: inline-block;
-              width: 90%;
-              color: $gray-d1;
+              @extend %t-action3;
+              @extend %t-regular;
+              display: block;
               margin: 0;
+              color: $gray-d1;
 
               &:empty {
                 display: none;
@@ -164,7 +162,6 @@
           }
 
           &:hover, &:focus {
-            background: $shadow-l1;
 
             > a p {
               color: $gray-d3;
@@ -182,19 +179,19 @@
         }
 
         &.active {
-          @extend %t-weight5;
+          @extend %t-strong;
 
           &:after {
+            @extend %t-regular;
+            @include transition(none);
+            @include right($baseline);
             content: '›';
             position: absolute;
             top: 50%;
-            right: 20px;
             margin-top: -13px;
             font-size: 30px;
-            font-weight: normal;
-            color: #333;
+            color: $gray-d3;
             opacity: 0;
-            @include transition(none);
           }
 
           > a {
@@ -208,24 +205,27 @@
             }
 
             p {
-              color: #333;
+              color: $gray-d3;
             }
           }
 
           span.subtitle {
-            @extend %t-weight2;
+            @extend %t-regular;
           }
         }
 
         &.graded {
-          > a {
-            .icon {
-              vertical-align: middle;
-            }
+         > a {
+           > img {
+             @include right($baseline/4);
+             position: absolute;
+             bottom: ($baseline/4);
+             margin: auto;
+           }
           }
 
           &.active > a {
-            background: linear-gradient(to bottom, #e6e6e6, #d6d6d6);
+            background: linear-gradient(to bottom, $gray-l4, #d6d6d6);
           }
         }
       }

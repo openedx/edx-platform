@@ -642,11 +642,11 @@ class TestTOC(ModuleStoreTestCase):
                             'format': '', 'due': None, 'active': False},
                            {'url_name': 'video_4f66f493ac8f', 'display_name': 'Video', 'graded': True,
                             'format': '', 'due': None, 'active': False}],
-                          'url_name': 'Overview', 'display_name': u'Overview'},
+                          'url_name': 'Overview', 'display_name': u'Overview', 'display_id': u'Overview'},
                          {'active': False, 'sections':
                           [{'url_name': 'toyvideo', 'display_name': 'toyvideo', 'graded': True,
                             'format': '', 'due': None, 'active': False}],
-                          'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
+                          'url_name': 'secret:magic', 'display_name': 'secret:magic', 'display_id': 'secretmagic'}])
 
             course = self.store.get_course(self.toy_course.id, depth=2)
             with check_mongo_calls(toc_finds):
@@ -682,11 +682,11 @@ class TestTOC(ModuleStoreTestCase):
                             'format': '', 'due': None, 'active': False},
                            {'url_name': 'video_4f66f493ac8f', 'display_name': 'Video', 'graded': True,
                             'format': '', 'due': None, 'active': False}],
-                          'url_name': 'Overview', 'display_name': u'Overview'},
+                          'url_name': 'Overview', 'display_name': u'Overview', 'display_id': u'Overview'},
                          {'active': False, 'sections':
                           [{'url_name': 'toyvideo', 'display_name': 'toyvideo', 'graded': True,
                             'format': '', 'due': None, 'active': False}],
-                          'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
+                          'url_name': 'secret:magic', 'display_name': 'secret:magic', 'display_id': 'secretmagic'}])
 
             with check_mongo_calls(toc_finds):
                 actual = render.toc_for_course(

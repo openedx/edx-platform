@@ -6,7 +6,7 @@
 %>
 
 <%def name="make_chapter(chapter)">
-  <div class="chapter">
+  <button class="chapter" id="${chapter['display_id']}-parent" aria-controls="${chapter['display_id']}-child" aria-expanded="false" aria-pressed="false">
       <%
           if chapter.get('active'):
               aria_label = _('{chapter}, current chapter').format(chapter=chapter['display_name'])
@@ -16,61 +16,34 @@
               active_class = ''
       %>
       <h3 ${active_class} aria-label="${aria_label}">
-        <a href="#">
           ${chapter['display_name']}
-        </a>
       </h3>
+    </button>
+    <div class="chapter-content-container">
+        <div id="${chapter['display_id']}-child" role="region" aria-labelledby="${chapter['display_id']}-parent" aria-hidden="false">
+            <ol>
+              % for section in chapter['sections']:
+                  <li class="${'active' if 'active' in section and section['active'] else ''} ${'graded'  if 'graded' in section and section['graded'] else ''}">
+                    <a href="${reverse('courseware_section', args=[course_id, chapter['url_name'], section['url_name']])}">
+                      <p>${section['display_name']} ${'<span class="sr">, current section</span>' if 'active' in section and section['active'] else ''}</p>
+                      <%
+                        if section.get('due') is None:
+                            due_date = ''
+                        else:
+                            formatted_string = get_time_display(section['due'], due_date_display_format, coerce_tz=settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES)
+                            due_date = '' if len(formatted_string)==0 else _('due {date}').format(date=formatted_string)
+                      %>
+                      <p class="subtitle">${section['format']} ${due_date}</p>
 
-    <ul>
-      % for section in chapter['sections']:
-          <li class="${'active' if 'active' in section and section['active'] else ''} ${'graded'  if 'graded' in section and section['graded'] else ''}">
-            <a href="${reverse('courseware_section', args=[course_id, chapter['url_name'], section['url_name']])}">
-              <p>${section['display_name']} ${'<span class="sr">, current section</span>' if 'active' in section and section['active'] else ''}</p>
-              <%
-                if section.get('due') is None:
-                    due_date = ''
-                else:
-                    formatted_string = get_time_display(section['due'], due_date_display_format, coerce_tz=settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES)
-                    due_date = '' if len(formatted_string)==0 else _('due {date}').format(date=formatted_string)
-              %>
-
-              ## There is behavior differences between
-              ## rending of sections which have proctoring/timed examinations
-              ## and those that do not.
-              ##
-              ## Proctoring exposes a exam status message field as well as
-              ## a status icon
-
-              % if section['format'] or due_date or 'proctoring' in section:
-              <p class="subtitle">
-                % if 'proctoring' in section:
-                  ## Display the proctored exam status icon and status message
-                  <i class="fa ${section['proctoring'].get('suggested_icon', 'fa-lock')}  ${section['proctoring'].get('status', 'eligible')}"></i>&nbsp;
-                  <span class="subtitle-name">${section['proctoring'].get('short_description', '')}
-                  </span>
-                  ## completed proctored exam statuses should not show the due date
-                  ## since the exam has already been submitted by the user
-                  % if not section['proctoring'].get('in_completed_state', False):
-                    <span class="subtitle-name">${due_date}</span>
-                  % endif
-                % else:
-                    ## non-proctored section, we just show the exam format and the due date
-                    ## this is the standard case in edx-platform
-                    <span class="subtitle-name">${section['format']} ${due_date}
-                    </span>
-                % endif
-              </p>
-              % endif
-
-              % if 'graded' in section and section['graded']:
-              ## sections that are graded should indicate this through an icon
-              <i class="icon fa fa-pencil-square-o" aria-hidden="true" data-tooltip="${_("This section is graded.")}"></i>
-              % endif
-            </a>
-          </li>
-      % endfor
-    </ul>
-  </div>
+                      % if 'graded' in section and section['graded']:
+                          <img src="/static/images/graded.png" alt="Graded Section">
+                      % endif
+                    </a>
+                  </li>
+              % endfor
+            </ol>
+        </div>
+    </div>
 </%def>
 
 % for chapter in toc:
