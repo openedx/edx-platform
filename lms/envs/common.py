@@ -2274,9 +2274,7 @@ PROFILE_IMAGE_BACKEND = {
         'base_url': os.path.join(MEDIA_URL, 'profile-images/'),
     },
 }
-PROFILE_IMAGE_DEFAULT_FILENAME = (
-    'images/edx-theme/default-profile' if FEATURES['IS_EDX_DOMAIN'] else 'images/default-theme/default-profile'
-)
+PROFILE_IMAGE_DEFAULT_FILENAME = 'images/default-theme/default-profile'
 PROFILE_IMAGE_DEFAULT_FILE_EXTENSION = 'png'
 # This secret key is used in generating unguessable URLs to users'
 # profile images.  Once it has been set, changing it will make the

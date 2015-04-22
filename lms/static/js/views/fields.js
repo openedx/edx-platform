@@ -583,6 +583,7 @@
             render: function () {
                 this.$el.html(this.template({
                     id: this.options.valueAttribute,
+                    inputName: (this.options.inputName || 'file'),
                     imageUrl: _.result(this, 'imageUrl'),
                     imageAltText: _.result(this, 'imageAltText'),
                     uploadButtonIcon: _.result(this, 'iconUpload'),
@@ -679,7 +680,6 @@
 
             fileSelected: function (e, data) {
                 if (_.isUndefined(data.files[0].size) || this.validateImageSize(data.files[0].size)) {
-                    data.formData = {file: data.files[0]};
                     this.setCurrentStatus('uploading');
                     this.setRemoveButtonVisibility('none');
                     this.showUploadInProgressMessage();
