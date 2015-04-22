@@ -47,3 +47,7 @@ autodeploy.properties
 .vagrant/
 logs
 .testids/
+
+cms/
+lms/
+common/
