@@ -153,6 +153,7 @@ def toc_for_course(request, course, active_chapter, active_section, field_data_c
         for chapter in chapters:
             # Only show required content, if there is required content
             # chapter.hide_from_toc is read-only (boo)
+            name_without_spaces = chapter.display_name_with_default.replace(" ", "-").replace(":", "")
             local_hide_from_toc = False
             if required_content:
                 if unicode(chapter.location) not in required_content:
@@ -178,6 +179,7 @@ def toc_for_course(request, course, active_chapter, active_section, field_data_c
                                      })
             toc_chapters.append({
                 'display_name': chapter.display_name_with_default,
+                'display_id': name_without_spaces,
                 'url_name': chapter.url_name,
                 'sections': sections,
                 'active': chapter.url_name == active_chapter

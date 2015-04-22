@@ -14,7 +14,7 @@ class CoursewarePage(CoursePage):
     url_path = "courseware/"
     xblock_component_selector = '.vert .xblock'
     section_selector = '.chapter'
-    subsection_selector = '.chapter ul li'
+    subsection_selector = '.chapter-content-container ol li'
 
     def is_browser_on_page(self):
         return self.q(css='body.courseware').present
