@@ -25,6 +25,9 @@
       margin: 0;
       overflow: visible;
       font-size: 16px;
+      box-shadow: none;
+      @include padding-left(19px);
+      color: $link-color;
 
       &:first-child {
         border: none;
@@ -108,7 +111,12 @@
       }
     }
 
-    ul.ui-accordion-content {
+    div.chapter-content-container{
+      padding: 11px 14px;
+      display: none;
+    }
+
+    div.ui-accordion-content {
       background: transparent;
       border: none;
       border-radius: 0;

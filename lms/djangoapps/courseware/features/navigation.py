@@ -92,7 +92,7 @@ def when_i_navigate_to_a_section(step):
     world.disable_jquery_animations()
 
     # Open the 2nd section
-    world.css_click(css_selector='div.chapter', index=1)
+    world.css_click(css_selector='button.chapter', index=1)
     subsection_css = 'a[href*="Test_Subsection_2/"]'
 
     # Click on the subsection to see the content
