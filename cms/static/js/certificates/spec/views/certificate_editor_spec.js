@@ -98,8 +98,12 @@ define([
                 var requests = AjaxHelpers.requests(this),
                     notificationSpy = ViewHelpers.createNotificationSpy();
                 this.view.$('.action-add').click();
-                this.view.$(SELECTORS.inputCertificateName).val('New Test Name');
-                this.view.$(SELECTORS.inputCertificateDescription).val('New Test Description');
+
+                setValuesToInputs(this.view, {
+                    inputCertificateName: 'New Test Name',
+                    inputCertificateDescription: 'New Test Description'
+                });
+
                 submitForm(this.view, requests, notificationSpy);
                 expect(this.model).toBeCorrectValuesInModel({
                     name: 'New Test Name',
