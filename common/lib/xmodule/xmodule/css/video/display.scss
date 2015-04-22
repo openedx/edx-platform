@@ -1,9 +1,9 @@
 %video-button {
   @include transition(all $tmg-f2 ease-in-out 0s);
   display: inline-block;
-  height: ($baseline*2);
-  padding: 0 ($baseline/1.5);
-  line-height: ($baseline*2);
+  height: 32px;
+  padding: 0 8px;
+  line-height: 32px;
   text-shadow: none;
   font-size: 100%;
   color: #f5f5f5;
@@ -70,8 +70,8 @@
   width: 100%;
 
   a {
+    @include margin-left(-($baseline/5) / 2);
     top: 0;
-    margin-left: -($baseline/5) / 2;
   }
 
   &:hover,
@@ -80,8 +80,8 @@
     margin-top: -($baseline/2.5);
 
     a {
+      @include margin-left(-($baseline/2));
       top: -6px;
-      margin-left: -($baseline/2);
     }
   }
 }
@@ -96,8 +96,8 @@
 
   &:hover,
   &:focus {
+    @include margin-left(-($baseline/4));
     width: ($baseline/2);
-    margin-left: -($baseline/4);
 
     a {
       left: -7px;
@@ -141,11 +141,11 @@
 }
 
 .video-wrapper {
+  @include float(left);
+  @include margin-right(flex-gutter(9));
   position: relative;
-  float: left;
   width: flex-grid(6, 9);
   min-height: 300px;
-  margin-right: flex-gutter(9);
   background-color: $black;
 
   .video-player {
@@ -153,15 +153,14 @@
     position: relative;
     min-height: 300px;
     overflow: hidden;
-    // background: $black;
 
     .video-overlay-captions {
-      display: none; // Hidden until turnt
       @extend %ui-depth1;
+      @include margin-left(2.5%); // Padding plus equally offset margins, centers the text
+      display: none; // Hidden until turnt
       width: 90%; // We don't want it right up against the edges.
       min-width: 24px;
       min-height: 24px;
-      margin-left: 2.5%; // Padding plus equally offset margins, centers the text
       padding: ($baseline/4) ($baseline/3);
       border-radius: 3px;
       background: rgba(0, 0, 0, .70);
@@ -209,12 +208,17 @@
           position: absolute;
           z-index: 10;
           bottom: ($baseline*2);
-          min-width: ($baseline*6.5);
+          width: 32px; // Match the width of the buttons
           height: auto; // Override the height of buttons
           margin: 0;
           padding: 0;
           background: #222;
           list-style: none;
+
+          &.video-speeds,
+          &.video-languages {
+            width: 110px;
+          }
 
           &.is-opened {
             display: block;
@@ -253,6 +257,8 @@
       .time,
       .speed,
       .video-speeds,
+      .language,
+      .video-languages,
       .volume-button,
       .size,
       .quality,
@@ -293,9 +299,9 @@
 
           .volume-slider {
             @extend %slider-range-vertical;
+            @include left(50%);
+            @include margin-left(-2px);
             border-bottom: 2px solid $black;
-            left: 50%;
-            margin-left: -2px;
           }
         }
       }
@@ -320,12 +326,12 @@
 }
 
 .subtitles {
+  @include padding-left(0);
   display: inline-block;
   visibility: visible;
   width: flex-grid(3, 9);
   max-height: 460px;
   margin: 0;
-  padding-left: 0;
   overflow: auto;
   font-size: 14px;
   list-style: none;
@@ -454,10 +460,10 @@
     position: static;
 
     .video-wrapper {
+      @include margin-right(0);
       height: 100%;
       width: 75%;
       vertical-align: middle;
-      margin-right: 0;
 
       object,
       iframe,
@@ -470,8 +476,8 @@
 
     .video-controls {
       @extend %ui-depth4;
+      @include left(0);
       position: absolute;
-      left: 0;
       bottom: 0;
       width: 100%;
     }
@@ -507,16 +513,16 @@
     clear: both;
   }
 
-  .video-download-button{
+  .video-download-button {
+    @include margin(($baseline*0.75), ($baseline/2), 0, 0);
     display: inline-block;
     vertical-align: top;
-    margin: ($baseline*0.75) ($baseline/2) 0 0;
 
     > a {
       @include transition(all $tmg-f2 ease-in-out 0s);
       @include font-size(14);
+      @include float(left);
       line-height : 14px;
-      float: left;
       border-radius: 3px;
       background-color: $very-light-text;
       padding: ($baseline*0.75);
@@ -539,9 +545,9 @@
   }
 
   .branding {
+    @include float(right);
+    @include margin(15px, 0, 0, 10px);
     display: inline-block;
-    float: right;
-    margin: 15px 0 0 10px;
     vertical-align: top;
 
     .host-tag {

@@ -79,7 +79,9 @@ function() {
             // We provide an independent behavior to adjust volume level.
             // Therefore, we do not need redundant focusing on slider in TAB
             // order.
-            container.find('a').attr('tabindex', -1);
+            container.find('a')
+                .attr('tabindex', -1)
+                .attr('role', 'slider');
         },
 
         /** Bind any necessary function callbacks to DOM events. */
@@ -232,12 +234,20 @@ function() {
                 .removeClass('is-opened');
 
             this.el
+                .find('.volume-button')
+                    .attr('aria-expanded', 'true');
+
+            this.el
                 .find('.menu')
                     .addClass('is-opened');
         },
 
         /** Closes speed menu. */
         closeMenu: function() {
+            this.el
+                .find('.volume-button')
+                    .attr('aria-expanded', 'false');
+
             this.el
                 .find('.menu')
                     .removeClass('is-opened');
@@ -383,8 +393,7 @@ function() {
                 'class':  'sr video-live-region',
                 'role': 'status',
                 'aria-hidden': 'false',
-                'aria-live': 'polite',
-                'aria-atomic': 'false'
+                'aria-live': 'polite'
             });
 
             this.button.after(this.liveRegion);
