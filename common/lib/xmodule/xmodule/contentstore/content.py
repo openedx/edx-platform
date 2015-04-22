@@ -59,6 +59,7 @@ class StaticContent(object):
             asset
         """
         path = path.replace('/', '_')
+        # todo: new coursekeys behave weirdly with assets, will break if title is non ascii
         return course_key.make_asset_key(
             'asset' if not is_thumbnail else 'thumbnail',
             AssetLocator.clean_keeping_underscores(path)
