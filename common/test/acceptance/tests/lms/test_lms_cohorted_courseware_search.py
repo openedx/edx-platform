@@ -94,7 +94,6 @@ class CoursewareSearchCohortTest(ContainerBase):
         """
         Reindex course content on studio course page
         """
-
         self._auto_auth(self.staff_user["username"], self.staff_user["email"], True)
         self.course_outline.visit()
         self.course_outline.start_reindex()

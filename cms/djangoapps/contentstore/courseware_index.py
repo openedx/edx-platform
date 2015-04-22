@@ -187,6 +187,7 @@ class SearchIndexerBase(object):
                     (triggered_at is not None and (triggered_at - item.subtree_edited_on) > reindex_age)
                 children_groups_usage = []
                 for child_item in item.get_children():
+<<<<<<< HEAD
                     if modulestore.has_published_version(child_item):
                         children_groups_usage.append(
                             index_item(
@@ -197,6 +198,15 @@ class SearchIndexerBase(object):
                         )
                 if None in children_groups_usage:
                     item_content_groups = None
+=======
+                    item_content_groups = getattr(item, 'content_groups', None)
+                    if item_content_groups:
+                        index_item(child_item, skip_index=skip_child_index,
+                                   groups_usage_info=groups_usage_info, content_groups=item.content_groups)
+                    else:
+                        index_item(child_item, skip_index=skip_child_index,
+                                   groups_usage_info=groups_usage_info)
+>>>>>>> SOL-495 Add support for split modulestore in tests and fix Davorins nitpicks
 
             if skip_index or not item_index_dictionary:
                 return
