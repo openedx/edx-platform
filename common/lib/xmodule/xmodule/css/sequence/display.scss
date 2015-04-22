@@ -252,7 +252,7 @@ $sequence--border-color: #C8C8C8;
 
   &.button-previous {
     @include border-radius(35px, 0, 0, 35px);
-    left: 0;
+    @include left(0);
     background-position: center 15px;
 
     // CASE: left to right layout
@@ -268,7 +268,7 @@ $sequence--border-color: #C8C8C8;
 
   &.button-next {
     @include border-radius(0, 35px, 35px, 0);
-    right: 0;
+    @include right(0);
     background-position: center 15px;
 
     // CASE: left to right layout
