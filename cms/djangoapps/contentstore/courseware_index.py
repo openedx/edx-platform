@@ -10,6 +10,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 
 from contentstore.utils import course_image_url
+from course_modes.models import CourseMode
 from eventtracking import tracker
 from search.search_engine_base import SearchEngine
 from xmodule.annotator_mixin import html_to_text
@@ -380,14 +381,43 @@ class AboutInfo(object):
     ANALYSE = 1 << 0  # Add the information to the analysed content of the index
     PROPERTY = 1 << 1  # Add the information as a property of the object being indexed (not analysed)
 
-    # Source location options - either from the course or the about info
-    FROM_ABOUT_INFO = 1
-    FROM_COURSE_PROPERTY = 2
-
     def __init__(self, property_name, index_flags, source_from):
         self.property_name = property_name
         self.index_flags = index_flags
         self.source_from = source_from
+
+    def get_value(self, **kwargs):
+        """ get the value for this piece of information, using the correct source """
+        return self.source_from(self, **kwargs)
+
+    def from_about_dictionary(self, **kwargs):
+        """ gets the value from the kwargs provided 'about_dictionary' """
+        about_dictionary = kwargs.get('about_dictionary', None)
+        if not about_dictionary:
+            raise ValueError("Context dictionary does not contain expected argument 'about_dictionary'")
+
+        return about_dictionary.get(self.property_name, None)
+
+    def from_course_property(self, **kwargs):
+        """ gets the value from the kwargs provided 'course' """
+        course = kwargs.get('course', None)
+        if not course:
+            raise ValueError("Context dictionary does not contain expected argument 'course'")
+
+        return getattr(course, self.property_name, None)
+
+    def from_course_mode(self, **kwargs):
+        """ fetches the available course modes from the CourseMode model """
+        course = kwargs.get('course', None)
+        if not course:
+            raise ValueError("Context dictionary does not contain expected argument 'course'")
+
+        return [mode.slug for mode in CourseMode.modes_for_course(course.id)]
+
+    # Source location options - either from the course or the about info
+    FROM_ABOUT_INFO = from_about_dictionary
+    FROM_COURSE_PROPERTY = from_course_property
+    FROM_COURSE_MODE = from_course_mode
 
 
 class CourseAboutSearchIndexer(object):
@@ -424,6 +454,7 @@ class CourseAboutSearchIndexer(object):
         AboutInfo("enrollment_start", AboutInfo.PROPERTY, AboutInfo.FROM_COURSE_PROPERTY),
         AboutInfo("enrollment_end", AboutInfo.PROPERTY, AboutInfo.FROM_COURSE_PROPERTY),
         AboutInfo("org", AboutInfo.PROPERTY, AboutInfo.FROM_COURSE_PROPERTY),
+        AboutInfo("modes", AboutInfo.PROPERTY, AboutInfo.FROM_COURSE_MODE),
     ]
 
     @classmethod
@@ -454,14 +485,15 @@ class CourseAboutSearchIndexer(object):
             for item in modulestore.get_items(course.id, qualifiers={"category": "about"})
         }
 
+        about_context = {
+            "course": course,
+            "about_dictionary": about_dictionary,
+        }
+
         for about_information in cls.ABOUT_INFORMATION_TO_INCLUDE:
             # Broad exception handler so that a single bad property does not scupper the collection of others
             try:
-                section_content = None
-                if about_information.source_from == AboutInfo.FROM_ABOUT_INFO:
-                    section_content = about_dictionary.get(about_information.property_name, None)
-                elif about_information.source_from == AboutInfo.FROM_COURSE_PROPERTY:
-                    section_content = getattr(course, about_information.property_name, None)
+                section_content = about_information.get_value(**about_context)
             except:  # pylint: disable=bare-except
                 section_content = None
                 log.warning(
@@ -487,7 +519,6 @@ class CourseAboutSearchIndexer(object):
             log.exception(
                 "Course discovery indexing error encountered, course discovery index may be out of date %s",
                 course_id,
-                exc_info=True,
             )
             raise
 
