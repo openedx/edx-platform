@@ -520,7 +520,6 @@ class CourseAboutSearchIndexer(object):
             log.exception(
                 "Course discovery indexing error encountered, course discovery index may be out of date %s",
                 course_id,
-                exc_info=True,
             )
             raise
 
