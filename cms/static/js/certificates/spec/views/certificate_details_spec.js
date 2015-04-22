@@ -60,6 +60,14 @@ define([
             CustomMatchers(this);
         });
 
+        it('JSON collection parsing into model', function () {
+            var CERTIFICATE_JSON = '[{"name": "Test certificate name", "description": "Test certificate description"}]';
+            this.collection.parse(CERTIFICATE_JSON);
+            var model = this.collection.at(1);
+            expect(model.get('name')).toEqual('Test certificate name');
+            expect(model.get('description')).toEqual('Test certificate description');
+        });
+
         it('should render properly', function () {
             expect(this.view.$el).toContainText('Test Name');
             expect(this.view.$('.delete')).toExist();
