@@ -94,7 +94,7 @@
   input,textarea {
     font-style: normal;
     font-weight: 400;
-    margin-right: ($baseline/5);
+    @include margin-right($baseline/5);
     padding: ($baseline/4) ($baseline/2);
   }
 
@@ -146,7 +146,7 @@
 
   .container {
     background-color: $white;
-    padding: ($baseline*1.5) ($baseline*1.5) ($baseline*2) ($baseline*1.5);
+    @include padding(($baseline*1.5), ($baseline*1.5), ($baseline*2), ($baseline*1.5));
   }
 
   // ====================
@@ -194,7 +194,7 @@
       border-collapse:collapse;
 
       tr {
-        text-align: left;
+        @include text-align(left);
       }
 
       td {
@@ -279,7 +279,7 @@
 
     .msg-content, .msg-icon {
       display: block;
-      float: left;
+      @include float(left);
     }
 
     .msg-content {
@@ -298,7 +298,7 @@
     .msg-icon {
       width: flex-grid(1,12);
       @extend %t-icon2;
-      margin-right: flex-gutter();
+      @include margin-right(flex-gutter());
       text-align: center;
       color: $m-blue;
     }
@@ -371,7 +371,7 @@
 
       .sts-track {
         width: flex-grid(3,12);
-        text-align: right;
+        @include text-align(right);
 
         .sts-track-value {
           @extend %copy-badge;
@@ -416,7 +416,7 @@
       }
 
       .sts-course-org {
-        margin-right: 0;
+        @include margin-right(0);
       }
 
       .wrapper-sts {
@@ -455,7 +455,7 @@
     @extend %ui-depth1;
     position: absolute;
     top: 43px;
-    left: 7%;
+    @include left(7%);
     display: block;
     width: 83%;
     margin: 0 auto;
@@ -505,7 +505,7 @@
           @extend %t-title7;
           @extend %t-weight4;
           @include line-height(0);
-          margin: 16px auto 0 auto;
+          @include margin(16px, auto, 0, auto);
           color: $m-gray-l1;
         }
       }
@@ -566,7 +566,7 @@
       @include triangle($baseline, $m-pink, down);
       position: absolute;
       bottom: -($baseline);
-      left: 50%;
+      @include left(50%);
     }
   }
 
@@ -663,7 +663,7 @@
       margin: $baseline 0;
 
       .wrapper-help {
-        float: right;
+        @include float(right);
         width: flex-grid(6,12);
         padding: 0 $baseline;
 
@@ -709,21 +709,21 @@
 
       .task {
         @extend %ui-window;
-        float: left;
+        @include float(left);
+        @include margin-right(flex-gutter());
         width: flex-grid(6,12);
-        margin-right: flex-gutter();
       }
 
       .controls {
         padding: ($baseline*0.75) $baseline;
         background: $m-gray-l4;
+        text-align: center;
 
         .list-controls {
           position: relative;
         }
 
         .control {
-          position: absolute;
 
           .action {
             @extend %btn-primary-blue;
@@ -759,18 +759,18 @@
         // control - redo
         .control-redo {
           position: absolute;
-          left: ($baseline/2);
+          @include left($baseline/2);
         }
 
         // control - take/do, retake
         .control-do, .control-retake {
-          left: 45%;
+          @include left(45%);
         }
 
         // control - approve
         .control-approve {
           position: absolute;
-          right: ($baseline/2);
+          @include right($baseline/2);
         }
       }
 
@@ -779,17 +779,17 @@
         margin-top: ($baseline*2);
 
         .copy {
-          float: left;
+          @include float(left);
           width: flex-grid(8,12);
-          margin-right: flex-gutter();
+          @include margin-right(flex-gutter());
         }
 
         .list-actions {
           position: relative;
           top: -($baseline/2);
-          float: left;
+          @include float(left);
           width: flex-grid(4,12);
-          text-align: right;
+          @include text-align(right);
 
           .action-retakephotos a {
             @extend %btn-primary-blue;
@@ -851,12 +851,12 @@
           margin: $baseline 0;
 
           .wrapper-photo {
-            float: left;
+            @include float(left);
             width: flex-grid(6,12);
-            margin-right: flex-gutter();
+            @include margin-right(flex-gutter());
 
             &:last-child {
-              margin-right: 0;
+              @include margin-right(0);
             }
 
             .placeholder-photo {
@@ -872,7 +872,7 @@
           }
 
           .help-tips {
-            margin-left: $baseline;
+            @include margin-left($baseline);
 
             .title {
               @extend %hd-lv5;
@@ -907,17 +907,17 @@
         @include clearfix();
 
         .copy {
-          float: left;
+          @include float(left);
           width: flex-grid(8,12);
-          margin-right: flex-gutter();
+          @include margin-right(flex-gutter());
         }
 
         .list-actions {
           position: relative;
           top: -($baseline);
-          float: left;
+          @include float(left);
           width: flex-grid(4,12);
-          text-align: right;
+          @include text-align(right);
 
           .action-editname a {
             @extend %btn-primary-blue;
@@ -935,13 +935,13 @@
           margin: $baseline 0;
 
           .field {
-            float: left;
-            margin-right: ($baseline/2);
+            @include float(left);
+            @include margin-right(($baseline/2));
             padding: ($baseline/2) ($baseline*0.75);
             background: $m-gray-t0;
 
             &:last-child {
-              margin-right: 0;
+              @include margin-right(0);
             }
           }
 
@@ -950,11 +950,11 @@
             .contribution-option {
               display: inline-block;
               vertical-align: middle;
-              margin-right: ($baseline/4);
+              @include margin-right($baseline/4);
               padding: 3px 0;
 
               &:last-child {
-                margin-right: 0;
+                @include margin-right(0);
               }
             }
 
@@ -987,7 +987,7 @@
           position: absolute;
           top: 40%;
           margin: 0 40px;
-          text-align: center;
+          @include text-align(center);
         }
       }
 
@@ -1024,7 +1024,7 @@
       @extend %t-weight4;
       position: absolute;
       top: -($baseline*1.25);
-      left: calc( 50% - 46px );
+      @include left(calc( 50% - 46px ));
       padding: ($baseline/2) ($baseline*1.5);
       background: white;
       text-align: center;
@@ -1050,15 +1050,9 @@
 
     .help-inline {
       @extend %t-copy-sub1;
-      float: left;
+      @include float(left);
       width: flex-grid(6,12);
-      margin: ($baseline*0.75) flex-gutter() 0 0;
-    }
-
-    .wizard-steps {
-      float: right;
-      width: flex-grid(6,12);
-      text-align: right;
+      @include margin(($baseline*0.75), flex-gutter(), 0, 0);
     }
 
     // STATE: is ready
@@ -1173,9 +1167,6 @@
 
       .help-item {
         @include fill-parent;
-
-        float: left;
-        margin-right: flex-gutter();
         margin-bottom: 25px;
 
         &:last-child {
@@ -1217,17 +1208,17 @@
 
       .deco-divider {
         @include fill-parent;
-        float: left;
+        @include float(left);
       }
     }
 
     .register-choice, .help-register {
-      float: left;
+      @include float(left);
     }
 
     .register-choice {
       @include fill-parent;
-      margin: 0 flex-gutter() $baseline 0;
+      @include margin(0, flex-gutter(), $baseline, 0);
       border-top: ($baseline/4) solid $m-gray-d4;
       padding: $baseline ($baseline*1.5);
       background: $m-gray-l4;
@@ -1243,8 +1234,8 @@
 
       .list-actions {
         @include fill-parent;
-        text-align: right;
-        float: right;
+        @include text-align(right);
+        @include float(right);
         margin: ($baseline/4) 0;
         border-top: none;
         clear: both;
@@ -1290,8 +1281,8 @@
       .deco-ribbon {
         position: relative;
         top: -($baseline*2.5);
-        right: -($baseline*0.35);
-        float: right;
+        @include right(-($baseline*0.35));
+        @include float(right);
         display: block;
         width: ($baseline*2.9);
         height: ($baseline*4.2);
@@ -1313,7 +1304,7 @@
       .deco-ribbon {
         position: absolute;
         top: -10px;
-        right: $baseline;
+        @include right($baseline);
         display: block;
         width: 45px;
         height: 45px;
@@ -1328,7 +1319,7 @@
       .action-intro {
         @include fill-parent;
         @extend %copy-detail;
-        text-align: left;
+        @include text-align(left);
       }
 
       .action-select input {
@@ -1395,8 +1386,8 @@
 
       .field {
         @include fill-parent;
-        float: left;
-        margin: 0 ($baseline/2) ($baseline/2) 0;
+        @include float(left);
+        @include margin(0, ($baseline/2), ($baseline/2), 0);
         padding: ($baseline/2) ($baseline*0.75);
         background: $m-gray-t0;
 
@@ -1406,7 +1397,7 @@
         }
 
         &:last-child {
-          margin-right: 0;
+          @include margin-right(0);
         }
       }
 
@@ -1420,11 +1411,11 @@
         .contribution-option {
           display: inline-block;
           vertical-align: middle;
-          margin-right: ($baseline/4);
+          @include margin-right($baseline/4);
           padding: 1px 0;
 
           &:last-child {
-            margin-right: 0;
+            @include margin-right(0);
           }
         }
 
@@ -1440,14 +1431,14 @@
           @include span-columns(6);
 
           &:nth-of-type(even) {
-            margin-right: 0;
+            @include margin-right(0);
           }
         }
       }
 
       .register-choice {
         .list-actions {
-          float: left;
+          @include float(left);
           width: auto;
         }
 
@@ -1487,7 +1478,7 @@
     @include media( $edx-bp-huge ) {
       .register-choice {
         .list-actions {
-          float: right;
+          @include float(right);
           clear: none;
         }
       }
@@ -1527,18 +1518,20 @@
     .list-reqs {
       @include clearfix();
       width: flex-grid(12,12);
+      text-align: center;
 
       .req {
         @extend %ui-window;
+        @include margin-right(flex-gutter());
+        display: inline-block;
+        vertical-align: top;
         width: flex-grid(4,12);
         min-height: ($baseline*15);
-        float: left;
-        margin-right: flex-gutter();
         border-color: $verified-color-lvl4;
         text-align: center;
 
         &:last-child {
-          margin-right: 0;
+          @include margin-right(0);
         }
 
         .title {
@@ -1575,7 +1568,7 @@
             @extend %ui-depth2;
             @extend %t-icon5;
             position: absolute;
-            left: 24px;
+            @include left(24px);
             top: 34px;
             background: $verified-color-lvl3;
             padding: 3px 5px;
@@ -1591,12 +1584,12 @@
             height: 88px;
 
             .fa-list-alt {
-              left: -7px;
+              @include left(-7px);
             }
 
             .id-photo {
               top: 13px;
-              left: -3px;
+              @include left(-3px);
               line-height: 1.1em;
             }
           }
@@ -1627,7 +1620,7 @@
 
       // specific requirements
       .req-activate {
-        float: left;
+        @include float(left);
         text-align: center;
         border-color: $m-pink-l3;
 
@@ -1780,9 +1773,9 @@
     .nav-wizard {
 
       .prompt-verify {
-        float: left;
+        @include float(left);
+        @include margin(0, flex-gutter(), 0, 0);
         width: flex-grid(6,12);
-        margin: 0 flex-gutter() 0 0;
 
         .title {
           @extend %hd-lv4;
@@ -1807,7 +1800,7 @@
         margin-top: ($baseline/2);
 
         .wizard-step {
-          margin-right: flex-gutter();
+          @include margin-right(flex-gutter());
           display: inline-block;
           vertical-align: middle;
 
@@ -2011,13 +2004,13 @@
       }
 
       .reverification-list {
-        margin-right: ($baseline*1.5);
+        @include margin-right($baseline*1.5);
         padding: 0;
         list-style-type: none;
 
         .item {
           box-shadow: 0 2px 5px 0 $shadow-l1 inset;
-          margin: ($baseline*0.75) ($baseline*0.75) ($baseline*0.75) 0;
+          @include margin(($baseline*0.75), ($baseline*0.75), ($baseline*0.75), 0);
           border: 1px solid $m-gray-t2;
 
           &.complete {
@@ -2115,10 +2108,10 @@
           display: inline-block;
           vertical-align: top;
           width: flex-grid(4,12);
-          padding-right: $baseline;
+          @include padding-right($baseline);
 
           &:last-child {
-            padding-right: 0;
+            @include padding-right(0);
           }
 
           .faq-answer {
@@ -2142,7 +2135,7 @@
         margin: $baseline 0;
 
         .wrapper-help {
-          float: right;
+          @include float(right);
           width: flex-grid(6,12);
           padding: 0 $baseline;
 
@@ -2196,9 +2189,9 @@
 
         .task {
           @extend %ui-window;
-          float: left;
+          @include float(left);
+          @include margin-right(flex-gutter());
           width: flex-grid(6,12);
-          margin-right: flex-gutter();
         }
 
         .controls {
@@ -2246,18 +2239,18 @@
           // control - redo
           .control-redo {
             position: absolute;
-            left: ($baseline/2);
+            @include left($baseline/2);
           }
 
           // control - take/do, retake
           .control-do, .control-retake {
-            left: 45%;
+            @include left(45%);
           }
 
           // control - approve
           .control-approve {
             position: absolute;
-            right: ($baseline/2);
+            @include right($baseline/2);
           }
         }
 
@@ -2266,17 +2259,17 @@
           margin-top: ($baseline*2);
 
           .copy {
-            float: left;
+            @include float(left);
             width: flex-grid(8,12);
-            margin-right: flex-gutter();
+            @include margin-right(flex-gutter());
           }
 
           .list-actions {
             position: relative;
             top: -($baseline/2);
-            float: left;
+            @include float(left);
             width: flex-grid(4,12);
-            text-align: right;
+            @include text-align(right);
 
             .action-retakephotos a {
               @extend %btn-primary-blue;
@@ -2323,17 +2316,17 @@
         border: 1px solid $light-gray;
 
         .copy {
-          float: left;
+          @include float(left);
           width: flex-grid(8,12);
-          margin-right: flex-gutter();
+          @include margin-right(flex-gutter());
         }
 
         .list-actions {
           position: relative;
           top: -($baseline);
-          float: left;
+          @include float(left);
           width: flex-grid(4,12);
-          text-align: right;
+          @include text-align(right);
 
           .action-editname a {
             @extend %btn-primary-blue;
@@ -2347,9 +2340,9 @@
         padding: ($baseline*0.75) $baseline;
 
         .prompt-verify {
-          float: left;
+          @include float(left);
+          @include margin(0, flex-gutter(), 0, 0);
           width: flex-grid(6,12);
-          margin: 0 flex-gutter() 0 0;
 
           .title {
             @extend %hd-lv4;
@@ -2374,12 +2367,12 @@
           margin-top: ($baseline/2);
 
           .wizard-step {
-            margin-right: flex-gutter();
+            @include margin-right(flex-gutter());
             display: inline-block;
             vertical-align: middle;
 
             &:last-child {
-              margin-right: 0;
+              @include margin-right(0);
             }
           }
         }
@@ -2423,7 +2416,7 @@
 
     .nav-item {
       display: block;
-      margin: 0 0 $baseline 0;
+      @include margin(0, 0, $baseline, 0);
       text-align: center;
 
       &.conditional:after {
@@ -2513,7 +2506,7 @@ h2.photo_verification {
   // progress indicator
   .progress-sts {
     width: 75%;
-    left: 13%;
+    @include left(13%);
   }
 
   .progress-sts-value {
@@ -2541,7 +2534,7 @@ h2.photo_verification {
   // progress indicator
   .progress-sts {
     width: 72%;
-    left: 15%;
+    @include left(15%);
   }
 
   // VIEW: photo

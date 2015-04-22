@@ -50,6 +50,8 @@
 @import 'views/shoppingcart';
 @import 'views/login-register';
 @import 'views/homepage';
+@import 'views/verification';
+@import 'views/decoupled-verification';
 
 // applications
 @import "discussion/utilities/variables";
