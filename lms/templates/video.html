@@ -68,16 +68,16 @@
             <button class="play-pause video_control" title="${_('Play')}"><i class="icon fa fa-play" aria-hidden="true"></i> <span class="sr">${_('Play')}</span></button>
             <div class="time vidtime">0:00 / 0:00</div>
             <div class="speeds menu-container">
-              <button class="speed speed-button" title="${_('Speed')}"><i class="icon fa fa-caret-right" aria-hidden="true" aria-haspopup="true" aria-controls="speed_menu"></i> ${_('Speed')}: <span class="value">1.0x</span></button>
+              <button class="speed speed-button" title="${_('Speed')}" aria-haspopup="true" aria-controls="speed_menu"><i class="icon fa fa-caret-right" aria-hidden="true"></i> ${_('Speed')}: <span class="value">1.0x</span></button>
               <ul id="speed_menu" class="video-speeds menu" role="menu"></ul>
             </div>
             <div class="languages menu-container">
-              <button class="language language-button" title="${_('Language')}"><i class="icon fa fa-caret-right" aria-hidden="true" aria-haspopup="true" aria-controls="language_menu"></i> ${_('Language')}: <span class="value"></span></button>
+              <button class="language language-button" title="${_('Language')}" aria-haspopup="true" aria-controls="language_menu"><i class="icon fa fa-caret-right" aria-hidden="true"></i> ${_('Language')} <span class="value"></span></button>
               <ul id="language_menu" class="video-languages menu" role="menu"></ul>
             </div>
             <div class="volume menu-container">
-              <button class="volume volume-button" title="${_('Volume')}"><i class="icon fa fa-volume-up" aria-hidden="true" aria-haspopup="true" aria-controls="volume_menu"></i> <span class="sr">${_('Volume')}</span></button>
-              <div id="volume_menu" class="volume-slider-container menu" role="presentation">
+              <button class="volume volume-button" title="${_('Volume')}" aria-haspopup="true" aria-controls="volume_menu"><i class="icon fa fa-volume-up" aria-hidden="true"></i> <span class="sr">${_('Volume')}</span></button>
+              <div id="volume_menu" class="volume-slider-container menu">
                 <div class="volume-slider"></div>
               </div>
             </div>

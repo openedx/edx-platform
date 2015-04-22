@@ -143,6 +143,10 @@ function (Iterator) {
                 .removeClass('is-opened');
 
             this.el
+                .find('.speed-button')
+                    .attr('aria-expanded', 'true');
+
+            this.el
                 .find('.menu')
                     .addClass('is-opened');
 
@@ -163,6 +167,10 @@ function (Iterator) {
             if (unBindEvent) {
                 $(window).off('click.speed');
             }
+
+            this.el
+                .find('.speed-button')
+                    .attr('aria-expanded', 'false');
 
             this.el
                 .find('.menu')
