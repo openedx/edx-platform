@@ -128,9 +128,10 @@ class BokChoyTestSuite(TestSuite):
             "--with-xunit",
             "--xunit-file={}".format(self.xunit_report),
             "--verbosity={}".format(self.verbosity),
-            "--pdb" if self.pdb else "",
-            self.extra_args,
         ]
+        if self.pdb:
+            cmd.append("--pdb")
+        cmd.append(self.extra_args)
 
         cmd = (" ").join(cmd)
         return cmd
