@@ -27,6 +27,7 @@ __test__ = False  # do not collect
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity"),
+    make_option("--pdb", action="store_true", help="Drop into debugger on failures or errors"),
     make_option("--skip_firefox_version_validation", action='store_false', dest="validate_firefox_version")
 ])
 def test_bokchoy(options):
@@ -55,6 +56,7 @@ def test_bokchoy(options):
         'default_store': getattr(options, 'default_store', 'split'),
         'verbosity': getattr(options, 'verbosity', 2),
         'extra_args': getattr(options, 'extra_args', ''),
+        'pdb': getattr(options, 'pdb', False),
         'test_dir': 'tests',
     }
     run_bokchoy(**opts)
