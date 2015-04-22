@@ -16,7 +16,11 @@ from xmodule.modulestore.django import SignalHandler
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.mixed import MixedModuleStore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase,
+    TEST_DATA_MONGO_MODULESTORE,
+    TEST_DATA_SPLIT_MODULESTORE
+)
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.modulestore.tests.test_cross_modulestore_import_export import MongoContentstoreBuilder
@@ -30,11 +34,11 @@ from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearch
 from contentstore.signals import listen_for_course_publish, listen_for_library_update
 
 import json
-from dateutil.tz import tzutc
 from django.conf import settings
+from dateutil.tz import tzutc
 from contentstore.utils import reverse_course_url, reverse_usage_url
-from xmodule.partitions.partitions import UserPartition
 from contentstore.tests.utils import CourseTestCase
+from xmodule.partitions.partitions import UserPartition
 
 COURSE_CHILD_STRUCTURE = {
     "course": "chapter",
@@ -791,13 +795,14 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
         self._perform_test_using_store(store_type, self._test_exception)
 
 
-class GroupConfigurationsSearch(CourseTestCase, MixedWithOptionsTestCase):
+class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
     """
-    Tests indexing of content groups on course modules.
+    Tests indexing of content groups on course modules using mongo modulestore.
     """
+    MODULESTORE = TEST_DATA_MONGO_MODULESTORE
 
     def setUp(self):
-        super(GroupConfigurationsSearch, self).setUp()
+        super(GroupConfigurationSearchMongo, self).setUp()
 
         self.chapter = ItemFactory.create(
             parent_location=self.course.location,
@@ -936,7 +941,7 @@ class GroupConfigurationsSearch(CourseTestCase, MixedWithOptionsTestCase):
             data={'metadata': group_access_content}
         )
 
-        self.save_course()
+        self.publish_item(self.store, self.html_unit1.location)
 
         with patch(settings.SEARCH_ENGINE + '.index') as mock_index:
             self.reindex_course(self.store)
@@ -954,7 +959,7 @@ class GroupConfigurationsSearch(CourseTestCase, MixedWithOptionsTestCase):
             data={'metadata': group_access_content}
         )
 
-        self.save_course()
+        self.publish_item(self.store, self.sequential.location)
 
         with patch(settings.SEARCH_ENGINE + '.index') as mock_index:
             self.reindex_course(self.store)
@@ -981,7 +986,7 @@ class GroupConfigurationsSearch(CourseTestCase, MixedWithOptionsTestCase):
             data={'metadata': group_access_content}
         )
 
-        self.save_course()
+        self.publish_item(self.store, self.sequential.location)
 
         # Checking group indexed correctly
         with patch(settings.SEARCH_ENGINE + '.index') as mock_index:
@@ -997,7 +1002,7 @@ class GroupConfigurationsSearch(CourseTestCase, MixedWithOptionsTestCase):
             data={'metadata': empty_group_access}
         )
 
-        self.save_course()
+        self.publish_item(self.store, self.sequential.location)
 
         # Checking group removed and not indexed any more
         with patch(settings.SEARCH_ENGINE + '.index') as mock_index:
@@ -1015,7 +1020,7 @@ class GroupConfigurationsSearch(CourseTestCase, MixedWithOptionsTestCase):
             data={'metadata': group_access_content}
         )
 
-        self.save_course()
+        self.publish_item(self.store, self.html_unit1.location)
 
         with patch(settings.SEARCH_ENGINE + '.index') as mock_index:
             self.reindex_course(self.store)
@@ -1023,3 +1028,10 @@ class GroupConfigurationsSearch(CourseTestCase, MixedWithOptionsTestCase):
             self.assertEqual(self._html_group_result(self.html_unit1), mock_index.mock_calls[0])
             self.assertEqual(self._html_nogroup_result(self.html_unit2), mock_index.mock_calls[2])
             mock_index.reset_mock()
+
+
+class GroupConfigurationSearchSplit(GroupConfigurationSearchMongo):
+    """
+    Tests indexing of content groups on course modules using split modulestore.
+    """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE

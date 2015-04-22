@@ -162,8 +162,8 @@ class SearchIndexerBase(object):
                 skip_child_index = skip_index or \
                     (triggered_at is not None and (triggered_at - item.subtree_edited_on) > reindex_age)
                 for child_item in item.get_children():
-                    temp_content = getattr(item, 'content_groups', None)
-                    if temp_content and temp_content != []:
+                    item_content_groups = getattr(item, 'content_groups', None)
+                    if item_content_groups:
                         index_item(child_item, skip_index=skip_child_index,
                                    groups_usage_info=groups_usage_info, content_groups=item.content_groups)
                     else:
