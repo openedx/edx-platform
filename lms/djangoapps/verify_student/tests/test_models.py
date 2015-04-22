@@ -18,7 +18,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from verify_student.models import (
-    SoftwareSecurePhotoVerification, VerificationException, VerificationCheckpoint, VerificationStatus
+    SoftwareSecurePhotoVerification, VerificationException, VerificationCheckpoint, VerificationStatus,
+    SkippedReverification
 )
 
 FAKE_SETTINGS = {
@@ -709,3 +710,71 @@ class VerificationStatusTest(ModuleStoreTestCase):
         self.assertEqual(len(result), len([self.check_point1.checkpoint_name, self.check_point2.checkpoint_name]))
         self.assertEqual(result[0].checkpoint.checkpoint_name, self.check_point1.checkpoint_name)
         self.assertEqual(result[1].checkpoint.checkpoint_name, self.check_point2.checkpoint_name)
+
+
+class SkippedReverificationTest(ModuleStoreTestCase):
+    """Tests for the SkippedReverification model. """
+
+    def setUp(self):
+        super(SkippedReverificationTest, self).setUp()
+        self.user = UserFactory.create()
+        self.course = CourseFactory.create()
+        self.checkpoint = VerificationCheckpoint.objects.create(course_id=self.course.id, checkpoint_name="midterm")
+
+    def test_add_skipped_attempts(self):
+        """adding skipped re-verification object using class method."""
+
+        # adding verification status
+        SkippedReverification.add_skipped_reverification_attempt(
+            checkpoint=self.checkpoint, user_id=self.user.id, course_id=unicode(self.course.id)
+        )
+
+        # getting the status from db
+        result = SkippedReverification.objects.filter(course_id=self.course.id)[0]
+        self.assertEqual(result.checkpoint, self.checkpoint)
+        self.assertEqual(result.user, self.user)
+        self.assertEqual(result.course_id, self.course.id)
+
+    def test_unique_constraint(self):
+        """adding skipped re-verification with same user and course id will
+        raise integrity exception
+        """
+
+        # adding verification object
+        SkippedReverification.add_skipped_reverification_attempt(
+            checkpoint=self.checkpoint, user_id=self.user.id, course_id=unicode(self.course.id)
+        )
+
+        with self.assertRaises(IntegrityError):
+            SkippedReverification.add_skipped_reverification_attempt(
+                checkpoint=self.checkpoint, user_id=self.user.id, course_id=unicode(self.course.id)
+            )
+
+        # Create skipped attempt for different user
+        user2 = UserFactory.create()
+        SkippedReverification.add_skipped_reverification_attempt(
+            checkpoint=self.checkpoint, user_id=user2.id, course_id=unicode(self.course.id)
+        )
+
+        # getting the status from db
+        result = SkippedReverification.objects.filter(user=user2)[0]
+        self.assertEqual(result.checkpoint, self.checkpoint)
+        self.assertEqual(result.user, user2)
+        self.assertEqual(result.course_id, self.course.id)
+
+    def test_check_user_skipped_reverification_exists(self):
+        """Checking check_user_skipped_reverification_exists method returns boolean status"""
+
+        # adding verification status
+        SkippedReverification.add_skipped_reverification_attempt(
+            checkpoint=self.checkpoint, user_id=self.user.id, course_id=unicode(self.course.id)
+        )
+
+        self.assertTrue(
+            SkippedReverification.check_user_skipped_reverification_exists(course_id=self.course.id, user=self.user)
+        )
+
+        user2 = UserFactory.create()
+        self.assertFalse(
+            SkippedReverification.check_user_skipped_reverification_exists(course_id=self.course.id, user=user2)
+        )

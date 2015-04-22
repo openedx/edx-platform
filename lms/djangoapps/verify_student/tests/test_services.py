@@ -8,7 +8,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from student.tests.factories import UserFactory
 from course_modes.tests.factories import CourseModeFactory
 from verify_student.services import ReverificationService
-from verify_student.models import VerificationCheckpoint, VerificationStatus
+from verify_student.models import VerificationCheckpoint, VerificationStatus, SkippedReverification
 
 
 @ddt.ddt
@@ -62,3 +62,21 @@ class TestReverifyService(ModuleStoreTestCase):
 
         VerificationStatus.objects.create(checkpoint=checkpoint_obj, user=self.user, status='submitted')
         self.assertEqual(rev.get_status(self.user.id, unicode(self.course_key), checkpoint_name), 'submitted')
+
+    def test_skip_verification(self):
+        """ Adding the test skip verification attempt for the user """
+
+        checkpoint_name = 'final_term'
+        rev = ReverificationService()
+
+        VerificationCheckpoint.objects.create(
+            course_id=unicode(self.course_key), checkpoint_name=checkpoint_name
+        )
+
+        rev.skip_verification(checkpoint_name, self.user.id, unicode(self.course_key))
+
+        self.assertEqual(1, SkippedReverification.objects.filter(user=self.user, course_id=self.course_key).count())
+
+        rev.skip_verification(checkpoint_name, self.user.id, unicode(self.course_key))
+
+        self.assertEqual(1, SkippedReverification.objects.filter(user=self.user, course_id=self.course_key).count())
