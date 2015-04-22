@@ -19,6 +19,7 @@ from instructor_task.tasks import (
     delete_problem_state,
     send_bulk_course_email,
     calculate_grades_csv,
+    calculate_problem_grade_report,
     calculate_students_features_csv,
     cohort_students,
 )
@@ -331,6 +332,18 @@ def submit_calculate_grades_csv(request, course_key):
     task_input = {}
     task_key = ""
 
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def submit_problem_grade_report(request, course_key):
+    """
+    Submits a task to generate a CSV grade report containing weighted problem
+    values.
+    """
+    task_type = 'grade_problems'
+    task_class = calculate_problem_grade_report
+    task_input = {}
+    task_key = ""
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 

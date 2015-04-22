@@ -76,6 +76,15 @@ class ContentGroupTestCase(ModuleStoreTestCase):
                     scheme_id='cohort'
                 )
             ],
+            grading_policy={
+                "GRADER": [{
+                    "type": "Homework",
+                    "min_count": 1,
+                    "drop_count": 0,
+                    "short_label": "HW",
+                    "weight": 1.0
+                }]
+            },
             cohort_config={'cohorted': True},
             discussion_topics={}
         )

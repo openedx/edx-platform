@@ -91,6 +91,40 @@ class CourseStructureTaskTests(ModuleStoreTestCase):
         cs = CourseStructure.objects.create(course_id=self.course.id, structure_json=structure_json)
         self.assertDictEqual(cs.structure, structure)
 
+
+    def test_ordered_blocks(self):
+        structure = {
+            'root': 'a/b/c',
+            'blocks': {
+                'a/b/c': {
+                    'id': 'a/b/c',
+                    'children': [
+                        'g/h/i'
+                    ]
+                },
+                'd/e/f': {
+                    'id': 'd/e/f',
+                    'children': []
+                },
+                'g/h/i': {
+                    'id': 'h/j/k',
+                    'children': [
+                        'j/k/l',
+                        'd/e/f'
+                    ]
+                },
+                'j/k/l': {
+                    'id': 'j/k/l',
+                    'children': []
+                }
+            }
+        }
+        in_order_blocks = ['a/b/c', 'g/h/i', 'j/k/l', 'd/e/f']
+        structure_json = json.dumps(structure)
+        cs = CourseStructure.objects.create(course_id=self.course.id, structure_json=structure_json)
+
+        self.assertEqual(cs.ordered_blocks.keys(), in_order_blocks)
+
     def test_block_with_missing_fields(self):
         """
         The generator should continue to operate on blocks/XModule that do not have graded or format fields.

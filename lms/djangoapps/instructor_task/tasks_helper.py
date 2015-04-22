@@ -4,7 +4,10 @@ running state of a course.
 
 """
 import json
+from collections import OrderedDict
 from datetime import datetime
+from eventtracking import tracker
+from itertools import chain
 from time import time
 import unicodecsv
 import logging
@@ -34,6 +37,7 @@ from instructor_task.models import ReportStore, InstructorTask, PROGRESS
 from lms.djangoapps.lms_xblock.runtime import LmsPartitionService
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
+from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
 from student.models import CourseEnrollment
@@ -703,6 +707,105 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
     # One last update before we close out...
     TASK_LOG.info(u'%s, Task type: %s, Finalizing grade task', task_info_string, action_name)
     return task_progress.update_task_state(extra_meta=current_step)
+
+
+def _order_problems(blocks):
+    """
+    Sort the problems by the assignment type and assignment that it belongs to.
+    """
+    problems = OrderedDict()
+    assignments = dict()
+    # First, sort out all the blocks into their correct assignments and all the
+    # assignments into their correct types.
+    for block in blocks:
+        # Put the assignments in order into the assignments list.
+        if blocks[block]['block_type'] == 'sequential':
+            block_format = blocks[block]['format']
+            if block_format not in assignments:
+                assignments[block_format] = OrderedDict()
+            assignments[block_format][block] = list()
+
+        # Put the problems into the correct order within their assignment.
+        if blocks[block]['block_type'] == 'problem' and blocks[block]['graded'] is True:
+            current = blocks[block]['parent']
+            # crawl up the tree for the sequential block
+            while blocks[current]['block_type'] != 'sequential':
+                current = blocks[current]['parent']
+
+            current_format = blocks[current]['format']
+            assignments[current_format][current].append(block)
+
+    # Now that we have a sorting and an order for the assignments and problems,
+    # iterate through them in order to generate the header row.
+    for assignment_type in assignments:
+        for assignment_index, assignment in enumerate(assignments[assignment_type].keys(), start=1):
+            for problem in assignments[assignment_type][assignment]:
+                header_name = "{assignment_type} {assignment_index}: {assignment_name} - {block}".format(
+                    block=blocks[problem]['display_name'],
+                    assignment_type=assignment_type,
+                    assignment_index=assignment_index,
+                    assignment_name=blocks[assignment]['display_name']
+                )
+                problems[problem] = [header_name + " (Earned)", header_name + " (Possible)"]
+
+    return problems
+
+
+def upload_problem_grade_report(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+    """
+    Generate a CSV containing all students' problem grades within a given
+    `course_id`.
+    """
+    start_time = time()
+    start_date = datetime.now(UTC)
+    status_interval = 100
+    enrolled_students = CourseEnrollment.users_enrolled_in(course_id)
+    task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
+
+    # This struct encapsulates both the display names of each static item in
+    # the header row as values as well as the django User field names of those
+    # items as the keys.  It is structured in this way to keep the values
+    # related.
+    header_row = OrderedDict([('id', 'Student ID'), ('email', 'Email'), ('username', 'Username')])
+
+    try:
+        course_structure = CourseStructure.objects.get(course_id=course_id)
+        blocks = course_structure.ordered_blocks
+        problems = _order_problems(blocks)
+    except CourseStructure.DoesNotExist:
+        return task_progress.update_task_state(extra_meta={'step': 'Generating course structure. Please refresh and try again.'})
+
+    # Just generate the static fields for now.
+    rows = [list(header_row.values()) + ['Final Grade'] + list(chain.from_iterable(problems.values()))]
+    current_step = {'step': 'Calculating Grades'}
+
+    for student, gradeset, err_msg in iterate_grades_for(course_id, enrolled_students, keep_raw_scores=True):
+        student_fields = [getattr(student, field_name) for field_name in header_row]
+        final_grade = gradeset['percent']
+        # Only consider graded problems
+        problem_scores = {unicode(score.module_id): score for score in gradeset['raw_scores'] if score.graded}
+        earned_possible_values = list()
+        for problem_id in problems:
+            try:
+                problem_score = problem_scores[problem_id]
+                earned_possible_values.append([problem_score.earned, problem_score.possible])
+            except KeyError:
+                # The student has not been graded on this problem.  For example,
+                # iterate_grades_for skips problems that students have never
+                # seen in order to speed up report generation.  It could also be
+                # the case that the student does not have access to it (e.g. A/B
+                # test or cohorted courseware).
+                earned_possible_values.append(['N/A', 'N/A'])
+        rows.append(student_fields + [final_grade] + list(chain.from_iterable(earned_possible_values)))
+
+        task_progress.attempted += 1
+        task_progress.succeeded += 1
+        if task_progress.attempted % status_interval == 0:
+            task_progress.update_task_state(extra_meta=current_step)
+
+    # Perform the upload
+    upload_csv_to_report_store(rows, 'problem_grade_report', course_id, start_date)
+    return task_progress.update_task_state(extra_meta={'step': 'Uploading CSV'})
 
 
 def upload_students_csv(_xmodule_instance_args, _entry_id, course_id, task_input, action_name):

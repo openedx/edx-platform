@@ -68,7 +68,7 @@ class TestGradeIteration(ModuleStoreTestCase):
 
     def test_all_empty_grades(self):
         """No students have grade entries"""
-        all_gradesets, all_errors = self._gradesets_and_errors_for(self.course.id, self.students)
+        all_gradesets, all_errors = self._gradesets_and_errors_for(self.course.id, self.students, keep_raw_scores=True)
         self.assertEqual(len(all_errors), 0)
         for gradeset in all_gradesets.values():
             self.assertIsNone(gradeset['grade'])
@@ -107,7 +107,7 @@ class TestGradeIteration(ModuleStoreTestCase):
         self.assertTrue(all_gradesets[student5])
 
     ################################# Helpers #################################
-    def _gradesets_and_errors_for(self, course_id, students):
+    def _gradesets_and_errors_for(self, course_id, students, keep_raw_scores=False):
         """Simple helper method to iterate through student grades and give us
         two dictionaries -- one that has all students and their respective
         gradesets, and one that has only students that could not be graded and
@@ -115,7 +115,7 @@ class TestGradeIteration(ModuleStoreTestCase):
         students_to_gradesets = {}
         students_to_errors = {}
 
-        for student, gradeset, err_msg in iterate_grades_for(course_id, students):
+        for student, gradeset, err_msg in iterate_grades_for(course_id, students, keep_raw_scores):
             students_to_gradesets[student] = gradeset
             if err_msg:
                 students_to_errors[student] = err_msg

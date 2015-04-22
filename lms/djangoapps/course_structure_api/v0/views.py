@@ -262,7 +262,6 @@ class CourseStructure(CourseViewMixin, RetrieveAPIView):
             return Response(status=503, headers={'Retry-After': '120'})
 
 
-
 class CourseGradingPolicy(CourseViewMixin, ListAPIView):
     """
     **Use Case**

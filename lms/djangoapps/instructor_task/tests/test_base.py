@@ -127,7 +127,9 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
         if course_factory_kwargs is not None:
             course_args.update(course_factory_kwargs)
         self.course = CourseFactory.create(**course_args)
+        self.add_course_content()
 
+    def add_course_content(self):
         # Add a chapter to the course
         chapter = ItemFactory.create(parent_location=self.course.location,
                                      display_name=TEST_SECTION_NAME)
@@ -141,12 +143,13 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
     @staticmethod
     def get_user_email(username):
         """Generate email address based on username"""
-        return '{0}@test.com'.format(username)
+        return u'{0}@test.com'.format(username)
 
     def login_username(self, username):
         """Login the user, given the `username`."""
         if self.current_user != username:
-            self.login(InstructorTaskCourseTestCase.get_user_email(username), "test")
+            user_email = User.objects.get(username=username).email
+            self.login(user_email, "test")
             self.current_user = username
 
     def _create_user(self, username, email=None, is_staff=False, mode='honor'):
@@ -190,16 +193,18 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
     the setup of a course and problem in order to access StudentModule state.
     """
     @staticmethod
-    def problem_location(problem_url_name):
+    def problem_location(problem_url_name, course_key=None):
         """
         Create an internal location for a test problem.
         """
         if "i4x:" in problem_url_name:
             return Location.from_deprecated_string(problem_url_name)
+        elif course_key:
+            return course_key.make_usage_key('problem', problem_url_name)
         else:
             return TEST_COURSE_KEY.make_usage_key('problem', problem_url_name)
 
-    def define_option_problem(self, problem_url_name, parent=None):
+    def define_option_problem(self, problem_url_name, parent=None, **kwargs):
         """Create the problem definition so the answer is Option 1"""
         if parent is None:
             parent = self.problem_section
@@ -213,7 +218,8 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
                            parent=parent,
                            category="problem",
                            display_name=str(problem_url_name),
-                           data=problem_xml)
+                           data=problem_xml,
+                           **kwargs)
 
     def redefine_option_problem(self, problem_url_name):
         """Change the problem definition so the answer is Option 2"""
@@ -249,8 +255,9 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
             # Note that this is a capa-specific convention.  The form is a version of the problem's
             # URL, modified so that it can be easily stored in html, prepended with "input-" and
             # appended with a sequence identifier for the particular response the input goes to.
-            return 'input_i4x-{0}-{1}-problem-{2}_{3}'.format(TEST_COURSE_ORG.lower(),
-                                                              TEST_COURSE_NUMBER.replace('.', '_'),
+            course_key = self.course.id
+            return 'input_i4x-{0}-{1}-problem-{2}_{3}'.format(course_key.org,
+                                                              course_key.course.replace('.', '_'),
                                                               problem_url_name, response_id)
 
         # make sure that the requested user is logged in, so that the ajax call works
@@ -260,7 +267,7 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         modx_url = reverse('xblock_handler', kwargs={
             'course_id': self.course.id.to_deprecated_string(),
             'usage_id': quote_slashes(
-                InstructorTaskModuleTestCase.problem_location(problem_url_name).to_deprecated_string()
+                InstructorTaskModuleTestCase.problem_location(problem_url_name, self.course.id).to_deprecated_string()
             ),
             'handler': 'xmodule_handler',
             'suffix': 'problem_check',

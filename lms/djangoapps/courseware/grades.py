@@ -225,7 +225,7 @@ def _grade(student, request, course, keep_raw_scores):
 
                     graded = module_descriptor.graded
                     if not total > 0:
-                        #We simply cannot grade a problem that is 12/0, because we might need it as a percentage
+                        # We simply cannot grade a problem that is 12/0, because we might need it as a percentage
                         graded = False
 
                     scores.append(
@@ -494,7 +494,7 @@ def manual_transaction():
         transaction.commit()
 
 
-def iterate_grades_for(course_or_id, students):
+def iterate_grades_for(course_or_id, students, keep_raw_scores=False):
     """Given a course_id and an iterable of students (User), yield a tuple of:
 
     (student, gradeset, err_msg) for every student enrolled in the course.
@@ -531,7 +531,7 @@ def iterate_grades_for(course_or_id, students):
                 # It's not pretty, but untangling that is currently beyond the
                 # scope of this feature.
                 request.session = {}
-                gradeset = grade(student, request, course)
+                gradeset = grade(student, request, course, keep_raw_scores)
                 yield student, gradeset, ""
             except Exception as exc:  # pylint: disable=broad-except
                 # Keep marching on even if this student couldn't be graded for

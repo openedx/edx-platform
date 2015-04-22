@@ -1,6 +1,7 @@
 import json
 import logging
 
+from collections import OrderedDict
 from model_utils.models import TimeStampedModel
 
 from util.models import CompressedTextField
@@ -25,6 +26,29 @@ class CourseStructure(TimeStampedModel):
         if self.structure_json:
             return json.loads(self.structure_json)
         return None
+
+    @property
+    def ordered_blocks(self):
+        if self.structure:
+            ordered_blocks = OrderedDict()
+            self._traverse_tree(self.structure['root'], self.structure['blocks'], ordered_blocks)
+            return ordered_blocks
+
+    def _traverse_tree(self, block, unordered_structure, ordered_blocks, parent=None):
+        """
+        Traverses the tree and fills in the ordered_blocks OrderedDict with the blocks in
+        the order that they appear in the course.
+        """
+        # find the dictionary entry for the current node
+        cur_block = unordered_structure[block]
+
+        if parent:
+            cur_block['parent'] = parent
+
+        ordered_blocks[block] = cur_block
+
+        for child_node in cur_block['children']:
+            self._traverse_tree(child_node, unordered_structure, ordered_blocks, parent=block)
 
 # Signals must be imported in a file that is automatically loaded at app startup (e.g. models.py). We import them
 # at the end of this file to avoid circular dependencies.

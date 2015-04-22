@@ -28,7 +28,7 @@ from instructor_task.api import (submit_rescore_problem_for_all_students,
                                  submit_reset_problem_attempts_for_all_students,
                                  submit_delete_problem_state_for_all_students)
 from instructor_task.models import InstructorTask
-from instructor_task.tasks_helper import upload_grades_csv
+from instructor_task.tasks_helper import upload_grades_csv, upload_problem_grade_report
 from instructor_task.tests.test_base import (InstructorTaskModuleTestCase, TestReportMixin, TEST_COURSE_ORG,
                                              TEST_COURSE_NUMBER, OPTION_1, OPTION_2)
 from capa.responsetypes import StudentInputError

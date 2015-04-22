@@ -35,6 +35,7 @@ from instructor_task.tasks_helper import (
     reset_attempts_module_state,
     delete_problem_module_state,
     upload_grades_csv,
+    upload_problem_grade_report,
     upload_students_csv,
     cohort_students_and_upload
 )
@@ -152,6 +153,25 @@ def calculate_grades_csv(entry_id, xmodule_instance_args):
     )
 
     task_fn = partial(upload_grades_csv, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
+
+
+# TODO: GRADES_DOWNLOAD_ROUTING_KEY is the high mem queue.  Do we know we need it?
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
+def calculate_problem_grade_report(entry_id, xmodule_instance_args):
+    """
+    Generate a CSV for a course containing all students' weighted problem
+    grades and push the results to an S3 bucket for download.
+    """
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
+    # TODO: can this be the same as the `calculate_grades_csv` action_name?
+    action_name = ugettext_noop('graded')
+    TASK_LOG.info(
+        u"Task: %s, InstructorTask ID: %s, Task type: %s, Preparing for task execution",
+        xmodule_instance_args.get('task_id'), entry_id, action_name
+    )
+
+    task_fn = partial(upload_problem_grade_report, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
 
 
