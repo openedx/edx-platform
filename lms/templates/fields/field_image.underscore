@@ -4,7 +4,7 @@
         <label class="u-field-upload-button">
             <span class="upload-button-icon" aria-hidden="true"><%= uploadButtonIcon %></span>
             <span class="upload-button-title" aria-live="polite"><%= uploadButtonTitle %></span>
-            <input class="upload-button-input" type="file" name="<%= id %>"/>
+            <input class="upload-button-input" type="file" name="<%= inputName %>"/>
        	</label>
        	<button class="upload-submit" type="button" hidden="true"><%= uploadButtonTitle %></button>
         
