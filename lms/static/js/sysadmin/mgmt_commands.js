@@ -35,6 +35,18 @@
             ]
         },
         {
+            'display_name': gettext('View user whitelist'),
+            'method': 'cert_whitelist',
+            'description': gettext('View the list of whitelisted users for a course'),
+            'kwargs': [
+                {
+                    'argument': 'course_id',
+                    'display_name': gettext('course_id'),
+                    'required': true
+                }
+            ]
+        },
+        {
             'display_name': gettext('Generate a single certificate'),
             'method': 'regenerate_user',
             'description': gettext('Put a request on the queue to recreate the certificate for a particular user in a particular course'),
@@ -52,24 +64,12 @@
                 {
                     'argument': 'grade',
                     'display_name': gettext('grade'),
-                    'required': true
+                    'required': false
                 },
                 {
                     'argument': 'template',
                     'display_name': gettext('template'),
-                    'required': true
-                },
-            ]
-        },
-        {
-            'display_name': gettext('Do a certificate run for a course'),
-            'method': 'ungenerated_certs',
-            'description': gettext('Find all students that need certificates for courses that have finished and put their cert requests on the queue.'),
-            'kwargs': [
-                {
-                    'argument': 'course',
-                    'display_name': 'course_id',
-                    'required': true
+                    'required': false
                 },
             ]
         },
