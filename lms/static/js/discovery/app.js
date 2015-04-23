@@ -11,17 +11,31 @@ define(['backbone'], function(Backbone) {
         var form = new DiscoveryForm();
 
         dispatcher.listenTo(form, 'search', function (query) {
-            results.showLoadingMessage();
+            results.showLoadingIndicator();
             collection.performSearch(query);
         });
 
         dispatcher.listenTo(form, 'clear', function () {
             collection.cancelSearch();
+            form.hideClearAllButton();
             results.clear();
         });
 
         dispatcher.listenTo(results, 'next', function () {
             collection.loadNextPage();
+        });
+
+        dispatcher.listenTo(collection, 'search', function () {
+            form.showClearAllButton();
+            results.render();
+        });
+
+        dispatcher.listenTo(collection, 'next', function () {
+            results.renderNext();
+        });
+
+        dispatcher.listenTo(collection, 'error', function () {
+            results.showErrorMessage();
         });
 
     };

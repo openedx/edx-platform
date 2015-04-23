@@ -7,37 +7,38 @@ define([
     'gettext',
     'js/discovery/result_item_view'
 ], function ($, _, Backbone, gettext, ResultItemView) {
-
    'use strict';
 
     return Backbone.View.extend({
 
-        el: 'ul.courses-listing',
+        el: 'section.courses',
+        originalContent: '',
+        $window: $(window),
+        $document: $(document),
 
         initialize: function () {
-            // this.resultsTemplate = _.template($(this.resultsTemplateId).html());
-            // this.loadingTemplate = _.template($(this.loadingTemplateId).html());
-            // this.errorTemplate = _.template($(this.errorTemplateId).html());
-            this.collection.on('search', this.render, this);
-            this.collection.on('next', this.renderNext, this);
-            this.collection.on('error', this.showErrorMessage, this);
+            this.loadingTemplate = _.template($('#loading-tpl').html());
+            this.errorTemplate = _.template($('#error-tpl').html());
+            this.loadingIndicator = $('<div>', {id: 'loading-indicator', style: 'display:none'});
+            this.loadingIndicator.html(this.loadingTemplate());
+            this.$el.append(this.loadingIndicator);
+            this.$list = this.$el.find('.courses-listing');
+            this.originalContent = this.$list.html();
         },
 
         render: function () {
-            this.$el.empty();
+            this.hideLoadingIndicator();
+            this.$list.empty();
             this.renderItems();
-            // this.$el.find(this.spinner).hide();
+            this.attachScrollHandler();
             return this;
         },
 
         renderNext: function () {
-            // total count may have changed
-            // this.$el.find('.search-count').text(this.totalCountMsg());
+            this.hideLoadingIndicator();
             this.renderItems();
-            // if (! this.collection.hasNextPage()) {
-            //     this.$el.find('.search-load-next').remove();
-            // }
-            // this.$el.find(this.spinner).hide();
+            this.isLoading = false;
+            // if has more attach
         },
 
         renderItems: function () {
@@ -46,23 +47,15 @@ define([
                 var item = new ResultItemView({ model: result });
                 return item.render().el;
             }, this);
-            this.$el.append(items);
+            this.$list.append(items);
         },
 
-        totalCountMsg: function () {
-            var fmt = ngettext('%s result', '%s results', this.collection.totalCount);
-            return interpolate(fmt, [this.collection.totalCount]);
+        showLoadingIndicator: function () {
+            this.loadingIndicator.show();
         },
 
-        clear: function () {
-            // this.$el.hide().empty();
-            // this.$contentElement.show();
-        },
-
-        showLoadingMessage: function () {
-            // this.$el.html(this.loadingTemplate());
-            // this.$el.show();
-            // this.$contentElement.hide();
+        hideLoadingIndicator: function () {
+            this.loadingIndicator.hide();
         },
 
         showErrorMessage: function () {
@@ -73,9 +66,51 @@ define([
 
         loadNext: function (event) {
             event && event.preventDefault();
-            this.$el.find(this.spinner).show();
+            this.showLoadingIndicator();
             this.trigger('next');
+        },
+
+        clear: function() {
+            this.$list.html(this.originalContent);
+            this.detachScrollHandler();
+        },
+
+        attachScrollHandler: function () {
+            this.nextScrollEvent = true;
+            this.$window.on('scroll', this.scrollHandler.bind(this));
+        },
+
+        detachScrollHandler: function () {
+            this.$window.off('scroll', this.scrollHandler);
+        },
+
+        scrollHandler: function () {
+            if (this.nextScrollEvent) {
+                setTimeout(this.throttledScrollHandler.bind(this), 400);
+                this.nextScrollEvent = false;
+            }
+        },
+
+        throttledScrollHandler: function () {
+            if (this.isBottom()) {
+                this.scrolledToBottom();
+            }
+            this.nextScrollEvent = true;
+        },
+
+        isBottom: function () {
+            var scrollBottom = this.$window.scrollTop() + this.$window.height();
+            return scrollBottom >= this.$document.height();
+        },
+
+        scrolledToBottom: function () {
+            this.hasMore = true;
+            if (this.hasMore && !this.isLoading) {
+                this.loadNext();
+                this.isLoading = true;
+            }
         }
+
 
     });
 
