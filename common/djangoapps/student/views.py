@@ -998,7 +998,7 @@ def _parse_course_id_from_string(input_str):
     """
     m_obj = re.match(r'^/courses/{}'.format(settings.COURSE_ID_PATTERN), input_str)
     if m_obj:
-        return CourseLocator.from_string(m_obj.group('course_id'))
+        return SlashSeparatedCourseKey.from_deprecated_string(m_obj.group('course_id'))
     return None
 
 

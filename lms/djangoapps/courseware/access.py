@@ -143,11 +143,7 @@ def _has_access_course_desc(user, action, course):
         """
         now = datetime.now(UTC())
         start = course.enrollment_start
-        if start is not None:
-            start = start.replace(tzinfo=pytz.UTC)
         end = course.enrollment_end
-        if end is not None:
-            end = end.replace(tzinfo=pytz.UTC)
 
         return (start is None or now > start) and (end is None or now < end)
 
