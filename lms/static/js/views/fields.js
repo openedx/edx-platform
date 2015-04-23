@@ -561,6 +561,7 @@
             titleRemoving: gettext("Removing"),
 
             titleImageAlt: '',
+            screenReaderTitle: gettext("Image"),
 
             iconUpload: '<i class="icon fa fa-camera" aria-hidden="true"></i>',
             iconRemove: '<i class="icon fa fa-remove" aria-hidden="true"></i>',
@@ -571,7 +572,9 @@
             events: {
                 'click .u-field-upload-button': 'clickedUploadButton',
                 'click .u-field-remove-button': 'clickedRemoveButton',
-                'click .upload-submit': 'clickedUploadButton'
+                'click .upload-submit': 'clickedUploadButton',
+                'focus .upload-button-input': 'showHoverState',
+                'blur .upload-button-input': 'hideHoverState'
             },
 
             initialize: function (options) {
@@ -589,12 +592,21 @@
                     uploadButtonIcon: _.result(this, 'iconUpload'),
                     uploadButtonTitle: _.result(this, 'uploadButtonTitle'),
                     removeButtonIcon: _.result(this, 'iconRemove'),
-                    removeButtonTitle: _.result(this, 'removeButtonTitle')
+                    removeButtonTitle: _.result(this, 'removeButtonTitle'),
+                    screenReaderTitle: _.result(this, 'screenReaderTitle')
                 }));
                 this.delegateEvents();
                 this.updateButtonsVisibility();
                 this.watchForPageUnload();
                 return this;
+            },
+
+            showHoverState: function () {
+                this.$('.u-field-upload-button').addClass('button-visible');
+            },
+
+            hideHoverState: function () {
+                this.$('.u-field-upload-button').removeClass('button-visible');
             },
 
             showErrorMessage: function (message) {

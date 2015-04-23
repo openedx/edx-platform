@@ -58,6 +58,14 @@
                 i {
                     color: $white;
                 }
+
+                &:focus {
+                    @include show-hover-state();
+                }
+            }
+
+            .button-visible {
+                @include show-hover-state();
             }
 
             .upload-button-icon, .upload-button-title {
@@ -88,17 +96,21 @@
                 margin-top: 2px;
                 text-align: center;
 
-                &:focus, &:active {
+                &:active {
                     box-shadow: none;
                     outline: 0;
                 }
+                &:focus {
+                    @include show-hover-state();
+                    box-shadow: none;
+                    outline: 0;
+                    border: 2px dashed $link-color !important;
+                }
             }
 
-            &:hover {
+            &:hover, &:focus {
                 .u-field-upload-button, .u-field-remove-button {
-                    opacity: 1;
-                    background-color: $shadow-d2;
-                    border-radius: ($baseline/4);
+                    @include show-hover-state();
                 }
             }
         }
