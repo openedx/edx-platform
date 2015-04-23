@@ -812,10 +812,6 @@ def follow_thread(request, course_id, thread_id):
     thread = cc.Thread.find(thread_id)
     user.follow(thread)
 
-    # call into the social_engagement django app to
-    # rescore this user
-    _update_user_engagement_score(course_key, thread.user_id)
-
     # Feature Flag to check that notifications are enabled or not.
     if settings.FEATURES.get("ENABLE_NOTIFICATIONS", False):
         # only send notifications when the user

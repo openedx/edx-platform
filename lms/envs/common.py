@@ -1730,12 +1730,6 @@ INSTALLED_APPS = (
     'cors_csrf',
 
     'commerce',
-
-    # EDX API application
-    'api_manager',
-
-    # Social Engagement
-    'social_engagement',
 )
 
 ######################### CSRF #########################################

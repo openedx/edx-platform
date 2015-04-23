@@ -22,6 +22,26 @@
 <%block name="nav_skip">#my-courses</%block>
 
 <%block name="header_extras">
+% if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
+<script type="text/javascript" src="${static.url('js/vendor/backbone-min.js')}"></script>
+<script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
+<script type="text/javascript" src="${static.url('js/vendor/date.js')}"></script>
+
+<script type="text/javascript" src="${static.url('edx_notifications/js/models/counter_icon_model.js')}"></script>
+<script type="text/javascript" src="${static.url('edx_notifications/js/models/user_notification_model.js')}"></script>
+<script type="text/javascript" src="${static.url('edx_notifications/js/collections/notification_collection.js')}"></script>
+
+<script type="text/javascript" src="${static.url('edx_notifications/js/views/counter_icon_view.js')}"></script>
+<script type="text/javascript" src="${static.url('edx_notifications/js/views/notification_pane_view.js')}"></script>
+
+
+<script type="text/template" id="xns-counter-template">
+    <%static:include path="dashboard/notifications_count.underscore" />
+</script>
+<script type="text/template" id="xns-pane-template">
+    <%static:include path="dashboard/notifications_pane.underscore" />
+</script>
+% endif
 % for template_name in ["donation"]:
 <script type="text/template" id="${template_name}-tpl">
   <%static:include path="dashboard/${template_name}.underscore" />
@@ -39,6 +59,49 @@
         changeEmailSettings: "${reverse('change_email_settings')}",
         verifyToggleBannerFailedOff: "${reverse('verify_student_toggle_failed_banner_off')}",
       });
+      % if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
+        Backbone.$.ajaxSetup({ cache: false });
+        var notification_counter_icon = new CounterIconView({
+          el: $(".xns-icon"),
+          count_el: $(".xns-counter"),
+          pane_el: $(".xns-pane"),
+          endpoints: {
+            unread_notification_count: "${endpoints['unread_notification_count']}",
+            mark_all_user_notifications_read: "${endpoints['mark_all_user_notifications_read']}",
+            user_notifications_all: "${endpoints['user_notifications_all']}",
+            user_notifications_unread_only: "${endpoints['user_notifications_unread_only']}",
+            renderer_templates_urls: "${endpoints['renderer_templates_urls']}",
+            user_notification_mark_read: "${endpoints['user_notification_mark_read']}"
+          },
+          global_variables: {
+            app_name: "${global_variables['app_name'] }",
+            hide_link_is_visible: "${global_variables['hide_link_is_visible']}",
+            always_show_dates_on_unread: false
+          },
+          refresh_watcher: {
+            name: "${refresh_watcher['name']}",
+            args: {
+            % if refresh_watcher['name'] == 'short-poll':
+              poll_period_secs: ${refresh_watcher['args']['poll_period_secs']}
+            %endif
+            }
+          },
+          view_audios: {
+            notification_alert:
+                    % if view_audios['notification_alert']:
+                      "${ view_audios['notification_alert'] }"
+                    % else:
+                      null
+                    % endif
+          },
+          namespace:
+                  % if namespace:
+                    "${namespace}"
+                  % else:
+                    null
+                  %endif
+        });
+      %endif
     });
   </script>
 </%block>

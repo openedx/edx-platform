@@ -120,6 +120,9 @@ from eventtracking import tracker
 # Note that this lives in LMS, so this dependency should be refactored.
 from notification_prefs.views import enable_notifications
 
+from edx_notifications.server.web.utils import get_notifications_widget_context
+from edx_notifications.lib.publisher import get_all_notification_types
+
 # Note that this lives in openedx, so this dependency should be refactored.
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 
@@ -674,7 +677,31 @@ def dashboard(request):
         'courses_requirements_not_met': courses_requirements_not_met,
         'ccx_membership_triplets': ccx_membership_triplets,
     }
-
+    if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
+        context_dict = get_notifications_widget_context({
+            'notification_types': get_all_notification_types(),
+            'global_variables': {
+                'app_name': 'Notification Test Server',
+                'hide_link_is_visible': settings.HIDE_LINK_IS_VISIBLE,
+                'always_show_dates_on_unread': True,
+            },
+            # for test purposes, set up a short-poll which contacts the server
+            # every 10 seconds to see if there is a new notification
+            #
+            # NOTE: short-poll technique should not be used in a production setting with
+            # any reasonable number of concurrent users. This is just for
+            # testing purposes.
+            #
+            'refresh_watcher': {
+                'name': 'short-poll',
+                'args': {
+                    'poll_period_secs': 10,
+                },
+            },
+            'include_framework_js': True,
+            'namespace': None,
+        })
+        context.update(context_dict)
     return render_to_response('dashboard.html', context)
 
 
