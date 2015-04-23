@@ -63,6 +63,30 @@ class RegisterPage(PageObject):
         return dashboard
 
 
+class ResetPasswordPage(PageObject):
+    """Initialize the page.
+
+        Arguments:
+            browser (Browser): The browser instance.
+    """
+    url = BASE_URL + "/login#forgot-password-modal"
+
+    def __init__(self, browser):
+        super(ResetPasswordPage, self).__init__(browser)
+
+    def is_browser_on_page(self):
+        return (
+            self.q(css="#login-anchor").is_present() and
+            self.q(css="#password-reset-anchor").is_present()
+        )
+
+    def is_form_visible(self):
+        return (
+            not self.q(css="#login-anchor").visible and
+            self.q(css="#password-reset-form").visible
+        )
+
+
 class CombinedLoginAndRegisterPage(PageObject):
     """Interact with combined login and registration page.
 
