@@ -36,6 +36,8 @@ define(['jquery', 'backbone'], function ($, Backbone) {
 
         clearSearch: function () {
             this.$searchField.val('');
+            this.trigger('clear');
+            return false;
         }
 
     });
