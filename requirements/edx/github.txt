@@ -21,7 +21,7 @@
 -e git+https://github.com/pmitros/django-pyfs.git@d175715e0fe3367ec0f1ee429c242d603f6e8b10#egg=djpyfs
 git+https://github.com/mitocw/django-cas.git@60a5b8e5a62e63e0d5d224a87f0b489201a0c695#egg=django-cas
 -e git+https://github.com/dgrtwo/ParsePy.git@7949b9f754d1445eff8e8f20d0e967b9a6420639#egg=parse_rest
-git+https://github.com/mfogel/django-settings-context-processor.git
+git+https://github.com/mfogel/django-settings-context-processor.git@b758c3930862761216267715a70bbefd206ac03a#egg=django-settings-context-processor==0.2
 # Master pyfs has a bug working with VPC auth. This is a fix. We should switch
 # back to master when and if this fix is merged back.
 # fs==0.4.0
