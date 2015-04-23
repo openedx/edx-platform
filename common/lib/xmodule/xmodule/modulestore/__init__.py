@@ -342,16 +342,21 @@ class EditInfo(object):
         self.original_usage = edit_info.get('original_usage', None)
         self.original_usage_version = edit_info.get('original_usage_version', None)
 
-    def __str__(self):
-        return ("EditInfo(previous_version={0.previous_version}, "
-                "update_version={0.update_version}, "
-                "source_version={0.source_version}, "
-                "edited_on={0.edited_on}, "
-                "edited_by={0.edited_by}, "
-                "original_usage={0.original_usage}, "
-                "original_usage_version={0.original_usage_version}, "
-                "_subtree_edited_on={0._subtree_edited_on}, "
-                "_subtree_edited_by={0._subtree_edited_by})").format(self)
+    def __repr__(self):
+        # pylint: disable=bad-continuation, redundant-keyword-arg
+        return ("{classname}(previous_version={self.previous_version}, "
+                "update_version={self.update_version}, "
+                "source_version={source_version}, "
+                "edited_on={self.edited_on}, "
+                "edited_by={self.edited_by}, "
+                "original_usage={self.original_usage}, "
+                "original_usage_version={self.original_usage_version}, "
+                "_subtree_edited_on={self._subtree_edited_on}, "
+                "_subtree_edited_by={self._subtree_edited_by})").format(
+            self=self,
+            classname=self.__class__.__name__,
+            source_version="UNSET" if self.source_version is UNSET else self.source_version,
+        )  # pylint: disable=bad-continuation
 
 
 class BlockData(object):
@@ -398,13 +403,17 @@ class BlockData(object):
         # EditInfo object containing all versioning/editing data.
         self.edit_info = EditInfo(**block_data.get('edit_info', {}))
 
-    def __str__(self):
-        return ("BlockData(fields={0.fields}, "
-                "block_type={0.block_type}, "
-                "definition={0.definition}, "
-                "definition_loaded={0.definition_loaded}, "
-                "defaults={0.defaults}, "
-                "edit_info={0.edit_info})").format(self)
+    def __repr__(self):
+        # pylint: disable=bad-continuation, redundant-keyword-arg
+        return ("{classname}(fields={self.fields}, "
+                "block_type={self.block_type}, "
+                "definition={self.definition}, "
+                "definition_loaded={self.definition_loaded}, "
+                "defaults={self.defaults}, "
+                "edit_info={self.edit_info})").format(
+            self=self,
+            classname=self.__class__.__name__,
+        )  # pylint: disable=bad-continuation
 
 
 new_contract('BlockData', BlockData)
