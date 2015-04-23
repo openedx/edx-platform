@@ -898,6 +898,8 @@ class EmailWidget
         return @show_errors error
       queries = data['queries']
       groups = new Set()
+      groupNames = {}
+      invisibleTable = $('.emailWidget.invisibleQueriesStorage')
       _.each queries, (query) =>
         blockId = query['block_id']
         blockType = query['block_type']
@@ -909,11 +911,12 @@ class EmailWidget
         created = query['created']
         type = {'text':query['type']}
         queryVals = [inclusion, type, displayEntity, filterOn]
-        invisibleTable = $('.emailWidget.invisibleQueriesStorage')
         @tr = @start_row(inclusion['text'], queryVals,
           {'class':['saved' + query.group]}, invisibleTable)
         @tr[0].setAttribute('created',created)
-        groups.add(query.group)
+        groups.add(query['group'])
+        if query['group_title'].length != 0
+          groupNames[query['group']] = query['group_title']
       savedGroup = []
       iter = groups.values()
       val = iter.next()
@@ -932,11 +935,14 @@ class EmailWidget
           types.push(jQuery(cells[0]).text())
           names.push(jQuery(cells[2]).text())
           time = query.getAttribute('created')
-        savedQueryDisplayName = ''
-        for i in [0..types.length-1]
-          savedQueryDisplayName += types[i]
-          savedQueryDisplayName += ' '
-          savedQueryDisplayName += names[i] + ' '
+        if typeof groupNames[group] == 'undefined'
+          savedQueryDisplayName = ''
+          for i in [0..types.length-1]
+            savedQueryDisplayName += types[i]
+            savedQueryDisplayName += ' '
+            savedQueryDisplayName += names[i] + ' '
+        else
+          savedQueryDisplayName = groupNames[group]
         savedVals = [{'text': time}, {'text': savedQueryDisplayName}]
         @start_saved_row('and', savedVals, group, $('.emailWidget.savedQueriesTable'))
 
@@ -968,18 +974,84 @@ class EmailWidget
     @delete_temp_query_batch(queriesToDelete)
     $('.emailWidget.queryTableBody tr').remove()
 
+  rename_button_click:(event) ->
+    $saveCancelEditButton = $ _.template('<div class="emailWidget saveEditName"><i class="icon-save"></i>
+          <%= labelSave %></div> <div class="emailWidget cancelEditName"><i class="icon-remove-sign">
+          </i> <%= labelCancel %></div>', {labelSave: 'Save' ,labelCancel: 'Cancel' })
+    $renameBtn = $ _.template('<div class="emailWidget editName"><i class="icon-pencil">
+      </i> <%= label %></div>', {label: 'Rename'})
+    targ = event.target
+    while (!targ.classList.contains('editName'))
+        targ = targ.parentNode
+    targ = jQuery(targ).parent()
+    originalText = targ.text().trim().substring(6)
+    targ.html('');
+    targ.append($saveCancelEditButton)
+    htmlString = '<div class="emailWidget invisibleSavedGroupName">'+
+      originalText+'</div><input type="text" class="emailWidget editNameInput" name="queryName" value="'+originalText+'">'
+    targ.append(htmlString)
+    $cancelEditButton = targ.find(".emailWidget.cancelEditName")
+    $saveEditButton = targ.find(".emailWidget.saveEditName")
+    $cancelEditButton.click (event) =>
+      targ = event.target
+      while (!targ.classList.contains('cancelEditName'))
+        targ = targ.parentNode
+      targ = jQuery(targ)
+      parent = targ.parent()
+      originalText = parent.find(".emailWidget.invisibleSavedGroupName").text()
+      parent.html('')
+      parent.append($renameBtn)
+      parent.append(originalText)
+      $renameBtn.click (event) =>
+        @rename_button_click(event)
+    $saveEditButton.click (event) =>
+      targ = event.target
+      while (!targ.classList.contains('saveEditName'))
+        targ = targ.parentNode
+      targ = jQuery(targ)
+      parent = targ.parent()
+      inputField = parent.find(".emailWidget.editNameInput")
+      newGroupName = inputField.attr("value")
+      groupId = parent.parent().attr("groupquery")
+      send_data =
+        group_id: groupId
+        group_name: newGroupName
+      $.ajax(
+        type: 'POST'
+        dataType: 'json'
+        url: $('.emailWidget.savedQueriesTable').data('group-name-endpoint')
+        data: send_data
+        success: $('#send_email select option[value="' +groupId + '"]').text(newGroupName)
+        error: std_ajax_err ->
+          cb? gettext('Error saving group name')
+      )
+      newText = newGroupName
+      parent.html('')
+      parent.append($renameBtn)
+      parent.append(newText)
+      $renameBtn.click (event) =>
+        @rename_button_click(event)
+
   # adds a row to saved queries
   start_saved_row:(color, arr, id, table) ->
     # find which row to insert in
     rows = table[0].children
     row = table[0].insertRow(rows)
     row.setAttribute('groupQuery', id)
+    $renameBtn = $ _.template('<div class="emailWidget editName"><i class="icon-pencil">
+      </i> <%= label %></div>', {label: 'Rename'})
     for num in [0..1]
       cell = row.insertCell(num)
       item = arr[num]
-      cell.innerHTML = item['text']
+      if num == 1
+        $(cell).append($renameBtn)
+      $(cell).append(item['text'])
       if item.hasOwnProperty('id')
         cell.id = item['id']
+
+    $renameBtn.click (event) =>
+      @rename_button_click(event)
+
     $loadBtn = $ _.template('<div class="loadQuery"><i class="icon-upload">
       </i> <%= label %></div>', {label: 'Load'})
     $loadBtn.click (event) =>
@@ -1187,20 +1259,22 @@ class EmailWidget
       cur_queries.push(row.getAttribute('query'))
     send_data =
       existing: cur_queries.join(',')
-    $.ajax
+      savedName: $(".emailWidget.savequeryname").val()
+    $(".emailWidget.savequeryname").val("")
+    $.ajax(
+      type: 'POST'
       dataType: 'json'
       url: @$saveQueryBtn.data('endpoint')
       data: send_data
       success: (data) -> cb? null, data
       error: std_ajax_err ->
         cb? gettext('Error saving query')
-
+    )
   # save queries in active queries
   send_save_query: ->
     @save_query (error, data) =>
       if error
         return @show_errors error
-
       $('#send_email select').append('<option value="' + data['group_id'] + '">' + data['group_title'] + '</option>')
       @load_saved_queries()
 

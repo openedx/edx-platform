@@ -29,7 +29,7 @@
 -e git+https://github.com/edx/bok-choy.git@4a259e3548a19e41cc39433caf68ea58d10a27ba#egg=bok_choy
 -e git+https://github.com/edx-solutions/django-splash.git@7579d052afcf474ece1239153cffe1c89935bc4f#egg=django-splash
 -e git+https://github.com/edx/acid-block.git@df1a7f0cae46567c251d507b8c72168aed8ec042#egg=acid-xblock
--e git+https://github.com/Stanford-Online/edx-ora2.git@79327e593a837546eb6a14a96b30ff4c57570fb3#egg=edx-ora2
+-e git+https://github.com/Stanford-Online/edx-ora2.git@ab3d2d1898c609bac3d7873eec476a5e38a07e2f#egg=edx-ora2
 -e git+https://github.com/edx/opaque-keys.git@0.1.2#egg=opaque-keys
 -e git+https://github.com/edx/ease.git@97de68448e5495385ba043d3091f570a699d5b5f#egg=ease
 -e git+https://github.com/edx/i18n-tools.git@56f048af9b6868613c14aeae760548834c495011#egg=i18n-tools
@@ -46,3 +46,4 @@
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@31a811911612e87244f760f483998867e4883565#egg=xblock-google-drive
 -e git+https://github.com/openlearninginitiative/xblock-submit-and-compare.git@f89d3debd58003a5bfedfbaad06072ec2082259d#egg=xblock-submit-and-compare
 -e git+https://github.com/mckinseyacademy/xblock-poll.git@09e8feda40fdf77bd19b830b497ff969891e11af#egg=xblock-poll
+-e git+https://github.com/Stanford-Online/xblock-mufi.git@3fc0a4593c719369b78b9492ba61c971a6d4dc3b#egg=xblock_mufi-master

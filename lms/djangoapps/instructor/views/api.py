@@ -89,6 +89,7 @@ from .tools import (
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx import locator
 from student.models import UserProfile, Registration
 import instructor.views.data_access as data_access
 from instructor.views.data_access_constants import QueryType, StudentQuery, QUERYORIGIN_MAP, QueryOrigin
@@ -853,12 +854,12 @@ def delete_saved_query(request, course_id, query_to_delete):  # pylint: disable=
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-@require_query_params(existing="Ids of previously issued queries")
 def save_query(request, course_id):
     """
     Saves a group of queries and assigns them the same group ID
     """
-    existing = request.GET.get('existing')
+    existing = request.POST.get('existing')
+    saved_name = request.POST.get('savedName')
     existing_queries = existing.split(',')
     if len(existing) == 0:
         return JsonResponse({
@@ -870,7 +871,8 @@ def save_query(request, course_id):
         for query in existing_queries
         if (query != "working" and query != "")
     ]
-    group = data_access.save_query(course_id, clean_existing)
+
+    group = data_access.save_query(course_id, saved_name, clean_existing)
     group_title = group.title or u'Query saved at ' + group.created.strftime("%m-%d-%y %H:%M")
 
     response_payload = {
@@ -926,6 +928,11 @@ def get_saved_queries(request, course_id):  # pylint: disable=unused-argument
         relation.query_id: relation.grouped_id
         for relation in relations
     }
+
+    title_map = {
+        group.id: group.title
+        for group in groups
+    }
     for relation in relations:
         relation_map[relation.query_id] = relation.grouped_id
     for group in groups:
@@ -942,6 +949,7 @@ def get_saved_queries(request, course_id):  # pylint: disable=unused-argument
                 'type': query.query_type,
                 'group': group_id,
                 'created': created[group_id],
+                'group_title': title_map[group_id],
             })
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
@@ -1111,6 +1119,33 @@ def list_course_problems(request, course_id):
         'course_id': course_id.to_deprecated_string(),
         'data': problem_list,
         'success': True,
+    }
+    return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def save_group_name(request, course_id):
+    """
+    Required POST params:
+         group_id : id of the saved group query to rename
+         group_name: the new name of the group query with id group_id
+    """
+    group_id = request.POST.get('group_id')
+    group_name = request.POST.get('group_name')
+
+    if group_id is None or group_name is None:
+        return JsonResponse({
+            'course_id': unicode(course_id),
+            'success': False,
+        })
+
+    success = data_access.save_group_name(group_id, group_name)
+
+    response_payload = {
+        'course_id': unicode(course_id),
+        'success': success,
     }
     return JsonResponse(response_payload)
 
@@ -2114,13 +2149,13 @@ def get_student_forums_usage(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_ora2_responses(request, course_id):
+def get_ora2_responses(request, course_id, include_email):
     """
     Pushes a Celery task which will aggregate ora2 responses for a course into a .csv
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = locator.CourseLocator.from_string(course_id)
     try:
-        instructor_task.api.submit_ora2_request_task(request, course_key)
+        instructor_task.api.submit_ora2_request_task(request, course_key, include_email)
         success_status = _("The ORA2 responses report is being generated.")
         return JsonResponse({"status": success_status})
     except AlreadyRunningError:
@@ -2155,6 +2190,7 @@ def get_course_forums_usage(request, course_id):
             "for the status of the task. When completed, the report "
             "will be available for download in the table below."
         )
+
         return JsonResponse({
             "status": already_running_status
         })

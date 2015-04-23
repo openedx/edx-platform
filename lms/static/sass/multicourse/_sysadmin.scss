@@ -1,0 +1,51 @@
+.mgmt-commands-body .command-selector {
+    border: solid 4px #000000;
+    padding: 20px;
+}
+
+.mgmt-commands-body .select-tag {
+    height: 35px;
+    font-size: 1.1em;
+}
+
+.mgmt-commands-body .textfield-tag {
+    width: 30%;
+}
+
+.mgmt-commands-body .full-width {
+    width: 100%;
+}
+
+.mgmt-commands-body .bordered-fieldset {
+    border: solid 4px #000000;
+    padding: 20px;
+    margin-top: 30px;
+}
+
+.mgmt-commands-body .execute-command-button {
+    margin-top: 20px;
+}
+
+.mgmt-commands-body #command-description {
+    margin-top: 10px;
+}
+
+.mgmt-commands-body .error {
+    color: #E40004;
+}
+
+.mgmt-commands-body .stderr {
+    color: #800000;
+}
+
+.mgmt-commands-body .stdout {
+    color: #008000;
+}
+
+.mgmt-commands-body .new-section {
+    margin-top: 20px;
+}
+
+.mgmt-commands-body .checkbox-label {
+    display: inline;
+}

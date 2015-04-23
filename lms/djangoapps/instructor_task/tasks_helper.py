@@ -28,7 +28,7 @@ from instructor_analytics.basic import student_response_rows, enrolled_students_
 from instructor_analytics.csvs import format_dictlist
 from instructor_task.models import ReportStore, InstructorTask, PROGRESS
 from student.models import CourseEnrollment
-from instructor.utils import collect_ora2_data, collect_course_forums_data, collect_student_forums_data
+from instructor.utils import collect_anonymous_ora2_data, collect_email_ora2_data, collect_course_forums_data, collect_student_forums_data
 
 # define different loggers for use within tasks and on client side
 TASK_LOG = get_task_logger(__name__)
@@ -140,7 +140,6 @@ class EmailWidgetTask(Task):     # pylint: disable=abstract-method
         """
         TASK_LOG.debug(u'Task %s: failure returned', task_id)
         TASK_LOG.warning(u"Task (%s) failed", task_id, exc_info=True)
-
 
 
 class UpdateProblemModuleStateError(Exception):
@@ -647,13 +646,6 @@ def push_student_responses_to_s3(_xmodule_instance_args, _entry_id, course_id, _
     return "succeeded"
 
 
-def push_ora2_responses_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
-    """
-    Collect ora2 responses and upload them to S3 as a CSV
-    """
-    return _push_csv_responses_to_s3(collect_ora2_data, u'ORA2_responses', course_id, action_name)
-
-
 def push_course_forums_data_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
     """
     Collect course forums usage data and upload them to S3 as a CSV
@@ -714,7 +706,6 @@ def _push_csv_responses_to_s3(csv_fn, filename, course_id, action_name):
 
     curr_step = "Uploading CSV"
     update_task_progress()
-
     upload_csv_to_report_store(
         rows,
         filename,
@@ -727,6 +718,20 @@ def _push_csv_responses_to_s3(csv_fn, filename, course_id, action_name):
     update_task_progress()
 
     return UPDATE_STATUS_SUCCEEDED
+
+
+def push_ora2_responses_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+    """
+    Collect ora2 responses and upload them to S3 as a CSV, without email addresses.  Pass is_anonymous = True
+    """
+    # push_ora2_responses_to_s3_base(_xmodule_instance_args, u'ORA2_responses_anonymous', _entry_id, course_id, _task_input, action_name, True)
+    include_email = _task_input['include_email']
+    if include_email == 'True':
+        filename = u'ORA2_responses_including_email'
+        return _push_csv_responses_to_s3(collect_email_ora2_data, filename, course_id, action_name)
+    else:
+        filename = u'ORA2_responses_anonymous'
+        return _push_csv_responses_to_s3(collect_anonymous_ora2_data, filename, course_id, action_name)
 
 
 def upload_students_csv(_xmodule_instance_args, _entry_id, course_id, task_input, action_name):
