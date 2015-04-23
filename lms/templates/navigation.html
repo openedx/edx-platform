@@ -48,7 +48,7 @@ site_status_msg = get_site_status_msg(course_id)
     </h1>
 
     % if course:
-    <h2><span class="provider">${course.display_org_with_default | h}:</span> 
+    <h2><span class="provider">${course.display_org_with_default | h}:</span>
       ${course.display_number_with_default | h}
       <%
         display_name = course.display_name_with_default
@@ -113,9 +113,11 @@ site_status_msg = get_site_status_msg(course_id)
           <li class="nav-global-01">
             <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
           </li>
-          <li class="nav-global-02">
-            <a href="${marketing_link('COURSES')}">${_("Courses")}</a>
-          </li>
+          % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
+            <li class="nav-global-02">
+              <a href="${marketing_link('COURSES')}">${_("Courses")}</a>
+            </li>
+          % endif
           <li class="nav-global-03">
             <a href="${marketing_link('SCHOOLS')}">${_("Schools")}</a>
           </li>

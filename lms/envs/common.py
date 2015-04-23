@@ -377,6 +377,9 @@ FEATURES = {
         'TWITTER_SHARING': False,
         'TWITTER_SHARING_TEXT': None
     },
+
+    # Course discovery feature
+    'ENABLE_COURSE_DISCOVERY': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -2289,3 +2292,15 @@ PROFILE_IMAGE_DEFAULT_FILE_EXTENSION = 'png'
 PROFILE_IMAGE_SECRET_KEY = 'placeholder secret key'
 PROFILE_IMAGE_MAX_BYTES = 1024 * 1024
 PROFILE_IMAGE_MIN_BYTES = 100
+
+# Sets the maximum number of courses listed on the homepage
+# If set to None, all courses will be listed on the homepage
+HOMEPAGE_COURSE_COUNT = 9
+
+# if COURSES_ARE_BROWSABLE feature is disabled, ENABLE_COURSE_DISCOVERY should be as well
+if not FEATURES.get('COURSES_ARE_BROWSABLE'):
+    FEATURES['ENABLE_COURSE_DISCOVERY'] = False
+
+# if COURSE DISCOVERY feature is disabled, all courses should be listed on the homepage
+if not FEATURES.get('ENABLE_COURSE_DISCOVERY'):
+    HOMEPAGE_COURSE_COUNT = None
