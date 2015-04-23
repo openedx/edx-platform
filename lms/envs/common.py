@@ -2252,7 +2252,7 @@ ECOMMERCE_API_SIGNING_KEY = None
 ECOMMERCE_API_TIMEOUT = 5
 
 # Reverification checkpoint name pattern
-CHECKPOINT_PATTERN = r'(?P<checkpoint_name>[\w ]+)'
+CHECKPOINT_PATTERN = r'(?P<checkpoint_name>[^/]+)'
 
 # For the fields override feature
 # If using FEATURES['INDIVIDUAL_DUE_DATES'], you should add
