@@ -33,23 +33,26 @@ Get the User's Enrollment Status in a Course
         "mode": "honor", 
         "is_active": true, 
         "course_details": {
-            "course_id": "edX/DemoX/Demo_Course", 
-            "enrollment_end": null, 
-            "course_modes": [
-                {
-                    "slug": "honor", 
-                    "name": "Honor Code Certificate", 
-                    "min_price": 0, 
-                    "suggested_prices": [], 
-                    "currency": "usd", 
-                    "expiration_datetime": null, 
-                    "description": null
-                }
-            ], 
-            "enrollment_start": null, 
-            "invite_only": false
-        }, 
-        "user": "staff"
+        "course_end": "2015-06-30T05:00:00Z", 
+        "course_start": "2015-02-05T05:00:00Z", 
+        "course_modes": [
+            {
+                "slug": "honor", 
+                "name": "Honor Code Certificate", 
+                "min_price": 0, 
+                "suggested_prices": [], 
+                "currency": "usd", 
+                "expiration_datetime": null, 
+                "description": null, 
+                "sku": null
+            }
+        ], 
+        "enrollment_start": "2015-01-01T05:00:00Z", 
+        "enrollment_end": "2015-02-13T05:00:00Z", 
+        "invite_only": false, 
+        "course_id": "edX/DemoX/Demo_Course"
+    }, 
+    "user": "staff"
     }
 
 .. _Get Enrollment Details for a Course:
@@ -70,8 +73,8 @@ Get Enrollment Details for a Course
     Allow: GET, HEAD, OPTIONS
 
     {
-        "course_id": "edX/DemoX/Demo_Course", 
-        "enrollment_end": null, 
+        "course_end": "2015-06-30T05:00:00Z", 
+        "course_start": "2015-02-05T05:00:00Z", 
         "course_modes": [
             {
                 "slug": "honor", 
@@ -80,11 +83,14 @@ Get Enrollment Details for a Course
                 "suggested_prices": [], 
                 "currency": "usd", 
                 "expiration_datetime": null, 
-                "description": null
+                "description": null, 
+                "sku": null
             }
         ], 
-        "enrollment_start": null, 
-        "invite_only": false
+        "enrollment_start": "2015-01-01T05:00:00Z", 
+        "enrollment_end": "2015-02-13T05:00:00Z", 
+        "invite_only": false, 
+        "course_id": "edX/DemoX/Demo_Course"
     }
 
 
@@ -108,12 +114,12 @@ View and Add to a User's Course Enrollments
 
     [
         {
-            "created": "2014-09-19T18:08:37Z", 
+            "created": "2014-11-19T04:06:55Z", 
             "mode": "honor", 
             "is_active": true, 
             "course_details": {
-                "course_id": "edX/DemoX/Demo_Course", 
-                "enrollment_end": null, 
+                "course_end": "2015-06-30T05:00:00Z", 
+                "course_start": "2015-02-05T05:00:00Z", 
                 "course_modes": [
                     {
                         "slug": "honor", 
@@ -122,37 +128,17 @@ View and Add to a User's Course Enrollments
                         "suggested_prices": [], 
                         "currency": "usd", 
                         "expiration_datetime": null, 
-                        "description": null
+                        "description": null, 
+                        "sku": null
                     }
                 ], 
-                "enrollment_start": null, 
-                "invite_only": false
-            }, 
-            "user": "honor"
+            "enrollment_start": "2015-01-01T05:00:00Z", 
+            "enrollment_end": "2015-02-13T05:00:00Z", 
+            "invite_only": false, 
+            "course_id": "edX/DemoX/Demo_Course"
         }, 
-        {
-            "created": "2014-09-19T18:09:35Z", 
-            "mode": "honor", 
-            "is_active": true, 
-            "course_details": {
-                "course_id": "ArbisoftX/BulkyEmail101/2014-15", 
-                "enrollment_end": null, 
-                "course_modes": [
-                    {
-                        "slug": "honor", 
-                        "name": "Honor Code Certificate", 
-                        "min_price": 0, 
-                        "suggested_prices": [], 
-                        "currency": "usd", 
-                        "expiration_datetime": null, 
-                        "description": null
-                    }
-                ], 
-                "enrollment_start": "2014-05-01T04:00:00Z", 
-                "invite_only": false
-            }, 
-            "user": "honor"
-        }
+        "user": "staff"
+    }
     ]
 
 
