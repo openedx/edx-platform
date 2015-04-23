@@ -62,9 +62,7 @@ textarea {
       ## Translators: refers to http://git-scm.com/docs/git-log
       <a href="${reverse('gitlogs')}">${_('Git Logs')}</a>
       <a href="${reverse('sysadmin_task_queue')}" class="${modeflag.get('task_queue')}">${_('Task Queue')}</a>
-      %if modeflag.get('mgmt_commands'):
-        <a href="${reverse('sysadmin_mgmt_commands')}" class="${modeflag.get('mgmt_commands')}">${_('MGMT Commands')}</a>
-      %endif
+      <a href="${reverse('sysadmin_mgmt_commands')}" class="${modeflag.get('mgmt_commands')}">${_('MGMT Commands')}</a>
     </h2>
 	<hr />
 %if modeflag.get('users'):
