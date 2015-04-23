@@ -13,7 +13,7 @@ from .models import (
     XModuleStudentInfoField
 )
 import logging
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.block_types import BlockTypeKeyV1
 from opaque_keys.edx.asides import AsideUsageKeyV1
 from contracts import contract, new_contract
@@ -490,6 +490,18 @@ class UserStateCache(DjangoOrmFieldCache):
         state[kvs_key.field_name] = value
         field_object.state = json.dumps(state)
 
+    @contract(user_id=int, usage_key=UsageKey, score="number|None", max_score="number|None")
+    def set_score(self, user_id, usage_key, score, max_score):
+        """
+        UNSUPPORTED METHOD
+
+        Set the score and max_score for the specified user and xblock usage.
+        """
+        field_object = self._cache[usage_key]
+        field_object.grade = score
+        field_object.max_grade = max_score
+        field_object.save()
+
 
 class UserStateSummaryCache(DjangoOrmFieldCache):
     """
@@ -909,3 +921,15 @@ class FieldDataCache(object):
             return False
 
         return self.cache[key.scope].has(key)
+
+    @contract(user_id=int, usage_key=UsageKey, score="number|None", max_score="number|None")
+    def set_score(self, user_id, usage_key, score, max_score):
+        """
+        UNSUPPORTED METHOD
+
+        Set the score and max_score for the specified user and xblock usage.
+        """
+        assert not self.user.is_anonymous()
+        assert user_id == self.user.id
+        assert usage_key.course_key == self.course_id
+        self.cache[Scope.user_state].set_score(user_id, usage_key, score, max_score)

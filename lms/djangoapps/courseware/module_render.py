@@ -416,24 +416,18 @@ def get_module_system_for_user(user, field_data_cache,
         """
         user_id = event.get('user_id', user.id)
 
-        # Construct the key for the module
-        key = KeyValueStore.Key(
-            scope=Scope.user_state,
-            user_id=user_id,
-            block_scope_id=descriptor.location,
-            field_name='grade'
-        )
-        StudentModule.objects.filter(
-            student__id=user_id,
-            module_state_key=descriptor.location,
-            course_id=course_id,
-        ).update(
-            grade=event.get('value'),
-            max_grade=event.get('max_value')
+        grade = event.get('value')
+        max_grade = event.get('max_value')
+
+        field_data_cache.set_score(
+            user_id,
+            descriptor.location,
+            grade,
+            max_grade,
         )
 
         # Bin score into range and increment stats
-        score_bucket = get_score_bucket(student_module.grade, student_module.max_grade)
+        score_bucket = get_score_bucket(grade, max_grade)
 
         tags = [
             u"org:{}".format(course_id.org),
