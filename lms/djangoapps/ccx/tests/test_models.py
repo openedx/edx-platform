@@ -147,6 +147,7 @@ class TestCCX(ModuleStoreTestCase):
         self.ccx = CcxFactory(course_id=course.id, coach=coach)
 
     def set_ccx_override(self, field, value):
+        """Create a field override for the test CCX on <field> with <value>"""
         override_field_for_ccx(self.ccx, self.course, field, value)
 
     def test_ccx_course_is_correct_course(self):
@@ -158,9 +159,12 @@ class TestCCX(ModuleStoreTestCase):
     def test_ccx_course_caching(self):
         """verify that caching the propery works to limit queries"""
         with check_mongo_calls(1):
-            self.ccx.course
+            # these statements are used entirely to demonstrate the
+            # instance-level caching of these values on CCX objects. The
+            # check_mongo_calls context is the point here.
+            self.ccx.course  # pylint: disable=pointless-statement
         with check_mongo_calls(0):
-            self.ccx.course
+            self.ccx.course  # pylint: disable=pointless-statement
 
     def test_ccx_start_is_correct(self):
         """verify that the start datetime for a ccx is correctly retrieved
@@ -172,7 +176,7 @@ class TestCCX(ModuleStoreTestCase):
         """
         expected = datetime.now(UTC())
         self.set_ccx_override('start', expected)
-        actual = self.ccx.start
+        actual = self.ccx.start  # pylint: disable=no-member
         diff = expected - actual
         self.assertEqual(diff.seconds, 0)
 
@@ -181,21 +185,24 @@ class TestCCX(ModuleStoreTestCase):
         now = datetime.now(UTC())
         self.set_ccx_override('start', now)
         with check_mongo_calls(1):
-            self.ccx.start
+            # these statements are used entirely to demonstrate the
+            # instance-level caching of these values on CCX objects. The
+            # check_mongo_calls context is the point here.
+            self.ccx.start  # pylint: disable=pointless-statement, no-member
         with check_mongo_calls(0):
-            self.ccx.start
+            self.ccx.start  # pylint: disable=pointless-statement, no-member
 
     def test_ccx_due_without_override(self):
         """verify that due returns None when the field has not been set"""
         expected = None
-        actual = self.ccx.due
+        actual = self.ccx.due  # pylint: disable=no-member
         self.assertTrue(expected is actual)
 
     def test_ccx_due_is_correct(self):
         """verify that the due datetime for a ccx is correctly retrieved"""
         expected = datetime.now(UTC())
         self.set_ccx_override('due', expected)
-        actual = self.ccx.due
+        actual = self.ccx.due  # pylint: disable=no-member
         diff = expected - actual
         self.assertEqual(diff.seconds, 0)
 
@@ -204,9 +211,12 @@ class TestCCX(ModuleStoreTestCase):
         expected = datetime.now(UTC())
         self.set_ccx_override('due', expected)
         with check_mongo_calls(1):
-            self.ccx.due
+            # these statements are used entirely to demonstrate the
+            # instance-level caching of these values on CCX objects. The
+            # check_mongo_calls context is the point here.
+            self.ccx.due  # pylint: disable=pointless-statement, no-member
         with check_mongo_calls(0):
-            self.ccx.due
+            self.ccx.due  # pylint: disable=pointless-statement, no-member
 
     def test_ccx_has_started(self):
         """verify that a ccx marked as starting yesterday has started"""
@@ -214,7 +224,7 @@ class TestCCX(ModuleStoreTestCase):
         delta = timedelta(1)
         then = now - delta
         self.set_ccx_override('start', then)
-        self.assertTrue(self.ccx.has_started())
+        self.assertTrue(self.ccx.has_started())  # pylint: disable=no-member
 
     def test_ccx_has_not_started(self):
         """verify that a ccx marked as starting tomorrow has not started"""
@@ -222,7 +232,7 @@ class TestCCX(ModuleStoreTestCase):
         delta = timedelta(1)
         then = now + delta
         self.set_ccx_override('start', then)
-        self.assertFalse(self.ccx.has_started())
+        self.assertFalse(self.ccx.has_started())  # pylint: disable=no-member
 
     def test_ccx_has_ended(self):
         """verify that a ccx that has a due date in the past has ended"""
@@ -230,7 +240,7 @@ class TestCCX(ModuleStoreTestCase):
         delta = timedelta(1)
         then = now - delta
         self.set_ccx_override('due', then)
-        self.assertTrue(self.ccx.has_ended())
+        self.assertTrue(self.ccx.has_ended())  # pylint: disable=no-member
 
     def test_ccx_has_not_ended(self):
         """verify that a ccx that has a due date in the future has not eneded
@@ -239,11 +249,11 @@ class TestCCX(ModuleStoreTestCase):
         delta = timedelta(1)
         then = now + delta
         self.set_ccx_override('due', then)
-        self.assertFalse(self.ccx.has_ended())
+        self.assertFalse(self.ccx.has_ended())  # pylint: disable=no-member
 
     def test_ccx_without_due_date_has_not_ended(self):
         """verify that a ccx without a due date has not ended"""
-        self.assertFalse(self.ccx.has_ended())
+        self.assertFalse(self.ccx.has_ended())  # pylint: disable=no-member
 
     def test_start_datetime_short_date(self):
         """verify that the start date for a ccx formats properly by default"""
@@ -251,7 +261,7 @@ class TestCCX(ModuleStoreTestCase):
         # This relies on SHORT_DATE remaining the same, is there a better way?
         expected = "Jan 01, 2015"
         self.set_ccx_override('start', start)
-        actual = self.ccx.start_datetime_text()
+        actual = self.ccx.start_datetime_text()  # pylint: disable=no-member
         self.assertEqual(expected, actual)
 
     def test_start_datetime_date_time_format(self):
@@ -260,7 +270,7 @@ class TestCCX(ModuleStoreTestCase):
         # This relies on SHORT_DATE remaining the same, is there a better way?
         expected = "Jan 01, 2015 at 12:00 UTC"
         self.set_ccx_override('start', start)
-        actual = self.ccx.start_datetime_text('DATE_TIME')
+        actual = self.ccx.start_datetime_text('DATE_TIME')  # pylint: disable=no-member
         self.assertEqual(expected, actual)
 
     def test_end_datetime_short_date(self):
@@ -269,7 +279,7 @@ class TestCCX(ModuleStoreTestCase):
         # This relies on SHORT_DATE remaining the same, is there a better way?
         expected = "Jan 01, 2015"
         self.set_ccx_override('due', end)
-        actual = self.ccx.end_datetime_text()
+        actual = self.ccx.end_datetime_text()  # pylint: disable=no-member
         self.assertEqual(expected, actual)
 
     def test_end_datetime_date_time_format(self):
@@ -278,13 +288,13 @@ class TestCCX(ModuleStoreTestCase):
         # This relies on SHORT_DATE remaining the same, is there a better way?
         expected = "Jan 01, 2015 at 12:00 UTC"
         self.set_ccx_override('due', end)
-        actual = self.ccx.end_datetime_text('DATE_TIME')
+        actual = self.ccx.end_datetime_text('DATE_TIME')  # pylint: disable=no-member
         self.assertEqual(expected, actual)
 
     def test_end_datetime_no_due_date(self):
         """verify that without a due date, the end date is an empty string"""
         expected = ''
-        actual = self.ccx.end_datetime_text()
+        actual = self.ccx.end_datetime_text()  # pylint: disable=no-member
         self.assertEqual(expected, actual)
-        actual = self.ccx.end_datetime_text('DATE_TIME')
+        actual = self.ccx.end_datetime_text('DATE_TIME')  # pylint: disable=no-member
         self.assertEqual(expected, actual)

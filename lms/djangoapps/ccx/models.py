@@ -32,6 +32,7 @@ class CustomCourseForEdX(models.Model):
 
     @property
     def course(self):
+        """Return the CourseDescriptor of the course related to this CCX"""
         if self._course is None:
             store = modulestore()
             with store.bulk_operations(self.course_id):
@@ -47,6 +48,8 @@ class CustomCourseForEdX(models.Model):
 
     @property
     def start(self):
+        """Get the value of the override of the 'start' datetime for this CCX
+        """
         if self._start is None:
             # avoid circular import problems
             from .overrides import get_override_for_ccx
@@ -56,6 +59,8 @@ class CustomCourseForEdX(models.Model):
 
     @property
     def due(self):
+        """Get the value of the override of the 'due' datetime for this CCX
+        """
         if self._due is _MARKER:
             # avoid circular import problems
             from .overrides import get_override_for_ccx
@@ -64,15 +69,21 @@ class CustomCourseForEdX(models.Model):
         return self._due
 
     def has_started(self):
+        """Return True if the CCX start date is in the past"""
         return datetime.now(UTC()) > self.start
 
     def has_ended(self):
+        """Return True if the CCX due date is set and is in the past"""
         if self.due is None:
             return False
 
         return datetime.now(UTC()) > self.due
 
     def start_datetime_text(self, format_string="SHORT_DATE"):
+        """Returns the desired text representation of the CCX start datetime
+
+        The returned value is always expressed in UTC
+        """
         i18n = self.course.runtime.service(self.course, "i18n")
         strftime = i18n.strftime
         value = strftime(self.start, format_string)
@@ -81,6 +92,13 @@ class CustomCourseForEdX(models.Model):
         return value
 
     def end_datetime_text(self, format_string="SHORT_DATE"):
+        """Returns the desired text representation of the CCX due datetime
+
+        If the due date for the CCX is not set, the value returned is the empty
+        string.
+
+        The returned value is always expressed in UTC
+        """
         if self.due is None:
             return ''
 
