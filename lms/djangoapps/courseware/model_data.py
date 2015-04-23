@@ -282,6 +282,23 @@ class DjangoOrmFieldCache(object):
         """
         return self._cache_key_for_kvs_key(kvs_key) in self._cache
 
+    @contract(kvs_key=DjangoKeyValueStore.Key, returns="datetime|None")
+    def last_modified(self, kvs_key):
+        """
+        Return when the supplied field was changed.
+
+        Arguments:
+            kvs_key (`DjangoKeyValueStore.Key`): The field value to delete
+
+        Returns: datetime if there was a modified date, or None otherwise
+        """
+        field_object = self._cache.get(self._cache_key_for_kvs_key(kvs_key))
+
+        if field_object is None:
+            return None
+        else:
+            return field_object.modified
+
     @contract(kvs_key=DjangoKeyValueStore.Key)
     def _set_field_value(self, field_object, kvs_key, value):
         field_object.value = json.dumps(value)
@@ -933,3 +950,23 @@ class FieldDataCache(object):
         assert user_id == self.user.id
         assert usage_key.course_key == self.course_id
         self.cache[Scope.user_state].set_score(user_id, usage_key, score, max_score)
+
+    @contract(key=DjangoKeyValueStore.Key, returns="datetime|None")
+    def last_modified(self, key):
+        """
+        Return when the supplied field was changed.
+
+        Arguments:
+            key (`DjangoKeyValueStore.Key`): The field value to delete
+
+        Returns: datetime if there was a modified date, or None otherwise
+        """
+        if key.scope.user == UserScope.ONE and not self.user.is_anonymous():
+            # If we're getting user data, we expect that the key matches the
+            # user we were constructed for.
+            assert key.user_id == self.user.id
+
+        if key.scope not in self.cache:
+            return None
+
+        return self.cache[key.scope].last_modified(key)
