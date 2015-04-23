@@ -1888,5 +1888,5 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
                        kwargs={
                            "course_id": unicode(course_key),
                            "checkpoint_name": checkpoint,
-                           "location": unicode(self.reverification_location)
+                           "usage_id": unicode(self.reverification_location)
                        })
