@@ -2821,6 +2821,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             # perhaps replace by fixing the views or Field Reference*.from_json to return a Key
             if isinstance(reference, basestring):
                 reference = BlockUsageLocator.from_string(reference)
+            elif isinstance(reference, BlockKey):
+                return reference
             return BlockKey.from_usage_key(reference)
 
         for field_name, value in fields.iteritems():
