@@ -74,6 +74,7 @@ define([
         },
 
         resetState: function () {
+            this.reset();
             this.page = 0;
             this.totalCount = 0;
             this.latestModelsCount = 0;
