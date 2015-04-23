@@ -276,22 +276,6 @@ class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
         # Submit payment
         self.fake_payment_page.submit_payment()
 
-        # Expect enrollment activated event
-        self.assert_event_emitted_num_times(
-            "edx.course.enrollment.activated",
-            self.start_time,
-            student_id,
-            1
-        )
-
-        # Expect that one mode_changed enrollment event fired as part of the upgrade
-        self.assert_event_emitted_num_times(
-            "edx.course.enrollment.mode_changed",
-            self.start_time,
-            student_id,
-            1
-        )
-
         # Proceed to verification
         self.payment_and_verification_flow.immediate_verification()
 
@@ -329,14 +313,6 @@ class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
         # Submit payment
         self.fake_payment_page.submit_payment()
 
-        # Expect enrollment activated event
-        self.assert_event_emitted_num_times(
-            "edx.course.enrollment.activated",
-            self.start_time,
-            student_id,
-            1
-        )
-
         # Navigate to the dashboard
         self.dashboard_page.visit()
 
@@ -364,24 +340,23 @@ class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
         # Proceed to the fake payment page
         self.upgrade_page.proceed_to_payment()
 
-        # Submit payment
-        self.fake_payment_page.submit_payment()
+        def only_enrollment_events(event):
+            """Filter out all non-enrollment events."""
+            return event['event_type'].startswith('edx.course.enrollment.')
 
-        # Expect that one mode_changed enrollment event fired as part of the upgrade
-        self.assert_event_emitted_num_times(
-            "edx.course.enrollment.mode_changed",
-            self.start_time,
-            student_id,
-            1
-        )
+        expected_events = [
+            {
+                'event_type': 'edx.course.enrollment.mode_changed',
+                'event': {
+                    'user_id': int(student_id),
+                    'mode': 'verified',
+                }
+            }
+        ]
 
-        # Expect no enrollment activated event
-        self.assert_event_emitted_num_times(
-            "edx.course.enrollment.activated",
-            self.start_time,
-            student_id,
-            0
-        )
+        with self.assert_events_match_during(event_filter=only_enrollment_events, expected_events=expected_events):
+            # Submit payment
+            self.fake_payment_page.submit_payment()
 
         # Navigate to the dashboard
         self.dashboard_page.visit()
