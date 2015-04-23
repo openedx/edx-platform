@@ -3,6 +3,7 @@ tests for the models
 """
 from datetime import datetime, timedelta
 from django.utils.timezone import UTC
+from mock import patch
 from student.models import CourseEnrollment  # pylint: disable=import-error
 from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
 from student.tests.factories import (  # pylint: disable=import-error
@@ -10,6 +11,7 @@ from student.tests.factories import (  # pylint: disable=import-error
     CourseEnrollmentFactory,
     UserFactory,
 )
+from util.tests.test_date_utils import fake_ugettext
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import (
     CourseFactory,
@@ -178,7 +180,7 @@ class TestCCX(ModuleStoreTestCase):
         self.set_ccx_override('start', expected)
         actual = self.ccx.start  # pylint: disable=no-member
         diff = expected - actual
-        self.assertEqual(diff.seconds, 0)
+        self.assertTrue(abs(diff.total_seconds()) < 1)
 
     def test_ccx_start_caching(self):
         """verify that caching the start property works to limit queries"""
@@ -194,9 +196,8 @@ class TestCCX(ModuleStoreTestCase):
 
     def test_ccx_due_without_override(self):
         """verify that due returns None when the field has not been set"""
-        expected = None
         actual = self.ccx.due  # pylint: disable=no-member
-        self.assertTrue(expected is actual)
+        self.assertIsNone(actual)
 
     def test_ccx_due_is_correct(self):
         """verify that the due datetime for a ccx is correctly retrieved"""
@@ -204,7 +205,7 @@ class TestCCX(ModuleStoreTestCase):
         self.set_ccx_override('due', expected)
         actual = self.ccx.due  # pylint: disable=no-member
         diff = expected - actual
-        self.assertEqual(diff.seconds, 0)
+        self.assertTrue(abs(diff.total_seconds()) < 1)
 
     def test_ccx_due_caching(self):
         """verify that caching the due property works to limit queries"""
@@ -255,42 +256,55 @@ class TestCCX(ModuleStoreTestCase):
         """verify that a ccx without a due date has not ended"""
         self.assertFalse(self.ccx.has_ended())  # pylint: disable=no-member
 
+    # ensure that the expected localized format will be found by the i18n
+    # service
+    @patch('util.date_utils.ugettext', fake_ugettext(translations={
+        "SHORT_DATE_FORMAT": "%b %d, %Y",
+    }))
     def test_start_datetime_short_date(self):
         """verify that the start date for a ccx formats properly by default"""
         start = datetime(2015, 1, 1, 12, 0, 0, tzinfo=UTC())
-        # This relies on SHORT_DATE remaining the same, is there a better way?
         expected = "Jan 01, 2015"
         self.set_ccx_override('start', start)
         actual = self.ccx.start_datetime_text()  # pylint: disable=no-member
         self.assertEqual(expected, actual)
 
+    @patch('util.date_utils.ugettext', fake_ugettext(translations={
+        "DATE_TIME_FORMAT": "%b %d, %Y at %H:%M",
+    }))
     def test_start_datetime_date_time_format(self):
         """verify that the DATE_TIME format also works as expected"""
         start = datetime(2015, 1, 1, 12, 0, 0, tzinfo=UTC())
-        # This relies on SHORT_DATE remaining the same, is there a better way?
         expected = "Jan 01, 2015 at 12:00 UTC"
         self.set_ccx_override('start', start)
         actual = self.ccx.start_datetime_text('DATE_TIME')  # pylint: disable=no-member
         self.assertEqual(expected, actual)
 
+    @patch('util.date_utils.ugettext', fake_ugettext(translations={
+        "SHORT_DATE_FORMAT": "%b %d, %Y",
+    }))
     def test_end_datetime_short_date(self):
         """verify that the end date for a ccx formats properly by default"""
         end = datetime(2015, 1, 1, 12, 0, 0, tzinfo=UTC())
-        # This relies on SHORT_DATE remaining the same, is there a better way?
         expected = "Jan 01, 2015"
         self.set_ccx_override('due', end)
         actual = self.ccx.end_datetime_text()  # pylint: disable=no-member
         self.assertEqual(expected, actual)
 
+    @patch('util.date_utils.ugettext', fake_ugettext(translations={
+        "DATE_TIME_FORMAT": "%b %d, %Y at %H:%M",
+    }))
     def test_end_datetime_date_time_format(self):
         """verify that the DATE_TIME format also works as expected"""
         end = datetime(2015, 1, 1, 12, 0, 0, tzinfo=UTC())
-        # This relies on SHORT_DATE remaining the same, is there a better way?
         expected = "Jan 01, 2015 at 12:00 UTC"
         self.set_ccx_override('due', end)
         actual = self.ccx.end_datetime_text('DATE_TIME')  # pylint: disable=no-member
         self.assertEqual(expected, actual)
 
+    @patch('util.date_utils.ugettext', fake_ugettext(translations={
+        "DATE_TIME_FORMAT": "%b %d, %Y at %H:%M",
+    }))
     def test_end_datetime_no_due_date(self):
         """verify that without a due date, the end date is an empty string"""
         expected = ''

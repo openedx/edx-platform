@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils.timezone import UTC
 
+from lazy import lazy
 from student.models import CourseEnrollment, AlreadyEnrolledError  # pylint: disable=import-error
 from xmodule_django.models import CourseKeyField, LocationKeyField  # pylint: disable=import-error
 from xmodule.error_module import ErrorDescriptor
@@ -15,7 +16,6 @@ from xmodule.modulestore.django import modulestore
 
 
 log = logging.getLogger("edx.ccx")
-_MARKER = object()
 
 
 class CustomCourseForEdX(models.Model):
@@ -26,47 +26,33 @@ class CustomCourseForEdX(models.Model):
     display_name = models.CharField(max_length=255)
     coach = models.ForeignKey(User, db_index=True)
 
-    _course = None
-    _start = None
-    _due = _MARKER
-
-    @property
+    @lazy
     def course(self):
         """Return the CourseDescriptor of the course related to this CCX"""
-        if self._course is None:
-            store = modulestore()
-            with store.bulk_operations(self.course_id):
-                course = store.get_course(self.course_id)
-                if course and not isinstance(course, ErrorDescriptor):
-                    self._course = course
-                else:
-                    log.error("CCX {0} from {2} course {1}".format(  # pylint: disable=logging-format-interpolation
-                        self.display_name, self.course_id, "broken" if course else "non-existent"
-                    ))
+        store = modulestore()
+        with store.bulk_operations(self.course_id):
+            course = store.get_course(self.course_id)
+            if not course or isinstance(course, ErrorDescriptor):
+                log.error("CCX {0} from {2} course {1}".format(  # pylint: disable=logging-format-interpolation
+                    self.display_name, self.course_id, "broken" if course else "non-existent"
+                ))
+            return course
 
-        return self._course
-
-    @property
+    @lazy
     def start(self):
         """Get the value of the override of the 'start' datetime for this CCX
         """
-        if self._start is None:
-            # avoid circular import problems
-            from .overrides import get_override_for_ccx
-            start = get_override_for_ccx(self, self.course, 'start')
-            self._start = start
-        return self._start
+        # avoid circular import problems
+        from .overrides import get_override_for_ccx
+        return get_override_for_ccx(self, self.course, 'start')
 
-    @property
+    @lazy
     def due(self):
         """Get the value of the override of the 'due' datetime for this CCX
         """
-        if self._due is _MARKER:
-            # avoid circular import problems
-            from .overrides import get_override_for_ccx
-            due = get_override_for_ccx(self, self.course, 'due')
-            self._due = due
-        return self._due
+        # avoid circular import problems
+        from .overrides import get_override_for_ccx
+        return get_override_for_ccx(self, self.course, 'due')
 
     def has_started(self):
         """Return True if the CCX start date is in the past"""
