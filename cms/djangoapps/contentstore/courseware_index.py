@@ -145,15 +145,12 @@ class SearchIndexerBase(object):
             if not item_index_dictionary and not item.has_children:
                 return
 
+            item_content_groups = None
             if groups_usage_info:
-                item.content_groups = []
-                for name, group in groups_usage_info:
-                    for module in group:
-                        if str(item.location) == str(module['usage_key_string']):
-                            item.content_groups.append(name)
+                item_content_groups = groups_usage_info.get(unicode(item.location), None)
 
-            if content_groups and not getattr(item, 'content_groups', None):
-                item.content_groups = content_groups
+            if content_groups and not item_content_groups:
+                item_content_groups = content_groups
 
             item_id = unicode(cls._id_modifier(item.scope_ids.usage_id))
             indexed_items.add(item_id)
@@ -162,13 +159,12 @@ class SearchIndexerBase(object):
                 skip_child_index = skip_index or \
                     (triggered_at is not None and (triggered_at - item.subtree_edited_on) > reindex_age)
                 for child_item in item.get_children():
-                    item_content_groups = getattr(item, 'content_groups', None)
-                    if item_content_groups:
-                        index_item(child_item, skip_index=skip_child_index,
-                                   groups_usage_info=groups_usage_info, content_groups=item.content_groups)
-                    else:
-                        index_item(child_item, skip_index=skip_child_index,
-                                   groups_usage_info=groups_usage_info)
+                    index_item(
+                        child_item,
+                        skip_index=skip_child_index,
+                        groups_usage_info=groups_usage_info,
+                        content_groups=item_content_groups
+                    )
 
             if skip_index or not item_index_dictionary:
                 return
@@ -181,9 +177,7 @@ class SearchIndexerBase(object):
                 item_index['id'] = item_id
                 if item.start:
                     item_index['start_date'] = item.start
-                item_index['content_groups'] = getattr(item, 'content_groups', None)
-                if item_index['content_groups'] == []:
-                    item_index['content_groups'] = None
+                item_index['content_groups'] = item_content_groups if item_content_groups else None
                 searcher.index(cls.DOCUMENT_TYPE, item_index)
                 indexed_count["count"] += 1
             except Exception as err:  # pylint: disable=broad-except
@@ -194,14 +188,7 @@ class SearchIndexerBase(object):
         try:
             with modulestore.branch_setting(ModuleStoreEnum.RevisionOption.published_only):
                 structure = cls._fetch_top_level(modulestore, structure_key)
-                groups_usage_info = None
-                if cls.DOCUMENT_TYPE == "courseware_content":
-                    groups_usage_info = GroupConfiguration.get_content_groups_usage_info(modulestore, structure).items()
-                    if groups_usage_info:
-                        for name, group in groups_usage_info:  # pylint: disable=unused-variable
-                            for module in group:
-                                view, args, kwargs = resolve(module['url'])  # pylint: disable=unused-variable
-                                module['usage_key_string'] = kwargs['usage_key_string']
+                groups_usage_info = cls.fetch_group_usage(modulestore, structure)
                 for item in structure.get_children():
                     index_item(item, groups_usage_info=groups_usage_info)
                 cls.remove_deleted_items(searcher, structure_key, indexed_items)
@@ -252,6 +239,13 @@ class SearchIndexerBase(object):
             data
         )
 
+    @classmethod
+    def fetch_group_usage(cls, modulestore, structure):  # pylint: disable=unused-argument
+        """
+        Base implementation of fetch group usage on course/library.
+        """
+        return None
+
 
 class CoursewareSearchIndexer(SearchIndexerBase):
     """
@@ -287,6 +281,21 @@ class CoursewareSearchIndexer(SearchIndexerBase):
         (Re)index all content within the given course, tracking the fact that a full reindex has taken place
         """
         return cls._do_reindex(modulestore, course_key)
+
+    @classmethod
+    def fetch_group_usage(cls, modulestore, structure):
+        groups_usage_dict = {}
+        groups_usage_info = GroupConfiguration.get_content_groups_usage_info(modulestore, structure).items()
+        if groups_usage_info:
+            for name, group in groups_usage_info:
+                for module in group:
+                    view, args, kwargs = resolve(module['url'])  # pylint: disable=unused-variable
+                    usage_key_string = unicode(kwargs['usage_key_string'])
+                    if groups_usage_dict.get(usage_key_string, None):
+                        groups_usage_dict[usage_key_string].append(name)
+                    else:
+                        groups_usage_dict[usage_key_string] = [name]
+        return groups_usage_dict
 
 
 class LibrarySearchIndexer(SearchIndexerBase):

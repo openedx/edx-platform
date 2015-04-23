@@ -2,13 +2,17 @@
 Testing indexing of the courseware as it is changed
 """
 import ddt
+import json
 from lazy.lazy import lazy
 import time
 from datetime import datetime
+from dateutil.tz import tzutc
 from mock import patch, call
 from pytz import UTC
 from uuid import uuid4
 from unittest import skip
+
+from django.conf import settings
 
 from xmodule.library_tools import normalize_key_for_search
 from xmodule.modulestore import ModuleStoreEnum
@@ -27,18 +31,14 @@ from xmodule.modulestore.tests.test_cross_modulestore_import_export import Mongo
 from xmodule.modulestore.tests.utils import create_modulestore_instance, LocationMixin, MixedSplitTestCase
 from xmodule.tests import DATA_DIR
 from xmodule.x_module import XModuleMixin
+from xmodule.partitions.partitions import UserPartition
 
 from search.search_engine_base import SearchEngine
 
 from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer, SearchIndexingError
 from contentstore.signals import listen_for_course_publish, listen_for_library_update
-
-import json
-from django.conf import settings
-from dateutil.tz import tzutc
 from contentstore.utils import reverse_course_url, reverse_usage_url
 from contentstore.tests.utils import CourseTestCase
-from xmodule.partitions.partitions import UserPartition
 
 COURSE_CHILD_STRUCTURE = {
     "course": "chapter",
