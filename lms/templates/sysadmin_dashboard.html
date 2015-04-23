@@ -7,6 +7,9 @@
   <%static:css group='style-course'/>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
+  %if modeflag.get('mgmt_commands'):
+      <script type='text/javascript' src="${static.url('js/sysadmin/mgmt_commands.js')}"></script>
+  %endif
 </%block>
 
 <style type="text/css">
@@ -59,6 +62,9 @@ textarea {
       ## Translators: refers to http://git-scm.com/docs/git-log
       <a href="${reverse('gitlogs')}">${_('Git Logs')}</a>
       <a href="${reverse('sysadmin_task_queue')}" class="${modeflag.get('task_queue')}">${_('Task Queue')}</a>
+      %if modeflag.get('mgmt_commands'):
+        <a href="${reverse('sysadmin_mgmt_commands')}" class="${modeflag.get('mgmt_commands')}">${_('MGMT Commands')}</a>
+      %endif
     </h2>
 	<hr />
 %if modeflag.get('users'):
@@ -207,6 +213,12 @@ textarea {
 
 %if msg:
     <p>${msg}</p>
+%endif
+
+%if modeflag.get('mgmt_commands'):
+    <div class="mgmt-commands-body">
+        <h2>Execute Management Command</h2>
+    </div>
 %endif
 
 %if datatable:
