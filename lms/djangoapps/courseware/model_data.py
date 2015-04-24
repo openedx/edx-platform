@@ -501,8 +501,24 @@ class UserStateCache(object):
         field_object.max_grade = max_score
         field_object.save()
 
+    @contract(kvs_key=DjangoKeyValueStore.Key)
+    def _set_field_value(self, field_object, kvs_key, value):
+        field_object.value = json.dumps(value)
+
     def __len__(self):
         return len(self._cache)
+
+    def _create_object(self, kvs_key):
+        field_object, __ = StudentModule.objects.get_or_create(
+            course_id=self.course_id,
+            student_id=kvs_key.user_id,
+            module_state_key=kvs_key.block_scope_id,
+            defaults={
+                'state': json.dumps({}),
+                'module_type': kvs_key.block_scope_id.block_type,
+            },
+        )
+        return field_object
 
     def _read_objects(self, fields, descriptors, aside_types):
         return _chunked_query(
@@ -516,18 +532,6 @@ class UserStateCache(object):
 
     def _cache_key_for_field_object(self, field_object):
         return field_object.module_state_key.map_into_course(self.course_id)
-
-    def _create_object(self, kvs_key):
-        field_object, __ = StudentModule.objects.get_or_create(
-            course_id=self.course_id,
-            student_id=kvs_key.user_id,
-            module_state_key=kvs_key.block_scope_id,
-            defaults={
-                'state': json.dumps({}),
-                'module_type': kvs_key.block_scope_id.block_type,
-            },
-        )
-        return field_object
 
     def _cache_key_for_kvs_key(self, key):
         """
