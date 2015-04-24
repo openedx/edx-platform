@@ -14,7 +14,7 @@ define([
         latestModelsCount: 0,
         searchTerm: '',
         page: 0,
-        url: '/search/course_discovery',
+        url: '/search/course_discovery/',
         fetchXhr: null,
 
         performSearch: function (searchTerm) {
