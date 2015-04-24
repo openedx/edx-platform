@@ -271,6 +271,10 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
     def test_user_does_not_match_param(self):
+        """
+        The view should return status 404 if the enrollment username does not match the username of the user
+        making the request, unless the request is made by a superuser or with a server API key.
+        """
         CourseModeFactory.create(
             course_id=self.course.id,
             mode_slug=CourseMode.HONOR,
@@ -279,13 +283,19 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
         url = reverse('courseenrollment',
                       kwargs={'username': self.other_user.username, "course_id": unicode(self.course.id)})
 
-        resp = self.client.get(url)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
         # Verify that the server still has access to this endpoint.
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
         self.client.logout()
-        resp = self.client.get(url, **{'HTTP_X_EDX_API_KEY': self.API_KEY})
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        response = self.client.get(url, **{'HTTP_X_EDX_API_KEY': self.API_KEY})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Verify superusers have access to this endpoint
+        superuser = UserFactory.create(password=self.PASSWORD, is_superuser=True)
+        self.client.login(username=superuser.username, password=self.PASSWORD)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_course_details(self):
         CourseModeFactory.create(

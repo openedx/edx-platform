@@ -5,12 +5,13 @@ from uuid import uuid4
 
 from ddt import ddt, data
 from django.core.urlresolvers import reverse
+from django.test import TestCase
 from django.test.utils import override_settings
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
+from ecommerce_api_client import exceptions
 from commerce.constants import Messages
-from commerce.exceptions import TimeoutError, ApiError
 from commerce.tests import EcommerceApiTestMixin
 from course_modes.models import CourseMode
 from enrollment.api import get_enrollment
@@ -19,17 +20,25 @@ from student.tests.factories import UserFactory, CourseModeFactory
 from student.tests.tests import EnrollmentEventTestMixin
 
 
-@ddt
-@override_settings(ECOMMERCE_API_URL=EcommerceApiTestMixin.ECOMMERCE_API_URL,
-                   ECOMMERCE_API_SIGNING_KEY=EcommerceApiTestMixin.ECOMMERCE_API_SIGNING_KEY)
-class BasketsViewTests(EnrollmentEventTestMixin, EcommerceApiTestMixin, ModuleStoreTestCase):
-    """
-    Tests for the commerce orders view.
-    """
+class UserMixin(object):
+    """ Mixin for tests involving users. """
+
+    def setUp(self):
+        super(UserMixin, self).setUp()
+        self.user = UserFactory()
 
     def _login(self):
         """ Log into LMS. """
         self.client.login(username=self.user.username, password='test')
+
+
+@ddt
+@override_settings(ECOMMERCE_API_URL=EcommerceApiTestMixin.ECOMMERCE_API_URL,
+                   ECOMMERCE_API_SIGNING_KEY=EcommerceApiTestMixin.ECOMMERCE_API_SIGNING_KEY)
+class BasketsViewTests(EnrollmentEventTestMixin, EcommerceApiTestMixin, UserMixin, ModuleStoreTestCase):
+    """
+    Tests for the commerce orders view.
+    """
 
     def _post_to_view(self, course_id=None):
         """
@@ -67,7 +76,6 @@ class BasketsViewTests(EnrollmentEventTestMixin, EcommerceApiTestMixin, ModuleSt
     def setUp(self):
         super(BasketsViewTests, self).setUp()
         self.url = reverse('commerce:baskets')
-        self.user = UserFactory()
         self._login()
 
         self.course = CourseFactory.create()
@@ -118,7 +126,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, EcommerceApiTestMixin, ModuleSt
         """
         If the call to the E-Commerce API times out, the view should log an error and return an HTTP 503 status.
         """
-        with self.mock_create_basket(side_effect=TimeoutError):
+        with self.mock_create_basket(side_effect=exceptions.Timeout):
             response = self._post_to_view()
 
         self.assertValidEcommerceInternalRequestErrorResponse(response)
@@ -128,7 +136,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, EcommerceApiTestMixin, ModuleSt
         """
         If the E-Commerce API raises an error, the view should return an HTTP 503 status.
         """
-        with self.mock_create_basket(side_effect=ApiError):
+        with self.mock_create_basket(side_effect=exceptions.SlumberBaseException):
             response = self._post_to_view()
 
         self.assertValidEcommerceInternalRequestErrorResponse(response)
@@ -296,6 +304,52 @@ class OrdersViewTests(BasketsViewTests):
 
     (XCOM-214) remove after release.
     """
+
     def setUp(self):
         super(OrdersViewTests, self).setUp()
         self.url = reverse('commerce:orders')
+
+
+@override_settings(ECOMMERCE_API_URL=EcommerceApiTestMixin.ECOMMERCE_API_URL,
+                   ECOMMERCE_API_SIGNING_KEY=EcommerceApiTestMixin.ECOMMERCE_API_SIGNING_KEY)
+class BasketOrderViewTests(UserMixin, EcommerceApiTestMixin, TestCase):
+    """ Tests for the basket order view. """
+    view_name = 'commerce:basket_order'
+    MOCK_ORDER = {'number': 1}
+    path = reverse(view_name, kwargs={'basket_id': 1})
+
+    def setUp(self):
+        super(BasketOrderViewTests, self).setUp()
+        self._login()
+
+    def test_order_found(self):
+        """ If the order is located, the view should pass the data from the API. """
+
+        with self.mock_basket_order(return_value=self.MOCK_ORDER):
+            response = self.client.get(self.path)
+
+        self.assertEqual(response.status_code, 200)
+        actual = json.loads(response.content)
+        self.assertEqual(actual, self.MOCK_ORDER)
+
+    def test_order_not_found(self):
+        """ If the order is not found, the view should return a 404. """
+        with self.mock_basket_order(side_effect=exceptions.HttpNotFoundError):
+            response = self.client.get(self.path)
+        self.assertEqual(response.status_code, 404)
+
+    def test_login_required(self):
+        """ The view should return 403 if the user is not logged in. """
+        self.client.logout()
+        response = self.client.get(self.path)
+        self.assertEqual(response.status_code, 403)
+
+
+class ReceiptViewTests(TestCase):
+    """ Tests for the receipt view. """
+
+    def test_login_required(self):
+        """ The view should redirect to the login page if the user is not logged in. """
+        self.client.logout()
+        response = self.client.get(reverse('commerce:checkout_receipt'))
+        self.assertEqual(response.status_code, 302)

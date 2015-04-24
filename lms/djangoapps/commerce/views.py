@@ -2,25 +2,30 @@
 import logging
 
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_page
+from django.views.decorators.csrf import csrf_exempt
+from ecommerce_api_client import exceptions
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_409_CONFLICT
 from rest_framework.views import APIView
 
-from commerce.api import EcommerceAPI
+from commerce import ecommerce_api_client
 from commerce.constants import Messages
-from commerce.exceptions import ApiError, InvalidConfigurationError, InvalidResponseError
+from commerce.exceptions import InvalidResponseError
 from commerce.http import DetailResponse, InternalRequestErrorResponse
 from course_modes.models import CourseMode
 from courseware import courses
 from edxmako.shortcuts import render_to_response
 from enrollment.api import add_enrollment
 from microsite_configuration import microsite
-from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
 from student.models import CourseEnrollment
+from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
 from util.json_request import JsonResponse
+from verify_student.models import SoftwareSecurePhotoVerification
 
 
 log = logging.getLogger(__name__)
@@ -92,10 +97,11 @@ class BasketsView(APIView):
             self._enroll(course_key, user)
             return DetailResponse(msg)
 
-        # Setup the API and report any errors if settings are not valid.
+        # Setup the API
+
         try:
-            api = EcommerceAPI()
-        except InvalidConfigurationError:
+            api = ecommerce_api_client(user)
+        except ValueError:
             self._enroll(course_key, user)
             msg = Messages.NO_ECOM_API.format(username=user.username, course_id=unicode(course_key))
             log.debug(msg)
@@ -103,34 +109,31 @@ class BasketsView(APIView):
 
         # Make the API call
         try:
-            response_data = api.create_basket(
-                user,
-                honor_mode.sku,
-                payment_processor="cybersource",
-            )
+            response_data = api.baskets.post({
+                'products': [{'sku': honor_mode.sku}],
+                'checkout': True,
+                'payment_processor_name': 'cybersource'
+            })
+
             payment_data = response_data["payment_data"]
-            if payment_data is not None:
-                # it is time to start the payment flow.
-                # NOTE this branch does not appear to be used at the moment.
+            if payment_data:
+                # Pass data to the client to begin the payment flow.
                 return JsonResponse(payment_data)
             elif response_data['order']:
-                # the order was completed immediately because there was no charge.
+                # The order was completed immediately because there isno charge.
                 msg = Messages.ORDER_COMPLETED.format(order_number=response_data['order']['number'])
                 log.debug(msg)
                 return DetailResponse(msg)
             else:
-                # Enroll in the honor mode directly as a failsafe.
-                # This MUST be removed when this code handles paid modes.
-                self._enroll(course_key, user)
                 msg = u'Unexpected response from basket endpoint.'
                 log.error(
                     msg + u' Could not enroll user %(username)s in course %(course_id)s.',
                     {'username': user.id, 'course_id': course_id},
                 )
                 raise InvalidResponseError(msg)
-        except ApiError as err:
-            # The API will handle logging of the error.
-            return InternalRequestErrorResponse(err.message)
+        except (exceptions.SlumberBaseException, exceptions.Timeout) as ex:
+            log.exception(ex.message)
+            return InternalRequestErrorResponse(ex.message)
 
 
 @cache_page(1800)
@@ -138,3 +141,29 @@ def checkout_cancel(_request):
     """ Checkout/payment cancellation view. """
     context = {'payment_support_email': microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)}
     return render_to_response("commerce/checkout_cancel.html", context)
+
+
+@csrf_exempt
+@login_required
+def checkout_receipt(request):
+    """ Receipt view. """
+    context = {
+        'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
+        'verified': SoftwareSecurePhotoVerification.verification_valid_or_pending(request.user).exists()
+    }
+    return render_to_response('commerce/checkout_receipt.html', context)
+
+
+class BasketOrderView(APIView):
+    """ Retrieve the order associated with a basket. """
+
+    authentication_classes = (SessionAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *_args, **kwargs):
+        """ HTTP handler. """
+        try:
+            order = ecommerce_api_client(request.user).baskets(kwargs['basket_id']).order.get()
+            return JsonResponse(order)
+        except exceptions.HttpNotFoundError:
+            return JsonResponse(status=404)

@@ -5,7 +5,7 @@ import httpretty
 import jwt
 import mock
 
-from commerce.api import EcommerceAPI
+from ecommerce_api_client.client import EcommerceApiClient
 
 
 class EcommerceApiTestMixin(object):
@@ -24,7 +24,7 @@ class EcommerceApiTestMixin(object):
     ORDER_DATA = {'number': ORDER_NUMBER}
     ECOMMERCE_API_SUCCESSFUL_BODY = {
         'id': BASKET_ID,
-        'order': {'number': ORDER_NUMBER},   # never both None.
+        'order': {'number': ORDER_NUMBER},  # never both None.
         'payment_data': PAYMENT_DATA,
     }
     ECOMMERCE_API_SUCCESSFUL_BODY_JSON = json.dumps(ECOMMERCE_API_SUCCESSFUL_BODY)  # pylint: disable=invalid-name
@@ -61,21 +61,41 @@ class EcommerceApiTestMixin(object):
             else:
                 response_data['order'] = {'number': self.ORDER_NUMBER}
             body = json.dumps(response_data)
-        httpretty.register_uri(httpretty.POST, url, status=status, body=body)
+        httpretty.register_uri(httpretty.POST, url, status=status, body=body,
+                               adding_headers={'Content-Type': 'application/json'})
 
-    class mock_create_basket(object):    # pylint: disable=invalid-name
-        """ Mocks calls to EcommerceAPI.create_basket. """
+    class mock_create_basket(object):  # pylint: disable=invalid-name
+        """ Mocks calls to E-Commerce API client basket creation method. """
 
         patch = None
 
         def __init__(self, **kwargs):
             default_kwargs = {'return_value': EcommerceApiTestMixin.ECOMMERCE_API_SUCCESSFUL_BODY}
             default_kwargs.update(kwargs)
-            self.patch = mock.patch.object(EcommerceAPI, 'create_basket', mock.Mock(**default_kwargs))
+            _mock = mock.Mock()
+            _mock.post = mock.Mock(**default_kwargs)
+            EcommerceApiClient.baskets = _mock
+            self.patch = _mock
 
         def __enter__(self):
-            self.patch.start()
-            return self.patch.new
+            return self.patch
 
         def __exit__(self, exc_type, exc_val, exc_tb):  # pylint: disable=unused-argument
-            self.patch.stop()
+            pass
+
+    class mock_basket_order(object):  # pylint: disable=invalid-name
+        """ Mocks calls to E-Commerce API client basket order method. """
+
+        patch = None
+
+        def __init__(self, **kwargs):
+            _mock = mock.Mock()
+            _mock.order.get = mock.Mock(**kwargs)
+            EcommerceApiClient.baskets = lambda client, basket_id: _mock
+            self.patch = _mock
+
+        def __enter__(self):
+            return self.patch
+
+        def __exit__(self, exc_type, exc_val, exc_tb):  # pylint: disable=unused-argument
+            pass
