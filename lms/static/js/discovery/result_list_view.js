@@ -27,11 +27,12 @@ define([
             this.loadingIndicator.html(this.loadingTemplate());
             this.$el.append(this.loadingIndicator);
             this.$list = this.$el.find('.courses-listing');
+            this.$message = this.$el.find('#discovery-message');
             this.originalContent = this.$list.html();
         },
 
         render: function () {
-            this.$el.find('#courses-not-found').empty();
+            this.$message.empty();
             this.hideLoadingIndicator();
             if (this.collection.length > 0) {
                 this.$list.empty();
@@ -41,7 +42,7 @@ define([
             }
             else {
                 var msg = this.notFoundTemplate({term: this.collection.searchTerm});
-                this.$el.find('#courses-not-found').html(msg);
+                this.$message.html(msg);
                 this.hideClearAllButton();
             }
             return this;
@@ -71,9 +72,8 @@ define([
         },
 
         showErrorMessage: function () {
-            // this.$el.html(this.errorTemplate());
-            // this.$el.show();
-            // this.$contentElement.hide();
+            var msg = this.errorTemplate();
+            this.$message.html(msg);
         },
 
         loadNext: function (event) {
