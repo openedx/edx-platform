@@ -89,7 +89,9 @@
 
       % if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
         % for ccx, membership, course in ccx_membership_triplets:
-            <%include file='ccx/_dashboard_ccx_listing.html' args="ccx=ccx, membership=membership, course=course" />
+          <% show_courseware_link = ccx.has_started() %>
+          <% is_course_blocked = False %>
+          <%include file='ccx/_dashboard_ccx_listing.html' args="ccx=ccx, membership=membership, course=course, show_courseware_link=show_courseware_link, is_course_blocked=is_course_blocked" />
         % endfor
       % endif
 
