@@ -15,7 +15,6 @@ django-filter==0.6.0
 django-followit==0.0.3
 django-keyedcache==1.4-6
 django-kombu==0.9.4
-django-mako==0.1.5pre
 django-masquerade==0.1.6
 django-mptt==0.5.5
 django-openid-auth==0.4
@@ -35,7 +34,7 @@ git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b
 GitPython==0.3.2.RC1
 glob2==0.3
 lxml==3.3.6
-mako==0.7.3
+mako==1.0.1
 Markdown==2.2.1
 mock==1.0.1
 networkx==1.7
