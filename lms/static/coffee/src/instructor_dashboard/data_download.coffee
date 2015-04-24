@@ -109,10 +109,10 @@ class DataDownload
           @$download_display_text.html data['grading_config_summary']
 
     @$calculate_grades_csv_btn.click (e) =>
-      @onClickGradeDownload @$calculate_grades_csv_btn, "Error generating grades. Please try again."
+      @onClickGradeDownload @$calculate_grades_csv_btn, gettext("Error generating grades. Please try again.")
 
     @$problem_grade_report_csv_btn.click (e) =>
-      @onClickGradeDownload @$problem_grade_report_csv_btn, "Error generating weighted problem report. Please try again."
+      @onClickGradeDownload @$problem_grade_report_csv_btn, gettext("Error generating weighted problem report. Please try again.")
 
   onClickGradeDownload: (button, errorMessage) ->
       # Clear any CSS styling from the request-response areas
@@ -124,7 +124,7 @@ class DataDownload
         dataType: 'json'
         url: url
         error: (std_ajax_err) =>
-          @$reports_request_response_error.text gettext(errorMessage)
+          @$reports_request_response_error.text errorMessage
           $(".msg-error").css({"display":"block"})
         success: (data) =>
           @$reports_request_response.text data['status']
@@ -201,6 +201,15 @@ class ReportDownloads
     $table_placeholder = $ '<div/>', class: 'slickgrid'
     @$report_downloads_table.append $table_placeholder
     grid = new Slick.Grid($table_placeholder, report_downloads_data, columns, options)
+    grid.onClick.subscribe(
+        (event) =>
+            report_url = event.target.href
+            if report_url
+                # Record that the user requested to download a report
+                Logger.log('edx.instructor.report.downloaded', {
+                    report_url: report_url
+                })
+    )
     grid.autosizeColumns()
 
 

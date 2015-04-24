@@ -5,15 +5,36 @@ End-to-end tests for the LMS Instructor Dashboard.
 
 from nose.plugins.attrib import attr
 
-from ..helpers import UniqueCourseTest, get_modal_alert
+from ..helpers import UniqueCourseTest, get_modal_alert, EventsTestMixin
 from ...pages.common.logout import LogoutPage
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.instructor_dashboard import InstructorDashboardPage
 from ...fixtures.course import CourseFixture
 
 
+class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
+    """
+    Mixin class for testing the instructor dashboard.
+    """
+    def log_in_as_instructor(self):
+        """
+        Logs in as an instructor and returns the id.
+        """
+        username = "test_instructor_{uuid}".format(uuid=self.unique_id[0:6])
+        auto_auth_page = AutoAuthPage(self.browser, username=username, course_id=self.course_id, staff=True)
+        return username, auto_auth_page.visit().get_user_id()
+
+    def visit_instructor_dashboard(self):
+        """
+        Visits the instructor dashboard.
+        """
+        instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
+        instructor_dashboard_page.visit()
+        return instructor_dashboard_page
+
+
 @attr('shard_5')
-class AutoEnrollmentWithCSVTest(UniqueCourseTest):
+class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
     """
     End-to-end tests for Auto-Registration and enrollment functionality via CSV file.
     """
@@ -21,13 +42,8 @@ class AutoEnrollmentWithCSVTest(UniqueCourseTest):
     def setUp(self):
         super(AutoEnrollmentWithCSVTest, self).setUp()
         self.course_fixture = CourseFixture(**self.course_info).install()
-
-        # login as an instructor
-        AutoAuthPage(self.browser, course_id=self.course_id, staff=True).visit()
-
-        # go to the membership page on the instructor dashboard
-        instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
-        instructor_dashboard_page.visit()
+        self.log_in_as_instructor()
+        instructor_dashboard_page = self.visit_instructor_dashboard()
         self.auto_enroll_section = instructor_dashboard_page.select_membership().select_auto_enroll_section()
 
     def test_browse_and_upload_buttons_are_visible(self):
@@ -91,7 +107,7 @@ class AutoEnrollmentWithCSVTest(UniqueCourseTest):
 
 
 @attr('shard_5')
-class EntranceExamGradeTest(UniqueCourseTest):
+class EntranceExamGradeTest(BaseInstructorDashboardTest):
     """
     Tests for Entrance exam specific student grading tasks.
     """
@@ -112,13 +128,9 @@ class EntranceExamGradeTest(UniqueCourseTest):
 
         LogoutPage(self.browser).visit()
 
-        # login as an instructor
-        AutoAuthPage(self.browser, course_id=self.course_id, staff=True).visit()
-
         # go to the student admin page on the instructor dashboard
-        instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
-        instructor_dashboard_page.visit()
-        self.student_admin_section = instructor_dashboard_page.select_student_admin()
+        self.log_in_as_instructor()
+        self.student_admin_section = self.visit_instructor_dashboard().select_student_admin()
 
     def test_input_text_and_buttons_are_visible(self):
         """
@@ -291,3 +303,104 @@ class EntranceExamGradeTest(UniqueCourseTest):
         self.student_admin_section.set_student_email(self.student_identifier)
         self.student_admin_section.click_task_history_button()
         self.assertTrue(self.student_admin_section.is_background_task_history_table_visible())
+
+
+class DataDownloadsTest(BaseInstructorDashboardTest):
+    """
+    Bok Choy tests for the "Data Downloads" tab.
+    """
+    def setUp(self):
+        super(DataDownloadsTest, self).setUp()
+        self.course_fixture = CourseFixture(**self.course_info).install()
+        self.instructor_username, self.instructor_id = self.log_in_as_instructor()
+        instructor_dashboard_page = self.visit_instructor_dashboard()
+        self.data_download_section = instructor_dashboard_page.select_data_download()
+
+    def verify_report_requested_event(self, report_type):
+        """
+        Verifies that the correct event is emitted when a report is requested.
+        """
+        self.verify_events_of_type(
+            self.instructor_username,
+            u"edx.instructor.report.requested",
+            [{
+                u"report_type": report_type
+            }]
+        )
+
+    def verify_report_downloaded_event(self, report_url):
+        """
+        Verifies that the correct event is emitted when a report is downloaded.
+        """
+        self.verify_events_of_type(
+            self.instructor_username,
+            u"edx.instructor.report.downloaded",
+            [{
+                u"report_url": report_url
+            }]
+        )
+
+    def verify_report_download(self, report_name):
+        """
+        Verifies that a report can be downloaded and an event fired.
+        """
+        download_links = self.data_download_section.report_download_links
+        self.assertEquals(len(download_links), 1)
+        download_links[0].click()
+        expected_url = download_links.attrs('href')[0]
+        self.assertIn(report_name, expected_url)
+        self.verify_report_downloaded_event(expected_url)
+
+    def test_student_profiles_report_download(self):
+        """
+        Scenario: Verify that an instructor can download a student profiles report
+
+        Given that I am an instructor
+        And I visit the instructor dashboard's "Data Downloads" tab
+        And I click on the "Download profile information as a CSV" button
+        Then a report should be generated
+        And a report requested event should be emitted
+        When I click on the report
+        Then a report downloaded event should be emitted
+        """
+        report_name = u"student_profile_info"
+        self.data_download_section.generate_student_profile_report_button.click()
+        self.data_download_section.wait_for_available_report()
+        self.verify_report_requested_event(report_name)
+        self.verify_report_download(report_name)
+
+    def test_grade_report_download(self):
+        """
+        Scenario: Verify that an instructor can download a grade report
+
+        Given that I am an instructor
+        And I visit the instructor dashboard's "Data Downloads" tab
+        And I click on the "Generate Grade Report" button
+        Then a report should be generated
+        And a report requested event should be emitted
+        When I click on the report
+        Then a report downloaded event should be emitted
+        """
+        report_name = u"grade_report"
+        self.data_download_section.generate_grade_report_button.click()
+        self.data_download_section.wait_for_available_report()
+        self.verify_report_requested_event(report_name)
+        self.verify_report_download(report_name)
+
+    def test_weighted_problem_grade_report_download(self):
+        """
+        Scenario: Verify that an instructor can download a weighted problem grade report
+
+        Given that I am an instructor
+        And I visit the instructor dashboard's "Data Downloads" tab
+        And I click on the "Generate Weighted Problem Grade Report" button
+        Then a report should be generated
+        And a report requested event should be emitted
+        When I click on the report
+        Then a report downloaded event should be emitted
+        """
+        report_name = u"problem_grade_report"
+        self.data_download_section.generate_weighted_problem_grade_report_button.click()
+        self.data_download_section.wait_for_available_report()
+        self.verify_report_requested_event(report_name)
+        self.verify_report_download(report_name)

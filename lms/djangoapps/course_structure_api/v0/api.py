@@ -23,8 +23,7 @@ def _retrieve_course(course_key):
 
     """
     try:
-        course = courses.get_course(course_key)
-        return course
+        return courses.get_course(course_key)
     except ValueError:
         raise CourseNotFoundError
 

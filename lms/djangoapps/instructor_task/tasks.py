@@ -156,7 +156,6 @@ def calculate_grades_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-# TODO: GRADES_DOWNLOAD_ROUTING_KEY is the high mem queue.  Do we know we need it?
 @task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
 def calculate_problem_grade_report(entry_id, xmodule_instance_args):
     """

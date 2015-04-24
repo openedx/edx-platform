@@ -702,12 +702,47 @@ class DataDownloadPage(PageObject):
     def is_browser_on_page(self):
         return self.q(css='a[data-section=data_download].active-section').present
 
+    @property
+    def generate_student_profile_report_button(self):
+        """
+        Returns the "Download profile information as a CSV" button.
+        """
+        return self.q(css='input[name=list-profiles-csv]')
+
+    @property
+    def generate_grade_report_button(self):
+        """
+        Returns the "Generate Grade Report" button.
+        """
+        return self.q(css='input[name=calculate-grades-csv]')
+
+    @property
+    def generate_weighted_problem_grade_report_button(self):
+        """
+        Returns the "Generate Weighted Problem Grade Report" button.
+        """
+        return self.q(css='input[name=problem-grade-report]')
+
+    @property
+    def report_download_links(self):
+        """
+        Returns the download links for the current page.
+        """
+        return self.q(css="#report-downloads-table .file-download-link>a")
+
+    def wait_for_available_report(self):
+        """
+        Waits for a downloadable report to be available.
+        """
+        EmptyPromise(
+            lambda: len(self.report_download_links) >= 1, 'Waiting for downloadable report'
+        ).fulfill()
+
     def get_available_reports_for_download(self):
         """
         Returns a list of all the available reports for download.
         """
-        reports = self.q(css="#report-downloads-table .file-download-link>a").map(lambda el: el.text)
-        return reports.results
+        return self.report_download_links.map(lambda el: el.text)
 
 
 class StudentAdminPage(PageObject):

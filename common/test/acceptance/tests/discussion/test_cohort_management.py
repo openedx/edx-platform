@@ -14,7 +14,6 @@ from xmodule.partitions.partitions import Group
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.instructor_dashboard import InstructorDashboardPage, DataDownloadPage
-from ...pages.studio.settings_advanced import AdvancedSettingsPage
 from ...pages.studio.settings_group_configurations import GroupConfigurationsPage
 
 import uuid
@@ -555,9 +554,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
 
         # Verify the results can be downloaded.
         data_download = self.instructor_dashboard_page.select_data_download()
-        EmptyPromise(
-            lambda: 1 == len(data_download.get_available_reports_for_download()), 'Waiting for downloadable report'
-        ).fulfill()
+        data_download.wait_for_available_report()
         report = data_download.get_available_reports_for_download()[0]
         base_file_name = "cohort_results_"
         self.assertIn("{}_{}".format(
