@@ -374,8 +374,17 @@ class UserStateCache(object):
             xblocks (list of :class:`XBlock`): XBlocks to cache fields for.
             aside_types (list of str): Aside types to cache fields for.
         """
-        for field_object in self._read_objects(fields, xblocks, aside_types):
-            self._cache[self._cache_key_for_field_object(field_object)] = field_object
+        query = _chunked_query(
+            StudentModule,
+            self.select_for_update,
+            'module_state_key__in',
+            _all_usage_keys(xblocks, aside_types),
+            course_id=self.course_id,
+            student=self.user.pk,
+        )
+        for field_object in query:
+            cache_key = field_object.module_state_key.map_into_course(self.course_id)
+            self._cache[cache_key] = field_object
 
     @contract(kvs_key=DjangoKeyValueStore.Key)
     def set(self, kvs_key, value):
@@ -519,19 +528,6 @@ class UserStateCache(object):
             },
         )
         return field_object
-
-    def _read_objects(self, fields, descriptors, aside_types):
-        return _chunked_query(
-            StudentModule,
-            self.select_for_update,
-            'module_state_key__in',
-            _all_usage_keys(descriptors, aside_types),
-            course_id=self.course_id,
-            student=self.user.pk,
-        )
-
-    def _cache_key_for_field_object(self, field_object):
-        return field_object.module_state_key.map_into_course(self.course_id)
 
     def _cache_key_for_kvs_key(self, key):
         """
