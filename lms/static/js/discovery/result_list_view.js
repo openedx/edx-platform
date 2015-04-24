@@ -15,9 +15,13 @@ define([
         originalContent: '',
         $window: $(window),
         $document: $(document),
+        events: {
+            'click #discovery-clear': 'clearAll'
+        },
 
         initialize: function () {
             this.loadingTemplate = _.template($('#loading-tpl').html());
+            this.notFoundTemplate = _.template($('#not_found-tpl').html());
             this.errorTemplate = _.template($('#error-tpl').html());
             this.loadingIndicator = $('<div>', {id: 'loading-indicator', style: 'display:none'});
             this.loadingIndicator.html(this.loadingTemplate());
@@ -27,10 +31,19 @@ define([
         },
 
         render: function () {
+            this.$el.find('#courses-not-found').empty();
             this.hideLoadingIndicator();
-            this.$list.empty();
-            this.renderItems();
-            this.attachScrollHandler();
+            if (this.collection.length > 0) {
+                this.$list.empty();
+                this.renderItems();
+                this.showClearAllButton();
+                this.attachScrollHandler();
+            }
+            else {
+                var msg = this.notFoundTemplate({term: this.collection.searchTerm});
+                this.$el.find('#courses-not-found').html(msg);
+                this.hideClearAllButton();
+            }
             return this;
         },
 
@@ -38,7 +51,6 @@ define([
             this.hideLoadingIndicator();
             this.renderItems();
             this.isLoading = false;
-            // if has more attach
         },
 
         renderItems: function () {
@@ -70,9 +82,17 @@ define([
             this.trigger('next');
         },
 
-        clear: function() {
+        clearResults: function() {
             this.$list.html(this.originalContent);
             this.detachScrollHandler();
+        },
+
+        showClearAllButton: function () {
+            this.$el.find('#discovery-clear').removeClass('hidden');
+        },
+
+        hideClearAllButton: function() {
+            this.$el.find('#discovery-clear').addClass('hidden');
         },
 
         attachScrollHandler: function () {
@@ -92,23 +112,34 @@ define([
         },
 
         throttledScrollHandler: function () {
-            if (this.isBottom()) {
+            if (this.isNearBottom()) {
                 this.scrolledToBottom();
             }
             this.nextScrollEvent = true;
         },
 
-        isBottom: function () {
+        isNearBottom: function () {
             var scrollBottom = this.$window.scrollTop() + this.$window.height();
-            return scrollBottom >= this.$document.height();
+            var threshold = this.$document.height() - 200;
+            return scrollBottom >= threshold;
         },
 
         scrolledToBottom: function () {
-            this.hasMore = true;
-            if (this.hasMore && !this.isLoading) {
+            if (this.thereIsMore() && !this.isLoading) {
                 this.loadNext();
                 this.isLoading = true;
             }
+        },
+
+        thereIsMore: function () {
+            return this.collection.hasNextPage();
+        },
+
+        clearAll: function () {
+            this.hideClearAllButton();
+            this.clearResults();
+            this.trigger('clear');
+            return false;
         }
 
 

@@ -15,10 +15,8 @@ define(['backbone'], function(Backbone) {
             collection.performSearch(query);
         });
 
-        dispatcher.listenTo(form, 'clear', function () {
-            collection.cancelSearch();
-            form.hideClearAllButton();
-            results.clear();
+        dispatcher.listenTo(results, 'clear', function () {
+            form.clearSearch();
         });
 
         dispatcher.listenTo(results, 'next', function () {
@@ -26,7 +24,6 @@ define(['backbone'], function(Backbone) {
         });
 
         dispatcher.listenTo(collection, 'search', function () {
-            form.showClearAllButton();
             results.render();
         });
 
