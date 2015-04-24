@@ -52,7 +52,7 @@ from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore, ModuleI18nService
@@ -724,12 +724,12 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     return descriptor
 
 
-def find_target_student_module(request, user_id, course_id, mod_id):
+def load_single_xblock(request, user_id, course_id, usage_key_string):
     """
-    Retrieve target StudentModule
+    Load a single XBlock identified by usage_key_string.
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    usage_key = course_id.make_usage_key_from_deprecated_string(mod_id)
+    usage_key = course_id.make_usage_key_from_deprecated_string(usage_key_string)
     user = User.objects.get(id=user_id)
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_id,
@@ -740,7 +740,7 @@ def find_target_student_module(request, user_id, course_id, mod_id):
     )
     instance = get_module(user, request, usage_key, field_data_cache, grade_bucket_type='xqueue')
     if instance is None:
-        msg = "No module {0} for user {1}--access denied?".format(mod_id, user)
+        msg = "No module {0} for user {1}--access denied?".format(usage_key_string, user)
         log.debug(msg)
         raise Http404
     return instance
@@ -764,7 +764,7 @@ def xqueue_callback(request, course_id, userid, mod_id, dispatch):
     if not isinstance(header, dict) or 'lms_key' not in header:
         raise Http404
 
-    instance = find_target_student_module(request, userid, course_id, mod_id)
+    instance = load_single_xblock(request, userid, course_id, mod_id)
 
     # Transfer 'queuekey' from xqueue response header to the data.
     # This is required to use the interface defined by 'handle_ajax'

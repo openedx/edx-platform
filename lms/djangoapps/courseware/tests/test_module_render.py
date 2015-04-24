@@ -160,8 +160,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         }
 
         # Patch getmodule to return our mock module
-        with patch('courseware.module_render.find_target_student_module') as get_fake_module:
-            get_fake_module.return_value = self.mock_module
+        with patch('courseware.module_render.load_single_xblock', return_value=self.mock_module):
             # call xqueue_callback with our mocked information
             request = self.request_factory.post(self.callback_url, data)
             render.xqueue_callback(request, self.course_key, self.mock_user.id, self.mock_module.id, self.dispatch)
@@ -176,8 +175,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
             'xqueue_body': 'hello world',
         }
 
-        with patch('courseware.module_render.find_target_student_module') as get_fake_module:
-            get_fake_module.return_value = self.mock_module
+        with patch('courseware.module_render.load_single_xblock', return_value=self.mock_module):
             # Test with missing xqueue data
             with self.assertRaises(Http404):
                 request = self.request_factory.post(self.callback_url, {})
