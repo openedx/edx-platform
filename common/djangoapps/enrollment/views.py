@@ -241,8 +241,8 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                If honor mode is not supported for the course, the request fails and returns the available modes.
 
                A server-to-server call can be used by this command to enroll a user in other modes, such as "verified"
-                    or "professional". If the mode is not supposed for the course, the request will fail and return the
-                    available modes.
+               or "professional". If the mode is not supported for the course, the request will fail and return the
+               available modes.
 
         **Example Requests**:
 
@@ -255,14 +255,14 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
             * user:  The user ID of the currently logged in user. Optional. You cannot use the command to enroll a different user.
 
             * mode: The Course Mode for the enrollment. Individual users cannot upgrade their enrollment mode from
-                'honor'. Only server to server requests can enroll with other modes. Optional.
+              'honor'. Only server to server requests can enroll with other modes. Optional.
 
             * course details: A collection that contains:
 
                 * course_id: The unique identifier for the course.
 
             * email_opt_in: A boolean indicating whether the user
-                wishes to opt into email from the organization running this course. Optional
+              wishes to opt into email from the organization running this course. Optional.
 
         **Response Values**
 
