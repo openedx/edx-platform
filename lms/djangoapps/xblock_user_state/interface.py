@@ -10,6 +10,7 @@ from xblock.fields import Scope, ScopeBase
 
 new_contract('UsageKey', UsageKey)
 
+
 class XBlockUserStateClient(object):
     """
     First stab at an interface for accessing XBlock User State. This will have
