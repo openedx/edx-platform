@@ -728,11 +728,12 @@ def load_single_xblock(request, user_id, course_id, usage_key_string):
     """
     Load a single XBlock identified by usage_key_string.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    usage_key = course_id.make_usage_key_from_deprecated_string(usage_key_string)
+    usage_key = UsageKey.from_string(usage_key_string)
+    course_key = CourseKey.from_string(course_id)
+    usage_key = usage_key.map_into_course(course_key)
     user = User.objects.get(id=user_id)
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-        course_id,
+        course_key,
         user,
         modulestore().get_item(usage_key),
         depth=0,
