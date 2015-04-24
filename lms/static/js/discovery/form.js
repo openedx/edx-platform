@@ -7,8 +7,7 @@ define(['jquery', 'backbone'], function ($, Backbone) {
 
         el: '#discovery-form',
         events: {
-            'submit form': 'submitForm',
-            'click #discovery-clear': 'clearSearch',
+            'submit form': 'submitForm'
         },
 
         initialize: function () {
@@ -35,18 +34,8 @@ define(['jquery', 'backbone'], function ($, Backbone) {
             }
         },
 
-        showClearAllButton: function () {
-            this.$el.find('#discovery-clear').removeClass('hidden');
-        },
-
-        hideClearAllButton: function() {
-            this.$el.find('#discovery-clear').addClass('hidden');
-        },
-
         clearSearch: function () {
             this.$searchField.val('');
-            this.trigger('clear');
-            return false;
         }
 
     });
