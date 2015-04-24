@@ -120,6 +120,7 @@ class MixedWithOptionsTestCase(MixedSplitTestCase):
     }
 
     INDEX_NAME = None
+    DOCUMENT_TYPE = None
 
     def setUp(self):
         super(MixedWithOptionsTestCase, self).setUp()
@@ -140,7 +141,7 @@ class MixedWithOptionsTestCase(MixedSplitTestCase):
     def search(self, field_dictionary=None):
         """ Performs index search according to passed parameters """
         fields = field_dictionary if field_dictionary else self._get_default_search()
-        return self.searcher.search(field_dictionary=fields)
+        return self.searcher.search(field_dictionary=fields, doc_type=self.DOCUMENT_TYPE)
 
     def _perform_test_using_store(self, store_type, test_to_perform):
         """ Helper method to run a test function that uses a specific store """
@@ -228,6 +229,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         )
 
     INDEX_NAME = CoursewareSearchIndexer.INDEX_NAME
+    DOCUMENT_TYPE = CoursewareSearchIndexer.DOCUMENT_TYPE
 
     def reindex_course(self, store):
         """ kick off complete reindex of the course """
@@ -462,7 +464,6 @@ class TestLargeCourseDeletions(MixedWithOptionsTestCase):
             while response["total"] > 0:
                 for item in response["results"]:
                     self.searcher.remove(CoursewareSearchIndexer.DOCUMENT_TYPE, item["data"]["id"])
-                    self.searcher.remove(CoursewareSearchIndexer.DOCUMENT_TYPE, item["data"]["id"])
                 response = self.searcher.search(field_dictionary={"course": self.course_id})
         self.course_id = None
 
@@ -590,13 +591,19 @@ class TestTaskExecution(ModuleStoreTestCase):
     def test_task_indexing_course(self):
         """ Making sure that the receiver correctly fires off the task when invoked by signal """
         searcher = SearchEngine.get_search_engine(CoursewareSearchIndexer.INDEX_NAME)
-        response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
+        response = searcher.search(
+            doc_type=CoursewareSearchIndexer.DOCUMENT_TYPE,
+            field_dictionary={"course": unicode(self.course.id)}
+        )
         self.assertEqual(response["total"], 0)
 
         listen_for_course_publish(self, self.course.id)
 
         # Note that this test will only succeed if celery is working in inline mode
-        response = searcher.search(field_dictionary={"course": unicode(self.course.id)})
+        response = searcher.search(
+            doc_type=CoursewareSearchIndexer.DOCUMENT_TYPE,
+            field_dictionary={"course": unicode(self.course.id)}
+        )
         self.assertEqual(response["total"], 3)
 
     def test_task_library_update(self):
@@ -650,6 +657,7 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
         )
 
     INDEX_NAME = LibrarySearchIndexer.INDEX_NAME
+    DOCUMENT_TYPE = LibrarySearchIndexer.DOCUMENT_TYPE
 
     def _get_default_search(self):
         """ Returns field_dictionary for default search """

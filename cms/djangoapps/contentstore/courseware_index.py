@@ -3,14 +3,19 @@ from __future__ import absolute_import
 from abc import ABCMeta, abstractmethod
 from datetime import timedelta
 import logging
+import re
 from six import add_metaclass
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
+
+from contentstore.utils import course_image_url
+from course_modes.models import CourseMode
 from eventtracking import tracker
+from search.search_engine_base import SearchEngine
+from xmodule.annotator_mixin import html_to_text
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.library_tools import normalize_key_for_search
-from search.search_engine_base import SearchEngine
 
 # REINDEX_AGE is the default amount of time that we look back for changes
 # that might have happened. If we are provided with a time at which the
@@ -20,6 +25,25 @@ from search.search_engine_base import SearchEngine
 REINDEX_AGE = timedelta(0, 60)  # 60 seconds
 
 log = logging.getLogger('edx.modulestore')
+
+
+def strip_html_content_to_text(html_content):
+    """ Gets only the textual part for html content - useful for building text to be searched """
+    # Removing HTML-encoded non-breaking space characters
+    text_content = re.sub(r"(\s|&nbsp;|//)+", " ", html_to_text(html_content))
+    # Removing HTML CDATA
+    text_content = re.sub(r"<!\[CDATA\[.*\]\]>", "", text_content)
+    # Removing HTML comments
+    text_content = re.sub(r"<!--.*-->", "", text_content)
+
+    return text_content
+
+
+def indexing_is_enabled():
+    """
+    Checks to see if the indexing feature is enabled
+    """
+    return settings.FEATURES.get('ENABLE_COURSEWARE_INDEX', False)
 
 
 class SearchIndexingError(Exception):
@@ -94,6 +118,8 @@ class SearchIndexerBase(object):
         Process course for indexing
 
         Arguments:
+        modulestore - modulestore object to use for operations
+
         structure_key (CourseKey|LibraryKey) - course or library identifier
 
         triggered_at (datetime) - provides time at which indexing was triggered;
@@ -174,6 +200,11 @@ class SearchIndexerBase(object):
         try:
             with modulestore.branch_setting(ModuleStoreEnum.RevisionOption.published_only):
                 structure = cls._fetch_top_level(modulestore, structure_key)
+
+                # First perform any additional indexing from the structure object
+                cls.supplemental_index_information(modulestore, structure)
+
+                # Now index the content
                 for item in structure.get_children():
                     index_item(item)
                 cls.remove_deleted_items(searcher, structure_key, indexed_items)
@@ -224,6 +255,21 @@ class SearchIndexerBase(object):
             data
         )
 
+    @classmethod
+    def supplemental_index_information(cls, modulestore, structure):
+        """
+        Perform any supplemental indexing given that the structure object has
+        already been loaded. Base implementation performs no operation.
+
+        Arguments:
+            modulestore - modulestore object used during the indexing operation
+            structure - structure object loaded during the indexing job
+
+        Returns:
+            None
+        """
+        pass
+
 
 class CoursewareSearchIndexer(SearchIndexerBase):
     """
@@ -259,6 +305,13 @@ class CoursewareSearchIndexer(SearchIndexerBase):
         (Re)index all content within the given course, tracking the fact that a full reindex has taken place
         """
         return cls._do_reindex(modulestore, course_key)
+
+    @classmethod
+    def supplemental_index_information(cls, modulestore, structure):
+        """
+        Perform additional indexing from loaded structure object
+        """
+        CourseAboutSearchIndexer.index_about_information(modulestore, structure)
 
 
 class LibrarySearchIndexer(SearchIndexerBase):
@@ -300,3 +353,176 @@ class LibrarySearchIndexer(SearchIndexerBase):
         (Re)index all content within the given library, tracking the fact that a full reindex has taken place
         """
         return cls._do_reindex(modulestore, library_key)
+
+
+class AboutInfo(object):
+    """ About info structure to contain
+       1) Property name to use
+       2) Where to add in the index (using flags above)
+       3) Where to source the properties value
+    """
+    # Bitwise Flags for where to index the information
+    #
+    # ANALYSE - states that the property text contains content that we wish to be able to find matched within
+    #   e.g. "joe" should yield a result for "I'd like to drink a cup of joe"
+    #
+    # PROPERTY - states that the property text should be a property of the indexed document, to be returned with the
+    # results: search matches will only be made on exact string matches
+    #   e.g. "joe" will only match on "joe"
+    #
+    # We are using bitwise flags because one may want to add the property to EITHER or BOTH parts of the index
+    #   e.g. university name is desired to be analysed, so that a search on "Oxford" will match
+    #   property values "University of Oxford" and "Oxford Brookes University",
+    #   but it is also a useful property, because within a (future) filtered search a user
+    #   may have chosen to filter courses from "University of Oxford"
+    #
+    # see https://wiki.python.org/moin/BitwiseOperators for information about bitwise shift operator used below
+    #
+    ANALYSE = 1 << 0  # Add the information to the analysed content of the index
+    PROPERTY = 1 << 1  # Add the information as a property of the object being indexed (not analysed)
+
+    def __init__(self, property_name, index_flags, source_from):
+        self.property_name = property_name
+        self.index_flags = index_flags
+        self.source_from = source_from
+
+    def get_value(self, **kwargs):
+        """ get the value for this piece of information, using the correct source """
+        return self.source_from(self, **kwargs)
+
+    def from_about_dictionary(self, **kwargs):
+        """ gets the value from the kwargs provided 'about_dictionary' """
+        about_dictionary = kwargs.get('about_dictionary', None)
+        if not about_dictionary:
+            raise ValueError("Context dictionary does not contain expected argument 'about_dictionary'")
+
+        return about_dictionary.get(self.property_name, None)
+
+    def from_course_property(self, **kwargs):
+        """ gets the value from the kwargs provided 'course' """
+        course = kwargs.get('course', None)
+        if not course:
+            raise ValueError("Context dictionary does not contain expected argument 'course'")
+
+        return getattr(course, self.property_name, None)
+
+    def from_course_mode(self, **kwargs):
+        """ fetches the available course modes from the CourseMode model """
+        course = kwargs.get('course', None)
+        if not course:
+            raise ValueError("Context dictionary does not contain expected argument 'course'")
+
+        return [mode.slug for mode in CourseMode.modes_for_course(course.id)]
+
+    # Source location options - either from the course or the about info
+    FROM_ABOUT_INFO = from_about_dictionary
+    FROM_COURSE_PROPERTY = from_course_property
+    FROM_COURSE_MODE = from_course_mode
+
+
+class CourseAboutSearchIndexer(object):
+    """
+    Class to perform indexing of about information from course object
+    """
+    DISCOVERY_DOCUMENT_TYPE = "course_info"
+    INDEX_NAME = CoursewareSearchIndexer.INDEX_NAME
+
+    # List of properties to add to the index - each item in the list is an instance of AboutInfo object
+    ABOUT_INFORMATION_TO_INCLUDE = [
+        AboutInfo("advertised_start", AboutInfo.PROPERTY, AboutInfo.FROM_COURSE_PROPERTY),
+        AboutInfo("announcement", AboutInfo.PROPERTY, AboutInfo.FROM_ABOUT_INFO),
+        AboutInfo("start", AboutInfo.PROPERTY, AboutInfo.FROM_COURSE_PROPERTY),
+        AboutInfo("end", AboutInfo.PROPERTY, AboutInfo.FROM_COURSE_PROPERTY),
+        AboutInfo("effort", AboutInfo.PROPERTY, AboutInfo.FROM_ABOUT_INFO),
+        AboutInfo("display_name", AboutInfo.ANALYSE, AboutInfo.FROM_COURSE_PROPERTY),
+        AboutInfo("overview", AboutInfo.ANALYSE, AboutInfo.FROM_ABOUT_INFO),
+        AboutInfo("title", AboutInfo.ANALYSE | AboutInfo.PROPERTY, AboutInfo.FROM_ABOUT_INFO),
+        AboutInfo("university", AboutInfo.ANALYSE | AboutInfo.PROPERTY, AboutInfo.FROM_ABOUT_INFO),
+        AboutInfo("number", AboutInfo.ANALYSE | AboutInfo.PROPERTY, AboutInfo.FROM_COURSE_PROPERTY),
+        AboutInfo("short_description", AboutInfo.ANALYSE, AboutInfo.FROM_ABOUT_INFO),
+        AboutInfo("description", AboutInfo.ANALYSE, AboutInfo.FROM_ABOUT_INFO),
+        AboutInfo("key_dates", AboutInfo.ANALYSE, AboutInfo.FROM_ABOUT_INFO),
+        AboutInfo("video", AboutInfo.ANALYSE, AboutInfo.FROM_ABOUT_INFO),
+        AboutInfo("course_staff_short", AboutInfo.ANALYSE, AboutInfo.FROM_ABOUT_INFO),
+        AboutInfo("course_staff_extended", AboutInfo.ANALYSE, AboutInfo.FROM_ABOUT_INFO),
+        AboutInfo("requirements", AboutInfo.ANALYSE, AboutInfo.FROM_ABOUT_INFO),
+        AboutInfo("syllabus", AboutInfo.ANALYSE, AboutInfo.FROM_ABOUT_INFO),
+        AboutInfo("textbook", AboutInfo.ANALYSE, AboutInfo.FROM_ABOUT_INFO),
+        AboutInfo("faq", AboutInfo.ANALYSE, AboutInfo.FROM_ABOUT_INFO),
+        AboutInfo("more_info", AboutInfo.ANALYSE, AboutInfo.FROM_ABOUT_INFO),
+        AboutInfo("ocw_links", AboutInfo.ANALYSE, AboutInfo.FROM_ABOUT_INFO),
+        AboutInfo("enrollment_start", AboutInfo.PROPERTY, AboutInfo.FROM_COURSE_PROPERTY),
+        AboutInfo("enrollment_end", AboutInfo.PROPERTY, AboutInfo.FROM_COURSE_PROPERTY),
+        AboutInfo("org", AboutInfo.PROPERTY, AboutInfo.FROM_COURSE_PROPERTY),
+        AboutInfo("modes", AboutInfo.PROPERTY, AboutInfo.FROM_COURSE_MODE),
+    ]
+
+    @classmethod
+    def index_about_information(cls, modulestore, course):
+        """
+        Add the given course to the course discovery index
+
+        Arguments:
+        modulestore - modulestore object to use for operations
+
+        course - course object from which to take properties, locate about information
+        """
+        searcher = SearchEngine.get_search_engine(cls.INDEX_NAME)
+        if not searcher:
+            return
+
+        course_id = unicode(course.id)
+        course_info = {
+            'id': course_id,
+            'course': course_id,
+            'content': {},
+            'image_url': course_image_url(course),
+        }
+
+        # load data for all of the 'about' modules for this course into a dictionary
+        about_dictionary = {
+            item.location.name: item.data
+            for item in modulestore.get_items(course.id, qualifiers={"category": "about"})
+        }
+
+        about_context = {
+            "course": course,
+            "about_dictionary": about_dictionary,
+        }
+
+        for about_information in cls.ABOUT_INFORMATION_TO_INCLUDE:
+            # Broad exception handler so that a single bad property does not scupper the collection of others
+            try:
+                section_content = about_information.get_value(**about_context)
+            except:  # pylint: disable=bare-except
+                section_content = None
+                log.warning(
+                    "Course discovery could not collect property %s for course %s",
+                    about_information.property_name,
+                    course_id,
+                    exc_info=True,
+                )
+
+            if section_content:
+                if about_information.index_flags & AboutInfo.ANALYSE:
+                    analyse_content = section_content
+                    if isinstance(section_content, basestring):
+                        analyse_content = strip_html_content_to_text(section_content)
+                    course_info['content'][about_information.property_name] = analyse_content
+                if about_information.index_flags & AboutInfo.PROPERTY:
+                    course_info[about_information.property_name] = section_content
+
+        # Broad exception handler to protect around and report problems with indexing
+        try:
+            searcher.index(cls.DISCOVERY_DOCUMENT_TYPE, course_info)
+        except:  # pylint: disable=bare-except
+            log.exception(
+                "Course discovery indexing error encountered, course discovery index may be out of date %s",
+                course_id,
+            )
+            raise
+
+        log.debug(
+            "Successfully added %s course to the course discovery index",
+            course_id
+        )
