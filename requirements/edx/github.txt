@@ -46,4 +46,4 @@
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@31a811911612e87244f760f483998867e4883565#egg=xblock-google-drive
 -e git+https://github.com/openlearninginitiative/xblock-submit-and-compare.git@f89d3debd58003a5bfedfbaad06072ec2082259d#egg=xblock-submit-and-compare
 -e git+https://github.com/mckinseyacademy/xblock-poll.git@09e8feda40fdf77bd19b830b497ff969891e11af#egg=xblock-poll
--e git+https://github.com/Stanford-Online/xblock-mufi.git@d2d11e50d63093c6b5df13682302d2da4acc3c9b#egg=xblock_mufi-master
+-e git+https://github.com/Stanford-Online/xblock-mufi.git@ee853b8a7668a87c27d13d55c0d149a04b8657b8#egg=xblock_mufi-master
