@@ -59,15 +59,9 @@ define([
             });
         },
 
-        cancelSearch: function () {
-            this.fetchXhr && this.fetchXhr.abort();
-            this.resetState();
-        },
-
         parse: function(response) {
             this.latestModelsCount = response.results.length;
             this.totalCount = response.total;
-            console.log(response)
             return _.map(response.results, function (result) {
                 return result.data;
             });
