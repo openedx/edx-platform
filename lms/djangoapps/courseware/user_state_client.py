@@ -37,13 +37,19 @@ class DjangoXBlockUserStateClient(DjangoXBlockUserStateClient):
 
     def get_many(username, block_keys, scope=Scope.user_state):
         """Returns dict of block_id -> state."""
+        if scope != Scope.user_state:
+            raise ValueError("Only Scope.user_state is supported")
         raise NotImplementedError()
 
     def set_many(username, block_keys_to_state, scope=Scope.user_state):
+        if scope != Scope.user_state:
+            raise ValueError("Only Scope.user_state is supported")
         raise NotImplementedError()
 
     def get_history(username, block_key, scope=Scope.user_state):
         """We don't guarantee that history for many blocks will be fast."""
+        if scope != Scope.user_state:
+            raise ValueError("Only Scope.user_state is supported")
         raise NotImplementedError()
 
     def iter_all_for_block(block_key, scope=Scope.user_state, batch_size=None):
@@ -52,6 +58,8 @@ class DjangoXBlockUserStateClient(DjangoXBlockUserStateClient):
         increments. If you're using this method, you should be running in an
         async task.
         """
+        if scope != Scope.user_state:
+            raise ValueError("Only Scope.user_state is supported")
         raise NotImplementedError()
 
     def iter_all_for_course(course_key, block_type=None, scope=Scope.user_state, batch_size=None):
@@ -60,4 +68,6 @@ class DjangoXBlockUserStateClient(DjangoXBlockUserStateClient):
         increments. If you're using this method, you should be running in an
         async task.
         """
+        if scope != Scope.user_state:
+            raise ValueError("Only Scope.user_state is supported")
         raise NotImplementedError()
