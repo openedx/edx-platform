@@ -354,68 +354,56 @@ class DjangoOrmFieldCache(object):
         raise NotImplementedError()
 
 
-class UserStateCache(DjangoOrmFieldCache):
+class UserStateCache(object):
     """
     Cache for Scope.user_state xblock field data.
     """
     def __init__(self, user, course_id, select_for_update=False):
-        super(UserStateCache, self).__init__()
+        self._cache = {}
         self.course_id = course_id
         self.user = user
         self.select_for_update = select_for_update
 
-    def _create_object(self, kvs_key):
+    def cache_fields(self, fields, xblocks, aside_types):  # pylint: disable=unused-argument
         """
-        Create a new object to add to the cache (which should record
-        the specified field ``value`` for the field identified by
-        ``kvs_key``).
+        Load all fields specified by ``fields`` for the supplied ``xblocks``
+        and ``aside_types`` into this cache.
 
         Arguments:
-            kvs_key (:class:`DjangoKeyValueStore.Key`): Which field to create an entry for
+            fields (list of str): Field names to cache.
+            xblocks (list of :class:`XBlock`): XBlocks to cache fields for.
+            aside_types (list of str): Aside types to cache fields for.
         """
-        field_object, __ = StudentModule.objects.get_or_create(
-            course_id=self.course_id,
-            student_id=kvs_key.user_id,
-            module_state_key=kvs_key.block_scope_id,
-            defaults={
-                'state': json.dumps({}),
-                'module_type': kvs_key.block_scope_id.block_type,
-            },
-        )
-        return field_object
+        for field_object in self._read_objects(fields, xblocks, aside_types):
+            self._cache[self._cache_key_for_field_object(field_object)] = field_object
 
-    def _read_objects(self, fields, xblocks, aside_types):
+    @contract(kvs_key=DjangoKeyValueStore.Key)
+    def set(self, kvs_key, value):
         """
-        Return an iterator for all objects stored in the underlying datastore
-        for the ``fields`` on the ``xblocks`` and the ``aside_types`` associated
-        with them.
+        Set the specified `kvs_key` to the field value `value`.
 
         Arguments:
-            fields (list of str): Field names to return values for
-            xblocks (list of :class:`~XBlock`): XBlocks to load fields for
-            aside_types (list of str): Asides to load field for (which annotate the supplied
-                xblocks).
+            kvs_key (`DjangoKeyValueStore.Key`): The field value to delete
+            value: The field value to store
         """
-        return _chunked_query(
-            StudentModule,
-            self.select_for_update,
-            'module_state_key__in',
-            _all_usage_keys(xblocks, aside_types),
-            course_id=self.course_id,
-            student=self.user.pk,
-        )
+        self.set_many({kvs_key: value})
 
-    def _cache_key_for_field_object(self, field_object):
-        return field_object.module_state_key.map_into_course(self.course_id)
-
-    def _cache_key_for_kvs_key(self, key):
+    @contract(kvs_key=DjangoKeyValueStore.Key, returns="datetime|None")
+    def last_modified(self, kvs_key):
         """
-        Return the key used in this DjangoOrmFieldCache for the specified KeyValueStore key.
+        Return when the supplied field was changed.
 
         Arguments:
-            key (:class:`~DjangoKeyValueStore.Key`): The key representing the cached field
+            kvs_key (`DjangoKeyValueStore.Key`): The key representing the cached field
+
+        Returns: datetime if there was a modified date, or None otherwise
         """
-        return key.block_scope_id
+        field_object = self._cache.get(self._cache_key_for_kvs_key(kvs_key))
+
+        if field_object is None:
+            return None
+        else:
+            return field_object.modified
 
     @contract(kv_dict="dict(DjangoKeyValueStore_Key: *)")
     def set_many(self, kv_dict):
@@ -501,12 +489,6 @@ class UserStateCache(DjangoOrmFieldCache):
 
         return kvs_key.field_name in json.loads(field_object.state)
 
-    @contract(kvs_key=DjangoKeyValueStore.Key)
-    def _set_field_value(self, field_object, kvs_key, value):
-        state = json.loads(field_object.state)
-        state[kvs_key.field_name] = value
-        field_object.state = json.dumps(state)
-
     @contract(user_id=int, usage_key=UsageKey, score="number|None", max_score="number|None")
     def set_score(self, user_id, usage_key, score, max_score):
         """
@@ -518,6 +500,49 @@ class UserStateCache(DjangoOrmFieldCache):
         field_object.grade = score
         field_object.max_grade = max_score
         field_object.save()
+
+    def __len__(self):
+        return len(self._cache)
+
+    def _read_objects(self, fields, descriptors, aside_types):
+        return _chunked_query(
+            StudentModule,
+            self.select_for_update,
+            'module_state_key__in',
+            _all_usage_keys(descriptors, aside_types),
+            course_id=self.course_id,
+            student=self.user.pk,
+        )
+
+    def _cache_key_for_field_object(self, field_object):
+        return field_object.module_state_key.map_into_course(self.course_id)
+
+    def _create_object(self, kvs_key):
+        field_object, __ = StudentModule.objects.get_or_create(
+            course_id=self.course_id,
+            student_id=kvs_key.user_id,
+            module_state_key=kvs_key.block_scope_id,
+            defaults={
+                'state': json.dumps({}),
+                'module_type': kvs_key.block_scope_id.block_type,
+            },
+        )
+        return field_object
+
+    def _cache_key_for_kvs_key(self, key):
+        """
+        Return the key used in this DjangoOrmFieldCache for the specified KeyValueStore key.
+
+        Arguments:
+            key (:class:`~DjangoKeyValueStore.Key`): The key representing the cached field
+        """
+        return key.block_scope_id
+
+    @contract(kvs_key=DjangoKeyValueStore.Key)
+    def _set_field_value(self, field_object, kvs_key, value):
+        state = json.loads(field_object.state)
+        state[kvs_key.field_name] = value
+        field_object.state = json.dumps(state)
 
 
 class UserStateSummaryCache(DjangoOrmFieldCache):
