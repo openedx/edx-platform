@@ -30,7 +30,7 @@ from ...fixtures.discussion import (
     Response,
     Comment,
     SearchResult,
-)
+    MultipleThreadFixture)
 
 from .helpers import BaseDiscussionMixin
 
@@ -254,6 +254,61 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
         self.assertTrue(self.thread_page.is_comment_visible(comment_id))
         self.assertTrue(self.thread_page.is_add_comment_visible(response_id))
         self.assertFalse(self.thread_page.is_show_comments_visible(response_id))
+
+
+@attr('shard_1')
+class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
+    """
+    Tests for the discussion page with multiple threads
+    """
+    def setUp(self):
+        super(DiscussionTabMultipleThreadTest, self).setUp()
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+        self.thread_count = 2
+        self.thread_ids = []
+        self.setup_multiple_threads(thread_count=self.thread_count)
+
+        self.thread_page_1 = DiscussionTabSingleThreadPage(
+            self.browser,
+            self.course_id,
+            self.discussion_id,
+            self.thread_ids[0]
+        )
+        self.thread_page_2 = DiscussionTabSingleThreadPage(
+            self.browser,
+            self.course_id,
+            self.discussion_id,
+            self.thread_ids[1]
+        )
+        self.thread_page_1.visit()
+
+    def setup_multiple_threads(self, thread_count):
+        threads = []
+        for i in range(thread_count):
+            thread_id = "test_thread_{}_{}".format(i, uuid4().hex)
+            thread_body = "Dummy Long text body." * 50
+            threads.append(
+                Thread(id=thread_id, commentable_id=self.discussion_id, body=thread_body),
+            )
+            self.thread_ids.append(thread_id)
+        view = MultipleThreadFixture(threads)
+        view.push()
+
+    def test_page_scroll_on_thread_change_view(self):
+        """
+        Check switching between threads changes the page to scroll to bottom
+        """
+        # verify threads are rendered on the page
+        self.assertTrue(
+            self.thread_page_1.check_threads_rendered_successfully(thread_count=self.thread_count)
+        )
+
+        # From the thread_page_1 open & verify next thread
+        self.thread_page_1.click_and_open_thread(thread_id=self.thread_ids[1])
+        self.assertTrue(self.thread_page_2.is_browser_on_page())
+
+        # Verify that window is on top of page.
+        self.thread_page_2.check_window_is_on_top()
 
 
 @attr('shard_1')

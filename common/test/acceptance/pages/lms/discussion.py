@@ -341,6 +341,42 @@ class DiscussionTabSingleThreadPage(CoursePage):
         with self.thread_page._secondary_action_menu_open(".forum-thread-main-wrapper"):
             self._find_within(".forum-thread-main-wrapper .action-close").first.click()
 
+    @wait_for_js
+    def is_window_on_top(self):
+        """
+        Check if window's scroll is at top
+        """
+        return self.browser.execute_script("return $('html, body').offset().top") == 0
+
+    def _thread_is_rendered_successfully(self, thread_id):
+        return self.q(css=".discussion-article[data-id='{}']".format(thread_id)).visible
+
+    def click_and_open_thread(self, thread_id):
+        """
+        Click specific thread on the list.
+        """
+        thread_selector = "li[data-id='{}']".format(thread_id)
+        self.q(css=thread_selector).first.click()
+        EmptyPromise(
+            lambda: self._thread_is_rendered_successfully(thread_id),
+            "Thread has been rendered"
+        ).fulfill()
+
+    def check_threads_rendered_successfully(self, thread_count):
+        """
+        Count the number of threads available on page.
+        """
+        return len(self.q(css=".forum-nav-thread").results) == thread_count
+
+    def check_window_is_on_top(self):
+        """
+        Check window is on top of the page
+        """
+        EmptyPromise(
+            self.is_window_on_top,
+            "Window is on top"
+        ).fulfill()
+
 
 class InlineDiscussionPage(PageObject):
     url = None
