@@ -1,0 +1,276 @@
+.view-teams {
+
+  // resets for existing styles
+  div.course-wrapper section.course-content {
+    padding: 0;
+
+    p {
+      margin-bottom: ($baseline/4);
+    }
+  }
+
+  .icon {
+    font-family: "FontAwesome";
+  }
+
+  %button-reset {
+    box-shadow: none;
+    border: none;
+    background-image: none;
+    background-color: transparent;
+    font-weight: normal;
+  }
+
+// layout
+  .page-header {
+    @include clearfix();
+    border-bottom: 1px solid $gray-l3;
+    padding: $baseline $baseline ($baseline/2) $baseline;
+
+    .page-title {
+      @extend %t-title4;
+      margin-bottom: ($baseline/4);
+      text-transform: none;
+      color: $black;
+    }
+
+    .page-description {
+      @extend %t-copy-sub1;
+      margin-bottom: ($baseline/4);
+      color: $gray;
+    }
+  }
+
+  .page-header.has-secondary {
+
+      .page-header-main {
+        display: inline-block;
+        width: flex-grid(8,12);
+      }
+
+      .page-header-secondary {
+        display: inline-block;
+        width: flex-grid(4,12);
+        @include text-align(right);
+      }
+  }
+
+// ui bits
+  .breadcrumbs {
+    @extend %t-copy-sub1;
+
+    .nav-item {
+      @include margin-right($baseline/2);
+      display: inline-block;
+    }
+
+    .icon {
+      @include margin-right($baseline/4);
+      display: inline-block;
+      color: $gray-l2;
+
+      @include rtl {
+        @include transform(rotateY(180deg));
+      }
+    }
+  }
+
+  .page-header-search {
+
+    .search-label {
+        @extend %text-sr;
+    }
+
+    .search-field {
+        transition: all .25s ease-in-out;
+        border: 0;
+        border-bottom: 2px solid transparent;
+        padding: ($baseline/4) ($baseline/2);
+        font-family: inherit;
+        color: $gray;
+        @include text-align(right);
+
+        &:focus {
+          border-bottom: 2px solid $black;
+          color: $black;
+        }
+    }
+
+    .action-search {
+      @extend %button-reset;
+      padding: ($baseline/4) ($baseline/2);
+
+
+      .icon {
+          color: $gray-l3;
+      }
+
+      &:hover,
+      &:focus {
+
+        .icon {
+            color: $black;
+        }
+      }
+    }
+  }
+
+// main content bits
+  .page-content {
+    padding: $baseline;
+  }
+
+  .page-content-nav {
+    margin-bottom: $baseline;
+    border-bottom: 2px solid $gray-l5;
+
+    .nav-item {
+        display: inline-block;
+        margin-bottom: -3px; // to match the border
+        border-bottom: 3px solid $gray-l5;
+        padding: ($baseline*.75);
+        color: $gray-d2;
+
+        &.is-active {
+            border-bottom: 3px solid $gray-d2;
+            color: $gray-d2;
+        }
+
+        &:hover,
+        &:focus {
+            border-bottom: 3px solid $link-color;
+            color: $link-color;
+        }
+    }
+  }
+
+  .intro {
+    @extend %t-weight4;
+  }
+
+  .create-team {
+
+    legend {
+        @extend %t-title6;
+        @extend %t-weight4;
+        margin-bottom: ($baseline/4);
+    }
+
+    .description {
+        @extend %t-copy-sub1;
+        margin-bottom: ($baseline/2);
+        color: $gray-l1;
+    }
+
+    .form-field {
+        margin: 0 0 ($baseline*0.75) 0;
+
+        .label {
+            display: block;
+            margin-bottom: ($baseline/4);
+        }
+
+        &.is-required {
+            @extend %t-weight4;
+
+            .label:after {
+              @include margin-left($baseline/4);
+              content: "*";
+            }
+        }
+
+        .input-text {
+            @extend %t-copy-base;
+            @include transition(all $tmg-f2 ease-in-out 0s);
+            display: block;
+            width: 90%;
+            height: 100%;
+            margin-bottom: ($baseline/4);
+            border: 1px solid $gray-l2;
+            padding: ($baseline/2);
+        }
+
+        .input-select {
+            @extend %t-copy-base;
+            width: 90%;
+            margin-bottom: ($baseline/4);
+            border: 1px solid $gray-l2;
+        }
+
+        .input-text,
+        .input-select {
+
+            &:focus {
+                border: 1px solid $blue;
+
+                + .tip {
+                    color: $blue;
+                }
+            }
+        }
+
+        &.has-errors {
+
+            .input-text,
+            .input-select {
+                border: 1px solid $alert-color;
+
+                + .tip {
+                    color: $alert-color;
+                }
+            }
+        }
+
+        .tip {
+            @extend %t-copy-sub1;
+            display: block;
+            color: $gray-l1;
+        }
+    }
+
+    .form-actions {
+        margin-top: $baseline;
+    }
+
+    .action {
+      @extend %t-copy;
+      @extend %t-action2;
+      @include margin-right ($baseline/2);
+      padding: ($baseline/2) $baseline;
+    }
+
+    .action-primary {
+      @extend %btn-primary-blue;
+      display: inline-block;
+      text-shadow: none;
+    }
+
+    .action-cancel {
+      @extend %button-reset;
+      display: inline-block;
+      border: 1px solid transparent;
+      color: $gray;
+
+      &:hover,
+      &:focus {
+          border: 1px solid $link-color;
+          color: $link-color;
+      }
+    }
+
+    .required-wrapper {
+      display: inline-block;
+      vertical-align: top;
+      width: 60%;
+    }
+
+    .optional-wrapper {
+      display: inline-block;
+      vertical-align: top;
+      width: 35%;
+      margin-left: 2%;
+      border-left: 2px solid $gray-l4;
+      padding-left: 2%;
+    }
+  }
+}
