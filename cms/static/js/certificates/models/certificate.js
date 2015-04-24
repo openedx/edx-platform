@@ -1,17 +1,28 @@
 define([
-    'backbone', 'underscore', 'underscore.string', 'gettext', 'backbone.associations', 'coffee/src/main'
+    'js/certificates/models/signatory', 'backbone', 'underscore', 'underscore.string', 'gettext', 'backbone-relational', 'backbone.associations', 'coffee/src/main'
 ],
-function(Backbone, _, str, gettext) {
+function(Signatory, Backbone, _, str, gettext) {
     'use strict';
     console.log('certificate_model.start');
     _.str = str;
-    var Certificate = Backbone.Model.extend({
+    var Certificate = Backbone.RelationalModel.extend({
         idAttribute: "id",
         defaults: {
             name: 'Default Name',
             description: 'Default Description',
             version: 1
         },
+
+        relations: [{
+            type: Backbone.HasMany,
+            key: 'signatories',
+            relatedModel: Signatory,
+            autoFetch: true,
+            reverseRelation: {
+                key: 'certificate',
+                includeInJSON: "id"
+            }
+        }],
 
         initialize: function(attributes, options) {
             console.log('certificate_model.initialize');

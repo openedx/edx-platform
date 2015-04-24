@@ -57,7 +57,9 @@ function(BaseView, _, gettext, str) {
                 index: this.model.collection.indexOf(this.model),
                 showDetails: showDetails || false
             });
-
+           attrs.signatories.each(function( model ) {
+               console.log(model)
+           });
             this.$el.html(this.template(attrs));
             return this;
         }
