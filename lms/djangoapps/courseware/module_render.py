@@ -737,7 +737,6 @@ def load_single_xblock(request, user_id, course_id, usage_key_string):
         user,
         modulestore().get_item(usage_key),
         depth=0,
-        select_for_update=True
     )
     instance = get_module(user, request, usage_key, field_data_cache, grade_bucket_type='xqueue')
     if instance is None:
