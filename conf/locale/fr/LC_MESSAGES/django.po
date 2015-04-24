@@ -168,7 +168,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-04-21 13:44+0000\n"
+"POT-Creation-Date: 2015-04-24 17:02+0000\n"
 "PO-Revision-Date: 2014-12-30 16:21+0000\n"
 "Last-Translator: Xavier Antoviaque <xavier@antoviaque.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
@@ -1912,15 +1912,21 @@ msgstr "Erreur : {msg}"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_hour} hour"
-msgstr "{num_hour} heure"
+msgid_plural "{num_hour} hours"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_minute} minute"
-msgstr "{num_minute} minute"
+msgid_plural "{num_minute} minutes"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_second} second"
-msgstr "{num_second} seconde"
+msgid_plural "{num_second} seconds"
+msgstr[0] ""
+msgstr[1] ""
 
 #. Translators: 'rescoring' refers to the act of re-submitting a student's
 #. solution so it can get a new score.
@@ -8741,7 +8747,7 @@ msgstr "Aide"
 #: cms/templates/widgets/header.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html
 msgid "Sign Out"
-msgstr ""
+msgstr "Se déconnecter"
 
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Enrollment for {} | Choose Your Track"
@@ -8863,11 +8869,11 @@ msgstr "Cacher les annotations"
 
 #: lms/templates/course.html
 msgid "LEARN MORE"
-msgstr ""
+msgstr "EN SAVOIR PLUS"
 
 #: lms/templates/course.html
 msgid "Starts"
-msgstr ""
+msgstr "Commence"
 
 #: lms/templates/dashboard.html
 msgid "Dashboard"
@@ -8891,7 +8897,7 @@ msgstr "Erreurs de chargement du cours"
 
 #: lms/templates/dashboard.html
 msgid "Want to change your account settings?"
-msgstr ""
+msgstr "Vous voulez changer les paramètres de votre compte ?"
 
 #: lms/templates/dashboard.html
 msgid "Click the arrow next to your username above."
@@ -9338,7 +9344,7 @@ msgstr ""
 
 #: lms/templates/index.html
 msgid "View all Courses"
-msgstr ""
+msgstr "Voir tous les cours"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -9514,7 +9520,7 @@ msgstr "Cliquer pour commencer"
 
 #: lms/templates/manage_user_standing.html
 msgid "Manage student accounts"
-msgstr ""
+msgstr "Gérer les comptes des étudiants"
 
 #: lms/templates/manage_user_standing.html
 msgid "Username:"
@@ -10586,9 +10592,26 @@ msgstr ""
 
 #: lms/templates/ccx/_dashboard_ccx_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "View Course"
-msgstr "Voir le cours"
+msgid "Ended - {end_date}"
+msgstr ""
+
+#: lms/templates/ccx/_dashboard_ccx_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Started - {start_date}"
+msgstr ""
+
+#: lms/templates/ccx/_dashboard_ccx_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Starts - {start_date}"
+msgstr ""
+
+#: lms/templates/ccx/_dashboard_ccx_listing.html
+msgid "View Archived Custom Course"
+msgstr ""
+
+#: lms/templates/ccx/_dashboard_ccx_listing.html
+msgid "View Custom Course"
+msgstr ""
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "CCX Coach Dashboard"
@@ -10971,6 +10994,16 @@ msgstr[1] "{num} points : {text}"
 #: lms/templates/combinedopenended/selfassessment/self_assessment_hint.html
 msgid "Please enter a hint below:"
 msgstr "Merci de saisir un indice ci-dessous :"
+
+#: lms/templates/commerce/checkout_cancel.html
+msgid "Checkout Cancelled"
+msgstr ""
+
+#: lms/templates/commerce/checkout_cancel.html
+msgid ""
+"Your transaction has been cancelled. If you feel an error has occurred, "
+"contact {email}."
+msgstr ""
 
 #: lms/templates/courseware/accordion.html
 msgid "{chapter}, current chapter"
@@ -11821,19 +11854,12 @@ msgid "Enrolled as: "
 msgstr "Inscrit en tant que:"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Ended - {end_date}"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Started - {start_date}"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Starts - {start_date}"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
+msgstr "Voir le cours"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "View Course"
 msgstr "Voir le cours"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html

@@ -46,8 +46,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-04-21 13:42+0000\n"
-"PO-Revision-Date: 2015-04-21 13:46+0000\n"
+"POT-Creation-Date: 2015-04-24 17:00+0000\n"
+"PO-Revision-Date: 2015-04-21 14:10+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Hindi (http://www.transifex.com/projects/p/edx-platform/language/hi/)\n"
 "MIME-Version: 1.0\n"
@@ -2267,6 +2267,7 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: lms/static/js/student_profile/views/learner_profile_factory.js
 msgid "Username"
 msgstr "उपयोगकर्ता नाम"
 
@@ -3397,7 +3398,11 @@ msgid "Full Profile"
 msgstr ""
 
 #: lms/static/js/student_profile/views/learner_profile_factory.js
-msgid "Location"
+msgid "Country"
+msgstr ""
+
+#: lms/static/js/student_profile/views/learner_profile_factory.js
+msgid "Add Country"
 msgstr ""
 
 #: lms/static/js/student_profile/views/learner_profile_factory.js
@@ -4646,7 +4651,6 @@ msgstr ""
 msgid "Click to edit"
 msgstr ""
 
-#: lms/templates/fields/field_readonly.underscore
 #: lms/templates/fields/field_text.underscore
 msgid "title"
 msgstr ""
