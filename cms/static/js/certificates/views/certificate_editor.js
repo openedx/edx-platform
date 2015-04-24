@@ -48,7 +48,8 @@ function(ListItemEditorView, _, $, gettext) {
                 uniqueId: _.uniqueId(),
                 name: this.model.escape('name'),
                 description: this.model.escape('description'),
-                isNew: this.model.isNew()
+                isNew: this.model.isNew(),
+                signatories: this.model.get('signatories')
             };
         },
 
@@ -76,11 +77,22 @@ function(ListItemEditorView, _, $, gettext) {
             );
         },
 
+        setSignatoryAttributes: function() {
+            //initialize the signatory model and set the corresponding attributes.
+            //TODO: we need to make this approach dynamic for signatory collections. e.g. 1 to 4 signatories.
+            //TODO: currently assuming only one signatory in certificate.
+            var signatory = this.model.get('signatories').first();
+            signatory.set('name', this.$('.signatory-name-input').val(), { silent: true });
+            signatory.set('title', this.$('.signatory-title-input').val(), { silent: true });
+            //signatory.set('certificate', this.model , { silent: true });
+            return signatory;
+        },
+
         setValues: function() {
             console.log('certificate_edit.setValues');
             this.setName();
             this.setDescription();
-
+            this.setSignatoryAttributes();
             return this;
         }
 

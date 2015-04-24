@@ -20,6 +20,26 @@
         <li class="collection-description certificate-description">
             <%= description %>
         </li>
+         <header>
+            <label class="title-2"><%= gettext("Course Signatories") %></label>
+         </header>
+        <% signatories.each(function( signatory ) { %>
+
+        <li>
+            <div class="message">
+                <span class="signatory-name-label"><%= gettext('Name') %>: </span>
+                <span class="signatory-name-value"><%= signatory.get('name') %></span>
+
+            </div>
+        </li>
+         <li>
+            <div class="message">
+                <span class="signatory-title-label"><%= gettext('Title') %>: </span>
+                <span class="signatory-title-value"><%= signatory.get('title') %></span>
+
+            </div>
+        </li>
+        <% }); %>
       <% } %>
    </ol>
 

@@ -26,7 +26,7 @@ define([
         console.log("certificate_factory.CertificatesPage.render");
         var certificatesPage = new CertificatesPage({
             el: $('#content'),
-            certificatesCollection: certificatesCollection,
+            certificatesCollection: certificatesCollection
         }).render();
     };
 });

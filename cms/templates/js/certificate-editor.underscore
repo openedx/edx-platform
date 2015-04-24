@@ -25,6 +25,33 @@
                 <span class="tip tip-stacked"><%= gettext("Optional long description") %></span>
             </div>
         </fieldset>
+
+            <header>
+                <label class="title-2" for="certificate-name-<%= uniqueId %>"><%= gettext("Course Signatories") %></label>
+            </header>
+             <% signatories.each(function( signatory ) { %>
+             <div class="input-wrap field text add-signatory-name">
+                <label for="signatory-name-<%= uniqueId %>"><%= gettext("Name 1") %></label>
+                <input id="signatory-name-<%= uniqueId %>" class="signatory-name-input text input-text" name="signatory-name"
+
+
+                placeholder="<%= gettext("Instructor Name") %>" value="<%= signatory.get('name') %>">
+
+                 </input>
+                <span class="tip tip-stacked"><%= gettext("Max 30 characters") %></span>
+            </div>
+            <div class="input-wrap field text add-signatory-title">
+                <label for="signatory-title-<%= uniqueId %>"><%= gettext("Title 1") %></label>
+                <input id="signatory-title-<%= uniqueId %>" class="signatory-title-input text input-text" name="signatory-title"
+                placeholder="<%= gettext("Instructor title") %>" value="<%= signatory.get('title') %>">
+                 </input>
+                <span class="tip tip-stacked"><%= gettext("Max 30 characters") %></span>
+            </div>
+            <% }); %>
+            <div class="actions">
+              <a href="#"><% print(gettext("Add New Signatory")) %></a>
+              <a href="#" style="float: right;"><% print(gettext("Remove Signatory")) %></a>
+            </div>
     </div>
     <div class="actions">
         <button class="action action-primary" type="submit"><% if (isNew) { print(gettext("Create")) } else { print(gettext("Save")) } %></button>
