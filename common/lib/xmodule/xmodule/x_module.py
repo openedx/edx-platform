@@ -555,6 +555,8 @@ class XModuleMixin(XModuleFields, XBlockMixin):
 
         # Skip rebinding if we're already bound a user, and it's this user.
         if self.scope_ids.user_id is not None and user_id == self.scope_ids.user_id:
+            if getattr(xmodule_runtime, 'position', None):
+                self.position = xmodule_runtime.position   # update the position of the tab
             return
 
         # If we are switching users mid-request, save the data from the old user.
