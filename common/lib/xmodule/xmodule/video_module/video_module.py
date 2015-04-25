@@ -218,8 +218,13 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         if getattr(self, 'video_speed_optimizations', True) and cdn_url:
             branding_info = BrandingInfoConfig.get_config().get(self.system.user_location)
 
+        play_video_local = settings.FEATURES.get('PLAY_VIDEO_LOCAL', False)
+        if getattr(self, 'video_speed_optimizations', True) and cdn_url or play_video_local:
             for index, source_url in enumerate(sources):
-                new_url = get_video_from_cdn(cdn_url, source_url)
+                new_url = get_video_from_cdn(
+                    cdn_url,
+                    source_url,
+                    play_video_local=play_video_local)
                 if new_url:
                     sources[index] = new_url
 
