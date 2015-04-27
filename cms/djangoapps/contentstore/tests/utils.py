@@ -12,6 +12,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 from contentstore.utils import reverse_url
 from student.models import Registration
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
+from lms import startup
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.inheritance import own_metadata
@@ -84,7 +85,14 @@ class CourseTestCase(ModuleStoreTestCase):
         self.client = AjaxEnabledTestClient()
         self.client.login(username=self.user.username, password=self.user_password)
 
-        self.course = CourseFactory.create()
+        self.course = CourseFactory.create(
+            org='MITx',
+            number='999',
+            display_name='Robot Super Course',
+        )
+
+        # initialize the Notification subsystem
+        startup.startup_notification_subsystem()
 
     def create_non_staff_authed_user_client(self, authenticate=True):
         """

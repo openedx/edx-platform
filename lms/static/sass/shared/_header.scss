@@ -147,7 +147,7 @@ header.global {
       }
     }
 
-    a.user-link {
+    a.user-link, a.xns-user-notifications {
       @include padding(5px, 12px, 10px, 10px);
       position: relative;
       text-transform: none;
@@ -208,7 +208,6 @@ header.global {
       top: 37px;
       min-width: 120px;
       z-index: 3;
-
       &.expanded {
         display: block;
       }
@@ -260,6 +259,96 @@ header.global {
           &:hover, &:focus {
             color: $base-font-color;
             text-decoration: none;
+          }
+        }
+      }
+      &.xns-pane {
+        width: 330px;
+        height: 400px;
+        font-size: 12px;
+        max-height: 550px;
+        overflow: auto;
+        .xns-content {
+          padding: 15px;
+        }
+        h2 {
+          margin-bottom: 10px;
+          display: block;
+        }
+        .xns-actions {
+          margin-bottom: 20px;
+          ul li {
+            display: inline-block;
+            padding: 0 15px;
+            border-right: 1px solid #ddd;
+            border-top: none;
+            a {
+              color: #328FE0;
+              text-decoration: none;
+            }
+            &:first-child {
+              padding-left: 0;
+            }
+            &:last-child {
+              padding-right: 0;
+              border: none;
+            }
+            &.active a {
+              color: #999;
+              text-decoration: none;
+            }
+            &.disabled a {
+              color: #999;
+              text-decoration: none;
+            }
+          }
+        }
+        .xns-title {
+          color: #328fe0;
+          font-weight: bold;
+        }
+        .xns-alert {
+          color: orange;
+          font-weight: bold;
+        }
+        .xns-username {
+          font-weight: bolder;
+        }
+        .xns-rank {
+          font-weight: bolder;
+        }
+        .xns-date {
+          font-style: italic;
+          color: #888888;
+        }
+        .xns-item{
+          position: relative;
+        }
+        .xns-item-body{
+          padding: 5px;
+          position: relative;
+          width: 96%;
+        }
+        .xns-item:hover .xns-close-item{
+          display: block;
+        }
+        .xns-close-item {
+          background: none repeat scroll 0 0 #fff;
+          border: 1px solid #eee;
+          border-radius: 50%;
+          cursor: pointer;
+          display: none;
+          font-size: 11px;
+          font-weight: bold;
+          height: 16px;
+          position: absolute;
+          right: -7px;
+          text-align: center;
+          top: -7px;
+          width: 16px;
+          opacity: 0.8;
+          &:hover{
+            opacity: 1;
           }
         }
       }

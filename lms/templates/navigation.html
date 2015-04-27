@@ -86,9 +86,19 @@ site_status_msg = get_site_status_msg(course_id)
           </div>
         </a>
       </li>
+      % if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
+        <li class="primary">
+          <a id="xns-user-notifications-dropdown" href="#" class="dropdown xns-user-notifications" aria-haspopup="true" aria-expanded="false">
+            <span class="sr">${_("Notifications Pane")}</span>
+            <i class="xns-icon icon fa fa-bell" aria-hidden="true"></i>
+            <div class='xns-counter'></div>
+          </a>
+          <div class="dropdown-menu xns-pane" aria-label="Notifications DropDown" aria-labelledby="user-notifications-dropdown" role="menu"></div>
+        </li>
+      % endif
       <li class="primary">
-        <a href="#" class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span><i class="fa fa-sort-desc" aria-hidden="true"></i></a>
-        <ul class="dropdown-menu" aria-label="More Options" role="menu">
+        <a id="as" href="#" class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span><i class="fa fa-sort-desc" aria-hidden="true"></i></a>
+        <ul class="dropdown-menu" aria-label="More Options" aria-labelledby="as" role="menu">
           <%block name="navigation_dropdown_menu_links" >
             <li><a href="${reverse('account_settings')}">${_("Account Settings")}</a></li>
             <li><a href="${reverse('learner_profile', kwargs={'username': user.username})}">${_("My Profile")}</a></li>
