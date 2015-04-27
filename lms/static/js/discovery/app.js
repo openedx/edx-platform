@@ -3,7 +3,7 @@
 define(['backbone'], function(Backbone) {
     'use strict';
 
-    return function (Collection, DiscoveryForm, ResultListView) {
+    return function (Collection, DiscoveryForm, ResultListView, searchQuery) {
 
         var collection = new Collection([]);
         var results = new ResultListView({ collection: collection });
@@ -45,6 +45,12 @@ define(['backbone'], function(Backbone) {
             form.showErrorMessage();
             form.hideLoadingIndicator();
         });
+
+
+        // kick off search if URL contains ?search_query=
+        if (searchQuery) {
+            form.doSearch(searchQuery);
+        }
 
     };
 
