@@ -808,11 +808,21 @@ div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler {
   display: none;
 }
 
-
 .wrapper-xblock {
 
     .discussion-preview {
       color: $gray-l1;
       font-style: italic;
     }
+}
+
+// add negative padding and margin to rendered parts of XBlock to display it
+// like a content block in a Unit
+.xblock.wrapper-xblock-base-level {
+  padding: -20px;
+  margin: -20px;
+
+  .xblock-header-secondary {
+    border: 0px;
+  }
 }
