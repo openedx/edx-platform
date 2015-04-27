@@ -6,10 +6,15 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponseBadRequest, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 
+from courseware.access import has_access
+from courseware.courses import get_course_with_access
+from courseware.module_render import get_module_by_usage_id
+from edxmako.shortcuts import render_to_response
 from lti_provider.signature_validator import SignatureValidator
+from opaque_keys.edx.keys import CourseKey
 
 # LTI launch parameters that must be present for a successful launch
 REQUIRED_PARAMETERS = [
@@ -97,7 +102,7 @@ def lti_run(request):
     # Remove the parameters from the session to prevent replay
     del request.session[LTI_SESSION_KEY]
 
-    return render_courseware()
+    return render_courseware(request, params)
 
 
 def get_required_parameters(dictionary, additional_params=None):
@@ -139,7 +144,7 @@ def restore_params_from_session(request):
     return get_required_parameters(session_params, additional_params)
 
 
-def render_courseware():
+def render_courseware(request, lti_params):
     """
     Render the content requested for the LTI launch.
     TODO: This method depends on the current refactoring work on the
@@ -149,4 +154,26 @@ def render_courseware():
     :return: an HttpResponse object that contains the template and necessary
     context to render the courseware.
     """
-    return HttpResponse('TODO: Render refactored courseware view.')
+    usage_id = lti_params['usage_id']
+    course_id = lti_params['course_id']
+    course_key = CourseKey.from_string(course_id)
+    user = request.user
+    course = get_course_with_access(user, 'load', course_key)
+    staff = has_access(request.user, 'staff', course)
+    instance, _ = get_module_by_usage_id(request, course_id, usage_id)
+
+    fragment = instance.render('student_view', context=request.GET)
+
+    context = {
+        'fragment': fragment,
+        'course': course,
+        'disable_accordion': True,
+        'allow_iframing': True,
+        'disable_header': True,
+        'disable_footer': True,
+        'disable_tabs': True,
+        'staff_access': staff,
+        'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
+    }
+
+    return render_to_response('courseware/courseware.html', context)
