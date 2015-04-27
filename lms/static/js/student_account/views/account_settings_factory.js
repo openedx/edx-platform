@@ -6,14 +6,15 @@
         'js/student_account/models/user_account_model',
         'js/student_account/models/user_preferences_model',
         'js/student_account/views/account_settings_fields',
-        'js/student_account/views/account_settings_view'
+        'js/student_account/views/account_settings_view',
+        'xmodule_js/common_static/js/src/string_utils'
     ], function (gettext, $, _, Backbone, Logger, FieldViews, UserAccountModel, UserPreferencesModel,
                  AccountSettingsFieldViews, AccountSettingsView) {
 
         return function (fieldsData, authData, userAccountsApiUrl, userPreferencesApiUrl, accountUserId, platformName) {
 
-            var interpolate_text = window.interpolate_text;
             var accountSettingsElement = $('.wrapper-account-settings');
+            var interpolate_text = window.interpolate_text;
 
             var userAccountModel = new UserAccountModel();
             userAccountModel.url = userAccountsApiUrl;
