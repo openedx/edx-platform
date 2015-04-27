@@ -13,7 +13,10 @@
     % if hidden:
       <div style="display:none;" name="${hidden}" inputid="input_${id}" />
     % endif
-
+        % if question_label != duplicate_question:
+        <p>${question_label}</p>
+        % endif
+    <label>    ${label}
   <input type="text" name="input_${id}" id="input_${id}" aria-label="${label}" aria-describedby="answer_${id}" value="${value|h}"
         % if do_math:
             class="math"
@@ -25,6 +28,7 @@
             style="display:none;"
         % endif
    />
+        </label>
    ${trailing_text | h}
 
       <p class="status" 

@@ -1,7 +1,8 @@
 <% doinline = "inline" if inline else "" %>
 
 <form class="inputtype option-input ${doinline}">
-   <select name="input_${id}" id="input_${id}" aria-label="${label}" aria-describedby="answer_${id}">
+    <label>${question_label}
+   <select name="input_${id}" id="input_${id}"  aria-describedby="answer_${id}">
       <option value="option_${id}_dummy_default">  </option>
       % for option_id, option_description in options:
           <option value="${option_id}"
@@ -11,7 +12,7 @@
           > ${option_description}</option>
       % endfor
     </select>
-
+    </label>
   <span id="answer_${id}"></span>  
   <span class="status ${status.classname}"
       id="status_${id}"

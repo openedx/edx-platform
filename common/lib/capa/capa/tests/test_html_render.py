@@ -148,10 +148,6 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # Expect problem has been turned into a <div>
         self.assertEqual(rendered_html.tag, "div")
 
-        # Expect question text is in a <p> child
-        question_element = rendered_html.find("p")
-        self.assertEqual(question_element.text, "Test question")
-
         # Expect that the response has been turned into a <span>
         response_element = rendered_html.find("span")
         self.assertEqual(response_element.tag, "span")
@@ -174,6 +170,25 @@ class CapaHtmlRenderTest(unittest.TestCase):
             'status': the_system.STATUS_CLASS('unsubmitted'),
             'label': '',
             'value': '',
+            'question_label': 'Test question',
+            'duplicate_question': '',
+            'preprocessor': None,
+            'msg': '',
+            'inline': False,
+            'hidden': False,
+            'do_math': False,
+            'id': '1_2_1',
+            'trailing_text': '',
+            'size': None,
+        }
+
+        expected_textline_ql_context = {
+            'STATIC_URL': '/dummy-static/',
+            'status': the_system.STATUS_CLASS('unsubmitted'),
+            'label': '',
+            'value': '',
+            'question_label': 'Test question',
+            'duplicate_question': 'Test question',
             'preprocessor': None,
             'msg': '',
             'inline': False,
@@ -189,7 +204,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         expected_calls = [
             mock.call('textline.html', expected_textline_context),
             mock.call('solutionspan.html', expected_solution_context),
-            mock.call('textline.html', expected_textline_context),
+            mock.call('textline.html', expected_textline_ql_context),
             mock.call('solutionspan.html', expected_solution_context)
         ]
 

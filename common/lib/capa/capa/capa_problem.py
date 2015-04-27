@@ -139,6 +139,9 @@ class LoncapaProblem(object):
         self.do_reset()
         self.problem_id = id
         self.capa_system = capa_system
+        self.question_label = ""
+        self.duplicate_question = ""
+        self.custom_added_responders = ['customresponse', 'imageresponse', 'formularesponse', 'jsmeresponse']
 
         state = state or {}
 
@@ -732,6 +735,8 @@ class LoncapaProblem(object):
                 'status': status,
                 'id': input_id,
                 'input_state': self.input_state[input_id],
+                'question_label': self.question_label,
+                'duplicate_question': self.duplicate_question,
                 'answervariable': answervariable,
                 'feedback': {
                     'message': msg,
@@ -739,6 +744,8 @@ class LoncapaProblem(object):
                     'hintmode': hintmode,
                 }
             }
+            if self.question_label:
+                self.duplicate_question = self.question_label
 
             input_type_cls = inputtypes.registry.get_class_for_tag(problemtree.tag)
             # save the input type so that we can make ajax calls on it if we need to
@@ -762,8 +769,36 @@ class LoncapaProblem(object):
         tree = etree.Element(problemtree.tag)
         for item in problemtree:
             item_xhtml = self._extract_html(item)
+            item_sibling = self.get_sibling(problemtree, item)
+            item_child = self.get_child(item)
             if item_xhtml is not None:
-                tree.append(item_xhtml)
+                # Extract the problem question and add it in html two conditions for a element to be a question
+                # Either the child of current element would have been in the responders
+                # Or the sibling of the current element would be in responders and a <p>
+                if item_child is not None and item_child in self.responders:
+                    # if immediate child of current element is in responder then only remove text and add remaining
+                    self.question_label = item_xhtml.text
+                    item_xhtml.text = ""
+                    item_xhtml.attrib['id'] = "question_" + str(self.responders.get(item_child).id)
+                    tree.append(item_xhtml)
+                elif item_sibling is not None and item_sibling in self.responders and item_xhtml.tag == "p":
+                    # if immediate sibling of current element is in the responder then check if it is in custom added
+                    # responders
+                    if any(responder in self.custom_added_responders for
+                           responder in self.responders.get(item_sibling).tags):
+                        # custom added responders are those which should be added from here and not from html
+                        if "formularesponse" in self.responders.get(item_sibling).tags:
+                            item_xhtml.tag = "label"
+                            item_xhtml.attrib['id'] = "question_" + str(self.responders.get(item_sibling).id)
+                            item_xhtml.attrib['for'] = "input_" + str(self.responders.get(item_sibling).answer_id)
+                            tree.append(item_xhtml)
+                        else:
+                            tree.append(item_xhtml)
+                    else:
+                        self.question_label = item_xhtml.text
+                else:
+                    # add all other elements which are not question elements
+                    tree.append(item_xhtml)
 
         if tree.tag in html_transforms:
             tree.tag = html_transforms[problemtree.tag]['tag']
@@ -834,3 +869,28 @@ class LoncapaProblem(object):
         for solution in tree.findall('.//solution'):
             solution.attrib['id'] = "%s_solution_%i" % (self.problem_id, solution_id)
             solution_id += 1
+
+    def get_sibling(self, tree, node):
+        """
+        Check if node exist in problem tree and return next sibling if exist
+        else return None
+        """
+        problem_tree = tree.xpath('//problem/*')
+        if node in problem_tree:
+            node_index = problem_tree.index(node)
+            try:
+                return problem_tree[node_index + 1]
+            except IndexError:
+                return None
+        else:
+            return None
+
+    def get_child(self, tree):
+        """
+        Get 1st child of the tree if there are any children
+        """
+        problem_tree = tree.xpath('./*')
+        if problem_tree:
+            return problem_tree[0]
+        else:
+            return None
