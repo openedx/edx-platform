@@ -27,6 +27,12 @@
   <%static:include path="dashboard/${template_name}.underscore" />
 </script>
 % endfor
+
+% for template_name in ["dashboard_search_item", "dashboard_search_results", "search_loading", "search_error"]:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="search/${template_name}.underscore" />
+</script>
+% endfor
 </%block>
 
 <%block name="js_extra">
@@ -69,8 +75,8 @@
     <header class="wrapper-header-courses">
       <h2 class="header-courses">${_("Current Courses")}</h2>
     </header>
-      
-      
+
+
     % if len(course_enrollment_pairs) > 0:
       <ul class="listing-courses">
       <% share_settings = settings.FEATURES.get('DASHBOARD_SHARE_SETTINGS', {}) %>
@@ -126,7 +132,32 @@
       </div>
     % endif
   </section>
-  <section class="profile-sidebar" role="region" aria-label="User info">
+
+  % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
+    <div id="dashboard-search-bar" class="search-bar dashboard-search-bar" role="search" aria-label="Dashboard">
+      <form>
+        <label for="dashboard-search-input">${_('Search Your Courses')}</label>
+        <div class="search-field-wrapper">
+          <input id="dashboard-search-input" type="text" class="search-field"/>
+          <button type="submit" class="search-button" aria-label="${_('Search')}">
+            <i class="icon fa fa-search" aria-hidden="true"></i>
+          </button>
+          <button type="button" class="cancel-button" aria-label="${_('Clear search')}">
+            <i class="icon fa fa-remove" aria-hidden="true"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  % endif
+
+  % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
+    <section id="dashboard-search-results" class="search-results dashboard-search-results"></section>
+  % endif
+
+  <section class="profile-sidebar" id="profile-sidebar" role="region" aria-label="User info">
+    <header class="profile">
+      <h2 class="username-header"><span class="sr">${_("Username")}: </span><span class="username-label">${ user.username }</span></h2>
+    </header>
     <section class="user-info">
       <ul>
         <li class="heads-up">

@@ -357,6 +357,9 @@ FEATURES = {
     # Courseware search feature
     'ENABLE_COURSEWARE_SEARCH': False,
 
+    # Dashboard search feature
+    'ENABLE_DASHBOARD_SEARCH': False,
+
     # log all information from cybersource callbacks
     'LOG_POSTPAY_CALLBACKS': True,
 
@@ -1103,7 +1106,7 @@ courseware_js = (
         for pth in ['courseware', 'histogram', 'navigation', 'time']
     ] +
     ['js/' + pth + '.js' for pth in ['ajax-error']] +
-    ['js/search/main.js'] +
+    ['js/search/course/main.js'] +
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.js'))
 )
 
@@ -1135,7 +1138,10 @@ main_vendor_js = base_vendor_js + [
     'js/vendor/URI.min.js',
 ]
 
-dashboard_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/dashboard/**/*.js'))
+dashboard_js = (
+    sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/dashboard/**/*.js')) +
+    ['js/search/dashboard/main.js']
+)
 discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
 rwd_header_footer_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/common_helpers/rwd_header_footer.js'))
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
@@ -2215,6 +2221,8 @@ PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM = 12
 SEARCH_ENGINE = None
 # Use the LMS specific result processor
 SEARCH_RESULT_PROCESSOR = "lms.lib.courseware_search.lms_result_processor.LmsSearchResultProcessor"
+# Use the LMS specific filter generator
+SEARCH_FILTER_GENERATOR = "lms.lib.courseware_search.lms_filter_generator.LmsSearchFilterGenerator"
 
 ### PERFORMANCE EXPERIMENT SETTINGS ###
 # CDN experiment/monitoring flags

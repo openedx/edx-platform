@@ -2,7 +2,7 @@
 
 define([
     'backbone',
-    'js/search/models/search_result'
+    'js/search/base/models/search_result'
 ], function (Backbone, SearchResult) {
     'use strict';
 
@@ -11,6 +11,7 @@ define([
         model: SearchResult,
         pageSize: 20,
         totalCount: 0,
+        latestModelsCount: 0,
         accessDeniedCount: 0,
         searchTerm: '',
         page: 0,
@@ -20,17 +21,15 @@ define([
         initialize: function (models, options) {
             // call super constructor
             Backbone.Collection.prototype.initialize.apply(this, arguments);
-            if (options && options.course_id) {
-                this.url += options.course_id;
+            if (options && options.courseId) {
+                this.url += options.courseId;
             }
         },
 
         performSearch: function (searchTerm) {
             this.fetchXhr && this.fetchXhr.abort();
             this.searchTerm = searchTerm || '';
-            this.totalCount = 0;
-            this.accessDeniedCount = 0;
-            this.page = 0;
+            this.resetState();
             this.fetchXhr = this.fetch({
                 data: {
                     search_string: searchTerm,
@@ -71,20 +70,34 @@ define([
 
         cancelSearch: function () {
             this.fetchXhr && this.fetchXhr.abort();
-            this.page = 0;
-            this.totalCount = 0;
-            this.accessDeniedCount = 0;
+            this.resetState();
         },
 
         parse: function(response) {
+            this.latestModelsCount = response.results.length;
             this.totalCount = response.total;
             this.accessDeniedCount += response.access_denied_count;
             this.totalCount -= this.accessDeniedCount;
-            return _.map(response.results, function(result){ return result.data; });
+            return _.map(response.results, function (result) {
+                return result.data;
+            });
+        },
+
+        resetState: function () {
+            this.page = 0;
+            this.totalCount = 0;
+            this.latestModelsCount = 0;
+            this.accessDeniedCount = 0;
+            // empty the entire collection
+            this.reset();
         },
 
         hasNextPage: function () {
             return this.totalCount - ((this.page + 1) * this.pageSize) > 0;
+        },
+
+        latestModels: function () {
+            return this.last(this.latestModelsCount);
         }
 
     });
