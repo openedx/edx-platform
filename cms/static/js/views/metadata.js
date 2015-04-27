@@ -6,7 +6,8 @@ define(
         "js/views/video/transcripts/metadata_videolist",
         "js/views/video/translations_editor"
     ],
-function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, LicenseModel, LicenseView, VideoList, VideoTranslations) {
+function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
+         LicenseModel, LicenseView, VideoList, VideoTranslations) {
     var Metadata = {};
 
     Metadata.Editor = BaseView.extend({

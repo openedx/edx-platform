@@ -55,15 +55,6 @@ class HtmlFields(object):
         scope=Scope.settings
     )
 
-    @property
-    def non_editable_metadata_fields(self):
-        """
-        `data` should not be editable in the Studio settings editor.
-        """
-        non_editable_fields = super(HtmlFields, self).non_editable_metadata_fields
-        non_editable_fields.append(HtmlFields.data)
-        return non_editable_fields
-
 
 class HtmlModuleMixin(HtmlFields, XModule):
     """
@@ -312,15 +303,6 @@ class AboutFields(object):
         scope=Scope.content
     )
 
-    @property
-    def non_editable_metadata_fields(self):
-        """
-        `data` should not be editable in the Studio settings editor.
-        """
-        non_editable_fields = super(AboutFields, self).non_editable_metadata_fields
-        non_editable_fields.append(AboutFields.data)
-        return non_editable_fields
-
 
 @XBlock.tag("detached")
 class AboutModule(AboutFields, HtmlModuleMixin):
@@ -358,15 +340,6 @@ class StaticTabFields(object):
         help=_("HTML for the additional pages")
     )
 
-    @property
-    def non_editable_metadata_fields(self):
-        """
-        `data` should not be editable in the Studio settings editor.
-        """
-        non_editable_fields = super(StaticTabFields, self).non_editable_metadata_fields
-        non_editable_fields.append(StaticTabFields.data)
-        return non_editable_fields
-
 
 @XBlock.tag("detached")
 class StaticTabModule(StaticTabFields, HtmlModuleMixin):
@@ -400,15 +373,6 @@ class CourseInfoFields(object):
         default=u"<ol></ol>",
         scope=Scope.content
     )
-
-    @property
-    def non_editable_metadata_fields(self):
-        """
-        `data` should not be editable in the Studio settings editor.
-        """
-        non_editable_fields = super(CourseInfoFields, self).non_editable_metadata_fields
-        non_editable_fields.append(CourseInfoFields.data)
-        return non_editable_fields
 
 
 @XBlock.tag("detached")

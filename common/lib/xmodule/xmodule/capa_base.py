@@ -200,15 +200,6 @@ class CapaFields(object):
         scope=Scope.settings
     )
 
-    @property
-    def non_editable_metadata_fields(self):
-        """
-        `data` should not be editable in the Studio settings editor.
-        """
-        non_editable_fields = super(CapaFields, self).non_editable_metadata_fields
-        non_editable_fields.append(CapaFields.data)
-        return non_editable_fields
-
 
 class CapaMixin(CapaFields):
     """

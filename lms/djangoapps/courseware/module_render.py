@@ -67,6 +67,7 @@ from openedx.core.lib.xblock_utils import (
 )
 from xmodule.lti_module import LTIModule
 from xmodule.x_module import XModuleDescriptor
+from xmodule.mixin import wrap_with_license
 from xblock_django.user_service import DjangoXBlockUserService
 from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
@@ -532,6 +533,9 @@ def get_module_system_for_user(user, field_data_cache,
     # Build a list of wrapping functions that will be applied in order
     # to the Fragment content coming out of the xblocks that are about to be rendered.
     block_wrappers = []
+
+    if settings.FEATURES.get("LICENSING", False):
+        block_wrappers.append(wrap_with_license)
 
     # Wrap the output display in a single div to allow for the XModule
     # javascript to be bound correctly
