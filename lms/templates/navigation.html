@@ -48,7 +48,7 @@ site_status_msg = get_site_status_msg(course_id)
     </h1>
 
     % if course:
-    <h2><span class="provider">${course.display_org_with_default | h}:</span> 
+    <h2><span class="provider">${course.display_org_with_default | h}:</span>
       ${course.display_number_with_default | h}
       <%
         display_name = course.display_name_with_default
@@ -76,7 +76,19 @@ site_status_msg = get_site_status_msg(course_id)
         %endif
       </%block>
     </ol>
+
     <ol class="user">
+      % if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
+        <li class="primary">
+          <a id="xns-user-notifications-dropdown" href="#" class="xns-user-notifications xns-icon" aria-haspopup="true" aria-expanded="false">
+            <span class="sr">${_("Notifications Pane")}</span>
+              <i class="icon fa fa-bell" aria-hidden="true"></i>
+              <div class='xns-counter'></div>
+              <i class="fa fa-sort-desc" aria-hidden="true"></i>
+          </a>
+          <div class="dropdown-menu xns-pane" aria-label="Notifications DropDown" aria-labelledby="user-notifications-dropdown" role="menu"></div>
+        </li>
+      % endif
       <li class="primary">
         <a href="${reverse('dashboard')}" class="user-link">
           <i class="icon fa fa-home" aria-hidden="true"></i>
@@ -86,16 +98,6 @@ site_status_msg = get_site_status_msg(course_id)
           </div>
         </a>
       </li>
-      % if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
-        <li class="primary">
-          <a id="xns-user-notifications-dropdown" href="#" class="dropdown xns-user-notifications" aria-haspopup="true" aria-expanded="false">
-            <span class="sr">${_("Notifications Pane")}</span>
-            <i class="xns-icon icon fa fa-bell" aria-hidden="true"></i>
-            <div class='xns-counter'></div>
-          </a>
-          <div class="dropdown-menu xns-pane" aria-label="Notifications DropDown" aria-labelledby="user-notifications-dropdown" role="menu"></div>
-        </li>
-      % endif
       <li class="primary">
         <a id="as" href="#" class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span><i class="fa fa-sort-desc" aria-hidden="true"></i></a>
         <ul class="dropdown-menu" aria-label="More Options" aria-labelledby="as" role="menu">

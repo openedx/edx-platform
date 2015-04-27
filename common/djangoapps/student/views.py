@@ -682,7 +682,7 @@ def dashboard(request):
             'notification_types': get_all_notification_types(),
             'global_variables': {
                 'app_name': 'Notification Test Server',
-                'hide_link_is_visible': settings.HIDE_LINK_IS_VISIBLE,
+                'hide_link_is_visible': getattr(settings, "HIDE_LINK_IS_VISIBLE", False),
                 'always_show_dates_on_unread': True,
             },
             # for test purposes, set up a short-poll which contacts the server

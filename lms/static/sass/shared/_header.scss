@@ -266,17 +266,26 @@ header.global {
         width: 330px;
         height: 400px;
         font-size: 12px;
+        font-family: "Open Sans";
         max-height: 550px;
         overflow: auto;
+        .ui-loading {
+
+        }
         .xns-content {
-          padding: 15px;
+          padding: 0px;
         }
         h2 {
-          margin-bottom: 10px;
-          display: block;
+          font-family: "Open Sans";
+          margin-bottom: 7px;
+          display: none;
+          font-weight: 700;
+        }
+        h3 {
+          font-family: "Open Sans";
         }
         .xns-actions {
-          margin-bottom: 20px;
+          margin-bottom: 5px;
           ul li {
             display: inline-block;
             padding: 0 15px;
@@ -325,7 +334,7 @@ header.global {
           position: relative;
         }
         .xns-item-body{
-          padding: 5px;
+          padding: 4px 15px;
           position: relative;
           width: 96%;
         }
@@ -342,9 +351,9 @@ header.global {
           font-weight: bold;
           height: 16px;
           position: absolute;
-          right: -7px;
+          right: 0px;
           text-align: center;
-          top: -7px;
+          top: 4px;
           width: 16px;
           opacity: 0.8;
           &:hover{
