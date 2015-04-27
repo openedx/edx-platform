@@ -38,9 +38,8 @@
                     error: function () {
                         view.showNotificationMessage(
                             view.indicators.error +
-                            gettext(
-                                'You must sign out of edX and sign back in before your language ' +
-                                'changes take effect.'
+                            interpolate_text(
+                                gettext('You must sign out of {platformName} and sign back in before your language changes take effect.'), {platformName: platformName}
                             )
                         );
                     }

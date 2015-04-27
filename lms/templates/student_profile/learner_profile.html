@@ -1,6 +1,8 @@
 <%! import json %>
+<%! from django.conf import settings %>
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils.translation import ugettext as _ %>
+<%! from microsite_configuration import microsite %>
 
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
@@ -39,7 +41,8 @@
           (function (require) {
             require(['js/student_profile/views/learner_profile_factory'], function(setupLearnerProfile) {
                 var options = ${ json.dumps(data) };
-                setupLearnerProfile(options);
+                var platformName = ${ json.dumps(microsite.get_value('platform_name', settings.PLATFORM_NAME))};
+                setupLearnerProfile(options, platformName);
             });
           }).call(this, require || RequireJS.require);
     </script>
