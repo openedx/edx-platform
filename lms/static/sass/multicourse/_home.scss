@@ -1,5 +1,6 @@
 $title-left-margin: grid-width(2) + $gw-gutter;
 $title-width: flex-grid(6);
+$button-width: $baseline*2.75;
 $course-search-input-height: ($baseline*2.8);
 
 .home {
@@ -89,6 +90,7 @@ $course-search-input-height: ($baseline*2.8);
 
         .search-input {
           @include float(left);
+          @include padding-right($button-width);
           @include padding-left($baseline*0.5);
           @extend %ui-depth1;
           @extend %t-icon4;
@@ -110,7 +112,7 @@ $course-search-input-height: ($baseline*2.8);
       }
 
       .search-button {
-        @include left(-$baseline*2.75);
+        @include left(-$button-width);
         @extend %ui-depth2;
         @extend %t-icon3;
         @extend %t-strong;
