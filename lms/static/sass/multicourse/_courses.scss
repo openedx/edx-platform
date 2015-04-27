@@ -95,9 +95,10 @@
     @extend %ui-depth1;
     @extend %t-icon4;
     @extend %t-demi-strong;
+    @include border-radius(0);
+    @include border-top-left-radius(3px);
+    @include border-bottom-left-radius(3px);
     border: 2px solid $gray-l3;
-    border-top-left-radius: 3px;
-    border-bottom-left-radius: 3px;
     height: $course-search-input-height;
     color: $black;
     font-style: normal;
@@ -113,7 +114,8 @@
     @extend %ui-depth2;
     @extend %t-icon3;
     @extend %t-strong;
-    margin-left: -2px;
+    @include margin-left(-2px);
+    position: relative;
     border: 2px solid $m-blue-d1;
     border-radius: ($baseline*0.1);
     box-shadow: none;
@@ -123,7 +125,6 @@
     color: $white;
     text-shadow: none;
 
-    // STATE: hover and focus
     &:hover, &:focus {
       background: $m-blue-l1;
     }
