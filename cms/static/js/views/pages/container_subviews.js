@@ -50,27 +50,20 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
         });
 
         /**
-         * A controller for updating the "View Live" and "Preview" buttons.
+         * A controller for updating the "View Live" button.
          */
-        var PreviewActionController = ContainerStateListenerView.extend({
+        var ViewLiveButtonController = ContainerStateListenerView.extend({
             shouldRefresh: function(model) {
-                return ViewUtils.hasChangedAttributes(model, ['has_changes', 'published']);
+                return ViewUtils.hasChangedAttributes(model, ['published']);
             },
 
             render: function() {
-                var previewAction = this.$el.find('.button-preview'),
-                    viewLiveAction = this.$el.find('.button-view');
+                var viewLiveAction = this.$el.find('.button-view');
                 if (this.model.get('published')) {
                     viewLiveAction.removeClass(disabledCss).attr('aria-disabled', false);
                 }
                 else {
                     viewLiveAction.addClass(disabledCss).attr('aria-disabled', true);
-                }
-                if (this.model.get('has_changes') || !this.model.get('published')) {
-                    previewAction.removeClass(disabledCss).attr('aria-disabled', false);
-                }
-                else {
-                    previewAction.addClass(disabledCss).attr('aria-disabled', true);
                 }
             }
         });
@@ -256,7 +249,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
 
         return {
             'MessageView': MessageView,
-            'PreviewActionController': PreviewActionController,
+            'ViewLiveButtonController': ViewLiveButtonController,
             'Publisher': Publisher,
             'PublishHistory': PublishHistory
         };
