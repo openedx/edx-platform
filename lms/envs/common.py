@@ -1974,6 +1974,7 @@ ALL_LANGUAGES = (
 ### Apps only installed in some instances
 OPTIONAL_APPS = (
     'mentoring',
+    'problem_builder',
 
     # edx-ora2
     'submissions',
