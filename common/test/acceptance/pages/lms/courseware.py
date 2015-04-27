@@ -92,7 +92,7 @@ class CoursewarePage(CoursePage):
         """
         return the url of the active subsection in the left nav
         """
-        return self.q(css='.chapter ul li.active a').attrs('href')[0]
+        return self.q(css='.chapter-content-container ol li.active a').attrs('href')[0]
 
 
 class CoursewareSequentialTabPage(CoursePage):
