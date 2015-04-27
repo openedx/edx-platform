@@ -1157,6 +1157,18 @@ def _update_module_location(module, new_location):
             module.get_explicitly_set_fields_by_scope(Scope.settings).keys()
         )
 
+        old_metadata = {}
+
+        # Getting the metadata without new location
+        for rekey_field_name in rekey_fields:
+            # key-value store information from module
+
+            # pylint: disable=protected-access
+            kvs_key = module._field_data._key(module, rekey_field_name)
+            kvs_value = module.xblock_kvs.get(kvs_key)
+
+            old_metadata[rekey_field_name] = (kvs_key, kvs_value)
+
     module.location = new_location
 
     # Pure XBlocks store the field data in a key-value store
@@ -1167,5 +1179,15 @@ def _update_module_location(module, new_location):
     # explicitly set each field to its current value before triggering the save.
     if len(rekey_fields) > 0:
         for rekey_field_name in rekey_fields:
+            # updating the KvsFieldData with the new location
+
+            # current key-value store key for the rekey_field_name
+            # pylint: disable=protected-access
+            kvs_key = module._field_data._key(module, rekey_field_name)
+
+            # deleting the old_kvs_key from module and update it with new one
+            module.xblock_kvs.delete(old_metadata[rekey_field_name][0])
+            module.xblock_kvs.set(kvs_key, old_metadata[rekey_field_name][1])
+
             setattr(module, rekey_field_name, getattr(module, rekey_field_name))
         module.save()
