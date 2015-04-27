@@ -8,11 +8,12 @@
         'js/student_profile/views/learner_profile_fields',
         'js/student_profile/views/learner_profile_view',
         'js/student_account/views/account_settings_fields',
-        'js/views/message_banner'
+        'js/views/message_banner',
+        'xmodule_js/common_static/js/src/string_utils'
     ], function (gettext, $, _, Backbone, Logger, AccountSettingsModel, AccountPreferencesModel, FieldsView,
                  LearnerProfileFieldsView, LearnerProfileView, AccountSettingsFieldViews, MessageBannerView) {
 
-        return function (options) {
+        return function (options, platformName) {
 
             var learnerProfileElement = $('.wrapper-profile');
             var defaultVisibility = options.default_visibility;
@@ -40,7 +41,9 @@
                 required: true,
                 editable: 'always',
                 showMessages: false,
-                title: gettext('edX learners can see my:'),
+                title: interpolate_text(
+                    gettext('{platformName} learners can see my:'), {platformName: platformName}
+                ),
                 valueAttribute: "account_privacy",
                 options: [
                     ['private', gettext('Limited Profile')],
@@ -101,7 +104,9 @@
                     editable: editable,
                     showMessages: false,
                     title: gettext('About me'),
-                    placeholderValue: gettext("Tell other edX learners a little about yourself: where you live, what your interests are, why you're taking courses on edX, or what you hope to learn."),
+                    placeholderValue: interpolate_text(
+                        gettext("Tell other {platformName} learners a little about yourself: where you live, what your interests are, why you're taking courses on {platformName}, or what you hope to learn."), {platformName: platformName}
+                    ),
                     valueAttribute: "bio",
                     helpMessage: ''
                 })

@@ -6,13 +6,15 @@
         'js/student_account/models/user_account_model',
         'js/student_account/models/user_preferences_model',
         'js/student_account/views/account_settings_fields',
-        'js/student_account/views/account_settings_view'
+        'js/student_account/views/account_settings_view',
+        'xmodule_js/common_static/js/src/string_utils'
     ], function (gettext, $, _, Backbone, Logger, FieldViews, UserAccountModel, UserPreferencesModel,
                  AccountSettingsFieldViews, AccountSettingsView) {
 
-        return function (fieldsData, authData, userAccountsApiUrl, userPreferencesApiUrl, accountUserId) {
+        return function (fieldsData, authData, userAccountsApiUrl, userPreferencesApiUrl, accountUserId, platformName) {
 
             var accountSettingsElement = $('.wrapper-account-settings');
+            var interpolate_text = window.interpolate_text;
 
             var userAccountModel = new UserAccountModel();
             userAccountModel.url = userAccountsApiUrl;
@@ -29,7 +31,9 @@
                                 model: userAccountModel,
                                 title: gettext('Username'),
                                 valueAttribute: 'username',
-                                helpMessage: gettext('The name that identifies you on the edX site. You cannot change your username.')
+                                helpMessage: interpolate_text(
+                                    gettext('The name that identifies you on the {platformName} site. You cannot change your username.'), {platformName: platformName}
+                                )
                             })
                         },
                         {
@@ -37,7 +41,9 @@
                                 model: userAccountModel,
                                 title: gettext('Full Name'),
                                 valueAttribute: 'name',
-                                helpMessage: gettext('The name that appears on your edX certificates. Other learners never see your full name.')
+                                helpMessage: interpolate_text(
+                                    gettext('The name that appears on your {platformName} certificates. Other learners never see your full name.'), {platformName: platformName}
+                                )
                             })
                         },
                         {
@@ -45,7 +51,9 @@
                                 model: userAccountModel,
                                 title: gettext('Email Address'),
                                 valueAttribute: 'email',
-                                helpMessage: gettext('The email address you use to sign in to edX. Communications from edX and your courses are sent to this address.')
+                                helpMessage: interpolate_text(
+                                    gettext('The email address you use to sign in to {platformName}. Communications from {platformName} and your courses are sent to this address.'), {platformName: platformName}
+                                )
                             })
                         },
                         {
@@ -67,8 +75,9 @@
                                 valueAttribute: 'pref-lang',
                                 required: true,
                                 refreshPageOnSave: true,
-                                helpMessage:
-                                    gettext('The language used for the edX site. The site is currently available in a limited number of languages.'),
+                                helpMessage: interpolate_text(
+                                    gettext('The language used for the {platformName} site. The site is currently available in a limited number of languages.'), {platformName: platformName}
+                                ),
                                 options: fieldsData.language.options
                             })
                         },
