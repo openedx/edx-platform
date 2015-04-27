@@ -103,9 +103,7 @@
                     editable: editable,
                     showMessages: false,
                     title: gettext('About me'),
-                    placeholderValue: interpolate_text(
-                        gettext("Tell other {platform_name} learners a little about yourself: where you live, what your interests are, why you're taking courses on {platform_name}, or what you hope to learn."), {platform_name: options.platform_name}
-                    ),
+                    placeholderValue: gettext("Tell other learners a little about yourself: where you live, what your interests are, why you're taking courses, or what you hope to learn."),
                     valueAttribute: "bio",
                     helpMessage: ''
                 })

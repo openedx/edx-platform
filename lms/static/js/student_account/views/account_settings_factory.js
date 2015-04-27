@@ -30,7 +30,7 @@
                                 title: gettext('Username'),
                                 valueAttribute: 'username',
                                 helpMessage: interpolate_text(
-                                    gettext('The name that identifies you on the {platform_name} site. You cannot change your username.'), {platform_name: platformName}
+                                    gettext('The name that identifies you throughout {platform_name}. You cannot change your username.'), {platform_name: platformName}
                                 )
                             })
                         },
@@ -39,9 +39,7 @@
                                 model: userAccountModel,
                                 title: gettext('Full Name'),
                                 valueAttribute: 'name',
-                                helpMessage: interpolate_text(
-                                    gettext('The name that appears on your {platform_name} certificates. Other learners never see your full name.'), {platform_name: platformName}
-                                )
+                                helpMessage: gettext('The name that appears on your certificates. Other learners never see your full name.')
                             })
                         },
                         {
@@ -50,7 +48,7 @@
                                 title: gettext('Email Address'),
                                 valueAttribute: 'email',
                                 helpMessage: interpolate_text(
-                                    gettext('The email address you use to sign in to {platform_name}. Communications from {platform_name} and your courses are sent to this address.'), {platform_name: platformName}
+                                    gettext('The email address you use to sign in. Communications from {platform_name} and your courses are sent to this address.'), {platform_name: platformName}
                                 )
                             })
                         },
@@ -74,7 +72,7 @@
                                 required: true,
                                 refreshPageOnSave: true,
                                 helpMessage: interpolate_text(
-                                    gettext('The language used for the {platform_name} site. The site is currently available in a limited number of languages.'), {platform_name: platformName}
+                                    gettext('The language used throughout this site. This site is currently available in a limited number of languages.'), {platform_name: platformName}
                                 ),
                                 options: fieldsData.language.options
                             })
