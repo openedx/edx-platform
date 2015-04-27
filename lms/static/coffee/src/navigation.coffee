@@ -2,7 +2,7 @@ class @Navigation
   constructor: ->
     if $('#accordion').length
       # First look for an active section
-      active = $('#accordion ul:has(li.active)').index('#accordion ul')
+      active = $('#accordion div div ol:has(li.active)').index('#accordion div div ol')
       # if we didn't find one, look for an active chapter
       if active < 0
         active = $('#accordion h3.active').index('#accordion h3')
