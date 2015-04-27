@@ -27,7 +27,7 @@ git+https://github.com/mfogel/django-settings-context-processor.git@b758c3930862
 git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b
 
 # Our libraries:
--e git+https://github.com/edx/XBlock.git@aed464a0e2f7478e93157150ac04133a745f5f46#egg=XBlock
+-e git+https://github.com/edx/XBlock.git@1934a2978cdd3e2414486c74b76e3040ff1fb138#egg=XBlock
 -e git+https://github.com/edx/codejail.git@6b17c33a89bef0ac510926b1d7fea2748b73aadd#egg=codejail
 -e git+https://github.com/edx/js-test-tool.git@v0.1.6#egg=js_test_tool
 -e git+https://github.com/edx/event-tracking.git@0.1.0#egg=event-tracking

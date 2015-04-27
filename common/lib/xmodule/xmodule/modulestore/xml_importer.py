@@ -1154,7 +1154,8 @@ def _update_module_location(module, new_location):
     else:
         rekey_fields = (
             module.get_explicitly_set_fields_by_scope(Scope.content).keys() +
-            module.get_explicitly_set_fields_by_scope(Scope.settings).keys()
+            module.get_explicitly_set_fields_by_scope(Scope.settings).keys() +
+            module.get_explicitly_set_fields_by_scope(Scope.children).keys()
         )
 
     module.location = new_location
