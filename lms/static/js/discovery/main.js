@@ -8,6 +8,11 @@ RequireJS.require([
 ], function ($, Backbone, App, Collection, DiscoveryForm, ResultListView) {
     'use strict';
 
-    var app = new App(Collection, DiscoveryForm, ResultListView);
+    var app = new App(
+        Collection,
+        DiscoveryForm,
+        ResultListView,
+        getParameterByName('search_query')
+    );
 
 });
