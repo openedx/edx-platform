@@ -90,4 +90,43 @@
     padding-top: ($baseline*3);
     @include columns(2 20px);
   }
+
+
+  .discovery-input {
+    @extend %ui-depth1;
+    @extend %t-icon4;
+    @extend %t-demi-strong;
+    border: 2px solid $gray-l3;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+    height: $course-search-input-height;
+    color: $black;
+    font-style: normal;
+
+    &:focus {
+      @extend %no-outline;
+      box-shadow: none;
+      border-color: $m-blue-d1;
+    }
+  }
+
+  .discovery-submit {
+    @extend %ui-depth2;
+    @extend %t-icon3;
+    @extend %t-strong;
+    margin-left: -2px;
+    border: 2px solid $m-blue-d1;
+    border-radius: ($baseline*0.1);
+    box-shadow: none;
+    background: $m-blue-d5;
+    padding: 0 ($baseline*0.7);
+    height: $course-search-input-height;
+    color: $white;
+    text-shadow: none;
+
+    // STATE: hover and focus
+    &:hover, &:focus {
+      background: $m-blue-l1;
+    }
+  }
 }
