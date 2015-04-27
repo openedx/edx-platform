@@ -20,29 +20,29 @@
       </h3>
     </button>
     <div class="chapter-content-container">
-    <div id="${chapter['display_id']}-child" role="region" aria-labelledby="${chapter['display_id']}-parent" aria-hidden="false">
-    <ol>
-      % for section in chapter['sections']:
-          <li class="${'active' if 'active' in section and section['active'] else ''} ${'graded'  if 'graded' in section and section['graded'] else ''}">
-            <a href="${reverse('courseware_section', args=[course_id, chapter['url_name'], section['url_name']])}">
-              <p>${section['display_name']} ${'<span class="sr">, current section</span>' if 'active' in section and section['active'] else ''}</p>
-              <%
-                if section.get('due') is None:
-                    due_date = ''
-                else:
-                    formatted_string = get_time_display(section['due'], due_date_display_format, coerce_tz=settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES)
-                    due_date = '' if len(formatted_string)==0 else _('due {date}').format(date=formatted_string)
-              %>
-              <p class="subtitle">${section['format']} ${due_date}</p>
+        <div id="${chapter['display_id']}-child" role="region" aria-labelledby="${chapter['display_id']}-parent" aria-hidden="false">
+            <ol>
+              % for section in chapter['sections']:
+                  <li class="${'active' if 'active' in section and section['active'] else ''} ${'graded'  if 'graded' in section and section['graded'] else ''}">
+                    <a href="${reverse('courseware_section', args=[course_id, chapter['url_name'], section['url_name']])}">
+                      <p>${section['display_name']} ${'<span class="sr">, current section</span>' if 'active' in section and section['active'] else ''}</p>
+                      <%
+                        if section.get('due') is None:
+                            due_date = ''
+                        else:
+                            formatted_string = get_time_display(section['due'], due_date_display_format, coerce_tz=settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES)
+                            due_date = '' if len(formatted_string)==0 else _('due {date}').format(date=formatted_string)
+                      %>
+                      <p class="subtitle">${section['format']} ${due_date}</p>
 
-              % if 'graded' in section and section['graded']:
-                  <img src="/static/images/graded.png" alt="Graded Section">
-              % endif
-            </a>
-          </li>
-      % endfor
-    </ol>
-    </div>
+                      % if 'graded' in section and section['graded']:
+                          <img src="/static/images/graded.png" alt="Graded Section">
+                      % endif
+                    </a>
+                  </li>
+              % endfor
+            </ol>
+        </div>
     </div>
 </%def>
 
