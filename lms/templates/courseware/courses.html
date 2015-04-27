@@ -7,7 +7,7 @@
 <%namespace name='static' file='../static_content.html'/>
 
 <%block name="header_extras">
-  % for template_name in ["result_item", "loading", "error", "not_found"]:
+  % for template_name in ["result_item", "error", "not_found"]:
   <script type="text/template" id="${template_name}-tpl">
       <%static:include path="discovery/${template_name}.underscore" />
   </script>
@@ -65,11 +65,14 @@
           <i class="icon fa fa-search" aria-hidden="true"></i>
         </button>
       </form>
+      <div id="discovery-message"></div>
+      <div id="loading-indicator" class="hidden">
+        <i class="icon fa fa-spinner fa-spin"></i> ${_('Loading')}
+      </div>
+      <a id="discovery-clear" href="#" class="hidden">${_('Clear all')}</a>
     </div>
 
     <section class="courses">
-      <div id="discovery-message"></div>
-      <a id="discovery-clear" href="#" class="hidden">${_('Clear all')}</a>
       <ul class="courses-listing">
         %for course in courses:
         <li class="courses-listing-item">
