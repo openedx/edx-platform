@@ -1,3 +1,7 @@
+$title-left-margin: grid-width(2) + $gw-gutter;
+$title-width: flex-grid(6);
+$course-search-input-height: ($baseline*2.8);
+
 .home {
   padding: 0;
 
@@ -19,30 +23,34 @@
     padding: 0;
     width: flex-grid(12);
 
-    .outer-wrapper {
-      @extend .animation-home-header-pop-up;
-      margin: 0 auto;
-      padding: 240px ($baseline/2) 0;
-      position: relative;
-      max-width: 1200px;
-      min-width: 760px;
+    .outer-wrapper, .course-search {
       @include clearfix();
+      @extend .animation-home-header-pop-up;
+      position: relative;
+      margin: 0 auto ($baseline);
+      padding: 0 ($baseline/2);
+      min-width: ($baseline*38);
+      max-width: ($baseline*60);
+    }
+
+    .outer-wrapper {
+      padding-top: ($baseline*5);
     }
 
     .title {
-      background: $white;
-      background: $course-header-bg;
+      @include margin-left($title-left-margin);
+      @include float(left);
+      @include box-sizing(border-box);
+      @include transition(all 0.2s linear 0s);
+      position: relative;
       border: 1px solid $border-color-3;
       box-shadow: 0 4px 25px 0 rgba(0,0,0, 0.5);
-      @include box-sizing(border-box);
-      min-height: 120px;
-      margin-left: grid-width(2) + $gw-gutter;
-      width: flex-grid(6);
-      float: left;
-      position: relative;
-      @include transition(all 0.2s linear 0s);
+      background: $white;
+      width: $title-width;
+      min-height: ($baseline*6);
       vertical-align: top;
 
+      // STATE: hover and focus
       &:hover, &:focus {
         .actions {
           display: none;
@@ -50,26 +58,76 @@
       }
 
       > hgroup {
+        @include left(0);
         @include box-sizing(border-box);
+        @include transition(all 0.2s linear 0s);
+        @include text-align(left);
         display: inline-block;
-        left: 0px;
+        top: 0px;
         opacity: 1.0;
         padding: 20px 30px;
-        top: 0px;
-        @include transition(all 0.2s linear 0s);
-        text-align: left;
 
         h1 {
+          @include text-align(left);
           margin-bottom: 0px;
-          text-align: left;
           text-shadow: 0 1px rgba(255,255,255, 0.6);
           text-transform: none;
         }
 
         h2 {
-          font-style: italic;
           margin-bottom: 0px;
           text-transform: lowercase;
+          font-style: italic;
+        }
+      }
+    }
+
+    .course-search {
+      .course-search-bar {
+        @include margin-left($title-left-margin);
+        width: $title-width;
+
+        .search-input {
+          @include float(left);
+          @include padding-left($baseline*0.5);
+          @extend %ui-depth1;
+          @extend %t-icon4;
+          @extend %t-demi-strong;
+          border: 2px solid $gray-l3;
+          border-radius: 3px;
+          box-shadow: none;
+          width: 100%;
+          height: $course-search-input-height;
+          color: $black;
+          font-style: normal;
+
+          // STATE: focus
+          &:focus {
+            @extend %no-outline;
+            border-color: $m-blue-d1;
+          }
+        }
+      }
+
+      .search-button {
+        @include left(-$baseline*2.75);
+        @extend %ui-depth2;
+        @extend %t-icon3;
+        @extend %t-strong;
+        position: relative;
+        top: 0;
+        border: 2px solid $m-blue-d1;
+        border-radius: ($baseline*0.1);
+        box-shadow: none;
+        background: $m-blue-d5;
+        padding: 0 ($baseline*0.7);
+        height: $course-search-input-height;
+        color: $white;
+        text-shadow: none;
+
+        // STATE: hover and focus
+        &:hover, &:focus {
+          background: $m-blue-l1;
         }
       }
     }
