@@ -40,7 +40,9 @@
                 required: true,
                 editable: 'always',
                 showMessages: false,
-                title: gettext('edX learners can see my:'),
+                title: interpolate_text(
+                    gettext('{platform_name} learners can see my:'), {platform_name: options.platform_name}
+                ),
                 valueAttribute: "account_privacy",
                 options: [
                     ['private', gettext('Limited Profile')],
@@ -101,7 +103,7 @@
                     editable: editable,
                     showMessages: false,
                     title: gettext('About me'),
-                    placeholderValue: gettext("Tell other edX learners a little about yourself: where you live, what your interests are, why you're taking courses on edX, or what you hope to learn."),
+                    placeholderValue: gettext("Tell other learners a little about yourself: where you live, what your interests are, why you're taking courses, or what you hope to learn."),
                     valueAttribute: "bio",
                     helpMessage: ''
                 })

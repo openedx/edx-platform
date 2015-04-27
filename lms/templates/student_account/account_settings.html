@@ -1,6 +1,8 @@
 <%! import json %>
 <%! from django.core.urlresolvers import reverse %>
+<%! from django.conf import settings %>
 <%! from django.utils.translation import ugettext as _ %>
+<%! from microsite_configuration import microsite %>
 
 <!--<%namespace name='static' file='/static_content.html'/>-->
 
@@ -40,9 +42,11 @@
 
                 var fieldsData = ${ json.dumps(fields) };
                 var authData = ${ json.dumps(auth) };
+                var platformName = ${ json.dumps(microsite.get_value('platform_name', settings.PLATFORM_NAME))};
 
                 setupAccountSettingsSection(
-                        fieldsData, authData, '${user_accounts_api_url}', '${user_preferences_api_url}', ${user.id}
+                        fieldsData, authData, '${user_accounts_api_url}', '${user_preferences_api_url}', ${user.id},
+                        platformName
                 );
             });
           }).call(this, require || RequireJS.require);

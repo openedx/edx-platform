@@ -387,8 +387,8 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         Then `about me` field mode should be `edit`
         """
         placeholder_value = (
-            "Tell other edX learners a little about yourself: where you live, what your interests are, "
-            "why you're taking courses on edX, or what you hope to learn."
+            "Tell other learners a little about yourself: where you live, what your interests are, "
+            "why you're taking courses, or what you hope to learn."
         )
 
         username, user_id = self.log_in_as_unique_user()

@@ -12,6 +12,8 @@ from django.views.decorators.http import require_http_methods
 from edxmako.shortcuts import render_to_response
 from student.models import User
 
+from microsite_configuration import microsite
+
 from django.utils.translation import ugettext as _
 
 
@@ -81,6 +83,7 @@ def learner_profile_context(logged_in_username, profile_username, user_is_staff)
             'own_profile': (logged_in_username == profile_username),
             'country_options': country_options,
             'language_options': settings.ALL_LANGUAGES,
+            'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
         }
     }
 
