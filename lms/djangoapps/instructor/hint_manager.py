@@ -91,7 +91,6 @@ def get_hints(request, course_id, field):
     # We want to use the course_id to find all matching usage_id's.
     # To do this, just take the school/number part - leave off the classname.
     # FIXME: we need to figure out how to do this with opaque keys
-    # todo: this will break if we migrate to split
     all_hints = XModuleUserStateSummaryField.objects.filter(
         field_name=field,
         usage_id__regex=re.escape(u'{0.org}/{0.course}'.format(course_id)),

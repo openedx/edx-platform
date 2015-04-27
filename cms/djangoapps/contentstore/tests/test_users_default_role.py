@@ -2,7 +2,6 @@
 Unit tests for checking default forum role "Student" of a user when he creates a course or
 after deleting it creates same course again
 """
-import mock
 from contentstore.tests.utils import AjaxEnabledTestClient
 from contentstore.utils import delete_course_and_groups, reverse_url
 from courseware.tests.factories import UserFactory
@@ -34,16 +33,15 @@ class TestUsersDefaultRole(ModuleStoreTestCase):
         """
         Create course at provided location
         """
-        with mock.patch.dict('django.conf.settings.FEATURES', {"DEFAULT_STORE_FOR_NEW_COURSE": None}):
-            resp = self.client.ajax_post(
-                reverse_url('course_handler'),
-                {
-                    'org': course_key.org,
-                    'number': course_key.course,
-                    'display_name': 'test course',
-                    'run': course_key.run,
-                }
-            )
+        resp = self.client.ajax_post(
+            reverse_url('course_handler'),
+            {
+                'org': course_key.org,
+                'number': course_key.course,
+                'display_name': 'test course',
+                'run': course_key.run,
+            }
+        )
         return resp
 
     def tearDown(self):

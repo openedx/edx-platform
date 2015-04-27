@@ -58,7 +58,7 @@ TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
-@override_settings(DEFAULT_STORE_FOR_NEW_COURSE=None)
+
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class ContentStoreTestCase(CourseTestCase):
     """
@@ -1058,8 +1058,7 @@ class ContentStoreTest(ContentStoreTestCase):
         except InvalidKeyError:
             # b/c the intent of the test with bad chars isn't to test auth but to test the handler, ignore
             pass
-        with mock.patch.dict('django.conf.settings.FEATURES', {"DEFAULT_STORE_FOR_NEW_COURSE": None}):
-            resp = self.client.ajax_post('/course/', self.course_data)
+        resp = self.client.ajax_post('/course/', self.course_data)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
         self.assertRegexpMatches(data['ErrMsg'], error_message)
@@ -1070,8 +1069,7 @@ class ContentStoreTest(ContentStoreTestCase):
 
     def test_create_course_duplicate_number(self):
         """Test new course creation - error path"""
-        with mock.patch.dict('django.conf.settings.FEATURES', {"DEFAULT_STORE_FOR_NEW_COURSE": None}):
-            self.client.ajax_post('/course/', self.course_data)
+        self.client.ajax_post('/course/', self.course_data)
         self.course_data['display_name'] = 'Robot Super Course Two'
         self.course_data['run'] = '2013_Summer'
 
@@ -1080,8 +1078,7 @@ class ContentStoreTest(ContentStoreTestCase):
     def test_create_course_case_change(self):
         """Test new course creation - error path due to case insensitive name equality"""
         self.course_data['number'] = 'capital'
-        with mock.patch.dict('django.conf.settings.FEATURES', {"DEFAULT_STORE_FOR_NEW_COURSE": None}):
-            self.client.ajax_post('/course/', self.course_data)
+        self.client.ajax_post('/course/', self.course_data)
         cache_current = self.course_data['org']
         self.course_data['org'] = self.course_data['org'].lower()
         self.assert_course_creation_failed('There is already a course defined with the same organization, course number, and course run. Please change either organization or course number to be unique.')
@@ -1744,13 +1741,12 @@ def _create_course(test, course_key, course_data):
     """
     Creates a course via an AJAX request and verifies the URL returned in the response.
     """
-    with mock.patch.dict('django.conf.settings.FEATURES', {"DEFAULT_STORE_FOR_NEW_COURSE": None}):
-        course_url = get_url('course_handler', course_key, 'course_key_string')
-        response = test.client.ajax_post(course_url, course_data)
-        test.assertEqual(response.status_code, 200)
-        data = parse_json(response)
-        test.assertNotIn('ErrMsg', data)
-        test.assertEqual(data['url'], course_url)
+    course_url = get_url('course_handler', course_key, 'course_key_string')
+    response = test.client.ajax_post(course_url, course_data)
+    test.assertEqual(response.status_code, 200)
+    data = parse_json(response)
+    test.assertNotIn('ErrMsg', data)
+    test.assertEqual(data['url'], course_url)
 
 
 def _get_course_id(course_data, key_class=SlashSeparatedCourseKey):

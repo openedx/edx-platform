@@ -68,8 +68,6 @@ def get_or_create_password_for_user(username):
 
 def get_room_name_for_course(course_id):
     """
-    This function will break with new-style course_ids from split mongo!
-
     Build a Jabber chat room name given a course ID with format:
 
         <room>@<domain>
