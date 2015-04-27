@@ -1,11 +1,11 @@
 define([
-    'backbone', 'underscore', 'underscore.string', 'gettext', 'backbone.associations', 'coffee/src/main'
+    'backbone', 'js/certificates/models/signatory', 'js/certificates/collections/signatories', 'underscore', 'underscore.string', 'gettext', 'backbone-relational', 'backbone.associations', 'coffee/src/main'
 ],
-function(Backbone, _, str, gettext) {
+function(Backbone, Signatory, SignatoryCollection, _, str, gettext) {
     'use strict';
     console.log('certificate_model.start');
     _.str = str;
-    var Certificate = Backbone.Model.extend({
+    var Certificate = Backbone.RelationalModel.extend({
         idAttribute: "id",
         defaults: {
             name: 'Default Name',
@@ -13,9 +13,27 @@ function(Backbone, _, str, gettext) {
             version: 1
         },
 
+        relations: [{
+            type: Backbone.HasMany,
+            key: 'signatories',
+            relatedModel: Signatory,
+            collectionType: SignatoryCollection,
+            reverseRelation: {
+                key: 'certificate',
+                includeInJSON: "id"
+            }
+        }],
+
         initialize: function(attributes, options) {
             console.log('certificate_model.initialize');
             this.canBeEmpty = options && options.canBeEmpty;
+
+            // If the object is a new object. (Not getting the data/json from the server).
+            if(options.add) {
+                // When creating a new certificate object then associating a signatory model with certificate.
+                // Minimum one signatory is mandatory.
+                attributes['signatories'] = new Signatory({certificate: this});
+            }
             this.setOriginalAttributes();
             return this;
         },
