@@ -15,41 +15,20 @@ define([
         originalContent: '',
         $window: $(window),
         $document: $(document),
-        events: {
-            'click #discovery-clear': 'clearAll'
-        },
 
         initialize: function () {
-            this.loadingTemplate = _.template($('#loading-tpl').html());
-            this.notFoundTemplate = _.template($('#not_found-tpl').html());
-            this.errorTemplate = _.template($('#error-tpl').html());
-            this.loadingIndicator = $('<div>', {id: 'loading-indicator', style: 'display:none'});
-            this.loadingIndicator.html(this.loadingTemplate());
-            this.$el.append(this.loadingIndicator);
             this.$list = this.$el.find('.courses-listing');
-            this.$message = this.$el.find('#discovery-message');
             this.originalContent = this.$list.html();
         },
 
         render: function () {
-            this.$message.empty();
-            this.hideLoadingIndicator();
-            if (this.collection.length > 0) {
-                this.$list.empty();
-                this.renderItems();
-                this.showClearAllButton();
-                this.attachScrollHandler();
-            }
-            else {
-                var msg = this.notFoundTemplate({term: this.collection.searchTerm});
-                this.$message.html(msg);
-                this.hideClearAllButton();
-            }
+            this.$list.empty();
+            this.renderItems();
+            this.attachScrollHandler();
             return this;
         },
 
         renderNext: function () {
-            this.hideLoadingIndicator();
             this.renderItems();
             this.isLoading = false;
         },
@@ -63,36 +42,14 @@ define([
             this.$list.append(items);
         },
 
-        showLoadingIndicator: function () {
-            this.loadingIndicator.show();
-        },
-
-        hideLoadingIndicator: function () {
-            this.loadingIndicator.hide();
-        },
-
-        showErrorMessage: function () {
-            var msg = this.errorTemplate();
-            this.$message.html(msg);
-        },
-
         loadNext: function (event) {
             event && event.preventDefault();
-            this.showLoadingIndicator();
             this.trigger('next');
         },
 
         clearResults: function() {
             this.$list.html(this.originalContent);
             this.detachScrollHandler();
-        },
-
-        showClearAllButton: function () {
-            this.$el.find('#discovery-clear').removeClass('hidden');
-        },
-
-        hideClearAllButton: function() {
-            this.$el.find('#discovery-clear').addClass('hidden');
         },
 
         attachScrollHandler: function () {
@@ -133,15 +90,7 @@ define([
 
         thereIsMore: function () {
             return this.collection.hasNextPage();
-        },
-
-        clearAll: function () {
-            this.hideClearAllButton();
-            this.clearResults();
-            this.trigger('clear');
-            return false;
         }
-
 
     });
 
