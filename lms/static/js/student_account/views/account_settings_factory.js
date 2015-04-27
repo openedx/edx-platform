@@ -12,7 +12,6 @@
 
         return function (fieldsData, authData, userAccountsApiUrl, userPreferencesApiUrl, accountUserId, platformName) {
 
-            var interpolate_text = window.interpolate_text;
             var accountSettingsElement = $('.wrapper-account-settings');
 
             var userAccountModel = new UserAccountModel();
@@ -31,7 +30,7 @@
                                 title: gettext('Username'),
                                 valueAttribute: 'username',
                                 helpMessage: interpolate_text(
-                                    gettext('The name that identifies you on the {platformName} site. You cannot change your username.'), {platformName: platformName}
+                                    gettext('The name that identifies you on the {platform_name} site. You cannot change your username.'), {platform_name: platformName}
                                 )
                             })
                         },
@@ -41,7 +40,7 @@
                                 title: gettext('Full Name'),
                                 valueAttribute: 'name',
                                 helpMessage: interpolate_text(
-                                    gettext('The name that appears on your {platformName} certificates. Other learners never see your full name.'), {platformName: platformName}
+                                    gettext('The name that appears on your {platform_name} certificates. Other learners never see your full name.'), {platform_name: platformName}
                                 )
                             })
                         },
@@ -51,7 +50,7 @@
                                 title: gettext('Email Address'),
                                 valueAttribute: 'email',
                                 helpMessage: interpolate_text(
-                                    gettext('The email address you use to sign in to {platformName}. Communications from {platformName} and your courses are sent to this address.'), {platformName: platformName}
+                                    gettext('The email address you use to sign in to {platform_name}. Communications from {platform_name} and your courses are sent to this address.'), {platform_name: platformName}
                                 )
                             })
                         },
@@ -75,7 +74,7 @@
                                 required: true,
                                 refreshPageOnSave: true,
                                 helpMessage: interpolate_text(
-                                    gettext('The language used for the {platformName} site. The site is currently available in a limited number of languages.'), {platformName: platformName}
+                                    gettext('The language used for the {platform_name} site. The site is currently available in a limited number of languages.'), {platform_name: platformName}
                                 ),
                                 options: fieldsData.language.options
                             })
