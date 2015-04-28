@@ -30,7 +30,7 @@ HTML5_SOURCES_INCORRECT = [
 ]
 
 
-@attr('shard_2')
+@attr('shard_4')
 @skipIf(is_youtube_available() is False, 'YouTube is not available!')
 class VideoBaseTest(UniqueCourseTest):
     """

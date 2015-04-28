@@ -3,6 +3,8 @@
 End-to-end tests for the LMS Instructor Dashboard.
 """
 
+from nose.plugins.attrib import attr
+
 from ..helpers import UniqueCourseTest, get_modal_alert
 from ...pages.common.logout import LogoutPage
 from ...pages.lms.auto_auth import AutoAuthPage
@@ -10,6 +12,7 @@ from ...pages.lms.instructor_dashboard import InstructorDashboardPage
 from ...fixtures.course import CourseFixture
 
 
+@attr('shard_5')
 class AutoEnrollmentWithCSVTest(UniqueCourseTest):
     """
     End-to-end tests for Auto-Registration and enrollment functionality via CSV file.
@@ -87,6 +90,7 @@ class AutoEnrollmentWithCSVTest(UniqueCourseTest):
         self.assertEqual(self.auto_enroll_section.first_notification_message(section_type=self.auto_enroll_section.NOTIFICATION_ERROR), "Make sure that the file you upload is in CSV format with no extraneous characters or rows.")
 
 
+@attr('shard_5')
 class EntranceExamGradeTest(UniqueCourseTest):
     """
     Tests for Entrance exam specific student grading tasks.

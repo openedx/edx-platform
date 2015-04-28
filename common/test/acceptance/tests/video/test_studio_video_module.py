@@ -126,7 +126,7 @@ class CMSVideoBaseTest(UniqueCourseTest):
         self.unit_page.xblocks[1].save_settings()
 
 
-@attr('shard_2')
+@attr('shard_4')
 class CMSVideoTest(CMSVideoBaseTest):
     """
     CMS Video Test Class

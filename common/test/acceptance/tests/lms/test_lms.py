@@ -37,7 +37,7 @@ from ...pages.lms.course_wiki import CourseWikiPage, CourseWikiEditPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
 
 
-@attr('shard_1')
+@attr('shard_4')
 class ForgotPasswordPageTest(UniqueCourseTest):
     """
     Test that forgot password forms is rendered if url contains 'forgot-password-modal'
@@ -57,7 +57,7 @@ class ForgotPasswordPageTest(UniqueCourseTest):
         self.assertTrue(self.reset_password_page.is_form_visible())
 
 
-@attr('shard_1')
+@attr('shard_4')
 class LoginFromCombinedPageTest(UniqueCourseTest):
     """Test that we can log in using the combined login/registration page.
 
@@ -153,7 +153,7 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         return (email, password)
 
 
-@attr('shard_1')
+@attr('shard_4')
 class RegisterFromCombinedPageTest(UniqueCourseTest):
     """Test that we can register a new user from the combined login/registration page. """
 
@@ -227,7 +227,7 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         self.assertEqual(self.register_page.current_form, "login")
 
 
-@attr('shard_1')
+@attr('shard_4')
 class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
     """Test that we can proceed through the payment and verification flow."""
     def setUp(self):
@@ -391,6 +391,7 @@ class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
         self.assertEqual(enrollment_mode, 'verified')
 
 
+@attr('shard_5')
 class CourseWikiTest(UniqueCourseTest):
     """
     Tests that verify the course wiki.
@@ -444,6 +445,7 @@ class CourseWikiTest(UniqueCourseTest):
         self.assertEqual(content, actual_content)
 
 
+@attr('shard_5')
 class HighLevelTabTest(UniqueCourseTest):
     """
     Tests that verify each of the high-level tabs available within a course.
@@ -629,6 +631,7 @@ class PDFTextBooksTabTest(UniqueCourseTest):
             self.tab_nav.go_to_tab("PDF Book {}".format(i))
 
 
+@attr('shard_5')
 class VideoTest(UniqueCourseTest):
     """
     Navigate to a video in the courseware and play it.
@@ -699,6 +702,7 @@ class VideoTest(UniqueCourseTest):
         self.assertGreaterEqual(self.video.duration, self.video.elapsed_time)
 
 
+@attr('shard_5')
 class VisibleToStaffOnlyTest(UniqueCourseTest):
     """
     Tests that content with visible_to_staff_only set to True cannot be viewed by students.
@@ -783,6 +787,7 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
         self.assertEqual(["Html Child in visible unit"], self.course_nav.sequence_items)
 
 
+@attr('shard_5')
 class TooltipTest(UniqueCourseTest):
     """
     Tests that tooltips are displayed
@@ -827,6 +832,7 @@ class TooltipTest(UniqueCourseTest):
         self.assertTrue(self.courseware_page.tooltips_displayed())
 
 
+@attr('shard_5')
 class PreRequisiteCourseTest(UniqueCourseTest):
     """
     Tests that pre-requisite course messages are displayed
@@ -911,6 +917,7 @@ class PreRequisiteCourseTest(UniqueCourseTest):
         self.settings_page.save_changes()
 
 
+@attr('shard_5')
 class ProblemExecutionTest(UniqueCourseTest):
     """
     Tests of problems.
@@ -989,6 +996,7 @@ class ProblemExecutionTest(UniqueCourseTest):
         self.assertFalse(problem_page.is_correct())
 
 
+@attr('shard_5')
 class EntranceExamTest(UniqueCourseTest):
     """
     Tests that course has an entrance exam.
