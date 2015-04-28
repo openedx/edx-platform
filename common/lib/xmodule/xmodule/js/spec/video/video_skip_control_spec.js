@@ -15,10 +15,10 @@
         afterEach(function () {
             $('source').remove();
             state.storage.clear();
-            if (state.bumperState.vodeoPlayer) {
+            if (state.bumperState.videoPlayer) {
                 state.bumperState.videoPlayer.destroy();
             }
-            if (state.vodeoPlayer) {
+            if (state.videoPlayer) {
                 state.videoPlayer.destroy();
             }
             window.onTouchBasedDevice = oldOTBD;
