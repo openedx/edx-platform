@@ -1,8 +1,6 @@
 <div id="wrapper-facephoto" class="wrapper-view block-photo face-photo-step">
   <div class="facephoto view">
     <h3 class="title"><%- gettext( "Take Your Photo" ) %></h3>
-      <p><%= gettext("Course key: ") + courseKey %></p>
-      <p><%= gettext("Checkpoint name: ") + checkpointName %></p>
     <div class="instruction">
       <p><%- gettext( "Use your webcam to take a photo of your face. We will match this photo with the photo on your ID." ) %></p>
     </div>
@@ -45,11 +43,9 @@
       </div>
     </div>
 
-
     <div>
       <button class="action action-primary" id="submit"><%= gettext("Submit") %></button>
     </div>
-
 
   </div>
 </div>
