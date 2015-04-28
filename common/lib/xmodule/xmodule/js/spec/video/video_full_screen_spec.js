@@ -35,14 +35,21 @@
                     'aria-disabled': 'false'
                 });
             });
-        });
 
-        it('updates ARIA on state change', function () {
-            expect().toBe();
-        });
+            it('updates ARIA on state change', function () {
+                var fullScreenControl = $('.add-fullscreen');
+                fullScreenControl.click();
+                expect(fullScreenControl).toHaveAttrs({
+                    'role': 'button',
+                    'title': 'Exit full browser',
+                    'aria-disabled': 'false'
+                });
+            });
 
-        it('can destroy itself', function () {
-            expect().toBe();
+            it('can destroy itself', function () {
+                state.videoFullScreen.destroy();
+                expect(state.videoFullScreen).toBeUndefined();
+            });
         });
 
     });
