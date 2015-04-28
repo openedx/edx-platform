@@ -207,7 +207,7 @@ from edxmako.shortcuts import marketing_link
       % endif
 
       <nav>
-        <a href="#" class="active">${_("Overview")}</a>
+      ##  <a href="#" class="active">${_("Overview")}</a>
       ##  <a href="#">${_("FAQ")}</a>
       ##  <a href="#">${_("Requirements")}</a>
       ##  <a href="#">${_("Text-book")}</a>
@@ -215,76 +215,15 @@ from edxmako.shortcuts import marketing_link
       ##  <a href="#">${_("Reviews")}</a>
       </nav>
 
-      <div class="inner-wrapper">
-        ${get_course_about_section(course, "overview")}
-      </div>
+      ##<div class="inner-wrapper">
+      ##  ${get_course_about_section(course, "overview")}
+      ##</div>
     </section>
-
     <section class="course-sidebar">
       <section class="course-summary">
-        <header>
-          % if microsite.get_value('course_about_show_social_links', True):
-          <div class="social-sharing">
-            <div class="sharing-message">${_("Share with friends and family!")}</div>
-            ## TODO: this should probably be an overrideable block,
-            ##       or something allowing themes to do whatever they
-            ##       want here (and on this whole page, really).
-            % if self.stanford_theme_enabled():
-              <a href="http://twitter.com/intent/tweet?text=I+just+registered+for+${course.number}+${get_course_about_section(course, 'title')}!+(http://class.stanford.edu)" class="share">
-                <i class="icon fa fa-twitter"></i><span class="sr">${_("Tweet that you've registered for this course")}</span>
-              </a>
-              <a href="mailto:?subject=Take%20a%20course%20at%20Stanford%20online!&body=I%20just%20registered%20for%20${course.number}%20${get_course_about_section(course, 'title')}+(http://class.stanford.edu)" class="share">
-                <i class="icon fa fa-envelope"></i><span class="sr">${_("Email someone to say you've registered for this course")}</span>
-              </a>
-            % else:
-              <%
-                site_domain = microsite.get_value('site_domain', settings.SITE_NAME)
-                platform_name = microsite.get_value('platform_name', settings.PLATFORM_NAME)
-
-                # Translators: This text will be automatically posted to the student's
-                # Twitter account. {url} should appear at the end of the text.
-                tweet_text = _("I just registered for {number} {title} through {account}: {url}").format(
-                    number=course.number,
-                    title=get_course_about_section(course, 'title'),
-                    account=microsite.get_value('course_about_twitter_account', settings.PLATFORM_TWITTER_ACCOUNT),
-                    url=u"http://{domain}{path}".format(
-                        domain=site_domain,
-                        path=reverse('about_course', args=[course.id.to_deprecated_string()])
-                    )
-                ).replace(u" ", u"+")
-                tweet_action = u"http://twitter.com/intent/tweet?text={tweet_text}".format(tweet_text=tweet_text)
-
-                facebook_link = microsite.get_value('course_about_facebook_link', settings.PLATFORM_FACEBOOK_ACCOUNT)
-
-                email_subject = u"mailto:?subject={subject}&body={body}".format(
-                    subject=_("Take a course with {platform} online").format(platform=platform_name),
-                    body=_("I just registered for {number} {title} through {platform} {url}").format(
-                        number=course.number,
-                        title=get_course_about_section(course, 'title'),
-                        platform=platform_name,
-                        url=u"http://{domain}{path}".format(
-                            domain=site_domain,
-                            path=reverse('about_course', args=[course.id.to_deprecated_string()]),
-                        )
-                    )
-                ).replace(u" ", u"%20")
-              %>
-              <a href="${tweet_action}" class="share">
-                <i class="icon fa fa-twitter"></i><span class="sr">${_("Tweet that you've registered for this course")}</span>
-              </a>
-              <a href="${facebook_link}" class="share">
-                <i class="icon fa fa-thumbs-up"></i><span class="sr">${_("Post a Facebook message to say you've registered for this course")}</span>
-              </a>
-              <a href="${email_subject}" class="share">
-                <i class="icon fa fa-envelope"></i><span class="sr">${_("Email someone to say you've registered for this course")}</span>
-              </a>
-            % endif
-          </div>
-          % endif
-        </header>
 
         <ol class="important-dates">
-          <li class="important-dates-item"><i class="icon fa fa-info-sign"></i><p class="important-dates-item-title">${_("Course Number")}</p><span class="important-dates-item-text course-number">${course.display_number_with_default | h}</span></li>
+        ##  <li class="important-dates-item"><i class="icon fa fa-info-sign"></i><p class="important-dates-item-title">${_("Course Number")}</p><span class="important-dates-item-text course-number">${course.display_number_with_default | h}</span></li>
           % if not course.start_date_is_still_default:
             <li class="important-dates-item"><i class="icon fa fa-calendar"></i><p class="important-dates-item-title">${_("Classes Start")}</p><span class="important-dates-item-text start-date">${course.start_datetime_text()}</span></li>
           % endif
