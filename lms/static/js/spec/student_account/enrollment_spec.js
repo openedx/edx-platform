@@ -5,7 +5,7 @@ define(['js/common_helpers/ajax_helpers', 'js/student_account/enrollment'],
         describe( 'edx.student.account.EnrollmentInterface', function() {
 
             var COURSE_KEY = 'edX/DemoX/Fall',
-                ENROLL_URL = '/commerce/orders/',
+                ENROLL_URL = '/commerce/baskets/',
                 FORWARD_URL = '/course_modes/choose/edX/DemoX/Fall/',
                 EMBARGO_MSG_URL = '/embargo/blocked-message/enrollment/default/';
 

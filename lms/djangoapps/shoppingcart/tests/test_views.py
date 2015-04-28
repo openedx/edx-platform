@@ -918,24 +918,27 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         """Mocks calls to EcommerceAPI.get_order. """
         patch = None
 
-        ORDER = copy.deepcopy(EcommerceApiTestMixin.ECOMMERCE_API_SUCCESSFUL_BODY)
-        ORDER['total_excl_tax'] = 40.0
-        ORDER['currency'] = 'USD'
-        ORDER['sources'] = [{'transactions': [
-            {'date_created': '2015-04-07 17:59:06.274587+00:00'},
-            {'date_created': '2015-04-08 13:33:06.150000+00:00'},
-            {'date_created': '2015-04-09 10:45:06.200000+00:00'},
-        ]}]
-        ORDER['billing_address'] = {
-            'first_name': 'Philip',
-            'last_name': 'Fry',
-            'line1': 'Robot Arms Apts',
-            'line2': '22 Robot Street',
-            'line4': 'New New York',
-            'state': 'NY',
-            'postcode': '11201',
-            'country': {
-                'display_name': 'United States',
+        ORDER = {
+            'status': OrderStatus.COMPLETE,
+            'number': EcommerceApiTestMixin.ORDER_NUMBER,
+            'total_excl_tax': 40.0,
+            'currency': 'USD',
+            'sources': [{'transactions': [
+                {'date_created': '2015-04-07 17:59:06.274587+00:00'},
+                {'date_created': '2015-04-08 13:33:06.150000+00:00'},
+                {'date_created': '2015-04-09 10:45:06.200000+00:00'},
+            ]}],
+            'billing_address': {
+                'first_name': 'Philip',
+                'last_name': 'Fry',
+                'line1': 'Robot Arms Apts',
+                'line2': '22 Robot Street',
+                'line4': 'New New York',
+                'state': 'NY',
+                'postcode': '11201',
+                'country': {
+                    'display_name': 'United States',
+                },
             },
         }
 

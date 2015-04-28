@@ -10,7 +10,6 @@ import httpretty
 from requests import Timeout
 
 from commerce.api import EcommerceAPI
-from commerce.constants import OrderStatus
 from commerce.exceptions import InvalidResponseError, TimeoutError, InvalidConfigurationError
 from commerce.tests import EcommerceApiTestMixin
 from student.tests.factories import UserFactory
@@ -26,7 +25,7 @@ class EcommerceAPITests(EcommerceApiTestMixin, TestCase):
 
     def setUp(self):
         super(EcommerceAPITests, self).setUp()
-        self.url = reverse('commerce:orders')
+        self.url = reverse('commerce:baskets')
         self.user = UserFactory()
         self.api = EcommerceAPI()
 
@@ -48,35 +47,40 @@ class EcommerceAPITests(EcommerceApiTestMixin, TestCase):
         self.assertRaises(InvalidConfigurationError, EcommerceAPI)
 
     @httpretty.activate
-    def test_create_order(self):
+    @data(True, False)
+    def test_create_basket(self, is_payment_required):
         """ Verify the method makes a call to the E-Commerce API with the correct headers and data. """
-        self._mock_ecommerce_api()
-        number, status, body = self.api.create_order(self.user, self.SKU)
+        self._mock_ecommerce_api(is_payment_required=is_payment_required)
+        response_data = self.api.create_basket(self.user, self.SKU, self.PROCESSOR)
 
         # Validate the request sent to the E-Commerce API endpoint.
         request = httpretty.last_request()
-        self.assertValidOrderRequest(request, self.user, self.ECOMMERCE_API_SIGNING_KEY, self.SKU)
+        self.assertValidBasketRequest(request, self.user, self.ECOMMERCE_API_SIGNING_KEY, self.SKU, self.PROCESSOR)
 
         # Validate the data returned by the method
-        self.assertEqual(number, self.ORDER_NUMBER)
-        self.assertEqual(status, OrderStatus.COMPLETE)
-        self.assertEqual(body, self.ECOMMERCE_API_SUCCESSFUL_BODY)
+        self.assertEqual(response_data['id'], self.BASKET_ID)
+        if is_payment_required:
+            self.assertEqual(response_data['order'], None)
+            self.assertEqual(response_data['payment_data'], self.PAYMENT_DATA)
+        else:
+            self.assertEqual(response_data['order'], {"number": self.ORDER_NUMBER})
+            self.assertEqual(response_data['payment_data'], None)
 
     @httpretty.activate
     @data(400, 401, 405, 406, 429, 500, 503)
-    def test_create_order_with_invalid_http_status(self, status):
+    def test_create_basket_with_invalid_http_status(self, status):
         """ If the E-Commerce API returns a non-200 status, the method should raise an InvalidResponseError. """
         self._mock_ecommerce_api(status=status, body=json.dumps({'user_message': 'FAIL!'}))
-        self.assertRaises(InvalidResponseError, self.api.create_order, self.user, self.SKU)
+        self.assertRaises(InvalidResponseError, self.api.create_basket, self.user, self.SKU, self.PROCESSOR)
 
     @httpretty.activate
-    def test_create_order_with_invalid_json(self):
+    def test_create_basket_with_invalid_json(self):
         """ If the E-Commerce API returns un-parseable data, the method should raise an InvalidResponseError. """
         self._mock_ecommerce_api(body='TOTALLY NOT JSON!')
-        self.assertRaises(InvalidResponseError, self.api.create_order, self.user, self.SKU)
+        self.assertRaises(InvalidResponseError, self.api.create_basket, self.user, self.SKU, self.PROCESSOR)
 
     @httpretty.activate
-    def test_create_order_with_timeout(self):
+    def test_create_basket_with_timeout(self):
         """ If the call to the E-Commerce API times out, the method should raise a TimeoutError. """
 
         def request_callback(_request, _uri, _headers):
@@ -85,4 +89,4 @@ class EcommerceAPITests(EcommerceApiTestMixin, TestCase):
 
         self._mock_ecommerce_api(body=request_callback)
 
-        self.assertRaises(TimeoutError, self.api.create_order, self.user, self.SKU)
+        self.assertRaises(TimeoutError, self.api.create_basket, self.user, self.SKU, self.PROCESSOR)

@@ -60,26 +60,57 @@ class EcommerceAPI(object):
             }
             url = '{base_url}/orders/{order_number}/'.format(base_url=self.url, order_number=order_number)
             return requests.get(url, headers=headers, timeout=self.timeout)
-        return self._call_ecommerce_service(get)
 
-    def create_order(self, user, sku):
+        data = self._call_ecommerce_service(get)
+        return data['number'], data['status'], data
+
+    def get_processors(self, user):
         """
-        Create a new order.
+        Retrieve the list of available payment processors.
 
-        Arguments
-            user    --  User for which the order should be created.
-            sku     --  SKU of the course seat being ordered.
-
-        Returns a tuple with the order number, order status, API response data.
+        Returns a list of strings.
         """
-        def create():
-            """Internal service call to create an order. """
+        def get():
+            """Internal service call to retrieve the processor list. """
             headers = {
                 'Content-Type': 'application/json',
                 'Authorization': 'JWT {}'.format(self._get_jwt(user))
             }
-            url = '{}/orders/'.format(self.url)
-            return requests.post(url, data=json.dumps({'sku': sku}), headers=headers, timeout=self.timeout)
+            url = '{base_url}/payment/processors/'.format(base_url=self.url)
+            return requests.get(url, headers=headers, timeout=self.timeout)
+
+        return self._call_ecommerce_service(get)
+
+    def create_basket(self, user, sku, payment_processor=None):
+        """Create a new basket and immediately trigger checkout.
+
+        Note that while the API supports deferring checkout to a separate step,
+        as well as adding multiple products to the basket, this client does not
+        currently need that capability, so that case is not supported.
+
+        Args:
+            user: the django.auth.User for which the basket should be created.
+            sku: a string containing the SKU of the course seat being ordered.
+            payment_processor: (optional) the name of the payment processor to
+                use for checkout.
+
+        Returns:
+            A dictionary containing {id, order, payment_data}.
+
+        Raises:
+            TimeoutError: the request to the API server timed out.
+            InvalidResponseError: the API server response was not understood.
+        """
+        def create():
+            """Internal service call to create a basket. """
+            headers = {
+                'Content-Type': 'application/json',
+                'Authorization': 'JWT {}'.format(self._get_jwt(user))
+            }
+            url = '{}/baskets/'.format(self.url)
+            data = {'products': [{'sku': sku}], 'checkout': True, 'payment_processor_name': payment_processor}
+            return requests.post(url, data=json.dumps(data), headers=headers, timeout=self.timeout)
+
         return self._call_ecommerce_service(create)
 
     @staticmethod
@@ -92,7 +123,7 @@ class EcommerceAPI(object):
         Arguments
             call    --  A callable function that makes a request to the E-Commerce Service.
 
-        Returns a tuple with the order number, order status, API response data.
+        Returns a dict of JSON-decoded API response data.
         """
         try:
             response = call()
@@ -109,7 +140,7 @@ class EcommerceAPI(object):
         status_code = response.status_code
 
         if status_code == HTTP_200_OK:
-            return data['number'], data['status'], data
+            return data
         else:
             msg = u'Response from E-Commerce API was invalid: (%(status)d) - %(msg)s'
             msg_kwargs = {
