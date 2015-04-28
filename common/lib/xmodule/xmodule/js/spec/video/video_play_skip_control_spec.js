@@ -11,7 +11,7 @@
 
 // Start the video with Bumper
             state = jasmine.initializePlayer();
-            spyOn(this.state.videoCommands, 'execute');
+            spyOn(state.videoCommands, 'execute');
         });
 
         afterEach(function () {

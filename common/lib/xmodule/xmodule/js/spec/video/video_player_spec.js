@@ -154,7 +154,7 @@ function (VideoPlayer) {
                 });
 
                 it('controls are in paused state', function () {
-                    expect(state.videoControl.isPlaying).toBe(false);
+                    expect(state.videoPlayer.isPlaying()).toBe(false);
                 });
             });
         });
