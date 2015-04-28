@@ -1,7 +1,7 @@
 # Custom requirements to be customized by individual OpenEdX instances
 
 -e git+https://github.com/edx/xblock-utils.git@b2a17fa3793e98e67bdb86273317c41b6297dcbb#egg=xblock-utils
--e git+https://github.com/edx-solutions/xblock-mentoring.git@873b93d3f6e23d88f22d786629e9c5608ad07c75#egg=xblock-mentoring
+-e git+https://github.com/edx-solutions/xblock-mentoring.git@77e355a1401f914bee060de7f11b6d54966f2146#egg=xblock-mentoring
 -e git+https://github.com/edx-solutions/xblock-image-explorer.git@21b9bcc4f2c7917463ab18a596161ac6c58c9c4a#egg=xblock-image-explorer
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop.git@92ee2055a16899090a073e1df81e35d5293ad767#egg=xblock-drag-and-drop
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@ed24dbef753e411f2c9b17339ae21f3a89a8531c#egg=xblock-drag-and-drop-v2
