@@ -21,6 +21,9 @@ function (VideoPlayer) {
             if (state.storage) {
                 state.storage.clear();
             }
+            if (state.videoPlayer) {
+                _.result(state.videoPlayer, 'destroy');
+            }
         });
 
         describe('constructor', function () {

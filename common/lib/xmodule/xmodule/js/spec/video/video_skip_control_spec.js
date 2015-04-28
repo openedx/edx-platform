@@ -15,7 +15,12 @@
         afterEach(function () {
             $('source').remove();
             state.storage.clear();
-            window.Video.previousState = null;
+            if (state.bumperState.vodeoPlayer) {
+                state.bumperState.videoPlayer.destroy();
+            }
+            if (state.vodeoPlayer) {
+                state.videoPlayer.destroy();
+            }
             window.onTouchBasedDevice = oldOTBD;
         });
 

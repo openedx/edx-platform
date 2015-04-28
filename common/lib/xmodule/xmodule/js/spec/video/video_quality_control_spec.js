@@ -7,6 +7,7 @@
             if (state.storage) {
                 state.storage.clear();
             }
+            state.videoPlayer.destroy();
         });
 
         describe('constructor, YouTube mode', function () {

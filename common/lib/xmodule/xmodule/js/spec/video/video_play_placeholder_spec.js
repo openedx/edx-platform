@@ -16,7 +16,7 @@
         afterEach(function () {
             $('source').remove();
             state.storage.clear();
-            window.Video.previousState = null;
+            state.videoPlayer.destroy();
             window.onTouchBasedDevice = oldOTBD;
         });
 

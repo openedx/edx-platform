@@ -13,12 +13,13 @@
         afterEach(function () {
             $('source').remove();
             state.storage.clear();
-            window.Video.previousState = null;
+            state.videoPlayer.destroy();
             window.onTouchBasedDevice = oldOTBD;
         });
 
         describe('constructor', function () {
             beforeEach(function () {
+                window.VideoState = {};
                 state = jasmine.initializePlayer();
             });
 
@@ -35,18 +36,6 @@
                 expect($('.video-controls').find('.vidtime'))
                     .toHaveText('0:00 / 0:00');
             });
-
-            it('add ARIA attributes to time control', function () {
-                var timeControl = $('div.slider > a');
-
-                expect(timeControl).toHaveAttrs({
-                    'role': 'slider',
-                    'title': 'Video position',
-                    'aria-disabled': 'false'
-                });
-
-                expect(timeControl).toHaveAttr('aria-valuetext');
-            });
         });
 
         describe('constructor with start-time', function () {
@@ -57,6 +46,7 @@
                 var duration, sliderEl, expectedValue;
 
                 runs(function () {
+                    window.VideoState = {};
                     state = jasmine.initializePlayer({
                         start: 10,
                         savedVideoPosition: 0
@@ -89,6 +79,7 @@
                 var duration, sliderEl, expectedValue;
 
                 runs(function () {
+                    window.VideoState = {};
                     state = jasmine.initializePlayer({
                         start: 10,
                         savedVideoPosition: 15
@@ -123,6 +114,7 @@
                 var duration, sliderEl, expectedValue;
 
                 runs(function () {
+                    window.VideoState = {};
                     state = jasmine.initializePlayer({
                         start: 10,
                         savedVideoPosition: -15
@@ -157,6 +149,7 @@
                 var duration, sliderEl, expectedValue;
 
                 runs(function () {
+                    window.VideoState = {};
                     state = jasmine.initializePlayer({
                         start: 10,
                         savedVideoPosition: 'a'
@@ -191,6 +184,7 @@
                 var duration, sliderEl, expectedValue;
 
                 runs(function () {
+                    window.VideoState = {};
                     state = jasmine.initializePlayer({
                         start: 10,
                         savedVideoPosition: 10000
@@ -220,13 +214,14 @@
 
         describe('constructor with end-time', function () {
             it(
-                'saved position is 0, timer slider and VCR set to 0:00 ' + 
+                'saved position is 0, timer slider and VCR set to 0:00 ' +
                 'and ending at specified end-time',
                 function ()
             {
                 var duration, sliderEl, expectedValue;
 
                 runs(function () {
+                    window.VideoState = {};
                     state = jasmine.initializePlayer({
                         end: 20,
                         savedVideoPosition: 0
@@ -261,6 +256,7 @@
                 var duration, sliderEl, expectedValue;
 
                 runs(function () {
+                    window.VideoState = {};
                     state = jasmine.initializePlayer({
                         end: 20,
                         savedVideoPosition: 15
@@ -295,6 +291,7 @@
                 var duration, sliderEl, expectedValue;
 
                 runs(function () {
+                    window.VideoState = {};
                     state = jasmine.initializePlayer({
                         end: 20,
                         savedVideoPosition: -15
@@ -329,6 +326,7 @@
                 var duration, sliderEl, expectedValue;
 
                 runs(function () {
+                    window.VideoState = {};
                     state = jasmine.initializePlayer({
                         end: 20,
                         savedVideoPosition: 'a'
@@ -364,6 +362,7 @@
                 var duration, sliderEl, expectedValue;
 
                 runs(function () {
+                    window.VideoState = {};
                     state = jasmine.initializePlayer({
                         end: 20,
                         savedVideoPosition: 10000
@@ -399,6 +398,7 @@
                 var duration, sliderEl, expectedValue;
 
                 runs(function () {
+                    window.VideoState = {};
                     state = jasmine.initializePlayer({
                         start: 10,
                         end: 20,
@@ -434,6 +434,7 @@
                 var duration, sliderEl, expectedValue;
 
                 runs(function () {
+                    window.VideoState = {};
                     state = jasmine.initializePlayer({
                         start: 10,
                         end: 20,
@@ -469,6 +470,7 @@
                 var duration, sliderEl, expectedValue;
 
                 runs(function () {
+                    window.VideoState = {};
                     state = jasmine.initializePlayer({
                         start: 10,
                         end: 20,
@@ -504,6 +506,7 @@
                 var duration, sliderEl, expectedValue;
 
                 runs(function () {
+                    window.VideoState = {};
                     state = jasmine.initializePlayer({
                         start: 10,
                         end: 20,
@@ -539,6 +542,7 @@
                 var duration, sliderEl, expectedValue;
 
                 runs(function () {
+                    window.VideoState = {};
                     state = jasmine.initializePlayer({
                         start: 10,
                         end: 20,
@@ -565,17 +569,6 @@
                     state.storage.clear();
                 });
             });
-        });
-
-        it('Controls height is actual on switch to fullscreen', function () {
-            spyOn($.fn, 'height').andCallFake(function (val) {
-                return _.isUndefined(val) ? 100: this;
-            });
-
-            state = jasmine.initializePlayer();
-            $(state.el).trigger('fullscreen');
-
-            expect(state.videoControl.height).toBe(150);
         });
 
         it('show', function () {

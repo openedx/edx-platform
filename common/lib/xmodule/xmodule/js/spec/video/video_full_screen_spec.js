@@ -13,7 +13,7 @@
         afterEach(function () {
             $('source').remove();
             state.storage.clear();
-            window.Video.previousState = null;
+            state.videoPlayer.destroy();
             window.onTouchBasedDevice = oldOTBD;
         });
 
@@ -52,5 +52,15 @@
             });
         });
 
+        it('Controls height is actual on switch to fullscreen', function () {
+            spyOn($.fn, 'height').andCallFake(function (val) {
+                return _.isUndefined(val) ? 100: this;
+            });
+
+            state = jasmine.initializePlayer();
+            $(state.el).trigger('fullscreen');
+
+            expect(state.videoFullScreen.height).toBe(150);
+        });
     });
 }).call(this, window.WAIT_TIMEOUT);

@@ -13,6 +13,7 @@ describe('VideoVolumeControl', function () {
         $('source').remove();
         window.onTouchBasedDevice = oldOTBD;
         state.storage.clear();
+        state.videoPlayer.destroy();
     });
 
     it('Volume level has correct value even if cookie is broken', function () {

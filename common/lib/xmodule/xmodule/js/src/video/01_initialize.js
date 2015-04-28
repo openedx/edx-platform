@@ -379,7 +379,6 @@ function (VideoPlayer, i18n) {
                     },
                     'startTime': function (value) {
                         value = parseInt(value, 10);
-
                         if (!isFinite(value) || value < 0) {
                             return 0;
                         }

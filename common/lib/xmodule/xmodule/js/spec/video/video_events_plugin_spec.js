@@ -18,6 +18,9 @@
             $('source').remove();
             window.onTouchBasedDevice = oldOTBD;
             state.storage.clear();
+            if (state.videoPlayer) {
+                state.videoPlayer.destroy();
+            }
         });
 
         it('can emit "load_video" event', function () {
@@ -132,7 +135,7 @@
 
         it('can destroy itself', function () {
             var plugin = state.videoEventsPlugin;
-            spyOn($.fn, 'off');
+            spyOn($.fn, 'off').andCallThrough();
             state.videoEventsPlugin.destroy();
             expect(state.videoEventsPlugin).toBeUndefined();
             expect($.fn.off).toHaveBeenCalledWith({

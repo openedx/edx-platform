@@ -17,7 +17,12 @@
             afterEach(function () {
                 $('source').remove();
                 state.storage.clear();
-                window.Video.previousState = null;
+                if (state.bumperState.videoPlayer) {
+                    state.bumperState.videoPlayer.destroy();
+                }
+                if (state.videoPlayer) {
+                    state.videoPlayer.destroy();
+                }
                 window.onTouchBasedDevice = oldOTBD;
             });
 
@@ -28,11 +33,6 @@
 
             it('destroy itself on "play" event', function () {
                 state.el.trigger('play');
-                expect($('.poster')).not.toExist();
-            });
-
-            it('destroy itself on "destroy" event', function () {
-                state.el.trigger('destroy');
                 expect($('.poster')).not.toExist();
             });
 
@@ -55,7 +55,7 @@
             afterEach(function () {
                 $('source').remove();
                 state.storage.clear();
-                window.Video.previousState = null;
+                state.videoPlayer.destroy();
                 window.onTouchBasedDevice = oldOTBD;
             });
 

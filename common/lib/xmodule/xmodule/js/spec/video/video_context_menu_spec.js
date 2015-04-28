@@ -68,6 +68,7 @@
             $('source').remove();
             _.result(state.storage, 'clear');
             _.result($('video').data('contextmenu'), 'destroy');
+            _.result(state.videoPlayer, 'destroy');
         });
 
         describe('constructor', function () {
