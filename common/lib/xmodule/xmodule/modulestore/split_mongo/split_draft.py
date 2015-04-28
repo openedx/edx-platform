@@ -328,7 +328,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 return True
 
             # check if the draft has changed since the published was created
-            if self._get_version(draft_block) != self._get_version(published_block):
+            if draft_block.edit_info.get_source_version() != published_block.edit_info.get_source_version():
                 return True
 
             # check the children in the draft
@@ -474,13 +474,6 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             # There is no published version xblock container, e.g. Library
             return None
         return self._get_block_from_structure(course_structure, BlockKey.from_usage_key(xblock.location))
-
-    def _get_version(self, block):
-        """
-        Return the version of the given database representation of a block.
-        """
-        source_version = block.edit_info.source_version
-        return source_version if source_version is not None else block.edit_info.update_version
 
     def import_xblock(self, user_id, course_key, block_type, block_id, fields=None, runtime=None, **kwargs):
         """
