@@ -8,8 +8,9 @@ from mock import patch, MagicMock, Mock
 
 from django.conf import settings
 from django.test import TestCase
+from django.test.utils import override_settings
 
-from xmodule.video_module import create_youtube_string, VideoDescriptor
+from xmodule.video_module import create_youtube_string, VideoDescriptor, bumper_utils
 from xmodule.x_module import STUDENT_VIEW
 from xmodule.tests.test_video import VideoDescriptorTestBase
 from xmodule.tests.test_import import DummySystem
@@ -169,7 +170,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
     CATEGORY = "video"
     DATA = SOURCE_XML
     METADATA = {}
-    maxDiff = None
 
     def setUp(self):
         super(TestGetHtmlMethod, self).setUp()
@@ -1061,3 +1061,129 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
             VideoDescriptor.from_xml(xml_data, module_system, id_generator=Mock())
         with self.assertRaises(ValVideoNotFoundError):
             get_video_info("test_edx_video_id")
+
+
+
+
+
+class TestVideoWithBumper(TestVideo):
+    """
+    Tests rendered content in presence of video bumper.
+    """
+    CATEGORY = "video"
+    METADATA = {}
+    FEATURES = settings.FEATURES
+
+    @patch('xmodule.video_module.bumper_utils.get_bumper_settings')
+    def test_is_bumper_enabled(self, get_bumper_settings):
+        """
+        Check that bumper is (not)shown if ENABLE_VIDEO_BUMPER is (False)True
+
+        Assume that bumper settings are correct.
+        """
+        self.FEATURES.update({
+        'SHOW_BUMPER_PERIODICITY': 1,
+        'ENABLE_VIDEO_BUMPER': True
+        })
+
+        get_bumper_settings.return_value = {
+                "edx_video_id": "edx_video_id",
+                "transcripts": {},
+        }
+        with override_settings(FEATURES=self.FEATURES):
+            self.assertTrue(bumper_utils.is_bumper_enabled(self.item_descriptor))
+
+        self.FEATURES.update({
+            'ENABLE_VIDEO_BUMPER': False
+        })
+
+        with override_settings(FEATURES=self.FEATURES):
+            self.assertFalse(bumper_utils.is_bumper_enabled(self.item_descriptor))
+
+    @patch('xmodule.video_module.bumper_utils.is_bumper_enabled')
+    @patch('xmodule.video_module.bumper_utils.get_bumper_settings')
+    @patch('edxval.api.get_urls_for_profiles')
+    def test_bumper_metadata(self, get_url_for_profiles,get_bumper_settings, is_bumper_enabled):
+        """
+        Test content with rendered bumper metadata.
+        """
+        get_url_for_profiles.return_value = {
+            "desktop_mp4": "http://test_bumper.mp4",
+            "desktop_webm": ""
+        }
+
+        get_bumper_settings.return_value = {
+                "edx_video_id": "edx_video_id",
+                "transcripts": {},
+        }
+
+        is_bumper_enabled.return_value = True
+
+        content = self.item_descriptor.render(STUDENT_VIEW).content
+        sources = [u'example.mp4', u'example.webm']
+        expected_context = {
+            'branding_info': None,
+            'bumper_metadata': json.dumps(
+                OrderedDict({
+                    "sources": ["http://test_bumper.mp4"],
+                    "showCaptions": "false",
+                    "transcriptLanguage": "en",
+                    "transcriptLanguages": {},
+                    "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
+                            self.item_descriptor, 'transcript', 'translation_bumper'
+                            ).rstrip('/?'),
+                    "transcriptAvailableTranslationsUrl":
+                    self.item_descriptor.xmodule_runtime.handler_url(
+                            self.item_descriptor, 'transcript', 'available_translations_bumper'
+                            ).rstrip('/?')
+             })),
+            'cdn_eval': False,
+            'cdn_exp_group': None,
+            'display_name': u'A Name',
+            'download_video_link': u'example.mp4',
+            'handout': None,
+            'id': self.item_descriptor.location.html_id(),
+            'metadata': json.dumps(
+                OrderedDict(
+                    {
+                        "saveStateUrl": self.item_descriptor.xmodule_runtime.ajax_url + "/save_user_state",
+                        "autoplay": False,
+                        "streams": "0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg",
+                        "sub": "a_sub_file.srt.sjson",
+                        "sources": sources,
+                        "captionDataDir": None,
+                        "showCaptions": "true",
+                        "generalSpeed": 1.0,
+                        "speed": None,
+                        "savedVideoPosition": 0.0,
+                        "start": 3603.0,
+                        "end": 3610.0,
+                        "transcriptLanguage": "en",
+                        "transcriptLanguages": OrderedDict({"en": "English", "uk": u"Українська"}),
+                        "ytTestTimeout": 1500,
+                        "ytApiUrl": "www.youtube.com/iframe_api",
+                        "ytTestUrl": "gdata.youtube.com/feeds/api/videos/",
+                        "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
+                            self.item_descriptor, 'transcript', 'translation'
+                            ).rstrip('/?'),
+                        "transcriptAvailableTranslationsUrl": self.item_descriptor.xmodule_runtime.handler_url(
+                            self.item_descriptor, 'transcript', 'available_translations'
+                            ).rstrip('/?'),
+                        "autohideHtml5": False,
+                    }
+                )
+            ),
+            'track': None,
+            'transcript_download_format': 'srt',
+            'transcript_download_formats_list': [
+                {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
+                {'display_name': 'Text (.txt) file', 'value': 'txt'}
+            ],
+            'poster': json.dumps(OrderedDict({
+                "url": "http://img.youtube.com/vi/ZwkTiUPN0mg/0.jpg",
+                "type": "youtube"
+            }))
+        }
+
+        expected_content = self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
+        self.assertEqual(content, expected_content)
