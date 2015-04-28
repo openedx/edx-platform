@@ -3,16 +3,18 @@
 define(['backbone'], function(Backbone) {
     'use strict';
 
-    return function (Collection, Form, ResultListView, searchQuery) {
+    return function (Collection, Form, ResultListView, FilterBarView, searchQuery) {
 
         var collection = new Collection([]);
         var results = new ResultListView({ collection: collection });
         var dispatcher = _.clone(Backbone.Events);
         var form = new Form();
+        var filters = new FilterBarView();
 
         dispatcher.listenTo(form, 'search', function (query) {
             collection.performSearch(query);
             form.showLoadingIndicator();
+            filters.changeQueryFilter(query);
         });
 
         dispatcher.listenTo(form, 'clear', function () {
