@@ -45,7 +45,7 @@ $course-search-input-height: ($baseline*2.8);
       @include transition(all 0.2s linear 0s);
       position: relative;
       border: 1px solid $border-color-3;
-      box-shadow: 0 4px 25px 0 rgba(0,0,0, 0.5);
+      box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
       background: $white;
       width: $title-width;
       min-height: ($baseline*6);
@@ -64,7 +64,7 @@ $course-search-input-height: ($baseline*2.8);
         @include transition(all 0.2s linear 0s);
         @include text-align(left);
         display: inline-block;
-        top: 0px;
+        top: 0;
         opacity: 1.0;
         padding: 20px 30px;
 
@@ -101,7 +101,7 @@ $course-search-input-height: ($baseline*2.8);
           width: 100%;
           height: $course-search-input-height;
           color: $black;
-          font-style: normal;
+          font-style: $sans-serif;
 
           // STATE: focus
           &:focus {
