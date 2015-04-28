@@ -30,6 +30,7 @@ from capa.xqueue_interface import XQueueInterface
 from courseware.access import has_access, get_user_role
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache, DjangoKeyValueStore
+from courseware.models import SCORE_CHANGED
 from courseware.entrance_exams import (
     get_entrance_exam_score,
     user_must_complete_entrance_exam
@@ -448,6 +449,17 @@ def get_module_system_for_user(user, field_data_cache,
             user,
             course_id,
             descriptor.location,
+        )
+
+        # Send a signal out to any listeners who are waiting for score change
+        # events.
+        SCORE_CHANGED.send(
+            sender=None,
+            points_possible=event['max_value'],
+            points_earned=event['value'],
+            user_id=user_id,
+            course_id=unicode(course_id),
+            usage_id=unicode(descriptor.location)
         )
 
     def publish(block, event_type, event):
