@@ -9,7 +9,8 @@
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice').andReturn(null);
             state = jasmine.initializePlayer();
-            spyOn(this.state.videoCommands, 'execute');
+            spyOn(state.videoCommands, 'execute');
+            spyOn(state.videoSaveStatePlugin, 'saveState');
         });
 
         afterEach(function () {
@@ -31,20 +32,30 @@
             });
         });
 
-        it('can update state on play', function () {
+        it('can update ARIA state on play', function () {
             state.el.trigger('play');
-            expect().toBe();
+            expect($('.video_control.pause')).toHaveAttrs({
+                'role': 'button',
+                'title': 'Pause',
+                'aria-disabled': 'false'
+            });
+        });
+
+        it('can update ARIA state on video ends', function () {
+            state.el.trigger('play');
+            state.el.trigger('ended');
+            expect($('.video_control.play')).toHaveAttrs({
+                'role': 'button',
+                'title': 'Play',
+                'aria-disabled': 'false'
+            });
         });
 
         it('can update state on pause', function () {
             state.el.trigger('pause');
-            expect().toBe();
+            expect(state.videoSaveStatePlugin.saveState).toHaveBeenCalledWith(true);
         });
 
-        it('can update state on video ends', function () {
-            state.el.trigger('ended');
-            expect().toBe();
-        });
 
         it('can start video playing on click', function () {
             $('.video_control.play').click();
@@ -52,7 +63,8 @@
         });
 
         it('can destroy itself', function () {
-            expect().toBe();
+            state.videoPlayPauseControl.destroy();
+            expect(state.videoPlayPauseControl).toBeUndefined();
         });
 
     });
