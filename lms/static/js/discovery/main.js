@@ -4,14 +4,16 @@ RequireJS.require([
     'js/discovery/app',
     'js/discovery/collection',
     'js/discovery/form',
-    'js/discovery/result_list_view'
-], function ($, Backbone, App, Collection, DiscoveryForm, ResultListView) {
+    'js/discovery/result_list_view',
+    'js/discovery/filter_bar_view'
+], function ($, Backbone, App, Collection, DiscoveryForm, ResultListView, FilterBarView) {
     'use strict';
 
     var app = new App(
         Collection,
         DiscoveryForm,
         ResultListView,
+        FilterBarView,
         getParameterByName('search_query')
     );
 
