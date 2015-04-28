@@ -173,7 +173,7 @@ def render_courseware(request, lti_params):
         'disable_footer': True,
         'disable_tabs': True,
         'staff_access': staff,
-        'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://example.com/xqa'),
+        'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://your_xqa_server.com'),
     }
 
     return render_to_response('courseware/courseware.html', context)
