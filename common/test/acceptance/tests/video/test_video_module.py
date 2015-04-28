@@ -76,6 +76,11 @@ class VideoBaseTest(UniqueCourseTest):
         self._install_course_fixture()
         self._navigate_to_courseware_video_no_render()
 
+    def navigate_to_video_with_bumper(self):
+        """ Prepare the course and get to the video and render it """
+        self._install_course_fixture()
+        self._navigate_to_courseware_video_with_bumper_and_render()
+
     def _install_course_fixture(self):
         """ Install the course fixture that has been defined """
         if self.assets:
@@ -139,6 +144,11 @@ class VideoBaseTest(UniqueCourseTest):
         """ Wait for the video Xmodule but not for rendering """
         self._navigate_to_courseware_video()
         self.video.wait_for_video_class()
+
+    def _navigate_to_courseware_video_with_bumper_and_render(self):
+        """ Wait for the video player to render """
+        self._navigate_to_courseware_video()
+        self.video.wait_for_video_bumper_render()
 
     def metadata_for_mode(self, player_mode, additional_data=None):
         """
@@ -395,7 +405,17 @@ class YouTubeVideoTest(VideoBaseTest):
             'time_to_response': 2.0,
             'youtube_api_blocked': True,
         })
-        self.metadata = self.metadata_for_mode('youtube_html5')
+
+        additional_data = {
+            'video_bumper': {
+                "transcripts": {
+                    "en": "b7xgknqkQk8.srt"
+                },
+                "edx_video_id": "edx_video_id"
+            }
+        }
+
+        self.metadata = self.metadata_for_mode('youtube_html5', additional_data=additional_data)
 
         self.navigate_to_video()
 
@@ -555,14 +575,14 @@ class YouTubeVideoTest(VideoBaseTest):
         # open video "C"
         self.course_nav.go_to_sequential('C')
 
-        # check if video "C" should start playing at speed "0.75"
-        self.assertEqual(self.video.speed, '0.75x')
+        # check if video "C" should start playing at speed "1.0"
+        self.assertEqual(self.video.speed, '1.0x')
 
         # open video "A"
         self.course_nav.go_to_sequential('A')
 
-        # check if video "A" should start playing at speed "2.0"
-        self.assertEqual(self.video.speed, '2.0x')
+        # check if video "A" should start playing at speed "1.0"
+        self.assertEqual(self.video.speed, '1.0x')
 
         # reload the page
         self.video.reload_page()
@@ -585,8 +605,8 @@ class YouTubeVideoTest(VideoBaseTest):
         # open video "C"
         self.course_nav.go_to_sequential('C')
 
-        # check if video "C" should start playing at speed "1.0"
-        self.assertEqual(self.video.speed, '1.0x')
+        # check if video "C" should start playing at speed "1.50"
+        self.assertEqual(self.video.speed, '1.50x')
 
     def test_video_has_correct_transcript(self):
         """
@@ -708,6 +728,26 @@ class YouTubeVideoTest(VideoBaseTest):
             self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
 
         self.assertEqual(self.video.caption_languages, {'zh_HANS': 'Simplified Chinese', 'zh_HANT': 'Traditional Chinese'})
+
+    def test_video_bumper_render(self):
+        """
+        Scenario: Video bumper is correct, also korekt working click play and skip.
+        """
+        additional_data = {
+            'video_bumper': {
+                "transcripts": {
+                    "en": "b7xgknqkQk8.srt"
+                },
+                "edx_video_id": "edx_video_id"
+            }
+        }
+        self.metadata = self.metadata_for_mode('youtube_html5', additional_data=additional_data)
+        self.navigate_to_video_with_bumper()
+
+        # self.video.click_player_button('btn-play')
+        # self.assertFalse(self.video.is_quality_button_active)
+        # self.video.click_player_button('quality')
+        # self.assertTrue(self.video.is_quality_button_active)
 
 
 class YouTubeHtml5VideoTest(VideoBaseTest):

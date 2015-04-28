@@ -238,26 +238,5 @@
                 expect(numAjaxCalls).toBe(1);
             });
         });
-
-        describe('log', function () {
-            beforeEach(function () {
-                loadFixtures('video_html5.html');
-                state = new Video('#example');
-                spyOn(Logger, 'log');
-                state.videoPlayer.log('someEvent', {
-                    currentTime: 25,
-                    speed: '1.0'
-                });
-            });
-
-            it('call the logger with valid extra parameters', function () {
-                expect(Logger.log).toHaveBeenCalledWith('someEvent', {
-                    id: 'id',
-                    code: 'html5',
-                    currentTime: 25,
-                    speed: '1.0'
-                });
-            });
-        });
     });
 }).call(this);

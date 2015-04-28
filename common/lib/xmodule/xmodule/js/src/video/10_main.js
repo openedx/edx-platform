@@ -35,74 +35,124 @@
     // Main module.
     require(
         [
+            'video/00_video_storage.js',
             'video/01_initialize.js',
             'video/025_focus_grabber.js',
             'video/035_video_accessible_menu.js',
             'video/04_video_control.js',
+            'video/04_video_full_screen.js',
             'video/05_video_quality_control.js',
             'video/06_video_progress_slider.js',
             'video/07_video_volume_control.js',
             'video/08_video_speed_control.js',
             'video/09_video_caption.js',
+            'video/09_play_placeholder.js',
+            'video/09_play_pause_control.js',
+            'video/09_play_skip_control.js',
+            'video/09_skip_control.js',
+            'video/09_bumper.js',
+            'video/09_save_state_plugin.js',
+            'video/09_events_plugin.js',
+            'video/09_poster.js',
             'video/10_commands.js',
             'video/095_video_context_menu.js'
         ],
         function (
-            initialize,
-            FocusGrabber,
-            VideoAccessibleMenu,
-            VideoControl,
-            VideoQualityControl,
-            VideoProgressSlider,
-            VideoVolumeControl,
-            VideoSpeedControl,
-            VideoCaption,
-            VideoCommands,
-            VideoContextMenu
+            VideoStorage,
+            initialize, FocusGrabber, VideoAccessibleMenu, VideoControl,
+            VideoFullScreen, VideoQualityControl, VideoProgressSlider,
+            VideoVolumeControl, VideoSpeedControl, VideoCaption,
+            VideoPlayPlaceholder, VideoPlayPauseControl, VideoPlaySkipControl,
+            VideoSkipControl, VideoBumper, VideoSaveStatePlugin,
+            VideoEventsPlugin, VideoPoster, VideoCommands, VideoContextMenu
         ) {
             var youtubeXhr = null,
                 oldVideo = window.Video;
 
             window.Video = function (element) {
-                var previousState = window.Video.previousState,
-                    state;
+                var el = $(element).find('.video'),
+                    id = el.attr('id').replace(/video_/, ''),
+                    storage = VideoStorage('VideoState', id),
+                    state = {
+                        el: el,
+                        id: id,
+                        metadata: el.data('metadata'),
+                        storage: storage,
+                        options: {},
+                        youtubeXhr: youtubeXhr
+                    };
 
-                // Check for existance of previous state, uninitialize it if necessary, and create a new state. Store
-                // new state for future invocation of this module consturctor function.
-                if (previousState && previousState.videoPlayer) {
-                    previousState.saveState(true);
-                    $(window).off('unload', previousState.saveState);
-                }
+                var getCleanState = function (state, metadata) {
+                    return $.extend(true, {}, state, {metadata: metadata}, {
+                        metadata: {
+                            savedVideoPosition: 0,
+                            speed: '1.0',
+                            startTime: 0,
+                            endTime: null,
+                            streams: []
+                        }
+                    });
+                };
 
-                state = {};
-                // Because this constructor can be called multiple times on a single page (when the user switches
-                // verticals, the page doesn't reload, but the content changes), we must will check each time if there
-                // is a previous copy of 'state' object. If there is, we will make sure that copy exists cleanly. We
-                // have to do this because when verticals switch, the code does not handle any Xmodule JS code that is
-                // running - it simply removes DOM elements from the page. Any functions that were running during this,
-                // and that will run afterwards (expecting the DOM elements to be present) must be stopped by hand.
-                window.Video.previousState = state;
+                var player = function (state, autoplay) {
+                    return function () {
+                        state.metadata.autoplay = autoplay || false;
+                        initialize(state, element);
+                    };
+                };
 
                 state.modules = [
-                    FocusGrabber,
-                    VideoAccessibleMenu,
-                    VideoControl,
-                    VideoQualityControl,
-                    VideoProgressSlider,
-                    VideoVolumeControl,
-                    VideoSpeedControl,
-                    VideoCaption,
-                    VideoCommands,
-                    VideoContextMenu
+                    FocusGrabber, VideoAccessibleMenu, VideoControl, VideoPlayPlaceholder, VideoPlayPauseControl,
+                    VideoProgressSlider, VideoSpeedControl, VideoVolumeControl, VideoQualityControl, VideoFullScreen,
+                    VideoCaption, VideoCommands, VideoContextMenu, VideoSaveStatePlugin, VideoEventsPlugin
                 ];
 
-                state.youtubeXhr = youtubeXhr;
-                initialize(state, element);
+                var bumperMetadata = el.data('bumper-metadata');
+                if (bumperMetadata) {
+                    var bumperState = getCleanState(state, bumperMetadata);
+
+                    _.extend(bumperState, {
+                        modules: [
+                            VideoAccessibleMenu, VideoControl, VideoPlaySkipControl, VideoSkipControl, VideoCaption,
+                            VideoVolumeControl, VideoCommands, VideoSaveStatePlugin, VideoEventsPlugin
+                        ],
+                        options: {
+                            SaveStatePlugin: {events: ['transcript_download:change', 'language_menu:change']},
+                            EventsPlugin: {data: {is_bumper: true}}
+                        }
+                    });
+
+                    var bumperPlayer = player(bumperState),
+                        bumper = new VideoBumper(bumperPlayer, bumperState);
+                    state.bumperState = bumperState;
+                    bumper.getPromise().done(player(state, true));
+                    new VideoPoster(state.el, {
+                        poster: el.data('poster'),
+                        onClick: function () {
+                            if (storage.getItem('isBumperShown')) {
+                                bumper.showMainVideo();
+                            } else {
+                                bumper.play();
+                            }
+                        }
+                    });
+                } else {
+                    initialize(state, element);
+                }
+
                 if (!youtubeXhr) {
                     youtubeXhr = state.youtubeXhr;
                 }
 
-                $(element).find('.video').data('video-player-state', state);
+                el.data('video-player-state', state);
+
+                var onSequenceChange = function onSequenceChange () {
+                    if (state && state.videoPlayer) {
+                        state.videoPlayer.destroy();
+                    }
+                    $('.sequence').off('sequence:change', onSequenceChange);
+                };
+                $('.sequence').on('sequence:change', onSequenceChange);
 
                 // Because the 'state' object is only available inside this closure, we will also make it available to
                 // the caller by returning it. This is necessary so that we can test Video with Jasmine.

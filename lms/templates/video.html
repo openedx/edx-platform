@@ -7,47 +7,9 @@
 <div
     id="video_${id}"
     class="video closed"
-
-    data-streams="${youtube_streams}"
-
-    % if sub:
-      data-sub="${sub}"
-    % endif
-    % if autoplay:
-      data-autoplay="${autoplay}"
-    % endif
-
-    data-sources='${sources}'
-    data-save-state-url="${ajax_url}"
-    data-caption-data-dir="${data_dir}"
-    data-show-captions="${show_captions}"
-    data-general-speed="${general_speed}"
-    data-speed="${speed}"
-    data-saved-video-position="${saved_video_position}"
-    data-start="${start}"
-    data-end="${end}"
-    data-transcript-language="${transcript_language}"
-    data-transcript-languages='${transcript_languages}'
-    data-autoplay="${autoplay}"
-    data-yt-test-timeout="${yt_test_timeout}"
-    data-yt-api-url="${yt_api_url}"
-    data-yt-test-url="${yt_test_url}"
-    data-transcript-translation-url="${transcript_translation_url}"
-    data-transcript-available-translations-url="${transcript_available_translations_url}"
-
-    ## For now, the option "data-autohide-html5" is hard coded. This option
-    ## either enables or disables autohiding of controls and captions on mouse
-    ## inactivity. If set to true, controls and captions will autohide for
-    ## HTML5 sources (non-YouTube) after a period of mouse inactivity over the
-    ## whole video. When the mouse moves (or a key is pressed while any part of
-    ## the video player is focused), the captions and controls will be shown
-    ## once again.
-    ##
-    ## There is no option in the "Advanced Editor" to set this option. However,
-    ## this option will have an effect if changed to "True". The code on
-    ## front-end exists.
-    data-autohide-html5="False"
-
+    data-metadata='${metadata}'
+    data-bumper-metadata='${bumper_metadata}'
+    data-poster='${poster}'
     tabindex="-1"
 >
     <div class="focus_grabber first"></div>
@@ -65,41 +27,13 @@
           </section>
           <div class="video-player-post"></div>
           <section class="video-controls is-hidden">
-              <div class="slider" title="${_('Video position')}"></div>
               <div>
-                  <ul class="vcr">
-                      <li><a class="video_control" href="#" title="${_('Play')}" role="button" aria-disabled="false"></a></li>
-                      <li><div class="vidtime">0:00 / 0:00</div></li>
-                  </ul>
-                  <div class="secondary-controls">
-                      <div class="speeds menu-container">
-                          <a class="speed-button" href="#" title="${_('Speeds')}" role="button" aria-disabled="false">
-                              <span class="label">${_('Speed')}</span>
-                              <span class="value"></span>
-                          </a>
-                          <ol class="video-speeds menu" role="menu"></ol>
-                      </div>
-                      <div class="volume">
-                          <a href="#" role="button" aria-disabled="false" title="${_('Volume')}" aria-label="${_('Click on this button to mute or unmute this video or press UP or DOWN buttons to increase or decrease volume level.')}"></a>
-                          <div role="presentation" class="volume-slider-container">
-                              <div class="volume-slider"></div>
-                          </div>
-                      </div>
-                      <a href="#" class="add-fullscreen" title="${_('Fill browser')}" role="button" aria-disabled="false">${_('Fill browser')}</a>
-                      <a href="#" class="quality-control is-hidden" title="${_('HD off')}" role="button" aria-disabled="false">${_('HD off')}</a>
-
-                      <div class="lang menu-container">
-                        <a href="#" class="hide-subtitles" title="${_('Turn off captions')}" role="button" aria-disabled="false">${_('Turn off captions')}</a>
-                      </div>
-                  </div>
+                  <div class="vcr"><div class="vidtime">0:00 / 0:00</div></div>
+                  <div class="secondary-controls"></div>
               </div>
           </section>
           <a class="nav-skip sr" id="before-transcript_${id}" href="#after-transcript_${id}">${_('Skip to end of transcript.')}</a>
       </article>
-
-      <ol id="transcript-captions" class="subtitles" tabindex="0" role="group" aria-label="${_('Activating an item in this group will spool the video to the corresponding time point. To skip transcript, go to previous item.')}">
-        <li></li>
-      </ol>
     </div>
 
     <a class="nav-skip sr" id="after-transcript_${id}" href="#before-transcript_${id}">${_('Go back to start of transcript.')}</a>

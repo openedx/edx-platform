@@ -380,6 +380,12 @@ FEATURES = {
         'TWITTER_SHARING': False,
         'TWITTER_SHARING_TEXT': None
     },
+
+    # Show video bumper in LMS
+    'ENABLE_VIDEO_BUMPER': True,
+
+    # How many seconds to show the bumper again
+    'SHOW_BUMPER_PERIODICITY' : 1,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -1577,6 +1583,8 @@ YOUTUBE = {
             'v': 'set_youtube_id_of_11_symbols_here',
         },
     },
+
+    'IMAGE_API': 'http://img.youtube.com/vi/{youtube_id}/0.jpg',  # /maxresdefault.jpg for 1920*1080
 }
 
 ################################### APPS ######################################

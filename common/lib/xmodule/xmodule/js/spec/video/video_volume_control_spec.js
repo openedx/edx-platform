@@ -35,8 +35,7 @@ describe('VideoVolumeControl', function () {
         });
 
         it('render the volume control', function () {
-            expect(state.videoControl.secondaryControlsEl.html())
-                .toContain('<div class="volume">\n');
+            expect($('.volume')).toExist();
         });
 
         it('create the slider', function () {
