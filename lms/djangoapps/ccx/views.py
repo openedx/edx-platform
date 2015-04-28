@@ -10,7 +10,7 @@ import pytz
 
 from copy import deepcopy
 from cStringIO import StringIO
-
+from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import (
     HttpResponse,
@@ -381,6 +381,7 @@ def ccx_student_management(request, course):
     action = request.POST.get('student-action', None)
     student_id = request.POST.get('student-id', '')
     user = email = None
+    error_message = ""
     try:
         user = get_student_from_identifier(student_id)
     except User.DoesNotExist:
@@ -397,9 +398,19 @@ def ccx_student_management(request, course):
         elif action == 'revoke':
             unenroll_email(ccx, email, email_students=False)
     except ValidationError:
-        log.info('Invalid user name or email when trying to enroll student: %s', email)
+        log.info(
+            'Invalid user name or email when trying to enroll student: %s',
+            email
+        )
+        if email:
+            error_message = (
+                'Could not find a user with name or email "{}" '.format(email)
+            )
 
     url = reverse('ccx_coach_dashboard', kwargs={'course_id': course.id})
+    if error_message:
+        messages.error(request, error_message, extra_tags='ccx_coach_invite_user_not_found')
+
     return redirect(url)
 
 

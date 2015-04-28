@@ -358,6 +358,26 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ).exists()
         )
 
+    def test_manage_add_single_invalid_student(self):
+        """enroll a single non valid student
+        """
+        self.make_coach()
+        self.make_ccx()
+        url = reverse(
+            'ccx_manage_student',
+            kwargs={'course_id': self.course.id.to_deprecated_string()}
+        )
+        data = {
+            'student-action': 'add',
+            'student-id': u','.join(["test_wrong_user_name", ]),  # pylint: disable=no-member
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        # we were redirected to our current location
+        self.assertEqual(len(response.redirect_chain), 1)
+        self.assertTrue(302 in response.redirect_chain[0])
+
     def test_manage_add_single_student(self):
         """enroll a single student who is a member of the class already
         """
