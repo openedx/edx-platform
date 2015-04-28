@@ -76,15 +76,22 @@ describe 'Navigation', ->
 
   describe 'setChapter', ->
     beforeEach ->
-      $('#accordion').append('<div><div><ol><li class="active"></li></ol></div></div>')
+      $('#accordion').append('<div><div><ol><li class="active"><a href="#"></a></li></ol></div></div>')
       new Navigation
     it 'Chapter opened', ->
       e = jQuery.Event('click')
       $('#accordion .chapter').trigger(e)
       expect($('.chapter')).toHaveClass('is-open')
+
     it 'content active on chapter opened', ->
       e = jQuery.Event('click')
       $('#accordion .chapter').trigger(e)
       expect($('.chapter').next('div').children('div')).toHaveClass('ui-accordion-content-active')
       expect($('.ui-accordion-content-active')).toHaveAttr('aria-hidden', 'false')
+
+    it 'focus move to first child on chapter opened', ->
+      spyOn($.fn, 'focus')
+      e = jQuery.Event('click')
+      $('#accordion .chapter').trigger(e)
+      expect($('.ui-accordion-content-active li:first-child a').focus).toHaveBeenCalled()
 
