@@ -9,13 +9,13 @@ beautifulsoup==3.2.1
 bleach==1.4
 html5lib==0.999
 boto==2.32.1
-celery==3.0.19
+celery==3.1.18
 cssselect==0.9.1
 dealer==2.0.4
 defusedxml==0.4.1
 distribute>=0.6.28, <0.7
 django-babel-underscore==0.1.0
-django-celery==3.0.17
+django-celery==3.1.16
 django-countries==2.1.2
 django-extensions==1.2.5
 django-filter==0.6.0
