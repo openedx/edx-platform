@@ -7,7 +7,7 @@
 <%namespace name='static' file='../static_content.html'/>
 
 <%block name="header_extras">
-  % for template_name in ["result_item", "error", "not_found"]:
+  % for template_name in ["result_item", "error", "not_found", "filter_bar", "filter"]:
   <script type="text/template" id="${template_name}-tpl">
       <%static:include path="discovery/${template_name}.underscore" />
   </script>
@@ -55,6 +55,9 @@
       </hgroup>
     </div>
   </header>
+
+    <div id="filter-bar" class="filters hide-phone">
+    </div>
 
   <section class="courses-container">
 
