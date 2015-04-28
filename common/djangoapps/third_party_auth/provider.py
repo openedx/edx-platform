@@ -114,6 +114,7 @@ class GoogleOauth2(BaseProvider):
     """Provider for Google's Oauth2 auth system."""
 
     BACKEND_CLASS = google.GoogleOAuth2
+    BACKEND_CLASS.DEFAULT_SCOPE =  ['https://www.googleapis.com/auth/userinfo.email']
     ICON_CLASS = 'icon-google-plus'
     NAME = 'Google'
     SETTINGS = {
