@@ -30,6 +30,8 @@ from django_future.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 import mongoengine
 from path import path
+from django.core.management import call_command
+import sys
 
 from courseware.courses import get_course_by_id
 import dashboard.git_import as git_import
@@ -46,6 +48,7 @@ from xmodule.modulestore.xml import XMLModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from instructor_task.models import InstructorTask
 from django_comment_client.management_utils import rename_user as rename_user_util
+from util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
 
@@ -779,6 +782,103 @@ class GitLogs(TemplateView):
                    'error_msg': error_msg}
 
         return render_to_response(self.template_name, context)
+
+
+class MgmtCommands(SysadminDashboardView):
+    """
+    Render views for management commands
+    """
+
+    def get(self, request):
+        """
+        Displays the view for the management commands tab
+        """
+
+        if not request.user.is_superuser:
+            raise Http404
+
+        context = {
+            'msg': self.msg,
+            'djangopid': os.getpid(),
+            'modeflag': {'mgmt_commands': 'active-section'},
+            'edx_platform_version': getattr(settings, 'EDX_PLATFORM_VERSION_STRING', ''),
+        }
+        return render_to_response(self.template_name, context)
+
+    def post(self, request):
+        """
+        Handles a post request containing data to run a management command
+        """
+
+        if not request.user.is_superuser:
+            raise Http404
+
+        command_name, kwargs, args = self.parse_parameters(request.POST.copy())
+        client_stdout, client_stderr, client_error = self.execute_command_and_capture_output(command_name, *args, **kwargs)
+
+        log.info(client_stdout)
+        log.error(client_stderr)
+
+        response = {
+            'stdout': client_stdout,
+            'stderr': client_stderr,
+        }
+        if client_error is not None:
+            response['error'] = client_error
+
+        return JsonResponse(response)
+
+    def execute_command_and_capture_output(self, command, *args, **kwargs):
+        """
+        Executes the specified command with the given args and kwargs, and returns the console output
+        :param command:
+        :param args:
+        :param kwargs:
+        :return: client_stdout, client_stderr, client_error
+        """
+        orig_stdout = sys.stdout
+        orig_stderr = sys.stderr
+
+        sys.stdout = stdout_buffer = StringIO.StringIO()
+        sys.stderr = stderr_buffer = StringIO.StringIO()
+
+        client_error = None
+        try:
+            call_command(command, *args, **kwargs)
+        except SystemExit:
+            client_error = _('Command failed')
+        except Exception as error:
+            client_error = unicode(error)
+
+        sys.stdout = orig_stdout
+        sys.stderr = orig_stderr
+        stdout_buffer.seek(0)
+        stderr_buffer.seek(0)
+
+        client_stdout = stdout_buffer.read()
+        client_stderr = stderr_buffer.read()
+        return client_stdout, client_stderr, client_error
+
+    def parse_parameters(self, parameters):
+        """
+        Parses the list of parameters from the ExecuteCommand post request
+        :param params:
+        :return: command_name, kwargs, args
+        """
+        command_name = parameters.pop('command')[0]
+
+        kwargs = {}
+        args = []
+        # collect kwargs and args
+        if 'args' in parameters:
+            args = parameters.pop('args')
+        if 'kwflags' in parameters:
+            kwflags = parameters.pop('kwflags')
+            for kwflag in kwflags:
+                kwargs[kwflag] = None
+        for kwarg in parameters:
+            kwargs[kwarg] = parameters[kwarg]
+        return command_name, kwargs, args
 
 
 class TaskQueue(SysadminDashboardView):

@@ -16,4 +16,5 @@ urlpatterns = patterns(
     url(r'^gitlogs/(?P<course_id>.+)$', sysadmin.GitLogs.as_view(),
         name="gitlogs_detail"),
     url(r'^task_queue/?$', sysadmin.TaskQueue.as_view(), name="sysadmin_task_queue"),
+    url(r'^mgmt_commands/?$', sysadmin.MgmtCommands.as_view(), name="sysadmin_mgmt_commands"),
 )

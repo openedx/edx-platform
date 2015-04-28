@@ -339,6 +339,7 @@
       <div class="bottom-email">
           <input type="button" name="getcsv" class="emailWidget getcsv" value="${_("Get CSV")}" data-endpoint="${ section_data['get_all_students'] }" data-csv="true" class="disabled">
           <input type="button" name="savequery" class="emailWidget savequery" value="${_("Save Query")}" data-endpoint="${ section_data['save_query'] }" data-csv="true" class="disabled">
+          <input type="text" name="savequeryname" class="emailWidget savequeryname" placeholder="Saved Query Name"><br>
           <div class="emailWidget estimated">${_("Approx 0 students selected")}</div>
           <input type="button" name="getest" class="emailWidget getest" value="${_("Update Students Estimate")}" data-endpoint="${ section_data['get_all_students'] }" >
           <input type="button" name="startover" class="emailWidget startover" value="${_("Clear Active Queries")}">
@@ -348,12 +349,15 @@
         <thead>
           <tr>
               <td class="label">${_("Date Saved")}</td>
-              <td class="label">${_("Query")}</td>
+              <td class="label">${_("Query Name")}</td>
               <td class="label"></td>
               <td class="label"></td>
           </tr>
         </thead>
-        <tbody class="emailWidget savedQueriesTable" data-endpoint="${ section_data['get_saved_queries'] }"></tbody>
+        <tbody class="emailWidget savedQueriesTable"
+               data-endpoint="${ section_data['get_saved_queries'] }"
+               data-group-name-endpoint="${ section_data['save_group_name'] }"
+                ></tbody>
 
       </table>
         <table>

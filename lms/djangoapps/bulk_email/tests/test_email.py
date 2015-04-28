@@ -272,7 +272,7 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         save_args = {
             'existing': ','.join(existing),
         }
-        response = self.client.get(save_url, save_args)
+        response = self.client.post(save_url, save_args)
         return response
 
     def _get_saved_queries(self):
