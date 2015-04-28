@@ -1,3 +1,0 @@
-<% if (typeof count !== 'undefined' && count > 0) { %>
-    <%- count %>
-<% } %>
