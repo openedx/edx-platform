@@ -134,7 +134,10 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
     def test_set_existing_field(self):
         "Test that setting an existing user_state field changes the value"
         # We are updating a problem, so we write to courseware_studentmodulehistory
-        # as well as courseware_studentmodule
+        # as well as courseware_studentmodule. We also need to read the database
+        # to discover if something other than the DjangoXBlockUserStateClient
+        # has written to the StudentModule (such as UserStateCache setting the score
+        # on the StudentModule).
         with self.assertNumQueries(3):
             self.kvs.set(user_state_key('a_field'), 'new_value')
         self.assertEquals(1, StudentModule.objects.all().count())
@@ -143,7 +146,10 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
     def test_set_missing_field(self):
         "Test that setting a new user_state field changes the value"
         # We are updating a problem, so we write to courseware_studentmodulehistory
-        # as well as courseware_studentmodule
+        # as well as courseware_studentmodule. We also need to read the database
+        # to discover if something other than the DjangoXBlockUserStateClient
+        # has written to the StudentModule (such as UserStateCache setting the score
+        # on the StudentModule).
         with self.assertNumQueries(3):
             self.kvs.set(user_state_key('not_a_field'), 'new_value')
         self.assertEquals(1, StudentModule.objects.all().count())
@@ -152,7 +158,10 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
     def test_delete_existing_field(self):
         "Test that deleting an existing field removes it from the StudentModule"
         # We are updating a problem, so we write to courseware_studentmodulehistory
-        # as well as courseware_studentmodule
+        # as well as courseware_studentmodule. We also need to read the database
+        # to discover if something other than the DjangoXBlockUserStateClient
+        # has written to the StudentModule (such as UserStateCache setting the score
+        # on the StudentModule).
         with self.assertNumQueries(3):
             self.kvs.delete(user_state_key('a_field'))
         self.assertEquals(1, StudentModule.objects.all().count())
@@ -190,6 +199,9 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
         # Scope.user_state is stored in a single row in the database, so we only
         # need to send a single update to that table.
         # We also are updating a problem, so we write to courseware student module history
+        # We also need to read the database to discover if something other than the
+        # DjangoXBlockUserStateClient has written to the StudentModule (such as
+        # UserStateCache setting the score on the StudentModule).
         with self.assertNumQueries(3):
             self.kvs.set_many(kv_dict)
 
@@ -207,7 +219,7 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
         with patch('django.db.models.Model.save', side_effect=DatabaseError):
             with self.assertRaises(KeyValueMultiSaveError) as exception_context:
                 self.kvs.set_many(kv_dict)
-        self.assertEquals(len(exception_context.exception.saved_field_names), 0)
+        self.assertEquals(exception_context.exception.saved_field_names, [])
 
 
 @attr('shard_1')
@@ -234,8 +246,11 @@ class TestMissingStudentModule(TestCase):
         self.assertEquals(0, StudentModule.objects.all().count())
 
         # We are updating a problem, so we write to courseware_studentmodulehistory
-        # as well as courseware_studentmodule
-        with self.assertNumQueries(6):
+        # as well as courseware_studentmodule. We also need to read the database
+        # to discover if something other than the DjangoXBlockUserStateClient
+        # has written to the StudentModule (such as UserStateCache setting the score
+        # on the StudentModule).
+        with self.assertNumQueries(3):
             self.kvs.set(user_state_key('a_field'), 'a_value')
 
         self.assertEquals(1, sum(len(cache) for cache in self.field_data_cache.cache.values()))
@@ -289,7 +304,7 @@ class StorageTestBase(object):
         self.kvs = DjangoKeyValueStore(self.field_data_cache)
 
     def test_set_and_get_existing_field(self):
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(1):
             self.kvs.set(self.key_factory('existing_field'), 'test_value')
         with self.assertNumQueries(0):
             self.assertEquals('test_value', self.kvs.get(self.key_factory('existing_field')))
@@ -306,14 +321,14 @@ class StorageTestBase(object):
 
     def test_set_existing_field(self):
         "Test that setting an existing field changes the value"
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(1):
             self.kvs.set(self.key_factory('existing_field'), 'new_value')
         self.assertEquals(1, self.storage_class.objects.all().count())
         self.assertEquals('new_value', json.loads(self.storage_class.objects.all()[0].value))
 
     def test_set_missing_field(self):
         "Test that setting a new field changes the value"
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(1):
             self.kvs.set(self.key_factory('missing_field'), 'new_value')
         self.assertEquals(2, self.storage_class.objects.all().count())
         self.assertEquals('old_value', json.loads(self.storage_class.objects.get(field_name='existing_field').value))
@@ -355,7 +370,7 @@ class StorageTestBase(object):
 
         # Each field is a separate row in the database, hence
         # a separate query
-        with self.assertNumQueries(len(kv_dict) * 3):
+        with self.assertNumQueries(len(kv_dict)):
             self.kvs.set_many(kv_dict)
         for key in kv_dict:
             self.assertEquals(self.kvs.get(key), kv_dict[key])
@@ -363,8 +378,8 @@ class StorageTestBase(object):
     def test_set_many_failure(self):
         """Test that setting many regular fields with a DB error """
         kv_dict = self.construct_kv_dict()
-        with self.assertNumQueries(6):
-            for key in kv_dict:
+        for key in kv_dict:
+            with self.assertNumQueries(1):
                 self.kvs.set(key, 'test value')
 
         with patch('django.db.models.Model.save', side_effect=[None, DatabaseError]):
@@ -372,8 +387,7 @@ class StorageTestBase(object):
                 self.kvs.set_many(kv_dict)
 
         exception = exception_context.exception
-        self.assertEquals(len(exception.saved_field_names), 1)
-        self.assertIn(exception.saved_field_names[0], ('existing_field', 'other_existing_field'))
+        self.assertEquals(exception.saved_field_names, ['existing_field', 'other_existing_field'])
 
 
 class TestUserStateSummaryStorage(StorageTestBase, TestCase):

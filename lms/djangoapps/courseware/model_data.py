@@ -24,6 +24,7 @@ from xblock.exceptions import KeyValueMultiSaveError, InvalidScopeError
 from xblock.fields import Scope, UserScope
 from xmodule.modulestore.django import modulestore
 from xblock.core import XBlockAside
+from courseware.user_state_client import DjangoXBlockUserStateClient
 
 log = logging.getLogger(__name__)
 
@@ -204,17 +205,27 @@ class DjangoOrmFieldCache(object):
             cache_key = self._cache_key_for_kvs_key(kvs_key)
             field_object = self._cache.get(cache_key)
 
-            if field_object is None:
-                self._cache[cache_key] = field_object = self._create_object(kvs_key)
-
-            self._set_field_value(field_object, kvs_key, value)
-
             try:
-                field_object.save()
-                saved_fields.append(kvs_key.field_name)
+                serialized_value = json.dumps(value)
+                # It is safe to force an insert or an update, because
+                # a) we should have retrieved the object as part of the
+                #    prefetch step, so if it isn't in our cache, it doesn't exist yet.
+                # b) no other code should be modifying these models out of band of
+                #    this cache.
+                if field_object is None:
+                    field_object = self._create_object(kvs_key, serialized_value)
+                    field_object.save(force_insert=True)
+                    self._cache[cache_key] = field_object
+                else:
+                    field_object.value = serialized_value
+                    field_object.save(force_update=True)
+
             except DatabaseError:
                 log.exception("Saving field %r failed", kvs_key.field_name)
                 raise KeyValueMultiSaveError(saved_fields)
+
+            finally:
+                saved_fields.append(kvs_key.field_name)
 
     @contract(kvs_key=DjangoKeyValueStore.Key)
     def delete(self, kvs_key):
@@ -264,15 +275,11 @@ class DjangoOrmFieldCache(object):
         else:
             return field_object.modified
 
-    @contract(kvs_key=DjangoKeyValueStore.Key)
-    def _set_field_value(self, field_object, kvs_key, value):
-        field_object.value = json.dumps(value)
-
     def __len__(self):
         return len(self._cache)
 
     @abstractmethod
-    def _create_object(self, kvs_key):
+    def _create_object(self, kvs_key, value):
         """
         Create a new object to add to the cache (which should record
         the specified field ``value`` for the field identified by
@@ -280,6 +287,7 @@ class DjangoOrmFieldCache(object):
 
         Arguments:
             kvs_key (:class:`DjangoKeyValueStore.Key`): Which field to create an entry for
+            value: What value to record in the field
         """
         raise NotImplementedError()
 
@@ -324,9 +332,10 @@ class UserStateCache(object):
     Cache for Scope.user_state xblock field data.
     """
     def __init__(self, user, course_id):
-        self._cache = {}
+        self._cache = defaultdict(dict)
         self.course_id = course_id
         self.user = user
+        self._client = DjangoXBlockUserStateClient(self.user)
 
     def cache_fields(self, fields, xblocks, aside_types):  # pylint: disable=unused-argument
         """
@@ -338,15 +347,12 @@ class UserStateCache(object):
             xblocks (list of :class:`XBlock`): XBlocks to cache fields for.
             aside_types (list of str): Aside types to cache fields for.
         """
-        query = StudentModule.objects.chunked_filter(
-            'module_state_key__in',
+        block_field_state = self._client.get_many(
+            self.user.username,
             _all_usage_keys(xblocks, aside_types),
-            course_id=self.course_id,
-            student=self.user.pk,
         )
-        for field_object in query:
-            cache_key = field_object.module_state_key.map_into_course(self.course_id)
-            self._cache[cache_key] = field_object
+        for usage_key, field_state in block_field_state:
+            self._cache[usage_key] = field_state
 
     @contract(kvs_key=DjangoKeyValueStore.Key)
     def set(self, kvs_key, value):
@@ -369,12 +375,11 @@ class UserStateCache(object):
 
         Returns: datetime if there was a modified date, or None otherwise
         """
-        field_object = self._cache.get(self._cache_key_for_kvs_key(kvs_key))
-
-        if field_object is None:
-            return None
-        else:
-            return field_object.modified
+        return self._client.get_mod_date(
+            self.user.username,
+            kvs_key.block_scope_id,
+            fields=[kvs_key.field_name],
+        ).get(kvs_key.field_name)
 
     @contract(kv_dict="dict(DjangoKeyValueStore_Key: *)")
     def set_many(self, kv_dict):
@@ -385,25 +390,21 @@ class UserStateCache(object):
             kv_dict (dict): A dictionary mapping :class:`~DjangoKeyValueStore.Key`
                 objects to values to set.
         """
-        dirty_field_objects = defaultdict(set)
+        pending_updates = defaultdict(dict)
         for kvs_key, value in kv_dict.items():
             cache_key = self._cache_key_for_kvs_key(kvs_key)
-            field_object = self._cache.get(cache_key)
 
-            if field_object is None:
-                self._cache[cache_key] = field_object = self._create_object(kvs_key)
+            pending_updates[cache_key][kvs_key.field_name] = value
 
-            self._set_field_value(field_object, kvs_key, value)
-            dirty_field_objects[field_object].add(kvs_key.field_name)
-
-        saved_fields = []
-        for field_object, fields in sorted(dirty_field_objects.iteritems()):
-            try:
-                field_object.save()
-                saved_fields.extend(fields)
-            except DatabaseError:
-                log.exception("Saving fields %r failed", fields)
-                raise KeyValueMultiSaveError(saved_fields)
+        try:
+            self._client.set_many(
+                self.user.username,
+                pending_updates
+            )
+        except DatabaseError:
+            raise KeyValueMultiSaveError([])
+        finally:
+            self._cache.update(pending_updates)
 
     @contract(kvs_key=DjangoKeyValueStore.Key)
     def get(self, kvs_key):
@@ -420,9 +421,7 @@ class UserStateCache(object):
         if cache_key not in self._cache:
             raise KeyError(kvs_key.field_name)
 
-        field_object = self._cache[cache_key]
-
-        return json.loads(field_object.state)[kvs_key.field_name]
+        return self._cache[cache_key][kvs_key.field_name]
 
     @contract(kvs_key=DjangoKeyValueStore.Key)
     def delete(self, kvs_key):
@@ -434,15 +433,17 @@ class UserStateCache(object):
 
         Raises: KeyError if key isn't found in the cache
         """
-
-        field_object = self._cache.get(self._cache_key_for_kvs_key(kvs_key))
-        if field_object is None:
+        cache_key = self._cache_key_for_kvs_key(kvs_key)
+        if cache_key not in self._cache:
             raise KeyError(kvs_key.field_name)
 
-        state = json.loads(field_object.state)
-        del state[kvs_key.field_name]
-        field_object.state = json.dumps(state)
-        field_object.save()
+        field_state = self._cache[cache_key]
+
+        if kvs_key.field_name not in field_state:
+            raise KeyError(kvs_key.field_name)
+
+        self._client.delete(self.user.username, cache_key, fields=[kvs_key.field_name])
+        del field_state[kvs_key.field_name]
 
     @contract(kvs_key=DjangoKeyValueStore.Key, returns=bool)
     def has(self, kvs_key):
@@ -454,11 +455,12 @@ class UserStateCache(object):
 
         Returns: bool
         """
-        field_object = self._cache.get(self._cache_key_for_kvs_key(kvs_key))
-        if field_object is None:
-            return False
+        cache_key = self._cache_key_for_kvs_key(kvs_key)
 
-        return kvs_key.field_name in json.loads(field_object.state)
+        return (
+            cache_key in self._cache and
+            kvs_key.field_name in self._cache[cache_key]
+        )
 
     @contract(user_id=int, usage_key=UsageKey, score="number|None", max_score="number|None")
     def set_score(self, user_id, usage_key, score, max_score):
@@ -467,29 +469,22 @@ class UserStateCache(object):
 
         Set the score and max_score for the specified user and xblock usage.
         """
-        field_object = self._cache[usage_key]
-        field_object.grade = score
-        field_object.max_grade = max_score
-        field_object.save()
-
-    @contract(kvs_key=DjangoKeyValueStore.Key)
-    def _set_field_value(self, field_object, kvs_key, value):
-        field_object.value = json.dumps(value)
+        student_module, created = StudentModule.objects.get_or_create(
+            student_id=user_id,
+            module_state_key=usage_key,
+            course_id=usage_key.course_key,
+            defaults={
+                'grade': score,
+                'max_grade': max_score,
+            }
+        )
+        if not created:
+            student_module.grade = score
+            student_module.max_grade = max_score
+            student_module.save()
 
     def __len__(self):
         return len(self._cache)
-
-    def _create_object(self, kvs_key):
-        field_object, __ = StudentModule.objects.get_or_create(
-            course_id=self.course_id,
-            student_id=kvs_key.user_id,
-            module_state_key=kvs_key.block_scope_id,
-            defaults={
-                'state': json.dumps({}),
-                'module_type': kvs_key.block_scope_id.block_type,
-            },
-        )
-        return field_object
 
     def _cache_key_for_kvs_key(self, key):
         """
@@ -500,12 +495,6 @@ class UserStateCache(object):
         """
         return key.block_scope_id
 
-    @contract(kvs_key=DjangoKeyValueStore.Key)
-    def _set_field_value(self, field_object, kvs_key, value):
-        state = json.loads(field_object.state)
-        state[kvs_key.field_name] = value
-        field_object.state = json.dumps(state)
-
 
 class UserStateSummaryCache(DjangoOrmFieldCache):
     """
@@ -515,7 +504,7 @@ class UserStateSummaryCache(DjangoOrmFieldCache):
         super(UserStateSummaryCache, self).__init__()
         self.course_id = course_id
 
-    def _create_object(self, kvs_key):
+    def _create_object(self, kvs_key, value):
         """
         Create a new object to add to the cache (which should record
         the specified field ``value`` for the field identified by
@@ -523,12 +512,13 @@ class UserStateSummaryCache(DjangoOrmFieldCache):
 
         Arguments:
             kvs_key (:class:`DjangoKeyValueStore.Key`): Which field to create an entry for
+            value: The value to assign to the new field object
         """
-        field_object, __ = XModuleUserStateSummaryField.objects.get_or_create(
+        return XModuleUserStateSummaryField(
             field_name=kvs_key.field_name,
-            usage_id=kvs_key.block_scope_id
+            usage_id=kvs_key.block_scope_id,
+            value=value,
         )
-        return field_object
 
     def _read_objects(self, fields, xblocks, aside_types):
         """
@@ -575,7 +565,7 @@ class PreferencesCache(DjangoOrmFieldCache):
         super(PreferencesCache, self).__init__()
         self.user = user
 
-    def _create_object(self, kvs_key):
+    def _create_object(self, kvs_key, value):
         """
         Create a new object to add to the cache (which should record
         the specified field ``value`` for the field identified by
@@ -583,13 +573,14 @@ class PreferencesCache(DjangoOrmFieldCache):
 
         Arguments:
             kvs_key (:class:`DjangoKeyValueStore.Key`): Which field to create an entry for
+            value: The value to assign to the new field object
         """
-        field_object, __ = XModuleStudentPrefsField.objects.get_or_create(
+        return XModuleStudentPrefsField(
             field_name=kvs_key.field_name,
             module_type=BlockTypeKeyV1(kvs_key.block_family, kvs_key.block_scope_id),
             student_id=kvs_key.user_id,
+            value=value,
         )
-        return field_object
 
     def _read_objects(self, fields, xblocks, aside_types):
         """
@@ -637,7 +628,7 @@ class UserInfoCache(DjangoOrmFieldCache):
         super(UserInfoCache, self).__init__()
         self.user = user
 
-    def _create_object(self, kvs_key):
+    def _create_object(self, kvs_key, value):
         """
         Create a new object to add to the cache (which should record
         the specified field ``value`` for the field identified by
@@ -645,12 +636,13 @@ class UserInfoCache(DjangoOrmFieldCache):
 
         Arguments:
             kvs_key (:class:`DjangoKeyValueStore.Key`): Which field to create an entry for
+            value: The value to assign to the new field object
         """
-        field_object, __ = XModuleStudentInfoField.objects.get_or_create(
+        return XModuleStudentInfoField(
             field_name=kvs_key.field_name,
             student_id=kvs_key.user_id,
+            value=value,
         )
-        return field_object
 
     def _read_objects(self, fields, xblocks, aside_types):
         """

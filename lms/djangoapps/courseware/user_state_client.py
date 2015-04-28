@@ -40,7 +40,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         pass
 
     def __init__(self, user):
-        self._student_module_cache = {}
         self.user = user
 
     def get(self, username, block_key, scope=Scope.user_state, fields=None):
@@ -93,6 +92,28 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         assert self.user.username == username
         return self.delete_many(username, [block_key], scope, fields=fields)
 
+    @contract(username="basestring", block_key=UsageKey, scope=ScopeBase, fields="seq(basestring)|set(basestring)|None")
+    def get_mod_date(self, username, block_key, scope=Scope.user_state, fields=None):
+        """
+        Get the last modification date for fields from the specified blocks.
+
+        Arguments:
+            username: The name of the user whose state should be deleted
+            block_key (UsageKey): The UsageKey identifying which xblock modification dates to retrieve.
+            scope (Scope): The scope to retrieve from.
+            fields: A list of fields to query. If None, delete all stored fields.
+                Specific implementations are free to return the same modification date
+                for all fields, if they don't store changes individually per field.
+                Implementations may omit fields for which data has not been stored.
+
+        Returns: list a dict of {field_name: modified_date} for each selected field.
+        """
+        results = self.get_mod_date_many(username, [block_key], scope, fields=fields)
+        return {
+            field: date for (_, field, date) in results
+        }
+
+    @contract(username="basestring", block_keys="seq(UsageKey)|set(UsageKey)")
     def _get_field_objects(self, username, block_keys):
         """
         Retrieve the :class:`~StudentModule`s for the supplied ``username`` and ``block_keys``.
@@ -108,23 +129,15 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         )
 
         for course_key, usage_keys in by_course:
-            not_cached = []
-            for usage_key in usage_keys:
-                if usage_key in self._student_module_cache:
-                    yield self._student_module_cache[usage_key]
-                else:
-                    not_cached.append(usage_key)
-
             query = StudentModule.objects.chunked_filter(
                 'module_state_key__in',
-                not_cached,
+                usage_keys,
                 student__username=username,
                 course_id=course_key,
             )
 
             for student_module in query:
                 usage_key = student_module.module_state_key.map_into_course(student_module.course_id)
-                self._student_module_cache[usage_key] = student_module
                 yield (student_module, usage_key)
 
 
@@ -170,14 +183,10 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         if scope != Scope.user_state:
             raise ValueError("Only Scope.user_state is supported")
 
-        field_objects = self._get_field_objects(username, block_keys_to_state.keys())
-        for field_object in field_objects:
-            usage_key = field_object.module_state_key.map_into_course(field_object.course_id)
-            current_state = json.loads(field_object.state)
-            current_state.update(block_keys_to_state.pop(usage_key))
-            field_object.state = json.dumps(current_state)
-            field_object.save()
-
+        # We do a find_or_create for every block (rather than re-using field objects
+        # that were queried in get_many) so that if the score has
+        # been changed by some other piece of the code, we don't overwrite
+        # that score.
         for usage_key, state in block_keys_to_state.items():
             student_module, created = StudentModule.objects.get_or_create(
                 student=self.user,
@@ -226,6 +235,39 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                 student_module.state = json.dumps(current_state)
             # We just read this object, so we know that we can do an update
             student_module.save(force_update=True)
+
+    @contract(
+        username="basestring",
+        block_keys="seq(UsageKey)|set(UsageKey)",
+        scope=ScopeBase,
+        fields="seq(basestring)|set(basestring)|None"
+    )
+    def get_mod_date_many(self, username, block_keys, scope=Scope.user_state, fields=None):
+        """
+        Get the last modification date for fields from the specified blocks.
+
+        Arguments:
+            username: The name of the user whose state should be deleted
+            block_key (UsageKey): The UsageKey identifying which xblock modification dates to retrieve.
+            scope (Scope): The scope to retrieve from.
+            fields: A list of fields to query. If None, delete all stored fields.
+                Specific implementations are free to return the same modification date
+                for all fields, if they don't store changes individually per field.
+                Implementations may omit fields for which data has not been stored.
+
+        Yields: tuples of (block, field_name, modified_date) for each selected field.
+        """
+        assert self.user.username == username
+        if scope != Scope.user_state:
+            raise ValueError("Only Scope.user_state is supported")
+
+        field_objects = self._get_field_objects(username, block_keys)
+        for field_object, usage_key in field_objects:
+            if field_object.state is None:
+                continue
+
+            for field in json.loads(field_object.state):
+                yield (usage_key, field, field_object.modified)
 
     def get_history(self, username, block_key, scope=Scope.user_state):
         """We don't guarantee that history for many blocks will be fast."""

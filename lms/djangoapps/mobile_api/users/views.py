@@ -147,7 +147,7 @@ class UserCourseStatus(views.APIView):
                 scope=Scope.user_state,
                 user_id=request.user.id,
                 block_scope_id=course.location,
-                field_name=None
+                field_name='position'
             )
             original_store_date = field_data_cache.last_modified(key)
             if original_store_date is not None and modification_date < original_store_date:
