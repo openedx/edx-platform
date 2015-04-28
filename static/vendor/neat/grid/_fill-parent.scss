@@ -1,0 +1,24 @@
+@charset "UTF-8";
+
+/// Forces the element to fill its parent container.
+///
+/// @example scss - Usage
+///   .element {
+///     @include fill-parent;
+///   }
+///
+/// @example css - CSS Output
+///   .element {
+///     width: 100%;
+///     -webkit-box-sizing: border-box;
+///     -moz-box-sizing: border-box;
+///     box-sizing: border-box;
+///   }
+
+@mixin fill-parent() {
+  width: 100%;
+
+  @if $border-box-sizing == false {
+    @include box-sizing(border-box);
+  }
+}
