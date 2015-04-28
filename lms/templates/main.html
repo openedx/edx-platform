@@ -133,6 +133,16 @@
   <link rel="stylesheet" type="text/css" href="${static.url(style_overrides_file)}" />
 % endif
 
+% if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False) and notifications_header_html:
+
+<script type="text/javascript" src="${static.url('js/vendor/backbone-min.js')}"></script>
+<script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
+<script type="text/javascript" src="${static.url('js/vendor/date.js')}"></script>
+
+  ${notifications_header_html}
+
+% endif
+
 </head>
 
 <body class="${dir_rtl} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
@@ -169,6 +179,11 @@
   % endif
 
   <%block name="js_extra"/>
+
+%if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False) and notifications_body_html:
+  ${notifications_body_html}
+%endif
+
 </body>
 </html>
 

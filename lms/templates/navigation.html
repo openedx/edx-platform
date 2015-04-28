@@ -78,12 +78,12 @@ site_status_msg = get_site_status_msg(course_id)
     </ol>
 
     <ol class="user">
-      % if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
+      % if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False) and notifications_body_html:
         <li class="primary">
           <a id="xns-user-notifications-dropdown" href="#" class="xns-user-notifications xns-icon" aria-haspopup="true" aria-expanded="false">
             <span class="sr">${_("Notifications Pane")}</span>
               <i class="icon fa fa-bell" aria-hidden="true"></i>
-              <div class='xns-counter'></div>
+              <div class='xns-counter'>&nbsp;</div>
               <i class="fa fa-sort-desc" aria-hidden="true"></i>
           </a>
           <div class="dropdown-menu xns-pane" aria-label="Notifications DropDown" aria-labelledby="user-notifications-dropdown" role="menu"></div>

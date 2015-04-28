@@ -503,6 +503,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
     # Allows the open edX footer to be leveraged in Django Templates.
     'edxmako.shortcuts.microsite_footer_context_processor',
+
+    # Injects Notifications context
+    'courseware.context_processor.notifications_context_processor',
 )
 
 # use the ratelimit backend to prevent brute force attacks
@@ -2345,10 +2348,8 @@ NOTIFICATION_MAX_LIST_SIZE = 100
 # NOTE: NOTIFICATION_CLICK_LINK_GROUP_URLS will usually get read in by the *.envs.json file
 #
 NOTIFICATION_CLICK_LINK_URL_MAPS = {
-    'open-edx.studio.announcements.*': '/courses/{course_id}/announcements',
-    'open-edx.lms.leaderboard.*': '/courses/{course_id}/cohort',
-    'open-edx.lms.discussions.*': '/courses/{course_id}/discussion/{commentable_id}/threads/{thread_id}',
-    'open-edx.xblock.group-project.*': '/courses/{course_id}/group_work?seqid={activity_location}',
+    'open-edx.studio.announcements.*': '/courses/{course_id}/info',
+    'open-edx.lms.discussions.*': '/courses/{course_id}/discussion/forum/{commentable_id}/threads/{thread_id}',
 }
 
 # list all known channel providers
