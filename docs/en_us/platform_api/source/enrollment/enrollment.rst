@@ -1,5 +1,5 @@
 ##################################################
-Enrollment API Module
+Enrollment API
 ##################################################
 
 This page contains information on using the Enrollment API to complete
