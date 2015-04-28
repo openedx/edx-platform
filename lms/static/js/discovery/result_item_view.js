@@ -20,13 +20,25 @@ define([
 
         render: function () {
             var data = _.clone(this.model.attributes);
-            data.start = (new Date(data.start)).toLocaleDateString();
-            data.enrollment_start = (new Date(data.enrollment_start)).toLocaleDateString();
+            // JS dates are always local time, convert to universal time
+            data.start = dateUTC(new Date(data.start)).toLocaleDateString();
+            data.enrollment_start = dateUTC(new Date(data.enrollment_start)).toLocaleDateString();
             this.$el.html(this.tpl(data));
             return this;
         }
 
     });
+
+    function  dateUTC(date) {
+        return new Date(
+            date.getUTCFullYear(),
+            date.getUTCMonth(),
+            date.getUTCDate(),
+            date.getUTCHours(),
+            date.getUTCMinutes(),
+            date.getUTCSeconds()
+        );
+    }
 
 });
 
