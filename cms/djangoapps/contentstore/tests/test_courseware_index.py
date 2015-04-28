@@ -855,6 +855,14 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
             publish_item=True,
         )
 
+        self.html_unit3 = ItemFactory.create(
+            parent_location=self.vertical2.location,
+            category="html",
+            display_name="Html Content 3",
+            modulestore=self.store,
+            publish_item=True,
+        )
+
         groups_list = {
             u'id': 666,
             u'name': u'Test name',
@@ -889,7 +897,7 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
             kwargs={'group_configuration_id': cid},
         )
 
-    def _html_group_result(self, html_unit):
+    def _html_group_result(self, html_unit, content_groups):
         """
         Return call object with arguments and content group for html_unit.
         """
@@ -900,7 +908,7 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
                 'content': {'html_content': '', 'display_name': unicode(html_unit.display_name)},
                 'course': unicode(self.course.id),
                 'content_type': 'Text',
-                'content_groups': [1],
+                'content_groups': content_groups,
                 'id': unicode(html_unit.location)
             }
         )
@@ -930,9 +938,9 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
 
         # Only published modules should be in the index
         added_to_index = self.reindex_course(self.store)
-        self.assertEqual(added_to_index, 6)
+        self.assertEqual(added_to_index, 7)
         response = self.searcher.search(field_dictionary={"course": unicode(self.course.id)})
-        self.assertEqual(response["total"], 6)
+        self.assertEqual(response["total"], 7)
 
         group_access_content = {'group_access': {666: [1]}}
 
@@ -946,25 +954,7 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
         with patch(settings.SEARCH_ENGINE + '.index') as mock_index:
             self.reindex_course(self.store)
             self.assertTrue(mock_index.called)
-            self.assertEqual(self._html_group_result(self.html_unit1), mock_index.mock_calls[0])
-            mock_index.reset_mock()
-
-    def test_content_group_gets_inherited_from_parent(self):
-        """ indexing course with content groups added to a parent """
-
-        group_access_content = {'group_access': {666: [1]}}
-
-        self.client.ajax_post(
-            reverse_usage_url("xblock_handler", self.sequential.location),
-            data={'metadata': group_access_content}
-        )
-
-        self.publish_item(self.store, self.sequential.location)
-
-        with patch(settings.SEARCH_ENGINE + '.index') as mock_index:
-            self.reindex_course(self.store)
-            self.assertTrue(mock_index.called)
-            self.assertEqual(self._html_group_result(self.html_unit1), mock_index.mock_calls[0])
+            self.assertEqual(self._html_group_result(self.html_unit1, [1]), mock_index.mock_calls[0])
             mock_index.reset_mock()
 
     def test_content_group_not_assigned(self):
@@ -982,27 +972,27 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
         group_access_content = {'group_access': {666: [1]}}
 
         self.client.ajax_post(
-            reverse_usage_url("xblock_handler", self.sequential.location),
+            reverse_usage_url("xblock_handler", self.html_unit1.location),
             data={'metadata': group_access_content}
         )
 
-        self.publish_item(self.store, self.sequential.location)
+        self.publish_item(self.store, self.html_unit1.location)
 
         # Checking group indexed correctly
         with patch(settings.SEARCH_ENGINE + '.index') as mock_index:
             self.reindex_course(self.store)
             self.assertTrue(mock_index.called)
-            self.assertEqual(self._html_group_result(self.html_unit1), mock_index.mock_calls[0])
+            self.assertEqual(self._html_group_result(self.html_unit1, [1]), mock_index.mock_calls[0])
             mock_index.reset_mock()
 
         empty_group_access = {'group_access': {}}
 
         self.client.ajax_post(
-            reverse_usage_url("xblock_handler", self.sequential.location),
+            reverse_usage_url("xblock_handler", self.html_unit1.location),
             data={'metadata': empty_group_access}
         )
 
-        self.publish_item(self.store, self.sequential.location)
+        self.publish_item(self.store, self.html_unit1.location)
 
         # Checking group removed and not indexed any more
         with patch(settings.SEARCH_ENGINE + '.index') as mock_index:
@@ -1025,8 +1015,60 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
         with patch(settings.SEARCH_ENGINE + '.index') as mock_index:
             self.reindex_course(self.store)
             self.assertTrue(mock_index.called)
-            self.assertEqual(self._html_group_result(self.html_unit1), mock_index.mock_calls[0])
+            self.assertEqual(self._html_group_result(self.html_unit1, [1]), mock_index.mock_calls[0])
             self.assertEqual(self._html_nogroup_result(self.html_unit2), mock_index.mock_calls[2])
+            mock_index.reset_mock()
+
+    def test_different_groups_indexed_on_assigned_html_blocks(self):
+        """ indexing course with different content groups assigned to each of multiple html units """
+        group_access_content_1 = {'group_access': {666: [1]}}
+        group_access_content_2 = {'group_access': {666: [0]}}
+
+        self.client.ajax_post(
+            reverse_usage_url("xblock_handler", self.html_unit1.location),
+            data={'metadata': group_access_content_1}
+        )
+        self.client.ajax_post(
+            reverse_usage_url("xblock_handler", self.html_unit2.location),
+            data={'metadata': group_access_content_2}
+        )
+
+        self.publish_item(self.store, self.html_unit1.location)
+        self.publish_item(self.store, self.html_unit2.location)
+
+        with patch(settings.SEARCH_ENGINE + '.index') as mock_index:
+            self.reindex_course(self.store)
+            self.assertTrue(mock_index.called)
+            self.assertEqual(self._html_group_result(self.html_unit1, [1]), mock_index.mock_calls[0])
+            self.assertEqual(self._html_group_result(self.html_unit2, [0]), mock_index.mock_calls[2])
+            mock_index.reset_mock()
+
+    def test_different_groups_indexed_on_same_vertical_html_blocks(self):
+        """
+        Indexing course with different content groups assigned to each of multiple html units
+        on same vertical
+
+        """
+        group_access_content_1 = {'group_access': {666: [1]}}
+        group_access_content_2 = {'group_access': {666: [0]}}
+
+        self.client.ajax_post(
+            reverse_usage_url("xblock_handler", self.html_unit2.location),
+            data={'metadata': group_access_content_1}
+        )
+        self.client.ajax_post(
+            reverse_usage_url("xblock_handler", self.html_unit3.location),
+            data={'metadata': group_access_content_2}
+        )
+
+        self.publish_item(self.store, self.html_unit2.location)
+        self.publish_item(self.store, self.html_unit3.location)
+
+        with patch(settings.SEARCH_ENGINE + '.index') as mock_index:
+            self.reindex_course(self.store)
+            self.assertTrue(mock_index.called)
+            self.assertEqual(self._html_group_result(self.html_unit2, [1]), mock_index.mock_calls[2])
+            self.assertEqual(self._html_group_result(self.html_unit3, [0]), mock_index.mock_calls[3])
             mock_index.reset_mock()
 
 

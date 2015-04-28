@@ -127,7 +127,7 @@ class SearchIndexerBase(object):
         # list - those are ready to be destroyed
         indexed_items = set()
 
-        def index_item(item, skip_index=False, groups_usage_info=None, content_groups=None):
+        def index_item(item, skip_index=False, groups_usage_info=None):
             """
             Add this item to the search index and indexed_items list
 
@@ -138,6 +138,9 @@ class SearchIndexerBase(object):
                 older than the REINDEX_AGE window and would have been already indexed.
                 This should really only be passed from the recursive child calls when
                 this method has determined that it is safe to do so
+
+            Returns:
+            item_content_groups - content groups assigned to indexed item
             """
             is_indexable = hasattr(item, "index_dictionary")
             item_index_dictionary = item.index_dictionary() if is_indexable else None
@@ -147,10 +150,8 @@ class SearchIndexerBase(object):
 
             item_content_groups = None
             if groups_usage_info:
-                item_content_groups = groups_usage_info.get(unicode(item.location), None)
-
-            if content_groups and not item_content_groups:
-                item_content_groups = content_groups
+                item_location = item.location.version_agnostic().replace(branch=None)
+                item_content_groups = groups_usage_info.get(unicode(item_location), None)
 
             item_id = unicode(cls._id_modifier(item.scope_ids.usage_id))
             indexed_items.add(item_id)
@@ -158,13 +159,17 @@ class SearchIndexerBase(object):
                 # determine if it's okay to skip adding the children herein based upon how recently any may have changed
                 skip_child_index = skip_index or \
                     (triggered_at is not None and (triggered_at - item.subtree_edited_on) > reindex_age)
+                children_groups_usage = []
                 for child_item in item.get_children():
-                    index_item(
-                        child_item,
-                        skip_index=skip_child_index,
-                        groups_usage_info=groups_usage_info,
-                        content_groups=item_content_groups
+                    children_groups_usage.append(
+                        index_item(
+                            child_item,
+                            skip_index=skip_child_index,
+                            groups_usage_info=groups_usage_info
+                        )
                     )
+                if None in children_groups_usage:
+                    item_content_groups = None
 
             if skip_index or not item_index_dictionary:
                 return
@@ -180,6 +185,7 @@ class SearchIndexerBase(object):
                 item_index['content_groups'] = item_content_groups if item_content_groups else None
                 searcher.index(cls.DOCUMENT_TYPE, item_index)
                 indexed_count["count"] += 1
+                return item_content_groups
             except Exception as err:  # pylint: disable=broad-except
                 # broad exception so that index operation does not fail on one item of many
                 log.warning('Could not index item: %s - %r', item.location, err)
@@ -286,6 +292,12 @@ class CoursewareSearchIndexer(SearchIndexerBase):
     def fetch_group_usage(cls, modulestore, structure):
         groups_usage_dict = {}
         groups_usage_info = GroupConfiguration.get_content_groups_usage_info(modulestore, structure).items()
+        groups_usage_info.extend(
+            GroupConfiguration.get_content_groups_items_usage_info(
+                modulestore,
+                structure
+            ).items()
+        )
         if groups_usage_info:
             for name, group in groups_usage_info:
                 for module in group:
