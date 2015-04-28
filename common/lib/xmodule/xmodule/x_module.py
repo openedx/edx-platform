@@ -269,9 +269,6 @@ class XModuleMixin(XModuleFields, XBlockMixin):
 
     Adding this Mixin to an :class:`XBlock` allows it to cooperate with old-style :class:`XModules`
     """
-
-    entry_point = "xmodule.v1"
-
     # Attributes for inspection of the descriptor
 
     # This indicates whether the xmodule is a problem-type.
@@ -728,6 +725,8 @@ class XModule(XModuleMixin, HTMLSnippet, XBlock):  # pylint: disable=abstract-me
         See the HTML module for a simple example.
     """
 
+    entry_point = "xmodule.v1"
+
     has_score = descriptor_attr('has_score')
     _field_data_cache = descriptor_attr('_field_data_cache')
     _field_data = descriptor_attr('_field_data')
@@ -923,6 +922,9 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
     create a problem, and can generate XModules (which do know about student
     state).
     """
+
+    entry_point = "xmodule.v1"
+
     module_class = XModule
 
     # VS[compat].  Backwards compatibility code that can go away after
