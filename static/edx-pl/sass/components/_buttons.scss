@@ -1,0 +1,384 @@
+// ------------------------------
+// edX Pattern Library: Components - Buttons
+
+// About: Contains base styling for demonstration and utility for buttons.
+// ----------------------------
+
+// #LAYOUT
+// #GLOBALS
+// #BASE (size)
+// #LARGE (size)
+// #SMALL (size)
+// #DEFAULT (style)
+// #DEFAULT-ALT (style)
+// #PRIMARY (style)
+// #SECONDARY (style)
+// #SECONDARY-ALT (style)
+// #LINK (style)
+// #ELEVATED (type)
+// #COMBO (type)
+// #ICONS (type)
+// #OVERLAY (type)
+// ----------------------------
+
+// ----------------------------
+// #GLOBALS
+// ----------------------------
+.btn {
+    @include transition(
+        color timing(xx-fast) ease-in-out 0s,
+        border-color timing(xx-fast) ease-in-out 0s,
+        background timing(xx-fast) ease-in-out 0s,
+        box-shadow timing(xx-fast) ease-in-out 0s
+    );
+
+    // Display: inline, side-by-side
+    display: inline-block;
+    border-style: $buttons-border-style;
+    border-radius: $buttons-border-radius;
+    border-width: $buttons-border-size;
+
+    // Display: block, one button per line, full width
+    &.block {
+        display: block;
+        width: 100%;
+    }
+
+    // STATE: is disabled
+    &:disabled,
+    &.is-disabled {
+        @extend %state-disabled;
+    }
+}
+
+// ----------------------------
+// #BASE
+// ----------------------------
+.btn-base {
+    font-size: font-size(mid-large);
+    padding: spacing-vertical(x-small) spacing-horizontal(mid-small);
+}
+
+
+// ----------------------------
+// #LARGE
+// ----------------------------
+.btn-large {
+    font-size: font-size(large);
+    padding: spacing-vertical(small) spacing-horizontal(base);
+}
+
+
+// ----------------------------
+// #SMALL
+// ----------------------------
+.btn-small {
+    font-size: font-size(small);
+    padding: spacing-vertical(x-small) spacing-horizontal(small);
+}
+
+
+// ----------------------------
+// #DEFAULT
+// ----------------------------
+.btn-default {
+    background: palette(grayscale, white);
+    border-color: palette(primary, base);
+    color: palette(primary, base);
+
+    // STATE: hover and focus
+    &:hover,
+    &.is-hovered,
+    &:focus,
+    &.is-focused {
+        background: palette(primary, base);
+        color: palette(grayscale, white);
+    }
+
+    // STATE: is pressed or active
+    &:active,
+    &.is-pressed,
+    &.is-active {
+        background: palette(primary, dark);
+        border-color: palette(primary, dark);
+    }
+
+    // STATE: is disabled
+    &:disabled,
+    &.is-disabled {
+        background: palette(grayscale, white);
+        border-color: palette(grayscale, x-light);
+        color: palette(grayscale, base);
+    }
+}
+
+
+// ----------------------------
+// #DEFAULT-ALT
+// ----------------------------
+.btn-default-alt {
+    background: $transparent;
+    border-color: palette(grayscale-cool, base);
+    color: palette(grayscale-cool, base);
+
+    // STATE: hover and focus
+    &:hover,
+    &.is-hovered,
+    &:focus,
+    &.is-focused {
+        background: palette(primary, base);
+        border-color: palette(primary, base);
+        color: palette(grayscale, white);
+    }
+
+    // STATE: is pressed or active
+    &:active,
+    &.is-pressed,
+    &.is-active {
+        background: palette(primary, dark);
+        border-color: palette(primary, dark);
+    }
+
+    // STATE: is disabled
+    &:disabled,
+    &.is-disabled {
+        background: $transparent;
+        border-color: palette(grayscale-cool, x-light);
+        color: palette(grayscale-cool, light);
+    }
+}
+
+
+// ----------------------------
+// #PRIMARY
+// ----------------------------
+.btn-primary {
+    background: palette(primary, base);
+    border-color: palette(primary, base);
+    color: palette(grayscale, white);
+
+    // STATE: hover and focus
+    &:hover,
+    &.is-hovered,
+    &:focus,
+    &.is-focused {
+        background: palette(primary, light);
+        border-color: palette(primary, light);
+    }
+
+    // STATE: is pressed or active
+    &:active,
+    &.is-pressed,
+    &.is-active {
+        background: palette(primary, base);
+        border-color: palette(primary, base);
+    }
+
+    // STATE: is disabled
+    &:disabled,
+    &.is-disabled {
+        background: palette(grayscale, x-light);
+        border-color: palette(grayscale, x-light);
+        color: palette(grayscale, base);
+    }
+}
+
+
+// ----------------------------
+// #SECONDARY
+// ----------------------------
+.btn-secondary {
+    background: $transparent;
+    border-color: $transparent;
+    color: palette(primary, base);
+
+    // STATE: hover and focus
+    &:hover,
+    &.is-hovered,
+    &:focus,
+    &.is-focused {
+        border-color: palette(grayscale-cool, trans);
+    }
+
+    // STATE: is pressed or active
+    &:active,
+    &.is-pressed,
+    &.is-active {
+        border-color: palette(primary, base);
+        color: palette(primary, base);
+    }
+
+    // STATE: is disabled
+    &:disabled,
+    &.is-disabled {
+        border-color: palette(grayscale, x-light);
+        color: palette(grayscale, light);
+    }
+}
+
+
+// ----------------------------
+// #SECONDARY-ALT
+// ----------------------------
+.btn-secondary-alt {
+    background: $transparent;
+    border-color: $transparent;
+    color: palette(grayscale-cool, dark);
+
+    // STATE: hover and focus
+    &:hover,
+    &.is-hovered,
+    &:focus,
+    &.is-focused {
+        background: palette(grayscale-cool, dark);
+        border-color: palette(grayscale-cool, dark);
+        color: palette(grayscale, white);
+    }
+
+    // STATE: is pressed or active
+    &:active,
+    &.is-pressed,
+    &.is-active {
+        background: palette(primary, dark);
+        border-color: palette(primary, dark);
+    }
+
+    // STATE: is disabled
+    &:disabled,
+    &.is-disabled {
+        border-color: palette(grayscale, x-light);
+        color: palette(grayscale, light);
+
+        &:hover,
+        &.is-hovered,
+        &:focus,
+        &.is-focused {
+            background: $transparent;
+            border-color: palette(grayscale, x-light);
+            color: palette(grayscale, light);
+        }
+    }
+}
+
+
+// ----------------------------
+// #LINK
+// ----------------------------
+.btn-link {
+    @extend %link;
+
+    // reset of inherited buttons
+    border-radius: 0;
+    border-color: $transparent;
+    padding: 1px;
+    background: $transparent;
+}
+
+
+// ----------------------------
+// #ELEVATED
+// ----------------------------
+.btn-elevated {
+    background: palette(primary, base);
+    box-shadow: inset 0 0 -$buttons-elevated-shadow 0 0 palette(primary, dark);
+    border-color: palette(primary, base);
+    color: palette(grayscale, white);
+
+    // STATE: hover and focus
+    &:hover,
+    &.is-hovered,
+    &:focus,
+    &.is-focused {
+        background: palette(primary, light);
+        box-shadow: inset 0 0 -$buttons-elevated-shadow 0 0 palette(primary, dark);
+    }
+
+    // STATE: is pressed or active
+    &:active,
+    &.is-pressed,
+    &.is-active {
+        background: palette(primary, dark);
+        box-shadow: inset 0 $buttons-elevated-shadow 0 0 palette(primary, x-dark);
+    }
+
+    // STATE: is disabled
+    &:disabled,
+    &.is-disabled {
+        background: palette(grayscale, x-light);
+        border-color: palette(grayscale, x-light);
+        box-shadow: inset 0 -1px 0 palette(grayscale, light);
+        color: palette(grayscale, base);
+    }
+}
+
+
+// ----------------------------
+// #COMBO
+// ----------------------------
+.btn-combo {
+    border-radius: 0;
+
+    // targets the first element in a parent container
+    &:first-of-type {
+        border-top-left-radius: $buttons-border-radius;
+        border-bottom-left-radius: $buttons-border-radius;
+    }
+
+    // targets the last element in a parent container
+    &:last-of-type {
+        border-top-right-radius: $buttons-border-radius;
+        border-bottom-right-radius: $buttons-border-radius;
+    }
+}
+
+
+// ----------------------------
+// #ICONS
+// ----------------------------
+.has-icon {
+
+}
+
+.has-icon-reverse {
+
+}
+
+
+// ----------------------------
+// #OVERLAY
+// ----------------------------
+.btn-overlay {
+    background: $transparent;
+    border-color: palette(grayscale, white);
+    color: palette(grayscale, white);
+    font-weight: font-weight(semi-bold);
+
+    // STATE: hover and focus
+    &:hover,
+    &.is-hovered,
+    &:focus,
+    &.is-focused {
+        background: palette(grayscale, white);
+        color: palette(primary, base);
+    }
+
+    // STATE: is pressed or active
+    &:active,
+    &.is-pressed,
+    &.is-active {
+        color: palette(primary, dark);
+    }
+
+    // STATE: is disabled
+    &:disabled,
+    &.is-disabled {
+        border-color: palette(grayscale, x-light);
+        color: palette(grayscale, x-light);
+
+        &:hover {
+            background: $transparent;
+            border-color: palette(grayscale, x-light);
+            color: palette(grayscale, x-light);
+        }
+    }
+}
