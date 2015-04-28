@@ -50,9 +50,9 @@
 
     % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
       <div class="course-search">
-        <form>
+        <form method="get" action="/courses">
           <div class="course-search-bar">
-            <input class="search-input" type="text" placeholder="${_("Search for a course")}"></input>
+            <input class="search-input" name="search_query" type="text" placeholder="${_("Search for a course")}"></input>
           </div>
           <button class="search-button" type="submit">
             <i class="icon fa fa-search" aria-hidden="true"></i>
