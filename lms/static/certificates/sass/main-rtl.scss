@@ -1,19 +1,24 @@
 // ------------------------------
-// Open edX Certificates: Main Style Compile (RTL)
+// Open edX Certificates: Main Style Compile
 
-// About: Sass compile for Open edX certificates. This does not contain styles for other Open edX products/experiences (e.g. account/onboarding).
+// About: Sass compile for the Open edX Certificates Elements.
+
+// NOTE: This is the right to left (RTL) configured style compile. It should mirror main-ltr w/ the exception of bi-app references.
 
 // ------------------------------
 // #VENDOR
 // ------------------------------
-@import '../vendor/bourbon/bourbon';
-@import '../vendor/neat/neat';
-@import '../vendor/bi-app/bi-app-rtl';   // RTL support
+@import '../../../../static/vendor/bourbon/bourbon';
+@import '../../../../static/vendor/susy/susy';
+@import '../../../../static/vendor/breakpoint/breakpoint';
+@import '../../../../static/vendor/bi-app/bi-app-rtl';   // RTL support
 
 // ------------------------------
 // #UTILITIES
 // ------------------------------
-@import 'utilities/variables';
-@import 'utilities/variables-rtl';
+@import '../../../../static/edx-pl/sass/utilities/variables-rtl';
 
-@import 'build';
+// ------------------------------
+// #BUILD
+// ------------------------------
+@import 'build';                                        // shared compile/build order for both LTR and RTL UI
