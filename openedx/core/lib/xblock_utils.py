@@ -299,7 +299,7 @@ def add_staff_markup(user, has_instructor_access, block, view, frag, context):  
         'element_id': block.location.html_id().replace('-', '_'),
         'edit_link': edit_link,
         'user': user,
-        'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
+        'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
         'histogram': json.dumps(histogram),
         'render_histogram': render_histogram,
         'block_content': frag.content,
