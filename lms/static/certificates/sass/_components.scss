@@ -6,6 +6,44 @@
 // ------------------------------
 // #HEADER APP
 // ------------------------------
-.header-app {
+.wrapper-header {
     background: palette(grayscale, white-t);
+    padding: spacing-vertical(small) spacing-horizontal(base);
+}
+
+.header-app {
+    @include outer-container();
+}
+
+.title-logo {
+    margin: 0;
+}
+
+// ------------------------------
+// #CONTENT
+// ------------------------------
+.wrapper-content {
+    padding: spacing-vertical(small) spacing-horizontal(base);
+}
+
+.wrapper-content-grid {
+    @include outer-container();
+}
+
+// ------------------------------
+// #FOOTER
+// ------------------------------
+.wrapper-footer {
+    padding: spacing-vertical(small) spacing-horizontal(base);
+}
+
+.footer-app {
+    @include outer-container();
+}
+
+.footer-app-nav {
+
+    .list-legal {
+        @extend %list-unstyled;
+    }
 }
