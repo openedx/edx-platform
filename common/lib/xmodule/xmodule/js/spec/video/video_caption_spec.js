@@ -121,11 +121,6 @@
                     });
                 });
 
-                it('bind the hide caption button', function () {
-                    state = jasmine.initializePlayer();
-                    expect($('.hide-subtitles')).toHandle('click');
-                });
-
                 it('bind the mouse movement', function () {
                     state = jasmine.initializePlayer();
                     expect($('.subtitles')).toHandle('mouseover');
@@ -907,8 +902,8 @@
                             $('.subtitles').css('maxHeight'), 10
                         );
                         videoWrapperHeight = $('.video-wrapper').height();
-                        progressSliderHeight = videoControl.sliderEl.height();
-                        controlHeight = videoControl.el.height();
+                        progressSliderHeight = state.el.find('.slider').height();
+                        controlHeight = state.el.find('.video-controls').height();
                         shouldBeHeight = videoWrapperHeight -
                             0.5 * progressSliderHeight -
                             controlHeight;
@@ -1043,7 +1038,6 @@
         describe('toggle', function () {
             beforeEach(function () {
                 state = jasmine.initializePlayer();
-                spyOn(state.videoPlayer, 'log');
                 $('.subtitles li[data-index=1]').addClass('current');
             });
 
@@ -1051,15 +1045,6 @@
                 beforeEach(function () {
                     state.el.removeClass('closed');
                     state.videoCaption.toggle(jQuery.Event('click'));
-                });
-
-                it('log the hide_transcript event', function () {
-                    expect(state.videoPlayer.log).toHaveBeenCalledWith(
-                        'hide_transcript',
-                        {
-                            currentTime: state.videoPlayer.currentTime
-                        }
-                    );
                 });
 
                 it('hide the caption', function () {
@@ -1077,15 +1062,6 @@
                     state.el.addClass('closed');
                     state.videoCaption.toggle(jQuery.Event('click'));
                     jasmine.Clock.useMock();
-                });
-
-                it('log the show_transcript event', function () {
-                    expect(state.videoPlayer.log).toHaveBeenCalledWith(
-                        'show_transcript',
-                        {
-                            currentTime: state.videoPlayer.currentTime
-                        }
-                    );
                 });
 
                 it('show the caption', function () {

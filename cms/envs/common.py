@@ -156,6 +156,13 @@ FEATURES = {
         # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in lms/envs/common.py
         'CUSTOM_COURSE_URLS': False
     }
+
+    # Show video bumper in Studio
+    'ENABLE_VIDEO_BUMPER': True,
+
+    # How many seconds to show the bumper again
+    'SHOW_BUMPER_PERIODICITY' : 1,
+
 }
 
 ENABLE_JASMINE = False
@@ -660,6 +667,8 @@ YOUTUBE = {
             'v': 'set_youtube_id_of_11_symbols_here',
         },
     },
+
+    'IMAGE_API': 'http://img.youtube.com/vi/{youtube_id}/0.jpg',  # /maxresdefault.jpg for 1920*1080
 }
 
 ############################# VIDEO UPLOAD PIPELINE #############################

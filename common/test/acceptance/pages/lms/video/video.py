@@ -21,6 +21,7 @@ VIDEO_BUTTONS = {
     'download_transcript': '.video-tracks > a',
     'speed': '.speeds',
     'quality': '.quality-control',
+    'do_not_show_again': '.skip',
 }
 
 CSS_CLASS_NAMES = {
@@ -104,6 +105,44 @@ class VideoPage(PageObject):
 
         EmptyPromise(_is_finished_loading, 'Finished loading the video', timeout=200).fulfill()
 
+        self.wait_for_ajax()
+
+    @wait_for_js
+    def wait_for_video_bumper_render(self):
+        """
+        Wait until Video Player Rendered Completely.
+
+        """
+        self.wait_for_video_class()
+        self.wait_for_element_presence(CSS_CLASS_NAMES['video_init'], 'Video Player Initialized')
+        self.wait_for_element_presence(CSS_CLASS_NAMES['video_time'], 'Video Player Initialized')
+
+        # import ipdb; ipdb.set_trace();
+        self.q(css='.poster-youtube .btn-play').first.click()
+        self.wait_for_ajax()
+
+        video_player_buttons = ['volume', 'play']#, 'do_not_show_again']
+        for button in video_player_buttons:
+            self.wait_for_element_visibility(VIDEO_BUTTONS[button], '{} button is visible'.format(button.title()))
+
+        self.q(css='.skip').first.click()
+        self.wait_for_ajax()
+
+        video_player_buttons = ['volume', 'play', 'fullscreen', 'speed']
+        for button in video_player_buttons:
+            self.wait_for_element_visibility(VIDEO_BUTTONS[button], '{} button is visible'.format(button.title()))
+
+        def _is_finished_loading():
+            """
+            Check if video loading completed.
+
+            Returns:
+                bool: Tells Video Finished Loading.
+
+            """
+            return not self.q(css=CSS_CLASS_NAMES['video_spinner']).visible
+
+        EmptyPromise(_is_finished_loading, 'Finished loading the video', timeout=200).fulfill()
         self.wait_for_ajax()
 
     def get_video_vertical_selector(self, video_display_name=None):

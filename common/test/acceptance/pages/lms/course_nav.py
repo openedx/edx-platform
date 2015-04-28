@@ -111,8 +111,8 @@ class CourseNavPage(PageObject):
         all_items = self.sequence_items
 
         try:
+            # import ipdb; ipdb.set_trace();
             seq_index = all_items.index(sequential_title)
-
         except ValueError:
             msg = "Could not find sequential '{0}'.  Available sequentials: [{1}]".format(
                 sequential_title, ", ".join(all_items)

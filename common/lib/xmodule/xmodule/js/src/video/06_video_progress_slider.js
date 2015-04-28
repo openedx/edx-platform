@@ -12,15 +12,17 @@ define(
 'video/06_video_progress_slider.js',
 [],
 function () {
+    var template = [
+        '<div class="slider" title="', gettext('Video position'), '"></div>'
+    ].join('');
+
     // VideoProgressSlider() function - what this module "exports".
     return function (state) {
         var dfd = $.Deferred();
 
         state.videoProgressSlider = {};
-
         _makeFunctionsPublic(state);
         _renderElements(state);
-        // No callbacks to DOM events (click, mousemove, etc.).
 
         dfd.resolve();
         return dfd.promise();
@@ -36,6 +38,7 @@ function () {
     //     these functions will get the 'state' object as a context.
     function _makeFunctionsPublic(state) {
         var methodsDict = {
+            destroy: destroy,
             buildSlider: buildSlider,
             getRangeParams: getRangeParams,
             onSlide: onSlide,
@@ -49,6 +52,11 @@ function () {
         state.bindTo(methodsDict, state.videoProgressSlider, state);
     }
 
+    function destroy() {
+        this.videoProgressSlider.el.removeAttr('tabindex').slider('destroy');
+        delete this.videoProgressSlider;
+    }
+
     // function _renderElements(state)
     //
     //     Create any necessary DOM elements, attach them, and set their
@@ -56,10 +64,19 @@ function () {
     //     via the 'state' object. Much easier to work this way - you don't
     //     have to do repeated jQuery element selects.
     function _renderElements(state) {
-        state.videoProgressSlider.el = state.videoControl.sliderEl;
+        state.videoProgressSlider.el = $(template);
 
+        state.el.find('.video-controls').prepend(state.videoProgressSlider.el);
         state.videoProgressSlider.buildSlider();
         _buildHandle(state);
+
+        // ARIA
+        // Let screen readers know that this anchor, representing the slider
+        // handle, behaves as a slider named 'video slider'.
+        state.videoProgressSlider.el.find('.ui-slider-handle').attr({
+            'role': 'slider',
+            'title': gettext('Video slider')
+        });
     }
 
     function _buildHandle(state) {
@@ -81,6 +98,8 @@ function () {
             'aria-valuemin': '0',
             'aria-valuenow': state.videoPlayer.currentTime
         });
+
+        state.el.on('destroy', state.videoProgressSlider.destroy);
     }
 
     // ***************************************************************

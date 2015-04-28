@@ -219,12 +219,13 @@
 
             it('mouse left/right-clicking behaves as expected on play/pause menu item', function () {
                 var menuItem = menuItems.first();
+                spyOn(state.videoPlayer, 'isPlaying');
                 spyOn(state.videoPlayer, 'play').andCallFake(function () {
-                    state.videoControl.isPlaying = true;
+                    state.videoPlayer.isPlaying.andReturn(true);
                     state.el.trigger('play');
                 });
                 spyOn(state.videoPlayer, 'pause').andCallFake(function () {
-                    state.videoControl.isPlaying = false;
+                    state.videoPlayer.isPlaying.andReturn(false);
                     state.el.trigger('pause');
                 });
                 // Left-click on play
