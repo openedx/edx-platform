@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
 from django.http import HttpResponse, HttpResponseBadRequest
 
-from contentstore.views.helpers import create_xblock
+from contentstore.views.helpers import create_xblock, remove_entrance_exam_graders
 from contentstore.views.item import delete_item
 from models.settings.course_metadata import CourseMetadata
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -269,6 +269,9 @@ def _delete_entrance_exam(request, course_key):
             'entrance_exam_id': None,
         }
         CourseMetadata.update_from_dict(metadata, course, request.user)
+
+        # Clean up any pre-existing entrance exam graders
+        remove_entrance_exam_graders(course_key, request.user)
 
     return HttpResponse(status=204)
 

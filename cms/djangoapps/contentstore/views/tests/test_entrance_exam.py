@@ -11,6 +11,7 @@ from django.test.client import RequestFactory
 from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase
 from contentstore.utils import reverse_url
 from contentstore.views.entrance_exam import create_entrance_exam, update_entrance_exam, delete_entrance_exam
+from contentstore.views.helpers import GRADER_TYPES
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from opaque_keys.edx.keys import UsageKey
@@ -84,7 +85,7 @@ class EntranceExamHandlerTests(CourseTestCase):
             seq_locator_string = json.loads(resp.content).get('locator')
             seq_locator = UsageKey.from_string(seq_locator_string)
             section_grader_type = CourseGradingModel.get_section_grader_type(seq_locator)
-            self.assertEqual('Entrance Exam', section_grader_type['graderType'])
+            self.assertEqual(GRADER_TYPES['ENTRANCE_EXAM'], section_grader_type['graderType'])
 
         def test_contentstore_views_entrance_exam_get(self):
             """
@@ -139,6 +140,14 @@ class EntranceExamHandlerTests(CourseTestCase):
             self.assertEqual(resp.status_code, 201)
             resp = self.client.get(self.exam_url)
             self.assertEqual(resp.status_code, 200)
+
+            # Confirm that we have only one Entrance Exam grader after re-adding the exam (validates SOL-475)
+            graders = CourseGradingModel.fetch(self.course_key).graders
+            count = 0
+            for grader in graders:
+                if grader['type'] == GRADER_TYPES['ENTRANCE_EXAM']:
+                    count += 1
+            self.assertEqual(count, 1)
 
         def test_contentstore_views_entrance_exam_delete_bogus_course(self):
             """
