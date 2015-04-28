@@ -212,7 +212,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
           .reference-title {
             @extend %t-title8;
             @extend %t-weight3;
-            margin-top: $baseline;
+            margin-top: ($baseline/2);
             text-transform: uppercase;
             letter-spacing: ($baseline/20);
             color: $gray-l2;

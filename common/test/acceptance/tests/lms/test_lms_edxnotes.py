@@ -1,7 +1,6 @@
 import os
 from uuid import uuid4
 from datetime import datetime
-from unittest import skipUnless
 from ..helpers import UniqueCourseTest
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.lms.auto_auth import AutoAuthPage
@@ -11,7 +10,6 @@ from ...pages.lms.edxnotes import EdxNotesUnitPage, EdxNotesPage
 from ...fixtures.edxnotes import EdxNotesFixture, Note, Range
 
 
-@skipUnless(os.environ.get("FEATURE_EDXNOTES"), "Requires Student Notes feature to be enabled")
 class EdxNotesTestMixin(UniqueCourseTest):
     """
     Creates a course with initial data and contains useful helper methods.
@@ -140,6 +138,16 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
                 note.text = "TEST TEXT {}".format(index)
                 index += 1
 
+    def edit_tags_in_notes(self, components, tags):
+        self.assertGreater(len(components), 0)
+        index = 0
+        for component in components:
+            self.assertGreater(len(component.notes), 0)
+            for note in component.edit_note():
+                note.tags = tags[index]
+                index += 1
+        self.assertEqual(index, len(tags), "Number of supplied tags did not match components")
+
     def remove_notes(self, components):
         self.assertGreater(len(components), 0)
         for component in components:
@@ -153,6 +161,11 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
     def assert_text_in_notes(self, notes):
         actual = [note.text for note in notes]
         expected = ["TEST TEXT {}".format(i) for i in xrange(len(notes))]
+        self.assertEqual(expected, actual)
+
+    def assert_tags_in_notes(self, notes, expected_tags):
+        actual = [note.tags for note in notes]
+        expected = [expected_tags[i] for i in xrange(len(notes))]
         self.assertEqual(expected, actual)
 
     def test_can_create_notes(self):
@@ -254,6 +267,69 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
         self.course_nav.go_to_sequential_position(1)
         components = self.note_unit_page.components
         self.assert_notes_are_removed(components)
+
+    def test_can_create_note_with_tags(self):
+        """
+        Scenario: a user of notes can define one with tags
+        Given I have a course with 3 annotatable components
+        And I open the unit with 2 annotatable components
+        When I add a note with tags for the first component
+        And I refresh the page
+        Then I see that note was correctly stored with its tags
+        """
+        self.note_unit_page.visit()
+
+        components = self.note_unit_page.components
+        for note in components[0].create_note(".{}".format(self.selector)):
+            note.tags = ["fruit", "tasty"]
+
+        self.note_unit_page.refresh()
+        self.assertEqual(["fruit", "tasty"], self.note_unit_page.notes[0].tags)
+
+    def test_can_change_tags(self):
+        """
+        Scenario: a user of notes can edit tags on notes
+        Given I have a course with 3 components with notes
+        When I open the unit with 2 annotatable components
+        And I edit tags on the notes for the 2 annotatable components
+        Then I see that the tags were correctly changed
+        And I again edit tags on the notes for the 2 annotatable components
+        And I refresh the page
+        Then I see that the tags were correctly changed
+        """
+        self._add_notes()
+        self.note_unit_page.visit()
+
+        components = self.note_unit_page.components
+        self.edit_tags_in_notes(components, [["hard"], ["apple", "pear"]])
+        self.assert_tags_in_notes(self.note_unit_page.notes, [["hard"], ["apple", "pear"]])
+
+        self.edit_tags_in_notes(components, [[], ["avocado"]])
+        self.assert_tags_in_notes(self.note_unit_page.notes, [[], ["avocado"]])
+
+        self.note_unit_page.refresh()
+        self.assert_tags_in_notes(self.note_unit_page.notes, [[], ["avocado"]])
+
+    def test_sr_labels(self):
+        """
+        Scenario: screen reader labels exist for text and tags fields
+        Given I have a course with 3 components with notes
+        When I open the unit with 2 annotatable components
+        And I open the editor for each note
+        Then the text and tags fields both have screen reader labels
+        """
+        self._add_notes()
+        self.note_unit_page.visit()
+
+        # First note is in the first annotatable component, will have field indexes 0 and 1.
+        for note in self.note_unit_page.components[0].edit_note():
+            self.assertTrue(note.has_sr_label(0, 0, "Note"))
+            self.assertTrue(note.has_sr_label(1, 1, "Tags (space-separated)"))
+
+        # Second note is in the second annotatable component, will have field indexes 2 and 3.
+        for note in self.note_unit_page.components[1].edit_note():
+            self.assertTrue(note.has_sr_label(0, 2, "Note"))
+            self.assertTrue(note.has_sr_label(1, 3, "Tags (space-separated)"))
 
 
 class EdxNotesPageTest(EdxNotesTestMixin):

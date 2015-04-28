@@ -131,19 +131,27 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
         },
 
         getEditorTabControls: function () {
-            var editor, editorControls, textArea, saveButton, cancelButton, tabControls = [];
+            var editor, editorControls, textArea, saveButton, cancelButton, tabControls = [], annotatorItems,
+                tagInput = null;
 
             // Editor elements
             editor = this.annotator.element.find('.annotator-editor');
             editorControls = editor.find('.annotator-controls');
-            textArea = editor.find('.annotator-listing')
-                             .find('.annotator-item')
-                             .first()
-                             .children('textarea');
+            annotatorItems = editor.find('.annotator-listing').find('.annotator-item');
+            textArea = annotatorItems.first().children('textarea');
             saveButton  = editorControls.find('.annotator-save');
             cancelButton = editorControls.find('.annotator-cancel');
 
-            tabControls.push(textArea, saveButton, cancelButton);
+            // If the tags plugin is enabled, add the ability to tab into it.
+            if (annotatorItems.length > 1) {
+                tagInput = annotatorItems.first().next().children('input');
+            }
+
+            tabControls.push(textArea);
+            if (tagInput){
+                tabControls.push(tagInput);
+            }
+            tabControls.push(saveButton, cancelButton);
 
             return tabControls;
         },
