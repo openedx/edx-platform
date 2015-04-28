@@ -5,7 +5,6 @@ Classes to provide the LMS runtime data storage to XBlocks
 import json
 from abc import abstractmethod, ABCMeta
 from collections import defaultdict
-from itertools import chain
 from .models import (
     StudentModule,
     XModuleUserStateSummaryField,
@@ -34,29 +33,6 @@ class InvalidWriteError(Exception):
     Raised to indicate that writing to a particular key
     in the KeyValueStore is disabled
     """
-
-
-def chunks(items, chunk_size):
-    """
-    Yields the values from items in chunks of size chunk_size
-    """
-    items = list(items)
-    return (items[i:i + chunk_size] for i in xrange(0, len(items), chunk_size))
-
-
-def _chunked_query(model_class, chunk_field, items, chunk_size=500, **kwargs):
-    """
-    Queries model_class with `chunk_field` set to chunks of size `chunk_size`,
-    and all other parameters from `**kwargs`.
-
-    This works around a limitation in sqlite3 on the number of parameters
-    that can be put into a single query.
-    """
-    res = chain.from_iterable(
-        model_class.objects.filter(**dict([(chunk_field, chunk)] + kwargs.items()))
-        for chunk in chunks(items, chunk_size)
-    )
-    return res
 
 
 def _all_usage_keys(descriptors, aside_types):
@@ -362,8 +338,7 @@ class UserStateCache(object):
             xblocks (list of :class:`XBlock`): XBlocks to cache fields for.
             aside_types (list of str): Aside types to cache fields for.
         """
-        query = _chunked_query(
-            StudentModule,
+        query = StudentModule.objects.chunked_filter(
             'module_state_key__in',
             _all_usage_keys(xblocks, aside_types),
             course_id=self.course_id,
@@ -567,8 +542,7 @@ class UserStateSummaryCache(DjangoOrmFieldCache):
             aside_types (list of str): Asides to load field for (which annotate the supplied
                 xblocks).
         """
-        return _chunked_query(
-            XModuleUserStateSummaryField,
+        return XModuleUserStateSummaryField.objects.chunked_filter(
             'usage_id__in',
             _all_usage_keys(xblocks, aside_types),
             field_name__in=set(field.name for field in fields),
@@ -629,8 +603,7 @@ class PreferencesCache(DjangoOrmFieldCache):
             aside_types (list of str): Asides to load field for (which annotate the supplied
                 xblocks).
         """
-        return _chunked_query(
-            XModuleStudentPrefsField,
+        return XModuleStudentPrefsField.objects.chunked_filter(
             'module_type__in',
             _all_block_types(xblocks, aside_types),
             student=self.user.pk,
