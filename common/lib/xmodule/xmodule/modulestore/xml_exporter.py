@@ -42,6 +42,9 @@ def _export_drafts(modulestore, course_key, export_fs, xml_centric_course_key):
             qualifiers={'category': {'$nin': DIRECT_ONLY_CATEGORIES}},
             revision=ModuleStoreEnum.RevisionOption.draft_only
         )
+        # Check to see if the returned draft modules have changes w.r.t. the published module.
+        # Only modules with changes will be exported into the /drafts directory.
+        draft_modules = [module for module in draft_modules if modulestore.has_changes(module)]
 
         if draft_modules:
             draft_course_dir = export_fs.makeopendir(DRAFT_DIR)
