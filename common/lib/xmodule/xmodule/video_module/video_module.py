@@ -37,7 +37,7 @@ from xmodule.exceptions import NotFoundError
 
 from .transcripts_utils import VideoTranscriptsMixin
 from .video_utils import create_youtube_string, get_video_from_cdn, get_poster
-from bumper_utils import bumperize
+from .bumper_utils import bumperize
 from .video_xfields import VideoFields
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 
@@ -309,7 +309,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         bumperize(self)
 
         context = {
-            'bumper_metadata': json.dumps(self.bumper['metadata']),
+            'bumper_metadata': json.dumps(OrderedDict(self.bumper['metadata'])),
             'metadata': json.dumps(OrderedDict(metadata)),
             'poster': json.dumps(get_poster(self)),
             'branding_info': branding_info,

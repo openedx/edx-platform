@@ -140,7 +140,7 @@ class VideoStudentViewHandlers(object):
             if self.transcript_language == 'en' and not bumper:
                 return Transcript.asset(self.location, self.sub).data
             else:
-                transcripts = self.transripts if not bumper else self.bumper_transcripts
+                transcripts = self.transcripts if not bumper else self.bumper_transcripts
                 if transcripts:
                     return get_or_create_sjson(self, transcripts, bumper)
                 elif bumper:

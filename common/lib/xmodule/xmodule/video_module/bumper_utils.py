@@ -12,10 +12,23 @@ try:
 except ImportError:
     edxval_api = None
 
+def get_bumper_settings(video):
+    """
+    Get bumper settings from video instance.
+    """
+    return getattr(video, 'video_bumper', {})
 
 def is_bumper_enabled(video):
     """
-    Check if bumper enabled
+    Check if bumper enabled.
+
+    - Feature flag ENABLE_VIDEO_BUMPER should be set to True
+    - Do not show again button should not be clicked by user.
+    - Current time minus periodicity must be greater that last time viewed
+    - edxval_api should be presented
+
+    Returns:
+         bool.
     """
     date_last_view_bumper = getattr(video, 'date_last_view_bumper', None)
     utc_now = datetime.utcnow().replace(tzinfo=pytz.utc)
@@ -24,7 +37,7 @@ def is_bumper_enabled(video):
                  (date_last_view_bumper and date_last_view_bumper + timedelta(seconds=periodicity) > utc_now)
     return bool(
         settings.FEATURES.get('ENABLE_VIDEO_BUMPER') and
-        getattr(video, 'video_bumper', {}) and
+        get_bumper_settings(video) and
         edxval_api and
         not has_viewed
     )
@@ -47,7 +60,7 @@ def bumperize(video):
     if not video.bumper['enabled']:
         return
 
-    bumper_settings = getattr(video, 'video_bumper', {})
+    bumper_settings = get_bumper_settings(video)
 
     try:
         edx_video_id, transcripts = bumper_settings['edx_video_id'], bumper_settings['transcripts']
@@ -61,17 +74,17 @@ def bumperize(video):
         'transcripts': transcripts,
     })
 
-    sources = get_sources(video)
+    sources = get_bumper_sources(video)
     if not sources:
         video.bumper['enabled'] = False
         return
 
     video.bumper.update({
-        'metadata': metadata(video, sources)
+        'metadata': bumper_metadata(video, sources)
     })
 
 
-def get_sources(video):
+def get_bumper_sources(video):
     """
     Get bumper sources from edxval.
 
@@ -89,16 +102,15 @@ def get_sources(video):
     return bumper_sources
 
 
-def metadata(video, sources):
+def bumper_metadata(video, sources):
     """
     Generate bumper metadata.
     """
     unused_track_url, bumper_transcript_language, bumper_languages = video.get_transcripts_for_student(video.bumper['transcripts'], bumper=True)
 
     bumper_metadata = {
-        # Why we dumps sources in video but not here?
         'sources': sources,
-        'showCaptions': json.dumps(bool(video.bumper['transcripts'])),  # Send it, Anton?
+        'showCaptions': json.dumps(bool(video.bumper['transcripts'])),  # TODO: clarify - send it, Anton?
         'transcriptLanguage': bumper_transcript_language,
         'transcriptLanguages': bumper_languages,
         'transcriptTranslationUrl': video.runtime.handler_url(video, 'transcript', 'translation_bumper').rstrip('/?'),

@@ -3,6 +3,7 @@
 Module contains utils specific for video_module but not for transcripts.
 """
 import json
+from collections import OrderedDict
 import logging
 import urllib
 import requests
@@ -86,7 +87,7 @@ def get_poster(video):
     if not video.bumper.get("enabled"):
         return
 
-    poster = {"url": "", "type": ""}
+    poster = OrderedDict({"url": "", "type": ""})
 
     if video.youtube_streams:
         youtube_id = video.youtube_streams.split('1.00:')[1].split(',')[0]
