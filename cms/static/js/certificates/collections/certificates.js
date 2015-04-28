@@ -6,7 +6,9 @@ function(Backbone, Certificate) {
     console.log("certificate_collection.start");
     var CertificateCollection = Backbone.Collection.extend({
         model: Certificate,
-        url: '/certificates/edX/DemoX/Demo_Course',
+        initialize: function(attr, options) {
+            this.url = options.certificateUrl;
+        },
 
         //Parse the JSON into Certificate models
         parse: function (certificatesJson) {
