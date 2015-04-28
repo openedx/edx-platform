@@ -292,6 +292,23 @@ class BulkOperationsMixin(object):
             bulk_ops_record.has_publish_item = False
 
 
+class Unset(object):
+    """
+    Class used to indicate a value that has not yet been explicitly set - it's uninitialized.
+    Differentiates this state from None, so that None can be a valid value.
+    """
+    def __deepcopy__(self, memo):
+        """
+        This class is immutable, so return itself.
+        """
+        memo[id(self)] = self
+        return self
+
+
+# Used as a non-None unset value for source_version below.
+UNSET = Unset()
+
+
 class EditInfo(object):
     """
     Encapsulates the editing info of a block.
@@ -307,15 +324,17 @@ class EditInfo(object):
         """
         Serialize to a Mongo-storable format.
         """
-        return {
+        block_to_store = {
             'previous_version': self.previous_version,
             'update_version': self.update_version,
-            'source_version': self.source_version,
             'edited_on': self.edited_on,
             'edited_by': self.edited_by,
             'original_usage': self.original_usage,
             'original_usage_version': self.original_usage_version,
         }
+        if self.source_version is not UNSET:
+            block_to_store['source_version'] = self.source_version
+        return block_to_store
 
     def from_storable(self, edit_info):
         """
@@ -329,8 +348,7 @@ class EditInfo(object):
         # May point to a structure not in this structure's history (e.g., to a draft
         # branch from which this version was published).
         self.update_version = edit_info.get('update_version', None)
-
-        self.source_version = edit_info.get('source_version', None)
+        self.source_version = edit_info.get('source_version', UNSET)
 
         # Datetime when this XBlock's fields last changed.
         self.edited_on = edit_info.get('edited_on', None)
@@ -341,6 +359,18 @@ class EditInfo(object):
         # these fields point to the original block in the library, for analytics.
         self.original_usage = edit_info.get('original_usage', None)
         self.original_usage_version = edit_info.get('original_usage_version', None)
+
+    def get_source_version(self, value_if_unset=UNSET):
+        """
+        Return the version of the given database representation of a block.
+        """
+        if value_if_unset is UNSET:
+            # Parameter was not passed-in.
+            value_if_unset = self.update_version
+        if self.source_version is not UNSET:
+            return self.source_version
+        else:
+            return value_if_unset
 
     def __repr__(self):
         # pylint: disable=bad-continuation, redundant-keyword-arg

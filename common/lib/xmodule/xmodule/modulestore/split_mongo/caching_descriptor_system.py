@@ -242,7 +242,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         module._edited_on = edit_info.edited_on  # pylint: disable=protected-access
         module.previous_version = edit_info.previous_version
         module.update_version = edit_info.update_version
-        module.source_version = edit_info.source_version
+        module.source_version = edit_info.get_source_version(value_if_unset=None)
         module.definition_locator = DefinitionLocator(block_key.type, definition_id)
         # decache any pending field settings
         module.save()
