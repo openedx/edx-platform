@@ -13,7 +13,7 @@
         afterEach(function () {
             $('source').remove();
             state.storage.clear();
-            window.Video.previousState = null;
+            state.videoPlayer.destroy();
             window.onTouchBasedDevice = oldOTBD;
         });
 
@@ -35,15 +35,32 @@
                     'aria-disabled': 'false'
                 });
             });
+
+            it('updates ARIA on state change', function () {
+                var fullScreenControl = $('.add-fullscreen');
+                fullScreenControl.click();
+                expect(fullScreenControl).toHaveAttrs({
+                    'role': 'button',
+                    'title': 'Exit full browser',
+                    'aria-disabled': 'false'
+                });
+            });
+
+            it('can destroy itself', function () {
+                state.videoFullScreen.destroy();
+                expect(state.videoFullScreen).toBeUndefined();
+            });
         });
 
-        it('updates ARIA on state change', function () {
-            expect().toBe();
-        });
+        it('Controls height is actual on switch to fullscreen', function () {
+            spyOn($.fn, 'height').andCallFake(function (val) {
+                return _.isUndefined(val) ? 100: this;
+            });
 
-        it('can destroy itself', function () {
-            expect().toBe();
-        });
+            state = jasmine.initializePlayer();
+            $(state.el).trigger('fullscreen');
 
+            expect(state.videoFullScreen.height).toBe(150);
+        });
     });
 }).call(this, window.WAIT_TIMEOUT);

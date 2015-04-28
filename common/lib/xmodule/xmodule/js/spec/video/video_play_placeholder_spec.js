@@ -7,16 +7,16 @@
         beforeEach(function () {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine
-                .createSpy('onTouchBasedDevice').andReturn(null);
+                .createSpy('onTouchBasedDevice').andReturn(['iPad']);
 
             state = jasmine.initializePlayer();
-            spyOn(this.state.videoCommands, 'execute');
+            spyOn(state.videoCommands, 'execute');
         });
 
         afterEach(function () {
             $('source').remove();
             state.storage.clear();
-            window.Video.previousState = null;
+            state.videoPlayer.destroy();
             window.onTouchBasedDevice = oldOTBD;
         });
 
@@ -52,7 +52,7 @@
             state = jasmine.initializePlayer();
             btnPlay = state.el.find('.btn-play');
 
-            state.videoControl.showPlayPlaceholder();
+            state.videoPlayPlaceholder.show();
 
             expect(btnPlay).not.toHaveClass('is-hidden');
             expect(btnPlay).toHaveAttrs({
@@ -60,7 +60,7 @@
                 'tabindex': 0
             });
 
-            state.videoControl.hidePlayPlaceholder();
+            state.videoPlayPlaceholder.hide();
 
             expect(btnPlay).toHaveClass('is-hidden');
             expect(btnPlay).toHaveAttrs({
@@ -103,8 +103,8 @@
                 state = jasmine.initializePlayer();
                 btnPlay = state.el.find('.btn-play');
 
-                state.videoControl.play();
-                state.videoControl.pause();
+                state.el.trigger('play');
+                state.el.trigger('pause');
 
                 expect(btnPlay).not.toHaveClass('is-hidden');
             });
@@ -120,7 +120,7 @@
                 state = jasmine.initializePlayer();
                 btnPlay = state.el.find('.btn-play');
 
-                state.videoControl.play();
+                state.el.trigger('play');
 
                 expect(btnPlay).toHaveClass('is-hidden');
             });
@@ -136,15 +136,16 @@
                 state = jasmine.initializePlayerYouTube();
                 btnPlay = state.el.find('.btn-play');
 
-                state.videoControl.play();
-                state.videoControl.pause();
+                state.el.trigger('play');
+                state.el.trigger('pause');
 
                 expect(btnPlay).toHaveClass('is-hidden');
             });
         });
 
         it('can destroy itself', function () {
-            expect().toBe();
+            state.videoPlayPlaceholder.destroy();
+            expect(state.videoPlayPlaceholder).toBeUndefined();
         });
 
     });

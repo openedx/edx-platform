@@ -657,7 +657,10 @@ function (Component) {
         if (!state.isYoutubeType()) {
             state.el.find('video').contextmenu(state.el, options);
             state.el.on('destroy', function () {
-                $(this).find('video').data('contextmenu').destroy();
+                var contextmenu = $(this).find('video').data('contextmenu');
+                if (contextmenu) {
+                    contextmenu.destroy();
+                }
             });
         }
 

@@ -11,7 +11,6 @@
                 window.onTouchBasedDevice = jasmine
                     .createSpy('onTouchBasedDevice').andReturn(null);
 
-    // Start the player with video bumper
                 state = jasmine.initializePlayer('video_with_bumper.html');
                 spyOn(state.bumperState.videoCommands, 'execute');
                 saveState = jasmine.createSpy('saveState');
@@ -21,7 +20,12 @@
             afterEach(function () {
                 $('source').remove();
                 state.storage.clear();
-                window.Video.previousState = null;
+                if (state.bumperState.videoPlayer) {
+                    state.bumperState.videoPlayer.destroy();
+                }
+                if (state.videoPlayer) {
+                    state.videoPlayer.destroy();
+                }
                 window.onTouchBasedDevice = oldOTBD;
             });
 
@@ -44,7 +48,7 @@
 
                 waitsFor(function () {
                     return state.el.hasClass('is-playing');
-                }, 'Player is not plaing.', WAIT_TIMEOUT);
+                }, 'Player is not playing.', WAIT_TIMEOUT);
             });
 
             it('can show the main video once bumper ends', function () {

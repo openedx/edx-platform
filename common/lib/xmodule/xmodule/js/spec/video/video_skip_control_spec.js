@@ -8,14 +8,19 @@
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice').andReturn(null);
-            state = jasmine.initializePlayer();
-            spyOn(this.state.videoCommands, 'execute');
+            state = jasmine.initializePlayer('video_with_bumper.html');
+            spyOn(state.bumperState.videoCommands, 'execute');
         });
 
         afterEach(function () {
             $('source').remove();
             state.storage.clear();
-            window.Video.previousState = null;
+            if (state.bumperState.videoPlayer) {
+                state.bumperState.videoPlayer.destroy();
+            }
+            if (state.videoPlayer) {
+                state.videoPlayer.destroy();
+            }
             window.onTouchBasedDevice = oldOTBD;
         });
 
@@ -26,6 +31,7 @@
         });
 
         it('add ARIA attributes to play control', function () {
+            state.el.trigger('play');
             expect($('.skip-control')).toHaveAttrs({
                 'role': 'button',
                 'title': 'Do not show again',
@@ -34,12 +40,14 @@
         });
 
         it('can skip the video on click', function () {
+            state.el.trigger('play');
             $('.skip-control').click();
-            expect(state.videoCommands.execute).toHaveBeenCalledWith('skip', true);
+            expect(state.bumperState.videoCommands.execute).toHaveBeenCalledWith('skip', true);
         });
 
         it('can destroy itself', function () {
-            expect().toBe();
+            state.bumperState.videoPlaySkipControl.destroy();
+            expect(state.bumperState.videoPlaySkipControl).toBeUndefined();
         });
 
     });

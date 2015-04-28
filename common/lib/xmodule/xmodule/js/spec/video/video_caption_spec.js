@@ -11,14 +11,13 @@
         });
 
         afterEach(function () {
-            $('.subtitles').remove();
-
             // `source` tags should be removed to avoid memory leak bug that we
             // had before. Removing of `source` tag, not `video` tag, stops
             // loading video source and clears the memory.
             $('source').remove();
             $.fn.scrollTo.reset();
             state.storage.clear();
+            state.videoPlayer.destroy();
 
             window.onTouchBasedDevice = oldOTBD;
         });
@@ -588,7 +587,7 @@
             it(msg, function () {
                 spyOn(Caption, 'fetchAvailableTranslations');
                 $.ajax.andCallFake(function (settings) {
-                    settings.error([]);
+                    _.result(settings, 'error');
                 });
 
                 state.config.transcriptLanguages = {};
@@ -607,7 +606,7 @@
             xit(msg, function () {
                 $.ajax
                     .andCallFake(function (settings) {
-                        settings.error([]);
+                        _.result(settings, 'error');
                     });
 
                 state.config.transcriptLanguages = {
@@ -685,7 +684,7 @@
             msg = 'on error: captions are hidden if there are no transcript';
             it(msg, function () {
                 $.ajax.andCallFake(function (settings) {
-                    settings.error();
+                    _.result(settings, 'error');
                 });
                 Caption.fetchAvailableTranslations();
 

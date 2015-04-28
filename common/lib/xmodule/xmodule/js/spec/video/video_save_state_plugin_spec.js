@@ -10,12 +10,16 @@
 
             jasmine.stubRequests();
             state = jasmine.initializePlayer();
+            spyOn(state.storage, 'setItem');
         });
 
         afterEach(function () {
             $('source').remove();
             window.onTouchBasedDevice = oldOTBD;
             state.storage.clear();
+            if (state.videoPlayer) {
+                state.videoPlayer.destroy();
+            }
         });
 
         describe('saveState function', function () {
@@ -36,19 +40,7 @@
             speed = '0.75';
 
             beforeEach(function () {
-                state = {
-                    videoPlayer: {
-                        currentTime: videoPlayerCurrentTime
-                    },
-                    storage: {
-                        setItem: jasmine.createSpy()
-                    },
-                    config: {
-                        saveStateUrl: 'http://example.com/save_user_state'
-                    }
-                };
-
-                spyOn($, 'ajax');
+                state.videoPlayer.currentTime = videoPlayerCurrentTime;
                 spyOn(Time, 'formatFull').andCallThrough();
             });
 
@@ -141,7 +133,7 @@
                     data        = value.data,
                     ajaxData    = value.ajaxData;
 
-                Initialize.prototype.saveState.call(state, asyncVal, data);
+                state.videoSaveStatePlugin.saveState(asyncVal, data);
 
                 if (speedVal) {
                     expect(state.storage.setItem).toHaveBeenCalledWith(
@@ -171,50 +163,69 @@
         });
 
         it('can save state on speed change', function () {
-            state.el.trigger('speedchange');
-            expect($.ajax).toHaveBeenCalledWith({});
+            state.el.trigger('speedchange', ['2.0']);
+            expect($.ajax).toHaveBeenCalledWith({
+                url: state.config.saveStateUrl,
+                type: 'POST',
+                async: true,
+                dataType: 'json',
+                data: {speed: '2.0'}
+            });
         });
 
         it('can save state on page unload', function () {
             state.el.trigger('play');
             $(window).trigger('unload');
-            expect($.ajax).toHaveBeenCalledWith({});
+            expect($.ajax).toHaveBeenCalledWith({
+                url: state.config.saveStateUrl,
+                type: 'POST',
+                async: false,
+                dataType: 'json',
+                data: {saved_video_position: '00:00:00'}
+            });
         });
 
         it('can save state on pause', function () {
             state.el.trigger('pause');
-            expect($.ajax).toHaveBeenCalledWith({});
-        });
-
-        it('can save state on destroy', function () {
-            state.el.trigger('destroy');
-            expect($.ajax).toHaveBeenCalledWith({});
+            expect($.ajax).toHaveBeenCalledWith({
+                url: state.config.saveStateUrl,
+                type: 'POST',
+                async: true,
+                dataType: 'json',
+                data: {saved_video_position: '00:00:00'}
+            });
         });
 
         it('can save state on changing transcript download format', function () {
             state.el.trigger('transcript_download:change', ['txt']);
-            expect($.ajax).toHaveBeenCalledWith({});
+            expect($.ajax).toHaveBeenCalledWith({
+                url: state.config.saveStateUrl,
+                type: 'POST',
+                async: true,
+                dataType: 'json',
+                data: {transcript_download_format: 'txt'}
+            });
         });
 
         it('can save state on language change', function () {
-            state.el.trigger('language_menu:change', [true]);
-            expect($.ajax).toHaveBeenCalledWith({});
+            state.el.trigger('language_menu:change', ['ua']);
+            expect(state.storage.setItem).toHaveBeenCalledWith('language', 'ua');
         });
 
         it('can save information about youtube availability', function () {
             state.el.trigger('youtube_availability', [true]);
-            expect($.ajax).toHaveBeenCalledWith({});
-        });
-
-        it('can set events that will be handled', function () {
-            // check possibility to do that test.
-            // https://github.com/edx/edx-platform/blob/aaef4b30012a0587c7cbe710ed6e6381094834d5/common/lib/xmodule/xmodule/js/src/video/09_save_state_plugin.js#L63
-            expect().toBe();
+            expect($.ajax).toHaveBeenCalledWith({
+                url: state.config.saveStateUrl,
+                type: 'POST',
+                async: true,
+                dataType: 'json',
+                data: {youtube_is_available: true}
+            });
         });
 
         it('can destroy itself', function () {
             var plugin = state.videoSaveStatePlugin;
-            spyOn($.fn, 'off');
+            spyOn($.fn, 'off').andCallThrough();
             state.videoSaveStatePlugin.destroy();
             expect(state.videoSaveStatePlugin).toBeUndefined();
             expect($.fn.off).toHaveBeenCalledWith({
