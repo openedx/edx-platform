@@ -162,9 +162,8 @@ def calculate_problem_grade_report(entry_id, xmodule_instance_args):
     Generate a CSV for a course containing all students' weighted problem
     grades and push the results to an S3 bucket for download.
     """
-    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
-    # TODO: can this be the same as the `calculate_grades_csv` action_name?
-    action_name = ugettext_noop('graded')
+    # Translators: This is a past-tense phrase that is inserted into task progress messages as {action}.
+    action_name = ugettext_noop('problem distribution graded')
     TASK_LOG.info(
         u"Task: %s, InstructorTask ID: %s, Task type: %s, Preparing for task execution",
         xmodule_instance_args.get('task_id'), entry_id, action_name
