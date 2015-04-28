@@ -29,9 +29,7 @@ class LmsSearchFilterGenerator(SearchFilterGenerator):
                 partition_group = CourseUserGroupPartitionGroup.objects.get(course_user_group=cohort)
             except CourseUserGroupPartitionGroup.DoesNotExist:
                 pass
-            if partition_group:
-                partition_group = partition_group.group_id
-            filter_dictionary['content_groups'] = unicode(partition_group)
+            filter_dictionary['content_groups'] = unicode(partition_group.group_id) if partition_group else None
         return filter_dictionary
 
     def field_dictionary(self, **kwargs):

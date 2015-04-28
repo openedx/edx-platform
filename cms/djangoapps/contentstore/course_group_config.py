@@ -237,6 +237,52 @@ class GroupConfiguration(object):
         return usage_info
 
     @staticmethod
+    def get_content_groups_items_usage_info(store, course):
+        """
+        Get usage information on items for content groups.
+        """
+        items = store.get_items(course.id, settings={'group_access': {'$exists': True}})
+
+        return GroupConfiguration._get_content_groups_items_usage_info(course, items)
+
+    @staticmethod
+    def _get_content_groups_items_usage_info(course, items):
+        """
+        Returns all items names and their urls.
+
+        Returns:
+        {'group_id':
+            [
+                {
+                    'label': 'Problem 1 / Problem 1',
+                    'url': 'url_to_item_1'
+                },
+                {
+                    'label': 'Problem 2 / Problem 2',
+                    'url': 'url_to_item_2'
+                }
+            ],
+        }
+        """
+        usage_info = {}
+        for item in items:
+            if hasattr(item, 'group_access') and item.group_access:
+                (__, group_ids), = item.group_access.items()
+                for group_id in group_ids:
+                    if group_id not in usage_info:
+                        usage_info[group_id] = []
+
+                    usage_info = GroupConfiguration._get_usage_info(
+                        course,
+                        unit=item,
+                        item=item,
+                        usage_info=usage_info,
+                        group_id=group_id
+                    )
+
+        return usage_info
+
+    @staticmethod
     def update_usage_info(store, course, configuration):
         """
         Update usage information for particular Group Configuration.
