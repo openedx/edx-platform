@@ -1,0 +1,23 @@
+<% console.log("signatory-editor.underscore.start") %>
+     <div class="signatory-panel-default">
+       <a class="signatory-panel-delete" href="#" data-tooltip="Delete">
+          <i class="icon fa fa-trash-o" aria-hidden="true"></i>
+          <span class="sr action-button-text"><%= gettext("Delete") %></span>
+       </a>
+       <div class="signatory-panel-header">Signatory <%= signatory_number %></div>
+       <div class="signatory-panel-body">
+         <fieldset class="collection-fields signatory-fields">
+                <div class="input-wrap field text add-signatory-name">
+                    <label><%= gettext("Name ") %></label>
+                    <input class="collection-name-input input-text signatory-name-input" name="signatory-name" type="text" placeholder="<%= gettext("This is the Name of the Signatory") %>" value="<%= name %>">
+                    <span class="tip tip-stacked"><%= gettext("Max 30 characters") %></span>
+                </div>
+                <div class="input-wrap field text add-signatory-title">
+                    <label><%= gettext("Title ") %></label>
+                    <input class="collection-name-input input-text signatory-title-input" name="signatory-title" type="text" placeholder="<%= gettext("This is the Title of the Signatory") %>" value="<%= title %>">
+                    <span class="tip tip-stacked"><%= gettext("Max 30 characters") %></span>
+                </div>
+         </fieldset>
+       </div>
+     </div>
+<% console.log("signatory-editor.underscore.start") %>

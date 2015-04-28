@@ -13,7 +13,9 @@ define([
         console.log('certificate_factory.function.start');
 
         var certificatesCollection = new CertificatesCollection(certificatesJson, {
-            parse: true, canBeEmpty: true
+            parse: true,
+            canBeEmpty: true,
+            certificateUrl: certificateUrl
         });
         /*
         var certificatesCollection = new CertificatesCollection();
