@@ -554,6 +554,8 @@ class VideoPage(PageObject):
 
         language_selector = VIDEO_MENUS["language"] + ' li[data-lang-code="{code}"]'.format(code=code)
         language_selector = self.get_element_selector(language_selector)
+
+        import ipdb; ipdb.set_trace();
         self.wait_for_element_visibility(language_selector, 'language menu is visible')
         self.q(css=language_selector).first.click()
 
@@ -724,6 +726,7 @@ class VideoPage(PageObject):
             timeout (float): Maximum number of seconds to wait for the Promise to be satisfied before timing out.
 
         """
+        # import ipdb; ipdb.set_trace();
         if result:
             return Promise(check_func, desc, timeout=timeout, try_interval=try_interval).fulfill()
         else:

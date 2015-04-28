@@ -477,7 +477,7 @@ class YouTubeVideoTest(VideoBaseTest):
     def _verify_caption_text(self, text):
         self.video._wait_for(
             lambda: (text in self.video.captions_text),
-            u'Captions contain "{}" text'.format(text),
+            u'Captions contain "{}" text'.format(text).encode('utf-8'),
             timeout=5
         )
 
@@ -743,11 +743,6 @@ class YouTubeVideoTest(VideoBaseTest):
         }
         self.metadata = self.metadata_for_mode('youtube_html5', additional_data=additional_data)
         self.navigate_to_video_with_bumper()
-
-        # self.video.click_player_button('btn-play')
-        # self.assertFalse(self.video.is_quality_button_active)
-        # self.video.click_player_button('quality')
-        # self.assertTrue(self.video.is_quality_button_active)
 
 
 class YouTubeHtml5VideoTest(VideoBaseTest):
