@@ -25,6 +25,13 @@
                 <span class="tip tip-stacked"><%= gettext("Optional long description") %></span>
             </div>
         </fieldset>
+         <header>
+           <label class="title-2"><%= gettext("Course Signatories") %></label>
+         </header>
+        <div class="signatory-list"> </div>
+        <span>
+           <a class="button action-add-signatory" href="javascript:void(0);"><%= gettext("Add Signatory (max 4)") %></a>
+        </span>
     </div>
     <div class="actions">
         <button class="action action-primary" type="submit"><% if (isNew) { print(gettext("Create")) } else { print(gettext("Save")) } %></button>

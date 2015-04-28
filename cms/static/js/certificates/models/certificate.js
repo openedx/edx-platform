@@ -18,6 +18,11 @@ function(Backbone, Signatory, SignatoryCollection, _, str, gettext) {
             key: 'signatories',
             relatedModel: Signatory,
             collectionType: SignatoryCollection,
+            collectionOptions: function(model) {
+                return {
+                    certificateUrl: model.collection.url
+                };
+            },
             reverseRelation: {
                 key: 'certificate',
                 includeInJSON: "id"
