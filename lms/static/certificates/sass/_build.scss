@@ -1,0 +1,46 @@
+// ------------------------------
+// Open edX Certificates: Shared Build Compile
+
+// About: Sass compile for Open edX Certificates elements that are shared between LTR and RTL UI. Configuration and vendor specific imports happen before this shared set of imports are compiled in the main-*.scss files.
+
+// ------------------------------
+// #UTILITIES
+// ------------------------------
+@import '../../../../static/edx-pl/sass/utilities/variables';
+@import '../../../../static/edx-pl/sass/utilities/functions';
+@import '../../../../static/edx-pl/sass/utilities/mixins';
+@import '../../../../static/edx-pl/sass/utilities/helpers';
+
+@import 'utilities.scss';
+
+// ------------------------------
+// #BASE
+// ------------------------------
+@import '../../../../static/edx-pl/sass/base/reset';
+@import '../../../../static/edx-pl/sass/base/typography';
+
+@import 'base.scss';
+
+// ------------------------------
+// #COMPONENTS
+// ------------------------------
+@import '../../../../static/edx-pl/sass/components/colors';
+@import '../../../../static/edx-pl/sass/components/buttons';
+@import '../../../../static/edx-pl/sass/components/headings';
+
+@import 'components.scss';
+
+// ------------------------------
+// #LAYOUTS
+// ------------------------------
+@import 'layouts';
+
+// ------------------------------
+// #VIEWS
+// ------------------------------
+@import 'views';
+
+// ------------------------------
+// #SHAME
+// ------------------------------
+@import 'overrides';
