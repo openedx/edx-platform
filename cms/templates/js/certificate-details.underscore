@@ -20,6 +20,13 @@
         <li class="collection-description certificate-description">
             <%= description %>
         </li>
+        <li class="collection-description certificate-description">
+         <header>
+           <label class="title-2"><%= gettext("Course Signatories") %></label>
+         </header>
+         <div class="signatory-details-list"></div>
+        </li>
+
       <% } %>
    </ol>
 

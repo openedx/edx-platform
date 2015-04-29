@@ -3,9 +3,9 @@
  * It is expected to be instantiated with a Certificate model.
  */
 define([
-    'js/views/baseview', 'underscore', 'gettext', 'underscore.string'
+    'js/views/baseview', 'underscore', 'js/certificates/models/signatory', 'js/certificates/views/signatory_details', 'gettext', 'underscore.string'
 ],
-function(BaseView, _, gettext, str) {
+function(BaseView, _, Signatory, SignatoryDetails, gettext, str) {
     'use strict';
     console.log('certificate_details.start');
     var CertificateDetailsView = BaseView.extend({
@@ -22,6 +22,7 @@ function(BaseView, _, gettext, str) {
 
             return [
                 'collection',
+                'certificates',
                 'certificate-details',
                 'certificate-details-' + index
             ].join(' ');
@@ -59,6 +60,16 @@ function(BaseView, _, gettext, str) {
             });
 
             this.$el.html(this.template(attrs));
+
+            if(showDetails) {
+                var self = this;
+                this.model.get("signatories").each(function (modelSignatory) {
+                    var signatory_detail_view = new SignatoryDetails({model: modelSignatory});
+                    self.$('div.signatory-details-list').append($(signatory_detail_view.render().$el));
+                });
+            }
+
+
             return this;
         }
 

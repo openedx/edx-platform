@@ -28,9 +28,10 @@
          <header>
            <label class="title-2"><%= gettext("Course Signatories") %></label>
          </header>
-        <div class="signatory-list"> </div>
+        <div class="signatory-edit-list"> </div>
         <span>
-           <a class="button action-add-signatory" href="javascript:void(0);"><%= gettext("Add Signatory (max 4)") %></a>
+           <a class="button action-add-signatory" href="javascript:void(0);"><%= gettext("Add Signatory") %></a>
+           <span class="tip tip-stacked"><%= gettext("(max 4 signatories are allowed)") %></span>
         </span>
     </div>
     <div class="actions">

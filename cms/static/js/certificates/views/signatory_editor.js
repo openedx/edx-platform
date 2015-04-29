@@ -2,21 +2,31 @@
  * This class defines an editing view for course certificates.
  * It is expected to be backed by a Certificate model.
  */
-define(['js/views/list_item_editor', 'js/certificates/models/signatory' ,"js/utils/templates", 'underscore', 'jquery', 'gettext'],
-function(ListItemEditorView, Signatory, TemplateUtils, _, $, gettext) {
+define(['js/views/list_item_editor', 'js/utils/templates', 'underscore', 'jquery', 'gettext'],
+function(ListItemEditorView, TemplateUtils, _, $, gettext) {
     'use strict';
     console.log('certificate_editor.start');
     var SignatoryEditorView = Backbone.View.extend({
         tagName: 'div',
-        className: 'signatory_view signatory-edit',
         events: {
             'change .signatory-name-input': 'setSignatoryName',
             'change .signatory-title-input': 'setSignatoryTitle'
         },
 
-        initialize: function() {
+        className: function () {
+            console.log('signatory_editor.className');
+            var index = this.model.collection.indexOf(this.model);
+
+            return [
+                'signatory-edit',
+                'signatory-edit-view-' + index
+            ].join(' ');
+        },
+
+        initialize: function(options) {
              _.bindAll(this, 'render');
             this.model.bind('change', this.render);
+            this.isEditingAllCollections = options.isEditingAllCollections;
             this.template = this.loadTemplate('signatory-editor');
         },
 
@@ -25,10 +35,12 @@ function(ListItemEditorView, Signatory, TemplateUtils, _, $, gettext) {
         },
 
         render: function() {
-            var data = this.model.toJSON();
-            var index = this.model.collection.indexOf(this.model) + 1;
-            data['signatory_number'] = index;
-            return $(this.el).html(this.template(data));
+            var attributes = $.extend({
+                isEditingAllCollections: this.isEditingAllCollections}, this.model.attributes, {
+                signatory_number: this.model.collection.indexOf(this.model) + 1
+            });
+
+            return $(this.el).html(this.template(attributes));
         },
 
         setSignatoryName: function(event) {
