@@ -9,7 +9,7 @@ define([
 ) {
     'use strict';
     describe('EdxNotes NoteItemView', function() {
-        var getView = function (model) {
+        var getView = function (model, scrollToTag) {
             model = new NoteModel(_.defaults(model || {}, {
                 id: 'id-123',
                 user: 'user-123',
@@ -23,7 +23,7 @@ define([
                 }
             }));
 
-            return new NoteItemView({model: model}).render();
+            return new NoteItemView({model: model, scrollToTag: scrollToTag}).render();
         };
 
         beforeEach(function() {
@@ -67,7 +67,19 @@ define([
             var view = getView({tags: ["First", "Second"]});
             expect(view.$('.reference-title').length).toBe(3);
             expect(view.$('.reference-title')[2]).toContainText('Tags:');
-            expect(view.$('.reference-tags').last()).toContainText('First, Second');
+            expect(view.$('a.reference-tags').length).toBe(2);
+            expect(view.$('a.reference-tags')[0]).toContainText('First');
+            expect(view.$('a.reference-tags')[1]).toContainText('Second');
+        });
+
+        it('should handle a click event on the tag', function() {
+            var scrollToTagSpy = {
+                scrollToTag: function (tagName){}
+            };
+            spyOn(scrollToTagSpy, 'scrollToTag');
+            var view = getView({tags: ["only"]}, scrollToTagSpy.scrollToTag);
+            view.$('a.reference-tags').click();
+            expect(scrollToTagSpy.scrollToTag).toHaveBeenCalledWith("only");
         });
 
         it('should log the edx.student_notes.used_unit_link event properly', function () {

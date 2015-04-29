@@ -7,7 +7,7 @@ define([
      'js/edxnotes/plugins/caret_navigation'
 ], function ($, _, Annotator, NotesLogger) {
     var plugins = ['Auth', 'Store', 'Scroller', 'Events', 'Accessibility', 'CaretNavigation', 'Tags'],
-        getOptions, setupPlugins, updateHeaders, getAnnotator;
+        getOptions, setupPlugins, getAnnotator;
 
     /**
      * Returns options for the annotator.
