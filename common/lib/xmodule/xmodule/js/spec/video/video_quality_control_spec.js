@@ -106,6 +106,11 @@
                  expect(qualityControl.el).toHaveClass('active');
             });
 
+            it('can destroy itself', function () {
+                state.videoQualityControl.destroy();
+                expect(state.videoQualityControl).toBeUndefined();
+                expect($('.quality-control')).not.toExist();
+            });
         });
 
         describe('constructor, HTML5 mode', function () {

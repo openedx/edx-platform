@@ -204,7 +204,7 @@ function (Initialize) {
 
                 describe('when new speed is available', function () {
                     beforeEach(function () {
-                        Initialize.prototype.setSpeed.call(state, '0.75', true);
+                        Initialize.prototype.setSpeed.call(state, '0.75');
                     });
 
                     it('set new speed', function () {
@@ -230,7 +230,7 @@ function (Initialize) {
                     };
 
                     $.each(map, function(key, expected) {
-                        Initialize.prototype.setSpeed.call(state, key, true);
+                        Initialize.prototype.setSpeed.call(state, key);
                         expect(state.speed).toBe(expected);
                     });
                 });

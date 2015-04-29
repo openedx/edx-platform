@@ -138,6 +138,11 @@
             });
         });
 
+        it('starts play the video on click', function () {
+            $('.btn-play').click();
+            expect(state.videoCommands.execute).toHaveBeenCalledWith('play');
+        });
+
         it('can destroy itself', function () {
             state.videoPlayPlaceholder.destroy();
             expect(state.videoPlayPlaceholder).toBeUndefined();

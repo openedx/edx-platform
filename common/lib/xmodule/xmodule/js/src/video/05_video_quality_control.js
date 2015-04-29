@@ -82,7 +82,7 @@ function () {
             state.videoQualityControl.fetchAvailableQualities
         ));
 
-        state.el.on('destroy', state.videoQualityControl.destroy);
+        state.el.on('destroy.quality', state.videoQualityControl.destroy);
     }
 
     // ***************************************************************

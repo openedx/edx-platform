@@ -317,6 +317,13 @@
             });
         });
 
+        it('can destroy itself', function () {
+            state = jasmine.initializePlayer();
+            state.videoProgressSlider.destroy();
+            expect(state.videoProgressSlider).toBeUndefined();
+            expect($('.slider')).toBeEmpty();
+        });
+
     });
 
 }).call(this);

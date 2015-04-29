@@ -573,13 +573,18 @@
 
         it('show', function () {
             var controls;
-
             state = jasmine.initializePlayer();
             controls = state.el.find('.video-controls');
             controls.addClass('is-hidden');
 
             state.videoControl.show();
             expect(controls).not.toHaveClass('is-hidden');
+        });
+
+        it('can destroy itself', function () {
+            state = jasmine.initializePlayer();
+            state.videoControl.destroy();
+            expect(state.videoControl).toBeUndefined();
         });
     });
 }).call(this, window.WAIT_TIMEOUT);
