@@ -34,9 +34,9 @@ class NoteChild(PageObject):
             return None
 
 
-class EdxNotesPageGroup(NoteChild):
+class EdxNotesChapterGroup(NoteChild):
     """
-    Helper class that works with note groups on Note page of the course.
+    Helper class that works with chapter (section) grouping of notes in the Course Structure view on the Note page.
     """
     BODY_SELECTOR = ".note-group"
 
@@ -51,18 +51,16 @@ class EdxNotesPageGroup(NoteChild):
     @property
     def children(self):
         children = self.q(css=self._bounded_selector('.note-section'))
-        return [EdxNotesPageSection(self.browser, child.get_attribute("id")) for child in children]
+        return [EdxNotesSubsectionGroup(self.browser, child.get_attribute("id")) for child in children]
 
 
-class EdxNotesPageSection(NoteChild):
+class EdxNotesGroupMixin(object):
     """
-    Helper class that works with note sections on Note page of the course.
+    Helper mixin that works with note groups (used for subsection and tag groupings).
     """
-    BODY_SELECTOR = ".note-section"
-
     @property
     def title(self):
-        return self._get_element_text(".course-subtitle")
+        return self._get_element_text(self.TITLE_SELECTOR)
 
     @property
     def children(self):
@@ -74,12 +72,46 @@ class EdxNotesPageSection(NoteChild):
         return [section.text for section in self.children]
 
 
+class EdxNotesSubsectionGroup(NoteChild, EdxNotesGroupMixin):
+    """
+    Helper class that works with subsection grouping of notes in the Course Structure view on the Note page.
+    """
+    BODY_SELECTOR = ".note-section"
+    TITLE_SELECTOR = ".course-subtitle"
+
+
+class EdxNotesTagsGroup(NoteChild, EdxNotesGroupMixin):
+    """
+    Helper class that works with tags grouping of notes in the Tags view on the Note page.
+    """
+    BODY_SELECTOR = ".note-group"
+    TITLE_SELECTOR = ".tags-title"
+
+    def scrolled_to_top(self, group_index):
+        """
+        Returns True if the group with supplied group)index is scrolled near the top of the page
+        (expects 10 px padding).
+
+        The group_index must be supplied because JQuery must be used to get this information, and it
+        does not have access to the bounded selector.
+        """
+        top_script = "return $('" + self.TITLE_SELECTOR + "')[" + str(group_index) + "].getBoundingClientRect().top"
+        EmptyPromise(
+            lambda: 8 < self.browser.execute_script(top_script) < 12,
+            "Expected tag title '{}' to scroll to top, but was at location {}".format(
+                self.title, self.browser.execute_script(top_script)
+            )
+        ).fulfill()
+        return True
+
+
 class EdxNotesPageItem(NoteChild):
     """
     Helper class that works with note items on Note page of the course.
     """
     BODY_SELECTOR = ".note"
     UNIT_LINK_SELECTOR = "a.reference-unit-link"
+    TAG_SELECTOR = "a.reference-tags"
 
     def go_to_unit(self, unit_page=None):
         self.q(css=self._bounded_selector(self.UNIT_LINK_SELECTOR)).click()
@@ -101,6 +133,18 @@ class EdxNotesPageItem(NoteChild):
     @property
     def time_updated(self):
         return self._get_element_text(".reference-updated-date")
+
+    @property
+    def tags(self):
+        """ The tags associated with this note. """
+        tag_links = self.q(css=self._bounded_selector(self.TAG_SELECTOR))
+        if len(tag_links) == 0:
+            return None
+        return[tag_link.text for tag_link in tag_links]
+
+    def go_to_tag(self, tag_name):
+        """ Clicks a tag associated with the note to change to the tags view (and scroll to the tag group). """
+        self.q(css=self._bounded_selector(self.TAG_SELECTOR)).filter(lambda el: el.text == tag_name).click()
 
 
 class EdxNotesPageView(PageObject):
@@ -174,7 +218,17 @@ class CourseStructureView(EdxNotesPageView):
     BODY_SELECTOR = "#structure-panel"
     TAB_SELECTOR = ".tab#view-course-structure"
     CHILD_SELECTOR = ".note-group"
-    CHILD_CLASS = EdxNotesPageGroup
+    CHILD_CLASS = EdxNotesChapterGroup
+
+
+class TagsView(EdxNotesPageView):
+    """
+    Helper class for Tags view.
+    """
+    BODY_SELECTOR = "#tags-panel"
+    TAB_SELECTOR = ".tab#view-tags"
+    CHILD_SELECTOR = ".note-group"
+    CHILD_CLASS = EdxNotesTagsGroup
 
 
 class SearchResultsView(EdxNotesPageView):
@@ -193,6 +247,7 @@ class EdxNotesPage(CoursePage):
     MAPPING = {
         "recent": RecentActivityView,
         "structure": CourseStructureView,
+        "tags": TagsView,
         "search": SearchResultsView,
     }
 
@@ -210,9 +265,9 @@ class EdxNotesPage(CoursePage):
         self.current_view = self.MAPPING[tab_name](self.browser)
         self.current_view.visit()
 
-    def close_tab(self, tab_name):
+    def close_tab(self):
         """
-        Closes the tab `tab_name(str)`.
+        Closes the current view.
         """
         self.current_view.close()
         self.current_view = self.MAPPING["recent"](self.browser)
@@ -267,20 +322,28 @@ class EdxNotesPage(CoursePage):
         return [EdxNotesPageItem(self.browser, child.get_attribute("id")) for child in children]
 
     @property
-    def groups(self):
+    def chapter_groups(self):
         """
-        Returns all groups on the page.
+        Returns all chapter groups on the page.
         """
         children = self.q(css='.note-group')
-        return [EdxNotesPageGroup(self.browser, child.get_attribute("id")) for child in children]
+        return [EdxNotesChapterGroup(self.browser, child.get_attribute("id")) for child in children]
 
     @property
-    def sections(self):
+    def subsection_groups(self):
         """
-        Returns all sections on the page.
+        Returns all subsection groups on the page.
         """
         children = self.q(css='.note-section')
-        return [EdxNotesPageSection(self.browser, child.get_attribute("id")) for child in children]
+        return [EdxNotesSubsectionGroup(self.browser, child.get_attribute("id")) for child in children]
+
+    @property
+    def tag_groups(self):
+        """
+        Returns all tag groups on the page.
+        """
+        children = self.q(css='.note-group')
+        return [EdxNotesTagsGroup(self.browser, child.get_attribute("id")) for child in children]
 
 
 class EdxNotesPageNoContent(CoursePage):
