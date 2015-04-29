@@ -137,6 +137,39 @@
 
             });
 
+            it('can destroy itself', function () {
+                spyOn($, 'ajaxWithPrefix');
+                state = jasmine.initializePlayer();
+                var plugin = state.videoCaption;
+
+                spyOn($.fn, 'off').andCallThrough();
+                state.videoCaption.destroy();
+
+                expect(state.videoCaption).toBeUndefined();
+                expect($.fn.off).toHaveBeenCalledWith('click', plugin.toggle);
+                expect($.fn.off).toHaveBeenCalledWith({
+                    mouseenter: plugin.onMouseEnter,
+                    mouseleave: plugin.onMouseLeave,
+                    mousemove: plugin.onMovement,
+                    mousewheel: plugin.onMovement,
+                    DOMMouseScroll: plugin.onMovement,
+                    scroll: state.videoControl.showControls
+                });
+                expect($.fn.off).toHaveBeenCalledWith({
+                    mouseenter: plugin.onContainerMouseEnter,
+                    mouseleave: plugin.onContainerMouseLeave
+                });
+                expect($.fn.off).toHaveBeenCalledWith({
+                    'caption:fetch': plugin.fetchCaption,
+                    'caption:resize': plugin.onResize,
+                    'caption:update': plugin.onCaptionUpdate,
+                    'ended': plugin.pause,
+                    'fullscreen': plugin.onResize,
+                    'pause': plugin.pause,
+                    'play': plugin.play
+                });
+            });
+
             describe('renderLanguageMenu', function () {
                 describe('is rendered', function () {
                     it('if languages more than 1', function () {

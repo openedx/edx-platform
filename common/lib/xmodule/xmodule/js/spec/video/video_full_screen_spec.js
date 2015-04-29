@@ -75,7 +75,6 @@
                 expect(state.videoCommands.execute).toHaveBeenCalledWith('toggleFullScreen');
             });
 
-
             it('can destroy itself', function () {
                 state.videoFullScreen.destroy();
                 expect(state.videoFullScreen).toBeUndefined();
