@@ -2265,3 +2265,66 @@ input[name="subject"] {
   @include left(2em);
   @include right(auto);
 }
+
+.course-specific-container {
+
+  .upload {
+    position: relative;
+
+    button {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+
+    .fileupload {
+      position: relative;
+      z-index: 2;
+      opacity: 0;
+      height: ($baseline*1.5);
+      width: ($baseline*6);
+    }
+  }
+
+  .bordered-fieldset {
+    border: solid 4px #000000;
+    padding: $baseline;
+    margin-top: ($baseline*1.5);
+  }
+
+  .success, .error {
+    ul {
+      list-style-type: none;
+
+      li {
+        margin-bottom: ($baseline*0.5);
+      }
+    }
+  }
+
+  .error {
+    color: #E40004;
+  }
+
+  .success {
+    color: #008000;
+  }
+
+  .new-section {
+    margin-top: $baseline;
+  }
+
+  .select-tag {
+    width: 40%;
+    height: ($baseline*1.5);
+    font-size: 1.1em;
+  }
+
+  .output-box {
+    .loading {
+      font-size: 2em;
+      margin-bottom: $baseline;
+    }
+  }
+}
