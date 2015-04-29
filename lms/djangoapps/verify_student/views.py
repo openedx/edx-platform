@@ -1244,7 +1244,7 @@ class InCourseReverifyView(View):
                 request.user, request.POST['face_image'], init_verification.photo_id_key
             )
             checkpoint.add_verification_attempt(attempt)
-            VerificationStatus.add_verification_status(checkpoint, user, "submitted")
+            VerificationStatus.add_verification_status(checkpoint, user, "submitted", usage_id)
 
             # emit the reverification event
             self._track_reverification_events(
