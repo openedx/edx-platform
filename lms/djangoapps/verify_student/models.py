@@ -1077,3 +1077,28 @@ class SkippedReverification(models.Model):
 
     class Meta:  # pylint: disable=missing-docstring, old-style-class
         unique_together = (('user', 'course_id'),)
+
+    @classmethod
+    def add_skipped_reverification_attempt(cls, checkpoint, user_id, course_id):
+        """ Create skipped reverification object
+
+        Arguments:
+            checkpoint(VerificationCheckpoint): VerificationCheckpoint object
+            user_id(str): User Id of currently logged in user
+            course_id(CourseKey): CourseKey
+        Returns:
+            None
+        """
+        cls.objects.create(checkpoint=checkpoint, user_id=user_id, course_id=course_id)
+
+    @classmethod
+    def check_user_skipped_reverification_exists(cls, user, course_id):
+        """Check user skipped re-verification attempt exists against specific course
+
+        Arguments:
+            user(User): user object
+            course_id(CourseKey): CourseKey
+        Returns:
+            Boolean
+        """
+        return cls.objects.filter(user=user, course_id=course_id).exists()
