@@ -140,6 +140,20 @@ urlpatterns = patterns(
     url(r'^gradebook$',
         'instructor.views.api.spoc_gradebook', name='spoc_gradebook'),
 
+    # Blank LTI csv
+    url(
+        r'^get_blank_lti$',
+        'instructor.views.api.get_blank_lti',
+        name='get_blank_lti',
+    ),
+
+    # Upload LTI csv
+    url(
+        r'^upload_lti$',
+        'instructor.views.api.upload_lti',
+        name='upload_lti',
+    ),
+
     # Collect student forums data
     url(r'get_student_forums_usage',
         'instructor.views.api.get_student_forums_usage', name='get_student_forums_usage'),
