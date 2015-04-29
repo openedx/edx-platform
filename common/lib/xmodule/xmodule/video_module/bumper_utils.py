@@ -3,6 +3,7 @@ Utils for video bumper
 """
 import json
 import pytz
+from collections import OrderedDict
 
 from datetime import datetime, timedelta
 from django.conf import settings
@@ -108,13 +109,13 @@ def bumper_metadata(video, sources):
     """
     unused_track_url, bumper_transcript_language, bumper_languages = video.get_transcripts_for_student(video.bumper['transcripts'], bumper=True)
 
-    bumper_metadata = {
+    bumper_metadata = OrderedDict({
         'sources': sources,
         'showCaptions': json.dumps(bool(video.bumper['transcripts'])),  # TODO: clarify - send it, Anton?
         'transcriptLanguage': bumper_transcript_language,
         'transcriptLanguages': bumper_languages,
         'transcriptTranslationUrl': video.runtime.handler_url(video, 'transcript', 'translation_bumper').rstrip('/?'),
         'transcriptAvailableTranslationsUrl': video.runtime.handler_url(video, 'transcript', 'available_translations_bumper').rstrip('/?'),
-    }
+    })
 
     return bumper_metadata
