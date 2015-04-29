@@ -1107,6 +1107,22 @@ class VerificationStatus(models.Model):
             status="submitted"
         ).count()
 
+    @classmethod
+    def get_location_id(cls, photo_verification):
+        """ Return the location id of xblock
+
+        Args:
+            photo_verification(SoftwareSecurePhotoVerification): SoftwareSecurePhotoVerification object
+
+        Return:
+            Location Id of xblock if any else empty string
+        """
+        try:
+            ver_status = cls.objects.filter(checkpoint__photo_verification=photo_verification).latest()
+            return ver_status.location_id
+        except cls.DoesNotExist:
+            return ""
+
 
 class InCourseReverificationConfiguration(ConfigurationModel):
     """Configure in-course re-verification.
