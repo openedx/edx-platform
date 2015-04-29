@@ -309,7 +309,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         bumperize(self)
 
         context = {
-            'bumper_metadata': json.dumps(OrderedDict(self.bumper['metadata'])),
+            'bumper_metadata': json.dumps(self.bumper['metadata']),
             'metadata': json.dumps(OrderedDict(metadata)),
             'poster': json.dumps(get_poster(self)),
             'branding_info': branding_info,
