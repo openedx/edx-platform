@@ -3,11 +3,18 @@ Tests for Discussion API internal interface
 """
 from datetime import datetime, timedelta
 
+import httpretty
 import mock
 from pytz import UTC
 
+from django.http import Http404
+from django.test.client import RequestFactory
+
+from opaque_keys.edx.locator import CourseLocator
+
 from courseware.tests.factories import BetaTesterFactory, StaffFactory
-from discussion_api.api import get_course_topics
+from discussion_api.api import get_course_topics, get_thread_list
+from discussion_api.tests.utils import CommentsServiceMockMixin
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from student.tests.factories import UserFactory
@@ -304,3 +311,171 @@ class GetCourseTopicsTest(ModuleStoreTestCase):
             "non_courseware_topics": [],
         }
         self.assertEqual(staff_actual, staff_expected)
+
+
+@httpretty.activate
+class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
+    """Test for get_thread_list"""
+    def setUp(self):
+        super(GetThreadListTest, self).setUp()
+        self.maxDiff = None  # pylint: disable=invalid-name
+        self.request = RequestFactory().get("/test_path")
+        self.course_key = CourseLocator.from_string("a/b/c")
+
+    def get_thread_list(self, threads, page=1, page_size=1, num_pages=1):
+        """
+        Register the appropriate comments service response, then call
+        get_thread_list and return the result.
+        """
+        self.register_get_threads_response(threads, page, num_pages)
+        ret = get_thread_list(self.request, self.course_key, page, page_size)
+        return ret
+
+    def test_empty(self):
+        self.assertEqual(
+            self.get_thread_list([]),
+            {
+                "results": [],
+                "next": None,
+                "previous": None,
+            }
+        )
+
+    def test_basic_query_params(self):
+        self.get_thread_list([], page=6, page_size=14)
+        self.assert_last_query_params({
+            "course_id": [unicode(self.course_key)],
+            "page": ["6"],
+            "per_page": ["14"],
+            "recursive": ["False"],
+        })
+
+    def test_thread_content(self):
+        source_threads = [
+            {
+                "id": "test_thread_id_0",
+                "course_id": unicode(self.course_key),
+                "commentable_id": "topic_x",
+                "created_at": "2015-04-28T00:00:00Z",
+                "updated_at": "2015-04-28T11:11:11Z",
+                "type": "discussion",
+                "title": "Test Title",
+                "body": "Test body",
+                "pinned": False,
+                "closed": False,
+                "comments_count": 5,
+                "unread_comments_count": 3,
+            },
+            {
+                "id": "test_thread_id_1",
+                "course_id": unicode(self.course_key),
+                "commentable_id": "topic_y",
+                "created_at": "2015-04-28T22:22:22Z",
+                "updated_at": "2015-04-28T00:33:33Z",
+                "type": "question",
+                "title": "Another Test Title",
+                "body": "More content",
+                "pinned": False,
+                "closed": True,
+                "comments_count": 18,
+                "unread_comments_count": 0,
+            },
+            {
+                "id": "test_thread_id_2",
+                "course_id": unicode(self.course_key),
+                "commentable_id": "topic_x",
+                "created_at": "2015-04-28T00:44:44Z",
+                "updated_at": "2015-04-28T00:55:55Z",
+                "type": "discussion",
+                "title": "Yet Another Test Title",
+                "body": "Still more content",
+                "pinned": True,
+                "closed": False,
+                "comments_count": 0,
+                "unread_comments_count": 0,
+            },
+        ]
+        expected_threads = [
+            {
+                "id": "test_thread_id_0",
+                "course_id": unicode(self.course_key),
+                "topic_id": "topic_x",
+                "created_at": "2015-04-28T00:00:00Z",
+                "updated_at": "2015-04-28T11:11:11Z",
+                "type": "discussion",
+                "title": "Test Title",
+                "raw_body": "Test body",
+                "pinned": False,
+                "closed": False,
+                "comment_count": 5,
+                "unread_comment_count": 3,
+            },
+            {
+                "id": "test_thread_id_1",
+                "course_id": unicode(self.course_key),
+                "topic_id": "topic_y",
+                "created_at": "2015-04-28T22:22:22Z",
+                "updated_at": "2015-04-28T00:33:33Z",
+                "type": "question",
+                "title": "Another Test Title",
+                "raw_body": "More content",
+                "pinned": False,
+                "closed": True,
+                "comment_count": 18,
+                "unread_comment_count": 0,
+            },
+            {
+                "id": "test_thread_id_2",
+                "course_id": unicode(self.course_key),
+                "topic_id": "topic_x",
+                "created_at": "2015-04-28T00:44:44Z",
+                "updated_at": "2015-04-28T00:55:55Z",
+                "type": "discussion",
+                "title": "Yet Another Test Title",
+                "raw_body": "Still more content",
+                "pinned": True,
+                "closed": False,
+                "comment_count": 0,
+                "unread_comment_count": 0,
+            },
+        ]
+        self.assertEqual(
+            self.get_thread_list(source_threads),
+            {
+                "results": expected_threads,
+                "next": None,
+                "previous": None,
+            }
+        )
+
+    def test_pagination(self):
+        # N.B. Empty thread list is not realistic but convenient for this test
+        self.assertEqual(
+            self.get_thread_list([], page=1, num_pages=3),
+            {
+                "results": [],
+                "next": "http://testserver/test_path?page=2",
+                "previous": None,
+            }
+        )
+        self.assertEqual(
+            self.get_thread_list([], page=2, num_pages=3),
+            {
+                "results": [],
+                "next": "http://testserver/test_path?page=3",
+                "previous": "http://testserver/test_path?page=1",
+            }
+        )
+        self.assertEqual(
+            self.get_thread_list([], page=3, num_pages=3),
+            {
+                "results": [],
+                "next": None,
+                "previous": "http://testserver/test_path?page=2",
+            }
+        )
+
+        # Test page past the last one
+        self.register_get_threads_response([], page=3, num_pages=3)
+        with self.assertRaises(Http404):
+            get_thread_list(self.request, self.course_key, page=4, page_size=10)
