@@ -13,6 +13,8 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
 
   .courses {
     @include row();
+    @include float(left);
+    width: 75%;
 
     .courses-listing {
       @extend %ui-no-list;
@@ -34,8 +36,8 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
         }
 
         @include media($bp-huge) {
-          @include span-columns(3); // 3 of 12
-          @include omega(4n);
+          @include span-columns(4); // 3 of 12
+          @include omega(3n);
         }
       }
     }
