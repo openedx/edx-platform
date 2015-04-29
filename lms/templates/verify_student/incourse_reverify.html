@@ -9,8 +9,7 @@ from verify_student.views import PayAndVerifyView
 <%block name="bodyclass">register verification-process step-requirements</%block>
 
 <%block name="pagetitle">
-  ${_("Verifying for \"{checkpoint_name}\" in course \"{course_name}\"").format(course_name=course_name,
-checkpoint_name=checkpoint_name)}
+  ${_("Re-Verify for {course_name}").format(course_name=course_name)}
 </%block>
 
 <%block name="header_extras">
