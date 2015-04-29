@@ -5,11 +5,12 @@ define(
 'video/09_events_plugin.js', [],
 function() {
     /**
-     * Video volume control module.
+     * Video Events module.
      * @exports video/09_events_plugin.js
      * @constructor
      * @param {Object} state The object containing the state of the video
      * @param {Object} i18n The object containing strings with translations.
+     * @param {Object} options
      * @return {jquery Promise}
      */
     var EventsPlugin = function(state, i18n, options) {

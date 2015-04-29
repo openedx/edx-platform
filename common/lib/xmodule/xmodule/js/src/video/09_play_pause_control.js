@@ -5,7 +5,7 @@ define(
 'video/09_play_pause_control.js', [],
 function() {
     /**
-     * Video volume control module.
+     * Video Play/Pause control module.
      * @exports video/09_play_pause_control.js
      * @constructor
      * @param {Object} state The object containing the state of the video

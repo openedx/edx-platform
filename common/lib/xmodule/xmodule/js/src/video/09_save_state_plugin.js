@@ -5,11 +5,12 @@ define(
 'video/09_save_state_plugin.js', [],
 function() {
     /**
-     * Video volume control module.
+     * Video Save state module.
      * @exports video/09_save_state_plugin.js
      * @constructor
      * @param {Object} state The object containing the state of the video
      * @param {Object} i18n The object containing strings with translations.
+     * @param {Object} options
      * @return {jquery Promise}
      */
     var SaveStatePlugin = function(state, i18n, options) {

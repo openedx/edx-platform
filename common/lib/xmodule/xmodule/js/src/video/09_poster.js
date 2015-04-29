@@ -4,18 +4,12 @@ define(
 'video/09_poster.js',
 [], function () {
     /**
-     * VideoPoster module exports a function.
-     *
-     * @type {function}
-     * @access public
-     *
-     * @param {object} state - The object containing the state of the video
-     *     player. All other modules, their parameters, public variables, etc.
-     *     are available via this object.
-     *
-     * @this {object} The global window object.
-     *
-     * @returns {jquery Promise}
+     * VideoPoster module.
+     * @exports video/09_play_skip_control.js
+     * @constructor
+     * @param {jquery Element} container
+     * @param {Object} options
+     * @return {jquery Promise}
      */
     var VideoPoster = function (container, options) {
         if (!(this instanceof VideoPoster)) {

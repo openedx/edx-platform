@@ -80,9 +80,15 @@
                         storage: storage,
                         options: {},
                         youtubeXhr: youtubeXhr
-                    };
+                    },
+                    mainPlayerModules = [FocusGrabber, VideoAccessibleMenu, VideoControl, VideoPlayPlaceholder,
+                        VideoPlayPauseControl, VideoProgressSlider, VideoSpeedControl, VideoVolumeControl,
+                        VideoQualityControl, VideoFullScreen, VideoCaption, VideoCommands, VideoContextMenu,
+                        VideoSaveStatePlugin, VideoEventsPlugin],
+                    bumperPlayerModules = [VideoAccessibleMenu, VideoControl, VideoPlaySkipControl, VideoSkipControl,
+                        VideoCaption, VideoVolumeControl, VideoCommands, VideoSaveStatePlugin, VideoEventsPlugin];
 
-                var getCleanState = function (state, metadata) {
+                var getBumperState = function (state, metadata) {
                     return $.extend(true, {}, state, {metadata: metadata}, {
                         metadata: {
                             savedVideoPosition: 0,
@@ -101,29 +107,21 @@
                     };
                 };
 
-                state.modules = [
-                    FocusGrabber, VideoAccessibleMenu, VideoControl, VideoPlayPlaceholder, VideoPlayPauseControl,
-                    VideoProgressSlider, VideoSpeedControl, VideoVolumeControl, VideoQualityControl, VideoFullScreen,
-                    VideoCaption, VideoCommands, VideoContextMenu, VideoSaveStatePlugin, VideoEventsPlugin
-                ];
+                state.modules = mainPlayerModules;
 
                 var bumperMetadata = el.data('bumper-metadata');
                 if (bumperMetadata) {
-                    var bumperState = getCleanState(state, bumperMetadata);
+                    var bumperState = getBumperState(state, bumperMetadata);
 
                     _.extend(bumperState, {
-                        modules: [
-                            VideoAccessibleMenu, VideoControl, VideoPlaySkipControl, VideoSkipControl, VideoCaption,
-                            VideoVolumeControl, VideoCommands, VideoSaveStatePlugin, VideoEventsPlugin
-                        ],
+                        modules: bumperPlayerModules,
                         options: {
                             SaveStatePlugin: {events: ['transcript_download:change', 'language_menu:change']},
                             EventsPlugin: {data: {is_bumper: true}}
                         }
                     });
 
-                    var bumperPlayer = player(bumperState),
-                        bumper = new VideoBumper(bumperPlayer, bumperState);
+                    var bumper = new VideoBumper(player(bumperState), bumperState);
                     state.bumperState = bumperState;
                     bumper.getPromise().done(player(state, true));
                     new VideoPoster(state.el, {

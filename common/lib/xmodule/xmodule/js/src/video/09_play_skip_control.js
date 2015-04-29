@@ -5,7 +5,7 @@ define(
 'video/09_play_skip_control.js', [],
 function() {
     /**
-     * Video volume control module.
+     * Video Play/Skip control module.
      * @exports video/09_play_skip_control.js
      * @constructor
      * @param {Object} state The object containing the state of the video

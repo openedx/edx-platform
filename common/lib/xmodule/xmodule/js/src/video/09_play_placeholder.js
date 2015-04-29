@@ -5,7 +5,7 @@ define(
 'video/09_play_placeholder.js', [],
 function() {
     /**
-     * Video volume control module.
+     * Video Play placeholder module.
      * @exports video/09_play_placeholder.js
      * @constructor
      * @param {Object} state The object containing the state of the video

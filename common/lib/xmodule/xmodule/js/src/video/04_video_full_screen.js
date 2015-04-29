@@ -1,6 +1,5 @@
 (function (requirejs, require, define) {
 
-// VideoControl module.
 define(
 'video/04_video_full_screen.js',
 [],
@@ -12,7 +11,6 @@ function () {
         '</a>'
     ].join('');
 
-    // VideoControl() function - what this module "exports".
     return function (state) {
         var dfd = $.Deferred();
 
