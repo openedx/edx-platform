@@ -302,6 +302,23 @@ class BulkOperationsMixin(object):
             bulk_ops_record.has_library_updated_item = False
 
 
+class Unset(object):
+    """
+    Class used to indicate a value that has not yet been explicitly set - it's uninitialized.
+    Differentiates this state from None, so that None can be a valid value.
+    """
+    def __deepcopy__(self, memo):
+        """
+        This class is immutable, so return itself.
+        """
+        memo[id(self)] = self
+        return self
+
+
+# Used as a non-None unset value for source_version below.
+UNSET = Unset()
+
+
 class EditInfo(object):
     """
     Encapsulates the editing info of a block.
@@ -317,15 +334,17 @@ class EditInfo(object):
         """
         Serialize to a Mongo-storable format.
         """
-        return {
+        block_to_store = {
             'previous_version': self.previous_version,
             'update_version': self.update_version,
-            'source_version': self.source_version,
             'edited_on': self.edited_on,
             'edited_by': self.edited_by,
             'original_usage': self.original_usage,
             'original_usage_version': self.original_usage_version,
         }
+        if self.source_version is not UNSET:
+            block_to_store['source_version'] = self.source_version
+        return block_to_store
 
     def from_storable(self, edit_info):
         """
@@ -339,8 +358,7 @@ class EditInfo(object):
         # May point to a structure not in this structure's history (e.g., to a draft
         # branch from which this version was published).
         self.update_version = edit_info.get('update_version', None)
-
-        self.source_version = edit_info.get('source_version', None)
+        self.source_version = edit_info.get('source_version', UNSET)
 
         # Datetime when this XBlock's fields last changed.
         self.edited_on = edit_info.get('edited_on', None)
@@ -352,16 +370,33 @@ class EditInfo(object):
         self.original_usage = edit_info.get('original_usage', None)
         self.original_usage_version = edit_info.get('original_usage_version', None)
 
-    def __str__(self):
-        return ("EditInfo(previous_version={0.previous_version}, "
-                "update_version={0.update_version}, "
-                "source_version={0.source_version}, "
-                "edited_on={0.edited_on}, "
-                "edited_by={0.edited_by}, "
-                "original_usage={0.original_usage}, "
-                "original_usage_version={0.original_usage_version}, "
-                "_subtree_edited_on={0._subtree_edited_on}, "
-                "_subtree_edited_by={0._subtree_edited_by})").format(self)
+    def get_source_version(self, value_if_unset=UNSET):
+        """
+        Return the version of the given database representation of a block.
+        """
+        if value_if_unset is UNSET:
+            # Parameter was not passed-in.
+            value_if_unset = self.update_version
+        if self.source_version is not UNSET:
+            return self.source_version
+        else:
+            return value_if_unset
+
+    def __repr__(self):
+        # pylint: disable=bad-continuation, redundant-keyword-arg
+        return ("{classname}(previous_version={self.previous_version}, "
+                "update_version={self.update_version}, "
+                "source_version={source_version}, "
+                "edited_on={self.edited_on}, "
+                "edited_by={self.edited_by}, "
+                "original_usage={self.original_usage}, "
+                "original_usage_version={self.original_usage_version}, "
+                "_subtree_edited_on={self._subtree_edited_on}, "
+                "_subtree_edited_by={self._subtree_edited_by})").format(
+            self=self,
+            classname=self.__class__.__name__,
+            source_version="UNSET" if self.source_version is UNSET else self.source_version,
+        )  # pylint: disable=bad-continuation
 
 
 class BlockData(object):
@@ -408,13 +443,17 @@ class BlockData(object):
         # EditInfo object containing all versioning/editing data.
         self.edit_info = EditInfo(**block_data.get('edit_info', {}))
 
-    def __str__(self):
-        return ("BlockData(fields={0.fields}, "
-                "block_type={0.block_type}, "
-                "definition={0.definition}, "
-                "definition_loaded={0.definition_loaded}, "
-                "defaults={0.defaults}, "
-                "edit_info={0.edit_info})").format(self)
+    def __repr__(self):
+        # pylint: disable=bad-continuation, redundant-keyword-arg
+        return ("{classname}(fields={self.fields}, "
+                "block_type={self.block_type}, "
+                "definition={self.definition}, "
+                "definition_loaded={self.definition_loaded}, "
+                "defaults={self.defaults}, "
+                "edit_info={self.edit_info})").format(
+            self=self,
+            classname=self.__class__.__name__,
+        )  # pylint: disable=bad-continuation
 
 
 new_contract('BlockData', BlockData)

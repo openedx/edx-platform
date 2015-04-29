@@ -10,15 +10,19 @@ import itertools
 import mimetypes
 from unittest import skip
 from uuid import uuid4
+from contextlib import contextmanager
 
 # Mixed modulestore depends on django, so we'll manually configure some django settings
 # before importing the module
 # TODO remove this import and the configuration -- xmodule should not depend on django!
 from django.conf import settings
+# This import breaks this test file when run separately. Needs to be fixed! (PLAT-449)
 from mock_django import mock_signal_receiver
 from nose.plugins.attrib import attr
 import pymongo
 from pytz import UTC
+from shutil import rmtree
+from tempfile import mkdtemp
 
 from xmodule.x_module import XModuleMixin
 from xmodule.modulestore.edit_info import EditInfoMixin
@@ -27,6 +31,7 @@ from xmodule.modulestore.tests.test_cross_modulestore_import_export import Mongo
 from xmodule.contentstore.content import StaticContent
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.django import SignalHandler
 
 if not settings.configured:
@@ -49,9 +54,7 @@ from xmodule.tests import DATA_DIR, CourseComparisonTest
 log = logging.getLogger(__name__)
 
 
-@ddt.ddt
-@attr('mongo')
-class TestMixedModuleStore(CourseComparisonTest):
+class CommonMixedModuleStoreSetup(CourseComparisonTest):
     """
     Quasi-superclass which tests Location based apps against both split and mongo dbs (Locator and
     Location-based dbs)
@@ -126,7 +129,7 @@ class TestMixedModuleStore(CourseComparisonTest):
         """
         Set up the database for testing
         """
-        super(TestMixedModuleStore, self).setUp()
+        super(CommonMixedModuleStoreSetup, self).setUp()
 
         self.exclude_field(None, 'wiki_slug')
         self.exclude_field(None, 'xml_attributes')
@@ -241,6 +244,12 @@ class TestMixedModuleStore(CourseComparisonTest):
         """
         return self.course_locations[string].course_key
 
+    def _has_changes(self, location):
+        """
+        Helper function that loads the item before calling has_changes
+        """
+        return self.store.has_changes(self.store.get_item(location))
+
     # pylint: disable=dangerous-default-value
     def _initialize_mixed(self, mappings=MAPPINGS, contentstore=None):
         """
@@ -285,6 +294,13 @@ class TestMixedModuleStore(CourseComparisonTest):
         )
         self._create_course(self.course_locations[self.MONGO_COURSEID].course_key)
 
+
+@ddt.ddt
+@attr('mongo')
+class TestMixedModuleStore(CommonMixedModuleStoreSetup):
+    """
+    Tests of the MixedModulestore interface methods.
+    """
     @ddt.data('draft', 'split')
     def test_get_modulestore_type(self, default_ms):
         """
@@ -505,12 +521,6 @@ class TestMixedModuleStore(CourseComparisonTest):
         # Publish and verify again
         component = self.store.publish(component.location, self.user_id)
         self.assertFalse(self.store.has_changes(component))
-
-    def _has_changes(self, location):
-        """
-        Helper function that loads the item before calling has_changes
-        """
-        return self.store.has_changes(self.store.get_item(location))
 
     def setup_has_changes(self, default_ms):
         """
@@ -2244,3 +2254,331 @@ class TestMixedModuleStore(CourseComparisonTest):
                         self.store.update_item(unit, self.user_id)
                         self.assertEqual(receiver.call_count, 0)
                     self.assertEqual(receiver.call_count, 0)
+
+
+@ddt.ddt
+@attr('mongo')
+class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
+    """
+    Tests which publish (or don't publish) items - and then export/import the course,
+    checking the state of the imported items.
+    """
+    def setUp(self):
+        """
+        Set up the database for testing
+        """
+        super(TestPublishOverExportImport, self).setUp()
+
+        self.user_id = ModuleStoreEnum.UserID.test
+        self.export_dir = mkdtemp()
+        self.addCleanup(rmtree, self.export_dir, ignore_errors=True)
+
+    def _export_import_course_round_trip(self, modulestore, contentstore, source_course_key, export_dir):
+        """
+        Export the course from a modulestore and then re-import the course.
+        """
+        top_level_export_dir = 'exported_source_course'
+        export_course_to_xml(
+            modulestore,
+            contentstore,
+            source_course_key,
+            export_dir,
+            top_level_export_dir,
+        )
+
+        import_course_from_xml(
+            modulestore,
+            'test_user',
+            export_dir,
+            source_dirs=[top_level_export_dir],
+            static_content_store=contentstore,
+            target_id=source_course_key,
+            create_if_not_present=True,
+            raise_on_failure=True,
+        )
+
+    @contextmanager
+    def _build_store(self, default_ms):
+        """
+        Perform the modulestore-building and course creation steps for a mixed modulestore test.
+        """
+        with MongoContentstoreBuilder().build() as contentstore:
+            # initialize the mixed modulestore
+            self._initialize_mixed(contentstore=contentstore, mappings={})
+            with self.store.default_store(default_ms):
+                source_course_key = self.store.make_course_key("org.source", "course.source", "run.source")
+                self._create_course(source_course_key)
+                yield contentstore, source_course_key
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_draft_has_changes_before_export_and_after_import(self, default_ms):
+        """
+        Tests that an unpublished unit remains with no changes across export and re-import.
+        """
+        with self._build_store(default_ms) as (contentstore, source_course_key):
+
+            # Create a dummy component to test against and don't publish it.
+            draft_xblock = self.store.create_item(
+                self.user_id,
+                self.course.id,
+                'vertical',
+                block_id='test_vertical'
+            )
+            # Not yet published, so changes are present
+            self.assertTrue(self._has_changes(draft_xblock.location))
+
+            self._export_import_course_round_trip(
+                self.store, contentstore, source_course_key, self.export_dir
+            )
+
+            # Verify that the imported block still is a draft, i.e. has changes.
+            self.assertTrue(self._has_changes(draft_xblock.location))
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_published_has_changes_before_export_and_after_import(self, default_ms):
+        """
+        Tests that an published unit remains published across export and re-import.
+        """
+        with self._build_store(default_ms) as (contentstore, source_course_key):
+
+            # Create a dummy component to test against and publish it.
+            published_xblock = self.store.create_item(
+                self.user_id,
+                self.course.id,
+                'vertical',
+                block_id='test_vertical'
+            )
+            self.store.publish(published_xblock.location, self.user_id)
+
+            # Retrieve the published block and make sure it's published.
+            self.assertFalse(self._has_changes(published_xblock.location))
+
+            self._export_import_course_round_trip(
+                self.store, contentstore, source_course_key, self.export_dir
+            )
+
+            # Get the published xblock from the imported course.
+            # Verify that it still is published, i.e. has no changes.
+            self.assertFalse(self._has_changes(published_xblock.location))
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_changed_published_has_changes_before_export_and_after_import(self, default_ms):
+        """
+        Tests that an published unit with an unpublished draft remains published across export and re-import.
+        """
+        with self._build_store(default_ms) as (contentstore, source_course_key):
+
+            # Create a dummy component to test against and publish it.
+            published_xblock = self.store.create_item(
+                self.user_id,
+                self.course.id,
+                'vertical',
+                block_id='test_vertical'
+            )
+            self.store.publish(published_xblock.location, self.user_id)
+
+            # Retrieve the published block and make sure it's published.
+            self.assertFalse(self._has_changes(published_xblock.location))
+
+            updated_display_name = 'Changed Display Name'
+            component = self.store.get_item(published_xblock.location)
+            component.display_name = updated_display_name
+            component = self.store.update_item(component, self.user_id)
+            self.assertTrue(self.store.has_changes(component))
+
+            self._export_import_course_round_trip(
+                self.store, contentstore, source_course_key, self.export_dir
+            )
+
+            # Get the published xblock from the imported course.
+            # Verify that the published block still has a draft block, i.e. has changes.
+            self.assertTrue(self._has_changes(published_xblock.location))
+
+            # Verify that the changes in the draft vertical still exist.
+            with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, source_course_key):
+                component = self.store.get_item(published_xblock.location)
+                self.assertEqual(component.display_name, updated_display_name)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_seq_with_unpublished_vertical_has_changes_before_export_and_after_import(self, default_ms):
+        """
+        Tests that an published unit with an unpublished draft remains published across export and re-import.
+        """
+        with self._build_store(default_ms) as (contentstore, source_course_key):
+
+            # create chapter
+            chapter = self.store.create_child(
+                self.user_id, self.course.location, 'chapter', block_id='section_one'
+            )
+            self.store.publish(chapter.location, self.user_id)
+
+            # create sequential
+            sequential = self.store.create_child(
+                self.user_id, chapter.location, 'sequential', block_id='subsection_one'
+            )
+            self.store.publish(sequential.location, self.user_id)
+
+            # create vertical - don't publish it!
+            vertical = self.store.create_child(
+                self.user_id, sequential.location, 'vertical', block_id='moon_unit'
+            )
+
+            # Retrieve the published block and make sure it's published.
+            # Chapter is published - but the changes in vertical below means it "has_changes".
+            self.assertTrue(self._has_changes(chapter.location))
+            # Sequential is published - but the changes in vertical below means it "has_changes".
+            self.assertTrue(self._has_changes(sequential.location))
+            # Vertical is unpublished - so it "has_changes".
+            self.assertTrue(self._has_changes(vertical.location))
+
+            self._export_import_course_round_trip(
+                self.store, contentstore, source_course_key, self.export_dir
+            )
+
+            # Get the published xblock from the imported course.
+            # Verify that the published block still has a draft block, i.e. has changes.
+            self.assertTrue(self._has_changes(chapter.location))
+            self.assertTrue(self._has_changes(sequential.location))
+            self.assertTrue(self._has_changes(vertical.location))
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_vertical_with_draft_and_published_unit_has_changes_before_export_and_after_import(self, default_ms):
+        """
+        Tests that an published unit with an unpublished draft remains published across export and re-import.
+        """
+        with self._build_store(default_ms) as (contentstore, source_course_key):
+
+            # create chapter
+            chapter = self.store.create_child(
+                self.user_id, self.course.location, 'chapter', block_id='section_one'
+            )
+            self.store.publish(chapter.location, self.user_id)
+
+            # create sequential
+            sequential = self.store.create_child(
+                self.user_id, chapter.location, 'sequential', block_id='subsection_one'
+            )
+            self.store.publish(sequential.location, self.user_id)
+
+            # create vertical
+            vertical = self.store.create_child(
+                self.user_id, sequential.location, 'vertical', block_id='moon_unit'
+            )
+            # Vertical has changes until it is actually published.
+            self.assertTrue(self._has_changes(vertical.location))
+            self.store.publish(vertical.location, self.user_id)
+            self.assertFalse(self._has_changes(vertical.location))
+
+            # create unit
+            unit = self.store.create_child(
+                self.user_id, vertical.location, 'html', block_id='html_unit'
+            )
+            # Vertical has a new child -and- unit is unpublished. So both have changes.
+            self.assertTrue(self._has_changes(vertical.location))
+            self.assertTrue(self._has_changes(unit.location))
+
+            # Publishing the vertical also publishes its unit child.
+            self.store.publish(vertical.location, self.user_id)
+            self.assertFalse(self._has_changes(vertical.location))
+            self.assertFalse(self._has_changes(unit.location))
+
+            # Publishing the unit separately has no effect on whether it has changes - it's already published.
+            self.store.publish(unit.location, self.user_id)
+            self.assertFalse(self._has_changes(vertical.location))
+            self.assertFalse(self._has_changes(unit.location))
+
+            # Retrieve the published block and make sure it's published.
+            self.store.publish(chapter.location, self.user_id)
+            self.assertFalse(self._has_changes(chapter.location))
+            self.assertFalse(self._has_changes(sequential.location))
+            self.assertFalse(self._has_changes(vertical.location))
+            self.assertFalse(self._has_changes(unit.location))
+
+            # Now make changes to the unit - but don't publish them.
+            component = self.store.get_item(unit.location)
+            updated_display_name = 'Changed Display Name'
+            component.display_name = updated_display_name
+            component = self.store.update_item(component, self.user_id)
+            self.assertTrue(self._has_changes(component.location))
+
+            # Export the course - then import the course export.
+            self._export_import_course_round_trip(
+                self.store, contentstore, source_course_key, self.export_dir
+            )
+
+            # Get the published xblock from the imported course.
+            # Verify that the published block still has a draft block, i.e. has changes.
+            self.assertTrue(self._has_changes(chapter.location))
+            self.assertTrue(self._has_changes(sequential.location))
+            self.assertTrue(self._has_changes(vertical.location))
+            self.assertTrue(self._has_changes(unit.location))
+
+            # Verify that the changes in the draft unit still exist.
+            with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, source_course_key):
+                component = self.store.get_item(unit.location)
+                self.assertEqual(component.display_name, updated_display_name)
+
+            # Verify that the draft changes don't exist in the published unit - it still uses the default name.
+            with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, source_course_key):
+                component = self.store.get_item(unit.location)
+                self.assertEqual(component.display_name, 'Text')
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_vertical_with_published_unit_remains_published_before_export_and_after_import(self, default_ms):
+        """
+        Tests that an published unit remains published across export and re-import.
+        """
+        with self._build_store(default_ms) as (contentstore, source_course_key):
+
+            # create chapter
+            chapter = self.store.create_child(
+                self.user_id, self.course.location, 'chapter', block_id='section_one'
+            )
+            self.store.publish(chapter.location, self.user_id)
+
+            # create sequential
+            sequential = self.store.create_child(
+                self.user_id, chapter.location, 'sequential', block_id='subsection_one'
+            )
+            self.store.publish(sequential.location, self.user_id)
+
+            # create vertical
+            vertical = self.store.create_child(
+                self.user_id, sequential.location, 'vertical', block_id='moon_unit'
+            )
+            # Vertical has changes until it is actually published.
+            self.assertTrue(self._has_changes(vertical.location))
+            self.store.publish(vertical.location, self.user_id)
+            self.assertFalse(self._has_changes(vertical.location))
+
+            # create unit
+            unit = self.store.create_child(
+                self.user_id, vertical.location, 'html', block_id='html_unit'
+            )
+            # Now make changes to the unit.
+            updated_display_name = 'Changed Display Name'
+            unit.display_name = updated_display_name
+            unit = self.store.update_item(unit, self.user_id)
+            self.assertTrue(self._has_changes(unit.location))
+
+            # Publishing the vertical also publishes its unit child.
+            self.store.publish(vertical.location, self.user_id)
+            self.assertFalse(self._has_changes(vertical.location))
+            self.assertFalse(self._has_changes(unit.location))
+
+            # Export the course - then import the course export.
+            self._export_import_course_round_trip(
+                self.store, contentstore, source_course_key, self.export_dir
+            )
+
+            # Get the published xblock from the imported course.
+            # Verify that the published block still has a draft block, i.e. has changes.
+            self.assertFalse(self._has_changes(chapter.location))
+            self.assertFalse(self._has_changes(sequential.location))
+            self.assertFalse(self._has_changes(vertical.location))
+            self.assertFalse(self._has_changes(unit.location))
+
+            # Verify that the published changes exist in the published unit.
+            with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, source_course_key):
+                component = self.store.get_item(unit.location)
+                self.assertEqual(component.display_name, updated_display_name)
