@@ -3,13 +3,14 @@
 define(['backbone'], function(Backbone) {
     'use strict';
 
-    return function (Collection, Form, ResultListView, FilterBarView, searchQuery) {
+    return function (Collection, Form, ResultListView, FilterBarView, FacetsBarView, searchQuery) {
 
         var collection = new Collection([]);
         var results = new ResultListView({ collection: collection });
         var dispatcher = _.clone(Backbone.Events);
         var form = new Form();
         var filters = new FilterBarView();
+        var facets = new FacetsBarView();
 
         dispatcher.listenTo(form, 'search', function (query) {
             collection.performSearch(query);
@@ -17,9 +18,18 @@ define(['backbone'], function(Backbone) {
             filters.changeQueryFilter(query);
         });
 
+        dispatcher.listenTo(filters, 'search', function (filters) {
+            collection.performSearch(filters);
+            form.showLoadingIndicator();
+        });
+
         dispatcher.listenTo(form, 'clear', function () {
             results.clearResults();
-            form.hideClearAllButton();
+            filters.hideClearAllButton();
+        });
+
+        dispatcher.listenTo(filters, 'clear', function () {
+            form.clearAll();
         });
 
         dispatcher.listenTo(results, 'next', function () {
@@ -30,7 +40,7 @@ define(['backbone'], function(Backbone) {
         dispatcher.listenTo(collection, 'search', function () {
             if (collection.length > 0) {
                 results.render();
-                form.showClearAllButton();
+                filters.showClearAllButton();
             }
             else {
                 form.showNotFoundMessage(collection.searchTerm);
@@ -48,6 +58,9 @@ define(['backbone'], function(Backbone) {
             form.hideLoadingIndicator();
         });
 
+        dispatcher.listenTo(facets, 'addFilter', function (data) {
+            filters.addFilter(data);
+        });
 
         // kick off search if URL contains ?search_query=
         if (searchQuery) {
