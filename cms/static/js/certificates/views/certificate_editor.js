@@ -23,8 +23,8 @@ function(ListItemEditorView, Signatory, SignatoryEditor, _, $, gettext) {
         addSignatory: function() {
             // create a new signatory
             var signatory = new Signatory({certificate: this.getSaveableModel()});
-            var signatory_view = new SignatoryEditor({model: signatory});
-            this.$('div.signatory-list').append($(signatory_view.render()));
+            var signatory_view = new SignatoryEditor({model: signatory, isEditingAllCollections: true});
+            this.$('div.signatory-edit-list').append($(signatory_view.render()));
             this.toggleAddSignatoryButtonState();
         },
 
@@ -34,6 +34,7 @@ function(ListItemEditorView, Signatory, SignatoryEditor, _, $, gettext) {
 
             return [
                 'collection-edit',
+                'certificates',
                 'certificate-edit',
                 'certificate-edit-' + index
             ].join(' ');
@@ -53,8 +54,8 @@ function(ListItemEditorView, Signatory, SignatoryEditor, _, $, gettext) {
 
             // At-least one signatory would be associated with certificate.
             this.model.get("signatories").each(function( modelSignatory) {
-                var signatory_view = new SignatoryEditor({model: modelSignatory});
-                self.$('div.signatory-list').append($(signatory_view.render()));
+                var signatory_view = new SignatoryEditor({model: modelSignatory, isEditingAllCollections: true});
+                self.$('div.signatory-edit-list').append($(signatory_view.render()));
             });
 
             this.toggleAddSignatoryButtonState();
@@ -63,7 +64,7 @@ function(ListItemEditorView, Signatory, SignatoryEditor, _, $, gettext) {
 
         toggleAddSignatoryButtonState: function() {
             // disable the 'add signatory' link if user has added up to 4 signatories.
-            if(this.$(".signatory-list > div.signatory_view").length >= MAX_SIGNATORIES_LIMIT) {
+            if(this.$(".signatory-edit-list > div.signatory-edit").length >= MAX_SIGNATORIES_LIMIT) {
                 this.$(".action-add-signatory").addClass("disableClick");
             }
             else if ($(".action-add-signatory").hasClass('disableClick')) {
