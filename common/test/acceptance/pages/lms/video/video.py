@@ -22,7 +22,8 @@ VIDEO_BUTTONS = {
     'download_transcript': '.video-tracks > a',
     'speed': '.speeds',
     'quality': '.quality-control',
-    'do_not_show_again': '.skip',
+    'do_not_show_again': '.skip-control',
+    'skip_bumper': '.skip',
 }
 
 CSS_CLASS_NAMES = {
@@ -120,12 +121,12 @@ class VideoPage(PageObject):
         # Poster is enabled, click play
         self.q(css='.poster .btn-play').first.click()
 
-        video_player_buttons = ['do_not_show_again' , 'volume', 'play']
+        video_player_buttons = ['do_not_show_again', 'skip_bumper', 'volume', 'play']
         for button in video_player_buttons:
             self.wait_for_element_visibility(VIDEO_BUTTONS[button], '{} button is visible'.format(button.title()))
 
         # Press "skip" on Video bumper
-        self.q(css='.skip').first.click()
+        self.q(css=VIDEO_BUTTONS['skip_bumper']).first.click()
         self.wait_for_ajax()
 
         video_player_buttons = ['volume', 'play', 'fullscreen', 'speed']
