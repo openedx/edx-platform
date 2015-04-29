@@ -35,10 +35,10 @@ git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b
 -e git+https://github.com/edx/bok-choy.git@82d2f4b72e807b10d112179c0a4abd810a001b82#egg=bok_choy
 -e git+https://github.com/edx-solutions/django-splash.git@7579d052afcf474ece1239153cffe1c89935bc4f#egg=django-splash
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
--e git+https://github.com/edx/edx-ora2.git@release-2015-04-15T15.17#egg=edx-ora2
+-e git+https://github.com/edx/edx-ora2.git@release-2015-04-29T15.45#egg=edx-ora2
 -e git+https://github.com/edx/edx-submissions.git@8fb070d2a3087dd7656d27022e550d12e3b85ba3#egg=edx-submissions
 -e git+https://github.com/edx/opaque-keys.git@1254ed4d615a428591850656f39f26509b86d30a#egg=opaque-keys
--e git+https://github.com/edx/ease.git@97de68448e5495385ba043d3091f570a699d5b5f#egg=ease
+-e git+https://github.com/edx/ease.git@c6dee053eae6b3ac4fdf6be11fa7a9f8265540aa#egg=ease
 -e git+https://github.com/edx/i18n-tools.git@7b89d5e01c1a7cc5d69d813bd8c6b706a8f75119#egg=i18n-tools
 -e git+https://github.com/edx/edx-oauth2-provider.git@0.5.1#egg=oauth2-provider
 -e git+https://github.com/edx/edx-val.git@d6087908aa3dd05ceaa7f56a21284f86c53cb3f0#egg=edx-val
