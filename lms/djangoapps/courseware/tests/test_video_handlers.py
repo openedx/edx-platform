@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 """Video xmodule tests in mongo."""
 
-from mock import patch
 import os
+import freezegun
 import tempfile
 import textwrap
 import json
-from datetime import timedelta
+
+from datetime import timedelta, datetime
 from webob import Request
-from mock import MagicMock, Mock
+from mock import MagicMock, Mock, patch
 
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
@@ -127,6 +128,8 @@ class TestVideo(BaseTestXmodule):
             {'speed': 2.0},
             {'saved_video_position': "00:00:10"},
             {'transcript_language': 'uk'},
+            {'do_not_show_again_bumper': True},
+            {'date_last_view_bumper': True},
             {'demoo�': 'sample'}
         ]
         for sample in data:
@@ -148,6 +151,15 @@ class TestVideo(BaseTestXmodule):
         self.assertEqual(self.item_descriptor.transcript_language, 'en')
         self.item_descriptor.handle_ajax('save_user_state', {'transcript_language': "uk"})
         self.assertEqual(self.item_descriptor.transcript_language, 'uk')
+
+        self.assertEqual(self.item_descriptor.do_not_show_again_bumper, False)
+        self.item_descriptor.handle_ajax('save_user_state', {'do_not_show_again_bumper': True})
+        self.assertEqual(self.item_descriptor.do_not_show_again_bumper, True)
+
+        with freezegun.freeze_time(datetime.now()):
+            self.assertEqual(self.item_descriptor.date_last_view_bumper, None)
+            self.item_descriptor.handle_ajax('save_user_state', {'date_last_view_bumper': True})
+            self.assertEqual(self.item_descriptor.date_last_view_bumper, datetime.utcnow())
 
         response = self.item_descriptor.handle_ajax('save_user_state', {u'demoo�': "sample"})
         self.assertEqual(json.loads(response)['success'], True)
