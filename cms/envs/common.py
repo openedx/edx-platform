@@ -974,6 +974,7 @@ SOUTH_MIGRATION_MODULES.update({
 
 # to prevent run-away queries from happening
 NOTIFICATION_MAX_LIST_SIZE = 100
+NOTIFICATIONS_SHORT_POLL_REFRESH_RATE = 30
 
 #
 # Various mapping tables which is used by the MsgTypeToUrlLinkResolver
