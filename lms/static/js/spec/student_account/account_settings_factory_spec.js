@@ -46,6 +46,13 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 ]
             };
 
+            var createAccountSettingsPage = function() {
+                var context = AccountSettingsPage(
+                    FIELDS_DATA, AUTH_DATA, Helpers.USER_ACCOUNTS_API_URL, Helpers.USER_PREFERENCES_API_URL, 'edX'
+                );
+                return context.accountSettingsView;
+            };
+
             var requests;
 
             beforeEach(function () {
@@ -61,10 +68,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 requests = AjaxHelpers.requests(this);
 
-                var context = AccountSettingsPage(
-                    FIELDS_DATA, AUTH_DATA, Helpers.USER_ACCOUNTS_API_URL, Helpers.USER_PREFERENCES_API_URL
-                );
-                var accountSettingsView = context.accountSettingsView;
+                var accountSettingsView = createAccountSettingsPage();
 
                 Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, true);
                 Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
@@ -85,10 +89,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 requests = AjaxHelpers.requests(this);
 
-                var context = AccountSettingsPage(
-                    FIELDS_DATA, AUTH_DATA, Helpers.USER_ACCOUNTS_API_URL, Helpers.USER_PREFERENCES_API_URL
-                );
-                var accountSettingsView = context.accountSettingsView;
+                var accountSettingsView = createAccountSettingsPage();
 
                 Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, true);
                 Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
@@ -117,10 +118,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 requests = AjaxHelpers.requests(this);
 
-                var context = AccountSettingsPage(
-                    FIELDS_DATA, AUTH_DATA, Helpers.USER_ACCOUNTS_API_URL, Helpers.USER_PREFERENCES_API_URL
-                );
-                var accountSettingsView = context.accountSettingsView;
+                var accountSettingsView = createAccountSettingsPage();
 
                 Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, true);
                 Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
@@ -138,10 +136,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 requests = AjaxHelpers.requests(this);
 
-                var context = AccountSettingsPage(
-                    FIELDS_DATA, AUTH_DATA, Helpers.USER_ACCOUNTS_API_URL, Helpers.USER_PREFERENCES_API_URL
-                );
-                var accountSettingsView = context.accountSettingsView;
+                var accountSettingsView = createAccountSettingsPage();
 
                 AjaxHelpers.respondWithJson(requests, Helpers.createAccountSettingsData());
                 AjaxHelpers.respondWithJson(requests, Helpers.createUserPreferencesData());
