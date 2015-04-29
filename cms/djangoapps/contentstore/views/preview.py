@@ -17,6 +17,7 @@ from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.library_tools import LibraryToolsService
 from xmodule.services import SettingsService
 from xmodule.modulestore.django import modulestore, ModuleI18nService
+from xmodule.mixin import wrap_with_license
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryUsageLocator
 from xmodule.x_module import ModuleSystem
@@ -169,6 +170,10 @@ def _preview_module_system(request, descriptor, field_data):
         partial(replace_static_urls, None, course_id=course_id),
         _studio_wrap_xblock,
     ]
+
+    if settings.FEATURES.get("LICENSING", False):
+        # stick the license wrapper in front
+        wrappers.insert(0, wrap_with_license)
 
     descriptor.runtime._services['studio_user_permissions'] = StudioPermissionsService(request)  # pylint: disable=protected-access
 

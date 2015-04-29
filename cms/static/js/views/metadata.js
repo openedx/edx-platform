@@ -553,11 +553,6 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
     });
 
     Metadata.License = AbstractEditor.extend({
-        template: _.template(
-            '<label class="label setting-label" for="list-license-types">' +
-                '<%- model.display_name %>' +
-            '</label>'
-        ),
 
         initialize: function(options) {
             this.licenseModel = new LicenseModel({"asString": this.model.getValue()});
@@ -569,13 +564,9 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
         },
 
         render: function() {
+            this.licenseView.render().$el.css("display", "inline");
             this.licenseView.undelegateEvents();
-            this.$el.html(this.template({
-                model: this.model.attributes
-            }));
-            // make the licenseView display after this template, inline
-            this.licenseView.render().$el.css("display", "inline")
-            this.$el.append(this.licenseView.el)
+            this.$el.empty().append(this.licenseView.el);
             // restore event bindings
             this.licenseView.delegateEvents();
             return this;
