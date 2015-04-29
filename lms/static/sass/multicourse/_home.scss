@@ -1,5 +1,6 @@
 $title-left-margin: grid-width(2) + $gw-gutter;
 $title-width: flex-grid(6);
+$button-width: $baseline*2.75;
 $course-search-input-height: ($baseline*2.8);
 
 .home {
@@ -44,7 +45,7 @@ $course-search-input-height: ($baseline*2.8);
       @include transition(all 0.2s linear 0s);
       position: relative;
       border: 1px solid $border-color-3;
-      box-shadow: 0 4px 25px 0 rgba(0,0,0, 0.5);
+      box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
       background: $white;
       width: $title-width;
       min-height: ($baseline*6);
@@ -63,7 +64,7 @@ $course-search-input-height: ($baseline*2.8);
         @include transition(all 0.2s linear 0s);
         @include text-align(left);
         display: inline-block;
-        top: 0px;
+        top: 0;
         opacity: 1.0;
         padding: 20px 30px;
 
@@ -89,6 +90,7 @@ $course-search-input-height: ($baseline*2.8);
 
         .search-input {
           @include float(left);
+          @include padding-right($button-width);
           @include padding-left($baseline*0.5);
           @extend %ui-depth1;
           @extend %t-icon4;
@@ -99,7 +101,7 @@ $course-search-input-height: ($baseline*2.8);
           width: 100%;
           height: $course-search-input-height;
           color: $black;
-          font-style: normal;
+          font-style: $sans-serif;
 
           // STATE: focus
           &:focus {
@@ -110,7 +112,7 @@ $course-search-input-height: ($baseline*2.8);
       }
 
       .search-button {
-        @include left(-$baseline*2.75);
+        @include left(-$button-width);
         @extend %ui-depth2;
         @extend %t-icon3;
         @extend %t-strong;

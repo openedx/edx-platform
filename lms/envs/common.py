@@ -2297,10 +2297,10 @@ PROFILE_IMAGE_MIN_BYTES = 100
 # If set to None, all courses will be listed on the homepage
 HOMEPAGE_COURSE_COUNT = 9
 
-# if COURSES_ARE_BROWSABLE feature is disabled, ENABLE_COURSE_DISCOVERY should be as well
-if not FEATURES.get('COURSES_ARE_BROWSABLE'):
-    FEATURES['ENABLE_COURSE_DISCOVERY'] = False
 
-# if COURSE DISCOVERY feature is disabled, all courses should be listed on the homepage
-if not FEATURES.get('ENABLE_COURSE_DISCOVERY'):
+if FEATURES.get('ENABLE_COURSE_DISCOVERY'):
+    # if COURSE DISCOVERY feature is enabled, COURSES_ARE_BROWSABLE should be enabled as well
+    FEATURES['COURSES_ARE_BROWSABLE'] = True
+else:
+    # if COURSE DISCOVERY feature is disabled, all courses should be listed on the homepage
     HOMEPAGE_COURSE_COUNT = None
