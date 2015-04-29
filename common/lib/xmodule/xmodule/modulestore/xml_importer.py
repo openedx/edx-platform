@@ -316,7 +316,7 @@ class ImportManager(object):
         log.debug('course data_dir=%s', source_courselike.data_dir)
 
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, dest_id):
-            course = _import_module_and_update_references(
+            course = _update_and_import_module(
                 source_courselike, self.store, self.user_id,
                 courselike_key,
                 dest_id,
@@ -381,7 +381,7 @@ class ImportManager(object):
                     if self.verbose:
                         log.debug('importing module location %s', child.location)
 
-                    _import_module_and_update_references(
+                    _update_and_import_module(
                         child,
                         self.store,
                         self.user_id,
@@ -399,7 +399,7 @@ class ImportManager(object):
             if self.verbose:
                 log.debug('importing module location %s', leftover)
 
-            _import_module_and_update_references(
+            _update_and_import_module(
                 self.xml_module_store.get_item(leftover),
                 self.store,
                 self.user_id,
@@ -620,12 +620,67 @@ def import_library_from_xml(*args, **kwargs):
     return list(manager.run_imports())
 
 
-def _import_module_and_update_references(
+def _update_and_import_module(
         module, store, user_id,
         source_course_id, dest_course_id,
         do_import_static=True, runtime=None):
-
+    """
+    Update all the module reference fields to the destination course id,
+    then import the module into the destination course.
+    """
     logging.debug(u'processing import of module %s...', unicode(module.location))
+
+    def _update_module_references(module, source_course_id, dest_course_id):
+        """
+        Move the module to a new course.
+        """
+        def _convert_ref_fields_to_new_namespace(reference):  # pylint: disable=invalid-name
+            """
+            Convert a reference to the new namespace, but only
+            if the original namespace matched the original course.
+
+            Otherwise, returns the input value.
+            """
+            assert isinstance(reference, UsageKey)
+            if source_course_id == reference.course_key:
+                return reference.map_into_course(dest_course_id)
+            else:
+                return reference
+
+        fields = {}
+        for field_name, field in module.fields.iteritems():
+            if field.scope != Scope.parent and field.is_set_on(module):
+                if isinstance(field, Reference):
+                    value = field.read_from(module)
+                    if value is None:
+                        fields[field_name] = None
+                    else:
+                        fields[field_name] = _convert_ref_fields_to_new_namespace(field.read_from(module))
+                elif isinstance(field, ReferenceList):
+                    references = field.read_from(module)
+                    fields[field_name] = [_convert_ref_fields_to_new_namespace(reference) for reference in references]
+                elif isinstance(field, ReferenceValueDict):
+                    reference_dict = field.read_from(module)
+                    fields[field_name] = {
+                        key: _convert_ref_fields_to_new_namespace(reference)
+                        for key, reference
+                        in reference_dict.iteritems()
+                    }
+                elif field_name == 'xml_attributes':
+                    value = field.read_from(module)
+                    # remove any export/import only xml_attributes
+                    # which are used to wire together draft imports
+                    if 'parent_url' in value:
+                        del value['parent_url']
+                    if 'parent_sequential_url' in value:
+                        del value['parent_sequential_url']
+
+                    if 'index_in_children_list' in value:
+                        del value['index_in_children_list']
+                    fields[field_name] = value
+                else:
+                    fields[field_name] = field.read_from(module)
+        return fields
 
     if do_import_static and 'data' in module.fields and isinstance(module.fields['data'], xblock.fields.String):
         # we want to convert all 'non-portable' links in the module_data
@@ -636,53 +691,7 @@ def _import_module_and_update_references(
             module.data
         )
 
-    # Move the module to a new course
-    def _convert_reference_fields_to_new_namespace(reference):
-        """
-        Convert a reference to the new namespace, but only
-        if the original namespace matched the original course.
-
-        Otherwise, returns the input value.
-        """
-        assert isinstance(reference, UsageKey)
-        if source_course_id == reference.course_key:
-            return reference.map_into_course(dest_course_id)
-        else:
-            return reference
-
-    fields = {}
-    for field_name, field in module.fields.iteritems():
-        if field.scope != Scope.parent and field.is_set_on(module):
-            if isinstance(field, Reference):
-                value = field.read_from(module)
-                if value is None:
-                    fields[field_name] = None
-                else:
-                    fields[field_name] = _convert_reference_fields_to_new_namespace(field.read_from(module))
-            elif isinstance(field, ReferenceList):
-                references = field.read_from(module)
-                fields[field_name] = [_convert_reference_fields_to_new_namespace(reference) for reference in references]
-            elif isinstance(field, ReferenceValueDict):
-                reference_dict = field.read_from(module)
-                fields[field_name] = {
-                    key: _convert_reference_fields_to_new_namespace(reference)
-                    for key, reference
-                    in reference_dict.iteritems()
-                }
-            elif field_name == 'xml_attributes':
-                value = field.read_from(module)
-                # remove any export/import only xml_attributes
-                # which are used to wire together draft imports
-                if 'parent_url' in value:
-                    del value['parent_url']
-                if 'parent_sequential_url' in value:
-                    del value['parent_sequential_url']
-
-                if 'index_in_children_list' in value:
-                    del value['index_in_children_list']
-                fields[field_name] = value
-            else:
-                fields[field_name] = field.read_from(module)
+    fields = _update_module_references(module, source_course_id, dest_course_id)
 
     return store.import_xblock(
         user_id, dest_course_id, module.location.category,
@@ -699,14 +708,13 @@ def _import_course_draft(
         target_id,
         mongo_runtime
 ):
-    '''
-    This will import all the content inside of the 'drafts' folder, if it exists
-    NOTE: This is not a full course import, basically in our current
-    application only verticals (and downwards) can be in draft.
-    Therefore, we need to use slightly different call points into
-    the import process_xml as we can't simply call XMLModuleStore() constructor
-    (like we do for importing public content)
-    '''
+    """
+    This method will import all the content inside of the 'drafts' folder, if content exists.
+    NOTE: This is not a full course import! In our current application, only verticals
+    (and blocks beneath) can be in draft. Therefore, different call points into the import
+    process_xml are used as the XMLModuleStore() constructor cannot simply be called
+    (as is done for importing public content).
+    """
     draft_dir = course_data_path + "/drafts"
     if not os.path.exists(draft_dir):
         return
@@ -720,7 +728,9 @@ def _import_course_draft(
     # Whether or not data_dir ends with a "/" differs in production vs. test.
     if not data_dir.endswith("/"):
         data_dir += "/"
+    # Remove absolute path, leaving relative <course_name>/drafts.
     draft_course_dir = draft_dir.replace(data_dir, '', 1)
+
     system = ImportSystem(
         xmlstore=xml_module_store,
         course_id=source_course_id,
@@ -761,7 +771,7 @@ def _import_course_draft(
                 parent.children.insert(index, non_draft_location)
                 store.update_item(parent, user_id)
 
-        _import_module_and_update_references(
+        _update_and_import_module(
             module, store, user_id,
             source_course_id,
             target_id,
@@ -770,52 +780,23 @@ def _import_course_draft(
         for child in module.get_children():
             _import_module(child)
 
-    # Now walk the /vertical directory.
+    # Now walk the /drafts directory.
     # Each file in the directory will be a draft copy of the vertical.
 
     # First it is necessary to order the draft items by their desired index in the child list,
     # since the order in which os.walk() returns the files is not guaranteed.
     drafts = []
-    for dirname, _dirnames, filenames in os.walk(draft_dir):
+    for rootdir, __, filenames in os.walk(draft_dir):
         for filename in filenames:
-            module_path = os.path.join(dirname, filename)
+            if filename.startswith('._'):
+                # Skip any OSX quarantine files, prefixed with a '._'.
+                continue
+            module_path = os.path.join(rootdir, filename)
             with open(module_path, 'r') as f:
                 try:
-                    # note, on local dev it seems like OSX will put
-                    # some extra files in the directory with "quarantine"
-                    # information. These files are binary files and will
-                    # throw exceptions when we try to parse the file
-                    # as an XML string. Let's make sure we're
-                    # dealing with a string before ingesting
-                    data = f.read()
+                    xml = f.read().decode('utf-8')
 
-                    try:
-                        xml = data.decode('utf-8')
-                    except UnicodeDecodeError, err:
-                        # seems like on OSX localdev, the OS is making
-                        # quarantine files in the unzip directory
-                        # when importing courses so if we blindly try to
-                        # enumerate through the directory, we'll try
-                        # to process a bunch of binary quarantine files
-                        # (which are prefixed with a '._' character which
-                        # will dump a bunch of exceptions to the output,
-                        # although they are harmless.
-                        #
-                        # Reading online docs there doesn't seem to be
-                        # a good means to detect a 'hidden' file that works
-                        # well across all OS environments. So for now, I'm using
-                        # OSX's utilization of a leading '.' in the filename
-                        # to indicate a system hidden file.
-                        #
-                        # Better yet would be a way to figure out if this is
-                        # a binary file, but I haven't found a good way
-                        # to do this yet.
-                        if filename.startswith('._'):
-                            continue
-                        # Not a 'hidden file', then re-raise exception
-                        raise err
-
-                    # process_xml call below recursively processes all descendants. If
+                    # The process_xml() call below recursively processes all descendants. If
                     # we call this on all verticals in a course with verticals nested below
                     # the unit level, we try to import the same content twice, causing naming conflicts.
                     # Therefore only process verticals at the unit level, assuming that any other
@@ -838,13 +819,12 @@ def _import_course_draft(
                         draft = draft_node_constructor(
                             module=descriptor, url=draft_url, parent_url=parent_url, index=index
                         )
-
                         drafts.append(draft)
 
                 except Exception:  # pylint: disable=broad-except
-                    logging.exception('Error while parsing course xml.')
+                    logging.exception('Error while parsing course drafts xml.')
 
-    # sort drafts by `index_in_children_list` attribute
+    # Sort drafts by `index_in_children_list` attribute.
     drafts.sort(key=lambda x: x.index)
 
     for draft in get_draft_subtree_roots(drafts):
@@ -864,11 +844,11 @@ def allowed_metadata_by_category(category):
 
 
 def check_module_metadata_editability(module):
-    '''
+    """
     Assert that there is no metadata within a particular module that
     we can't support editing. However we always allow 'display_name'
     and 'xml_attributes'
-    '''
+    """
     allowed = allowed_metadata_by_category(module.location.category)
     if '*' in allowed:
         # everything is allowed
