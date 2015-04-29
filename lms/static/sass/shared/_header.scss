@@ -269,6 +269,7 @@ header.global {
         font-family: "Open Sans";
         max-height: 550px;
         overflow: auto;
+        z-index: 99999;
         .ui-loading {
 
         }

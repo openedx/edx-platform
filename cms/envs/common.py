@@ -983,10 +983,8 @@ NOTIFICATIONS_SHORT_POLL_REFRESH_RATE = 30
 # NOTE: NOTIFICATION_CLICK_LINK_URL_MAPS will usually get read in by the *.envs.json file
 #
 NOTIFICATION_CLICK_LINK_URL_MAPS = {
-    'open-edx.studio.announcements.*': '/courses/{course_id}/announcements',
-    'open-edx.lms.leaderboard.*': '/courses/{course_id}/cohort',
-    'open-edx.lms.discussions.*': '/courses/{course_id}/discussion/{commentable_id}/threads/{thread_id}',
-    'open-edx.xblock.group-project.*': '/courses/{course_id}/group_work?seqid={activity_location}',
+    'open-edx.studio.announcements.*': '/courses/{course_id}/info',
+    'open-edx.lms.discussions.*': '/courses/{course_id}/discussion/forum/{commentable_id}/threads/{thread_id}',
 }
 
 # list all known channel providers
