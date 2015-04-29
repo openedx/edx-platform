@@ -406,16 +406,7 @@ class YouTubeVideoTest(VideoBaseTest):
             'youtube_api_blocked': True,
         })
 
-        additional_data = {
-            'video_bumper': {
-                "transcripts": {
-                    "en": "b7xgknqkQk8.srt"
-                },
-                "edx_video_id": "edx_video_id"
-            }
-        }
-
-        self.metadata = self.metadata_for_mode('youtube_html5', additional_data=additional_data)
+        self.metadata = self.metadata_for_mode('youtube_html5')
 
         self.navigate_to_video()
 
@@ -477,7 +468,7 @@ class YouTubeVideoTest(VideoBaseTest):
     def _verify_caption_text(self, text):
         self.video._wait_for(
             lambda: (text in self.video.captions_text),
-            u'Captions contain "{}" text'.format(text).encode('utf-8'),
+            u'Captions contain "{}" text'.format(text),
             timeout=5
         )
 
@@ -731,7 +722,12 @@ class YouTubeVideoTest(VideoBaseTest):
 
     def test_video_bumper_render(self):
         """
-        Scenario: Video bumper is correct, also korekt working click play and skip.
+        Scenario: Poster, Video bumper and main Video are displayed.
+
+        Given I have Video with bumper enabled,
+        Then I see Poster, and I click "play",
+        Then I see Video Bumper and I click "skip"
+        Then I see main video playing.
         """
         additional_data = {
             'video_bumper': {
@@ -743,6 +739,7 @@ class YouTubeVideoTest(VideoBaseTest):
         }
         self.metadata = self.metadata_for_mode('youtube_html5', additional_data=additional_data)
         self.navigate_to_video_with_bumper()
+        self.assertIn(self.video.state, ['playing', 'buffering'])
 
 
 class YouTubeHtml5VideoTest(VideoBaseTest):
