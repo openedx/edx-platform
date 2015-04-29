@@ -3,6 +3,7 @@ Test for lms courseware app, module data (runtime data storage for XBlocks)
 """
 import json
 from mock import Mock, patch
+from nose.plugins.attrib import attr
 from functools import partial
 
 from courseware.model_data import DjangoKeyValueStore
@@ -52,6 +53,7 @@ class StudentModuleFactory(cmfStudentModuleFactory):
     course_id = course_id
 
 
+@attr('shard_1')
 class TestInvalidScopes(TestCase):
     def setUp(self):
         super(TestInvalidScopes, self).setUp()
@@ -72,6 +74,7 @@ class TestInvalidScopes(TestCase):
             self.assertRaises(InvalidScopeError, self.kvs.set_many, {key: 'value'})
 
 
+@attr('shard_1')
 class OtherUserFailureTestMixin(object):
     """
     Mixin class to add test cases for failures when a user trying to use the kvs is not
@@ -96,6 +99,7 @@ class OtherUserFailureTestMixin(object):
             self.kvs.set(self.other_key_factory(self.existing_field_name), "new_value")
 
 
+@attr('shard_1')
 class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
     """Tests for user_state storage via StudentModule"""
     other_key_factory = partial(DjangoKeyValueStore.Key, Scope.user_state, 2, location('usage_id'))  # user_id=2, not 1
@@ -206,6 +210,7 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
         self.assertEquals(len(exception_context.exception.saved_field_names), 0)
 
 
+@attr('shard_1')
 class TestMissingStudentModule(TestCase):
     def setUp(self):
         super(TestMissingStudentModule, self).setUp()
@@ -253,6 +258,7 @@ class TestMissingStudentModule(TestCase):
             self.assertFalse(self.kvs.has(user_state_key('a_field')))
 
 
+@attr('shard_1')
 class StorageTestBase(object):
     """
     A base class for that gets subclassed when testing each of the scopes.

@@ -3,6 +3,7 @@ Unit tests for masquerade.
 """
 import json
 from mock import patch
+from nose.plugins.attrib import attr
 from datetime import datetime
 
 from django.core.urlresolvers import reverse
@@ -121,6 +122,7 @@ class MasqueradeTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(show_answer_expected, "Show Answer" in problem_html)
 
 
+@attr('shard_1')
 class NormalStudentVisibilityTest(MasqueradeTestCase):
     """
     Verify the course displays as expected for a "normal" student (to ensure test setup is correct).
@@ -175,6 +177,7 @@ class StaffMasqueradeTestCase(MasqueradeTestCase):
         return response
 
 
+@attr('shard_1')
 class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
     """
     Check for staff being able to masquerade as student.
@@ -212,6 +215,7 @@ class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
         self.verify_show_answer_present(True)
 
 
+@attr('shard_1')
 class TestGetMasqueradingGroupId(StaffMasqueradeTestCase):
     """
     Check for staff being able to masquerade as belonging to a group.

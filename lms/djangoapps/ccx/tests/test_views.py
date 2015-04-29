@@ -6,6 +6,7 @@ import json
 import re
 import pytz
 from mock import patch
+from nose.plugins.attrib import attr
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
@@ -55,6 +56,7 @@ def intercept_renderer(path, context):
     return response
 
 
+@attr('shard_1')
 class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Tests for Custom Courses views.
@@ -433,6 +435,7 @@ def patched_get_children(self, usage_key_filter=None):  # pylint: disable=missin
     return list(iter_children())
 
 
+@attr('shard_1')
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
     'ccx.overrides.CustomCoursesForEdxOverrideProvider',))
 @patch('xmodule.x_module.XModuleMixin.get_children', patched_get_children, spec=True)
@@ -584,6 +587,7 @@ class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(grades['section_breakdown']), 4)
 
 
+@attr('shard_1')
 class TestSwitchActiveCCX(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """Verify the view for switching which CCX is active, if any
     """

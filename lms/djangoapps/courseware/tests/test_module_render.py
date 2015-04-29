@@ -5,6 +5,7 @@ Test for lms courseware app, module render unit
 import ddt
 import itertools
 import json
+from nose.plugins.attrib import attr
 from functools import partial
 
 from bson import ObjectId
@@ -74,6 +75,7 @@ class EmptyXModuleDescriptor(XModuleDescriptor):  # pylint: disable=abstract-met
     module_class = EmptyXModule
 
 
+@attr('shard_1')
 @ddt.ddt
 class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -258,6 +260,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(hash_resource(resources), 'a76e27c8e80ca3efd7ce743093aa59e0')
 
 
+@attr('shard_1')
 class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test the handle_xblock_callback function
@@ -435,6 +438,7 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEquals(len(doc('div.xblock-student_view-videosequence')), 1)
 
 
+@attr('shard_1')
 @ddt.ddt
 class TestTOC(ModuleStoreTestCase):
     """Check the Table of Contents for a course"""
@@ -531,6 +535,7 @@ class TestTOC(ModuleStoreTestCase):
                 self.assertIn(toc_section, actual)
 
 
+@attr('shard_1')
 @ddt.ddt
 class TestHtmlModifiers(ModuleStoreTestCase):
     """
@@ -692,6 +697,7 @@ class XBlockWithJsonInitData(XBlock):
         return frag
 
 
+@attr('shard_1')
 @ddt.ddt
 class JsonInitDataTest(ModuleStoreTestCase):
     """Tests for JSON data injected into the JS init function."""
@@ -785,6 +791,7 @@ class ViewInStudioTest(ModuleStoreTestCase):
         self.module = self._get_module(course_key, descriptor, location)
 
 
+@attr('shard_1')
 class MongoViewInStudioTest(ViewInStudioTest):
     """Test the 'View in Studio' link visibility in a mongo backed course."""
 
@@ -813,6 +820,7 @@ class MongoViewInStudioTest(ViewInStudioTest):
         self.assertNotIn('View Unit in Studio', result_fragment.content)
 
 
+@attr('shard_1')
 class MixedViewInStudioTest(ViewInStudioTest):
     """Test the 'View in Studio' link visibility in a mixed mongo backed course."""
 
@@ -837,6 +845,7 @@ class MixedViewInStudioTest(ViewInStudioTest):
         self.assertNotIn('View Unit in Studio', result_fragment.content)
 
 
+@attr('shard_1')
 class XmlViewInStudioTest(ViewInStudioTest):
     """Test the 'View in Studio' link visibility in an xml backed course."""
     MODULESTORE = TEST_DATA_XML_MODULESTORE
@@ -848,6 +857,7 @@ class XmlViewInStudioTest(ViewInStudioTest):
         self.assertNotIn('View Unit in Studio', result_fragment.content)
 
 
+@attr('shard_1')
 @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_DEBUG_INFO_TO_STAFF': True, 'DISPLAY_HISTOGRAMS_TO_STAFF': True})
 @patch('courseware.module_render.has_access', Mock(return_value=True))
 class TestStaffDebugInfo(ModuleStoreTestCase):
@@ -968,6 +978,7 @@ PER_STUDENT_ANONYMIZED_DESCRIPTORS = set(
 )
 
 
+@attr('shard_1')
 @ddt.ddt
 class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -1043,6 +1054,7 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
 
+@attr('shard_1')
 @patch('track.views.tracker')
 class TestModuleTrackingContext(ModuleStoreTestCase):
     """
@@ -1121,6 +1133,7 @@ class TestModuleTrackingContext(ModuleStoreTestCase):
             self.assertEqual(module_info['original_usage_version'], unicode(original_usage_version))
 
 
+@attr('shard_1')
 class TestXmoduleRuntimeEvent(TestSubmittingProblems):
     """
     Inherit from TestSubmittingProblems to get functionality that set up a course and problems structure
@@ -1169,6 +1182,7 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
         self.assertIsNone(student_module.max_grade)
 
 
+@attr('shard_1')
 class TestRebindModule(TestSubmittingProblems):
     """
     Tests to verify the functionality of rebinding a module.
@@ -1235,6 +1249,7 @@ class TestRebindModule(TestSubmittingProblems):
         self.assertFalse(psycho_handler.called)
 
 
+@attr('shard_1')
 @ddt.ddt
 class TestEventPublishing(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -1273,6 +1288,7 @@ class TestEventPublishing(ModuleStoreTestCase, LoginEnrollmentTestCase):
         mock_track_function.return_value.assert_called_once_with(event_type, event)
 
 
+@attr('shard_1')
 @ddt.ddt
 class LMSXBlockServiceBindingTest(ModuleStoreTestCase):
     """
@@ -1355,6 +1371,7 @@ BLOCK_TYPES = ['xblock', 'xmodule']
 USER_NUMBERS = range(2)
 
 
+@attr('shard_1')
 @ddt.ddt
 class TestFilteredChildren(ModuleStoreTestCase):
     """

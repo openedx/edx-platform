@@ -3,6 +3,7 @@
 from collections import OrderedDict
 import json
 import mock
+from nose.plugins.attrib import attr
 import oauthlib
 import urllib
 
@@ -17,6 +18,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.x_module import STUDENT_VIEW
 
 
+@attr('shard_1')
 class TestLTI(BaseTestXmodule):
     """
     Integration test for lti xmodule.
@@ -122,6 +124,7 @@ class TestLTI(BaseTestXmodule):
         self.assertEqual(generated_content, expected_content)
 
 
+@attr('shard_1')
 class TestLTIModuleListing(ModuleStoreTestCase):
     """
     a test for the rest endpoint that lists LTI modules in a course

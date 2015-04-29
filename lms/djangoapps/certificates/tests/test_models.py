@@ -3,6 +3,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.test.utils import override_settings
+from nose.plugins.attrib import attr
 
 from opaque_keys.edx.locator import CourseLocator
 from certificates.models import (
@@ -15,6 +16,7 @@ FEATURES_INVALID_FILE_PATH = settings.FEATURES.copy()
 FEATURES_INVALID_FILE_PATH['CERTS_HTML_VIEW_CONFIG_PATH'] = 'invalid/path/to/config.json'
 
 
+@attr('shard_1')
 class ExampleCertificateTest(TestCase):
     """Tests for the ExampleCertificate model. """
 
@@ -80,6 +82,7 @@ class ExampleCertificateTest(TestCase):
         self.assertIs(result, None)
 
 
+@attr('shard_1')
 class CertificateHtmlViewConfigurationTest(TestCase):
     """
     Test the CertificateHtmlViewConfiguration model.

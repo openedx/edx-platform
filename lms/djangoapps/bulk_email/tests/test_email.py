@@ -4,6 +4,7 @@ Unit tests for sending course email
 """
 import json
 from mock import patch, Mock
+from nose.plugins.attrib import attr
 import os
 from unittest import skipIf
 
@@ -85,6 +86,7 @@ class EmailSendFromDashboardTestCase(ModuleStoreTestCase):
         }
 
 
+@attr('shard_1')
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
 class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase):
@@ -313,6 +315,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         self.assertItemsEqual(outbox_contents, should_send_contents)
 
 
+@attr('shard_1')
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 @skipIf(os.environ.get("TRAVIS") == 'true', "Skip this test in Travis CI.")
 class TestEmailSendFromDashboard(EmailSendFromDashboardTestCase):

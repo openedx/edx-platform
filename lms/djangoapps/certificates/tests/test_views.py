@@ -3,6 +3,7 @@
 import json
 import ddt
 from uuid import uuid4
+from nose.plugins.attrib import attr
 
 from django.conf import settings
 from django.core.cache import cache
@@ -26,6 +27,7 @@ FEATURES_WITH_CERTS_DISABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_DISABLED['CERTIFICATES_HTML_VIEW'] = False
 
 
+@attr('shard_1')
 @ddt.ddt
 class UpdateExampleCertificateViewTest(TestCase):
     """Tests for the XQueue callback that updates example certificates. """
@@ -167,6 +169,7 @@ class UpdateExampleCertificateViewTest(TestCase):
         self.assertEqual(content['return_code'], 0)
 
 
+@attr('shard_1')
 class CertificatesViewsTests(ModuleStoreTestCase):
     """
     Tests for the manual refund page

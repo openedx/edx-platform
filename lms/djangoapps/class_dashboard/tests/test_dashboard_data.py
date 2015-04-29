@@ -7,6 +7,7 @@ import json
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 from mock import patch
+from nose.plugins.attrib import attr
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.factories import StudentModuleFactory
@@ -26,6 +27,7 @@ from class_dashboard.views import has_instructor_access_for_class
 USER_COUNT = 11
 
 
+@attr('shard_1')
 class TestGetProblemGradeDistribution(ModuleStoreTestCase):
     """
     Tests related to class_dashboard/dashboard_data.py
