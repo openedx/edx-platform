@@ -54,6 +54,7 @@ function () {
 
     function destroy() {
         this.videoProgressSlider.el.removeAttr('tabindex').slider('destroy');
+        this.el.off('destroy', this.videoProgressSlider.destroy);
         delete this.videoProgressSlider;
     }
 

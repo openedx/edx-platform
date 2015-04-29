@@ -71,12 +71,20 @@
                 var esc = $.Event('keyup');
                 esc.keyCode = 27;
                 state.isFullScreen = true;
-                $(state.el).trigger(esc);
+                $(document).trigger(esc);
                 expect(state.videoCommands.execute).toHaveBeenCalledWith('toggleFullScreen');
+            });
+
+            it('can update video dimensions on state change', function () {
+                state.el.trigger('fullscreen', [true]);
+                expect(state.resizer.setMode).toHaveBeenCalledWith('both');
+                state.el.trigger('fullscreen', [false]);
+                expect(state.resizer.setMode).toHaveBeenCalledWith('width');
             });
 
             it('can destroy itself', function () {
                 state.videoFullScreen.destroy();
+                expect($('.add-fullscreen')).not.toExist();
                 expect(state.videoFullScreen).toBeUndefined();
             });
         });
