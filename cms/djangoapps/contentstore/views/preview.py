@@ -25,7 +25,7 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock.fragment import Fragment
 from student.auth import has_studio_read_access, has_studio_write_access
 from xblock_django.user_service import DjangoXBlockUserService
-from xmodule.services import SettingsService, NotificationsService, CoursewareParentInfoService
+from xmodule.services import SettingsService, NotificationsService
 
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from cms.lib.xblock.field_data import CmsFieldData
@@ -150,7 +150,6 @@ def get_available_xblock_services():
     services = {
         "i18n": ModuleI18nService(),
         "settings": SettingsService(),
-        "courseware_parent_info": CoursewareParentInfoService(),
         "library_tools": LibraryToolsService(modulestore()),
     }
 

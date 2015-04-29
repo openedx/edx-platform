@@ -381,9 +381,6 @@ FEATURES = {
     # Enable notifications via edx-notifications
     'ENABLE_NOTIFICATIONS': False,
 
-    # Enable the Organizations,
-    'ORGANIZATIONS_APP': False,
-
     # Whether edx-notifications should use Celery for bulk operations
     'ENABLE_NOTIFICATIONS_CELERY': False,
 }
@@ -2296,24 +2293,6 @@ PROFILE_IMAGE_SECRET_KEY = 'placeholder secret key'
 PROFILE_IMAGE_MAX_BYTES = 1024 * 1024
 PROFILE_IMAGE_MIN_BYTES = 100
 
-# TODO (ECOM-16): Remove once the A/B test of auto-registration completes
-AUTO_REGISTRATION_AB_TEST_EXCLUDE_COURSES = set([
-    "HarvardX/SW12.2x/1T2014",
-    "HarvardX/SW12.3x/1T2014",
-    "HarvardX/SW12.4x/1T2014",
-    "HarvardX/SW12.5x/2T2014",
-    "HarvardX/SW12.6x/2T2014",
-    "HarvardX/HUM2.1x/3T2014",
-    "HarvardX/SW12x/2013_SOND",
-    "LinuxFoundationX/LFS101x/2T2014",
-    "HarvardX/CS50x/2014_T1",
-    "HarvardX/AmPoX.1/2014_T3",
-    "HarvardX/SW12.7x/3T2014",
-    "HarvardX/SW12.10x/1T2015",
-    "HarvardX/SW12.9x/3T2014",
-    "HarvardX/SW12.8x/3T2014",
-])
-
 ################################### EDX-NOTIFICATIONS SUBSYSTEM ######################################
 INSTALLED_APPS += (
     'edx_notifications',
@@ -2340,6 +2319,7 @@ SOUTH_MIGRATION_MODULES.update({
 
 # to prevent run-away queries from happening
 NOTIFICATION_MAX_LIST_SIZE = 100
+NOTIFICATIONS_SHORT_POLL_REFRESH_RATE = 30
 
 #
 # Various mapping tables which is used by the MsgTypeToUrlLinkResolver

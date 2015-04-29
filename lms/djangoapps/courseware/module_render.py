@@ -37,14 +37,7 @@ from courseware.entrance_exams import (
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, unquote_slashes, quote_slashes
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
-# from lms.lib.xblock.field_data import LmsFieldData
-# from lms.lib.xblock.runtime import (
-#     LmsModuleSystem,
-#     SettingsService,
-#     unquote_slashes,
-#     quote_slashes
-# )
-from xmodule.services import NotificationsService, CoursewareParentInfoService
+from xmodule.services import NotificationsService
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
@@ -591,7 +584,6 @@ def get_module_system_for_user(user, field_data_cache,
         'i18n': ModuleI18nService(),
         'fs': xblock.reference.plugins.FSService(),
         'field-data': field_data,
-        'courseware_parent_info': CoursewareParentInfoService(),
         'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
         "reverification": ReverificationService()
     }

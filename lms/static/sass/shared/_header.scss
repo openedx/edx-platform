@@ -294,6 +294,7 @@ header.global {
             a {
               color: #328FE0;
               text-decoration: none;
+
             }
             &:first-child {
               padding-left: 0;
@@ -305,10 +306,12 @@ header.global {
             &.active a {
               color: #999;
               text-decoration: none;
+              cursor: default;
             }
             &.disabled a {
               color: #999;
               text-decoration: none;
+              cursor: default;
             }
           }
         }
@@ -332,6 +335,7 @@ header.global {
         }
         .xns-item{
           position: relative;
+          cursor: pointer;
         }
         .xns-item-body{
           padding: 4px 15px;
