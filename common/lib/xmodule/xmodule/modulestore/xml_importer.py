@@ -352,9 +352,16 @@ class ImportManager(object):
         raise NotImplementedError
 
     @abstractmethod
-    def import_children(self, source_courselike, courselike, courselike_key, data_path, dest_id):
+    def import_children(self, source_courselike, courselike, courselike_key, dest_id):
         """
         To be overloaded with a method that installs the child items into self.store.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def import_drafts(self, courselike, courselike_key, data_path, dest_id):
+        """
+        To be overloaded with a method that installs the draft items into self.store.
         """
         raise NotImplementedError
 
@@ -419,8 +426,12 @@ class ImportManager(object):
                 dest_id, runtime = self.get_dest_id(courselike_key)
             except DuplicateCourseError:
                 continue
+
+            # This bulk operation wraps all the operations to populate the published branch.
             with self.store.bulk_operations(dest_id):
+                # Retrieve the course itself.
                 source_courselike, courselike, data_path = self.get_courselike(courselike_key, runtime, dest_id)
+
                 # Import all static pieces.
                 self.import_static(data_path, dest_id)
 
@@ -428,7 +439,17 @@ class ImportManager(object):
                 self.import_asset_metadata(data_path, dest_id)
 
                 # Import all children
-                self.import_children(source_courselike, courselike, courselike_key, data_path, dest_id)
+                self.import_children(source_courselike, courselike, courselike_key, dest_id)
+
+            # This bulk operation wraps all the operations to populate the draft branch with any items
+            # from the /drafts subdirectory.
+            # Drafts must be imported in a separate bulk operation from published items to import properly,
+            # due to the recursive_build() above creating a draft item for each course block
+            # and then publishing it.
+            with self.store.bulk_operations(dest_id):
+                # Import all draft items into the courselike.
+                courselike = self.import_drafts(courselike, courselike_key, data_path, dest_id)
+
             yield courselike
 
 
@@ -520,13 +541,19 @@ class CourseImportManager(ImportManager):
         if course.tabs is None or len(course.tabs) == 0:
             CourseTabList.initialize_default(course)
 
-    def import_children(self, source_courselike, courselike, courselike_key, data_path, dest_id):
+    def import_children(self, source_courselike, courselike, courselike_key, dest_id):
         """
         Imports all children into the desired store.
         """
+        # The branch setting of published_only forces an overwrite of all draft modules
+        # during the course import.
         with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, dest_id):
             self.recursive_build(source_courselike, courselike, courselike_key, dest_id)
 
+    def import_drafts(self, courselike, courselike_key, data_path, dest_id):
+        """
+        Imports all drafts into the desired store.
+        """
         # Import any draft items
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, dest_id):
             _import_course_draft(
@@ -538,6 +565,11 @@ class CourseImportManager(ImportManager):
                 dest_id,
                 courselike.runtime
             )
+
+        # Importing the drafts potentially triggered a new structure version.
+        # If so, the HEAD version_guid of the passed-in courselike will be out-of-date.
+        # Fetch the course to return the most recent course version.
+        return self.store.get_course(courselike.id.replace(branch=None, version_guid=None))
 
 
 class LibraryImportManager(ImportManager):
@@ -597,11 +629,17 @@ class LibraryImportManager(ImportManager):
         """
         pass
 
-    def import_children(self, source_courselike, courselike, courselike_key, data_path, dest_id):
+    def import_children(self, source_courselike, courselike, courselike_key, dest_id):
         """
         Imports all children into the desired store.
         """
         self.recursive_build(source_courselike, courselike, courselike_key, dest_id)
+
+    def import_drafts(self, courselike, courselike_key, data_path, dest_id):
+        """
+        Imports all drafts into the desired store.
+        """
+        return courselike
 
 
 def import_course_from_xml(*args, **kwargs):
