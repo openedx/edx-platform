@@ -3,6 +3,7 @@ Utils for video bumper
 """
 import json
 import pytz
+import logging
 from collections import OrderedDict
 
 from datetime import datetime, timedelta
@@ -12,6 +13,9 @@ try:
     import edxval.api as edxval_api
 except ImportError:
     edxval_api = None
+
+log = logging.getLogger(__name__)
+
 
 def get_bumper_settings(video):
     """
