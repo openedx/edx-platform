@@ -26,7 +26,7 @@ def notifications_context_processor(request):
 
     course_id = ss.groupdict().get('course_id', None)
     if not course_id:
-        return {}
+        course_id = ""
 
     # put the import here in case edx_notifications has not been installed in the virtual env
     from edx_notifications.server.web.utils import get_notifications_widget_context
@@ -47,7 +47,7 @@ def notifications_context_processor(request):
                     'poll_period_secs': getattr(settings, 'NOTIFICATIONS_SHORT_POLL_REFRESH_RATE', 30)
                 },
             },
-            'namespace': None,
+            'namespace': course_id if course_id else None,
         })
 
         _cached_renderings_by_course_id[course_id] = {
