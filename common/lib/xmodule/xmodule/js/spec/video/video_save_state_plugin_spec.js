@@ -174,8 +174,8 @@
         });
 
         it('can save state on page unload', function () {
-            state.el.trigger('play');
-            $(window).trigger('unload');
+            $.ajax.reset();
+            state.videoSaveStatePlugin.onUnload();
             expect($.ajax).toHaveBeenCalledWith({
                 url: state.config.saveStateUrl,
                 type: 'POST',

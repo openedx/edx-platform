@@ -210,14 +210,6 @@ function (Initialize) {
                     it('set new speed', function () {
                         expect(state.speed).toEqual('0.75');
                     });
-
-                    it('save setting for new speed', function () {
-                        expect(state.storage.setItem.calls[0].args)
-                            .toEqual(['speed', '0.75', true]);
-
-                        expect(state.storage.setItem.calls[1].args)
-                            .toEqual(['general_speed', '0.75']);
-                    });
                 });
 
                 describe('when new speed is not available', function () {

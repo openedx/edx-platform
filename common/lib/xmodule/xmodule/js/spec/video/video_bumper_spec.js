@@ -52,7 +52,6 @@
             });
 
             it('can show the main video once bumper ends', function () {
-                //state.bumperState.videoPlayer.onEnded();
                 state.bumperState.el.trigger('ended');
                 expect($('.is-bumper')).not.toExist();
 
@@ -61,13 +60,10 @@
                     return state.el.hasClass('is-initialized');
                 }, 'Player is not initialized.', WAIT_TIMEOUT);
 
-                //waitsFor(function () {
-                //    return expect($('.video-controls')).toExist();
-                //}, 'Player is not plaing.', WAIT_TIMEOUT);
 
                 waitsFor(function () {
                     return state.el.hasClass('is-playing');
-                }, 'Player is not plaing.', WAIT_TIMEOUT);
+                }, 'Player is not playing.', WAIT_TIMEOUT);
 
             });
 
@@ -77,7 +73,7 @@
 
                 waitsFor(function () {
                     return state.el.hasClass('is-playing');
-                }, 'Player is not plaing.', WAIT_TIMEOUT);
+                }, 'Player is not playing.', WAIT_TIMEOUT);
             });
 
             it('can stop the bumper video playing if it is too long', function () {
@@ -86,7 +82,7 @@
 
                 waitsFor(function () {
                     return state.el.hasClass('is-playing');
-                }, 'Player is not plaing.', WAIT_TIMEOUT);
+                }, 'Player is not playing.', WAIT_TIMEOUT);
             });
 
             it('can save appropriate states correctly on ended', function () {
