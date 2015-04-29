@@ -3,17 +3,17 @@
 <div class="batch-enrollment" style="float:left;width:50%">
   <form method="POST" action="ccx_invite">
   <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-  <h2> ${_("Batch Enrollment")} </h2>
+  <h2 tabindex="0"> ${_("Batch Enrollment")} </h2>
   <p>
-    <label for="student-ids">
+    <label id="label-student-ids" for="student-ids">
       ${_("Enter email addresses and/or usernames separated by new lines or commas.")}
       ${_("You will not get notification for emails that bounce, so please double-check spelling.")} </label>
-    <textarea rows="6" name="student-ids" placeholder="${_("Email Addresses/Usernames")}" spellcheck="false"></textarea>
+    <textarea rows="6" name="student-ids" aria-describedby="label-student-ids" placeholder="${_("Email Addresses/Usernames")}" spellcheck="false"></textarea>
   </p>
 
   <div class="enroll-option">
-    <input type="checkbox" name="auto-enroll" value="Auto-Enroll" checked="yes">
-    <label style="display:inline" for="auto-enroll">${_("Auto Enroll")}</label>
+    <input type="checkbox" name="auto-enroll" aria-describedby="label-auto-enroll" value="Auto-Enroll" checked="yes">
+    <label style="display:inline" id="label-auto-enroll" for="auto-enroll">${_("Auto Enroll")}</label>
     <div class="hint auto-enroll-hint">
       <span class="hint-caret"></span>
       <p>
@@ -26,8 +26,8 @@
   </div>
 
   <div class="enroll-option">
-    <input type="checkbox" name="email-students" value="Notify-students-by-email" checked="yes">
-    <label style="display:inline" for="email-students">${_("Notify users by email")}</label>
+    <input type="checkbox" name="email-students" aria-describedby="label-email-students" value="Notify-students-by-email" checked="yes">
+    <label style="display:inline" id="label-email-students" for="email-students">${_("Notify users by email")}</label>
     <div class="hint email-students-hint">
       <span class="hint-caret"></span>
       <p>
@@ -51,7 +51,7 @@
   <div class="auth-list-container active">
     <div class="member-list-widget">
       <div class="member-list">
-        <h2> ${_("Student List Management")}</h2>
+        <h2 tabindex="0"> ${_("Student List Management")}</h2>
         <table>
           <thead>
             <tr>
@@ -63,9 +63,9 @@
           <tbody>
             %for member in ccx_members:
             <tr>
-              <td>${member.student}</td>
-              <td>${member.student.email}</td>
-              <td><div class="revoke"><i class="icon-remove-sign"></i> Revoke access</div></td>
+              <td tabindex="0">${member.student}</td>
+              <td tabindex="0">${member.student.email}</td>
+              <td><div class="revoke" tabindex="0"><i class="icon-remove-sign"></i> Revoke access</div></td>
             </tr>
             %endfor
           </tbody>
