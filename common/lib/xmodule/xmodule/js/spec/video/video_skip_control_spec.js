@@ -9,7 +9,7 @@
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice').andReturn(null);
             state = jasmine.initializePlayer('video_with_bumper.html');
-            spyOn(state.bumperState.videoCommands, 'execute');
+            spyOn(state.bumperState.videoCommands, 'execute').andCallThrough();
         });
 
         afterEach(function () {
@@ -40,9 +40,11 @@
         });
 
         it('can skip the video on click', function () {
+            spyOn(state.bumperState.videoBumper, 'skipAndDoNotShowAgain');
             state.el.trigger('play');
             $('.skip-control').click();
             expect(state.bumperState.videoCommands.execute).toHaveBeenCalledWith('skip', true);
+            expect(state.bumperState.videoBumper.skipAndDoNotShowAgain).toHaveBeenCalled();
         });
 
         it('can destroy itself', function () {

@@ -24,6 +24,7 @@
 
             it('render the fullscreen control', function () {
                 expect($('.add-fullscreen')).toExist();
+                expect(state.videoFullScreen.fullScreenState).toBe(false);
             });
 
             it('add ARIA attributes to fullscreen control', function () {
@@ -36,6 +37,19 @@
                 });
             });
 
+            it('event handler to toggle fullscreen mode', function () {
+                spyOn(state.videoFullScreen, 'exit');
+                spyOn(state.videoFullScreen, 'enter');
+
+                state.videoFullScreen.fullScreenState = false;
+                state.videoFullScreen.toggle();
+                expect(state.videoFullScreen.enter).toHaveBeenCalled();
+
+                state.videoFullScreen.fullScreenState = true;
+                state.videoFullScreen.toggle();
+                expect(state.videoFullScreen.exit).toHaveBeenCalled();
+            });
+
             it('updates ARIA on state change', function () {
                 var fullScreenControl = $('.add-fullscreen');
                 fullScreenControl.click();
@@ -44,6 +58,21 @@
                     'title': 'Exit full browser',
                     'aria-disabled': 'false'
                 });
+                fullScreenControl.click();
+                expect(fullScreenControl).toHaveAttrs({
+                    'role': 'button',
+                    'title': 'Fill browser',
+                    'aria-disabled': 'false'
+                });
+            });
+
+            it('out of fullscreen by pressing esc', function () {
+                spyOn(state.videoCommands, 'execute')
+                var esc = $.Event('keyup');
+                esc.keyCode = 27;
+                state.isFullScreen = true;
+                $(state.el).trigger(esc);
+                expect(state.videoCommands.execute).toHaveBeenCalledWith('toggleFullScreen');
             });
 
             it('can destroy itself', function () {
