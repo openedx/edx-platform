@@ -82,7 +82,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 AjaxHelpers.respondWithError(requests, 500);
                 FieldViewsSpecHelpers.expectMessageContains(
                     view,
-                    "You must sign out of edX and sign back in before your language changes take effect."
+                    "You must sign out and sign back in before your language changes take effect."
                 );
             });
 
