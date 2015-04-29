@@ -21,12 +21,12 @@ def notifications_context_processor(request):
         return {}
 
     ss = _notifications_namespace_regex.search(request.path)
-    if not ss:
-        return {}
-
-    course_id = ss.groupdict().get('course_id', None)
-    if not course_id:
-        course_id = ""
+    if ss:
+        course_id = ss.groupdict().get('course_id', None)
+        if not course_id:
+            return {}
+    else:
+        course_id = ''
 
     # put the import here in case edx_notifications has not been installed in the virtual env
     from edx_notifications.server.web.utils import get_notifications_widget_context
