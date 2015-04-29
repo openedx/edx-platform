@@ -8,13 +8,16 @@
 // ------------------------------
 $em-base: 16; // deliberately sets bourbon-based em-base (http://bourbon.io/docs/#em-base)
 
+
 // grid - settings
 $max-width:                     rem(1000); // override neat's default
 $grid-columns:                  12;
 $column:                        rem(65);
 $gutter:                        rem(20);
-$visual-grid:                   true;
-$visual-grid-color:             palette(primary, light);
+
+$visual-grid:                   true !global;
+$visual-grid-index:             front !global;
+$visual-grid-color:             red !global;
 
 // grid - breakpoints
 $bp-small:                      new-breakpoint(320px, 4);
