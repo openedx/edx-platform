@@ -51,6 +51,12 @@ define(['jquery', 'backbone'], function ($, Backbone) {
             this.$loadingIndicator.addClass('hidden');
         },
 
+        clearAll: function () {
+            this.clearSearch();
+            this.trigger('clear');
+            return false;
+        },
+
         showNotFoundMessage: function (searchTerm) {
             var msg = this.notFoundTemplate({term: searchTerm});
             this.$message.html(msg);
