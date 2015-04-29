@@ -434,20 +434,18 @@ form {
 // +Form - Create New Wrapper 
 // ==================== 
 .wrapper-create-element {
-  height: 0;
-  opacity: 0.0;
-  pointer-events: none;
+  height: auto;
+  opacity: 1.0;
+  pointer-events: auto;
   overflow: hidden;
+  display: none;
 
   &.animate {
     @include transition(opacity $tmg-f1 ease-in-out 0s, height $tmg-f1 ease-in-out 0s);
   }
 
   &.is-shown {
-    height: auto; // define a specific height for the animating version of this UI to work properly
-    margin-bottom: $baseline;
-    opacity: 1.0;
-    pointer-events: auto;
+    display: block;
   }
 }
 
