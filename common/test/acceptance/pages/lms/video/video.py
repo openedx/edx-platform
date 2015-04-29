@@ -3,6 +3,7 @@ Video player in the courseware.
 """
 
 import time
+import json
 import requests
 from selenium.webdriver.common.action_chains import ActionChains
 from bok_choy.page_object import PageObject
@@ -21,7 +22,8 @@ VIDEO_BUTTONS = {
     'download_transcript': '.video-tracks > a',
     'speed': '.speeds',
     'quality': '.quality-control',
-    'do_not_show_again': '.skip',
+    'do_not_show_again': '.skip-control',
+    'skip_bumper': '.skip',
 }
 
 CSS_CLASS_NAMES = {
@@ -110,22 +112,21 @@ class VideoPage(PageObject):
     @wait_for_js
     def wait_for_video_bumper_render(self):
         """
-        Wait until Video Player Rendered Completely.
-
+        Wait until Poster, Video Bumper and main Video Player are Rendered Completely.
         """
         self.wait_for_video_class()
         self.wait_for_element_presence(CSS_CLASS_NAMES['video_init'], 'Video Player Initialized')
         self.wait_for_element_presence(CSS_CLASS_NAMES['video_time'], 'Video Player Initialized')
 
-        # import ipdb; ipdb.set_trace();
-        self.q(css='.poster-youtube .btn-play').first.click()
-        self.wait_for_ajax()
+        # Poster is enabled, click play
+        self.q(css='.poster .btn-play').first.click()
 
-        video_player_buttons = ['volume', 'play']#, 'do_not_show_again']
+        video_player_buttons = ['do_not_show_again', 'skip_bumper', 'volume', 'play']
         for button in video_player_buttons:
             self.wait_for_element_visibility(VIDEO_BUTTONS[button], '{} button is visible'.format(button.title()))
 
-        self.q(css='.skip').first.click()
+        # Press "skip" on Video bumper
+        self.q(css=VIDEO_BUTTONS['skip_bumper']).first.click()
         self.wait_for_ajax()
 
         video_player_buttons = ['volume', 'play', 'fullscreen', 'speed']
@@ -223,19 +224,14 @@ class VideoPage(PageObject):
     @property
     def is_autoplay_enabled(self):
         """
-        Extract `data-autoplay` attribute to check video autoplay is enabled or disabled.
+        Extract autoplay value of `data-metadata` attribute to check video autoplay is enabled or disabled.
 
         Returns:
             bool: Tells if autoplay enabled/disabled.
-
         """
         selector = self.get_element_selector(CSS_CLASS_NAMES['video_container'])
-        auto_play = self.q(css=selector).attrs('data-autoplay')[0]
-
-        if auto_play.lower() == 'false':
-            return False
-
-        return True
+        auto_play = json.loads(self.q(css=selector).attrs('data-metadata')[0])['autoplay']
+        return auto_play
 
     @property
     def is_error_message_shown(self):
@@ -725,7 +721,6 @@ class VideoPage(PageObject):
             timeout (float): Maximum number of seconds to wait for the Promise to be satisfied before timing out.
 
         """
-        # import ipdb; ipdb.set_trace();
         if result:
             return Promise(check_func, desc, timeout=timeout, try_interval=try_interval).fulfill()
         else:

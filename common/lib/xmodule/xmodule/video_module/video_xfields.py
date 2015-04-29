@@ -178,7 +178,7 @@ class VideoFields(object):
         scope=Scope.preferences,
     )
     do_not_show_again_bumper = Boolean(
-        display_name=_("Do not show again bumper"),
+        display_name=_("Do not show bumper again"),
         scope=Scope.preferences,
         default=False,
     )
