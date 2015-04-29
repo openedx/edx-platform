@@ -34,5 +34,10 @@
 
         <h3 class="reference-title"><%- gettext("Last Edited:") %></h3>
         <span class="reference-meta reference-updated-date"><%- updated %></span>
+
+        <% if (tags.length > 0) { %>
+            <h3 class="reference-title"><%- gettext("Tags:") %></h3>
+            <span class="reference-meta reference-tags"><%- tags.join(", ") %></span>
+        <% } %>
     </div>
 </footer>
