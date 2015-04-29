@@ -43,9 +43,9 @@ def parse_license(lic):
              />
         </a>
     % else:
-        <i class="icon-cc"></i>
+        <i aria-hidden="true" class="icon-cc"></i>
         % for option in enabled:
-            <i class="icon-cc-${option}"></i>
+            <i aria-hidden="true" class="icon-cc-${option}"></i>
         % endfor
         <span class="license-text">${_("Some Rights Reserved")}</span>
     % endif
