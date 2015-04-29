@@ -50,7 +50,13 @@
         });
 
         it('can destroy itself', function () {
-            expect().toBe();
+            var plugin = state.videoPlaySkipControl,
+                el = plugin.el;
+            spyOn($.fn, 'off').andCallThrough();
+            state.videoPlaySkipControl.destroy();
+            expect(state.videoPlaySkipControl).toBeUndefined();
+            expect(el).not.toExist();
+            expect($.fn.off).toHaveBeenCalledWith('destroy', plugin.destroy);
         });
 
     });

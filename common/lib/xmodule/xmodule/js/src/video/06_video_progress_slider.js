@@ -69,14 +69,6 @@ function () {
         state.el.find('.video-controls').prepend(state.videoProgressSlider.el);
         state.videoProgressSlider.buildSlider();
         _buildHandle(state);
-
-        // ARIA
-        // Let screen readers know that this anchor, representing the slider
-        // handle, behaves as a slider named 'video slider'.
-        state.videoProgressSlider.el.find('.ui-slider-handle').attr({
-            'role': 'slider',
-            'title': gettext('Video slider')
-        });
     }
 
     function _buildHandle(state) {

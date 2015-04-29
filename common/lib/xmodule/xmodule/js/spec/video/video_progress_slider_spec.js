@@ -43,6 +43,7 @@
                 it('add ARIA attributes to time control', function () {
                     var timeControl = $('div.slider > a');
 
+                    debugger
                     expect(timeControl).toHaveAttrs({
                         'role': 'slider',
                         'title': 'Video position',
