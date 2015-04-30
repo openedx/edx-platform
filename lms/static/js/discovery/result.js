@@ -5,20 +5,19 @@ define(['backbone'], function (Backbone) {
 
     return Backbone.Model.extend({
         defaults: {
-            content: {
-                display_name: '',
-                number: '',
-                overview: '',
-                short_description: ''
-            },
+            modes: [],
             course: '',
             enrollment_start: '',
-            id: '',
-            image_url: '',
             number: '',
+            content: {
+                overview: '',
+                display_name: '',
+                number: ''
+            },
             start: '',
-            effort: '',
-            org: ''
+            image_url: '',
+            org: '',
+            id: ''
         }
     });
 
