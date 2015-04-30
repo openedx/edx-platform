@@ -3,12 +3,12 @@
 define(['backbone'], function(Backbone) {
     'use strict';
 
-    return function (Collection, DiscoveryForm, ResultListView, searchQuery) {
+    return function (Collection, SearchForm, ResultListView, searchQuery) {
 
         var collection = new Collection([]);
         var results = new ResultListView({ collection: collection });
         var dispatcher = _.clone(Backbone.Events);
-        var form = new DiscoveryForm();
+        var form = new SearchForm();
 
         dispatcher.listenTo(form, 'search', function (query) {
             collection.performSearch(query);
