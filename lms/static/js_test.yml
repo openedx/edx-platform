@@ -90,6 +90,7 @@ fixture_paths:
     - templates/file-upload.underscore
     - js/fixtures/edxnotes
     - templates/courseware_search
+    - templates/discovery
 
 requirejs:
   paths:

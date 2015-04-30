@@ -5,8 +5,25 @@ define([
     'underscore',
     'backbone',
     'gettext',
-], function ($, _, Backbone, gettext) {
+    'date'
+], function ($, _, Backbone, gettext, Date) {
     'use strict';
+
+    function formatDate(date) {
+        return dateUTC(date).toString('MMM dd, yyyy');
+    }
+
+    // Return a date object using UTC time instead of local time
+    function dateUTC(date) {
+        return new Date(
+            date.getUTCFullYear(),
+            date.getUTCMonth(),
+            date.getUTCDate(),
+            date.getUTCHours(),
+            date.getUTCMinutes(),
+            date.getUTCSeconds()
+        );
+    }
 
     return Backbone.View.extend({
 
@@ -20,25 +37,13 @@ define([
 
         render: function () {
             var data = _.clone(this.model.attributes);
-            // JS dates are always local time, convert to universal time
-            data.start = dateUTC(new Date(data.start)).toLocaleDateString();
-            data.enrollment_start = dateUTC(new Date(data.enrollment_start)).toLocaleDateString();
+            data.start = formatDate(new Date(data.start));
+            data.enrollment_start = formatDate(new Date(data.enrollment_start));
             this.$el.html(this.tpl(data));
             return this;
         }
 
     });
-
-    function  dateUTC(date) {
-        return new Date(
-            date.getUTCFullYear(),
-            date.getUTCMonth(),
-            date.getUTCDate(),
-            date.getUTCHours(),
-            date.getUTCMinutes(),
-            date.getUTCSeconds()
-        );
-    }
 
 });
 
