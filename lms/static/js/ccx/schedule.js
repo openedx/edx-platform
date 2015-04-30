@@ -141,7 +141,7 @@ var edx = edx || {};
               return !node.hidden});
             this.$el.html(schedule_template({chapters: this.showing}));
             $('table.ccx-schedule .sequential,.vertical').hide();
-            $('table.ccx-schedule .toggle-collapse').on('click', this.toggle_collapse);
+            $('table.ccx-schedule .unit a').on('click', this.toggle_collapse);
 	    //
 	    // Hidden hover fields for empty date fields
 	    $('table.ccx-schedule .date a').each(function() {
@@ -149,7 +149,8 @@ var edx = edx || {};
 		$(this).text('Set date').addClass('empty');
 	      }
 	    });
-	    
+
+        $('table.ccx-schedule .unit').attr('tabindex',0);
 	    // Handle date edit clicks
 	    $('table.ccx-schedule .date a').attr('href', '#enter-date-modal')
 	      .leanModal({closeButton: '.close-modal'});
@@ -292,13 +293,13 @@ var edx = edx || {};
 	    var children = self.get_children(row);
 
 	    if (row.is('.expanded')) {
-	      $(this).removeClass('fa-caret-down').addClass('fa-caret-right');
+	      $(this).find(".toggle-collapse").removeClass('fa-caret-down').addClass('fa-caret-right');
 	      row.removeClass('expanded').addClass('collapsed');
 	      children.hide(); 
 	    }
 
 	    else {
-	      $(this).removeClass('fa-caret-right').addClass('fa-caret-down');
+	      $(this).find(".toggle-collapse").removeClass('fa-caret-right').addClass('fa-caret-down');
 	      row.removeClass('collapsed').addClass('expanded');
 	      children.filter('.collapsed').each(function() {
 		children = children.not(self.get_children(this));
