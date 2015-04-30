@@ -50,7 +50,8 @@ function (HTML5Video, Resizer) {
             update: update,
             figureOutStartEndTime: figureOutStartEndTime,
             figureOutStartingTime: figureOutStartingTime,
-            updatePlayTime: updatePlayTime
+            updatePlayTime: updatePlayTime,
+            onLoadMetadataHtml5: onLoadMetadataHtml5
         };
 
     VideoPlayer.prototype = methodsDict;
@@ -79,6 +80,17 @@ function (HTML5Video, Resizer) {
         state.videoPlayer.onSlideSeek = debouncedF;
         state.videoPlayer.onCaptionSeek = debouncedF;
     }
+
+    // Updates players state, once metadata is loaded for html5 player.
+    function onLoadMetadataHtml5() {
+        var player = this.videoPlayer.player.videoE,
+            videoWidth = player[0].videoWidth || player.width(),
+            videoHeight = player[0].videoHeight || player.height();
+
+        _resize(state, videoWidth, videoHeight);
+        _updateVcrAndRegion(state);
+    }
+
 
     // function _initialize(state)
     //
@@ -155,13 +167,7 @@ function (HTML5Video, Resizer) {
 
             player = state.videoEl = state.videoPlayer.player.videoEl;
 
-            player[0].addEventListener('loadedmetadata', function () {
-                var videoWidth = player[0].videoWidth || player.width(),
-                    videoHeight = player[0].videoHeight || player.height();
-
-                _resize(state, videoWidth, videoHeight);
-                _updateVcrAndRegion(state);
-            }, false);
+            player[0].addEventListener('loadedmetadata', this.onLoadMetadataHtml5, false);
 
         } else {
             youTubeId = state.youtubeId();
@@ -321,6 +327,9 @@ function (HTML5Video, Resizer) {
         this.videoPlayer.stopTimer();
         if (this.resizer && this.resizer.destroy) {
             this.resizer.destroy();
+        }
+        if (player && player.video) {
+            player.video.removeEventListener('loadedmetadata', this.onLoadMetadataHtml5, false);
         }
         if (player && _.isFunction(player.destroy)) {
             player.destroy();

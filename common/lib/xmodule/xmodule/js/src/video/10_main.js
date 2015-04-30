@@ -150,6 +150,7 @@
                     if (state && state.videoPlayer) {
                         state.videoPlayer.destroy();
                     }
+
                     $('.sequence').off('sequence:change', onSequenceChange);
                 };
                 $('.sequence').on('sequence:change', onSequenceChange);

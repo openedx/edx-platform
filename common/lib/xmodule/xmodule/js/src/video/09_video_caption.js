@@ -26,7 +26,7 @@ function (Sjson, AsyncProcess) {
 
         _.bindAll(this, 'toggle', 'onMouseEnter', 'onMouseLeave', 'onMovement',
             'onContainerMouseEnter', 'onContainerMouseLeave', 'fetchCaption',
-            'onResize', 'pause', 'play', 'onCaptionUpdate', 'onCaptionHandler'
+            'onResize', 'pause', 'play', 'onCaptionUpdate', 'onCaptionHandler', 'destroy'
         );
         this.state = state;
         this.state.videoCaption = this;
@@ -54,33 +54,7 @@ function (Sjson, AsyncProcess) {
         ].join(''),
 
         destroy: function () {
-            var state = this.state,
-                events = [
-                    'mouseover', 'mouseout', 'mousedown', 'click', 'focus', 'blur',
-                    'keydown'
-                ].join(' ');
-
-            this.hideSubtitlesEl.off('click', this.toggle);
-            this.subtitlesEl
-                .off({
-                    mouseenter: this.onMouseEnter,
-                    mouseleave: this.onMouseLeave,
-                    mousemove: this.onMovement,
-                    mousewheel: this.onMovement,
-                    DOMMouseScroll: this.onMovement,
-                    scroll: state.videoControl.showControls
-                })
-                .off(events, 'li[data-index]', this.onCaptionHandler)
-                .empty().css({maxHeight: 'auto'});
-
-            this.container
-                .off({
-                    mouseenter: this.onContainerMouseEnter,
-                    mouseleave: this.onContainerMouseLeave
-                })
-                .empty();
-
-            state.el
+            this.state.el
                 .off({
                     'caption:fetch': this.fetchCaption,
                     'caption:resize': this.onResize,
@@ -88,10 +62,10 @@ function (Sjson, AsyncProcess) {
                     'ended': this.pause,
                     'fullscreen': this.onResize,
                     'pause': this.pause,
-                    'play': this.play
+                    'play': this.play,
+                    'destroy': this.destroy
                 })
                 .removeClass('is-captions-rendered');
-
             this.subtitlesEl.remove();
             this.container.remove();
             this.subtitlesEl = this.container = null;
@@ -158,7 +132,8 @@ function (Sjson, AsyncProcess) {
                     'ended': this.pause,
                     'fullscreen': this.onResize,
                     'pause': this.pause,
-                    'play': this.play
+                    'play': this.play,
+                    'destroy': this.destroy
                 });
 
             if ((state.videoType === 'html5') && (state.config.autohideHtml5)) {
