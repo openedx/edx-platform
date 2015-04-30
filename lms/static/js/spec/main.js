@@ -94,6 +94,7 @@
             'js/student_profile/views/learner_profile_fields': 'js/student_profile/views/learner_profile_fields',
             'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory',
             'js/student_profile/views/learner_profile_view': 'js/student_profile/views/learner_profile_view',
+            'js/ccx/schedule': 'js/ccx/schedule',
 
             // edxnotes
             'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min',
@@ -297,6 +298,10 @@
             'js/shoppingcart/shoppingcart.js': {
                 exports: 'js/shoppingcart/shoppingcart',
                 deps: ['jquery', 'underscore', 'gettext']
+            },
+            'js/ccx/schedule': {
+                exports: 'js/ccx/schedule',
+                deps: ['jquery', 'underscore', 'backbone', 'gettext']
             },
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
@@ -633,7 +638,8 @@
         'lms/include/js/spec/edxnotes/plugins/caret_navigation_spec.js',
         'lms/include/js/spec/edxnotes/collections/notes_spec.js',
         'lms/include/js/spec/search/search_spec.js',
-        'lms/include/js/spec/discovery/discovery_spec.js'
+        'lms/include/js/spec/discovery/discovery_spec.js',
+        'lms/include/js/spec/ccx/schedule_spec.js'
     ]);
 
 }).call(this, requirejs, define);
