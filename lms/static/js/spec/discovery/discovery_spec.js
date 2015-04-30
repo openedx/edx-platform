@@ -259,6 +259,7 @@ define([
 
     });
 
+
     describe('FilterView', function () {
 
         beforeEach(function () {
@@ -278,6 +279,7 @@ define([
         });
 
     });
+
 
     describe('FilterBarView', function () {
 
@@ -301,6 +303,63 @@ define([
         });
 
     });
+
+
+    describe('ResultListView', function () {
+
+        beforeEach(function () {
+            jasmine.Clock.useMock();
+            loadFixtures('js/fixtures/discovery.html');
+            TemplateHelpers.installTemplates([
+                'templates/discovery/result_item',
+                'templates/discovery/not_found',
+                'templates/discovery/error'
+            ]);
+            collection = new Collection([JSON_RESPONSE.results[0].data]);
+            collection.latestModelsCount = 1;
+            this.view = new ResultListView({ collection: collection });
+        });
+
+        it('renders search results', function () {
+            this.view.render();
+            expect($('.courses-listing article').length).toEqual(1);
+            expect($('.courses-listing .course-title')).toContainHtml('edX Demonstration Course');
+            this.view.clearResults();
+            expect($('.courses-listing article').length).toEqual(1);
+            expect($('.courses-listing .course-title')).toContainHtml('title');
+            this.view.renderNext();
+            expect($('.courses-listing article').length).toEqual(2);
+        });
+
+        it('scrolling triggers an event for next page', function () {
+            this.onNext = jasmine.createSpy('onNext');
+            this.view.on('next', this.onNext);
+            spyOn(this.view.collection, 'hasNextPage').andCallFake(function () {
+                return true;
+            });
+            this.view.render();
+            window.scroll(0, $(document).height());
+            $(window).trigger('scroll');
+            jasmine.Clock.tick(500);
+            expect(this.onNext).toHaveBeenCalled();
+        });
+
+
+    });
+
+
+    describe('App', function () {
+
+        beforeEach(function () {
+
+        });
+
+        it('renders correctly', function () {
+
+        });
+
+    });
+
 
 
 });
