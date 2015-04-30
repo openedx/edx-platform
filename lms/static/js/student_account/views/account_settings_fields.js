@@ -38,10 +38,7 @@
                     error: function () {
                         view.showNotificationMessage(
                             view.indicators.error +
-                            gettext(
-                                'You must sign out of edX and sign back in before your language ' +
-                                'changes take effect.'
-                            )
+                                gettext('You must sign out and sign back in before your language changes take effect.')
                         );
                     }
                 });

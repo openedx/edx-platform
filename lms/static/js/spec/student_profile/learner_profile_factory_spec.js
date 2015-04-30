@@ -40,7 +40,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     'profile_image_min_bytes': Helpers.IMAGE_MIN_BYTES,
                     'profile_image_upload_url': Helpers.IMAGE_UPLOAD_API_URL,
                     'profile_image_remove_url': Helpers.IMAGE_REMOVE_API_URL,
-                    'default_visibility': 'all_users'
+                    'default_visibility': 'all_users',
+                    'platform_name': 'edX'
                 });
             };
 

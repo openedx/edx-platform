@@ -1,14 +1,33 @@
 import os
 import signal
 import tempfile
+import gc
 
 from datetime import datetime
 from meliae import scanner
 
 
 def dump_memory(signum, frame):
-    """Dump memory stats for the current process to a temp directory. Uses the meliae output format."""
-    scanner.dump_all_objects('{}/meliae.{}.{}.dump'.format(tempfile.gettempdir(), datetime.now().isoformat(), os.getpid()))
+    """
+    Dump memory stats for the current process to a temp directory.
+    Uses the meliae output format.
+    """
+
+    timestamp = datetime.now().isoformat()
+    format_str = '{}/meliae.{}.{}.{{}}.dump'.format(
+        tempfile.gettempdir(),
+        timestamp,
+        os.getpid(),
+    )
+
+    scanner.dump_all_objects(format_str.format('pre-gc'))
+
+    # force garbarge collection
+    for gen in xrange(3):
+        gc.collect(gen)
+        scanner.dump_all_objects(
+            format_str.format("gc-gen-{}".format(gen))
+        )
 
 
 def install_memory_dumper(dump_signal=signal.SIGPROF):
