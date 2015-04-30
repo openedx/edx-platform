@@ -19,7 +19,7 @@
 # bossnm11 <bossnm11@gmail.com>, 2014
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
 # jeon <bluerespect@nate.com>, 2014-2015
-# chans <kcsgoodboy@gmail.com>, 2014
+# Chanseok <kcsgoodboy@gmail.com>, 2014
 # seungil <luck8778@gmail.com>, 2014
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -47,7 +47,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-04-24 17:00+0000\n"
+"POT-Creation-Date: 2015-04-30 15:37+0000\n"
 "PO-Revision-Date: 2015-04-21 14:10+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/projects/p/edx-platform/language/ko_KR/)\n"
@@ -1489,8 +1489,8 @@ msgstr ""
 msgid "Vertical space"
 msgstr ""
 
-#: lms/templates/courseware_search/search_item.underscore
-#: lms/templates/courseware_search/search_item_seq.underscore
+#: lms/templates/search/course_search_item.underscore
+#: lms/templates/search/dashboard_search_item.underscore
 msgid "View"
 msgstr "보기"
 
@@ -1854,7 +1854,8 @@ msgstr[0] ""
 msgid "Current conversation"
 msgstr ""
 
-#: lms/templates/courseware_search/search_list.underscore
+#: lms/templates/search/course_search_results.underscore
+#: lms/templates/search/dashboard_search_results.underscore
 msgid "Search Results"
 msgstr "검색 결과"
 
@@ -2164,7 +2165,7 @@ msgstr ""
 msgid "Error generating student profile information. Please try again."
 msgstr ""
 
-#: lms/templates/courseware_search/search_loading.underscore
+#: lms/templates/search/search_loading.underscore
 #: lms/templates/student_account/account_settings.underscore
 msgid "Loading"
 msgstr "로딩"
@@ -3107,7 +3108,7 @@ msgstr ""
 msgid "Prevent students from generating certificates in this course?"
 msgstr ""
 
-#: lms/static/js/search/views/search_list_view.js
+#: lms/static/js/search/base/views/search_results_view.js
 msgid "%s result"
 msgid_plural "%s results"
 msgstr[0] ""
@@ -3361,6 +3362,32 @@ msgstr ""
 #: lms/static/js/verify_student/views/incourse_reverify_view.js
 #: lms/static/js/verify_student/views/review_photos_step_view.js
 msgid "Could not submit photos"
+msgstr ""
+
+#: lms/static/js/verify_student/views/make_payment_step_view.js
+msgid "Professional Education Verified Certificate"
+msgstr ""
+
+#: lms/static/js/verify_student/views/make_payment_step_view.js
+msgid "Professional Education"
+msgstr ""
+
+#: lms/static/js/verify_student/views/make_payment_step_view.js
+msgid "Verified Certificate upgrade"
+msgstr ""
+
+#: lms/static/js/verify_student/views/make_payment_step_view.js
+msgid "Verified Certificate"
+msgstr ""
+
+#: lms/static/js/verify_student/views/make_payment_step_view.js
+msgid "Pay with Credit Card"
+msgstr ""
+
+#. Translators: 'processor' is the name of a third-party payment processing
+#. vendor (example: "PayPal")
+#: lms/static/js/verify_student/views/make_payment_step_view.js
+msgid "Pay with {processor}"
 msgstr ""
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
@@ -4466,19 +4493,6 @@ msgstr ""
 msgid "remove"
 msgstr ""
 
-#: lms/templates/courseware_search/search_error.underscore
-msgid "There was an error, try searching again."
-msgstr "오류가 있습니다. 다시 검색해 보십시요."
-
-#: lms/templates/courseware_search/search_list.underscore
-msgid "Load next %(num_items)s result"
-msgid_plural "Load next %(num_items)s results"
-msgstr[0] ""
-
-#: lms/templates/courseware_search/search_list.underscore
-msgid "Sorry, no results were found."
-msgstr ""
-
 #: lms/templates/dashboard/donation.underscore
 msgid "Donate"
 msgstr "기부"
@@ -4712,6 +4726,25 @@ msgid ""
 "file, download course profile information or cohort results on "
 "%(link_start)s the Data Download page. %(link_end)s"
 msgstr ""
+
+#: lms/templates/search/course_search_results.underscore
+#: lms/templates/search/dashboard_search_results.underscore
+msgid "Load next %(num_items)s result"
+msgid_plural "Load next %(num_items)s results"
+msgstr[0] ""
+
+#: lms/templates/search/course_search_results.underscore
+#: lms/templates/search/dashboard_search_results.underscore
+msgid "Sorry, no results were found."
+msgstr ""
+
+#: lms/templates/search/dashboard_search_results.underscore
+msgid "Back to Dashboard"
+msgstr ""
+
+#: lms/templates/search/search_error.underscore
+msgid "There was an error, try searching again."
+msgstr "오류가 있습니다. 다시 검색해 보십시요."
 
 #: lms/templates/student_account/account.underscore
 msgid "New Address"
@@ -5019,14 +5052,6 @@ msgstr ""
 msgid "Upload an image or capture one with your web or phone camera."
 msgstr ""
 
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Course key:"
-msgstr ""
-
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Checkpoint name:"
-msgstr ""
-
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: %(courseName)s"
 msgstr ""
@@ -5117,7 +5142,7 @@ msgid "Your verification status is good until %(verificationGoodUntil)s."
 msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore
-msgid "Continue to payment"
+msgid "price"
 msgstr ""
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
