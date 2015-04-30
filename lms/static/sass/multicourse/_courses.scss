@@ -1,6 +1,37 @@
+@import '../base/grid-settings';
+@import 'neat/neat'; // lib - Neat
+
+$facet-text-color: #3d3e3f;
+$facet-background-color: #007db8;
+
 .find-courses, .university-profile {
   background: $course-profile-bg;
   padding-bottom: ($baseline*3);
+
+  .courses-container .courses {
+    width: 75%;
+
+    .courses-listing .courses-listing-item {
+      @include fill-parent();
+      max-height: $course-card-height;
+      margin: ($baseline*0.75) 0 ($baseline*1.5) 0;
+
+      @include media($bp-medium) {
+        @include span-columns(4); // 4 of 8
+        @include omega(2n);
+      }
+
+      @include media($bp-large) {
+        @include span-columns(4); // 4 of 12
+        @include omega(3n);
+      }
+
+      @include media($bp-huge) {
+        @include span-columns(4); // 4 of 12
+        @include omega(3n);
+      }
+    }
+  }
 
   header.search {
     background: $course-profile-bg;
@@ -103,6 +134,7 @@
     color: $black;
     font-style: normal;
 
+    //STATE: focus
     &:focus {
       @extend %no-outline;
       box-shadow: none;
@@ -125,26 +157,20 @@
     color: $white;
     text-shadow: none;
 
+    //STATE: hover, focus
     &:hover, &:focus {
       background: $m-blue-l1;
     }
   }
 
   .filters {
-    clear: both;
+    @include clearfix();
     margin-top: ($baseline/2);
     border-top: 1px solid $courseware-button-border-color;
     border-bottom: 1px solid $courseware-button-border-color;
     width: 100%;
     height: auto;
     max-height: ($baseline*10);
-    overflow: hidden;
-
-    &:after {
-      display: table;
-      clear: both;
-      content: "";
-    }
 
     ul {
       @include padding-left(0);
@@ -189,19 +215,36 @@
 
 
   .search-facets{
+    @include rtl() { $layout-direction: "LTR"; }
+    @include ltr() { $layout-direction: "RTL"; }
+    @include box-sizing(border-box);
+    @extend %ui-depth1;
     position: relative;
-    float: right;
-    width: 25%;
-    background: none repeat scroll 0 0 white;
+    box-shadow: 1px 2px 5px $black-t0;
+    border-top: 1px solid $black;
+    border-bottom: 2px solid $black;
+    background-color: $white;
     max-height: ($baseline*100);
-    border-bottom: 2px solid black;
-    border-top: 1px solid black;
-    box-shadow: 1px 2px 5px #ccc;
-    box-sizing: border-box;
-    z-index: 100;
+
+    @include fill-parent();
+    margin: ($baseline*2) 0 ($baseline*3.5) 0;
+
+    @include media($bp-medium) {
+      @include span-columns(2);
+      @include omega();
+    }
+
+    @include media($bp-large) {
+      @include span-columns(3);
+      @include omega();
+    }
+
+    @include media($bp-huge) {
+      @include span-columns(3);
+      @include omega();
+    }
 
     &.phone-menu {
-      margin: ($baseline*2) 0 ($baseline*3.5) 0;
       padding: 0;
       overflow: visible;
       border: medium none;
@@ -210,52 +253,61 @@
     &:before {
       opacity: 0;
       position: absolute;
-      padding: ($baseline*2) ($baseline*0.75) 0 ($baseline*0.75);
-      background: none repeat scroll 0 0 white;
-      content: "";
-      height: 5px;
-      right: 0;
       top: -3px;
+      right: 0;
+      background-color: $white;
+      padding: ($baseline*2) ($baseline*0.75) 0 ($baseline*0.75);
+      height: 5px;
+      content: "";
       width: ($baseline*2.5);
     }
+
     h2,
     section {
       @extend %t-icon5;
       @extend %t-strong;
-      border: medium none;
-      color: #3d3e3f;
-      font-family: $sans-serif;
       margin: 0 ($baseline/2) 0 ($baseline/2);
+      border: medium none;
       padding: ($baseline/2);
+      color: $facet-text-color;
+      font-family: $sans-serif;
       text-transform: none;
-    }
-
-    section {
-      border-top: 1px solid #e6e6e6;
-      margin: 0;
-      padding: ($baseline/2) 0 ($baseline/2) 0;
     }
 
     h3 {
       @extend %t-icon6;
       @extend %t-strong;
-      color: #3d3e3f;
-      font-family: $sans-serif;
       margin: 0 ($baseline/2) ($baseline/2) ($baseline/2);
+      color: $facet-text-color;
+      font-family: $sans-serif;
+    }
+
+    section {
+      margin: 0;
+      border-top: 1px solid $courseware-button-border-color;
+      padding: ($baseline/2) 0 ($baseline/2) 0;
     }
 
     a {
-      box-sizing: border-box;
-      color: #3d3e3f;
-      float: left;
+      @include float(left);
+      @include box-sizing(border-box);
       opacity: 1;
+      padding: 0 12px;
+      width: 100%;
       overflow: hidden;
-      padding-left: 12px;
       text-decoration: none;
       text-overflow: ellipsis;
-      transition: all 0.2s ease-out 0s;
+      line-height: 28px;
       white-space: nowrap;
-      width: 100%;
+      color: $facet-text-color;
+      transition: all $tmg-f2 ease-out 0s;
+
+      //STATE: hover, visited
+      &:hover,
+      &:visited {
+        color: $facet-text-color;
+        text-decoration: none;
+      }
     }
 
     ul {
@@ -269,13 +321,13 @@
       }
 
       li {
+        @include clearfix();
         @extend %t-icon6;
         position: relative;
         clear: both;
-        border-top-color: white;
-        border-top: 1px solid #e6e6e6;
+        border-top: 1px solid $white;
         padding: 0;
-        height: 28px;
+        height: 30px;
         line-height: 28px;
         overflow: hidden;
 
@@ -285,36 +337,33 @@
           right: 12px;
         }
 
+        //STATE: hover
         &:hover {
-          background: #007db8;
-          color: white;
+          background: $facet-background-color;
+          color: $white;
           text-decoration: none;
+
           .count,
           a {
-            color: white;
+            color: $white;
+
+            //STATE: visited
+            &:visited {
+              color: $white;
+              text-decoration: none;
+            }
           }
-        }
-        &:after {
-          clear: both;
-          content: "";
-          display: table;
         }
       }
     }
 
     .toggle {
-      clear: both;
-
-      &:after {
-        clear: both;
-        content: "";
-        display: table;
-      }
+      @include clearfix();
 
       a {
         @extend %t-icon6;
         @extend %t-strong;
-        color: #007db8;
+        color: $facet-background-color;
       }
     }
   }

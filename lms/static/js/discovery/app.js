@@ -13,13 +13,12 @@ define(['backbone'], function(Backbone) {
         var facets = new FacetsBarView();
 
         dispatcher.listenTo(form, 'search', function (query) {
-            collection.performSearch(query);
             form.showLoadingIndicator();
             filters.changeQueryFilter(query);
         });
 
-        dispatcher.listenTo(filters, 'search', function (filters) {
-            collection.performSearch(filters);
+        dispatcher.listenTo(filters, 'search', function (searchTerm, filters) {
+            collection.performSearch(searchTerm, filters);
             form.showLoadingIndicator();
         });
 

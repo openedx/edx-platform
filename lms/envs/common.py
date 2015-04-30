@@ -355,7 +355,7 @@ FEATURES = {
     'MODE_CREATION_FOR_TESTING': False,
 
     # Courseware search feature
-    'ENABLE_COURSEWARE_SEARCH': True,
+    'ENABLE_COURSEWARE_SEARCH': False,
 
     # Dashboard search feature
     'ENABLE_DASHBOARD_SEARCH': False,
