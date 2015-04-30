@@ -399,6 +399,9 @@ FEATURES = {
     # How many seconds to show the bumper again, default is 7 days:
     'SHOW_BUMPER_PERIODICITY': 7 * 24 * 3600,
 
+    # Enable OpenBadge support. See the BADGR_* settings later in this file.
+    'ENABLE_OPENBADGES': False,
+
 }
 
 # Ignore static asset files on import which match this pattern
@@ -2023,6 +2026,13 @@ REGISTRATION_EXTRA_FIELDS = {
 ########################## CERTIFICATE NAME ########################
 CERT_NAME_SHORT = "Certificate"
 CERT_NAME_LONG = "Certificate of Achievement"
+
+#################### Badgr OpenBadges generation #######################
+# Be sure to set up images for course modes using the BadgeImageConfiguration model in the certificates app.
+BADGR_API_TOKEN = None
+# Do not add the trailing slash here.
+BADGR_BASE_URL = "http://localhost:8005"
+BADGR_ISSUER_SLUG = "example-issuer"
 
 ###################### Grade Downloads ######################
 GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
