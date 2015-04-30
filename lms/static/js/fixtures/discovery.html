@@ -1,0 +1,46 @@
+<section class="courses-container">
+  <div id="discovery-form">
+    <form>
+      <input class="discovery-input" placeholder="Search for a course" type="text"/><!-- removes spacing
+      --><button type="submit" class="button postfix discovery-submit" aria-label="Search">
+        <i class="icon fa fa-search" aria-hidden="true"></i>
+      </button>
+    </form>
+    <div id="discovery-message"></div>
+    <div id="loading-indicator" class="hidden">
+      <i class="icon fa fa-spinner fa-spin"></i> Loading
+    </div>
+  </div>
+
+  <section class="courses">
+    <ul class="courses-listing">
+      <li class="courses-listing-item">
+        <article class="course" id="" role="region" aria-label="">
+          <a href="">
+            <header class="course-image">
+              <div class="cover-image">
+                <img src="" alt="" />
+                <div class="learn-more" aria-hidden=true>LEARN MORE</div>
+              </div>
+            </header>
+            <section class="course-info" aria-hidden=true>
+              <h2 class="course-name">
+                <span class="course-organization">university</span>
+                <span class="course-code">123</span>
+                <span class="course-title">title</span>
+              </h2>
+              <div class="course-date" aria-hidden="true">Starts: May 09, 1984</div>
+            </section>
+            <div class="sr">
+              <ul>
+              <li>university</li>
+              <li>123</li>
+              <li>Starts: <time itemprop="startDate" datetime="May 09, 1984">May 09, 1984</time></li>
+            </ul>
+            </div>
+          </a>
+        </article>
+      </li>
+    </ul>
+  </section>
+</section>
