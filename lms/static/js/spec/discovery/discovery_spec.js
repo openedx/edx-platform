@@ -9,7 +9,12 @@ define([
     'js/discovery/form',
     'js/discovery/result',
     'js/discovery/result_item_view',
-    'js/discovery/result_list_view'
+    'js/discovery/result_list_view',
+    'js/discovery/filter',
+    'js/discovery/filters',
+    'js/discovery/filter_bar_view',
+    'js/discovery/filter_view',
+    'js/discovery/search_facets_view'
 ], function(
     $,
     Sinon,
@@ -21,8 +26,12 @@ define([
     DiscoveryForm,
     ResultItem,
     ResultItemView,
-    ResultListView
-
+    ResultListView,
+    FilterModel,
+    FiltersCollection,
+    FiltersBarView,
+    FilterView,
+    SearchFacetView
 ) {
     'use strict';
 
@@ -50,6 +59,15 @@ define([
             }
         ]
     };
+
+    var FACET_LIST = [
+        {"type": "example1", "query": "search1"},
+        {"type": "example2", "query": "search2"}
+    ];
+
+    var SEARCH_FILTER = {"type": "search_string", "query": "search3"};
+
+
 
     describe('Collection', function () {
 
@@ -241,9 +259,48 @@ define([
 
     });
 
+    describe('FilterView', function () {
 
+        beforeEach(function () {
+            TemplateHelpers.installTemplate('templates/discovery/filter');
+            this.filter = new FilterView({
+                model: new FilterModel()
+            });
+        });
 
+        it('model cleans view on destruction correctly', function () {
+            var data = this.filter.model.attributes;
+            this.filter.render();
+            expect(this.filter.$el.length).toBe(1);
+            expect(this.filter.$el).toContainHtml(data.content.query);
+            this.filter.cleanModelView();
+            expect(this.filter.$el.length).toBe(0);
+        });
 
+    });
+
+    describe('FilterBarView', function () {
+
+        beforeEach(function () {
+            TemplateHelpers.installTemplate('templates/discovery/filter_bar_view');
+            this.filterBar = new FiltersBarView();
+        });
+
+        it('view searches for sent facet object', function () {
+            expect(this.filterBar.$el.length).toBe(1);
+            this.filter.addFilter(FACET_LIST[0]);
+            expect(this.filterBar.$el.find('#clear-all-filters')).toBeVisible();
+        });
+
+        it('view searches for entered search string', function () {
+            spyOn(this.filterBar, 'addFilter').andCallThrough();
+            expect(this.filterBar.$el.length).toBe(1);
+            this.filter.changeQueryFilter(SEARCH_FILTER.query);
+            expect(this.filterBar.$el.find('#clear-all-filters')).toBeVisible();
+            expect(this.filterBar.addFilter).toHaveBeenCalledWith(SEARCH_FILTER);
+        });
+
+    });
 
 
 });

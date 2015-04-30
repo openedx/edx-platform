@@ -14,8 +14,13 @@ define([
         initialize: function () {
             this.bind('remove', this.onModelRemoved, this);
         },
+
         onModelRemoved: function (model, collection, options) {
             model.cleanModelView();
+        },
+
+        getQueryModel: function() {
+            return this.findWhere({'type': 'search_string'});
         }
     });
 
