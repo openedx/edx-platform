@@ -56,7 +56,8 @@ MEDIA_URL = "/static/uploads/"
 
 CELERY_ALWAYS_EAGER = True
 CELERY_RESULT_BACKEND = 'cache'
-BROKER_TRANSPORT = 'memory'
+CELERY_CACHE_BACKEND = 'memory'
+#BROKER_TRANSPORT = 'memory'
 
 ###################### Grade Downloads ######################
 GRADES_DOWNLOAD = {
