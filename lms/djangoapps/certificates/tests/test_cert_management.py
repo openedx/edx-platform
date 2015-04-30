@@ -2,27 +2,63 @@
 import ddt
 from django.core.management.base import CommandError
 from nose.plugins.attrib import attr
+from django.test.utils import override_settings
+from mock import patch
 
 from opaque_keys.edx.locator import CourseLocator
+from certificates.tests.factories import BadgeAssertionFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from certificates.management.commands import resubmit_error_certificates
-from certificates.models import GeneratedCertificate, CertificateStatuses
+from certificates.management.commands import resubmit_error_certificates, regenerate_user
+from certificates.models import GeneratedCertificate, CertificateStatuses, BadgeAssertion
 
 
-@attr('shard_1')
-@ddt.ddt
-class ResubmitErrorCertificatesTest(ModuleStoreTestCase):
-    """Tests for the resubmit_error_certificates management command. """
+class CertificateManagementTest(ModuleStoreTestCase):
+    """
+    Base test class for Certificate Management command tests.
+    """
+    # Override with the command module you wish to test.
+    command = resubmit_error_certificates
 
     def setUp(self):
-        super(ResubmitErrorCertificatesTest, self).setUp()
+        super(CertificateManagementTest, self).setUp()
         self.user = UserFactory.create()
         self.courses = [
             CourseFactory.create()
             for __ in range(3)
         ]
+
+    def _create_cert(self, course_key, user, status):
+        """Create a certificate entry. """
+        # Enroll the user in the course
+        CourseEnrollmentFactory.create(
+            user=user,
+            course_id=course_key
+        )
+
+        # Create the certificate
+        GeneratedCertificate.objects.create(
+            user=user,
+            course_id=course_key,
+            status=status
+        )
+
+    def _run_command(self, *args, **kwargs):
+        """Run the management command to generate a fake cert. """
+        command = self.command.Command()
+        return command.handle(*args, **kwargs)
+
+    def _assert_cert_status(self, course_key, user, expected_status):
+        """Check the status of a certificate. """
+        cert = GeneratedCertificate.objects.get(user=user, course_id=course_key)
+        self.assertEqual(cert.status, expected_status)
+
+
+@attr('shard_1')
+@ddt.ddt
+class ResubmitErrorCertificatesTest(CertificateManagementTest):
+    """Tests for the resubmit_error_certificates management command. """
 
     def test_resubmit_error_certificate(self):
         # Create a certificate with status 'error'
@@ -105,27 +141,39 @@ class ResubmitErrorCertificatesTest(ModuleStoreTestCase):
         # since the course doesn't actually exist.
         self._assert_cert_status(phantom_course, self.user, CertificateStatuses.error)
 
-    def _create_cert(self, course_key, user, status):
-        """Create a certificate entry. """
-        # Enroll the user in the course
-        CourseEnrollmentFactory.create(
-            user=user,
-            course_id=course_key
+
+@attr('shard_1')
+class RegenerateCertificatesTest(CertificateManagementTest):
+    """
+    Tests for regenerating certificates.
+    """
+    command = regenerate_user
+
+    def setUp(self):
+        """
+        We just need one course here.
+        """
+        super(RegenerateCertificatesTest, self).setUp()
+        self.course = self.courses[0]
+
+    @override_settings(CERT_QUEUE='test-queue')
+    @patch('certificates.management.commands.regenerate_user.XQueueCertInterface', spec=True)
+    def test_clear_badge(self, xqueue):
+        """
+        Given that I have a user with a badge
+        If I run regeneration for a user
+        Then certificate generation will be requested
+        And the badge will be deleted
+        """
+        key = self.course.location.course_key
+        BadgeAssertionFactory(user=self.user, course_id=key, data={})
+        self._create_cert(key, self.user, CertificateStatuses.downloadable)
+        self.assertTrue(BadgeAssertion.objects.filter(user=self.user, course_id=key))
+        self._run_command(
+            username=self.user.email, course=unicode(key), noop=False, insecure=False, template_file=None,
+            grade_value=None
         )
-
-        # Create the certificate
-        GeneratedCertificate.objects.create(
-            user=user,
-            course_id=course_key,
-            status=status
+        xqueue.return_value.regen_cert.assert_called_with(
+            self.user, key, course=self.course, forced_grade=None, template_file=None
         )
-
-    def _run_command(self, *args, **kwargs):
-        """Run the management command to generate a fake cert. """
-        command = resubmit_error_certificates.Command()
-        return command.handle(*args, **kwargs)
-
-    def _assert_cert_status(self, course_key, user, expected_status):
-        """Check the status of a certificate. """
-        cert = GeneratedCertificate.objects.get(user=user, course_id=course_key)
-        self.assertEqual(cert.status, expected_status)
+        self.assertFalse(BadgeAssertion.objects.filter(user=self.user, course_id=key))

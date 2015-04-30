@@ -1,12 +1,13 @@
-from factory.django import DjangoModelFactory
+# Factories are self documenting
+# pylint: disable=missing-docstring
+from factory.django import DjangoModelFactory, ImageField
 
 from certificates.models import (
-    GeneratedCertificate, CertificateStatuses, CertificateHtmlViewConfiguration, CertificateWhitelist
+    GeneratedCertificate, CertificateStatuses, CertificateHtmlViewConfiguration, CertificateWhitelist, BadgeAssertion,
+    BadgeImageConfiguration,
 )
 
 
-# Factories are self documenting
-# pylint: disable=missing-docstring
 class GeneratedCertificateFactory(DjangoModelFactory):
 
     FACTORY_FOR = GeneratedCertificate
@@ -23,6 +24,20 @@ class CertificateWhitelistFactory(DjangoModelFactory):
 
     course_id = None
     whitelist = True
+
+
+class BadgeAssertionFactory(DjangoModelFactory):
+    FACTORY_FOR = BadgeAssertion
+
+    mode = 'honor'
+
+
+class BadgeImageConfigurationFactory(DjangoModelFactory):
+
+    FACTORY_FOR = BadgeImageConfiguration
+
+    mode = 'honor'
+    icon = ImageField(color='blue', height=50, width=50, filename='test.png', format='PNG')
 
 
 class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):
