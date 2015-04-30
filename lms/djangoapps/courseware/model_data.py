@@ -95,9 +95,7 @@ class DjangoKeyValueStore(KeyValueStore):
         self._field_data_cache = field_data_cache
 
     def get(self, key):
-        if key.scope not in self._allowed_scopes:
-            raise InvalidScopeError(key)
-
+        self._raise_unless_scope_is_allowed(key)
         return self._field_data_cache.get(key)
 
     def set(self, key, value):
@@ -116,22 +114,22 @@ class DjangoKeyValueStore(KeyValueStore):
         """
         for key in kv_dict:
             # Check key for validity
-            if key.scope not in self._allowed_scopes:
-                raise InvalidScopeError(key)
+            self._raise_unless_scope_is_allowed(key)
 
         self._field_data_cache.set_many(kv_dict)
 
     def delete(self, key):
-        if key.scope not in self._allowed_scopes:
-            raise InvalidScopeError(key)
-
+        self._raise_unless_scope_is_allowed(key)
         self._field_data_cache.delete(key)
 
     def has(self, key):
+        self._raise_unless_scope_is_allowed(key)
+        return self._field_data_cache.has(key)
+
+    def _raise_unless_scope_is_allowed(self, key):
+        """Raise an InvalidScopeError if key.scope is not in self._allowed_scopes."""
         if key.scope not in self._allowed_scopes:
             raise InvalidScopeError(key)
-
-        return self._field_data_cache.has(key)
 
 
 new_contract("DjangoKeyValueStore", DjangoKeyValueStore)
