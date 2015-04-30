@@ -59,6 +59,7 @@ jscover.log.*
 common/test/data/test_unicode/static/
 django-pyfs
 test_root/uploads/*.txt
+test_root/uploads/badges/*.png
 
 ### Installation artifacts
 *.egg-info

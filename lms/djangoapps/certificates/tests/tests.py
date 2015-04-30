@@ -82,3 +82,20 @@ class CertificatesModelTest(ModuleStoreTestCase):
         completed_milestones = milestones_achieved_by_user(student, unicode(pre_requisite_course.id))
         self.assertEqual(len(completed_milestones), 1)
         self.assertEqual(completed_milestones[0]['namespace'], unicode(pre_requisite_course.id))
+
+    @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
+    @patch('certificates.badge_handler.BadgeHandler', spec=True)
+    def test_badge_callback(self, handler):
+        student = UserFactory()
+        course = CourseFactory.create(org='edx', number='998', display_name='Test Course', issue_badges=True)
+        cert = GeneratedCertificateFactory.create(
+            user=student,
+            course_id=course.id,
+            status=CertificateStatuses.generating,
+            mode='verified'
+        )
+        # Check return value since class instance will be stored there.
+        self.assertFalse(handler.return_value.award.called)
+        cert.status = CertificateStatuses.downloadable
+        cert.save()
+        self.assertTrue(handler.return_value.award.called)
