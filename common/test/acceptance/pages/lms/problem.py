@@ -26,7 +26,7 @@ class ProblemPage(PageObject):
         """
         Return the text of the question of the problem.
         """
-        return self.q(css="div.problem p").text
+        return self.q(css="div.problem div div p").text
 
     def fill_answer(self, text):
         """

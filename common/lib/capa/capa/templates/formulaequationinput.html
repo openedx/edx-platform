@@ -1,13 +1,18 @@
 <% doinline = 'style="display:inline-block;vertical-align:top"' if inline else "" %>
 <section id="formulaequationinput_${id}" class="inputtype formulaequationinput" ${doinline}>
   <div class="${status.classname}" id="status_${id}">
-    <input type="text" name="input_${id}" id="input_${id}"
-        data-input-id="${id}" value="${value|h}"
-        aria-label="${label}"
-        % if size:
-        size="${size}"
-        % endif
-        />
+      % if question_label != "":
+      <label> ${question_label}
+      % endif
+        <input type="text" name="input_${id}" id="input_${id}"
+            data-input-id="${id}" value="${value|h}"
+            % if size:
+            size="${size}"
+            % endif
+            />
+      % if question_label != "":
+      </label>
+      % endif
 
       <p class="status" 
          %if status != 'unsubmitted':
