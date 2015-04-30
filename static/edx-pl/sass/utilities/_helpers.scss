@@ -104,9 +104,6 @@
 // reset of copy
 %reset-copy {
     font-family: $text-base-font-family;
-    font-size: font-size(base);
-    line-height: line-height(base);
-    color: $text-base-color;
 }
 
 // reset of code
@@ -119,7 +116,11 @@
 
 // reset of links
 %link {
-    @include transition(all timing(x-fast) ease-in-out);
+    @include transition(
+        color timing(xx-fast) ease-in-out 0s,
+        border-color timing(xx-fast) ease-in-out 0s
+    );
+
     border-bottom: 1px solid $transparent;
     color: palette(primary, base);
     text-decoration: none;
@@ -128,15 +129,15 @@
     &:hover,
     &:active,
     &:focus {
-        border-bottom-color: palette(primary, mid-light);
-        color: palette(primary, mid-light);
+        border-bottom-color: palette(primary, accent);
+        color: palette(primary, accent);
     }
 
     // STATE: is disabled
     &:disabled,
     &.is-disabled {
         display: none; // :)
-        color: palette(grayscale, mid-light);
+        color: palette(grayscale, light);
     }
 
     // STATE: is pressed or active

@@ -11,7 +11,7 @@
 // ----------------------------
 // #SWATCH LAYOUT
 // ----------------------------
-.swatch {
+.example {
     @include transition(all timing(x-fast) ease-in-out);
     border: 1px solid palette(grayscale, x-light);
     border-radius: spacing-horizontal(xx-small);
@@ -35,7 +35,7 @@
     text-align: center;
 
     .color-class {
-        font-size: font-size(mid-small);
+        font-size: font-size(small);
         text-transform: lowercase;
 
         // CASE: light text on dark bg

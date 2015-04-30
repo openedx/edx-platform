@@ -35,20 +35,18 @@ video {
 }
 
 body {
+    @include font-smoothing(on);
     color: $text-base-color;
     background: $view-bg;
-    font-size: $font-scale-medium;
+    font-size: font-size(base);
     font-family: $font-family-sans-serif;
-    -webkit-font-smoothing: antialiased;
 }
 
-.hd-1,
-.hd-2,
-.hd-3,
-.hd-4,
-.hd-5,
-.hd-6 {
-    @extend %reset-headings;
+p,
+ol,
+ul,
+dl {
+    margin: 0 0 spacing-vertical(small) 0;
 }
 
 // ----------------------------
