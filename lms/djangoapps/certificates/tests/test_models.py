@@ -1,19 +1,28 @@
 """Tests for certificate Django models. """
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.files.images import ImageFile
 from django.test import TestCase
 from django.test.utils import override_settings
 from nose.plugins.attrib import attr
+# pylint: disable=no-name-in-module
+from path import path
 
 from opaque_keys.edx.locator import CourseLocator
 from certificates.models import (
     ExampleCertificate,
     ExampleCertificateSet,
-    CertificateHtmlViewConfiguration
-)
+    CertificateHtmlViewConfiguration,
+    BadgeImageConfiguration)
 
 FEATURES_INVALID_FILE_PATH = settings.FEATURES.copy()
 FEATURES_INVALID_FILE_PATH['CERTS_HTML_VIEW_CONFIG_PATH'] = 'invalid/path/to/config.json'
+
+# pylint: disable=invalid-name
+TEST_DIR = path(__file__).dirname()
+TEST_DATA_DIR = 'common/test/data/'
+PLATFORM_ROOT = TEST_DIR.parent.parent.parent.parent
+TEST_DATA_ROOT = PLATFORM_ROOT / TEST_DATA_DIR
 
 
 @attr('shard_1')
@@ -151,3 +160,52 @@ class CertificateHtmlViewConfigurationTest(TestCase):
         self.config.configuration = ''
         self.config.save()
         self.assertEquals(self.config.get_config(), {})
+
+
+@attr('shard_1')
+class BadgeImageConfigurationTest(TestCase):
+    """
+    Test the validation features of BadgeImageConfiguration.
+    """
+    def get_image(self, name):
+        """
+        Get one of the test images from the test data directory.
+        """
+        return ImageFile(open(TEST_DATA_ROOT / 'badges' / name + '.png'))
+
+    def create_clean(self, file_obj):
+        """
+        Shortcut to create a BadgeImageConfiguration with a specific file.
+        """
+        BadgeImageConfiguration(mode='honor', icon=file_obj).full_clean()
+
+    def test_good_image(self):
+        """
+        Verify that saving a valid badge image is no problem.
+        """
+        good = self.get_image('good')
+        BadgeImageConfiguration(mode='honor', icon=good).full_clean()
+
+    def test_unbalanced_image(self):
+        """
+        Verify that setting an image with an uneven width and height raises an error.
+        """
+        unbalanced = ImageFile(self.get_image('unbalanced'))
+        self.assertRaises(ValidationError, self.create_clean, unbalanced)
+
+    def test_large_image(self):
+        """
+        Verify that setting an image that is too big raises an error.
+        """
+        large = self.get_image('large')
+        self.assertRaises(ValidationError, self.create_clean, large)
+
+    def test_no_double_default(self):
+        """
+        Verify that creating two configurations as default is not permitted.
+        """
+        BadgeImageConfiguration(mode='test', icon=self.get_image('good'), default=True).save()
+        self.assertRaises(
+            ValidationError,
+            BadgeImageConfiguration(mode='test2', icon=self.get_image('good'), default=True).full_clean
+        )

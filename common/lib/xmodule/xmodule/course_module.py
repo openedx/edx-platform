@@ -663,7 +663,14 @@ class CourseFields(object):
         # Ensure that courses imported from XML keep their image
         default="images_course_image.jpg"
     )
-
+    issue_badges = Boolean(
+        display_name=_("Issue OpenBadges"),
+        help=_(
+            "Issue OpenBadges badges for this course. Badges are generated when certificates are created."
+        ),
+        scope=Scope.settings,
+        default=True
+    )
     ## Course level Certificate Name overrides.
     cert_name_short = String(
         help=_(
