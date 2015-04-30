@@ -76,7 +76,12 @@ class TextbooksPage(CoursePage):
         """
         check if the view live button of textbook is working fine
         """
-        url = self.q(css='.textbook .action-view a').attrs('href')[0]
+        try:
+            url = self.q(css='.textbook a.view').attrs('href')[0]
+        except:
+            textbook = self.q(css='.textbook').html
+            anchor = self.q(css='.textbook a.view').html
+            raise Exception('{} ===== {}'.format(textbook, anchor))
         try:
             response = requests.get(url)
         except requests.exceptions.ConnectionError:
