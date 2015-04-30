@@ -424,27 +424,49 @@ class ContentLicenseTest(StudioCourseTest):
             self.browser,
             self.course_id,
         )
-        self.outline_page.visit()
+        self.settings_page.visit()
 
     def test_empty_license(self):
-        self.assertEqual(self.outline_page.license, "None")
+        """
+        When I visit the Studio settings page,
+        I see that the course license is "None" by default.
+        Then I visit the LMS courseware page,
+        and I see that there is no course license displayed.
+        """
+        self.assertIsNone(self.settings_page.course_license)
         self.lms_courseware.visit()
         self.assertIsNone(self.lms_courseware.course_license)
 
     def test_arr_license(self):
-        self.outline_page.edit_course_start_date()
-        self.settings_page.set_course_license("all-rights-reserved")
+        """
+        When I visit the Studio settings page,
+        and I set the course license to "All Rights Reserved",
+        and I refresh the page,
+        I see that the course license is "All Rights Reserved".
+        Then I visit the LMS courseware page,
+        and I see that the course license is "All Rights Reserved".
+        """
+        self.settings_page.course_license = "All Rights Reserved"
         self.settings_page.save_changes()
-        self.outline_page.visit()
-        self.assertEqual(self.outline_page.license, "© All Rights Reserved")
+        self.settings_page.refresh_and_wait_for_load()
+        self.assertEqual(self.settings_page.course_license, "All Rights Reserved")
+
         self.lms_courseware.visit()
         self.assertEqual(self.lms_courseware.course_license, "© All Rights Reserved")
 
     def test_cc_license(self):
-        self.outline_page.edit_course_start_date()
-        self.settings_page.set_course_license("creative-commons")
+        """
+        When I visit the Studio settings page,
+        and I set the course license to "Creative Commons",
+        and I refresh the page,
+        I see that the course license is "Creative Commons".
+        Then I visit the LMS courseware page,
+        and I see that the course license is "Some Rights Reserved".
+        """
+        self.settings_page.course_license = "Creative Commons"
         self.settings_page.save_changes()
-        self.outline_page.visit()
-        self.assertEqual(self.outline_page.license, "Some Rights Reserved")
+        self.settings_page.refresh_and_wait_for_load()
+        self.assertEqual(self.settings_page.course_license, "Creative Commons")
+
         self.lms_courseware.visit()
         self.assertEqual(self.lms_courseware.course_license, "Some Rights Reserved")

@@ -1277,7 +1277,6 @@ PIPELINE_CSS = {
         'source_filenames': [
             'sass/lms-main.css',
             'css/edx-cc.css',
-            'css/edx-cc-ie7.css',
         ],
         'output_filename': 'css/lms-main.css',
     },

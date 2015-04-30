@@ -25,6 +25,7 @@ from pkg_resources import resource_string
 
 from django.conf import settings
 
+from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
 
@@ -287,6 +288,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         })
 
 
+@XBlock.wants("settings")
 class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers,
                       TabsEditingDescriptor, EmptyDataRawDescriptor):
     """
@@ -383,6 +385,12 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
     @property
     def editable_metadata_fields(self):
         editable_fields = super(VideoDescriptor, self).editable_metadata_fields
+
+        settings_service = self.runtime.service(self, 'settings')
+        if settings_service:
+            xb_settings = settings_service.get_settings_bucket(self)
+            if not xb_settings.get("licensing_enabled", False) and "license" in editable_fields:
+                del editable_fields["license"]
 
         if self.source_visible:
             editable_fields['source']['non_editable'] = True

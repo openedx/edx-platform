@@ -1,6 +1,11 @@
 // studio - views - course settings
 // ====================
+// Table of Contents
+// * +Settings - Base / All
+// * +Settings - Licenses
 
+// +Settings - Base / All
+// ====================
 .view-settings {
   @include text-align(left);
   @include direction();
@@ -104,10 +109,11 @@
       margin-top: ($baseline/4);
       color: $gray-d1;
     }
-    .tip-inline{
-    display: inline;
-    margin-left: 5px;
-  }
+
+    .tip-inline {
+      display: inline;
+      @include margin-left($baseline/4);
+    }
 
     .message-error {
       @extend %t-copy-sub1;
@@ -149,6 +155,7 @@
            }
          }
       }
+
       #heading-entrance-exam{
         font-weight: 600;
       }
@@ -156,6 +163,7 @@
       label[for="entrance-exam-enabled"] {
         font-size: 14px;
       }
+
       .field {
         margin: 0 0 ($baseline*2) 0;
 
@@ -976,5 +984,102 @@
         }
       }
     }
+  }
+}
+
+// +Settings - Licenses
+// ====================
+.view-settings {
+
+  .license-img {
+    padding: ($baseline/5);
+  }
+
+  .license-types {
+    text-align: center;
+    vertical-align: middle;
+    display: inline-block;
+
+    .license-type {
+      display: inline-block;
+    }
+
+    .action.license-button {
+      @include grey-button;
+      @extend %t-action2;
+      display: inline-block;
+      text-align: center;
+      width: 220px;
+      height: 40px;
+      cursor: pointer;
+
+      &.is-selected {
+        @include blue-button;
+      }
+    }
+
+    .tip {
+      @extend %t-copy-sub2;
+    }
+  }
+  .wrapper-license-options {
+    margin-bottom: ($baseline/2);
+
+    .tip {
+      @extend %t-copy-sub2;
+    }
+    .license-options {
+      padding-bottom: ($baseline/2);
+
+      .license-option {
+        line-height: 1.5;
+        border-bottom: 1px solid $gray-l4;
+        padding: ($baseline/2) 0 ($baseline*0.4);
+
+        &.is-clickable {
+          cursor: pointer;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        input[type=checkbox] {
+          vertical-align: top;
+          width: auto;
+          min-width: auto;
+          height: auto;
+          border: 0;
+          margin: ($baseline*0.15) 15px 0px;
+        }
+
+        .option-name {
+          @extend %t-action3;
+          @extend %t-strong;
+          display: inline-block;
+          width: 15%;
+          vertical-align: top;
+          cursor: pointer;
+        }
+        .explanation {
+          @extend %t-action4;
+          display: inline-block;
+          width: 75%;
+          vertical-align: top;
+          color: $gray;
+        }
+      }
+    }
+  }
+  .license-preview a {
+    color: $gray;
+
+    &:hover {
+      color: $ui-link-color;
+    }
+  }
+  .list-input.settings-list ul.license-options li {
+    // to make sure the padding is correctly overridden
+    padding: ($baseline / 2) 0 ($baseline * 0.4);
   }
 }

@@ -143,6 +143,9 @@ FEATURES = {
     # Toggle course entrance exams feature
     'ENTRANCE_EXAMS': False,
 
+    # Toggle platform-wide course licensing
+    'LICENSING': False,
+
     # Enable the courseware search functionality
     'ENABLE_COURSEWARE_INDEX': False,
 
@@ -943,5 +946,11 @@ SEARCH_ENGINE = None
 ELASTIC_FIELD_MAPPINGS = {
     "start_date": {
         "type": "date"
+    }
+}
+
+XBLOCK_SETTINGS = {
+    "VideoDescriptor": {
+        "licensing_enabled": FEATURES.get("LICENSING", False)
     }
 }

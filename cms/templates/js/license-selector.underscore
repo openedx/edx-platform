@@ -1,13 +1,14 @@
-<div class="license-wrapper">
+<div class="wrapper-license">
     <h3 class="label setting-label">
         <%= gettext("License Type") %>
     </h3>
     <ul class="license-types">
         <% var link_start_tpl = '<a href="{url}" target="_blank">'; %>
         <% _.each(licenseInfo, function(license, licenseType) { %>
-            <li data-license="<%- licenseType %>">
+            <li class="license-type" data-license="<%- licenseType %>">
                 <button name="license-<%- licenseType %>"
                         class="action license-button <% if(model.type === licenseType) { print("is-selected"); } %>"
+                        aria-pressed="<%- (model.type === licenseType).toString() %>"
                         <% if (license.tooltip) { %>data-tooltip="<%- license.tooltip %>"<% } %>>
                     <%- license.name %>
                 </button>
@@ -45,31 +46,23 @@
                             (optionInfo.conflictsWith && _.any(optionInfo.conflictsWith, function(key) {return model.options[key];}));
                     %>
                     <li data-option="<%- optionKey %>"
-                            class="action-item license-button
-                                   <% if (optionSelected) { print("is-selected"); } %>
-                                   <% if (optionDisabled) { print("is-disabled"); } else { print("is-clickable"); } %>"
+                        class="action-item license-option
+                               <% if (optionSelected) { print("is-selected"); } %>
+                               <% if (optionDisabled) { print("is-disabled"); } else { print("is-clickable"); } %>"
                     >
-                        <i aria-hidden="true"
-                          class="fa fa-fw
-                             <% if(optionSelected) { print("fa-check-square-o"); } else { print("fa-square-o"); } %>
-                             <% if(optionDisabled) { print("is-disabled"); } %>
-                             "></i>
-                        <h4 class="option-name">
+                        <input type="checkbox"
+                               id="<%- model.type %>-<%- optionKey %>"
+                               name="<%- model.type %>-<%- optionKey %>"
+                               aria-describedby="<%- optionKey %>-explanation"
+                               <% if(optionSelected) { print('checked="checked"'); } %>
+                               <% if(optionDisabled) { print('disabled="disabled"'); } %>
+                        />
+                        <label for="<%- model.type %>-<%- optionKey %>" class="option-name">
                             <%- optionInfo.name %>
-                            <%
-                                var states = [];
-                                if (optionSelected) {
-                                    states.push(gettext("selected"));
-                                }
-                                if (optionDisabled) {
-                                    states.push(gettext("disabled"));
-                                }
-                                if (states) {
-                            %>
-                                <span class="sr">, <%- states.join(", ") %></span>
-                            <% } %>
-                        </h4>
-                        <div class="explanation"><%- optionInfo.help %></div>
+                        </label>
+                        <div id="<%- optionKey %>-explanation" class="explanation">
+                            <%- optionInfo.help %>
+                        </div>
                     </li>
                 <% } // could implement other types here %>
             <% }) %>
@@ -78,7 +71,7 @@
 <% } %>
 
 <% if (showPreview) { %>
-    <div class="license-preview-wrapper">
+    <div class="wrapper-license-preview">
         <h4 class="label setting-label">
             <%= gettext("License Display") %>
         </h4>
@@ -100,7 +93,7 @@
                     version = model.options.ver || "1.0";
              }
         %>
-            <a rel="license" href="//creativecommons.org/licenses/<%- enabled.join("-") %>/<%- version %>/">
+            <a rel="license" href="https://creativecommons.org/licenses/<%- enabled.join("-") %>/<%- version %>/">
             <% if (previewButton) { %>
                 <img src="https://licensebuttons.net/l/<%- enabled.join("-") %>/<%- version %>/<%- typeof buttonSize == "string" ? buttonSize : "88x31" %>.png"
                     alt="<%- typeof licenseString == "string" ? licenseString : "" %>"

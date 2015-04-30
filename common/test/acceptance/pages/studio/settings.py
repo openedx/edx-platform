@@ -19,6 +19,13 @@ class SettingsPage(CoursePage):
     def is_browser_on_page(self):
         return self.q(css='body.view-settings').present
 
+    def refresh_and_wait_for_load(self):
+        """
+        Refresh the page and wait for all resources to load.
+        """
+        self.browser.refresh()
+        self.wait_for_page()
+
     def get_elements(self, css_selector):
         self.wait_for_element_presence(
             css_selector,
@@ -72,16 +79,35 @@ class SettingsPage(CoursePage):
                 'Entrance exam minimum score percent is invisible'
             )
 
-    def set_course_license(self, license_type):
-        css_selector = (
-            "section.license ul.license-types "
-            "li[data-license={license_type}] button"
-        ).format(license_type=license_type)
+    @property
+    def course_license(self):
+        license_types_css = "section.license ul.license-types li.license-type"
         self.wait_for_element_presence(
-            css_selector,
-            '{license_type} button is present'.format(license_type=license_type)
+            license_types_css,
+            "license type buttons are present",
         )
-        self.q(css=css_selector).click()
+        selected = self.q(css=license_types_css + " button.is-selected")
+        if selected.is_present():
+            return selected.text[0]
+        return None
+
+    @course_license.setter
+    def course_license(self, license_name):
+        license_types_css = "section.license ul.license-types li.license-type"
+        self.wait_for_element_presence(
+            license_types_css,
+            "license type buttons are present",
+        )
+        button_xpath = (
+            "//section[contains(@class, 'license')]"
+            "//ul[contains(@class, 'license-types')]"
+            "//li[contains(@class, 'license-type')]"
+            "//button[contains(text(),'{license_name}')]"
+        ).format(license_name=license_name)
+        button = self.q(xpath=button_xpath)
+        if not button.present:
+            raise Exception("Invalid license name: {name}".format(name=license_name))
+        button.click()
 
     def save_changes(self, wait_for_confirmation=True):
         """

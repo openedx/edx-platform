@@ -28,6 +28,12 @@ class VideoLicenseTest(StudioCourseTest):
 
     # used by StudioCourseTest.setUp()
     def populate_course_fixture(self, course_fixture):
+        """
+        Create a course with a single chapter.
+        That chapter has a single section.
+        That section has a single vertical.
+        That vertical has a single video element.
+        """
         video_block = XBlockFixtureDesc('video', "Test Video")
         vertical = XBlockFixtureDesc('vertical', "Test Vertical")
         vertical.add_children(video_block)
@@ -38,6 +44,11 @@ class VideoLicenseTest(StudioCourseTest):
         self.course_fixture.add_children(chapter)
 
     def test_empty_license(self):
+        """
+        When I visit the LMS courseware,
+        I can see that the video is present
+        but it has no license displayed by default.
+        """
         self.lms_courseware.visit()
         video = self.lms_courseware.q(css=".vert .xblock .video")
         self.assertTrue(video.is_present())
@@ -45,6 +56,13 @@ class VideoLicenseTest(StudioCourseTest):
         self.assertFalse(video_license.is_present())
 
     def test_arr_license(self):
+        """
+        When I edit a video element in Studio,
+        I can set an "All Rights Reserved" license on that video element.
+        When I visit the LMS courseware,
+        I can see that the video is present
+        and that it has "All Rights Reserved" displayed for the license.
+        """
         self.studio_course_outline.visit()
         subsection = self.studio_course_outline.section_at(0).subsection_at(0)
         subsection.expand_subsection()
@@ -65,6 +83,13 @@ class VideoLicenseTest(StudioCourseTest):
         self.assertEqual(video_license.text[0], "© All Rights Reserved")
 
     def test_cc_license(self):
+        """
+        When I edit a video element in Studio,
+        I can set a "Creative Commons" license on that video element.
+        When I visit the LMS courseware,
+        I can see that the video is present
+        and that it has "Some Rights Reserved" displayed for the license.
+        """
         self.studio_course_outline.visit()
         subsection = self.studio_course_outline.section_at(0).subsection_at(0)
         subsection.expand_subsection()

@@ -78,6 +78,9 @@ FEATURES['MILESTONES_APP'] = True
 ################################ ENTRANCE EXAMS ################################
 FEATURES['ENTRANCE_EXAMS'] = True
 
+################################ COURSE LICENSES ################################
+FEATURES['LICENSING'] = True
+
 ################################ SEARCH INDEX ################################
 FEATURES['ENABLE_COURSEWARE_INDEX'] = True
 FEATURES['ENABLE_LIBRARY_INDEX'] = True

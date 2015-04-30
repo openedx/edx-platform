@@ -1,9 +1,22 @@
 // studio - elements - xblock rendering
 // ==========================
 
-// styling for xblocks at various levels of nesting: page level,
+// Table of Contents
+// * +Layout - Xblocks
+// * +Licensing - Xblocks
+// * +Pagination - Xblocks 
+// * +Messaging - Xblocks
+// * +Case: Page Level
+// * +Case: Nesting Level
+// * +Case: Element / Component Level
+// * +Case: Experiment Groups - Edited
+// * +Editing - Xblocks
+// * +Case - Special Xblock Type Overrides
 
-// extends - UI archetypes - xblock rendering
+
+// +Layout - Xblocks 
+// ====================
+// styling for xblocks at various levels of nesting: page level,
 .wrapper-xblock {
   margin: ($baseline/2);
   border: 1px solid $gray-l4;
@@ -45,7 +58,7 @@
     }
   }
 
-  // secondary header for meta-information and associated actions
+  // UI: secondary header for meta-information and associated actions
   .xblock-header-secondary {
     overflow: hidden;
     border-top: 1px solid $gray-l3;
@@ -103,28 +116,48 @@
     }
   }
 
+  // +Licensing - Xblocks 
+  // ====================
   .xblock-license,
-  .xmodule_display.xmodule_HtmlModule .xblock-license {
-    text-align: $bi-app-right;
+  .xmodule_display.xmodule_HtmlModule .xblock-license,
+  .xmodule_VideoModule .xblock-license {
+    @include text-align(right);
+    @extend %t-title7;
+    display: block;
+    width: auto;
     border-top: 1px solid $gray-l3;
-    margin: 0 15px;
-    padding: 5px;
-    font-size: 80%;
-    color: $gray-l3;
+    padding: ($baseline/4) 0;
+    color: $gray;
+    text-align: $bi-app-right;
+
+    .license-label,
+    .license-value,
+    .license-actions {
+      display: inline-block;
+      vertical-align: middle;
+      margin-bottom: 0;
+    }
 
     a {
-      color: $gray-l3;
+      color: $gray;
 
       &:hover {
         color: $ui-link-color;
       }
     }
-    span {
-      color: inherit;
-    }
 
+    i {
+      font-style: normal;
+    }
   }
 
+  // CASE: xblocks video
+  .xmodule_VideoModule .xblock-license {
+    border: 0;
+  }
+
+
+  // +Pagination - Xblocks 
   .container-paging-header {
     .meta-wrap {
       margin: $baseline ($baseline/2);
@@ -154,12 +187,9 @@
     }
   }
 
-
-
-  // ====================
-
   //UI: default internal xblock content styles
-
+  // ====================
+  // TO-DO: clean-up / remove this reset
   // internal headings for problems and video components
   h2 {
     @extend %t-title5;
@@ -220,6 +250,8 @@
     }
   }
 
+  // +Messaging - Xblocks
+  // ====================
   // xblock message area, for general information as well as validation
   .wrapper-xblock-message {
 
@@ -281,7 +313,8 @@
     }
   }
 
-  // CASE: page level - outer most level
+  // +Case: Page Level
+  // ====================
   &.level-page {
     margin: 0;
     box-shadow: none;
@@ -325,7 +358,9 @@
 
   }
 
-  // CASE: nesting level - element wrapper level
+  // +Case: Nesting Level
+  // ====================
+  // element wrapper level
   &.level-nesting {
     @include transition(all $tmg-f2 linear 0s);
     border: 1px solid $gray-l3;
@@ -359,7 +394,8 @@
     }
   }
 
-  // CASE: element/component level
+  // +Case: Element / Component Level
+  // ====================
   &.level-element {
     @include transition(all $tmg-f2 linear 0s);
     box-shadow: none;
@@ -416,7 +452,9 @@
     }
   }
 
-  // CASE: edited experiment groups: active and inactive
+  // +Case: Experiment Groups - Edited
+  // ====================
+  // edited experiment groups: active and inactive
   .wrapper-groups {
 
     .title {
@@ -456,8 +494,8 @@
   }
 }
 
+// +Editing - Xblocks
 // ====================
-// XBlock editing
 
 // xblock Editor tab wrapper
 .wrapper-comp-editor {
@@ -807,7 +845,10 @@
   }
 }
 
-// CASE: special xblock type overrides
+
+// +Case - Special Xblock Type Overrides
+// ====================
+// TO-DO - remove this reset styling from base _xblocks.scss file
 
 // Latex Compiler
 // make room for the launch compiler button

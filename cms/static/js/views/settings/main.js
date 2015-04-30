@@ -276,12 +276,13 @@ var DetailsView = ValidatingView.extend({
         this.model.fetch({
             success: function() {
                 self.render();
-                _.each(self.codeMirrors,
-                       function(mirror) {
-                           var ele = mirror.getTextArea();
-                           var field = self.selectorToField[ele.id];
-                           mirror.setValue(self.model.get(field));
-                       });
+                _.each(self.codeMirrors, function(mirror) {
+                    var ele = mirror.getTextArea();
+                    var field = self.selectorToField[ele.id];
+                    mirror.setValue(self.model.get(field));
+                });
+                self.licenseModel.setFromString(self.model.get("license"), {silent: true});
+                self.licenseView.render()
             },
             reset: true,
             silent: true});

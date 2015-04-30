@@ -138,19 +138,19 @@ define(["js/views/license", "js/models/license", "js/common_helpers/template_hel
 
         it("has no preview by default", function () {
             this.view.render();
-            expect(this.view.$("#license-preview").length).toEqual(0)
+            expect(this.view.$(".license-preview").length).toEqual(0)
             this.view.$("li[data-license=creative-commons] button").click();
-            expect(this.view.$("#license-preview").length).toEqual(0)
+            expect(this.view.$(".license-preview").length).toEqual(0)
         });
 
         it("displays a preview if showPreview is true", function() {
             this.view = new LicenseView({model: this.model, showPreview: true});
             this.view.render()
-            expect(this.view.$("#license-preview").length).toEqual(1)
-            expect(this.view.$("#license-preview")).toHaveText("");
+            expect(this.view.$(".license-preview").length).toEqual(1)
+            expect(this.view.$(".license-preview")).toHaveText("");
             this.view.$("li[data-license=creative-commons] button").click();
-            expect(this.view.$("#license-preview").length).toEqual(1)
-            expect(this.view.$("#license-preview")).toContainText("Some Rights Reserved");
+            expect(this.view.$(".license-preview").length).toEqual(1)
+            expect(this.view.$(".license-preview")).toContainText("Some Rights Reserved");
         });
 
     })

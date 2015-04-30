@@ -41,61 +41,63 @@ html.video-fullscreen{
   }
 }
 
-div.course-wrapper {
-  position: relative;
+.content-wrapper {
 
-  .course-license {
-    position: absolute;
-    margin: 5px auto;
-    bottom: 0;
-    text-align: center;
-    width: 100%;
-    color: $gray-l3;
-
-    a:link, a:visited {
-      color: $gray-l3;
-    }
-    a:active, a:hover {
-      color: $link-hover;
-    }
-  }
-
-  .xblock-license {
+  .container-footer {
+    margin: 0 auto;
+    max-width: grid-width(12);
+    min-width: 760px;
+    width: flex-grid(12);
+    color: $gray;
     text-align: $bi-app-right;
-    border-top: 1px solid $gray-l3;
-    margin: 0 15px;
-    padding: 5px;
-    font-size: 80%;
+  }
+}
+
+.content-wrapper {
+
+  .course-license, .xblock-license {
+    @include text-align(right);
+    @extend %t-title7;
+    display: block;
+    width: auto;
+    padding: ($baseline/4) 0;
 
     span {
       color: inherit;
     }
 
-    &, a {
-      color: $gray-l3;
-
-      &:hover {
-        color: $link-hover;
-      }
+    a:link, a:visited {
+      color: $gray;
     }
-  }
-
-  .xmodule_display .xblock-license,
-  .xmodule_display .xblock-license a {
-    color: $gray-l3;
-
-    &:hover {
+    a:active, a:hover {
       color: $link-hover;
     }
-  }
 
-  .xmodule_VideoModule .xblock-license {
-    border: 0;
+    .license-label,
+    .license-value,
+    .license-actions {
+      display: inline-block;
+      vertical-align: middle;
+      margin-bottom: 0;
+    }
+
+    i {
+      font-style: normal;
+    }
+
+    img {
+      display: inline;
+    }
   }
+}
+
+// TO-DO should this be content wrapper? 
+div.course-wrapper {
+  position: relative;
 
   section.course-content {
     @extend .content;
-    padding: 40px;
+    padding: ($baseline*2);
     line-height: 1.6;
 
     h1 {
