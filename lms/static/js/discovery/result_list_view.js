@@ -42,11 +42,6 @@ define([
             this.$list.append(items);
         },
 
-        loadNext: function (event) {
-            event && event.preventDefault();
-            this.trigger('next');
-        },
-
         clearResults: function() {
             this.$list.html(this.originalContent);
             this.detachScrollHandler();
@@ -83,7 +78,7 @@ define([
 
         scrolledToBottom: function () {
             if (this.thereIsMore() && !this.isLoading) {
-                this.loadNext();
+                this.trigger('next');
                 this.isLoading = true;
             }
         },
