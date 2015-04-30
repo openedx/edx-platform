@@ -301,7 +301,6 @@ GIT_REPO_DIR = TEST_ROOT / "course_repos"
 CELERY_ALWAYS_EAGER = True
 CELERY_RESULT_BACKEND = 'cache'
 CELERY_CACHE_BACKEND = 'memory'
-BROKER_TRANSPORT = 'memory'
 
 ######################### MARKETING SITE ###############################
 
