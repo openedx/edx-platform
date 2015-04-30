@@ -17,7 +17,8 @@ log = logging.getLogger(__name__)
 from openedx.core.djangoapps.course_groups.scope_resolver import CourseGroupScopeResolver
 from student.scope_resolver import CourseEnrollmentsScopeResolver, StudentEmailScopeResolver
 from edx_notifications.scopes import register_user_scope_resolver
-
+from edx_notifications.namespaces import register_namespace_resolver
+from util.namespace_resolver import CourseNamespaceResolver
 
 log = logging.getLogger(__name__)
 
@@ -94,7 +95,10 @@ def startup_notification_subsystem():
         # to edx-notifications
         register_user_scope_resolver('course_enrollments', CourseEnrollmentsScopeResolver())
         register_user_scope_resolver('course_group', CourseGroupScopeResolver())
-        register_user_scope_resolver('student_email_resolver', StudentEmailScopeResolver())
+        register_user_scope_resolver('user_email_resolver', StudentEmailScopeResolver())
+
+        # register namespace resolver
+        register_namespace_resolver(CourseNamespaceResolver())
     except Exception, ex:  # pylint: disable=broad-except
         # Note this will fail when we try to run migrations as manage.py will call startup.py
         # and startup.initialze() will try to manipulate some database tables.
