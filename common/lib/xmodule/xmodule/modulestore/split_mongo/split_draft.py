@@ -328,7 +328,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 return True
 
             # check if the draft has changed since the published was created
-            if self._get_version(draft_block) != self._get_version(published_block):
+            if draft_block.edit_info.get_source_version() != published_block.edit_info.get_source_version():
                 return True
 
             # check the children in the draft
@@ -475,13 +475,6 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             return None
         return self._get_block_from_structure(course_structure, BlockKey.from_usage_key(xblock.location))
 
-    def _get_version(self, block):
-        """
-        Return the version of the given database representation of a block.
-        """
-        source_version = block.edit_info.source_version
-        return source_version if source_version is not None else block.edit_info.update_version
-
     def import_xblock(self, user_id, course_key, block_type, block_id, fields=None, runtime=None, **kwargs):
         """
         Split-based modulestores need to import published blocks to both branches
@@ -494,11 +487,14 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 block_id = self.DEFAULT_ROOT_LIBRARY_BLOCK_ID
             new_usage_key = course_key.make_usage_key(block_type, block_id)
 
+            # Only the course import process calls import_xblock(). If the branch setting is published_only,
+            # then the non-draft blocks are being imported.
             if self.get_branch_setting() == ModuleStoreEnum.Branch.published_only:
-                # override existing draft (PLAT-297, PLAT-299). NOTE: this has the effect of removing
-                # any local changes w/ the import.
+                # Override any existing drafts (PLAT-297, PLAT-299). This import/publish step removes
+                # any local changes during the course import.
                 draft_course = course_key.for_branch(ModuleStoreEnum.BranchName.draft)
                 with self.branch_setting(ModuleStoreEnum.Branch.draft_preferred, draft_course):
+                    # Importing the block and publishing the block links the draft & published blocks' version history.
                     draft_block = self.import_xblock(user_id, draft_course, block_type, block_id, fields, runtime)
                     return self.publish(draft_block.location.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
 
