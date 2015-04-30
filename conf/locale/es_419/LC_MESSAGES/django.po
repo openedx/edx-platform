@@ -114,6 +114,7 @@
 # Sarina Canelake <sarina@edx.org>, 2014-2015
 # UAbierta Universidad de Chile <uabierta@u.uchile.cl>, 2015
 # Valeria Freire <valtodopds@hotmail.com>, 2014-2015
+# Yleana Munoz <yleana.munoz@gmail.com>, 2015
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2015 edX
@@ -164,7 +165,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-04-24 17:02+0000\n"
+"POT-Creation-Date: 2015-04-30 15:39+0000\n"
 "PO-Revision-Date: 2014-12-30 16:21+0000\n"
 "Last-Translator: Cristian Salamea <ovnicraft@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
@@ -607,7 +608,7 @@ msgstr "Certificado de {platform_name} para el curso {course_name}"
 
 #: common/djangoapps/student/models.py
 msgid "The ISO 639-1 language code for this language."
-msgstr ""
+msgstr "El código de idioma ISO 639-1 para este idioma."
 
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
@@ -1932,20 +1933,20 @@ msgstr "Error: {msg}"
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_hour} hour"
 msgid_plural "{num_hour} hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num_hour} hora"
+msgstr[1] "{num_hour} horas"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_minute} minute"
 msgid_plural "{num_minute} minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num_minute} minuto"
+msgstr[1] "{num_minute} minutos"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_second} second"
 msgid_plural "{num_second} seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num_second} segundo"
+msgstr[1] "{num_second} segundos"
 
 #. Translators: 'rescoring' refers to the act of re-submitting a student's
 #. solution so it can get a new score.
@@ -3827,7 +3828,7 @@ msgstr "Instructor"
 
 #: common/lib/xmodule/xmodule/tabs.py
 msgid "CCX Coach"
-msgstr ""
+msgstr "Tutor CCX"
 
 #: common/lib/xmodule/xmodule/textannotation_module.py
 msgid "Text Annotation"
@@ -4699,6 +4700,7 @@ msgstr "Índice"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 #: lms/templates/wiki/plugins/attachments/index.html
+#: lms/templates/dashboard.html
 #: lms/templates/discussion/_thread_list_template.html
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Search"
@@ -4711,7 +4713,7 @@ msgstr "Derechos de Autor"
 
 #: lms/djangoapps/ccx/views.py
 msgid "You must be a CCX Coach to access this view."
-msgstr ""
+msgstr "Debe ser un tutor CCX para acceder a esta vista."
 
 #: lms/djangoapps/certificates/models.py
 msgid ""
@@ -4984,7 +4986,7 @@ msgstr ""
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/tools.py
+#: lms/djangoapps/instructor/views/tools.py lms/templates/dashboard.html
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Username"
@@ -5107,12 +5109,8 @@ msgid "Your certificate will be available when you pass the course."
 msgstr "Tu certificado estará disponible cuando apruebes el curso."
 
 #: lms/djangoapps/courseware/views.py
-msgid "Certificate has already been created."
-msgstr "El certificado ya ha sido creado."
-
-#: lms/djangoapps/courseware/views.py
-msgid "Certificate is already being created."
-msgstr "El certificado ya está siendo creado."
+msgid "Certificate is being created."
+msgstr ""
 
 #: lms/djangoapps/courseware/features/video.py
 msgid "ERROR: No playable video sources found!"
@@ -7497,6 +7495,10 @@ msgstr "Su rostro no fue visible un tu foto de carnet."
 msgid "There was an error verifying your ID photos."
 msgstr "Hubo un error verificando las fotos de su documento de identidad."
 
+#: lms/djangoapps/verify_student/models.py
+msgid "Usage id of Reverification XBlock."
+msgstr ""
+
 #: lms/djangoapps/verify_student/views.py
 msgid "Intro"
 msgstr "Introducción"
@@ -7567,7 +7569,7 @@ msgstr "Verificación de fotos recibidas"
 
 #: lms/djangoapps/verify_student/views.py
 msgid "No checkpoint found"
-msgstr ""
+msgstr "No se encontró el punto de control"
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Invalid image data during photo verification."
@@ -8307,19 +8309,19 @@ msgstr "Ya existe una cohorte con ese nombre."
 
 #: openedx/core/djangoapps/profile_images/images.py
 msgid "bytes"
-msgstr ""
+msgstr "bytes"
 
 #: openedx/core/djangoapps/profile_images/images.py
 msgid "KB"
-msgstr ""
+msgstr "KB"
 
 #: openedx/core/djangoapps/profile_images/images.py
 msgid "MB"
-msgstr ""
+msgstr "MB"
 
 #: openedx/core/djangoapps/profile_images/views.py
 msgid "No file provided for profile image"
-msgstr ""
+msgstr "No se suministró una foto de perfil"
 
 #. Translators: This example email address is used as a placeholder in
 #. a field on the login form meant to hold the user's email address.
@@ -8481,11 +8483,11 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
 msgid "The '{field_name}' field cannot be edited."
-msgstr ""
+msgstr "El campo '{field_name}' no puede ser editado."
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
 msgid "This value is invalid."
-msgstr ""
+msgstr "Este valor es inválido."
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 msgid "Delete failed for user preference '{preference_key}'."
@@ -8954,7 +8956,7 @@ msgstr "Formato incorrecto para el campo '{name}'. {detailed_message}"
 #: cms/templates/404.html cms/templates/error.html
 #: lms/templates/static_templates/404.html
 msgid "Page Not Found"
-msgstr "No se encontró la página"
+msgstr "Page Not Found"
 
 #: cms/templates/404.html lms/templates/static_templates/404.html
 msgid "Page not found"
@@ -9116,7 +9118,7 @@ msgstr "Ayuda"
 #: cms/templates/widgets/header.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html
 msgid "Sign Out"
-msgstr ""
+msgstr "Cerrar sesión"
 
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Enrollment for {} | Choose Your Track"
@@ -9132,7 +9134,7 @@ msgstr "Lo sentimos, hubo un error al intentar inscribirlo"
 
 #: common/templates/course_modes/choose.html
 msgid "Pursue Academic Credit with a Verified Certificate"
-msgstr ""
+msgstr "Aplicar al crédito académico con un Certificado Verificado"
 
 #: common/templates/course_modes/choose.html
 msgid ""
@@ -9141,28 +9143,38 @@ msgid ""
 "qualify for academic credit from {org}, advance your career, or strengthen "
 "your school applications."
 msgstr ""
+"Hágase elegible para crédito académico y resalte tus nuevos conocimientos y "
+"habilidades con un certificado verificado. Utilize esta valiosa acreditación"
+" aplicar por crédito académico de {org}, para avanzar en su carrera, o "
+"mejorar sus aplicaciones académicas."
 
 #: common/templates/course_modes/choose.html
 msgid "Benefits of a Verified Certificate"
-msgstr ""
+msgstr "Beneficios de un Certificado Verificado"
 
 #: common/templates/course_modes/choose.html
 msgid ""
 "{b_start}Eligible for credit:{b_end} Receive academic credit after "
 "successfully completing the course"
 msgstr ""
+"{b_start}Eligible para crédito académico:{b_end} Reciba crédito académico "
+"luego de completar exitosamente el curso"
 
 #: common/templates/course_modes/choose.html
 msgid ""
 "{b_start}Official:{b_end} Receive an instructor-signed certificate with the "
 "institution's logo"
 msgstr ""
+"{b_start}Oficial:{b_end} Reciba un certificado firmado por el instructor con"
+" el logo de la institución"
 
 #: common/templates/course_modes/choose.html
 msgid ""
 "{b_start}Easily shareable:{b_end} Add the certificate to your CV or resume, "
 "or post it directly on LinkedIn"
 msgstr ""
+"{b_start}Comparta fácilmente:{b_end} Agregue el certificado a su CV, o "
+"publíquelo directamente en LinkedIn"
 
 #: common/templates/course_modes/choose.html
 msgid "Pursue a Verified Certificate"
@@ -9174,24 +9186,34 @@ msgid ""
 "this valuable credential to improve your job prospects and advance your "
 "career, or highlight your certificate in school applications."
 msgstr ""
+"Resalte sus nuevos conocimientos y habilidades con un certificado "
+"verificado. Utilice esta valiosa acreditación para mejorar sus perspectivas "
+"de empleo y avanzar en su carrera, o resalte su certificado en aplicaciones "
+"académicas."
 
 #: common/templates/course_modes/choose.html
 msgid ""
 "{b_start}Official: {b_end}Receive an instructor-signed certificate with the "
 "institution's logo"
 msgstr ""
+"{b_start}Oficial:{b_end} Reciba un certificado firmado por el instructor con"
+" el logo de la institución"
 
 #: common/templates/course_modes/choose.html
 msgid ""
 "{b_start}Easily shareable: {b_end}Add the certificate to your CV or resume, "
 "or post it directly on LinkedIn"
 msgstr ""
+"{b_start}Comparta fácilmente:{b_end} Agregue el certificado a su CV, o "
+"publíquelo directamente en LinkedIn"
 
 #: common/templates/course_modes/choose.html
 msgid ""
 "{b_start}Motivating: {b_end}Give yourself an additional incentive to "
 "complete the course"
 msgstr ""
+"{b_start}Motivación: {b_end}Dese usted mismo un incentivo adicional para "
+"completar el curso"
 
 #: common/templates/course_modes/choose.html
 msgid "Audit This Course"
@@ -9238,11 +9260,11 @@ msgstr "Esconder anotaciones"
 
 #: lms/templates/course.html
 msgid "LEARN MORE"
-msgstr ""
+msgstr "APRENDER MAS"
 
 #: lms/templates/course.html
 msgid "Starts"
-msgstr ""
+msgstr "Empieza"
 
 #: lms/templates/dashboard.html
 msgid "Dashboard"
@@ -9265,12 +9287,20 @@ msgid "Course-loading errors"
 msgstr "Errores en la carga del curso"
 
 #: lms/templates/dashboard.html
-msgid "Want to change your account settings?"
+msgid "Search Your Courses"
 msgstr ""
+
+#: lms/templates/dashboard.html lms/templates/courseware/courseware.html
+msgid "Clear search"
+msgstr "Reiniciar búsqueda"
+
+#: lms/templates/dashboard.html
+msgid "Want to change your account settings?"
+msgstr "¿Desea cambiar su configuración de cuenta?"
 
 #: lms/templates/dashboard.html
 msgid "Click the arrow next to your username above."
-msgstr ""
+msgstr "Haga clic en la flecha sobre su nombre de usuario."
 
 #: lms/templates/dashboard.html
 msgid "Order History"
@@ -9714,7 +9744,7 @@ msgstr ""
 
 #: lms/templates/index.html
 msgid "View all Courses"
-msgstr ""
+msgstr "Ver todos los cursos"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -9894,7 +9924,7 @@ msgstr "Haga clic para lanzar"
 
 #: lms/templates/manage_user_standing.html
 msgid "Manage student accounts"
-msgstr ""
+msgstr "Administrar las cuentas de estudiantes"
 
 #: lms/templates/manage_user_standing.html
 msgid "Username:"
@@ -9902,23 +9932,23 @@ msgstr "Usuario:"
 
 #: lms/templates/manage_user_standing.html
 msgid "Profile:"
-msgstr ""
+msgstr "Perfil:"
 
 #: lms/templates/manage_user_standing.html
 msgid "Image:"
-msgstr ""
+msgstr "Imagen"
 
 #: lms/templates/manage_user_standing.html
 msgid "Name:"
-msgstr ""
+msgstr "Nombre"
 
 #: lms/templates/manage_user_standing.html
 msgid "Choose an action:"
-msgstr ""
+msgstr "Elegir una acción:"
 
 #: lms/templates/manage_user_standing.html
 msgid "View Profile"
-msgstr ""
+msgstr "Ver Perfil"
 
 #: lms/templates/manage_user_standing.html
 msgid "Disable Account"
@@ -9930,7 +9960,7 @@ msgstr "Reactivar Cuenta"
 
 #: lms/templates/manage_user_standing.html
 msgid "Remove Profile Image"
-msgstr ""
+msgstr "Eliminar foto de perfil"
 
 #: lms/templates/manage_user_standing.html
 msgid "Students whose accounts have been disabled"
@@ -10011,11 +10041,11 @@ msgstr "Despliegue de más opciones"
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 #: lms/templates/student_account/account_settings.html
 msgid "Account Settings"
-msgstr ""
+msgstr "Configuración de la cuenta"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "My Profile"
-msgstr ""
+msgstr "Mi Perfil"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Shopping Cart"
@@ -10044,7 +10074,7 @@ msgstr "Global"
 #. Translators: This is short for "System administration".
 #: lms/templates/navigation.html
 msgid "Sysadmin"
-msgstr ""
+msgstr "Sysadmin"
 
 #: lms/templates/navigation.html
 msgid "Schools"
@@ -10972,12 +11002,12 @@ msgstr "Campo de salida de la calculadora"
 
 #: lms/templates/ccx/_dashboard_ccx_listing.html
 msgid "{course_number} {ccx_name} Cover Image"
-msgstr ""
+msgstr "{course_number} {ccx_name} Imagen de portada"
 
 #: lms/templates/ccx/_dashboard_ccx_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Ended - {end_date}"
-msgstr ""
+msgstr "Curso terminado - {end_date}"
 
 #: lms/templates/ccx/_dashboard_ccx_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -10987,19 +11017,19 @@ msgstr "Inicio: {start_date}"
 #: lms/templates/ccx/_dashboard_ccx_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Starts - {start_date}"
-msgstr ""
+msgstr "Inicio del curso - {start_date}"
 
 #: lms/templates/ccx/_dashboard_ccx_listing.html
 msgid "View Archived Custom Course"
-msgstr ""
+msgstr "Ver el Curso personalizado archivado"
 
 #: lms/templates/ccx/_dashboard_ccx_listing.html
 msgid "View Custom Course"
-msgstr ""
+msgstr "Ver el Curso personalizado"
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "CCX Coach Dashboard"
-msgstr ""
+msgstr "Panel de Control para tutores CCX"
 
 #: lms/templates/ccx/coach_dashboard.html
 #: lms/templates/courseware/legacy_instructor_dashboard.html
@@ -11013,7 +11043,7 @@ msgstr "Calendario"
 #: lms/templates/ccx/coach_dashboard.html
 #: lms/templates/ccx/grading_policy.html
 msgid "Grading Policy"
-msgstr ""
+msgstr "Política de Calificaciones"
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -11097,11 +11127,11 @@ msgstr "Inscribirse"
 
 #: lms/templates/ccx/enrollment.html
 msgid "Student List Management"
-msgstr ""
+msgstr "Gestión de lista de Estudiantes"
 
 #: lms/templates/ccx/grading_policy.html
 msgid "WARNING"
-msgstr ""
+msgstr "ALERTA"
 
 #: lms/templates/ccx/grading_policy.html
 msgid ""
@@ -11109,30 +11139,35 @@ msgid ""
 " failing to display. This form does not check the validity of the policy "
 "before saving."
 msgstr ""
+"Para usuarios avanzados únicamente. Los errores en las políticas de "
+"calificaciones pueden llevar a que el curso no pueda ser mostrado. Este "
+"formulario no verifica la validez de la política antes de guardarla."
 
 #: lms/templates/ccx/grading_policy.html
 msgid "Most coaches should not need to make changes to the grading policy."
 msgstr ""
+"La mayoría de los entrenadores no deberían tener que hacer cambios a la "
+"política de calificaciones."
 
 #: lms/templates/ccx/grading_policy.html
 msgid "Save Grading Policy"
-msgstr ""
+msgstr "Guardar Política de Calificaciones"
 
 #: lms/templates/ccx/schedule.html
 msgid "Set date"
-msgstr ""
+msgstr "Configurar fecha"
 
 #: lms/templates/ccx/schedule.html
 msgid "You have unsaved changes."
-msgstr ""
+msgstr "Tienes cambios sin guardar"
 
 #: lms/templates/ccx/schedule.html
 msgid "There was an error saving changes."
-msgstr ""
+msgstr "Hubo un error guardando los cambios."
 
 #: lms/templates/ccx/schedule.html
 msgid "Schedule a Unit"
-msgstr ""
+msgstr "Agendar una Unidad"
 
 #: lms/templates/ccx/schedule.html
 msgid "Start Date"
@@ -11140,31 +11175,31 @@ msgstr "Fecha inicial:"
 
 #: lms/templates/ccx/schedule.html
 msgid "(Optional)"
-msgstr ""
+msgstr "(Opcional)"
 
 #: lms/templates/ccx/schedule.html
 msgid "Add Unit"
-msgstr ""
+msgstr "Agregar Unidad"
 
 #: lms/templates/ccx/schedule.html
 msgid "Add All Units"
-msgstr ""
+msgstr "Agregar todas las Unidades"
 
 #: lms/templates/ccx/schedule.html
 msgid "All units have been added."
-msgstr ""
+msgstr "Todas las unidades han sido agregadas."
 
 #: lms/templates/ccx/student_admin.html
 msgid "Student Grades"
-msgstr ""
+msgstr "Calificaciones de Estudiantes"
 
 #: lms/templates/ccx/student_admin.html
 msgid "View gradebook"
-msgstr ""
+msgstr "Ver libro de calificaciones"
 
 #: lms/templates/ccx/student_admin.html
 msgid "Download student grades"
-msgstr ""
+msgstr "Descargar calificaciones de estudiantes"
 
 #: lms/templates/certificates/invalid.html
 msgid "This is an invalid certificate number"
@@ -11190,16 +11225,20 @@ msgid ""
 "Ensure that the ID number is an exact match of the ID number on the PDF or "
 "print certificate you are referencing."
 msgstr ""
+"Asegúrese de que el ID es una copia exacta del número en el archivo PDF o "
+"certificado impreso que está referenciando."
 
 #: lms/templates/certificates/invalid.html
 msgid ""
 "If you are trying to validate a certificate with this ID number, it may be a"
 " forgery."
 msgstr ""
+"Si está tratando de validar un certificado con este número de ID, podría ser"
+" una falsificación."
 
 #: lms/templates/certificates/valid.html
 msgid "Certificate Type"
-msgstr ""
+msgstr "Tipo de Certificado"
 
 #: lms/templates/chat/toggle_chat.html
 msgid "Open Chat"
@@ -11384,13 +11423,15 @@ msgstr "Por favor ingrese una sugerencia a continuación:"
 
 #: lms/templates/commerce/checkout_cancel.html
 msgid "Checkout Cancelled"
-msgstr ""
+msgstr "Transacción de pago cancelada"
 
 #: lms/templates/commerce/checkout_cancel.html
 msgid ""
 "Your transaction has been cancelled. If you feel an error has occurred, "
 "contact {email}."
 msgstr ""
+"Su transacción ha sido cancelada.  Si considera que ocurrió un error, "
+"contacte a {email}."
 
 #: lms/templates/courseware/accordion.html
 msgid "{chapter}, current chapter"
@@ -11500,7 +11541,7 @@ msgstr "Inicio de clases"
 
 #: lms/templates/courseware/course_about.html
 msgid "Classes End"
-msgstr "Terminación de clases"
+msgstr "Termino de clases"
 
 #: lms/templates/courseware/course_about.html
 msgid "Estimated Effort"
@@ -11609,10 +11650,6 @@ msgstr "Buscar cursos"
 #: lms/templates/courseware/courseware.html
 msgid "search"
 msgstr "buscar"
-
-#: lms/templates/courseware/courseware.html
-msgid "Clear search"
-msgstr "Reiniciar búsqueda"
 
 #: lms/templates/courseware/courseware.html
 msgid "No content has been added to this course"
@@ -12072,17 +12109,18 @@ msgstr "Progreso del curso para el estudiante '{username}' ({email})"
 
 #: lms/templates/courseware/progress.html
 msgid "Your certificate is available"
-msgstr ""
+msgstr "Su certificado está disponible"
 
 #: lms/templates/courseware/progress.html
 msgid ""
 "You can now download your certificate as a PDF. If you keep working and "
-"receive a higher grade, you can request an updated certificate."
+"receive a higher grade,you can request an {link_start} updated certificate "
+"{link_end}."
 msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "PDF will open in a new browser window or tab."
-msgstr ""
+msgstr "El PDF se abrirá en una nueva ventana o pestaña del navegador."
 
 #: lms/templates/courseware/progress.html
 msgid "Download Your Certificate"
@@ -12090,26 +12128,31 @@ msgstr "Descargar Tu certificaddo"
 
 #: lms/templates/courseware/progress.html
 msgid "We're working on it..."
-msgstr ""
+msgstr "Estamos trabajando en eso..."
 
 #: lms/templates/courseware/progress.html
 msgid ""
 "We're creating your certificate. You can keep working in your courses and a "
 "link to it will appear here and on your Dashboard when it is ready."
 msgstr ""
+"Estamos creando su certificado. Puede seguir trabajando en sus cursos y "
+"cuando el certificado esté listo, aparecerá un vínculo al mismo en su panel "
+"de control. "
 
 #: lms/templates/courseware/progress.html
 msgid "Congratulations, you qualified for a certificate!"
-msgstr ""
+msgstr "Felicitaciones, usted califica para recibir un certificado!"
 
 #: lms/templates/courseware/progress.html
 msgid ""
 "You can keep working for a higher grade, or request your certificate now."
 msgstr ""
+"Puede seguir trabajando en el curso para obtener una calificación superior, "
+"o puede solicitar su certificado ahora."
 
 #: lms/templates/courseware/progress.html
 msgid "Request Certificate"
-msgstr ""
+msgstr "Solicitar certificado"
 
 #: lms/templates/courseware/progress.html
 msgid "{earned:.3n} of {total:.3n} possible points"
@@ -12272,45 +12315,52 @@ msgstr "Compartir en Twitter"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course options dropdown"
-msgstr ""
+msgstr "Despliegue de opciones para el curso"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Additional Actions Menu"
-msgstr ""
+msgstr "Acciones de menú adicionales"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Available Actions"
-msgstr ""
+msgstr "Acciones disponibles"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "Are you sure you want to unenroll from the purchased course "
 "%(course_number)s?"
 msgstr ""
+"¿Está seguro de que desea cancelar su inscripción del curso adquirido "
+"%(course_number)s?"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You will be refunded the amount you paid."
-msgstr ""
+msgstr "Se le devolverá el valor pagado."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You will not be refunded the amount you paid."
-msgstr ""
+msgstr "No le será devuelto el valor pagado."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Are you sure you want to unenroll from %(course_number)s?"
 msgstr ""
+"¿Está seguro de que desea borrar su inscripción al curso %(course_number)s?"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "Are you sure you want to unenroll from the verified {cert_name_long} track "
 "of %(course_number)s?"
 msgstr ""
+"¿Está seguro de que desea eliminarse de la modalidad verificada de "
+"{cert_name_long} para %(course_number)s?"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "The refund deadline for this course has passed, so you will not receive a "
 "refund."
 msgstr ""
+"Su fecha límite para devolución en este curso ha pasado, por lo que no "
+"recibirá una devolución."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Email Settings"
@@ -12473,7 +12523,7 @@ msgstr "Aprobada:"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "ID Verification Status"
-msgstr ""
+msgstr "Status de verificacion Usuario"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Reviewed and Verified"
@@ -13126,12 +13176,17 @@ msgid ""
 " account. Click on the link below or copy and paste it into your browser's "
 "address bar."
 msgstr ""
+"Cambie su vida y comience a aprender hoy mismo activando su cuenta en "
+"{platform_name}. Haga clic en el siguiente enlace o cópielo y péguelo en su "
+"barra de direcciones del navegador."
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
 "After you activate your account, you can sign up for and take any of the "
 "hundreds of courses {platform_name} offers."
 msgstr ""
+"Después de activar su cuenta, podrá inicia sesión y tomar cualquiera de los "
+"cursos ofrecidos por {platform_name}:"
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
@@ -13155,6 +13210,8 @@ msgid ""
 "This email was automatically sent by {site_name} because someone attempted "
 "to create an {platform_name} account using this email address."
 msgstr ""
+"Este email fue enviado automaticamente por {site_name} debido a que alguien "
+"intento crear una cuenta en {platform_name} usando esta direccion de email."
 
 #: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/email_change.txt
@@ -13358,6 +13415,8 @@ msgid ""
 "To enroll in {course_names} we have provided a registration URL for you.  "
 "Please follow the instructions below to claim your access."
 msgstr ""
+"Para inscribirse en {course_names} hemos proporcionado una URL de registro. "
+"Por favor siga las siguientes instrucciones para confirmar su acceso."
 
 #. Translators: please translate the text inside [[ ]]. This is meant as a
 #. template for course teams to use.
@@ -14861,7 +14920,7 @@ msgstr "Añadir profesor asistente de la comunidad."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "CCX Coaches"
-msgstr ""
+msgstr "Tutores CCX"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -14869,10 +14928,13 @@ msgid ""
 "course, which they can use to provide personalized instruction to their own "
 "students based in this course material."
 msgstr ""
+"Los tutores CCX pueden crear sus propios cursos personalizados con base en "
+"este curso, y usarlos para dar instrucción personalizada a sus propios "
+"estudiantes basandose en el material de este curso."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add CCX Coach"
-msgstr ""
+msgstr "Añadir tutor CCX"
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Use Reload Graphs to refresh the graphs."
@@ -15800,7 +15862,7 @@ msgstr "{site_name} -  Confirmar inscripción "
 #: lms/templates/shoppingcart/registration_code_receipt.html
 #: lms/templates/shoppingcart/registration_code_redemption.html
 msgid "Confirm your enrollment for: {span_start}course dates{span_end}"
-msgstr ""
+msgstr "Confirme su inscripción para: {span_start}course dates{span_end}"
 
 #: lms/templates/shoppingcart/registration_code_receipt.html
 msgid "{course_name}"
@@ -15915,6 +15977,8 @@ msgstr ""
 msgid ""
 "After this purchase is complete, {username} will be enrolled in this course."
 msgstr ""
+"Luego de que la compra esté completa, {username} será inscrito en este "
+"curso."
 
 #: lms/templates/shoppingcart/shopping_cart_flow.html
 msgid "Shopping cart"
@@ -16042,7 +16106,7 @@ msgstr "Perfil de Estudiante"
 
 #: lms/templates/student_profile/learner_profile.html
 msgid "Learner Profile"
-msgstr ""
+msgstr "Perfil de usuario"
 
 #. Translators: this section lists all the third-party authentication
 #. providers
@@ -16201,19 +16265,19 @@ msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
 msgid "You are upgrading your enrollment for: {course_name}"
-msgstr ""
+msgstr "Está actualizando su inscripción para: {course_name}"
 
 #: lms/templates/verify_student/_verification_header.html
 msgid "You are re-verifying for: {course_name}"
-msgstr ""
+msgstr "Se está reverificando para: {course_name}"
 
 #: lms/templates/verify_student/_verification_header.html
 msgid "You are enrolling in: {course_name}"
-msgstr ""
+msgstr "Se está inscribiendo en el curso: {course_name}"
 
 #: lms/templates/verify_student/_verification_header.html
 msgid "Congratulations! You are now enrolled in {course_display}"
-msgstr ""
+msgstr "Felicitaciones! Ya se encuentra inscrito en {course_display}"
 
 #: lms/templates/verify_student/_verification_support.html
 #: lms/templates/verify_student/pay_and_verify.html
@@ -16239,7 +16303,7 @@ msgid "Edit Your Full Name"
 msgstr "Edite su nombre completo"
 
 #: lms/templates/verify_student/incourse_reverify.html
-msgid "Verifying for \"{checkpoint_name}\" in course \"{course_name}\""
+msgid "Re-Verify for {course_name}"
 msgstr ""
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
@@ -16345,11 +16409,15 @@ msgstr ""
 msgid ""
 "Once in position, use the camera button {btn_icon} to capture your picture"
 msgstr ""
+"Una vez en posición, use el botón de la cámara {btn_icon} para capturar la "
+"imagen"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
 msgid "Use the checkmark button {btn_icon} once you are happy with the photo"
 msgstr ""
+"Una vez esté satisfecho con la fotografía, utilice el botón de verificación "
+"{btn_icon}"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -16672,6 +16740,9 @@ msgid ""
 "Acceptable IDs include driver's licenses, passports, or other goverment-"
 "issued IDs that include your name and photo"
 msgstr ""
+"Los documentos de identidad aceptables incluyen licencias de conducción, "
+"pasaportes, o otros documentos de identificación emitidos por el gobierno "
+"que tengan su nombre y su fotografía."
 
 #: lms/templates/verify_student/photo_reverification.html
 msgid "Check that there isn't any glare"
@@ -16693,6 +16764,8 @@ msgstr ""
 #: lms/templates/verify_student/photo_reverification.html
 msgid "Once in position, use the camera button {btn_icon} to capture your ID"
 msgstr ""
+"Una vez en posición, use el botón de la cámara {btn_icon} para capturar su "
+"ID"
 
 #: lms/templates/verify_student/photo_reverification.html
 msgid "Why do you need a photo of my ID?"
@@ -16945,6 +17018,9 @@ msgid ""
 "the URL you went to was correct, as e-mail programs will sometimes split it "
 "into two lines."
 msgstr ""
+"Lo sentimos. Algo salió mal con su activación. Asegúrese de que la URL que "
+"visitó fuera la correcta, ya que algunos programas de correo electrónico "
+"pueden modificarla, dividiéndola en dos líneas."
 
 #: cms/templates/activation_invalid.html
 msgid ""
@@ -17952,6 +18028,10 @@ msgid ""
 "create cohort-specific courseware. In other words, you can customize the "
 "content that particular cohorts see in your course."
 msgstr ""
+"Si usted tiene cohortes habilitadas en su curso, puede utilizar grupos de "
+"contenido para crear contenido específicos por cohortes. En otras palabras, "
+"se puede personalizar el contenido que determinadas cohortes verán en su "
+"curso."
 
 #: cms/templates/group_configurations.html
 msgid ""
@@ -17961,6 +18041,11 @@ msgid ""
 "Only learners in the cohorts that are associated with the specified content "
 "groups see the additional content."
 msgstr ""
+"Cada grupo de contenido que cree se puede asociar a una o más cohortes. "
+"Además de los contenidos del curso que están dirigidos a todos los "
+"estudiantes, puede designar algún contenido como visible solo para grupos de"
+" contenido especificados. Sólo los alumnos de las cohortes que se asocian "
+"con los grupos de contenido especificados podrán ver el contenido adicional."
 
 #: cms/templates/group_configurations.html
 msgid ""
@@ -17970,6 +18055,12 @@ msgid ""
 "use by a unit. To delete a content group, hover over its box and click the "
 "delete icon."
 msgstr ""
+"Haga clic en {em_start}Nuevo grupo de contenido{em_end} para añadir un nuevo"
+" grupo de contenido. Para editar el nombre de un grupo de contenido, pase el"
+" ratón sobre su cuadro y haga clic en {em_start}Editar{em_end}. Puede "
+"eliminar un grupo de contenido sólo si no está en uso por una unidad. Para "
+"eliminar un grupo de contenido, pase el ratón sobre su cuadro y haga clic en"
+" el icono de borrar."
 
 #: cms/templates/group_configurations.html
 msgid "Learn More"
@@ -17983,6 +18074,12 @@ msgid ""
 "experiment. When you create a content experiment for a course, you select "
 "the group configuration to use."
 msgstr ""
+"Utilice las configuraciones de grupo de experimentos si está realizando "
+"experimentos de contenido, también conocidas como pruebas A/B, en su curso. "
+"Las configuraciones de grupos de experimento definen cómo muchos grupos de "
+"estudiantes están en un experimento de contenido. Cuando se crea un "
+"experimento de contenidos para un curso, se selecciona la configuración del "
+"grupo que se va a utilizar."
 
 #: cms/templates/group_configurations.html
 msgid ""
@@ -17992,6 +18089,12 @@ msgid ""
 "not in use in an experiment. To delete a configuration, hover over its box "
 "and click the delete icon."
 msgstr ""
+"Haga clic en {em_start}nueva configuración de Grupo{em_end} para añadir una "
+"nueva configuración. Para editar una configuración, pase el ratón sobre su "
+"cuadro y haga clic en {em_start}Editar{em_end}. Puede eliminar una "
+"configuración de grupo sólo si no está en uso en un experimento. Para "
+"eliminar una configuración, pase el ratón sobre su cuadro y haga clic en el "
+"icono de borrar."
 
 #: cms/templates/group_configurations.html cms/templates/settings.html
 #: cms/templates/settings_advanced.html cms/templates/settings_graders.html
@@ -18464,6 +18567,9 @@ msgid ""
 " existing library entirely. You might also have developed a library outside "
 "of {studio_name}."
 msgstr ""
+"Es posible que desee actualizar una biblioteca existente a una nueva "
+"versión, o reemplazar una biblioteca existente por completo. También puede "
+"ser que haya desarrollado una biblioteca fuera de {studio_name}."
 
 #: cms/templates/import.html
 msgid "Note: Library content is not automatically updated in courses"
@@ -19874,6 +19980,15 @@ msgid ""
 "LMS as soon as its status is {em_start}Ready{em_end}, although processing "
 "may not be complete for all encodings and all video hosting sites."
 msgstr ""
+"Tan pronto como el estado de un archivo sea {em_start}Listo{em_end}, se "
+"puede añadir el vídeo a un componente en su curso. Copie el ID del vídeo. En"
+" otra ventana del navegador, en la página de Estructura del curso, cree o "
+"localice a un componente de vídeo para reproducir este vídeo. Edite el "
+"componente de vídeo para pegar el ID en el campo {em_start} Video "
+"ID{em_end}. El vídeo se puede reproducir en el LMS tan pronto como su estado"
+" sea {em_start}Listo{em_end}, aunque el procesamiento puede no estar "
+"completo para todas las codificaciones y todos los sitios de alojamiento de "
+"vídeo."
 
 #: cms/templates/visibility_editor.html
 msgid "No content groups exist"
