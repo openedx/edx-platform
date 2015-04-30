@@ -110,8 +110,12 @@ END
         exit $EXIT
         ;;
 
-    "other-unit")
+    "cms-unit")
         paver test_system -s cms --extra_args="--with-flaky" --cov_args="-p" || { EXIT=1; }
+        exit $EXIT
+        ;;
+
+    "commonlib-js-unit")
         paver test_js --coverage --skip_clean || { EXIT=1; }
         paver test_lib --skip_clean --extra_args="--with-flaky" --cov_args="-p" || { EXIT=1; }
         exit $EXIT
