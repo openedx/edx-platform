@@ -27,10 +27,6 @@ define([
 
         remove: function() {
             $(this.el).remove();
-        },
-
-        clearFilter: function () {
-            this.$el.remove();
         }
 
     });
