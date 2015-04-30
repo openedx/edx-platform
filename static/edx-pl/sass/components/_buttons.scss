@@ -10,12 +10,11 @@
 // #LARGE (size)
 // #SMALL (size)
 // #DEFAULT (style)
-// #DEFAULT-ALT (style)
 // #PRIMARY (style)
 // #SECONDARY (style)
-// #SECONDARY-ALT (style)
 // #LINK (style)
 // #ELEVATED (type)
+// #ELEVATED-ALT (type)
 // #COMBO (type)
 // #ICONS (type)
 // #OVERLAY (type)
@@ -37,6 +36,7 @@
     border-style: $buttons-border-style;
     border-radius: $buttons-border-radius;
     border-width: $buttons-border-size;
+    font-weight: $buttons-font-weight;
 
     // Display: block, one button per line, full width
     &.block {
@@ -55,8 +55,8 @@
 // #BASE
 // ----------------------------
 .btn-base {
-    font-size: font-size(mid-large);
-    padding: spacing-vertical(x-small) spacing-horizontal(mid-small);
+    padding: spacing-vertical(x-small) spacing-horizontal(base);
+    font-size: font-size(base);
 }
 
 
@@ -64,8 +64,8 @@
 // #LARGE
 // ----------------------------
 .btn-large {
-    font-size: font-size(large);
-    padding: spacing-vertical(small) spacing-horizontal(base);
+    padding: spacing-vertical(small) spacing-horizontal(mid-large);
+    font-size: font-size(mid-large);
 }
 
 
@@ -73,8 +73,8 @@
 // #SMALL
 // ----------------------------
 .btn-small {
-    font-size: font-size(small);
     padding: spacing-vertical(x-small) spacing-horizontal(small);
+    font-size: font-size(small);
 }
 
 
@@ -82,8 +82,8 @@
 // #DEFAULT
 // ----------------------------
 .btn-default {
-    background: palette(grayscale, white);
     border-color: palette(primary, base);
+    background: palette(grayscale, white);
     color: palette(primary, base);
 
     // STATE: hover and focus
@@ -99,62 +99,25 @@
     &:active,
     &.is-pressed,
     &.is-active {
-        background: palette(primary, dark);
         border-color: palette(primary, dark);
+        background: palette(primary, dark);
     }
 
     // STATE: is disabled
     &:disabled,
     &.is-disabled {
+        border-color: palette(grayscale, light);
         background: palette(grayscale, white);
-        border-color: palette(grayscale, x-light);
         color: palette(grayscale, base);
     }
 }
-
-
-// ----------------------------
-// #DEFAULT-ALT
-// ----------------------------
-.btn-default-alt {
-    background: $transparent;
-    border-color: palette(grayscale-cool, base);
-    color: palette(grayscale-cool, base);
-
-    // STATE: hover and focus
-    &:hover,
-    &.is-hovered,
-    &:focus,
-    &.is-focused {
-        background: palette(primary, base);
-        border-color: palette(primary, base);
-        color: palette(grayscale, white);
-    }
-
-    // STATE: is pressed or active
-    &:active,
-    &.is-pressed,
-    &.is-active {
-        background: palette(primary, dark);
-        border-color: palette(primary, dark);
-    }
-
-    // STATE: is disabled
-    &:disabled,
-    &.is-disabled {
-        background: $transparent;
-        border-color: palette(grayscale-cool, x-light);
-        color: palette(grayscale-cool, light);
-    }
-}
-
 
 // ----------------------------
 // #PRIMARY
 // ----------------------------
 .btn-primary {
-    background: palette(primary, base);
     border-color: palette(primary, base);
+    background: palette(primary, base);
     color: palette(grayscale, white);
 
     // STATE: hover and focus
@@ -162,23 +125,23 @@
     &.is-hovered,
     &:focus,
     &.is-focused {
-        background: palette(primary, light);
-        border-color: palette(primary, light);
+        border-color: palette(primary, accent);
+        background: palette(primary, accent);
     }
 
     // STATE: is pressed or active
     &:active,
     &.is-pressed,
     &.is-active {
-        background: palette(primary, base);
         border-color: palette(primary, base);
+        background: palette(primary, base);
     }
 
     // STATE: is disabled
     &:disabled,
     &.is-disabled {
-        background: palette(grayscale, x-light);
-        border-color: palette(grayscale, x-light);
+        border-color: palette(grayscale, light);
+        background: palette(grayscale, light);
         color: palette(grayscale, base);
     }
 }
@@ -188,8 +151,8 @@
 // #SECONDARY
 // ----------------------------
 .btn-secondary {
-    background: $transparent;
     border-color: $transparent;
+    background: $transparent;
     color: palette(primary, base);
 
     // STATE: hover and focus
@@ -197,7 +160,7 @@
     &.is-hovered,
     &:focus,
     &.is-focused {
-        border-color: palette(grayscale-cool, trans);
+        border-color: palette(grayscale-cool, light);
     }
 
     // STATE: is pressed or active
@@ -211,52 +174,8 @@
     // STATE: is disabled
     &:disabled,
     &.is-disabled {
-        border-color: palette(grayscale, x-light);
+        border-color: palette(grayscale, light);
         color: palette(grayscale, light);
-    }
-}
-
-
-// ----------------------------
-// #SECONDARY-ALT
-// ----------------------------
-.btn-secondary-alt {
-    background: $transparent;
-    border-color: $transparent;
-    color: palette(grayscale-cool, dark);
-
-    // STATE: hover and focus
-    &:hover,
-    &.is-hovered,
-    &:focus,
-    &.is-focused {
-        background: palette(grayscale-cool, dark);
-        border-color: palette(grayscale-cool, dark);
-        color: palette(grayscale, white);
-    }
-
-    // STATE: is pressed or active
-    &:active,
-    &.is-pressed,
-    &.is-active {
-        background: palette(primary, dark);
-        border-color: palette(primary, dark);
-    }
-
-    // STATE: is disabled
-    &:disabled,
-    &.is-disabled {
-        border-color: palette(grayscale, x-light);
-        color: palette(grayscale, light);
-
-        &:hover,
-        &.is-hovered,
-        &:focus,
-        &.is-focused {
-            background: $transparent;
-            border-color: palette(grayscale, x-light);
-            color: palette(grayscale, light);
-        }
     }
 }
 
@@ -279,9 +198,9 @@
 // #ELEVATED
 // ----------------------------
 .btn-elevated {
-    background: palette(primary, base);
-    box-shadow: inset 0 0 -$buttons-elevated-shadow 0 0 palette(primary, dark);
     border-color: palette(primary, base);
+    box-shadow: inset 0 0 -$buttons-elevated-shadow 0 0 palette(primary, dark);
+    background: palette(primary, base);
     color: palette(grayscale, white);
 
     // STATE: hover and focus
@@ -289,24 +208,63 @@
     &.is-hovered,
     &:focus,
     &.is-focused {
-        background: palette(primary, light);
         box-shadow: inset 0 0 -$buttons-elevated-shadow 0 0 palette(primary, dark);
+        background: palette(primary, accent);
     }
 
     // STATE: is pressed or active
     &:active,
     &.is-pressed,
     &.is-active {
-        background: palette(primary, dark);
         box-shadow: inset 0 $buttons-elevated-shadow 0 0 palette(primary, x-dark);
+        background: palette(primary, dark);
     }
 
     // STATE: is disabled
     &:disabled,
     &.is-disabled {
-        background: palette(grayscale, x-light);
         border-color: palette(grayscale, x-light);
         box-shadow: inset 0 -1px 0 palette(grayscale, light);
+        background: palette(grayscale, x-light);
+        color: palette(grayscale, base);
+    }
+}
+
+
+// ----------------------------
+// #ELEVATED-ALT
+// ----------------------------
+.btn-elevated-alt {
+    box-shadow: inset 0 0 -$buttons-elevated-shadow 0 0 palette(grayscale-cool, light);
+    border-color: palette(grayscale-cool, light);
+    background: $transparent;
+    color: palette(primary, base);
+
+    // STATE: hover and focus
+    &:hover,
+    &.is-hovered,
+    &:focus,
+    &.is-focused {
+        border-color: palette(primary, base);
+        box-shadow: inset 0 0 -$buttons-elevated-shadow 0 0 palette(primary, base);
+        color: palette(grayscale, white);
+        background: palette(primary, accent);
+    }
+
+    // STATE: is pressed or active
+    &:active,
+    &.is-pressed,
+    &.is-active {
+        box-shadow: inset 0 $buttons-elevated-shadow 0 0 palette(primary, x-dark);
+        background: palette(primary, dark);
+    }
+
+    // STATE: is disabled
+    &:disabled,
+    &.is-disabled {
+        border-color: palette(grayscale, x-light);
+        box-shadow: inset 0 -1px 0 palette(grayscale, light);
+        background: palette(grayscale, x-light);
         color: palette(grayscale, base);
     }
 }
@@ -348,8 +306,8 @@
 // #OVERLAY
 // ----------------------------
 .btn-overlay {
-    background: $transparent;
     border-color: palette(grayscale, white);
+    background: $transparent;
     color: palette(grayscale, white);
     font-weight: font-weight(semi-bold);
 
@@ -372,12 +330,12 @@
     // STATE: is disabled
     &:disabled,
     &.is-disabled {
-        border-color: palette(grayscale, x-light);
+        border-color: palette(grayscale, trans);
         color: palette(grayscale, x-light);
 
         &:hover {
+            border-color: palette(grayscale, trans);
             background: $transparent;
-            border-color: palette(grayscale, x-light);
             color: palette(grayscale, x-light);
         }
     }

@@ -1,16 +1,10 @@
 // ------------------------------
 // edX Pattern Library: Components - Headings
 
-// About: Contains base styling for headings, relying on Bourbon's mathematical scales for precision.
-
-// Scale:
-// 12, 14, 16, 18, 21, 24, 32, 43
-// ----------------------------
+// About: Contains base styling for headings (leading type for sections of content and UI).
 
 // #GLOBAL
 // #INDIVIDUAL HEADINGS
-// ----------------------------
-
 
 // ----------------------------
 // #GLOBAL
@@ -96,13 +90,13 @@
 // Level six heading
 .hd-6 {
     margin-bottom: spacing-vertical(x-small);
-    font-size: font-size(mid-small);
+    font-size: font-size(small);
     line-height: line-height(mid-small);
 }
 
 // Level seven heading
 .hd-7 {
     margin-bottom: spacing-vertical(x-small);
-    font-size: font-size(small);
+    font-size: font-size(x-small);
     line-height: line-height(small);
 }

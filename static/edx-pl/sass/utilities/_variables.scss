@@ -15,7 +15,7 @@
 // ----------------------------
 // #UNITS
 // ----------------------------
-$em-base: 18; // deliberately sets bourbon-based em-base (http://bourbon.io/docs/#em-base)
+$em-base: 16; // deliberately sets bourbon-based em-base (http://bourbon.io/docs/#em-base)
 
 
 // ----------------------------
@@ -131,11 +131,6 @@ $font-family-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace
 // typography: config - scale
 $modular-scale-ratio: $perfect-fourth;
 
-$font-scale-small: 16;
-$font-scale-medium: 18;
-$font-scale-large: 18;
-$font-scale-base: $font-scale-medium;
-
 // typography: sizes
 $font-sizes: (
     xxx-large:      38,
@@ -143,9 +138,9 @@ $font-sizes: (
     x-large:        24,
     large:          21,
     mid-large:      18,
-    mid-small:      16,
+    base:           16,
     small:          14,
-    base:           $font-scale-base
+    x-small:        12,
 );
 
 // typography: line-height
@@ -242,10 +237,16 @@ $component-active-color: palette(grayscale, white);
 $component-active-bg: palette(primary, base);
 
 // base text settings
-$text-base-color: palette(grayscale, dark);
 $text-base-font-family: $font-family-sans-serif;
+$text-base-color: palette(grayscale, dark);
 $text-base-font-weight: font-weight(normal);
 $text-base-focus-color: palette(grayscale, x-dark);
+
+$text-emphasized-color: palette(grayscale, x-dark);
+$text-emphasized-font-weight: font-weight(normal);
+
+$text-de-emphasized-color: palette(grayscale, base);
+$text-de-emphasized-font-weight: font-weight(normal);
 
 // links
 $link-color: palette(primary, base);
@@ -271,7 +272,8 @@ $headings-secondary-color: palette(grayscale, base);
 $buttons-border-style: solid;
 $buttons-border-size: 1px;
 $buttons-elevated-shadow: 3px;
-$buttons-border-radius: 4px;
+$buttons-border-radius: 3px;
+$buttons-font-weight: font-weight(semi-bold);
 
 // tables
 $table-cell-padding: spacing-vertical(small) spacing-horizontal(small);
