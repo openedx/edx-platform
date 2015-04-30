@@ -47,6 +47,7 @@ Eligibility:
 """
 from datetime import datetime
 import json
+import logging
 import uuid
 
 from django.conf import settings
@@ -57,12 +58,16 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
 from django.utils.translation import ugettext_lazy
+from django_extensions.db.fields.json import JSONField
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
+from xmodule.modulestore.django import modulestore
 from config_models.models import ConfigurationModel
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 from util.milestones_helpers import fulfill_course_milestone
 from course_modes.models import CourseMode
+
+LOGGER = logging.getLogger(__name__)
 
 
 class CertificateStatuses(object):
@@ -574,3 +579,51 @@ class CertificateHtmlViewConfiguration(ConfigurationModel):
         instance = cls.current()
         json_data = json.loads(instance.configuration) if instance.enabled else {}
         return json_data
+
+
+class BadgeAssertion(models.Model):
+    """
+    Tracks badges on our side of the badge baking transaction
+    """
+    user = models.ForeignKey(User)
+    course_id = CourseKeyField(max_length=255, blank=True, default=None)
+    data = JSONField()
+
+    @property
+    def image_url(self):
+        """
+        Get the image for this assertion.
+        """
+        return self.data['json']['image']
+
+    class Meta(object):
+        """
+        Meta information for Django's construction of the model.
+        """
+        unique_together = (('course_id', 'user'),)
+
+
+# pylint: disable=unused-argument
+def create_badge(sender, instance, **kwargs):
+    """
+    Standard signal hook to create badges when a certificate has been generated.
+    """
+    if not settings.FEATURES.get('ENABLE_OPENBADGES', False):
+        return
+    if not modulestore().get_course(instance.course_id).issue_badges:
+        LOGGER.info("Course is not configured to issue badges.")
+        return
+    if BadgeAssertion.objects.filter(user=instance.user, course_id=instance.course_id):
+        LOGGER.info("Badge already exists for this user on this course.")
+        # Badge already exists. Skip.
+        return
+    # Don't bake a badge until the certificate is available. Prevents user-facing requests from being paused for this
+    # by making sure it only gets run on the callback during normal workflow.
+    if not instance.status == CertificateStatuses.downloadable:
+        return
+    from .badge_handler import BadgeHandler
+    handler = BadgeHandler(instance.course_id)
+    handler.award(instance.user)
+
+# Create badges when certificates are saved.
+post_save.connect(create_badge, sender=GeneratedCertificate, dispatch_uid="generate_badge")

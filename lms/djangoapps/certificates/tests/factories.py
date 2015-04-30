@@ -1,7 +1,7 @@
 from factory.django import DjangoModelFactory
 
 from certificates.models import (
-    GeneratedCertificate, CertificateStatuses, CertificateHtmlViewConfiguration, CertificateWhitelist
+    GeneratedCertificate, CertificateStatuses, CertificateHtmlViewConfiguration, CertificateWhitelist, BadgeAssertion
 )
 
 
@@ -23,6 +23,10 @@ class CertificateWhitelistFactory(DjangoModelFactory):
 
     course_id = None
     whitelist = True
+
+
+class BadgeAssertionFactory(DjangoModelFactory):
+    FACTORY_FOR = BadgeAssertion
 
 
 class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):
