@@ -12,6 +12,7 @@ from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
+from django.conf import settings
 from contentstore.utils import reverse_usage_url, reverse_course_url
 
 from contentstore.views.component import (
@@ -28,12 +29,15 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
 from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory, check_mongo_calls
+from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.x_module import STUDIO_VIEW, STUDENT_VIEW
 from xblock.exceptions import NoSuchHandlerError
 from xblock_django.user_service import DjangoXBlockUserService
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import Location
 from xmodule.partitions.partitions import Group, UserPartition
+
+TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
 class ItemTest(CourseTestCase):
@@ -417,6 +421,28 @@ class TestDuplicateItem(ItemTest):
 
         # Create a second sequential just (testing children of children)
         self.create_xblock(parent_usage_key=self.chapter_usage_key, category='sequential2')
+
+    def test_discussion_duplication(self):
+        """
+        Tests that duplicated discussion component have unique 'discussion_id',
+        if 'discussion_id' is present in xml.
+        """
+        store = modulestore()
+        # Importing course from xml
+        courses = import_course_from_xml(
+            store, self.user.id, TEST_DATA_DIR, ["test_course_discussion"], create_if_not_present=True
+        )
+        # making usage key for discussion component
+        discussion_location = courses[0].id.make_usage_key('discussion', 'discussion_component')
+        discussion_xblock = store.get_item(discussion_location)
+        parent_xblock = discussion_xblock.get_parent()
+
+        # Creating duplicate discussion item
+        dup_usage_key = self._duplicate_item(parent_xblock.location, discussion_location, "duplicate discussion")
+        dup_discussion_xblock = store.get_item(dup_usage_key)
+
+        # Check that existing discussion item and duplicated discussion item has unique 'discussion_id'
+        self.assertNotEqual(discussion_xblock.discussion_id, dup_discussion_xblock.discussion_id)
 
     def test_duplicate_equality(self):
         """
