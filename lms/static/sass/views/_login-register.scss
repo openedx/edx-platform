@@ -220,6 +220,11 @@ $sm-btn-linkedin: #0077b5;
             font-weight: 500;
         }
 
+        #login-remember {
+            line-height: 0;
+            height: auto;
+        }
+
         label {
             display: block;
             margin: 0 0 6px 0;
@@ -237,6 +242,10 @@ $sm-btn-linkedin: #0077b5;
                 margin: 5px 5px 0 0;
                 width: 90%;
                 vertical-align: top;
+            }
+
+            &[for="login-remember"] {
+                display: inline-block;
             }
 
             a {
