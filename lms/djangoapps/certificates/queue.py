@@ -206,7 +206,8 @@ class XQueueCertInterface(object):
             status.unavailable,
             status.deleted,
             status.error,
-            status.notpassing
+            status.notpassing,
+            status.downloadable
         ]
 
         cert_status = certificate_status_for_student(student, course_id)['status']
@@ -257,13 +258,23 @@ class XQueueCertInterface(object):
             if forced_grade:
                 grade['grade'] = forced_grade
 
-            cert, __ = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)
+            cert, created = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)
+
+            if not created:
+                LOGGER.info(
+                    u"Regenerate certificate for user %s in course %s "
+                    u"with status %s, download_uuid %s, "
+                    u"and download_url %s",
+                    cert.user.id, unicode(cert.course_id),
+                    cert.status, cert.download_uuid, cert.download_url
+                )
 
             cert.mode = cert_mode
             cert.user = student
             cert.grade = grade['percent']
             cert.course_id = course_id
             cert.name = profile_name
+            cert.download_url = ''
             # Strip HTML from grade range label
             grade_contents = grade.get('grade', None)
             try:
