@@ -37,8 +37,8 @@ define([
         },
 
         changeQueryFilter: function(query) {
-            var data = {'query': query, 'type': 'query'};
-            var queryModel = this.collection.findWhere({'type': 'query'});
+            var data = {'query': query, 'type': 'search_string'};
+            var queryModel = this.collection.getQueryModel();
             if (queryModel) {
                 this.collection.remove(queryModel);
             }
@@ -47,9 +47,10 @@ define([
 
         addFilter: function(data) {
             var filter = new Filter(data);
-            this.collection.add(filter);
             var filterView = new FilterView({model: filter});
+            this.collection.add(filter);
             this.filtersList.append(filterView.render().el);
+            this.trigger('search', this.getSearchTerm(), this.collection);
             if(this.$el.hasClass('hidden')) {
                 this.showClearAllButton();
             }
@@ -67,8 +68,7 @@ define([
                 this.trigger('clear');
                 this.hideClearAllButton();
             }
-        // TODO: Change collection.js to take filter array and not just search term
-        //    this.trigger('search', this.collection);
+            this.trigger('search', this.getSearchTerm(), this.collection);
         },
 
         clearFilters: function() {
@@ -89,6 +89,14 @@ define([
 
         hideClearAllButton: function() {
             this.$el.addClass('hidden');
+        },
+
+        getSearchTerm: function() {
+            var queryModel = this.collection.getQueryModel();
+            if (queryModel) {
+                return queryModel.get('query');
+            }
+            return '';
         }
 
     });

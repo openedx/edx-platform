@@ -416,6 +416,12 @@ $homepage__header--gradient__color--alpha: lighten($gray, 15%);
 $homepage__header--gradient__color--bravo: saturate($gray, 30%);
 $homepage__header--background: lighten($gray, 15%);
 
+// VIEWS: homepage and courses
+$course-card-height: ($baseline*18);
+$course-image-height: ($baseline*8);
+$course-info-height: ($baseline*10);
+$course-title-height: ($baseline*3.6);
+
 // ====================
 
 // IMAGES: backgrounds
