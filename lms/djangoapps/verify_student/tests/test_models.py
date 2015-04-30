@@ -675,7 +675,7 @@ class VerificationCheckpointTest(ModuleStoreTestCase):
 
 @ddt.ddt
 class VerificationStatusTest(ModuleStoreTestCase):
-    """Tests for the VerificationStatus model. """
+    """ Tests for the VerificationStatus model. """
 
     def setUp(self):
         super(VerificationStatusTest, self).setUp()
@@ -683,33 +683,70 @@ class VerificationStatusTest(ModuleStoreTestCase):
         self.course = CourseFactory.create()
         self.check_point1 = VerificationCheckpoint.objects.create(course_id=self.course.id, checkpoint_name="midterm")
         self.check_point2 = VerificationCheckpoint.objects.create(course_id=self.course.id, checkpoint_name="final")
+        self.dummy_reverification_item_id_1 = 'i4x://{}/{}/edx-reverification-block/related_assessment_1'.format(
+            self.course.location.org,
+            self.course.location.course
+        )
+        self.dummy_reverification_item_id_2 = 'i4x://{}/{}/edx-reverification-block/related_assessment_2'.format(
+            self.course.location.org,
+            self.course.location.course
+        )
 
     @ddt.data('submitted', "approved", "denied", "error")
     def test_add_verification_status(self, status):
-        """adding verfication status using the class method."""
+        """ Adding verification status using the class method. """
 
         # adding verification status
-        VerificationStatus.add_verification_status(checkpoint=self.check_point1, user=self.user, status=status)
+        VerificationStatus.add_verification_status(
+            checkpoint=self.check_point1,
+            user=self.user,
+            status=status,
+            location_id=self.dummy_reverification_item_id_1
+        )
 
         # getting the status from db
         result = VerificationStatus.objects.filter(checkpoint=self.check_point1)[0]
         self.assertEqual(result.status, status)
         self.assertEqual(result.user, self.user)
 
-    @ddt.data('submitted', "approved", "denied", "error")
+    @ddt.data("approved", "denied", "error")
     def test_add_status_from_checkpoints(self, status):
-        """adding verfication status for checkpoints list."""
+        """ Adding verification status for checkpoints list after submitting sspv. """
 
-        # adding verification status with multiple points
+        # add initial verification status for checkpoints
+        initial_status = "submitted"
+        VerificationStatus.add_verification_status(
+            checkpoint=self.check_point1,
+            user=self.user,
+            status=initial_status,
+            location_id=self.dummy_reverification_item_id_1
+        )
+        VerificationStatus.add_verification_status(
+            checkpoint=self.check_point2,
+            user=self.user,
+            status=initial_status,
+            location_id=self.dummy_reverification_item_id_2
+        )
+
+        # now add verification status for multiple checkpoint points
         VerificationStatus.add_status_from_checkpoints(
             checkpoints=[self.check_point1, self.check_point2], user=self.user, status=status
         )
 
-        # getting the status from db.
-        result = VerificationStatus.objects.filter(user=self.user)
-        self.assertEqual(len(result), len([self.check_point1.checkpoint_name, self.check_point2.checkpoint_name]))
-        self.assertEqual(result[0].checkpoint.checkpoint_name, self.check_point1.checkpoint_name)
-        self.assertEqual(result[1].checkpoint.checkpoint_name, self.check_point2.checkpoint_name)
+        # test that verification status entries with new status have been added
+        # for both checkpoints and all entries have related 'location_id'.
+        result = VerificationStatus.objects.filter(user=self.user, checkpoint=self.check_point1)
+        self.assertEqual(len(result), len(self.check_point1.checkpoint_status.all()))
+        self.assertEqual(
+            list(result.values_list('location_id', flat=True)),
+            list(self.check_point1.checkpoint_status.all().values_list('location_id', flat=True))
+        )
+        result = VerificationStatus.objects.filter(user=self.user, checkpoint=self.check_point2)
+        self.assertEqual(len(result), len(self.check_point2.checkpoint_status.all()))
+        self.assertEqual(
+            list(result.values_list('location_id', flat=True)),
+            list(self.check_point2.checkpoint_status.all().values_list('location_id', flat=True))
+        )
 
 
 class SkippedReverificationTest(ModuleStoreTestCase):
