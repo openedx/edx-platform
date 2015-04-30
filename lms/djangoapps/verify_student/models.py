@@ -1028,7 +1028,7 @@ class VerificationStatus(models.Model):
         get_latest_by = "timestamp"
 
     @classmethod
-    def add_verification_status(cls, checkpoint, user, status, location_id=''):
+    def add_verification_status(cls, checkpoint, user, status, location_id=None):
         """ Create new verification status object
 
         Arguments:
@@ -1058,9 +1058,33 @@ class VerificationStatus(models.Model):
             try:
                 location_id = cls.objects.filter(checkpoint=checkpoint).latest().location_id
             except cls.DoesNotExist:
-                location_id = ''
+                location_id = None
 
             cls.objects.create(checkpoint=checkpoint, user=user, status=status, location_id=location_id)
+
+    @classmethod
+    def get_user_attempts(cls, user_id, course_key, related_assessment, location_id):
+        """
+        Get re-verification attempts against a user for a given 'checkpoint'
+        and 'course_id'.
+
+        Arguments:
+            user_id(str): User Id string
+            course_key(str): A CourseKey of a course
+            related_assessment(str): Verification checkpoint name
+            location_id(str): Location of Reverification XBlock in courseware
+
+        Returns:
+            count of re-verification attempts
+        """
+
+        return cls.objects.filter(
+            user_id=user_id,
+            checkpoint__course_id=course_key,
+            checkpoint__checkpoint_name=related_assessment,
+            location_id=location_id,
+            status="submitted"
+        ).count()
 
 
 class InCourseReverificationConfiguration(ConfigurationModel):
