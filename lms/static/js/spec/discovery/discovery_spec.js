@@ -18,7 +18,7 @@ define([
     TemplateHelpers,
     App,
     Collection,
-    SearchForm,
+    DiscoveryForm,
     ResultItem,
     ResultItemView,
     ResultListView
@@ -188,6 +188,59 @@ define([
         });
 
     });
+
+
+    describe('DiscoveryForm', function () {
+
+        beforeEach(function () {
+            loadFixtures('js/fixtures/discovery.html');
+            TemplateHelpers.installTemplates([
+                'templates/discovery/not_found',
+                'templates/discovery/error'
+            ]);
+            this.form = new DiscoveryForm();
+            this.onSearch = jasmine.createSpy('onSearch');
+            this.form.on('search', this.onSearch);
+        });
+
+        it('trims input string', function () {
+            var term = '  search string  ';
+            $('.discovery-input').val(term);
+            $('form').trigger('submit');
+            expect(this.onSearch).toHaveBeenCalledWith($.trim(term));
+        });
+
+        it('handles calls to doSearch', function () {
+            var term = '  search string  ';
+            $('.discovery-input').val(term);
+            this.form.doSearch(term);
+            expect(this.onSearch).toHaveBeenCalledWith($.trim(term));
+            expect($('.discovery-input').val()).toEqual(term);
+            expect($('#discovery-message')).toBeEmpty();
+        });
+
+        it('clears search', function () {
+            $('.discovery-input').val('somethig');
+            this.form.clearSearch();
+            expect($('.discovery-input').val()).toEqual('');
+        });
+
+        it('shows/hides loading indicator', function () {
+            this.form.showLoadingIndicator();
+            expect($('#loading-indicator')).not.toHaveClass('hidden');
+            this.form.hideLoadingIndicator();
+            expect($('#loading-indicator')).toHaveClass('hidden');
+        });
+
+        it('shows messages', function () {
+            this.form.showNotFoundMessage();
+            expect($('#discovery-message')).not.toBeEmpty();
+            this.form.showErrorMessage();
+            expect($('#discovery-message')).not.toBeEmpty();
+        });
+
+    });
+
 
 
 
