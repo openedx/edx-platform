@@ -20,7 +20,7 @@ from django.http import (
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from django.views.generic.base import View
+from django.views.generic.base import View, RedirectView
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.contrib.auth.decorators import login_required
@@ -473,10 +473,9 @@ class PayAndVerifyView(View):
                 url = reverse('verify_student_start_flow', kwargs=course_kwargs)
         elif message == self.UPGRADE_MSG:
             if is_enrolled:
-                # If upgrading and we've paid but haven't verified,
-                # then the "verify later" messaging makes more sense.
                 if already_paid:
-                    url = reverse('verify_student_verify_later', kwargs=course_kwargs)
+                    # If the student has paid, but not verified, redirect to the verification flow.
+                    url = reverse('verify_student_verify_now', kwargs=course_kwargs)
             else:
                 url = reverse('verify_student_start_flow', kwargs=course_kwargs)
 
@@ -1205,7 +1204,7 @@ class InCourseReverifyView(View):
 
         Returns:
             HttpResponse with status_code 400 if photo is missing or any error
-            or redirect to verify_student_verify_later url if initial verification doesn't exist otherwise
+            or redirect to the verification flow if initial verification doesn't exist otherwise
             HttpsResponse with status code 200
         """
         # Check the in-course re-verification is enabled or not
@@ -1330,4 +1329,12 @@ class InCourseReverifyView(View):
             u"for the course %s.",
             user.id, course_key
         )
-        return redirect(reverse('verify_student_verify_later', kwargs={'course_id': unicode(course_key)}))
+        return redirect(reverse('verify_student_verify_now', kwargs={'course_id': unicode(course_key)}))
+
+
+class VerifyLaterView(RedirectView):
+    """ This view has been deprecated and should redirect to the unified verification flow. """
+    permanent = True
+
+    def get_redirect_url(self, course_id, **kwargs):    # pylint: disable=unused-argument
+        return reverse('verify_student_verify_now', kwargs={'course_id': unicode(course_id)})
