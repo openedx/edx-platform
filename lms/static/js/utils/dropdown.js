@@ -61,8 +61,8 @@ var edx = edx || {},
 
                     open.parent()
                         .find(that.opts.button)
-                            .removeClass(that.opts.button_active)
-                                .attr('aria-expanded', 'false');
+                        .removeClass(that.opts.button_active)
+                        .attr('aria-expanded', 'false');
                 }
             },
 
@@ -77,8 +77,8 @@ var edx = edx || {},
 
                     open.parent()
                         .find(that.opts.button)
-                            .removeClass(that.opts.button_active)
-                                .attr('aria-expanded', 'false');
+                        .removeClass(that.opts.button_active)
+                        .attr('aria-expanded', 'false');
                 }
             },
 
@@ -90,9 +90,9 @@ var edx = edx || {},
                 } else {
                     el.parent()
                         .find(that.opts.menu)
-                            .removeClass(that.opts.menu_inactive)
-                            .addClass(that.opts.menu_active)
-                                .focus();
+                        .removeClass(that.opts.menu_inactive)
+                        .addClass(that.opts.menu_active)
+                        .focus();
 
                     el.addClass(that.opts.button_active)
                         .attr('aria-expanded', 'true');

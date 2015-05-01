@@ -105,53 +105,62 @@
     <a class="nav-skip sr" id="after-transcript_${id}" href="#before-transcript_${id}">${_('Go back to start of transcript.')}</a>
 
     <div class="focus_grabber last"></div>
-  <ul class="wrapper-downloads">
-    % if download_video_link:
+    <ul class="wrapper-downloads">
+      % if download_video_link:
         <li class="video-sources video-download-button">
             <a href="${download_video_link}">${_('Download video')}</a>
         </li>
-    % endif
-    % if track:
+      % endif
+
+      % if track:
         <li class="video-tracks video-download-button">
           % if transcript_download_format:
-            <a href="${track}">${_('Download transcript')}</a>
-            <div class="a11y-menu-container">
-                <a class="a11y-menu-button" href="#" title="${'.' + transcript_download_format}">${'.' + transcript_download_format}</a>
-                <ol class="a11y-menu-list">
-                % for item in transcript_download_formats_list:
-                  % if item['value'] == transcript_download_format:
-                  <li class="a11y-menu-item active">
-                  % else:
-                  <li class="a11y-menu-item">
-                  % endif
-                  ## This is necessary so we don't scrape 'display_name' as a string.
-                  <% dname = item['display_name'] %>
-                      <a class="a11y-menu-item-link" href="#${item['value']}" title="${_(dname)}" data-value="${item['value']}">
-                        ${_(dname)}
-                      </a>
-                  </li>
-                % endfor
-                </ol>
-            </div>
+
+          <div class="wrapper-more-actions">
+            <button type="button" class="button button-more has-dropdown" aria-haspopup="true" aria-expanded="false" aria-controls="dropdown-transcript-format">
+                <span class="icon fa fa-sort-desc" aria-hidden="true"></span>
+                <span class="sr">${_('Transcript download format')}</span>
+            </button>
+            <ul class="dropdown is-hidden" id="dropdown-transcript-format" tabindex="-1">
+              % for item in transcript_download_formats_list:
+                % if item['value'] == transcript_download_format:
+                <li class="dropdown-item active">
+                % else:
+                <li class="dropdown-item">
+                % endif
+
+                ## This is necessary so we don't scrape 'display_name' as a string.
+                <% dname = item['display_name'] %>
+                  <a class="action" href="#${item['value']}" title="${_(dname)}" data-value="${item['value']}">
+                    ${_(dname)}
+                  </a>
+                </li>
+              % endfor
+            </ul>
+          </div>
+
+          <a class="download-link" href="${track}">${_('Download transcript')}</a>
+
           % else:
             <a href="${track}" class="external-track">${_('Download transcript')}</a>
           % endif
         </li>
-    % endif
-    % if handout:
+      % endif
+
+      % if handout:
         <li class="video-handout video-download-button">
             <a href="${handout}" target="_blank">${_('Download Handout')}</a>
         </li>
-    % endif
+      % endif
 
-    % if branding_info:
-      <li id="branding" class="branding">
-        <span class="host-tag">${branding_info['logo_tag']}</span>
-        <a href="${branding_info['url']}" target="_blank" title="${branding_info['logo_tag']}"><img class="brand-logo" src="${branding_info['logo_src']}" alt="${branding_info['logo_tag']}" /></a>
-      </li>
-    % endif
-  </ul>
-</div>
+      % if branding_info:
+        <li id="branding" class="branding">
+          <span class="host-tag">${branding_info['logo_tag']}</span>
+          <a href="${branding_info['url']}" target="_blank" title="${branding_info['logo_tag']}"><img class="brand-logo" src="${branding_info['logo_src']}" alt="${branding_info['logo_tag']}" /></a>
+        </li>
+      % endif
+    </ul>
+  </div>
 % if cdn_eval:
 <script>
   function sendPerformanceBeacon(id, expgroup, value, event_name) {

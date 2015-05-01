@@ -55,13 +55,18 @@ div.video {
         float: left;
         border-radius: 3px;
         background-color: $very-light-text;
-        padding: ($baseline*0.75);
+        padding: ($baseline*0.65);
         color: $lighter-base-font-color;
 
         &:hover, &:focus {
           background-color: $action-primary-active-bg;
           color: $very-light-text;
         }
+      }
+
+      .button-more {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
       }
     }
     .video-tracks {
