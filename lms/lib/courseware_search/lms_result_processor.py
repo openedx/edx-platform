@@ -13,8 +13,6 @@ from xmodule.modulestore.search import path_to_location, navigation_index
 
 from courseware.access import has_access
 
-UNNAMED_MODULE_NAME = _("(Unnamed)")
-
 
 class LmsSearchResultProcessor(SearchResultProcessor):
 
@@ -61,51 +59,6 @@ class LmsSearchResultProcessor(SearchResultProcessor):
             "jump_to",
             kwargs={"course_id": self._results_fields["course"], "location": self._results_fields["id"]}
         )
-
-    @property
-    def course_name(self):
-        """
-        Display the course name when searching multiple courses - retain result for subsequent uses
-        """
-        if self._course_name is None:
-            course = self.get_module_store().get_course(self.get_course_key())
-            self._course_name = course.display_name_with_default
-        return self._course_name
-
-    @property
-    def location(self):
-        """
-        Blend "location" property into the resultset, so that the path to the found component can be shown within the UI
-        """
-        # TODO: update whern changes to "cohorted-courseware" branch are merged in
-        (course_key, chapter, section, position) = path_to_location(self.get_module_store(), self.get_usage_key())
-
-        def get_display_name(item_key):
-            """ gets display name from object's key """
-            item = self.get_item(item_key)
-            display_name = getattr(item, "display_name", None)
-            return display_name if display_name else UNNAMED_MODULE_NAME
-
-        def get_position_name(section, position):
-            """ helper to fetch name corresponding to the position therein """
-            if position:
-                section_item = self.get_item(course_key.make_usage_key("sequential", section))
-                if section_item.has_children and len(section_item.children) >= position:
-                    return get_display_name(section_item.children[position - 1])
-            return None
-
-        location_description = []
-        if chapter:
-            location_description.append(get_display_name(course_key.make_usage_key("chapter", chapter)))
-        if section:
-            location_description.append(get_display_name(course_key.make_usage_key("sequential", section)))
-        if position:
-            # We're only wanting to show the first vertical, so we use the
-            # navigation_index function to display the same location to which one
-            # would be sent if navigating
-            location_description.append(get_position_name(section, navigation_index(position)))
-
-        return location_description
 
     def should_remove(self, user):
         """ Test to see if this result should be removed due to access restriction """
