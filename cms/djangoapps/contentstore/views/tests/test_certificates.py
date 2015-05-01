@@ -22,15 +22,24 @@ class HelperMethods(object):
     """
     Mixin that provides useful methods for certificate configuration tests.
     """
-    def _add_course_certificates(self, count=1):
+    def _add_course_certificates(self, count=1, signatory_count=0):
         """
         Create certificate for the course.
         """
+        signatories = [
+            {
+                'name': 'Name ' + str(i),
+                'title': 'Title ' + str(i),
+            } for i in xrange(0, signatory_count)
+
+        ]
+
         certificates = [
             {
                 'id': i,
                 'name': 'Name ' + str(i),
                 'description': 'Description ' + str(i),
+                'signatories': signatories,
                 'version': CERTIFICATE_SCHEMA_VERSION
             } for i in xrange(0, count)
         ]
@@ -153,7 +162,8 @@ class CertificatesListHandlerTestCase(CourseTestCase, CertificatesBaseTestCase, 
         expected = {
             u'version': CERTIFICATE_SCHEMA_VERSION,
             u'name': u'Test certificate',
-            u'description': u'Test description'
+            u'description': u'Test description',
+            u'signatories': []
         }
         response = self.client.ajax_post(
             self._url(),
@@ -228,7 +238,8 @@ class CertificatesListHandlerTestCase(CourseTestCase, CertificatesBaseTestCase, 
         json_data = {
             u'version': CERTIFICATE_SCHEMA_VERSION,
             u'name': u'New test certificate',
-            u'description': u'New test description'
+            u'description': u'New test description',
+            u'signatories': []
         }
 
         response = self.client.post(
@@ -270,7 +281,8 @@ class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase
             u'id': 666,
             u'version': CERTIFICATE_SCHEMA_VERSION,
             u'name': u'Test certificate',
-            u'description': u'Test description'
+            u'description': u'Test description',
+            u'signatories': []
         }
 
         response = self.client.put(
@@ -293,7 +305,8 @@ class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase
             u'id': 1,
             u'version': CERTIFICATE_SCHEMA_VERSION,
             u'name': u'New test certificate',
-            u'description': u'New test description'
+            u'description': u'New test description',
+            u'signatories': []
         }
 
         response = self.client.put(
@@ -339,6 +352,39 @@ class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase
         self._add_course_certificates(count=2)
         response = self.client.delete(
             self._url(cid=100),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 404)
+
+
+    def test_can_delete_signatory(self):
+        """
+        Delete an existing certificate signatory
+        """
+        self._add_course_certificates(count=2, signatory_count=3)
+        test_url = '{}/signatories/1'.format(self._url(cid=1))
+        response = self.client.delete(
+            test_url,
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 204)
+        self.reload_course()
+        # Verify that certificates are properly updated in the course.
+        certificates = self.course.certificates['certificates']
+        self.assertEqual(len(certificates[1].get("signatories")), 2)
+
+    def test_delete_signatory_non_existing_certificate(self):
+        """
+        Try to delete a non existing certificate signatory. It should return status code 404 Not found.
+        """
+        self._add_course_certificates(count=2)
+        test_url = '{}/signatories/1'.format(self._url(cid=100))
+        response = self.client.delete(
+            test_url,
             content_type="application/json",
             HTTP_ACCEPT="application/json",
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",

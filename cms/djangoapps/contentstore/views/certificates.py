@@ -64,6 +64,8 @@ class CertificateManager(object):
         except ValueError:
             raise CertificateValidationError(_("invalid JSON"))
         certificate["version"] = CERTIFICATE_SCHEMA_VERSION
+        if certificate.get("signatories") is None:
+            certificate["signatories"] = []
         return certificate
 
     @staticmethod
@@ -170,6 +172,21 @@ class CertificateManager(object):
                 break
         return JsonResponse(status=204)
 
+    @staticmethod
+    def remove_signatory(request, store, course, certificate_id, signatory_id):
+        """
+        Remove the specified signatory from the specified course certificate
+        Currently the 'signatory_id' is simply the index value of the signatories array
+        """
+        for cert_index, cert in enumerate(course.certificates['certificates']):
+            if int(cert['id']) == int(certificate_id):
+                for sig_index, signatory in enumerate(cert.get('signatories')):
+                    if int(signatory_id) == int(sig_index):
+                        del cert['signatories'][sig_index]
+                        store.update_item(course, request.user.id)
+                        break
+        return JsonResponse(status=204)
+
 
 class Certificate(object):
     """
@@ -264,11 +281,7 @@ def certificates_detail_handler(request, course_key_string, certificate_id):
     store = modulestore()
     with store.bulk_operations(course_key):
         course = get_course_and_check_access(course_key, request.user)
-        certificates_list = []
-        if course.certificates.get('certificates') is not None:
-            certificates_list = course.certificates['certificates']
-        else:
-            course.certificates['certificates'] = []
+        certificates_list = course.certificates['certificates']
 
         match_index = None
         match_cert = None
@@ -301,4 +314,43 @@ def certificates_detail_handler(request, course_key_string, certificate_id):
                 store=store,
                 course=course,
                 certificate_id=certificate_id
+            )
+
+
+@csrf_exempt
+@login_required
+#@ensure_csrf_cookie
+@require_http_methods(("POST", "PUT", "DELETE"))
+def signatory_detail_handler(request, course_key_string, certificate_id, signatory_id):
+    """
+    JSON API endpoint for manipulating a specific course certificate signatory via its internal ID.
+    Used by the Backbone application.
+
+    POST or PUT
+        json: update certificate signatory based on provided information
+    """
+    course_key = CourseKey.from_string(course_key_string)
+    store = modulestore()
+    with store.bulk_operations(course_key):
+        course = get_course_and_check_access(course_key, request.user)
+        certificates_list = course.certificates['certificates']
+
+        match_index = None
+        match_cert = None
+        for index, cert in enumerate(certificates_list):
+            if certificate_id is not None:
+                if int(cert['id']) == int(certificate_id):
+                    match_index = index
+                    match_cert = cert
+
+        if request.method == "DELETE":
+            if not match_cert:
+                return JsonResponse(status=404)
+
+            return CertificateManager.remove_signatory(
+                request=request,
+                store=store,
+                course=course,
+                certificate_id=certificate_id,
+                signatory_id=signatory_id
             )
