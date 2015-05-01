@@ -1,7 +1,7 @@
 # Custom requirements to be customized by individual OpenEdX instances
 
--e git+https://github.com/edx/xblock-utils.git@b2a17fa3793e98e67bdb86273317c41b6297dcbb#egg=xblock-utils
--e git+https://github.com/edx-solutions/xblock-mentoring.git@77e355a1401f914bee060de7f11b6d54966f2146#egg=xblock-mentoring
+-e git+https://github.com/edx/xblock-utils.git@a0e77eeb4eb971ac57243fe1056dd8db6806f514#egg=xblock-utils
+-e git+https://github.com/edx-solutions/xblock-mentoring.git@5bf410d26d80b1472c9cf60677f869a5f946a47#1egg=xblock-mentoring
 -e git+https://github.com/edx-solutions/xblock-image-explorer.git@21b9bcc4f2c7917463ab18a596161ac6c58c9c4a#egg=xblock-image-explorer
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop.git@92ee2055a16899090a073e1df81e35d5293ad767#egg=xblock-drag-and-drop
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@ed24dbef753e411f2c9b17339ae21f3a89a8531c#egg=xblock-drag-and-drop-v2
@@ -11,4 +11,4 @@
 -e git+https://github.com/mckinseyacademy/xblock-poll.git@ca0e6eb4ef10c128d573c3cec015dcfee7984730#egg=xblock-poll
 -e git+https://github.com/OfficeDev/xblock-officemix/@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock_officemix-master
 -e git+https://github.com/edx/edx-notifications.git@1496385f16d2571bc5d958c17e30f3eac3869b8e#egg=edx-notifications
--e git+https://github.com/open-craft/problem-builder.git@1d5391df41a459d8817b513bd2f3fb670c2e18a0#egg=problem-builder
+-e git+https://github.com/open-craft/problem-builder.git@4d76960af3e4625228eeb2359d915ba5b54156f4#egg=problem-builder
