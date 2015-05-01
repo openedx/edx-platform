@@ -1,6 +1,5 @@
-(function (WAIT_TIMEOUT) {
+(function () {
     'use strict';
-
     describe('VideoSkipControl', function () {
         var state, oldOTBD;
 
@@ -52,6 +51,5 @@
             state.bumperState.videoPlaySkipControl.destroy();
             expect(state.bumperState.videoPlaySkipControl).toBeUndefined();
         });
-
     });
-}).call(this, window.WAIT_TIMEOUT);
+}).call(this);

@@ -1,6 +1,5 @@
 (function () {
     'use strict';
-
     describe('VideoPlaySkipControl', function () {
         var state, oldOTBD;
 
@@ -61,6 +60,5 @@
             expect(el).not.toExist();
             expect($.fn.off).toHaveBeenCalledWith('destroy', plugin.destroy);
         });
-
     });
 }).call(this);

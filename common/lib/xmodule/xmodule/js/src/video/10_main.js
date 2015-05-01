@@ -1,6 +1,5 @@
 (function (require, $) {
     'use strict';
-
     // In the case when the Video constructor will be called before RequireJS finishes loading all of the Video
     // dependencies, we will have a mock function that will collect all the elements that must be initialized as
     // Video elements.
@@ -58,13 +57,10 @@
             'video/095_video_context_menu.js'
         ],
         function (
-            VideoStorage,
-            initialize, FocusGrabber, VideoAccessibleMenu, VideoControl,
-            VideoFullScreen, VideoQualityControl, VideoProgressSlider,
-            VideoVolumeControl, VideoSpeedControl, VideoCaption,
-            VideoPlayPlaceholder, VideoPlayPauseControl, VideoPlaySkipControl,
-            VideoSkipControl, VideoBumper, VideoSaveStatePlugin,
-            VideoEventsPlugin, VideoPoster, VideoCommands, VideoContextMenu
+            VideoStorage, initialize, FocusGrabber, VideoAccessibleMenu, VideoControl, VideoFullScreen,
+            VideoQualityControl, VideoProgressSlider, VideoVolumeControl, VideoSpeedControl, VideoCaption,
+            VideoPlayPlaceholder, VideoPlayPauseControl, VideoPlaySkipControl, VideoSkipControl, VideoBumper,
+            VideoSaveStatePlugin, VideoEventsPlugin, VideoPoster, VideoCommands, VideoContextMenu
         ) {
             var youtubeXhr = null,
                 oldVideo = window.Video;
@@ -103,7 +99,7 @@
                     bumperState.options = {
                         SaveStatePlugin: {events: ['transcript_download:change', 'language_menu:change']},
                         EventsPlugin: {data: {is_bumper: true}}
-                    }
+                    };
                     return bumperState;
                 };
 
@@ -143,12 +139,10 @@
                 }
 
                 el.data('video-player-state', state);
-
                 var onSequenceChange = function onSequenceChange () {
                     if (state && state.videoPlayer) {
                         state.videoPlayer.destroy();
                     }
-
                     $('.sequence').off('sequence:change', onSequenceChange);
                 };
                 $('.sequence').on('sequence:change', onSequenceChange);

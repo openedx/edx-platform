@@ -1,11 +1,8 @@
 (function(define) {
 'use strict';
-// VideoPlayPlaceholder module.
-define(
-'video/09_play_placeholder.js', [],
-function() {
+define('video/09_play_placeholder.js', [], function() {
     /**
-     * Video volume control module.
+     * Play placeholder control module.
      * @exports video/09_play_placeholder.js
      * @constructor
      * @param {Object} state The object containing the state of the video
@@ -39,7 +36,7 @@ function() {
         },
 
         shouldBeShown: function () {
-            return /iPad|Android/i.test(this.state.isTouch[0]) && !this.state.isYoutubeType()
+            return /iPad|Android/i.test(this.state.isTouch[0]) && !this.state.isYoutubeType();
         },
 
         /** Initializes the module. */

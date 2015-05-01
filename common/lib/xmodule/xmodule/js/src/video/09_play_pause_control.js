@@ -1,11 +1,8 @@
 (function(define) {
 'use strict';
-// VideoPlayPauseControl module.
-define(
-'video/09_play_pause_control.js', [],
-function() {
+define('video/09_play_pause_control.js', [], function() {
     /**
-     * Video volume control module.
+     * Play/pause control module.
      * @exports video/09_play_pause_control.js
      * @constructor
      * @param {Object} state The object containing the state of the video

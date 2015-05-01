@@ -1,6 +1,5 @@
-(function (WAIT_TIMEOUT) {
+(function () {
     'use strict';
-
     describe('VideoPlayPauseControl', function () {
         var state, oldOTBD;
 
@@ -56,7 +55,6 @@
             expect(state.videoSaveStatePlugin.saveState).toHaveBeenCalledWith(true);
         });
 
-
         it('can start video playing on click', function () {
             $('.video_control.play').click();
             expect(state.videoCommands.execute).toHaveBeenCalledWith('togglePlayback');
@@ -66,6 +64,5 @@
             state.videoPlayPauseControl.destroy();
             expect(state.videoPlayPauseControl).toBeUndefined();
         });
-
     });
-}).call(this, window.WAIT_TIMEOUT);
+}).call(this);

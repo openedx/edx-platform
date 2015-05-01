@@ -1,6 +1,5 @@
-(function (WAIT_TIMEOUT) {
+(function () {
     'use strict';
-
     describe('VideoPlayPlaceholder', function () {
         var state, oldOTBD;
 
@@ -42,7 +41,6 @@
 
         beforeEach(function () {
             jasmine.stubRequests();
-
             spyOn(window.YT, 'Player').andCallThrough();
         });
 
@@ -105,7 +103,6 @@
 
                 state.el.trigger('play');
                 state.el.trigger('pause');
-
                 expect(btnPlay).not.toHaveClass('is-hidden');
             });
 
@@ -121,7 +118,6 @@
                 btnPlay = state.el.find('.btn-play');
 
                 state.el.trigger('play');
-
                 expect(btnPlay).toHaveClass('is-hidden');
             });
 
@@ -138,7 +134,6 @@
 
                 state.el.trigger('play');
                 state.el.trigger('pause');
-
                 expect(btnPlay).toHaveClass('is-hidden');
             });
         });
@@ -147,6 +142,5 @@
             state.videoPlayPlaceholder.destroy();
             expect(state.videoPlayPlaceholder).toBeUndefined();
         });
-
     });
-}).call(this, window.WAIT_TIMEOUT);
+}).call(this);

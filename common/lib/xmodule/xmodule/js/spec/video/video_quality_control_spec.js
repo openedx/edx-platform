@@ -1,6 +1,6 @@
 (function (undefined) {
     describe('VideoQualityControl', function () {
-        var state, qualityControl, qualityControlEl, videoPlayer, player;
+        var state, qualityControl, videoPlayer, player;
 
         afterEach(function () {
             $('source').remove();

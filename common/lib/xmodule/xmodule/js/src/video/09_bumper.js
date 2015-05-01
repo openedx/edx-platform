@@ -1,22 +1,13 @@
 (function (define) {
 'use strict';
-// VideoCaption module.
-define(
-'video/09_bumper.js',
-[], function () {
+define('video/09_bumper.js',[], function () {
     /**
-     * VideoBumper module exports a function.
-     *
-     * @type {function}
-     * @access public
-     *
-     * @param {object} state - The object containing the state of the video
-     *     player. All other modules, their parameters, public variables, etc.
-     *     are available via this object.
-     *
-     * @this {object} The global window object.
-     *
-     * @returns {jquery Promise}
+     * VideoBumper module.
+     * @exports video/09_bumper.js
+     * @constructor
+     * @param {Object} player The player factory.
+     * @param {Object} state The object containing the state of the video
+     * @return {jquery Promise}
      */
     var VideoBumper = function (player, state) {
         if (!(this instanceof VideoBumper)) {
@@ -113,5 +104,4 @@ define(
 
     return VideoBumper;
 });
-
 }(RequireJS.define));

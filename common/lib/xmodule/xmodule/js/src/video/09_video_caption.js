@@ -1,5 +1,4 @@
 (function (define) {
-
 // VideoCaption module.
 define(
 'video/09_video_caption.js',
@@ -75,8 +74,7 @@ function (Sjson, AsyncProcess) {
         *
         */
         renderElements: function () {
-            var state = this.state,
-                languages = this.state.config.transcriptLanguages;
+            var languages = this.state.config.transcriptLanguages;
 
             this.loaded = false;
             this.subtitlesEl = $(this.template);
@@ -694,7 +692,7 @@ function (Sjson, AsyncProcess) {
         *
         */
         play: function () {
-            var startAndCaptions, start, end;
+            var captions, startAndCaptions, start;
             if (this.loaded) {
                 if (!this.rendered) {
                     startAndCaptions = this.getBoundedCaptions();
@@ -725,10 +723,7 @@ function (Sjson, AsyncProcess) {
         */
         updatePlayTime: function (time) {
             var state = this.state,
-                startTime,
-                endTime,
-                params,
-                newIndex;
+                params, newIndex;
 
             if (this.loaded) {
                 if (state.isFlashMode()) {

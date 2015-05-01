@@ -1,4 +1,5 @@
 (function (undefined) {
+    'use strict';
     describe('VideoPlayer Save State plugin', function () {
         var state, oldOTBD;
 
@@ -36,7 +37,6 @@
             // test completeness sake. Also, make sure it is float, as is the
             // time above.
             newCurrentTime = 5.4;
-
             speed = '0.75';
 
             beforeEach(function () {
@@ -123,8 +123,6 @@
                     }
                 });
             });
-
-            return;
 
             function itSpec(value) {
                 var asyncVal    = value.asyncVal,

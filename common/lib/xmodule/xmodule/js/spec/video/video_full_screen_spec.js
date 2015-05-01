@@ -1,6 +1,5 @@
-(function (WAIT_TIMEOUT) {
+(function () {
     'use strict';
-
     describe('VideoFullScreen', function () {
         var state, oldOTBD;
 
@@ -67,7 +66,7 @@
             });
 
             it('out of fullscreen by pressing esc', function () {
-                spyOn(state.videoCommands, 'execute')
+                spyOn(state.videoCommands, 'execute');
                 var esc = $.Event('keyup');
                 esc.keyCode = 27;
                 state.isFullScreen = true;
@@ -92,4 +91,4 @@
             expect(state.videoFullScreen.height).toBe(150);
         });
     });
-}).call(this, window.WAIT_TIMEOUT);
+}).call(this);

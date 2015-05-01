@@ -1,5 +1,4 @@
 (function (requirejs, require, define, undefined) {
-
 'use strict';
 
 require(

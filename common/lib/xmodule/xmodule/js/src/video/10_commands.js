@@ -1,11 +1,8 @@
 (function(define) {
 'use strict';
-// VideoCommands module.
 define('video/10_commands.js', [], function() {
     var VideoCommands, Command, playCommand, pauseCommand, togglePlaybackCommand,
-        muteCommand, unmuteCommand, toggleMuteCommand, toggleFullScreenCommand,
-        setSpeedCommand, skipCommand;
-
+        toggleMuteCommand, toggleFullScreenCommand, setSpeedCommand, skipCommand;
     /**
      * Video commands module.
      * @exports video/10_commands.js

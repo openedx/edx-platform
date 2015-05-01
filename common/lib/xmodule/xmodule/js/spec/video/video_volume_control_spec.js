@@ -292,7 +292,7 @@ describe('VideoVolumeControl', function () {
                 shiftKey: true
             });
         });
-    })
+    });
 
     describe('keyDownButtonHandler', function () {
         beforeEach(function () {
@@ -308,6 +308,6 @@ describe('VideoVolumeControl', function () {
             }));
             expect(volumeControl.getMuteStatus()).toEqual(isMuted);
         });
-    })
+    });
 });
 }).call(this);

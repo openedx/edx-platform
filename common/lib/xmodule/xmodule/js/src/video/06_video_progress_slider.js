@@ -120,7 +120,7 @@ function () {
     // whole slider). Remember that endTime === null means the end-time
     // is set to the end of video by default.
     function updateStartEndTimeRegion(params) {
-        var left, width, start, end, duration, rangeParams;
+        var start, end, duration, rangeParams;
 
         // We must have a duration in order to determine the area of range.
         // It also must be non-zero.

@@ -1,10 +1,6 @@
-(function (requirejs, require, define) {
-
-// VideoControl module.
-define(
-'video/04_video_full_screen.js',
-[],
-function () {
+(function (define) {
+'use strict';
+define('video/04_video_full_screen.js', [], function () {
     var template = [
         '<a href="#" class="add-fullscreen" title="',
             gettext('Fill browser'), '" role="button" aria-disabled="false">',
@@ -176,4 +172,4 @@ function () {
     }
 });
 
-}(RequireJS.requirejs, RequireJS.require, RequireJS.define));
+}(RequireJS.define));

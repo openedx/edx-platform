@@ -1,4 +1,5 @@
 (function (undefined) {
+    'use strict';
     describe('VideoPlayer Events plugin', function () {
         var state, oldOTBD;
 

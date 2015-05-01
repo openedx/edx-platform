@@ -1,25 +1,16 @@
 (function (define) {
-
-define(
-'video/09_poster.js',
-['video/00_resizer.js'], function (Resizer) {
+'use strict';
+define('video/09_poster.js', ['video/00_resizer.js'], function (Resizer) {
     /**
-     * VideoPoster module exports a function.
-     *
-     * @type {function}
-     * @access public
-     *
-     * @param {object} state - The object containing the state of the video
-     *     player. All other modules, their parameters, public variables, etc.
-     *     are available via this object.
-     *
-     * @this {object} The global window object.
-     *
-     * @returns {jquery Promise}
+     * Poster module.
+     * @exports video/09_play_skip_control.js
+     * @constructor
+     * @param {Object} element
+     * @param {Object} options
      */
     var VideoPoster = function (element, options) {
         if (!(this instanceof VideoPoster)) {
-            return new VideoPoster(state);
+            return new VideoPoster(element, options);
         }
 
         _.bindAll(this, 'onClick', 'destroy');
@@ -85,5 +76,4 @@ define(
 
     return VideoPoster;
 });
-
 }(RequireJS.define));
