@@ -4,6 +4,8 @@ Test courseware search
 import os
 import json
 
+from nose.plugins.attrib import attr
+
 from ..helpers import UniqueCourseTest
 from ...pages.common.logout import LogoutPage
 from ...pages.studio.utils import add_html_component, click_css, type_in_codemirror
@@ -14,6 +16,7 @@ from ...pages.lms.courseware_search import CoursewareSearchPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 
 
+@attr('shard_5')
 class CoursewareSearchTest(UniqueCourseTest):
     """
     Test courseware search.

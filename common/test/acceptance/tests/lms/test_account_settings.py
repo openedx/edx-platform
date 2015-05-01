@@ -3,6 +3,7 @@
 End-to-end tests for the Account Settings page.
 """
 from unittest import skip
+from nose.plugins.attrib import attr
 
 from bok_choy.web_app_test import WebAppTest
 
@@ -13,6 +14,7 @@ from ...pages.lms.dashboard import DashboardPage
 from ..helpers import EventsTestMixin
 
 
+@attr('shard_5')
 class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
     """
     Mixin with helper methods to test the account settings page.
@@ -57,6 +59,7 @@ class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
         )
 
 
+@attr('shard_5')
 class DashboardMenuTest(AccountSettingsTestMixin, WebAppTest):
     """
     Tests that the dashboard menu works correctly with the account settings page.
@@ -79,6 +82,7 @@ class DashboardMenuTest(AccountSettingsTestMixin, WebAppTest):
         dashboard_page.click_account_settings_link()
 
 
+@attr('shard_5')
 class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
     """
     Tests that verify behaviour of the Account Settings page.
