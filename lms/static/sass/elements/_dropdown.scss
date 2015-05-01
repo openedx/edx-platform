@@ -1,0 +1,105 @@
+.wrapper-more-actions {
+    @include float(right);
+    @include margin-right(($baseline/2));
+    display: inline-block;
+    position: relative;
+
+    .button-more.has-dropdown {
+        @extend %ui-depth2;
+        position: relative;
+        height: ($baseline*2);
+        width: ($baseline*2);
+        padding: 0;
+        border: 1px solid transparent;
+        background: $white;
+        box-shadow: none;
+        font-size: $body-font-size;
+        text-shadow: none;
+        line-height: ($baseline*2);
+
+        .icon {
+            color: $gray-l1;
+        }
+
+        &:hover,
+        &:focus {
+            background: $white;
+            border-color: $gray-l3;
+
+            .icon {
+                color: $gray-d3;
+            }
+        }
+
+        &.is-active {
+            border-width: 1px 1px 0 1px;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            border-color: $gray-l3;
+            background: $white;
+
+            .icon {
+                color: $gray-d3;
+            }
+        }
+
+        & + .dropdown {
+            @extend %ui-no-list;
+            @extend %ui-depth1;
+            position: absolute;
+            margin-top: -1px;
+            min-width: ($baseline*7.5);
+            max-width: ($baseline*12.5);
+            border: 1px solid $gray-l3;
+            border-radius: 3px;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            background: $white;
+            box-shadow: 0 2px 2px rgba(0, 0, 0, .15);
+            text-indent: 0;
+
+            &.is-hidden {
+                @extend %block-sr;
+            }
+
+            &.align-left {
+                // @include left(0);
+                left: 0;
+
+                &.control-text-align {
+                    @include text-align(left);
+                }
+            }
+
+            &.align-right {
+                // @include right(0);
+                right: 0;
+
+                &.control-text-align {
+                    @include text-align(right);
+                }
+            }
+
+            .dropdown-item {
+                @extend %ui-no-list;
+                display: block;
+                margin: 0;
+                padding: 0;;
+
+                .action {
+                    display: block;
+                    float: none;
+                    margin: 0;
+                    padding: ($baseline/2);
+                    border: 0;
+                    text-align: inherit;
+
+                    &:hover,
+                    &:focus {
+                        border: none;
+                    }
+                }
+            }
+        }
+    }
+}

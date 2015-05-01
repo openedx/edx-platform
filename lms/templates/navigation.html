@@ -87,14 +87,19 @@ site_status_msg = get_site_status_msg(course_id)
         </a>
       </li>
       <li class="primary">
-        <a href="#" class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span><i class="fa fa-sort-desc" aria-hidden="true"></i></a>
-        <ul class="dropdown-menu" aria-label="More Options" role="menu">
-          <%block name="navigation_dropdown_menu_links" >
-            <li><a href="${reverse('account_settings')}">${_("Account Settings")}</a></li>
-            <li><a href="${reverse('learner_profile', kwargs={'username': user.username})}">${_("My Profile")}</a></li>
-          </%block>
-          <li><a href="${reverse('logout')}" role="menuitem">${_("Sign Out")}</a></li>
-        </ul>
+        <div class="wrapper-more-actions">
+          <button type="button" class="button button-more has-dropdown" aria-haspopup="true" aria-expanded="false" aria-controls="dropdown-profile">
+            <span class="icon fa fa-sort-desc" aria-hidden="true"></span>
+            <span class="sr">${_('User options')}</span>
+          </button>
+          <ul class="dropdown is-hidden" id="dropdown-profile" tabindex="-1">
+            <%block name="navigation_dropdown_menu_links" >
+              <li class="dropdown-item"><a class="action" href="${reverse('account_settings')}">${_("Account Settings")}</a></li>
+              <li class="dropdown-item"><a class="action" href="${reverse('learner_profile', kwargs={'username': user.username})}">${_("My Profile")}</a></li>
+            </%block>
+            <li class="dropdown-item"><a class="action" href="${reverse('logout')}" role="menuitem">${_("Sign Out")}</a></li>
+          </ul>
+        </div>
       </li>
     </ol>
       % if should_display_shopping_cart_func(): # see shoppingcart.context_processor.user_has_cart_context_processor
