@@ -26,6 +26,22 @@ $baseline:               20;
 $baseline-vertical:      ($baseline*2);
 $baseline-horizontal:    $baseline;
 
+$susy: (
+    use-custom clearfix: true,
+    global-box-sizing: border-box,
+    math: fluid,
+    output: float,
+    columns: 12,
+    gutters: .5,
+    container: 1050px,
+);
+
+// grid - breakpoints
+$bp-small:  320px;
+$bp-medium: 768px;
+$bp-large:  1024px;
+$bp-huge:   1280px;
+
 // ----------------------------
 // #COLORS
 // ----------------------------

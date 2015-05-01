@@ -1,5 +1,7 @@
 // ------------------------------
 // edX Pattern Library: Variables (RTL-centric)
 
-// grid
-$default-layout-direction: RTL !global;
+// grid - configuration (susy-based)
+$susy: (
+    flow: rtl,
+);

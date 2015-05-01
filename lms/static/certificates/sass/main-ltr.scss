@@ -9,8 +9,14 @@
 // #VENDOR
 // ------------------------------
 @import '../../../../static/vendor/bourbon/bourbon';
-@import '../../../../static/vendor/neat/neat';
+@import '../../../../static/vendor/susy/susy';
+@import '../../../../static/vendor/breakpoint/breakpoint';
 @import '../../../../static/vendor/bi-app/bi-app-ltr';   // LTR support
+
+// ------------------------------
+// #UTILITIES
+// ------------------------------
+@import '../../../../static/edx-pl/sass/utilities/variables-ltr';
 
 // ------------------------------
 // #BUILD

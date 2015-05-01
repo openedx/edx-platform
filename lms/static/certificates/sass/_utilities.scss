@@ -3,27 +3,15 @@
 
 // About: configuration, functions, variables, mixins, and general helpers for rendering.
 
+// #CONFIG
+// #FUNCTIONS
+// #MIXINS
+// #HELPERS
+
 // ------------------------------
 // #CONFIG
 // ------------------------------
-$em-base: 16; // deliberately sets bourbon-based em-base (http://bourbon.io/docs/#em-base)
-
-
-// grid - settings
-$max-width:                     rem(1000); // override neat's default
-$grid-columns:                  12;
-$column:                        rem(65);
-$gutter:                        rem(20);
-
-$visual-grid:                   true !global;
-$visual-grid-index:             front !global;
-$visual-grid-color:             red !global;
-
-// grid - breakpoints
-$bp-small:                      new-breakpoint(320px, 4);
-$bp-medium:                     new-breakpoint(800px, 6);
-$bp-large:                      new-breakpoint(1000px, 12);
-$bp-huge:                       new-breakpoint(1200px, 12);
+$em-base:       16; // deliberately sets bourbon-based em-base (http://bourbon.io/docs/#em-base)
 
 // ------------------------------
 // #FUNCTIONS
@@ -36,3 +24,23 @@ $bp-huge:                       new-breakpoint(1200px, 12);
 // ------------------------------
 // #HELPERS
 // ------------------------------
+// don't link style me, bro!
+%reset-link {
+    border-bottom: none;
+    padding: 0;
+
+    &:hover, &:focus, &:active {
+        border-bottom: 0;
+    }
+}
+
+// visual dividers
+%divider-1 {
+    border-bottom-width: rem(4);
+    border-bottom-style: solid;
+}
+
+%divider-2 {
+    border-bottom-width: rem(2);
+    border-bottom-style: solid;
+}

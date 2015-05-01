@@ -3,6 +3,222 @@
 
 // About: styling for generic layouts and responsive support.
 
+// #BASE
+// #ACCOMPLISHMENT
+
 // ------------------------------
 // #BASE
 // ------------------------------
+%layout-wrapper {
+    margin-bottom: spacing-vertical(base);
+    padding: 0 gutter();
+}
+
+%layout {
+    @include container();
+}
+
+// app header
+.wrapper-header {
+    @extend %layout-wrapper;
+    padding-top: spacing-vertical(small);
+    padding-bottom: spacing-vertical(small);
+}
+
+.header-app {
+    @extend %layout;
+
+    .logo {
+        @include span(2 first);
+
+        @include susy-breakpoint($bp-huge, $susy) {
+            @include span(1 first);
+        }
+    }
+}
+
+.header-app-title {
+    margin: 0;
+}
+
+// banner
+.wrapper-banner {
+    @extend %layout-wrapper;
+
+    .banner {
+        @extend %layout;
+    }
+}
+
+// app footer
+.wrapper-footer {
+    @extend %layout-wrapper;
+}
+
+.footer-app {
+    @extend %layout;
+}
+
+.footer-app-copyright {
+
+    @include susy-breakpoint($bp-medium, $susy) {
+        @include span(6 first);
+        margin-bottom: 0;
+    }
+}
+
+.footer-app-nav {
+
+    @include susy-breakpoint($bp-medium, $susy) {
+        @include span(6 last);
+    }
+
+    .list-legal {
+
+        @include susy-breakpoint($bp-medium, $susy) {
+            text-align: right;
+        }
+    }
+}
+
+// ------------------------------
+// #ACCOMPLISHMENT
+// ------------------------------
+.layout-accomplishment {
+
+    .wrapper-introduction {
+        @extend %layout-wrapper;
+
+        .introduction {
+            @extend %layout;
+        }
+    }
+
+    .wrapper-accomplishment-rendering {
+        @extend %layout-wrapper;
+        margin-bottom: spacing-vertical(x-small);
+
+        .accomplishment-rendering {
+            @extend %layout;
+            position: relative;
+            top: -(spacing-vertical(base));
+        }
+    }
+
+    .accomplishment-orgs {
+        display: table;
+
+        .organization {
+            @include gallery(6);
+            display: table-row;
+            margin-bottom: spacing-vertical(small);
+            text-align: center;
+            height: rem(100);
+
+            @include susy-breakpoint($bp-medium, $susy) {
+                @include gallery(4);
+            }
+
+            @include susy-breakpoint($bp-large, $susy) {
+                @include gallery(3);
+            }
+
+            @include susy-breakpoint($bp-huge, $susy) {
+                @include gallery(3);
+            }
+
+            .organization-logo {
+                display: table-cell;
+                vertical-align: middle;
+                max-width: 75%;
+                margin: auto;
+            }
+        }
+    }
+
+    .accomplishment-signatories {
+
+        .signatory {
+            @include gallery(6);
+            margin-bottom: spacing-vertical(small);
+            position: relative;
+
+            @include susy-breakpoint($bp-medium, $susy) {
+                @include gallery(4);
+            }
+
+            @include susy-breakpoint($bp-large, $susy) {
+                @include gallery(3);
+            }
+
+            @include susy-breakpoint($bp-huge, $susy) {
+                @include gallery(3);
+            }
+
+            .signatory-signature {
+                position: relative;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%,-50%);
+                width: 75%;
+            }
+        }
+    }
+
+    .wrapper-accomplishment-metadata {
+        @extend %layout-wrapper;
+
+        .accomplishment-metadata {
+            @extend %layout;
+        }
+
+        .wrapper-metadata .metadata {
+            @extend %divider-2;
+            margin-bottom: spacing-vertical(small);
+            border-bottom-color: palette(grayscale, x-light);
+            padding-bottom: spacing-vertical(small);
+
+            &:last-child {
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+
+            @include susy-breakpoint($bp-large, $susy) {
+                @include gallery(6);
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+        }
+    }
+
+    .wrapper-accomplishment-related {
+        @extend %layout-wrapper;
+
+        .accomplishment-related {
+            @extend %layout;
+        }
+
+        .accomplishment-brief {
+            margin-bottom: spacing-vertical(small);
+
+            @include susy-breakpoint($bp-medium, $susy) {
+                @include gallery(6);
+            }
+        }
+    }
+
+    .wrapper-about {
+        @extend %layout-wrapper;
+
+        .about {
+            @extend %layout;
+        }
+
+        .about-item {
+
+            @include susy-breakpoint($bp-medium, $susy) {
+                @include gallery(6);
+            }
+        }
+    }
+}

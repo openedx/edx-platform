@@ -9,8 +9,12 @@
 // #VENDOR
 // ------------------------------
 @import '../../vendor/bourbon/bourbon';
-@import '../../vendor/neat/neat';
 @import '../../vendor/bi-app/bi-app-ltr';   // LTR support
+
+// ------------------------------
+// #UTILITIES
+// ------------------------------
+@import 'utilities/variables';
 
 // ------------------------------
 // #BUILD

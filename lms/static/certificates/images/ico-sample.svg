@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="556px" height="556px" viewBox="0 0 556 556" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.3.1 (12002) - http://www.bohemiancoding.com/sketch -->
+    <title>ico-sample</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="SCRATCH" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="ico-sample" sketch:type="MSArtboardGroup">
+            <g id="Mark" sketch:type="MSLayerGroup">
+                <rect id="FILL" stroke="#979797" fill="#303E45" sketch:type="MSShapeGroup" x="0" y="0" width="556" height="556"></rect>
+                <text id="" sketch:type="MSTextLayer" font-family="FontAwesome" font-size="275" font-weight="normal" fill="#FBFBFB">
+                    <tspan x="150" y="381"></tspan>
+                </text>
+            </g>
+        </g>
+    </g>
+</svg>
