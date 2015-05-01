@@ -24,7 +24,16 @@ document_body_class = document_body_class_append if document_body_class_append e
 <body class="view-certificate view-valid-certificate ${dir_rtl} ${document_body_class}" data-view="valid-certificate">
 
     <div class="wrapper-view">
+
+        <%include file="_accomplishment-header.html" />
+
+        <hr class="divider sr-only">
+
         ${self.body()}
+
+        <hr class="divider sr-only">
+
+        <%include file="_accomplishment-footer.html" />
     </div>
     <%include file="_assets-secondary.html" />
 </body>
