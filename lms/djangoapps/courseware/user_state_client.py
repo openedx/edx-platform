@@ -136,7 +136,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         }
 
     @contract(username="basestring", block_keys="seq(UsageKey)|set(UsageKey)")
-    def _get_field_objects(self, username, block_keys):
+    def _get_student_modules(self, username, block_keys):
         """
         Retrieve the :class:`~StudentModule`s for the supplied ``username`` and ``block_keys``.
 
@@ -186,7 +186,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         if scope != Scope.user_state:
             raise ValueError("Only Scope.user_state is supported, not {}".format(scope))
 
-        modules = self._get_field_objects(username, block_keys)
+        modules = self._get_student_modules(username, block_keys)
         for module, usage_key in modules:
             if module.state is None:
                 state = {}
@@ -256,12 +256,12 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         if scope != Scope.user_state:
             raise ValueError("Only Scope.user_state is supported")
 
-        student_modules = self._get_field_objects(username, block_keys)
+        student_modules = self._get_student_modules(username, block_keys)
         for student_module, _ in student_modules:
             if fields is None:
-                field_object.state = "{}"
+                student_module.state = "{}"
             else:
-                current_state = json.loads(field_object.state)
+                current_state = json.loads(student_module.state)
                 for field in fields:
                     if field in current_state:
                         del current_state[field]
@@ -295,13 +295,13 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         if scope != Scope.user_state:
             raise ValueError("Only Scope.user_state is supported")
 
-        field_objects = self._get_field_objects(username, block_keys)
-        for field_object, usage_key in field_objects:
-            if field_object.state is None:
+        student_modules = self._get_student_modules(username, block_keys)
+        for student_module, usage_key in student_modules:
+            if student_module.state is None:
                 continue
 
-            for field in json.loads(field_object.state):
-                yield (usage_key, field, field_object.modified)
+            for field in json.loads(student_module.state):
+                yield (usage_key, field, student_module.modified)
 
     def get_history(self, username, block_key, scope=Scope.user_state):
         """We don't guarantee that history for many blocks will be fast."""
