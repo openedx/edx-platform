@@ -40,7 +40,12 @@ def is_bumper_enabled(video):
     periodicity = settings.FEATURES.get('SHOW_BUMPER_PERIODICITY', 0)
     has_viewed = getattr(video, 'do_not_show_again_bumper') or \
                  (date_last_view_bumper and date_last_view_bumper + timedelta(seconds=periodicity) > utc_now)
-    return True
+    return bool(
+        settings.FEATURES.get('ENABLE_VIDEO_BUMPER') and
+        get_bumper_settings(video) and
+        edxval_api and
+        not has_viewed
+    )
 
 
 def bumperize(video):
@@ -97,9 +102,9 @@ def get_bumper_sources(video):
     except edxval_api.ValInternalError:
         # if no bumper sources, nothing will be showed
         log.warning("Could not retrieve information from VAL for Bumper edx Video ID: %s.", video.bumper['edx_video_id'])
-        # return []
+        return []
 
-    return ['http://www.w3schools.com/html/mov_bbb.mp4']
+    return bumper_sources
 
 
 def bumper_metadata(video, sources):
