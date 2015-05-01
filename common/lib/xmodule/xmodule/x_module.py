@@ -16,6 +16,7 @@ from pkg_resources import (
 )
 from webob import Response
 from webob.multidict import MultiDict
+from lazy import lazy
 
 from xblock.core import XBlock, XBlockAside
 from xblock.fields import (
@@ -358,6 +359,14 @@ class XModuleMixin(XModuleFields, XBlockMixin):
         self.save()
         return self._field_data._kvs  # pylint: disable=protected-access
 
+    @lazy
+    def _unwrapped_field_data(self):
+        """
+        This property hold the value _field_data here before we wrap it in
+        the LmsFieldData or OverrideFieldData classes.
+        """
+        return self._field_data
+
     def get_explicitly_set_fields_by_scope(self, scope=Scope.content):
         """
         Get a dictionary of the fields for the given scope which are set explicitly on this xblock. (Including
@@ -539,14 +548,17 @@ class XModuleMixin(XModuleFields, XBlockMixin):
         """
         return None
 
-    def bind_for_student(self, xmodule_runtime, field_data, user_id):
+    def bind_for_student(self, xmodule_runtime, user_id, wrappers=None):
         """
         Set up this XBlock to act as an XModule instead of an XModuleDescriptor.
 
         Arguments:
             xmodule_runtime (:class:`ModuleSystem'): the runtime to use when accessing student facing methods
-            field_data (:class:`FieldData`): The :class:`FieldData` to use for all subsequent data access
             user_id: The user_id to set in scope_ids
+            wrappers: These are a list functions that put a wrapper, such as
+                      LmsFieldData or OverrideFieldData, around the field_data.
+                      Note that the functions will be applied in the order in
+                      which they're listed. So [f1, f2] -> f2(f1(field_data))
         """
         # pylint: disable=attribute-defined-outside-init
 
@@ -575,7 +587,15 @@ class XModuleMixin(XModuleFields, XBlockMixin):
 
         # Set the new xmodule_runtime and field_data (which are user-specific)
         self.xmodule_runtime = xmodule_runtime
-        self._field_data = field_data
+
+        if wrappers is None:
+            wrappers = []
+
+        wrapped_field_data = self._unwrapped_field_data
+        for wrapper in wrappers:
+            wrapped_field_data = wrapper(wrapped_field_data)
+
+        self._field_data = wrapped_field_data
 
     @property
     def non_editable_metadata_fields(self):
@@ -1239,7 +1259,7 @@ class MetricsMixin(object):
             )
 
 
-class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
+class DescriptorSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
     """
     Base class for :class:`Runtime`s to be used with :class:`XModuleDescriptor`s
     """
@@ -1485,7 +1505,7 @@ class XMLParsingSystem(DescriptorSystem):
                     setattr(xblock, field.name, field_value)
 
 
-class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
+class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
     """
     This is an abstraction such that x_modules can function independent
     of the courseware (e.g. import into other types of courseware, LMS,
