@@ -306,6 +306,23 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
         self.assertEqual(mode['sku'], '123')
         self.assertEqual(mode['name'], CourseMode.HONOR)
 
+    def test_get_course_details_with_credit_course(self):
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug=CourseMode.CREDIT_MODE,
+            mode_display_name=CourseMode.CREDIT_MODE,
+        )
+        resp = self.client.get(
+            reverse('courseenrollmentdetails', kwargs={"course_id": unicode(self.course.id)})
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = json.loads(resp.content)
+        self.assertEqual(unicode(self.course.id), data['course_id'])
+        mode = data['course_modes'][0]
+        self.assertEqual(mode['slug'], CourseMode.CREDIT_MODE)
+        self.assertEqual(mode['name'], CourseMode.CREDIT_MODE)
+
     @ddt.data(
         # NOTE: Studio requires a start date, but this is not
         # enforced at the data layer, so we need to handle the case
