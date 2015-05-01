@@ -2376,5 +2376,5 @@ NOTIFICATION_CHANNEL_PROVIDERS = {
 
 # list all of the mappings of notification types to channel
 NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = {
-    '*': 'triggered-email',  # default global mapping
+    '*': 'durable',  # default global mapping
 }
