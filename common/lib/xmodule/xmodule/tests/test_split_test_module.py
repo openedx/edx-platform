@@ -100,7 +100,6 @@ class SplitTestModuleTest(XModuleXmlImportTest, PartitionTestCase):
         self.split_test_module = self.course_sequence.get_children()[0]
         self.split_test_module.bind_for_student(
             self.module_system,
-            self.split_test_module._field_data,  # pylint: disable=protected-access
             user.id
         )
 
