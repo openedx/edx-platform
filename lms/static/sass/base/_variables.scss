@@ -35,8 +35,7 @@ $font-bold: 700;
 $body-font-size: em(14);
 $body-line-height: golden-ratio(.875em, 1);
 $base-font-color: rgb(60,60,60);
-$baseFontColor: rgb(60,60,60);
-$base-font-color: rgb(60,60,60);
+$baseFontColor: $base-font-color;
 $lighter-base-font-color: rgb(100,100,100);
 $very-light-text: rgb(255,255,255); // #ffffff
 
