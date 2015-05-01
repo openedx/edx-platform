@@ -200,6 +200,10 @@ function () {
         };
 
         var destroy = function () {
+            var data = getData();
+            data.element.css({
+                'height': '', 'width': '', 'top': '', 'left': ''
+            });
             removeCallbacks();
             resetDelta();
             mode = null;

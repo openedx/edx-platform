@@ -27,6 +27,12 @@ div.video {
     }
   }
 
+  &.is-poster {
+    .slider {
+      visibility: hidden;
+    }
+  }
+
   div.tc-wrapper {
     @include clearfix();
     position: relative;
@@ -690,8 +696,7 @@ div.video {
     }
 
     ol.subtitles {
-        width: 0;
-        height: 0;
+        display: none;
     }
 
     ol.subtitles.html5 {

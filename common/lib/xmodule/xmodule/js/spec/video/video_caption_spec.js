@@ -146,19 +146,6 @@
                 state.videoCaption.destroy();
 
                 expect(state.videoCaption).toBeUndefined();
-                expect($.fn.off).toHaveBeenCalledWith('click', plugin.toggle);
-                expect($.fn.off).toHaveBeenCalledWith({
-                    mouseenter: plugin.onMouseEnter,
-                    mouseleave: plugin.onMouseLeave,
-                    mousemove: plugin.onMovement,
-                    mousewheel: plugin.onMovement,
-                    DOMMouseScroll: plugin.onMovement,
-                    scroll: state.videoControl.showControls
-                });
-                expect($.fn.off).toHaveBeenCalledWith({
-                    mouseenter: plugin.onContainerMouseEnter,
-                    mouseleave: plugin.onContainerMouseLeave
-                });
                 expect($.fn.off).toHaveBeenCalledWith({
                     'caption:fetch': plugin.fetchCaption,
                     'caption:resize': plugin.onResize,
@@ -166,7 +153,8 @@
                     'ended': plugin.pause,
                     'fullscreen': plugin.onResize,
                     'pause': plugin.pause,
-                    'play': plugin.play
+                    'play': plugin.play,
+                    'destroy': plugin.destroy
                 });
             });
 

@@ -83,12 +83,12 @@ function (HTML5Video, Resizer) {
 
     // Updates players state, once metadata is loaded for html5 player.
     function onLoadMetadataHtml5() {
-        var player = this.videoPlayer.player.videoE,
+        var player = this.videoPlayer.player.videoEl,
             videoWidth = player[0].videoWidth || player.width(),
             videoHeight = player[0].videoHeight || player.height();
 
-        _resize(state, videoWidth, videoHeight);
-        _updateVcrAndRegion(state);
+        _resize(this, videoWidth, videoHeight);
+        _updateVcrAndRegion(this);
     }
 
 
@@ -166,8 +166,7 @@ function (HTML5Video, Resizer) {
             });
 
             player = state.videoEl = state.videoPlayer.player.videoEl;
-
-            player[0].addEventListener('loadedmetadata', this.onLoadMetadataHtml5, false);
+            player[0].addEventListener('loadedmetadata', state.videoPlayer.onLoadMetadataHtml5, false);
 
         } else {
             youTubeId = state.youtubeId();
@@ -329,7 +328,7 @@ function (HTML5Video, Resizer) {
             this.resizer.destroy();
         }
         if (player && player.video) {
-            player.video.removeEventListener('loadedmetadata', this.onLoadMetadataHtml5, false);
+            player.video.removeEventListener('loadedmetadata', this.videoPlayer.onLoadMetadataHtml5, false);
         }
         if (player && _.isFunction(player.destroy)) {
             player.destroy();

@@ -1,5 +1,5 @@
 (function (define) {
-
+'use strict';
 // VideoCaption module.
 define(
 'video/09_bumper.js',
@@ -20,7 +20,7 @@ define(
      */
     var VideoBumper = function (player, state) {
         if (!(this instanceof VideoBumper)) {
-            return new VideoBumper(state, element);
+            return new VideoBumper(player, state);
         }
 
         _.bindAll(
@@ -65,10 +65,6 @@ define(
             }
         },
 
-        play: function () {
-            this.state.videoCommands.execute('play');
-        },
-
         skip: function () {
             this.element.trigger('skip');
         },
@@ -103,9 +99,11 @@ define(
         destroy: function () {
             var events = ['ended', 'skip', 'error'].join(' ');
             this.element.off(events, this.showMainVideoHandler);
-            this.element.off('timeupdate', this.skipByDuration);
+            this.element.off({
+                'timeupdate': this.skipByDuration,
+                'initialize': this.destroyAndResolve
+            });
             this.element.removeClass('is-bumper');
-            this.element.off('initialize', this.destroyAndResolve);
             if (_.isFunction(this.state.videoPlayer.destroy)) {
                 this.state.videoPlayer.destroy();
             }

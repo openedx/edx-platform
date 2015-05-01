@@ -80,10 +80,17 @@
                         storage: storage,
                         options: {},
                         youtubeXhr: youtubeXhr
-                    };
+                    },
+                    bumperMetadata = el.data('bumper-metadata'),
+                    mainVideoModules = [FocusGrabber, VideoAccessibleMenu, VideoControl, VideoPlayPlaceholder,
+                        VideoPlayPauseControl, VideoProgressSlider, VideoSpeedControl, VideoVolumeControl,
+                        VideoQualityControl, VideoFullScreen, VideoCaption, VideoCommands, VideoContextMenu,
+                        VideoSaveStatePlugin, VideoEventsPlugin],
+                    bumperVideoModules = [VideoAccessibleMenu, VideoControl, VideoPlaySkipControl, VideoSkipControl,
+                        VideoVolumeControl, VideoCaption, VideoCommands, VideoSaveStatePlugin, VideoEventsPlugin];
 
-                var getCleanState = function (state, metadata) {
-                    return $.extend(true, {}, state, {metadata: metadata}, {
+                var getBumperState = function (metadata) {
+                    var bumperState = $.extend(true, {}, state, {metadata: metadata}, {
                         metadata: {
                             savedVideoPosition: 0,
                             speed: '1.0',
@@ -92,47 +99,38 @@
                             streams: []
                         }
                     });
+                    bumperState.modules = bumperVideoModules;
+                    bumperState.options = {
+                        SaveStatePlugin: {events: ['transcript_download:change', 'language_menu:change']},
+                        EventsPlugin: {data: {is_bumper: true}}
+                    }
+                    return bumperState;
                 };
 
-                var player = function (state, autoplay) {
+                var player = function (state) {
                     return function () {
-                        state.metadata.autoplay = autoplay || false;
+                        state.metadata.autoplay = true;
                         initialize(state, element);
                     };
                 };
 
-                state.modules = [
-                    FocusGrabber, VideoAccessibleMenu, VideoControl, VideoPlayPlaceholder, VideoPlayPauseControl,
-                    VideoProgressSlider, VideoSpeedControl, VideoVolumeControl, VideoQualityControl, VideoFullScreen,
-                    VideoCaption, VideoCommands, VideoContextMenu, VideoSaveStatePlugin, VideoEventsPlugin
-                ];
+                state.modules = mainVideoModules;
 
-                var bumperMetadata = el.data('bumper-metadata');
                 if (bumperMetadata) {
-                    var bumperState = getCleanState(state, bumperMetadata);
-
-                    _.extend(bumperState, {
-                        modules: [
-                            VideoAccessibleMenu, VideoControl, VideoPlaySkipControl, VideoSkipControl, VideoCaption,
-                            VideoVolumeControl, VideoCommands, VideoSaveStatePlugin, VideoEventsPlugin
-                        ],
-                        options: {
-                            SaveStatePlugin: {events: ['transcript_download:change', 'language_menu:change']},
-                            EventsPlugin: {data: {is_bumper: true}}
-                        }
-                    });
-
-                    var bumperPlayer = player(bumperState),
-                        bumper = new VideoBumper(bumperPlayer, bumperState);
-                    state.bumperState = bumperState;
-                    bumper.getPromise().done(player(state, true));
                     new VideoPoster(state.el, {
                         poster: el.data('poster'),
                         onClick: function () {
+                            var mainVideoPlayer = player(state), bumper, bumperState;
                             if (storage.getItem('isBumperShown')) {
-                                bumper.showMainVideo();
+                                mainVideoPlayer();
                             } else {
-                                bumper.play();
+                                bumperState = getBumperState(bumperMetadata);
+                                bumper = new VideoBumper(player(bumperState), bumperState);
+                                state.bumperState = bumperState;
+                                bumper.getPromise().done(function () {
+                                    delete state.bumperState;
+                                    mainVideoPlayer();
+                                });
                             }
                         }
                     });

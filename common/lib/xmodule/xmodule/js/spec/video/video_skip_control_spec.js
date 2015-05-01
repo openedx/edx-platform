@@ -9,13 +9,14 @@
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice').andReturn(null);
             state = jasmine.initializePlayer('video_with_bumper.html');
+            $('.poster .btn-play').click();
             spyOn(state.bumperState.videoCommands, 'execute').andCallThrough();
         });
 
         afterEach(function () {
             $('source').remove();
             state.storage.clear();
-            if (state.bumperState.videoPlayer) {
+            if (state.bumperState && state.bumperState.videoPlayer) {
                 state.bumperState.videoPlayer.destroy();
             }
             if (state.videoPlayer) {

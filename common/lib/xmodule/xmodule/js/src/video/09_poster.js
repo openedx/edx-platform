@@ -2,7 +2,7 @@
 
 define(
 'video/09_poster.js',
-[], function () {
+['video/00_resizer.js'], function (Resizer) {
     /**
      * VideoPoster module exports a function.
      *
@@ -17,14 +17,15 @@ define(
      *
      * @returns {jquery Promise}
      */
-    var VideoPoster = function (container, options) {
+    var VideoPoster = function (element, options) {
         if (!(this instanceof VideoPoster)) {
             return new VideoPoster(state);
         }
 
         _.bindAll(this, 'onClick', 'destroy');
         this.dfd = $.Deferred();
-        this.container = container;
+        this.element = element;
+        this.container = element.find('.video-player');
         this.options = options || {};
         this.initialize();
     };
@@ -40,24 +41,31 @@ define(
         ].join('')),
 
         initialize: function () {
-            if (!this.options.poster) {
-                return;
-            }
             this.el = $(this.template({
                 url: this.options.poster.url,
                 type: this.options.poster.type
             }));
+            this.element.addClass('is-poster');
+            this.resizer = new Resizer({
+                element: this.container,
+                elementRatio: 16/9,
+                container: this.element
+            }).delta.add(47, 'height').setMode('width');
             this.render();
             this.bindHandlers();
         },
 
         bindHandlers: function () {
+            var self = this;
             this.el.on('click', this.onClick);
-            this.container.on('play destroy', this.destroy);
+            this.element.on('play destroy', this.destroy);
+            $(window).on('resize.poster', _.debounce(function () {
+                self.resizer.align();
+            }, 100));
         },
 
         render: function () {
-            this.container.find('.video-player').append(this.el);
+            this.container.append(this.el);
         },
 
         onClick: function () {
@@ -67,7 +75,10 @@ define(
         },
 
         destroy: function () {
-            this.container.off('play destroy', this.destroy);
+            this.element.off('play destroy', this.destroy);
+            $(window).off('resize.poster');
+            this.element.removeClass('is-poster');
+            this.resizer.destroy();
             this.el.remove();
         }
     };

@@ -68,8 +68,6 @@ function (Sjson, AsyncProcess) {
                 .removeClass('is-captions-rendered');
             this.subtitlesEl.remove();
             this.container.remove();
-            this.subtitlesEl = this.container = null;
-            this.loaded = this.rendered = false;
             delete this.state.videoCaption;
         },
         /**
