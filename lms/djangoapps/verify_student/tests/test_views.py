@@ -27,7 +27,6 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
 
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
-from commerce.exceptions import ApiError
 from commerce.tests import EcommerceApiTestMixin
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment

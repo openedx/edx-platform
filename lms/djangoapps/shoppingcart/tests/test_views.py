@@ -2,8 +2,6 @@
 Tests for Shopping Cart views
 """
 from collections import OrderedDict
-import copy
-import mock
 import pytz
 from urlparse import urlparse
 from decimal import Decimal
@@ -29,9 +27,6 @@ import ddt
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from commerce.api import EcommerceAPI
-from commerce.constants import OrderStatus
-from commerce.tests import EcommerceApiTestMixin
 from student.roles import CourseSalesAdminRole
 from util.date_utils import get_default_time_display
 from util.testing import UrlResetMixin
@@ -93,7 +88,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
                                       min_price=self.cost)
         self.course_mode.save()
 
-        #Saving another testing course mode
+        # Saving another testing course mode
         self.testing_cost = 20
         self.testing_course = CourseFactory.create(org='edX', number='888', display_name='Testing Super Course')
         self.testing_course_mode = CourseMode(course_id=self.testing_course.id,
@@ -868,111 +863,9 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
                 'unit_cost': 40,
                 'quantity': 1,
                 'line_cost': 40,
-                'line_desc': 'Honor Code Certificate for course Test Course'
+                'line_desc': 'Honor Code Certificate for course Test Course',
+                'course_key': unicode(self.verified_course_key)
             })
-
-    @ddt.data(0, 1, 2)
-    @override_settings(
-        ECOMMERCE_API_URL=EcommerceApiTestMixin.ECOMMERCE_API_URL,
-        ECOMMERCE_API_SIGNING_KEY=EcommerceApiTestMixin.ECOMMERCE_API_SIGNING_KEY
-    )
-    def test_show_ecom_receipt_json(self, num_items):
-        # set up the get request to return an order with X number of line items.
-
-        # Log in the student. Use a false order ID for the E-Commerce Application.
-        self.login_user()
-        url = reverse('shoppingcart.views.show_receipt', args=['EDX-100042'])
-        with self.mock_get_order(num_items=num_items):
-            resp = self.client.get(url, HTTP_ACCEPT="application/json")
-
-        # Should have gotten a successful response
-        self.assertEqual(resp.status_code, 200)
-
-        # Parse the response as JSON and check the contents
-        json_resp = json.loads(resp.content)
-        self.assertEqual(json_resp.get('currency'), self.mock_get_order.ORDER['currency'])
-        self.assertEqual(json_resp.get('purchase_datetime'), 'Apr 07, 2015 at 17:59 UTC')
-        self.assertEqual(json_resp.get('total_cost'), self.mock_get_order.ORDER['total_excl_tax'])
-        self.assertEqual(json_resp.get('status'), self.mock_get_order.ORDER['status'])
-        self.assertEqual(json_resp.get('billed_to'), {
-            'first_name': self.mock_get_order.ORDER['billing_address']['first_name'],
-            'last_name': self.mock_get_order.ORDER['billing_address']['last_name'],
-            'street1': self.mock_get_order.ORDER['billing_address']['line1'],
-            'street2': self.mock_get_order.ORDER['billing_address']['line2'],
-            'city': self.mock_get_order.ORDER['billing_address']['line4'],
-            'state': self.mock_get_order.ORDER['billing_address']['state'],
-            'postal_code': self.mock_get_order.ORDER['billing_address']['postcode'],
-            'country': self.mock_get_order.ORDER['billing_address']['country']['display_name']
-        })
-
-        self.assertEqual(len(json_resp.get('items')), num_items)
-        for item in json_resp.get('items'):
-            self.assertEqual(item, {
-                'unit_cost': self.mock_get_order.LINE['unit_price_excl_tax'],
-                'quantity': self.mock_get_order.LINE['quantity'],
-                'line_cost': self.mock_get_order.LINE['line_price_excl_tax'],
-                'line_desc': self.mock_get_order.LINE['description']
-            })
-
-    class mock_get_order(object):  # pylint: disable=invalid-name
-        """Mocks calls to EcommerceAPI.get_order. """
-        patch = None
-
-        ORDER = {
-            'status': OrderStatus.COMPLETE,
-            'number': EcommerceApiTestMixin.ORDER_NUMBER,
-            'total_excl_tax': 40.0,
-            'currency': 'USD',
-            'sources': [{'transactions': [
-                {'date_created': '2015-04-07 17:59:06.274587+00:00'},
-                {'date_created': '2015-04-08 13:33:06.150000+00:00'},
-                {'date_created': '2015-04-09 10:45:06.200000+00:00'},
-            ]}],
-            'billing_address': {
-                'first_name': 'Philip',
-                'last_name': 'Fry',
-                'line1': 'Robot Arms Apts',
-                'line2': '22 Robot Street',
-                'line4': 'New New York',
-                'state': 'NY',
-                'postcode': '11201',
-                'country': {
-                    'display_name': 'United States',
-                },
-            },
-        }
-
-        LINE = {
-            "title": "Honor Code Certificate for course Test Course",
-            "description": "Honor Code Certificate for course Test Course",
-            "status": "Paid",
-            "line_price_excl_tax": 40.0,
-            "quantity": 1,
-            "unit_price_excl_tax": 40.0
-        }
-
-        def __init__(self, **kwargs):
-
-            result = copy.deepcopy(self.ORDER)
-            result['lines'] = [copy.deepcopy(self.LINE) for _ in xrange(kwargs['num_items'])]
-            default_kwargs = {
-                'return_value': (
-                    EcommerceApiTestMixin.ORDER_NUMBER,
-                    OrderStatus.COMPLETE,
-                    result,
-                )
-            }
-
-            default_kwargs.update(kwargs)
-
-            self.patch = mock.patch.object(EcommerceAPI, 'get_order', mock.Mock(**default_kwargs))
-
-        def __enter__(self):
-            self.patch.start()
-            return self.patch.new
-
-        def __exit__(self, exc_type, exc_val, exc_tb):  # pylint: disable=unused-argument
-            self.patch.stop()
 
     def test_show_receipt_json_multiple_items(self):
         # Two different item types
@@ -997,13 +890,15 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
             'unit_cost': 40,
             'quantity': 1,
             'line_cost': 40,
-            'line_desc': 'Registration for Course: Robot Super Course'
+            'line_desc': 'Registration for Course: Robot Super Course',
+            'course_key': unicode(self.course_key)
         })
         self.assertEqual(items[1], {
             'unit_cost': 40,
             'quantity': 1,
             'line_cost': 40,
-            'line_desc': 'Honor Code Certificate for course Test Course'
+            'line_desc': 'Honor Code Certificate for course Test Course',
+            'course_key': unicode(self.verified_course_key)
         })
 
     def test_receipt_json_refunded(self):

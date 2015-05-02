@@ -135,7 +135,9 @@ class EnrollmentView(APIView, ApiKeyPermissionMixIn):
         """
         username = username or request.user.username
 
-        if request.user.username != username and not self.has_api_key_permissions(request):
+        # TODO Implement proper permissions
+        if request.user.username != username and not self.has_api_key_permissions(request) \
+                and not request.user.is_superuser:
             # Return a 404 instead of a 403 (Unauthorized). If one user is looking up
             # other users, do not let them deduce the existence of an enrollment.
             return Response(status=status.HTTP_404_NOT_FOUND)

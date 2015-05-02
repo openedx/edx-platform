@@ -8,6 +8,7 @@ import decimal
 import datetime
 from collections import namedtuple
 
+
 from pytz import UTC
 from ipware.ip import get_ip
 from django.conf import settings
@@ -24,6 +25,7 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
+from ecommerce_api_client.exceptions import SlumberBaseException
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys import InvalidKeyError
 from xmodule.modulestore.django import modulestore
@@ -33,8 +35,7 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings, update_account_settings
 from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
 from openedx.core.djangoapps.user_api.errors import UserNotFound, AccountValidationError
-from commerce.api import EcommerceAPI
-from commerce.exceptions import ApiError
+from commerce import ecommerce_api_client
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment
 from student.views import reverification_info
@@ -383,7 +384,7 @@ class PayAndVerifyView(View):
         # get available payment processors
         if unexpired_paid_course_mode.sku:
             # transaction will be conducted via ecommerce service
-            processors = EcommerceAPI().get_processors(request.user)
+            processors = ecommerce_api_client(request.user).get_processors()
         else:
             # transaction will be conducted using legacy shopping cart
             processors = [settings.CC_PROCESSOR_NAME]
@@ -655,14 +656,14 @@ class PayAndVerifyView(View):
 def checkout_with_ecommerce_service(user, course_key, course_mode, processor):     # pylint: disable=invalid-name
     """ Create a new basket and trigger immediate checkout, using the E-Commerce API. """
     try:
-        api = EcommerceAPI()
+        api = ecommerce_api_client(user)
         # Make an API call to create the order and retrieve the results
-        response_data = api.create_basket(user, course_mode.sku, processor)
+        response_data = api.create_basket(course_mode.sku, processor)
         # Pass the payment parameters directly from the API response.
         return response_data.get('payment_data')
-    except ApiError:
+    except SlumberBaseException:
         params = {'username': user.username, 'mode': course_mode.slug, 'course_id': unicode(course_key)}
-        log.error('Failed to create order for %(username)s %(mode)s mode of %(course_id)s', params)
+        log.exception('Failed to create order for %(username)s %(mode)s mode of %(course_id)s', params)
         raise
 
 
