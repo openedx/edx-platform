@@ -36,7 +36,7 @@ define([
     'use strict';
 
     var JSON_RESPONSE = {
-        "total": 1,
+        "total": 365,
         "results": [
             {
                 "data": {
@@ -95,7 +95,7 @@ define([
             this.server.respond();
 
             expect(this.onSearch).toHaveBeenCalled();
-            expect(this.collection.totalCount).toEqual(1);
+            expect(this.collection.totalCount).toEqual(365);
             expect(this.collection.latestModels()[0].attributes).toEqual(JSON_RESPONSE.results[0].data);
             expect(this.collection.page).toEqual(0);
         });
@@ -259,6 +259,7 @@ define([
 
     });
 
+
     describe('FilterView', function () {
 
         beforeEach(function () {
@@ -278,6 +279,7 @@ define([
         });
 
     });
+
 
     describe('FilterBarView', function () {
 
@@ -301,6 +303,120 @@ define([
         });
 
     });
+
+
+    describe('ResultListView', function () {
+
+        beforeEach(function () {
+            jasmine.Clock.useMock();
+            loadFixtures('js/fixtures/discovery.html');
+            TemplateHelpers.installTemplates([
+                'templates/discovery/result_item',
+                'templates/discovery/not_found',
+                'templates/discovery/error'
+            ]);
+            var collection = new Collection([JSON_RESPONSE.results[0].data]);
+            collection.latestModelsCount = 1;
+            this.view = new ResultListView({ collection: collection });
+        });
+
+        it('renders search results', function () {
+            this.view.render();
+            expect($('.courses-listing article').length).toEqual(1);
+            expect($('.courses-listing .course-title')).toContainHtml('edX Demonstration Course');
+            this.view.renderNext();
+            expect($('.courses-listing article').length).toEqual(2);
+        });
+
+        it('scrolling triggers an event for next page', function () {
+            this.onNext = jasmine.createSpy('onNext');
+            this.view.on('next', this.onNext);
+            spyOn(this.view.collection, 'hasNextPage').andCallFake(function () {
+                return true;
+            });
+            this.view.render();
+            window.scroll(0, $(document).height());
+            $(window).trigger('scroll');
+            jasmine.Clock.tick(500);
+            expect(this.onNext).toHaveBeenCalled();
+
+            // should not be triggered again (while it is loading)
+            $(window).trigger('scroll');
+            jasmine.Clock.tick(500);
+            expect(this.onNext.calls.length).toEqual(1);
+        });
+
+    });
+
+
+    describe('Discovery App', function () {
+
+        beforeEach(function () {
+            loadFixtures('js/fixtures/discovery.html');
+            TemplateHelpers.installTemplates([
+                'templates/discovery/result_item',
+                'templates/discovery/not_found',
+                'templates/discovery/error'
+            ]);
+            this.server = Sinon.fakeServer.create();
+            this.app = new App(
+                Collection,
+                DiscoveryForm,
+                ResultListView
+            );
+        });
+
+        afterEach(function () {
+            this.server.restore();
+        });
+
+        it('performs search', function () {
+            $('.discovery-input').val('test');
+            $('.discovery-submit').trigger('click');
+            this.server.respondWith('POST', '/search/course_discovery/', [200, {}, JSON.stringify(JSON_RESPONSE)]);
+            this.server.respond();
+            expect($('.courses-listing article').length).toEqual(1);
+            expect($('.courses-listing .course-title')).toContainHtml('edX Demonstration Course');
+        });
+
+        it('loads more', function () {
+            jasmine.Clock.useMock();
+            $('.discovery-input').val('test');
+            $('.discovery-submit').trigger('click');
+            this.server.respondWith('POST', '/search/course_discovery/', [200, {}, JSON.stringify(JSON_RESPONSE)]);
+            this.server.respond();
+            expect($('.courses-listing article').length).toEqual(1);
+            expect($('.courses-listing .course-title')).toContainHtml('edX Demonstration Course');
+            window.scroll(0, $(document).height());
+            $(window).trigger('scroll');
+            jasmine.Clock.tick(500);
+            this.server.respondWith('POST', '/search/course_discovery/', [200, {}, JSON.stringify(JSON_RESPONSE)]);
+            this.server.respond();
+            expect($('.courses-listing article').length).toEqual(2);
+        });
+
+        it('displays not found message', function () {
+            $('.discovery-input').val('asdfasdf');
+            $('.discovery-submit').trigger('click');
+            this.server.respondWith('POST', '/search/course_discovery/', [200, {}, '{}']);
+            this.server.respond();
+            expect($('#discovery-message')).not.toBeEmpty();
+            expect($('.courses-listing article').length).toEqual(1);
+            expect($('.courses-listing .course-title')).toContainHtml('title');
+        });
+
+        it('displays error message', function () {
+            $('.discovery-input').val('asdfasdf');
+            $('.discovery-submit').trigger('click');
+            this.server.respondWith('POST', '/search/course_discovery/', [404, {}, '']);
+            this.server.respond();
+            expect($('#discovery-message')).not.toBeEmpty();
+            expect($('.courses-listing article').length).toEqual(1);
+            expect($('.courses-listing .course-title')).toContainHtml('title');
+        });
+
+    });
+
 
 
 });
