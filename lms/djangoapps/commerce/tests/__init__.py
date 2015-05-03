@@ -1,11 +1,58 @@
 """ Commerce app tests package. """
 import json
 
+from django.test import TestCase
+from django.test.utils import override_settings
+from ecommerce_api_client.client import EcommerceApiClient
 import httpretty
 import jwt
 import mock
 
-from ecommerce_api_client.client import EcommerceApiClient
+from commerce import ecommerce_api_client
+from student.tests.factories import UserFactory
+
+
+class EcommerceApiClientTest(TestCase):
+    """ Tests to ensure the client is initialized properly. """
+
+    TEST_SIGNING_KEY = 'edx'
+    TEST_API_URL = 'http://example.com/api'
+    TEST_USER_EMAIL = 'test@example.com'
+    TEST_CLIENT_ID = 'test-client-id'
+
+    @override_settings(ECOMMERCE_API_SIGNING_KEY=TEST_SIGNING_KEY, ECOMMERCE_API_URL=TEST_API_URL)
+    @httpretty.activate
+    def test_tracking_context(self):
+        """ Ensure the tracking context is set up in the api client correctly
+        and automatically. """
+        user = UserFactory()
+        user.email = self.TEST_USER_EMAIL
+        user.save()  # pylint: disable=no-member
+
+        # fake an ecommerce api request.
+        httpretty.register_uri(
+            httpretty.POST,
+            '{}/baskets/1/'.format(self.TEST_API_URL),
+            status=200, body='{}',
+            adding_headers={'Content-Type': 'application/json'}
+        )
+        mock_tracker = mock.Mock()
+        mock_tracker.resolve_context = mock.Mock(return_value={'client_id': self.TEST_CLIENT_ID})
+        with mock.patch('commerce.tracker.get_tracker', return_value=mock_tracker):
+            ecommerce_api_client(user).baskets(1).post()
+
+        # make sure the request's JWT token payload included correct tracking context values.
+        actual_header = httpretty.last_request().headers['Authorization']
+        expected_payload = {
+            'username': user.username,
+            'email': user.email,
+            'tracking_context': {
+                'lms_user_id': user.id,  # pylint: disable=no-member
+                'lms_client_id': self.TEST_CLIENT_ID,
+            },
+        }
+        expected_header = 'JWT {}'.format(jwt.encode(expected_payload, self.TEST_SIGNING_KEY))
+        self.assertEqual(actual_header, expected_header)
 
 
 class EcommerceApiTestMixin(object):
@@ -28,22 +75,6 @@ class EcommerceApiTestMixin(object):
         'payment_data': PAYMENT_DATA,
     }
     ECOMMERCE_API_SUCCESSFUL_BODY_JSON = json.dumps(ECOMMERCE_API_SUCCESSFUL_BODY)  # pylint: disable=invalid-name
-
-    def assertValidJWTAuthHeader(self, request, user, key):
-        """ Verifies that the JWT Authorization header is correct. """
-        expected_jwt = jwt.encode({'username': user.username, 'email': user.email}, key)
-        self.assertEqual(request.headers['Authorization'], 'JWT {}'.format(expected_jwt))
-
-    def assertValidBasketRequest(self, request, user, jwt_signing_key, sku, processor):
-        """ Verifies that an order request to the E-Commerce Service is valid. """
-        self.assertValidJWTAuthHeader(request, user, jwt_signing_key)
-        expected_body_data = {
-            'products': [{'sku': sku}],
-            'checkout': True,
-            'payment_processor_name': processor
-        }
-        self.assertEqual(json.loads(request.body), expected_body_data)
-        self.assertEqual(request.headers['Content-Type'], 'application/json')
 
     def _mock_ecommerce_api(self, status=200, body=None, is_payment_required=False):
         """
