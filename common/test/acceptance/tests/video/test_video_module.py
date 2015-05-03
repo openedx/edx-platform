@@ -761,12 +761,11 @@ class YouTubeVideoTest(VideoBaseTest):
                 self.video.use_video(video_name)
                 self.assertTrue(self.video.is_poster_shown)
                 self.video.click_on_poster()
-                self.video.wait_for_video_player_render()
+                self.video.wait_for_video_player_render(autoplay=True)
                 self.assertIn(self.video.state, ['playing', 'buffering', 'finished'])
 
         self.course_fixture.add_advanced_settings(additional_data)
         self.navigate_to_video_no_render()
-
 
         self.video.use_video('B')
         self.assertTrue(self.video.is_poster_shown)
@@ -774,23 +773,25 @@ class YouTubeVideoTest(VideoBaseTest):
         self.video.wait_for_video_bumper_render()
         self.assertIn(self.video.state, ['playing', 'buffering', 'finished'])
         self.video.click_player_button('skip_bumper')
+
+        # no autoplay here, maybe video is too small, so pause is not switched
         self.video.wait_for_video_player_render()
         self.assertIn(self.video.state, ['playing', 'buffering', 'finished'])
-
 
         self.video.use_video('A')
         execute_video_steps(['A'])
 
         # go to second sequential position
-        self.go_to_sequential_position(2)
+        self.course_nav.go_to_sequential_position(2)
+
         execute_video_steps(tab2_video_names)
 
         # go back to first sequential position
         # we are again playing tab 1 videos to ensure that switching didn't broke some video functionality.
-        self.go_to_sequential_position(1)
+        self.course_nav.go_to_sequential_position(1)
         execute_video_steps(tab1_video_names)
 
-        self.video.reload_page()
+        self.video.browser.refresh()
         execute_video_steps(tab1_video_names)
 
 

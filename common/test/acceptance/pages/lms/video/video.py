@@ -83,7 +83,7 @@ class VideoPage(PageObject):
         self.wait_for_element_presence(video_selector, 'Video is initialized')
 
     @wait_for_js
-    def wait_for_video_player_render(self):
+    def wait_for_video_player_render(self, autoplay=False):
         """
         Wait until Video Player Rendered Completely.
 
@@ -92,7 +92,12 @@ class VideoPage(PageObject):
         self.wait_for_element_presence(CSS_CLASS_NAMES['video_init'], 'Video Player Initialized')
         self.wait_for_element_presence(CSS_CLASS_NAMES['video_time'], 'Video Player Initialized')
 
-        video_player_buttons = ['volume', 'play', 'fullscreen', 'speed']
+        video_player_buttons = ['volume', 'fullscreen', 'speed']
+        if autoplay:
+            video_player_buttons.append('pause')
+        else:
+            video_player_buttons.append('play')
+
         for button in video_player_buttons:
             self.wait_for_element_visibility(VIDEO_BUTTONS[button], '{} button is visible'.format(button.title()))
 
