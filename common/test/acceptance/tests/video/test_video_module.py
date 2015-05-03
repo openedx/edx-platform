@@ -76,11 +76,6 @@ class VideoBaseTest(UniqueCourseTest):
         self._install_course_fixture()
         self._navigate_to_courseware_video_no_render()
 
-    def navigate_to_video_with_bumper(self):
-        """ Prepare the course and get to the video and render it """
-        self._install_course_fixture()
-        self._navigate_to_courseware_video_with_bumper_and_render()
-
     def _install_course_fixture(self):
         """ Install the course fixture that has been defined """
         if self.assets:
@@ -144,11 +139,6 @@ class VideoBaseTest(UniqueCourseTest):
         """ Wait for the video Xmodule but not for rendering """
         self._navigate_to_courseware_video()
         self.video.wait_for_video_class()
-
-    def _navigate_to_courseware_video_with_bumper_and_render(self):
-        """ Wait for the video player to render """
-        self._navigate_to_courseware_video()
-        self.video.wait_for_video_bumper_render()
 
     def metadata_for_mode(self, player_mode, additional_data=None):
         """
@@ -722,24 +712,86 @@ class YouTubeVideoTest(VideoBaseTest):
 
     def test_video_bumper_render(self):
         """
-        Scenario: Poster, Video bumper and main Video are displayed.
+        Scenario: Multiple videos with bumper in sequentials all load and work, switching between sequentials
+        Given it has videos "A,B" in "Youtube" and "HTML5" modes in position "1" of sequential
+        And video "C" in "Youtube" mode in position "2" of sequential
+        When I open sequential position "1"
+        Then I see video "B" has a poster
+        When I click on it
+        Then I see video bumper is playing
+        When I skip the bumper
+        Then I see the main video
+        When I click on video "A"
+        Then the main video starts playing
+        When I open sequential position "2"
+        And click on the poster
+        Then the main video starts playing
+        Then I see that the main video starts playing once I go back to position "2" of sequential
+        When I reload the page
+        Then I see that the main video starts playing when I click on the poster
+        """
 
-        Given I have Video with bumper enabled,
-        Then I see Poster, and I click "play",
-        Then I see Video Bumper and I click "skip"
-        Then I see main video playing.
+        """
+        Scenario: Multiple videos in sequentials all load and work, switching between sequentials
+        Given it has videos "A,B" in "Youtube" mode in position "1" of sequential
+        And videos "E,F" in "Youtube" mode in position "2" of sequential
         """
         additional_data = {
-            'video_bumper': {
-                "transcripts": {
-                    "en": "b7xgknqkQk8.srt"
-                },
-                "edx_video_id": "edx_video_id"
+            u'video_bumper': {
+                u'value': {
+                    "transcripts": {},
+                    "edx_video_id": "edx_video_id"
+                }
             }
         }
-        self.metadata = self.metadata_for_mode('youtube_html5', additional_data=additional_data)
-        self.navigate_to_video_with_bumper()
-        self.assertIn(self.video.state, ['playing', 'buffering'])
+
+        self.verticals = [
+            [{'display_name': 'A'}, {'display_name': 'B', 'metadata': self.metadata_for_mode('html5')}],
+            [{'display_name': 'C'}]
+        ]
+
+        tab1_video_names = ['A', 'B']
+        tab2_video_names = ['C']
+
+        def execute_video_steps(video_names):
+            """
+            Execute video steps
+            """
+            for video_name in video_names:
+                self.video.use_video(video_name)
+                self.assertTrue(self.video.is_poster_shown)
+                self.video.click_on_poster()
+                self.video.wait_for_video_player_render()
+                self.assertIn(self.video.state, ['playing', 'buffering', 'finished'])
+
+        self.course_fixture.add_advanced_settings(additional_data)
+        self.navigate_to_video_no_render()
+
+
+        self.video.use_video('B')
+        self.assertTrue(self.video.is_poster_shown)
+        self.video.click_on_poster()
+        self.video.wait_for_video_bumper_render()
+        self.assertIn(self.video.state, ['playing', 'buffering', 'finished'])
+        self.video.click_player_button('skip_bumper')
+        self.video.wait_for_video_player_render()
+        self.assertIn(self.video.state, ['playing', 'buffering', 'finished'])
+
+
+        self.video.use_video('A')
+        execute_video_steps(['A'])
+
+        # go to second sequential position
+        self.go_to_sequential_position(2)
+        execute_video_steps(tab2_video_names)
+
+        # go back to first sequential position
+        # we are again playing tab 1 videos to ensure that switching didn't broke some video functionality.
+        self.go_to_sequential_position(1)
+        execute_video_steps(tab1_video_names)
+
+        self.video.reload_page()
+        execute_video_steps(tab1_video_names)
 
 
 class YouTubeHtml5VideoTest(VideoBaseTest):

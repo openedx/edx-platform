@@ -40,7 +40,8 @@ CSS_CLASS_NAMES = {
     'video_time': 'div.vidtime',
     'video_display_name': '.vert h2',
     'captions_lang_list': '.langs-list li',
-    'video_speed': '.speeds .value'
+    'video_speed': '.speeds .value',
+    'poster': '.poster'
 }
 
 VIDEO_MODES = {
@@ -118,33 +119,18 @@ class VideoPage(PageObject):
         self.wait_for_element_presence(CSS_CLASS_NAMES['video_init'], 'Video Player Initialized')
         self.wait_for_element_presence(CSS_CLASS_NAMES['video_time'], 'Video Player Initialized')
 
-        # Poster is enabled, click play
-        self.q(css='.poster .btn-play').first.click()
-
-        video_player_buttons = ['do_not_show_again', 'skip_bumper', 'volume', 'play']
+        video_player_buttons = ['do_not_show_again', 'skip_bumper', 'volume']
         for button in video_player_buttons:
             self.wait_for_element_visibility(VIDEO_BUTTONS[button], '{} button is visible'.format(button.title()))
 
-        # Press "skip" on Video bumper
-        self.q(css=VIDEO_BUTTONS['skip_bumper']).first.click()
-        self.wait_for_ajax()
+    @property
+    def is_poster_shown(self):
+        selector = self.get_element_selector(CSS_CLASS_NAMES['poster'])
+        return self.q(css=selector).visible
 
-        video_player_buttons = ['volume', 'play', 'fullscreen', 'speed']
-        for button in video_player_buttons:
-            self.wait_for_element_visibility(VIDEO_BUTTONS[button], '{} button is visible'.format(button.title()))
-
-        def _is_finished_loading():
-            """
-            Check if video loading completed.
-
-            Returns:
-                bool: Tells Video Finished Loading.
-
-            """
-            return not self.q(css=CSS_CLASS_NAMES['video_spinner']).visible
-
-        EmptyPromise(_is_finished_loading, 'Finished loading the video', timeout=200).fulfill()
-        self.wait_for_ajax()
+    def click_on_poster(self):
+        selector = self.get_element_selector(CSS_CLASS_NAMES['poster'])
+        self.q(css=selector).click()
 
     def get_video_vertical_selector(self, video_display_name=None):
         """
