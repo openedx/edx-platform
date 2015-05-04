@@ -6,6 +6,7 @@ from django.http import Http404
 from collections import defaultdict
 
 from lms.lib.comment_client.thread import Thread
+from lms.lib.comment_client.user import User
 from discussion_api.pagination import get_paginated_data
 from django_comment_client.utils import get_accessible_discussion_modules
 
@@ -69,7 +70,7 @@ def get_course_topics(course, user):
     }
 
 
-def _cc_thread_to_api_thread(thread):
+def _cc_thread_to_api_thread(thread, cc_user):
     """
     Convert a thread data dict from the comment_client format (which is a direct
     representation of the format returned by the comments service) to the format
@@ -91,6 +92,10 @@ def _cc_thread_to_api_thread(thread):
     ret.update({
         "topic_id": thread["commentable_id"],
         "raw_body": thread["body"],
+        "following": thread["id"] in cc_user["subscribed_thread_ids"],
+        "abuse_flagged": cc_user["id"] in thread["abuse_flaggers"],
+        "voted": thread["id"] in cc_user["upvoted_ids"],
+        "vote_count": thread["votes"]["up_count"],
         "comment_count": thread["comments_count"],
         "unread_comment_count": thread["unread_comments_count"],
     })
@@ -113,6 +118,7 @@ def get_thread_list(request, course_key, page, page_size):
     A paginated result containing a list of threads; see
     discussion_api.views.ThreadViewSet for more detail.
     """
+    cc_user = User.from_django_user(request.user).retrieve()
     threads, result_page, num_pages, _ = Thread.search({
         "course_id": unicode(course_key),
         "page": page,
@@ -124,5 +130,5 @@ def get_thread_list(request, course_key, page, page_size):
     if result_page != page:
         raise Http404
 
-    results = [_cc_thread_to_api_thread(thread) for thread in threads]
+    results = [_cc_thread_to_api_thread(thread, cc_user) for thread in threads]
     return get_paginated_data(request, results, page, num_pages)

@@ -21,6 +21,18 @@ class CommentsServiceMockMixin(object):
             status=200
         )
 
+    def register_user_response(self, user, subscribed_thread_ids=None, upvoted_ids=None):
+        httpretty.register_uri(
+            httpretty.GET,
+            "http://localhost:4567/api/v1/users/{id}".format(id=user.id),
+            body=json.dumps({
+                "id": str(user.id),
+                "subscribed_thread_ids": subscribed_thread_ids or [],
+                "upvoted_ids": upvoted_ids or [],
+            }),
+            status=200
+        )
+
     def assert_last_query_params(self, expected_params):
         """
         Assert that the last mock request had the expected query parameters
