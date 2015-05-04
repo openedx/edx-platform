@@ -720,7 +720,7 @@ class RegistrationView(APIView):
         if third_party_auth.is_enabled():
             running_pipeline = third_party_auth.pipeline.get(request)
             if running_pipeline:
-                current_provider = third_party_auth.provider.Registry.get_by_backend_name(running_pipeline.get('backend'))
+                current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
 
                 # Override username / email / full name
                 field_overrides = current_provider.get_register_form_data(

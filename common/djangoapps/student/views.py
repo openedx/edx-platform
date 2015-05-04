@@ -424,7 +424,7 @@ def register_user(request, extra_context=None):
     # selected provider.
     if third_party_auth.is_enabled() and pipeline.running(request):
         running_pipeline = pipeline.get(request)
-        current_provider = provider.Registry.get_by_backend_name(running_pipeline.get('backend'))
+        current_provider = provider.Registry.get_from_pipeline(running_pipeline)
         overrides = current_provider.get_register_form_data(running_pipeline.get('kwargs'))
         overrides['running_pipeline'] = running_pipeline
         overrides['selected_provider'] = current_provider.NAME
@@ -952,10 +952,11 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
         running_pipeline = pipeline.get(request)
         username = running_pipeline['kwargs'].get('username')
         backend_name = running_pipeline['backend']
-        requested_provider = provider.Registry.get_by_backend_name(backend_name)
+        third_party_uid = running_pipeline['kwargs']['uid']
+        requested_provider = provider.Registry.get_from_pipeline(running_pipeline)
 
         try:
-            user = pipeline.get_authenticated_user(username, backend_name)
+            user = pipeline.get_authenticated_user(requested_provider, username, third_party_uid)
             third_party_auth_successful = True
         except User.DoesNotExist:
             AUDIT_LOG.warning(
@@ -1509,7 +1510,7 @@ def create_account_with_params(request, params):
         provider_name = None
         if third_party_auth.is_enabled() and pipeline.running(request):
             running_pipeline = pipeline.get(request)
-            current_provider = provider.Registry.get_by_backend_name(running_pipeline.get('backend'))
+            current_provider = provider.Registry.get_from_pipeline(running_pipeline)
             provider_name = current_provider.NAME
 
         analytics.track(
