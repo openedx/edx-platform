@@ -3,7 +3,7 @@ Unit test tasks
 """
 import os
 import sys
-from paver.easy import sh, task, cmdopts, needs, call_task
+from paver.easy import sh, task, cmdopts, needs, call_task, no_help
 from pavelib.utils.test import suites
 from pavelib.utils.envs import Env
 from optparse import make_option
@@ -212,16 +212,26 @@ def coverage(options):
     call_task('diff_coverage', options=dict(options))
 
 
+@no_help
 @task
 @needs('pavelib.prereqs.install_prereqs')
-def combine_coverage():
+def combine_jenkins_coverage():
     """
-    Combine coverage reports.
+    Combine coverage reports from jenkins build flow.
     """
+    coveragerc = Env.REPO_ROOT / 'test_root' / '.jenkins-coveragerc'
+
     for directory in Env.LIB_TEST_DIRS + ['cms', 'lms']:
         report_dir = Env.REPORT_DIR / directory
+
+        # Only try to combine the coverage if we've run the tests.
         if report_dir.isdir():
-            sh("cd {} && coverage combine".format(report_dir))
+            sh(
+                "cd {} && coverage combine --rcfile={}".format(
+                    report_dir,
+                    coveragerc,
+                )
+            )
 
 
 @task
