@@ -4,10 +4,11 @@
         'gettext', 'jquery', 'underscore', 'backbone'
     ], function (gettext, $, _, Backbone) {
 
-        var MessageBannerView = Backbone.View.extend({
+        return Backbone.View.extend({
 
-            initialize: function () {
-                this.template = _.template($('#message_banner-tpl').text());
+            initialize: function (options) {
+                var templateId = _.isUndefined(options.templateId) ? '#message_view-tpl' : options.templateId;
+                this.template = _.template($(templateId).text());
             },
 
             render: function () {
@@ -15,14 +16,16 @@
                     this.$el.html('');
                 } else {
                     this.$el.html(this.template({
-                        message: this.message
+                        message: this.message,
+                        icon: this.icon
                     }));
                 }
                 return this;
             },
 
-            showMessage: function (message) {
+            showMessage: function (message, icon) {
                 this.message = message;
+                this.icon = icon;
                 this.render();
             },
 
@@ -31,7 +34,5 @@
                 this.render();
             }
         });
-
-        return MessageBannerView;
     });
 }).call(this, define || RequireJS.define);

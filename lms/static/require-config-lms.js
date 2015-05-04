@@ -68,7 +68,8 @@
             "osda": 'js/vendor/ova/OpenSeaDragonAnnotation',
             "ova": 'js/vendor/ova/ova',
             "catch": 'js/vendor/ova/catch/js/catch',
-            "handlebars": 'js/vendor/ova/catch/js/handlebars-1.1.2'
+            "handlebars": 'js/vendor/ova/catch/js/handlebars-1.1.2',
+            "moment": "js/vendor/moment-with-locales.min"
             // end of files needed by OVA
         },
         shim: {
