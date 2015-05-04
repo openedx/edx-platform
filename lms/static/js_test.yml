@@ -97,6 +97,9 @@ fixture_paths:
     - js/fixtures/search
     - templates/search
     - templates/discovery
+    - js/fixtures/bookmarks
+    - templates/bookmarks
+    - templates/message_view.underscore
 
 requirejs:
   paths:

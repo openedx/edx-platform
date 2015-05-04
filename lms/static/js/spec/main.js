@@ -57,6 +57,7 @@
             'capa/display': 'xmodule_js/src/capa/display',
             'string_utils': 'xmodule_js/common_static/js/src/string_utils',
             'logger': 'xmodule_js/common_static/js/src/logger',
+            'moment': 'xmodule_js/common_static/js/src/moment',
 
             // Manually specify LMS files that are not converted to RequireJS
             'history': 'js/vendor/history',
@@ -94,6 +95,12 @@
             'js/student_profile/views/learner_profile_fields': 'js/student_profile/views/learner_profile_fields',
             'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory',
             'js/student_profile/views/learner_profile_view': 'js/student_profile/views/learner_profile_view',
+
+            'js/bookmarks/collections/bookmarks': 'js/bookmarks/collections/bookmarks',
+            'js/bookmarks/models/bookmark': 'js/bookmarks/models/bookmark',
+            'js/bookmarks/views/bookmarks_button': 'js/bookmarks/views/bookmarks_button',
+            'js/bookmarks/views/bookmarks_list': 'js/bookmarks/views/bookmarks_list',
+            'js/views/message': 'js/views/message',
 
             // edxnotes
             'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min',
@@ -633,7 +640,8 @@
         'lms/include/js/spec/edxnotes/plugins/caret_navigation_spec.js',
         'lms/include/js/spec/edxnotes/collections/notes_spec.js',
         'lms/include/js/spec/search/search_spec.js',
-        'lms/include/js/spec/discovery/discovery_spec.js'
+        'lms/include/js/spec/discovery/discovery_spec.js',
+        'lms/include/js/spec/bookmarks/bookmarks_spec.js'
     ]);
 
 }).call(this, requirejs, define);
