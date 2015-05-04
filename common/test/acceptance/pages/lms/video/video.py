@@ -3,6 +3,7 @@ Video player in the courseware.
 """
 
 import time
+import json
 import requests
 from selenium.webdriver.common.action_chains import ActionChains
 from bok_choy.page_object import PageObject
@@ -21,6 +22,8 @@ VIDEO_BUTTONS = {
     'download_transcript': '.video-tracks > a',
     'speed': '.speeds',
     'quality': '.quality-control',
+    'do_not_show_again': '.skip-control',
+    'skip_bumper': '.play-skip-control',
 }
 
 CSS_CLASS_NAMES = {
@@ -37,7 +40,8 @@ CSS_CLASS_NAMES = {
     'video_time': 'div.vidtime',
     'video_display_name': '.vert h2',
     'captions_lang_list': '.langs-list li',
-    'video_speed': '.speeds .value'
+    'video_speed': '.speeds .value',
+    'poster': '.poster',
 }
 
 VIDEO_MODES = {
@@ -79,7 +83,7 @@ class VideoPage(PageObject):
         self.wait_for_element_presence(video_selector, 'Video is initialized')
 
     @wait_for_js
-    def wait_for_video_player_render(self):
+    def wait_for_video_player_render(self, autoplay=False):
         """
         Wait until Video Player Rendered Completely.
 
@@ -88,7 +92,12 @@ class VideoPage(PageObject):
         self.wait_for_element_presence(CSS_CLASS_NAMES['video_init'], 'Video Player Initialized')
         self.wait_for_element_presence(CSS_CLASS_NAMES['video_time'], 'Video Player Initialized')
 
-        video_player_buttons = ['volume', 'play', 'fullscreen', 'speed']
+        video_player_buttons = ['volume', 'fullscreen', 'speed']
+        if autoplay:
+            video_player_buttons.append('pause')
+        else:
+            video_player_buttons.append('play')
+
         for button in video_player_buttons:
             self.wait_for_element_visibility(VIDEO_BUTTONS[button], '{} button is visible'.format(button.title()))
 
@@ -105,6 +114,34 @@ class VideoPage(PageObject):
         EmptyPromise(_is_finished_loading, 'Finished loading the video', timeout=200).fulfill()
 
         self.wait_for_ajax()
+
+    @wait_for_js
+    def wait_for_video_bumper_render(self):
+        """
+        Wait until Poster, Video Bumper and main Video Player are Rendered Completely.
+        """
+        self.wait_for_video_class()
+        self.wait_for_element_presence(CSS_CLASS_NAMES['video_init'], 'Video Player Initialized')
+        self.wait_for_element_presence(CSS_CLASS_NAMES['video_time'], 'Video Player Initialized')
+
+        video_player_buttons = ['do_not_show_again', 'skip_bumper', 'volume']
+        for button in video_player_buttons:
+            self.wait_for_element_visibility(VIDEO_BUTTONS[button], '{} button is visible'.format(button.title()))
+
+    @property
+    def is_poster_shown(self):
+        """
+        Check whether a poster is show.
+        """
+        selector = self.get_element_selector(CSS_CLASS_NAMES['poster'])
+        return self.q(css=selector).visible
+
+    def click_on_poster(self):
+        """
+        Click on the video poster.
+        """
+        selector = self.get_element_selector(CSS_CLASS_NAMES['poster'])
+        self.q(css=selector).click()
 
     def get_video_vertical_selector(self, video_display_name=None):
         """
@@ -184,19 +221,14 @@ class VideoPage(PageObject):
     @property
     def is_autoplay_enabled(self):
         """
-        Extract `data-autoplay` attribute to check video autoplay is enabled or disabled.
+        Extract autoplay value of `data-metadata` attribute to check video autoplay is enabled or disabled.
 
         Returns:
             bool: Tells if autoplay enabled/disabled.
-
         """
         selector = self.get_element_selector(CSS_CLASS_NAMES['video_container'])
-        auto_play = self.q(css=selector).attrs('data-autoplay')[0]
-
-        if auto_play.lower() == 'false':
-            return False
-
-        return True
+        auto_play = json.loads(self.q(css=selector).attrs('data-metadata')[0])['autoplay']
+        return auto_play
 
     @property
     def is_error_message_shown(self):
@@ -515,6 +547,7 @@ class VideoPage(PageObject):
 
         language_selector = VIDEO_MENUS["language"] + ' li[data-lang-code="{code}"]'.format(code=code)
         language_selector = self.get_element_selector(language_selector)
+
         self.wait_for_element_visibility(language_selector, 'language menu is visible')
         self.q(css=language_selector).first.click()
 

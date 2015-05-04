@@ -198,4 +198,5 @@ class AdvancedSettingsPage(CoursePage):
             'text_customization',
             'annotation_storage_url',
             'social_sharing_url',
+            'video_bumper',
         ]

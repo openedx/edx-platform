@@ -5,6 +5,12 @@ define(
 'video/05_video_quality_control.js',
 [],
 function () {
+    var template = [
+        '<a href="#" class="quality-control is-hidden" title="',
+            gettext('HD off'), '" role="button" aria-disabled="false">',
+            gettext('HD off'),
+        '</a>'
+    ].join('');
 
     // VideoQualityControl() function - what this module "exports".
     return function (state) {
@@ -12,7 +18,6 @@ function () {
 
         // Changing quality for now only works for YouTube videos.
         if (state.videoType !== 'youtube') {
-            state.el.find('a.quality-control').remove();
             return;
         }
 
@@ -36,6 +41,7 @@ function () {
     //     get the 'state' object as a context.
     function _makeFunctionsPublic(state) {
         var methodsDict = {
+            destroy: destroy,
             fetchAvailableQualities: fetchAvailableQualities,
             onQualityChange: onQualityChange,
             showQualityControl: showQualityControl,
@@ -45,16 +51,25 @@ function () {
         state.bindTo(methodsDict, state.videoQualityControl, state);
     }
 
+    function destroy() {
+        this.videoQualityControl.el.off({
+            'click': this.videoQualityControl.toggleQuality,
+            'destroy': this.videoQualityControl.destroy
+        });
+        this.el.off('.quality');
+        this.videoQualityControl.el.remove();
+        delete this.videoQualityControl;
+    }
+
     // function _renderElements(state)
     //
     //     Create any necessary DOM elements, attach them, and set their initial configuration. Also
     //     make the created DOM elements available via the 'state' object. Much easier to work this
     //     way - you don't have to do repeated jQuery element selects.
     function _renderElements(state) {
-        state.videoQualityControl.el = state.el.find('a.quality-control');
-
-        state.videoQualityControl.el.show();
+        var element = state.videoQualityControl.el = $(template);
         state.videoQualityControl.quality = 'large';
+        state.el.find('.secondary-controls').append(element);
     }
 
     // function _bindHandlers(state)
@@ -64,9 +79,11 @@ function () {
         state.videoQualityControl.el.on('click',
             state.videoQualityControl.toggleQuality
         );
-        state.el.on('play', _.once(
+        state.el.on('play.quality', _.once(
             state.videoQualityControl.fetchAvailableQualities
         ));
+
+        state.el.on('destroy.quality', state.videoQualityControl.destroy);
     }
 
     // ***************************************************************
@@ -141,7 +158,7 @@ function () {
         event.preventDefault();
 
         newQuality = isHD ? 'large' : 'highres';
-        
+
         this.trigger('videoPlayer.handlePlaybackQualityChange', newQuality);
     }
 

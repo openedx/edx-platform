@@ -74,6 +74,9 @@ class CourseMetadata(object):
                 not settings.FEATURES.get("DASHBOARD_SHARE_SETTINGS").get("CUSTOM_COURSE_URLS")):
             filtered_list.append('social_sharing_url')
 
+        if not settings.FEATURES.get('ENABLE_VIDEO_BUMPER'):
+            filtered_list.append('video_bumper')
+
         return filtered_list
 
     @classmethod

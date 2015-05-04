@@ -5,6 +5,7 @@
         afterEach(function () {
             $('source').remove();
             state.storage.clear();
+            state.videoPlayer.destroy();
         });
 
         describe('constructor', function () {
