@@ -269,8 +269,8 @@ function () {
 
             lastSource = this.videoEl.find('source').last();
             lastSource.on('error', this.showErrorMessage.bind(this));
-
-            this.videoEl.on('error', this.onError);
+            lastSource.on('error', this.onError.bind(this));
+            this.videoEl.on('error', this.onError.bind(this));
 
             if (/iP(hone|od)/i.test(isTouch[0])) {
                 this.videoEl.prop('controls', true);

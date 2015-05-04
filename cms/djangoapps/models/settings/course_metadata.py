@@ -77,7 +77,6 @@ class CourseMetadata(object):
         if not settings.FEATURES.get('ENABLE_VIDEO_BUMPER'):
             filtered_list.append('video_bumper')
 
-
         return filtered_list
 
     @classmethod
