@@ -1,28 +1,33 @@
 """
-Implement the Reverification XBlock "reverification" server
+Implementation of "reverification" service to communicate with Reverification XBlock
 """
 
 import logging
-from opaque_keys.edx.keys import CourseKey
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from verify_student.models import VerificationCheckpoint, VerificationStatus, SkippedReverification
 from django.db import IntegrityError
+
+from opaque_keys.edx.keys import CourseKey
+from verify_student.models import VerificationCheckpoint, VerificationStatus, SkippedReverification
+
 
 log = logging.getLogger(__name__)
 
 
 class ReverificationService(object):
-    """ Service to implement the Reverification XBlock "reverification" service
-
+    """
+    Reverification XBlock service
     """
 
     def get_status(self, user_id, course_id, related_assessment):
-        """ Check if the user has any verification attempt or has skipped the verification
+        """
+        Get verification attempt status against a user for a given 'checkpoint'
+        and 'course_id'.
 
         Args:
             user_id(str): User Id string
-            course_id(str): A string of course_id
+            course_id(str): A string of course id
             related_assessment(str): Verification checkpoint name
 
         Returns:
@@ -44,10 +49,11 @@ class ReverificationService(object):
             return None
 
     def start_verification(self, course_id, related_assessment, item_id):
-        """ Get or create the verification checkpoint and return the re-verification link
+        """
+        Create re-verification link against a verification checkpoint.
 
         Args:
-            course_id(str): A string of course_id
+            course_id(str): A string of course id
             related_assessment(str): Verification checkpoint name
 
         Returns:
@@ -66,12 +72,13 @@ class ReverificationService(object):
         return re_verification_link
 
     def skip_verification(self, checkpoint_name, user_id, course_id):
-        """Create the add verification attempt
+        """
+        Add skipped verification attempt entry against a given 'checkpoint'
 
         Args:
-            course_id(str): A string of course_id
-            user_id(str): User Id string
             checkpoint_name(str): Verification checkpoint name
+            user_id(str): User Id string
+            course_id(str): A string of course_id
 
         Returns:
             None
@@ -84,3 +91,20 @@ class ReverificationService(object):
             SkippedReverification.add_skipped_reverification_attempt(checkpoint, user_id, course_key)
         except IntegrityError:
             log.exception("Skipped attempt already exists for user %s: with course %s:", user_id, unicode(course_id))
+
+    def get_attempts(self, user_id, course_id, related_assessment, location_id):
+        """
+        Get re-verification attempts against a user for a given 'checkpoint'
+        and 'course_id'.
+
+        Args:
+            user_id(str): User Id string
+            course_id(str): A string of course id
+            related_assessment(str): Verification checkpoint name
+            location_id(str): Location of Reverification XBlock in courseware
+
+        Returns:
+            Number of re-verification attempts of a user
+        """
+        course_key = CourseKey.from_string(course_id)
+        return VerificationStatus.get_user_attempts(user_id, course_key, related_assessment, location_id)
