@@ -1,6 +1,8 @@
 """
 Class used for defining and running Bok Choy acceptance test suite
 """
+import time
+
 from paver.easy import sh
 from pavelib.utils.test.suites import TestSuite
 from pavelib.utils.envs import Env
@@ -41,6 +43,7 @@ class BokChoyTestSuite(TestSuite):
         self.extra_args = kwargs.get('extra_args', '')
         self.har_dir = self.log_dir / 'hars'
         self.imports_dir = kwargs.get('imports_dir', None)
+        self.external_services = kwargs.get('external_services', None)
 
     def __enter__(self):
         super(BokChoyTestSuite, self).__enter__()
@@ -92,7 +95,7 @@ class BokChoyTestSuite(TestSuite):
         # Ensure the test servers are available
         msg = colorize('green', "Starting test servers...")
         print(msg)
-        bokchoy_utils.start_servers(self.default_store)
+        bokchoy_utils.start_servers(self.default_store, external_services=self.external_services)
 
         msg = colorize('green', "Waiting for servers to start...")
         print(msg)
@@ -135,3 +138,11 @@ class BokChoyTestSuite(TestSuite):
 
         cmd = (" ").join(cmd)
         return cmd
+
+
+class BokChoyDevelopmentSuite(BokChoyTestSuite):
+
+    def run_test(self):
+        print('Run command:\n\n{0}\n\nPress Ctrl-C to exit...'.format(self.cmd))
+        while True:
+            time.sleep(10000)
