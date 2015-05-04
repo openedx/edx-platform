@@ -91,6 +91,9 @@ fixture_paths:
     - js/fixtures/edxnotes
     - js/fixtures/search
     - templates/search
+    - js/fixtures/bookmarks
+    - templates/bookmarks
+    - templates/message_view.underscore
 
 requirejs:
   paths:
