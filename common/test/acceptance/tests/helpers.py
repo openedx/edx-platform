@@ -283,6 +283,11 @@ def get_modal_alert(browser):
     return browser.switch_to.alert
 
 
+def is_404_page(browser):
+    """ Check if page is 404 """
+    return 'Page not found (404)' in browser.find_element_by_tag_name('h1').text
+
+
 class EventsTestMixin(TestCase):
     """
     Helpers and setup for running tests that evaluate events emitted
