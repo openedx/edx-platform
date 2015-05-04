@@ -283,3 +283,23 @@ class ContentStoreImportTest(SignalDisconnectTestMixin, ModuleStoreTestCase):
         }
 
         self.assertEqual(remapped_verticals, split_test_module.group_id_to_child)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_video_components_present_while_import(self, store):
+        """
+        Test that video components with same edx_video_id are present while re-importing
+        """
+        with modulestore().default_store(store):
+            module_store = modulestore()
+            course_id = module_store.make_course_key('edX', 'test_import_course', '2012_Fall')
+
+            # Import first time
+            __, __, course = self.load_test_import_course(target_id=course_id, module_store=module_store)
+
+            # Re-import
+            __, __, re_course = self.load_test_import_course(target_id=course.id, module_store=module_store)
+
+            vertical = module_store.get_item(re_course.id.make_usage_key('vertical', 'vertical_test'))
+
+            video = module_store.get_item(vertical.children[1])
+            self.assertEqual(video.display_name, 'default')
