@@ -189,9 +189,7 @@ def _third_party_auth_context(request, redirect_to):
 
         running_pipeline = pipeline.get(request)
         if running_pipeline is not None:
-            current_provider = third_party_auth.provider.Registry.get_by_backend_name(
-                running_pipeline.get('backend')
-            )
+            current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
             context["currentProvider"] = current_provider.NAME
             context["finishAuthUrl"] = pipeline.get_complete_url(current_provider.BACKEND_CLASS.name)
 
@@ -382,7 +380,7 @@ def account_settings_context(request):
             ),
             # If the user is connected, sending a POST request to this url removes the connection
             # information for this provider from their edX account.
-            'disconnect_url': pipeline.get_disconnect_url(state.provider.NAME),
+            'disconnect_url': pipeline.get_disconnect_url(state.provider.NAME, state.association_id),
         } for state in auth_states]
 
     return context

@@ -196,9 +196,11 @@ class ProviderUserState(object):
     lms/templates/dashboard.html.
     """
 
-    def __init__(self, enabled_provider, user, state):
+    def __init__(self, enabled_provider, user, association_id=None):
+        # UserSocialAuth row ID
+        self.association_id = association_id
         # Boolean. Whether the user has an account associated with the provider
-        self.has_account = state
+        self.has_account = association_id is not None
         # provider.BaseProvider child. Callers must verify that the provider is
         # enabled.
         self.provider = enabled_provider
@@ -215,7 +217,7 @@ def get(request):
     return request.session.get('partial_pipeline')
 
 
-def get_authenticated_user(username, backend_name):
+def get_authenticated_user(auth_provider, username, uid):
     """Gets a saved user authenticated by a particular backend.
 
     Between pipeline steps User objects are not saved. We need to reconstitute
@@ -224,26 +226,26 @@ def get_authenticated_user(username, backend_name):
     authenticate().
 
     Args:
+        auth_provider: the third_party_auth provider in use for the current pipeline.
         username: string. Username of user to get.
-        backend_name: string. The name of the third-party auth backend from
-            the running pipeline.
+        uid: string. The user ID according to the third party.
 
     Returns:
         User if user is found and has a social auth from the passed
-        backend_name.
+        provider.
 
     Raises:
         User.DoesNotExist: if no user matching user is found, or the matching
         user has no social auth associated with the given backend.
         AssertionError: if the user is not authenticated.
     """
-    user = models.DjangoStorage.user.user_model().objects.get(username=username)
-    match = models.DjangoStorage.user.get_social_auth_for_user(user, provider=backend_name)
+    match = models.DjangoStorage.user.get_social_auth(provider=auth_provider.BACKEND_CLASS.name, uid=uid)
 
-    if not match:
+    if not match or match.user.username != username:
         raise User.DoesNotExist
 
-    user.backend = provider.Registry.get_by_backend_name(backend_name).get_authentication_backend()
+    user = match.user
+    user.backend = auth_provider.get_authentication_backend()
     return user
 
 
@@ -257,10 +259,12 @@ def _get_enabled_provider_by_name(provider_name):
     return enabled_provider
 
 
-def _get_url(view_name, backend_name, auth_entry=None, redirect_url=None):
+def _get_url(view_name, backend_name, auth_entry=None, redirect_url=None,
+             extra_params=None, url_params=None):
     """Creates a URL to hook into social auth endpoints."""
-    kwargs = {'backend': backend_name}
-    url = reverse(view_name, kwargs=kwargs)
+    url_params = url_params or {}
+    url_params['backend'] = backend_name
+    url = reverse(view_name, kwargs=url_params)
 
     query_params = OrderedDict()
     if auth_entry:
@@ -268,6 +272,9 @@ def _get_url(view_name, backend_name, auth_entry=None, redirect_url=None):
 
     if redirect_url:
         query_params[AUTH_REDIRECT_KEY] = redirect_url
+
+    if extra_params:
+        query_params.update(extra_params)
 
     return u"{url}?{params}".format(
         url=url,
@@ -288,29 +295,32 @@ def get_complete_url(backend_name):
     Raises:
         ValueError: if no provider is enabled with the given backend_name.
     """
-    enabled_provider = provider.Registry.get_by_backend_name(backend_name)
-
-    if not enabled_provider:
+    if not any(provider.Registry.get_enabled_by_backend_name(backend_name)):
         raise ValueError('Provider with backend %s not enabled' % backend_name)
 
     return _get_url('social:complete', backend_name)
 
 
-def get_disconnect_url(provider_name):
+def get_disconnect_url(provider_name, association_id):
     """Gets URL for the endpoint that starts the disconnect pipeline.
 
     Args:
         provider_name: string. Name of the provider.BaseProvider child you want
             to disconnect from.
+        association_id: int. Optional ID of a specific row in the UserSocialAuth
+            table to disconnect (useful if multiple providers use a common backend)
 
     Returns:
         String. URL that starts the disconnection pipeline.
 
     Raises:
-        ValueError: if no provider is enabled with the given backend_name.
+        ValueError: if no provider is enabled with the given name.
     """
-    enabled_provider = _get_enabled_provider_by_name(provider_name)
-    return _get_url('social:disconnect', enabled_provider.BACKEND_CLASS.name)
+    backend_name = _get_enabled_provider_by_name(provider_name).BACKEND_CLASS.name
+    if association_id:
+        return _get_url('social:disconnect_individual', backend_name, url_params={'association_id': association_id})
+    else:
+        return _get_url('social:disconnect', backend_name)
 
 
 def get_login_url(provider_name, auth_entry, redirect_url=None):
@@ -340,6 +350,7 @@ def get_login_url(provider_name, auth_entry, redirect_url=None):
         enabled_provider.BACKEND_CLASS.name,
         auth_entry=auth_entry,
         redirect_url=redirect_url,
+        extra_params=enabled_provider.get_url_params(),
     )
 
 
@@ -355,7 +366,7 @@ def get_duplicate_provider(messages):
     unfortunately not in a reusable constant.
 
     Returns:
-        provider.BaseProvider child instance. The provider of the duplicate
+        string name of the python-social-auth backend that has the duplicate
         account, or None if there is no duplicate (and hence no error).
     """
     social_auth_messages = [m for m in messages if m.message.endswith('is already in use.')]
@@ -364,7 +375,8 @@ def get_duplicate_provider(messages):
         return
 
     assert len(social_auth_messages) == 1
-    return provider.Registry.get_by_backend_name(social_auth_messages[0].extra_tags.split()[1])
+    backend_name = social_auth_messages[0].extra_tags.split()[1]
+    return backend_name
 
 
 def get_provider_user_states(user):
@@ -378,13 +390,16 @@ def get_provider_user_states(user):
             each enabled provider.
     """
     states = []
-    found_user_backends = [
-        social_auth.provider for social_auth in models.DjangoStorage.user.get_social_auth_for_user(user)
-    ]
+    found_user_auths = list(models.DjangoStorage.user.get_social_auth_for_user(user))
 
     for enabled_provider in provider.Registry.enabled():
+        association_id = None
+        for auth in found_user_auths:
+            if enabled_provider.match_social_auth(auth):
+                association_id = auth.id
+                break
         states.append(
-            ProviderUserState(enabled_provider, user, enabled_provider.BACKEND_CLASS.name in found_user_backends)
+            ProviderUserState(enabled_provider, user, association_id)
         )
 
     return states

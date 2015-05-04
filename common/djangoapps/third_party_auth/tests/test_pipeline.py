@@ -38,5 +38,5 @@ class ProviderUserStateTestCase(testutil.TestCase):
     """Tests ProviderUserState behavior."""
 
     def test_get_unlink_form_name(self):
-        state = pipeline.ProviderUserState(provider.GoogleOauth2, object(), False)
+        state = pipeline.ProviderUserState(provider.GoogleOauth2, object(), 1000)
         self.assertEqual(provider.GoogleOauth2.NAME + '_unlink_form', state.get_unlink_form_name())
