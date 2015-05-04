@@ -556,14 +556,14 @@ class YouTubeVideoTest(VideoBaseTest):
         # open video "C"
         self.course_nav.go_to_sequential('C')
 
-        # check if video "C" should start playing at speed "1.0"
-        self.assertEqual(self.video.speed, '1.0x')
+        # check if video "C" should start playing at speed "0.75"
+        self.assertEqual(self.video.speed, '0.75x')
 
         # open video "A"
         self.course_nav.go_to_sequential('A')
 
-        # check if video "A" should start playing at speed "1.0"
-        self.assertEqual(self.video.speed, '1.0x')
+        # check if video "A" should start playing at speed "2.0"
+        self.assertEqual(self.video.speed, '2.0x')
 
         # reload the page
         self.video.reload_page()
@@ -587,7 +587,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self.course_nav.go_to_sequential('C')
 
         # check if video "C" should start playing at speed "1.50"
-        self.assertEqual(self.video.speed, '1.50x')
+        self.assertEqual(self.video.speed, '1.0x')
 
     def test_video_has_correct_transcript(self):
         """
@@ -729,12 +729,6 @@ class YouTubeVideoTest(VideoBaseTest):
         Then I see that the main video starts playing once I go back to position "2" of sequential
         When I reload the page
         Then I see that the main video starts playing when I click on the poster
-        """
-
-        """
-        Scenario: Multiple videos in sequentials all load and work, switching between sequentials
-        Given it has videos "A,B" in "Youtube" mode in position "1" of sequential
-        And videos "E,F" in "Youtube" mode in position "2" of sequential
         """
         additional_data = {
             u'video_bumper': {

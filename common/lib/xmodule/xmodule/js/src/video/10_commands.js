@@ -28,6 +28,7 @@ define('video/10_commands.js', [], function() {
 
     VideoCommands.prototype = {
         destroy: function () {
+            this.state.el.off('destroy', this.destroy);
             delete this.state.videoCommands;
         },
 

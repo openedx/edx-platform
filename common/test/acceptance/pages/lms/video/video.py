@@ -41,7 +41,7 @@ CSS_CLASS_NAMES = {
     'video_display_name': '.vert h2',
     'captions_lang_list': '.langs-list li',
     'video_speed': '.speeds .value',
-    'poster': '.poster'
+    'poster': '.poster',
 }
 
 VIDEO_MODES = {

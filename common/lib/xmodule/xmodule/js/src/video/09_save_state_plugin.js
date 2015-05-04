@@ -77,8 +77,8 @@ define('video/09_save_state_plugin.js', [], function() {
 
         onSpeedChange: function (event, newSpeed) {
             this.saveState(true, {speed: newSpeed});
-            this.state.storage.setItem('speed', this.state.speed, true);
-            this.state.storage.setItem('general_speed', this.state.speed);
+            this.state.storage.setItem('speed', newSpeed, true);
+            this.state.storage.setItem('general_speed', newSpeed);
         },
 
         saveStateHandler: function () {
