@@ -25,7 +25,9 @@ git+https://github.com/mfogel/django-settings-context-processor.git@b758c3930862
 # back to master when and if this fix is merged back.
 # fs==0.4.0
 git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b
--e git+https://github.com/open-craft/python-social-auth.git@789e0dc93017f6956f95c2f07260136e5d20102b#egg=python-social-auth
+# For SAML Support (To be moved to PyPi installation in base.txt once our changes are merged):
+-e git+https://github.com/open-craft/python-saml.git@902b4ca21f71b7ba0467817962ed810e19a2927f#egg=python-saml
+-e git+https://github.com/open-craft/python-social-auth.git@b4e741d97ecfd51fae9c8a8c1143db7a63dc6e59#egg=python-social-auth
 
 # Our libraries:
 -e git+https://github.com/edx/XBlock.git@aed464a0e2f7478e93157150ac04133a745f5f46#egg=XBlock

@@ -359,7 +359,7 @@ def get_login_url(provider_name, auth_entry, redirect_url=None, enroll_course_id
         redirect_url=redirect_url,
         enroll_course_id=enroll_course_id,
         email_opt_in=email_opt_in
-    )
+    ) + enabled_provider.get_url_query()  # Some optional extra data that will show up as FIELDS_STORED_IN_SESSION
 
 
 def get_duplicate_provider(messages):
@@ -396,6 +396,7 @@ def get_provider_user_states(user):
         List of ProviderUserState. The list of states of a user's account with
             each enabled provider.
     """
+    # TODO: Fix this method to search by provider name, not backend name
     states = []
     found_user_backends = [
         social_auth.provider for social_auth in models.DjangoStorage.user.get_social_auth_for_user(user)
