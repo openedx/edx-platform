@@ -98,6 +98,9 @@ fixture_paths:
     - templates/search
     - templates/discovery
     - common/templates
+    - js/fixtures/bookmarks
+    - templates/bookmarks
+    - templates/message_view.underscore
 
 requirejs:
   paths:
