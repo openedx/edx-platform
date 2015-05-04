@@ -171,6 +171,12 @@ class CoursewarePage(CoursePage):
         """
         return self.q(css=".proctored_exam_status .exam-timer").is_present()
 
+    def active_usage_id(self):
+        """ Returns the usage id of active sequence item """
+        get_active = lambda el: 'active' in el.get_attribute('class')
+        attribute_value = lambda el: el.get_attribute('data-id')
+        return self.q(css='#sequence-list a').filter(get_active).map(attribute_value).results[0]
+
 
 class CoursewareSequentialTabPage(CoursePage):
     """

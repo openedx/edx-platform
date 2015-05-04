@@ -649,3 +649,11 @@ section.self-assessment {
     font-weight: bold;
   }
 }
+
+.courseware-results-wrapper {
+  padding: ($baseline*2);
+
+  .courseware-results {
+    display: none;
+  }
+}

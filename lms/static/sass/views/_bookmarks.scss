@@ -1,0 +1,127 @@
+// Rules for placing bookmarks and search button side by side
+.wrapper-course-modes {
+  border-bottom: 1px solid $gray-l3;
+  padding: ($baseline/4);
+
+  > div {
+    @include box-sizing(border-box);
+    display: inline-block;
+  }
+}
+
+
+// Rules for Bookmarks Button
+.courseware-bookmarks-button {
+  width: flex-grid(5);
+  vertical-align: top;
+
+  button {
+    &.is-active {
+      background-color: $white;
+      &:before {
+        content: "\f02e";
+        font-family: FontAwesome;
+      }
+    }
+
+    &.is-inactive {
+      background: none;
+      &:before {
+          content: "\f097";
+          font-family: FontAwesome;
+      }
+    }
+  }
+
+  .bookmarks-list-button {
+    background: none;
+    border-radius: ($baseline/4);
+    padding: ($baseline/2);
+    width: 100%;
+
+    &:hover {
+      background: none;
+    }
+
+    &:focus, &:active {
+      box-shadow: none;
+    }
+  }
+}
+
+
+// Rules for Bookmarks Results Header
+.bookmarks-results-header {
+  margin: 0;
+}
+
+// Rules for Bookmarks Results
+.bookmarks-results-list {
+  padding-top: $baseline;
+
+  .bookmarks-results-list-item {
+    @include padding(($baseline/4), $baseline, ($baseline/2), $baseline);
+    display: block;
+    border: 1px solid $gray;
+    border-radius: ($baseline/4);
+    margin-bottom: $baseline;
+
+    &:hover {
+      border-color: $link-color;
+      color: $link-color;
+    }
+  }
+
+  .results-list-item-view {
+    @include float(right);
+    margin-top: $baseline;
+  }
+
+  .list-item-date {
+    @extend %t-title7;
+    color: $gray;
+  }
+
+  a.bookmarks-results-list-item:before {
+    content: "\f02e";
+    position: relative;
+    top: -7px;
+    font-family: FontAwesome;
+  }
+
+  .list-item-content {
+    overflow: hidden;
+  }
+
+  .list-item-left-section {
+    @include float(left);
+    width: 90%;
+
+    .list-item-breadcrumbtrail, .list-item-date {
+      @extend %t-ultralight;
+    }
+  }
+
+  .list-item-right-section {
+    @include float(right);
+    margin-top: 7px;
+  }
+}
+
+
+// Rules for empty bookmarks list
+.bookmarks-empty {
+  margin-top: $baseline;
+  border: 1px solid $gray-l4;
+  padding: $baseline;
+  background-color: $gray-l6;
+}
+
+.bookmarks-empty-header {
+  @extend %t-title5;
+  margin-bottom: ($baseline/2);
+}
+
+.bookmarks-empty-detail {
+  @extend %t-copy-sub1;
+}

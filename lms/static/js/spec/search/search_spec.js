@@ -361,20 +361,90 @@ define([
                 expect($('.search-button')).toBeVisible();
             }
 
-            describe('CourseSearchForm', function () {
-                beforeEach(function () {
-                    loadFixtures('js/fixtures/search/course_search_form.html');
-                    this.form = new CourseSearchForm();
-                    this.onClear = jasmine.createSpy('onClear');
-                    this.onSearch = jasmine.createSpy('onSearch');
-                    this.form.on('clear', this.onClear);
-                    this.form.on('search', this.onSearch);
-                });
-                it('trims input string', trimsInputString);
-                it('handles calls to doSearch', doesSearch);
-                it('triggers a search event and changes to active state', triggersSearchEvent);
-                it('clears search when clicking on cancel button', clearsSearchOnCancel);
-                it('clears search when search box is empty', clearsSearchOnEmpty);
+        function rendersSearchResults () {
+            var searchResults = [{
+                location: ['section', 'subsection', 'unit'],
+                url: '/some/url/to/content',
+                content_type: 'text',
+                course_name: '',
+                excerpt: 'this is a short excerpt'
+            }];
+            this.collection.set(searchResults);
+            this.collection.latestModelsCount = 1;
+            this.collection.totalCount = 1;
+
+            this.resultsView.render();
+            expect(this.resultsView.$el.find('ol')[0]).toExist();
+            expect(this.resultsView.$el.find('li').length).toEqual(1);
+            expect(this.resultsView.$el).toContainHtml('Search Results');
+            expect(this.resultsView.$el).toContainHtml('this is a short excerpt');
+
+            this.collection.set(searchResults);
+            this.collection.totalCount = 2;
+            this.resultsView.renderNext();
+            expect(this.resultsView.$el.find('.search-count')).toContainHtml('2');
+            expect(this.resultsView.$el.find('li').length).toEqual(2);
+        }
+
+        function showsMoreResultsLink () {
+            this.collection.totalCount = 123;
+            this.collection.hasNextPage = function () { return true; };
+            this.resultsView.render();
+            expect(this.resultsView.$el.find('a.search-load-next')[0]).toExist();
+
+            this.collection.totalCount = 123;
+            this.collection.hasNextPage = function () { return false; };
+            this.resultsView.render();
+            expect(this.resultsView.$el.find('a.search-load-next')[0]).not.toExist();
+        }
+
+        function triggersNextPageEvent () {
+            var onNext = jasmine.createSpy('onNext');
+            this.resultsView.on('next', onNext);
+            this.collection.totalCount = 123;
+            this.collection.hasNextPage = function () { return true; };
+            this.resultsView.render();
+            this.resultsView.$el.find('a.search-load-next').click();
+            expect(onNext).toHaveBeenCalled();
+        }
+
+        function showsLoadMoreSpinner () {
+            this.collection.totalCount = 123;
+            this.collection.hasNextPage = function () { return true; };
+            this.resultsView.render();
+            expect(this.resultsView.$el.find('a.search-load-next .icon')).toBeHidden();
+            this.resultsView.loadNext();
+            // toBeVisible does not work with inline
+            expect(this.resultsView.$el.find('a.search-load-next .icon')).toHaveCss({ 'display': 'inline' });
+            this.resultsView.renderNext();
+            expect(this.resultsView.$el.find('a.search-load-next .icon')).toBeHidden();
+        }
+
+        function beforeEachHelper(SearchResultsView) {
+            appendSetFixtures(
+                '<section id="courseware-search-results"></section>' +
+                '<section id="course-content"></section>' +
+                '<section id="dashboard-search-results"></section>' +
+                '<section id="my-courses"></section>'
+            );
+
+            TemplateHelpers.installTemplates([
+                'templates/search/course_search_item',
+                'templates/search/dashboard_search_item',
+                'templates/search/course_search_results',
+                'templates/search/dashboard_search_results',
+                'templates/search/search_list',
+                'templates/search/search_loading',
+                'templates/search/search_error'
+            ]);
+
+            var MockCollection = Backbone.Collection.extend({
+                hasNextPage: function () {},
+                latestModelsCount: 0,
+                pageSize: 20,
+                latestModels: function () {
+                    return SearchCollection.prototype.latestModels.apply(this, arguments);
+                }
             });
 
             describe('DashSearchForm', function () {
@@ -492,7 +562,7 @@ define([
                     '<section id="dashboard-search-results"></section>' +
                     '<section id="my-courses"></section>'
                 );
-
+                
                 TemplateHelpers.installTemplates([
                     'templates/search/course_search_item',
                     'templates/search/dashboard_search_item',
@@ -502,6 +572,12 @@ define([
                     'templates/search/search_loading',
                     'templates/search/search_error'
                 ]);
+
+                var courseId = 'a/b/c';
+                CourseSearchFactory(courseId);
+                spyOn(Backbone.history, 'navigate');
+                this.$contentElement = $('#course-content');
+                this.$searchResults = $('.courseware-results');
 
                 var MockCollection = Backbone.Collection.extend({
                     hasNextPage: function () {},

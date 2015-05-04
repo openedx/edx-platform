@@ -97,6 +97,10 @@ from eventtracking import tracker
 import analytics
 from courseware.url_helpers import get_redirect_url
 
+from lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
+
+
 log = logging.getLogger("edx.courseware")
 
 template_imports = {'urllib': urllib}
@@ -424,6 +428,8 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             'studio_url': studio_url,
             'masquerade': masquerade,
             'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
+            'reverifications': fetch_reverify_banner_info(request, course_key),
+            'language_preference': language_preference,
         }
 
         now = datetime.now(UTC())
