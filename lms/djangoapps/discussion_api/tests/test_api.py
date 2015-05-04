@@ -323,13 +323,16 @@ class GetCourseTopicsTest(ModuleStoreTestCase):
 
 
 @ddt.ddt
-@httpretty.activate
 class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
     """Test for get_thread_list"""
     def setUp(self):
         super(GetThreadListTest, self).setUp()
+        httpretty.reset()
+        httpretty.enable()
+        self.addCleanup(httpretty.disable)
         self.maxDiff = None  # pylint: disable=invalid-name
         self.user = UserFactory.create()
+        self.register_get_user_response(self.user)
         self.request = RequestFactory().get("/test_path")
         self.request.user = self.user
         self.course = CourseFactory.create()
@@ -366,6 +369,11 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
         })
 
     def test_thread_content(self):
+        self.register_get_user_response(
+            self.user,
+            subscribed_thread_ids=["test_thread_id_0"],
+            upvoted_ids=["test_thread_id_1"]
+        )
         source_threads = [
             {
                 "id": "test_thread_id_0",
@@ -378,6 +386,8 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "body": "Test body",
                 "pinned": False,
                 "closed": False,
+                "abuse_flaggers": [],
+                "votes": {"up_count": 4},
                 "comments_count": 5,
                 "unread_comments_count": 3,
             },
@@ -392,6 +402,8 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "body": "More content",
                 "pinned": False,
                 "closed": True,
+                "abuse_flaggers": [],
+                "votes": {"up_count": 9},
                 "comments_count": 18,
                 "unread_comments_count": 0,
             },
@@ -406,6 +418,8 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "body": "Still more content",
                 "pinned": True,
                 "closed": False,
+                "abuse_flaggers": [str(self.user.id)],
+                "votes": {"up_count": 0},
                 "comments_count": 0,
                 "unread_comments_count": 0,
             },
@@ -422,6 +436,10 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "raw_body": "Test body",
                 "pinned": False,
                 "closed": False,
+                "following": True,
+                "abuse_flagged": False,
+                "voted": False,
+                "vote_count": 4,
                 "comment_count": 5,
                 "unread_comment_count": 3,
             },
@@ -436,6 +454,10 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "raw_body": "More content",
                 "pinned": False,
                 "closed": True,
+                "following": False,
+                "abuse_flagged": False,
+                "voted": True,
+                "vote_count": 9,
                 "comment_count": 18,
                 "unread_comment_count": 0,
             },
@@ -450,6 +472,10 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "raw_body": "Still more content",
                 "pinned": True,
                 "closed": False,
+                "following": False,
+                "abuse_flagged": True,
+                "voted": False,
+                "vote_count": 0,
                 "comment_count": 0,
                 "unread_comment_count": 0,
             },
