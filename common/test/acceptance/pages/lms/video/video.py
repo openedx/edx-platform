@@ -23,7 +23,7 @@ VIDEO_BUTTONS = {
     'speed': '.speeds',
     'quality': '.quality-control',
     'do_not_show_again': '.skip-control',
-    'skip_bumper': '.skip',
+    'skip_bumper': '.play-skip-control',
 }
 
 CSS_CLASS_NAMES = {

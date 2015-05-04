@@ -25,7 +25,7 @@ define('video/09_play_skip_control.js', [], function() {
 
     PlaySkipControl.prototype = {
         template: [
-            '<a class="video_control play" href="#" title="',
+            '<a class="video_control play play-skip-control" href="#" title="',
                 gettext('Play'), '" role="button" aria-disabled="false">',
                 gettext('Play'),
             '</a>'

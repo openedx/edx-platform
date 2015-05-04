@@ -115,7 +115,7 @@
                 if (bumperMetadata) {
                     new VideoPoster(state.el, {
                         poster: el.data('poster'),
-                        onClick: function () {
+                        onClick: _.once(function () {
                             var mainVideoPlayer = player(state), bumper, bumperState;
                             if (storage.getItem('isBumperShown')) {
                                 mainVideoPlayer();
@@ -128,7 +128,7 @@
                                     mainVideoPlayer();
                                 });
                             }
-                        }
+                        })
                     });
                 } else {
                     initialize(state, element);
