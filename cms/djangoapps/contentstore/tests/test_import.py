@@ -283,3 +283,34 @@ class ContentStoreImportTest(SignalDisconnectTestMixin, ModuleStoreTestCase):
         }
 
         self.assertEqual(remapped_verticals, split_test_module.group_id_to_child)
+
+    def test_video_components_present_while_import(self):
+        """
+        Test that video components are present while re-importing
+        """
+        with modulestore().default_store(ModuleStoreEnum.Type.mongo):
+            module_store = modulestore()
+            course_id = module_store.make_course_key('edX', 'test_video_modules', '2015_M4')
+            import_course_from_xml(
+                module_store,
+                self.user.id,
+                TEST_DATA_DIR,
+                ['plat-612'],
+                target_id=course_id,
+                create_if_not_present=True
+            )
+
+            course = module_store.get_course(course_id)
+            course_key = course.id
+
+            self.assertIsNotNone(course)
+
+            vertical_location = course_key.make_usage_key('vertical', 'e5684330d8904500b7987b3d49d68c63')
+            vertical = module_store.get_item(vertical_location)
+
+            self.assertIsNotNone(vertical)
+            self.assertTrue(len(vertical.children) > 0)
+
+            video = module_store.get_item(vertical.children[0])
+            self.assertIsNotNone(video)
+            self.assertTrue(video.display_name == 'Video: The Cele Group')
