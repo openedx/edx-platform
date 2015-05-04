@@ -110,6 +110,54 @@ function () {
                     });
         };
 
+        Player.prototype.onError = function (event) {
+            if ($.isFunction(this.config.events.onError)) {
+                this.config.events.onError();
+            }
+        };
+
+        Player.prototype.destroy = function () {
+            this.video.removeEventListener('loadedmetadata', this.onLoadedMetadata, false);
+            this.video.removeEventListener('play', this.onPlay, false);
+            this.video.removeEventListener('playing', this.onPlaying, false);
+            this.video.removeEventListener('pause', this.onPause, false);
+            this.video.removeEventListener('ended', this.onEnded, false);
+            this.el
+                .find('.video-player div').removeClass('hidden')
+                .end()
+                .find('.video-player h3').addClass('hidden')
+                .end().removeClass('is-initialized')
+                .find('.spinner').attr({'aria-hidden': 'false'});
+            this.videoEl.remove();
+        };
+
+        Player.prototype.onLoadedMetadata = function () {
+            this.playerState = HTML5Video.PlayerState.PAUSED;
+            if ($.isFunction(this.config.events.onReady)) {
+                this.config.events.onReady(null);
+            }
+        };
+
+        Player.prototype.onPlay = function () {
+            this.playerState = HTML5Video.PlayerState.BUFFERING;
+            this.callStateChangeCallback();
+        };
+
+        Player.prototype.onPlaying = function () {
+            this.playerState = HTML5Video.PlayerState.PLAYING;
+            this.callStateChangeCallback();
+        };
+
+        Player.prototype.onPause = function () {
+            this.playerState = HTML5Video.PlayerState.PAUSED;
+            this.callStateChangeCallback();
+        };
+
+        Player.prototype.onEnded = function () {
+            this.playerState = HTML5Video.PlayerState.ENDED;
+            this.callStateChangeCallback();
+        };
+
         return Player;
 
         /*
@@ -152,6 +200,7 @@ function () {
             var isTouch = onTouchBasedDevice() || '',
                 sourceList, _this, errorMessage, lastSource;
 
+            _.bindAll(this, 'onLoadedMetadata', 'onPlay', 'onPlaying', 'onPause', 'onEnded');
             this.logs = [];
             // Initially we assume that el is a DOM element. If jQuery selector
             // fails to select something, we assume that el is an ID of a DOM
@@ -226,6 +275,8 @@ function () {
 
             lastSource = this.videoEl.find('source').last();
             lastSource.on('error', this.showErrorMessage.bind(this));
+            lastSource.on('error', this.onError.bind(this));
+            this.videoEl.on('error', this.onError.bind(this));
 
             if (/iP(hone|od)/i.test(isTouch[0])) {
                 this.videoEl.prop('controls', true);
@@ -280,35 +331,11 @@ function () {
             // When the <video> tag has been processed by the browser, and it
             // is ready for playback, notify other parts of the VideoPlayer,
             // and initially pause the video.
-            this.video.addEventListener('loadedmetadata', function () {
-                _this.playerState = HTML5Video.PlayerState.PAUSED;
-                if ($.isFunction(_this.config.events.onReady)) {
-                    _this.config.events.onReady(null);
-                }
-            }, false);
-
-            // Register the 'play' event.
-            this.video.addEventListener('play', function () {
-                _this.playerState = HTML5Video.PlayerState.BUFFERING;
-                _this.callStateChangeCallback();
-            }, false);
-
-            this.video.addEventListener('playing', function () {
-                _this.playerState = HTML5Video.PlayerState.PLAYING;
-                _this.callStateChangeCallback();
-            }, false);
-
-            // Register the 'pause' event.
-            this.video.addEventListener('pause', function () {
-                _this.playerState = HTML5Video.PlayerState.PAUSED;
-                _this.callStateChangeCallback();
-            }, false);
-
-            // Register the 'ended' event.
-            this.video.addEventListener('ended', function () {
-                _this.playerState = HTML5Video.PlayerState.ENDED;
-                _this.callStateChangeCallback();
-            }, false);
+            this.video.addEventListener('loadedmetadata', this.onLoadedMetadata, false);
+            this.video.addEventListener('play', this.onPlay, false);
+            this.video.addEventListener('playing', this.onPlaying, false);
+            this.video.addEventListener('pause', this.onPause, false);
+            this.video.addEventListener('ended', this.onEnded, false);
 
             // Place the <video> element on the page.
             this.videoEl.appendTo(this.el.find('.video-player div'));

@@ -408,12 +408,15 @@ def generate_sjson_for_all_speeds(item, user_filename, result_subs_dict, lang):
     )
 
 
-def get_or_create_sjson(item):
+def get_or_create_sjson(item, transcripts):
     """
     Get sjson if already exists, otherwise generate it.
 
     Generate sjson with subs_id name, from user uploaded srt.
     Subs_id is extracted from srt filename, which was set by user.
+
+    Args:
+        transcipts (dict): dictionary of (language: file) pairs.
 
     Raises:
         TranscriptException: when srt subtitles do not exist,
@@ -421,7 +424,7 @@ def get_or_create_sjson(item):
 
     `item` is module object.
     """
-    user_filename = item.transcripts[item.transcript_language]
+    user_filename = transcripts[item.transcript_language]
     user_subs_id = os.path.splitext(user_filename)[0]
     source_subs_id, result_subs_dict = user_subs_id, {1.0: user_subs_id}
     try:
@@ -517,7 +520,7 @@ class VideoTranscriptsMixin(object):
     This is necessary for both VideoModule and VideoDescriptor.
     """
 
-    def available_translations(self, verify_assets=True):
+    def available_translations(self, bumper=False, verify_assets=True):
         """Return a list of language codes for which we have transcripts.
 
         Args:
@@ -528,36 +531,53 @@ class VideoTranscriptsMixin(object):
                 when trying to make a listing of videos and their languages.
 
                 Defaults to True.
+
+            bumper (boolean): Return a list of language codes for which we have transcripts for video bumper.
+
+                Defaults to False
         """
         translations = []
 
-        # If we're not verifying the assets, we just trust our field values
-        if not verify_assets:
-            translations = list(self.transcripts)
-            if not translations or self.sub:
-                translations += ['en']
-            return set(translations)
+        if not bumper:
+            # If we're not verifying the assets, we just trust our field values
+            if not verify_assets:
+                translations = list(self.transcripts)
+                if not translations or self.sub:
+                    translations += ['en']
+                return set(translations)
 
-        # If we've gotten this far, we're going to verify that the transcripts
-        # being referenced are actually in the contentstore.
-        if self.sub:  # check if sjson exists for 'en'.
-            try:
-                Transcript.asset(self.location, self.sub, 'en')
-            except NotFoundError:
-                pass
-            else:
-                translations = ['en']
+            # If we've gotten this far, we're going to verify that the transcripts
+            # being referenced are actually in the contentstore.
+            if self.sub:  # check if sjson exists for 'en'.
+                try:
+                    Transcript.asset(self.location, self.sub, 'en')
+                except NotFoundError:
+                    pass
+                else:
+                    translations = ['en']
 
-        for lang in self.transcripts:
-            try:
-                Transcript.asset(self.location, None, None, self.transcripts[lang])
-            except NotFoundError:
-                continue
-            translations.append(lang)
+            for lang in self.transcripts:
+                try:
+                    Transcript.asset(self.location, None, None, self.transcripts[lang])
+                except NotFoundError:
+                    continue
+                translations.append(lang)
+
+        else:
+            # If we're not verifying the assets, we just trust our field values
+            if not verify_assets:
+                return self.bumper_transcripts.keys()
+
+            for lang in self.bumper_transcripts:
+                try:
+                    Transcript.asset(self.location, None, None, self.bumper_transcripts[lang])
+                except NotFoundError:
+                    continue
+                translations.append(lang)
 
         return translations
 
-    def get_transcript(self, transcript_format='srt', lang=None):
+    def get_transcript(self, transcript_format='srt', lang=None, bumper=False):
         """
         Returns transcript, filename and MIME type.
 
@@ -574,7 +594,7 @@ class VideoTranscriptsMixin(object):
         if not lang:
             lang = self.transcript_language
 
-        if lang == 'en':
+        if lang == 'en' and not bumper:
             if self.sub:  # HTML5 case and (Youtube case for new style videos)
                 transcript_name = self.sub
             elif self.youtube_id_1_0:  # old courses
@@ -587,8 +607,9 @@ class VideoTranscriptsMixin(object):
             filename = u'{}.{}'.format(transcript_name, transcript_format)
             content = Transcript.convert(data, 'sjson', transcript_format)
         else:
-            data = Transcript.asset(self.location, None, None, self.transcripts[lang]).data
-            filename = u'{}.{}'.format(os.path.splitext(self.transcripts[lang])[0], transcript_format)
+            transcripts = self.transcripts if not bumper else self.bumper_transcripts
+            data = Transcript.asset(self.location, None, None, transcripts[lang]).data
+            filename = u'{}.{}'.format(os.path.splitext(transcripts[lang])[0], transcript_format)
             content = Transcript.convert(data, 'srt', transcript_format)
 
         if not content:
@@ -597,16 +618,19 @@ class VideoTranscriptsMixin(object):
 
         return content, filename, Transcript.mime_types[transcript_format]
 
-    def get_default_transcript_language(self):
+    def get_default_transcript_language(self, transcripts, bumper=False):
         """
         Returns the default transcript language for this video module.
+
+        Args:
+            transcripts (dict): self.transcripts for video or self.bumper_transcripts for bumper
         """
-        if self.transcript_language in self.transcripts:
+        if self.transcript_language in transcripts:
             transcript_language = self.transcript_language
-        elif self.sub:
+        elif self.sub and not bumper:
             transcript_language = u'en'
-        elif len(self.transcripts) > 0:
-            transcript_language = sorted(self.transcripts)[0]
+        elif len(transcripts) > 0:
+            transcript_language = sorted(transcripts)[0]
         else:
             transcript_language = u'en'
         return transcript_language
