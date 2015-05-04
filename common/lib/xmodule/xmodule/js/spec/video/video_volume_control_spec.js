@@ -13,6 +13,7 @@ describe('VideoVolumeControl', function () {
         $('source').remove();
         window.onTouchBasedDevice = oldOTBD;
         state.storage.clear();
+        state.videoPlayer.destroy();
     });
 
     it('Volume level has correct value even if cookie is broken', function () {
@@ -35,8 +36,7 @@ describe('VideoVolumeControl', function () {
         });
 
         it('render the volume control', function () {
-            expect(state.videoControl.secondaryControlsEl.html())
-                .toContain('<div class="volume">\n');
+            expect($('.volume')).toExist();
         });
 
         it('create the slider', function () {
@@ -292,7 +292,7 @@ describe('VideoVolumeControl', function () {
                 shiftKey: true
             });
         });
-    })
+    });
 
     describe('keyDownButtonHandler', function () {
         beforeEach(function () {
@@ -308,6 +308,6 @@ describe('VideoVolumeControl', function () {
             }));
             expect(volumeControl.getMuteStatus()).toEqual(isMuted);
         });
-    })
+    });
 });
 }).call(this);

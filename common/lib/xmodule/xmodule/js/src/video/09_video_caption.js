@@ -1,5 +1,4 @@
 (function (define) {
-
 // VideoCaption module.
 define(
 'video/09_video_caption.js',
@@ -24,6 +23,10 @@ function (Sjson, AsyncProcess) {
             return new VideoCaption(state);
         }
 
+        _.bindAll(this, 'toggle', 'onMouseEnter', 'onMouseLeave', 'onMovement',
+            'onContainerMouseEnter', 'onContainerMouseLeave', 'fetchCaption',
+            'onResize', 'pause', 'play', 'onCaptionUpdate', 'onCaptionHandler', 'destroy'
+        );
         this.state = state;
         this.state.videoCaption = this;
         this.renderElements();
@@ -32,29 +35,58 @@ function (Sjson, AsyncProcess) {
     };
 
     VideoCaption.prototype = {
+        langTemplate: [
+            '<div class="lang menu-container">',
+                '<a href="#" class="hide-subtitles" title="',
+                    gettext('Turn off captions'), '" role="button" aria-disabled="false">',
+                    gettext('Turn off captions'),
+                '</a>',
+            '</div>'
+        ].join(''),
+
+        template: [
+            '<ol id="transcript-captions" class="subtitles" tabindex="0" role="group" aria-label="',
+                gettext('Activating an item in this group will spool the video to the corresponding time point. To skip transcript, go to previous item.'),
+                '">',
+                '<li></li>',
+            '</ol>'
+        ].join(''),
+
+        destroy: function () {
+            this.state.el
+                .off({
+                    'caption:fetch': this.fetchCaption,
+                    'caption:resize': this.onResize,
+                    'caption:update': this.onCaptionUpdate,
+                    'ended': this.pause,
+                    'fullscreen': this.onResize,
+                    'pause': this.pause,
+                    'play': this.play,
+                    'destroy': this.destroy
+                })
+                .removeClass('is-captions-rendered');
+            this.subtitlesEl.remove();
+            this.container.remove();
+            delete this.state.videoCaption;
+        },
         /**
         * @desc Initiate rendering of elements, and set their initial configuration.
         *
         */
         renderElements: function () {
-            var state = this.state,
-                languages = this.state.config.transcriptLanguages;
+            var languages = this.state.config.transcriptLanguages;
 
             this.loaded = false;
-            this.subtitlesEl = state.el.find('ol.subtitles');
-            this.container = state.el.find('.lang');
-            this.hideSubtitlesEl = state.el.find('a.hide-subtitles');
+            this.subtitlesEl = $(this.template);
+            this.container = $(this.langTemplate);
+            this.hideSubtitlesEl = this.container.find('a.hide-subtitles');
 
             if (_.keys(languages).length) {
                 this.renderLanguageMenu(languages);
-
-                if (!this.fetchCaption()) {
-                    this.hideCaptions(true);
-                    this.hideSubtitlesEl.hide();
+                if (this.fetchCaption()) {
+                    this.state.el.find('.video-wrapper').after(this.subtitlesEl);
+                    this.state.el.find('.secondary-controls').append(this.container);
                 }
-            } else {
-                this.hideCaptions(true, false);
-                this.hideSubtitlesEl.hide();
             }
         },
 
@@ -64,65 +96,40 @@ function (Sjson, AsyncProcess) {
         *
         */
         bindHandlers: function () {
-            var self = this,
-                state = this.state,
+            var state = this.state,
                 events = [
                     'mouseover', 'mouseout', 'mousedown', 'click', 'focus', 'blur',
                     'keydown'
                 ].join(' ');
 
-            // Change context to VideoCaption of event handlers using `bind`.
-            this.hideSubtitlesEl.on('click', this.toggle.bind(this));
+            this.hideSubtitlesEl.on('click', this.toggle);
             this.subtitlesEl
                 .on({
-                    mouseenter: this.onMouseEnter.bind(this),
-                    mouseleave: this.onMouseLeave.bind(this),
-                    mousemove: this.onMovement.bind(this),
-                    mousewheel: this.onMovement.bind(this),
-                    DOMMouseScroll: this.onMovement.bind(this)
+                    mouseenter: this.onMouseEnter,
+                    mouseleave: this.onMouseLeave,
+                    mousemove: this.onMovement,
+                    mousewheel: this.onMovement,
+                    DOMMouseScroll: this.onMovement
                 })
-                .on(events, 'li[data-index]', function (event) {
-                    switch (event.type) {
-                        case 'mouseover':
-                        case 'mouseout':
-                            self.captionMouseOverOut(event);
-                            break;
-                        case 'mousedown':
-                            self.captionMouseDown(event);
-                            break;
-                        case 'click':
-                            self.captionClick(event);
-                            break;
-                        case 'focusin':
-                            self.captionFocus(event);
-                            break;
-                        case 'focusout':
-                            self.captionBlur(event);
-                            break;
-                        case 'keydown':
-                            self.captionKeyDown(event);
-                            break;
-                    }
-                });
+                .on(events, 'li[data-index]', this.onCaptionHandler);
 
             if (this.showLanguageMenu) {
                 this.container.on({
-                    mouseenter: this.onContainerMouseEnter.bind(this),
-                    mouseleave: this.onContainerMouseLeave.bind(this)
+                    mouseenter: this.onContainerMouseEnter,
+                    mouseleave: this.onContainerMouseLeave
                 });
             }
 
             state.el
                 .on({
-                    'caption:fetch': this.fetchCaption.bind(this),
-                    'caption:resize': this.onResize.bind(this),
-                    'caption:update': function (event, time) {
-                        self.updatePlayTime(time);
-                    },
-                    'ended': this.pause.bind(this),
-                    'fullscreen': this.onResize.bind(this),
-                    'pause': this.pause.bind(this),
-                    'play': this.play.bind(this)
+                    'caption:fetch': this.fetchCaption,
+                    'caption:resize': this.onResize,
+                    'caption:update': this.onCaptionUpdate,
+                    'ended': this.pause,
+                    'fullscreen': this.onResize,
+                    'pause': this.pause,
+                    'play': this.play,
+                    'destroy': this.destroy
                 });
 
             if ((state.videoType === 'html5') && (state.config.autohideHtml5)) {
@@ -130,6 +137,33 @@ function (Sjson, AsyncProcess) {
             }
         },
 
+        onCaptionUpdate: function (event, time) {
+            this.updatePlayTime(time);
+        },
+
+        onCaptionHandler: function (event) {
+            switch (event.type) {
+                case 'mouseover':
+                case 'mouseout':
+                    this.captionMouseOverOut(event);
+                    break;
+                case 'mousedown':
+                    this.captionMouseDown(event);
+                    break;
+                case 'click':
+                    this.captionClick(event);
+                    break;
+                case 'focusin':
+                    this.captionFocus(event);
+                    break;
+                case 'focusout':
+                    this.captionBlur(event);
+                    break;
+                case 'keydown':
+                    this.captionKeyDown(event);
+                    break;
+            }
+        },
 
         /**
         * @desc Opens language menu.
@@ -138,8 +172,8 @@ function (Sjson, AsyncProcess) {
         */
         onContainerMouseEnter: function (event) {
             event.preventDefault();
-            this.state.videoPlayer.log('video_show_cc_menu', {});
             $(event.currentTarget).addClass('is-opened');
+            this.state.el.trigger('language_menu:show');
         },
 
         /**
@@ -149,8 +183,8 @@ function (Sjson, AsyncProcess) {
         */
         onContainerMouseLeave: function (event) {
             event.preventDefault();
-            this.state.videoPlayer.log('video_hide_cc_menu', {});
             $(event.currentTarget).removeClass('is-opened');
+            this.state.el.trigger('language_menu:hide');
         },
 
         /**
@@ -417,11 +451,11 @@ function (Sjson, AsyncProcess) {
 
                 if (state.lang !== langCode) {
                     state.lang = langCode;
-                    state.storage.setItem('language', langCode);
                     el  .addClass('is-active')
                         .siblings('li')
                         .removeClass('is-active');
 
+                    state.el.trigger('language_menu:change', [langCode]);
                     self.fetchCaption();
                 }
             });
@@ -658,7 +692,7 @@ function (Sjson, AsyncProcess) {
         *
         */
         play: function () {
-            var startAndCaptions, start, end;
+            var captions, startAndCaptions, start;
             if (this.loaded) {
                 if (!this.rendered) {
                     startAndCaptions = this.getBoundedCaptions();
@@ -689,10 +723,7 @@ function (Sjson, AsyncProcess) {
         */
         updatePlayTime: function (time) {
             var state = this.state,
-                startTime,
-                endTime,
-                params,
-                newIndex;
+                params, newIndex;
 
             if (this.loaded) {
                 if (state.isFlashMode()) {
@@ -813,35 +844,28 @@ function (Sjson, AsyncProcess) {
         */
         hideCaptions: function (hide_captions, update_cookie) {
             var hideSubtitlesEl = this.hideSubtitlesEl,
-                state = this.state,
-                type, text;
+                state = this.state, text;
 
             if (typeof update_cookie === 'undefined') {
                 update_cookie = true;
             }
 
             if (hide_captions) {
-                type = 'hide_transcript';
                 state.captionsHidden = true;
                 state.el.addClass('closed');
                 text = gettext('Turn on captions');
+                this.state.el.trigger('captions:hide');
             } else {
-                type = 'show_transcript';
                 state.captionsHidden = false;
                 state.el.removeClass('closed');
                 this.scrollCaption();
                 text = gettext('Turn off captions');
+                this.state.el.trigger('captions:show');
             }
 
             hideSubtitlesEl
                 .attr('title', text)
                 .text(gettext(text));
-
-            if (state.videoPlayer) {
-                state.videoPlayer.log(type, {
-                    currentTime: state.videoPlayer.currentTime
-                });
-            }
 
             if (state.resizer) {
                 if (state.isFullScreen) {
@@ -868,9 +892,8 @@ function (Sjson, AsyncProcess) {
         */
         captionHeight: function () {
             var state = this.state;
-
             if (state.isFullScreen) {
-                return state.container.height() - state.videoControl.height;
+                return state.container.height() - state.videoFullScreen.height;
             } else {
                 return state.container.height();
             }
@@ -889,8 +912,8 @@ function (Sjson, AsyncProcess) {
             ) {
                 // In case of html5 autoshowing subtitles, we adjust height of
                 // subs, by height of scrollbar.
-                height = state.videoControl.el.height() +
-                    0.5 * state.videoControl.sliderEl.height();
+                height = state.el.find('.video-controls').height() +
+                    0.5 * state.el.find('.slider').height();
                 // Height of videoControl does not contain height of slider.
                 // css is set to absolute, to avoid yanking when slider
                 // autochanges its height.

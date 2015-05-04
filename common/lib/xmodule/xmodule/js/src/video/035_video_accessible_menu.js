@@ -299,8 +299,7 @@ function () {
         var fileType = $(event.currentTarget).data('value');
 
         this.videoAccessibleMenu.setValue(fileType);
-        this.saveState(true, {'transcript_download_format': fileType});
-        this.storage.setItem('transcript_download_format', fileType);
+        this.el.trigger('transcript_download:change', [fileType]);
     }
 
 });
