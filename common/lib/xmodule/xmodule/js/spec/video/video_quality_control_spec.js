@@ -1,12 +1,13 @@
 (function (undefined) {
     describe('VideoQualityControl', function () {
-        var state, qualityControl, qualityControlEl, videoPlayer, player;
+        var state, qualityControl, videoPlayer, player;
 
         afterEach(function () {
             $('source').remove();
             if (state.storage) {
                 state.storage.clear();
             }
+            state.videoPlayer.destroy();
         });
 
         describe('constructor, YouTube mode', function () {

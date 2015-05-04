@@ -10,8 +10,8 @@
 
         afterEach(function () {
             state.storage.clear();
+            state.videoPlayer.destroy();
             $.fn.scrollTo.reset();
-            $('.subtitles').remove();
             $('source').remove();
             window.onTouchBasedDevice = oldOTBD;
         });

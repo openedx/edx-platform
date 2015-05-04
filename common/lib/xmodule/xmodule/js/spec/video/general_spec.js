@@ -1,6 +1,6 @@
 (function (undefined) {
     describe('Video', function () {
-        var oldOTBD;
+        var oldOTBD, state;
 
         beforeEach(function () {
             jasmine.stubRequests();
@@ -17,11 +17,12 @@
                 beforeEach(function () {
                     loadFixtures('video.html');
                     $.cookie.andReturn('0.50');
+                    this.state = jasmine.initializePlayerYouTube('video_html5.html');
                 });
 
                 describe('by default', function () {
-                    beforeEach(function () {
-                        this.state = new window.Video('#example');
+                    afterEach(function () {
+                        this.state.videoPlayer.destroy();
                     });
 
                     it('check videoType', function () {
@@ -54,19 +55,16 @@
                 var state;
 
                 beforeEach(function () {
-                    loadFixtures('video_html5.html');
                     $.cookie.andReturn('0.75');
+                    state = jasmine.initializePlayer('video_html5.html');
+                });
+
+                afterEach(function () {
+                    state.videoPlayer.destroy();
+                    state = undefined;
                 });
 
                 describe('by default', function () {
-                    beforeEach(function () {
-                        state = new window.Video('#example');
-                    });
-
-                    afterEach(function () {
-                        state = undefined;
-                    });
-
                     it('check videoType', function () {
                         expect(state.videoType).toEqual('html5');
                     });
@@ -95,14 +93,6 @@
                 // the stand alone HTML5 player object is already loaded, so no
                 // further testing in that case is required.
                 describe('HTML5 API is available', function () {
-                    beforeEach(function () {
-                        state = new Video('#example');
-                    });
-
-                    afterEach(function () {
-                        state = null;
-                    });
-
                     it('create the Video Player', function () {
                         expect(state.videoPlayer.player).not.toBeUndefined();
                     });
@@ -113,8 +103,11 @@
         describe('YouTube API is not loaded', function () {
             beforeEach(function () {
                 window.YT = undefined;
+                state = jasmine.initializePlayerYouTube();
+            })
 
-                state = jasmine.initializePlayerYouTube('video.html');
+            afterEach(function () {
+                state.videoPlayer.destroy();
             });
 
             it('callback, to be called after YouTube API loads, exists and is called', function () {
@@ -159,9 +152,8 @@
                 }
             ];
 
-            beforeEach(function () {
-                loadFixtures('video.html');
-
+            afterEach(function () {
+                state.videoPlayer.destroy();
             });
 
             $.each(miniTestSuite, function (index, test) {
@@ -172,13 +164,10 @@
 
             function itFabrique(itDescription, data, expectData) {
                 it(itDescription, function () {
-                    $('#example').find('.video')
-                        .data({
-                            'start': data.start,
-                            'end': data.end
-                        });
-
-                    state = new Video('#example');
+                    state = jasmine.initializePlayer('video.html', {
+                        'start': data.start,
+                        'end': data.end
+                    });
 
                     expect(state.config.startTime).toBe(expectData.start);
                     expect(state.config.endTime).toBe(expectData.end);
@@ -236,27 +225,6 @@
                 //
                 //     this.youtubeXhr = this.getVideoMetadata();
                 expect(numAjaxCalls).toBe(1);
-            });
-        });
-
-        describe('log', function () {
-            beforeEach(function () {
-                loadFixtures('video_html5.html');
-                state = new Video('#example');
-                spyOn(Logger, 'log');
-                state.videoPlayer.log('someEvent', {
-                    currentTime: 25,
-                    speed: '1.0'
-                });
-            });
-
-            it('call the logger with valid extra parameters', function () {
-                expect(Logger.log).toHaveBeenCalledWith('someEvent', {
-                    id: 'id',
-                    code: 'html5',
-                    currentTime: 25,
-                    speed: '1.0'
-                });
             });
         });
     });

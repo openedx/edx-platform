@@ -12,6 +12,7 @@
             $('source').remove();
             window.onTouchBasedDevice = oldOTBD;
             state.storage.clear();
+            state.videoPlayer.destroy();
         });
 
         describe('constructor', function () {

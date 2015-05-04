@@ -149,6 +149,17 @@ class InheritanceMixin(XBlockMixin):
         default=True,
         scope=Scope.settings
     )
+    video_bumper = Dict(
+        display_name=_("Video Bumper Settings"),
+        help=_(
+            """Enter video bumper settings in the following format:"""
+            """{"""
+            """ "edx_video_id": "edx_video_id","""
+            """ "transcripts": {"en": "b7xgknqkQk8.srt", "ua": "ua.srt"}, """
+            """}"""
+        ),
+        scope=Scope.settings
+    )
 
     reset_key = "DEFAULT_SHOW_RESET_BUTTON"
     default_reset_button = getattr(settings, reset_key) if hasattr(settings, reset_key) else False
