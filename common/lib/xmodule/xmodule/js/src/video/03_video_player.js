@@ -36,6 +36,7 @@ function (HTML5Video, Resizer) {
             onPlay: onPlay,
             runTimer: runTimer,
             stopTimer: stopTimer,
+            onLoadMetadataHtml5: onLoadMetadataHtml5,
             onPlaybackQualityChange: onPlaybackQualityChange,
             onReady: onReady,
             onSlideSeek: onSeek,
@@ -376,7 +377,7 @@ function (HTML5Video, Resizer) {
                     end: true
                 });
 
-                this.el.trigger('stop');            
+                this.el.trigger('stop');
             }
             this.el.trigger('timeupdate', [this.videoPlayer.currentTime]);
         }
