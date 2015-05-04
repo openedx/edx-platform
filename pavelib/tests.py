@@ -214,6 +214,18 @@ def coverage(options):
 
 @task
 @needs('pavelib.prereqs.install_prereqs')
+def combine_coverage():
+    """
+    Combine coverage reports.
+    """
+    for directory in Env.LIB_TEST_DIRS + ['cms', 'lms']:
+        report_dir = Env.REPORT_DIR / directory
+        if report_dir.isdir():
+            sh("cd {} && coverage combine".format(report_dir))
+
+
+@task
+@needs('pavelib.prereqs.install_prereqs')
 @cmdopts([
     ("compare_branch=", "b", "Branch to compare against, defaults to origin/master"),
 ])
