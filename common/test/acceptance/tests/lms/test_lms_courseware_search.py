@@ -5,6 +5,7 @@ import os
 import json
 
 from nose.plugins.attrib import attr
+from flaky import flaky
 
 from ..helpers import UniqueCourseTest
 from ...pages.common.logout import LogoutPage
@@ -178,6 +179,7 @@ class CoursewareSearchTest(UniqueCourseTest):
         # Do the search again, this time we expect results.
         self.assertTrue(self._search_for_content(self.SEARCH_STRING))
 
+    @flaky  # TODO fix SOL-835
     def test_reindex(self):
         """
         Make sure new content gets reindexed on button press.
