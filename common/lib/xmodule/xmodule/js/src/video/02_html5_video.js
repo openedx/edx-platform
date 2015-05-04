@@ -112,7 +112,7 @@ function () {
 
         Player.prototype.onError = function (event) {
             if ($.isFunction(this.config.events.onError)) {
-                this.config.events.onError(event.target.error.code);
+                this.config.events.onError();
             }
         };
 
@@ -122,6 +122,12 @@ function () {
             this.video.removeEventListener('playing', this.onPlaying, false);
             this.video.removeEventListener('pause', this.onPause, false);
             this.video.removeEventListener('ended', this.onEnded, false);
+            this.el
+                .find('.video-player div').removeClass('hidden')
+                .end()
+                .find('.video-player h3').addClass('hidden')
+                .end().removeClass('is-initialized')
+                .find('.spinner').attr({'aria-hidden': 'false'});
             this.videoEl.remove();
         };
 
