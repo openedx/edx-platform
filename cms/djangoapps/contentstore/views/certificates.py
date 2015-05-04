@@ -178,9 +178,10 @@ class CertificateManager(object):
         Remove the specified signatory from the specified course certificate
         Currently the 'signatory_id' is simply the index value of the signatories array
         """
-        for cert_index, cert in enumerate(course.certificates['certificates']):
+        for cert_index, cert in enumerate(course.certificates['certificates']):  # pylint: disable=unused-variable
+
             if int(cert['id']) == int(certificate_id):
-                for sig_index, signatory in enumerate(cert.get('signatories')):
+                for sig_index, signatory in enumerate(cert.get('signatories')):  # pylint: disable=unused-variable
                     if int(signatory_id) == int(sig_index):
                         del cert['signatories'][sig_index]
                         store.update_item(course, request.user.id)
@@ -198,7 +199,7 @@ class Certificate(object):
         """
         self.course = course
         self.certificate_data = certificate_data
-        self.id = certificate_data['id']
+        self.id = certificate_data['id']  # pylint: disable=invalid-name
 
     def get_certificate_data(self):
         """
@@ -335,12 +336,11 @@ def signatory_detail_handler(request, course_key_string, certificate_id, signato
         course = get_course_and_check_access(course_key, request.user)
         certificates_list = course.certificates['certificates']
 
-        match_index = None
         match_cert = None
+        # pylint: disable=unused-variable
         for index, cert in enumerate(certificates_list):
             if certificate_id is not None:
                 if int(cert['id']) == int(certificate_id):
-                    match_index = index
                     match_cert = cert
 
         if request.method == "DELETE":

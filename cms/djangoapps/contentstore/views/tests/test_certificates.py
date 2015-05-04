@@ -358,7 +358,6 @@ class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase
         )
         self.assertEqual(response.status_code, 404)
 
-
     def test_can_delete_signatory(self):
         """
         Delete an existing certificate signatory
