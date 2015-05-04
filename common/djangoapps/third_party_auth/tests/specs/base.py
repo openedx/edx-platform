@@ -115,12 +115,12 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         """Asserts the user's account settings page context is in the expected state.
 
         If duplicate is True, we expect context['duplicate_provider'] to contain
-        the duplicate provider object. If linked is passed, we conditionally
+        the duplicate provider backend name. If linked is passed, we conditionally
         check that the provider is included in context['auth']['providers'] and
         its connected state is correct.
         """
         if duplicate:
-            self.assertEqual(context['duplicate_provider'].NAME, self.PROVIDER_CLASS.NAME)
+            self.assertEqual(context['duplicate_provider'], self.PROVIDER_CLASS.BACKEND_CLASS.name)
         else:
             self.assertIsNone(context['duplicate_provider'])
 

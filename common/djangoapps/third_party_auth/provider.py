@@ -5,6 +5,8 @@ invoke the Django armature.
 """
 
 from social.backends import google, linkedin, facebook
+from social.backends.saml import OID_EDU_PERSON_PRINCIPAL_NAME
+from .saml import SAMLAuthBackend
 
 _DEFAULT_ICON_CLASS = 'fa-signin'
 
@@ -36,7 +38,7 @@ class BaseProvider(object):
         return '%s.%s' % (cls.BACKEND_CLASS.__module__, cls.BACKEND_CLASS.__name__)
 
     @classmethod
-    def get_email(cls, unused_provider_details):
+    def get_email(cls, provider_details):
         """Gets user's email address.
 
         Provider responses can contain arbitrary data. This method can be
@@ -44,16 +46,16 @@ class BaseProvider(object):
         extracted by the social_details pipeline step.
 
         Args:
-            unused_provider_details: dict of string -> string. Data about the
+            provider_details: dict of string -> string. Data about the
                 user passed back by the provider.
 
         Returns:
             String or None. The user's email address, if any.
         """
-        return None
+        return provider_details.get('email')
 
     @classmethod
-    def get_name(cls, unused_provider_details):
+    def get_name(cls, provider_details):
         """Gets user's name.
 
         Provider responses can contain arbitrary data. This method can be
@@ -61,13 +63,13 @@ class BaseProvider(object):
         extracted by the social_details pipeline step.
 
         Args:
-            unused_provider_details: dict of string -> string. Data about the
+            provider_details: dict of string -> string. Data about the
                 user passed back by the provider.
 
         Returns:
             String or None. The user's full name, if any.
         """
-        return None
+        return provider_details.get('fullname')
 
     @classmethod
     def get_register_form_data(cls, pipeline_kwargs):
@@ -109,6 +111,21 @@ class BaseProvider(object):
         for key, value in cls.SETTINGS.iteritems():
             setattr(settings, key, value)
 
+    @classmethod
+    def get_url_params(cls):
+        """ Get a dict of GET parameters to append to login links for this provider """
+        return {}
+
+    @classmethod
+    def is_active_for_pipeline(cls, pipeline):
+        """ Is this provider being used for the specified pipeline? """
+        return cls.BACKEND_CLASS.name == pipeline['backend']
+
+    @classmethod
+    def match_social_auth(cls, social_auth):
+        """ Is this provider being used for this UserSocialAuth entry? """
+        return cls.BACKEND_CLASS.name == social_auth.provider
+
 
 class GoogleOauth2(BaseProvider):
     """Provider for Google's Oauth2 auth system."""
@@ -120,14 +137,6 @@ class GoogleOauth2(BaseProvider):
         'SOCIAL_AUTH_GOOGLE_OAUTH2_KEY': None,
         'SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET': None,
     }
-
-    @classmethod
-    def get_email(cls, provider_details):
-        return provider_details.get('email')
-
-    @classmethod
-    def get_name(cls, provider_details):
-        return provider_details.get('fullname')
 
 
 class LinkedInOauth2(BaseProvider):
@@ -141,14 +150,6 @@ class LinkedInOauth2(BaseProvider):
         'SOCIAL_AUTH_LINKEDIN_OAUTH2_SECRET': None,
     }
 
-    @classmethod
-    def get_email(cls, provider_details):
-        return provider_details.get('email')
-
-    @classmethod
-    def get_name(cls, provider_details):
-        return provider_details.get('fullname')
-
 
 class FacebookOauth2(BaseProvider):
     """Provider for LinkedIn's Oauth2 auth system."""
@@ -161,13 +162,77 @@ class FacebookOauth2(BaseProvider):
         'SOCIAL_AUTH_FACEBOOK_SECRET': None,
     }
 
-    @classmethod
-    def get_email(cls, provider_details):
-        return provider_details.get('email')
+
+class SAMLProviderMixin(object):
+    """ Base class for SAML/Shibboleth providers """
+    BACKEND_CLASS = SAMLAuthBackend
+    ICON_CLASS = 'fa-university'
 
     @classmethod
-    def get_name(cls, provider_details):
-        return provider_details.get('fullname')
+    def get_url_params(cls):
+        """ Get a dict of GET parameters to append to login links for this provider """
+        return {'idp': cls.IDP["id"]}
+
+    @classmethod
+    def is_active_for_pipeline(cls, pipeline):
+        """ Is this provider being used for the specified pipeline? """
+        if cls.BACKEND_CLASS.name == pipeline['backend']:
+            idp_name = pipeline['kwargs']['response']['idp_name']
+            return cls.IDP["id"] == idp_name
+        return False
+
+    @classmethod
+    def match_social_auth(cls, social_auth):
+        """ Is this provider being used for this UserSocialAuth entry? """
+        prefix = cls.IDP["id"] + ":"
+        return cls.BACKEND_CLASS.name == social_auth.provider and social_auth.uid.startswith(prefix)
+
+
+class TestShibAProvider(SAMLProviderMixin, BaseProvider):
+    """ Provider for testshib.org public Shibboleth test server. """
+    NAME = 'TestShib A'
+    IDP = {
+        "id": "testshiba",  # Required slug
+        "entity_id": "https://idp.testshib.org/idp/shibboleth",
+        "url": "https://idp.testshib.org/idp/profile/SAML2/Redirect/SSO",
+        "attr_email": OID_EDU_PERSON_PRINCIPAL_NAME,
+        "x509cert": """
+            MIIEDjCCAvagAwIBAgIBADANBgkqhkiG9w0BAQUFADBnMQswCQYDVQQGEwJVUzEV
+            MBMGA1UECBMMUGVubnN5bHZhbmlhMRMwEQYDVQQHEwpQaXR0c2J1cmdoMREwDwYD
+            VQQKEwhUZXN0U2hpYjEZMBcGA1UEAxMQaWRwLnRlc3RzaGliLm9yZzAeFw0wNjA4
+            MzAyMTEyMjVaFw0xNjA4MjcyMTEyMjVaMGcxCzAJBgNVBAYTAlVTMRUwEwYDVQQI
+            EwxQZW5uc3lsdmFuaWExEzARBgNVBAcTClBpdHRzYnVyZ2gxETAPBgNVBAoTCFRl
+            c3RTaGliMRkwFwYDVQQDExBpZHAudGVzdHNoaWIub3JnMIIBIjANBgkqhkiG9w0B
+            AQEFAAOCAQ8AMIIBCgKCAQEArYkCGuTmJp9eAOSGHwRJo1SNatB5ZOKqDM9ysg7C
+            yVTDClcpu93gSP10nH4gkCZOlnESNgttg0r+MqL8tfJC6ybddEFB3YBo8PZajKSe
+            3OQ01Ow3yT4I+Wdg1tsTpSge9gEz7SrC07EkYmHuPtd71CHiUaCWDv+xVfUQX0aT
+            NPFmDixzUjoYzbGDrtAyCqA8f9CN2txIfJnpHE6q6CmKcoLADS4UrNPlhHSzd614
+            kR/JYiks0K4kbRqCQF0Dv0P5Di+rEfefC6glV8ysC8dB5/9nb0yh/ojRuJGmgMWH
+            gWk6h0ihjihqiu4jACovUZ7vVOCgSE5Ipn7OIwqd93zp2wIDAQABo4HEMIHBMB0G
+            A1UdDgQWBBSsBQ869nh83KqZr5jArr4/7b+QazCBkQYDVR0jBIGJMIGGgBSsBQ86
+            9nh83KqZr5jArr4/7b+Qa6FrpGkwZzELMAkGA1UEBhMCVVMxFTATBgNVBAgTDFBl
+            bm5zeWx2YW5pYTETMBEGA1UEBxMKUGl0dHNidXJnaDERMA8GA1UEChMIVGVzdFNo
+            aWIxGTAXBgNVBAMTEGlkcC50ZXN0c2hpYi5vcmeCAQAwDAYDVR0TBAUwAwEB/zAN
+            BgkqhkiG9w0BAQUFAAOCAQEAjR29PhrCbk8qLN5MFfSVk98t3CT9jHZoYxd8QMRL
+            I4j7iYQxXiGJTT1FXs1nd4Rha9un+LqTfeMMYqISdDDI6tv8iNpkOAvZZUosVkUo
+            93pv1T0RPz35hcHHYq2yee59HJOco2bFlcsH8JBXRSRrJ3Q7Eut+z9uo80JdGNJ4
+            /SJy5UorZ8KazGj16lfJhOBXldgrhppQBb0Nq6HKHguqmwRfJ+WkxemZXzhediAj
+            Geka8nz8JjwxpUjAiSWYKLtJhGEaTqCYxCCX2Dw+dOTqUzHOZ7WKv4JXPK5G/Uhr
+            8K/qhmFT2nIQi538n6rVYLeWj8Bbnl+ev0peYzxFyF5sQA==
+        """
+    }
+
+
+class TestShibBProvider(SAMLProviderMixin, BaseProvider):
+    """ Provider for testshib.org public Shibboleth test server. """
+    NAME = 'TestShib B'
+    IDP = {
+        "id": "testshibB",  # Required slug
+        "entity_id": "https://idp.testshib.org/idp/shibboleth",
+        "url": "https://IDP.TESTSHIB.ORG/idp/profile/SAML2/Redirect/SSO",
+        "attr_email": OID_EDU_PERSON_PRINCIPAL_NAME,
+        "x509cert": TestShibAProvider.IDP["x509cert"],
+    }
 
 
 class Registry(object):
@@ -235,13 +300,39 @@ class Registry(object):
         return cls._ENABLED.get(provider_name)
 
     @classmethod
-    def get_by_backend_name(cls, backend_name):
-        """Gets provider (or None) by backend name.
+    def get_from_pipeline(cls, running_pipeline):
+        """Gets the provider that is being used for the specified pipeline (or None).
 
         Args:
-            backend_name: string. The python-social-auth
-                backends.base.BaseAuth.name (for example, 'google-oauth2') to
-                try and get a provider for.
+            running_pipeline: The python-social-auth pipeline being used to
+                authenticate a user.
+
+        Returns:
+            A provider class (a subclass of BaseProvider) or None.
+
+        Raises:
+            RuntimeError: if the registry has not been configured.
+        """
+        cls._check_configured()
+        for enabled in cls._ENABLED.values():
+            if enabled.is_active_for_pipeline(running_pipeline):
+                return enabled
+
+    @classmethod
+    def get_enabled_by_backend_name(cls, backend_name):
+        """Generator returning all enabled providers that use the specified
+        backend.
+
+        Example:
+            >>> list(get_enabled_by_backend_name("tpa-saml"))
+                [TestShibAProvider, TestShibBProvider]
+
+        Args:
+            backend_name: The name of a python-social-auth backend used by
+                one or more providers.
+
+        Yields:
+            Provider classes (subclasses of BaseProvider).
 
         Raises:
             RuntimeError: if the registry has not been configured.
@@ -249,7 +340,7 @@ class Registry(object):
         cls._check_configured()
         for enabled in cls._ENABLED.values():
             if enabled.BACKEND_CLASS.name == backend_name:
-                return enabled
+                yield enabled
 
     @classmethod
     def _reset(cls):
