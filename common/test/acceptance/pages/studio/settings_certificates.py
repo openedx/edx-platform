@@ -1,142 +1,112 @@
 """
-Course Group Configurations page.
+Course Certificates pages.
 """
 from bok_choy.promise import EmptyPromise
 from .course_page import CoursePage
 from .utils import confirm_prompt
 
 
-class GroupConfigurationsPage(CoursePage):
+class CertificatesPage(CoursePage):
     """
-    Course Group Configurations page.
+    Course certificates page.
     """
 
-    url_path = "group_configurations"
-    experiment_groups_css = ".experiment-groups"
-    content_groups_css = ".content-groups"
+    url_path = "certificates"
+    certficate_css = ".certificates-list"
 
     def is_browser_on_page(self):
         """
         Verify that the browser is on the page and it is not still loading.
         """
         EmptyPromise(
-            lambda: self.q(css='body.view-group-configurations').present,
-            'On the group configuration page'
+            lambda: self.q(css='body.view-certificates').present,
+            'On the certificates page'
         ).fulfill()
 
         EmptyPromise(
             lambda: not self.q(css='span.spin').visible,
-            'Group Configurations are finished loading'
+            'Certificates are finished loading'
         ).fulfill()
 
         return True
 
     @property
-    def experiment_group_configurations(self):
+    def certificates(self):
         """
-        Return list of the experiment group configurations for the course.
+        Return list of the certificates for the course.
         """
-        return self._get_groups(self.experiment_groups_css)
+        css = self.certficate_css + ' .wrapper-collection'
+        return [Certificate(self, self.certficate_css, index) for index in xrange(len(self.q(css=css)))]
+
+    def create_first_certificate(self):
+        """
+        Creates new certificate when there are none initially defined.
+        """
+        self.q(css=self.certficate_css + " .new-button").first.click()
+
+    def add_certificate(self):
+        """
+        Creates new certificate when at least one already exists
+        """
+        self.q(css=self.certficate_css + " .action-add").first.click()
 
     @property
-    def content_groups(self):
+    def no_certificates_message_shown(self):
         """
-        Return list of the content groups for the course.
+        Returns whether or not no certificates created message is present.
         """
-        return self._get_groups(self.content_groups_css)
-
-    def _get_groups(self, prefix):
-        """
-        Return list of the group-configurations-list-item's of specified type for the course.
-        """
-        css = prefix + ' .wrapper-collection'
-        return [GroupConfiguration(self, prefix, index) for index in xrange(len(self.q(css=css)))]
-
-    def create_experiment_group_configuration(self):
-        """
-        Creates new group configuration.
-        """
-        self.q(css=self.experiment_groups_css + " .new-button").first.click()
-
-    def create_first_content_group(self):
-        """
-        Creates new content group when there are none initially defined.
-        """
-        self.q(css=self.content_groups_css + " .new-button").first.click()
-
-    def add_content_group(self):
-        """
-        Creates new content group when at least one already exists
-        """
-        self.q(css=self.content_groups_css + " .action-add").first.click()
+        return self.q(css='.wrapper-content ' + self.certficate_css + ' .no-content').present
 
     @property
-    def no_experiment_groups_message_is_present(self):
-        return self._no_content_message(self.experiment_groups_css).present
-
-    @property
-    def no_content_groups_message_is_present(self):
-        return self._no_content_message(self.content_groups_css).present
-
-    @property
-    def no_experiment_groups_message_text(self):
-        return self._no_content_message(self.experiment_groups_css).text[0]
-
-    @property
-    def no_content_groups_message_text(self):
-        return self._no_content_message(self.content_groups_css).text[0]
-
-    def _no_content_message(self, prefix):
+    def no_certificates_message_text(self):
         """
-        Returns the message about "no content" for the specified type.
+        Returns text of .no-content container.
         """
-        return self.q(css='.wrapper-content ' + prefix + ' .no-content')
-
-    @property
-    def experiment_group_sections_present(self):
-        """
-        Returns whether or not anything related to content experiments is present.
-        """
-        return self.q(css=self.experiment_groups_css).present or self.q(css=".experiment-groups-doc").present
+        return self.q(css='.wrapper-content ' + self.certficate_css + ' .no-content').text[0]
 
 
-class GroupConfiguration(object):
+class Certificate(object):
     """
-    Group Configuration wrapper.
+    Certificate wrapper.
     """
 
     def __init__(self, page, prefix, index):
         self.page = page
-        self.SELECTOR = prefix + ' .wrapper-collection-{}'.format(index)
+        self.selector = prefix + ' .certificates-list-item-{}'.format(index)
         self.index = index
 
     def get_selector(self, css=''):
-        return ' '.join([self.SELECTOR, css])
+        """
+        Return selector fo certificate container
+        """
+        return ' '.join([self.selector, css])
 
-    def find_css(self, selector):
+    def find_css(self, css_selector):
         """
         Find elements as defined by css locator.
         """
-        return self.page.q(css=self.get_selector(css=selector))
+        return self.page.q(css=self.get_selector(css=css_selector))
 
     def toggle(self):
         """
-        Expand/collapse group configuration.
+        Expand/collapse certificate configuration.
         """
-        self.find_css('a.group-toggle').first.click()
+        self.find_css('a.detail-toggle').first.click()
+
+    @property
+    def signatories(self):
+        """
+        Return list of the signatories for the certificate.
+        """
+        css = self.selector + ' .signatory-' + self.mode
+        return [Signatory(self, self.selector, self.mode, index) for index in xrange(len(self.page.q(css=css)))]
 
     @property
     def is_expanded(self):
         """
-        Group configuration usage information is expanded.
+        Certificate details are expanded.
         """
-        return self.find_css('a.group-toggle.hide-groups').present
-
-    def add_group(self):
-        """
-        Add new group.
-        """
-        self.find_css('button.action-add-group').first.click()
+        return self.find_css('a.detail-toggle.hide-details').present
 
     def get_text(self, css):
         """
@@ -144,27 +114,11 @@ class GroupConfiguration(object):
         """
         return self.find_css(css).first.text[0]
 
-    def click_outline_anchor(self):
-        """
-        Click on the `Course Outline` link.
-        """
-        self.find_css('p.group-configuration-usage-text a').first.click()
-
-    def click_unit_anchor(self, index=0):
-        """
-        Click on the link to the unit.
-        """
-        self.find_css('li.group-configuration-usage-unit a').nth(index).click()
-
     def edit(self):
         """
-        Open editing view for the group configuration.
+        Open editing view for the certificate.
         """
         self.find_css('.action-edit .edit').first.click()
-
-    @property
-    def delete_button_is_disabled(self):
-        return self.find_css('.actions .delete.is-disabled').present
 
     @property
     def delete_button_is_present(self):
@@ -175,40 +129,30 @@ class GroupConfiguration(object):
 
     def delete(self):
         """
-        Delete the group configuration.
+        Delete the certificate
         """
         self.find_css('.actions .delete').first.click()
         confirm_prompt(self.page)
+        self.page.wait_for_ajax()
 
     def save(self):
         """
-        Save group configuration.
+        Save certificate.
         """
         self.find_css('.action-primary').first.click()
         self.page.wait_for_ajax()
 
     def cancel(self):
         """
-        Cancel group configuration.
+        Cancel certificate editing.
         """
         self.find_css('.action-secondary').first.click()
 
-    @property
-    def mode(self):
+    def add_signatory(self):
         """
-        Return group configuration mode.
+        Add signatory to certificate
         """
-        if self.find_css('.collection-edit').present:
-            return 'edit'
-        elif self.find_css('.collection').present:
-            return 'details'
-
-    @property
-    def id(self):
-        """
-        Return group configuration id.
-        """
-        return self.get_text('.group-configuration-id .group-configuration-value')
+        self.find_css('.action-add-signatory').first.click()
 
     @property
     def validation_message(self):
@@ -218,134 +162,136 @@ class GroupConfiguration(object):
         return self.get_text('.message-status.error')
 
     @property
-    def usages(self):
+    def mode(self):
         """
-        Return list of usages.
+        Return certificate mode.
         """
-        css = '.group-configuration-usage-unit'
-        return self.find_css(css).text
+        if self.find_css('.collection-edit').present:
+            return 'edit'
+        elif self.find_css('.collection').present:
+            return 'details'
+
+    @property
+    # pylint: disable=invalid-name
+    def id(self):
+        """
+        Returns certificate id.
+        """
+        return self.get_text('.certificate-id .certificate-value')
 
     @property
     def name(self):
         """
-        Return group configuration name.
+        Return certificate name.
         """
         return self.get_text('.title')
 
     @name.setter
     def name(self, value):
         """
-        Set group configuration name.
+        Set certificate name.
         """
         self.find_css('.collection-name-input').first.fill(value)
 
     @property
     def description(self):
         """
-        Return group configuration description.
+        Return certificate description.
         """
-        return self.get_text('.group-configuration-description')
+        return self.get_text('.certificate-description')
 
     @description.setter
     def description(self, value):
         """
-        Set group configuration description.
+        Set certificate description.
         """
-        self.find_css('.group-configuration-description-input').first.fill(value)
-
-    @property
-    def groups(self):
-        """
-        Return list of groups.
-        """
-        def group_selector(group_index):
-            return self.get_selector('.group-{} '.format(group_index))
-
-        return [Group(self.page, group_selector(index)) for index, element in enumerate(self.find_css('.group'))]
-
-    @property
-    def delete_note(self):
-        """
-        Return delete note for the group configuration.
-        """
-        return self.find_css('.wrapper-delete-button').first.attrs('data-tooltip')[0]
-
-    @property
-    def details_error_icon_is_present(self):
-        return self.find_css('.wrapper-group-configuration-usages .fa-exclamation-circle').present
-
-    @property
-    def details_warning_icon_is_present(self):
-        return self.find_css('.wrapper-group-configuration-usages .fa-warning').present
-
-    @property
-    def details_message_is_present(self):
-        return self.find_css('.wrapper-group-configuration-usages .group-configuration-validation-message').present
-
-    @property
-    def details_message_text(self):
-        return self.find_css('.wrapper-group-configuration-usages .group-configuration-validation-message').text[0]
-
-    @property
-    def edit_warning_icon_is_present(self):
-        return self.find_css('.wrapper-group-configuration-validation .fa-warning').present
-
-    @property
-    def edit_warning_message_is_present(self):
-        return self.find_css('.wrapper-group-configuration-validation .group-configuration-validation-text').present
-
-    @property
-    def edit_warning_message_text(self):
-        return self.find_css('.wrapper-group-configuration-validation .group-configuration-validation-text').text[0]
-
-    def __repr__(self):
-        return "<{}:{}>".format(self.__class__.__name__, self.name)
+        self.find_css('.certificate-description-input').first.fill(value)
 
 
-class Group(object):
+class Signatory(object):
     """
-    Group wrapper.
+    Signatory wrapper.
     """
-    def __init__(self, page, prefix_selector):
-        self.page = page
-        self.prefix = prefix_selector
 
-    def find_css(self, selector):
+    def __init__(self, certificate, prefix, mode, index):
+        self.certificate = certificate
+        self.selector = prefix + ' .signatory-{}-view-{}'.format(mode, index)
+        self.index = index
+
+    def get_selector(self, css=''):
+        """
+        Return selector fo signatory container
+        """
+        return ' '.join([self.selector, css])
+
+    def find_css(self, css_selector):
         """
         Find elements as defined by css locator.
         """
-        return self.page.q(css=self.prefix + selector)
+        return self.certificate.page.q(css=self.get_selector(css=css_selector))
 
     @property
     def name(self):
         """
-        Return the name of the group .
+        Return signatory name.
         """
-        css = '.group-name'
-        return self.find_css(css).first.text[0]
+        return self.find_css('.signatory-panel-body .signatory-name-value').first.text[0]
 
     @name.setter
     def name(self, value):
         """
-        Set the name for the group.
+        Set signatory name.
         """
-        css = '.group-name'
-        self.find_css(css).first.fill(value)
+        self.find_css('.signatory-name-input').first.fill(value)
 
     @property
-    def allocation(self):
+    def title(self):
         """
-        Return allocation for the group.
+        Return signatory title.
         """
-        css = '.group-allocation'
-        return self.find_css(css).first.text[0]
+        return self.find_css('.signatory-panel-body .signatory-title-value').first.text[0]
 
-    def remove(self):
+    @title.setter
+    def title(self, value):
         """
-        Remove the group.
+        Set signatory title.
         """
-        css = '.action-close'
-        return self.find_css(css).first.click()
+        self.find_css('.signatory-title-input').first.fill(value)
 
-    def __repr__(self):
-        return "<{}:{}>".format(self.__class__.__name__, self.name)
+    def edit(self):
+        """
+        Open editing view for the signatory.
+        """
+        self.find_css('.edit-signatory').first.click()
+
+    def delete(self):
+        """
+        Delete the signatory
+        """
+        self.find_css('.signatory-panel-delete').first.click()
+        confirm_prompt(self.certificate.page)
+        self.certificate.page.wait_for_ajax()
+
+    def save(self):
+        """
+        Save signatory.
+        """
+        self.find_css('.signatory-panel-save').first.click()
+        self.certificate.page.wait_for_ajax()
+
+    def close(self):
+        """
+        Cancel signatory editing.
+        """
+        self.find_css('.signatory-panel-close').first.click()
+        EmptyPromise(
+            lambda: self.find_css('.signatory-panel-body .signatory-name-value').present,
+            'On signatory detail view'
+        ).fulfill()
+
+    @property
+    def delete_icon_is_present(self):
+        """
+        Returns whether or not the delete icon is present.
+        """
+        return self.find_css('.signatory-panel-delete').present
