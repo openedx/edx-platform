@@ -12,6 +12,7 @@
             $('source').remove();
             window.onTouchBasedDevice = oldOTBD;
             state.storage.clear();
+            state.videoPlayer.destroy();
         });
 
         describe('constructor', function () {
@@ -37,6 +38,18 @@
                 it('build the seek handle', function () {
                     expect(state.videoProgressSlider.handle)
                         .toBe('.slider .ui-slider-handle');
+                });
+
+                it('add ARIA attributes to time control', function () {
+                    var timeControl = $('div.slider > a');
+
+                    expect(timeControl).toHaveAttrs({
+                        'role': 'slider',
+                        'title': 'Video position',
+                        'aria-disabled': 'false'
+                    });
+
+                    expect(timeControl).toHaveAttr('aria-valuetext');
                 });
             });
 
@@ -302,6 +315,13 @@
             $.each(cases, function(input, output) {
                 expect(getTimeDescription(input)).toBe(output);
             });
+        });
+
+        it('can destroy itself', function () {
+            state = jasmine.initializePlayer();
+            state.videoProgressSlider.destroy();
+            expect(state.videoProgressSlider).toBeUndefined();
+            expect($('.slider')).toBeEmpty();
         });
 
     });

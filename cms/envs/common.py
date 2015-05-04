@@ -163,6 +163,13 @@ FEATURES = {
 
     # Teams feature
     'ENABLE_TEAMS': False,
+
+    # Show video bumper in Studio
+    'ENABLE_VIDEO_BUMPER': False,
+
+    # How many seconds to show the bumper again, default is 7 days:
+    'SHOW_BUMPER_PERIODICITY': 7 * 24 * 3600,
+
 }
 
 ENABLE_JASMINE = False
@@ -645,6 +652,8 @@ YOUTUBE = {
             'v': 'set_youtube_id_of_11_symbols_here',
         },
     },
+
+    'IMAGE_API': 'http://img.youtube.com/vi/{youtube_id}/0.jpg',  # /maxresdefault.jpg for 1920*1080
 }
 
 ############################# VIDEO UPLOAD PIPELINE #############################

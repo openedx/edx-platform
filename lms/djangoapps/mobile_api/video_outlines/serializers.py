@@ -228,7 +228,7 @@ def video_summary(video_profiles, course_id, video_descriptor, request, local_ca
         "duration": duration,
         "size": size,
         "transcripts": transcripts,
-        "language": video_descriptor.get_default_transcript_language(),
+        "language": video_descriptor.get_default_transcript_language(video_descriptor.transcripts),
         "encoded_videos": video_data.get('profiles')
     }
     ret.update(always_available_data)
