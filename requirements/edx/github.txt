@@ -40,7 +40,7 @@ git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b
 -e git+https://github.com/edx/ease.git@c6dee053eae6b3ac4fdf6be11fa7a9f8265540aa#egg=ease
 -e git+https://github.com/edx/i18n-tools.git@7b89d5e01c1a7cc5d69d813bd8c6b706a8f75119#egg=i18n-tools
 -e git+https://github.com/edx/edx-oauth2-provider.git@0.5.1#egg=oauth2-provider
--e git+https://github.com/edx/edx-val.git@d6087908aa3dd05ceaa7f56a21284f86c53cb3f0#egg=edx-val
+-e git+https://github.com/edx/edx-val.git@b1e11c9af3233bc06a17acbb33179f46d43c3b87#egg=edx-val
 -e git+https://github.com/pmitros/RecommenderXBlock.git@9b07e807c89ba5761827d0387177f71aa57ef056#egg=recommender-xblock
 -e git+https://github.com/edx/edx-milestones.git@547f2250ee49e73ce8d7ff4e78ecf1b049892510#egg=edx-milestones
 -e git+https://github.com/edx/edx-search.git@9d566b88fd80cb0b60c052eee2bee30eb9f35b9c#egg=edx-search
