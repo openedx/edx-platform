@@ -98,14 +98,12 @@ END
     "unit")
         case "$SHARD" in
             "lms")
-                paver test_system -s lms --extra_args="--with-flaky" || { EXIT=1; }
-                paver coverage
+                SHARD=1 paver test_system -s lms --extra_args="--with-flaky" --cov_args="-p" || { EXIT=1; }
                 ;;
             "cms-js-commonlib")
-                paver test_system -s cms --extra_args="--with-flaky" || { EXIT=1; }
-                paver test_js --coverage --skip_clean || { EXIT=1; }
-                paver test_lib --skip_clean --extra_args="--with-flaky" || { EXIT=1; }
-                paver coverage
+                SHARD=1 paver test_system -s cms --extra_args="--with-flaky" --cov_args="-p" || { EXIT=1; }
+                SHARD=1 paver test_js --coverage --skip_clean || { EXIT=1; }
+                SHARD=1 paver test_lib --skip_clean --extra_args="--with-flaky" --cov_args="-p" || { EXIT=1; }
                 ;;
             *)
                 paver test --extra_args="--with-flaky"
@@ -210,15 +208,4 @@ END
 END
                 ;;
         esac
-
-        # Move the reports to a directory that is unique to the shard
-        # so that when they are 'slurped' to the main flow job, they
-        # do not conflict with and overwrite reports from other shards.
-        mv reports/ reports_tmp/
-        mkdir -p reports/${TEST_SUITE}/${SHARD}
-        mv reports_tmp/* reports/${TEST_SUITE}/${SHARD}
-        rm -r reports_tmp/
-        exit $EXIT
-        ;;
-
 esac
