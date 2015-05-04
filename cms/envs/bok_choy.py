@@ -65,6 +65,9 @@ FEATURES['MILESTONES_APP'] = True
 # Enable pre-requisite course
 FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
 
+FEATURES['ENABLE_MOBILE_REST_API'] = True  # Enable video bumper in Studio
+FEATURES['ENABLE_VIDEO_BUMPER'] = True  # Enable video bumper in Studio settings
+
 ########################### Entrance Exams #################################
 FEATURES['ENTRANCE_EXAMS'] = True
 
