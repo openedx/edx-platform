@@ -1,0 +1,5 @@
+<label for="course-bookmarks-button" class="sr"><%= gettext("Course") %></label>
+<button type="button" class="bookmarks-button" id="course-bookmarks-button">
+    <i class="icon fa fa-bookmark" aria-hidden="true"></i>
+    Bookmarks
+</button>

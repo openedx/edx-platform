@@ -30,6 +30,12 @@ ${page_title_breadcrumbs(course_name())}
 </script>
 % endfor
 
+% for template_name in ["bookmarks_button", "bookmarks_results"]:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="bookmarks/${template_name}.underscore" />
+</script>
+% endfor
+
 </%block>
 
 <%block name="headextra">
@@ -148,6 +154,8 @@ ${fragment.foot_html()}
         <a href="#">${_("close")}</a>
       </header>
 
+      <div class="courseware-bookmarks-button" role="button"></div>
+
       % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
         <div id="courseware-search-bar" class="search-bar courseware-search-bar" role="search" aria-label="Course">
           <form>
@@ -205,6 +213,16 @@ ${fragment.foot_html()}
     % endif
   </div>
 </div>
+
+<%block name="bookmarks">
+    <script>
+        (function (require) {
+          require(['js/bookmarks/views/bookmarks_button'], function(bookmarksButtonView) {
+            new bookmarksButtonView({}).render();
+          });
+        }).call(this, require || RequireJS.require);
+    </script>
+</%block>
 
 <nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
   ## Utility: Chat

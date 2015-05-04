@@ -1,0 +1,41 @@
+<div class="bookmarks-results-header"><%= gettext("My Bookmarks") %></div>
+
+<% if (bookmarks.length) { %>
+
+    <div class='bookmarks-results-list'>
+        <% _.each(bookmarks, function(bookmark, index) { %>
+             <a class="bookmarks-results-list-item" href="<%= bookmark.get('usage_id') %>" aria-describedby="bookmark-type-<%= index %> bookmark-date-<%= index %>">
+                <div class="list-item-content">
+                    <div class="list-item-left-section">
+                        <h3> <%= bookmark.get('breadcrumbTrail') %> </h3>
+                        <p id="bookmark-date-<%= index %>" class="list-item-date"> <%= gettext("Bookmarked on") %> <%= bookmark.get('userFriendlyDate') %> </p>
+                    </div>
+
+                    <p id="bookmark-type-<%= index %>" class="list-item-right-section">
+                        <span aria-hidden="true">View</span>
+                        <i class="icon fa fa-arrow-right" aria-hidden="true"></i>
+                    </p>
+                </div>
+            </a>
+        <% }); %>
+    </div>
+
+<% } else { %>
+
+    <div class="bookmarks-empty" tabindex="0">
+        <div class="bookmarks-empty-header">
+            <i class="icon fa fa-bookmark bookmarks-empty-header-icon" aria-hidden="true"></i>
+            It looks like your bookmarks list is empty!
+            <br>
+        </div>
+        <div  class="bookmarks-empty-detail">
+            <span class="bookmarks-empty-detail-title">
+                <%= gettext("Use bookmarks to quickly reference courseware pages you would like to return to. Toggle the bookmark button on courseware page to save that page to this list. An example bookmark toggle is shown here for reference.") %>
+            </span>
+            <span class="bookmarks-empty-detail-bookmark-button" aria-hidden="true">
+                <i class="icon fa fa-bookmark bookmarks-empty-header-icon"></i>
+                Bookmarks
+            </span>
+        </div>
+    </div>
+<% } %>
