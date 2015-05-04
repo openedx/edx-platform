@@ -1,11 +1,8 @@
 #!/usr/bin/env bash
 source scripts/jenkins-common.sh
 
-# Combine the data files that were generated using -p
-paver combine_coverage
-
-# Get the diff coverage and html reports for unit tests
-paver coverage
+# Run coverage again to get the diff coverage report
+paver diff_coverage
 
 # JUnit test reporter will fail the build
 # if it thinks test results are old
