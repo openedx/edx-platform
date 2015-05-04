@@ -55,3 +55,7 @@ class TestPaverBokChoyCmd(unittest.TestCase):
         self.request.test_spec = "test_foo.py"
         self.request.default_store = "invalid"
         self.assertEqual(self.request.cmd.strip(), self._expected_command(self.request.test_spec, "invalid"))
+
+    def test_serversonly(self):
+        self.request.serversonly = True
+        self.assertEqual(self.request.cmd.strip(), "")

@@ -1,6 +1,8 @@
 """
 Class used for defining and running Bok Choy acceptance test suite
 """
+from time import sleep
+
 from paver.easy import sh
 from pavelib.utils.test.suites import TestSuite
 from pavelib.utils.envs import Env
@@ -23,7 +25,9 @@ class BokChoyTestSuite(TestSuite):
       log_dir - directory for test output
       report_dir - directory for reports (e.g., coverage) related to test execution
       xunit_report - directory for xunit-style output (xml)
-      fasttest - when set, skip various set-up tasks (e.g., DB migrations)
+      fasttest - when set, skip various set-up tasks (e.g., collectstatic)
+      serversonly - prepare and run the necessary servers, only stopping when interrupted with Ctrl-C
+      testsonly - assume servers are running (as per above) and run tests with no setup or cleaning of environment
       test_spec - when set, specifies test files, classes, cases, etc. See platform doc.
       default_store - modulestore to use when running tests (split or draft)
     """
@@ -35,6 +39,8 @@ class BokChoyTestSuite(TestSuite):
         self.xunit_report = self.report_dir / "xunit.xml"
         self.cache = Env.BOK_CHOY_CACHE
         self.fasttest = kwargs.get('fasttest', False)
+        self.serversonly = kwargs.get('serversonly', False)
+        self.testsonly = kwargs.get('testsonly', False)
         self.test_spec = kwargs.get('test_spec', None)
         self.default_store = kwargs.get('default_store', None)
         self.verbosity = kwargs.get('verbosity', 2)
@@ -55,9 +61,32 @@ class BokChoyTestSuite(TestSuite):
             test_utils.clean_test_files()
 
         msg = colorize('green', "Checking for mongo, memchache, and mysql...")
-        print(msg)
+        print msg
         bokchoy_utils.check_services()
 
+        if not self.testsonly:
+            self.prepare_bokchoy_run()
+
+        msg = colorize('green', "Confirming servers have started...")
+        print msg
+        bokchoy_utils.wait_for_test_servers()
+        if self.serversonly:
+            self.run_servers_continuously()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        super(BokChoyTestSuite, self).__exit__(exc_type, exc_value, traceback)
+
+        msg = colorize('green', "Cleaning up databases...")
+        print msg
+
+        # Clean up data we created in the databases
+        sh("./manage.py lms --settings bok_choy flush --traceback --noinput")
+        bokchoy_utils.clear_mongo()
+
+    def prepare_bokchoy_run(self):
+        """
+        Sets up and starts servers for bok-choy run. This includes any stubbed servers.
+        """
         sh("{}/scripts/reset-test-db.sh".format(Env.REPO_ROOT))
 
         if not self.fasttest:
@@ -90,31 +119,40 @@ class BokChoyTestSuite(TestSuite):
             )
 
         # Ensure the test servers are available
-        msg = colorize('green', "Starting test servers...")
-        print(msg)
+        msg = colorize('green', "Confirming servers are running...")
+        print msg
         bokchoy_utils.start_servers(self.default_store)
 
-        msg = colorize('green', "Waiting for servers to start...")
-        print(msg)
-        bokchoy_utils.wait_for_test_servers()
+    def run_servers_continuously(self):
+        """
+        Infinite loop. Servers will continue to run in the current session unless interrupted.
+        """
+        print 'Bok-choy servers running. Press Ctrl-C to exit...\n'
+        print 'Note: pressing Ctrl-C multiple times can corrupt noseid files and system state. Just press it once.\n'
 
-    def __exit__(self, exc_type, exc_value, traceback):
-        super(BokChoyTestSuite, self).__exit__(exc_type, exc_value, traceback)
-
-        msg = colorize('green', "Cleaning up databases...")
-        print(msg)
-
-        # Clean up data we created in the databases
-        sh("./manage.py lms --settings bok_choy flush --traceback --noinput")
-        bokchoy_utils.clear_mongo()
+        while True:
+            try:
+                sleep(10000)
+            except KeyboardInterrupt:
+                print "Stopping bok-choy servers.\n"
+                break
 
     @property
     def cmd(self):
+        """
+        This method composes the nosetests command to send to the terminal. If nosetests aren't being run,
+         the command returns an empty string.
+        """
         # Default to running all tests if no specific test is specified
         if not self.test_spec:
             test_spec = self.test_dir
         else:
             test_spec = self.test_dir / self.test_spec
+
+        # Skip any additional commands (such as nosetests) if running in
+        # servers only mode
+        if self.serversonly:
+            return ""
 
         # Construct the nosetests command, specifying where to save
         # screenshots and XUnit XML reports
