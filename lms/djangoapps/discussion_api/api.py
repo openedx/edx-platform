@@ -1,8 +1,12 @@
 """
 Discussion API internal interface
 """
+from django.http import Http404
+
 from collections import defaultdict
 
+from lms.lib.comment_client.thread import Thread
+from discussion_api.pagination import get_paginated_data
 from django_comment_client.utils import get_accessible_discussion_modules
 
 
@@ -63,3 +67,62 @@ def get_course_topics(course, user):
         "courseware_topics": courseware_topics,
         "non_courseware_topics": non_courseware_topics,
     }
+
+
+def _cc_thread_to_api_thread(thread):
+    """
+    Convert a thread data dict from the comment_client format (which is a direct
+    representation of the format returned by the comments service) to the format
+    used in this API
+    """
+    ret = {
+        key: thread[key]
+        for key in [
+            "id",
+            "course_id",
+            "created_at",
+            "updated_at",
+            "type",
+            "title",
+            "pinned",
+            "closed",
+        ]
+    }
+    ret.update({
+        "topic_id": thread["commentable_id"],
+        "raw_body": thread["body"],
+        "comment_count": thread["comments_count"],
+        "unread_comment_count": thread["unread_comments_count"],
+    })
+    return ret
+
+
+def get_thread_list(request, course_key, page, page_size):
+    """
+    Return the list of all discussion threads pertaining to the given course
+
+    Parameters:
+
+    request: The django request objects used for build_absolute_uri
+    course_key: The key of the course to get discussion threads for
+    page: The page number (1-indexed) to retrieve
+    page_size: The number of threads to retrieve per page
+
+    Returns:
+
+    A paginated result containing a list of threads; see
+    discussion_api.views.ThreadViewSet for more detail.
+    """
+    threads, result_page, num_pages, _ = Thread.search({
+        "course_id": unicode(course_key),
+        "page": page,
+        "per_page": page_size
+    })
+    # The comments service returns the last page of results if the requested
+    # page is beyond the last page, but we want be consistent with DRF's general
+    # behavior and return a 404 in that case
+    if result_page != page:
+        raise Http404
+
+    results = [_cc_thread_to_api_thread(thread) for thread in threads]
+    return get_paginated_data(request, results, page, num_pages)
