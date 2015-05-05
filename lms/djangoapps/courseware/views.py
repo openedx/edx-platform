@@ -65,6 +65,8 @@ from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
 from instructor.enrollment import uses_shib
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.coursetalk.helpers import inject_coursetalk_keys_into_context
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangoapps.credit.api import (
     get_credit_requirement_status,
     is_user_eligible_for_credit,
@@ -97,8 +99,6 @@ from .entrance_exams import (
 from .module_render import toc_for_course, get_module_for_descriptor, get_module, get_module_by_usage_id
 
 from lang_pref import LANGUAGE_KEY
-from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
-
 
 log = logging.getLogger("edx.courseware")
 
@@ -727,6 +727,9 @@ def course_info(request, course_id):
             # course is not yet visible to students.
             context['disable_student_access'] = True
 
+        if CourseEnrollment.is_enrolled(request.user, course.id):
+            inject_coursetalk_keys_into_context(context, course_key)
+
         return render_to_response('courseware/info.html', context)
 
 
@@ -935,7 +938,7 @@ def course_about(request, course_id):
         # Overview
         overview = CourseOverview.get_from_id(course.id)
 
-        return render_to_response('courseware/course_about.html', {
+        context = {
             'course': course,
             'staff_access': staff_access,
             'studio_url': studio_url,
@@ -961,7 +964,10 @@ def course_about(request, course_id):
             'cart_link': reverse('shoppingcart.views.show_cart'),
             'pre_requisite_courses': pre_requisite_courses,
             'course_image_urls': overview.image_urls,
-        })
+        }
+        inject_coursetalk_keys_into_context(context, course_key)
+
+        return render_to_response('courseware/course_about.html', context)
 
 
 @transaction.non_atomic_requests
