@@ -13,8 +13,8 @@ $facet-background-color: #007db8;
 
     .courses-listing .courses-listing-item {
       @include fill-parent();
-      max-height: $course-card-height;
       margin: ($baseline*0.75) 0 ($baseline*1.5) 0;
+      max-height: $course-card-height;
 
       @include media($bp-medium) {
         @include span-columns(4); // 4 of 8
@@ -181,8 +181,8 @@ $facet-background-color: #007db8;
     li {
       @include float(left);
       @include margin(($baseline/2), $baseline, ($baseline/2), 0);
-      padding: ($baseline/2) ($baseline*0.75);
       position: relative;
+      padding: ($baseline/2) ($baseline*0.75);
       background: $courseware-button-border-color;
       width: auto;
 
@@ -215,58 +215,56 @@ $facet-background-color: #007db8;
 
 
   .search-facets{
+    /* rtl and ltr mixins are included to switch default layer direction of this block */
     @include rtl() { $layout-direction: "LTR"; }
     @include ltr() { $layout-direction: "RTL"; }
+    @include fill-parent();
+    @include omega();
     @include box-sizing(border-box);
     @extend %ui-depth1;
     position: relative;
+    margin: ($baseline*2) 0 ($baseline*3.5) 0;
     box-shadow: 1px 2px 5px $black-t0;
     border-top: 1px solid $black;
     border-bottom: 2px solid $black;
     background-color: $white;
     max-height: ($baseline*100);
 
-    @include fill-parent();
-    margin: ($baseline*2) 0 ($baseline*3.5) 0;
-
     @include media($bp-medium) {
       @include span-columns(2);
-      @include omega();
     }
 
     @include media($bp-large) {
       @include span-columns(3);
-      @include omega();
     }
 
     @include media($bp-huge) {
       @include span-columns(3);
-      @include omega();
     }
 
     &.phone-menu {
+      border: medium none;
       padding: 0;
       overflow: visible;
-      border: medium none;
     }
 
     &:before {
-      opacity: 0;
+      @include right(0);
       position: absolute;
-      top: -3px;
-      right: 0;
+      top: (-$baseline*0.15);
+      opacity: 0;
       background-color: $white;
       padding: ($baseline*2) ($baseline*0.75) 0 ($baseline*0.75);
-      height: 5px;
-      content: "";
       width: ($baseline*2.5);
+      height: ($baseline/4);
+      content: "";
     }
 
     h2,
     section {
       @extend %t-icon5;
       @extend %t-strong;
-      margin: 0 ($baseline/2) 0 ($baseline/2);
+      margin: 0 ($baseline/2);
       border: medium none;
       padding: ($baseline/2);
       color: $facet-text-color;
@@ -285,22 +283,22 @@ $facet-background-color: #007db8;
     section {
       margin: 0;
       border-top: 1px solid $courseware-button-border-color;
-      padding: ($baseline/2) 0 ($baseline/2) 0;
+      padding: ($baseline/2) 0;
     }
 
     a {
       @include float(left);
       @include box-sizing(border-box);
+      @include line-height(18.92);
+      @include transition(all $tmg-f2 ease-out 0s);
       opacity: 1;
-      padding: 0 12px;
+      padding: 0 ($baseline*0.6);
       width: 100%;
       overflow: hidden;
       text-decoration: none;
       text-overflow: ellipsis;
-      line-height: 28px;
       white-space: nowrap;
       color: $facet-text-color;
-      transition: all $tmg-f2 ease-out 0s;
 
       //STATE: hover, visited
       &:hover,
@@ -311,8 +309,8 @@ $facet-background-color: #007db8;
     }
 
     ul {
+      @include padding-left(0);
       margin: 0;
-      padding-left: 0;
       overflow: hidden;
       list-style: outside none none;
 
@@ -322,19 +320,19 @@ $facet-background-color: #007db8;
 
       li {
         @include clearfix();
+        @include line-height(18.92);
         @extend %t-icon6;
         position: relative;
         clear: both;
         border-top: 1px solid $white;
         padding: 0;
-        height: 30px;
-        line-height: 28px;
+        height: ($baseline*1.5);
         overflow: hidden;
 
         .count {
+          @include right($baseline*0.6);
           @include box-sizing(border-box);
           @include transition(all 0.2s ease-out);
-          right: 12px;
         }
 
         //STATE: hover
