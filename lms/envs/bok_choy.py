@@ -55,8 +55,7 @@ MEDIA_URL = "/static/uploads/"
 ################################# CELERY ######################################
 
 CELERY_ALWAYS_EAGER = True
-CELERY_RESULT_BACKEND = 'cache'
-CELERY_CACHE_BACKEND = 'memory'
+CELERY_RESULT_BACKEND='djcelery.backends.cache:CacheBackend'
 
 ###################### Grade Downloads ######################
 GRADES_DOWNLOAD = {
