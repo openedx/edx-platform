@@ -168,12 +168,12 @@ define([
                 };
                 highlight.data('annotation', annotation);
                 this.annotator.viewer.load([annotation]);
-                listing = this.annotator.element.find('.annotator-listing').first(),
+                listing = this.annotator.element.find('.annotator-listing').first();
                 note = this.annotator.element.find('.annotator-note').first();
                 edit= this.annotator.element.find('.annotator-edit').first();
                 del = this.annotator.element.find('.annotator-delete').first();
                 close = this.annotator.element.find('.annotator-close').first();
-                spyOn(this.annotator.viewer, 'hide').andCallThrough();;
+                spyOn(this.annotator.viewer, 'hide').andCallThrough();
             });
 
             it('should give focus to Note on Listing TAB keydown', function () {
@@ -224,7 +224,7 @@ define([
         });
 
         describe('keydown events on editor', function () {
-            var highlight, annotation, form, textArea, save, cancel;
+            var highlight, annotation, form, annotatorItems, textArea, tags, save, cancel;
 
             beforeEach(function() {
                 highlight = $('<span class="annotator-hl" tabindex="0"/>').appendTo(this.annotator.element);
@@ -236,7 +236,9 @@ define([
                 highlight.data('annotation', annotation);
                 this.annotator.editor.show(annotation, {'left': 0, 'top': 0});
                 form = this.annotator.element.find('form.annotator-widget');
-                textArea = this.annotator.element.find('.annotator-item').first().children('textarea');
+                annotatorItems = this.annotator.element.find('.annotator-item');
+                textArea = annotatorItems.first().children('textarea');
+                tags = annotatorItems.first().next().children('input');
                 save  = this.annotator.element.find('.annotator-save');
                 cancel = this.annotator.element.find('.annotator-cancel');
                 spyOn(this.annotator.editor, 'submit').andCallThrough();
@@ -255,9 +257,11 @@ define([
                 expect(cancel).toBeFocused();
             });
 
-            it('should cycle forward through texarea, save, and cancel on TAB keydown', function () {
+            it('should cycle forward through textarea, tags, save, and cancel on TAB keydown', function () {
                 textArea.focus();
                 textArea.trigger(tabForwardEvent());
+                expect(tags).toBeFocused();
+                tags.trigger(tabForwardEvent());
                 expect(save).toBeFocused();
                 save.trigger(tabForwardEvent());
                 expect(cancel).toBeFocused();
@@ -265,13 +269,15 @@ define([
                 expect(textArea).toBeFocused();
             });
 
-            it('should cycle back through texarea, save, and cancel on SHIFT + TAB keydown', function () {
+            it('should cycle back through textarea, tags, save, and cancel on SHIFT + TAB keydown', function () {
                 textArea.focus();
                 textArea.trigger(tabBackwardEvent());
                 expect(cancel).toBeFocused();
                 cancel.trigger(tabBackwardEvent());
                 expect(save).toBeFocused();
                 save.trigger(tabBackwardEvent());
+                expect(tags).toBeFocused();
+                tags.trigger(tabBackwardEvent());
                 expect(textArea).toBeFocused();
             });
 

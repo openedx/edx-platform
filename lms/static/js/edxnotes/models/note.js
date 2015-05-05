@@ -12,6 +12,7 @@ define(['backbone', 'js/edxnotes/utils/utils', 'underscore.string'], function (B
             'text': '',
             'quote': '',
             'ranges': [],
+            'tags': [],
             'unit': {
                 'display_name': '',
                 'url': '',

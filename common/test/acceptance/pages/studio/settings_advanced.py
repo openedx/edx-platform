@@ -177,6 +177,7 @@ class AdvancedSettingsPage(CoursePage):
             'discussion_topics',
             'due',
             'due_date_display_format',
+            'edxnotes',
             'use_latex_compiler',
             'video_speed_optimizations',
             'enrollment_domain',

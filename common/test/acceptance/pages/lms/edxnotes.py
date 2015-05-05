@@ -1,5 +1,5 @@
 from bok_choy.page_object import PageObject, PageLoadError, unguarded
-from bok_choy.promise import BrokenPromise
+from bok_choy.promise import BrokenPromise, EmptyPromise
 from .course_page import CoursePage
 from ...tests.helpers import disable_animations
 from selenium.webdriver.common.action_chains import ActionChains
@@ -523,7 +523,7 @@ class EdxNoteHighlight(NoteChild):
         Returns text of the note.
         """
         self.show()
-        element = self.q(css=self._bounded_selector(".annotator-annotation > div"))
+        element = self.q(css=self._bounded_selector(".annotator-annotation > div.annotator-note"))
         if element:
             text = element.text[0].strip()
         else:
@@ -538,3 +538,47 @@ class EdxNoteHighlight(NoteChild):
         Sets text for the note.
         """
         self.q(css=self._bounded_selector(".annotator-item textarea")).first.fill(value)
+
+    @property
+    def tags(self):
+        """
+        Returns the tags associated with the note.
+
+        Tags are returned as a list of strings, with each tag as an individual string.
+        """
+        tag_text = []
+        self.show()
+        tags = self.q(css=self._bounded_selector(".annotator-annotation > div.annotator-tags > span.annotator-tag"))
+        if tags:
+            for tag in tags:
+                tag_text.append(tag.text)
+        self.q(css="body").first.click()
+        self.wait_for_notes_invisibility()
+        return tag_text
+
+    @tags.setter
+    def tags(self, tags):
+        """
+        Sets tags for the note. Tags should be supplied as a list of strings, with each tag as an individual string.
+        """
+        self.q(css=self._bounded_selector(".annotator-item input")).first.fill(" ".join(tags))
+
+    def has_sr_label(self, sr_index, field_index, expected_text):
+        """
+        Returns true iff a screen reader label (of index sr_index) exists for the annotator field with
+        the specified field_index and text.
+        """
+        label_exists = False
+        EmptyPromise(
+            lambda: len(self.q(css=self._bounded_selector("li.annotator-item > label.sr"))) > sr_index,
+            "Expected more than '{}' sr labels".format(sr_index)
+        ).fulfill()
+        annotator_field_label = self.q(css=self._bounded_selector("li.annotator-item > label.sr"))[sr_index]
+        for_attrib_correct = annotator_field_label.get_attribute("for") == "annotator-field-" + str(field_index)
+        if for_attrib_correct and (annotator_field_label.text == expected_text):
+            label_exists = True
+
+        self.q(css="body").first.click()
+        self.wait_for_notes_invisibility()
+
+        return label_exists

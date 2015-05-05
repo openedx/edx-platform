@@ -94,6 +94,9 @@ FEATURES['MILESTONES_APP'] = True
 # Enable pre-requisite course
 FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
 
+# Enable student notes
+FEATURES['ENABLE_EDXNOTES'] = True
+
 # Unfortunately, we need to use debug mode to serve staticfiles
 DEBUG = True
 
