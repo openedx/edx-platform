@@ -800,7 +800,7 @@ def _submit_for_retry(entry_id, email_id, to_list, global_email_context, current
         log.exception(u'Task %s: email with id %d caused send_course_email task to fail to retry. To list: %s',
                       task_id, email_id, [i['email'] for i in to_list])
         num_failed = len(to_list)
-        subtask_status.increment(subtask_status, failed=num_failed, state=FAILURE)
+        subtask_status.increment(failed=num_failed, state=FAILURE)
         return subtask_status, retry_exc
 
 
