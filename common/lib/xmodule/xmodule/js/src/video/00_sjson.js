@@ -79,7 +79,7 @@ function() {
             var captions = getCaptions();
 
             if (startTimes.length !== captions.length) {
-                throw new Exception("video caption and start time arrays do not match in length");
+                console.warn("video caption and start time arrays do not match in length");
             }
 
             // if end is null, then it's been set to

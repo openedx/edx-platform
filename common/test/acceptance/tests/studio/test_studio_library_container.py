@@ -3,6 +3,7 @@ Acceptance tests for Library Content in LMS
 """
 import ddt
 from flaky import flaky
+from nose.plugins.attrib import attr
 import textwrap
 
 from .base_studio_test import StudioLibraryTest
@@ -17,6 +18,7 @@ SUBSECTION_NAME = 'Test Subsection'
 UNIT_NAME = 'Test Unit'
 
 
+@attr('shard_5')
 @ddt.ddt
 class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest, TestWithSearchIndexMixin):
     """

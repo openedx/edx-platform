@@ -461,6 +461,10 @@ FEATURES['ENTRANCE_EXAMS'] = True
 
 # Enable courseware search for tests
 FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
+
+# Enable dashboard search for tests
+FEATURES['ENABLE_DASHBOARD_SEARCH'] = True
+
 # Use MockSearchEngine as the search engine for test scenario
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 
@@ -489,3 +493,7 @@ PROFILE_IMAGE_DEFAULT_FILE_EXTENSION = 'png'
 PROFILE_IMAGE_SECRET_KEY = 'secret'
 PROFILE_IMAGE_MAX_BYTES = 1024 * 1024
 PROFILE_IMAGE_MIN_BYTES = 100
+
+# Enable the LTI provider feature for testing
+FEATURES['ENABLE_LTI_PROVIDER'] = True
+INSTALLED_APPS += ('lti_provider',)

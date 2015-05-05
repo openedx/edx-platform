@@ -2,6 +2,7 @@
 Provides unit tests for SSL based authentication portions
 of the external_auth app.
 """
+import copy
 import unittest
 
 from django.conf import settings
@@ -31,9 +32,12 @@ FEATURES_WITH_SSL_AUTH_AUTO_ACTIVATE = FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP.c
 FEATURES_WITH_SSL_AUTH_AUTO_ACTIVATE['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'] = True
 FEATURES_WITHOUT_SSL_AUTH = settings.FEATURES.copy()
 FEATURES_WITHOUT_SSL_AUTH['AUTH_USE_CERTIFICATES'] = False
+CACHES_ENABLE_GENERAL = copy.deepcopy(settings.CACHES)
+CACHES_ENABLE_GENERAL['general']['BACKEND'] = 'django.core.cache.backends.locmem.LocMemCache'
 
 
 @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH)
+@override_settings(CACHES=CACHES_ENABLE_GENERAL)
 class SSLClientTest(ModuleStoreTestCase):
     """
     Tests SSL Authentication code sections of external_auth

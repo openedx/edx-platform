@@ -2025,7 +2025,7 @@ def validate_new_email(user, new_email):
         raise ValueError(_('An account with this e-mail already exists.'))
 
 
-def do_email_change_request(user, new_email, activation_key=uuid.uuid4().hex):
+def do_email_change_request(user, new_email, activation_key=None):
     """
     Given a new email for a user, does some basic verification of the new address and sends an activation message
     to the new address. If any issues are encountered with verification or sending the message, a ValueError will
@@ -2037,6 +2037,10 @@ def do_email_change_request(user, new_email, activation_key=uuid.uuid4().hex):
         pec.user = user
     else:
         pec = pec_list[0]
+
+    # if activation_key is not passing as an argument, generate a random key
+    if not activation_key:
+        activation_key = uuid.uuid4().hex
 
     pec.new_email = new_email
     pec.activation_key = activation_key

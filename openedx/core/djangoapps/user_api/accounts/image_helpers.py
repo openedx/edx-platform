@@ -8,6 +8,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.storage import get_storage_class
 from staticfiles.storage import staticfiles_storage
 
+from microsite_configuration import microsite
+
 from student.models import UserProfile
 from ..errors import UserNotFound
 
@@ -108,7 +110,7 @@ def _get_default_profile_image_urls():
     TODO The result of this function should be memoized, but not in tests.
     """
     return _get_profile_image_urls(
-        settings.PROFILE_IMAGE_DEFAULT_FILENAME,
+        microsite.get_value('PROFILE_IMAGE_DEFAULT_FILENAME', settings.PROFILE_IMAGE_DEFAULT_FILENAME),
         staticfiles_storage,
         file_extension=settings.PROFILE_IMAGE_DEFAULT_FILE_EXTENSION,
     )

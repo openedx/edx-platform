@@ -104,53 +104,54 @@ Get the Course Structure
         "root": "i4x://ANUx/ANU-INDIA1x/course/1T2014", 
         "blocks": {
             "i4x://ANUx/ANU-INDIA1x/html/834f845ae8b944f1882f14ce6417c9d1": {
-            "id": "i4x://ANUx/ANU-
-                INDIA1x/html/834f845ae8b944f1882f14ce6417c9d1", 
-            "type": "html", 
-            "display_name": "", 
-            "graded": false, 
-            "format": null, 
-            "children": []
-        }, 
-        "i4x://ANUx/ANU-INDIA1x/html/c3493aaebaba4ab6a0499fbc27ac3b0e": {
-            "id": "i4x://ANUx/ANU-
-                INDIA1x/html/c3493aaebaba4ab6a0499fbc27ac3b0e", 
-            "type": "problem", 
-            "display_name": "Check your learning - Part 1",  
-            "graded": true,  
-            "format": null, 
-            "children": []
-        }, 
-        "i4x://ANUx/ANU-INDIA1x/sequential/3731eee6a39c473c98ef6a5c3f56c04c": {
-            "id": "i4x://ANUx/ANU-
-                INDIA1x/sequential/3731eee6a39c473c98ef6a5c3f56c04c", 
-            "type": "sequential", 
-            "display_name": "Reflective project", 
-            "graded": true, 
-            "format": "Reflective Project", 
-            "children": [
-                "i4x://ANUx/ANU-
-                    INDIA1x/vertical/efe3f47a5bc24894b726c229d6bf5968", 
-                "i4x://ANUx/ANU-
-                    INDIA1x/vertical/9106a1b1fad040858bad56fe5d48074e", 
-                "i4x://ANUx/ANU-
-                    INDIA1x/vertical/27d2cf635bd44038a1207461b761a63a", 
-                "i4x://ANUx/ANU-
-                    INDIA1x/vertical/94b719b765b046e2a811f1c4e4f84e5b"
-            ]
-        },
-        "i4x://ANUx/ANU-INDIA1x/vertical/0a3cd583cb1d4108bfbdaf57c511da3a": {
-            "id": "i4x://ANUx/ANU-
-                INDIA1x/vertical/0a3cd583cb1d4108bfbdaf57c511da3a", 
-            "type": "vertical", 
-            "display_name": "What you need to do this week", 
-            "graded": false, 
-            "format": null, 
-            "children": [
-                "i4x://ANUx/ANU-INDIA1x/html/a20abbba4a0f4a578d96cbdd4b34307b"
-            ]
-        },
+                "id": "i4x://ANUx/ANU-
+                    INDIA1x/html/834f845ae8b944f1882f14ce6417c9d1", 
+                "type": "html", 
+                "display_name": "", 
+                "graded": false, 
+                "format": null, 
+                "children": []
+            }, 
+            "i4x://ANUx/ANU-INDIA1x/html/c3493aaebaba4ab6a0499fbc27ac3b0e": {
+                "id": "i4x://ANUx/ANU-
+                    INDIA1x/html/c3493aaebaba4ab6a0499fbc27ac3b0e", 
+                "type": "problem", 
+                "display_name": "Check your learning - Part 1",  
+                "graded": true,  
+                "format": null, 
+                "children": []
+            }, 
+            "i4x://ANUx/ANU-INDIA1x/sequential/3731eee6a39c473c98ef6a5c3f56c04c": {
+                "id": "i4x://ANUx/ANU-
+                    INDIA1x/sequential/3731eee6a39c473c98ef6a5c3f56c04c", 
+                "type": "sequential", 
+                "display_name": "Reflective project", 
+                "graded": true, 
+                "format": "Reflective Project", 
+                "children": [
+                    "i4x://ANUx/ANU-
+                        INDIA1x/vertical/efe3f47a5bc24894b726c229d6bf5968", 
+                    "i4x://ANUx/ANU-
+                        INDIA1x/vertical/9106a1b1fad040858bad56fe5d48074e", 
+                    "i4x://ANUx/ANU-
+                        INDIA1x/vertical/27d2cf635bd44038a1207461b761a63a", 
+                    "i4x://ANUx/ANU-
+                        INDIA1x/vertical/94b719b765b046e2a811f1c4e4f84e5b"
+                ]
+            },
+            "i4x://ANUx/ANU-INDIA1x/vertical/0a3cd583cb1d4108bfbdaf57c511da3a": {
+                "id": "i4x://ANUx/ANU-
+                    INDIA1x/vertical/0a3cd583cb1d4108bfbdaf57c511da3a", 
+                "type": "vertical", 
+                "display_name": "What you need to do this week", 
+                "graded": false, 
+                "format": null, 
+                "children": [
+                    "i4x://ANUx/ANU-INDIA1x/html/a20abbba4a0f4a578d96cbdd4b34307b"
+                ]
+            },
         . . .
+        }
     }
 
 .. _Get the Course Grading Policy:

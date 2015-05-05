@@ -8,6 +8,7 @@ import decimal
 import datetime
 from collections import namedtuple
 
+
 from pytz import UTC
 from ipware.ip import get_ip
 from django.conf import settings
@@ -24,6 +25,7 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
+from ecommerce_api_client.exceptions import SlumberBaseException
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys import InvalidKeyError
 from xmodule.modulestore.django import modulestore
@@ -33,8 +35,7 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings, update_account_settings
 from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
 from openedx.core.djangoapps.user_api.errors import UserNotFound, AccountValidationError
-from commerce.api import EcommerceAPI
-from commerce.exceptions import ApiError
+from commerce import ecommerce_api_client
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment
 from student.views import reverification_info
@@ -380,6 +381,14 @@ class PayAndVerifyView(View):
         # Determine the photo verification status
         verification_good_until = self._verification_valid_until(request.user)
 
+        # get available payment processors
+        if unexpired_paid_course_mode.sku:
+            # transaction will be conducted via ecommerce service
+            processors = ecommerce_api_client(request.user).get_processors()
+        else:
+            # transaction will be conducted using legacy shopping cart
+            processors = [settings.CC_PROCESSOR_NAME]
+
         # Render the top-level page
         context = {
             'contribution_amount': contribution_amount,
@@ -393,7 +402,7 @@ class PayAndVerifyView(View):
             'is_active': json.dumps(request.user.is_active),
             'message_key': message,
             'platform_name': settings.PLATFORM_NAME,
-            'purchase_endpoint': get_purchase_endpoint(),
+            'processors': processors,
             'requirements': requirements,
             'user_full_name': full_name,
             'verification_deadline': (
@@ -644,26 +653,59 @@ class PayAndVerifyView(View):
         return (has_paid, bool(is_active))
 
 
-def create_order_with_ecommerce_service(user, course_key, course_mode):     # pylint: disable=invalid-name
-    """ Create a new order using the E-Commerce API. """
+def checkout_with_ecommerce_service(user, course_key, course_mode, processor):     # pylint: disable=invalid-name
+    """ Create a new basket and trigger immediate checkout, using the E-Commerce API. """
     try:
-        api = EcommerceAPI()
+        api = ecommerce_api_client(user)
         # Make an API call to create the order and retrieve the results
-        _order_number, _order_status, data = api.create_order(user, course_mode.sku)
-
+        response_data = api.create_basket(course_mode.sku, processor)
         # Pass the payment parameters directly from the API response.
-        return HttpResponse(json.dumps(data['payment_parameters']), content_type='application/json')
-    except ApiError:
+        return response_data.get('payment_data')
+    except SlumberBaseException:
         params = {'username': user.username, 'mode': course_mode.slug, 'course_id': unicode(course_key)}
-        log.error('Failed to create order for %(username)s %(mode)s mode of %(course_id)s', params)
+        log.exception('Failed to create order for %(username)s %(mode)s mode of %(course_id)s', params)
         raise
+
+
+def checkout_with_shoppingcart(request, user, course_key, course_mode, amount):
+    """ Create an order and trigger checkout using shoppingcart."""
+    cart = Order.get_cart_for_user(user)
+    cart.clear()
+    enrollment_mode = course_mode.slug
+    CertificateItem.add_to_order(cart, course_key, amount, enrollment_mode)
+
+    # Change the order's status so that we don't accidentally modify it later.
+    # We need to do this to ensure that the parameters we send to the payment system
+    # match what we store in the database.
+    # (Ordinarily we would do this client-side when the user submits the form, but since
+    # the JavaScript on this page does that immediately, we make the change here instead.
+    # This avoids a second AJAX call and some additional complication of the JavaScript.)
+    # If a user later re-enters the verification / payment flow, she will create a new order.
+    cart.start_purchase()
+
+    callback_url = request.build_absolute_uri(
+        reverse("shoppingcart.views.postpay_callback")
+    )
+
+    payment_data = {
+        'payment_processor_name': settings.CC_PROCESSOR_NAME,
+        'payment_page_url': get_purchase_endpoint(),
+        'payment_form_data': get_signed_purchase_params(
+            cart,
+            callback_url=callback_url,
+            extra_data=[unicode(course_key), course_mode.slug]
+        ),
+    }
+    return payment_data
 
 
 @require_POST
 @login_required
 def create_order(request):
     """
-    Submit PhotoVerification and create a new Order for this verified cert
+    This endpoint is named 'create_order' for backward compatibility, but its
+    actual use is to add a single product to the user's cart and request
+    immediate checkout.
     """
     # Only submit photos if photo data is provided by the client.
     # TODO (ECOM-188): Once the A/B test of decoupling verified / payment
@@ -724,35 +766,23 @@ def create_order(request):
         return HttpResponseBadRequest(_("No selected price or selected price is below minimum."))
 
     if current_mode.sku:
-        return create_order_with_ecommerce_service(request.user, course_id, current_mode)
+        # if request.POST doesn't contain 'processor' then the service's default payment processor will be used.
+        payment_data = checkout_with_ecommerce_service(
+            request.user,
+            course_id,
+            current_mode,
+            request.POST.get('processor')
+        )
+    else:
+        payment_data = checkout_with_shoppingcart(request, request.user, course_id, current_mode, amount)
 
-    # I know, we should check this is valid. All kinds of stuff missing here
-    cart = Order.get_cart_for_user(request.user)
-    cart.clear()
-    enrollment_mode = current_mode.slug
-    CertificateItem.add_to_order(cart, course_id, amount, enrollment_mode)
-
-    # Change the order's status so that we don't accidentally modify it later.
-    # We need to do this to ensure that the parameters we send to the payment system
-    # match what we store in the database.
-    # (Ordinarily we would do this client-side when the user submits the form, but since
-    # the JavaScript on this page does that immediately, we make the change here instead.
-    # This avoids a second AJAX call and some additional complication of the JavaScript.)
-    # If a user later re-enters the verification / payment flow, she will create a new order.
-    cart.start_purchase()
-
-    callback_url = request.build_absolute_uri(
-        reverse("shoppingcart.views.postpay_callback")
-    )
-
-    params = get_signed_purchase_params(
-        cart,
-        callback_url=callback_url,
-        extra_data=[unicode(course_id), current_mode.slug]
-    )
-
-    params['success'] = True
-    return HttpResponse(json.dumps(params), content_type="text/json")
+    if 'processor' not in request.POST:
+        # (XCOM-214) To be removed after release.
+        # the absence of this key in the POST payload indicates that the request was initiated from
+        # a stale js client, which expects a response containing only the 'payment_form_data' part of
+        # the payment data result.
+        payment_data = payment_data['payment_form_data']
+    return HttpResponse(json.dumps(payment_data), content_type="application/json")
 
 
 @require_POST
@@ -805,6 +835,8 @@ def submit_photos_for_verification(request):
     attempt.upload_photo_id_image(b64_photo_id_image.decode('base64'))
     attempt.mark_ready()
     attempt.submit()
+
+    log.info(u"Submitted initial verification attempt for user %s", request.user.id)
 
     account_settings = get_account_settings(request.user)
 
@@ -1121,21 +1153,32 @@ class InCourseReverifyView(View):
 
         incourse_reverify_enabled = InCourseReverificationConfiguration.current().enabled
         if not incourse_reverify_enabled:
+            log.error(
+                u"In-course reverification is not enabled.  "
+                u"You can enable it in Django admin by setting "
+                u"InCourseReverificationConfiguration to enabled."
+            )
             raise Http404
 
         user = request.user
         course_key = CourseKey.from_string(course_id)
         course = modulestore().get_course(course_key)
         if course is None:
+            log.error(u"Could not find course %s for in-course reverification.", course_key)
             raise Http404
 
         checkpoint = VerificationCheckpoint.get_verification_checkpoint(course_key, checkpoint_name)
         if checkpoint is None:
+            log.error(
+                u"No verification checkpoint exists for the "
+                u"course %s and checkpoint name %s.",
+                course_key, checkpoint_name
+            )
             raise Http404
 
         init_verification = SoftwareSecurePhotoVerification.get_initial_verification(user)
         if not init_verification:
-            return redirect(reverse('verify_student_verify_later', kwargs={'course_id': unicode(course_key)}))
+            return self._redirect_no_initial_verification(user, course_key)
 
         # emit the reverification event
         self._track_reverification_events(
@@ -1176,6 +1219,7 @@ class InCourseReverifyView(View):
             usage_key = UsageKey.from_string(usage_id).replace(course_key=course_key)
         except InvalidKeyError:
             raise Http404(u"Invalid course_key or usage_key")
+
         course = modulestore().get_course(course_key)
         checkpoint = VerificationCheckpoint.get_verification_checkpoint(course_key, checkpoint_name)
         if checkpoint is None:
@@ -1191,17 +1235,17 @@ class InCourseReverifyView(View):
                 'usage_id': usage_id
             }
             return render_to_response("verify_student/incourse_reverify.html", context)
+
         init_verification = SoftwareSecurePhotoVerification.get_initial_verification(user)
         if not init_verification:
-            log.error("Could not submit verification attempt for user %s", request.user.id)
-            return redirect(reverse('verify_student_verify_later', kwargs={'course_id': unicode(course_key)}))
+            return self._redirect_no_initial_verification(user, course_key)
 
         try:
             attempt = SoftwareSecurePhotoVerification.submit_faceimage(
                 request.user, request.POST['face_image'], init_verification.photo_id_key
             )
             checkpoint.add_verification_attempt(attempt)
-            VerificationStatus.add_verification_status(checkpoint, user, "submitted")
+            VerificationStatus.add_verification_status(checkpoint, user, "submitted", usage_id)
 
             # emit the reverification event
             self._track_reverification_events(
@@ -1211,6 +1255,10 @@ class InCourseReverifyView(View):
             try:
                 redirect_url = get_redirect_url(course_key, usage_key)
             except (ItemNotFoundError, NoPathToItem):
+                log.warning(
+                    u"Could not find redirect URL for location %s in course %s",
+                    course_key, usage_key
+                )
                 redirect_url = reverse("courseware", args=(unicode(course_key),))
 
             return JsonResponse({'url': redirect_url})
@@ -1236,6 +1284,11 @@ class InCourseReverifyView(View):
             None
 
         """
+        log.info(
+            u"In-course reverification: event %s occurred for user %s in course %s at checkpoint %s",
+            event_name, user_id, course_id, checkpoint
+        )
+
         if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
             tracking_context = tracker.get_tracker().resolve_context()
             analytics.track(
@@ -1252,3 +1305,29 @@ class InCourseReverifyView(View):
                     }
                 }
             )
+
+    def _redirect_no_initial_verification(self, user, course_key):
+        """Redirect because the user does not have an initial verification.
+
+        NOTE: currently, we assume that courses are configured such that
+        the first re-verification always occurs AFTER the initial verification
+        deadline.  Later, we may want to allow users to upgrade to a verified
+        track, then submit an initial verification that also counts
+        as a verification for the checkpoint in the course.
+
+        Arguments:
+            user (User): The user who made the request.
+            course_key (CourseKey): The identifier for the course for which
+                the user is attempting to re-verify.
+
+        Returns:
+            HttpResponse
+
+        """
+        log.warning(
+            u"User %s does not have an initial verification, so "
+            u"he/she will be redirected to the \"verify later\" flow "
+            u"for the course %s.",
+            user.id, course_key
+        )
+        return redirect(reverse('verify_student_verify_later', kwargs={'course_id': unicode(course_key)}))

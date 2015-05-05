@@ -2,17 +2,20 @@
 import logging
 
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_page
-
+from django.views.decorators.csrf import csrf_exempt
+from ecommerce_api_client import exceptions
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_202_ACCEPTED, HTTP_409_CONFLICT
+from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_409_CONFLICT
 from rest_framework.views import APIView
 
-from commerce.api import EcommerceAPI
-from commerce.constants import OrderStatus, Messages
-from commerce.exceptions import ApiError, InvalidConfigurationError
+from commerce import ecommerce_api_client
+from commerce.constants import Messages
+from commerce.exceptions import InvalidResponseError
 from commerce.http import DetailResponse, InternalRequestErrorResponse
 from course_modes.models import CourseMode
 from courseware import courses
@@ -21,13 +24,15 @@ from enrollment.api import add_enrollment
 from microsite_configuration import microsite
 from student.models import CourseEnrollment
 from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
+from util.json_request import JsonResponse
+from verify_student.models import SoftwareSecurePhotoVerification
 
 
 log = logging.getLogger(__name__)
 
 
-class OrdersView(APIView):
-    """ Creates an order with a course seat and enrolls users. """
+class BasketsView(APIView):
+    """ Creates a basket with a course seat and enrolls users. """
 
     # LMS utilizes User.user_is_active to indicate email verification, not whether an account is active. Sigh!
     authentication_classes = (SessionAuthenticationAllowInactiveUser,)
@@ -63,7 +68,7 @@ class OrdersView(APIView):
 
     def post(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """
-        Attempt to create the order and enroll the user.
+        Attempt to create the basket and enroll the user.
         """
         user = request.user
         valid, course_key, error = self._is_data_valid(request)
@@ -92,10 +97,11 @@ class OrdersView(APIView):
             self._enroll(course_key, user)
             return DetailResponse(msg)
 
-        # Setup the API and report any errors if settings are not valid.
+        # Setup the API
+
         try:
-            api = EcommerceAPI()
-        except InvalidConfigurationError:
+            api = ecommerce_api_client(user)
+        except ValueError:
             self._enroll(course_key, user)
             msg = Messages.NO_ECOM_API.format(username=user.username, course_id=unicode(course_key))
             log.debug(msg)
@@ -103,31 +109,31 @@ class OrdersView(APIView):
 
         # Make the API call
         try:
-            order_number, order_status, _body = api.create_order(user, honor_mode.sku)
-            if order_status == OrderStatus.COMPLETE:
-                msg = Messages.ORDER_COMPLETED.format(order_number=order_number)
+            response_data = api.baskets.post({
+                'products': [{'sku': honor_mode.sku}],
+                'checkout': True,
+                'payment_processor_name': 'cybersource'
+            })
+
+            payment_data = response_data["payment_data"]
+            if payment_data:
+                # Pass data to the client to begin the payment flow.
+                return JsonResponse(payment_data)
+            elif response_data['order']:
+                # The order was completed immediately because there isno charge.
+                msg = Messages.ORDER_COMPLETED.format(order_number=response_data['order']['number'])
                 log.debug(msg)
                 return DetailResponse(msg)
             else:
-                # TODO Before this functionality is fully rolled-out, this branch should be updated to NOT enroll the
-                # user. Enrollments must be initiated by the E-Commerce API only.
-                self._enroll(course_key, user)
-                msg = u'Order %(order_number)s was received with %(status)s status. Expected %(complete_status)s. ' \
-                      u'User %(username)s was enrolled in %(course_id)s by LMS.'
-                msg_kwargs = {
-                    'order_number': order_number,
-                    'status': order_status,
-                    'complete_status': OrderStatus.COMPLETE,
-                    'username': user.username,
-                    'course_id': course_id,
-                }
-                log.error(msg, msg_kwargs)
-
-                msg = Messages.ORDER_INCOMPLETE_ENROLLED.format(order_number=order_number)
-                return DetailResponse(msg, status=HTTP_202_ACCEPTED)
-        except ApiError as err:
-            # The API will handle logging of the error.
-            return InternalRequestErrorResponse(err.message)
+                msg = u'Unexpected response from basket endpoint.'
+                log.error(
+                    msg + u' Could not enroll user %(username)s in course %(course_id)s.',
+                    {'username': user.id, 'course_id': course_id},
+                )
+                raise InvalidResponseError(msg)
+        except (exceptions.SlumberBaseException, exceptions.Timeout) as ex:
+            log.exception(ex.message)
+            return InternalRequestErrorResponse(ex.message)
 
 
 @cache_page(1800)
@@ -135,3 +141,29 @@ def checkout_cancel(_request):
     """ Checkout/payment cancellation view. """
     context = {'payment_support_email': microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)}
     return render_to_response("commerce/checkout_cancel.html", context)
+
+
+@csrf_exempt
+@login_required
+def checkout_receipt(request):
+    """ Receipt view. """
+    context = {
+        'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
+        'verified': SoftwareSecurePhotoVerification.verification_valid_or_pending(request.user).exists()
+    }
+    return render_to_response('commerce/checkout_receipt.html', context)
+
+
+class BasketOrderView(APIView):
+    """ Retrieve the order associated with a basket. """
+
+    authentication_classes = (SessionAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *_args, **kwargs):
+        """ HTTP handler. """
+        try:
+            order = ecommerce_api_client(request.user).baskets(kwargs['basket_id']).order.get()
+            return JsonResponse(order)
+        except exceptions.HttpNotFoundError:
+            return JsonResponse(status=404)

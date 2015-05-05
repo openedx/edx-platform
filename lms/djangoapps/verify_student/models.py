@@ -13,33 +13,31 @@ from email.utils import formatdate
 import functools
 import json
 import logging
+import pytz
+import requests
 import uuid
+
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
+from django.db import models
+from django.utils.translation import ugettext as _, ugettext_lazy
 
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
-from django.core.exceptions import ObjectDoesNotExist
-import pytz
-import requests
-
-from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.db import models
-from django.contrib.auth.models import User
-from django.utils.translation import ugettext as _
+from config_models.models import ConfigurationModel
 from model_utils.models import StatusModel
 from model_utils import Choices
-
+from reverification.models import MidcourseReverificationWindow
 from verify_student.ssencrypt import (
     random_aes_key, encrypt_and_encode,
     generate_signed_message, rsa_encrypt
 )
-
-from reverification.models import MidcourseReverificationWindow
-
 from xmodule_django.models import CourseKeyField
-log = logging.getLogger(__name__)
 
-from config_models.models import ConfigurationModel
+
+log = logging.getLogger(__name__)
 
 
 def generateUUID():  # pylint: disable=invalid-name
@@ -1018,21 +1016,30 @@ class VerificationStatus(models.Model):
     response = models.TextField(null=True, blank=True)
     error = models.TextField(null=True, blank=True)
 
+    # This field is used to save location of Reverification module in courseware
+    location_id = models.CharField(
+        null=True,
+        blank=True,
+        max_length=255,
+        help_text=ugettext_lazy("Usage id of Reverification XBlock.")
+    )
+
     class Meta(object):  # pylint: disable=missing-docstring
         get_latest_by = "timestamp"
 
     @classmethod
-    def add_verification_status(cls, checkpoint, user, status):
+    def add_verification_status(cls, checkpoint, user, status, location_id=None):
         """ Create new verification status object
 
         Arguments:
             checkpoint(VerificationCheckpoint): VerificationCheckpoint object
             user(User): user object
             status(str): String representing the status from VERIFICATION_STATUS_CHOICES
+            location_id(str): Usage key of Reverification XBlock
         Returns:
             None
         """
-        cls.objects.create(checkpoint=checkpoint, user=user, status=status)
+        cls.objects.create(checkpoint=checkpoint, user=user, status=status, location_id=location_id)
 
     @classmethod
     def add_status_from_checkpoints(cls, checkpoints, user, status):
@@ -1046,7 +1053,38 @@ class VerificationStatus(models.Model):
             None
         """
         for checkpoint in checkpoints:
-            cls.objects.create(checkpoint=checkpoint, user=user, status=status)
+            # get 'location_id' from last entry (if it exists) and add it in
+            # new entry
+            try:
+                location_id = cls.objects.filter(checkpoint=checkpoint).latest().location_id
+            except cls.DoesNotExist:
+                location_id = None
+
+            cls.objects.create(checkpoint=checkpoint, user=user, status=status, location_id=location_id)
+
+    @classmethod
+    def get_user_attempts(cls, user_id, course_key, related_assessment, location_id):
+        """
+        Get re-verification attempts against a user for a given 'checkpoint'
+        and 'course_id'.
+
+        Arguments:
+            user_id(str): User Id string
+            course_key(str): A CourseKey of a course
+            related_assessment(str): Verification checkpoint name
+            location_id(str): Location of Reverification XBlock in courseware
+
+        Returns:
+            count of re-verification attempts
+        """
+
+        return cls.objects.filter(
+            user_id=user_id,
+            checkpoint__course_id=course_key,
+            checkpoint__checkpoint_name=related_assessment,
+            location_id=location_id,
+            status="submitted"
+        ).count()
 
 
 class InCourseReverificationConfiguration(ConfigurationModel):
@@ -1077,3 +1115,28 @@ class SkippedReverification(models.Model):
 
     class Meta:  # pylint: disable=missing-docstring, old-style-class
         unique_together = (('user', 'course_id'),)
+
+    @classmethod
+    def add_skipped_reverification_attempt(cls, checkpoint, user_id, course_id):
+        """ Create skipped reverification object
+
+        Arguments:
+            checkpoint(VerificationCheckpoint): VerificationCheckpoint object
+            user_id(str): User Id of currently logged in user
+            course_id(CourseKey): CourseKey
+        Returns:
+            None
+        """
+        cls.objects.create(checkpoint=checkpoint, user_id=user_id, course_id=course_id)
+
+    @classmethod
+    def check_user_skipped_reverification_exists(cls, user, course_id):
+        """Check user skipped re-verification attempt exists against specific course
+
+        Arguments:
+            user(User): user object
+            course_id(CourseKey): CourseKey
+        Returns:
+            Boolean
+        """
+        return cls.objects.filter(user=user, course_id=course_id).exists()

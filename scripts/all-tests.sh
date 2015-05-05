@@ -61,7 +61,7 @@ git clean -qxfd
 source scripts/jenkins-common.sh
 
 # Violations thresholds for failing the build
-PYLINT_THRESHOLD=5500
+PYLINT_THRESHOLD=6400
 
 # If the environment variable 'SHARD' is not set, default to 'all'.
 # This could happen if you are trying to use this script from
@@ -179,7 +179,15 @@ END
                 ;;
 
             "4")
-                paver test_bokchoy --extra_args="-a shard_1=False,shard_2=False,shard_3=False --with-flaky" || { EXIT=1; }
+                paver test_bokchoy --extra_args="-a 'shard_4' --with-flaky" || { EXIT=1; }
+                ;;
+
+            "5")
+                paver test_bokchoy --extra_args="-a 'shard_5' --with-flaky" || { EXIT=1; }
+                ;;
+
+            "6")
+                paver test_bokchoy --extra_args="-a shard_1=False,shard_2=False,shard_3=False,shard_4=False,shard_5=False --with-flaky" || { EXIT=1; }
                 ;;
 
             # Default case because if we later define another bok-choy shard on Jenkins

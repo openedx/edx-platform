@@ -113,7 +113,7 @@ if Backbone?
         numVotes = votes.up_count
         button.find(".js-sr-vote-count").html(
           interpolate(
-            ngettext("currently %(numVotes)s vote", "currently %(numVotes)s votes", numVotes),
+            ngettext("there is currently %(numVotes)s vote", "there are currently %(numVotes)s votes", numVotes),
             {numVotes: numVotes},
             true
           )

@@ -85,6 +85,17 @@ class LmsSearchResultProcessorTestCase(ModuleStoreTestCase):
         self.assertEqual(
             srp.url, "/courses/{}/jump_to/{}".format(unicode(self.course.id), unicode(self.html.scope_ids.usage_id)))
 
+    def test_course_name_parameter(self):
+        srp = LmsSearchResultProcessor(
+            {
+                "course": unicode(self.course.id),
+                "id": unicode(self.html.scope_ids.usage_id),
+                "content": {"text": "This is the html text"}
+            },
+            "test"
+        )
+        self.assertEqual(srp.course_name, self.course.display_name)
+
     def test_location_parameter(self):
         srp = LmsSearchResultProcessor(
             {

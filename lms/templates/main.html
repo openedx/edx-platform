@@ -49,14 +49,16 @@
       </title>
   </%block>
 
-  <script type="text/javascript">
-    /* immediately break out of an iframe if coming from the marketing website */
-    (function(window) {
-      if (window.location !== window.top.location) {
-        window.top.location = window.location;
-      }
-    })(this);
-  </script>
+  % if not allow_iframing:
+      <script type="text/javascript">
+        /* immediately break out of an iframe if coming from the marketing website */
+        (function(window) {
+          if (window.location !== window.top.location) {
+            window.top.location = window.location;
+          }
+        })(this);
+      </script>
+  % endif
 
   <script type="text/javascript" src="/jsi18n/"></script>
 
@@ -141,25 +143,29 @@
 
     <%include file="mathjax_accessible.html" />
 
-    <%include file="${header_file}" />
+    % if not disable_header:
+        <%include file="${header_file}" />
+    % endif
 
     <div class="content-wrapper" id="content">
       ${self.body()}
       <%block name="bodyextra"/>
     </div>
 
-    <%block name="footer">
-      ## Can be overridden by child templates wanting to hide the footer.
-      <%
-        if theme_enabled() and not is_microsite():
-          footer_file = 'theme-footer.html'
-        elif settings.FEATURES.get('IS_EDX_DOMAIN', False) and not is_microsite():
-          footer_file = microsite.get_template_path('footer-edx-new.html')
-        else:
-          footer_file = microsite.get_template_path('footer.html')
-      %>
-      <%include file="${footer_file}" />
-    </%block>
+    % if not disable_footer:
+        <%block name="footer">
+          ## Can be overridden by child templates wanting to hide the footer.
+          <%
+            if theme_enabled() and not is_microsite():
+              footer_file = 'theme-footer.html'
+            elif settings.FEATURES.get('IS_EDX_DOMAIN', False) and not is_microsite():
+              footer_file = microsite.get_template_path('footer-edx-new.html')
+            else:
+              footer_file = microsite.get_template_path('footer.html')
+          %>
+          <%include file="${footer_file}" />
+        </%block>
+    % endif
 
   </div>
 

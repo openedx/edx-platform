@@ -1348,10 +1348,8 @@ def generate_user_cert(request, course_id):
 
     certificate_status = certs_api.certificate_downloadable_status(student, course.id)
 
-    if certificate_status["is_downloadable"]:
-        return HttpResponseBadRequest(_("Certificate has already been created."))
-    elif certificate_status["is_generating"]:
-        return HttpResponseBadRequest(_("Certificate is already being created."))
+    if certificate_status["is_generating"]:
+        return HttpResponseBadRequest(_("Certificate is being created."))
     else:
         # If the certificate is not already in-process or completed,
         # then create a new certificate generation task.

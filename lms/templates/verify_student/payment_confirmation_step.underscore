@@ -5,8 +5,8 @@
     </h3>
 
     <% if ( receipt ) { %>
-    <ul class="list-info">
-      <li class="info-item payment-info">
+    <div class="list-info">
+      <div class="info-item payment-info">
         <div class="copy">
           <p><%- gettext( "Please print this page for your records; it serves as your receipt. You will also receive an email with the same information." ) %></p>
         </div>
@@ -43,7 +43,7 @@
             <tfoot>
               <tr>
                 <th scope="row" class="total-label" colspan="1"><%- gettext( "Total" ) %></th>
-                <td claass="total-value" colspan="3">
+                <td class="total-value" colspan="3">
                   <span class="value-amount"><%- receipt.totalCost %></span>
                    <span class="value-currency">(<%- receipt.currency.toUpperCase() %>)</span>
                 </td>
@@ -71,8 +71,8 @@
               <span class="address-country"><%- receipt.billedTo.country.toUpperCase() %></span>)
           </p>
         </div>
-      </li>
-    </ul>
+      </div>
+    </div>
     <% } else { %>
         <p class="no-content"><%- gettext( "No receipt available" ) %></p>
     <% } %>

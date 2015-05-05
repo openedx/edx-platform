@@ -243,6 +243,32 @@ class EmailChangeRequestTests(EventTestMixin, TestCase):
         self.request.POST['password'] = 'wrong'
         self.assertFailedRequest(self.run_request(), 'Invalid password')
 
+    @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+    def test_duplicate_activation_key(self):
+        """Assert that if two users change Email address simultaneously, server should return 200"""
+
+        # New emails for the users
+        user1_new_email = "valid_user1_email@example.com"
+        user2_new_email = "valid_user2_email@example.com"
+
+        # Set new email for user1.
+        self.request.POST['new_email'] = user1_new_email
+
+        # Create a another user 'user2' & make request for change email
+        user2 = UserFactory.create(email=self.new_email, password="test2")
+        user2_request = self.req_factory.post('unused_url', data={
+            'password': 'test2',
+            'new_email': user2_new_email
+        })
+        user2_request.user = user2
+
+        # Send requests & check if response was successful
+        user1_response = change_email_request(self.request)
+        user2_response = change_email_request(user2_request)
+
+        self.assertEqual(user1_response.status_code, 200)
+        self.assertEqual(user2_response.status_code, 200)
+
     def test_invalid_emails(self):
         for email in ('bad_email', 'bad_email@', '@bad_email'):
             self.request.POST['new_email'] = email

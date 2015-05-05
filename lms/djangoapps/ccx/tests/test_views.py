@@ -492,10 +492,13 @@ class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # sure if there's a way to poke the test harness to do so.  So, we'll
         # just inject the override field storage in this brute force manner.
         OverrideFieldData.provider_classes = None
+        # pylint: disable=protected-access
         for block in iter_blocks(course):
-            block._field_data = OverrideFieldData.wrap(   # pylint: disable=protected-access
-                coach, block._field_data)   # pylint: disable=protected-access
-            block._field_data_cache = {'tabs': [], 'discussion_topics': []}  # pylint: disable=protected-access
+            block._field_data = OverrideFieldData.wrap(coach, block._field_data)
+            new_cache = {'tabs': [], 'discussion_topics': []}
+            if 'grading_policy' in block._field_data_cache:
+                new_cache['grading_policy'] = block._field_data_cache['grading_policy']
+            block._field_data_cache = new_cache
 
         def cleanup_provider_classes():
             """

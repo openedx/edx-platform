@@ -815,7 +815,7 @@ def xblock_resource(request, block_type, uri):  # pylint: disable=unused-argumen
     return HttpResponse(content, mimetype=mimetype)
 
 
-def _get_module_by_usage_id(request, course_id, usage_id):
+def get_module_by_usage_id(request, course_id, usage_id):
     """
     Gets a module instance based on its `usage_id` in a course, for a given request/user
 
@@ -887,7 +887,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix):
     if error_msg:
         return JsonResponse(object={'success': error_msg}, status=413)
 
-    instance, tracking_context = _get_module_by_usage_id(request, course_id, usage_id)
+    instance, tracking_context = get_module_by_usage_id(request, course_id, usage_id)
 
     tracking_context_name = 'module_callback_handler'
     req = django_to_webob_request(request)
@@ -945,7 +945,7 @@ def xblock_view(request, course_id, usage_id, view_name):
     if not request.user.is_authenticated():
         raise PermissionDenied
 
-    instance, _ = _get_module_by_usage_id(request, course_id, usage_id)
+    instance, _ = get_module_by_usage_id(request, course_id, usage_id)
 
     try:
         fragment = instance.render(view_name, context=request.GET)

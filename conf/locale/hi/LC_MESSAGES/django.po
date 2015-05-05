@@ -72,7 +72,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-04-21 13:44+0000\n"
+"POT-Creation-Date: 2015-04-30 15:39+0000\n"
 "PO-Revision-Date: 2014-12-30 16:21+0000\n"
 "Last-Translator: ria1234 <contactpayal@yahoo.com.au>\n"
 "Language-Team: Hindi (http://www.transifex.com/projects/p/edx-platform/language/hi/)\n"
@@ -1722,15 +1722,21 @@ msgstr "त्रुटि: {msg}"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_hour} hour"
-msgstr ""
+msgid_plural "{num_hour} hours"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_minute} minute"
-msgstr ""
+msgid_plural "{num_minute} minutes"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_second} second"
-msgstr ""
+msgid_plural "{num_second} seconds"
+msgstr[0] ""
+msgstr[1] ""
 
 #. Translators: 'rescoring' refers to the act of re-submitting a student's
 #. solution so it can get a new score.
@@ -4058,6 +4064,7 @@ msgstr "सूची"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 #: lms/templates/wiki/plugins/attachments/index.html
+#: lms/templates/dashboard.html
 #: lms/templates/discussion/_thread_list_template.html
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Search"
@@ -4301,7 +4308,7 @@ msgstr ""
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/tools.py
+#: lms/djangoapps/instructor/views/tools.py lms/templates/dashboard.html
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Username"
@@ -4419,11 +4426,7 @@ msgid "Your certificate will be available when you pass the course."
 msgstr ""
 
 #: lms/djangoapps/courseware/views.py
-msgid "Certificate has already been created."
-msgstr ""
-
-#: lms/djangoapps/courseware/views.py
-msgid "Certificate is already being created."
+msgid "Certificate is being created."
 msgstr ""
 
 #: lms/djangoapps/courseware/features/video.py
@@ -6601,6 +6604,10 @@ msgstr ""
 msgid "There was an error verifying your ID photos."
 msgstr "आपके आईडी की फ़ोटोओं की पुष्टि करने में त्रुटि हुई।"
 
+#: lms/djangoapps/verify_student/models.py
+msgid "Usage id of Reverification XBlock."
+msgstr ""
+
 #: lms/djangoapps/verify_student/views.py
 msgid "Intro"
 msgstr ""
@@ -8256,6 +8263,14 @@ msgid "Course-loading errors"
 msgstr "पाठ्यक्रम लोड त्रुटी "
 
 #: lms/templates/dashboard.html
+msgid "Search Your Courses"
+msgstr ""
+
+#: lms/templates/dashboard.html lms/templates/courseware/courseware.html
+msgid "Clear search"
+msgstr ""
+
+#: lms/templates/dashboard.html
 msgid "Want to change your account settings?"
 msgstr ""
 
@@ -9906,9 +9921,26 @@ msgstr ""
 
 #: lms/templates/ccx/_dashboard_ccx_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "View Course"
-msgstr "पाठयक्रम देखें"
+msgid "Ended - {end_date}"
+msgstr ""
+
+#: lms/templates/ccx/_dashboard_ccx_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Started - {start_date}"
+msgstr ""
+
+#: lms/templates/ccx/_dashboard_ccx_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Starts - {start_date}"
+msgstr ""
+
+#: lms/templates/ccx/_dashboard_ccx_listing.html
+msgid "View Archived Custom Course"
+msgstr ""
+
+#: lms/templates/ccx/_dashboard_ccx_listing.html
+msgid "View Custom Course"
+msgstr ""
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "CCX Coach Dashboard"
@@ -10287,6 +10319,16 @@ msgstr[1] "{num} अंक: {text}"
 msgid "Please enter a hint below:"
 msgstr "कृपया नीचे कोई संकेत दर्ज करें"
 
+#: lms/templates/commerce/checkout_cancel.html
+msgid "Checkout Cancelled"
+msgstr ""
+
+#: lms/templates/commerce/checkout_cancel.html
+msgid ""
+"Your transaction has been cancelled. If you feel an error has occurred, "
+"contact {email}."
+msgstr ""
+
 #: lms/templates/courseware/accordion.html
 msgid "{chapter}, current chapter"
 msgstr "{chapter}, मौजूदा अध्याय"
@@ -10493,10 +10535,6 @@ msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "search"
-msgstr ""
-
-#: lms/templates/courseware/courseware.html
-msgid "Clear search"
 msgstr ""
 
 #: lms/templates/courseware/courseware.html
@@ -10923,7 +10961,8 @@ msgstr ""
 #: lms/templates/courseware/progress.html
 msgid ""
 "You can now download your certificate as a PDF. If you keep working and "
-"receive a higher grade, you can request an updated certificate."
+"receive a higher grade,you can request an {link_start} updated certificate "
+"{link_end}."
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -11095,20 +11134,13 @@ msgid "Enrolled as: "
 msgstr ": के रूप में नामांकन"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Ended - {end_date}"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Started - {start_date}"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Starts - {start_date}"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
 msgstr "संग्रहित कोर्स देखें "
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "View Course"
+msgstr "पाठयक्रम देखें"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share on Facebook"
@@ -14777,7 +14809,7 @@ msgid "Edit Your Full Name"
 msgstr "अपना पूरा नाम बदलें"
 
 #: lms/templates/verify_student/incourse_reverify.html
-msgid "Verifying for \"{checkpoint_name}\" in course \"{course_name}\""
+msgid "Re-Verify for {course_name}"
 msgstr ""
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html

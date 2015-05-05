@@ -27,6 +27,7 @@
 # Julien Colmonts <julien.colmonts@student.uclouvain.be>, 2014
 # Julien Rolland <julien.rolland33@gmail.com>, 2013
 # Justine Seran, 2015
+# Kévin SEVERIN <kevin.severin@laposte.net>, 2015
 # laurentFUN <laurent.at.fun@gmail.com>, 2014
 # Marco Morales, 2014
 # moocit-france <contact@moocit.fr>, 2014-2015
@@ -100,6 +101,7 @@
 # Julien Colmonts <julien.colmonts@student.uclouvain.be>, 2014
 # Julien Rolland <julien.rolland33@gmail.com>, 2013
 # Justine Seran, 2015
+# Kévin SEVERIN <kevin.severin@laposte.net>, 2015
 # laurentFUN <laurent.at.fun@gmail.com>, 2014
 # Leslie Bordonné <leslie@bordonne.com>, 2015
 # madmarsu <madmarsu@gmail.com>, 2014
@@ -168,7 +170,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-04-21 13:44+0000\n"
+"POT-Creation-Date: 2015-04-30 15:39+0000\n"
 "PO-Revision-Date: 2014-12-30 16:21+0000\n"
 "Last-Translator: Xavier Antoviaque <xavier@antoviaque.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
@@ -1912,15 +1914,21 @@ msgstr "Erreur : {msg}"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_hour} hour"
-msgstr "{num_hour} heure"
+msgid_plural "{num_hour} hours"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_minute} minute"
-msgstr "{num_minute} minute"
+msgid_plural "{num_minute} minutes"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_second} second"
-msgstr "{num_second} seconde"
+msgid_plural "{num_second} seconds"
+msgstr[0] ""
+msgstr[1] ""
 
 #. Translators: 'rescoring' refers to the act of re-submitting a student's
 #. solution so it can get a new score.
@@ -4547,6 +4555,7 @@ msgstr "Index"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 #: lms/templates/wiki/plugins/attachments/index.html
+#: lms/templates/dashboard.html
 #: lms/templates/discussion/_thread_list_template.html
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Search"
@@ -4790,7 +4799,7 @@ msgstr ""
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/tools.py
+#: lms/djangoapps/instructor/views/tools.py lms/templates/dashboard.html
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Username"
@@ -4914,11 +4923,7 @@ msgid "Your certificate will be available when you pass the course."
 msgstr ""
 
 #: lms/djangoapps/courseware/views.py
-msgid "Certificate has already been created."
-msgstr ""
-
-#: lms/djangoapps/courseware/views.py
-msgid "Certificate is already being created."
+msgid "Certificate is being created."
 msgstr ""
 
 #: lms/djangoapps/courseware/features/video.py
@@ -7197,6 +7202,10 @@ msgstr ""
 "Il y a eu une erreur pendant le processus de vérification de vos photos "
 "d'identité."
 
+#: lms/djangoapps/verify_student/models.py
+msgid "Usage id of Reverification XBlock."
+msgstr ""
+
 #: lms/djangoapps/verify_student/views.py
 msgid "Intro"
 msgstr ""
@@ -8741,7 +8750,7 @@ msgstr "Aide"
 #: cms/templates/widgets/header.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html
 msgid "Sign Out"
-msgstr ""
+msgstr "Se déconnecter"
 
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Enrollment for {} | Choose Your Track"
@@ -8863,11 +8872,11 @@ msgstr "Cacher les annotations"
 
 #: lms/templates/course.html
 msgid "LEARN MORE"
-msgstr ""
+msgstr "EN SAVOIR PLUS"
 
 #: lms/templates/course.html
 msgid "Starts"
-msgstr ""
+msgstr "Commence"
 
 #: lms/templates/dashboard.html
 msgid "Dashboard"
@@ -8890,8 +8899,16 @@ msgid "Course-loading errors"
 msgstr "Erreurs de chargement du cours"
 
 #: lms/templates/dashboard.html
-msgid "Want to change your account settings?"
+msgid "Search Your Courses"
 msgstr ""
+
+#: lms/templates/dashboard.html lms/templates/courseware/courseware.html
+msgid "Clear search"
+msgstr ""
+
+#: lms/templates/dashboard.html
+msgid "Want to change your account settings?"
+msgstr "Vous voulez changer les paramètres de votre compte ?"
 
 #: lms/templates/dashboard.html
 msgid "Click the arrow next to your username above."
@@ -9338,7 +9355,7 @@ msgstr ""
 
 #: lms/templates/index.html
 msgid "View all Courses"
-msgstr ""
+msgstr "Voir tous les cours"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -9514,7 +9531,7 @@ msgstr "Cliquer pour commencer"
 
 #: lms/templates/manage_user_standing.html
 msgid "Manage student accounts"
-msgstr ""
+msgstr "Gérer les comptes des étudiants"
 
 #: lms/templates/manage_user_standing.html
 msgid "Username:"
@@ -10586,9 +10603,26 @@ msgstr ""
 
 #: lms/templates/ccx/_dashboard_ccx_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "View Course"
-msgstr "Voir le cours"
+msgid "Ended - {end_date}"
+msgstr ""
+
+#: lms/templates/ccx/_dashboard_ccx_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Started - {start_date}"
+msgstr ""
+
+#: lms/templates/ccx/_dashboard_ccx_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Starts - {start_date}"
+msgstr ""
+
+#: lms/templates/ccx/_dashboard_ccx_listing.html
+msgid "View Archived Custom Course"
+msgstr ""
+
+#: lms/templates/ccx/_dashboard_ccx_listing.html
+msgid "View Custom Course"
+msgstr ""
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "CCX Coach Dashboard"
@@ -10972,6 +11006,16 @@ msgstr[1] "{num} points : {text}"
 msgid "Please enter a hint below:"
 msgstr "Merci de saisir un indice ci-dessous :"
 
+#: lms/templates/commerce/checkout_cancel.html
+msgid "Checkout Cancelled"
+msgstr ""
+
+#: lms/templates/commerce/checkout_cancel.html
+msgid ""
+"Your transaction has been cancelled. If you feel an error has occurred, "
+"contact {email}."
+msgstr ""
+
 #: lms/templates/courseware/accordion.html
 msgid "{chapter}, current chapter"
 msgstr "{chapter}, chapitre en cours"
@@ -11184,10 +11228,6 @@ msgstr "Rechercher un cours"
 #: lms/templates/courseware/courseware.html
 msgid "search"
 msgstr "rechercher"
-
-#: lms/templates/courseware/courseware.html
-msgid "Clear search"
-msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "No content has been added to this course"
@@ -11648,7 +11688,8 @@ msgstr ""
 #: lms/templates/courseware/progress.html
 msgid ""
 "You can now download your certificate as a PDF. If you keep working and "
-"receive a higher grade, you can request an updated certificate."
+"receive a higher grade,you can request an {link_start} updated certificate "
+"{link_end}."
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -11821,19 +11862,12 @@ msgid "Enrolled as: "
 msgstr "Inscrit en tant que:"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Ended - {end_date}"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Started - {start_date}"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Starts - {start_date}"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
+msgstr "Voir le cours"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "View Course"
 msgstr "Voir le cours"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -15720,7 +15754,7 @@ msgid "Edit Your Full Name"
 msgstr "Éditer votre nom complet"
 
 #: lms/templates/verify_student/incourse_reverify.html
-msgid "Verifying for \"{checkpoint_name}\" in course \"{course_name}\""
+msgid "Re-Verify for {course_name}"
 msgstr ""
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html

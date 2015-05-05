@@ -4,7 +4,7 @@ define(['backbone', 'jquery', 'js/verify_student/photocapture'],
         describe("Photo Verification", function () {
 
             beforeEach(function () {
-                setFixtures('<div id="order-error" style="display: none;"></div><input type="radio" name="contribution" value="35" id="contribution-35" checked="checked"><input type="radio" id="contribution-other" name="contribution" value=""><input type="text" size="9" name="contribution-other-amt" id="contribution-other-amt" value="30"><img id="face_image" src="src="data:image/png;base64,dummy"><img id="photo_id_image" src="src="data:image/png;base64,dummy"><button id="pay_button">pay button</button>');
+                setFixtures('<div id="order-error" style="display: none;"></div><input type="radio" name="contribution" value="35" id="contribution-35" checked="checked"><input type="radio" id="contribution-other" name="contribution" value=""><input type="text" size="9" name="contribution-other-amt" id="contribution-other-amt" value="30"><img id="face_image" src="src="data:image/png;base64,dummy"><img id="photo_id_image" src="src="data:image/png;base64,dummy"><button class="payment-button">pay button</button>');
             });
 
             it('retake photo', function () {
@@ -27,7 +27,7 @@ define(['backbone', 'jquery', 'js/verify_student/photocapture'],
                 });
                 submitToPaymentProcessing();
                 expect(window.submitForm).toHaveBeenCalled();
-                expect($("#pay_button")).toHaveClass("is-disabled");
+                expect($(".payment-button")).toHaveClass("is-disabled");
             });
 
             it('Error during process', function () {
@@ -44,7 +44,7 @@ define(['backbone', 'jquery', 'js/verify_student/photocapture'],
                 expect(window.showSubmissionError).toHaveBeenCalled();
 
                 // make sure the button isn't disabled
-                expect($("#pay_button")).not.toHaveClass("is-disabled");
+                expect($(".payment-button")).not.toHaveClass("is-disabled");
 
                 // but also make sure that it was disabled during the ajax call
                 expect($.fn.addClass).toHaveBeenCalledWith("is-disabled");

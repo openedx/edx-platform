@@ -18,7 +18,7 @@ def clean_test_files():
     Clean fixture files used by tests and .pyc files
     """
     sh("git clean -fqdx test_root/logs test_root/data test_root/staticfiles test_root/uploads")
-    sh("find . -type f -name \"*.pyc\" -delete")
+    sh("find . -type f -name \"*.pyc\" -not -path './.git/*' -delete")
     sh("rm -rf test_root/log/auto_screenshots/*")
     sh("rm -rf /tmp/mako_[cl]ms")
 
@@ -73,8 +73,9 @@ def check_firefox_version():
         raise Exception(
             'Required firefox version not found.\n'
             'Expected: {expected_version}; Actual: {actual_version}.\n\n'
-            'As the root user in devstack, run the following:\n\n'
+            'As the vagrant user in devstack, run the following:\n\n'
             '\t$ sudo wget -O /tmp/firefox_28.deb https://s3.amazonaws.com/vagrant.testeng.edx.org/firefox_28.0%2Bbuild2-0ubuntu0.12.04.1_amd64.deb\n'
+            '\t$ sudo apt-get remove firefox\n\n'
             '\t$ sudo gdebi -nq /tmp/firefox_28.deb\n\n'
             'Confirm the new version:\n'
             '\t$ firefox --version\n'

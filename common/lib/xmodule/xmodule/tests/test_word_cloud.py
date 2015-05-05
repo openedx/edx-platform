@@ -24,7 +24,7 @@ class WordCloudModuleTest(LogicTest):
         })
 
     def test_good_ajax_request(self):
-        "Make shure that ajax request works correctly"
+        "Make sure that ajax request works correctly"
         post_data = MultiDict(('student_words[]', word) for word in ['cat', 'cat', 'dog', 'sun'])
         response = self.ajax_request('submit', post_data)
         self.assertEqual(response['status'], 'success')
