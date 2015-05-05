@@ -5,6 +5,7 @@ invoke the Django armature.
 """
 
 from social.backends import google, linkedin, facebook
+from social.backends.saml import OID_EDU_PERSON_PRINCIPAL_NAME
 from .saml import SAMLAuthBackend
 
 _DEFAULT_ICON_CLASS = 'fa-signin'
@@ -170,6 +171,7 @@ class TestShibAProvider(SAMLProviderMixin, BaseProvider):
         "id": "testshiba",  # Required slug
         "entity_id": "https://idp.testshib.org/idp/shibboleth",
         "url": "https://idp.testshib.org/idp/profile/SAML2/Redirect/SSO",
+        "attr_email": OID_EDU_PERSON_PRINCIPAL_NAME,
         "x509cert": """
             MIIEDjCCAvagAwIBAgIBADANBgkqhkiG9w0BAQUFADBnMQswCQYDVQQGEwJVUzEV
             MBMGA1UECBMMUGVubnN5bHZhbmlhMRMwEQYDVQQHEwpQaXR0c2J1cmdoMREwDwYD
