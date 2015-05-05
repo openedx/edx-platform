@@ -130,6 +130,9 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
         self.add_course_content()
 
     def add_course_content(self):
+        """
+        Add a chapter and a sequential to the current course.
+        """
         # Add a chapter to the course
         chapter = ItemFactory.create(parent_location=self.course.location,
                                      display_name=TEST_SECTION_NAME)
@@ -217,7 +220,7 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         ItemFactory.create(parent_location=parent.location,
                            parent=parent,
                            category="problem",
-                           display_name=str(problem_url_name),
+                           display_name=problem_url_name,
                            data=problem_xml,
                            **kwargs)
 
@@ -256,9 +259,12 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
             # URL, modified so that it can be easily stored in html, prepended with "input-" and
             # appended with a sequence identifier for the particular response the input goes to.
             course_key = self.course.id
-            return 'input_i4x-{0}-{1}-problem-{2}_{3}'.format(course_key.org,
-                                                              course_key.course.replace('.', '_'),
-                                                              problem_url_name, response_id)
+            return u'input_i4x-{0}-{1}-problem-{2}_{3}'.format(
+                course_key.org.replace(u'.', u'_'),
+                course_key.course.replace(u'.', u'_'),
+                problem_url_name,
+                response_id
+            )
 
         # make sure that the requested user is logged in, so that the ajax call works
         # on the right problem:
@@ -275,7 +281,7 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
 
         # assign correct identifier to each response.
         resp = self.client.post(modx_url, {
-            get_input_id('{}_1').format(index): response for index, response in enumerate(responses, 2)
+            get_input_id(u'{}_1').format(index): response for index, response in enumerate(responses, 2)
         })
         return resp
 
@@ -289,7 +295,7 @@ class TestReportMixin(object):
         if os.path.exists(reports_download_path):
             shutil.rmtree(reports_download_path)
 
-    def verify_rows_in_csv(self, expected_rows, verify_order=True, ignore_other_columns=False):
+    def verify_rows_in_csv(self, expected_rows, file_index=0, verify_order=True, ignore_other_columns=False):
         """
         Verify that the last ReportStore CSV contains the expected content.
 
@@ -298,6 +304,9 @@ class TestReportMixin(object):
                 where each dict represents a row of data in the last
                 ReportStore CSV.  Each dict maps keys from the CSV
                 header to values in that row's corresponding cell.
+            file_index (int): Describes which report store file to
+                open.  Files are ordered by last modified date, and 0
+                corresponds to the most recently modified file.
             verify_order (boolean): When True, we verify that both the
                 content and order of `expected_rows` matches the
                 actual csv rows.  When False (default), we only verify
@@ -306,7 +315,7 @@ class TestReportMixin(object):
                 contain data which is the subset of actual csv rows.
         """
         report_store = ReportStore.from_config()
-        report_csv_filename = report_store.links_for(self.course.id)[0][0]
+        report_csv_filename = report_store.links_for(self.course.id)[file_index][0]
         with open(report_store.path_to(self.course.id, report_csv_filename)) as csv_file:
             # Expand the dict reader generator so we don't lose it's content
             csv_rows = [row for row in unicodecsv.DictReader(csv_file)]

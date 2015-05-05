@@ -229,7 +229,13 @@ def _grade(student, request, course, keep_raw_scores):
                         graded = False
 
                     scores.append(
-                        Score(correct, total, graded, module_descriptor.display_name_with_default, module_descriptor.location)
+                        Score(
+                            correct,
+                            total,
+                            graded,
+                            module_descriptor.display_name_with_default,
+                            module_descriptor.location
+                        )
                     )
 
                 _, graded_total = graders.aggregate_scores(scores, section_name)

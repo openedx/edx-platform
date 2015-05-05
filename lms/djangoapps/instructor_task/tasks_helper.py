@@ -556,12 +556,7 @@ def upload_csv_to_report_store(rows, csv_name, course_id, timestamp):
         ),
         rows
     )
-    tracker.emit(
-        REPORT_REQUESTED_EVENT_NAME,
-        {
-            "report_type": csv_name,
-        }
-    )
+    tracker.emit(REPORT_REQUESTED_EVENT_NAME, {"report_type": csv_name, })
 
 
 def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):  # pylint: disable=too-many-statements
@@ -721,6 +716,14 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
 def _order_problems(blocks):
     """
     Sort the problems by the assignment type and assignment that it belongs to.
+
+    Args:
+        blocks (OrderedDict) - A course structure containing blocks that have been ordered
+                              (i.e. when we iterate over them, we will see them in the order
+                              that they appear in the course).
+
+    Returns:
+        an OrderedDict that maps a problem id to its headers in the final report.
     """
     problems = OrderedDict()
     assignments = dict()
@@ -749,7 +752,7 @@ def _order_problems(blocks):
     for assignment_type in assignments:
         for assignment_index, assignment in enumerate(assignments[assignment_type].keys(), start=1):
             for problem in assignments[assignment_type][assignment]:
-                header_name = "{assignment_type} {assignment_index}: {assignment_name} - {block}".format(
+                header_name = u"{assignment_type} {assignment_index}: {assignment_name} - {block}".format(
                     block=blocks[problem]['display_name'],
                     assignment_type=assignment_type,
                     assignment_index=assignment_index,
@@ -771,10 +774,9 @@ def upload_problem_grade_report(_xmodule_instance_args, _entry_id, course_id, _t
     enrolled_students = CourseEnrollment.users_enrolled_in(course_id)
     task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 
-    # This struct encapsulates both the display names of each static item in
-    # the header row as values as well as the django User field names of those
-    # items as the keys.  It is structured in this way to keep the values
-    # related.
+    # This struct encapsulates both the display names of each static item in the
+    # header row as values as well as the django User field names of those items
+    # as the keys.  It is structured in this way to keep the values related.
     header_row = OrderedDict([('id', 'Student ID'), ('email', 'Email'), ('username', 'Username')])
 
     try:
@@ -782,14 +784,25 @@ def upload_problem_grade_report(_xmodule_instance_args, _entry_id, course_id, _t
         blocks = course_structure.ordered_blocks
         problems = _order_problems(blocks)
     except CourseStructure.DoesNotExist:
-        return task_progress.update_task_state(extra_meta={'step': 'Generating course structure. Please refresh and try again.'})
+        return task_progress.update_task_state(
+            extra_meta={'step': 'Generating course structure. Please refresh and try again.'}
+        )
 
     # Just generate the static fields for now.
     rows = [list(header_row.values()) + ['Final Grade'] + list(chain.from_iterable(problems.values()))]
+    error_rows = [list(header_row.values()) + ['error_msg']]
     current_step = {'step': 'Calculating Grades'}
 
     for student, gradeset, err_msg in iterate_grades_for(course_id, enrolled_students, keep_raw_scores=True):
         student_fields = [getattr(student, field_name) for field_name in header_row]
+        task_progress.attempted += 1
+
+        if err_msg:
+            # There was an error grading this student.
+            error_rows.append(student_fields + [err_msg])
+            task_progress.failed += 1
+            continue
+
         final_grade = gradeset['percent']
         # Only consider graded problems
         problem_scores = {unicode(score.module_id): score for score in gradeset['raw_scores'] if score.graded}
@@ -807,13 +820,17 @@ def upload_problem_grade_report(_xmodule_instance_args, _entry_id, course_id, _t
                 earned_possible_values.append(['N/A', 'N/A'])
         rows.append(student_fields + [final_grade] + list(chain.from_iterable(earned_possible_values)))
 
-        task_progress.attempted += 1
         task_progress.succeeded += 1
         if task_progress.attempted % status_interval == 0:
             task_progress.update_task_state(extra_meta=current_step)
 
-    # Perform the upload
-    upload_csv_to_report_store(rows, 'problem_grade_report', course_id, start_date)
+    # Perform the upload if any students have been successfully graded
+    if len(rows) > 1:
+        upload_csv_to_report_store(rows, 'problem_grade_report', course_id, start_date)
+    # If there are any error rows, write them out as well
+    if len(error_rows) > 1:
+        upload_csv_to_report_store(error_rows, 'problem_grade_report_err', course_id, start_date)
+
     return task_progress.update_task_state(extra_meta={'step': 'Uploading CSV'})
 
 

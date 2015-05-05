@@ -24,12 +24,16 @@ class GradesheetTest(unittest.TestCase):
         scores.append(Score(earned=3, possible=5, graded=True, section="summary", module_id=None))
         all_total, graded_total = aggregate_scores(scores)
         self.assertAlmostEqual(all_total, Score(earned=3, possible=10, graded=False, section="summary", module_id=None))
-        self.assertAlmostEqual(graded_total, Score(earned=3, possible=5, graded=True, section="summary", module_id=None))
+        self.assertAlmostEqual(
+            graded_total, Score(earned=3, possible=5, graded=True, section="summary", module_id=None)
+        )
 
         scores.append(Score(earned=2, possible=5, graded=True, section="summary", module_id=None))
         all_total, graded_total = aggregate_scores(scores)
         self.assertAlmostEqual(all_total, Score(earned=5, possible=15, graded=False, section="summary", module_id=None))
-        self.assertAlmostEqual(graded_total, Score(earned=5, possible=10, graded=True, section="summary", module_id=None))
+        self.assertAlmostEqual(
+            graded_total, Score(earned=5, possible=10, graded=True, section="summary", module_id=None)
+        )
 
 
 class GraderTest(unittest.TestCase):

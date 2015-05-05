@@ -29,6 +29,9 @@ class CourseStructure(TimeStampedModel):
 
     @property
     def ordered_blocks(self):
+        """
+        Return the blocks in the order with which they're seen in the courseware. Parents are ordered before children.
+        """
         if self.structure:
             ordered_blocks = OrderedDict()
             self._traverse_tree(self.structure['root'], self.structure['blocks'], ordered_blocks)

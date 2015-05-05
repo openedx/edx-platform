@@ -15,7 +15,6 @@ from course_structure_api.v0 import api, serializers
 from course_structure_api.v0.errors import CourseNotFoundError, CourseStructureNotAvailableError
 from courseware import courses
 from courseware.access import has_access
-from openedx.core.djangoapps.content.course_structures import models, tasks
 from openedx.core.lib.api.permissions import IsAuthenticatedOrDebug
 from openedx.core.lib.api.serializers import PaginationSerializer
 from student.roles import CourseInstructorRole, CourseStaffRole
@@ -253,7 +252,7 @@ class CourseStructure(CourseViewMixin, RetrieveAPIView):
     """
 
     @CourseViewMixin.course_check
-    def get(self, request, course_id=None):
+    def get(self, request, **kwargs):
         try:
             return Response(api.course_structure(self.course_key))
         except CourseStructureNotAvailableError:
@@ -289,5 +288,5 @@ class CourseGradingPolicy(CourseViewMixin, ListAPIView):
     allow_empty = False
 
     @CourseViewMixin.course_check
-    def get(self, request, course_id=None):
+    def get(self, request, **kwargs):
         return Response(api.course_grading_policy(self.course_key))

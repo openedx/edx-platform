@@ -1,7 +1,8 @@
 """
 API implementation of the Course Structure API for Python code.
 
-Note: The course list and course detail functionality isn't currently supported here because of the tricky interactions between DRF and the code.
+Note: The course list and course detail functionality isn't currently supported here because
+of the tricky interactions between DRF and the code.
 Most of that information is available by accessing the course objects directly.
 """
 
@@ -62,8 +63,8 @@ def course_structure(course_key):
     """
     course = _retrieve_course(course_key)
     try:
-        course_structure = models.CourseStructure.objects.get(course_id=course.id)
-        return serializers.CourseStructureSerializer(course_structure.structure).data
+        requested_course_structure = models.CourseStructure.objects.get(course_id=course.id)
+        return serializers.CourseStructureSerializer(requested_course_structure.structure).data
     except models.CourseStructure.DoesNotExist:
         # If we don't have data stored, generate it and return an error.
         tasks.update_course_structure.delay(unicode(course_key))

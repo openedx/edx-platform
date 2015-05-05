@@ -320,24 +320,16 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         """
         Verifies that the correct event is emitted when a report is requested.
         """
-        self.verify_events_of_type(
-            self.instructor_username,
-            u"edx.instructor.report.requested",
-            [{
-                u"report_type": report_type
-            }]
+        self.assert_matching_events_were_emitted(
+            event_filter={'name': u'edx.instructor.report.requested', 'report_type': report_type}
         )
 
     def verify_report_downloaded_event(self, report_url):
         """
         Verifies that the correct event is emitted when a report is downloaded.
         """
-        self.verify_events_of_type(
-            self.instructor_username,
-            u"edx.instructor.report.downloaded",
-            [{
-                u"report_url": report_url
-            }]
+        self.assert_matching_events_were_emitted(
+            event_filter={'name': u'edx.instructor.report.downloaded', 'report_url': report_url}
         )
 
     def verify_report_download(self, report_name):
@@ -364,7 +356,7 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         Then a report downloaded event should be emitted
         """
         report_name = u"student_profile_info"
-        self.data_download_section.generate_student_profile_report_button.click()
+        self.data_download_section.generate_student_report_button.click()
         self.data_download_section.wait_for_available_report()
         self.verify_report_requested_event(report_name)
         self.verify_report_download(report_name)
@@ -400,7 +392,7 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         Then a report downloaded event should be emitted
         """
         report_name = u"problem_grade_report"
-        self.data_download_section.generate_problem_grade_report_button.click()
+        self.data_download_section.generate_problem_report_button.click()
         self.data_download_section.wait_for_available_report()
         self.verify_report_requested_event(report_name)
         self.verify_report_download(report_name)

@@ -703,7 +703,7 @@ class DataDownloadPage(PageObject):
         return self.q(css='a[data-section=data_download].active-section').present
 
     @property
-    def generate_student_profile_report_button(self):
+    def generate_student_report_button(self):
         """
         Returns the "Download profile information as a CSV" button.
         """
@@ -717,7 +717,7 @@ class DataDownloadPage(PageObject):
         return self.q(css='input[name=calculate-grades-csv]')
 
     @property
-    def generate_problem_grade_report_button(self):
+    def generate_problem_report_button(self):
         """
         Returns the "Generate Problem Grade Report" button.
         """

@@ -68,8 +68,8 @@ class CourseStructureTaskTests(ModuleStoreTestCase):
             }
         }
         structure_json = json.dumps(structure)
-        cs = CourseStructure.objects.create(course_id=self.course.id, structure_json=structure_json)
-        self.assertEqual(cs.structure_json, structure_json)
+        structure = CourseStructure.objects.create(course_id=self.course.id, structure_json=structure_json)
+        self.assertEqual(structure.structure_json, structure_json)
 
         # Reload the data to ensure the init signal is fired to decompress the data.
         cs = CourseStructure.objects.get(course_id=self.course.id)
@@ -90,7 +90,6 @@ class CourseStructureTaskTests(ModuleStoreTestCase):
         structure_json = json.dumps(structure)
         cs = CourseStructure.objects.create(course_id=self.course.id, structure_json=structure_json)
         self.assertDictEqual(cs.structure, structure)
-
 
     def test_ordered_blocks(self):
         structure = {
@@ -121,9 +120,11 @@ class CourseStructureTaskTests(ModuleStoreTestCase):
         }
         in_order_blocks = ['a/b/c', 'g/h/i', 'j/k/l', 'd/e/f']
         structure_json = json.dumps(structure)
-        cs = CourseStructure.objects.create(course_id=self.course.id, structure_json=structure_json)
+        retrieved_course_structure = CourseStructure.objects.create(
+            course_id=self.course.id, structure_json=structure_json
+        )
 
-        self.assertEqual(cs.ordered_blocks.keys(), in_order_blocks)
+        self.assertEqual(retrieved_course_structure.ordered_blocks.keys(), in_order_blocks)
 
     def test_block_with_missing_fields(self):
         """
