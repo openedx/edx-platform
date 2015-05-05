@@ -2721,8 +2721,8 @@ NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = {
     '*': 'durable',  # default global mapping
 }
 
-NOTIFICATION_DAILY_DIGEST_SUBJECT = "Your daily digest of Notifications from Open edX"
-NOTIFICATION_WEEKLY_DIGEST_SUBJECT = "Your weekly digest of Notifications from Open edX"
+NOTIFICATION_DAILY_DIGEST_SUBJECT = "Your unread notifications for '{display_name}'"
+NOTIFICATION_WEEKLY_DIGEST_SUBJECT = "Your unread notifications for '{display_name}'"
 NOTIFICATION_BRANDED_DEFAULT_LOGO = 'edx_notifications/img/edx-openedx-logo-tag.png'
 NOTIFICATION_EMAIL_FROM_ADDRESS = ''
 NOTIFICATION_EMAIL_CLICK_LINK_ROOT = 'http://localhost'
