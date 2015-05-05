@@ -106,7 +106,7 @@ class NamespaceEnrollmentsScopeResolver(NotificationUserScopeResolver):
             if scope_context['fields'].get('last_name'):
                 fields.append('last_name')
         else:
-            fields =['id', 'email', 'first_name', 'last_name']
+            fields = ['id', 'email', 'first_name', 'last_name']
 
         query = query.values(*fields)
         query = query.filter(
@@ -135,6 +135,20 @@ class StudentEmailScopeResolver(NotificationUserScopeResolver):
         if not user_id:
             return None
 
-        return User.objects.values_list('email', flat=True).filter(
-            id=user_id
-        )
+        if 'fields' in scope_context:
+            fields = []
+            if scope_context['fields'].get('id'):
+                fields.append('id')
+
+            if scope_context['fields'].get('email'):
+                fields.append('email')
+
+            if scope_context['fields'].get('first_name'):
+                fields.append('first_name')
+
+            if scope_context['fields'].get('last_name'):
+                fields.append('last_name')
+        else:
+            fields = ['id', 'email', 'first_name', 'last_name']
+
+        return User.objects.values(*fields).filter(id=user_id)
