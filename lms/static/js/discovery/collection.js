@@ -18,18 +18,20 @@ define([
         url: '/search/course_discovery/',
         fetchXhr: null,
 
-        performSearch: function (searchTerm, filters) {
+        performSearch: function (searchTerm, facets) {
             this.fetchXhr && this.fetchXhr.abort();
             this.searchTerm = searchTerm || '';
-            this.facetList = filters || {};
+            this.facetList = facets || {};
             var data = {
                 search_string: searchTerm,
                 page_size: this.pageSize,
                 page_index: 0
             };
-            filters.each(function(facet) {
-                data[facet.get('type')] = facet.get('query');
-            });
+            if(this.facetList.length > 0) {
+                this.facetList.each(function(facet) {
+                    data[facet.get('type')] = facet.get('query');
+                });
+            }
             this.resetState();
             this.fetchXhr = this.fetch({
                 data: data,

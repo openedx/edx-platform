@@ -17,18 +17,16 @@ define(['backbone'], function(Backbone) {
             filters.changeQueryFilter(query);
         });
 
-        dispatcher.listenTo(filters, 'search', function (searchTerm, filters) {
-            collection.performSearch(searchTerm, filters);
+        dispatcher.listenTo(filters, 'search', function (searchTerm, facets) {
+            collection.performSearch(searchTerm, facets);
             form.showLoadingIndicator();
         });
 
-        dispatcher.listenTo(form, 'clear', function () {
-            results.clearResults();
-            filters.hideClearAllButton();
-        });
-
         dispatcher.listenTo(filters, 'clear', function () {
-            form.clearAll();
+            form.clearSearch();
+            results.clearResults();
+            collection.performSearch();
+            filters.hideClearAllButton();
         });
 
         dispatcher.listenTo(results, 'next', function () {
@@ -39,7 +37,6 @@ define(['backbone'], function(Backbone) {
         dispatcher.listenTo(collection, 'search', function () {
             if (collection.length > 0) {
                 results.render();
-                filters.showClearAllButton();
             }
             else {
                 form.showNotFoundMessage(collection.searchTerm);
