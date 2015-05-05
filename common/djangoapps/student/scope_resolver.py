@@ -118,7 +118,7 @@ class NamespaceEnrollmentsScopeResolver(NotificationUserScopeResolver):
             if scope_context['fields'].get('last_name'):
                 fields.append('last_name')
         else:
-            fields =['id', 'email', 'first_name', 'last_name']
+            fields = ['id', 'email', 'first_name', 'last_name']
 
         query = query.values(*fields)
         query = query.filter(
