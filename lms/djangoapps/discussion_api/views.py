@@ -133,12 +133,11 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         form = ThreadListGetForm(request.GET)
         if not form.is_valid():
             raise ValidationError(form.errors)
-        course_key = form.cleaned_data["course_id"]
-        self.get_course_or_404(request.user, course_key)
+        course = self.get_course_or_404(request.user, form.cleaned_data["course_id"])
         return Response(
             get_thread_list(
                 request,
-                course_key,
+                course,
                 form.cleaned_data["page"],
                 form.cleaned_data["page_size"]
             )

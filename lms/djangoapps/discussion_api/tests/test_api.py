@@ -12,8 +12,6 @@ from pytz import UTC
 from django.http import Http404
 from django.test.client import RequestFactory
 
-from opaque_keys.edx.locator import CourseLocator
-
 from courseware.tests.factories import BetaTesterFactory, StaffFactory
 from discussion_api.api import get_course_topics, get_thread_list
 from discussion_api.tests.utils import CommentsServiceMockMixin
@@ -337,6 +335,7 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
         self.request.user = self.user
         self.course = CourseFactory.create()
         self.author = UserFactory.create()
+        self.cohort = CohortFactory.create(course_id=self.course.id)
 
     def get_thread_list(self, threads, page=1, page_size=1, num_pages=1, course=None):
         """
@@ -345,7 +344,7 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
         """
         course = course or self.course
         self.register_get_threads_response(threads, page, num_pages)
-        ret = get_thread_list(self.request, course.id, page, page_size)
+        ret = get_thread_list(self.request, course, page, page_size)
         return ret
 
     def create_role(self, role_name, users):
@@ -363,6 +362,7 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
             "id": "dummy",
             "course_id": unicode(self.course.id),
             "commentable_id": "dummy",
+            "group_id": None,
             "user_id": str(self.author.id),
             "username": self.author.username,
             "anonymous": False,
@@ -414,6 +414,7 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "id": "test_thread_id_0",
                 "course_id": unicode(self.course.id),
                 "commentable_id": "topic_x",
+                "group_id": None,
                 "user_id": str(self.author.id),
                 "username": self.author.username,
                 "anonymous": False,
@@ -434,6 +435,7 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "id": "test_thread_id_1",
                 "course_id": unicode(self.course.id),
                 "commentable_id": "topic_y",
+                "group_id": self.cohort.id,
                 "user_id": str(self.author.id),
                 "username": self.author.username,
                 "anonymous": False,
@@ -454,6 +456,7 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "id": "test_thread_id_2",
                 "course_id": unicode(self.course.id),
                 "commentable_id": "topic_x",
+                "group_id": self.cohort.id + 1,  # non-existent group
                 "user_id": str(self.author.id),
                 "username": self.author.username,
                 "anonymous": False,
@@ -476,6 +479,8 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "id": "test_thread_id_0",
                 "course_id": unicode(self.course.id),
                 "topic_id": "topic_x",
+                "group_id": None,
+                "group_name": None,
                 "author": self.author.username,
                 "author_label": None,
                 "created_at": "2015-04-28T00:00:00Z",
@@ -496,6 +501,8 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "id": "test_thread_id_1",
                 "course_id": unicode(self.course.id),
                 "topic_id": "topic_y",
+                "group_id": self.cohort.id,
+                "group_name": self.cohort.name,
                 "author": self.author.username,
                 "author_label": None,
                 "created_at": "2015-04-28T22:22:22Z",
@@ -516,6 +523,8 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "id": "test_thread_id_2",
                 "course_id": unicode(self.course.id),
                 "topic_id": "topic_x",
+                "group_id": self.cohort.id + 1,
+                "group_name": None,
                 "author": self.author.username,
                 "author_label": None,
                 "created_at": "2015-04-28T00:44:44Z",
@@ -594,7 +603,7 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
         # Test page past the last one
         self.register_get_threads_response([], page=3, num_pages=3)
         with self.assertRaises(Http404):
-            get_thread_list(self.request, self.course.id, page=4, page_size=10)
+            get_thread_list(self.request, self.course, page=4, page_size=10)
 
     @ddt.data(
         (FORUM_ROLE_ADMINISTRATOR, True, False, True),
