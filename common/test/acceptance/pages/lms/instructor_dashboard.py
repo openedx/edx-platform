@@ -446,8 +446,10 @@ class CohortManagementSection(PageObject):
         """
         Uploads a file with cohort assignment information.
         """
-        # If the CSV upload section has not yet been toggled on, click on the toggle link.
-        cvs_upload_toggle = self.q(css=self._bounded_selector(".toggle-cohort-management-secondary")).first
+        # Toggle on the CSV upload section.
+        cvs_upload_toggle_css = '.toggle-cohort-management-secondary'
+        self.wait_for_element_visibility(cvs_upload_toggle_css, "Wait for csv upload link to appear")
+        cvs_upload_toggle = self.q(css=self._bounded_selector(cvs_upload_toggle_css)).first
         if cvs_upload_toggle:
             cvs_upload_toggle.click()
         path = InstructorDashboardPage.get_asset_path(filename)
