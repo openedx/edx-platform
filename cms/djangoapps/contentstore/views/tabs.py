@@ -61,10 +61,7 @@ def tabs_handler(request, course_key_string):
         # present in the same order they are displayed in LMS
 
         tabs_to_render = []
-        for tab in CourseTabList.iterate_displayable_cms(
-                course_item,
-                settings,
-        ):
+        for tab in CourseTabList.iterate_displayable(course_item, settings, inline_collections=False):
             if isinstance(tab, StaticTab):
                 # static tab needs its locator information to render itself as an xmodule
                 static_tab_loc = course_key.make_usage_key('static_tab', tab.url_slug)
