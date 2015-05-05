@@ -77,7 +77,11 @@ class Command(BaseCommand):
         """
         Sends the daily digest.
         """
-        from_timestamp = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=1)
+        if const.NOTIFICATION_DIGEST_SEND_TIMEFILTERED:
+            from_timestamp = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=1)
+        else:
+            from_timestamp = None
+
         to_timestamp = datetime.datetime.now(pytz.UTC)
         preference_name = const.NOTIFICATION_DAILY_DIGEST_PREFERENCE_NAME
         subject = const.NOTIFICATION_DAILY_DIGEST_SUBJECT
@@ -95,7 +99,12 @@ class Command(BaseCommand):
         """
         Sends the weekly digest.
         """
-        from_timestamp = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=7)
+
+        if const.NOTIFICATION_DIGEST_SEND_TIMEFILTERED:
+            from_timestamp = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=7)
+        else:
+            from_timestamp = None
+
         to_timestamp = datetime.datetime.now(pytz.UTC)
         preference_name = const.NOTIFICATION_WEEKLY_DIGEST_PREFERENCE_NAME
         subject = const.NOTIFICATION_WEEKLY_DIGEST_SUBJECT

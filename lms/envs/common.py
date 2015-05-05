@@ -2726,6 +2726,7 @@ NOTIFICATION_WEEKLY_DIGEST_SUBJECT = "Your unread notifications for '{display_na
 NOTIFICATION_BRANDED_DEFAULT_LOGO = 'edx_notifications/img/edx-openedx-logo-tag.png'
 NOTIFICATION_EMAIL_FROM_ADDRESS = ''
 NOTIFICATION_EMAIL_CLICK_LINK_ROOT = 'http://localhost'
+NOTIFICATION_DIGEST_SEND_TIMEFILTERED = True
 
 #date format the api will be formatting the datetime values
 API_DATE_FORMAT = '%Y-%m-%d'
