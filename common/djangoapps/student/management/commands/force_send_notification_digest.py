@@ -81,7 +81,7 @@ class Command(BaseCommand):
         to_timestamp = datetime.datetime.now(pytz.UTC)
         preference_name = const.NOTIFICATION_DAILY_DIGEST_PREFERENCE_NAME
         subject = const.NOTIFICATION_DAILY_DIGEST_SUBJECT
-        from_email = const.NOTIFICATION_DIGEST_FROM_ADDRESS
+        from_email = const.NOTIFICATION_EMAIL_FROM_ADDRESS
 
         if namespace == "All":
             digests_sent = send_notifications_digest(from_timestamp, to_timestamp, preference_name, subject, from_email)
@@ -99,7 +99,7 @@ class Command(BaseCommand):
         to_timestamp = datetime.datetime.now(pytz.UTC)
         preference_name = const.NOTIFICATION_WEEKLY_DIGEST_PREFERENCE_NAME
         subject = const.NOTIFICATION_WEEKLY_DIGEST_SUBJECT
-        from_email = const.NOTIFICATION_DIGEST_FROM_ADDRESS
+        from_email = const.NOTIFICATION_EMAIL_FROM_ADDRESS
 
         if namespace == "All":
             digests_sent = send_notifications_digest(from_timestamp, to_timestamp, preference_name, subject, from_email)
