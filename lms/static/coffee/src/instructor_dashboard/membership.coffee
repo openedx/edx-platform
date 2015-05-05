@@ -28,6 +28,7 @@ class MemberListWidget
     template_html = $("#member-list-widget-template").html()
     @$container.html Mustache.render template_html, params
 
+    @$('.info').attr('tabindex' , 0)
     # bind add button
     @$('input[type="button"].add').click =>
       params.add_handler? @$('.add-field').val()
@@ -45,7 +46,7 @@ class MemberListWidget
     $tbody = @$('table tbody')
     $tr = $ '<tr>'
     for item in row_array
-      $td = $ '<td>'
+      $td = $ '<td tabindex="0">'
       if item instanceof jQuery
         $td.append item
       else
@@ -117,7 +118,7 @@ class AuthListWidget extends MemberListWidget
 
         # create revoke button and insert it into the row
         label_trans = gettext("Revoke access")
-        $revoke_btn = $ _.template('<div class="revoke"><i class="icon fa fa-times-circle"></i> <%= label %></div>', {label: label_trans}),
+        $revoke_btn = $ _.template('<div class="revoke" tabindex="0"><i class="icon fa fa-times-circle"></i> <%= label %></div>', {label: label_trans}),
           class: 'revoke'
         $revoke_btn.click =>
             @modify_member_access member.email, 'revoke', (error) =>
