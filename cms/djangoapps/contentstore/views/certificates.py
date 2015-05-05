@@ -103,6 +103,12 @@ class CertificateManager(object):
                 MYSQL_MAX_INT,
                 CertificateManager.get_used_ids(course)
             )
+
+        # assign unique id to signatories.
+        for index, signatory in enumerate(certificate_data['signatories']):
+            if not signatory.get('id', False):
+                signatory['id'] = generate_int_id(used_ids=CertificateManager.get_used_ids(course))
+
         return certificate_data
 
     @staticmethod
@@ -182,7 +188,7 @@ class CertificateManager(object):
 
             if int(cert['id']) == int(certificate_id):
                 for sig_index, signatory in enumerate(cert.get('signatories')):  # pylint: disable=unused-variable
-                    if int(signatory_id) == int(sig_index):
+                    if int(signatory_id) == int(signatory['id']):
                         del cert['signatories'][sig_index]
                         store.update_item(course, request.user.id)
                         break
