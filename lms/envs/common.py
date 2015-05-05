@@ -304,6 +304,23 @@ FEATURES = {
     # Turn on Advanced Security by default
     'ADVANCED_SECURITY': True,
 
+    # Show a "Download your certificate" on the Progress page if the lowest
+    # nonzero grade cutoff is met
+    'SHOW_PROGRESS_SUCCESS_BUTTON': False,
+
+    # Analytics Data API (for active student count)
+    # Default to false here b/c dev environments won't have the api, will override in aws.py
+    'ENABLE_ANALYTICS_ACTIVE_COUNT': False,
+
+    # TODO: ECOM-136 remove this feature flag when new styles are available on main site.for
+    # Enable the new edX footer to be rendered. Defaults to false.
+    'ENABLE_NEW_EDX_FOOTER': False,
+
+    # TODO: ECOM-136
+    # Enables the new navigation template and styles. This should be enabled
+    # when the styles appropriately match the edX.org website.
+    'ENABLE_NEW_EDX_HEADER': False,
+
     # When a logged in user goes to the homepage ('/') should the user be
     # redirected to the dashboard - this is default Open edX behavior. Set to
     # False to not redirect the user
@@ -2703,3 +2720,17 @@ NOTIFICATION_CHANNEL_PROVIDERS = {
 NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = {
     '*': 'durable',  # default global mapping
 }
+
+NOTIFICATION_DAILY_DIGEST_SUBJECT = "Your daily digest of Notifications from Open edX"
+NOTIFICATION_WEEKLY_DIGEST_SUBJECT = "Your weekly digest of Notifications from Open edX"
+NOTIFICATION_BRANDED_DEFAULT_LOGO = 'edx_notifications/img/edx-openedx-logo-tag.png'
+NOTIFICATION_EMAIL_FROM_ADDRESS = ''
+NOTIFICATION_EMAIL_CLICK_LINK_ROOT = 'http://localhost'
+
+#date format the api will be formatting the datetime values
+API_DATE_FORMAT = '%Y-%m-%d'
+
+# for Student Notes we would like to avoid too frequent token refreshes (default is 30 seconds)
+if FEATURES['ENABLE_EDXNOTES']:
+    OAUTH_ID_TOKEN_EXPIRATION = 60 * 60
+
