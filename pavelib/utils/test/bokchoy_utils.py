@@ -18,10 +18,13 @@ except ImportError:
 __test__ = False  # do not collect
 
 
-def start_servers(default_store):
+def start_servers(default_store, external_services=None):
     """
     Start the servers we will run tests on, returns PIDs for servers.
     """
+
+    if external_services is None:
+        external_services = []
 
     def start_server(cmd, logfile, cwd=None):
         """
@@ -31,6 +34,10 @@ def start_servers(default_store):
         run_background_process(cmd, out_log=logfile, err_log=logfile, cwd=cwd)
 
     for service, info in Env.BOK_CHOY_SERVERS.iteritems():
+        if service in external_services:
+            print('Assuming {0} service is being managed externally...'.format(service))
+            continue
+
         address = "0.0.0.0:{}".format(info['port'])
         cmd = (
             "DEFAULT_STORE={default_store} "

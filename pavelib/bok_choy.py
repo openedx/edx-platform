@@ -3,7 +3,7 @@ Run acceptance tests that use the bok-choy framework
 http://bok-choy.readthedocs.org/en/latest/
 """
 from paver.easy import task, needs, cmdopts, sh
-from pavelib.utils.test.suites.bokchoy_suite import BokChoyTestSuite
+from pavelib.utils.test.suites.bokchoy_suite import BokChoyTestSuite, BokChoyDevelopmentSuite
 from pavelib.utils.envs import Env
 from pavelib.utils.test.utils import check_firefox_version
 from optparse import make_option
@@ -86,6 +86,39 @@ def perf_report_bokchoy(options):
         'test_dir': 'performance',
     }
     run_bokchoy(**opts)
+
+
+@task
+@needs('pavelib.prereqs.install_prereqs')
+@cmdopts([
+    ('fasttest', 'a', 'Skip some setup'),
+    ('imports_dir=', 'd', 'Directory containing (un-archived) courses to be imported'),
+    ('default_store=', 's', 'Default modulestore'),
+    make_option("--external-service", action="append", dest="external_services"),
+])
+def dev_bokchoy(options):
+    """
+    Run the expensive setup for bok choy tests once and just keep them all alive while you run tests in another process.
+    Note this will not actually run any tests, it will simply show you the command you can run from the other process.
+    """
+    opts = {
+        'test_spec': getattr(options, 'test_spec', None),
+        'fasttest': getattr(options, 'fasttest', False),
+        'default_store': getattr(options, 'default_store', 'split'),
+        'imports_dir': getattr(options, 'imports_dir', None),
+        'verbosity': getattr(options, 'verbosity', 2),
+        'test_dir': 'tests',
+        'external_services': getattr(options, 'external_services', None),
+    }
+    test_suite = BokChoyDevelopmentSuite('bok-choy', **opts)
+    msg = colorize(
+        'green',
+        'Running tests using {default_store} modulestore.'.format(
+            default_store=test_suite.default_store,
+        )
+    )
+    print(msg)
+    test_suite.run()
 
 
 def run_bokchoy(**opts):
