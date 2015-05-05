@@ -18,7 +18,6 @@ define([
         tagName: 'div',
         templateId: '#filter_bar-tpl',
         className: 'filters hidden',
-        collection: new FiltersCollection([]),
 
         events: {
             'click #clear-all-filters': 'clearAll',
@@ -26,6 +25,7 @@ define([
         },
 
         initialize: function () {
+            this.collection = new FiltersCollection([]);
             this.tpl = _.template($(this.templateId).html());
             this.$el.html(this.tpl());
             this.hideClearAllButton();
@@ -37,12 +37,14 @@ define([
         },
 
         changeQueryFilter: function(query) {
-            var data = {'query': query, 'type': 'search_string'};
-            var queryModel = this.collection.getQueryModel();
-            if (queryModel) {
-                this.collection.remove(queryModel);
+            if (query) {
+                var data = {query: query, type: 'search_string'};
+                var queryModel = this.collection.getQueryModel();
+                if (queryModel) {
+                    this.collection.remove(queryModel);
+                }
+                this.addFilter(data);
             }
-            this.addFilter(data);
         },
 
         addFilter: function(data) {
@@ -51,7 +53,7 @@ define([
             this.collection.add(filter);
             this.filtersList.append(filterView.render().el);
             this.trigger('search', this.getSearchTerm(), this.collection);
-            if(this.$el.hasClass('hidden')) {
+            if (this.$el.hasClass('hidden')) {
                 this.showClearAllButton();
             }
         },
@@ -60,15 +62,16 @@ define([
             event.preventDefault();
             var $target =  $(event.currentTarget);
             var clearModel = this.collection.findWhere({
-                'query': $target.data('value'),
-                'type': $target.data('type')
+                query: $target.data('value'),
+                type: $target.data('type')
             });
             this.collection.remove(clearModel);
             if (this.collection.length === 0) {
                 this.trigger('clear');
-                this.hideClearAllButton();
             }
-            this.trigger('search', this.getSearchTerm(), this.collection);
+            else {
+                this.trigger('search', this.getSearchTerm(), this.collection);
+            }
         },
 
         clearFilters: function() {
@@ -80,7 +83,6 @@ define([
             event.preventDefault();
             this.clearFilters();
             this.trigger('clear');
-            this.hideClearAllButton();
         },
 
         showClearAllButton: function () {

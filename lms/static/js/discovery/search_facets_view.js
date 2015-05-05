@@ -23,14 +23,11 @@ define([
         },
 
         initialize: function () {
-/*            this.tpl = _.template($(this.templateId).html());
-            this.$el.html(this.tpl());
-            this.filtersList = this.$el.find('ul');*/
+            // Empty for now.
         },
 
         render: function () {
-/*            var filter = new FilterView();
-            this.filtersList.append(filter.render().el);*/
+            // Empty for now.
         },
 
         collapse: function(event) {
@@ -62,7 +59,7 @@ define([
             event.preventDefault();
             var $target = $(event.currentTarget);
             var value = $target.find('.facet-option').data('value');
-            var data = {'type': $target.data('facet'), 'query': value};
+            var data = {type: $target.data('facet'), query: value};
             this.trigger('addFilter', data);
         }
 

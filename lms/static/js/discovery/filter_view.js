@@ -26,7 +26,7 @@ define([
         },
 
         remove: function() {
-            $(this.el).remove();
+            this.$el.remove();
         }
 
     });
