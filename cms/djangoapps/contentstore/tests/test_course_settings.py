@@ -662,7 +662,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         If feature flag is off, then giturl must be filtered.
         """
         # pylint: disable=unused-variable
-        is_valid, errors, test_model = CourseMetadata.validate_and_update_from_json(
+        is_valid, errors, test_model = CourseMetadata.validate_from_json(
             self.course,
             {
                 "giturl": {"value": "http://example.com"},
@@ -677,7 +677,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         If feature flag is on, then giturl must not be filtered.
         """
         # pylint: disable=unused-variable
-        is_valid, errors, test_model = CourseMetadata.validate_and_update_from_json(
+        is_valid, errors, test_model = CourseMetadata.validate_from_json(
             self.course,
             {
                 "giturl": {"value": "http://example.com"},
@@ -736,7 +736,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         If feature flag is off, then edxnotes must be filtered.
         """
         # pylint: disable=unused-variable
-        is_valid, errors, test_model = CourseMetadata.validate_and_update_from_json(
+        is_valid, errors, test_model = CourseMetadata.validate_from_json(
             self.course,
             {
                 "edxnotes": {"value": "true"},
@@ -751,7 +751,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         If feature flag is on, then edxnotes must not be filtered.
         """
         # pylint: disable=unused-variable
-        is_valid, errors, test_model = CourseMetadata.validate_and_update_from_json(
+        is_valid, errors, test_model = CourseMetadata.validate_from_json(
             self.course,
             {
                 "edxnotes": {"value": "true"},
@@ -788,8 +788,8 @@ class CourseMetadataEditingTest(CourseTestCase):
         )
         self.assertNotIn('edxnotes', test_model)
 
-    def test_validate_and_update_from_json_correct_inputs(self):
-        is_valid, errors, test_model = CourseMetadata.validate_and_update_from_json(
+    def test_validate_from_json_correct_inputs(self):
+        is_valid, errors, test_model = CourseMetadata.validate_from_json(
             self.course,
             {
                 "advertised_start": {"value": "start A"},
@@ -802,18 +802,13 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertTrue(len(errors) == 0)
         self.update_check(test_model)
 
-        # fresh fetch to ensure persistence
-        fresh = modulestore().get_course(self.course.id)
-        test_model = CourseMetadata.fetch(fresh)
-        self.update_check(test_model)
-
         # Tab gets tested in test_advanced_settings_munge_tabs
         self.assertIn('advanced_modules', test_model, 'Missing advanced_modules')
         self.assertEqual(test_model['advanced_modules']['value'], ['combinedopenended'], 'advanced_module is not updated')
 
-    def test_validate_and_update_from_json_wrong_inputs(self):
+    def test_validate_from_json_wrong_inputs(self):
         # input incorrectly formatted data
-        is_valid, errors, test_model = CourseMetadata.validate_and_update_from_json(
+        is_valid, errors, test_model = CourseMetadata.validate_from_json(
             self.course,
             {
                 "advertised_start": {"value": 1, "display_name": "Course Advertised Start Date", },
@@ -824,7 +819,7 @@ class CourseMetadataEditingTest(CourseTestCase):
             user=self.user
         )
 
-        # Check valid results from validate_and_update_from_json
+        # Check valid results from validate_from_json
         self.assertFalse(is_valid)
         self.assertEqual(len(errors), 3)
         self.assertFalse(test_model)
@@ -946,23 +941,6 @@ class CourseMetadataEditingTest(CourseTestCase):
         })
         course = modulestore().get_course(self.course.id)
         self.assertNotIn(EXTRA_TAB_PANELS.get("open_ended"), course.tabs)
-
-    @patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': True})
-    def test_course_settings_munge_tabs(self):
-        """
-        Test that adding and removing specific course settings adds and removes tabs.
-        """
-        self.assertNotIn(EXTRA_TAB_PANELS.get("edxnotes"), self.course.tabs)
-        self.client.ajax_post(self.course_setting_url, {
-            "edxnotes": {"value": True}
-        })
-        course = modulestore().get_course(self.course.id)
-        self.assertIn(EXTRA_TAB_PANELS.get("edxnotes"), course.tabs)
-        self.client.ajax_post(self.course_setting_url, {
-            "edxnotes": {"value": False}
-        })
-        course = modulestore().get_course(self.course.id)
-        self.assertNotIn(EXTRA_TAB_PANELS.get("edxnotes"), course.tabs)
 
 
 class CourseGraderUpdatesTest(CourseTestCase):

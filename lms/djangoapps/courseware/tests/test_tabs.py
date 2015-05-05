@@ -54,13 +54,15 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertIn("OOGIE BLOOGIE", resp.content)
 
     def test_invalid_course_key(self):
-        request = get_request_for_user(UserFactory.create())
+        self.setup_user()
+        request = get_request_for_user(self.user)
         with self.assertRaises(Http404):
             static_tab(request, course_id='edX/toy', tab_slug='new_tab')
 
     def test_get_static_tab_contents(self):
+        self.setup_user()
         course = get_course_by_id(self.toy_course_key)
-        request = get_request_for_user(UserFactory.create())
+        request = get_request_for_user(self.user)
         tab = tabs.CourseTabList.get_tab_by_slug(course.tabs, 'resources')
 
         # Test render works okay
@@ -162,6 +164,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
                 'description': 'Testing Courseware Tabs'
             }
             self.user.is_staff = False
+            request = get_request_for_user(self.user)
             self.course.entrance_exam_enabled = True
             self.course.entrance_exam_id = unicode(entrance_exam.location)
             milestone = milestones_helpers.add_milestone(milestone)
@@ -176,7 +179,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
                 self.relationship_types['FULFILLS'],
                 milestone
             )
-            course_tab_list = get_course_tab_list(self.course, self.user)
+            course_tab_list = get_course_tab_list(request, self.course)
             self.assertEqual(len(course_tab_list), 1)
             self.assertEqual(course_tab_list[0]['tab_id'], 'courseware')
             self.assertEqual(course_tab_list[0]['name'], 'Entrance Exam')
@@ -201,7 +204,8 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             # log in again as student
             self.client.logout()
             self.login(self.email, self.password)
-            course_tab_list = get_course_tab_list(self.course, self.user)
+            request = get_request_for_user(self.user)
+            course_tab_list = get_course_tab_list(request, self.course)
             self.assertEqual(len(course_tab_list), 5)
 
         def test_course_tabs_list_for_staff_members(self):
@@ -213,8 +217,8 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             self.client.logout()
             staff_user = StaffFactory(course_key=self.course.id)
             self.client.login(username=staff_user.username, password='test')
-
-            course_tab_list = get_course_tab_list(self.course, staff_user)
+            request = get_request_for_user(staff_user)
+            course_tab_list = get_course_tab_list(request, self.course)
             self.assertEqual(len(course_tab_list), 5)
 
 
@@ -256,8 +260,8 @@ class TextBookTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         Test that all textbooks tab links generating correctly.
         """
         type_to_reverse_name = {'textbook': 'book', 'pdftextbook': 'pdf_book', 'htmltextbook': 'html_book'}
-
-        course_tab_list = get_course_tab_list(self.course, self.user)
+        request = get_request_for_user(self.user)
+        course_tab_list = get_course_tab_list(request, self.course)
         num_of_textbooks_found = 0
         for tab in course_tab_list:
             # Verify links of all textbook type tabs.

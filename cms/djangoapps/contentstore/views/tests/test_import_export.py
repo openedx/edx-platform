@@ -116,7 +116,7 @@ class ImportTestCase(CourseTestCase):
         Check that course is imported successfully in existing course and users have their access roles
         """
         # Create a non_staff user and add it to course staff only
-        __, nonstaff_user = self.create_non_staff_authed_user_client(authenticate=False)
+        __, nonstaff_user = self.create_non_staff_authed_user_client()
         auth.add_users(self.user, CourseStaffRole(self.course.id), nonstaff_user)
 
         course = self.store.get_course(self.course.id)
