@@ -122,6 +122,7 @@ if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
 
 # if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
 urlpatterns += (
+    # TODO Namespace these!
     url(r'^verify_student/', include('verify_student.urls')),
     url(r'^course_modes/', include('course_modes.urls')),
 )
