@@ -6,7 +6,7 @@ from setuptools import setup
 
 setup(
     name="Open edX",
-    version="0.3",
+    version="0.3.1",
     install_requires=["distribute"],
     requires=[],
     # NOTE: These are not the names we should be installing.  This tree should
@@ -22,6 +22,7 @@ setup(
             "ccx = lms.djangoapps.ccx.plugins:CcxCourseViewType",
             "edxnotes = lms.djangoapps.edxnotes.plugins:EdxNotesCourseViewType",
             "instructor = lms.djangoapps.instructor.views.instructor_dashboard:InstructorDashboardViewType",
+            "teams = lms.djangoapps.teams.plugins:TeamsCourseViewType",
         ],
         "openedx.user_partition_scheme": [
             "random = openedx.core.djangoapps.user_api.partition_schemes:RandomUserPartitionScheme",
