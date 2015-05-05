@@ -7,6 +7,7 @@ import json
 from ...pages.common.logout import LogoutPage
 from ...pages.studio.overview import CourseOutlinePage
 from ...pages.lms.courseware_search import CoursewareSearchPage
+from ...pages.lms.staff_view import StaffPage
 from ...fixtures.course import XBlockFixtureDesc
 
 from nose.plugins.attrib import attr
@@ -98,6 +99,15 @@ class CoursewareSearchCohortTest(ContainerBase):
         self.course_outline.visit()
         self.course_outline.start_reindex()
         self.course_outline.wait_for_ajax()
+
+    def _goto_staff_page(self):
+        """
+        Open staff page with assertion
+        """
+        self.courseware_search_page.visit()
+        staff_page = StaffPage(self.browser, self.course_id)
+        self.assertEqual(staff_page.staff_view_mode, 'Staff')
+        return staff_page
 
     def populate_course_fixture(self, course_fixture):
         """
@@ -242,3 +252,57 @@ class CoursewareSearchCohortTest(ContainerBase):
         self.courseware_search_page.visit()
         self.courseware_search_page.search_for_term(self.visible_to_all_html)
         assert self.visible_to_all_html in self.courseware_search_page.search_results.html[0]
+
+    def test_cohorted_search_user_staff_all_content(self):
+        """
+        Test staff user can search all public content if cohorts used on course.
+        """
+        self._auto_auth(self.staff_user["username"], self.staff_user["email"], False)
+        self._goto_staff_page()
+        self.courseware_search_page.search_for_term(self.visible_to_all_html)
+        assert self.visible_to_all_html in self.courseware_search_page.search_results.html[0]
+        self.courseware_search_page.clear_search()
+        self.courseware_search_page.search_for_term(self.group_a_and_b_html)
+        assert self.group_a_and_b_html in self.courseware_search_page.search_results.html[0]
+        self.courseware_search_page.clear_search()
+        self.courseware_search_page.search_for_term(self.group_a_html)
+        assert self.group_a_html in self.courseware_search_page.search_results.html[0]
+        self.courseware_search_page.clear_search()
+        self.courseware_search_page.search_for_term(self.group_b_html)
+        assert self.group_b_html in self.courseware_search_page.search_results.html[0]
+
+    def test_cohorted_search_user_staff_masquerade_student_content(self):
+        """
+        Test staff user can search just student public content if selected from preview menu.
+        """
+        self._auto_auth(self.staff_user["username"], self.staff_user["email"], False)
+        self._goto_staff_page().set_staff_view_mode('Student')
+        self.courseware_search_page.search_for_term(self.visible_to_all_html)
+        assert self.visible_to_all_html in self.courseware_search_page.search_results.html[0]
+        self.courseware_search_page.clear_search()
+        self.courseware_search_page.search_for_term(self.group_a_and_b_html)
+        assert self.group_a_and_b_html not in self.courseware_search_page.search_results.html[0]
+        self.courseware_search_page.clear_search()
+        self.courseware_search_page.search_for_term(self.group_a_html)
+        assert self.group_a_html not in self.courseware_search_page.search_results.html[0]
+        self.courseware_search_page.clear_search()
+        self.courseware_search_page.search_for_term(self.group_b_html)
+        assert self.group_b_html not in self.courseware_search_page.search_results.html[0]
+
+    def test_cohorted_search_user_staff_masquerade_cohort_content(self):
+        """
+        Test staff user can search cohort and public content if selected from preview menu.
+        """
+        self._auto_auth(self.staff_user["username"], self.staff_user["email"], False)
+        self._goto_staff_page().set_staff_view_mode('Student in ' + self.content_group_a)
+        self.courseware_search_page.search_for_term(self.visible_to_all_html)
+        assert self.visible_to_all_html in self.courseware_search_page.search_results.html[0]
+        self.courseware_search_page.clear_search()
+        self.courseware_search_page.search_for_term(self.group_a_and_b_html)
+        assert self.group_a_and_b_html in self.courseware_search_page.search_results.html[0]
+        self.courseware_search_page.clear_search()
+        self.courseware_search_page.search_for_term(self.group_a_html)
+        assert self.group_a_html in self.courseware_search_page.search_results.html[0]
+        self.courseware_search_page.clear_search()
+        self.courseware_search_page.search_for_term(self.group_b_html)
+        assert self.group_b_html not in self.courseware_search_page.search_results.html[0]
