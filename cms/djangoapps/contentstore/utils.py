@@ -30,8 +30,7 @@ log = logging.getLogger(__name__)
 # In order to instantiate an open ended tab automatically, need to have this data
 OPEN_ENDED_PANEL = {"name": _("Open Ended Panel"), "type": "open_ended"}
 NOTES_PANEL = {"name": _("My Notes"), "type": "notes"}
-EDXNOTES_PANEL = {"name": _("Notes"), "type": "edxnotes"}
-EXTRA_TAB_PANELS = dict([(p['type'], p) for p in [OPEN_ENDED_PANEL, NOTES_PANEL, EDXNOTES_PANEL]])
+EXTRA_TAB_PANELS = dict([(p['type'], p) for p in [OPEN_ENDED_PANEL, NOTES_PANEL]])
 
 
 def add_instructor(course_key, requesting_user, new_instructor):
@@ -278,15 +277,15 @@ def add_extra_panel_tab(tab_type, course):
     """
     # Copy course tabs
     course_tabs = copy.copy(course.tabs)
-    changed = False
-    # Check to see if open ended panel is defined in the course
 
-    tab_panel = EXTRA_TAB_PANELS.get(tab_type)
-    if tab_panel not in course_tabs:
-        # Add panel to the tabs if it is not defined
-        course_tabs.append(tab_panel)
-        changed = True
-    return changed, course_tabs
+    # Check to see if open ended panel is defined in the course
+    tab_panel = _get_tab_panel_for_type(tab_type)
+    if tab_panel in course_tabs:
+        return False, course_tabs
+
+    # Add panel to the tabs if it is not defined
+    course_tabs.append(tab_panel)
+    return True, course_tabs
 
 
 def remove_extra_panel_tab(tab_type, course):
@@ -298,15 +297,28 @@ def remove_extra_panel_tab(tab_type, course):
     """
     # Copy course tabs
     course_tabs = copy.copy(course.tabs)
-    changed = False
-    # Check to see if open ended panel is defined in the course
 
+    # Check to see if open ended panel is not defined in the course
+    tab_panel = _get_tab_panel_for_type(tab_type)
+    if tab_panel not in course_tabs:
+        return False, course_tabs
+
+    # Remove panel from the tabs if it is not defined
+    course_tabs = [ct for ct in course_tabs if ct != tab_panel]
+    return True, course_tabs
+
+
+def _get_tab_panel_for_type(tab_type):
+    """
+    Returns a tab panel representation for the specified tab type.
+    """
     tab_panel = EXTRA_TAB_PANELS.get(tab_type)
-    if tab_panel in course_tabs:
-        # Add panel to the tabs if it is not defined
-        course_tabs = [ct for ct in course_tabs if ct != tab_panel]
-        changed = True
-    return changed, course_tabs
+    if tab_panel:
+        return tab_panel
+    return {
+        "name": tab_type.title,
+        "type": tab_type.name
+    }
 
 
 def reverse_url(handler_name, key_name=None, key_value=None, kwargs=None):

@@ -1,5 +1,5 @@
 """Tests for Tab classes"""
-from mock import MagicMock
+from mock import MagicMock, patch
 import xmodule.tabs as tabs
 import unittest
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -17,6 +17,28 @@ class TabTestCase(unittest.TestCase):
         self.settings.FEATURES = {}
         self.reverse = lambda name, args: "name/{0}/args/{1}".format(name, ",".join(str(a) for a in args))
         self.books = None
+
+    def create_mock_user(self, is_authenticated=True, is_staff=True, is_enrolled=True):
+        """
+        Creates a mock user with the specified properties.
+        """
+        user = MagicMock()
+        user.name = 'mock_user'
+        user.is_staff = is_staff
+        user.is_enrolled = is_enrolled
+        user.is_authenticated = lambda: is_authenticated
+        return user
+
+    @patch('xmodule.tabs.is_user_enrolled_or_staff')
+    @patch('xmodule.tabs.is_user_staff')
+    def is_tab_enabled(self, tab, course, settings, user, is_staff_mock=None, is_enrolled_or_staff_mock=None):
+        """
+        Returns true if the specified tab is enabled.
+        """
+        is_staff_mock.return_value = user.is_staff
+        is_enrolled_or_staff_mock.return_value = user.is_enrolled or user.is_staff
+
+        return tab.is_enabled(course, settings, user=user)
 
     def set_up_books(self, num_books):
         """Initializes the textbooks in the course and adds the given number of books to each textbook"""
@@ -101,33 +123,17 @@ class TabTestCase(unittest.TestCase):
     ):
         """Checks can display results for various users"""
         if for_staff_only:
-            self.assertEquals(
-                expected_value,
-                tab.can_display(
-                    self.course, self.settings, is_user_authenticated=True, is_user_staff=True, is_user_enrolled=True
-                )
-            )
+            user = self.create_mock_user(is_authenticated=True, is_staff=True, is_enrolled=True)
+            self.assertEquals(expected_value, self.is_tab_enabled(tab, self.course, self.settings, user))
         if for_authenticated_users_only:
-            self.assertEquals(
-                expected_value,
-                tab.can_display(
-                    self.course, self.settings, is_user_authenticated=True, is_user_staff=False, is_user_enrolled=False
-                )
-            )
+            user = self.create_mock_user(is_authenticated=True, is_staff=False, is_enrolled=False)
+            self.assertEquals(expected_value, self.is_tab_enabled(tab, self.course, self.settings, user))
         if not for_staff_only and not for_authenticated_users_only and not for_enrolled_users_only:
-            self.assertEquals(
-                expected_value,
-                tab.can_display(
-                    self.course, self.settings, is_user_authenticated=False, is_user_staff=False, is_user_enrolled=False
-                )
-            )
+            user = self.create_mock_user(is_authenticated=False, is_staff=False, is_enrolled=False)
+            self.assertEquals(expected_value, self.is_tab_enabled(tab, self.course, self.settings, user))
         if for_enrolled_users_only:
-            self.assertEquals(
-                expected_value,
-                tab.can_display(
-                    self.course, self.settings, is_user_authenticated=True, is_user_staff=False, is_user_enrolled=True
-                )
-            )
+            user = self.create_mock_user(is_authenticated=True, is_staff=False, is_enrolled=True)
+            self.assertEquals(expected_value, self.is_tab_enabled(tab, self.course, self.settings, user))
 
     def check_get_and_set_methods(self, tab):
         """Test __getitem__ and __setitem__ calls"""
@@ -285,13 +291,16 @@ class TextbooksTestCase(TabTestCase):
         self.num_textbook_tabs = sum(1 for tab in self.course.tabs if isinstance(tab, tabs.TextbookTabsBase))
         self.num_textbooks = self.num_textbook_tabs * len(self.books)
 
-    def test_textbooks_enabled(self):
+    @patch('xmodule.tabs.is_user_enrolled_or_staff')
+    def test_textbooks_enabled(self, is_enrolled_or_staff_mock):
+        is_enrolled_or_staff_mock.return_value = True
 
         type_to_reverse_name = {'textbook': 'book', 'pdftextbook': 'pdf_book', 'htmltextbook': 'html_book'}
 
         self.settings.FEATURES['ENABLE_TEXTBOOK'] = True
         num_textbooks_found = 0
-        for tab in tabs.CourseTabList.iterate_displayable(self.course, self.settings):
+        user = self.create_mock_user(is_authenticated=True, is_staff=False, is_enrolled=True)
+        for tab in tabs.CourseTabList.iterate_displayable(self.course, self.settings, user=user):
             # verify all textbook type tabs
             if isinstance(tab, tabs.SingleTextbookTab):
                 book_type, book_index = tab.tab_id.split("/", 1)
@@ -397,56 +406,6 @@ class SyllabusTestCase(TabTestCase):
         self.check_syllabus_tab(False)
 
 
-class InstructorTestCase(TabTestCase):
-    """Test cases for Instructor Tab."""
-
-    def test_instructor_tab(self):
-        name = 'Instructor'
-        tab = self.check_tab(
-            tab_class=tabs.InstructorTab,
-            dict_tab={'type': tabs.InstructorTab.type, 'name': name},
-            expected_name=name,
-            expected_link=self.reverse('instructor_dashboard', args=[self.course.id.to_deprecated_string()]),
-            expected_tab_id=tabs.InstructorTab.type,
-            invalid_dict_tab=None,
-        )
-        self.check_can_display_results(tab, for_staff_only=True)
-
-
-class EdxNotesTestCase(TabTestCase):
-    """
-    Test cases for Notes Tab.
-    """
-
-    def check_edxnotes_tab(self):
-        """
-        Helper function for verifying the edxnotes tab.
-        """
-        return self.check_tab(
-            tab_class=tabs.EdxNotesTab,
-            dict_tab={'type': tabs.EdxNotesTab.type, 'name': 'same'},
-            expected_link=self.reverse('edxnotes', args=[self.course.id.to_deprecated_string()]),
-            expected_tab_id=tabs.EdxNotesTab.type,
-            invalid_dict_tab=self.fake_dict_tab,
-        )
-
-    def test_edxnotes_tabs_enabled(self):
-        """
-        Tests that edxnotes tab is shown when feature is enabled.
-        """
-        self.settings.FEATURES['ENABLE_EDXNOTES'] = True
-        tab = self.check_edxnotes_tab()
-        self.check_can_display_results(tab, for_authenticated_users_only=True)
-
-    def test_edxnotes_tabs_disabled(self):
-        """
-        Tests that edxnotes tab is not shown when feature is disabled.
-        """
-        self.settings.FEATURES['ENABLE_EDXNOTES'] = False
-        tab = self.check_edxnotes_tab()
-        self.check_can_display_results(tab, expected_value=False)
-
-
 class KeyCheckerTestCase(unittest.TestCase):
     """Test cases for KeyChecker class"""
 
@@ -510,7 +469,6 @@ class TabListTestCase(TabTestCase):
             tabs.TextbookTabs.type,
             tabs.PDFTextbookTabs.type,
             tabs.HtmlTextbookTabs.type,
-            tabs.EdxNotesTab.type,
         ]
 
         for unique_tab_type in unique_tab_types:
@@ -543,7 +501,6 @@ class TabListTestCase(TabTestCase):
                 {'type': tabs.OpenEndedGradingTab.type},
                 {'type': tabs.NotesTab.type, 'name': 'fake_name'},
                 {'type': tabs.SyllabusTab.type},
-                {'type': tabs.EdxNotesTab.type, 'name': 'fake_name'},
             ],
             # with external discussion
             [
@@ -599,7 +556,11 @@ class CourseTabListTestCase(TabListTestCase):
         self.assertTrue(tabs.ExternalDiscussionTab() not in self.course.tabs)
         self.assertTrue(tabs.DiscussionTab() in self.course.tabs)
 
-    def test_iterate_displayable(self):
+    @patch('xmodule.tabs.is_user_enrolled_or_staff')
+    @patch('xmodule.tabs.is_user_staff')
+    def test_iterate_displayable(self, is_staff_mock, is_enrolled_or_staff_mock):
+        is_staff_mock.return_value = True
+        is_enrolled_or_staff_mock.return_value = True
         # enable all tab types
         self.settings.FEATURES['ENABLE_TEXTBOOK'] = True
         self.settings.FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
@@ -613,24 +574,24 @@ class CourseTabListTestCase(TabListTestCase):
         # initialize the course tabs to a list of all valid tabs
         self.course.tabs = self.all_valid_tab_list
 
-        # enumerate the tabs using the CMS call
-        for i, tab in enumerate(tabs.CourseTabList.iterate_displayable_cms(
-            self.course,
-            self.settings,
+        # enumerate the tabs with no user
+        for i, tab in enumerate(tabs.CourseTabList.iterate_displayable(
+                self.course,
+                self.settings,
+                inline_collections=False
         )):
             self.assertEquals(tab.type, self.course.tabs[i].type)
 
-        # enumerate the tabs and verify textbooks and the instructor tab
+        # enumerate the tabs with a staff user
+        user = self.create_mock_user(is_authenticated=True, is_staff=True, is_enrolled=True)
         for i, tab in enumerate(tabs.CourseTabList.iterate_displayable(
-            self.course,
-            self.settings,
+                self.course,
+                self.settings,
+                user=user
         )):
             if getattr(tab, 'is_collection_item', False):
                 # a collection item was found as a result of a collection tab
                 self.assertTrue(getattr(self.course.tabs[i], 'is_collection', False))
-            elif i == len(self.course.tabs):
-                # the last tab must be the Instructor tab
-                self.assertEquals(tab.type, tabs.InstructorTab.type)
             else:
                 # all other tabs must match the expected type
                 self.assertEquals(tab.type, self.course.tabs[i].type)
@@ -638,14 +599,14 @@ class CourseTabListTestCase(TabListTestCase):
         # test including non-empty collections
         self.assertIn(
             tabs.HtmlTextbookTabs(),
-            list(tabs.CourseTabList.iterate_displayable_cms(self.course, self.settings)),
+            list(tabs.CourseTabList.iterate_displayable(self.course, self.settings, inline_collections=False)),
         )
 
         # test not including empty collections
         self.course.html_textbooks = []
         self.assertNotIn(
             tabs.HtmlTextbookTabs(),
-            list(tabs.CourseTabList.iterate_displayable_cms(self.course, self.settings)),
+            list(tabs.CourseTabList.iterate_displayable(self.course, self.settings, inline_collections=False)),
         )
 
     def test_get_tab_by_methods(self):
@@ -698,12 +659,13 @@ class DiscussionLinkTestCase(TabTestCase):
         """Helper function to verify whether the discussion tab exists and can be displayed"""
         self.course.tabs = tab_list
         self.course.discussion_link = discussion_link_in_course
-        discussion = tabs.CourseTabList.get_discussion(self.course)
+        discussion_tab = tabs.CourseTabList.get_discussion(self.course)
+        user = self.create_mock_user(is_authenticated=True, is_staff=is_staff, is_enrolled=is_enrolled)
         self.assertEquals(
             (
-                discussion is not None and
-                discussion.can_display(self.course, self.settings, True, is_staff, is_enrolled) and
-                (discussion.link_func(self.course, self._reverse(self.course)) == expected_discussion_link)
+                discussion_tab is not None and
+                self.is_tab_enabled(discussion_tab, self.course, self.settings, user) and
+                (discussion_tab.link_func(self.course, self._reverse(self.course)) == expected_discussion_link)
             ),
             expected_can_display_value
         )

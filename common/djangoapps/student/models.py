@@ -1131,6 +1131,8 @@ class CourseEnrollment(models.Model):
 
         `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
         """
+        if not user.is_authenticated():
+            return False
         try:
             record = CourseEnrollment.objects.get(user=user, course_id=course_key)
             return record.is_active
