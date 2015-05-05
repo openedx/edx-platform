@@ -450,6 +450,10 @@ class CohortManagementSection(PageObject):
         cvs_upload_toggle = self.q(css=self._bounded_selector(".toggle-cohort-management-secondary")).first
         if cvs_upload_toggle:
             cvs_upload_toggle.click()
+            self.wait_for_element_visibility(
+                self._bounded_selector(self.csv_browse_button_selector_css),
+                'File upload link visible'
+            )
         path = InstructorDashboardPage.get_asset_path(filename)
         file_input = self.q(css=self._bounded_selector(self.csv_browse_button_selector_css)).results[0]
         file_input.send_keys(path)
