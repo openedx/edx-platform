@@ -224,6 +224,7 @@ class VideoStudentViewHandlers(object):
                 self.bumper_transcripts = getattr(self, 'video_bumper')['transcripts']
                 bumper=True
                 language = dispatch.replace('translation_bumper', '').strip('/')
+
             else:
                 language = dispatch.replace('translation', '').strip('/')
 
@@ -231,7 +232,8 @@ class VideoStudentViewHandlers(object):
                 log.info("Invalid /translation request: no language.")
                 return Response(status=400)
 
-            if language not in ['en'] + self.transcripts.keys():
+            transcripts = self.transcripts if not bumper else self.bumper_transcripts
+            if language not in ['en'] + transcripts.keys():
                 log.info("Video: transcript facilities are not available for given language.")
                 return Response(status=404)
 
