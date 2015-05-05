@@ -182,6 +182,8 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         )
         self.assert_last_query_params({
             "course_id": [unicode(self.course.id)],
+            "sort_key": ["date"],
+            "sort_order": ["desc"],
             "page": ["1"],
             "per_page": ["10"],
             "recursive": ["False"],
@@ -200,6 +202,8 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         )
         self.assert_last_query_params({
             "course_id": [unicode(self.course.id)],
+            "sort_key": ["date"],
+            "sort_order": ["desc"],
             "page": ["18"],
             "per_page": ["4"],
             "recursive": ["False"],

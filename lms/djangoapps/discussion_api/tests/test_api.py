@@ -2,7 +2,9 @@
 Tests for Discussion API internal interface
 """
 from datetime import datetime, timedelta
+import itertools
 
+import ddt
 import httpretty
 import mock
 from pytz import UTC
@@ -15,6 +17,13 @@ from opaque_keys.edx.locator import CourseLocator
 from courseware.tests.factories import BetaTesterFactory, StaffFactory
 from discussion_api.api import get_course_topics, get_thread_list
 from discussion_api.tests.utils import CommentsServiceMockMixin
+from django_comment_common.models import (
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_MODERATOR,
+    FORUM_ROLE_STUDENT,
+    Role,
+)
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from student.tests.factories import UserFactory
@@ -313,22 +322,26 @@ class GetCourseTopicsTest(ModuleStoreTestCase):
         self.assertEqual(staff_actual, staff_expected)
 
 
+@ddt.ddt
 @httpretty.activate
 class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
     """Test for get_thread_list"""
     def setUp(self):
         super(GetThreadListTest, self).setUp()
         self.maxDiff = None  # pylint: disable=invalid-name
+        self.user = UserFactory.create()
         self.request = RequestFactory().get("/test_path")
-        self.course_key = CourseLocator.from_string("a/b/c")
+        self.request.user = self.user
+        self.course = CourseFactory.create()
 
-    def get_thread_list(self, threads, page=1, page_size=1, num_pages=1):
+    def get_thread_list(self, threads, page=1, page_size=1, num_pages=1, course=None):
         """
         Register the appropriate comments service response, then call
         get_thread_list and return the result.
         """
+        course = course or self.course
         self.register_get_threads_response(threads, page, num_pages)
-        ret = get_thread_list(self.request, self.course_key, page, page_size)
+        ret = get_thread_list(self.request, course.id, page, page_size)
         return ret
 
     def test_empty(self):
@@ -344,7 +357,9 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
     def test_basic_query_params(self):
         self.get_thread_list([], page=6, page_size=14)
         self.assert_last_query_params({
-            "course_id": [unicode(self.course_key)],
+            "course_id": [unicode(self.course.id)],
+            "sort_key": ["date"],
+            "sort_order": ["desc"],
             "page": ["6"],
             "per_page": ["14"],
             "recursive": ["False"],
@@ -354,7 +369,7 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
         source_threads = [
             {
                 "id": "test_thread_id_0",
-                "course_id": unicode(self.course_key),
+                "course_id": unicode(self.course.id),
                 "commentable_id": "topic_x",
                 "created_at": "2015-04-28T00:00:00Z",
                 "updated_at": "2015-04-28T11:11:11Z",
@@ -368,7 +383,7 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
             },
             {
                 "id": "test_thread_id_1",
-                "course_id": unicode(self.course_key),
+                "course_id": unicode(self.course.id),
                 "commentable_id": "topic_y",
                 "created_at": "2015-04-28T22:22:22Z",
                 "updated_at": "2015-04-28T00:33:33Z",
@@ -382,7 +397,7 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
             },
             {
                 "id": "test_thread_id_2",
-                "course_id": unicode(self.course_key),
+                "course_id": unicode(self.course.id),
                 "commentable_id": "topic_x",
                 "created_at": "2015-04-28T00:44:44Z",
                 "updated_at": "2015-04-28T00:55:55Z",
@@ -398,7 +413,7 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
         expected_threads = [
             {
                 "id": "test_thread_id_0",
-                "course_id": unicode(self.course_key),
+                "course_id": unicode(self.course.id),
                 "topic_id": "topic_x",
                 "created_at": "2015-04-28T00:00:00Z",
                 "updated_at": "2015-04-28T11:11:11Z",
@@ -412,7 +427,7 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
             },
             {
                 "id": "test_thread_id_1",
-                "course_id": unicode(self.course_key),
+                "course_id": unicode(self.course.id),
                 "topic_id": "topic_y",
                 "created_at": "2015-04-28T22:22:22Z",
                 "updated_at": "2015-04-28T00:33:33Z",
@@ -426,7 +441,7 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
             },
             {
                 "id": "test_thread_id_2",
-                "course_id": unicode(self.course_key),
+                "course_id": unicode(self.course.id),
                 "topic_id": "topic_x",
                 "created_at": "2015-04-28T00:44:44Z",
                 "updated_at": "2015-04-28T00:55:55Z",
@@ -447,6 +462,28 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "previous": None,
             }
         )
+
+    @ddt.data(
+        *itertools.product(
+            [
+                FORUM_ROLE_ADMINISTRATOR,
+                FORUM_ROLE_MODERATOR,
+                FORUM_ROLE_COMMUNITY_TA,
+                FORUM_ROLE_STUDENT,
+            ],
+            [True, False]
+        )
+    )
+    @ddt.unpack
+    def test_request_group(self, role_name, course_is_cohorted):
+        cohort_course = CourseFactory.create(cohort_config={"cohorted": course_is_cohorted})
+        CohortFactory.create(course_id=cohort_course.id, users=[self.user])
+        role = Role.objects.create(name=role_name, course_id=cohort_course.id)
+        role.users = [self.user]
+        self.get_thread_list([], course=cohort_course)
+        actual_has_group = "group_id" in httpretty.last_request().querystring
+        expected_has_group = (course_is_cohorted and role_name == FORUM_ROLE_STUDENT)
+        self.assertEqual(actual_has_group, expected_has_group)
 
     def test_pagination(self):
         # N.B. Empty thread list is not realistic but convenient for this test
@@ -478,4 +515,4 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
         # Test page past the last one
         self.register_get_threads_response([], page=3, num_pages=3)
         with self.assertRaises(Http404):
-            get_thread_list(self.request, self.course_key, page=4, page_size=10)
+            get_thread_list(self.request, self.course.id, page=4, page_size=10)
