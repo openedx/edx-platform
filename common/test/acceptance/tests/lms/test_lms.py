@@ -619,7 +619,7 @@ class PDFTextBooksTabTest(UniqueCourseTest):
         # Auto-auth register for the course
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
 
-    @flaky  # TODO: fix this, see TNL-2083
+    @skip('TODO: fix this, see TNL-2083')
     def test_verify_textbook_tabs(self):
         """
         Test multiple pdf textbooks loads correctly in lms.
