@@ -336,6 +336,7 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
         self.request = RequestFactory().get("/test_path")
         self.request.user = self.user
         self.course = CourseFactory.create()
+        self.author = UserFactory.create()
 
     def get_thread_list(self, threads, page=1, page_size=1, num_pages=1, course=None):
         """
@@ -345,6 +346,40 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
         course = course or self.course
         self.register_get_threads_response(threads, page, num_pages)
         ret = get_thread_list(self.request, course.id, page, page_size)
+        return ret
+
+    def create_role(self, role_name, users):
+        """Create a Role in self.course with the given name and users"""
+        role = Role.objects.create(name=role_name, course_id=self.course.id)
+        role.users = users
+        role.save()
+
+    def make_cs_thread(self, thread_data):
+        """
+        Create a dictionary containing all needed thread fields as returned by
+        the comments service with dummy data overridden by thread_data
+        """
+        ret = {
+            "id": "dummy",
+            "course_id": unicode(self.course.id),
+            "commentable_id": "dummy",
+            "user_id": str(self.author.id),
+            "username": self.author.username,
+            "anonymous": False,
+            "anonymous_to_peers": False,
+            "created_at": "1970-01-01T00:00:00Z",
+            "updated_at": "1970-01-01T00:00:00Z",
+            "type": "discussion",
+            "title": "dummy",
+            "body": "dummy",
+            "pinned": False,
+            "closed": False,
+            "abuse_flaggers": [],
+            "votes": {"up_count": 0},
+            "comments_count": 0,
+            "unread_comments_count": 0,
+        }
+        ret.update(thread_data)
         return ret
 
     def test_empty(self):
@@ -379,6 +414,10 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "id": "test_thread_id_0",
                 "course_id": unicode(self.course.id),
                 "commentable_id": "topic_x",
+                "user_id": str(self.author.id),
+                "username": self.author.username,
+                "anonymous": False,
+                "anonymous_to_peers": False,
                 "created_at": "2015-04-28T00:00:00Z",
                 "updated_at": "2015-04-28T11:11:11Z",
                 "type": "discussion",
@@ -395,6 +434,10 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "id": "test_thread_id_1",
                 "course_id": unicode(self.course.id),
                 "commentable_id": "topic_y",
+                "user_id": str(self.author.id),
+                "username": self.author.username,
+                "anonymous": False,
+                "anonymous_to_peers": False,
                 "created_at": "2015-04-28T22:22:22Z",
                 "updated_at": "2015-04-28T00:33:33Z",
                 "type": "question",
@@ -411,6 +454,10 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "id": "test_thread_id_2",
                 "course_id": unicode(self.course.id),
                 "commentable_id": "topic_x",
+                "user_id": str(self.author.id),
+                "username": self.author.username,
+                "anonymous": False,
+                "anonymous_to_peers": False,
                 "created_at": "2015-04-28T00:44:44Z",
                 "updated_at": "2015-04-28T00:55:55Z",
                 "type": "discussion",
@@ -429,6 +476,8 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "id": "test_thread_id_0",
                 "course_id": unicode(self.course.id),
                 "topic_id": "topic_x",
+                "author": self.author.username,
+                "author_label": None,
                 "created_at": "2015-04-28T00:00:00Z",
                 "updated_at": "2015-04-28T11:11:11Z",
                 "type": "discussion",
@@ -447,6 +496,8 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "id": "test_thread_id_1",
                 "course_id": unicode(self.course.id),
                 "topic_id": "topic_y",
+                "author": self.author.username,
+                "author_label": None,
                 "created_at": "2015-04-28T22:22:22Z",
                 "updated_at": "2015-04-28T00:33:33Z",
                 "type": "question",
@@ -465,6 +516,8 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "id": "test_thread_id_2",
                 "course_id": unicode(self.course.id),
                 "topic_id": "topic_x",
+                "author": self.author.username,
+                "author_label": None,
                 "created_at": "2015-04-28T00:44:44Z",
                 "updated_at": "2015-04-28T00:55:55Z",
                 "type": "discussion",
@@ -542,3 +595,69 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
         self.register_get_threads_response([], page=3, num_pages=3)
         with self.assertRaises(Http404):
             get_thread_list(self.request, self.course.id, page=4, page_size=10)
+
+    @ddt.data(
+        (FORUM_ROLE_ADMINISTRATOR, True, False, True),
+        (FORUM_ROLE_ADMINISTRATOR, False, True, False),
+        (FORUM_ROLE_MODERATOR, True, False, True),
+        (FORUM_ROLE_MODERATOR, False, True, False),
+        (FORUM_ROLE_COMMUNITY_TA, True, False, True),
+        (FORUM_ROLE_COMMUNITY_TA, False, True, False),
+        (FORUM_ROLE_STUDENT, True, False, True),
+        (FORUM_ROLE_STUDENT, False, True, True),
+    )
+    @ddt.unpack
+    def test_anonymity(self, role_name, anonymous, anonymous_to_peers, expected_api_anonymous):
+        """
+        Test that a thread is properly made anonymous.
+
+        A thread should be anonymous iff the anonymous field is true or the
+        anonymous_to_peers field is true and the requester does not have a
+        privileged role.
+
+        role_name is the name of the requester's role.
+        thread_anon is the value of the anonymous field in the thread data.
+        thread_anon_to_peers is the value of the anonymous_to_peers field in the
+          thread data.
+        expected_api_anonymous is whether the thread should actually be
+          anonymous in the API output when requested by a user with the given
+          role.
+        """
+        self.create_role(role_name, [self.user])
+        result = self.get_thread_list([
+            self.make_cs_thread({
+                "anonymous": anonymous,
+                "anonymous_to_peers": anonymous_to_peers,
+            })
+        ])
+        actual_api_anonymous = result["results"][0]["author"] is None
+        self.assertEqual(actual_api_anonymous, expected_api_anonymous)
+
+    @ddt.data(
+        (FORUM_ROLE_ADMINISTRATOR, False, "staff"),
+        (FORUM_ROLE_ADMINISTRATOR, True, None),
+        (FORUM_ROLE_MODERATOR, False, "staff"),
+        (FORUM_ROLE_MODERATOR, True, None),
+        (FORUM_ROLE_COMMUNITY_TA, False, "community_ta"),
+        (FORUM_ROLE_COMMUNITY_TA, True, None),
+        (FORUM_ROLE_STUDENT, False, None),
+        (FORUM_ROLE_STUDENT, True, None),
+    )
+    @ddt.unpack
+    def test_author_labels(self, role_name, anonymous, expected_label):
+        """
+        Test correctness of the author_label field.
+
+        The label should be "staff", "staff", or "community_ta" for the
+        Administrator, Moderator, and Community TA roles, respectively, but
+        the label should not be present if the thread is anonymous.
+
+        role_name is the name of the author's role.
+        anonymous is the value of the anonymous field in the thread data.
+        expected_label is the expected value of the author_label field in the
+          API output.
+        """
+        self.create_role(role_name, [self.author])
+        result = self.get_thread_list([self.make_cs_thread({"anonymous": anonymous})])
+        actual_label = result["results"][0]["author_label"]
+        self.assertEqual(actual_label, expected_label)

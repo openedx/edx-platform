@@ -121,6 +121,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ThreadViewSet list"""
     def setUp(self):
         super(ThreadViewSetListTest, self).setUp()
+        self.author = UserFactory.create()
         self.url = reverse("thread-list")
 
     def test_course_id_missing(self):
@@ -146,6 +147,10 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "id": "test_thread",
             "course_id": unicode(self.course.id),
             "commentable_id": "test_topic",
+            "user_id": str(self.author.id),
+            "username": self.author.username,
+            "anonymous": False,
+            "anonymous_to_peers": False,
             "created_at": "2015-04-28T00:00:00Z",
             "updated_at": "2015-04-28T11:11:11Z",
             "type": "discussion",
@@ -162,6 +167,8 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "id": "test_thread",
             "course_id": unicode(self.course.id),
             "topic_id": "test_topic",
+            "author": self.author.username,
+            "author_label": None,
             "created_at": "2015-04-28T00:00:00Z",
             "updated_at": "2015-04-28T11:11:11Z",
             "type": "discussion",

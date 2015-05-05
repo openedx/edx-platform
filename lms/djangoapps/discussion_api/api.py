@@ -77,12 +77,19 @@ def get_course_topics(course, user):
     }
 
 
-def _cc_thread_to_api_thread(thread, cc_user):
+def _cc_thread_to_api_thread(thread, cc_user, staff_user_ids, ta_user_ids):
     """
     Convert a thread data dict from the comment_client format (which is a direct
     representation of the format returned by the comments service) to the format
     used in this API
     """
+    is_anonymous = (
+        thread["anonymous"] or
+        (
+            thread["anonymous_to_peers"] and
+            int(cc_user["id"]) not in (staff_user_ids | ta_user_ids)
+        )
+    )
     ret = {
         key: thread[key]
         for key in [
@@ -98,6 +105,13 @@ def _cc_thread_to_api_thread(thread, cc_user):
     }
     ret.update({
         "topic_id": thread["commentable_id"],
+        "author": None if is_anonymous else thread["username"],
+        "author_label": (
+            None if is_anonymous else
+            "staff" if int(thread["user_id"]) in staff_user_ids else
+            "community_ta" if int(thread["user_id"]) in ta_user_ids else
+            None
+        ),
         "raw_body": thread["body"],
         "following": thread["id"] in cc_user["subscribed_thread_ids"],
         "abuse_flagged": cc_user["id"] in thread["abuse_flaggers"],
@@ -144,6 +158,23 @@ def get_thread_list(request, course_key, page, page_size):
     # behavior and return a 404 in that case
     if result_page != page:
         raise Http404
+    # TODO: cache staff_user_ids and ta_user_ids if we need to improve perf
+    staff_user_ids = {
+        user.id
+        for role in Role.objects.filter(
+            name__in=[FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR],
+            course_id=course_key
+        )
+        for user in role.users.all()
+    }
+    ta_user_ids = {
+        user.id
+        for role in Role.objects.filter(name=FORUM_ROLE_COMMUNITY_TA, course_id=course_key)
+        for user in role.users.all()
+    }
 
-    results = [_cc_thread_to_api_thread(thread, cc_user) for thread in threads]
+    results = [
+        _cc_thread_to_api_thread(thread, cc_user, staff_user_ids, ta_user_ids)
+        for thread in threads
+    ]
     return get_paginated_data(request, results, page, num_pages)
