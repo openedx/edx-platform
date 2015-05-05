@@ -175,6 +175,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
             'label': '',
             'value': '',
             'preprocessor': None,
+            'question_label': '',
             'msg': '',
             'inline': False,
             'hidden': False,
