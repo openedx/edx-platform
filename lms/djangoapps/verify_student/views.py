@@ -384,7 +384,7 @@ class PayAndVerifyView(View):
         # get available payment processors
         if unexpired_paid_course_mode.sku:
             # transaction will be conducted via ecommerce service
-            processors = ecommerce_api_client(request.user).get_processors()
+            processors = ecommerce_api_client(request.user).payment.processors.get()
         else:
             # transaction will be conducted using legacy shopping cart
             processors = [settings.CC_PROCESSOR_NAME]
@@ -657,9 +657,13 @@ def checkout_with_ecommerce_service(user, course_key, course_mode, processor):  
     try:
         api = ecommerce_api_client(user)
         # Make an API call to create the order and retrieve the results
-        response_data = api.create_basket(course_mode.sku, processor)
+        result = api.baskets.post({
+            'products': [{'sku': course_mode.sku}],
+            'checkout': True,
+            'payment_processor_name': processor
+        })
         # Pass the payment parameters directly from the API response.
-        return response_data.get('payment_data')
+        return result.get('payment_data')
     except SlumberBaseException:
         params = {'username': user.username, 'mode': course_mode.slug, 'course_id': unicode(course_key)}
         log.exception('Failed to create order for %(username)s %(mode)s mode of %(course_id)s', params)

@@ -18,6 +18,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django.core import mail
+import httpretty
 from bs4 import BeautifulSoup
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -27,7 +28,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
 
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
-from commerce.tests import EcommerceApiTestMixin
+from commerce.tests import TEST_PAYMENT_DATA, TEST_API_URL, TEST_API_SIGNING_KEY
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment
 from course_modes.tests.factories import CourseModeFactory
@@ -36,8 +37,11 @@ from shoppingcart.models import Order, CertificateItem
 from embargo.test_utils import restrict_course
 from util.testing import UrlResetMixin
 from verify_student.views import (
-    render_to_response, PayAndVerifyView, EVENT_NAME_USER_ENTERED_INCOURSE_REVERIFY_VIEW,
-    EVENT_NAME_USER_SUBMITTED_INCOURSE_REVERIFY
+    checkout_with_ecommerce_service,
+    EVENT_NAME_USER_ENTERED_INCOURSE_REVERIFY_VIEW,
+    EVENT_NAME_USER_SUBMITTED_INCOURSE_REVERIFY,
+    PayAndVerifyView,
+    render_to_response,
 )
 from verify_student.models import (
     SoftwareSecurePhotoVerification, VerificationCheckpoint,
@@ -650,13 +654,18 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
             course.start = kwargs.get('course_start')
             modulestore().update_item(course, ModuleStoreEnum.UserID.test)
 
+        mode_kwargs = {}
+        if kwargs.get('sku'):
+            mode_kwargs['sku'] = kwargs['sku']
+
         for course_mode in course_modes:
             min_price = (0 if course_mode in ["honor", "audit"] else self.MIN_PRICE)
             CourseModeFactory(
                 course_id=course.id,
                 mode_slug=course_mode,
                 mode_display_name=course_mode,
-                min_price=min_price
+                min_price=min_price,
+                **mode_kwargs
             )
 
         return course
@@ -819,6 +828,35 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
 
         self.assertEqual(response_dict['course_name'], mode_display_name)
 
+    @httpretty.activate
+    @override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
+    def test_processors_api(self):
+        """
+        Check that when working with a product being processed by the
+        ecommerce api, we correctly call to that api for the list of
+        available payment processors.
+        """
+        # setting a nonempty sku on the course will a trigger calls to
+        # the ecommerce api to get payment processors.
+        course = self._create_course("verified", sku='nonempty-sku')
+        self._enroll(course.id, "honor")
+
+        # mock out the payment processors endpoint
+        httpretty.register_uri(
+            httpretty.GET,
+            "{}/payment/processors/".format(TEST_API_URL),
+            body=json.dumps(['foo', 'bar']),
+            content_type="application/json",
+        )
+        # make the server request
+        response = self._get_page('verify_student_start_flow', course.id)
+        self.assertEqual(response.status_code, 200)
+
+        # ensure the mock api call was made.  NOTE: the following line
+        # approximates the check - if the headers were empty it means
+        # there was no last request.
+        self.assertNotEqual(httpretty.last_request().headers, {})
+
 
 class CheckoutTestMixin(object):
     """
@@ -927,7 +965,7 @@ class CheckoutTestMixin(object):
         # ensure the response to a request from a stale js client is modified so as
         # not to break behavior in the browser.
         # (XCOM-214) remove after release.
-        expected_payment_data = EcommerceApiTestMixin.PAYMENT_DATA.copy()
+        expected_payment_data = TEST_PAYMENT_DATA.copy()
         expected_payment_data['payment_form_data'].update({'foo': 'bar'})
         patched_create_order.return_value = expected_payment_data
         # there is no 'processor' parameter in the post payload, so the response should only contain payment form data.
@@ -945,7 +983,7 @@ class CheckoutTestMixin(object):
         self.assertEqual(data, {'foo': 'bar'})
 
 
-@patch('verify_student.views.checkout_with_shoppingcart', return_value=EcommerceApiTestMixin.PAYMENT_DATA)
+@patch('verify_student.views.checkout_with_shoppingcart', return_value=TEST_PAYMENT_DATA)
 class TestCreateOrderShoppingCart(CheckoutTestMixin, ModuleStoreTestCase):
     """ Test view behavior when the shoppingcart is used. """
 
@@ -958,12 +996,9 @@ class TestCreateOrderShoppingCart(CheckoutTestMixin, ModuleStoreTestCase):
         return dict(zip(('request', 'user', 'course_key', 'course_mode', 'amount'), patched_create_order.call_args[0]))
 
 
-@override_settings(
-    ECOMMERCE_API_URL=EcommerceApiTestMixin.ECOMMERCE_API_URL,
-    ECOMMERCE_API_SIGNING_KEY=EcommerceApiTestMixin.ECOMMERCE_API_SIGNING_KEY
-)
-@patch('verify_student.views.checkout_with_ecommerce_service', return_value=EcommerceApiTestMixin.PAYMENT_DATA)
-class TestCreateOrderEcommerceService(CheckoutTestMixin, EcommerceApiTestMixin, ModuleStoreTestCase):
+@override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
+@patch('verify_student.views.checkout_with_ecommerce_service', return_value=TEST_PAYMENT_DATA)
+class TestCreateOrderEcommerceService(CheckoutTestMixin, ModuleStoreTestCase):
     """ Test view behavior when the ecommerce service is used. """
 
     def make_sku(self):
@@ -973,6 +1008,40 @@ class TestCreateOrderEcommerceService(CheckoutTestMixin, EcommerceApiTestMixin, 
     def _get_checkout_args(self, patched_create_order):
         """ Assuming patched_create_order was called, return a mapping containing the call arguments."""
         return dict(zip(('user', 'course_key', 'course_mode', 'processor'), patched_create_order.call_args[0]))
+
+
+class TestCheckoutWithEcommerceService(ModuleStoreTestCase):
+    """
+    Ensures correct behavior in the function `checkout_with_ecommerce_service`.
+    """
+
+    @httpretty.activate
+    @override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
+    def test_create_basket(self):
+        """
+        Check that when working with a product being processed by the
+        ecommerce api, we correctly call to that api to create a basket.
+        """
+        user = UserFactory.create(username="test-username")
+        course_mode = CourseModeFactory(sku="test-sku")
+        expected_payment_data = {'foo': 'bar'}
+        # mock out the payment processors endpoint
+        httpretty.register_uri(
+            httpretty.POST,
+            "{}/baskets/".format(TEST_API_URL),
+            body=json.dumps({'payment_data': expected_payment_data}),
+            content_type="application/json",
+        )
+        # call the function
+        actual_payment_data = checkout_with_ecommerce_service(user, 'dummy-course-key', course_mode, 'test-processor')
+        # check the api call
+        self.assertEqual(json.loads(httpretty.last_request().body), {
+            'products': [{'sku': 'test-sku'}],
+            'checkout': True,
+            'payment_processor_name': 'test-processor',
+        })
+        # check the response
+        self.assertEqual(actual_payment_data, expected_payment_data)
 
 
 class TestCreateOrderView(ModuleStoreTestCase):

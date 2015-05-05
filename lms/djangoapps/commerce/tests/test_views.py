@@ -12,7 +12,8 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from ecommerce_api_client import exceptions
 from commerce.constants import Messages
-from commerce.tests import EcommerceApiTestMixin
+from commerce.tests import TEST_BASKET_ID, TEST_ORDER_NUMBER, TEST_PAYMENT_DATA, TEST_API_URL, TEST_API_SIGNING_KEY
+from commerce.tests.mocks import mock_basket_order, mock_create_basket
 from course_modes.models import CourseMode
 from enrollment.api import get_enrollment
 from student.models import CourseEnrollment
@@ -33,9 +34,8 @@ class UserMixin(object):
 
 
 @ddt
-@override_settings(ECOMMERCE_API_URL=EcommerceApiTestMixin.ECOMMERCE_API_URL,
-                   ECOMMERCE_API_SIGNING_KEY=EcommerceApiTestMixin.ECOMMERCE_API_SIGNING_KEY)
-class BasketsViewTests(EnrollmentEventTestMixin, EcommerceApiTestMixin, UserMixin, ModuleStoreTestCase):
+@override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
+class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase):
     """
     Tests for the commerce orders view.
     """
@@ -60,7 +60,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, EcommerceApiTestMixin, UserMixi
     def assertResponsePaymentData(self, response):
         """ Asserts correctness of a JSON body containing payment information. """
         actual_response = json.loads(response.content)
-        self.assertEqual(actual_response, self.PAYMENT_DATA)
+        self.assertEqual(actual_response, TEST_PAYMENT_DATA)
 
     def assertValidEcommerceInternalRequestErrorResponse(self, response):
         """ Asserts the response is a valid response sent when the E-Commerce API is unavailable. """
@@ -126,7 +126,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, EcommerceApiTestMixin, UserMixi
         """
         If the call to the E-Commerce API times out, the view should log an error and return an HTTP 503 status.
         """
-        with self.mock_create_basket(side_effect=exceptions.Timeout):
+        with mock_create_basket(exception=exceptions.Timeout):
             response = self._post_to_view()
 
         self.assertValidEcommerceInternalRequestErrorResponse(response)
@@ -136,7 +136,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, EcommerceApiTestMixin, UserMixi
         """
         If the E-Commerce API raises an error, the view should return an HTTP 503 status.
         """
-        with self.mock_create_basket(side_effect=exceptions.SlumberBaseException):
+        with mock_create_basket(exception=exceptions.SlumberBaseException):
             response = self._post_to_view()
 
         self.assertValidEcommerceInternalRequestErrorResponse(response)
@@ -150,7 +150,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, EcommerceApiTestMixin, UserMixi
 
         # Validate the response content
         if is_completed:
-            msg = Messages.ORDER_COMPLETED.format(order_number=self.ORDER_NUMBER)
+            msg = Messages.ORDER_COMPLETED.format(order_number=TEST_ORDER_NUMBER)
             self.assertResponseMessage(response, msg)
         else:
             self.assertResponsePaymentData(response)
@@ -166,8 +166,8 @@ class BasketsViewTests(EnrollmentEventTestMixin, EcommerceApiTestMixin, UserMixi
         self.user.is_active = user_is_active
         self.user.save()  # pylint: disable=no-member
 
-        return_value = {'id': self.BASKET_ID, 'payment_data': None, 'order': {'number': self.ORDER_NUMBER}}
-        with self.mock_create_basket(return_value=return_value):
+        return_value = {'id': TEST_BASKET_ID, 'payment_data': None, 'order': {'number': TEST_ORDER_NUMBER}}
+        with mock_create_basket(response=return_value):
             self._test_successful_ecommerce_api_call()
 
     @data(True, False)
@@ -180,8 +180,8 @@ class BasketsViewTests(EnrollmentEventTestMixin, EcommerceApiTestMixin, UserMixi
         self.user.is_active = user_is_active
         self.user.save()  # pylint: disable=no-member
 
-        return_value = {'id': self.BASKET_ID, 'payment_data': self.PAYMENT_DATA, 'order': None}
-        with self.mock_create_basket(return_value=return_value):
+        return_value = {'id': TEST_BASKET_ID, 'payment_data': TEST_PAYMENT_DATA, 'order': None}
+        with mock_create_basket(response=return_value):
             self._test_successful_ecommerce_api_call(False)
 
     def _test_course_without_sku(self):
@@ -189,7 +189,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, EcommerceApiTestMixin, UserMixi
         Validates the view bypasses the E-Commerce API when the course has no CourseModes with SKUs.
         """
         # Place an order
-        with self.mock_create_basket() as api_mock:
+        with mock_create_basket(expect_called=False):
             response = self._post_to_view()
 
         # Validate the response content
@@ -197,9 +197,6 @@ class BasketsViewTests(EnrollmentEventTestMixin, EcommerceApiTestMixin, UserMixi
         msg = Messages.NO_SKU_ENROLLED.format(enrollment_mode='honor', course_id=self.course.id,
                                               username=self.user.username)
         self.assertResponseMessage(response, msg)
-
-        # No calls made to the E-Commerce API
-        self.assertFalse(api_mock.called)
 
     def test_course_without_sku(self):
         """
@@ -218,7 +215,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, EcommerceApiTestMixin, UserMixi
         """
         If the E-Commerce Service is not configured, the view should enroll the user.
         """
-        with self.mock_create_basket() as api_mock:
+        with mock_create_basket(expect_called=False):
             response = self._post_to_view()
 
         # Validate the response
@@ -228,7 +225,6 @@ class BasketsViewTests(EnrollmentEventTestMixin, EcommerceApiTestMixin, UserMixi
 
         # Ensure that the user is not enrolled and that no calls were made to the E-Commerce API
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
-        self.assertFalse(api_mock.called)
 
     def assertProfessionalModeBypassed(self):
         """ Verifies that the view returns HTTP 406 when a course with no honor mode is encountered. """
@@ -238,16 +234,13 @@ class BasketsViewTests(EnrollmentEventTestMixin, EcommerceApiTestMixin, UserMixi
         CourseModeFactory.create(course_id=self.course.id, mode_slug=mode, mode_display_name=mode,
                                  sku=uuid4().hex.decode('ascii'))
 
-        with self.mock_create_basket() as api_mock:
+        with mock_create_basket(expect_called=False):
             response = self._post_to_view()
 
         # The view should return an error status code
         self.assertEqual(response.status_code, 406)
         msg = Messages.NO_HONOR_MODE.format(course_id=self.course.id)
         self.assertResponseMessage(response, msg)
-
-        # No calls should be made to the E-Commerce API.
-        self.assertFalse(api_mock.called)
 
     def test_course_with_professional_mode_only(self):
         """ Verifies that the view behaves appropriately when the course only has a professional mode. """
@@ -293,7 +286,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, EcommerceApiTestMixin, UserMixi
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
         self.assertIsNotNone(get_enrollment(self.user.username, unicode(self.course.id)))
 
-        with self.mock_create_basket():
+        with mock_create_basket():
             self._test_successful_ecommerce_api_call(False)
 
 
@@ -310,9 +303,8 @@ class OrdersViewTests(BasketsViewTests):
         self.url = reverse('commerce:orders')
 
 
-@override_settings(ECOMMERCE_API_URL=EcommerceApiTestMixin.ECOMMERCE_API_URL,
-                   ECOMMERCE_API_SIGNING_KEY=EcommerceApiTestMixin.ECOMMERCE_API_SIGNING_KEY)
-class BasketOrderViewTests(UserMixin, EcommerceApiTestMixin, TestCase):
+@override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
+class BasketOrderViewTests(UserMixin, TestCase):
     """ Tests for the basket order view. """
     view_name = 'commerce:basket_order'
     MOCK_ORDER = {'number': 1}
@@ -325,7 +317,7 @@ class BasketOrderViewTests(UserMixin, EcommerceApiTestMixin, TestCase):
     def test_order_found(self):
         """ If the order is located, the view should pass the data from the API. """
 
-        with self.mock_basket_order(return_value=self.MOCK_ORDER):
+        with mock_basket_order(basket_id=1, response=self.MOCK_ORDER):
             response = self.client.get(self.path)
 
         self.assertEqual(response.status_code, 200)
@@ -334,7 +326,7 @@ class BasketOrderViewTests(UserMixin, EcommerceApiTestMixin, TestCase):
 
     def test_order_not_found(self):
         """ If the order is not found, the view should return a 404. """
-        with self.mock_basket_order(side_effect=exceptions.HttpNotFoundError):
+        with mock_basket_order(basket_id=1, exception=exceptions.HttpNotFoundError):
             response = self.client.get(self.path)
         self.assertEqual(response.status_code, 404)
 
