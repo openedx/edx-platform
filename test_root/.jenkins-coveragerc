@@ -1,0 +1,4 @@
+[paths]
+source =
+    /home/jenkins/workspace/edx-platform-unit-coverage
+    /home/jenkins/workspace/edx-platform-test-subset
