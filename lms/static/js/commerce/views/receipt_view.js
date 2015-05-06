@@ -109,16 +109,20 @@ var edx = edx || {};
                     purchasedDatetime: order.date_placed,
                     totalCost: self.formatMoney(order.total_excl_tax),
                     isRefunded: false,
-                    billedTo: {
+                    items: [],
+                    billedTo: null
+                };
+
+                if (order.billing_address){
+                    receiptContext.billedTo = {
                         firstName: order.billing_address.first_name,
                         lastName: order.billing_address.last_name,
                         city: order.billing_address.city,
                         state: order.billing_address.state,
                         postalCode: order.billing_address.postcode,
                         country: order.billing_address.country
-                    },
-                    items: []
-                };
+                    }
+                }
 
                 receiptContext.items = _.map(
                     order.lines,

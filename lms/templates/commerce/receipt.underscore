@@ -61,16 +61,18 @@
           <% } %>
         </div>
 
-        <div class="copy">
-          <p><%- gettext( "Billed to" ) %>:
-              <span class="name-first"><%- receipt.billedTo.firstName %></span>
-              <span class="name-last"><%- receipt.billedTo.lastName %></span>
-              (<span class="address-city"><%- receipt.billedTo.city %></span>,
-              <span class="address-state"><%- receipt.billedTo.state %></span>
-              <span class="address-postalcode"><%- receipt.billedTo.postalCode %></span>
-              <span class="address-country"><%- receipt.billedTo.country.toUpperCase() %></span>)
-          </p>
-        </div>
+        <% if ( receipt.billedTo ) { %>
+            <div class="copy">
+              <p><%- gettext( "Billed to" ) %>:
+                  <span class="name-first"><%- receipt.billedTo.firstName %></span>
+                  <span class="name-last"><%- receipt.billedTo.lastName %></span>
+                  (<span class="address-city"><%- receipt.billedTo.city %></span>,
+                  <span class="address-state"><%- receipt.billedTo.state %></span>
+                  <span class="address-postalcode"><%- receipt.billedTo.postalCode %></span>
+                  <span class="address-country"><%- receipt.billedTo.country.toUpperCase() %></span>)
+              </p>
+            </div>
+        <% } %>
       </div>
     </div>
     <% } else { %>
