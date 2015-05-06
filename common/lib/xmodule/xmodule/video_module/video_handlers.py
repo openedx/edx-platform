@@ -142,7 +142,7 @@ class VideoStudentViewHandlers(object):
             else:
                 transcripts = self.transcripts if not bumper else self.bumper_transcripts
                 if transcripts:
-                    return get_or_create_sjson(self, transcripts, bumper)
+                    return get_or_create_sjson(self, transcripts)
                 elif bumper:
                     log.info("No transcripts for video bumper.")
 
@@ -247,8 +247,12 @@ class VideoStudentViewHandlers(object):
                 # Try to return static URL redirection as last resort
                 # if no translation is required
                 return self.get_static_transcript(request, bumper=bumper)
+            except TranscriptException as ex:
+                if bumper:
+                    return self.get_static_transcript(request, bumper=bumper)
+                log.info(ex.message)
+                response = Response(status=404)
             except (
-                TranscriptException,
                 UnicodeDecodeError,
                 TranscriptsGenerationException
             ) as ex:

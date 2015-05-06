@@ -486,15 +486,14 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         ('translation_bumper/en', attach_bumper_transcript))
     @ddt.unpack
     def test_translaton_en_html5_success(self, dispatch, attach):
-        subs = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
-        good_sjson = _create_file(json.dumps(subs))
+        good_sjson = _create_file(json.dumps(TRANSCRIPT))
         _upload_sjson_file(good_sjson, self.item_descriptor.location)
         subs_id = _get_subs_id(good_sjson.name)
 
         attach(self.item, subs_id)
         request = Request.blank(dispatch)
         response = self.item.transcript(request=request, dispatch=dispatch)
-        self.assertDictEqual(json.loads(response.body), subs)
+        self.assertDictEqual(json.loads(response.body), TRANSCRIPT)
 
     def test_translaton_non_en_html5_success(self):
         subs = {
