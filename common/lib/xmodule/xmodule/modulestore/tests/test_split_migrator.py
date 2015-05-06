@@ -10,11 +10,11 @@ from nose.plugins.attrib import attr
 
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict, UNIQUE_ID
 from xmodule.modulestore.split_migrator import SplitMigrator
-from xmodule.modulestore.tests.test_split_w_old_mongo import SplitWMongoCourseBoostrapper
+from xmodule.modulestore.tests.test_split_w_old_mongo import SplitWMongoCourseBootstrapper
 
 
 @attr('mongo')
-class TestMigration(SplitWMongoCourseBoostrapper):
+class TestMigration(SplitWMongoCourseBootstrapper):
     """
     Test the split migrator
     """
