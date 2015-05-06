@@ -586,7 +586,7 @@ class YouTubeVideoTest(VideoBaseTest):
         # open video "C"
         self.course_nav.go_to_sequential('C')
 
-        # check if video "C" should start playing at speed "1.50"
+        # check if video "C" should start playing at speed "1.0"
         self.assertEqual(self.video.speed, '1.0x')
 
     def test_video_has_correct_transcript(self):
