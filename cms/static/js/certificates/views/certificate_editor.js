@@ -20,14 +20,6 @@ function(ListItemEditorView, Signatory, SignatoryEditor, _, $, gettext) {
             'click .action-add-signatory': 'addSignatory'
         },
 
-        addSignatory: function() {
-            // create a new signatory
-            var signatory = new Signatory({certificate: this.getSaveableModel()});
-            var signatory_view = new SignatoryEditor({model: signatory, isEditingAllCollections: true});
-            this.$('div.signatory-edit-list').append($(signatory_view.render()));
-            this.toggleAddSignatoryButtonState();
-        },
-
         className: function () {
             console.log('certificate_editor.className');
             var index = this.model.collection.indexOf(this.model);
@@ -42,24 +34,45 @@ function(ListItemEditorView, Signatory, SignatoryEditor, _, $, gettext) {
 
         initialize: function() {
             console.log('certificate_editor.initialize');
+            _.bindAll(this, "onSignatoryRemoved");
+            this.eventAgg = _.extend({}, Backbone.Events);
+            this.eventAgg.bind("onSignatoryRemoved", this.onSignatoryRemoved);
             ListItemEditorView.prototype.initialize.call(this);
 
             this.template = this.loadTemplate('certificate-editor');
+        },
+
+        /**
+         * Callback on signatory model destroyed/removed.
+         * @param model
+         */
+        onSignatoryRemoved: function(model) {
+            this.model.setOriginalAttributes();
+            this.render();
         },
 
         render: function() {
             console.log('certificate_edit.render');
             ListItemEditorView.prototype.render.call(this);
             var self = this;
-
             // At-least one signatory would be associated with certificate.
             this.model.get("signatories").each(function( modelSignatory) {
-                var signatory_view = new SignatoryEditor({model: modelSignatory, isEditingAllCollections: true});
+                var signatory_view = new SignatoryEditor({
+                    model: modelSignatory,
+                    isEditingAllCollections: true,
+                    eventAgg: self.eventAgg
+                });
                 self.$('div.signatory-edit-list').append($(signatory_view.render()));
             });
 
             this.toggleAddSignatoryButtonState();
             return this;
+        },
+
+        addSignatory: function() {
+            // create a new signatory
+            var signatory = new Signatory({certificate: this.getSaveableModel()});
+            this.render();
         },
 
         toggleAddSignatoryButtonState: function() {

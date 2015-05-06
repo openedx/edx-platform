@@ -10,14 +10,29 @@ function(Backbone, Certificate) {
             this.url = options.certificateUrl;
         },
 
+        IsJsonString: function(str) {
+            try {
+                JSON.parse(str);
+            } catch (e) {
+                return false;
+            }
+            return true;
+        },
+
         //Parse the JSON into Certificate models
         parse: function (certificatesJson) {
 
             console.log("certificates_collection.parse.start");
             console.log(certificatesJson);
 
-            //Parse the provided JSON and create models in the collection
-            var modelArray = JSON.parse(certificatesJson);
+            var modelArray;
+            if(this.IsJsonString(certificatesJson)) {
+                //Parse the provided JSON and create models in the collection
+                modelArray = JSON.parse(certificatesJson);
+            } else {
+                modelArray = certificatesJson;
+            }
+
             for (var i in modelArray) {
                 console.log(modelArray[i]);
                 this.push(modelArray[i]);

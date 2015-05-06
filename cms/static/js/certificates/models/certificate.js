@@ -18,11 +18,6 @@ function(Backbone, Signatory, SignatoryCollection, _, str, gettext) {
             key: 'signatories',
             relatedModel: Signatory,
             collectionType: SignatoryCollection,
-            collectionOptions: function(model) {
-                return {
-                    certificateUrl: model.collection.url
-                };
-            },
             reverseRelation: {
                 key: 'certificate',
                 includeInJSON: "id"
@@ -50,6 +45,11 @@ function(Backbone, Signatory, SignatoryCollection, _, str, gettext) {
         setOriginalAttributes: function() {
             console.log('certificate_model.setOriginalAttributes');
             this._originalAttributes = this.parse(this.toJSON());
+
+            // setting the signatories collection url.
+            if(!this.isNew() && !this.get('signatories').url) {
+                this.get('signatories').url = this.collection.url + '/' + this.get('id') + '/signatories';
+            }
         },
 
         validate: function(attrs) {
