@@ -109,10 +109,16 @@ def _upload_file(subs_file, location, filename):
 
 
 def attach_sub(item, filename):
+    """
+    Attach `en` transcript.
+    """
     item.sub = filename
 
 
 def attach_bumper_transcript(item, filename, lang="en"):
+    """
+    Attach bumper transcript.
+    """
     item.video_bumper["transcripts"][lang] = filename
 
 
@@ -553,7 +559,10 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         # Test different language to ensure we are just ignoring it since we can't
         # translate with static fallback
         ('/translation/uk', 'translation/uk', '404 Not Found'),
-        ('/translation_bumper/en', 'translation_bumper/en', '307 Temporary Redirect', 'OEoXaMPEzfM', attach_bumper_transcript),
+        (
+            '/translation_bumper/en', 'translation_bumper/en', '307 Temporary Redirect', 'OEoXaMPEzfM',
+            attach_bumper_transcript
+        ),
         ('/translation_bumper/uk', 'translation_bumper/uk', '404 Not Found'),
     )
     @ddt.unpack

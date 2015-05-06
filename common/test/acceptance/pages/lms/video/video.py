@@ -130,10 +130,16 @@ class VideoPage(PageObject):
 
     @property
     def is_poster_shown(self):
+        """
+        Check that whether a poster is show.
+        """
         selector = self.get_element_selector(CSS_CLASS_NAMES['poster'])
         return self.q(css=selector).visible
 
     def click_on_poster(self):
+        """
+        Click on the video poster.
+        """
         selector = self.get_element_selector(CSS_CLASS_NAMES['poster'])
         self.q(css=selector).click()
 

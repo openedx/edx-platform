@@ -74,7 +74,7 @@ class TestVideoYouTube(TestVideo):
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
-            }
+        }
 
         self.assertEqual(
             context,
@@ -294,8 +294,12 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 'sub': data['sub'],
             })
             expected_context.update({
-                'transcript_download_format': None if self.item_descriptor.track and self.item_descriptor.download_track else 'srt',
-                'track': track_url if data['expected_track_url'] == u'a_sub_file.srt.sjson' else data['expected_track_url'],
+                'transcript_download_format': (
+                    None if self.item_descriptor.track and self.item_descriptor.download_track else 'srt'
+                ),
+                'track': (
+                    track_url if data['expected_track_url'] == u'a_sub_file.srt.sjson' else data['expected_track_url'],
+                )
                 'id': self.item_descriptor.location.html_id(),
                 'metadata': json.dumps(metadata)
             })
@@ -417,7 +421,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             context = self.item_descriptor.render(STUDENT_VIEW).content
 
             expected_context = dict(initial_context)
-            metadata.update({
+            expected_context['metadata'].update({
                 'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript', 'translation'
                 ).rstrip('/?'),
@@ -430,7 +434,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             expected_context.update({
                 'id': self.item_descriptor.location.html_id(),
                 'download_video_link': data['result'].get('download_video_link'),
-                'metadata': json.dumps(metadata)
+                'metadata': json.dumps(expected_context['metadata'])
             })
 
             self.assertEqual(
@@ -775,8 +779,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'result': {
                 'download_video_link': u'example_source.mp4',
                 'sources': [
-                        u'http://cdn_example.com/example.mp4',
-                        u'http://cdn_example.com/example.webm'
+                    u'http://cdn_example.com/example.mp4',
+                    u'http://cdn_example.com/example.webm'
                 ],
             },
         }
@@ -1081,7 +1085,7 @@ class TestVideoWithBumper(TestVideo):
     @patch('xmodule.video_module.bumper_utils.is_bumper_enabled')
     @patch('xmodule.video_module.bumper_utils.get_bumper_settings')
     @patch('edxval.api.get_urls_for_profiles')
-    def test_bumper_metadata(self, get_url_for_profiles,get_bumper_settings, is_bumper_enabled):
+    def test_bumper_metadata(self, get_url_for_profiles, get_bumper_settings, is_bumper_enabled):
         """
         Test content with rendered bumper metadata.
         """

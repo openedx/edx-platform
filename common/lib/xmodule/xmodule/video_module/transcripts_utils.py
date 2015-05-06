@@ -608,8 +608,8 @@ class VideoTranscriptsMixin(object):
             content = Transcript.convert(data, 'sjson', transcript_format)
         else:
             transcripts = self.transcripts if not bumper else self.bumper_transcripts
-            data = Transcript.asset(self.location, None, None, self.transcripts[lang]).data
-            filename = u'{}.{}'.format(os.path.splitext(self.transcripts[lang])[0], transcript_format)
+            data = Transcript.asset(self.location, None, None, transcripts[lang]).data
+            filename = u'{}.{}'.format(os.path.splitext(transcripts[lang])[0], transcript_format)
             content = Transcript.convert(data, 'srt', transcript_format)
 
         if not content:
