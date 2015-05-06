@@ -104,15 +104,9 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         return instructor_task
 
     def _run_task_with_mock_celery(self, task_class, entry_id, task_id):
-        """Submit a task and mock how celery provides a current_task."""
-        mock_current_task = Mock()
-        mock_current_task.max_retries = settings.BULK_EMAIL_MAX_RETRIES
-        mock_current_task.default_retry_delay = settings.BULK_EMAIL_DEFAULT_RETRY_DELAY
+        """Mock was not needed for some tests, testing to see if it's needed at all."""
         task_args = [entry_id, {}]
-
-        with patch('bulk_email.tasks._get_current_task') as mock_get_task:
-            mock_get_task.return_value = mock_current_task
-            return task_class.apply(task_args, task_id=task_id).get()
+        return task_class.apply(task_args, task_id=task_id).get()
 
     def test_email_missing_current_task(self):
         task_entry = self._create_input_entry()
