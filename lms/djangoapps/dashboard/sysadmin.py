@@ -17,6 +17,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
+from django.core.management import call_command
 from django.db import IntegrityError
 from django.http import HttpResponse, Http404
 from django.utils.decorators import method_decorator
@@ -30,25 +31,25 @@ from django_future.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 import mongoengine
 from path import path
-from django.core.management import call_command
 import sys
 
 from courseware.courses import get_course_by_id
 import dashboard.git_import as git_import
+from django_comment_client.management_utils import rename_user as rename_user_util
 from dashboard.git_import import GitImportError
-from student.roles import CourseStaffRole, CourseInstructorRole
+from dashboard.sysadmin_extensions import sysadmin_course_tabs
 from dashboard.models import CourseImportLog
 from external_auth.models import ExternalAuthMap
 from external_auth.views import generate_password
+from instructor_task.models import InstructorTask
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.models import CourseEnrollment, UserProfile, Registration
+from student.roles import CourseStaffRole, CourseInstructorRole
 import track.views
+from util.json_request import JsonResponse
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml import XMLModuleStore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from instructor_task.models import InstructorTask
-from django_comment_client.management_utils import rename_user as rename_user_util
-from util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
 
@@ -379,6 +380,48 @@ class Users(SysadminDashboardView):
         return render_to_response(self.template_name, context)
 
 
+class CourseTabs(SysadminDashboardView):
+    """
+    Handles rendering the view and processing requests for Edit Course Tabs
+    """
+
+    def get(self, request):
+        """
+        Displays the form for Edit Course Tabs
+        """
+
+        if not request.user.is_superuser:
+            raise Http404
+
+        context = {
+            'msg': self.msg,
+            'djangopid': os.getpid(),
+            'modeflag': {'course_tabs': 'active-section'},
+            'edx_platform_version': getattr(settings, 'EDX_PLATFORM_VERSION_STRING', ''),
+        }
+        return render_to_response(self.template_name, context)
+
+    def post(self, request):
+        """Handle requests to Edit Course Tabs"""
+
+        if not request.user.is_superuser:
+            raise Http404
+
+        action = request.POST.get('action', '')
+        track.views.server_track(request, action, {}, page='course_tabs_sysdashboard')
+
+        if action in ['get_current_tabs', 'delete_tab', 'insert_tab']:
+            self.msg = sysadmin_course_tabs.process_request(action, request)
+
+        context = {
+            'msg': self.msg,
+            'djangopid': os.getpid(),
+            'modeflag': {'course_tabs': 'active-section'},
+            'edx_platform_version': getattr(settings, 'EDX_PLATFORM_VERSION_STRING', ''),
+        }
+        return render_to_response(self.template_name, context)
+
+
 class Courses(SysadminDashboardView):
     """
     This manages adding/updating courses from git, deleting courses, and
@@ -592,6 +635,7 @@ class Courses(SysadminDashboardView):
                                  page='courses_sysdashboard')
 
         courses = {course.id: course for course in self.get_courses()}
+
         if action == 'add_course':
             gitloc = request.POST.get('repo_location', '').strip().replace(' ', '').replace(';', '')
             branch = request.POST.get('repo_branch', '').strip().replace(' ', '').replace(';', '')
