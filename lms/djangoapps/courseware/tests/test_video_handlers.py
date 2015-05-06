@@ -364,7 +364,7 @@ def attach_sub(item, filename):
     item.sub = filename
 
 def attach_bumper_transcript(item, filename, lang="en"):
-    return lambda: item.video_bumper["transcripts"][lang] = filename
+    item.video_bumper["transcripts"][lang] = filename
 
 
 @ddt.ddt
@@ -418,7 +418,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
 
     @ddt.data(
         ('translation/en', attach_sub),
-        ('translation_bumper/en', attach_bumper_transcript()))
+        ('translation_bumper/en', attach_bumper_transcript))
     @ddt.unpack
     def test_translaton_en_youtube_success(self, dispatch, attach):
         subs = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
@@ -476,7 +476,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
 
     @ddt.data(
         ('translation/en', attach_sub),
-        ('translation_bumper/en', attach_bumper_transcript()))
+        ('translation_bumper/en', attach_bumper_transcript))
     @ddt.unpack
     def test_translaton_en_html5_success(self, dispatch, attach):
         subs = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
@@ -544,7 +544,19 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         response = self.item.transcript(request=request, dispatch='translation/uk')
         self.assertEqual(response.status, '404 Not Found')
 
-    def test_translation_static_transcript(self):
+    @ddt.data(
+        # Test youtube style en
+        ('/translation/en?videoId=12345', 'translation/en', '307 Temporary Redirect', '12345'),
+        # Test html5 style en
+        ('/translation/en', 'translation/en', '307 Temporary Redirect', 'OEoXaMPEzfM', attach_sub),
+        # Test different language to ensure we are just ignoring it since we can't
+        # translate with static fallback
+        ('/translation/uk', 'translation/uk', '404 Not Found'),
+        ('/translation_bumper/en', 'translation_bumper/en', '307 Temporary Redirect', 'OEoXaMPEzfM', attach_bumper_transcript),
+        ('/translation_bumper/uk', 'translation_bumper/uk', '404 Not Found'),
+    )
+    @ddt.unpack
+    def test_translation_static_transcript(self, url, dispatch, status_code, sub=None, attach=None):
         """
         Set course static_asset_path and ensure we get redirected to that path
         if it isn't found in the contentstore
@@ -555,30 +567,16 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
             store.update_item(self.course, self.user.id)
 
-        # Test youtube style en
-        request = Request.blank('/translation/en?videoId=12345')
-        response = self.item.transcript(request=request, dispatch='translation/en')
-        self.assertEqual(response.status, '307 Temporary Redirect')
-        self.assertIn(
-            ('Location', '/static/dummy/static/subs_12345.srt.sjson'),
-            response.headerlist
-        )
-
-        # Test HTML5 video style
-        self.item.sub = 'OEoXaMPEzfM'
-        request = Request.blank('/translation/en')
-        response = self.item.transcript(request=request, dispatch='translation/en')
-        self.assertEqual(response.status, '307 Temporary Redirect')
-        self.assertIn(
-            ('Location', '/static/dummy/static/subs_OEoXaMPEzfM.srt.sjson'),
-            response.headerlist
-        )
-
-        # Test different language to ensure we are just ignoring it since we can't
-        # translate with static fallback
-        request = Request.blank('/translation/uk')
-        response = self.item.transcript(request=request, dispatch='translation/uk')
-        self.assertEqual(response.status, '404 Not Found')
+        if attach:
+            attach(self.item, sub)
+        request = Request.blank(url)
+        response = self.item.transcript(request=request, dispatch=dispatch)
+        self.assertEqual(response.status, status_code)
+        if sub:
+            self.assertIn(
+                ('Location', '/static/dummy/static/subs_{}.srt.sjson'.format(sub)),
+                response.headerlist
+            )
 
 
 class TestStudioTranscriptTranslationGetDispatch(TestVideo):
