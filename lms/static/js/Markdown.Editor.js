@@ -1051,10 +1051,10 @@
                 style.marginLeft = "30px";
                 var errorMsg;
                 if (isImage) {
-                    errorMsg = doc.createTextNode("You either have to give description or select checkbox");
+                    errorMsg = doc.createTextNode("Please describe this image or agree that it has no contextual value by checking the checkbox");
                 }
                 else {
-                    errorMsg = doc.createTextNode("You have to give description");
+                    errorMsg = doc.createTextNode("Please describe this link in the context of your post.");
                 }
                 formError.appendChild(errorMsg);
                 formError.appendChild(doc.createElement("br"));
