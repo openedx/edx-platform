@@ -111,8 +111,9 @@ class BaseProvider(object):
             setattr(settings, key, value)
 
     @classmethod
-    def get_url_query(self):
-        return ''
+    def get_url_params(cls):
+        """ Get a dict of GET parameters to append to login links for this provider """
+        return {}
 
 
 class GoogleOauth2(BaseProvider):
@@ -157,8 +158,9 @@ class SAMLProviderMixin(object):
     ICON_CLASS = 'fa-university'
 
     @classmethod
-    def get_url_query(cls):
-        return '&idp={}'.format(cls.IDP["id"])
+    def get_url_params(cls):
+        """ Get a dict of GET parameters to append to login links for this provider """
+        return {'idp': cls.IDP["id"]}
 
 
 class TestShibAProvider(SAMLProviderMixin, BaseProvider):

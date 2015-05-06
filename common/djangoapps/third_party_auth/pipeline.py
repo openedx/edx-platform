@@ -260,7 +260,8 @@ def _get_enabled_provider_by_name(provider_name):
     return enabled_provider
 
 
-def _get_url(view_name, backend_name, auth_entry=None, redirect_url=None, enroll_course_id=None, email_opt_in=None):
+def _get_url(view_name, backend_name, auth_entry=None, redirect_url=None,
+             enroll_course_id=None, email_opt_in=None, extra_params=None):
     """Creates a URL to hook into social auth endpoints."""
     kwargs = {'backend': backend_name}
     url = reverse(view_name, kwargs=kwargs)
@@ -277,6 +278,9 @@ def _get_url(view_name, backend_name, auth_entry=None, redirect_url=None, enroll
 
     if email_opt_in:
         query_params[AUTH_EMAIL_OPT_IN_KEY] = email_opt_in
+
+    if extra_params:
+        query_params.update(extra_params)
 
     return u"{url}?{params}".format(
         url=url,
@@ -358,8 +362,9 @@ def get_login_url(provider_name, auth_entry, redirect_url=None, enroll_course_id
         auth_entry=auth_entry,
         redirect_url=redirect_url,
         enroll_course_id=enroll_course_id,
-        email_opt_in=email_opt_in
-    ) + enabled_provider.get_url_query()  # Some optional extra data that will show up as FIELDS_STORED_IN_SESSION
+        email_opt_in=email_opt_in,
+        extra_params=enabled_provider.get_url_params(),
+    )
 
 
 def get_duplicate_provider(messages):
