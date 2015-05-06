@@ -17,6 +17,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import MagicMock, patch, create_autospec, Mock
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 from pytz import UTC
 from xblock.core import XBlock
