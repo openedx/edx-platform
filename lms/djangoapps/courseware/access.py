@@ -22,6 +22,7 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.x_module import XModule, DEPRECATION_VSCOMPAT_EVENT
 from xmodule.split_test_module import get_split_user_partitions
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
+from xmodule.util.django import get_current_request_hostname
 
 from external_auth.models import ExternalAuthMap
 from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
@@ -436,7 +437,7 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
                 descriptor,
                 course_key=course_key
             )
-            if now > effective_start:
+            if in_preview_mode() or now > effective_start:
                 # after start date, everyone can see it
                 debug("Allow: now > effective start date")
                 return True
@@ -687,3 +688,11 @@ def get_user_role(user, course_key):
         return 'staff'
     else:
         return 'student'
+
+
+def in_preview_mode():
+    """
+    Returns whether the user is in preview mode or not.
+    """
+    hostname = get_current_request_hostname()
+    return hostname and settings.PREVIEW_DOMAIN in hostname.split('.')
