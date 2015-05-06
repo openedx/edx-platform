@@ -72,9 +72,10 @@ define([
         },
 
         parse: function(response) {
-            this.latestModelsCount = response.results.length;
+            var results = response['results'] || [];
+            this.latestModelsCount = results.length;
             this.totalCount = response.total;
-            return _.map(response.results, function (result) {
+            return _.map(results, function (result) {
                 return result.data;
             });
         },

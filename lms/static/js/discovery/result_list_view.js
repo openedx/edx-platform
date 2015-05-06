@@ -12,19 +12,17 @@ define([
     return Backbone.View.extend({
 
         el: 'section.courses',
-        originalContent: '',
         $window: $(window),
         $document: $(document),
 
         initialize: function () {
             this.$list = this.$el.find('.courses-listing');
-            this.originalContent = this.$list.html();
+            this.attachScrollHandler();
         },
 
         render: function () {
             this.$list.empty();
             this.renderItems();
-            this.attachScrollHandler();
             return this;
         },
 
@@ -42,23 +40,9 @@ define([
             this.$list.append(items);
         },
 
-        loadNext: function (event) {
-            event && event.preventDefault();
-            this.trigger('next');
-        },
-
-        clearResults: function() {
-            this.$list.html(this.originalContent);
-            this.detachScrollHandler();
-        },
-
         attachScrollHandler: function () {
             this.nextScrollEvent = true;
             this.$window.on('scroll', this.scrollHandler.bind(this));
-        },
-
-        detachScrollHandler: function () {
-            this.$window.off('scroll', this.scrollHandler);
         },
 
         scrollHandler: function () {
@@ -83,7 +67,7 @@ define([
 
         scrolledToBottom: function () {
             if (this.thereIsMore() && !this.isLoading) {
-                this.loadNext();
+                this.trigger('next');
                 this.isLoading = true;
             }
         },
