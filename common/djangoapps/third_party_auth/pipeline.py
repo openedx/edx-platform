@@ -445,7 +445,7 @@ def parse_query_params(strategy, response, *args, **kwargs):
     """Reads whitelisted query params, transforms them into pipeline args."""
     auth_entry = strategy.session.get(AUTH_ENTRY_KEY)
     if not (auth_entry and auth_entry in _AUTH_ENTRY_CHOICES):
-        raise AuthEntryError(strategy.backend, 'auth_entry missing or invalid')
+        raise AuthEntryError(strategy.request.backend, 'auth_entry missing or invalid')
 
     return {'auth_entry': auth_entry}
 
@@ -526,7 +526,7 @@ def _create_redirect_url(url, strategy):
 
 
 @partial.partial
-def set_logged_in_cookie(backend=None, user=None, request=None, auth_entry=None, *args, **kwargs):
+def set_logged_in_cookie(backend=None, user=None, strategy=None, auth_entry=None, *args, **kwargs):
     """This pipeline step sets the "logged in" cookie for authenticated users.
 
     Some installations have a marketing site front-end separate from
@@ -552,6 +552,7 @@ def set_logged_in_cookie(backend=None, user=None, request=None, auth_entry=None,
 
     """
     if not is_api(auth_entry) and user is not None and user.is_authenticated():
+        request = strategy.request if strategy else None
         if request is not None:
             # Check that the cookie isn't already set.
             # This ensures that we allow the user to continue to the next
@@ -692,7 +693,7 @@ def change_enrollment(strategy, auth_entry=None, user=None, *args, **kwargs):
 
 
 @partial.partial
-def associate_by_email_if_login_api(auth_entry, strategy, details, user, *args, **kwargs):
+def associate_by_email_if_login_api(auth_entry, backend, details, user, *args, **kwargs):
     """
     This pipeline step associates the current social auth with the user with the
     same email address in the database.  It defers to the social library's associate_by_email
@@ -701,7 +702,7 @@ def associate_by_email_if_login_api(auth_entry, strategy, details, user, *args, 
     This association is done ONLY if the user entered the pipeline through a LOGIN API.
     """
     if auth_entry == AUTH_ENTRY_LOGIN_API:
-        association_response = associate_by_email(strategy, details, user, *args, **kwargs)
+        association_response = associate_by_email(backend, details, user, *args, **kwargs)
         if (
             association_response and
             association_response.get('user') and

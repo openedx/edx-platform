@@ -1134,7 +1134,7 @@ def login_oauth_token(request, backend):
     """
     warnings.warn("Please use AccessTokenExchangeView instead.", DeprecationWarning)
 
-    backend = request.social_strategy.backend
+    backend = request.backend
     if isinstance(backend, social_oauth.BaseOAuth1) or isinstance(backend, social_oauth.BaseOAuth2):
         if "access_token" in request.POST:
             # Tell third party auth pipeline that this is an API call
@@ -1142,7 +1142,7 @@ def login_oauth_token(request, backend):
             user = None
             try:
                 user = backend.do_auth(request.POST["access_token"])
-            except HTTPError:
+            except (HTTPError, AuthException):
                 pass
             # do_auth can return a non-User object if it fails
             if user and isinstance(user, User):
@@ -1452,7 +1452,10 @@ def create_account_with_params(request, params):
 
         # next, link the account with social auth, if provided
         if should_link_with_social_auth:
-            request.social_strategy = social_utils.load_strategy(backend=params['provider'], request=request)
+            backend_name = params['provider']
+            request.social_strategy = social_utils.load_strategy(request)
+            redirect_uri = reverse('social:complete', args=(backend_name, ))
+            request.backend = social_utils.load_backend(request.social_strategy, backend_name, redirect_uri)
             social_access_token = params.get('access_token')
             if not social_access_token:
                 raise ValidationError({
@@ -1466,7 +1469,7 @@ def create_account_with_params(request, params):
             pipeline_user = None
             error_message = ""
             try:
-                pipeline_user = request.social_strategy.backend.do_auth(social_access_token, user=user)
+                pipeline_user = request.backend.do_auth(social_access_token, user=user)
             except AuthAlreadyAssociated:
                 error_message = _("The provided access_token is already associated with another user.")
             except (HTTPError, AuthException):
