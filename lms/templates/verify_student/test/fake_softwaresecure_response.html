@@ -1,0 +1,75 @@
+<%namespace name='static' file='/static_content.html'/>
+<html>
+<head><title>Fake Software Secure Form</title>
+</head>
+<body>
+<p>Fake Software Secure page</p>
+<p>It will pick the most recent software secure attempt for a logged-in user.</p>
+
+<br>
+<div>
+<input type="button" value="PASS" id="btn_pass">
+<input type="button" value="FAIL" id="btn_denied" style="margin-left: 10px">
+<input type="button" value="SYSTEM FAIL" id="btn_error" style="margin-left: 10px">
+<input type="button" value="UNKNOWN ERROR" id="btn_unknown_error" style="margin-left: 10px">
+</div>
+
+<div id="errors-info" style="padding-top: 20px;color: red"></div>
+<div id="success-info" style="padding-top: 20px;color: green"></div>
+
+</body>
+</html>
+<script type="text/javascript" src="${static.url('js/vendor/jquery.min.js')}"></script>
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+    $("#btn_pass").click(function(e){
+        e.preventDefault();
+        ajax_post($(this).val(),"");
+    });
+    $("#btn_denied").click(function(e){
+        e.preventDefault();
+        ajax_post($(this).val(),"failure");
+    });
+    $("#btn_error").click(function(e){
+        e.preventDefault();
+        ajax_post($(this).val(),"system error");
+    });
+    $("#btn_unknown_error").click(function(e){
+        e.preventDefault();
+        ajax_post($(this).val(),"unknown system error");
+    });
+
+
+    function ajax_post(status, reason){
+
+        var data = {
+            "EdX-ID": '${receipt_id}',
+            "Result": status,
+            "Reason": reason,
+            "MessageType": ""
+        };
+
+        $('#errors-info').html('');
+        $('#success-info').html('');
+
+        $.ajax({
+            type: "POST",
+            url: '${results_callback}',
+            headers: {
+            "Authorization": "${authorization_code}"
+            },
+            data: JSON.stringify(data),
+            contentType: "application/json;",
+            success: function () {
+               $('#success-info').html('status updated.');
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                $('#errors-info').html(jqXHR.responseText);
+            }
+        });
+    }
+});
+
+</script>
