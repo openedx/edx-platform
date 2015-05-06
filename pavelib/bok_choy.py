@@ -22,6 +22,8 @@ __test__ = False  # do not collect
 @cmdopts([
     ('test_spec=', 't', 'Specific test to run'),
     ('fasttest', 'a', 'Skip some setup'),
+    ('serversonly', 'r', 'Prepare suite and leave servers running'),
+    ('testsonly', 'o', 'Assume servers are running and execute tests only'),
     ('extra_args=', 'e', 'adds as extra args to the test command'),
     ('default_store=', 's', 'Default modulestore'),
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
@@ -33,7 +35,10 @@ __test__ = False  # do not collect
 def test_bokchoy(options):
     """
     Run acceptance tests that use the bok-choy framework.
-    Skips some setup if `fasttest` is True.
+    Skips some static asset steps if `fasttest` is True.
+    Using 'serversonly' will prepare and run servers, leaving a process running in the terminal. At
+        the same time, a user can open a separate terminal and use 'testsonly' for executing tests against
+        those running servers.
 
     `test_spec` is a nose-style test specifier relative to the test directory
     Examples:
@@ -53,6 +58,8 @@ def test_bokchoy(options):
     opts = {
         'test_spec': getattr(options, 'test_spec', None),
         'fasttest': getattr(options, 'fasttest', False),
+        'serversonly': getattr(options, 'serversonly', False),
+        'testsonly': getattr(options, 'testsonly', False),
         'default_store': getattr(options, 'default_store', 'split'),
         'verbosity': getattr(options, 'verbosity', 2),
         'extra_args': getattr(options, 'extra_args', ''),
