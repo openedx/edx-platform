@@ -43,39 +43,6 @@ class TestIntegrationTask(InstructorTaskModuleTestCase):
     Base class to provide general methods used for "integration" testing of particular tasks.
     """
 
-    def submit_student_answer(self, username, problem_url_name, responses):
-        """
-        Use ajax interface to submit a student answer.
-
-        Assumes the input list of responses has two values.
-        """
-        def get_input_id(response_id):
-            """Creates input id using information about the test course and the current problem."""
-            # Note that this is a capa-specific convention.  The form is a version of the problem's
-            # URL, modified so that it can be easily stored in html, prepended with "input-" and
-            # appended with a sequence identifier for the particular response the input goes to.
-            return 'input_i4x-{0}-{1}-problem-{2}_{3}'.format(TEST_COURSE_ORG.lower(),
-                                                              TEST_COURSE_NUMBER.replace('.', '_'),
-                                                              problem_url_name, response_id)
-
-        # make sure that the requested user is logged in, so that the ajax call works
-        # on the right problem:
-        self.login_username(username)
-        # make ajax call:
-        modx_url = reverse('xblock_handler', kwargs={
-            'course_id': self.course.id.to_deprecated_string(),
-            'usage_id': quote_slashes(InstructorTaskModuleTestCase.problem_location(problem_url_name).to_deprecated_string()),
-            'handler': 'xmodule_handler',
-            'suffix': 'problem_check',
-        })
-
-        # we assume we have two responses, so assign them the correct identifiers.
-        resp = self.client.post(modx_url, {
-            get_input_id('2_1'): responses[0],
-            get_input_id('3_1'): responses[1],
-        })
-        return resp
-
     def _assert_task_failure(self, entry_id, task_type, problem_url_name, expected_message):
         """Confirm that expected values are stored in InstructorTask on task failure."""
         instructor_task = InstructorTask.objects.get(id=entry_id)
@@ -606,7 +573,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestIntegrationTask):
         """
         self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, task_result)
 
-    def verify_grades_in_csv(self, students_grades):
+    def verify_grades_in_csv(self, students_grades, ignore_other_columns=False):
         """
         Verify that the grades CSV contains the expected grades data.
 
@@ -642,7 +609,8 @@ class TestGradeReportConditionalContent(TestReportMixin, TestIntegrationTask):
                     user_partition_group(student)
                 )
                 for student_grades in students_grades for student, grades in student_grades.iteritems()
-            ]
+            ],
+            ignore_other_columns=ignore_other_columns
         )
 
     def test_both_groups_problems(self):
@@ -668,7 +636,8 @@ class TestGradeReportConditionalContent(TestReportMixin, TestIntegrationTask):
                 [
                     {self.student_a: {'grade': '1.0', 'HW': '1.0'}},
                     {self.student_b: {'grade': '0.5', 'HW': '0.5'}}
-                ]
+                ],
+                ignore_other_columns=True
             )
 
     def test_one_group_problem(self):
@@ -690,5 +659,6 @@ class TestGradeReportConditionalContent(TestReportMixin, TestIntegrationTask):
                 [
                     {self.student_a: {'grade': '1.0', 'HW': '1.0'}},
                     {self.student_b: {'grade': '0.0', 'HW': '0.0'}}
-                ]
+                ],
+                ignore_other_columns=True
             )

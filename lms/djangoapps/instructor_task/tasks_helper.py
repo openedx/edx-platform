@@ -22,6 +22,7 @@ from util.file import course_filename_prefix_generator, UniversalNewlineIterator
 from xmodule.modulestore.django import modulestore
 from xmodule.split_test_module import get_split_user_partitions
 
+from certificates.models import CertificateWhitelist, certificate_info_for_user
 from courseware.courses import get_course_by_id, get_problems_in_section
 from courseware.grades import iterate_grades_for
 from courseware.models import StudentModule
@@ -36,6 +37,7 @@ from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
 from student.models import CourseEnrollment
+from verify_student.models import SoftwareSecurePhotoVerification
 
 
 # define different loggers for use within tasks and on client side
@@ -549,7 +551,7 @@ def upload_csv_to_report_store(rows, csv_name, course_id, timestamp):
     )
 
 
-def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):  # pylint: disable=too-many-statements
     """
     For a given `course_id`, generate a grades CSV file for all students that
     are enrolled, and store using a `ReportStore`. Once created, the files can
@@ -583,6 +585,10 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
 
     experiment_partitions = get_split_user_partitions(course.user_partitions)
     group_configs_header = [u'Experiment Group ({})'.format(partition.name) for partition in experiment_partitions]
+
+    certificate_info_header = ['Certificate Eligible', 'Certificate Delivered', 'Certificate Type']
+    certificate_whitelist = CertificateWhitelist.objects.filter(course_id=course_id, whitelist=True)
+    whitelisted_user_ids = [entry.user_id for entry in certificate_whitelist]
 
     # Loop over all our students and build our CSV lists in memory
     header = None
@@ -623,7 +629,8 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
             if not header:
                 header = [section['label'] for section in gradeset[u'section_breakdown']]
                 rows.append(
-                    ["id", "email", "username", "grade"] + header + cohorts_header + group_configs_header
+                    ["id", "email", "username", "grade"] + header + cohorts_header +
+                    group_configs_header + ['Enrollment Track', 'Verification Status'] + certificate_info_header
                 )
 
             percents = {
@@ -642,6 +649,19 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
                 group = LmsPartitionService(student, course_id).get_group(partition, assign=False)
                 group_configs_group_names.append(group.name if group else '')
 
+            enrollment_mode = CourseEnrollment.enrollment_mode_for_user(student, course_id)[0]
+            verification_status = SoftwareSecurePhotoVerification.verification_status_for_user(
+                student,
+                course_id,
+                enrollment_mode
+            )
+            certificate_info = certificate_info_for_user(
+                student,
+                course_id,
+                gradeset['grade'],
+                student.id in whitelisted_user_ids
+            )
+
             # Not everybody has the same gradable items. If the item is not
             # found in the user's gradeset, just assume it's a 0. The aggregated
             # grades for their sections and overall course will be calculated
@@ -651,7 +671,8 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
             row_percents = [percents.get(label, 0.0) for label in header]
             rows.append(
                 [student.id, student.email, student.username, gradeset['percent']] +
-                row_percents + cohorts_group_name + group_configs_group_names
+                row_percents + cohorts_group_name + group_configs_group_names +
+                [enrollment_mode] + [verification_status] + certificate_info
             )
         else:
             # An empty gradeset means we failed to grade a student.

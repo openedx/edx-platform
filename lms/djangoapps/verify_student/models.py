@@ -13,6 +13,8 @@ from email.utils import formatdate
 import functools
 import json
 import logging
+
+from course_modes.models import CourseMode
 import pytz
 import requests
 import uuid
@@ -934,6 +936,25 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         attempt.save()
         attempt.submit()
         return attempt
+
+    @classmethod
+    def verification_status_for_user(cls, user, course_id, user_enrollment_mode):
+        """
+        Returns the verification status for use in grade report.
+        """
+        if user_enrollment_mode not in CourseMode.VERIFIED_MODES:
+            return 'N/A'
+
+        user_is_verified = cls.user_is_verified(user)
+
+        if not user_is_verified:
+            return 'Not ID Verified'
+        else:
+            user_is_re_verified = cls.user_is_reverified_for_all(course_id, user)
+            if not user_is_re_verified:
+                return 'ID Verification Expired'
+            else:
+                return 'ID Verified'
 
 
 class VerificationCheckpoint(models.Model):
