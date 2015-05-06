@@ -154,24 +154,28 @@ ${fragment.foot_html()}
         <a href="#">${_("close")}</a>
       </header>
 
-      <div class="courseware-bookmarks-button" role="button"></div>
+      <div class="wrapper-course-modes">
 
-      % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
-        <div id="courseware-search-bar" class="search-bar courseware-search-bar" role="search" aria-label="Course">
-          <form>
-            <label for="course-search-input" class="sr">${_('Course Search')}</label>
-            <div class="search-field-wrapper">
-              <input id="course-search-input" type="text" class="search-field"/>
-              <button type="submit" class="search-button">
-                ${_('search')} <i class="icon fa fa-search" aria-hidden="true"></i>
-              </button>
-              <button type="button" class="cancel-button" aria-label="${_('Clear search')}">
-                <i class="icon fa fa-remove" aria-hidden="true"></i>
-              </button>
+          <div class="courseware-bookmarks-button" role="button"></div>
+
+          % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+            <div id="courseware-search-bar" class="search-bar courseware-search-bar" role="search" aria-label="Course">
+              <form>
+                <label for="course-search-input" class="sr">${_('Course Search')}</label>
+                <div class="search-field-wrapper">
+                  <input id="course-search-input" type="text" class="search-field"/>
+                  <button type="submit" class="search-button">
+                    ${_('search')} <i class="icon fa fa-search" aria-hidden="true"></i>
+                  </button>
+                  <button type="button" class="cancel-button" aria-label="${_('Clear search')}">
+                    <i class="icon fa fa-remove" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </form>
             </div>
-          </form>
-        </div>
-      % endif
+          % endif
+
+      </div>
 
       <div id="accordion" style="display: none">
         <nav aria-label="${_('Course Navigation')}">
@@ -207,10 +211,11 @@ ${fragment.foot_html()}
 
       ${fragment.body_html()}
     </section>
-    % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+
+    <!--% if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):-->
       <section id="courseware-search-results" class="search-results courseware-search-results" data-course-id="${course.id}">
       </section>
-    % endif
+    <!--% endif-->
   </div>
 </div>
 

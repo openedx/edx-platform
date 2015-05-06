@@ -9,11 +9,12 @@
             el: '.courseware-bookmarks-button',
 
             events: {
-                'click .bookmarks-button': 'renderBookmarksListView'
+                'click .bookmarks-button': 'toggleBookmarksListView'
             },
 
             initialize: function () {
                 this.template = _.template($('#bookmarks_button-tpl').text());
+                this.bookmarksResultsView = new BookmarksResultsView({collection: new BookmarksCollection()});
                 _.bindAll(this, 'render');
             },
 
@@ -22,9 +23,14 @@
                 return this;
             },
 
-            renderBookmarksListView: function () {
-                var bookmarksCollection = new BookmarksCollection();
-                new BookmarksResultsView({collection: bookmarksCollection}).loadBookmarks();
+            toggleBookmarksListView: function () {
+                if (this.bookmarksResultsView.bookmarksShown()) {
+                    this.bookmarksResultsView.hideBookmarks();
+                    this.$('.bookmarks-button').attr('aria-pressed', 'false');
+                } else {
+                    this.bookmarksResultsView.loadBookmarks();
+                    this.$('.bookmarks-button').attr('aria-pressed', 'true');
+                }
             }
         });
 

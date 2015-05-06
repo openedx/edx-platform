@@ -29,6 +29,15 @@
                 return this;
             },
 
+            bookmarksShown: function () {
+                return this.$("#my-bookmarks").is(":visible");
+            },
+
+            hideBookmarks: function () {
+              this.$el.hide();
+              $(this.contentElement).show();
+            },
+
             url: function () {
                 return '/api/bookmarks/v1/bookmarks';
             },
@@ -36,7 +45,7 @@
             loadBookmarks: function () {
                 var view = this;
 
-                this.setElementsVisibility();
+                this.toggleElementsVisibility();
                 this.showLoadingMessage();
 
                 this.collection.url = this.url();
@@ -45,14 +54,15 @@
                     data: {course_id: '', fields: 'path'}
                 }).done(function () {
                     view.render();
+                    view.setFocusAfterBookmarksLoaded();
                 }).fail(function () {
                     view.showErrorMessage();
                 });
             },
 
-            setElementsVisibility: function () {
-                $(this.contentElement).toggle();
-                this.$el.toggle();
+            toggleElementsVisibility: function () {
+                $(this.contentElement).hide();
+                this.$el.show();
             },
 
             showLoadingMessage: function () {
@@ -61,6 +71,10 @@
 
             showErrorMessage: function () {
                 $(this.el).html(this.error + ' ' + this.errorMessage);
+            },
+
+            setFocusAfterBookmarksLoaded: function () {
+                this.$('#my-bookmarks').focus();
             }
         });
 

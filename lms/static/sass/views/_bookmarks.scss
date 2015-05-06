@@ -1,32 +1,125 @@
+// Rules for placing bookmarks and search button side by side
+.wrapper-course-modes {
+  border-bottom: 1px solid lightgray;
+  display: table;
+  width: 98%;
+  padding: 6px 3px;
+
+  > div {
+    display: table-cell;
+  }
+}
+
+
+// Rules for Bookmarks Button
 .courseware-bookmarks-button {
-  display: inline-block;
-  /* width: 100px; */
-}
+  width: 40%;
+  padding: 0 3px;
+  vertical-align: top;
 
-.bookmarks-button {
-  margin: 8px 0 0 ($baseline/4);
-  background: none;
-  border-radius: ($baseline/4);
-  padding: 9px 8px 10px;
+  button[aria-pressed="true"] {
+    &:before {
+      content: "\f02e";
+      font-family: FontAwesome;
+    }
 
-  &:hover {
-    background: none !important;
+    background-color: $white;
   }
 
-  &:focus, &:active {
-    box-shadow: none !important;
+  button[aria-pressed="false"] {
+    &:before {
+      content: "\f097";
+      font-family: FontAwesome;
+    }
+
+    background: none;
+  }
+
+  .bookmarks-button {
+    background: none;
+    border-radius: ($baseline/4);
+    padding: 9px 8px 10px;
+    width: 100%;
+
+    &:hover {
+      background: none !important;
+    }
+
+    &:focus, &:active {
+      box-shadow: none !important;
+    }
   }
 }
 
+
+// Rules for Bookmarks Results Header
+.bookmarks-results-header {
+  margin: 0;
+}
+
+// Rules for Bookmarks Results
+.bookmarks-results-list {
+  padding-top: $baseline;
+
+  .bookmarks-results-list-item {
+    border: 1px solid $gray;
+    padding: ($baseline/4) $baseline ($baseline/2);
+    border-radius: ($baseline/4);
+    margin-bottom: $baseline;
+    display: block;
+
+    &:hover {
+      border-color: $link-color;
+      color: $link-color;
+    }
+  }
+
+  .results-list-item-view {
+    @include float(right);
+    margin-top: $baseline;
+  }
+
+  .list-item-date {
+    color: $gray;
+    font-size: 14px;
+  }
+
+  a.bookmarks-results-list-item:before {
+    content: "\f02e";
+    position: relative;
+    top: -7px;
+    font-family: FontAwesome;
+  }
+
+  .list-item-content {
+    overflow: hidden;
+  }
+
+  .list-item-left-section {
+    @include float(left);
+
+    h3, p {
+      font-weight: 100;
+    }
+  }
+
+  .list-item-right-section {
+    @include float(right);
+    margin-top: 7px;
+  }
+}
+
+
+// Rules for empty bookmarks list
 .bookmarks-empty {
-  margin-top: 20px;
+  margin-top: $baseline;
   border: 1px solid $gray-l4;
-  padding: 20px;
+  padding: $baseline;
   background-color: $gray-l6;
 }
 
 .bookmarks-empty-header {
-  margin-bottom: 10px;
+  margin-bottom: ($baseline/2);
   font-size: 1.2em;
 }
 
@@ -37,60 +130,12 @@
 
 .bookmarks-empty-detail-title {
   width: 85%;
-  float: left;
+  @include float(left);
 }
 
 .bookmarks-empty-detail-bookmark-button {
-  float: right;
+  @include float(right);
   border: 1px solid $gray-l4;
-  padding: 5px;
-  border-radius: 2px;
-}
-
-
-
-
-.bookmarks-results-header {
-  font-size: 1.2em;
-}
-
-.bookmarks-results-list {
-  padding-top: $baseline;
-}
-
-.bookmarks-results-list-item {
-  border: 1px solid;
-  padding: ($baseline/4) $baseline ($baseline/2);
-  border-radius: 5px;
-  margin-bottom: $baseline;
-  display: block;
-}
-
-.results-list-item-view {
-  float: right;
-  margin-top: $baseline;
-}
-
-.list-item-date {
-  color: $gray;
-}
-
-a.bookmarks-results-list-item:before {
-  content: "\f02e";
-  position: relative;
-  top: -7px;
-  font-family: FontAwesome;
-}
-
-.list-item-content {
-  overflow: hidden;
-}
-
-.list-item-left-section {
-  float: left;
-}
-
-.list-item-right-section {
-  float: right;
-  margin-top: 7px;
+  padding: ($baseline/4);
+  border-radius: ($baseline/10);
 }

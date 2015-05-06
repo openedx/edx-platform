@@ -1,4 +1,5 @@
-<div class="bookmarks-results-header"><%= gettext("My Bookmarks") %></div>
+<div id="my-bookmarks" class="sr-is-focusable" tabindex="-1"></div>
+<h2 class="bookmarks-results-header" tabindex="0"><%= gettext("My Bookmarks") %></h2>
 
 <% if (bookmarks.length) { %>
 
@@ -24,7 +25,7 @@
 
     <div class="bookmarks-empty" tabindex="0">
         <div class="bookmarks-empty-header">
-            <i class="icon fa fa-bookmark bookmarks-empty-header-icon" aria-hidden="true"></i>
+            <i class="icon fa fa-bookmark-o bookmarks-empty-header-icon" aria-hidden="true"></i>
             It looks like your bookmarks list is empty!
             <br>
         </div>
@@ -33,7 +34,7 @@
                 <%= gettext("Use bookmarks to quickly reference courseware pages you would like to return to. Toggle the bookmark button on courseware page to save that page to this list. An example bookmark toggle is shown here for reference.") %>
             </span>
             <span class="bookmarks-empty-detail-bookmark-button" aria-hidden="true">
-                <i class="icon fa fa-bookmark bookmarks-empty-header-icon"></i>
+                <i class="icon fa fa-bookmark-o bookmarks-empty-header-icon"></i>
                 Bookmarks
             </span>
         </div>
