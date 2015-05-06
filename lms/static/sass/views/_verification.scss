@@ -2414,6 +2414,12 @@
   }
 }
 
+// UI: photo reverification heading
+h1.photo_verification {
+  @extend %t-title1;
+  text-align: left;
+}
+
 // ====================
 
 // STATE: already verified

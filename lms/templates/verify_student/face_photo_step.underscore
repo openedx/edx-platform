@@ -1,6 +1,6 @@
 <div id="wrapper-facephoto" class="wrapper-view block-photo face-photo-step">
   <div class="facephoto view">
-    <h3 class="title"><%- gettext( "Take Your Photo" ) %></h3>
+    <h1 class="title photo_verification"><%- gettext( "Take Your Photo" ) %></h1>
     <div class="instruction">
       <p><%- gettext( "Use your webcam to take a photo of your face. We will match this photo with the photo on your ID." ) %></p>
     </div>
