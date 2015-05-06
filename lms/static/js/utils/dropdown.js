@@ -9,7 +9,7 @@ var edx = edx || {},
                 midpoint: ($(window).width() / 2),
                 button: $('.button-more.has-dropdown'),
                 button_active: 'is-active',
-                menu: $('.dropdown'),
+                menu: $('.dropdown-menu'),
                 menu_inactive: 'is-hidden',
                 menu_active: 'is-visible',
                 menu_align: 'align-',
@@ -17,90 +17,86 @@ var edx = edx || {},
             },
 
             init: function(parent) {
-                var that = _dropdown;
 
-                if (parent) {
-                    that.opts.page = $(parent);
+                if (_dropdown.opts.button.length && _dropdown.opts.menu.length) {
+
+                    if (parent) {
+                        _dropdown.opts.page = $(parent);
+                    }
+
+                    _dropdown.listenForClick();
+                    _dropdown.listenForKeypress();
                 }
-
-                _dropdown.listenForClick();
-                _dropdown.listenForKeypress();
             },
 
             listenForClick: function() {
-                var that = _dropdown;
 
-                that.opts.button.on('click', function() {
-                    that.closeDropdownMenu();
-                    that.openDropdownMenu($(this));
+                _dropdown.opts.button.on('click', function() {
+                    _dropdown.closeDropdownMenu(); // close any open menus
+                    _dropdown.openDropdownMenu($(this)); // then open the chosen menu
                 });
 
-                that.opts.page.on('click', function() {
-                    that.closeDropdownMenu();
+                _dropdown.opts.page.on('click', function() {
+                    _dropdown.closeDropdownMenu();
                 });
             },
 
             listenForKeypress: function() {
-                var that = _dropdown;
 
-                that.opts.page.on('keydown', function(e) {
+                _dropdown.opts.page.on('keydown', function(e) {
                     var keyCode = e.keyCode,
                         focused = $(e.currentTarget.activeElement),
                         items, menu;
 
                     if (27 === keyCode) {
-                        that.closeDropdownMenus();
+                        // When the ESC key is pressed, close all menus
+                        _dropdown.closeDropdownMenus();
                     }
 
                     if (focused.is('.action')) {
-
-                        menu = focused.parent().parent();
-                        items = menu.find('.dropdown-item .action').length;
+                        // Key handlers for when a menu item has focus
+                        menu = focused.closest('.dropdown-menu');
 
                         switch (keyCode) {
                             case 38:
-                                that.previousMenuItemLink(focused, menu);
-                                return false;
+                                _dropdown.previousMenuItemLink(focused, menu);
                                 break;
 
                             case 40:
-                                that.nextMenuItemLink(focused, menu);
-                                return false;
+                                _dropdown.nextMenuItemLink(focused, menu);
                                 break;
 
                             case 27:
-                                that.closeDropdownMenus();
+                                _dropdown.closeDropdownMenus();
                                 break;
                         }
 
-                    } else if(focused.is('.has-dropdown')) {
-
+                    } else if (focused.is('.has-dropdown')) {
+                        // Key handlers for when the button that opens the menu has focus
                         switch(keyCode) {
                             case 40:
-                                that.openDropdownMenu(focused);
-                                return false;
+                                _dropdown.openDropdownMenu(focused);
                                 break;
 
                             case 13:
-                                that.openDropdownMenu(focused);
+                                _dropdown.openDropdownMenu(focused);
                                 break;
 
                             case 27:
-                                that.closeDropdownMenus();
+                                _dropdown.closeDropdownMenus();
                                 break;
                         }
-                    } else if (focused.is('.dropdown')) {
-
-                        menu = focused.parent().parent();
+                    } else if (focused.is('.dropdown-menu')) {
+                        // Key handlers for when the menu itself has focus, before an item within it receives focus
+                        menu = focused.closest('.dropdown-menu');
 
                         switch(keyCode) {
                             case 40:
-                                that.focusFirstItem(menu);
-                                return false;
+                                _dropdown.focusFirstItem(menu);
                                 break;
 
                             case 27:
-                                that.closeDropdownMenus();
+                                _dropdown.closeDropdownMenus();
                                 break;
                         }
                     } else {
@@ -117,7 +113,6 @@ var edx = edx || {},
 
             previousMenuItemLink: function(focused, menu) {
                 var items = menu.children('.dropdown-item').find('.action'),
-                    items_count = items.length - 1,
                     index = items.index(focused),
                     prev = index - 1;
 
@@ -146,53 +141,50 @@ var edx = edx || {},
             },
 
             closeDropdownMenu: function() {
-                var that = _dropdown;
-                    open = that.opts.page.find(that.opts.menu).not(':focus');
+                var open = _dropdown.opts.page.find(_dropdown.opts.menu).not(':focus');
 
                 if (open) {
                     open
-                        .removeClass(that.opts.menu_active)
-                        .addClass(that.opts.menu_inactive);
+                        .removeClass(_dropdown.opts.menu_active)
+                        .addClass(_dropdown.opts.menu_inactive);
 
                     open.parent()
-                        .find(that.opts.button)
-                        .removeClass(that.opts.button_active)
+                        .find(_dropdown.opts.button)
+                        .removeClass(_dropdown.opts.button_active)
                         .attr('aria-expanded', 'false');
                 }
             },
 
             closeDropdownMenus: function() {
-                var that = _dropdown;
-                    open = that.opts.page.find(that.opts.menu);
+                var open = _dropdown.opts.page.find(_dropdown.opts.menu);
 
                 if (open) {
                     open
-                        .removeClass(that.opts.menu_active)
-                        .addClass(that.opts.menu_inactive);
+                        .removeClass(_dropdown.opts.menu_active)
+                        .addClass(_dropdown.opts.menu_inactive);
 
                     open.parent()
-                        .find(that.opts.button)
-                        .removeClass(that.opts.button_active)
+                        .find(_dropdown.opts.button)
+                        .removeClass(_dropdown.opts.button_active)
                         .attr('aria-expanded', 'false');
                 }
             },
 
             openDropdownMenu: function(el) {
-                var that = _dropdown,
-                    menu = el.parent().find(that.opts.menu);
+                var menu = el.parent().find(_dropdown.opts.menu);
 
-                if (menu.hasClass(that.opts.menu_active)) {
+                if (menu.hasClass(_dropdown.opts.menu_active)) {
                     return false;
                 } else {
-                    el.addClass(that.opts.button_active)
+                    el.addClass(_dropdown.opts.button_active)
                         .attr('aria-expanded', 'true');
 
                     menu
-                        .removeClass(that.opts.menu_inactive)
-                        .addClass(that.opts.menu_active);
+                        .removeClass(_dropdown.opts.menu_inactive)
+                        .addClass(_dropdown.opts.menu_active);
 
-                    that.setFocus(menu);
-                    that.setOrientation(el);
+                    _dropdown.setFocus(menu);
+                    _dropdown.setOrientation(el);
                 }
             },
 
@@ -204,18 +196,17 @@ var edx = edx || {},
             },
 
             setOrientation: function(el) {
-                var that = _dropdown;
 
-                el.parent().find(that.opts.menu)
-                    .removeClass(that.opts.menu_align + 'left')
-                    .removeClass(that.opts.menu_align + 'right');
+                el.parent().find(_dropdown.opts.menu)
+                    .removeClass(_dropdown.opts.menu_align + 'left')
+                    .removeClass(_dropdown.opts.menu_align + 'right');
 
-                if (el.offset().left > that.opts.midpoint) {
-                    el.parent().find(that.opts.menu)
-                        .addClass(that.opts.menu_align + 'right');
+                if (el.offset().left > _dropdown.opts.midpoint) {
+                    el.parent().find(_dropdown.opts.menu)
+                        .addClass(_dropdown.opts.menu_align + 'right');
                 } else {
-                    el.parent().find(that.opts.menu)
-                        .addClass(that.opts.menu_align + 'left');
+                    el.parent().find(_dropdown.opts.menu)
+                        .addClass(_dropdown.opts.menu_align + 'left');
                 }
             }
 

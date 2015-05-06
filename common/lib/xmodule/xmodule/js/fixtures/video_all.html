@@ -71,16 +71,24 @@
 
         <ul class="wrapper-downloads">
           <li class="video-tracks">
-            <div class="a11y-menu-container">
-                <a class="a11y-menu-button" href="#" title=".srt">.srt</a>
-                <ol class="a11y-menu-list">
-                  <li class="a11y-menu-item">
-                    <a class="a11y-menu-item-link" href="#txt" title="Text (.txt) file" data-value="txt">Text (.txt) file</a>
-                  </li>
-                  <li class="a11y-menu-item active">
-                    <a class="a11y-menu-item-link" href="#srt" title="SubRip (.srt) file" data-value="srt">SubRip (.srt) file</a>
-                  </li>
-                </ol>
+            <div class="wrapper-more-actions">
+              <button type="button" class="button button-more has-dropdown" aria-haspopup="true" aria-expanded="false" aria-controls="dropdown-transcript-format" aria-disabled="false">
+                <span class="icon fa fa-sort-desc" aria-hidden="true"></span>
+                <span class="sr">Transcript download format</span>
+              </button>
+              <ul class="dropdown-menu is-hidden" id="dropdown-transcript-format" tabindex="-1">
+                <li class="dropdown-item is-active">
+                  <a class="action" href="#srt" title="SubRip (.srt) file" data-value="srt" aria-disabled="false">
+                    SubRip (.srt) file
+                  </a>
+                </li>
+                <li class="dropdown-item">
+                  <a class="action" href="#txt" title="Text (.txt) file" data-value="txt" aria-disabled="false">
+                    Text (.txt) file
+                  </a>
+                </li>
+              </ul>
+              <a class="download-link" href="/courses/edX/DemoX/Demo_Course/xblock/i4x:;_;_edX;_DemoX;_video;_0b9e39477cf34507a7a48f74be381fdd/handler/transcript/download">Download transcript (.txt)</a>
             </div>
           </li>
         </ul>

@@ -51,11 +51,10 @@ div.video {
       > a {
         @include transition(all $tmg-f2 ease-in-out 0s);
         @include font-size(14);
-        line-height : 14px;
-        float: left;
+        @include float(left);
         border-radius: 3px;
         background-color: $very-light-text;
-        padding: ($baseline*0.65);
+        padding: ($baseline/1.5);
         color: $lighter-base-font-color;
 
         &:hover, &:focus {
@@ -65,8 +64,24 @@ div.video {
       }
 
       .button-more {
+        @include font-size(12);
+        padding: ($baseline/1.5);
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
+      }
+
+      .dropdown-menu {
+
+        .dropdown-item {
+
+          .action {
+
+            &:hover,
+            &:focus {
+              text-decoration: underline !important; // Because the _base styles for a:hover/focus has important :(
+            }
+          }
+        }
       }
     }
     .video-tracks {

@@ -279,3 +279,120 @@
     opacity: 0;
   }
 }
+
+// fade in  animation
+%anim-fadeIn {
+  @include animation(fade-in-animation $tmg-f2);
+}
+
+// +Fade Out - Extend
+// ==================== 
+// fade out keyframes
+@include keyframes(fadeOut) { 
+  0% {
+    opacity: 1.0;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 0.0;
+  }
+}
+
+// fade out animation
+%anim-fadeOut {
+  @include animation(fadeOut $tmg-f2 linear 1);
+}
+
+// +Rotate Up - Extend
+// ==================== 
+// rotate up keyframes
+@include keyframes(rotateUp) {
+  0% {
+    @include transform(rotate(0deg));
+  }
+
+  50% {
+    @include transform(rotate(-90deg));
+  }
+
+  100% {
+    @include transform(rotate(-180deg));
+  }
+}
+
+// rotate up animation
+%anim-rotateUp {
+  @include animation(rotateUp $tmg-f2 ease-in-out 1);
+}
+
+
+// +Rotate Down - Extend
+// ====================
+// rotate down keyframes
+@include keyframes(rotateDown) {
+  0% {
+    @include transform(rotate(0deg));
+  }
+
+  50% {
+    @include transform(rotate(90deg));
+  }
+
+  100% {
+    @include transform(rotate(180deg));
+  }
+}
+
+// rotate down animation
+%anim-rotateDown {
+  @include animation(rotateDown $tmg-f2 ease-in-out 1);
+}
+
+
+// +Rotate Clockwise - Extend
+// ====================
+// rotate clockwise keyframes
+@include keyframes(rotateCW) {
+  0% {
+    @include transform(rotate(0deg));
+  }
+
+  50% {
+    @include transform(rotate(180deg));
+  }
+
+  100% {
+    @include transform(rotate(360deg));
+  }
+}
+
+// rotate clockwise animation
+%anim-rotateCW {
+  @include animation(rotateCW $tmg-s1 linear infinite);
+}
+
+// +Rotate Clockwise - Extend
+// ====================
+// rotate clockwise keyframes
+@include keyframes(rotateCCW) {
+  0% {
+    @include transform(rotate(0deg));
+  }
+
+  50% {
+    @include transform(rotate(-180deg));
+  }
+
+  100% {
+    @include transform(rotate(-360deg));
+  }
+}
+
+// rotate clockwise animation
+%anim-rotateCCW {
+  @include animation(rotateCCW $tmg-s1 linear infinite);
+}
