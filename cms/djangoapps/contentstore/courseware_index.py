@@ -176,7 +176,8 @@ class SearchIndexerBase(object):
                 skip_child_index = skip_index or \
                     (triggered_at is not None and (triggered_at - item.subtree_edited_on) > reindex_age)
                 for child_item in item.get_children():
-                    index_item(child_item, skip_index=skip_child_index)
+                    if modulestore.has_published_version(child_item):
+                        index_item(child_item, skip_index=skip_child_index)
 
             if skip_index or not item_index_dictionary:
                 return
