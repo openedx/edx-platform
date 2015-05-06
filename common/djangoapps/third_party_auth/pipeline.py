@@ -218,7 +218,7 @@ def get(request):
     return request.session.get('partial_pipeline')
 
 
-def get_authenticated_user(username, backend_name):
+def get_authenticated_user(provider, username, uid):
     """Gets a saved user authenticated by a particular backend.
 
     Between pipeline steps User objects are not saved. We need to reconstitute
@@ -227,26 +227,26 @@ def get_authenticated_user(username, backend_name):
     authenticate().
 
     Args:
+        provider: the third_party_auth provider in use for the current pipeline.
         username: string. Username of user to get.
-        backend_name: string. The name of the third-party auth backend from
-            the running pipeline.
+        uid: string. The user ID according to the third party.
 
     Returns:
         User if user is found and has a social auth from the passed
-        backend_name.
+        provider.
 
     Raises:
         User.DoesNotExist: if no user matching user is found, or the matching
         user has no social auth associated with the given backend.
         AssertionError: if the user is not authenticated.
     """
-    user = models.DjangoStorage.user.user_model().objects.get(username=username)
-    match = models.DjangoStorage.user.get_social_auth_for_user(user, provider=backend_name)
+    match = models.DjangoStorage.user.get_social_auth(provider=provider.BACKEND_CLASS.name, uid=uid)
 
-    if not match:
+    if not match or match.user.username != username:
         raise User.DoesNotExist
 
-    user.backend = provider.Registry.get_by_backend_name(backend_name).get_authentication_backend()
+    user = match.user
+    user.backend = provider.get_authentication_backend()
     return user
 
 
@@ -301,9 +301,7 @@ def get_complete_url(backend_name):
     Raises:
         ValueError: if no provider is enabled with the given backend_name.
     """
-    enabled_provider = provider.Registry.get_by_backend_name(backend_name)
-
-    if not enabled_provider:
+    if not any(provider.Registry.get_enabled_by_backend_name(backend_name)):
         raise ValueError('Provider with backend %s not enabled' % backend_name)
 
     return _get_url('social:complete', backend_name)
@@ -379,7 +377,7 @@ def get_duplicate_provider(messages):
     unfortunately not in a reusable constant.
 
     Returns:
-        provider.BaseProvider child instance. The provider of the duplicate
+        string name of the python-social-auth backend that has the duplicate
         account, or None if there is no duplicate (and hence no error).
     """
     social_auth_messages = [m for m in messages if m.message.endswith('is already in use.')]
@@ -388,7 +386,8 @@ def get_duplicate_provider(messages):
         return
 
     assert len(social_auth_messages) == 1
-    return provider.Registry.get_by_backend_name(social_auth_messages[0].extra_tags.split()[1])
+    backend_name = social_auth_messages[0].extra_tags.split()[1]
+    return backend_name
 
 
 def get_provider_user_states(user):
@@ -401,15 +400,13 @@ def get_provider_user_states(user):
         List of ProviderUserState. The list of states of a user's account with
             each enabled provider.
     """
-    # TODO: Fix this method to search by provider name, not backend name
     states = []
-    found_user_backends = [
-        social_auth.provider for social_auth in models.DjangoStorage.user.get_social_auth_for_user(user)
-    ]
+    found_user_auths = list(models.DjangoStorage.user.get_social_auth_for_user(user))
 
     for enabled_provider in provider.Registry.enabled():
+        is_connected = any(enabled_provider.match_social_auth(auth) for auth in found_user_auths)
         states.append(
-            ProviderUserState(enabled_provider, user, enabled_provider.BACKEND_CLASS.name in found_user_backends)
+            ProviderUserState(enabled_provider, user, is_connected)
         )
 
     return states

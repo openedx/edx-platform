@@ -116,6 +116,16 @@ class BaseProvider(object):
         """ Get a dict of GET parameters to append to login links for this provider """
         return {}
 
+    @classmethod
+    def is_active_for_pipeline(cls, pipeline):
+        """ Is this provider being used for the specified pipeline? """
+        return cls.BACKEND_CLASS.name == pipeline['backend']
+
+    @classmethod
+    def match_social_auth(cls, social_auth):
+        """ Is this provider being used for this UserSocialAuth entry? """
+        return cls.BACKEND_CLASS.name == social_auth.provider
+
 
 class GoogleOauth2(BaseProvider):
     """Provider for Google's Oauth2 auth system."""
@@ -163,6 +173,19 @@ class SAMLProviderMixin(object):
         """ Get a dict of GET parameters to append to login links for this provider """
         return {'idp': cls.IDP["id"]}
 
+    @classmethod
+    def is_active_for_pipeline(cls, pipeline):
+        """ Is this provider being used for the specified pipeline? """
+        if cls.BACKEND_CLASS.name == pipeline['backend']:
+            idp_name = pipeline['kwargs']['response']['idp_name']
+            return cls.IDP["id"] == idp_name
+
+    @classmethod
+    def match_social_auth(cls, social_auth):
+        """ Is this provider being used for this UserSocialAuth entry? """
+        prefix = cls.IDP["id"] + ":"
+        return cls.BACKEND_CLASS.name == social_auth.provider and social_auth.uid.startswith(prefix)
+
 
 class TestShibAProvider(SAMLProviderMixin, BaseProvider):
     """ Provider for testshib.org public Shibboleth test server. """
@@ -196,6 +219,18 @@ class TestShibAProvider(SAMLProviderMixin, BaseProvider):
             Geka8nz8JjwxpUjAiSWYKLtJhGEaTqCYxCCX2Dw+dOTqUzHOZ7WKv4JXPK5G/Uhr
             8K/qhmFT2nIQi538n6rVYLeWj8Bbnl+ev0peYzxFyF5sQA==
         """
+    }
+
+
+class TestShibBProvider(SAMLProviderMixin, BaseProvider):
+    """ Provider for testshib.org public Shibboleth test server. """
+    NAME = 'TestShib B'
+    IDP = {
+        "id": "testshibB",  # Required slug
+        "entity_id": "https://idp.testshib.org/idp/shibboleth",
+        "url": "https://IDP.TESTSHIB.ORG/idp/profile/SAML2/Redirect/SSO",
+        "attr_email": OID_EDU_PERSON_PRINCIPAL_NAME,
+        "x509cert": TestShibAProvider.IDP["x509cert"],
     }
 
 
@@ -264,13 +299,30 @@ class Registry(object):
         return cls._ENABLED.get(provider_name)
 
     @classmethod
-    def get_by_backend_name(cls, backend_name):
-        """Gets provider (or None) by backend name.
+    def get_from_pipeline(cls, running_pipeline):
+        """Gets the provider that is being used for the specified pipeline (or None).
 
         Args:
-            backend_name: string. The python-social-auth
-                backends.base.BaseAuth.name (for example, 'google-oauth2') to
-                try and get a provider for.
+            running_pipeline: The python-social-auth pipeline being used to
+                authenticate a user.
+
+        Raises:
+            RuntimeError: if the registry has not been configured.
+        """
+        cls._check_configured()
+        for enabled in cls._ENABLED.values():
+            if enabled.is_active_for_pipeline(running_pipeline):
+                return enabled
+
+
+    @classmethod
+    def get_enabled_by_backend_name(cls, backend_name):
+        """Generator returning all enabled providers that use the specified
+        backend.
+
+        Args:
+            backend_name: The name of a python-social-auth backend used by
+                one or more providers.
 
         Raises:
             RuntimeError: if the registry has not been configured.
@@ -278,7 +330,8 @@ class Registry(object):
         cls._check_configured()
         for enabled in cls._ENABLED.values():
             if enabled.BACKEND_CLASS.name == backend_name:
-                return enabled
+                yield enabled
+
 
     @classmethod
     def _reset(cls):

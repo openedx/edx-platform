@@ -1,5 +1,6 @@
 """Unit tests for provider.py."""
 
+from mock import Mock
 from third_party_auth import provider
 from third_party_auth.tests import testutil
 
@@ -67,16 +68,22 @@ class RegistryTest(testutil.TestCase):
         provider.Registry.configure_once([])
         self.assertIsNone(provider.Registry.get(provider.LinkedInOauth2.NAME))
 
-    def test_get_by_backend_name_raises_runtime_error_if_not_configured(self):
-        with self.assertRaisesRegexp(RuntimeError, '^.*not configured$'):
-            provider.Registry.get_by_backend_name('')
-
-    def test_get_by_backend_name_returns_enabled_provider(self):
-        provider.Registry.configure_once([provider.GoogleOauth2.NAME])
-        self.assertIs(
-            provider.GoogleOauth2,
-            provider.Registry.get_by_backend_name(provider.GoogleOauth2.BACKEND_CLASS.name))
-
-    def test_get_by_backend_name_returns_none_if_provider_not_enabled(self):
+    def test_get_from_pipeline_returns_none_if_provider_not_enabled(self):
         provider.Registry.configure_once([])
-        self.assertIsNone(provider.Registry.get_by_backend_name(provider.GoogleOauth2.BACKEND_CLASS.name))
+        self.assertIsNone(provider.Registry.get_from_pipeline(Mock()))
+
+    def test_get_enabled_by_backend_name_raises_runtime_error_if_not_configured(self):
+        with self.assertRaisesRegexp(RuntimeError, '^.*not configured$'):
+            provider.Registry.get_enabled_by_backend_name('').next()
+
+    def test_get_enabled_by_backend_name_returns_enabled_provider(self):
+        provider.Registry.configure_once([provider.GoogleOauth2.NAME])
+        found = list(provider.Registry.get_enabled_by_backend_name(provider.GoogleOauth2.BACKEND_CLASS.name))
+        self.assertEqual(found, [provider.GoogleOauth2])
+
+    def test_get_enabled_by_backend_name_returns_none_if_provider_not_enabled(self):
+        provider.Registry.configure_once([])
+        self.assertEqual(
+            [],
+            list(provider.Registry.get_enabled_by_backend_name(provider.GoogleOauth2.BACKEND_CLASS.name))
+        )

@@ -41,16 +41,16 @@ class GetAuthenticatedUserTestCase(TestCase):
 
     def test_raises_does_not_exist_if_user_missing(self):
         with self.assertRaises(models.User.DoesNotExist):
-            pipeline.get_authenticated_user('new_' + self.user.username, 'backend')
+            pipeline.get_authenticated_user(self.enabled_provider, 'new_' + self.user.username, 'user@example.com')
 
     def test_raises_does_not_exist_if_user_found_but_no_association(self):
         backend_name = 'backend'
 
         self.assertIsNotNone(self.get_by_username(self.user.username))
-        self.assertIsNone(provider.Registry.get_by_backend_name(backend_name))
+        self.assertFalse(any(provider.Registry.get_enabled_by_backend_name(backend_name)))
 
         with self.assertRaises(models.User.DoesNotExist):
-            pipeline.get_authenticated_user(self.user.username, 'backend')
+            pipeline.get_authenticated_user(self.enabled_provider, self.user.username, 'user@example.com')
 
     def test_raises_does_not_exist_if_user_and_association_found_but_no_match(self):
         self.assertIsNotNone(self.get_by_username(self.user.username))
@@ -58,11 +58,11 @@ class GetAuthenticatedUserTestCase(TestCase):
             self.user, 'uid', 'other_' + self.enabled_provider.BACKEND_CLASS.name)
 
         with self.assertRaises(models.User.DoesNotExist):
-            pipeline.get_authenticated_user(self.user.username, self.enabled_provider.BACKEND_CLASS.name)
+            pipeline.get_authenticated_user(self.enabled_provider, self.user.username, 'uid')
 
     def test_returns_user_with_is_authenticated_and_backend_set_if_match(self):
         social_models.DjangoStorage.user.create_social_auth(self.user, 'uid', self.enabled_provider.BACKEND_CLASS.name)
-        user = pipeline.get_authenticated_user(self.user.username, self.enabled_provider.BACKEND_CLASS.name)
+        user = pipeline.get_authenticated_user(self.enabled_provider, self.user.username, 'uid')
 
         self.assertEqual(self.user, user)
         self.assertEqual(self.enabled_provider.get_authentication_backend(), user.backend)
