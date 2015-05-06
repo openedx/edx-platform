@@ -577,7 +577,6 @@ class VideoTranscriptsMixin(object):
 
         return translations
 
-
     def get_transcript(self, transcript_format='srt', lang=None, bumper=False):
         """
         Returns transcript, filename and MIME type.

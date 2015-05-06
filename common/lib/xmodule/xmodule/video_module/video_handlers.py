@@ -217,12 +217,12 @@ class VideoStudentViewHandlers(object):
                     Returns list of languages, for which transcript files exist.
                     For 'en' check if SJSON exists. For non-`en` check if SRT file exists.
         """
-        bumper=False
+        bumper = False
         if dispatch.startswith('translation'):
             if dispatch.startswith('translation_bumper'):
                 # if we here, then bumper is available,
                 self.bumper_transcripts = getattr(self, 'video_bumper')['transcripts']
-                bumper=True
+                bumper = True
                 language = dispatch.replace('translation_bumper', '').strip('/')
 
             else:
@@ -278,7 +278,7 @@ class VideoStudentViewHandlers(object):
             if dispatch.startswith('available_translations_bumper'):
                 # if we here, then bumper is available,
                 self.bumper_transcripts = getattr(self, 'video_bumper')['transcripts']
-                bumper=True
+                bumper = True
             available_translations = self.available_translations(bumper=bumper)
             if available_translations:
                 response = Response(json.dumps(available_translations))
@@ -290,6 +290,7 @@ class VideoStudentViewHandlers(object):
             response = Response(status=404)
 
         return response
+
 
 class VideoStudioViewHandlers(object):
     """

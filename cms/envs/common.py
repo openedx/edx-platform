@@ -161,7 +161,7 @@ FEATURES = {
     'ENABLE_VIDEO_BUMPER': False,
 
     # How many seconds to show the bumper again, default is 7 days:
-    'SHOW_BUMPER_PERIODICITY' : 7 * 24 * 3600,
+    'SHOW_BUMPER_PERIODICITY': 7 * 24 * 3600,
 
 }
 

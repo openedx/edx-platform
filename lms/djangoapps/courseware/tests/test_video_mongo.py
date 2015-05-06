@@ -1109,11 +1109,10 @@ class TestVideoWithBumper(TestVideo):
                 "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript', 'translation_bumper'
                 ).rstrip('/?'),
-                "transcriptAvailableTranslationsUrl":
-                self.item_descriptor.xmodule_runtime.handler_url(
+                "transcriptAvailableTranslationsUrl": self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript', 'available_translations_bumper'
                 ).rstrip('/?')
-             })),
+            })),
             'cdn_eval': False,
             'cdn_exp_group': None,
             'display_name': u'A Name',

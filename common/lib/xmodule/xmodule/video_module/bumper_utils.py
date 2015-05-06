@@ -23,6 +23,7 @@ def get_bumper_settings(video):
     """
     return getattr(video, 'video_bumper', {})
 
+
 def is_bumper_enabled(video):
     """
     Check if bumper enabled.
@@ -38,8 +39,10 @@ def is_bumper_enabled(video):
     date_last_view_bumper = getattr(video, 'date_last_view_bumper', None)
     utc_now = datetime.utcnow().replace(tzinfo=pytz.utc)
     periodicity = settings.FEATURES.get('SHOW_BUMPER_PERIODICITY', 0)
-    has_viewed = getattr(video, 'do_not_show_again_bumper') or \
-                 (date_last_view_bumper and date_last_view_bumper + timedelta(seconds=periodicity) > utc_now)
+    has_viewed = any([
+        getattr(video, 'do_not_show_again_bumper'),
+        (date_last_view_bumper and date_last_view_bumper + timedelta(seconds=periodicity) > utc_now)
+    ])
     return bool(
         settings.FEATURES.get('ENABLE_VIDEO_BUMPER') and
         get_bumper_settings(video) and
