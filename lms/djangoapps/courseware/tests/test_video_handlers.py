@@ -6,6 +6,7 @@ import freezegun
 import tempfile
 import textwrap
 import json
+import ddt
 
 from datetime import timedelta, datetime
 from webob import Request
@@ -359,6 +360,14 @@ class TestTranscriptDownloadDispatch(TestVideo):
         self.assertEqual(response.headers['Content-Disposition'], 'attachment; filename="塞.srt"')
 
 
+def attach_sub(item, filename):
+    item.sub = filename
+
+def attach_bumper_transcript(item, filename, lang="en"):
+    return lambda: item.video_bumper["transcripts"][lang] = filename
+
+
+@ddt.ddt
 class TestTranscriptTranslationGetDispatch(TestVideo):
     """
     Test video handler that provide translation transcripts.
@@ -385,37 +394,41 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         super(TestTranscriptTranslationGetDispatch, self).setUp()
         self.item_descriptor.render(STUDENT_VIEW)
         self.item = self.item_descriptor.xmodule_runtime.xmodule_instance
+        self.item.video_bumper = {"transcripts": {"en": ""}}
 
-    def test_translation_fails(self):
+    @ddt.data(
         # No language
-        request = Request.blank('/translation')
-        response = self.item.transcript(request=request, dispatch='translation')
-        self.assertEqual(response.status, '400 Bad Request')
-
+        ('/translation', 'translation', '400 Bad Request'),
         # No videoId - HTML5 video with language that is not in available languages
-        request = Request.blank('/translation/ru')
-        response = self.item.transcript(request=request, dispatch='translation/ru')
-        self.assertEqual(response.status, '404 Not Found')
-
+        ('/translation/ru', 'translation/ru', '404 Not Found'),
         # Language is not in available languages
-        request = Request.blank('/translation/ru?videoId=12345')
-        response = self.item.transcript(request=request, dispatch='translation/ru')
-        self.assertEqual(response.status, '404 Not Found')
-
+        ('/translation/ru?videoId=12345', 'translation/ru', '404 Not Found'),
         # Youtube_id is invalid or does not exist
-        request = Request.blank('/translation/uk?videoId=9855256955511225')
-        response = self.item.transcript(request=request, dispatch='translation/uk')
-        self.assertEqual(response.status, '404 Not Found')
+        ('/translation/uk?videoId=9855256955511225', 'translation/uk', '404 Not Found'),
+        ('/translation_bumper', 'translation_bumper', '400 Bad Request'),
+        ('/translation_bumper/ru', 'translation_bumper/ru', '404 Not Found'),
+        ('/translation_bumper/ru?videoId=12345', 'translation_bumper/ru', '404 Not Found'),
+        ('/translation_bumper/uk?videoId=9855256955511225', 'translation_bumper/uk', '404 Not Found'),
+    )
+    @ddt.unpack
+    def test_translation_fails(self, url, dispatch, status_code):
+        request = Request.blank(url)
+        response = self.item.transcript(request=request, dispatch=dispatch)
+        self.assertEqual(response.status, status_code)
 
-    def test_translaton_en_youtube_success(self):
+    @ddt.data(
+        ('translation/en', attach_sub),
+        ('translation_bumper/en', attach_bumper_transcript()))
+    @ddt.unpack
+    def test_translaton_en_youtube_success(self, dispatch, attach):
         subs = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
         good_sjson = _create_file(json.dumps(subs))
         _upload_sjson_file(good_sjson, self.item_descriptor.location)
         subs_id = _get_subs_id(good_sjson.name)
 
-        self.item.sub = subs_id
-        request = Request.blank('/translation/en?videoId={}'.format(subs_id))
-        response = self.item.transcript(request=request, dispatch='translation/en')
+        attach(self.item, subs_id)
+        request = Request.blank('/{}?videoId={}'.format(dispatch, subs_id))
+        response = self.item.transcript(request=request, dispatch=dispatch)
         self.assertDictEqual(json.loads(response.body), subs)
 
     def test_translation_non_en_youtube_success(self):
@@ -461,15 +474,19 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         }
         self.assertDictEqual(json.loads(response.body), calculated_1_5)
 
-    def test_translaton_en_html5_success(self):
+    @ddt.data(
+        ('translation/en', attach_sub),
+        ('translation_bumper/en', attach_bumper_transcript()))
+    @ddt.unpack
+    def test_translaton_en_html5_success(self, dispatch, attach):
         subs = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
         good_sjson = _create_file(json.dumps(subs))
         _upload_sjson_file(good_sjson, self.item_descriptor.location)
         subs_id = _get_subs_id(good_sjson.name)
 
-        self.item.sub = subs_id
-        request = Request.blank('/translation/en')
-        response = self.item.transcript(request=request, dispatch='translation/en')
+        attach(self.item, subs_id)
+        request = Request.blank(dispatch)
+        response = self.item.transcript(request=request, dispatch=dispatch)
         self.assertDictEqual(json.loads(response.body), subs)
 
     def test_translaton_non_en_html5_success(self):
