@@ -131,7 +131,7 @@ class VideoPage(PageObject):
     @property
     def is_poster_shown(self):
         """
-        Check that whether a poster is show.
+        Check whether a poster is show.
         """
         selector = self.get_element_selector(CSS_CLASS_NAMES['poster'])
         return self.q(css=selector).visible
