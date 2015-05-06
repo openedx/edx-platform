@@ -40,7 +40,7 @@ define([
             if (query) {
                 var data = {query: query, type: 'search_string'};
                 var queryModel = this.collection.getQueryModel();
-                if (queryModel) {
+                if (typeof queryModel !== 'undefined') {
                     this.collection.remove(queryModel);
                 }
                 this.addFilter(data);
@@ -95,7 +95,7 @@ define([
 
         getSearchTerm: function() {
             var queryModel = this.collection.getQueryModel();
-            if (queryModel) {
+            if (typeof queryModel !== 'undefined') {
                 return queryModel.get('query');
             }
             return '';
