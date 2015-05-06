@@ -45,13 +45,24 @@ def request_token(request):
     This token will be the same for all calls to `request_token`
     made on the same request object.
     """
+    # pylint: disable=protected-access
     if not hasattr(request, '_xblock_token'):
         request._xblock_token = uuid.uuid1().get_hex()
 
     return request._xblock_token
 
 
-def wrap_xblock(runtime_class, block, view, frag, context, usage_id_serializer, request_token, display_name_only=False, extra_data=None):  # pylint: disable=unused-argument
+def wrap_xblock(
+        runtime_class,
+        block,
+        view,
+        frag,
+        context,                        # pylint: disable=unused-argument
+        usage_id_serializer,
+        request_token,                  # pylint: disable=redefined-outer-name
+        display_name_only=False,
+        extra_data=None
+):
     """
     Wraps the results of rendering an XBlock view in a standard <section> with identifying
     data so that the appropriate javascript module can be loaded onto it.
@@ -181,13 +192,14 @@ def grade_histogram(module_id):
     from django.db import connection
     cursor = connection.cursor()
 
-    q = """SELECT courseware_studentmodule.grade,
-                  COUNT(courseware_studentmodule.student_id)
-    FROM courseware_studentmodule
-    WHERE courseware_studentmodule.module_id=%s
-    GROUP BY courseware_studentmodule.grade"""
+    query = """\
+        SELECT courseware_studentmodule.grade,
+        COUNT(courseware_studentmodule.student_id)
+        FROM courseware_studentmodule
+        WHERE courseware_studentmodule.module_id=%s
+        GROUP BY courseware_studentmodule.grade"""
     # Passing module_id this way prevents sql-injection.
-    cursor.execute(q, [module_id.to_deprecated_string()])
+    cursor.execute(query, [module_id.to_deprecated_string()])
 
     grades = list(cursor.fetchall())
     grades.sort(key=lambda x: x[0])  # Add ORDER BY to sql query?
@@ -218,7 +230,13 @@ def add_staff_markup(user, has_instructor_access, block, view, frag, context):  
             edit_link = "//" + settings.CMS_BASE + '/container/' + unicode(block.location)
 
             # return edit link in rendered HTML for display
-            return wrap_fragment(frag, render_to_string("edit_unit_link.html", {'frag_content': frag.content, 'edit_link': edit_link}))
+            return wrap_fragment(
+                frag,
+                render_to_string(
+                    "edit_unit_link.html",
+                    {'frag_content': frag.content, 'edit_link': edit_link}
+                )
+            )
         else:
             return frag
 
@@ -251,8 +269,9 @@ def add_staff_markup(user, has_instructor_access, block, view, frag, context):  
 
     source_file = block.source_file  # source used to generate the problem XML, eg latex or word
 
-    # useful to indicate to staff if problem has been released or not
-    # TODO (ichuang): use _has_access_descriptor.can_load in lms.courseware.access, instead of now>mstart comparison here
+    # Useful to indicate to staff if problem has been released or not.
+    # TODO (ichuang): use _has_access_descriptor.can_load in lms.courseware.access,
+    # instead of now>mstart comparison here.
     now = datetime.datetime.now(UTC())
     is_released = "unknown"
     mstart = block.start
@@ -268,24 +287,25 @@ def add_staff_markup(user, has_instructor_access, block, view, frag, context):  
             log.warning("Unable to read field in Staff Debug information", exc_info=True)
             field_contents.append((name, "WARNING: Unable to read field"))
 
-    staff_context = {'fields': field_contents,
-                     'xml_attributes': getattr(block, 'xml_attributes', {}),
-                     'location': block.location,
-                     'xqa_key': block.xqa_key,
-                     'source_file': source_file,
-                     'source_url': '%s/%s/tree/master/%s' % (giturl, data_dir, source_file),
-                     'category': str(block.__class__.__name__),
-                     # Template uses element_id in js function names, so can't allow dashes
-                     'element_id': block.location.html_id().replace('-', '_'),
-                     'edit_link': edit_link,
-                     'user': user,
-                     'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
-                     'histogram': json.dumps(histogram),
-                     'render_histogram': render_histogram,
-                     'block_content': frag.content,
-                     'is_released': is_released,
-                     'has_instructor_access': has_instructor_access,
-                     }
+    staff_context = {
+        'fields': field_contents,
+        'xml_attributes': getattr(block, 'xml_attributes', {}),
+        'location': block.location,
+        'xqa_key': block.xqa_key,
+        'source_file': source_file,
+        'source_url': '%s/%s/tree/master/%s' % (giturl, data_dir, source_file),
+        'category': str(block.__class__.__name__),
+        # Template uses element_id in js function names, so can't allow dashes
+        'element_id': block.location.html_id().replace('-', '_'),
+        'edit_link': edit_link,
+        'user': user,
+        'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
+        'histogram': json.dumps(histogram),
+        'render_histogram': render_histogram,
+        'block_content': frag.content,
+        'is_released': is_released,
+        'has_instructor_access': has_instructor_access,
+    }
     return wrap_fragment(frag, render_to_string("staff_problem_info.html", staff_context))
 
 
@@ -323,7 +343,7 @@ def get_course_update_items(course_updates, provided_index=0):
         # purely to handle free formed updates not done via editor. Actually kills them, but at least doesn't break.
         try:
             course_html_parsed = html.fromstring(course_updates.data)
-        except (etree.XMLSyntaxError, etree.ParserError):
+        except (etree.XMLSyntaxError, etree.ParserError):   # pylint: disable=no-member
             log.error("Cannot parse: " + course_updates.data)
             escaped = escape(course_updates.data)
             course_html_parsed = html.fromstring("<ol><li>" + escaped + "</li></ol>")
