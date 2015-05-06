@@ -13,20 +13,28 @@ define([
         totalCount: 0,
         latestModelsCount: 0,
         searchTerm: '',
+        facetList: {},
         page: 0,
         url: '/search/course_discovery/',
         fetchXhr: null,
 
-        performSearch: function (searchTerm) {
+        performSearch: function (searchTerm, facets) {
             this.fetchXhr && this.fetchXhr.abort();
             this.searchTerm = searchTerm || '';
+            this.facetList = facets || {};
+            var data = {
+                search_string: searchTerm,
+                page_size: this.pageSize,
+                page_index: 0
+            };
+            if(this.facetList.length > 0) {
+                this.facetList.each(function(facet) {
+                    data[facet.get('type')] = facet.get('query');
+                });
+            }
             this.resetState();
             this.fetchXhr = this.fetch({
-                data: {
-                    search_string: searchTerm,
-                    page_size: this.pageSize,
-                    page_index: 0
-                },
+                data: data,
                 type: 'POST',
                 success: function (self, xhr) {
                     self.trigger('search');
@@ -39,12 +47,16 @@ define([
 
         loadNextPage: function () {
             this.fetchXhr && this.fetchXhr.abort();
+            var data = {
+                search_string: searchTerm,
+                page_size: this.pageSize,
+                page_index: this.page + 1
+            };
+            this.facetList.each(function(facet) {
+                data[facet.type] = facet.query;
+            });
             this.fetchXhr = this.fetch({
-                data: {
-                    search_string: this.searchTerm,
-                    page_size: this.pageSize,
-                    page_index: this.page + 1
-                },
+                data: data,
                 type: 'POST',
                 success: function (self, xhr) {
                     self.page += 1;
