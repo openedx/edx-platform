@@ -11,6 +11,7 @@
         <button class="u-field-remove-button" type="button">
             <span class="remove-button-icon" aria-hidden="true"><%= removeButtonIcon %></span>
             <span class="remove-button-title" aria-live="polite"><%= removeButtonTitle %></span>
+            <span class="sr"><%= screenReaderTitle %></span>
         </button>
     </div>
 </div>
