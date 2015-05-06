@@ -290,7 +290,9 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'ytApiUrl': settings.YOUTUBE['API'],
             'ytTestUrl': settings.YOUTUBE['TEST_URL'],
             'transcriptTranslationUrl': self.runtime.handler_url(self, 'transcript', 'translation').rstrip('/?'),
-            'transcriptAvailableTranslationsUrl': self.runtime.handler_url(self, 'transcript', 'available_translations').rstrip('/?'),
+            'transcriptAvailableTranslationsUrl': self.runtime.handler_url(
+                self, 'transcript', 'available_translations'
+            ).rstrip('/?'),
 
             ## For now, the option "data-autohide-html5" is hard coded. This option
             ## either enables or disables autohiding of controls and captions on mouse

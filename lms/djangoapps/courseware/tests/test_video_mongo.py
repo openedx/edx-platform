@@ -10,7 +10,7 @@ from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from xmodule.video_module import create_youtube_string, VideoDescriptor, bumper_utils
+from xmodule.video_module import VideoDescriptor, bumper_utils
 from xmodule.x_module import STUDENT_VIEW
 from xmodule.tests.test_video import VideoDescriptorTestBase
 from xmodule.tests.test_import import DummySystem

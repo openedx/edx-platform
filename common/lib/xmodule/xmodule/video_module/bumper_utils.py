@@ -104,7 +104,9 @@ def get_bumper_sources(video):
         bumper_sources = filter(None, [val_video_urls[p] for p in val_profiles])
     except edxval_api.ValInternalError:
         # if no bumper sources, nothing will be showed
-        log.warning("Could not retrieve information from VAL for Bumper edx Video ID: %s.", video.bumper['edx_video_id'])
+        log.warning(
+            "Could not retrieve information from VAL for Bumper edx Video ID: %s.", video.bumper['edx_video_id']
+        )
         return []
 
     return bumper_sources
@@ -114,15 +116,19 @@ def bumper_metadata(video, sources):
     """
     Generate bumper metadata.
     """
-    unused_track_url, bumper_transcript_language, bumper_languages = video.get_transcripts_for_student(video.bumper['transcripts'], bumper=True)
+    unused_track_url, bumper_transcript_language, bumper_languages = video.get_transcripts_for_student(
+        video.bumper['transcripts'], bumper=True
+    )
 
-    bumper_metadata = OrderedDict({
+    metadata = OrderedDict({
         'sources': sources,
         'showCaptions': json.dumps(bool(video.bumper['transcripts'])),  # TODO: clarify - send it, Anton?
         'transcriptLanguage': bumper_transcript_language,
         'transcriptLanguages': bumper_languages,
         'transcriptTranslationUrl': video.runtime.handler_url(video, 'transcript', 'translation_bumper').rstrip('/?'),
-        'transcriptAvailableTranslationsUrl': video.runtime.handler_url(video, 'transcript', 'available_translations_bumper').rstrip('/?'),
+        'transcriptAvailableTranslationsUrl': video.runtime.handler_url(
+            video, 'transcript', 'available_translations_bumper'
+        ).rstrip('/?'),
     })
 
-    return bumper_metadata
+    return metadata

@@ -408,7 +408,7 @@ def generate_sjson_for_all_speeds(item, user_filename, result_subs_dict, lang):
     )
 
 
-def get_or_create_sjson(item, transcripts, bumper=False):
+def get_or_create_sjson(item, transcripts):
     """
     Get sjson if already exists, otherwise generate it.
 
