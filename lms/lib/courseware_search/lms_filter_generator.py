@@ -25,13 +25,13 @@ class LmsSearchFilterGenerator(SearchFilterGenerator):
                 course_key = CourseKey.from_string(kwargs['course_id'])
             except InvalidKeyError:
                 course_key = SlashSeparatedCourseKey.from_deprecated_string(kwargs['course_id'])
-
             staff_access = has_access(user, 'staff', course_key)
             if staff_access and 'request' in kwargs and kwargs['request']:
                 request = kwargs['request']
                 masquerade = setup_masquerade(request, course_key, staff_access)
-                if masquerade.role != 'staff':
-                    filter_dictionary['content_groups'] = masquerade.group_id
+                if masquerade:
+                    if masquerade.role != 'staff':
+                        filter_dictionary['content_groups'] = masquerade.group_id
             else:
                 cohorted_user_partition = get_cohorted_user_partition(course_key)
                 if cohorted_user_partition:
@@ -41,7 +41,6 @@ class LmsSearchFilterGenerator(SearchFilterGenerator):
                         cohorted_user_partition,
                     )
                     filter_dictionary['content_groups'] = unicode(partition_group.id) if partition_group else None
-
         return filter_dictionary
 
     def field_dictionary(self, **kwargs):

@@ -258,7 +258,7 @@ class CoursewareSearchCohortTest(ContainerBase):
         Test staff user can search all public content if cohorts used on course.
         """
         self._auto_auth(self.staff_user["username"], self.staff_user["email"], False)
-        self._goto_staff_page()
+        self._goto_staff_page().set_staff_view_mode('Staff')
         self.courseware_search_page.search_for_term(self.visible_to_all_html)
         assert self.visible_to_all_html in self.courseware_search_page.search_results.html[0]
         self.courseware_search_page.clear_search()
