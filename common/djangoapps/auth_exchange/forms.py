@@ -10,6 +10,7 @@ from provider.oauth2.forms import ScopeChoiceField, ScopeMixin
 from provider.oauth2.models import Client
 from requests import HTTPError
 from social.backends import oauth as social_oauth
+from social.exceptions import AuthException
 
 from third_party_auth import pipeline
 
@@ -54,7 +55,7 @@ class AccessTokenExchangeForm(ScopeMixin, OAuthForm):
         if self._errors:
             return {}
 
-        backend = self.request.social_strategy.backend
+        backend = self.request.backend
         if not isinstance(backend, social_oauth.BaseOAuth2):
             raise OAuthValidationError(
                 {
@@ -89,7 +90,7 @@ class AccessTokenExchangeForm(ScopeMixin, OAuthForm):
         user = None
         try:
             user = backend.do_auth(self.cleaned_data.get("access_token"))
-        except HTTPError:
+        except (HTTPError, AuthException):
             pass
         if user and isinstance(user, User):
             self.cleaned_data["user"] = user

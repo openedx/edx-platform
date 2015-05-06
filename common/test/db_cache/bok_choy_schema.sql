@@ -2236,59 +2236,6 @@ CREATE TABLE `shoppingcart_registrationcoderedemption` (
   CONSTRAINT `registration_code_id_refs_id_4d01e47b` FOREIGN KEY (`registration_code_id`) REFERENCES `shoppingcart_courseregistrationcode` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `social_auth_association`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `social_auth_association` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `server_url` varchar(255) NOT NULL,
-  `handle` varchar(255) NOT NULL,
-  `secret` varchar(255) NOT NULL,
-  `issued` int(11) NOT NULL,
-  `lifetime` int(11) NOT NULL,
-  `assoc_type` varchar(64) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `social_auth_code`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `social_auth_code` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `email` varchar(75) NOT NULL,
-  `code` varchar(32) NOT NULL,
-  `verified` tinyint(1) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`,`code`),
-  KEY `social_auth_code_65da3d2c` (`code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `social_auth_nonce`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `social_auth_nonce` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `server_url` varchar(255) NOT NULL,
-  `timestamp` int(11) NOT NULL,
-  `salt` varchar(65) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `social_auth_usersocialauth`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `social_auth_usersocialauth` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `provider` varchar(32) NOT NULL,
-  `uid` varchar(255) NOT NULL,
-  `extra_data` longtext NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `provider` (`provider`,`uid`),
-  KEY `social_auth_usersocialauth_fbfc09f1` (`user_id`),
-  CONSTRAINT `user_id_refs_id_60fa311b` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `south_migrationhistory`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
