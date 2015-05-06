@@ -140,7 +140,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         exception_middleware = middleware.ExceptionMiddleware()
         request, _ = self.get_request_and_strategy(auth_entry=auth_entry)
         response = exception_middleware.process_exception(
-            request, exceptions.AuthCanceled(request.social_strategy.backend))
+            request, exceptions.AuthCanceled(request.backend))
         location = response.get('Location')
 
         self.assertEqual(302, response.status_code)
@@ -161,7 +161,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         """
         _, strategy = self.get_request_and_strategy(
             auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
-        strategy.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+        strategy.request.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
         self.create_user_models_for_existing_account(
             strategy, email, password, self.get_username(), skip_social_auth=True)
 
@@ -239,7 +239,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
     def assert_redirect_to_dashboard_looks_correct(self, response):
         """Asserts a response would redirect to /dashboard."""
         self.assertEqual(302, response.status_code)
-        # pylint: disable-msg=protected-access
+        # pylint: disable=protected-access
         self.assertEqual(auth_settings._SOCIAL_AUTH_LOGIN_REDIRECT_URL, response.get('Location'))
 
     def assert_redirect_to_login_looks_correct(self, response):
@@ -287,7 +287,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         See student.views.register and student.views._do_create_account.
         """
         response_data = self.get_response_data()
-        uid = strategy.backend.get_user_id(response_data, response_data)
+        uid = strategy.request.backend.get_user_id(response_data, response_data)
         user = social_utils.Storage.user.create_user(email=email, password=password, username=username)
         profile = student_models.UserProfile(user=user)
         profile.save()
@@ -310,7 +310,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         args = ()
         kwargs = {
             'request': strategy.request,
-            'backend': strategy.backend,
+            'backend': strategy.request.backend,
             'user': None,
             'response': self.get_response_data(),
         }
@@ -355,8 +355,9 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         if auth_entry:
             request.session[pipeline.AUTH_ENTRY_KEY] = auth_entry
 
-        strategy = social_utils.load_strategy(backend=self.backend_name, redirect_uri=redirect_uri, request=request)
+        strategy = social_utils.load_strategy(request=request)
         request.social_strategy = strategy
+        request.backend = social_utils.load_backend(strategy, self.backend_name, redirect_uri)
 
         return request, strategy
 
@@ -404,7 +405,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # configure the backend, and mock out wire traffic.
         request, strategy = self.get_request_and_strategy(
             auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
-        strategy.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+        request.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
         pipeline.analytics.track = mock.MagicMock()
         request.user = self.create_user_models_for_existing_account(
             strategy, 'user@example.com', 'password', self.get_username(), skip_social_auth=True)
@@ -413,12 +414,12 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # expected state.
         self.client.get(
             pipeline.get_login_url(self.PROVIDER_CLASS.NAME, pipeline.AUTH_ENTRY_LOGIN))
-        actions.do_complete(strategy, social_views._do_login)  # pylint: disable-msg=protected-access
+        actions.do_complete(request.backend, social_views._do_login)  # pylint: disable=protected-access
 
         mako_middleware_process_request(strategy.request)
         student_views.signin_user(strategy.request)
         student_views.login_user(strategy.request)
-        actions.do_complete(strategy, social_views._do_login)  # pylint: disable-msg=protected-access
+        actions.do_complete(request.backend, social_views._do_login)  # pylint: disable=protected-access
 
         # First we expect that we're in the unlinked state, and that there
         # really is no association in the backend.
@@ -428,7 +429,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # We should be redirected back to the complete page, setting
         # the "logged in" cookie for the marketing site.
         self.assert_logged_in_cookie_redirect(actions.do_complete(
-            request.social_strategy, social_views._do_login, request.user, None,  # pylint: disable-msg=protected-access
+            request.backend, social_views._do_login, request.user, None,  # pylint: disable=protected-access
             redirect_field_name=auth.REDIRECT_FIELD_NAME
         ))
 
@@ -437,7 +438,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
 
         # Fire off the auth pipeline to link.
         self.assert_redirect_to_dashboard_looks_correct(actions.do_complete(
-            request.social_strategy, social_views._do_login, request.user, None,  # pylint: disable-msg=protected-access
+            request.backend, social_views._do_login, request.user, None,  # pylint: disable=protected-access
             redirect_field_name=auth.REDIRECT_FIELD_NAME))
 
         # Now we expect to be in the linked state, with a backend entry.
@@ -449,7 +450,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # configure the backend, and mock out wire traffic.
         request, strategy = self.get_request_and_strategy(
             auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
-        strategy.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+        request.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
         user = self.create_user_models_for_existing_account(
             strategy, 'user@example.com', 'password', self.get_username())
         self.assert_social_auth_exists_for_user(user, strategy)
@@ -461,12 +462,12 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # expected state.
         self.client.get(
             pipeline.get_login_url(self.PROVIDER_CLASS.NAME, pipeline.AUTH_ENTRY_LOGIN))
-        actions.do_complete(strategy, social_views._do_login)  # pylint: disable-msg=protected-access
+        actions.do_complete(request.backend, social_views._do_login)  # pylint: disable=protected-access
 
         mako_middleware_process_request(strategy.request)
         student_views.signin_user(strategy.request)
         student_views.login_user(strategy.request)
-        actions.do_complete(strategy, social_views._do_login, user=user)  # pylint: disable-msg=protected-access
+        actions.do_complete(request.backend, social_views._do_login, user=user)  # pylint: disable=protected-access
 
         # First we expect that we're in the linked state, with a backend entry.
         self.assert_account_settings_context_looks_correct(account_settings_context(request), user, linked=True)
@@ -474,7 +475,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
 
         # Fire off the disconnect pipeline to unlink.
         self.assert_redirect_to_dashboard_looks_correct(actions.do_disconnect(
-            request.social_strategy, request.user, None, redirect_field_name=auth.REDIRECT_FIELD_NAME))
+            request.backend, request.user, None, redirect_field_name=auth.REDIRECT_FIELD_NAME))
 
         # Now we expect to be in the unlinked state, with no backend entry.
         self.assert_account_settings_context_looks_correct(account_settings_context(request), user, linked=False)
@@ -490,7 +491,8 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         username = self.get_username()
         _, strategy = self.get_request_and_strategy(
             auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
-        strategy.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+        backend = strategy.request.backend
+        backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
         linked_user = self.create_user_models_for_existing_account(strategy, email, password, username)
         unlinked_user = social_utils.Storage.user.create_user(
             email='other_' + email, password=password, username='other_' + username)
@@ -499,7 +501,8 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.assert_social_auth_does_not_exist_for_user(unlinked_user, strategy)
 
         with self.assertRaises(exceptions.AuthAlreadyAssociated):
-            actions.do_complete(strategy, social_views._do_login, user=unlinked_user)  # pylint: disable-msg=protected-access
+            # pylint: disable=protected-access
+            actions.do_complete(backend, social_views._do_login, user=unlinked_user)
 
     def test_already_associated_exception_populates_dashboard_with_error(self):
         # Instrument the pipeline with an exception. We test that the
@@ -511,21 +514,21 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # that the duplicate error has no effect on the state of the controls.
         request, strategy = self.get_request_and_strategy(
             auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
-        strategy.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+        strategy.request.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
         user = self.create_user_models_for_existing_account(
             strategy, 'user@example.com', 'password', self.get_username())
         self.assert_social_auth_exists_for_user(user, strategy)
 
         self.client.get('/login')
         self.client.get(pipeline.get_login_url(self.PROVIDER_CLASS.NAME, pipeline.AUTH_ENTRY_LOGIN))
-        actions.do_complete(strategy, social_views._do_login)  # pylint: disable-msg=protected-access
+        actions.do_complete(request.backend, social_views._do_login)  # pylint: disable=protected-access
 
         mako_middleware_process_request(strategy.request)
         student_views.signin_user(strategy.request)
         student_views.login_user(strategy.request)
-        actions.do_complete(strategy, social_views._do_login, user=user)  # pylint: disable-msg=protected-access
+        actions.do_complete(request.backend, social_views._do_login, user=user)  # pylint: disable=protected-access
 
-        # Monkey-patch storage for messaging; pylint: disable-msg=protected-access
+        # Monkey-patch storage for messaging; pylint: disable=protected-access
         request._messages = fallback.FallbackStorage(request)
         middleware.ExceptionMiddleware().process_exception(
             request,
@@ -539,7 +542,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # configure the backend, and mock out wire traffic.
         request, strategy = self.get_request_and_strategy(
             auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
-        strategy.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+        strategy.request.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
         pipeline.analytics.track = mock.MagicMock()
         user = self.create_user_models_for_existing_account(
             strategy, 'user@example.com', 'password', self.get_username())
@@ -558,8 +561,8 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
 
         # Next, the provider makes a request against /auth/complete/<provider>
         # to resume the pipeline.
-        # pylint: disable-msg=protected-access
-        self.assert_redirect_to_login_looks_correct(actions.do_complete(strategy, social_views._do_login))
+        # pylint: disable=protected-access
+        self.assert_redirect_to_login_looks_correct(actions.do_complete(request.backend, social_views._do_login))
 
         mako_middleware_process_request(strategy.request)
         # At this point we know the pipeline has resumed correctly. Next we
@@ -574,7 +577,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # We should be redirected back to the complete page, setting
         # the "logged in" cookie for the marketing site.
         self.assert_logged_in_cookie_redirect(actions.do_complete(
-            request.social_strategy, social_views._do_login, request.user, None,  # pylint: disable-msg=protected-access
+            request.backend, social_views._do_login, request.user, None,  # pylint: disable=protected-access
             redirect_field_name=auth.REDIRECT_FIELD_NAME
         ))
 
@@ -582,13 +585,13 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.set_logged_in_cookie(request)
 
         self.assert_redirect_to_dashboard_looks_correct(
-            actions.do_complete(strategy, social_views._do_login, user=user))
+            actions.do_complete(request.backend, social_views._do_login, user=user))
         self.assert_account_settings_context_looks_correct(account_settings_context(request), user)
 
     def test_signin_fails_if_account_not_active(self):
         _, strategy = self.get_request_and_strategy(
             auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
-        strategy.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+        strategy.request.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
         user = self.create_user_models_for_existing_account(strategy, 'user@example.com', 'password', self.get_username())
 
         user.is_active = False
@@ -600,7 +603,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
     def test_signin_fails_if_no_account_associated(self):
         _, strategy = self.get_request_and_strategy(
             auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
-        strategy.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+        strategy.request.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
         self.create_user_models_for_existing_account(
             strategy, 'user@example.com', 'password', self.get_username(), skip_social_auth=True)
 
@@ -625,7 +628,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # Mock out wire traffic.
         request, strategy = self.get_request_and_strategy(
             auth_entry=pipeline.AUTH_ENTRY_REGISTER, redirect_uri='social:complete')
-        strategy.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+        strategy.request.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
 
         # Begin! Grab the registration page and check the login control on it.
         self.assert_register_response_before_pipeline_looks_correct(self.client.get('/register'))
@@ -637,8 +640,8 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
             pipeline.get_login_url(self.PROVIDER_CLASS.NAME, pipeline.AUTH_ENTRY_LOGIN)))
 
         # Next, the provider makes a request against /auth/complete/<provider>.
-        # pylint: disable-msg=protected-access
-        self.assert_redirect_to_register_looks_correct(actions.do_complete(strategy, social_views._do_login))
+        # pylint: disable=protected-access
+        self.assert_redirect_to_register_looks_correct(actions.do_complete(request.backend, social_views._do_login))
 
         mako_middleware_process_request(strategy.request)
         # At this point we know the pipeline has resumed correctly. Next we
@@ -675,7 +678,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # Since the user's account is not yet active, we should be redirected to /login
         self.assert_redirect_to_login_looks_correct(
             actions.do_complete(
-                request.social_strategy, social_views._do_login, request.user, None,  # pylint: disable-msg=protected-access
+                request.backend, social_views._do_login, request.user, None,  # pylint: disable=protected-access
                 redirect_field_name=auth.REDIRECT_FIELD_NAME
             )
         )
@@ -687,7 +690,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # Try again.  This time, we should be redirected back to the complete page, setting
         # the "logged in" cookie for the marketing site.
         self.assert_logged_in_cookie_redirect(actions.do_complete(
-            request.social_strategy, social_views._do_login, request.user, None,  # pylint: disable-msg=protected-access
+            request.backend, social_views._do_login, request.user, None,  # pylint: disable=protected-access
             redirect_field_name=auth.REDIRECT_FIELD_NAME
         ))
 
@@ -698,7 +701,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # and send the user to the dashboard, where the association will be
         # displayed.
         self.assert_redirect_to_dashboard_looks_correct(
-            actions.do_complete(strategy, social_views._do_login, user=created_user))
+            actions.do_complete(strategy.request.backend, social_views._do_login, user=created_user))
         self.assert_social_auth_exists_for_user(created_user, strategy)
         self.assert_account_settings_context_looks_correct(account_settings_context(request), created_user, linked=True)
 
@@ -710,18 +713,20 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # Create a colliding username in the backend, then proceed with
         # assignment via pipeline to make sure a distinct username is created.
         strategy.storage.user.create_user(username=self.get_username(), email='user@email.com', password='password')
-        strategy.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
-        # pylint: disable-msg=protected-access
-        self.assert_redirect_to_register_looks_correct(actions.do_complete(strategy, social_views._do_login))
+        backend = strategy.request.backend
+        backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+        # pylint: disable=protected-access
+        self.assert_redirect_to_register_looks_correct(actions.do_complete(backend, social_views._do_login))
         distinct_username = pipeline.get(request)['kwargs']['username']
         self.assertNotEqual(original_username, distinct_username)
 
     def test_new_account_registration_fails_if_email_exists(self):
         request, strategy = self.get_request_and_strategy(
             auth_entry=pipeline.AUTH_ENTRY_REGISTER, redirect_uri='social:complete')
-        strategy.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
-        # pylint: disable-msg=protected-access
-        self.assert_redirect_to_register_looks_correct(actions.do_complete(strategy, social_views._do_login))
+        backend = strategy.request.backend
+        backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+        # pylint: disable=protected-access
+        self.assert_redirect_to_register_looks_correct(actions.do_complete(backend, social_views._do_login))
 
         mako_middleware_process_request(strategy.request)
         self.assert_register_response_in_pipeline_looks_correct(
@@ -733,21 +738,21 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
 
     def test_pipeline_raises_auth_entry_error_if_auth_entry_invalid(self):
         auth_entry = 'invalid'
-        self.assertNotIn(auth_entry, pipeline._AUTH_ENTRY_CHOICES)  # pylint: disable-msg=protected-access
+        self.assertNotIn(auth_entry, pipeline._AUTH_ENTRY_CHOICES)  # pylint: disable=protected-access
 
         _, strategy = self.get_request_and_strategy(auth_entry=auth_entry, redirect_uri='social:complete')
 
         with self.assertRaises(pipeline.AuthEntryError):
-            strategy.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+            strategy.request.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
 
     def test_pipeline_raises_auth_entry_error_if_auth_entry_missing(self):
         _, strategy = self.get_request_and_strategy(auth_entry=None, redirect_uri='social:complete')
 
         with self.assertRaises(pipeline.AuthEntryError):
-            strategy.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+            strategy.request.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
 
 
-class Oauth2IntegrationTest(IntegrationTest):  # pylint: disable-msg=abstract-method
+class Oauth2IntegrationTest(IntegrationTest):  # pylint: disable=abstract-method
     """Base test case for integration tests of Oauth2 providers."""
 
     # Dict of string -> object. Information about the token granted to the
