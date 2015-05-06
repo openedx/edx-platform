@@ -10,7 +10,7 @@ from xmodule.x_module import XModuleMixin
 from opaque_keys.edx.locations import Location
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore.xml_importer import _import_module_and_update_references, _update_module_location
+from xmodule.modulestore.xml_importer import _update_and_import_module, _update_module_location
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.tests import DATA_DIR
@@ -145,7 +145,7 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
 
         # Move to different runtime w/ different course id
         target_location_namespace = SlashSeparatedCourseKey("org", "course", "run")
-        new_version = _import_module_and_update_references(
+        new_version = _update_and_import_module(
             self.xblock,
             modulestore(),
             999,
@@ -182,7 +182,7 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
 
         # Remap the namespace
         target_location_namespace = Location("org", "course", "run", "category", "stubxblock")
-        new_version = _import_module_and_update_references(
+        new_version = _update_and_import_module(
             self.xblock,
             modulestore(),
             999,
@@ -214,7 +214,7 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
 
         # Remap the namespace
         target_location_namespace = Location("org", "course", "run", "category", "stubxblock")
-        new_version = _import_module_and_update_references(
+        new_version = _update_and_import_module(
             self.xblock,
             modulestore(),
             999,
