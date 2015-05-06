@@ -12,9 +12,7 @@ Supported:
         - %%COURSE_END_DATE%% => end date of the course
 
 Usage:
-    KEYWORD_FUNCTION_MAP must be supplied in startup.py, so that it lives
-    above other modules in the dependency tree and acts like a global var.
-    Then we can call substitute_keywords_with_data where substitution is
+    Call substitute_keywords_with_data where substitution is
     needed. Currently called in:
         - LMS: Announcements + Bulk emails
         - CMS: Not called
@@ -22,7 +20,6 @@ Usage:
 
 from django.contrib.auth.models import User
 from student.models import anonymous_id_for_user
-from xmodule.modulestore.django import modulestore
 
 
 def anonymous_id_from_user_id(user_id):
