@@ -105,6 +105,7 @@ class VideoTimesTest(VideoBaseTest):
 
         self.assertIn(self.video.position, ('0:15', '0:16'))
 
+    @flaky  # TODO fix this, see TNL-1619
     def test_video_end_time_and_finish_time(self):
         """
         Scenario: Youtube video works after pausing at end time and then plays again from End Time to the end.
