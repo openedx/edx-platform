@@ -323,3 +323,118 @@
       margin-bottom: none;
     }
   }
+
+
+// ===================
+// Dropdown menus
+// ===================
+.wrapper-more-actions {
+    @include float(right);
+    @include margin-right(($baseline/2));
+    position: relative;
+    display: inline-block;
+
+    .button-more.has-dropdown {
+        @extend %ui-depth2;
+        @include transition(all, $tmg-f2);
+        position: relative;
+        padding: ($baseline/2);
+        border: 1px solid transparent;
+        background: $white;
+        box-shadow: none;
+        font-size: $body-font-size;
+        text-shadow: none; // Clears text shadows on all buttons
+        line-height: ($baseline/2);
+
+        .icon {
+            @include transition(all, $tmg-f2);
+            @include transform-origin(45% center); // odd first value to keep icons centered
+            color: $gray-l1;
+        }
+
+        &:hover,
+        &:focus {
+            border-color: $gray-l3;
+            background: $white;
+
+            .icon {
+                color: $gray-d3;
+            }
+        }
+
+        &.is-active {
+            @include border-bottom-left-radius(0);
+            @include border-bottom-right-radius(0);
+            border-bottom-width: 0;
+            border-color: $gray-l3;
+            background: $white;
+
+            .icon {
+                @include transform(rotate(-180deg));
+                color: $gray-d3;
+            }
+        }
+
+        & + .dropdown-menu {
+            @extend %ui-depth1;
+            @extend %ui-no-list;
+            @extend %anim-fadeIn;
+            @include border-top-left-radius(0);
+            @include border-top-right-radius(0);
+            position: absolute;
+            min-width: ($baseline*7.5);
+            max-width: ($baseline*12.5);
+            margin-top: -1px;
+            border: 1px solid $gray-l3;
+            border-radius: 3px;
+            background: $white;
+            box-shadow: 0 2px 2px rgba(0, 0, 0, .15);
+            font-size: $body-font-size;
+            text-indent: 0;
+
+            &.is-hidden {
+                @extend %text-sr;
+            }
+
+            &.align-left {
+                left: 0;
+
+                &.control-text-align {
+                    @include text-align(left);
+                }
+            }
+
+            &.align-right {
+                right: 0;
+
+                &.control-text-align {
+                    @include text-align(right);
+                }
+            }
+
+            .dropdown-item {
+                @extend %ui-no-list;
+                display: block;
+                margin: 0;
+                padding: 0;
+
+                .action {
+                    float: none; // Clears any set floats in menus, because there are some :(
+                    display: block;
+                    margin: 0; // Clears margins that may have been previously set
+                    padding: ($baseline/1.5);
+                    border-bottom: 1px solid $gray-l5;
+                    line-height: 1.25rem;
+                    text-align: inherit;
+                    color: $link-color;
+
+                    &:hover,
+                    &:focus {
+                        text-decoration: underline;
+                        color: inherit;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -92,7 +92,7 @@ site_status_msg = get_site_status_msg(course_id)
             <span class="icon fa fa-sort-desc" aria-hidden="true"></span>
             <span class="sr">${_('User options')}</span>
           </button>
-          <ul class="dropdown is-hidden" id="dropdown-profile" tabindex="-1">
+          <ul class="dropdown-menu is-hidden" id="dropdown-profile" tabindex="-1">
             <%block name="navigation_dropdown_menu_links" >
               <li class="dropdown-item"><a class="action" href="${reverse('account_settings')}">${_("Account Settings")}</a></li>
               <li class="dropdown-item"><a class="action" href="${reverse('learner_profile', kwargs={'username': user.username})}">${_("My Profile")}</a></li>

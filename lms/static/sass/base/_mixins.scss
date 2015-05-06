@@ -135,16 +135,6 @@
   width: 1px;
 }
 
-// extends - hidden el - screenreaders
-%block-sr {
-  clip: rect(1px 1px 1px 1px);
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-}
-
 // extends - UI - removes list styling/spacing when using uls, ols for navigation and less content-centric cases
 %ui-no-list {
   list-style: none;

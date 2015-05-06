@@ -63,13 +63,13 @@ function () {
         var container = state.el.find('li.video-tracks>.wrapper-more-actions'),
             downloadLink = container.parent().find('.download-link'),
             button = container.children('.button-more.has-dropdown'),
-            menuList = container.children('.dropdown'),
+            menuList = container.children('.dropdown-menu'),
             menuItems = menuList.children('.dropdown-item'),
             menuItemsLinks = menuItems.children('.action'),
             value = (function (val, activeElement) {
                 return val || activeElement.find('a').data('value') || 'srt';
-            }(state.videoAccessibleMenu.value, menuItems.filter('.active'))),
-            msg = '.' + value;
+            }(state.videoAccessibleMenu.value, menuItems.filter('.is-active'))),
+            transcript_filetype = '.' + value;
 
         $.extend(state.videoAccessibleMenu, {
             container: container,
@@ -81,8 +81,7 @@ function () {
 
         if (value) {
             state.videoAccessibleMenu.setValue(value);
-            // button.text(gettext(msg));
-            downloadLink.text(gettext('Download transcript (' + msg + ')'));
+            downloadLink.text(interpolate(gettext('Download transcript (%(transcript_filetype)s)?'), { transcript_filetype: transcript_filetype }, true));
         }
     }
 
@@ -204,13 +203,16 @@ function () {
             index = target.parent().index();
 
             switch (keyCode) {
+                // Scroll up menu, wrapping at the top. Keep menu open.
                 case KEY.UP:
                     _previousMenuItemLink(this.menuItemsLinks, index).focus();
                     break;
+                // Scroll down  menu, wrapping at the bottom. Keep menu open.
 
                 case KEY.DOWN:
                     _nextMenuItemLink(this.menuItemsLinks, index).focus();
                     break;
+                // Close menu.
 
                 case KEY.TAB:
                     _closeMenu(this);
@@ -219,6 +221,7 @@ function () {
                     // will give focus to Play/Pause button and tabbing
                     // forward to Volume button.
                     break;
+                // Close menu, give focus to button and change file type.
 
                 case KEY.ENTER:
                 case KEY.SPACE:
@@ -226,6 +229,7 @@ function () {
                     this.changeFileType.call(this, event);
                     _closeMenu(this);
                     break;
+                // Close menu and give focus to speed control.
 
                 case KEY.ESCAPE:
                     _closeMenu(this);
@@ -234,7 +238,7 @@ function () {
             }
             return false;
 
-        } else if(target.is('.has-dropdown')) {
+        } else if (target.is('.has-dropdown')) {
 
             switch(keyCode) {
                 case KEY.DOWN:
@@ -245,17 +249,20 @@ function () {
         } else {
 
             switch(keyCode) {
+                // Open menu and focus on last element of list above it.
                 case KEY.ENTER:
                 case KEY.SPACE:
                 case KEY.UP:
                     _openMenu(this);
                     this.menuItemsLinks.last().focus();
                     break;
+                // Close menu.
 
                 case KEY.ESCAPE:
                     _closeMenu(this);
                     break;
             }
+            // We do not stop propagation and default behavior on a TAB keypress.
             return event.keyCode === KEY.TAB;
         }
     }
@@ -278,11 +285,13 @@ function () {
     function _bindHandlers(state) {
         var menu = state.videoAccessibleMenu;
 
+        // Attach various events handlers to menu container.
         menu.container.on({
             'click': _toggleMenuHandler.bind(menu),
             'keydown': _keyDownHandler.bind(menu)
         });
 
+        // Attach click and keydown event handlers to individual menu items.
         menu.menuItems
             .on('click', '.action', _clickHandler.bind(menu))
             .on('keydown', '.action', _keyDownHandler.bind(menu));
@@ -297,10 +306,10 @@ function () {
 
         menu.value = value;
         menu.menuItems
-            .removeClass('active')
+            .removeClass('is-active')
             .find("a[data-value='" + value + "']")
             .parent()
-            .addClass('active');
+            .addClass('is-active');
     }
 
     // ***************************************************************
@@ -311,14 +320,16 @@ function () {
     // ***************************************************************
 
     function changeFileType(event) {
-        var fileType = $(event.currentTarget).data('value');
+        var fileType = $(event.currentTarget).data('value'),
+            button = $('.download-link'),
+            wrapper = $('.video-download-button');
 
         this.videoAccessibleMenu.setValue(fileType);
         this.saveState(true, {'transcript_download_format': fileType});
         this.storage.setItem('transcript_download_format', fileType);
 
-        $(event.currentTarget).parent().parent().parent().next('.download-link')
-            .text(gettext('Download transcript (.' + fileType + ')'))
+        wrapper.find(button)
+            .text(interpolate(gettext('Download transcript (%(fileType)s)?'), { fileType: fileType }, true))
                 .focus();
     }
 

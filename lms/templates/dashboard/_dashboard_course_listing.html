@@ -164,11 +164,11 @@ from student.helpers import (
             % endif
 
             <div class="wrapper-more-actions">
-                <button type="button" class="button button-more has-dropdown" aria-haspopup="true" aria-expanded="false" aria-controls="dropdown-${dashboard_index}" data-course-number="${course.number | h}" data-dashboard-index="${dashboard_index}">
+                <button type="button" class="button button-more has-dropdown" id="dropdown-for-${dashboard_index}" aria-haspopup="true" aria-expanded="false" aria-controls="dropdown-${dashboard_index}" data-course-number="${course.number | h}" data-dashboard-index="${dashboard_index}">
                     <span class="icon fa fa-cog" aria-hidden="true"></span>
                     <span class="sr">${_('Course options')}</span>
                 </button>
-                <ul class="dropdown is-hidden" id="dropdown-${dashboard_index}" tabindex="-1">
+                <ul class="dropdown-menu is-hidden" id="dropdown-${dashboard_index}" tabindex="-1">
                     <li class="dropdown-item" id="actions-item-unenroll-${dashboard_index}">
                         % if is_paid_course and show_refund_option:
                         ## Translators: The course name will be added to the end of this sentence.
