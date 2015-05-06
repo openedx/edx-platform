@@ -619,6 +619,44 @@
       }
     }
 
+    @mixin help {
+      margin-bottom: ($baseline*1.5);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .title {
+        @extend %hd-lv3;
+      }
+
+      .copy {
+        @extend %copy-detail;
+      }
+    }
+
+    .requirements {
+      margin-bottom: 10px;
+      @include outer-container;
+
+      .title {
+        @extend %hd-lv3;
+        margin-bottom: 10px;
+      }
+
+      .requirement {
+        @include help();
+
+        border: 1px solid #e5e5e5;
+        border-top: 5px solid #f4d78a;
+        padding: 10px;
+        box-shadow: 1px 1px 3px #888888;
+
+        // TODO Determine why this is not responsive.
+        @include span-columns(6);
+      }
+    }
+
     .wrapper-task {
       @include clearfix();
       width: flex-grid(12,12);
@@ -630,19 +668,7 @@
         padding: 0 $baseline;
 
         .help {
-          margin-bottom: ($baseline*1.5);
-
-          &:last-child {
-            margin-bottom: 0;
-          }
-
-          .title {
-            @extend %hd-lv3;
-          }
-
-          .copy {
-            @extend %copy-detail;
-          }
+          @include help();
 
           .example {
             color: $m-gray-l2;
@@ -668,6 +694,10 @@
             .help-item-emphasis {
               @extend %t-weight4;
             }
+          }
+
+          .copy-extra {
+            color: $black;
           }
 
           // help - faq
@@ -2415,9 +2445,22 @@
 }
 
 // UI: photo reverification heading
-h1.photo_verification {
+h2.photo_verification {
   @extend %t-title1;
   text-align: left;
+  text-transform: none;
+}
+
+.facephoto.view {
+  .wrapper-task {
+    #facecam {
+      float: left;
+    }
+
+    .wrapper-help {
+      float: right;
+    }
+  }
 }
 
 // ====================
