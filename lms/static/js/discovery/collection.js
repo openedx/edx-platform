@@ -22,16 +22,7 @@ define([
             this.fetchXhr && this.fetchXhr.abort();
             this.searchTerm = searchTerm || '';
             this.facetList = facets || {};
-            var data = {
-                search_string: searchTerm,
-                page_size: this.pageSize,
-                page_index: 0
-            };
-            if(this.facetList.length > 0) {
-                this.facetList.each(function(facet) {
-                    data[facet.get('type')] = facet.get('query');
-                });
-            }
+            var data = this.preparePostData(0);
             this.resetState();
             this.fetchXhr = this.fetch({
                 data: data,
@@ -47,14 +38,7 @@ define([
 
         loadNextPage: function () {
             this.fetchXhr && this.fetchXhr.abort();
-            var data = {
-                search_string: searchTerm,
-                page_size: this.pageSize,
-                page_index: this.page + 1
-            };
-            this.facetList.each(function(facet) {
-                data[facet.type] = facet.query;
-            });
+            var data = this.preparePostData(this.page + 1);
             this.fetchXhr = this.fetch({
                 data: data,
                 type: 'POST',
@@ -69,6 +53,20 @@ define([
                 reset: false,
                 remove: false
             });
+        },
+
+        preparePostData: function(pageNumber) {
+            var data = {
+                search_string: this.searchTerm,
+                page_size: this.pageSize,
+                page_index: pageNumber
+            };
+            if(this.facetList.length > 0) {
+                this.facetList.each(function(facet) {
+                    data[facet.get('type')] = facet.get('query');
+                });
+            }
+            return data;
         },
 
         parse: function(response) {
