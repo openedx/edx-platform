@@ -108,6 +108,14 @@ def _upload_file(subs_file, location, filename):
     del_cached_content(content.location)
 
 
+def attach_sub(item, filename):
+    item.sub = filename
+
+
+def attach_bumper_transcript(item, filename, lang="en"):
+    item.video_bumper["transcripts"][lang] = filename
+
+
 class TestVideo(BaseTestXmodule):
     """Integration tests: web client + mongo."""
     CATEGORY = "video"
@@ -360,19 +368,12 @@ class TestTranscriptDownloadDispatch(TestVideo):
         self.assertEqual(response.headers['Content-Disposition'], 'attachment; filename="塞.srt"')
 
 
-def attach_sub(item, filename):
-    item.sub = filename
-
-def attach_bumper_transcript(item, filename, lang="en"):
-    item.video_bumper["transcripts"][lang] = filename
-
-
 @ddt.ddt
 class TestTranscriptTranslationGetDispatch(TestVideo):
     """
     Test video handler that provide translation transcripts.
 
-    Tests for `translation` dispatch.
+    Tests for `translation` and `translation_bumper` dispatches.
     """
 
     srt_file = _create_srt_file()
