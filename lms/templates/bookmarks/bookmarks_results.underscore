@@ -1,11 +1,11 @@
 <div id="my-bookmarks" class="sr-is-focusable" tabindex="-1"></div>
-<h2 class="bookmarks-results-header" tabindex="0"><%= gettext("My Bookmarks") %></h2>
+<h2 class="bookmarks-results-header"><%= gettext("My Bookmarks") %></h2>
 
 <% if (bookmarks.length) { %>
 
     <div class='bookmarks-results-list'>
         <% _.each(bookmarks, function(bookmark, index) { %>
-             <a class="bookmarks-results-list-item" href="<%= bookmark.get('usage_id') %>" aria-describedby="bookmark-type-<%= index %> bookmark-date-<%= index %>">
+             <a class="bookmarks-results-list-item" href="<%= bookmark.get('usage_id') %>" aria-describedby="bookmark-type-<%= index %> bookmark-date-<%= index %>" target="_blank">
                 <div class="list-item-content">
                     <div class="list-item-left-section">
                         <h3> <%= bookmark.get('breadcrumbTrail') %> </h3>
@@ -19,6 +19,22 @@
                 </div>
             </a>
         <% }); %>
+
+        <!--Below anchor tag is temporarily placed here just to test accessibility-->
+        <a class="bookmarks-results-list-item" href="http://www.edx.org" aria-labelledby="bookmark-link-3" aria-describedby="bookmark-type-3 bookmark-date-3" target="_blank">
+            <div class="list-item-content">
+                <div class="list-item-left-section">
+                    <h3 id="bookmark-link-3"> FIRST > SECOND > THIRD </h3>
+                    <p id="bookmark-date-3" class="list-item-date"> Bookmarked on January 1, 2050 </p>
+                </div>
+
+                <p id="bookmark-type-3" class="list-item-right-section">
+                    <span aria-hidden="true">View</span>
+                    <i class="icon fa fa-arrow-right" aria-hidden="true"></i>
+                </p>
+            </div>
+        </a>
+
     </div>
 
 <% } else { %>
