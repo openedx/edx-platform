@@ -2104,7 +2104,8 @@ NOTIFICATION_DAILY_DIGEST_SUBJECT = "Your unread notifications for '{display_nam
 NOTIFICATION_WEEKLY_DIGEST_SUBJECT = "Your unread notifications for '{display_name}'"
 NOTIFICATION_BRANDED_DEFAULT_LOGO = 'edx_notifications/img/edx-openedx-logo-tag.png'
 NOTIFICATION_EMAIL_FROM_ADDRESS = ''
-NOTIFICATION_EMAIL_CLICK_LINK_ROOT = 'http://localhost'
+NOTIFICATION_APP_HOSTNAME = SITE_NAME
+NOTIFICATION_EMAIL_CLICK_LINK_URL_FORMAT = "http://{hostname}{url_path}"
 NOTIFICATION_DIGEST_SEND_TIMEFILTERED = True
 
 # Country code overrides
