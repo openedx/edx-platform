@@ -380,6 +380,9 @@ FEATURES = {
         'TWITTER_SHARING': False,
         'TWITTER_SHARING_TEXT': None
     },
+
+    # Course discovery feature
+    'ENABLE_COURSE_DISCOVERY': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -2318,3 +2321,7 @@ PROFILE_IMAGE_MIN_BYTES = 100
 
 # This is to check the domain in case of preview.
 PREVIEW_DOMAIN = 'preview'
+
+# Sets the maximum number of courses listed on the homepage
+# If set to None, all courses will be listed on the homepage
+HOMEPAGE_COURSE_MAX = None

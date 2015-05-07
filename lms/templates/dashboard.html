@@ -104,13 +104,12 @@
       </ul>
     % else:
       <section class="empty-dashboard-message">
+        <p>${_("Looks like you haven't enrolled in any courses yet.")}</p>
+
         % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
-          <p>${_("Looks like you haven't enrolled in any courses yet.")}</p>
           <a href="${marketing_link('COURSES')}">
             ${_("Find courses now!")}
           </a>
-        % else:
-          <p>${_("Looks like you haven't enrolled in any courses yet.")}</p>
         %endif
       </section>
     % endif
