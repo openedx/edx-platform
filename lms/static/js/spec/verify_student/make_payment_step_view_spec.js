@@ -57,7 +57,7 @@ define([
             };
 
             var expectPaymentDisabledBecauseInactive = function() {
-                var payButton = $( '.payment_button' );
+                var payButton = $( '.payment-button' );
 
                 // Payment button should be hidden
                 expect( payButton.length ).toEqual(0);
@@ -98,6 +98,19 @@ define([
                 expect(form.attr('action')).toEqual('http://payment-page-url/');
             };
 
+            var checkPaymentButtons = function( requests, buttons ) {
+                var $el = $( '.payment-button' );
+                expect($el.length).toEqual(_.size(buttons));
+                _.each(buttons, function( expectedText, expectedId ) {
+                    var buttonEl = $( '#' + expectedId );
+                    expect( buttonEl.length ).toEqual( 1 );
+                    expect( buttonEl[0] ).toHaveClass( 'payment-button' );
+                    expect( buttonEl[0].text ).toEqual( expectedText );
+                    buttonEl[0].click();
+                    expect(requests[requests.length - 1].requestBody.split('&')).toContain('processor=' + expectedId);
+                });
+            };
+
             beforeEach(function() {
                 window.analytics = jasmine.createSpyObj('analytics', ['track', 'page', 'trackLink']);
 
@@ -118,6 +131,20 @@ define([
                     succeeds: true
                 });
                 expectPaymentSubmitted( view, {foo: 'bar'} );
+            });
+
+            it( 'provides working payment buttons for a single processor', function() {
+                createView({processors: ['cybersource']});
+                checkPaymentButtons( AjaxHelpers.requests(this), {cybersource: "Pay with Credit Card"});
+            });
+
+            it( 'provides working payment buttons for multiple processors', function() {
+                createView({processors: ['cybersource', 'paypal', 'other']});
+                checkPaymentButtons( AjaxHelpers.requests(this), {
+                    cybersource: "Pay with Credit Card",
+                    paypal: "Pay with PayPal",
+                    other: "Pay with other"
+                });
             });
 
             it( 'by default minimum price is selected if no suggested prices are given', function() {
