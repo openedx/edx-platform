@@ -1196,6 +1196,13 @@ class CourseEnrollment(models.Model):
         )
 
     @classmethod
+    def enrolled_and_dropped_out_users(cls, course_id):
+        """Return a queryset of Users in the course."""
+        return User.objects.filter(
+            courseenrollment__course_id=course_id
+        )
+
+    @classmethod
     def enrollment_counts(cls, course_id):
         """
         Returns a dictionary that stores the total enrollment count for a course, as well as the

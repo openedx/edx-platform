@@ -32,20 +32,20 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from course_modes.models import CourseMode
 from courseware.models import StudentModule
-from courseware.tests.factories import StaffFactory, InstructorFactory, BetaTesterFactory
+from courseware.tests.factories import StaffFactory, InstructorFactory, BetaTesterFactory, UserProfileFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
 from django_comment_common.utils import seed_permissions_roles
 from microsite_configuration import microsite
 from shoppingcart.models import (
     RegistrationCodeRedemption, Order, CouponRedemption,
-    PaidCourseRegistration, Coupon, Invoice, CourseRegistrationCode, CourseRegistrationCodeInvoiceItem
-)
+    PaidCourseRegistration, Coupon, Invoice, CourseRegistrationCode, CourseRegistrationCodeInvoiceItem,
+    InvoiceTransaction)
 from shoppingcart.pdf import PDFInvoice
 from student.models import (
     CourseEnrollment, CourseEnrollmentAllowed, NonExistentCourseError
 )
-from student.tests.factories import UserFactory, CourseModeFactory
+from student.tests.factories import UserFactory, CourseModeFactory, AdminFactory
 from student.roles import CourseBetaTesterRole, CourseSalesAdminRole, CourseFinanceAdminRole, CourseInstructorRole
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -86,6 +86,12 @@ REPORTS_DATA = (
         'instructor_api_endpoint': 'get_students_features',
         'task_api_endpoint': 'instructor_task.api.submit_calculate_students_features_csv',
         'extra_instructor_api_kwargs': {'csv': '/csv'}
+    },
+    {
+        'report_type': 'detailed enrollment',
+        'instructor_api_endpoint': 'get_enrollment_report',
+        'task_api_endpoint': 'instructor_task.api.submit_detailed_enrollment_features_csv',
+        'extra_instructor_api_kwargs': {}
     }
 )
 
@@ -193,8 +199,10 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ('list_instructor_tasks', {}),
             ('list_background_email_tasks', {}),
             ('list_report_downloads', {}),
+            ('list_financial_report_downloads', {}),
             ('calculate_grades_csv', {}),
             ('get_students_features', {}),
+            ('get_enrollment_report', {}),
         ]
         # Endpoints that only Instructors can access
         self.instructor_level_endpoints = [
@@ -253,6 +261,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         staff_member = StaffFactory(course_key=self.course.id)
         CourseEnrollment.enroll(staff_member, self.course.id)
+        CourseFinanceAdminRole(self.course.id).add_users(staff_member)
         self.client.login(username=staff_member.username, password='test')
         # Try to promote to forums admin - not working
         # update_forum_role(self.course.id, staff_member, FORUM_ROLE_ADMINISTRATOR, 'allow')
@@ -282,6 +291,8 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         inst = InstructorFactory(course_key=self.course.id)
         CourseEnrollment.enroll(inst, self.course.id)
+
+        CourseFinanceAdminRole(self.course.id).add_users(inst)
         self.client.login(username=inst.username, password='test')
 
         for endpoint, args in self.staff_level_endpoints:
@@ -1742,6 +1753,20 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         for student in self.students:
             CourseEnrollment.enroll(student, self.course.id)
 
+    def register_with_redemption_code(self, user, code):
+        """
+        enroll user using a registration code
+        """
+        redeem_url = reverse('register_code_redemption', args=[code])
+        self.client.login(username=user.username, password='test')
+        response = self.client.get(redeem_url)
+        self.assertEquals(response.status_code, 200)
+        # check button text
+        self.assertTrue('Activate Course Enrollment' in response.content)
+
+        response = self.client.post(redeem_url)
+        self.assertEquals(response.status_code, 200)
+
     def test_invalidate_sale_record(self):
         """
         Testing the sale invalidating scenario.
@@ -2022,6 +2047,164 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
 
         self.assertEqual('cohort' in res_json['feature_names'], is_cohorted)
 
+    def test_assert_require_course_finance_admin(self):
+        """
+        Test assert require_course fiance_admin before generating
+        a detailed enrollment report
+        """
+        self.client.login(username=self.instructor.username, password='test')
+        course_with_invalid_ee = CourseFactory.create(entrance_exam_id='invalid_exam')
+        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
+        # url with invalid course id
+        url = reverse('get_enrollment_report', kwargs={'course_id': 'invalid/course/key'})
+        response = self.client.get(url, {})
+        # invalid course url return 404
+        self.assertEqual(response.status_code, 404)
+        CourseFinanceAdminRole(self.course.id).remove_users(self.instructor)
+
+        # create a new finance_admin role for user role with invalid course
+        CourseFinanceAdminRole(course_with_invalid_ee.id).add_users(self.instructor)
+        url = reverse('get_enrollment_report', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {})
+        self.assertEqual(response.status_code, 403)
+
+    def test_enrollment_report_features_csv(self):
+        """
+        test to generate enrollment report.
+        enroll users, admin staff using registration codes.
+        """
+        InvoiceTransaction.objects.create(
+            invoice=self.sale_invoice_1,
+            amount=self.sale_invoice_1.total_amount,
+            status='completed',
+            created_by=self.instructor,
+            last_modified_by=self.instructor
+        )
+        course_registration_code = CourseRegistrationCode.objects.create(
+            code='abcde',
+            course_id=self.course.id.to_deprecated_string(),
+            created_by=self.instructor,
+            invoice=self.sale_invoice_1,
+            invoice_item=self.invoice_item,
+            mode_slug='honor'
+        )
+
+        admin_user = AdminFactory()
+        admin_cart = Order.get_cart_for_user(admin_user)
+        PaidCourseRegistration.add_to_order(admin_cart, self.course.id)
+        admin_cart.purchase()
+
+        # create a new user/student and enroll
+        # in the course using a registration code
+        # and then validates the generated detailed enrollment report
+        test_user = UserFactory()
+        self.register_with_redemption_code(test_user, course_registration_code.code)
+
+        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
+        UserProfileFactory.create(user=self.students[0], meta='{"company": "asdasda"}')
+
+        self.client.login(username=self.instructor.username, password='test')
+        url = reverse('get_enrollment_report', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {})
+        self.assertIn('Your detailed enrollment report is being generated!', response.content)
+
+    def test_bulk_purchase_detailed_report(self):
+        """
+        test to generate detailed enrollment report.
+        1 Purchase registration codes.
+        2 Enroll users via registration code.
+        3 Validate generated enrollment report.
+        """
+        paid_course_reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course.id)
+        # update the quantity of the cart item paid_course_reg_item
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'),
+                                {'ItemId': paid_course_reg_item.id, 'qty': '4'})
+        self.assertEqual(resp.status_code, 200)
+        # apply the coupon code to the item in the cart
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
+        self.assertEqual(resp.status_code, 200)
+        self.cart.purchase()
+
+        course_reg_codes = CourseRegistrationCode.objects.filter(order=self.cart)
+        self.register_with_redemption_code(self.instructor, course_reg_codes[0].code)
+
+        test_user = UserFactory()
+        test_user_cart = Order.get_cart_for_user(test_user)
+        PaidCourseRegistration.add_to_order(test_user_cart, self.course.id)
+        test_user_cart.purchase()
+        InvoiceTransaction.objects.create(
+            invoice=self.sale_invoice_1,
+            amount=-self.sale_invoice_1.total_amount,
+            status='refunded',
+            created_by=self.instructor,
+            last_modified_by=self.instructor
+        )
+        course_registration_code = CourseRegistrationCode.objects.create(
+            code='abcde',
+            course_id=self.course.id.to_deprecated_string(),
+            created_by=self.instructor,
+            invoice=self.sale_invoice_1,
+            invoice_item=self.invoice_item,
+            mode_slug='honor'
+        )
+
+        test_user1 = UserFactory()
+        self.register_with_redemption_code(test_user1, course_registration_code.code)
+
+        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
+        self.client.login(username=self.instructor.username, password='test')
+
+        url = reverse('get_enrollment_report', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {})
+        self.assertIn('Your detailed enrollment report is being generated!', response.content)
+
+    def test_create_registration_code_without_invoice_and_order(self):
+        """
+        test generate detailed enrollment report,
+        used a registration codes which has been created via invoice or bulk
+        purchase scenario.
+        """
+        course_registration_code = CourseRegistrationCode.objects.create(
+            code='abcde',
+            course_id=self.course.id.to_deprecated_string(),
+            created_by=self.instructor,
+            mode_slug='honor'
+        )
+        test_user1 = UserFactory()
+        self.register_with_redemption_code(test_user1, course_registration_code.code)
+
+        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
+        self.client.login(username=self.instructor.username, password='test')
+
+        url = reverse('get_enrollment_report', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {})
+        self.assertIn('Your detailed enrollment report is being generated!', response.content)
+
+    def test_invoice_payment_is_still_pending_for_registration_codes(self):
+        """
+        test generate enrollment report
+        enroll a user in a course using registration code
+        whose invoice has not been paid yet
+        """
+        course_registration_code = CourseRegistrationCode.objects.create(
+            code='abcde',
+            course_id=self.course.id.to_deprecated_string(),
+            created_by=self.instructor,
+            invoice=self.sale_invoice_1,
+            invoice_item=self.invoice_item,
+            mode_slug='honor'
+        )
+
+        test_user1 = UserFactory()
+        self.register_with_redemption_code(test_user1, course_registration_code.code)
+
+        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
+        self.client.login(username=self.instructor.username, password='test')
+
+        url = reverse('get_enrollment_report', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {})
+        self.assertIn('Your detailed enrollment report is being generated!', response.content)
+
     @patch.object(instructor.views.api, 'anonymous_id_for_user', Mock(return_value='42'))
     @patch.object(instructor.views.api, 'unique_id_for_user', Mock(return_value='41'))
     def test_get_anon_ids(self):
@@ -2071,6 +2254,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         kwargs.update(extra_instructor_api_kwargs)
         url = reverse(instructor_api_endpoint, kwargs=kwargs)
 
+        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
         with patch(task_api_endpoint):
             response = self.client.get(url, {})
         success_status = "Your {report_type} report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section.".format(report_type=report_type)
@@ -2083,6 +2267,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         kwargs.update(extra_instructor_api_kwargs)
         url = reverse(instructor_api_endpoint, kwargs=kwargs)
 
+        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
         with patch(task_api_endpoint) as mock:
             mock.side_effect = AlreadyRunningError()
             response = self.client.get(url, {})
