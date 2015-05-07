@@ -55,7 +55,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 var view = new AccountSettingsFieldViews.LanguagePreferenceFieldView(fieldData).render();
 
                 var data = {'language': FieldViewsSpecHelpers.SELECT_OPTIONS[2][0]};
-                view.$(selector).val(data[fieldData.valueAttribute]).change();
+                view.$(selector).val(data[fieldData.valueAttribute]).focusout();
                 FieldViewsSpecHelpers.expectAjaxRequestWithData(requests, data);
                 AjaxHelpers.respondWithNoContent(requests);
 
