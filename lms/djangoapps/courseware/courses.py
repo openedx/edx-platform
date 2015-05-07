@@ -31,10 +31,12 @@ from lxml import etree
 from dateutil import parser
 from django.utils import timezone
 import datetime
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, get_language
 import locale
 from openedx.core.djangoapps.user_api.models import UserPreference
 from lang_pref import LANGUAGE_KEY
+from django.utils.dateformat import format
+from django.utils import formats
 
 log = logging.getLogger(__name__)
 
@@ -285,14 +287,14 @@ def get_course_info_section(request, course, section_key):
     """
     info_module = get_course_info_section_module(request, course, section_key)
 
-    lang_to_locale_dict={'es-es':'es_ES.utf8', 'en': 'en_US.utf8', 'ca@valencia' : 'ca_ES.utf8@valencia'}
-
-
     cur_lang_code = UserPreference.get_preference(request.user, LANGUAGE_KEY) #User preferred language
-    cur_lang_code_mod = lang_to_locale_dict[cur_lang_code] # We obtain the locale
+    if cur_lang_code is None:
+       cur_lang_code = settings.LANGUAGE_CODE
+    #print cur_lang_code
 
-    locale.setlocale(locale.LC_ALL, (cur_lang_code_mod))
-    date_format = locale.nl_langinfo(locale.D_FMT) # It's used if we want this format specifically.
+
+    #correct_format = formats.get_format("SHORT_DATE_FORMAT", cur_lang_code)
+    #print correct_format
 
     html = ''
     if info_module is not None:
@@ -313,9 +315,7 @@ def get_course_info_section(request, course, section_key):
             for article in root.findall('article'):
                 for heading in article.iter('h2'):
                     try:
-
-                        heading.text =  parser.parse(heading.text).strftime(date_format) # eg:  17/01/2015 (es y ca@valencia) or 01/17/2015 (en)
-
+                        heading.text = formats.date_format(parser.parse(heading.text))#"SHORT_DATE_FORMAT") 
                     except ValueError:
                         heading.text = heading.text
 
