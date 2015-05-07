@@ -5,9 +5,16 @@ from django.http import Http404
 
 from collections import defaultdict
 
-from lms.lib.comment_client.thread import Thread
 from discussion_api.pagination import get_paginated_data
 from django_comment_client.utils import get_accessible_discussion_modules
+from django_comment_common.models import (
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_MODERATOR,
+    Role,
+)
+from lms.lib.comment_client.thread import Thread
+from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id
 
 
 def get_course_topics(course, user):
@@ -113,10 +120,18 @@ def get_thread_list(request, course_key, page, page_size):
     A paginated result containing a list of threads; see
     discussion_api.views.ThreadViewSet for more detail.
     """
+    user_is_privileged = Role.objects.filter(
+        course_id=course_key,
+        name__in=[FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA],
+        users=request.user
+    ).exists()
     threads, result_page, num_pages, _ = Thread.search({
         "course_id": unicode(course_key),
+        "group_id": None if user_is_privileged else get_cohort_id(request.user, course_key),
+        "sort_key": "date",
+        "sort_order": "desc",
         "page": page,
-        "per_page": page_size
+        "per_page": page_size,
     })
     # The comments service returns the last page of results if the requested
     # page is beyond the last page, but we want be consistent with DRF's general
