@@ -1,23 +1,35 @@
 """
 Test helper functions and base classes.
 """
+import inspect
 import json
 import unittest
 import functools
+import operator
+import pprint
 import requests
 import os
+import urlparse
+from contextlib import contextmanager
 from datetime import datetime
 from path import path
 from bok_choy.javascript import js_defined
 from bok_choy.web_app_test import WebAppTest
-from bok_choy.promise import EmptyPromise
+from bok_choy.promise import EmptyPromise, Promise
 from opaque_keys.edx.locator import CourseLocator
-from pymongo import MongoClient
+from pymongo import MongoClient, ASCENDING
+from openedx.core.lib.tests.assertions.events import assert_event_matches, is_matching_event, EventMatchTolerates
 from xmodule.partitions.partitions import UserPartition
 from xmodule.partitions.tests.test_partitions import MockUserPartitionScheme
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+
+
+from ..pages.common import BASE_URL
+
+
+MAX_EVENTS_IN_FAILURE_OUTPUT = 20
 
 
 def skip_if_browser(browser):
@@ -279,80 +291,256 @@ class EventsTestMixin(object):
         self.event_collection = MongoClient()["test"]["events"]
         self.reset_event_tracking()
 
-    def assert_event_emitted_num_times(self, event_name, event_time, event_user_id, num_times_emitted, **kwargs):
-        """
-        Tests the number of times a particular event was emitted.
-
-        Extra kwargs get passed to the mongo query in the form: "event.<key>: value".
-
-        :param event_name: Expected event name (e.g., "edx.course.enrollment.activated")
-        :param event_time: Latest expected time, after which the event would fire (e.g., the beginning of the test case)
-        :param event_user_id: user_id expected in the event
-        :param num_times_emitted: number of times the event is expected to appear since the event_time
-        """
-        find_kwargs = {
-            "name": event_name,
-            "time": {"$gt": event_time},
-            "event.user_id": int(event_user_id),
-        }
-        find_kwargs.update({"event.{}".format(key): value for key, value in kwargs.items()})
-        matching_events = self.event_collection.find(find_kwargs)
-        self.assertEqual(matching_events.count(), num_times_emitted, '\n'.join(str(event) for event in matching_events))
-
     def reset_event_tracking(self):
-        """
-        Resets all event tracking so that previously captured events are removed.
-        """
+        """Drop any events that have been collected thus far and start collecting again from scratch."""
         self.event_collection.drop()
         self.start_time = datetime.now()
 
-    def get_matching_events(self, username, event_type):
+    @contextmanager
+    def capture_events(self, event_filter=None, number_of_matches=1, captured_events=None):
         """
-        Returns a cursor for the matching browser events related emitted for the specified username.
-        """
-        return self.event_collection.find({
-            "username": username,
-            "event_type": event_type,
-            "time": {"$gt": self.start_time},
-        })
+        Context manager that captures all events emitted while executing a particular block.
 
-    def verify_events_of_type(self, username, event_type, expected_events, expected_referers=None):
-        """Verify that the expected events of a given type were logged.
-        Args:
-            username (str): The name of the user for which events will be tested.
-            event_type (str): The type of event to be verified.
-            expected_events (list): A list of dicts representing the events that should
-                have been fired.
-            expected_referers (list): A list of strings representing the referers for each event
-                that should been fired (optional). If present, the actual referers compared
-                with this list, checking that the expected_referers are the suffixes of
-                actual_referers. For example, if one event is expected, specifying ["/account/settings"]
-                will verify that the referer for the single event ends with "/account/settings".
+        All captured events are stored in the list referenced by `captured_events`. Note that this list is appended to
+        *in place*. The events will be appended to the list in the order they are emitted.
+
+        The `event_filter` is expected to be a callable that allows you to filter the event stream and select particular
+        events of interest. A dictionary `event_filter` is also supported, which simply indicates that the event should
+        match that provided expectation.
+
+        `number_of_matches` tells this context manager when enough events have been found and it can move on. The
+        context manager will not exit until this many events have passed the filter. If not enough events are found
+        before a timeout expires, then this will raise a `BrokenPromise` error. Note that this simply states that
+        *at least* this many events have been emitted, so `number_of_matches` is simply a lower bound for the size of
+        `captured_events`.
         """
-        EmptyPromise(
-            lambda: self.get_matching_events(username, event_type).count() >= len(expected_events),
-            "Waiting for the minimum number of events of type {type} to have been recorded".format(type=event_type)
+        start_time = datetime.utcnow()
+
+        yield
+
+        events = self.wait_for_events(
+            start_time=start_time, event_filter=event_filter, number_of_matches=number_of_matches)
+
+        if captured_events is not None and hasattr(captured_events, 'append') and callable(captured_events.append):
+            for event in events:
+                captured_events.append(event)
+
+    @contextmanager
+    def assert_events_match_during(self, event_filter=None, expected_events=None):
+        """
+        Context manager that ensures that events matching the `event_filter` and `expected_events` are emitted.
+
+        This context manager will filter out the event stream using the `event_filter` and wait for
+        `len(expected_events)` to match the filter.
+
+        It will then compare the events in order with their counterpart in `expected_events` to ensure they match the
+        more detailed assertion.
+
+        Typically `event_filter` will be an `event_type` filter and the `expected_events` list will contain more
+        detailed assertions.
+        """
+        captured_events = []
+        with self.capture_events(event_filter, len(expected_events), captured_events):
+            yield
+
+        self.assert_events_match(expected_events, captured_events)
+
+    def wait_for_events(self, start_time=None, event_filter=None, number_of_matches=1, timeout=None):
+        """
+        Wait for `number_of_matches` events to pass the `event_filter`.
+
+        By default, this will look at all events that have been emitted since the beginning of the setup of this mixin.
+        A custom `start_time` can be specified which will limit the events searched to only those emitted after that
+        time.
+
+        The `event_filter` is expected to be a callable that allows you to filter the event stream and select particular
+        events of interest. A dictionary `event_filter` is also supported, which simply indicates that the event should
+        match that provided expectation.
+
+        `number_of_matches` lets us know when enough events have been found and it can move on. The function will not
+        return until this many events have passed the filter. If not enough events are found before a timeout expires,
+        then this will raise a `BrokenPromise` error. Note that this simply states that *at least* this many events have
+        been emitted, so `number_of_matches` is simply a lower bound for the size of `captured_events`.
+
+        Specifying a custom `timeout` can allow you to extend the default 30 second timeout if necessary.
+        """
+        if start_time is None:
+            start_time = self.start_time
+
+        if timeout is None:
+            timeout = 30
+
+        def check_for_matching_events():
+            """Gather any events that have been emitted since `start_time`"""
+            return self.matching_events_were_emitted(
+                start_time=start_time,
+                event_filter=event_filter,
+                number_of_matches=number_of_matches
+            )
+
+        return Promise(
+            check_for_matching_events,
+            # This is a bit of a hack, Promise calls str(description), so I set the description to an object with a
+            # custom __str__ and have it do some intelligent stuff to generate a helpful error message.
+            CollectedEventsDescription(
+                'Waiting for {number_of_matches} events to match the filter:\n{event_filter}'.format(
+                    number_of_matches=number_of_matches,
+                    event_filter=self.event_filter_to_descriptive_string(event_filter),
+                ),
+                functools.partial(self.get_matching_events_from_time, start_time=start_time, event_filter={})
+            ),
+            timeout=timeout
         ).fulfill()
 
-        # Verify that the correct events were fired
-        cursor = self.get_matching_events(username, event_type)
-        actual_events = []
-        actual_referers = []
-        for __ in range(0, cursor.count()):
-            emitted_data = cursor.next()
-            event = emitted_data["event"]
-            if emitted_data["event_source"] == "browser":
-                event = json.loads(event)
-            actual_events.append(event)
-            actual_referers.append(emitted_data["referer"])
-        self.assertEqual(expected_events, actual_events)
-        if expected_referers is not None:
-            self.assertEqual(len(expected_referers), len(actual_referers), "Number of expected referers is incorrect")
-            for index, actual_referer in enumerate(actual_referers):
-                self.assertTrue(
-                    actual_referer.endswith(expected_referers[index]),
-                    "Refer '{0}' does not have correct suffix, '{1}'.".format(actual_referer, expected_referers[index])
+    def matching_events_were_emitted(self, start_time=None, event_filter=None, number_of_matches=1):
+        """Return True if enough events have been emitted that pass the `event_filter` since `start_time`."""
+        matching_events = self.get_matching_events_from_time(start_time=start_time, event_filter=event_filter)
+        return len(matching_events) >= number_of_matches, matching_events
+
+    def get_matching_events_from_time(self, start_time=None, event_filter=None):
+        """
+        Return a list of events that pass the `event_filter` and were emitted after `start_time`.
+
+        This function is used internally by most of the other assertions and convenience methods in this class.
+
+        The `event_filter` is expected to be a callable that allows you to filter the event stream and select particular
+        events of interest. A dictionary `event_filter` is also supported, which simply indicates that the event should
+        match that provided expectation.
+        """
+        if start_time is None:
+            start_time = self.start_time
+
+        if isinstance(event_filter, dict):
+            event_filter = functools.partial(is_matching_event, event_filter)
+        elif not callable(event_filter):
+            raise ValueError(
+                'event_filter must either be a dict or a callable function with as single "event" parameter that '
+                'returns a boolean value.'
+            )
+
+        matching_events = []
+        cursor = self.event_collection.find(
+            {
+                "time": {
+                    "$gte": start_time
+                }
+            }
+        ).sort("time", ASCENDING)
+        for event in cursor:
+            matches = False
+            try:
+                # Mongo automatically assigns an _id to all events inserted into it. We strip it out here, since
+                # we don't care about it.
+                del event['_id']
+                if event_filter is not None:
+                    # Typically we will be grabbing all events of a particular type, however, you can use arbitrary
+                    # logic to identify the events that are of interest.
+                    matches = event_filter(event)
+            except AssertionError:
+                # allow the filters to use "assert" to filter out events
+                continue
+            else:
+                if matches is None or matches:
+                    matching_events.append(event)
+        return matching_events
+
+    def assert_matching_events_were_emitted(self, start_time=None, event_filter=None, number_of_matches=1):
+        """Assert that at least `number_of_matches` events have passed the filter since `start_time`."""
+        description = CollectedEventsDescription(
+            'Not enough events match the filter:\n' + self.event_filter_to_descriptive_string(event_filter),
+            functools.partial(self.get_matching_events_from_time, start_time=start_time, event_filter={})
+        )
+
+        self.assertTrue(
+            self.matching_events_were_emitted(
+                start_time=start_time, event_filter=event_filter, number_of_matches=number_of_matches
+            ),
+            description
+        )
+
+    def assert_no_matching_events_were_emitted(self, event_filter, start_time=None):
+        """Assert that no events have passed the filter since `start_time`."""
+        matching_events = self.get_matching_events_from_time(start_time=start_time, event_filter=event_filter)
+
+        description = CollectedEventsDescription(
+            'Events unexpected matched the filter:\n' + self.event_filter_to_descriptive_string(event_filter),
+            lambda: matching_events
+        )
+
+        self.assertEquals(len(matching_events), 0, description)
+
+    def assert_events_match(self, expected_events, actual_events):
+        """
+        Assert that each item in the expected events sequence matches its counterpart at the same index in the actual
+        events sequence.
+        """
+        for expected_event, actual_event in zip(expected_events, actual_events):
+            assert_event_matches(
+                expected_event,
+                actual_event,
+                tolerate=EventMatchTolerates.lenient()
+            )
+
+    def relative_path_to_absolute_uri(self, relative_path):
+        """Return an aboslute URI given a relative path taking into account the test context."""
+        return urlparse.urljoin(BASE_URL, relative_path)
+
+    def event_filter_to_descriptive_string(self, event_filter):
+        """Find the source code of the callable or pretty-print the dictionary"""
+        message = ''
+        if callable(event_filter):
+            file_name = '(unknown)'
+            try:
+                file_name = inspect.getsourcefile(event_filter)
+            except TypeError:
+                pass
+
+            try:
+                list_of_source_lines, line_no = inspect.getsourcelines(event_filter)
+            except IOError:
+                pass
+            else:
+                message = '{file_name}:{line_no}\n{hr}\n{event_filter}\n{hr}'.format(
+                    event_filter=''.join(list_of_source_lines).rstrip(),
+                    file_name=file_name,
+                    line_no=line_no,
+                    hr='-' * 20,
                 )
+
+        if not message:
+            message = '{hr}\n{event_filter}\n{hr}'.format(
+                event_filter=pprint.pformat(event_filter),
+                hr='-' * 20,
+            )
+
+        return message
+
+
+class CollectedEventsDescription(object):
+    """
+    Produce a clear error message when tests fail.
+
+    This class calls the provided `get_events_func` when converted to a string, and pretty prints the returned events.
+    """
+
+    def __init__(self, description, get_events_func):
+        self.description = description
+        self.get_events_func = get_events_func
+
+    def __str__(self):
+        message_lines = [
+            self.description,
+            'Events:'
+        ]
+        events = self.get_events_func()
+        events.sort(key=operator.itemgetter('time'), reverse=True)
+        for event in events[:MAX_EVENTS_IN_FAILURE_OUTPUT]:
+            message_lines.append(pprint.pformat(event))
+        if len(events) > MAX_EVENTS_IN_FAILURE_OUTPUT:
+            message_lines.append(
+                'Too many events to display, the remaining events were omitted. Run locally to diagnose.')
+
+        return '\n\n'.join(message_lines)
 
 
 class UniqueCourseTest(WebAppTest):

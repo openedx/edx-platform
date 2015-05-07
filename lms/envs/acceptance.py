@@ -80,7 +80,7 @@ TRACKING_BACKENDS.update({
     }
 })
 
-EVENT_TRACKING_BACKENDS.update({
+EVENT_TRACKING_BACKENDS['tracking_logs']['OPTIONS']['backends'].update({
     'mongo': {
         'ENGINE': 'eventtracking.backends.mongodb.MongoBackend',
         'OPTIONS': {

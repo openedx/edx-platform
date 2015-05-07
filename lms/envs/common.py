@@ -587,22 +587,42 @@ TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat', r'^/segm
 
 EVENT_TRACKING_ENABLED = True
 EVENT_TRACKING_BACKENDS = {
-    'logger': {
-        'ENGINE': 'eventtracking.backends.logger.LoggerBackend',
+    'tracking_logs': {
+        'ENGINE': 'eventtracking.backends.routing.RoutingBackend',
         'OPTIONS': {
-            'name': 'tracking',
-            'max_event_size': TRACK_MAX_EVENT,
+            'backends': {
+                'logger': {
+                    'ENGINE': 'eventtracking.backends.logger.LoggerBackend',
+                    'OPTIONS': {
+                        'name': 'tracking',
+                        'max_event_size': TRACK_MAX_EVENT,
+                    }
+                }
+            },
+            'processors': [
+                {'ENGINE': 'track.shim.LegacyFieldMappingProcessor'},
+                {'ENGINE': 'track.shim.VideoEventProcessor'}
+            ]
+        }
+    },
+    'segmentio': {
+        'ENGINE': 'eventtracking.backends.routing.RoutingBackend',
+        'OPTIONS': {
+            'backends': {
+                'segment': {'ENGINE': 'eventtracking.backends.segment.SegmentBackend'}
+            },
+            'processors': [
+                {
+                    'ENGINE': 'eventtracking.processors.whitelist.NameWhitelistProcessor',
+                    'OPTIONS': {
+                        'whitelist': []
+                    }
+                }
+            ]
         }
     }
 }
-EVENT_TRACKING_PROCESSORS = [
-    {
-        'ENGINE': 'track.shim.LegacyFieldMappingProcessor'
-    },
-    {
-        'ENGINE': 'track.shim.VideoEventProcessor'
-    }
-]
+EVENT_TRACKING_PROCESSORS = []
 
 # Backwards compatibility with ENABLE_SQL_TRACKING_LOGS feature flag.
 # In the future, adding the backend to TRACKING_BACKENDS should be enough.

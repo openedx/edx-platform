@@ -48,6 +48,7 @@ class VideoBaseTest(UniqueCourseTest):
         self.tab_nav = TabNavPage(self.browser)
         self.course_nav = CourseNavPage(self.browser)
         self.course_info_page = CourseInfoPage(self.browser, self.course_id)
+        self.auth_page = AutoAuthPage(self.browser, course_id=self.course_id)
 
         self.course_fixture = CourseFixture(
             self.course_info['org'], self.course_info['number'],
@@ -58,6 +59,7 @@ class VideoBaseTest(UniqueCourseTest):
         self.assets = []
         self.verticals = None
         self.youtube_configuration = {}
+        self.user_info = {}
 
         # reset youtube stub server
         self.addCleanup(YouTubeStubConfig.reset)
@@ -125,8 +127,8 @@ class VideoBaseTest(UniqueCourseTest):
 
     def _navigate_to_courseware_video(self):
         """ Register for the course and navigate to the video unit """
-        AutoAuthPage(self.browser, course_id=self.course_id).visit()
-
+        self.auth_page.visit()
+        self.user_info = self.auth_page.user_info
         self.course_info_page.visit()
         self.tab_nav.go_to_tab('Courseware')
 

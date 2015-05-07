@@ -3,6 +3,7 @@
 from mock import sentinel
 from django.test.utils import override_settings
 
+from openedx.core.lib.tests.assertions.events import assert_events_equal
 from track.tests import EventTrackingTestCase, FROZEN_TIME
 
 
@@ -13,12 +14,12 @@ LEGACY_SHIM_PROCESSOR = [
 ]
 
 
+@override_settings(
+    EVENT_TRACKING_PROCESSORS=LEGACY_SHIM_PROCESSOR,
+)
 class LegacyFieldMappingProcessorTestCase(EventTrackingTestCase):
     """Ensure emitted events contain the fields legacy processors expect to find."""
 
-    @override_settings(
-        EVENT_TRACKING_PROCESSORS=LEGACY_SHIM_PROCESSOR,
-    )
     def test_event_field_mapping(self):
         data = {sentinel.key: sentinel.value}
 
@@ -62,11 +63,8 @@ class LegacyFieldMappingProcessorTestCase(EventTrackingTestCase):
             'page': None,
             'session': sentinel.session,
         }
-        self.assertEqualUnicode(expected_event, emitted_event)
+        assert_events_equal(expected_event, emitted_event)
 
-    @override_settings(
-        EVENT_TRACKING_PROCESSORS=LEGACY_SHIM_PROCESSOR,
-    )
     def test_missing_fields(self):
         self.tracker.emit(sentinel.name)
 
@@ -88,4 +86,4 @@ class LegacyFieldMappingProcessorTestCase(EventTrackingTestCase):
             'page': None,
             'session': '',
         }
-        self.assertEqualUnicode(expected_event, emitted_event)
+        assert_events_equal(expected_event, emitted_event)

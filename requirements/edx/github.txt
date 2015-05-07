@@ -30,7 +30,7 @@ git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b
 -e git+https://github.com/edx/XBlock.git@1934a2978cdd3e2414486c74b76e3040ff1fb138#egg=XBlock
 -e git+https://github.com/edx/codejail.git@6b17c33a89bef0ac510926b1d7fea2748b73aadd#egg=codejail
 -e git+https://github.com/edx/js-test-tool.git@v0.1.6#egg=js_test_tool
--e git+https://github.com/edx/event-tracking.git@0.1.0#egg=event-tracking
+-e git+https://github.com/edx/event-tracking.git@0.2.0#egg=event-tracking
 -e git+https://github.com/edx/bok-choy.git@82d2f4b72e807b10d112179c0a4abd810a001b82#egg=bok_choy
 -e git+https://github.com/edx-solutions/django-splash.git@7579d052afcf474ece1239153cffe1c89935bc4f#egg=django-splash
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
