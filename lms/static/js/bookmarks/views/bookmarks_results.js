@@ -51,7 +51,7 @@
                 this.collection.url = this.url();
                 this.collection.fetch({
                     reset: true,
-                    data: {course_id: '', fields: 'path'}
+                    data: {course_id: 'a/b/c', fields: 'path', page: 1, page_size: 65536}
                 }).done(function () {
                     view.render();
                     view.setFocusAfterBookmarksLoaded();
