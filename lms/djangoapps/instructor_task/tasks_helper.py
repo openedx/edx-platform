@@ -19,12 +19,13 @@ from django.core.files.storage import DefaultStorage
 from django.db import transaction, reset_queries
 import dogstats_wrapper as dog_stats_api
 from pytz import UTC
+from instructor.paidcourse_enrollment_report import PaidCourseEnrollmentReportProvider
 
 from track.views import task_track
 from util.file import course_filename_prefix_generator, UniversalNewlineIterator
 from xmodule.modulestore.django import modulestore
 from xmodule.split_test_module import get_split_user_partitions
-
+from django.utils.translation import ugettext as _
 from certificates.models import CertificateWhitelist, certificate_info_for_user
 from courseware.courses import get_course_by_id, get_problems_in_section
 from courseware.grades import iterate_grades_for
@@ -532,7 +533,7 @@ def delete_problem_module_state(xmodule_instance_args, _module_descriptor, stude
     return UPDATE_STATUS_SUCCEEDED
 
 
-def upload_csv_to_report_store(rows, csv_name, course_id, timestamp):
+def upload_csv_to_report_store(rows, csv_name, course_id, timestamp, config_name='GRADES_DOWNLOAD'):
     """
     Upload data as a CSV using ReportStore.
 
@@ -546,7 +547,7 @@ def upload_csv_to_report_store(rows, csv_name, course_id, timestamp):
         csv_name: Name of the resulting CSV
         course_id: ID of the course
     """
-    report_store = ReportStore.from_config()
+    report_store = ReportStore.from_config(config_name)
     report_store.store_rows(
         course_id,
         u"{course_prefix}_{csv_name}_{timestamp_str}.csv".format(
@@ -575,7 +576,7 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
     start_time = time()
     start_date = datetime.now(UTC)
     status_interval = 100
-    enrolled_students = CourseEnrollment.users_enrolled_in(course_id)
+    enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id)
     task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 
     fmt = u'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
@@ -771,7 +772,7 @@ def upload_problem_grade_report(_xmodule_instance_args, _entry_id, course_id, _t
     start_time = time()
     start_date = datetime.now(UTC)
     status_interval = 100
-    enrolled_students = CourseEnrollment.users_enrolled_in(course_id)
+    enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id)
     task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 
     # This struct encapsulates both the display names of each static item in the
@@ -842,7 +843,9 @@ def upload_students_csv(_xmodule_instance_args, _entry_id, course_id, task_input
     """
     start_time = time()
     start_date = datetime.now(UTC)
-    task_progress = TaskProgress(action_name, CourseEnrollment.num_enrolled_in(course_id), start_time)
+    enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id)
+    task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
+
     current_step = {'step': 'Calculating Profile Info'}
     task_progress.update_task_state(extra_meta=current_step)
 
@@ -862,6 +865,126 @@ def upload_students_csv(_xmodule_instance_args, _entry_id, course_id, task_input
     # Perform the upload
     upload_csv_to_report_store(rows, 'student_profile_info', course_id, start_date)
 
+    return task_progress.update_task_state(extra_meta=current_step)
+
+
+def upload_enrollment_report(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+    """
+    For a given `course_id`, generate a CSV file containing profile
+    information for all students that are enrolled, and store using a
+    `ReportStore`.
+    """
+    start_time = time()
+    start_date = datetime.now(UTC)
+    status_interval = 100
+    students_in_course = CourseEnrollment.objects.enrolled_and_dropped_out_users(course_id)
+    task_progress = TaskProgress(action_name, students_in_course.count(), start_time)
+
+    fmt = u'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
+    task_info_string = fmt.format(
+        task_id=_xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None,
+        entry_id=_entry_id,
+        course_id=course_id,
+        task_input=_task_input
+    )
+    TASK_LOG.info(u'%s, Task type: %s, Starting task execution', task_info_string, action_name)
+
+    # Loop over all our students and build our CSV lists in memory
+    rows = []
+    header = None
+    current_step = {'step': 'Gathering Profile Information'}
+    enrollment_report_provider = PaidCourseEnrollmentReportProvider()
+    total_students = students_in_course.count()
+    student_counter = 0
+    TASK_LOG.info(
+        u'%s, Task type: %s, Current step: %s, generating detailed enrollment report for total students: %s',
+        task_info_string,
+        action_name,
+        current_step,
+        total_students
+    )
+
+    for student in students_in_course:
+        # Periodically update task status (this is a cache write)
+        if task_progress.attempted % status_interval == 0:
+            task_progress.update_task_state(extra_meta=current_step)
+        task_progress.attempted += 1
+
+        # Now add a log entry after certain intervals to get a hint that task is in progress
+        student_counter += 1
+        if student_counter % 100 == 0:
+            TASK_LOG.info(
+                u'%s, Task type: %s, Current step: %s, gathering enrollment profile for students in progress: %s/%s',
+                task_info_string,
+                action_name,
+                current_step,
+                student_counter,
+                total_students
+            )
+
+        user_data = enrollment_report_provider.get_user_profile(student.id)
+        course_enrollment_data = enrollment_report_provider.get_enrollment_info(student, course_id)
+        payment_data = enrollment_report_provider.get_payment_info(student, course_id)
+
+        # display name map for the column headers
+        enrollment_report_headers = {
+            'User ID': _('User ID'),
+            'Username': _('Username'),
+            'Full Name': _('Full Name'),
+            'First Name': _('First Name'),
+            'Last Name': _('Last Name'),
+            'Company Name': _('Company Name'),
+            'Title': _('Title'),
+            'Language': _('Language'),
+            'Year of Birth': _('Year of Birth'),
+            'Gender': _('Gender'),
+            'Level of Education': _('Level of Education'),
+            'Mailing Address': _('Mailing Address'),
+            'Goals': _('Goals'),
+            'City': _('City'),
+            'Country': _('Country'),
+            'Enrollment Date': _('Enrollment Date'),
+            'Currently Enrolled': _('Currently Enrolled'),
+            'Enrollment Source': _('Enrollment Source'),
+            'Enrollment Role': _('Enrollment Role'),
+            'List Price': _('List Price'),
+            'Payment Amount': _('Payment Amount'),
+            'Coupon Codes Used': _('Coupon Codes Used'),
+            'Registration Code Used': _('Registration Code Used'),
+            'Payment Status': _('Payment Status'),
+            'Transaction Reference Number': _('Transaction Reference Number')
+        }
+
+        if not header:
+            header = user_data.keys() + course_enrollment_data.keys() + payment_data.keys()
+            display_headers = []
+            for header_element in header:
+                # translate header into a localizable display string
+                display_headers.append(enrollment_report_headers.get(header_element, header_element))
+            rows.append(display_headers)
+
+        rows.append(user_data.values() + course_enrollment_data.values() + payment_data.values())
+        task_progress.succeeded += 1
+
+    TASK_LOG.info(
+        u'%s, Task type: %s, Current step: %s, Detailed enrollment report generated for students: %s/%s',
+        task_info_string,
+        action_name,
+        current_step,
+        student_counter,
+        total_students
+    )
+
+    # By this point, we've got the rows we're going to stuff into our CSV files.
+    current_step = {'step': 'Uploading CSVs'}
+    task_progress.update_task_state(extra_meta=current_step)
+    TASK_LOG.info(u'%s, Task type: %s, Current step: %s', task_info_string, action_name, current_step)
+
+    # Perform the actual upload
+    upload_csv_to_report_store(rows, 'enrollment_report', course_id, start_date, config_name='FINANCIAL_REPORTS')
+
+    # One last update before we close out...
+    TASK_LOG.info(u'%s, Task type: %s, Finalizing detailed enrollment task', task_info_string, action_name)
     return task_progress.update_task_state(extra_meta=current_step)
 
 

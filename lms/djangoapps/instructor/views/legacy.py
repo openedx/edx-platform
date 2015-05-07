@@ -102,7 +102,7 @@ def instructor_dashboard(request, course_id):
     else:
         idash_mode = request.session.get(idash_mode_key, 'Grades')
 
-    enrollment_number = CourseEnrollment.num_enrolled_in(course_key)
+    enrollment_number = CourseEnrollment.objects.num_enrolled_in(course_key)
 
     # assemble some course statistics for output to instructor
     def get_course_stats_table():

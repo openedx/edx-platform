@@ -90,6 +90,10 @@ urlpatterns = patterns(
     url(r'problem_grade_report$',
         'instructor.views.api.problem_grade_report', name="problem_grade_report"),
 
+    # Financial Report downloads..
+    url(r'^list_financial_report_downloads$',
+        'instructor.views.api.list_financial_report_downloads', name="list_financial_report_downloads"),
+
     # Registration Codes..
     url(r'get_registration_codes$',
         'instructor.views.api.get_registration_codes', name="get_registration_codes"),
@@ -99,6 +103,11 @@ urlpatterns = patterns(
         'instructor.views.api.active_registration_codes', name="active_registration_codes"),
     url(r'spent_registration_codes$',
         'instructor.views.api.spent_registration_codes', name="spent_registration_codes"),
+
+    # Reports..
+    url(r'get_enrollment_report$',
+        'instructor.views.api.get_enrollment_report', name="get_enrollment_report"),
+
 
     # Coupon Codes..
     url(r'get_coupon_codes',

@@ -30,7 +30,7 @@ import unicodecsv
 import urllib
 import decimal
 from student import auth
-from student.roles import GlobalStaff, CourseSalesAdminRole
+from student.roles import GlobalStaff, CourseSalesAdminRole, CourseFinanceAdminRole
 from util.file import store_uploaded_file, course_and_time_based_filename_generator, FileValidationException, UniversalNewlineIterator
 from util.json_request import JsonResponse
 from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
@@ -269,6 +269,31 @@ def require_sales_admin(func):
             return HttpResponseNotFound()
 
         access = auth.has_access(request.user, CourseSalesAdminRole(course_key))
+
+        if access:
+            return func(request, course_id)
+        else:
+            return HttpResponseForbidden()
+    return wrapped
+
+
+def require_finance_admin(func):
+    """
+    Decorator for checking finance administrator access before executing an HTTP endpoint. This decorator
+    is designed to be used for a request based action on a course. It assumes that there will be a
+    request object as well as a course_id attribute to leverage to check course level privileges.
+
+    If the user does not have privileges for this operation, this will return HttpResponseForbidden (403).
+    """
+    def wrapped(request, course_id):  # pylint: disable=missing-docstring
+
+        try:
+            course_key = CourseKey.from_string(course_id)
+        except InvalidKeyError:
+            log.error(u"Unable to find course with course key %s", course_id)
+            return HttpResponseNotFound()
+
+        access = auth.has_access(request.user, CourseFinanceAdminRole(course_key))
 
         if access:
             return func(request, course_id)
@@ -1090,6 +1115,29 @@ def get_coupon_codes(request, course_id):  # pylint: disable=unused-argument
     coupons_list = instructor_analytics.basic.coupon_codes_features(query_features, coupons)
     header, data_rows = instructor_analytics.csvs.format_dictlist(coupons_list, query_features)
     return instructor_analytics.csvs.create_csv_response('Coupons.csv', header, data_rows)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_finance_admin
+def get_enrollment_report(request, course_id):
+    """
+    get the enrollment report for the particular course.
+    """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    try:
+        instructor_task.api.submit_detailed_enrollment_features_csv(request, course_key)
+        success_status = _("Your detailed enrollment report is being generated! "
+                           "You can view the status of the generation task in the 'Pending Instructor Tasks' section.")
+        return JsonResponse({"status": success_status})
+    except AlreadyRunningError:
+        already_running_status = _("A detailed enrollment report generation task is already in progress. "
+                                   "Check the 'Pending Instructor Tasks' table for the status of the task. "
+                                   "When completed, the report will be available for download in the table below.")
+        return JsonResponse({
+            "status": already_running_status
+        })
 
 
 def save_registration_code(user, course_id, mode_slug, invoice=None, order=None, invoice_item=None):
@@ -1918,7 +1966,27 @@ def list_report_downloads(_request, course_id):
     List grade CSV files that are available for download for this course.
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    report_store = ReportStore.from_config()
+    report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
+
+    response_payload = {
+        'downloads': [
+            dict(name=name, url=url, link='<a href="{}">{}</a>'.format(url, name))
+            for name, url in report_store.links_for(course_id)
+        ]
+    }
+    return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_finance_admin
+def list_financial_report_downloads(_request, course_id):
+    """
+    List grade CSV files that are available for download for this course.
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    report_store = ReportStore.from_config(config_name='FINANCIAL_REPORTS')
 
     response_payload = {
         'downloads': [

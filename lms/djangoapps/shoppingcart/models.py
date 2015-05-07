@@ -7,6 +7,7 @@ from decimal import Decimal
 import json
 import analytics
 from io import BytesIO
+from django.db.models import Q
 import pytz
 import logging
 import smtplib
@@ -980,6 +981,17 @@ class InvoiceTransaction(TimeStampedModel):
     created_by = models.ForeignKey(User)
     last_modified_by = models.ForeignKey(User, related_name='last_modified_by_user')
 
+    @classmethod
+    def get_invoice_transaction(cls, invoice_id):
+        """
+        if found Returns the Invoice Transaction object for the given invoice_id
+        else returns None
+        """
+        try:
+            return cls.objects.get(Q(invoice_id=invoice_id), Q(status='completed') | Q(status='refunded'))
+        except InvoiceTransaction.DoesNotExist:
+            return None
+
     def snapshot(self):
         """Create a snapshot of the invoice transaction.
 
@@ -1165,6 +1177,17 @@ class RegistrationCodeRedemption(models.Model):
     course_enrollment = models.ForeignKey(CourseEnrollment, null=True)
 
     @classmethod
+    def registration_code_used_for_enrollment(cls, course_enrollment):
+        """
+        Returns RegistrationCodeRedemption object if registration code
+        has been used during the course enrollment else Returns None.
+        """
+        try:
+            return cls.objects.get(course_enrollment=course_enrollment)
+        except RegistrationCodeRedemption.DoesNotExist:
+            return None
+
+    @classmethod
     def is_registration_code_redeemed(cls, course_reg_code):
         """
         Checks the existence of the registration code
@@ -1295,6 +1318,18 @@ class PaidCourseRegistration(OrderItem):
     course_id = CourseKeyField(max_length=128, db_index=True)
     mode = models.SlugField(default=CourseMode.DEFAULT_MODE_SLUG)
     course_enrollment = models.ForeignKey(CourseEnrollment, null=True)
+
+    @classmethod
+    def get_course_item_for_user_enrollment(cls, user, course_id, course_enrollment):
+        """
+        Returns PaidCourseRegistration object if user has payed for
+        the course enrollment else Returns None
+        """
+        try:
+            return cls.objects.filter(course_id=course_id, user=user, course_enrollment=course_enrollment,
+                                      status='purchased').latest('id')
+        except PaidCourseRegistration.DoesNotExist:
+            return None
 
     @classmethod
     def contained_in_order(cls, order, course_id):
