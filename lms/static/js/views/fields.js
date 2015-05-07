@@ -201,13 +201,15 @@
                 this.$el.addClass('mode-edit');
             },
 
-            startEditing: function () {
+            startEditing: function (event) {
+                event.preventDefault();
                 if (this.editable === 'toggle' && this.mode !== 'edit') {
                     this.showEditMode(true);
                 }
             },
 
-            finishEditing: function() {
+            finishEditing: function(event) {
+                event.preventDefault();
                 if (this.fieldValue() !== this.modelValue()) {
                     this.saveValue();
                 } else {
