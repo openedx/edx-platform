@@ -24,7 +24,6 @@ define(['backbone'], function(Backbone) {
 
         dispatcher.listenTo(filters, 'clear', function () {
             form.clearSearch();
-            results.clearResults();
             collection.performSearch();
             filters.hideClearAllButton();
         });
