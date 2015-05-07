@@ -15,18 +15,21 @@
         return function (options) {
 
             var learnerProfileElement = $('.wrapper-profile');
-            var defaultVisibility = options.default_visibility;
-            var accountPreferencesModel, accountSettingsModel;
 
-            if (options.own_profile) {
-                accountSettingsModel = new AccountSettingsModel({
-                    'default_public_account_fields': options.default_public_account_fields
-                });
-                accountPreferencesModel = new AccountPreferencesModel({account_privacy: defaultVisibility});
-            } else {
-                accountSettingsModel = new AccountSettingsModel(options.accounts_data, {parse: true});
-                accountPreferencesModel = new AccountPreferencesModel(options.preferences_data);
-            }
+            var accountSettingsModel = new AccountSettingsModel(
+                _.extend(
+                    options.account_settings_data,
+                    {'default_public_account_fields': options.default_public_account_fields}
+                ),
+                {parse: true}
+            );
+            var AccountPreferencesModelWithDefaults = AccountPreferencesModel.extend({
+                defaults: {
+                    account_privacy: options.default_visibility
+                }
+            });
+            var accountPreferencesModel = new AccountPreferencesModelWithDefaults(options.preferences_data);
+
             accountSettingsModel.url = options.accounts_api_url;
             accountPreferencesModel.url = options.preferences_api_url;
 
@@ -123,10 +126,6 @@
                 sectionTwoFieldViews: sectionTwoFieldViews
             });
 
-            var showLoadingError = function () {
-                learnerProfileView.showLoadingError();
-            };
-
             var getProfileVisibility = function() {
                 if (options.has_preferences_access) {
                     return accountPreferencesModel.get('account_privacy');
@@ -147,34 +146,12 @@
                 learnerProfileView.render();
             };
 
-            if (options.own_profile) {
-                accountSettingsModel.fetch({
-                    success: function () {
-                        // Fetch the preferences model if the user has access
-                        if (options.has_preferences_access) {
-                            accountPreferencesModel.fetch({
-                                success: function () {
-                                    if (accountSettingsModel.get('requires_parental_consent')) {
-                                        accountPreferencesModel.set('account_privacy', 'private');
-                                    }
-                                    showLearnerProfileView();
-                                },
-                                error: showLoadingError
-                            });
-                        } else {
-                            showLearnerProfileView();
-                        }
-                    },
-                    error: showLoadingError
-                });
-            } else {
-                if (options.has_preferences_access) {
-                    if (accountSettingsModel.get('requires_parental_consent')) {
-                        accountPreferencesModel.set('account_privacy', 'private');
-                    }
+            if (options.has_preferences_access) {
+                if (accountSettingsModel.get('requires_parental_consent')) {
+                    accountPreferencesModel.set('account_privacy', 'private');
                 }
-                showLearnerProfileView();
             }
+            showLearnerProfileView();
 
             return {
                 accountSettingsModel: accountSettingsModel,

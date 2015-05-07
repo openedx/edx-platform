@@ -114,7 +114,11 @@
 
                 setTimeout(function () {
                     if ((context === view.lastSuccessMessageContext) && (view.getNotificationMessage() === successMessage)) {
-                        view.showHelpMessage();
+                        if (view.editable === 'toggle') {
+                            view.showCanEditMessage(true);
+                        } else {
+                            view.showHelpMessage();
+                        }
                     }
                 }, messageRevertDelay);
             },
@@ -201,15 +205,13 @@
                 this.$el.addClass('mode-edit');
             },
 
-            startEditing: function (event) {
-                event.preventDefault();
+            startEditing: function () {
                 if (this.editable === 'toggle' && this.mode !== 'edit') {
                     this.showEditMode(true);
                 }
             },
 
-            finishEditing: function(event) {
-                event.preventDefault();
+            finishEditing: function() {
                 if (this.fieldValue() !== this.modelValue()) {
                     this.saveValue();
                 } else {
