@@ -182,6 +182,6 @@ class PipelineEnrollmentTest(UrlResetMixin, ModuleStoreTestCase):
         request.user = self.user
         request.session = cache.SessionStore()
 
-        return social_utils.load_strategy(
-            backend=self.BACKEND_NAME, request=request
-        )
+        request.social_strategy = social_utils.load_strategy(request)
+        request.backend = social_utils.load_backend(request.social_strategy, self.BACKEND_NAME, redirect_uri='')
+        return request.social_strategy
