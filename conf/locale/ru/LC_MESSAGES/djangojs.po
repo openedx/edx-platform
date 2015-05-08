@@ -90,8 +90,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-04-30 15:37+0000\n"
-"PO-Revision-Date: 2015-04-21 14:10+0000\n"
+"POT-Creation-Date: 2015-05-08 17:28+0000\n"
+"PO-Revision-Date: 2015-05-06 19:54+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/edx-platform/language/ru/)\n"
 "MIME-Version: 1.0\n"
@@ -99,7 +99,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 "Language: ru\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
 
 #: cms/static/coffee/src/views/tabs.js
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
@@ -278,6 +278,7 @@ msgid_plural "(%(earned)s/%(possible)s points)"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10). There will always be at least 1 point possible.;
@@ -287,6 +288,7 @@ msgid_plural "(%(num_points)s points possible)"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Answer:"
@@ -712,6 +714,7 @@ msgstr "Удалить таблицу"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/group-configuration-editor.underscore
+#: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Description"
 msgstr ""
@@ -1774,6 +1777,7 @@ msgid_plural "%(value)s hours"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s minute"
@@ -1781,6 +1785,7 @@ msgid_plural "%(value)s minutes"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s second"
@@ -1788,6 +1793,7 @@ msgid_plural "%(value)s seconds"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Caption will be displayed when "
@@ -1856,11 +1862,12 @@ msgid "…"
 msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "currently %(numVotes)s vote"
-msgid_plural "currently %(numVotes)s votes"
+msgid "there is currently %(numVotes)s vote"
+msgid_plural "there are currently %(numVotes)s votes"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "%(numVotes)s Vote"
@@ -1868,6 +1875,7 @@ msgid_plural "%(numVotes)s Votes"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "We had some trouble subscribing you to this thread. Please try again."
@@ -1943,6 +1951,7 @@ msgid_plural "%(unread_count)s new comments"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Current conversation"
@@ -1992,6 +2001,7 @@ msgid_plural "%(numResponses)s other responses"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "%(numResponses)s response"
@@ -1999,6 +2009,7 @@ msgid_plural "%(numResponses)s responses"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Showing all responses"
@@ -2010,6 +2021,7 @@ msgid_plural "Showing first %(numResponses)s responses"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Load all responses"
@@ -2091,6 +2103,7 @@ msgid_plural "%d minutes"
 msgstr[0] "%d минута"
 msgstr[1] "%d минуты"
 msgstr[2] "%d минут"
+msgstr[3] "%d минут"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about an hour"
@@ -2102,6 +2115,7 @@ msgid_plural "about %d hours"
 msgstr[0] "около %d часа"
 msgstr[1] "около %d часов"
 msgstr[2] "около %d часов"
+msgstr[3] "около %d часов"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "a day"
@@ -2113,6 +2127,7 @@ msgid_plural "%d days"
 msgstr[0] "%d день"
 msgstr[1] "%d дня"
 msgstr[2] "%d дней"
+msgstr[3] "%d дней"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a month"
@@ -2124,6 +2139,7 @@ msgid_plural "%d months"
 msgstr[0] "%d месяц"
 msgstr[1] "%d месяца"
 msgstr[2] "%d месяцев"
+msgstr[3] "%d месяцев"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a year"
@@ -2135,6 +2151,7 @@ msgid_plural "%d years"
 msgstr[0] "%d год"
 msgstr[1] "%d года"
 msgstr[2] "%d лет"
+msgstr[3] "%d лет"
 
 #. Translators: please note that this is not a literal flag, but rather a
 #. report
@@ -2149,6 +2166,7 @@ msgid_plural "Check the box to remove %(totalFlags)s flags."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #. Translators: 'count' is the number of flags solely for that annotation that
 #. will be removed
@@ -2158,6 +2176,7 @@ msgid_plural "Check the box to remove %(count)s flags."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "All flags have been removed. To undo, uncheck the box."
@@ -2178,6 +2197,7 @@ msgid_plural "This annotation has %(count)s flags."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "User"
@@ -2255,7 +2275,7 @@ msgstr "Текст"
 msgid "Video"
 msgstr ""
 
-#: common/static/js/vendor/ova/catch/js/catch.js
+#: common/static/js/vendor/ova/catch/js/catch.js lms/static/js/views/fields.js
 msgid "Image"
 msgstr ""
 
@@ -2264,6 +2284,7 @@ msgid "Reply"
 msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
+#: lms/templates/edxnotes/note-item.underscore
 msgid "Tags:"
 msgstr ""
 
@@ -3136,6 +3157,7 @@ msgid_plural "{numUsersAdded} students have been added to this cohort"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "{numMoved} student was removed from {oldCohort}"
@@ -3143,6 +3165,7 @@ msgid_plural "{numMoved} students were removed from {oldCohort}"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "{numPresent} student was already in the cohort"
@@ -3150,6 +3173,7 @@ msgid_plural "{numPresent} students were already in the cohort"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Unknown user: {user}"
@@ -3161,6 +3185,7 @@ msgid_plural "There were {numErrors} errors when trying to add students:"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "View all errors"
@@ -3244,6 +3269,7 @@ msgid_plural "%s results"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Started entrance exam rescore task for student '{student_id}'."
@@ -3290,8 +3316,8 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
-"The name that identifies you on the edX site. You cannot change your "
-"username."
+"The name that identifies you throughout {platform_name}. You cannot change "
+"your username."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -3301,8 +3327,8 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
-"The name that appears on your edX certificates. Other learners never see "
-"your full name."
+"The name that appears on your certificates. Other learners never see your "
+"full name."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -3311,8 +3337,8 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
-"The email address you use to sign in to edX. Communications from edX and "
-"your courses are sent to this address."
+"The email address you use to sign in. Communications from {platform_name} "
+"and your courses are sent to this address."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -3341,8 +3367,8 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
-"The language used for the edX site. The site is currently available in a "
-"limited number of languages."
+"The language used throughout this site. This site is currently available in "
+"a limited number of languages."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -3384,7 +3410,8 @@ msgid "We've sent a confirmation message to {new_email_address}. "
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
-msgid "You must sign out of edX and sign back in before your language "
+msgid ""
+"You must sign out and sign back in before your language changes take effect."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
@@ -3393,11 +3420,11 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Unlink"
-msgstr ""
+msgstr "Снять привязку к учётной записи"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Link"
-msgstr ""
+msgstr "Привязать к учётной записи"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Unlinking"
@@ -3428,7 +3455,7 @@ msgid "Saved"
 msgstr ""
 
 #: lms/static/js/student_profile/views/learner_profile_factory.js
-msgid "edX learners can see my:"
+msgid "{platform_name} learners can see my:"
 msgstr ""
 
 #: lms/static/js/student_profile/views/learner_profile_factory.js
@@ -3457,8 +3484,8 @@ msgstr ""
 
 #: lms/static/js/student_profile/views/learner_profile_factory.js
 msgid ""
-"Tell other edX learners a little about yourself: where you live, what your "
-"interests are, why you're taking courses on edX, or what you hope to learn."
+"Tell other learners a little about yourself: where you live, what your "
+"interests are, why you're taking courses, or what you hope to learn."
 msgstr ""
 
 #: lms/static/js/student_profile/views/learner_profile_fields.js
@@ -3475,6 +3502,10 @@ msgstr ""
 msgid ""
 "You must be over 13 to share a full profile. If you are over 13, make sure "
 "that you have specified a birth year on the {account_settings_page_link}"
+msgstr ""
+
+#: lms/static/js/student_profile/views/learner_profile_fields.js
+msgid "Profile Image"
 msgstr ""
 
 #: lms/static/js/student_profile/views/learner_profile_fields.js
@@ -3517,6 +3548,10 @@ msgstr ""
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Pay with Credit Card"
+msgstr ""
+
+#: lms/static/js/verify_student/views/make_payment_step_view.js
+msgid "Pay with PayPal"
 msgstr ""
 
 #. Translators: 'processor' is the name of a third-party payment processing
@@ -3664,6 +3699,7 @@ msgid_plural "%(num_students)s students opened Subsection"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "%(num_students)s student"
@@ -3671,6 +3707,7 @@ msgid_plural "%(num_students)s students"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "%(num_questions)s question"
@@ -3678,6 +3715,7 @@ msgid_plural "%(num_questions)s questions"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "Number of Students"
@@ -4042,6 +4080,7 @@ msgid_plural "Used in %(count)s units"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #. Translators: 'outlineAnchor' is an anchor pointing to
 #. the course outline page.
@@ -4099,6 +4138,7 @@ msgid_plural "Contains %(count)s groups"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #. Translators: 'outlineAnchor' is an anchor pointing to
 #. the course outline page.
@@ -4641,6 +4681,78 @@ msgstr ""
 msgid "remove"
 msgstr ""
 
+#: lms/templates/commerce/receipt.underscore
+msgid "Thank you! We have received your payment."
+msgstr ""
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid ""
+"Please print this page for your records; it serves as your receipt. You will"
+" also receive an email with the same information."
+msgstr ""
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Order No."
+msgstr ""
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Date"
+msgstr ""
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Amount"
+msgstr ""
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Total"
+msgstr ""
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Please Note"
+msgstr ""
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Crossed out items have been refunded."
+msgstr ""
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Billed to"
+msgstr ""
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "No receipt available"
+msgstr ""
+
+#: lms/templates/commerce/receipt.underscore
+msgid "Go to Dashboard"
+msgstr ""
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid ""
+"If you don't verify your identity now, you can still explore your course "
+"from your dashboard. You will receive periodic reminders from "
+"%(platformName)s to verify your identity."
+msgstr ""
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Want to confirm your identity later?"
+msgstr ""
+
+#: lms/templates/commerce/receipt.underscore
+msgid "Verify Now"
+msgstr ""
+
 #: lms/templates/dashboard/donation.underscore
 msgid "Donate"
 msgstr ""
@@ -4831,6 +4943,7 @@ msgid_plural "(contains %(student_count)s students)"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
 msgid ""
@@ -4884,6 +4997,7 @@ msgid_plural "Load next %(num_items)s results"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
@@ -5081,47 +5195,63 @@ msgid "Error:"
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
+msgid "What You Need for Verification"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/intro_step.underscore
+#: lms/templates/verify_student/make_payment_step.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Webcam"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+msgid ""
+"You need a computer that has a webcam. When you receive a browser prompt, "
+"make sure that you allow access to the camera."
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+msgid "Photo Identification"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+msgid ""
+"You need a driver's license, passport, or other government-issued ID that "
+"has your name and photo."
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Take Your Photo"
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
 msgid ""
-"Use your webcam to take a photo of your face. We will match this photo with "
-"the photo on your ID."
+"When your face is in position, use the camera button %(icon)s below to take "
+"your photo."
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Tips on taking a successful photo"
+msgid "To take a successful photo, make sure that:"
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Make sure your face is well-lit"
+msgid "Your face is well-lit."
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Be sure your entire face is inside the frame"
+msgid "Your entire face fits inside the frame."
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Once in position, use the camera button %(icon)s to capture your photo"
+msgid "The photo of your face matches the photo on your ID."
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Can we match the photo you took with the one on your ID?"
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Use the retake photo button if you are not pleased with your photo"
+msgid ""
+"To use the current photo, select the camera button %(icon)s. To take another"
+" photo, select the retake button %(icon)s."
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -5185,6 +5315,11 @@ msgid ""
 msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Tips on taking a successful photo"
+msgstr ""
+
+#: lms/templates/verify_student/id_photo_step.underscore
 msgid "Ensure that you can see your photo and read your name"
 msgstr ""
 
@@ -5196,12 +5331,39 @@ msgstr ""
 msgid "Once in position, use the camera button %(icon)s to capture your ID"
 msgstr ""
 
+#: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Use the retake photo button if you are not pleased with your photo"
+msgstr ""
+
 #: lms/templates/verify_student/image_input.underscore
 msgid "Preview of uploaded image"
 msgstr ""
 
 #: lms/templates/verify_student/image_input.underscore
 msgid "Upload an image or capture one with your web or phone camera."
+msgstr ""
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"Use your webcam to take a photo of your face. We will match this photo with "
+"the photo on your ID."
+msgstr ""
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Make sure your face is well-lit"
+msgstr ""
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Be sure your entire face is inside the frame"
+msgstr ""
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Once in position, use the camera button %(icon)s to capture your photo"
+msgstr ""
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Can we match the photo you took with the one on your ID?"
 msgstr ""
 
 #: lms/templates/verify_student/intro_step.underscore
@@ -5236,12 +5398,6 @@ msgstr ""
 msgid ""
 "A driver's license, passport, or other government-issued ID with your name "
 "and photo"
-msgstr ""
-
-#: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/make_payment_step.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Webcam"
 msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore
@@ -5302,44 +5458,6 @@ msgid "Thank you! We have received your payment for %(courseName)s."
 msgstr ""
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"Please print this page for your records; it serves as your receipt. You will"
-" also receive an email with the same information."
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Order No."
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Date"
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Amount"
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Total"
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Please Note"
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Crossed out items have been refunded."
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Billed to"
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "No receipt available"
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Next Step: Confirm your identity"
 msgstr ""
 
@@ -5357,17 +5475,6 @@ msgstr ""
 msgid ""
 "A driver's license, passport, or government-issued ID with your name and "
 "photo."
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"If you don't verify your identity now, you can still explore your course "
-"from your dashboard. You will receive periodic reminders from "
-"%(platformName)s to verify your identity."
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Want to confirm your identity later?"
 msgstr ""
 
 #: lms/templates/verify_student/review_photos_step.underscore

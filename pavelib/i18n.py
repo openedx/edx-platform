@@ -193,10 +193,11 @@ def i18n_robot_pull():
     Pull source strings, generate po and mo files, and validate
     """
     sh('git clean -fdX conf/locale')
-    # sh('paver test_i18n')  # tests were removed from repo, but there should still be tests that cover the translations...
+    # sh('paver test_i18n')  # TODO tests were removed from repo, but there should still be tests that cover the translations...
 
     # Validate the recently pulled translations, and give a bail option
     cmd = "i18n_tool validate"
+    print("\n\nValidating translations with `i18n_tool validate`...")
     sh("{cmd}".format(cmd=cmd))
 
     con = raw_input("Continue with committing these translations (y/n)? ")

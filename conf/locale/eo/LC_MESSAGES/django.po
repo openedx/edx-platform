@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-04-30 15:52+0000\n"
-"PO-Revision-Date: 2015-04-30 15:52:14.238792\n"
+"POT-Creation-Date: 2015-05-08 17:46+0000\n"
+"PO-Revision-Date: 2015-05-08 17:46:13.732135\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -7269,6 +7269,7 @@ msgid "Invoice"
 msgstr "Ìnvöïçé Ⱡ'σяєм ιρѕυм #"
 
 #: lms/djangoapps/shoppingcart/pdf.py
+#: lms/templates/commerce/checkout_receipt.html
 msgid "Receipt"
 msgstr "Réçéïpt Ⱡ'σяєм ιρѕυм #"
 
@@ -8386,10 +8387,6 @@ msgstr "Ýöütüßé Ⱡ'σяєм ιρѕυм #"
 msgid "Taiwan"
 msgstr "Täïwän Ⱡ'σяєм ιρѕυ#"
 
-#: lms/lib/courseware_search/lms_result_processor.py
-msgid "(Unnamed)"
-msgstr "(Ûnnäméd) Ⱡ'σяєм ιρѕυм ∂σł#"
-
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
 msgid "Skip to main content"
@@ -8725,7 +8722,7 @@ msgstr "Édït Ⱡ'σяєм ι#"
 msgid "Save changes"
 msgstr "Sävé çhängés Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
-#: lms/templates/wiki/edit.html
+#: lms/templates/wiki/edit.html cms/templates/container.html
 msgid "Preview"
 msgstr "Prévïéw Ⱡ'σяєм ιρѕυм #"
 
@@ -9152,6 +9149,10 @@ msgstr ""
 msgid "Password"
 msgstr "Pässwörd Ⱡ'σяєм ιρѕυм ∂#"
 
+#: openedx/core/djangoapps/user_api/views.py lms/templates/login.html
+msgid "Remember me"
+msgstr "Rémémßér mé Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
 #: openedx/core/djangoapps/user_api/views.py
 msgid ""
 "It looks like {email_address} belongs to an existing account. Try again with"
@@ -9344,6 +9345,10 @@ msgstr "Çöüld nöt ïndéx ïtém: {} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ�
 #: cms/djangoapps/contentstore/courseware_index.py
 msgid "General indexing error occurred"
 msgstr "Généräl ïndéxïng érrör öççürréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: cms/djangoapps/contentstore/courseware_index.py
+msgid "(Unnamed)"
+msgstr "(Ûnnäméd) Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
@@ -9852,6 +9857,7 @@ msgid "Settings"
 msgstr "Séttïngs Ⱡ'σяєм ιρѕυм ∂#"
 
 #: cms/templates/html_error.html lms/templates/module-error.html
+#: lms/templates/commerce/checkout_receipt.html
 msgid "Error:"
 msgstr "Érrör: Ⱡ'σяєм ιρѕυ#"
 
@@ -10651,6 +10657,10 @@ msgstr ""
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/index.html
+msgid "Search for a course"
+msgstr "Séärçh för ä çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: lms/templates/index.html
 msgid "View all Courses"
 msgstr "Vïéw äll Çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
@@ -10813,10 +10823,6 @@ msgstr ""
 #: lms/templates/login.html
 msgid "Account Preferences"
 msgstr "Àççöünt Préférénçés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/templates/login.html
-msgid "Remember me"
-msgstr "Rémémßér mé Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #. Translators: provider_name is the name of an external, third-party user
 #. authentication provider (like Google or LinkedIn).
@@ -11650,6 +11656,7 @@ msgstr ""
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
+#: lms/templates/commerce/checkout_receipt.html
 msgid "Error"
 msgstr "Érrör Ⱡ'σяєм ιρѕ#"
 
@@ -12484,6 +12491,22 @@ msgid ""
 msgstr ""
 "Ýöür tränsäçtïön häs ßéén çänçélléd. Ìf ýöü féél än érrör häs öççürréd, "
 "çöntäçt {email}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/templates/commerce/checkout_receipt.html
+msgid "Could not retrieve payment information"
+msgstr ""
+"Çöüld nöt rétrïévé päýmént ïnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: lms/templates/commerce/checkout_receipt.html
+msgid "Loading Order Data..."
+msgstr "Löädïng Ördér Dätä... Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/commerce/checkout_receipt.html
+msgid "Please wait while we retrieve your order details."
+msgstr ""
+"Pléäsé wäït whïlé wé rétrïévé ýöür ördér détäïls. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/courseware/accordion.html
 msgid "{chapter}, current chapter"
@@ -14218,8 +14241,8 @@ msgid "Unfollow"
 msgstr "Ûnföllöw Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/discussion/_underscore_templates.html
-msgid "Vote"
-msgstr "Vöté Ⱡ'σяєм ι#"
+msgid "Vote for this post,"
+msgstr "Vöté för thïs pöst, Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Report abuse"
@@ -15167,6 +15190,59 @@ msgid "You have been removed from a beta test for {course_name}"
 msgstr ""
 "Ýöü hävé ßéén rémövéd fröm ä ßétä tést för {course_name} Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/emails/reverification_processed.txt
+msgid ""
+"Your verification for course {course_name} and assessment {assessment} has "
+"been passed."
+msgstr ""
+"Ýöür vérïfïçätïön för çöürsé {course_name} änd ässéssmént {assessment} häs "
+"ßéén pässéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: lms/templates/emails/reverification_processed.txt
+msgid ""
+"Your verification for course {course_name} and assessment {assessment} has "
+"failed."
+msgstr ""
+"Ýöür vérïfïçätïön för çöürsé {course_name} änd ässéssmént {assessment} häs "
+"fäïléd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "You have reached your allowed attempts limit. No more retakes allowed."
+msgstr ""
+"Ýöü hävé réäçhéd ýöür ällöwéd ättémpts lïmït. Nö möré rétäkés ällöwéd. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Assessment date has passed and retake not allowed."
+msgstr ""
+"Àsséssmént däté häs pässéd änd rétäké nöt ällöwéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Assessment closes on {due_date}."
+msgstr "Àsséssmént çlösés ön {due_date}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Assessment is open and you have {left_attempts} attempt(s) remaining."
+msgstr ""
+"Àsséssmént ïs öpén änd ýöü hävé {left_attempts} ättémpt(s) rémäïnïng. Ⱡ'σяєм"
+" ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Click on link below to re-verify:"
+msgstr ""
+"Çlïçk ön lïnk ßélöw tö ré-vérïfý: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Click on link below to go to the courseware:"
+msgstr ""
+"Çlïçk ön lïnk ßélöw tö gö tö thé çöürséwäré: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "The {platform_name} Team."
+msgstr "Thé {platform_name} Téäm. Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/emails/unenroll_email_allowedmessage.txt
 msgid "Dear Student,"
@@ -17800,10 +17876,18 @@ msgstr "Pré-Çöürsé Sürvéý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α�
 #: lms/templates/survey/survey.html
 msgid ""
 "You can begin your course as soon as you complete the following form. "
-"Required fields are marked with an asterisk (*)."
+"Required fields are marked with an asterisk (*). This information is for the"
+" use of {platform_name} only. It will not be linked to your public profile "
+"in any way."
 msgstr ""
 "Ýöü çän ßégïn ýöür çöürsé äs söön äs ýöü çömplété thé föllöwïng förm. "
-"Réqüïréd fïélds äré märkéd wïth än ästérïsk (*). Ⱡ'σяєм ιρѕυм #"
+"Réqüïréd fïélds äré märkéd wïth än ästérïsk (*). Thïs ïnförmätïön ïs för thé"
+" üsé öf {platform_name} önlý. Ìt wïll nöt ßé lïnkéd tö ýöür püßlïç pröfïlé "
+"ïn äný wäý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
+"∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ "
+"мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ "
+"єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
+"νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ρ#"
 
 #: lms/templates/survey/survey.html
 msgid "You are missing the following required fields:"
@@ -18981,12 +19065,17 @@ msgid "Drag to reorder"
 msgstr "Dräg tö réördér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: cms/templates/container.html
+msgid "Open the courseware in the LMS"
+msgstr "Öpén thé çöürséwäré ïn thé LMS Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: cms/templates/container.html
 msgid "View Live Version"
 msgstr "Vïéw Lïvé Vérsïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: cms/templates/container.html
-msgid "Preview Changes"
-msgstr "Prévïéw Çhängés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+msgid "Preview the courseware in the LMS"
+msgstr ""
+"Prévïéw thé çöürséwäré ïn thé LMS Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: cms/templates/container.html
 msgid "Adding components"
