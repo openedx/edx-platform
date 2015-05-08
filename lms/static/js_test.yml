@@ -98,5 +98,5 @@ requirejs:
 
 # Because require.js is responsible for loading all dependencies, we exclude
 # all files from being included in <script> tags
-exclude_from_page:
-    - .*
+#exclude_from_page:
+#    - .*
