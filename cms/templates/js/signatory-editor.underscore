@@ -43,6 +43,19 @@
                   <span class="message-error"><%= error.organization %></span>
                 <% } %>
             </div>
+            <div class="input-wrap field text add-signatory-signature">
+                <label for="signatory-signature-<%= signatory_number %>"><%= gettext("Signature Image") %></label>
+                <% if (signature_image_path != "") { %>
+                    <div class="current-signature-image"><span class="wrapper-signature-image"><img class="signature-image" src="<%= signature_image_path %>" alt="Signature Image"></span></div>
+                <% } %>
+                <div class="signature-upload-wrapper">
+                  <div class="signature-upload-input-wrapper">
+                    <input id="signatory-signature-<%= signatory_number %>" class="collection-name-input input-text signatory-signature-input" name="signatory-signature-url" type="text" placeholder="<%= gettext("Path to Signature Image") %>" value="<%= signature_image_path %>"  aria-describedby="signatory-signature-<%= signatory_number %>-tip">
+                    <span id="signatory-signature-<%= signatory_number %>-tip" class="tip tip-stacked"><%= gettext("Image must be 450px X 150px transparent PNG") %></span>
+                  </div>
+                  <button type="button" class="action action-upload-signature">Upload Signature Image</button>
+                </div>               
+            </div>
          </fieldset>
        </div>
      </div>
