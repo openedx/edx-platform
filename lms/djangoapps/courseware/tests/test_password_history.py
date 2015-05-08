@@ -4,6 +4,7 @@ This file will test through the LMS some of the PasswordHistory features
 import json
 from mock import patch
 from uuid import uuid4
+from nose.plugins.attrib import attr
 
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -20,6 +21,7 @@ from student.models import PasswordHistory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 
 
+@attr('shard_1')
 @patch.dict("django.conf.settings.FEATURES", {'ADVANCED_SECURITY': True})
 class TestPasswordHistory(LoginEnrollmentTestCase):
     """

@@ -2,6 +2,7 @@
 
 import json
 from uuid import uuid4
+from nose.plugins.attrib import attr
 
 from ddt import ddt, data
 from django.core.urlresolvers import reverse
@@ -33,6 +34,7 @@ class UserMixin(object):
         self.client.login(username=self.user.username, password='test')
 
 
+@attr('shard_1')
 @ddt
 @override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
 class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase):
@@ -303,6 +305,7 @@ class OrdersViewTests(BasketsViewTests):
         self.url = reverse('commerce:orders')
 
 
+@attr('shard_1')
 @override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
 class BasketOrderViewTests(UserMixin, TestCase):
     """ Tests for the basket order view. """
@@ -337,6 +340,7 @@ class BasketOrderViewTests(UserMixin, TestCase):
         self.assertEqual(response.status_code, 403)
 
 
+@attr('shard_1')
 class ReceiptViewTests(TestCase):
     """ Tests for the receipt view. """
 

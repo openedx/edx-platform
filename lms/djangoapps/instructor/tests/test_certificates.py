@@ -2,6 +2,7 @@
 import contextlib
 import ddt
 import mock
+from nose.plugins.attrib import attr
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -12,6 +13,7 @@ from certificates.models import CertificateGenerationConfiguration
 from certificates import api as certs_api
 
 
+@attr('shard_1')
 @ddt.ddt
 class CertificatesInstructorDashTest(ModuleStoreTestCase):
     """Tests for the certificate panel of the instructor dash. """
@@ -148,6 +150,7 @@ class CertificatesInstructorDashTest(ModuleStoreTestCase):
         self.assertContains(response, expected_html)
 
 
+@attr('shard_1')
 @override_settings(CERT_QUEUE='certificates')
 @ddt.ddt
 class CertificatesInstructorApiTest(ModuleStoreTestCase):

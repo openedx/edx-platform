@@ -4,12 +4,14 @@ edx.org uses an edx footer but other instances use an Open edX footer.
 """
 
 from mock import patch
+from nose.plugins.attrib import attr
 
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 
 
+@attr('shard_1')
 class TestFooter(TestCase):
 
     SOCIAL_MEDIA_URLS = {

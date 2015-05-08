@@ -4,6 +4,7 @@ Tests related to the Microsites feature
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
+from nose.plugins.attrib import attr
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from course_modes.models import CourseMode
@@ -13,6 +14,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
+@attr('shard_1')
 class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     This is testing of the Microsite feature

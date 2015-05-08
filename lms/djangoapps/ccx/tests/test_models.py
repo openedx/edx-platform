@@ -4,6 +4,7 @@ tests for the models
 from datetime import datetime, timedelta
 from django.utils.timezone import UTC
 from mock import patch
+from nose.plugins.attrib import attr
 from student.models import CourseEnrollment  # pylint: disable=import-error
 from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
 from student.tests.factories import (  # pylint: disable=import-error
@@ -29,6 +30,7 @@ from ..models import (
 from ..overrides import override_field_for_ccx
 
 
+@attr('shard_1')
 class TestCcxMembership(ModuleStoreTestCase):
     """Unit tests for the CcxMembership model
     """
@@ -135,6 +137,7 @@ class TestCcxMembership(ModuleStoreTestCase):
         self.assertTrue(self.has_ccx_future_membership(user))
 
 
+@attr('shard_1')
 class TestCCX(ModuleStoreTestCase):
     """Unit tests for the CustomCourseForEdX model
     """

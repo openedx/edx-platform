@@ -3,6 +3,7 @@ Python tests for the Survey workflows
 """
 
 from collections import OrderedDict
+from nose.plugins.attrib import attr
 
 from django.core.urlresolvers import reverse
 
@@ -13,6 +14,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.helpers import LoginEnrollmentTestCase
 
 
+@attr('shard_1')
 class SurveyViewsTests(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     All tests for the views.py file

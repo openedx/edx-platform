@@ -4,6 +4,7 @@ import pytz
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from mock import Mock, patch
+from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 import courseware.access as access
@@ -28,6 +29,7 @@ from util.milestones_helpers import (
 # pylint: disable=protected-access
 
 
+@attr('shard_1')
 class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for the various access controls on the student dashboard
@@ -368,6 +370,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
 
 
+@attr('shard_1')
 class UserRoleTestCase(TestCase):
     """
     Tests for user roles.

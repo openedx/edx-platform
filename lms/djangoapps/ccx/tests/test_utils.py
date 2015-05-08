@@ -1,6 +1,8 @@
 """
 test utils
 """
+from nose.plugins.attrib import attr
+
 from ccx.models import (  # pylint: disable=import-error
     CcxMembership,
     CcxFutureMembership,
@@ -21,6 +23,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
+@attr('shard_1')
 class TestEmailEnrollmentState(ModuleStoreTestCase):
     """unit tests for the EmailEnrollmentState class
     """
@@ -120,6 +123,7 @@ class TestEmailEnrollmentState(ModuleStoreTestCase):
         self.assertTrue(member in representation)
 
 
+@attr('shard_1')
 # TODO: deal with changes in behavior for auto_enroll
 class TestGetEmailParams(ModuleStoreTestCase):
     """tests for ccx.utils.get_email_params
@@ -176,6 +180,7 @@ class TestGetEmailParams(ModuleStoreTestCase):
         self.assertTrue(auto['auto_enroll'])
 
 
+@attr('shard_1')
 # TODO: deal with changes in behavior for auto_enroll
 class TestEnrollEmail(ModuleStoreTestCase):
     """tests for the enroll_email function from ccx.utils
@@ -356,6 +361,7 @@ class TestEnrollEmail(ModuleStoreTestCase):
         self.assertEqual(self.outbox, [])
 
 
+@attr('shard_1')
 # TODO: deal with changes in behavior for auto_enroll
 class TestUnenrollEmail(ModuleStoreTestCase):
     """Tests for the unenroll_email function from ccx.utils"""
@@ -504,6 +510,7 @@ class TestUnenrollEmail(ModuleStoreTestCase):
         self.assertEqual(self.outbox, [])
 
 
+@attr('shard_1')
 class TestUserCCXList(ModuleStoreTestCase):
     """Unit tests for ccx.utils.get_all_ccx_for_user"""
 

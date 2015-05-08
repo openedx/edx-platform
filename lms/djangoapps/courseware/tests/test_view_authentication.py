@@ -3,6 +3,7 @@ import pytz
 
 from django.core.urlresolvers import reverse
 from mock import patch
+from nose.plugins.attrib import attr
 
 from courseware.access import has_access
 from courseware.tests.helpers import LoginEnrollmentTestCase
@@ -20,6 +21,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
 
+@attr('shard_1')
 class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that view authentication works properly.
@@ -386,6 +388,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertTrue(self.enroll(self.course))
 
 
+@attr('shard_1')
 class TestBetatesterAccess(ModuleStoreTestCase):
     """
     Tests for the beta tester feature

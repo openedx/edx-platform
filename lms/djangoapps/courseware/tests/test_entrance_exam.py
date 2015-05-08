@@ -4,6 +4,7 @@ Tests use cases related to LMS Entrance Exam behavior, such as gated content acc
 from django.conf import settings
 from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
+from nose.plugins.attrib import attr
 
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module, toc_for_course
@@ -34,6 +35,7 @@ from mock import patch, Mock
 import mock
 
 
+@attr('shard_1')
 class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Check that content is properly gated.  Create a test course from scratch to mess with.

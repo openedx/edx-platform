@@ -95,6 +95,10 @@ END
         exit $EXIT
         ;;
 
+    # TODO: Remove the "unit" TEST_SUITE in favor of "lms-unit", etc.
+    # For now it is left in here so that there is not a time limit on how fast
+    # we need to update the groovy script in the jenkins config after merging
+    # the changes needed to shard out the unit tests.
     "unit")
         case "$SHARD" in
             "lms")
@@ -110,7 +114,32 @@ END
                 paver coverage
                 ;;
         esac
+        exit $EXIT
+        ;;
 
+    "lms-unit")
+        case "$SHARD" in
+            "1")
+                paver test_system -s lms --extra_args="--attr='shard_1' --with-flaky" --cov_args="-p" || { EXIT=1; }
+                ;;
+            "2")
+                paver test_system -s lms --extra_args="--attr='shard_1=False' --with-flaky" --cov_args="-p" || { EXIT=1; }
+                ;;
+            *)
+                paver test_system -s lms --extra_args="--with-flaky" --cov_args="-p" || { EXIT=1; }
+                ;;
+        esac
+        exit $EXIT
+        ;;
+
+    "cms-unit")
+        paver test_system -s cms --extra_args="--with-flaky" --cov_args="-p" || { EXIT=1; }
+        exit $EXIT
+        ;;
+
+    "commonlib-js-unit")
+        paver test_js --coverage --skip_clean || { EXIT=1; }
+        paver test_lib --skip_clean --extra_args="--with-flaky" --cov_args="-p" || { EXIT=1; }
         exit $EXIT
         ;;
 

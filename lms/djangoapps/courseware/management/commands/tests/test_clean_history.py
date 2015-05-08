@@ -2,6 +2,7 @@
 
 import fnmatch
 from mock import Mock
+from nose.plugins.attrib import attr
 import os.path
 import textwrap
 
@@ -138,6 +139,7 @@ class HistoryCleanerTest(TransactionTestCase):
         self.assertEqual(self.parse_rows(rows), self.read_history())
 
 
+@attr('shard_1')
 class HistoryCleanerNoDbTest(HistoryCleanerTest):
     """Tests of StudentModuleHistoryCleaner with db access mocked."""
 
@@ -208,6 +210,7 @@ class HistoryCleanerNoDbTest(HistoryCleanerTest):
         smhc.delete_history.assert_called_once_with([42, 23, 15, 8])
 
 
+@attr('shard_1')
 class HistoryCleanerWitDbTest(HistoryCleanerTest):
     """Tests of StudentModuleHistoryCleaner with a real db."""
 
@@ -394,6 +397,7 @@ class SmhcForTestingMain(SmhcSayStubbed):
         self.say("(not really committing)")
 
 
+@attr('shard_1')
 class HistoryCleanerMainTest(HistoryCleanerTest):
     """Tests of StudentModuleHistoryCleaner.main(), using SmhcForTestingMain."""
 

@@ -5,6 +5,7 @@ Unit tests for enrollment methods in views.py
 
 import ddt
 from mock import patch
+from nose.plugins.attrib import attr
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -19,6 +20,7 @@ from django.core import mail
 USER_COUNT = 4
 
 
+@attr('shard_1')
 @ddt.ddt
 class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """

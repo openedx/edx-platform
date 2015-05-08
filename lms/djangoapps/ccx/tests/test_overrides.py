@@ -4,6 +4,7 @@ tests for overrides
 import datetime
 import mock
 import pytz
+from nose.plugins.attrib import attr
 
 from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
 from django.test.utils import override_settings
@@ -17,6 +18,7 @@ from ..overrides import override_field_for_ccx
 from .test_views import flatten, iter_blocks
 
 
+@attr('shard_1')
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
     'ccx.overrides.CustomCoursesForEdxOverrideProvider',))
 class TestFieldOverrides(ModuleStoreTestCase):

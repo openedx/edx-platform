@@ -6,6 +6,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from mock import MagicMock, Mock, patch
+from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.courses import get_course_by_id
@@ -24,6 +25,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
+@attr('shard_1')
 class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """Test cases for Static Tab Dates."""
 
@@ -75,6 +77,7 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             self.assertIn("this module is temporarily unavailable", static_tab)
 
 
+@attr('shard_1')
 class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for the static tab dates of an XML course
@@ -108,6 +111,7 @@ class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertIn(self.xml_data, resp.content)
 
 
+@attr('shard_1')
 class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Validate tab behavior when dealing with Entrance Exams
@@ -214,6 +218,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             self.assertEqual(len(course_tab_list), 5)
 
 
+@attr('shard_1')
 class TextBookTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Validate tab behavior when dealing with textbooks.

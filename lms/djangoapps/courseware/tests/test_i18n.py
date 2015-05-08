@@ -2,11 +2,13 @@
 Tests i18n in courseware
 """
 import re
+from nose.plugins.attrib import attr
 
 from django.test import TestCase
 from django.test.utils import override_settings
 
 
+@attr('shard_1')
 @override_settings(LANGUAGES=(('eo', 'Esperanto'),))
 class I18nTestCase(TestCase):
     """
