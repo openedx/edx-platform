@@ -5,6 +5,7 @@ from django.http import Http404
 
 from collections import defaultdict
 
+from courseware.courses import get_course_with_access
 from discussion_api.pagination import get_paginated_data
 from django_comment_client.utils import get_accessible_discussion_modules
 from django_comment_common.models import (
@@ -16,9 +17,22 @@ from django_comment_common.models import (
 from lms.lib.comment_client.thread import Thread
 from lms.lib.comment_client.user import User
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id, get_cohort_names
+from xmodule.tabs import DiscussionTab
 
 
-def get_course_topics(course, user):
+def _get_course_or_404(course_key, user):
+    """
+    Get the course descriptor, raising Http404 if the course is not found,
+    the user cannot access forums for the course, or the discussion tab is
+    disabled for the course.
+    """
+    course = get_course_with_access(user, 'load_forum', course_key)
+    if not any([isinstance(tab, DiscussionTab) for tab in course.tabs]):
+        raise Http404
+    return course
+
+
+def get_course_topics(course_key, user):
     """
     Return the course topic listing for the given course and user.
 
@@ -39,6 +53,7 @@ def get_course_topics(course, user):
         """
         return module.sort_key or module.discussion_target
 
+    course = _get_course_or_404(course_key, user)
     discussion_modules = get_accessible_discussion_modules(course, user)
     modules_by_category = defaultdict(list)
     for module in discussion_modules:
@@ -138,7 +153,7 @@ def _cc_thread_to_api_thread(thread, cc_user, staff_user_ids, ta_user_ids, group
     return ret
 
 
-def get_thread_list(request, course, page, page_size):
+def get_thread_list(request, course_key, page, page_size):
     """
     Return the list of all discussion threads pertaining to the given course
 
@@ -154,6 +169,7 @@ def get_thread_list(request, course, page, page_size):
     A paginated result containing a list of threads; see
     discussion_api.views.ThreadViewSet for more detail.
     """
+    course = _get_course_or_404(course_key, request.user)
     user_is_privileged = Role.objects.filter(
         course_id=course.id,
         name__in=[FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA],
