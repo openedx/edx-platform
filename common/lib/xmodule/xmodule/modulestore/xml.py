@@ -14,6 +14,7 @@ from importlib import import_module
 from lxml import etree
 from path import path
 from contextlib import contextmanager
+from lazy import lazy
 
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import make_error_tracker, exc_info_to_str
@@ -933,6 +934,9 @@ class LibraryXMLModuleStore(XMLModuleStore):
         here manually.
         """
         init_dict = {key: getattr(library_descriptor, key) for key in library_descriptor.fields.keys()}
+        # if set, invalidate '_unwrapped_field_data' so it will be reset
+        # the next time it will be called
+        lazy.invalidate(library_descriptor, '_unwrapped_field_data')
         # pylint: disable=protected-access
         library_descriptor._field_data = inheriting_field_data(InheritanceKeyValueStore(init_dict))
 
