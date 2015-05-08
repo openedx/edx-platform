@@ -106,7 +106,7 @@ class SearchIndexerBase(object):
         response = searcher.search(
             doc_type=cls.DOCUMENT_TYPE,
             field_dictionary=cls._get_location_info(structure_key),
-            exclude_ids=exclude_items
+            exclude_dictionary={"id": list(exclude_items)}
         )
         result_ids = [result["data"]["id"] for result in response["results"]]
         for result_id in result_ids:
@@ -298,7 +298,7 @@ class CoursewareSearchIndexer(SearchIndexerBase):
     @classmethod
     def _get_location_info(cls, normalized_structure_key):
         """ Builds location info dictionary """
-        return {"course": unicode(normalized_structure_key)}
+        return {"course": unicode(normalized_structure_key), "org": normalized_structure_key.org}
 
     @classmethod
     def do_course_reindex(cls, modulestore, course_key):
