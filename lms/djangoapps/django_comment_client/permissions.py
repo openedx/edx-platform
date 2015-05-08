@@ -5,34 +5,27 @@ Module for checking permissions with the comment_client backend
 import logging
 from types import NoneType
 from django.core import cache
+
+from request_cache.middleware import RequestCache
 from lms.lib.comment_client import Thread
 from opaque_keys.edx.keys import CourseKey
 
-CACHE = cache.get_cache('default')
-CACHE_LIFESPAN = 60
-
-
-def cached_has_permission(user, permission, course_id=None):
-    """
-    Call has_permission if it's not cached. A change in a user's role or
-    a role's permissions will only become effective after CACHE_LIFESPAN seconds.
-    """
-    assert isinstance(course_id, (NoneType, CourseKey))
-    key = u"permission_{user_id:d}_{course_id}_{permission}".format(
-        user_id=user.id, course_id=course_id, permission=permission)
-    val = CACHE.get(key, None)
-    if val not in [True, False]:
-        val = has_permission(user, permission, course_id=course_id)
-        CACHE.set(key, val, CACHE_LIFESPAN)
-    return val
+from django_comment_common.models import all_permissions_for_user_in_course
 
 
 def has_permission(user, permission, course_id=None):
     assert isinstance(course_id, (NoneType, CourseKey))
-    for role in user.roles.filter(course_id=course_id):
-        if role.has_permission(permission):
-            return True
-    return False
+    request_cache_dict = RequestCache.get_request_cache().data
+    cache_key = "django_comment_client.permissions.has_permission.all_permissions.{}.{}".format(
+        user.id, course_id
+    )
+    if cache_key in request_cache_dict:
+        all_permissions = request_cache_dict[cache_key]
+    else:
+        all_permissions = all_permissions_for_user_in_course(user, course_id)
+        request_cache_dict[cache_key] = all_permissions
+
+    return permission in all_permissions
 
 
 CONDITIONS = ['is_open', 'is_author', 'is_question_author']
@@ -84,7 +77,7 @@ def _check_conditions_permissions(user, permissions, course_id, content):
         if isinstance(per, basestring):
             if per in CONDITIONS:
                 return _check_condition(user, per, content)
-            return cached_has_permission(user, per, course_id=course_id)
+            return has_permission(user, per, course_id=course_id)
         elif isinstance(per, list) and operator in ["and", "or"]:
             results = [test(user, x, operator="and") for x in per]
             if operator == "or":
