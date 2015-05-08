@@ -418,11 +418,58 @@ class ContentLicenseTest(StudioCourseTest):
             self.course_info['number'],
             self.course_info['run']
         )
-        self.settings_page = SettingsPage(
-            self.browser,
-            self.course_info['org'],
-            self.course_info['number'],
-            self.course_info['run']
+
+    def make_signatory_data(self, prefix='First'):
+        """
+        Makes signatory dict which can be used in the tests to create certificates
+        """
+        return {
+            'name': '{prefix} Signatory Name'.format(prefix=prefix),
+            'title': '{prefix} Signatory Title'.format(prefix=prefix),
+        }
+
+    def create_and_verify_certificate(self, name, description, existing_certs, signatories):
+        """
+        Creates a new certificate and verifies that it was properly created.
+        """
+        self.assertEqual(existing_certs, len(self.certificates_page.certificates))
+        if existing_certs == 0:
+            self.certificates_page.create_first_certificate()
+        else:
+            self.certificates_page.add_certificate()
+        certificate = self.certificates_page.certificates[existing_certs]
+        certificate.name = name
+        certificate.description = description
+
+        # add signatories
+        added_signatories = 0
+        for idx, signatory in enumerate(signatories):
+            certificate.signatories[idx].name = signatory['name']
+            certificate.signatories[idx].title = signatory['title']
+            added_signatories += 1
+            if len(signatories) > added_signatories:
+                certificate.add_signatory()
+
+        # Save the certificate
+        self.assertEqual(certificate.get_text('.action-primary'), "Create")
+        self.assertFalse(certificate.delete_button_is_present)
+        certificate.save()
+        self.assertIn(name, certificate.name)
+        return certificate
+
+    def test_no_certificates_by_default(self):
+        """
+        Scenario: Ensure that message telling me to create a new certificate is
+            shown when no certificate exist.
+        Given I have a course without certificates
+        When I go to the Certificates page in Studio
+        Then I see "You have not created any certificates yet." message
+        """
+        self.certificates_page.visit()
+        self.assertTrue(self.certificates_page.no_certificates_message_shown)
+        self.assertIn(
+            "You have not created any certificates yet.",
+            self.certificates_page.no_certificates_message_text
         )
         self.lms_courseware = CoursewarePage(
             self.browser,
