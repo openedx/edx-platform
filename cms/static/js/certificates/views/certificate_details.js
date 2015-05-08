@@ -27,9 +27,7 @@ function(BaseView, _, Signatory, SignatoryDetails, gettext, str) {
 
         initialize: function() {
             // Set up the initial state of the attributes set for this model instance
-            this.template = _.template(
-                $('#certificate-details-tpl').text()
-            );
+            this.template = this.loadTemplate('certificate-details');
             this.listenTo(this.model, 'change', this.render);
         },
 

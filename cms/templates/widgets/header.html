@@ -99,9 +99,11 @@
                   <li class="nav-item nav-course-settings-advanced">
                     <a href="${advanced_settings_url}">${_("Advanced Settings")}</a>
                   </li>
+                  % if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
                   <li class="nav-item nav-course-settings-certificates">
                     <a href="${certificates_url}">${_("Certificates")}</a>
                   </li>
+                  % endif
                 </ul>
               </div>
             </div>

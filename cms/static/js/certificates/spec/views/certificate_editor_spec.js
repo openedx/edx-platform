@@ -3,6 +3,7 @@
 define([
     'underscore', 'js/models/course',
     'js/certificates/models/certificate',
+    'js/certificates/models/signatory',
     'js/certificates/collections/certificates',
     'js/certificates/views/certificate_editor',
     'js/views/feedback_notification',
@@ -10,11 +11,12 @@ define([
     'js/spec_helpers/view_helpers', 'js/spec_helpers/validation_helpers', 'js/certificates/spec/custom_matchers',
     'jasmine-stealth'
 ], function(
-    _, Course, CertificateModel, CertificatesCollection, CertificateEditorView,
+    _, Course, CertificateModel, SignatoryModel, CertificatesCollection, CertificateEditorView,
     Notification, AjaxHelpers, TemplateHelpers, ViewHelpers, ValidationHelpers, CustomMatchers
 ) {
     'use strict';
 
+    var MAX_SIGNATORIES = 4;
     var SELECTORS = {
         detailsView: '.certificate-details',
         editView: '.certificate-edit',
@@ -24,14 +26,19 @@ define([
         errorMessage: '.certificate-edit-error',
         inputCertificateName: '.collection-name-input',
         inputCertificateDescription: '.certificate-description-input',
+        inputSignatoryName: '.signatory-name-input',
+        inputSignatoryTitle: '.signatory-title-input',
         warningMessage: '.certificate-validation-text',
         warningIcon: '.wrapper-certificate-validation > i',
-        note: '.wrapper-delete-button'
+        note: '.wrapper-delete-button',
+        action_add_signatory: '.action-add-signatory'
     };
 
     var submitForm = function (view, requests, notificationSpy) {
         view.$('form').submit();
         ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
+        requests[0].respond(200);
+        ViewHelpers.verifyNotificationHidden(notificationSpy);
     };
 
     var submitAndVerifyFormError = function (view, requests, notificationSpy) {
@@ -69,21 +76,21 @@ define([
         };
 
         beforeEach(function() {
-            ViewHelpers.installViewTemplates();
-            TemplateHelpers.installTemplate('certificate-editor', true);
+            TemplateHelpers.installTemplates(['certificate-editor', 'signatory-editor'], true);
 
-             this.model = new CertificateModel({
-                id: 0,
+            this.newModelOptions = {add: true};
+            this.model = new CertificateModel({
                 name: 'Test Name',
                 description: 'Test Description'
-            });
 
-            this.collection = new CertificatesCollection();
-            this.collection.add(this.model);
-            this.collection.url = '/certificates/edX/DemoX/Demo_Course';
+            }, this.newModelOptions);
+
+            this.collection = new CertificatesCollection([ this.model ], {
+                certificateUrl: '/certificates/'+ window.course.id
+            });
+            this.model.set('id', 0);
             this.view = new CertificateEditorView({
                 model: this.model
-
             });
             appendSetFixtures(this.view.render().el);
             CustomMatchers(this);
@@ -135,6 +142,51 @@ define([
                     description: 'Test Description'
                 })
                 expect(this.collection.length).toBe(1);
+            });
+
+            it('user can only add signatories up to max 4', function() {
+                for(var i = 0; i < MAX_SIGNATORIES ; i++) {
+                    this.view.$(SELECTORS.action_add_signatory).click();
+                }
+                expect(this.view.$(SELECTORS.action_add_signatory)).toHaveClass('disableClick');
+
+            });
+
+            it('user can add signatories if not reached the upper limit', function() {
+                spyOnEvent(SELECTORS.action_add_signatory, 'click');
+                this.view.$(SELECTORS.action_add_signatory).click();
+                expect('click').not.toHaveBeenPreventedOn(SELECTORS.action_add_signatory);
+                expect(this.view.$(SELECTORS.action_add_signatory)).not.toHaveClass('disableClick');
+            });
+
+            it('signatories should save properly', function() {
+                var requests = AjaxHelpers.requests(this),
+                    notificationSpy = ViewHelpers.createNotificationSpy();
+                this.view.$('.action-add').click();
+
+                setValuesToInputs(this.view, {
+                    inputCertificateName: 'New Test Name',
+                    inputCertificateDescription: 'New Test Description',
+                    inputSignatoryName: 'New Signatory Name',
+                    inputSignatoryTitle: 'New Signatory Title'
+                });
+
+                // Force a change event to fire. so model updated with the new values.
+                this.view.$(SELECTORS.inputSignatoryName).trigger('change');
+                this.view.$(SELECTORS.inputSignatoryTitle).trigger('change');
+
+                submitForm(this.view, requests, notificationSpy);
+                expect(this.model).toBeCorrectValuesInModel({
+                    name: 'New Test Name',
+                    description: 'New Test Description'
+                });
+
+                // get the first signatory from the signatories collection.
+                var signatory = this.model.get('signatories').at(0);
+                expect(signatory).toBeInstanceOf(SignatoryModel);
+                expect(signatory.get('name')).toEqual('New Signatory Name');
+                expect(signatory.get('title')).toEqual('New Signatory Title');
+
             });
         });
     });
