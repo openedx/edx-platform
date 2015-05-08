@@ -26,6 +26,8 @@ from django.http import Http404, HttpResponse
 from django.test.client import RequestFactory
 from django.views.decorators.csrf import csrf_exempt
 
+import newrelic.agent
+
 from capa.xqueue_interface import XQueueInterface
 from courseware.access import has_access, get_user_role
 from courseware.masquerade import setup_masquerade
@@ -888,6 +890,13 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix):
         return JsonResponse(object={'success': error_msg}, status=413)
 
     instance, tracking_context = get_module_by_usage_id(request, course_id, usage_id)
+
+    # Name the transaction so that we can view XBlock handlers separately in
+    # New Relic. The suffix is necessary for XModule handlers because the
+    # "handler" in those cases is always just "xmodule_handler".
+    nr_tx_name = "{}.{}".format(instance.__class__.__name__, handler)
+    nr_tx_name += "/{}".format(suffix) if suffix else ""
+    newrelic.agent.set_transaction_name(nr_tx_name, group="Python/XBlock/Handler")
 
     tracking_context_name = 'module_callback_handler'
     req = django_to_webob_request(request)
