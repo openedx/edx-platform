@@ -8,9 +8,11 @@ define([
     'js/utils/templates',
     'js/views/utils/view_utils',
     'js/views/feedback_prompt',
-    'js/views/feedback_notification'
+    'js/views/feedback_notification',
+    'js/models/uploads',
+    'js/views/uploads' 
 ],
-function ($, _, Backbone, gettext, TemplateUtils, ViewUtils, PromptView, NotificationView) {
+function ($, _, Backbone, gettext, TemplateUtils, ViewUtils, PromptView, NotificationView, FileUploadModel, FileUploadDialog) {
     'use strict';
     var SignatoryEditorView = Backbone.View.extend({
         tagName: 'div',
@@ -18,7 +20,9 @@ function ($, _, Backbone, gettext, TemplateUtils, ViewUtils, PromptView, Notific
             'change .signatory-name-input': 'setSignatoryName',
             'change .signatory-title-input': 'setSignatoryTitle',
             'change .signatory-organization-input': 'setSignatoryOrganization',
-            'click  .signatory-panel-delete': 'deleteItem'
+            'click  .signatory-panel-delete': 'deleteItem',
+            'change .signatory-signature-input': 'setSignatorySignatureImagePath',
+            'click .action-upload-signature': 'uploadSignatureImage'
         },
 
         className: function () {
@@ -105,6 +109,16 @@ function ($, _, Backbone, gettext, TemplateUtils, ViewUtils, PromptView, Notific
             this.eventAgg.trigger("onSignatoryUpdated", this.model);
         },
 
+        setSignatorySignatureImagePath: function(event) {
+            // #TODO should have a single method for setting these fields.
+            if (event && event.preventDefault) { event.preventDefault(); }
+            this.model.set(
+                'signature_image_path',
+                this.$('.signatory-signature-input').val(),
+                { silent: true }
+            );
+        },
+
         deleteItem: function(event) {
             // Remove the specified model from the collection
             if (event && event.preventDefault) { event.preventDefault(); }
@@ -148,6 +162,23 @@ function ($, _, Backbone, gettext, TemplateUtils, ViewUtils, PromptView, Notific
                 }
             });
             confirm.show();
+        },
+
+        uploadSignatureImage: function(event) {
+            event.preventDefault();
+            var upload = new FileUploadModel({
+                title: gettext("Upload signature image."),
+                message: gettext("Image must be 450px X 150px transparent PNG."),
+                mimeTypes: ['image/png']
+            });
+            var self = this;
+            var modal = new FileUploadDialog({
+                model: upload,
+                onSuccess: function(response) {
+                    self.model.set('signature_image_path', response.asset.url);
+                }
+            });
+            modal.show();
         }
     });
     return SignatoryEditorView;
