@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.utils.translation import ugettext_noop
+from request_cache.middleware import RequestCache
+
 from student.models import CourseEnrollment
 
 from xmodule.modulestore.django import modulestore
@@ -90,6 +92,7 @@ class Role(models.Model):
         if self.name == FORUM_ROLE_STUDENT and \
            (permission.startswith('edit') or permission.startswith('update') or permission.startswith('create')) and \
            (not course.forum_posts_allowed):
+            request_cache_dict[cache_key] = False
             return False
 
         return self.permissions.filter(name=permission).exists()
@@ -105,3 +108,27 @@ class Permission(models.Model):
 
     def __unicode__(self):
         return self.name
+
+def all_permissions_for_user_in_course(user, course_id):
+    course = modulestore().get_course(course_id)
+    if course is None:
+        raise ItemNotFoundError(course_id)
+
+    all_roles = {role.name for role in Role.objects.filter(users=user, course_id=course_id)}
+    print all_roles
+
+    def blacked_out(p_name):
+        return (
+            all_roles == {FORUM_ROLE_STUDENT} and 
+            (p_name.startswith('edit') or p_name.startswith('update') or p_name.startswith('create')) and
+            (not course.forum_posts_allowed)
+        )
+
+    permissions = {
+        permission.name
+        for permission
+        in Permission.objects.filter(roles__users=user, roles__course_id=course_id)
+        if not blacked_out(permission.name) 
+    }
+    print permissions
+    return permissions
