@@ -43,7 +43,7 @@ git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b
 -e git+https://github.com/edx/edx-val.git@d6087908aa3dd05ceaa7f56a21284f86c53cb3f0#egg=edx-val
 -e git+https://github.com/pmitros/RecommenderXBlock.git@9b07e807c89ba5761827d0387177f71aa57ef056#egg=recommender-xblock
 -e git+https://github.com/edx/edx-milestones.git@547f2250ee49e73ce8d7ff4e78ecf1b049892510#egg=edx-milestones
--e git+https://github.com/edx/edx-search.git@9d566b88fd80cb0b60c052eee2bee30eb9f35b9c#egg=edx-search
+-e git+https://github.com/edx/edx-search.git@9d636351474563d75dea8dbec6cb85b1c650666d#egg=edx-search
 git+https://github.com/edx/edx-lint.git@8bf82a32ecb8598c415413df66f5232ab8d974e9#egg=edx_lint==0.2.1
 -e git+https://github.com/edx/xblock-utils.git@581ed636c862b286002bb9a3724cc883570eb54c#egg=xblock-utils
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
