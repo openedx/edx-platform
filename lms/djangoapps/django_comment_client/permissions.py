@@ -16,22 +16,22 @@ CACHE = cache.get_cache('default')
 CACHE_LIFESPAN = 60
 
 
+# def cached_has_permission(user, permission, course_id=None):
+#     """
+#     Call has_permission if it's not cached. A change in a user's role or
+#     a role's permissions will only become effective after CACHE_LIFESPAN seconds.
+#     """
+#     assert isinstance(course_id, (NoneType, CourseKey))
+#     key = u"permission_{user_id:d}_{course_id}_{permission}".format(
+#         user_id=user.id, course_id=course_id, permission=permission)
+#     val = CACHE.get(key, None)
+#     if val not in [True, False]:
+#         val = has_permission(user, permission, course_id=course_id)
+#         CACHE.set(key, val, CACHE_LIFESPAN)
+#     return val
+
+
 def cached_has_permission(user, permission, course_id=None):
-    """
-    Call has_permission if it's not cached. A change in a user's role or
-    a role's permissions will only become effective after CACHE_LIFESPAN seconds.
-    """
-    assert isinstance(course_id, (NoneType, CourseKey))
-    key = u"permission_{user_id:d}_{course_id}_{permission}".format(
-        user_id=user.id, course_id=course_id, permission=permission)
-    val = CACHE.get(key, None)
-    if val not in [True, False]:
-        val = has_permission(user, permission, course_id=course_id)
-        CACHE.set(key, val, CACHE_LIFESPAN)
-    return val
-
-
-def has_permission(user, permission, course_id=None):
     assert isinstance(course_id, (NoneType, CourseKey))
     request_cache_dict = RequestCache.get_request_cache().data
     cache_key = "django_comment_client.perimissions.has_permission.all_permissions.{}.{}".format(
@@ -95,7 +95,7 @@ def _check_conditions_permissions(user, permissions, course_id, content):
         if isinstance(per, basestring):
             if per in CONDITIONS:
                 return _check_condition(user, per, content)
-            return has_permission(user, per, course_id=course_id)
+            return cached_has_permission(user, per, course_id=course_id)
         elif isinstance(per, list) and operator in ["and", "or"]:
             results = [test(user, x, operator="and") for x in per]
             if operator == "or":

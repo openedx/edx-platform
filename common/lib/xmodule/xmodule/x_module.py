@@ -1183,8 +1183,6 @@ class MetricsMixin(object):
 
     def render(self, block, view_name, context=None):
         start_time = time.time()
-        name = "{}:{}.{}".format(block.__module__, block.__class__.__name__, view_name)
-        newrelic.agent.set_transaction_name(name, group="Python/XBlock/Render")
         try:
             status = "success"
             return super(MetricsMixin, self).render(block, view_name, context=context)
@@ -1211,12 +1209,16 @@ class MetricsMixin(object):
                 tags=tags,
                 sample_rate=XMODULE_METRIC_SAMPLE_RATE,
             )
-            print "{}: {}".format(end_time - start_time, name)
+            log.info(
+                "%.3fs - %s.%s (%s)",
+                end_time - start_time,
+                block.__class__.__name__,
+                view_name,
+                block.location,
+            )
 
     def handle(self, block, handler_name, request, suffix=''):
         start_time = time.time()
-        name = "{}:{}.{}".format(block.__module__, block.__class__.__name__, handler_name)
-        newrelic.agent.set_transaction_name(name, group="Python/XBlock/Handler")
         try:
             status = "success"
             return super(MetricsMixin, self).handle(block, handler_name, request, suffix=suffix)
@@ -1243,7 +1245,13 @@ class MetricsMixin(object):
                 tags=tags,
                 sample_rate=XMODULE_METRIC_SAMPLE_RATE
             )
-            print "{}: {}".format(end_time - start_time, name)
+            log.info(
+                "%.3fs - %s.%s (%s)",
+                end_time - start_time,
+                block.__class__.__name__,
+                handler_name,
+                block.location,
+            )
 
 class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
     """

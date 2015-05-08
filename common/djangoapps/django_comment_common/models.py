@@ -1,5 +1,6 @@
 import logging
 
+from django.core.cache import cache
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -110,25 +111,30 @@ class Permission(models.Model):
         return self.name
 
 def all_permissions_for_user_in_course(user, course_id):
-    course = modulestore().get_course(course_id)
-    if course is None:
-        raise ItemNotFoundError(course_id)
+    course_blacked_out_key = "django_comment_common.models.course_blacked_out.{}".format(course_id)
+    course_blacked_out = cache.get(course_blacked_out_key)
+    if course_blacked_out is None:
+        course = modulestore().get_course(course_id)
+        if course is None:
+            raise ItemNotFoundError(course_id)
+        course_blacked_out = not course.forum_posts_allowed
+        cache.set(course_blacked_out_key, course_blacked_out, 60)
 
     all_roles = {role.name for role in Role.objects.filter(users=user, course_id=course_id)}
     print all_roles
 
-    def blacked_out(p_name):
+    def permission_blacked_out(p_name):
         return (
+            course_blacked_out and
             all_roles == {FORUM_ROLE_STUDENT} and 
-            (p_name.startswith('edit') or p_name.startswith('update') or p_name.startswith('create')) and
-            (not course.forum_posts_allowed)
+            (p_name.startswith('edit') or p_name.startswith('update') or p_name.startswith('create'))
         )
 
     permissions = {
         permission.name
         for permission
         in Permission.objects.filter(roles__users=user, roles__course_id=course_id)
-        if not blacked_out(permission.name) 
+        if not permission_blacked_out(permission.name) 
     }
     print permissions
     return permissions
