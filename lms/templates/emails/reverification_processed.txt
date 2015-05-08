@@ -1,0 +1,43 @@
+<%namespace file="../main.html" import="stanford_theme_enabled" />
+<%! from django.utils.translation import ugettext as _ %>
+% if status == "approved":
+    ${_("Your verification for course {course_name} and assessment {assessment} "
+        "has been passed."
+    ).format(course_name=course_name, assessment=assessment)}
+
+%else:
+    ${_("Your verification for course {course_name} and assessment {assessment} "
+        "has failed."
+    ).format(course_name=course_name, assessment=assessment)}
+
+    % if not is_attempt_allowed:
+        ${_("You have reached your allowed attempts limit. No more retakes allowed.")}
+    % elif not verification_open:
+        ${_("Assessment date has passed and retake not allowed.")}
+    % else:
+        % if due_date:
+            ${_("Assessment closes on {due_date}.".format(due_date=due_date))}
+        % else:
+            ${_("Assessment is open and you have {left_attempts} attempt(s) remaining.".format(left_attempts=left_attempts))}
+        % endif
+
+        ${_("Click on link below to re-verify:")}
+        % if is_secure:
+          https://${ site }${ reverify_link }
+        % else:
+          http://${ site }${ reverify_link }
+        % endif
+
+    % endif
+% endif
+
+    ${_("Click on link below to go to the courseware:")}
+    % if is_secure:
+      https://${ site }${ courseware_url }
+    % else:
+      http://${ site }${ courseware_url }
+    % endif
+
+
+
+${_("The {platform_name} Team.").format(platform_name=platform_name)}

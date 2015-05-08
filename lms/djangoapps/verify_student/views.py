@@ -10,6 +10,7 @@ from collections import namedtuple
 
 
 from pytz import UTC
+from django.utils import timezone
 from ipware.ip import get_ip
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -58,6 +59,7 @@ from util.date_utils import get_default_time_display
 from eventtracking import tracker
 import analytics
 from courseware.url_helpers import get_redirect_url
+from django.contrib.auth.models import User
 
 log = logging.getLogger(__name__)
 
@@ -859,6 +861,96 @@ def submit_photos_for_verification(request):
     return HttpResponse(200)
 
 
+def _compose_message_reverification_email(
+        course_key, user_id, relates_assessment, photo_verification, status, is_secure
+):  # pylint: disable=invalid-name
+    """ Composes subject and message for email
+
+    Args:
+        course_key(CourseKey): CourseKey object
+        user_id(str): User Id
+        relates_assessment(str): related assessment name
+        photo_verification(QuerySet/SoftwareSecure): A query set of SoftwareSecure objects or SoftwareSecure objec
+        status(str): approval status
+        is_secure(Bool): Is running on secure protocol or not
+
+    Returns:
+        None if any error occurred else Tuple of subject and message strings
+    """
+    try:
+        location_id = VerificationStatus.get_location_id(photo_verification)
+        usage_key = UsageKey.from_string(location_id)
+        course = modulestore().get_course(course_key)
+        redirect_url = get_redirect_url(course_key, usage_key.replace(course_key=course_key))
+
+        subject = "Re-verification Status"
+
+        context = {
+            "status": status,
+            "course_name": course.display_name_with_default,
+            "assessment": relates_assessment,
+            "courseware_url": redirect_url
+        }
+
+        reverification_block = modulestore().get_item(usage_key)
+        # Allowed attempts is 1 if not set on verification block
+        allowed_attempts = 1 if reverification_block.attempts == 0 else reverification_block.attempts
+        user_attempts = VerificationStatus.get_user_attempts(user_id, course_key, relates_assessment, location_id)
+        left_attempts = allowed_attempts - user_attempts
+        is_attempt_allowed = left_attempts > 0
+        verification_open = True
+        if reverification_block.due:
+            verification_open = timezone.now() <= reverification_block.due
+
+        context["left_attempts"] = left_attempts
+        context["is_attempt_allowed"] = is_attempt_allowed
+        context["verification_open"] = verification_open
+        context["due_date"] = get_default_time_display(reverification_block.due)
+        context["is_secure"] = is_secure
+        context["site"] = microsite.get_value('SITE_NAME', 'localhost')
+        context['platform_name'] = microsite.get_value('platform_name', settings.PLATFORM_NAME),
+
+        re_verification_link = reverse(
+            'verify_student_incourse_reverify',
+            args=(
+                unicode(course_key),
+                unicode(relates_assessment),
+                unicode(location_id)
+            )
+        )
+        context["reverify_link"] = re_verification_link
+        message = render_to_string('emails/reverification_processed.txt', context)
+        log.info(
+            "Sending email to User_Id=%s. Attempts left for this user are %s. "
+            "Allowed attempts %s. "
+            "Due Date %s",
+            str(user_id), left_attempts, allowed_attempts, str(reverification_block.due)
+        )
+        return subject, message
+    # Catch all exception to avoid raising back to view
+    except:  # pylint: disable=bare-except
+        log.exception("The email for re-verification sending failed for user_id %s", user_id)
+
+
+def _send_email(user_id, subject, message):
+    """ Send email to given user
+
+    Args:
+        user_id(str): User Id
+        subject(str): Subject lines of emails
+        message(str): Email message body
+
+    Returns:
+        None
+    """
+    from_address = microsite.get_value(
+        'email_from_address',
+        settings.DEFAULT_FROM_EMAIL
+    )
+    user = User.objects.get(id=user_id)
+    user.email_user(subject, message, from_address)
+
+
 @require_POST
 @csrf_exempt  # SS does its own message signing, and their API won't have a cookie value
 def results_callback(request):
@@ -910,26 +1002,24 @@ def results_callback(request):
     try:
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=receipt_id)
     except SoftwareSecurePhotoVerification.DoesNotExist:
-        log.error("Software Secure posted back for receipt_id {}, but not found".format(receipt_id))
+        log.error("Software Secure posted back for receipt_id %s, but not found", receipt_id)
         return HttpResponseBadRequest("edX ID {} not found".format(receipt_id))
 
-    checkpoints = VerificationCheckpoint.objects.filter(photo_verification=attempt).all()
-
     if result == "PASS":
-        log.debug("Approving verification for {}".format(receipt_id))
+        log.debug("Approving verification for %s", receipt_id)
         attempt.approve()
         status = "approved"
     elif result == "FAIL":
-        log.debug("Denying verification for {}".format(receipt_id))
+        log.debug("Denying verification for %s", receipt_id)
         attempt.deny(json.dumps(reason), error_code=error_code)
         status = "denied"
     elif result == "SYSTEM FAIL":
-        log.debug("System failure for {} -- resetting to must_retry".format(receipt_id))
+        log.debug("System failure for %s -- resetting to must_retry", receipt_id)
         attempt.system_error(json.dumps(reason), error_code=error_code)
         status = "error"
         log.error("Software Secure callback attempt for %s failed: %s", receipt_id, reason)
     else:
-        log.error("Software Secure returned unknown result {}".format(result))
+        log.error("Software Secure returned unknown result %s", result)
         return HttpResponseBadRequest(
             "Result {} not understood. Known results: PASS, FAIL, SYSTEM FAIL".format(result)
         )
@@ -939,7 +1029,22 @@ def results_callback(request):
         course_id = attempt.window.course_id
         course_enrollment = CourseEnrollment.get_or_create_enrollment(attempt.user, course_id)
         course_enrollment.emit_event(EVENT_NAME_USER_REVERIFICATION_REVIEWED_BY_SOFTWARESECURE)
-    VerificationStatus.add_status_from_checkpoints(checkpoints=checkpoints, user=attempt.user, status=status)
+
+    incourse_reverify_enabled = InCourseReverificationConfiguration.current().enabled
+    if incourse_reverify_enabled:
+        checkpoints = VerificationCheckpoint.objects.filter(photo_verification=attempt).all()
+        VerificationStatus.add_status_from_checkpoints(checkpoints=checkpoints, user=attempt.user, status=status)
+        # If this is re-verification then send the update email
+        if checkpoints:
+            user_id = attempt.user.id
+            course_key = checkpoints[0].course_id
+            relates_assessment = checkpoints[0].checkpoint_name
+
+            subject, message = _compose_message_reverification_email(
+                course_key, user_id, relates_assessment, attempt, status, request.is_secure()
+            )
+
+            _send_email(user_id, subject, message)
     return HttpResponse("OK!")
 
 

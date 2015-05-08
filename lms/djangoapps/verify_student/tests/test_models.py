@@ -772,6 +772,40 @@ class VerificationStatusTest(ModuleStoreTestCase):
             list(self.check_point2.checkpoint_status.all().values_list('location_id', flat=True))
         )
 
+    def test_get_location_id(self):
+        """ Getting location id for a specific checkpoint  """
+
+        # creating software secure attempt against checkpoint
+        self.check_point1.add_verification_attempt(SoftwareSecurePhotoVerification.objects.create(user=self.user))
+
+        # add initial verification status for checkpoint
+        VerificationStatus.add_verification_status(
+            checkpoint=self.check_point1,
+            user=self.user,
+            status='submitted',
+            location_id=self.dummy_reverification_item_id_1
+        )
+
+        attempt = SoftwareSecurePhotoVerification.objects.filter(user=self.user)
+
+        self.assertIsNotNone(VerificationStatus.get_location_id(attempt))
+        self.assertEqual(VerificationStatus.get_location_id(None), '')
+
+    def test_get_user_attempts(self):
+
+        # adding verification status
+        VerificationStatus.add_verification_status(
+            checkpoint=self.check_point1,
+            user=self.user,
+            status='submitted',
+            location_id=self.dummy_reverification_item_id_1
+        )
+
+        self.assertEqual(VerificationStatus.get_user_attempts(
+            course_key=self.course.id,
+            user_id=self.user.id,
+            related_assessment='midterm', location_id=self.dummy_reverification_item_id_1), 1)
+
 
 class SkippedReverificationTest(ModuleStoreTestCase):
     """Tests for the SkippedReverification model. """
