@@ -16,7 +16,8 @@ function(_, str, Backbone, BackboneRelational, gettext) {
         defaults: {
             name: 'Name of the signatory',
             title: 'Title of the signatory',
-            organization: 'Organization of the signatory'
+            organization: 'Organization of the signatory',
+            signature_image_path: ''
         },
 
         initialize: function(attributes, options) {
