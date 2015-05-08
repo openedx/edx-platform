@@ -144,7 +144,7 @@ class EdxNotesPageItem(NoteChild):
 
     def go_to_tag(self, tag_name):
         """ Clicks a tag associated with the note to change to the tags view (and scroll to the tag group). """
-        self.q(css=self._bounded_selector(self.TAG_SELECTOR)).filter(lambda el: el.text == tag_name).click()
+        self.q(css=self._bounded_selector(self.TAG_SELECTOR)).filter(lambda el: tag_name in el.text).click()
 
 
 class EdxNotesPageView(PageObject):
