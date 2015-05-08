@@ -611,17 +611,17 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
             task_progress.update_task_state(extra_meta=current_step)
         task_progress.attempted += 1
 
-        # Now add a log entry after certain intervals to get a hint that task is in progress
+        # Now add a log entry after each student is graded to get a sense
+        # of the task's progress
         student_counter += 1
-        if student_counter % 1000 == 0:
-            TASK_LOG.info(
-                u'%s, Task type: %s, Current step: %s, Grade calculation in-progress for students: %s/%s',
-                task_info_string,
-                action_name,
-                current_step,
-                student_counter,
-                total_enrolled_students
-            )
+        TASK_LOG.info(
+            u'%s, Task type: %s, Current step: %s, Grade calculation in-progress for students: %s/%s',
+            task_info_string,
+            action_name,
+            current_step,
+            student_counter,
+            total_enrolled_students
+        )
 
         if gradeset:
             # We were able to successfully grade this student for this course.
