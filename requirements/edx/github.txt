@@ -34,7 +34,7 @@ git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b
 -e git+https://github.com/edx/bok-choy.git@82d2f4b72e807b10d112179c0a4abd810a001b82#egg=bok_choy
 -e git+https://github.com/edx-solutions/django-splash.git@7579d052afcf474ece1239153cffe1c89935bc4f#egg=django-splash
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
--e git+https://github.com/edx/edx-ora2.git@release-2015-04-29T15.45#egg=edx-ora2
+-e git+https://github.com/edx/edx-ora2.git@release-2015-05-07T14.06#egg=edx-ora2
 -e git+https://github.com/edx/edx-submissions.git@e2361932b9bce061a018a31bb3929e9cade80f49#egg=edx-submissions
 -e git+https://github.com/edx/opaque-keys.git@1254ed4d615a428591850656f39f26509b86d30a#egg=opaque-keys
 -e git+https://github.com/edx/ease.git@c6dee053eae6b3ac4fdf6be11fa7a9f8265540aa#egg=ease
