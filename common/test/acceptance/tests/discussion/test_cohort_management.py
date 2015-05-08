@@ -4,7 +4,6 @@ End-to-end tests related to the cohort management on the LMS Instructor Dashboar
 """
 
 from datetime import datetime
-from flaky import flaky
 
 from pytz import UTC, utc
 from bok_choy.promise import EmptyPromise
@@ -719,7 +718,6 @@ class CohortDiscussionTopicsTest(UniqueCourseTest, CohortTestMixin):
         self.reload_page()
         self.assertEqual(self.cohort_management_page.get_cohorted_topics_count(key), cohorted_topics)
 
-    @flaky  # TODO: fix this, see TNL-2120
     def test_cohort_course_wide_discussion_topic(self):
         """
         Scenario: cohort a course-wide discussion topic.
