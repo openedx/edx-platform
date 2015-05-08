@@ -287,15 +287,6 @@ def get_course_info_section(request, course, section_key):
     """
     info_module = get_course_info_section_module(request, course, section_key)
 
-    cur_lang_code = UserPreference.get_preference(request.user, LANGUAGE_KEY) #User preferred language
-    if cur_lang_code is None:
-       cur_lang_code = settings.LANGUAGE_CODE
-    #print cur_lang_code
-
-
-    #correct_format = formats.get_format("SHORT_DATE_FORMAT", cur_lang_code)
-    #print correct_format
-
     html = ''
     if info_module is not None:
         try:
