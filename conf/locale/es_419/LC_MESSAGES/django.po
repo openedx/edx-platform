@@ -94,6 +94,7 @@
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
 # Juan Fernando Villa <elite.linux@gmail.com>, 2015
+# Juan <juan.marrero@utec.edu.uy>, 2015
 # Lalo Cabrera <laloogcabrera@yahoo.com.mx>, 2014
 # camilomaiden <inactive+camilomaiden@transifex.com>, 2014
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
@@ -165,7 +166,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-04-30 15:39+0000\n"
+"POT-Creation-Date: 2015-05-08 17:31+0000\n"
 "PO-Revision-Date: 2014-12-30 16:21+0000\n"
 "Last-Translator: Cristian Salamea <ovnicraft@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
@@ -7633,10 +7634,6 @@ msgstr "Youtube"
 msgid "Taiwan"
 msgstr "Taiwan"
 
-#: lms/lib/courseware_search/lms_result_processor.py
-msgid "(Unnamed)"
-msgstr "(Sin nombre)"
-
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
 msgid "Skip to main content"
@@ -8351,6 +8348,10 @@ msgstr ""
 msgid "Password"
 msgstr "Contraseña"
 
+#: lms/templates/login.html
+msgid "Remember me"
+msgstr "Recordarme"
+
 #: openedx/core/djangoapps/user_api/views.py
 msgid ""
 "It looks like {email_address} belongs to an existing account. Try again with"
@@ -8534,6 +8535,10 @@ msgstr "No se ha podido indexar el item: {}"
 #: cms/djangoapps/contentstore/courseware_index.py
 msgid "General indexing error occurred"
 msgstr "Error general al indexar"
+
+#: cms/djangoapps/contentstore/courseware_index.py
+msgid "(Unnamed)"
+msgstr ""
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
@@ -9004,6 +9009,7 @@ msgid "Settings"
 msgstr "Configuración"
 
 #: cms/templates/html_error.html lms/templates/module-error.html
+#: lms/templates/commerce/checkout_receipt.html
 msgid "Error:"
 msgstr "Error:"
 
@@ -9743,6 +9749,10 @@ msgstr ""
 "Open edX."
 
 #: lms/templates/index.html
+msgid "Search for a course"
+msgstr ""
+
+#: lms/templates/index.html
 msgid "View all Courses"
 msgstr "Ver todos los cursos"
 
@@ -9874,10 +9884,6 @@ msgstr ""
 #: lms/templates/login.html
 msgid "Account Preferences"
 msgstr "Preferencias de la Cuenta"
-
-#: lms/templates/login.html
-msgid "Remember me"
-msgstr "Recordarme"
 
 #. Translators: provider_name is the name of an external, third-party user
 #. authentication provider (like Google or LinkedIn).
@@ -10644,6 +10650,7 @@ msgstr "Actividad de carga de git reciente para {course_id}"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
+#: lms/templates/commerce/checkout_receipt.html
 msgid "Error"
 msgstr "Error"
 
@@ -11432,6 +11439,18 @@ msgid ""
 msgstr ""
 "Su transacción ha sido cancelada.  Si considera que ocurrió un error, "
 "contacte a {email}."
+
+#: lms/templates/commerce/checkout_receipt.html
+msgid "Could not retrieve payment information"
+msgstr ""
+
+#: lms/templates/commerce/checkout_receipt.html
+msgid "Loading Order Data..."
+msgstr ""
+
+#: lms/templates/commerce/checkout_receipt.html
+msgid "Please wait while we retrieve your order details."
+msgstr ""
 
 #: lms/templates/courseware/accordion.html
 msgid "{chapter}, current chapter"
@@ -12983,8 +13002,8 @@ msgid "Unfollow"
 msgstr "Dejar de seguir"
 
 #: lms/templates/discussion/_underscore_templates.html
-msgid "Vote"
-msgstr "Votar"
+msgid "Vote for this post,"
+msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Report abuse"
@@ -13810,6 +13829,46 @@ msgstr "Sus otros cursos no han sido afectados."
 #: lms/templates/emails/remove_beta_tester_email_subject.txt
 msgid "You have been removed from a beta test for {course_name}"
 msgstr "Usted ha sido eliminado de la prueba beta para el curso {course_name}"
+
+#: lms/templates/emails/reverification_processed.txt
+msgid ""
+"Your verification for course {course_name} and assessment {assessment} has "
+"been passed."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid ""
+"Your verification for course {course_name} and assessment {assessment} has "
+"failed."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "You have reached your allowed attempts limit. No more retakes allowed."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Assessment date has passed and retake not allowed."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Assessment closes on {due_date}."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Assessment is open and you have {left_attempts} attempt(s) remaining."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Click on link below to re-verify:"
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Click on link below to go to the courseware:"
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "The {platform_name} Team."
+msgstr ""
 
 #: lms/templates/emails/unenroll_email_allowedmessage.txt
 msgid "Dear Student,"
@@ -16149,10 +16208,10 @@ msgstr "Encuesta previa al curso"
 #: lms/templates/survey/survey.html
 msgid ""
 "You can begin your course as soon as you complete the following form. "
-"Required fields are marked with an asterisk (*)."
+"Required fields are marked with an asterisk (*). This information is for the"
+" use of {platform_name} only. It will not be linked to your public profile "
+"in any way."
 msgstr ""
-"Puede comenzar su curso tan pronto como diligencie el siguiente formulario. "
-"Los campos obligatorios están marcados con un asterisco (*)."
 
 #: lms/templates/survey/survey.html
 msgid "You are missing the following required fields:"
@@ -17201,12 +17260,16 @@ msgid "Drag to reorder"
 msgstr "Arrastre para reorganizar"
 
 #: cms/templates/container.html
+msgid "Open the courseware in the LMS"
+msgstr ""
+
+#: cms/templates/container.html
 msgid "View Live Version"
 msgstr "Ver la versión publicada"
 
 #: cms/templates/container.html
-msgid "Preview Changes"
-msgstr "Previsualizar los cambios"
+msgid "Preview the courseware in the LMS"
+msgstr ""
 
 #: cms/templates/container.html
 msgid "Adding components"

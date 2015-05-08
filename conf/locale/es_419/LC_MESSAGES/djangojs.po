@@ -85,8 +85,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-04-30 15:37+0000\n"
-"PO-Revision-Date: 2015-04-29 04:01+0000\n"
+"POT-Creation-Date: 2015-05-08 17:28+0000\n"
+"PO-Revision-Date: 2015-05-06 19:54+0000\n"
 "Last-Translator: Juan Camilo Montoya Franco <juan.montoya@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
@@ -718,6 +718,7 @@ msgstr "Borrar tabla"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/group-configuration-editor.underscore
+#: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Description"
 msgstr "Descripción"
@@ -1890,10 +1891,10 @@ msgid "…"
 msgstr "..."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "currently %(numVotes)s vote"
-msgid_plural "currently %(numVotes)s votes"
-msgstr[0] "actualmente %(numVotes)s voto"
-msgstr[1] "actualmente %(numVotes)s votos"
+msgid "there is currently %(numVotes)s vote"
+msgid_plural "there are currently %(numVotes)s votes"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "%(numVotes)s Vote"
@@ -2303,7 +2304,7 @@ msgstr "Texto"
 msgid "Video"
 msgstr "Video"
 
-#: common/static/js/vendor/ova/catch/js/catch.js
+#: common/static/js/vendor/ova/catch/js/catch.js lms/static/js/views/fields.js
 msgid "Image"
 msgstr "Imagen"
 
@@ -3461,9 +3462,9 @@ msgstr "Información básica de la cuenta (requerida)"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
-"The name that identifies you on the edX site. You cannot change your "
-"username."
-msgstr "En nombre que lo identifica en el sitio. No podrá ser cambiado"
+"The name that identifies you throughout {platform_name}. You cannot change "
+"your username."
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/templates/student_profile/profile.underscore
@@ -3472,11 +3473,9 @@ msgstr "Nombre Completo"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
-"The name that appears on your edX certificates. Other learners never see "
-"your full name."
+"The name that appears on your certificates. Other learners never see your "
+"full name."
 msgstr ""
-"El nombre que aparecerá en sus certificados. Otros usuarios nunca verán su "
-"nombre completo."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Email Address"
@@ -3484,11 +3483,9 @@ msgstr "Dirección de correo electrónico"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
-"The email address you use to sign in to edX. Communications from edX and "
-"your courses are sent to this address."
+"The email address you use to sign in. Communications from {platform_name} "
+"and your courses are sent to this address."
 msgstr ""
-"La dirección de correo que usa para iniciar sesión. Las comunicaciones de "
-"edX y de sus cursos serán enviadas a esta dirección."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/templates/student_account/account.underscore
@@ -3519,11 +3516,9 @@ msgstr "Idioma"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
-"The language used for the edX site. The site is currently available in a "
-"limited number of languages."
+"The language used throughout this site. This site is currently available in "
+"a limited number of languages."
 msgstr ""
-"El idioma que usará para el sitio. Actualmente solo hay disponibilidad de "
-"usar un número limitado de idiomas."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Country or Region"
@@ -3564,9 +3559,9 @@ msgid "We've sent a confirmation message to {new_email_address}. "
 msgstr "Hemos enviado un mensaje de confirmación a {new_email_address}."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
-msgid "You must sign out of edX and sign back in before your language "
+msgid ""
+"You must sign out and sign back in before your language changes take effect."
 msgstr ""
-"Debe cerrar sesión y volver a iniciar para que se aplique el nuevo idioma"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "We've sent a message to {email_address}. "
@@ -3609,8 +3604,8 @@ msgid "Saved"
 msgstr "Guardado"
 
 #: lms/static/js/student_profile/views/learner_profile_factory.js
-msgid "edX learners can see my:"
-msgstr "Los usuarios de edX pueden ver mi:"
+msgid "{platform_name} learners can see my:"
+msgstr ""
 
 #: lms/static/js/student_profile/views/learner_profile_factory.js
 msgid "Limited Profile"
@@ -3638,12 +3633,9 @@ msgstr "Sobre mí"
 
 #: lms/static/js/student_profile/views/learner_profile_factory.js
 msgid ""
-"Tell other edX learners a little about yourself: where you live, what your "
-"interests are, why you're taking courses on edX, or what you hope to learn."
+"Tell other learners a little about yourself: where you live, what your "
+"interests are, why you're taking courses, or what you hope to learn."
 msgstr ""
-"Comparta con otros usuarios de edX algo sobre usted: donde vive, cuales son "
-"sus intereses, porque está tomando cursos en edX, o cuales son sus "
-"expectativas de aprendizaje."
 
 #: lms/static/js/student_profile/views/learner_profile_fields.js
 msgid "Account Settings page."
@@ -3666,6 +3658,10 @@ msgstr ""
 "Debe tener 13 años o más para compartir un perfil completo.  Si ud tiene mas"
 " de esta edad, asegúrese que ha especificado un año de nacimiento en "
 "{account_settings_page_link}"
+
+#: lms/static/js/student_profile/views/learner_profile_fields.js
+msgid "Profile Image"
+msgstr ""
 
 #: lms/static/js/student_profile/views/learner_profile_fields.js
 msgid "Profile image for {username}"
@@ -3707,6 +3703,10 @@ msgstr ""
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Pay with Credit Card"
+msgstr ""
+
+#: lms/static/js/verify_student/views/make_payment_step_view.js
+msgid "Pay with PayPal"
 msgstr ""
 
 #. Translators: 'processor' is the name of a third-party payment processing
@@ -4911,6 +4911,83 @@ msgstr "eliminar todo"
 msgid "remove"
 msgstr "eliminar"
 
+#: lms/templates/commerce/receipt.underscore
+msgid "Thank you! We have received your payment."
+msgstr ""
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid ""
+"Please print this page for your records; it serves as your receipt. You will"
+" also receive an email with the same information."
+msgstr ""
+"Por favor imprima esta página para sus registros; la misma es válida como su"
+" recibo. También recibirá un correo electrónico con la esta información."
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Order No."
+msgstr "Orden Num."
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Date"
+msgstr "Fecha"
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Amount"
+msgstr "Cantidad"
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Total"
+msgstr "Total"
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Please Note"
+msgstr "Por favor tener en cuenta"
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Crossed out items have been refunded."
+msgstr "Los items tachados han tenido devolución"
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Billed to"
+msgstr "Facturado a"
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "No receipt available"
+msgstr "No hay recibo disponible"
+
+#: lms/templates/commerce/receipt.underscore
+msgid "Go to Dashboard"
+msgstr ""
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid ""
+"If you don't verify your identity now, you can still explore your course "
+"from your dashboard. You will receive periodic reminders from "
+"%(platformName)s to verify your identity."
+msgstr ""
+"Si no verifica su identidad ahora, de todas formas podrá explorar el curso "
+"desde su Panel de Control. Recibirá recordatorios periódicos de "
+"%(platformName)s para realizar la verificación de identidad."
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Want to confirm your identity later?"
+msgstr "¿Desea confirmar su identidad después?"
+
+#: lms/templates/commerce/receipt.underscore
+msgid "Verify Now"
+msgstr ""
+
 #: lms/templates/dashboard/donation.underscore
 msgid "Donate"
 msgstr "Donar"
@@ -5389,54 +5466,64 @@ msgid "Error:"
 msgstr "Error:"
 
 #: lms/templates/verify_student/face_photo_step.underscore
+msgid "What You Need for Verification"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/intro_step.underscore
+#: lms/templates/verify_student/make_payment_step.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Webcam"
+msgstr "Cámara web"
+
+#: lms/templates/verify_student/face_photo_step.underscore
+msgid ""
+"You need a computer that has a webcam. When you receive a browser prompt, "
+"make sure that you allow access to the camera."
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+msgid "Photo Identification"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+msgid ""
+"You need a driver's license, passport, or other government-issued ID that "
+"has your name and photo."
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Take Your Photo"
 msgstr "Tome su fotografía"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
 msgid ""
-"Use your webcam to take a photo of your face. We will match this photo with "
-"the photo on your ID."
+"When your face is in position, use the camera button %(icon)s below to take "
+"your photo."
 msgstr ""
-"Use su cámara web para tomar una fotografía de su cara. Usaremos esta foto "
-"para verificarla contra la fotografía de su documento de identificación."
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Tips on taking a successful photo"
-msgstr "Consejos para tomar una foto exitosamente"
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Make sure your face is well-lit"
-msgstr "Asegurese de que su rostro esté bien iluminado"
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Be sure your entire face is inside the frame"
-msgstr "Verifique que su cara está completamente dentro del marco de la foto"
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Once in position, use the camera button %(icon)s to capture your photo"
+msgid "To take a successful photo, make sure that:"
 msgstr ""
-"Una vez en posición, use el botón de la cámara %(icon)s para capturar su "
-"foto"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Can we match the photo you took with the one on your ID?"
+msgid "Your face is well-lit."
 msgstr ""
-"¿Podemos verificar la foto que usted acaba de tomar contra la foto en su "
-"documento de identificación?"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Use the retake photo button if you are not pleased with your photo"
-msgstr "Utilice el botón retomar foto si usted no está satisfecho con su foto"
+msgid "Your entire face fits inside the frame."
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+msgid "The photo of your face matches the photo on your ID."
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+msgid ""
+"To use the current photo, select the camera button %(icon)s. To take another"
+" photo, select the retake button %(icon)s."
+msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -5513,6 +5600,11 @@ msgstr ""
 "aceptados."
 
 #: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Tips on taking a successful photo"
+msgstr "Consejos para tomar una foto exitosamente"
+
+#: lms/templates/verify_student/id_photo_step.underscore
 msgid "Ensure that you can see your photo and read your name"
 msgstr ""
 "Asegurese de que se pueda ver su cara y leer su nombre en la foto del "
@@ -5527,6 +5619,11 @@ msgid "Once in position, use the camera button %(icon)s to capture your ID"
 msgstr ""
 "Una vez en posición, usa el botón de la cámara %(icon)s para capturar tu ID"
 
+#: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Use the retake photo button if you are not pleased with your photo"
+msgstr "Utilice el botón retomar foto si usted no está satisfecho con su foto"
+
 #: lms/templates/verify_student/image_input.underscore
 msgid "Preview of uploaded image"
 msgstr "Vista previa de imagen subida"
@@ -5534,6 +5631,34 @@ msgstr "Vista previa de imagen subida"
 #: lms/templates/verify_student/image_input.underscore
 msgid "Upload an image or capture one with your web or phone camera."
 msgstr "Subir una imagen o captura con tu camara web o del teléfono"
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"Use your webcam to take a photo of your face. We will match this photo with "
+"the photo on your ID."
+msgstr ""
+"Use su cámara web para tomar una fotografía de su cara. Usaremos esta foto "
+"para verificarla contra la fotografía de su documento de identificación."
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Make sure your face is well-lit"
+msgstr "Asegurese de que su rostro esté bien iluminado"
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Be sure your entire face is inside the frame"
+msgstr "Verifique que su cara está completamente dentro del marco de la foto"
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Once in position, use the camera button %(icon)s to capture your photo"
+msgstr ""
+"Una vez en posición, use el botón de la cámara %(icon)s para capturar su "
+"foto"
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Can we match the photo you took with the one on your ID?"
+msgstr ""
+"¿Podemos verificar la foto que usted acaba de tomar contra la foto en su "
+"documento de identificación?"
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: %(courseName)s"
@@ -5574,12 +5699,6 @@ msgid ""
 msgstr ""
 "Una licencia de conducir, pasaporte, cédula o otra identificación oficial "
 "con su nombre y foto"
-
-#: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/make_payment_step.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Webcam"
-msgstr "Cámara web"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "You are enrolling in: %(courseName)s"
@@ -5649,46 +5768,6 @@ msgid "Thank you! We have received your payment for %(courseName)s."
 msgstr "Gracias! Hemos recibido su pago para %(courseName)s."
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"Please print this page for your records; it serves as your receipt. You will"
-" also receive an email with the same information."
-msgstr ""
-"Por favor imprima esta página para sus registros; la misma es válida como su"
-" recibo. También recibirá un correo electrónico con la esta información."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Order No."
-msgstr "Orden Num."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Date"
-msgstr "Fecha"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Amount"
-msgstr "Cantidad"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Total"
-msgstr "Total"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Please Note"
-msgstr "Por favor tener en cuenta"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Crossed out items have been refunded."
-msgstr "Los items tachados han tenido devolución"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Billed to"
-msgstr "Facturado a"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "No receipt available"
-msgstr "No hay recibo disponible"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Next Step: Confirm your identity"
 msgstr "Siguiente paso: Confirmación de identidad"
 
@@ -5712,20 +5791,6 @@ msgid ""
 msgstr ""
 "Una licencia de conducir, pasaporte, cédula o otra identificación oficial "
 "con su nombre y foto"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"If you don't verify your identity now, you can still explore your course "
-"from your dashboard. You will receive periodic reminders from "
-"%(platformName)s to verify your identity."
-msgstr ""
-"Si no verifica su identidad ahora, de todas formas podrá explorar el curso "
-"desde su Panel de Control. Recibirá recordatorios periódicos de "
-"%(platformName)s para realizar la verificación de identidad."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Want to confirm your identity later?"
-msgstr "¿Desea confirmar su identidad después?"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Review Your Photos"

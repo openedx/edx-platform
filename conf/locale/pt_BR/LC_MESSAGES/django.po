@@ -105,6 +105,7 @@
 # Gislene Kucker Arantes <gislene.trad@gmail.com>, 2014
 # Gustavo Henrique de Almeida Gonçalves <gustavo@faprender.org>, 2015
 # Gustavo Henrique de Almeida Gonçalves <gustavo@faprender.org>, 2015
+# Hudson Martins dos Santos <p4p4l3gu4x@gmail.com>, 2015
 # javiercencig <javier@jecnet.com.br>, 2014
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
@@ -125,6 +126,7 @@
 # Paulo Castro, 2013
 # Pedro Guimarães Martins <pedrogmartins7@gmail.com>, 2014-2015
 # Raphael Mendonça, 2014
+# Raysa Valentim dos Santos <raysavalentims@gmail.com>, 2015
 # Renata Barboza-Murray, 2013-2014
 # Rene de Souza Vianello Argento <rene.argento@gmail.com>, 2015
 # Ricardo Pietrobon <pietr007@gmail.com>, 2013-2014
@@ -162,6 +164,7 @@
 # Francisco Cantarutti <francisco.cantarutti@sisqualis.com.br>, 2014
 # Gustavo Henrique de Almeida Gonçalves <gustavo@faprender.org>, 2015
 # Hannah Ximenes <hannahmoreira@yahoo.com.br>, 2014
+# Hudson Martins dos Santos <p4p4l3gu4x@gmail.com>, 2015
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
 # Leonardo Flores Zambaldi <fzleonardo@gmail.com>, 2014
 # Leonardo Lehnemann Agostinho Martins <lehneman@gmail.com>, 2014
@@ -208,7 +211,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-04-30 15:39+0000\n"
+"POT-Creation-Date: 2015-05-08 17:31+0000\n"
 "PO-Revision-Date: 2014-12-30 16:21+0000\n"
 "Last-Translator: javiercencig <javier@jecnet.com.br>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/edx-platform/language/pt_BR/)\n"
@@ -6184,6 +6187,7 @@ msgid "Invoice"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/pdf.py
+#: lms/templates/commerce/checkout_receipt.html
 msgid "Receipt"
 msgstr ""
 
@@ -7112,10 +7116,6 @@ msgstr ""
 msgid "Taiwan"
 msgstr ""
 
-#: lms/lib/courseware_search/lms_result_processor.py
-msgid "(Unnamed)"
-msgstr ""
-
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
 msgid "Skip to main content"
@@ -7810,6 +7810,10 @@ msgstr ""
 msgid "Password"
 msgstr "Senha"
 
+#: lms/templates/login.html
+msgid "Remember me"
+msgstr "Lembrar as minhas informações"
+
 #: openedx/core/djangoapps/user_api/views.py
 msgid ""
 "It looks like {email_address} belongs to an existing account. Try again with"
@@ -7949,6 +7953,10 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/courseware_index.py
 msgid "General indexing error occurred"
+msgstr ""
+
+#: cms/djangoapps/contentstore/courseware_index.py
+msgid "(Unnamed)"
 msgstr ""
 
 #: cms/djangoapps/contentstore/git_export_utils.py
@@ -8392,6 +8400,7 @@ msgid "Settings"
 msgstr "Configurações"
 
 #: cms/templates/html_error.html lms/templates/module-error.html
+#: lms/templates/commerce/checkout_receipt.html
 msgid "Error:"
 msgstr "Erro:"
 
@@ -9087,6 +9096,10 @@ msgid "It works! This is the default homepage for this Open edX instance."
 msgstr ""
 
 #: lms/templates/index.html
+msgid "Search for a course"
+msgstr ""
+
+#: lms/templates/index.html
 msgid "View all Courses"
 msgstr ""
 
@@ -9213,10 +9226,6 @@ msgstr ""
 #: lms/templates/login.html
 msgid "Account Preferences"
 msgstr "Preferências da conta"
-
-#: lms/templates/login.html
-msgid "Remember me"
-msgstr "Lembrar as minhas informações"
 
 #. Translators: provider_name is the name of an external, third-party user
 #. authentication provider (like Google or LinkedIn).
@@ -9972,6 +9981,7 @@ msgstr ""
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
+#: lms/templates/commerce/checkout_receipt.html
 msgid "Error"
 msgstr "Erro"
 
@@ -10737,6 +10747,18 @@ msgstr ""
 msgid ""
 "Your transaction has been cancelled. If you feel an error has occurred, "
 "contact {email}."
+msgstr ""
+
+#: lms/templates/commerce/checkout_receipt.html
+msgid "Could not retrieve payment information"
+msgstr ""
+
+#: lms/templates/commerce/checkout_receipt.html
+msgid "Loading Order Data..."
+msgstr ""
+
+#: lms/templates/commerce/checkout_receipt.html
+msgid "Please wait while we retrieve your order details."
 msgstr ""
 
 #: lms/templates/courseware/accordion.html
@@ -12221,7 +12243,7 @@ msgid "Unfollow"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
-msgid "Vote"
+msgid "Vote for this post,"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
@@ -12975,6 +12997,46 @@ msgstr "Os seus outros cursos não foram afetados."
 #: lms/templates/emails/remove_beta_tester_email_subject.txt
 msgid "You have been removed from a beta test for {course_name}"
 msgstr "Você foi excluído da lista de testadores beta do curso {course_name}"
+
+#: lms/templates/emails/reverification_processed.txt
+msgid ""
+"Your verification for course {course_name} and assessment {assessment} has "
+"been passed."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid ""
+"Your verification for course {course_name} and assessment {assessment} has "
+"failed."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "You have reached your allowed attempts limit. No more retakes allowed."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Assessment date has passed and retake not allowed."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Assessment closes on {due_date}."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Assessment is open and you have {left_attempts} attempt(s) remaining."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Click on link below to re-verify:"
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Click on link below to go to the courseware:"
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "The {platform_name} Team."
+msgstr ""
 
 #: lms/templates/emails/unenroll_email_allowedmessage.txt
 msgid "Dear Student,"
@@ -15199,7 +15261,9 @@ msgstr ""
 #: lms/templates/survey/survey.html
 msgid ""
 "You can begin your course as soon as you complete the following form. "
-"Required fields are marked with an asterisk (*)."
+"Required fields are marked with an asterisk (*). This information is for the"
+" use of {platform_name} only. It will not be linked to your public profile "
+"in any way."
 msgstr ""
 
 #: lms/templates/survey/survey.html
@@ -16176,11 +16240,15 @@ msgid "Drag to reorder"
 msgstr ""
 
 #: cms/templates/container.html
+msgid "Open the courseware in the LMS"
+msgstr ""
+
+#: cms/templates/container.html
 msgid "View Live Version"
 msgstr ""
 
 #: cms/templates/container.html
-msgid "Preview Changes"
+msgid "Preview the courseware in the LMS"
 msgstr ""
 
 #: cms/templates/container.html
