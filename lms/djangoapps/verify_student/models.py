@@ -974,6 +974,13 @@ class VerificationCheckpoint(models.Model):
     class Meta:  # pylint: disable=missing-docstring, old-style-class
         unique_together = (('course_id', 'checkpoint_name'),)
 
+    def __unicode__(self):
+        """Unicode representation of the checkpoint. """
+        return u"{checkpoint} in {course}".format(
+            checkpoint=self.checkpoint_name,
+            course=self.course_id
+        )
+
     def add_verification_attempt(self, verification_attempt):
         """ Add the verification attempt in M2M relation of photo_verification
 
@@ -1047,6 +1054,8 @@ class VerificationStatus(models.Model):
 
     class Meta(object):  # pylint: disable=missing-docstring
         get_latest_by = "timestamp"
+        verbose_name = "Verification Status"
+        verbose_name_plural = "Verification Statuses"
 
     @classmethod
     def add_verification_status(cls, checkpoint, user, status, location_id=None):
