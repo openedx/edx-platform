@@ -34,6 +34,8 @@ class InstructorDashboardPage(CoursePage):
         """
         self.q(css='a[data-section=cohort_management]').first.click()
         cohort_management_section = CohortManagementSection(self.browser)
+        # The first time cohort management is selected, an ajax call is made.
+        cohort_management_section.wait_for_ajax()
         cohort_management_section.wait_for_page()
         return cohort_management_section
 
@@ -111,7 +113,21 @@ class CohortManagementSection(PageObject):
     }
 
     def is_browser_on_page(self):
-        return self.q(css='.cohort-management').present
+        """
+        Cohorts management exists under one class; however, render time can be longer because of sub-classes
+        that must be rendered beneath it. To determine if the browser is on the cohorts management page (and
+        allow for it to fully-render), we need to consider three different states of the page:
+        * When no cohorts have been added yet
+        * When a new cohort is being added (a confirmation state)
+        * When cohorts exist (the traditional management page)
+        """
+        cohorts_warning_title = '.message-warning .message-title'
+
+        if self.q(css=cohorts_warning_title).visible:
+            return self.q(css='.message-title').text[0] == u'You currently have no cohorts configured'
+        # The page may be in either the traditional management state, or an 'add new cohort' state.
+        # Confirm the CSS class is visible because the CSS class can exist on the page even in different states.
+        return self.q(css='.cohort-management-nav').visible or self.q(css='.new-cohort-form').visible
 
     def _bounded_selector(self, selector):
         """
@@ -480,13 +496,8 @@ class CohortManagementSection(PageObject):
         """
         Shows the discussion topics.
         """
-        EmptyPromise(
-            lambda: self.q(css=self._bounded_selector('.toggle-cohort-management-discussions')).results != 0,
-            "Waiting for discussion section to show"
-        ).fulfill()
-
-        # If the discussion topic section has not yet been toggled on, click on the toggle link.
-        self.q(css=self._bounded_selector(".toggle-cohort-management-discussions")).click()
+        self.q(css=self._bounded_selector(".toggle-cohort-management-discussions")).first.click()
+        self.wait_for_element_visibility("#cohort-management-discussion-topics", "Waiting for discussions to appear")
 
     def discussion_topics_visible(self):
         """
