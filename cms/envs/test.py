@@ -187,7 +187,7 @@ simplefilter('ignore')
 ################################# CELERY ######################################
 
 CELERY_ALWAYS_EAGER = True
-CELERY_RESULT_BACKEND='djcelery.backends.cache:CacheBackend'
+CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
 
 ########################### Server Ports ###################################
 
