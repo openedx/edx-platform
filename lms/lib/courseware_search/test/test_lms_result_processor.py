@@ -6,7 +6,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from courseware.tests.factories import UserFactory
 
-from lms.lib.courseware_search.lms_result_processor import LmsSearchResultProcessor, UNNAMED_MODULE_NAME
+from lms.lib.courseware_search.lms_result_processor import LmsSearchResultProcessor
 
 
 class LmsSearchResultProcessorTestCase(ModuleStoreTestCase):
@@ -85,71 +85,6 @@ class LmsSearchResultProcessorTestCase(ModuleStoreTestCase):
         self.assertEqual(
             srp.url, "/courses/{}/jump_to/{}".format(unicode(self.course.id), unicode(self.html.scope_ids.usage_id)))
 
-    def test_course_name_parameter(self):
-        srp = LmsSearchResultProcessor(
-            {
-                "course": unicode(self.course.id),
-                "id": unicode(self.html.scope_ids.usage_id),
-                "content": {"text": "This is the html text"}
-            },
-            "test"
-        )
-        self.assertEqual(srp.course_name, self.course.display_name)
-
-    def test_location_parameter(self):
-        srp = LmsSearchResultProcessor(
-            {
-                "course": unicode(self.course.id),
-                "id": unicode(self.html.scope_ids.usage_id),
-                "content": {"text": "This is html test text"}
-            },
-            "test"
-        )
-
-        self.assertEqual(len(srp.location), 3)
-        self.assertEqual(srp.location[0], 'Test Section')
-        self.assertEqual(srp.location[1], 'Test Subsection')
-        self.assertEqual(srp.location[2], 'Test Unit')
-
-        srp = LmsSearchResultProcessor(
-            {
-                "course": unicode(self.course.id),
-                "id": unicode(self.vertical.scope_ids.usage_id),
-                "content": {"text": "This is html test text"}
-            },
-            "test"
-        )
-
-        self.assertEqual(len(srp.location), 3)
-        self.assertEqual(srp.location[0], 'Test Section')
-        self.assertEqual(srp.location[1], 'Test Subsection')
-        self.assertEqual(srp.location[2], 'Test Unit')
-
-        srp = LmsSearchResultProcessor(
-            {
-                "course": unicode(self.course.id),
-                "id": unicode(self.subsection.scope_ids.usage_id),
-                "content": {"text": "This is html test text"}
-            },
-            "test"
-        )
-
-        self.assertEqual(len(srp.location), 2)
-        self.assertEqual(srp.location[0], 'Test Section')
-        self.assertEqual(srp.location[1], 'Test Subsection')
-
-        srp = LmsSearchResultProcessor(
-            {
-                "course": unicode(self.course.id),
-                "id": unicode(self.section.scope_ids.usage_id),
-                "content": {"text": "This is html test text"}
-            },
-            "test"
-        )
-
-        self.assertEqual(len(srp.location), 1)
-        self.assertEqual(srp.location[0], 'Test Section')
-
     def test_should_remove(self):
         """
         Tests that "visible_to_staff_only" overrides start date.
@@ -164,22 +99,3 @@ class LmsSearchResultProcessorTestCase(ModuleStoreTestCase):
         )
 
         self.assertEqual(srp.should_remove(self.global_staff), False)
-
-    def test_missing_display_name(self):
-        """
-        Tests that we get the correct name to include when there is an empty or null display name
-        """
-        srp = LmsSearchResultProcessor(
-            {
-                "course": unicode(self.course.id),
-                "id": unicode(self.ghost_html.scope_ids.usage_id),
-                "content": {"text": "This is html test text"}
-            },
-            "test"
-        )
-
-        location = srp.location
-        self.assertEqual(len(location), 3)
-        self.assertEqual(location[0], self.section.display_name)
-        self.assertEqual(location[1], UNNAMED_MODULE_NAME)
-        self.assertEqual(location[2], UNNAMED_MODULE_NAME)
