@@ -390,8 +390,7 @@ def account_settings_context(request):
             ),
             # If the user is connected, sending a POST request to this url removes the connection
             # information for this provider from their edX account.
-            'disconnect_url': pipeline.get_disconnect_url(state.provider.NAME),
-            # TODO: Fix python-social-auth disconnect pipeline to allow deleting by UserSocialAuth ID or by uid prefix
+            'disconnect_url': pipeline.get_disconnect_url(state.provider.NAME, state.association_id),
         } for state in auth_states]
 
     return context

@@ -199,9 +199,11 @@ class ProviderUserState(object):
     lms/templates/dashboard.html.
     """
 
-    def __init__(self, enabled_provider, user, state):
+    def __init__(self, enabled_provider, user, association_id=None):
+        # UserSocialAuth row ID
+        self.association_id = association_id
         # Boolean. Whether the user has an account associated with the provider
-        self.has_account = state
+        self.has_account = association_id is not None
         # provider.BaseProvider child. Callers must verify that the provider is
         # enabled.
         self.provider = enabled_provider
@@ -261,9 +263,10 @@ def _get_enabled_provider_by_name(provider_name):
 
 
 def _get_url(view_name, backend_name, auth_entry=None, redirect_url=None,
-             enroll_course_id=None, email_opt_in=None, extra_params=None):
+             enroll_course_id=None, email_opt_in=None, extra_params=None,
+             **kwargs):
     """Creates a URL to hook into social auth endpoints."""
-    kwargs = {'backend': backend_name}
+    kwargs['backend'] = backend_name
     url = reverse(view_name, kwargs=kwargs)
 
     query_params = OrderedDict()
@@ -307,21 +310,26 @@ def get_complete_url(backend_name):
     return _get_url('social:complete', backend_name)
 
 
-def get_disconnect_url(provider_name):
+def get_disconnect_url(provider_name, association_id):
     """Gets URL for the endpoint that starts the disconnect pipeline.
 
     Args:
         provider_name: string. Name of the provider.BaseProvider child you want
             to disconnect from.
+        association_id: int. Optional ID of a specific row in the UserSocialAuth
+            table to disconnect (useful if multiple providers use a common backend)
 
     Returns:
         String. URL that starts the disconnection pipeline.
 
     Raises:
-        ValueError: if no provider is enabled with the given backend_name.
+        ValueError: if no provider is enabled with the given name.
     """
-    enabled_provider = _get_enabled_provider_by_name(provider_name)
-    return _get_url('social:disconnect', enabled_provider.BACKEND_CLASS.name)
+    backend_name = _get_enabled_provider_by_name(provider_name).BACKEND_CLASS.name
+    if association_id:
+        return _get_url('social:disconnect_individual', backend_name, association_id=association_id)
+    else:
+        return _get_url('social:disconnect', backend_name)
 
 
 def get_login_url(provider_name, auth_entry, redirect_url=None, enroll_course_id=None, email_opt_in=None):
@@ -404,9 +412,13 @@ def get_provider_user_states(user):
     found_user_auths = list(models.DjangoStorage.user.get_social_auth_for_user(user))
 
     for enabled_provider in provider.Registry.enabled():
-        is_connected = any(enabled_provider.match_social_auth(auth) for auth in found_user_auths)
+        association_id = None
+        for auth in found_user_auths:
+            if enabled_provider.match_social_auth(auth):
+                association_id = auth.id
+                break
         states.append(
-            ProviderUserState(enabled_provider, user, is_connected)
+            ProviderUserState(enabled_provider, user, association_id)
         )
 
     return states
