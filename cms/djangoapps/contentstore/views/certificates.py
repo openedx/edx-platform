@@ -32,12 +32,13 @@ from django.views.decorators.http import require_http_methods
 
 from contentstore.utils import reverse_course_url
 from edxmako.shortcuts import render_to_response
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, AssetKey
 from student.auth import has_studio_read_access
 from util.db import generate_int_id, MYSQL_MAX_INT
 from util.json_request import JsonResponse
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
+from contentstore.views.assets import delete_asset
 from contentstore.views.exception import CertificateValidationError
 from django.core.exceptions import PermissionDenied
 
@@ -54,6 +55,20 @@ def _get_course_and_check_access(course_key, user, depth=0):
         raise PermissionDenied()
     course_module = modulestore().get_course(course_key, depth=depth)
     return course_module
+
+
+def _delete_asset(course_key, asset_key_string):
+    """
+    Internal method used to create asset key from string and
+    remove asset by calling delete_asset method of assets module.
+    """
+    if asset_key_string:
+        # remove first slash in asset path
+        # otherwise it generates InvalidKeyError in case of split modulestore
+        if '/' == asset_key_string[0]:
+            asset_key_string = asset_key_string[1:]
+        asset_key = AssetKey.from_string(asset_key_string)
+        delete_asset(course_key, asset_key)
 
 
 class CertificateManager(object):
@@ -182,6 +197,7 @@ class CertificateManager(object):
             if int(cert['id']) == int(certificate_id):
                 course.certificates['certificates'].pop(index)
                 store.update_item(course, request.user.id)
+                CertificateManager.remove_signatory_signature_images(course, cert)
                 break
 
     # pylint-disable: unused-variable
@@ -194,9 +210,18 @@ class CertificateManager(object):
             if int(cert['id']) == int(certificate_id):
                 for sig_index, signatory in enumerate(cert.get('signatories')):  # pylint: disable=unused-variable
                     if int(signatory_id) == int(signatory['id']):
+                        _delete_asset(course.id, signatory['signature_image_path'])
                         del cert['signatories'][sig_index]
                         store.update_item(course, request.user.id)
                         break
+
+    @staticmethod
+    def remove_signatory_signature_images(course, certificate):
+        """
+        Remove the signature images for all signatories in specified certificate
+        """
+        for sig_index, signatory in enumerate(certificate.get('signatories')):  # pylint: disable=unused-variable
+            _delete_asset(course.id, signatory['signature_image_path'])
 
 
 class Certificate(object):
@@ -250,6 +275,7 @@ def certificates_list_handler(request, course_key_string):
         if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
             certificate_url = reverse_course_url('certificates.certificates_list_handler', course_key)
             course_outline_url = reverse_course_url('course_handler', course_key)
+            upload_asset_url = reverse_course_url('assets_handler', course_key)
             certificates = None
             if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
                 certificates = CertificateManager.get_certificates(course)
@@ -257,6 +283,7 @@ def certificates_list_handler(request, course_key_string):
                 'context_course': course,
                 'certificate_url': certificate_url,
                 'course_outline_url': course_outline_url,
+                'upload_asset_url': upload_asset_url,
                 'certificates': json.dumps(certificates),
             })
         elif "application/json" in request.META.get('HTTP_ACCEPT'):
