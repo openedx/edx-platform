@@ -1048,7 +1048,6 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
-#    'pyinstrument.middleware.ProfilerMiddleware',
     'request_cache.middleware.RequestCache',
     'microsite_configuration.middleware.MicrositeMiddleware',
     'django_comment_client.middleware.AjaxExceptionMiddleware',

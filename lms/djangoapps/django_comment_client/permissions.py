@@ -30,7 +30,6 @@ CACHE_LIFESPAN = 60
 #         CACHE.set(key, val, CACHE_LIFESPAN)
 #     return val
 
-
 def cached_has_permission(user, permission, course_id=None):
     assert isinstance(course_id, (NoneType, CourseKey))
     request_cache_dict = RequestCache.get_request_cache().data
@@ -45,6 +44,7 @@ def cached_has_permission(user, permission, course_id=None):
 
     return permission in all_permissions
 
+has_permission = cached_has_permission
 
 CONDITIONS = ['is_open', 'is_author', 'is_question_author']
 
