@@ -67,13 +67,13 @@ define([
             expect(view.$('#tags-panel')).toExist();
 
             // Pumpkin notes has the greatest number of notes, and therefore should come first.
-            // Yummy and pie notes have the same number of notes. The one with the most recent note (pie)
-            // should come first. "no tags" should always be last.
-            expect(tags).toEqual(['pumpkin', 'pie', 'yummy', 'no tags']);
+            // Yummy and pie notes have the same number of notes. They should be sorted alphabetically.
+            // "no tags" should always be last.
+            expect(tags).toEqual(['pumpkin (3)', 'pie (2)', 'yummy (2)', '[no tags] (1)']);
 
             expect(pumpkinNotes).toEqual(['Note 4', 'Note 2', 'Note 1']);
-            expect(pieNotes).toEqual(['Note 4', 'Note 3']);
-            expect(yummyNotes).toEqual(['Note 2', 'Note 1']);
+            expect(yummyNotes).toEqual(['Note 4', 'Note 3']);
+            expect(pieNotes).toEqual(['Note 2', 'Note 1']);
             expect(noTagsNotes).toEqual(['Note 5']);
         });
     });

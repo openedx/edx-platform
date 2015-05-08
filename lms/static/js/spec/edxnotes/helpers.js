@@ -115,7 +115,7 @@ define(['underscore'], function(_) {
                 updated: 'December 11, 2014 at 11:12AM',
                 text: 'Third added model',
                 quote: 'Note 4',
-                tags: ['Pumpkin', 'pumpkin', 'pie']
+                tags: ['Pumpkin', 'pumpkin', 'yummy']
             },
             {
                 chapter: getChapter('Second Chapter', 0, 1, [1, 'w_n', 0]),
@@ -134,7 +134,7 @@ define(['underscore'], function(_) {
                 updated: 'December 11, 2014 at 11:11AM',
                 text: 'Second added model',
                 quote: 'Note 3',
-                tags: ['pie']
+                tags: ['yummy']
             },
             {
                 chapter: getChapter('Second Chapter', 0, 1, [1, 'w_n', 0]),
@@ -144,7 +144,7 @@ define(['underscore'], function(_) {
                 updated: 'December 11, 2014 at 11:10AM',
                 text: 'First added model',
                 quote: 'Note 2',
-                tags: ['PUMPKIN', 'yummy']
+                tags: ['PUMPKIN', 'pie']
             },
             {
                 chapter: getChapter('First Chapter', 1, 0, [2]),
@@ -154,7 +154,7 @@ define(['underscore'], function(_) {
                 updated: 'December 11, 2014 at 11:10AM',
                 text: 'First added model',
                 quote: 'Note 1',
-                tags: ['yummy', 'pumpkin']
+                tags: ['pie', 'pumpkin']
             }
         ];
     };

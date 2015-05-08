@@ -343,7 +343,7 @@ class EdxNotesPageTest(EdxNotesTestMixin):
     def _add_default_notes(self, tags=None):
         """
         Creates 5 test notes. If tags are not specified, will populate the notes with some test tag data.
-        If tags are specified, they will be used for each of the 5 notes.
+        If tags are specified, they will be used for each of the 3 notes that have tags.
         """
         xblocks = self.course_fixture.get_nested_xblocks(category="html")
         self._add_notes([
@@ -591,19 +591,20 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         self.assertEqual(len(notes), 7)
         self.assertEqual(len(groups), 4)
 
-        # Tag group "review"
+        # Tag group "cool"
         self.assertGroupContent(
             groups[0],
-            title=u"review",
-            notes=[u"Fourth note", None]
+            title=u"cool (2)",
+            notes=[u"Third note", None]
         )
 
         self.assertNoteContent(
             notes[0],
-            text=u"Fourth note",
-            unit_name="Test Unit 3",
-            time_updated="Jan 01, 2014 at 01:01 UTC",
-            tags=["review"]
+            quote=u"Annotate this text",
+            text=u"Third note",
+            unit_name="Test Unit 1",
+            time_updated="Jan 01, 2013 at 01:01 UTC",
+            tags=["Cool", "TODO"]
         )
 
         self.assertNoteContent(
@@ -614,20 +615,19 @@ class EdxNotesPageTest(EdxNotesTestMixin):
             tags=["Review", "cool"]
         )
 
-        # Tag group "cool"
+        # Tag group "review"
         self.assertGroupContent(
             groups[1],
-            title=u"cool",
-            notes=[u"Third note", None]
+            title=u"review (2)",
+            notes=[u"Fourth note", None]
         )
 
         self.assertNoteContent(
             notes[2],
-            quote=u"Annotate this text",
-            text=u"Third note",
-            unit_name="Test Unit 1",
-            time_updated="Jan 01, 2013 at 01:01 UTC",
-            tags=["Cool", "TODO"]
+            text=u"Fourth note",
+            unit_name="Test Unit 3",
+            time_updated="Jan 01, 2014 at 01:01 UTC",
+            tags=["review"]
         )
 
         self.assertNoteContent(
@@ -641,7 +641,7 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         # Tag group "todo"
         self.assertGroupContent(
             groups[2],
-            title=u"todo",
+            title=u"todo (1)",
             notes=["Third note"]
         )
 
@@ -657,7 +657,7 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         # Notes with no tags
         self.assertGroupContent(
             groups[3],
-            title=u"no tags",
+            title=u"[no tags] (2)",
             notes=["Fifth note", "First note"]
         )
 
@@ -825,7 +825,7 @@ class EdxNotesPageTest(EdxNotesTestMixin):
 
         # Because all the notes (with tags) have the same tags, they will end up ordered alphabetically.
         pear_group = self.notes_page.tag_groups[group_index]
-        self.assertEqual(tag_name, pear_group.title)
+        self.assertEqual(tag_name + " (3)", pear_group.title)
         self.assertTrue(pear_group.scrolled_to_top(group_index))
 
     def test_tabs_behaves_correctly(self):
