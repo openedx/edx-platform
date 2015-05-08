@@ -137,8 +137,11 @@ function () {
         // @TODO: onOpen callback
     }
 
+    function _focusOnFirst(menu) {
+        menu.find('.dropdown-item:first .action').focus();
+    }
+
     function _closeMenu(menu, without_handler) {
-        // Remove the previously added clickHandler from window element.
         var msg = '.' + menu.value;
 
         menu.menuList
@@ -190,69 +193,72 @@ function () {
         return false;
     }
 
-//     function _keyDownHandler(event) {
-//         var KEY = $.ui.keyCode,
-//             keyCode = event.keyCode,
-//             target = $(event.currentTarget),
-//             index;
+    function _keyDownHandler(event) {
+        var KEY = $.ui.keyCode,
+            keyCode = event.keyCode,
+            target = $(event.currentTarget),
+            index;
 
-//         if (target.is('.action')) {
+        if (target.is('.action')) {
 
-//             index = target.parent().index();
+            index = target.parent().index();
 
-//             switch (keyCode) {
-//                 // Scroll up menu, wrapping at the top. Keep menu open.
-//                 case KEY.UP:
-//                     _previousMenuItemLink(this.menuItemsLinks, index).focus();
-//                     break;
-//                 // Scroll down  menu, wrapping at the bottom. Keep menu
-//                 // open.
-//                 case KEY.DOWN:
-//                     _nextMenuItemLink(this.menuItemsLinks, index).focus();
-//                     break;
-//                 // Close menu.
-//                 case KEY.TAB:
-//                     _closeMenu(this);
-//                     // TODO
-//                     // What has to happen here? In speed menu, tabbing backward
-//                     // will give focus to Play/Pause button and tabbing
-//                     // forward to Volume button.
-//                     break;
-//                 // Close menu, give focus to button and change
-//                 // file type.
-//                 case KEY.ENTER:
-//                 case KEY.SPACE:
-//                     this.button.focus();
-//                     this.changeFileType.call(this, event);
-//                     _closeMenu(this);
-//                     break;
-//                 // Close menu and give focus to speed control.
-//                 case KEY.ESCAPE:
-//                     _closeMenu(this);
-//                     this.button.focus();
-//                     break;
-//             }
-//             return false;
-//         }
-//         else {
-//             switch(keyCode) {
-//                 // Open menu and focus on last element of list above it.
-//                 case KEY.ENTER:
-//                 case KEY.SPACE:
-//                 case KEY.UP:
-//                     _openMenu(this);
-//                     this.menuItemsLinks.last().focus();
-//                     break;
-//                 // Close menu.
-//                 case KEY.ESCAPE:
-//                     _closeMenu(this);
-//                     break;
-//             }
-//             // We do not stop propagation and default behavior on a TAB
-//             // keypress.
-//             return event.keyCode === KEY.TAB;
-//         }
-//     }
+            switch (keyCode) {
+                case KEY.UP:
+                    _previousMenuItemLink(this.menuItemsLinks, index).focus();
+                    break;
+
+                case KEY.DOWN:
+                    _nextMenuItemLink(this.menuItemsLinks, index).focus();
+                    break;
+
+                case KEY.TAB:
+                    _closeMenu(this);
+                    // TODO
+                    // What has to happen here? In speed menu, tabbing backward
+                    // will give focus to Play/Pause button and tabbing
+                    // forward to Volume button.
+                    break;
+
+                case KEY.ENTER:
+                case KEY.SPACE:
+                    this.button.focus();
+                    this.changeFileType.call(this, event);
+                    _closeMenu(this);
+                    break;
+
+                case KEY.ESCAPE:
+                    _closeMenu(this);
+                    this.button.focus();
+                    break;
+            }
+            return false;
+
+        } else if(target.is('.has-dropdown')) {
+
+            switch(keyCode) {
+                case KEY.DOWN:
+                    _focusOnFirst(this);
+                    break;
+            }
+            return false;
+        } else {
+
+            switch(keyCode) {
+                case KEY.ENTER:
+                case KEY.SPACE:
+                case KEY.UP:
+                    _openMenu(this);
+                    this.menuItemsLinks.last().focus();
+                    break;
+
+                case KEY.ESCAPE:
+                    _closeMenu(this);
+                    break;
+            }
+            return event.keyCode === KEY.TAB;
+        }
+    }
 
     /**
      * @desc Bind any necessary function callbacks to DOM events (click,
@@ -272,18 +278,14 @@ function () {
     function _bindHandlers(state) {
         var menu = state.videoAccessibleMenu;
 
-        // Attach various events handlers to menu container.
         menu.container.on({
-            // 'mouseenter': _openMenuHandler.bind(menu),
-            // 'mouseleave': _closeMenuHandler.bind(menu),
-            'click': _toggleMenuHandler.bind(menu)
-            // 'keydown': _keyDownHandler.bind(menu)
+            'click': _toggleMenuHandler.bind(menu),
+            'keydown': _keyDownHandler.bind(menu)
         });
 
-        // Attach click and keydown event handlers to individual menu items.
         menu.menuItems
-            .on('click', '.action', _clickHandler.bind(menu));
-            // .on('keydown', '.action', _keyDownHandler.bind(menu));
+            .on('click', '.action', _clickHandler.bind(menu))
+            .on('keydown', '.action', _keyDownHandler.bind(menu));
 
         $(document).on({
             'click': _closeMenuHandler.bind(menu)
@@ -315,7 +317,6 @@ function () {
         this.saveState(true, {'transcript_download_format': fileType});
         this.storage.setItem('transcript_download_format', fileType);
 
-        // Update the download button text format
         $(event.currentTarget).parent().parent().parent().next('.download-link')
             .text(gettext('Download transcript (.' + fileType + ')'))
                 .focus();
