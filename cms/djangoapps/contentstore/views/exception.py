@@ -16,3 +16,10 @@ class CertificateValidationError(CertificateException):
     An exception raised when certificate information is invalid.
     """
     pass
+
+
+class AssetNotFoundException(Exception):
+    """
+    Raised when asset not found
+    """
+    pass
