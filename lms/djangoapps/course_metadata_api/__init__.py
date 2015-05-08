@@ -1,0 +1,1 @@
+""" Course Metadata API Application """
