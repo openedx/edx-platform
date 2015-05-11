@@ -30,6 +30,8 @@ define([
         PanelConstructor: TabPanelView.extend({
             id: 'tags-panel',
             title: 'Tags',
+            // Translators: this is a title shown before all Notes that have no associated tags. It is put within
+            // brackets to differentiate it from user-defined tags, but it should still be translated.
             noTags: gettext('[no tags]'),  // User-defined tags cannot have spaces, so no risk of a collision.
 
             renderContent: function () {
@@ -118,6 +120,10 @@ define([
         }),
 
         tabInfo: {
+            // Translators: 'Tags' is the name of the view (noun) within the Student Notes page that shows all
+            // notes organized by the tags the student has associated with them (if any). When defining a
+            // note in the courseware, the student can choose to associate 1 or more tags with the note
+            // in order to group similar notes together and help with search.
             name: gettext('Tags'),
             identifier: 'view-tags',
             icon: 'fa fa-tag'
