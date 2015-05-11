@@ -170,7 +170,19 @@ MOCK_MODULES = [
     'student.roles',
     'embargo.models',
     'xmodule.vertical_block',
-    'vertical_block'
+    'vertical_block',
+    'errors',
+    'UserNotFound', 
+    'UserNotAuthorized', 
+    'AccountUpdateError', 
+    'AccountValidationError',
+    'transaction',
+    'parsers',
+    'MergePatchParser',
+    'get_account_settings',
+    'update_account_settings',
+    'serializers',
+    'PROFILE_IMAGE_KEY_PREFIX'
 ]
 
 for mod_name in MOCK_MODULES:

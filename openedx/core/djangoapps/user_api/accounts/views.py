@@ -24,7 +24,8 @@ class AccountView(APIView):
     """
         **Use Cases**
 
-            Get or update a user's account information. Updates are supported only through merge patch.
+            Get or update a user's account information. Updates are supported
+            only through merge patch.
 
         **Example Requests**:
 
@@ -38,72 +39,74 @@ class AccountView(APIView):
             request for another account and has "is_staff" access, the response
             contains:
 
-                * username: The username associated with the account.
+            * username: The username associated with the account.
 
-                * name: The full name of the user.
+            * name: The full name of the user.
 
-                * email: email for the user (the new email address must be
-                    confirmed via a confirmation email, so GET will not reflect
-                    the change until the address has been confirmed).
+            * email: email for the user (the new email address must be confirmed
+              via a confirmation email, so GET will not reflect the change until
+              the address has been confirmed).
 
-                * date_joined: The date the account was created, in the string
-                    format provided by datetime.
-                    For example, "2014-08-26T17:52:11Z".
+            * date_joined: The date the account was created, in the string
+              format provided by datetime. For example, "2014-08-26T17:52:11Z".
 
-                * gender: One of the following values:
-                    * "m"
-                    * "f"
-                    * "o"
-                    * null
+            * gender: One of the following values:
 
-                * year_of_birth: The year the user was born, as an integer, or
-                    null.
+                * "m"
+                * "f"
+                * "o"
+                * null
 
-                * level_of_education: One of the following values:
-                    * "p": PhD or Doctorate
-                    * "m": Master's or professional degree
-                    * "b": Bachelor's degree
-                    * "a": Associate's degree
-                    * "hs": Secondary/high school
-                    * "jhs": Junior secondary/junior high/middle school
-                    * "el": Elementary/primary school
-                    * "none": "None"
-                    * "o": "Other"
-                    * null: The user did not enter a value.
+            * year_of_birth: The year the user was born, as an integer, or null.
 
-                * language: The user's preferred language, or null.
+            * level_of_education: One of the following values:
 
-                * country: null (not set), or a Country corresponding to one of
-                    the ISO 3166-1 countries.
+                * "p": PhD or Doctorate
+                * "m": Master's or professional degree
+                * "b": Bachelor's degree
+                * "a": Associate's degree
+                * "hs": Secondary/high school
+                * "jhs": Junior secondary/junior high/middle school
+                * "el": Elementary/primary school
+                * "none": None
+                * "o": Other
+                * null: The user did not enter a value.
 
-                * country: A ISO 3166 country code or null.
+            * language: The user's preferred language, or null.
 
-                * mailing_address: The textual representation of the user's
-                    mailing address, or null.
+            * country: null (not set), or a Country corresponding to one of the
+              ISO 3166-1 countries.
 
-                * goals: The textual representation of the user's goals, or null.
+            * country: A ISO 3166 country code or null.
 
-                * bio: null or textural representation of user biographical
-                    information ("about me").
+            * mailing_address: The textual representation of the user's mailing
+              address, or null.
 
-                * is_active: boolean representation of whether a user is active.
+            * goals: The textual representation of the user's goals, or null.
 
-                * profile_image: JSON representation of a user's profile image
-                    information. The keys are:
-                    the user's profile image:
-                    * "has_image": boolean indicating whether the user has
-                        a profile image.
-                    * "image_url_*": absolute URL to various sizes of a user's
-                        profile image, where '*' matches a representation of
-                        the corresponding image size such as 'small', 'medium',
-                        'large', and 'full'. These are configurable via
-                        PROFILE_IMAGE_SIZES_MAP.
+            * bio: null or textural representation of user biographical
+              information ("about me").
+
+           * is_active: boolean representation of whether a user is active.
+
+            * profile_image: JSON representation of a user's profile image
+              information. The keys are: the user's profile image:
+                
+                * "has_image": boolean indicating whether the user has a profile
+                  image.
+                
+                * "image_url_*": absolute URL to various sizes of a user's
+                  profile image, where '*' matches a representation of the
+                  corresponding image size such as 'small', 'medium', 'large',
+                  and 'full'. These are configurable via
+                  PROFILE_IMAGE_SIZES_MAP.
 
                 * requires_parental_consent: true if the user is a minor
-                    requiring parental consent.
+                  requiring parental consent.
 
-                * language_proficiencies: array of language preferences.
-                    Each preference is a JSON object with the following keys:
+                * language_proficiencies: array of language preferences. Each
+                  preference is a JSON object with the following keys:
+                    
                     * "code": string ISO 639-1 language code e.g. "en".
 
             For all text fields, clients rendering the values should take care
@@ -114,8 +117,8 @@ class AccountView(APIView):
             If a user who does not have "is_staff" access requests account
             information for a different user, only a subset of these fields is
             returned. The fields returned depend on the configuration setting
-            ACCOUNT_VISIBILITY_CONFIGURATION, and the visibility preference of
-            the user for whom data is requested.
+            ACCOUNT_VISIBILITY_CONFIGURATION, and the visibility preference of the
+            user for whom data is requested.
 
             Note that a user can view which account fields they have shared with
             other users by requesting their own username and providing the url
@@ -126,10 +129,10 @@ class AccountView(APIView):
 
         **Response Values for PATCH**
 
-            Users can only modify their own account information. If the requesting
-            user does not have username "username", this method will return with
-            a status of 403 for staff access but a 404 for ordinary users
-            to avoid leaking the existence of the account.
+            Users can only modify their own account information. If the
+            requesting user does not have username "username", this method will
+            return with a status of 403 for staff access but a 404 for ordinary
+            users to avoid leaking the existence of the account.
 
             If no user exists with the specified username, a 404 error is
             returned.
