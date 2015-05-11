@@ -22,8 +22,7 @@ define([
                 tabsCollection: this.tabsCollection
             });
 
-            scrollToTag = this.tagsView.scrollToTag.bind(this.tagsView);
-            this.tagsView.options.scrollToTag = scrollToTag;
+            scrollToTag = this.tagsView.scrollToTag;
 
             // Remove the Tags model from the tabs collection because it should not appear first.
             tagsModel = this.tabsCollection.shift();

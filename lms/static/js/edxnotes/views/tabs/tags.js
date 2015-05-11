@@ -20,6 +20,13 @@ define([
                 scrollTop: titleElement.offset().top - 10
             },'slow');
         },
+
+        initialize: function (options) {
+            TabView.prototype.initialize.call(this, options);
+            _.bindAll(this, 'scrollToTag');
+            this.options.scrollToTag = this.scrollToTag;
+        },
+
         PanelConstructor: TabPanelView.extend({
             id: 'tags-panel',
             title: 'Tags',
@@ -40,7 +47,7 @@ define([
                     // If a note was tagged with the same tag more than once, don't add again.
                     // We can assume it would be the last element of the list because we iterate through
                     // all tags on a given note before moving on to the text note.
-                    if (noteList.length === 0 || noteList[noteList.length -1] !== note) {
+                    if (noteList.length === 0 || noteList[noteList.length - 1] !== note) {
                         noteList.push(note);
                     }
                 };

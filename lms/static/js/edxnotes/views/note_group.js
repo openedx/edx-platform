@@ -3,7 +3,7 @@
 define([
     'gettext', 'underscore', 'backbone'
 ], function (gettext, _, Backbone) {
-    var GroupView, CourseStructureChapterView;
+    var GroupView, ChapterView;
 
     GroupView = Backbone.View.extend({
         tagName: 'section',
@@ -29,7 +29,7 @@ define([
         }
     });
 
-    CourseStructureChapterView = Backbone.View.extend({
+    ChapterView = Backbone.View.extend({
         tagName: 'section',
         className: 'note-group',
         id: function () {
@@ -74,6 +74,6 @@ define([
         }
     });
 
-    return {GroupView: GroupView, ChapterView: CourseStructureChapterView};
+    return {GroupView: GroupView, ChapterView: ChapterView};
 });
 }).call(this, define || RequireJS.define);
