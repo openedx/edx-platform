@@ -7,14 +7,14 @@ define([
 
     var TagsView = TabView.extend({
         scrollToTag: function(tagName) {
-            var titleElement;
+            var titleElement, displayedTitle;
             if (!this.tabModel.isActive()) {
                 this.tabModel.activate();
             }
+
+            displayedTitle = this.contentView.titleMap[tagName.toLowerCase()];
             titleElement = this.$el.find('.tags-title').filter(
-                // Since tags can only be single words, we are safe just looking for the title
-                // containing the tagName, and we don't need to worry about the display of the count.
-                function(){ return $(this).text().indexOf(tagName.toLowerCase()) !== -1; }
+                function(){ return $(this).text() === displayedTitle; }
             );
             $('html,body').animate({
                 scrollTop: titleElement.offset().top - 10
@@ -27,7 +27,7 @@ define([
 
             renderContent: function () {
                 var notesByTag = {}, noTags = this.noTags, addNoteForTag, noteList, tags, i,
-                    sortedTagNames, container, group, noteGroup;
+                    sortedTagNames, container, group, noteGroup, tagTitle, titleMap;
 
                 // Iterate through all the notes and build up a dictionary structure by tag.
                 // Note that the collection will be in most-recently updated order already.
@@ -78,14 +78,19 @@ define([
 
                container = document.createDocumentFragment();
 
+                // Store map of titles for scrollToTag functionality.
+                this.titleMap = {};
+                titleMap = this.titleMap;
+
                 _.each(sortedTagNames, function (tagName) {
                     noteGroup = notesByTag[tagName];
-                    group = this.getGroup(
-                        interpolate_text(
-                            gettext("{tagName} ({numberOfNotesWithTag})"),
-                            {tagName: tagName, numberOfNotesWithTag: noteGroup.length}
-                        )
+                    var tagTitle = interpolate_text(
+                        gettext("{tagName} ({numberOfNotesWithTag})"),
+                        {tagName: tagName, numberOfNotesWithTag: noteGroup.length}
                     );
+                    group = this.getGroup(tagTitle);
+                    titleMap[tagName] = tagTitle;
+
                     group.addChild(this.getNotes(noteGroup));
                     container.appendChild(group.render().el);
                 }, this);
