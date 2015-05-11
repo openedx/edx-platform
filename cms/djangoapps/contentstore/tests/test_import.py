@@ -283,3 +283,51 @@ class ContentStoreImportTest(SignalDisconnectTestMixin, ModuleStoreTestCase):
         }
 
         self.assertEqual(remapped_verticals, split_test_module.group_id_to_child)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_ora_rubric_settings_import_draft_correctly(self, store):
+        """
+        Test that questions/rubrics/settings are correctly import for ora draft problems
+        """
+        with modulestore().default_store(store):
+            module_store = modulestore()
+            course_id = module_store.make_course_key('edX', 'test_draft_settings_ora', '2015_AN')
+            import_course_from_xml(
+                module_store,
+                self.user.id,
+                TEST_DATA_DIR,
+                ['draft_ora_import_course'],
+                target_id=course_id,
+                create_if_not_present=True
+            )
+
+            course = module_store.get_course(course_id)
+            course_key = course.id
+
+            self.assertIsNotNone(course)
+
+            ora_location = course_key.make_usage_key('openassessment', '49ebafdd36fc4d1daf413319fc152112')
+            peer_assessment = module_store.get_item(ora_location)
+
+            self.assertIsNotNone(peer_assessment)
+
+            # Checking Settings
+            # must_grade ==> Default=5 , Draft=9
+            self.assertEqual(peer_assessment.rubric_assessments[1]['must_grade'], 9)
+
+            # Checking the Rubric
+            rubric_criteria = peer_assessment.rubric_criteria[0]
+            # Criterion Label ==> Default="Ideas", Draft="Ideas draft"
+            self.assertEqual(rubric_criteria['label'], 'Ideas draft')
+
+            # First Option
+            # ==================== Defaults ========================
+            #  label="Poor", Points=0,
+            # Explanation="Difficult for the reader to discern the main idea.
+            # Too brief or too repetitive to establish or maintain a focus."
+            # =================== Draft ============================
+            # label="Poor draft", Points=2, Explanation="draft"
+            first_option = rubric_criteria['options'][0]
+            self.assertEqual(first_option['label'], "Poor draft")
+            self.assertEqual(first_option['points'], 2)
+            self.assertEqual(first_option['explanation'], "draft")

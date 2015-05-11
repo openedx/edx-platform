@@ -1,0 +1,43 @@
+{
+    "course/2015_A20": {
+        "discussion_topics": {
+            "General": {
+                "id": "i4x-arbisoft-1252-course-2015_A20"
+            }
+        }, 
+        "display_name": "TNL-1252", 
+        "start": "2030-01-01T00:00:00Z", 
+        "tabs": [
+            {
+                "name": "Courseware", 
+                "type": "courseware"
+            }, 
+            {
+                "name": "Course Info", 
+                "type": "course_info"
+            }, 
+            {
+                "name": "Textbooks", 
+                "type": "textbooks"
+            }, 
+            {
+                "name": "Discussion", 
+                "type": "discussion"
+            }, 
+            {
+                "name": "Wiki", 
+                "type": "wiki"
+            }, 
+            {
+                "name": "Progress", 
+                "type": "progress"
+            }
+        ], 
+        "xml_attributes": {
+            "filename": [
+                "course/2015_A20.xml", 
+                "course/2015_A20.xml"
+            ]
+        }
+    }
+}
