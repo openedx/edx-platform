@@ -6,7 +6,7 @@ from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.course_nav import CourseNavPage
 from ...pages.lms.courseware import CoursewarePage
-from ...pages.lms.edxnotes import EdxNotesUnitPage, EdxNotesPage
+from ...pages.lms.edxnotes import EdxNotesUnitPage, EdxNotesPage, EdxNotesPageNoContent
 from ...fixtures.edxnotes import EdxNotesFixture, Note, Range
 
 
@@ -413,10 +413,11 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         When I open Notes page
         Then I see only "You do not have any notes within the course." message
         """
-        self.notes_page.visit()
+        notes_page_empty = EdxNotesPageNoContent(self.browser, self.course_id)
+        notes_page_empty.visit()
         self.assertIn(
             "You have not made any notes in this course yet. Other students in this course are using notes to:",
-            self.notes_page.no_content_text)
+            notes_page_empty.no_content_text)
 
     def test_recent_activity_view(self):
         """

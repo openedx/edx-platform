@@ -201,7 +201,7 @@ class EdxNotesPage(CoursePage):
         self.current_view = self.MAPPING["recent"](self.browser)
 
     def is_browser_on_page(self):
-        return self.q(css=".wrapper-student-notes").present
+        return self.q(css=".wrapper-student-notes .note-group").visible
 
     def switch_to_tab(self, tab_name):
         """
@@ -281,6 +281,16 @@ class EdxNotesPage(CoursePage):
         """
         children = self.q(css='.note-section')
         return [EdxNotesPageSection(self.browser, child.get_attribute("id")) for child in children]
+
+
+class EdxNotesPageNoContent(CoursePage):
+    """
+    EdxNotes page -- when no notes have been added.
+    """
+    url_path = "edxnotes/"
+
+    def is_browser_on_page(self):
+        return self.q(css=".wrapper-student-notes .is-empty").visible
 
     @property
     def no_content_text(self):
