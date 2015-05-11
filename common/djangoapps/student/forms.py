@@ -105,7 +105,7 @@ class AccountCreationForm(forms.Form):
     # TODO: Resolve repetition
     username = forms.SlugField(
         min_length=2,
-        max_length=30,
+        max_length=255,
         error_messages={
             "required": _USERNAME_TOO_SHORT_MSG,
             "invalid": _("Username should only consist of A-Z and 0-9, with no spaces."),
@@ -114,7 +114,7 @@ class AccountCreationForm(forms.Form):
         }
     )
     email = forms.EmailField(
-        max_length=75,  # Limit per RFCs is 254, but User's email field in django 1.4 only takes 75
+        max_length=255,
         error_messages={
             "required": _EMAIL_INVALID_MSG,
             "invalid": _EMAIL_INVALID_MSG,

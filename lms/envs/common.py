@@ -1651,6 +1651,9 @@ INSTALLED_APPS = (
     'external_auth',
     'django_openid_auth',
 
+    # Allow longer usernames and passwords
+    'longerusernameandemail',
+
     # OAuth2 Provider
     'provider',
     'provider.oauth2',
