@@ -1246,6 +1246,20 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
         self.assertIsNone(student_module.grade)
         self.assertIsNone(student_module.max_grade)
 
+    @patch('courseware.module_render.SCORE_CHANGED.send')
+    def test_score_change_signal(self, send_mock):
+        """Test that a Django signal is generated when a score changes"""
+        self.set_module_grade_using_publish(self.grade_dict)
+        expected_signal_kwargs = {
+            'sender': None,
+            'points_possible': self.grade_dict['max_value'],
+            'points_earned': self.grade_dict['value'],
+            'user_id': self.student_user.id,
+            'course_id': unicode(self.course.id),
+            'usage_id': unicode(self.problem.location)
+        }
+        send_mock.assert_called_with(**expected_signal_kwargs)
+
 
 @attr('shard_1')
 class TestRebindModule(TestSubmittingProblems):
