@@ -11,17 +11,16 @@ define([
     return Backbone.View.extend({
 
         tagName: 'li',
-        templateId: '#filter-tpl',
-        className: 'active-filter',
+        templateId: '#search_facet-tpl',
+        className: '',
 
         initialize: function () {
             this.tpl = _.template($(this.templateId).html());
-            this.listenTo(this.model, 'destroy', this.remove);
         },
 
-        render: function () {
-            this.className = this.model.get('type');
-            this.$el.html(this.tpl(this.model.attributes));
+        render: function (term, count) {
+            this.$el.html(this.tpl({term: term, count: count}));
+            this.$el.attr('data-facet', term);
             return this;
         },
 

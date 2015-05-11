@@ -1,0 +1,6 @@
+<a tabindex="0" data-value="<%= term %>" class="facet-option" href="#">
+    <%= term %>
+    <span class="count">
+        <%= count %>
+    </span>
+</a>

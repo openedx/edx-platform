@@ -10,7 +10,7 @@ define(['backbone'], function(Backbone) {
         var dispatcher = _.clone(Backbone.Events);
         var form = new Form();
         var filters = new FilterBarView();
-        var facets = new FacetsBarView();
+        var facetsBarView = new FacetsBarView();
 
         dispatcher.listenTo(form, 'search', function (query) {
             form.showLoadingIndicator();
@@ -40,6 +40,7 @@ define(['backbone'], function(Backbone) {
             else {
                 form.showNotFoundMessage(collection.searchTerm);
             }
+            facetsBarView.renderFacets(collection.facets);
             form.hideLoadingIndicator();
         });
 
@@ -53,7 +54,7 @@ define(['backbone'], function(Backbone) {
             form.hideLoadingIndicator();
         });
 
-        dispatcher.listenTo(facets, 'addFilter', function (data) {
+        dispatcher.listenTo(facetsBarView, 'addFilter', function (data) {
             filters.addFilter(data);
         });
 
