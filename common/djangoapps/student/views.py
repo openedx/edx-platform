@@ -55,7 +55,7 @@ from student.models import (
     PendingEmailChange, CourseEnrollment, unique_id_for_user,
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
     create_comments_service_user, PasswordHistory, UserSignupSource,
-    DashboardConfiguration)
+    DashboardConfiguration, CourseAllowUnenroll)
 from student.forms import PasswordResetFormNoActive
 
 from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow
@@ -491,6 +491,17 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
 
     return blocked
 
+def courses_allow_unenroll(courses):
+    """Check if course allow unenroll, this will remove link to unenroll in template"""
+    res = {}
+    for course, enrollment in courses:
+        flag = True
+        try:
+            ca = CourseAllowUnenroll.objects.get(course_id=enrollment.course_id)
+        except CourseAllowUnenroll.DoesNotExist:
+            flag = False
+        res.update({enrollment.course_id: flag})
+    return res
 
 @login_required
 @ensure_csrf_cookie
@@ -671,6 +682,9 @@ def dashboard(request):
                                              if course.pre_requisite_courses)
     courses_requirements_not_met = get_pre_requisite_courses_not_completed(user, courses_having_prerequisites)
 
+    # get course if allow unenroll
+    courses_unenroll = courses_allow_unenroll(course_enrollment_pairs)
+
     context = {
         'enrollment_message': enrollment_message,
         'course_enrollment_pairs': course_enrollment_pairs,
@@ -702,6 +716,7 @@ def dashboard(request):
         'provider_states': [],
         'order_history_list': order_history_list,
         'courses_requirements_not_met': courses_requirements_not_met,
+        'courses_allow_unenroll': courses_unenroll
     }
 
     if third_party_auth.is_enabled():
@@ -1064,6 +1079,15 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
             else:
                 AUDIT_LOG.warning(u"Login failed - Unknown user email: {0}".format(email))
 
+        try:
+            username = email
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+                AUDIT_LOG.warning(u"Login failed - Unknown user username")
+            else:
+                AUDIT_LOG.warning(u"Login failed - Unknown user username: {0}".format(username))
+
     # check if the user has a linked shibboleth account, if so, redirect the user to shib-login
     # This behavior is pretty much like what gmail does for shibboleth.  Try entering some @stanford.edu
     # address into the Gmail login.
@@ -1420,18 +1444,6 @@ def _do_create_account(post_vars, extended_profile=None):
     if post_vars.get('city_id'):
         city = City.objects.get(id=post_vars['city_id'])
         profile.city = city
-    type_id = post_vars['type_id']
-    if type_id == 'cedula':
-        js = {}
-        try:
-            validate_cedula(post_vars['cedula'])
-        except ValidationError:
-            js['value'] = "ID Incorrecto"
-            js['field'] = 'cedula'
-            js['sucess'] = False
-            return JsonResponse(js, status=400)
-
-    profile.cedula = post_vars['cedula']
 
     # add any extended profile information in the denormalized 'meta' field in the profile
     if extended_profile:
@@ -1566,15 +1578,6 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
             js['field'] = field_name
             return JsonResponse(js, status=400)
 
-    type_id = post_vars['type_id']
-    if type_id == 'cedula':
-        try:
-            validate_cedula(post_vars['cedula'])
-        except ValidationError:
-            js['value'] = _("A valid ID is required.")
-            js['field'] = 'cedula'
-            return HttpResponse(json.dumps(js))
-
         max_length = 75
         if field_name == 'username':
             max_length = 30
@@ -1587,6 +1590,26 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
             js['value'] = error_str[field_name]
             js['field'] = field_name
             return JsonResponse(js, status=400)
+
+    type_id = post_vars['type_id']
+    if type_id == 'cedula':
+        try:
+            validate_cedula(post_vars['cedula'])
+        except ValidationError:
+            js['value'] = _("A valid ID is required.")
+            js['field'] = 'cedula'
+            return JsonResponse(js, status=400)
+    prof = False
+    try:
+        prof = UserProfile.objects.get(cedula=post_vars['cedula'])
+    except UserProfile.DoesNotExist:
+        pass
+    if prof:
+        js = {
+            'value': _("CEDULA/PASAPORTE Existente"),
+            'field': 'cedula'
+            }
+        return JsonResponse(js, status=400)
 
     try:
         validate_email(post_vars['email'])

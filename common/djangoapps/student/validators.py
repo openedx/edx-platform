@@ -6,8 +6,8 @@ def validate_cedula(cedula):
     """
     Validador de cedula de Ecuador
     """
-    if not cedula.isdigit():
-        raise ValidationError(_('Identificador no debe contener caracteres.'),
+    if not cedula.isdigit() or not len(cedula) == 10:
+        raise ValidationError(_('Error en identificador.'),
                               code='invalid')
     values = [int(cedula[x])*(2 - (x % 2)) for x in range(9)]
     total = sum(map(lambda x: x > 9 and x - 9 or x, values))

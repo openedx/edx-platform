@@ -502,6 +502,7 @@ def students_update_enrollment(request, course_id):
             user = get_student_from_identifier(identifier)
         except User.DoesNotExist:
             email = identifier
+            language = settings.LANGUAGE_CODE
         else:
             email = user.email
             language = get_user_email_language(user)
