@@ -427,6 +427,8 @@ if settings.COURSEWARE_ENABLED:
         # Student Notes
         url(r'^courses/{}/edxnotes'.format(settings.COURSE_ID_PATTERN),
             include('edxnotes.urls'), name="edxnotes_endpoints"),
+
+        url(r'^api/v1/branding/', include('branding.api_urls')),
     )
 
     # allow course staff to change to student view of courseware

@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from branding.models import BrandingApiConfig
 from django.http import Http404
 from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie
@@ -12,6 +13,8 @@ import courseware.views
 from microsite_configuration import microsite
 from edxmako.shortcuts import marketing_link
 from util.cache import cache_if_anonymous
+from .api import get_footer_json, get_footer_static, get_footer_html
+from util.json_request import JsonResponse, HttpResponse
 
 
 def get_course_enrollments(user):
@@ -102,3 +105,28 @@ def courses(request):
     #  we do not expect this case to be reached in cases where
     #  marketing is enabled or the courses are not browsable
     return courseware.views.courses(request)
+
+
+def footer(request):
+    # if configuration is not enabled then return 404
+    if not BrandingApiConfig.current().enabled:
+        raise Http404
+    if "application/json" in request.META.get('HTTP_ACCEPT') or "*/*" in request.META.get('HTTP_ACCEPT'):
+        return JsonResponse(get_footer_json(), 200)
+    elif "text/html" in request.META.get('HTTP_ACCEPT'):
+        html = get_footer_html()
+        return HttpResponse(html, status=200)
+    elif "text/javascript" in request.META.get('HTTP_ACCEPT'):
+        try:
+            content = get_footer_static("footer.js")
+        except IOError:
+            return HttpResponse(content="No js file found", status=404)
+        return HttpResponse(content, content_type='text/javascript', status=200)
+    elif "text/css" in request.META.get('HTTP_ACCEPT'):
+        try:
+            content = get_footer_static("footer.css")
+        except IOError:
+            return HttpResponse(content="No css file found", status=404)
+        return HttpResponse(content, content_type='text/css', status=200)
+    else:
+        return HttpResponse(status=406)
