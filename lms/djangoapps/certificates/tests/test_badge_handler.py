@@ -2,7 +2,6 @@
 Tests for the BadgeHandler, which communicates with the Badgr Server.
 """
 from django.test.utils import override_settings
-from eventtracking import tracker
 from lazy.lazy import lazy
 from mock import patch, Mock, call
 from certificates.models import BadgeAssertion
@@ -21,6 +20,7 @@ BADGR_SETTINGS = {
 }
 
 
+@override_settings(**BADGR_SETTINGS)
 class BadgeHandlerTestCase(ModuleStoreTestCase):
     """
     Tests the BadgeHandler object
@@ -45,7 +45,6 @@ class BadgeHandlerTestCase(ModuleStoreTestCase):
         """
         return BadgeHandler(self.course.location.course_key)
 
-    @override_settings(**BADGR_SETTINGS)
     def test_urls(self):
         """
         Make sure the handler generates the correct URLs for different API tasks.
@@ -69,7 +68,6 @@ class BadgeHandlerTestCase(ModuleStoreTestCase):
         """
         self.assertEqual(headers, {'Authorization': 'Token 12345'})
 
-    @override_settings(**BADGR_SETTINGS)
     def test_slug(self):
         """
         Verify slug generation is working as expected. If this test fails, the algorithm has changed, and it will cause
@@ -80,7 +78,6 @@ class BadgeHandlerTestCase(ModuleStoreTestCase):
             'fc5519bfbeff40a53dc6d36a894f5c468c7020edc3858cb86046bc8740c9c1f0'
         )
 
-    @override_settings(**BADGR_SETTINGS)
     def test_get_headers(self):
         """
         Check to make sure the handler generates appropriate HTTP headers.
@@ -88,7 +85,6 @@ class BadgeHandlerTestCase(ModuleStoreTestCase):
         self.check_headers(self.handler.get_headers())
 
     @patch('requests.post')
-    @override_settings(**BADGR_SETTINGS)
     def test_create_badge(self, post):
         """
         Verify badge spec creation works.
@@ -109,7 +105,6 @@ class BadgeHandlerTestCase(ModuleStoreTestCase):
             }
         )
 
-    @override_settings(**BADGR_SETTINGS)
     def test_ensure_badge_created_cache(self):
         """
         Make sure ensure_badge_created doesn't call create_badge if we know the badge is already there.
@@ -120,7 +115,6 @@ class BadgeHandlerTestCase(ModuleStoreTestCase):
         self.assertFalse(self.handler.create_badge.called)
 
     @patch('requests.get')
-    @override_settings(**BADGR_SETTINGS)
     def test_ensure_badge_created_checks(self, get):
         response = Mock()
         response.status_code = 200
@@ -140,7 +134,6 @@ class BadgeHandlerTestCase(ModuleStoreTestCase):
         self.assertFalse(self.handler.create_badge.called)
 
     @patch('requests.get')
-    @override_settings(**BADGR_SETTINGS)
     def test_ensure_badge_created_creates(self, get):
         response = Mock()
         response.status_code = 404
@@ -153,7 +146,6 @@ class BadgeHandlerTestCase(ModuleStoreTestCase):
         self.assertTrue(BadgeHandler.badges['fc5519bfbeff40a53dc6d36a894f5c468c7020edc3858cb86046bc8740c9c1f0'])
 
     @patch('requests.post')
-    @override_settings(**BADGR_SETTINGS)
     def test_create_assertion(self, post):
         result = {'json': {'image': 'http://www.example.com/example.png'}}
         response = Mock()

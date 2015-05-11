@@ -54,6 +54,7 @@ class CertificateManagementTest(ModuleStoreTestCase):
         cert = GeneratedCertificate.objects.get(user=user, course_id=course_key)
         self.assertEqual(cert.status, expected_status)
 
+
 @attr('shard_1')
 @ddt.ddt
 class ResubmitErrorCertificatesTest(CertificateManagementTest):

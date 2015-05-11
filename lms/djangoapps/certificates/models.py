@@ -603,7 +603,8 @@ class BadgeAssertion(models.Model):
         unique_together = (('course_id', 'user'),)
 
 
-# pylint: disable=unused-argument
+@receiver(post_save, sender=GeneratedCertificate)
+#pylint: disable=unused-argument
 def create_badge(sender, instance, **kwargs):
     """
     Standard signal hook to create badges when a certificate has been generated.
@@ -624,6 +625,3 @@ def create_badge(sender, instance, **kwargs):
     from .badge_handler import BadgeHandler
     handler = BadgeHandler(instance.course_id)
     handler.award(instance.user)
-
-# Create badges when certificates are saved.
-post_save.connect(create_badge, sender=GeneratedCertificate, dispatch_uid="generate_badge")
