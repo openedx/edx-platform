@@ -337,7 +337,7 @@ def submit_calculate_grades_csv(request, course_key):
 
 def submit_problem_grade_report(request, course_key):
     """
-    Submits a task to generate a CSV grade report containing weighted problem
+    Submits a task to generate a CSV grade report containing problem
     values.
     """
     task_type = 'grade_problems'

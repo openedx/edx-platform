@@ -112,7 +112,7 @@ class DataDownload
       @onClickGradeDownload @$calculate_grades_csv_btn, gettext("Error generating grades. Please try again.")
 
     @$problem_grade_report_csv_btn.click (e) =>
-      @onClickGradeDownload @$problem_grade_report_csv_btn, gettext("Error generating weighted problem report. Please try again.")
+      @onClickGradeDownload @$problem_grade_report_csv_btn, gettext("Error generating problem grade report. Please try again.")
 
   onClickGradeDownload: (button, errorMessage) ->
       # Clear any CSS styling from the request-response areas

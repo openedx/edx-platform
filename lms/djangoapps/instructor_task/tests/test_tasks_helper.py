@@ -271,7 +271,7 @@ class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
 
 class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
     """
-    Test that the weighted problem CSV generation works.
+    Test that the problem CSV generation works.
     """
     def setUp(self):
         super(TestProblemGradeReport, self).setUp()

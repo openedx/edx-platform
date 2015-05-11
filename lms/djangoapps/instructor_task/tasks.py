@@ -159,7 +159,7 @@ def calculate_grades_csv(entry_id, xmodule_instance_args):
 @task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
 def calculate_problem_grade_report(entry_id, xmodule_instance_args):
     """
-    Generate a CSV for a course containing all students' weighted problem
+    Generate a CSV for a course containing all students' problem
     grades and push the results to an S3 bucket for download.
     """
     # Translators: This is a past-tense phrase that is inserted into task progress messages as {action}.

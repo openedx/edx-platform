@@ -717,9 +717,9 @@ class DataDownloadPage(PageObject):
         return self.q(css='input[name=calculate-grades-csv]')
 
     @property
-    def generate_weighted_problem_grade_report_button(self):
+    def generate_problem_grade_report_button(self):
         """
-        Returns the "Generate Weighted Problem Grade Report" button.
+        Returns the "Generate Problem Grade Report" button.
         """
         return self.q(css='input[name=problem-grade-report]')
 

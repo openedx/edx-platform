@@ -387,20 +387,20 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         self.verify_report_requested_event(report_name)
         self.verify_report_download(report_name)
 
-    def test_weighted_problem_grade_report_download(self):
+    def test_problem_grade_report_download(self):
         """
-        Scenario: Verify that an instructor can download a weighted problem grade report
+        Scenario: Verify that an instructor can download a problem grade report
 
         Given that I am an instructor
         And I visit the instructor dashboard's "Data Downloads" tab
-        And I click on the "Generate Weighted Problem Grade Report" button
+        And I click on the "Generate Problem Grade Report" button
         Then a report should be generated
         And a report requested event should be emitted
         When I click on the report
         Then a report downloaded event should be emitted
         """
         report_name = u"problem_grade_report"
-        self.data_download_section.generate_weighted_problem_grade_report_button.click()
+        self.data_download_section.generate_problem_grade_report_button.click()
         self.data_download_section.wait_for_available_report()
         self.verify_report_requested_event(report_name)
         self.verify_report_download(report_name)
