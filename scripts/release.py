@@ -474,6 +474,9 @@ def generate_email(start_ref, end_ref, release_date=None):
         verify the changes -- but even if you can't, you're still responsible!)
         If you find any bugs, please notify me and record the bugs on the
         release page. Thanks!
+
+        By the way, if you have an @edx.org email address and are having trouble logging
+        into stage, you may need to reset your password.
     """.format(
         emails=", ".join(prbe.keys()),
         date=release_date.isoformat(),
