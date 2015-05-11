@@ -28,7 +28,7 @@ requirejs.config({
         "backbone": "xmodule_js/common_static/js/vendor/backbone-min",
         "backbone.associations": "xmodule_js/common_static/js/vendor/backbone-associations-min",
         "backbone.paginator": "xmodule_js/common_static/js/vendor/backbone.paginator.min",
-        "backbone-relational": "xmodule_js/common_static/js/vendor/backbone-relational",
+        "backbone-relational": "xmodule_js/common_static/js/vendor/backbone-relational.min",
         "tinymce": "xmodule_js/common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min",
         "jquery.tinymce": "xmodule_js/common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce",
         "xmodule": "xmodule_js/src/xmodule",

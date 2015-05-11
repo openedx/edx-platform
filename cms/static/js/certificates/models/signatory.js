@@ -10,8 +10,9 @@ function(Backbone, _, str) {
     var Signatory = Backbone.RelationalModel.extend({
         idAttribute: "id",
         defaults: {
-            name: 'Signatory Name',
-            title: 'Signatory Title'
+            name: 'Name of the signatory',
+            title: 'Title of the signatory',
+            organization: 'Organization of the signatory'
         },
 
         initialize: function(attributes, options) {

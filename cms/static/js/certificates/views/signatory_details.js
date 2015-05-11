@@ -19,8 +19,7 @@ function(BaseView, ViewUtils, SignatoryEditorView, _, TemplateUtils, gettext, st
             // Determine the CSS class names for this model instance
             var index = this.model.collection.indexOf(this.model);
             return [
-                'signatory-details',
-                'signatory-details-view-' + index
+                'signatory-details'
             ].join(' ');
         },
 

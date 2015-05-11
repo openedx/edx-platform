@@ -28,6 +28,7 @@ define([
         inputCertificateDescription: '.certificate-description-input',
         inputSignatoryName: '.signatory-name-input',
         inputSignatoryTitle: '.signatory-title-input',
+        inputSignatoryOrganization: '.signatory-organization-input',
         warningMessage: '.certificate-validation-text',
         warningIcon: '.wrapper-certificate-validation > i',
         note: '.wrapper-delete-button',
@@ -194,12 +195,14 @@ define([
                     inputCertificateName: 'New Test Name',
                     inputCertificateDescription: 'New Test Description',
                     inputSignatoryName: 'New Signatory Name',
-                    inputSignatoryTitle: 'New Signatory Title'
+                    inputSignatoryTitle: 'New Signatory Title',
+                    inputSignatoryOrganization: 'New Signatory Organization'
                 });
 
                 // Force a change event to fire. so model updated with the new values.
                 this.view.$(SELECTORS.inputSignatoryName).trigger('change');
                 this.view.$(SELECTORS.inputSignatoryTitle).trigger('change');
+                this.view.$(SELECTORS.inputSignatoryOrganization).trigger('change');
 
                 submitForm(this.view, requests, notificationSpy);
                 expect(this.model).toBeCorrectValuesInModel({
@@ -212,7 +215,7 @@ define([
                 expect(signatory).toBeInstanceOf(SignatoryModel);
                 expect(signatory.get('name')).toEqual('New Signatory Name');
                 expect(signatory.get('title')).toEqual('New Signatory Title');
-
+                expect(signatory.get('organization')).toEqual('New Signatory Organization');
             });
         });
     });

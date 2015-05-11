@@ -29,11 +29,13 @@ define([
         note: '.wrapper-delete-button',
         signatory_name_value: '.signatory-name-value',
         signatory_title_value: '.signatory-title-value',
+        signatory_organization_value: '.signatory-organization-value',
         edit_signatory: '.edit-signatory',
         signatory_panel_save: '.signatory-panel-save',
         signatory_panel_close: '.signatory-panel-close',
         inputSignatoryName: '.signatory-name-input',
         inputSignatoryTitle: '.signatory-title-input'
+        inputSignatoryOrganization: '.signatory-organization-input'
     };
 
     beforeEach(function() {
@@ -132,6 +134,7 @@ define([
                 this.view.$(SELECTORS.edit_signatory).click();
                 expect(this.view.$(SELECTORS.inputSignatoryName)).toExist();
                 expect(this.view.$(SELECTORS.inputSignatoryTitle)).toExist();
+                expect(this.view.$(SELECTORS.inputSignatoryOrganization)).toExist();
             });
 
             it('signatory saved successfully after editing', function() {
@@ -143,6 +146,7 @@ define([
 
                 this.view.$(SELECTORS.inputSignatoryName).val('New Signatory Test Name');
                 this.view.$(SELECTORS.inputSignatoryTitle).val('New Signatory Test Title');
+                this.view.$(SELECTORS.inputSignatoryOrganization).val('New Signatory Test Organization');
                 this.view.$(SELECTORS.signatory_panel_save).click();
 
                 ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
@@ -151,7 +155,7 @@ define([
 
                 expect(this.view.$(SELECTORS.signatory_name_value)).toContainText('New Signatory Test Name');
                 expect(this.view.$(SELECTORS.signatory_title_value)).toContainText('New Signatory Test Title');
-
+                expect(this.view.$(SELECTORS.signatory_organization_value)).toContainText('New Signatory Test Organization');
             });
 
             it('show certificate signatories details', function(){
@@ -160,8 +164,8 @@ define([
                 // The default certificate signatory should be visible.
                 expect(this.view.$(SELECTORS.signatory_name_value)).toContainText('Signatory Name');
                 expect(this.view.$(SELECTORS.signatory_title_value)).toContainText('Signatory Title');
+                expect(this.view.$(SELECTORS.signatory_organization_value)).toContainText('Signatory Organization');
             });
-
         });
     });
 });

@@ -215,7 +215,7 @@ class Signatory(object):
 
     def __init__(self, certificate, prefix, mode, index):
         self.certificate = certificate
-        self.selector = prefix + ' .signatory-{}-view-{}'.format(mode, index)
+        self.selector = prefix + ' .signatory-details'.format(mode, index)
         self.index = index
 
     def get_selector(self, css=''):
