@@ -94,7 +94,7 @@ define([
                 _.each(sortedTagNames, function (tagName) {
                     noteGroup = notesByTag[tagName];
                     var tagTitle = interpolate_text(
-                        gettext("{tagName} ({numberOfNotesWithTag})"),
+                        "{tagName} ({numberOfNotesWithTag})",
                         {tagName: tagName, numberOfNotesWithTag: noteGroup.length}
                     );
                     group = this.getGroup(tagTitle);
