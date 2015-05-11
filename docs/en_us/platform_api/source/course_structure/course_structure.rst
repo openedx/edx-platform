@@ -1,5 +1,5 @@
 ########################################
-Course Structure API
+Course Structure API Module
 ########################################
 
 This page contains information on using the Course Structure API to
