@@ -1,5 +1,5 @@
 ####################################
-Mobile User API
+Mobile User API Module
 ####################################
 
 This page describes how to use the Mobile User API to complete
