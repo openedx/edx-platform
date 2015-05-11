@@ -1441,7 +1441,7 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
         self.assertIn(reg_item1, context['shoppingcart_items'][0])
         self.assertEqual(1, len(context['shoppingcart_items']))
         self.assertEqual(True, context['is_course_enrollment_closed'])
-        self.assertIn(self.testing_course.display_name, context['appended_expired_course_names'])
+        self.assertIn(self.testing_course.display_name, context['expired_course_names'])
 
     def test_to_check_that_cart_item_enrollment_is_closed_when_clicking_the_payment_button(self):
         self.login_user()

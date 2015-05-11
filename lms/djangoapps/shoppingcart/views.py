@@ -177,8 +177,6 @@ def show_cart(request):
             Order.remove_cart_item_from_order(expired_item)
         cart.update_order_type()
 
-    appended_expired_course_names = ", ".join(expired_cart_item_names)
-
     callback_url = request.build_absolute_uri(
         reverse("shoppingcart.views.postpay_callback")
     )
@@ -188,7 +186,7 @@ def show_cart(request):
         'shoppingcart_items': valid_cart_item_tuples,
         'amount': cart.total_cost,
         'is_course_enrollment_closed': is_any_course_expired,
-        'appended_expired_course_names': appended_expired_course_names,
+        'expired_course_names': expired_cart_item_names,
         'site_name': site_name,
         'form_html': form_html,
         'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
