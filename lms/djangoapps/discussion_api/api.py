@@ -111,7 +111,6 @@ def _cc_thread_to_api_thread(thread, cc_user, staff_user_ids, ta_user_ids, group
             "group_id",
             "created_at",
             "updated_at",
-            "type",
             "title",
             "pinned",
             "closed",
@@ -127,6 +126,7 @@ def _cc_thread_to_api_thread(thread, cc_user, staff_user_ids, ta_user_ids, group
             "community_ta" if int(thread["user_id"]) in ta_user_ids else
             None
         ),
+        "type": thread["thread_type"],
         "raw_body": thread["body"],
         "following": thread["id"] in cc_user["subscribed_thread_ids"],
         "abuse_flagged": cc_user["id"] in thread["abuse_flaggers"],
