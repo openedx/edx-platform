@@ -59,6 +59,12 @@ class StaticContent(object):
             asset
         """
         path = path.replace('/', '_')
+        # todo: new coursekeys behave weirdly with assets, will break if title is non ascii
+        # if an asset path is empty (i.e. course image url is empty) split mongo course assets will
+        # throw exceptions. thus we bypass that and just return an empty key
+        if len(path) == 0 and not course_key.deprecated:
+            return ""
+
         return course_key.make_asset_key(
             'asset' if not is_thumbnail else 'thumbnail',
             AssetLocator.clean_keeping_underscores(path)

@@ -29,12 +29,6 @@ class TestSysadminMgmtCommands(SysadminBaseTestCase):
             'args': ['arg1', 'arg2'],
         }
 
-    def _setsuperuser_login(self):
-        """Makes the test user a superuser and logs them in"""
-        self.user.is_superuser = True
-        self.user.save()
-        self.client.login(username=self.user.username, password='foo')
-
     def test_mgmt_commands_handles_systemexit(self):
         with patch('dashboard.sysadmin.call_command') as call_command:
             call_command.side_effect = SystemExit()
