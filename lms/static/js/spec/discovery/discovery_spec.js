@@ -259,51 +259,131 @@ define([
 
     });
 
-
-    describe('FilterView', function () {
-
-        beforeEach(function () {
-            TemplateHelpers.installTemplate('templates/discovery/filter');
-            this.filter = new FilterView({
-                model: new FilterModel()
-            });
-        });
-
-        it('model cleans view on destruction correctly', function () {
-            var data = this.filter.model.attributes;
-            this.filter.render();
-            expect(this.filter.$el.length).toBe(1);
-            expect(this.filter.$el).toContainHtml(data.content.query);
-            this.filter.cleanModelView();
-            expect(this.filter.$el.length).toBe(0);
-        });
-
-    });
-
-
     describe('FilterBarView', function () {
-
         beforeEach(function () {
-            TemplateHelpers.installTemplate('templates/discovery/filter_bar_view');
+            loadFixtures('js/fixtures/discovery.html');
+            TemplateHelpers.installTemplates(
+                ['templates/discovery/filter_bar',
+                'templates/discovery/filter']
+            );
             this.filterBar = new FiltersBarView();
+            this.onClear = jasmine.createSpy('onClear');
+            this.filterBar.on('clear', this.onClear);
         });
 
         it('view searches for sent facet object', function () {
             expect(this.filterBar.$el.length).toBe(1);
-            this.filter.addFilter(FACET_LIST[0]);
+            this.filterBar.addFilter(FACET_LIST[0]);
             expect(this.filterBar.$el.find('#clear-all-filters')).toBeVisible();
         });
 
         it('view searches for entered search string', function () {
             spyOn(this.filterBar, 'addFilter').andCallThrough();
             expect(this.filterBar.$el.length).toBe(1);
-            this.filter.changeQueryFilter(SEARCH_FILTER.query);
+            this.filterBar.changeQueryFilter(SEARCH_FILTER.query);
             expect(this.filterBar.$el.find('#clear-all-filters')).toBeVisible();
             expect(this.filterBar.addFilter).toHaveBeenCalledWith(SEARCH_FILTER);
         });
 
+        it('model cleans view on destruction correctly', function () {
+            this.filterBar.addFilter(SEARCH_FILTER);
+            var model = this.filterBar.collection.findWhere(SEARCH_FILTER);
+            expect(this.filterBar.$el.find('.active-filter').length).toBe(1);
+            model.cleanModelView();
+            expect(this.filterBar.$el.find('.active-filter').length).toBe(0);
+        });
+
+        it('view removes all filters and hides bar if clear all', function () {
+            spyOn(this.filterBar, 'clearAll').andCallThrough();
+            this.filterBar.delegateEvents();
+            this.filterBar.addFilter(SEARCH_FILTER);
+            var clearAll = this.filterBar.$el.find('#clear-all-filters');
+            expect(clearAll).toBeVisible();
+            clearAll.trigger('click');
+            expect(this.filterBar.clearAll).toHaveBeenCalled();
+            expect(this.onClear).toHaveBeenCalled();
+        });
+
+        it('view hides bar if all filters removed', function () {
+            spyOn(this.filterBar, 'clearFilter').andCallThrough();
+            this.filterBar.delegateEvents();
+            this.filterBar.addFilter(SEARCH_FILTER);
+            var clearAll = this.filterBar.$el.find('#clear-all-filters');
+            expect(clearAll).toBeVisible();
+            var filter = this.filterBar.$el.find('li a');
+            filter.trigger('click');
+            expect(this.filterBar.clearFilter).toHaveBeenCalled();
+            expect(this.onClear).toHaveBeenCalled();
+        });
+
+        it('view changes query filter', function () {
+            this.filterBar.addFilter(SEARCH_FILTER);
+            var filter = $(this.filterBar.$el.find('li a')[0]);
+            expect(filter.text().trim()).toBe(SEARCH_FILTER.query);
+            // Have to explicitly remove model because events not dispatched
+            var model = this.filterBar.collection.findWhere(SEARCH_FILTER);
+            model.cleanModelView();
+            this.filterBar.changeQueryFilter(SEARCH_FILTER.query + '2');
+            filter = $(this.filterBar.$el.find('li a')[0]);
+            expect(filter.text().trim()).toBe(SEARCH_FILTER.query + '2');
+        });
+
+        it('view returns correct search term', function () {
+            this.filterBar.addFilter(SEARCH_FILTER);
+            expect(this.filterBar.getSearchTerm()).toBe(SEARCH_FILTER.query);
+        });
+
     });
 
+    describe('SearchFacetView', function () {
+        beforeEach(function () {
+            loadFixtures('js/fixtures/discovery.html');
+            this.searchFacetView = new SearchFacetView();
+            this.onAddFilter = jasmine.createSpy('onAddFilter');
+            this.searchFacetView.on('addFilter', this.onAddFilter);
+        });
+
+        it('view expands more content on show more click', function () {
+            var $showMore = this.searchFacetView.$el.find('.show-more');
+            var $showLess = this.searchFacetView.$el.find('.show-less');
+            var $ul = $showMore.parent('div').siblings('ul');
+            expect($showMore).not.toHaveClass('hidden');
+            expect($showLess).toHaveClass('hidden');
+            expect($ul).toHaveClass('collapse');
+            $showMore.trigger('click');
+            expect($showMore).toHaveClass('hidden');
+            expect($showLess).not.toHaveClass('hidden');
+            expect($ul).not.toHaveClass('collapse');
+        });
+
+        it('view collapses content on show less click', function () {
+            var $showMore = this.searchFacetView.$el.find('.show-more');
+            var $showLess = this.searchFacetView.$el.find('.show-less');
+            var $ul = $showMore.parent('div').siblings('ul');
+            $showMore.trigger('click');
+            expect($showMore).toHaveClass('hidden');
+            expect($showLess).not.toHaveClass('hidden');
+            expect($ul).not.toHaveClass('collapse');
+            $showLess.trigger('click');
+            expect($showMore).not.toHaveClass('hidden');
+            expect($showLess).toHaveClass('hidden');
+            expect($ul).toHaveClass('collapse');
+        });
+
+        it('view triggers addFilter event if facet is clicked', function () {
+            this.searchFacetView.delegateEvents();
+            var $facetLink = this.searchFacetView.$el.find('li a[data-value="Current"]');
+            var $facet = $facetLink.parent('li');
+            $facet.trigger('click');
+            expect(this.onAddFilter).toHaveBeenCalledWith(
+                {
+                    type: $facet.data('facet'),
+                    query: $facetLink.data('value')
+                }
+            );
+        });
+
+    });
 
     describe('ResultListView', function () {
 
@@ -355,6 +435,8 @@ define([
             loadFixtures('js/fixtures/discovery.html');
             TemplateHelpers.installTemplates([
                 'templates/discovery/result_item',
+                'templates/discovery/filter',
+                'templates/discovery/filter_bar',
                 'templates/discovery/not_found',
                 'templates/discovery/error'
             ]);
@@ -362,7 +444,9 @@ define([
             this.app = new App(
                 Collection,
                 DiscoveryForm,
-                ResultListView
+                ResultListView,
+                FiltersBarView,
+                SearchFacetView
             );
         });
 
@@ -377,6 +461,7 @@ define([
             this.server.respond();
             expect($('.courses-listing article').length).toEqual(1);
             expect($('.courses-listing .course-title')).toContainHtml('edX Demonstration Course');
+            expect($('.active-filter').length).toBe(1);
         });
 
         it('loads more', function () {
@@ -413,6 +498,29 @@ define([
             expect($('#discovery-message')).not.toBeEmpty();
             expect($('.courses-listing article').length).toEqual(1);
             expect($('.courses-listing .course-title')).toContainHtml('title');
+        });
+
+        it('check filters and bar removed on clear all', function () {
+            $('.discovery-input').val('test');
+            $('.discovery-submit').trigger('click');
+            this.server.respondWith('POST', '/search/course_discovery/', [200, {}, JSON.stringify(JSON_RESPONSE)]);
+            this.server.respond();
+            expect($('.active-filter').length).toBe(1);
+            expect($('#filter-bar')).not.toHaveClass('hidden');
+            $('#clear-all-filters').trigger('click');
+            expect($('.active-filter').length).toBe(0);
+            expect($('#filter-bar')).toHaveClass('hidden');
+        });
+
+        it('check filters and bar removed on last filter cleared', function () {
+            $('.discovery-input').val('test');
+            $('.discovery-submit').trigger('click');
+            this.server.respondWith('POST', '/search/course_discovery/', [200, {}, JSON.stringify(JSON_RESPONSE)]);
+            this.server.respond();
+            expect($('.active-filter').length).toBe(1);
+            var $filter = $('.active-filter');
+            $filter.find('a').trigger('click');
+            expect($('.active-filter').length).toBe(0);
         });
 
     });

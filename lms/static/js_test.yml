@@ -91,6 +91,7 @@ fixture_paths:
     - js/fixtures/edxnotes
     - js/fixtures/search
     - templates/search
+    - templates/discovery
 
 requirejs:
   paths:

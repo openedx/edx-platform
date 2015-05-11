@@ -6,7 +6,7 @@ define(['backbone'], function (Backbone) {
     return Backbone.Model.extend({
         defaults: {
             query: '',
-            type: 'query'
+            type: 'search_string'
         },
 
         cleanModelView: function() {
