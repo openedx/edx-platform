@@ -9,8 +9,8 @@ function(Backbone, Signatory, SignatoryCollection, _, str, gettext) {
     var Certificate = Backbone.RelationalModel.extend({
         idAttribute: "id",
         defaults: {
-            name: 'Default Name',
-            description: 'Default Description',
+            name: 'Name of the certificate',
+            description: 'Description of the certificate',
             version: 1
         },
 

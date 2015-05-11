@@ -13,11 +13,11 @@ define(['js/certificates/models/certificate', 'js/certificates/collections/certi
 
         describe('Basic', function() {
             it('certificate should have name by default', function() {
-                expect(this.model.get('name')).toEqual('Default Name');
+                expect(this.model.get('name')).toEqual('Name of the certificate');
             });
 
             it('certificate should have description by default', function() {
-                expect(this.model.get('description')).toEqual('Default Description');
+                expect(this.model.get('description')).toEqual('Description of the certificate');
             });
 
             it('certificate should be able to reset itself', function() {

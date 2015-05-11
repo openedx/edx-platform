@@ -8,6 +8,7 @@ function(ViewUtils, PromptView, NotificationView, TemplateUtils, _, $, gettext) 
         events: {
             'change .signatory-name-input': 'setSignatoryName',
             'change .signatory-title-input': 'setSignatoryTitle',
+            'change .signatory-organization-input': 'setSignatoryOrganization',
             'click  .signatory-panel-delete': 'deleteItem'
         },
 
@@ -83,10 +84,21 @@ function(ViewUtils, PromptView, NotificationView, TemplateUtils, _, $, gettext) 
             );
         },
 
+        setSignatoryOrganization: function(event) {
+            // Update the model with the provided data
+            if (event && event.preventDefault) { event.preventDefault(); }
+            this.model.set(
+                'organization',
+                this.$('.signatory-organization-input').val(),
+                { silent: true }
+            );
+        },
+
         setSignatoriesValues: function() {
             // set the signatories values
             this.setSignatoryName();
             this.setSignatoryTitle();
+            this.setSignatoryOrganization();
         },
 
         deleteItem: function(event) {
