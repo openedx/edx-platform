@@ -124,7 +124,7 @@ class MicrositeCrossBrandingFilterMiddleware():
         if m is None:
             return None
 
-        course_id =  m.group('course_id')
+        course_id = m.group('course_id')
         course_key = CourseKey.from_string(course_id)
 
         # If the course org is the same as the current microsite
