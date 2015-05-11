@@ -80,7 +80,7 @@ footer#footer-edx-v3 {
     margin-bottom: 30px;
   }
 
-  .sm-link {
+  a.sm-link {
     @include float(left);
     @include margin(0, 0, 10px, 12px);
     @include font-size(28);

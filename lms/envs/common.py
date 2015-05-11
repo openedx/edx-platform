@@ -342,9 +342,6 @@ FEATURES = {
     # Show the mobile app links in the footer
     'ENABLE_FOOTER_MOBILE_APP_LINKS': False,
 
-    # Use version 3 of the footer (added May 2015)
-    'ENABLE_FOOTER_V3': False,
-
     # Let students save and manage their annotations
     'ENABLE_EDXNOTES': False,
 
@@ -506,6 +503,11 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
     # Allows the open edX footer to be leveraged in Django Templates.
     'edxmako.shortcuts.open_source_footer_context_processor',
+
+    # TODO (ECOM-1339): Remove once the V3 version of the footer is enabled permanently
+    # This allows us to pass the appropriate feature flag to the main Django template
+    # that contains the footer.
+    'branding.context_processors.branding_context_processor',
 
     # Shoppingcart processor (detects if request.user has a cart)
     'shoppingcart.context_processor.user_has_cart_context_processor',
@@ -1039,6 +1041,48 @@ PARENTAL_CONSENT_AGE_LIMIT = 13
 ################################# Jasmine ##################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
 
+
+######################### Branded Footer ###################################
+# Constants for the footer used on the site and shared with other sites
+# (such as marketing and the blog) via the branding API.
+
+# URL for OpenEdX displayed in the footer
+FOOTER_OPENEDX_URL = "http://open.edx.org"
+
+# URL for the OpenEdX logo image
+# We use logo images served from files.edx.org so we can (roughly) track
+# how many OpenEdX installations are running.
+# Site operators can choose from these logo options:
+# * https://files.edx.org/openedx-logos/edx-openedx-logo-tag.png
+# * https://files.edx.org/openedx-logos/edx-openedx-logo-tag-light.png"
+# * https://files.edx.org/openedx-logos/edx-openedx-logo-tag-dark.png
+FOOTER_OPENEDX_LOGO_IMAGE = "https://files.edx.org/openedx-logos/edx-openedx-logo-tag.png"
+
+# This is just a placeholder image.
+# Site operators can customize this with their organization's image.
+FOOTER_ORGANIZATION_IMAGE = "images/default-theme/logo.png"
+
+# These are referred to both by the Django asset pipeline
+# AND by the branding footer API, which needs to decide which
+# version of the CSS to serve.
+FOOTER_CSS = {
+    "openedx": {
+        "ltr": "style-lms-footer",
+        "rtl": "style-lms-footer-rtl",
+    },
+    "edx": {
+        "ltr": "style-lms-footer-edx",
+        "rtl": "style-lms-footer-edx-rtl",
+    },
+}
+
+# Cache expiration for the version of the footer served
+# by the branding API.
+FOOTER_CACHE_TIMEOUT = 30 * 60
+
+# Max age cache control header for the footer (controls browser caching).
+FOOTER_BROWSER_CACHE_MAX_AGE = 5 * 60
+
 ################################# Deprecation warnings #####################
 
 # Ignore deprecation warnings (so we don't clutter Jenkins builds/production)
@@ -1182,8 +1226,7 @@ dashboard_js = (
     ['js/search/dashboard/main.js']
 )
 discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
-rwd_header_footer_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/common_helpers/rwd_header_footer.js'))
-footer_edx_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/footer-edx.js'))
+rwd_header_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/utils/rwd_header.js'))
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
 open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
 notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.js'))
@@ -1196,7 +1239,7 @@ instructor_dash_js = (
 # These are not courseware, so they do not need many of the courseware-specific
 # JavaScript modules.
 student_account_js = [
-    'js/utils/rwd_header_footer.js',
+    'js/utils/rwd_header.js',
     'js/utils/edx.utils.validate.js',
     'js/form.ext.js',
     'js/my_courses_dropdown.js',
@@ -1342,17 +1385,29 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-style-xmodule-annotations.css',
     },
-    'style-edx-footer': {
+    FOOTER_CSS['openedx']['ltr']: {
         'source_filenames': [
-            'sass/footer-v3.css',
+            'sass/lms-footer.css',
         ],
-        'output_filename': 'css/lms-footer-edx.css',
+        'output_filename': 'css/lms-footer.css',
     },
-    'style-edx-footer-rtl': {
+    FOOTER_CSS['openedx']['rtl']: {
         'source_filenames': [
-            'sass/footer-v3-rtl.css',
+            'sass/lms-footer-rtl.css',
         ],
-        'output_filename': 'css/lms-footer-edx-rtl.css',
+        'output_filename': 'css/lms-footer-rtl.css'
+    },
+    FOOTER_CSS['edx']['ltr']: {
+        'source_filenames': [
+            'sass/lms-footer-edx.css',
+        ],
+        'output_filename': 'css/lms-footer-edx.css'
+    },
+    FOOTER_CSS['edx']['rtl']: {
+        'source_filenames': [
+            'sass/lms-footer-edx-rtl.css',
+        ],
+        'output_filename': 'css/lms-footer-edx-rtl.css'
     },
 }
 
@@ -1423,9 +1478,9 @@ PIPELINE_JS = {
         'source_filenames': dashboard_js,
         'output_filename': 'js/dashboard.js'
     },
-    'rwd_header_footer': {
-        'source_filenames': rwd_header_footer_js,
-        'output_filename': 'js/rwd_header_footer.js'
+    'rwd_header': {
+        'source_filenames': rwd_header_js,
+        'output_filename': 'js/rwd_header.js'
     },
     'student_account': {
         'source_filenames': student_account_js,
@@ -1448,8 +1503,8 @@ PIPELINE_JS = {
         'output_filename': 'js/ccx.js'
     },
     'footer_edx': {
-        'source_filenames': footer_edx_js,
-        'output_filename': 'js/footer_edx.js'
+        'source_filenames': ['js/footer-edx.js'],
+        'output_filename': 'js/footer-edx.js',
     }
 }
 
@@ -1491,6 +1546,7 @@ PIPELINE_UGLIFYJS_BINARY = 'node_modules/.bin/uglifyjs'
 
 # Setting that will only affect the edX version of django-pipeline until our changes are merged upstream
 PIPELINE_COMPILE_INPLACE = True
+
 
 ################################# CELERY ######################################
 
@@ -1797,25 +1853,14 @@ MKTG_URL_LINK_MAP = {
 ################# Social Media Footer Links #######################
 # The names list controls the order of social media
 # links in the footer.
-if FEATURES.get('ENABLE_FOOTER_V3'):
-    SOCIAL_MEDIA_FOOTER_NAMES = [
-        "facebook",
-        "twitter",
-        "linkedin",
-        "weibo",
-        "vk",
-    ]
-else:
-    SOCIAL_MEDIA_FOOTER_NAMES = [
-        "facebook",
-        "twitter",
-        "linkedin",
-        "google_plus",
-        "tumblr",
-        "meetup",
-        "reddit",
-        "youtube",
-    ]
+SOCIAL_MEDIA_FOOTER_NAMES = [
+    "facebook",
+    "twitter",
+    "youtube",
+    "linkedin",
+    "google_plus",
+    "reddit",
+]
 
 # The footer URLs dictionary maps social footer names
 # to URLs defined in configuration.
@@ -1852,7 +1897,7 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # Translators: This is the website name of www.tumblr.com.  Please
         # translate this the way that Tumblr advertises in your language.
         "title": _("Tumblr"),
-        "icon": "fa-tumblr-square"
+        "icon": "fa-tumblr"
     },
     "meetup": {
         # Translators: This is the website name of www.meetup.com.  Please
@@ -1864,7 +1909,7 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # Translators: This is the website name of www.reddit.com.  Please
         # translate this the way that Reddit advertises in your language.
         "title": _("Reddit"),
-        "icon": "fa-reddit-square"
+        "icon": "fa-reddit"
     },
     "vk": {
         # Translators: This is the website name of https://vk.com.  Please
@@ -1882,7 +1927,7 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # Translators: This is the website name of www.youtube.com.  Please
         # translate this the way that YouTube advertises in your language.
         "title": _("Youtube"),
-        "icon": "fa-youtube-square"
+        "icon": "fa-youtube"
     }
 }
 

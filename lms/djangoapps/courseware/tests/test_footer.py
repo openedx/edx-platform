@@ -14,6 +14,17 @@ from django.test.utils import override_settings
 @attr('shard_1')
 class TestFooter(TestCase):
 
+    SOCIAL_MEDIA_NAMES = [
+        "facebook",
+        "google_plus",
+        "twitter",
+        "linkedin",
+        "tumblr",
+        "meetup",
+        "reddit",
+        "youtube",
+    ]
+
     SOCIAL_MEDIA_URLS = {
         "facebook": "http://www.facebook.com/",
         "google_plus": "https://plus.google.com/",
@@ -51,7 +62,10 @@ class TestFooter(TestCase):
             self.assertContains(resp, 'wrapper-footer')
 
     @patch.dict(settings.FEATURES, {'IS_EDX_DOMAIN': True})
-    @override_settings(SOCIAL_MEDIA_FOOTER_URLS=SOCIAL_MEDIA_URLS)
+    @override_settings(
+        SOCIAL_MEDIA_FOOTER_NAMES=SOCIAL_MEDIA_NAMES,
+        SOCIAL_MEDIA_FOOTER_URLS=SOCIAL_MEDIA_URLS
+    )
     def test_edx_footer_social_links(self):
         resp = self.client.get('/')
         for name, url in self.SOCIAL_MEDIA_URLS.iteritems():

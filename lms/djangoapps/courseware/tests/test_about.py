@@ -306,7 +306,7 @@ class AboutWithInvitationOnly(ModuleStoreTestCase):
         url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
-        self.assertIn(u"Register for {}".format(self.course.id.course), resp.content)
+        self.assertIn(u"Register for {}".format(self.course.id.course), resp.content.decode('utf-8'))
 
         # Check that registration button is present
         self.assertIn(REG_STR, resp.content)
@@ -336,7 +336,7 @@ class AboutTestCaseShibCourse(LoginEnrollmentTestCase, ModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("OOGIE BLOOGIE", resp.content)
-        self.assertIn(u"Register for {}".format(self.course.id.course), resp.content)
+        self.assertIn(u"Register for {}".format(self.course.id.course), resp.content.decode('utf-8'))
         self.assertIn(SHIB_ERROR_STR, resp.content)
         self.assertIn(REG_STR, resp.content)
 
@@ -348,7 +348,7 @@ class AboutTestCaseShibCourse(LoginEnrollmentTestCase, ModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("OOGIE BLOOGIE", resp.content)
-        self.assertIn(u"Register for {}".format(self.course.id.course), resp.content)
+        self.assertIn(u"Register for {}".format(self.course.id.course), resp.content.decode('utf-8'))
         self.assertIn(SHIB_ERROR_STR, resp.content)
         self.assertIn(REG_STR, resp.content)
 
