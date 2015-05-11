@@ -243,8 +243,8 @@
       data-add-button-label="${_("Add Community TA")}"
     ></div>
   %endif
-  
-  %if section_data['access']['instructor'] and settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
+
+  %if section_data['access']['instructor'] and section_data['ccx_is_enabled']:
     <div class="auth-list-container"
       data-rolename="ccx_coach"
       data-display-name="${_("CCX Coaches")}"

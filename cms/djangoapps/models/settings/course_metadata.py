@@ -83,6 +83,10 @@ class CourseMetadata(object):
         if not settings.FEATURES.get('ENABLE_VIDEO_BUMPER'):
             filtered_list.append('video_bumper')
 
+        # Do not show enable_ccx if feature is not enabled.
+        if not settings.FEATURES.get('CUSTOM_COURSES_EDX'):
+            filtered_list.append('enable_ccx')
+
         return filtered_list
 
     @classmethod
