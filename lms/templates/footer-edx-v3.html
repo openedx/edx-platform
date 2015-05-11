@@ -1,0 +1,90 @@
+## mako
+<%! from django.core.urlresolvers import reverse %>
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='static_content.html'/>
+## WARNING: These files are specific to edx.org and are not used in installations outside of that domain. Open edX users will want to use the file "footer.html" for any changes or overrides.
+<footer id="footer-edx-v3" role="contentinfo" aria-label="${_("Page Footer")}">
+    <h2 class="sr footer-about-title">${_("About edX")}</h2>
+
+    <div class="footer-logo">
+        <img alt="edX logo" src="${static.url('images/edx-theme/edx-header-logo.png')}">
+    </div>
+
+    <div class="site-details">
+        <nav class="site-nav" aria-label="${_("About edX")}">
+            <a href="${marketing_link('ABOUT')}">${_("About")}</a>
+            <a href="${marketing_link('BLOG')}">${_("Blog")}</a>
+            <a href="${marketing_link('NEWS')}">${_("News")}</a>
+            <a href="${marketing_link('FAQ')}">${_("FAQs")}</a>
+            <a href="${marketing_link('CONTACT')}">${_("Contact")}</a>
+            <a href="${marketing_link('JOBS')}">${_("Jobs")}</a>
+            <a href="${marketing_link('DONATE')}">${_("Donate")}</a>
+            <a href="${marketing_link('DONATE')}">${_("Sitemap")}</a>
+        </nav>
+        <nav class="legal-notices" aria-label="${_("Legal")}">
+            <a href="${marketing_link('TOS')}">${_("Terms of Service &amp; Honor Code")}</a>
+            <a href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
+            <a href="${marketing_link('PRIVACY')}">${_("Website Accessibility Policy")}</a>
+        </nav>
+        <p class="copyright">
+            ## Using "edX Inc." explicitly here for copyright purposes (settings.PLATFORM_NAME is just "edX", and this footer is only used on edx.org)
+            ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
+            <p>&copy; ${settings.COPYRIGHT_YEAR} edX Inc. All rights reserved except where noted. EdX, Open edX and the edX and Open edX logos are registered trademarks of trademarks of edX Inc.</p>
+        </p>
+        <div class="openedx-link">
+          <a href="http://open.edx.org" title="${_("Powered by Open edX")}">
+            <img alt="${_("Powered by Open edX")}" src="https://files.edx.org/openedx-logos/edx-openedx-logo-tag.png">
+          </a>
+        </div>
+    </div>
+
+    <div class="external-links">
+        <div class="social-media-links">
+          ## Translators: This is the website name of www.facebook.com. Please
+          ## translate this the way that Facebook advertises in your language.
+          <a href="${settings.SOCIAL_MEDIA_FOOTER_URLS.get('facebook', '#')}" class="sm-link external" title="${_("Facebook")}" rel="noreferrer">
+            <span class="icon fa fa-facebook-square element-invisible"></span>
+          </a>
+
+          ## Translators: This is the website name of www.twitter.com. Please
+          ## translate this the way that Twitter advertises in your language.
+          <a href="${settings.SOCIAL_MEDIA_FOOTER_URLS.get('twitter', '#')}" class="sm-link external" title="${_("Twitter")}" rel="noreferrer">
+            <span class="icon fa fa-twitter element-invisible"></span>
+          </a>
+
+          ## Translators: This is the website name of www.linked.com. Please
+          ## translate this the way that LinkedIn advertises in your language.
+          <a href="${settings.SOCIAL_MEDIA_FOOTER_URLS.get('linkedin', '#')}" class="sm-link external" title="${_("LinkedIn")}" rel="noreferrer">
+            <span class="icon fa fa-linkedin-square element-invisible"></span>
+          </a>
+
+          ## Translators: This is the website name of plus.google.com. Please
+          ## translate this the way that Google+ advertises in your language.
+          <a href="${settings.SOCIAL_MEDIA_FOOTER_URLS.get('facebook', '#')}" class="sm-link external" title="${_("Google+")}" rel="noreferrer">
+            <span class="icon fa fa-weibo element-invisible"></span>
+          </a>
+
+          ## Translators: This is the website name of www.meetup.com. Please
+          ## translate this the way that Meetup advertises in your language.
+          <a href="${settings.SOCIAL_MEDIA_FOOTER_URLS.get('facebook', '#')}" class="sm-link external" title="${_("Meetup")}" rel="noreferrer">
+            <span class="icon fa fa-vk element-invisible"></span>
+          </a>
+        </div>
+
+        ## % if settings.FEATURES.get('ENABLE_FOOTER_MOBILE_APP_LINKS'):
+        <div class="mobile-app-links">
+          <a href="${settings.MOBILE_STORE_URLS.get('apple', '#')}" class="app-link external">
+            <img class="app-store" alt="${_("Apple app on Apple Store")}" src="${static.url('images/app/app_store_badge_135x40.svg')}">
+          </a>
+          <a href="${settings.MOBILE_STORE_URLS.get('google', '#')}" class="app-link external">
+            <img class="google-play" alt="${_("Android app on Google Play")}" src="${static.url('images/app/google_play_badge_45.png')}">
+          </a>
+        </div>
+        ## % endif
+    </div>
+</footer>
+
+<script type="text/javascript" src="/static/js/vendor/noreferrer.js" charset="utf-8"></script>
+<%block name="js_extra">
+    <%static:js group='footer_edx'/>
+</%block>
