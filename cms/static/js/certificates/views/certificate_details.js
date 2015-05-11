@@ -20,8 +20,7 @@ function(BaseView, _, Signatory, SignatoryDetails, gettext, str) {
             return [
                 'collection',
                 'certificates',
-                'certificate-details',
-                'certificate-details-' + index
+                'certificate-details'
             ].join(' ');
         },
 

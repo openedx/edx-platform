@@ -18,16 +18,22 @@
        <div class="signatory-panel-header">Signatory <%= signatory_number %></div>
        <div class="signatory-panel-body">
          <fieldset class="collection-fields signatory-fields">
-                <div class="input-wrap field text add-signatory-name">
-                    <label><%= gettext("Name ") %></label>
-                    <input class="collection-name-input input-text signatory-name-input" name="signatory-name" type="text" placeholder="<%= gettext("This is the Name of the Signatory") %>" value="<%= name %>">
-                    <span class="tip tip-stacked"><%= gettext("Max 30 characters") %></span>
-                </div>
-                <div class="input-wrap field text add-signatory-title">
-                    <label><%= gettext("Title ") %></label>
-                    <input class="collection-name-input input-text signatory-title-input" name="signatory-title" type="text" placeholder="<%= gettext("This is the Title of the Signatory") %>" value="<%= title %>">
-                    <span class="tip tip-stacked"><%= gettext("Max 30 characters") %></span>
-                </div>
+            <legend class="sr"><%= gettext("Certificate Signatory Configuration") %></legend>
+            <div class="input-wrap field text add-signatory-name">
+                <label for="signatory-name-<%= signatory_number %>"><%= gettext("Name ") %></label>
+                <input id="signatory-name-<%= signatory_number %>" class="collection-name-input input-text signatory-name-input" name="signatory-name" type="text" placeholder="<%= gettext("Name of the signatory") %>" value="<%= name %>" maxlength="30"  aria-describedby="signatory-name-<%= signatory_number %>-tip">
+                <span id="signatory-name-<%= signatory_number %>-tip" class="tip tip-stacked"><%= gettext("Maximum 30 characters") %></span>
+            </div>
+            <div class="input-wrap field text add-signatory-title">
+                <label for="signatory-title-<%= signatory_number %>"><%= gettext("Title ") %></label>
+                <input id="signatory-title-<%= signatory_number %>" class="collection-name-input input-text signatory-title-input" name="signatory-title" type="text" placeholder="<%= gettext("Title of the signatory") %>" value="<%= title %>" maxlength="30"  aria-describedby="signatory-title-<%= signatory_number %>-tip">
+                <span id="signatory-title-<%= signatory_number %>-tip" class="tip tip-stacked"><%= gettext("Maximum 30 characters") %></span>
+            </div>
+            <div class="input-wrap field text add-signatory-organization">
+                <label for="signatory-organization-<%= signatory_number %>"><%= gettext("Organization ") %></label>
+                <input id="signatory-organization-<%= signatory_number %>" class="collection-name-input input-text signatory-organization-input" name="signatory-organization" type="text" placeholder="<%= gettext("Organization of the signatory") %>" value="<%= organization %>" maxlength="30"  aria-describedby="signatory-organization-<%= signatory_number %>-tip">
+                <span id="signatory-organization-<%= signatory_number %>-tip" class="tip tip-stacked"><%= gettext("Maximum 30 characters") %></span>
+            </div>
          </fieldset>
        </div>
      </div>
