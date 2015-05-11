@@ -14,6 +14,7 @@ define([
         latestModelsCount: 0,
         searchTerm: '',
         facetList: {},
+        facets: {},
         page: 0,
         url: '/search/course_discovery/',
         fetchXhr: null,
@@ -73,6 +74,7 @@ define([
             var results = response['results'] || [];
             this.latestModelsCount = results.length;
             this.totalCount = response.total;
+            this.facets = response.facets;
             return _.map(results, function (result) {
                 return result.data;
             });
