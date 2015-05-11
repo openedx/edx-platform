@@ -26,6 +26,7 @@ function(BaseView, ViewUtils, SignatoryEditorView, _, TemplateUtils, gettext, st
 
         initialize: function() {
             // Set up the initial state of the attributes set for this model instance
+            this.edit_view = null;
             this.template = this.loadTemplate('signatory-details');
             this.listenTo(this.model, 'change', this.render);
         },
@@ -38,8 +39,8 @@ function(BaseView, ViewUtils, SignatoryEditorView, _, TemplateUtils, gettext, st
         editSignatory: function(event) {
             // Retrieve the edit view for this model
             if (event && event.preventDefault) { event.preventDefault(); }
-            var view =  new SignatoryEditorView({model: this.model, isEditingAllCollections: false});
-            this.$el.html(view.render());
+            this.edit_view =  new SignatoryEditorView({model: this.model, isEditingAllCollections: false});
+            this.$el.html(this.edit_view.render());
         },
 
         saveSignatoryData: function(event) {
@@ -47,6 +48,7 @@ function(BaseView, ViewUtils, SignatoryEditorView, _, TemplateUtils, gettext, st
             if (event && event.preventDefault) { event.preventDefault(); }
             var certificate = this.model.get('certificate');
             var self = this;
+            if(this.edit_view !== null) this.edit_view.setSignatoriesValues();
             ViewUtils.runOperationShowingMessage(
                 gettext('Saving'),
                 function () {

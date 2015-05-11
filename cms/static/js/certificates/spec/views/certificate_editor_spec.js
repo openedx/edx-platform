@@ -31,7 +31,8 @@ define([
         warningMessage: '.certificate-validation-text',
         warningIcon: '.wrapper-certificate-validation > i',
         note: '.wrapper-delete-button',
-        action_add_signatory: '.action-add-signatory'
+        action_add_signatory: '.action-add-signatory',
+        signatory_panel_delete: '.signatory-panel-delete'
     };
 
     var submitForm = function (view, requests, notificationSpy) {
@@ -46,8 +47,18 @@ define([
             ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
             AjaxHelpers.respondWithError(requests);
             ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
-        };
+    };
 
+    var clickDeleteItem = function (that, promptText, element) {
+        var requests = AjaxHelpers.requests(that),
+            promptSpy = ViewHelpers.createPromptSpy(),
+            notificationSpy = ViewHelpers.createNotificationSpy();
+        that.view.$(element).click();
+
+        ViewHelpers.verifyPromptShowing(promptSpy, promptText);
+        ViewHelpers.confirmPrompt(promptSpy);
+        ViewHelpers.verifyPromptHidden(promptSpy);
+    };
 
     beforeEach(function() {
         window.course = new Course({
@@ -140,12 +151,12 @@ define([
                 expect(this.model).toBeCorrectValuesInModel({
                     name: 'Test Name',
                     description: 'Test Description'
-                })
+                });
                 expect(this.collection.length).toBe(1);
             });
 
             it('user can only add signatories up to max 4', function() {
-                for(var i = 0; i < MAX_SIGNATORIES ; i++) {
+                for(var i = 1; i < MAX_SIGNATORIES ; i++) {
                     this.view.$(SELECTORS.action_add_signatory).click();
                 }
                 expect(this.view.$(SELECTORS.action_add_signatory)).toHaveClass('disableClick');
@@ -158,6 +169,21 @@ define([
                 expect('click').not.toHaveBeenPreventedOn(SELECTORS.action_add_signatory);
                 expect(this.view.$(SELECTORS.action_add_signatory)).not.toHaveClass('disableClick');
             });
+
+            it('user can add signatories when signatory reached the upper limit But after deleting a signatory',
+                function() {
+                    for(var i = 1; i < MAX_SIGNATORIES ; i++) {
+                        this.view.$(SELECTORS.action_add_signatory).click();
+                    }
+                    expect(this.view.$(SELECTORS.action_add_signatory)).toHaveClass('disableClick');
+
+                    // now delete anyone of the signatory, Add signatory should be enabled.
+                    var signatory = this.model.get('signatories').at(0);
+                    var text = 'Are you sure you want to delete "'+ signatory.get('title') +'" as a signatory?';
+                    clickDeleteItem(this, text, SELECTORS.signatory_panel_delete + ':first');
+                    expect(this.view.$(SELECTORS.action_add_signatory)).not.toHaveClass('disableClick');
+                }
+            );
 
             it('signatories should save properly', function() {
                 var requests = AjaxHelpers.requests(this),

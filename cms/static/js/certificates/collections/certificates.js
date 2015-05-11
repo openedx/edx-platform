@@ -13,24 +13,20 @@ function(Backbone, Certificate) {
             this.url = options.certificateUrl;
         },
 
-        IsJsonString: function(str) {
-            // Validates the format of the provided string
+        certificate_array: function(certificate_info) {
+            var return_array;
             try {
-                JSON.parse(str);
+                return_array = JSON.parse(certificate_info);
             } catch (e) {
-                return false;
+                return_array = certificate_info;
             }
-            return true;
+            return return_array;
         },
 
         parse: function (certificatesJson) {
             // Transforms the provided JSON into a Certificates collection
-            var modelArray;
-            if(this.IsJsonString(certificatesJson)) {
-                modelArray = JSON.parse(certificatesJson);
-            } else {
-                modelArray = certificatesJson;
-            }
+            var modelArray = this.certificate_array(certificatesJson);
+
             for (var i in modelArray) {
                 this.push(modelArray[i]);
             }

@@ -83,6 +83,12 @@ function(ViewUtils, PromptView, NotificationView, TemplateUtils, _, $, gettext) 
             );
         },
 
+        setSignatoriesValues: function() {
+            // set the signatories values
+            this.setSignatoryName();
+            this.setSignatoryTitle();
+        },
+
         deleteItem: function(event) {
             // Remove the specified model from the collection
             if (event && event.preventDefault) { event.preventDefault(); }
@@ -90,7 +96,7 @@ function(ViewUtils, PromptView, NotificationView, TemplateUtils, _, $, gettext) 
             var model = this.model;
             var self = this;
             var confirm = new PromptView.Warning({
-                title: gettext('Are you sure you want to delete this signatory with title "'+model.get('title') +'"?'),
+                title: gettext('Are you sure you want to delete "'+model.get('title') +'" as a signatory?'),
                 message: gettext('This action cannot be undone.'),
                 actions: {
                     primary: {

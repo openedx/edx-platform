@@ -28,7 +28,12 @@ define([
         warningIcon: '.wrapper-certificate-validation > i',
         note: '.wrapper-delete-button',
         signatory_name_value: '.signatory-name-value',
-        signatory_title_value: '.signatory-title-value'
+        signatory_title_value: '.signatory-title-value',
+        edit_signatory: '.edit-signatory',
+        signatory_panel_save: '.signatory-panel-save',
+        signatory_panel_close: '.signatory-panel-close',
+        inputSignatoryName: '.signatory-name-input',
+        inputSignatoryTitle: '.signatory-title-input'
     };
 
     beforeEach(function() {
@@ -46,9 +51,9 @@ define([
         delete window.course;
     });
 
-    describe('Experiment certificates details view', function() {
+    describe('Experiment details view', function() {
         beforeEach(function() {
-            TemplateHelpers.installTemplates(['certificate-details', 'signatory-details'], true);
+            TemplateHelpers.installTemplates(['certificate-details', 'signatory-details', 'signatory-editor'], true);
 
             this.newModelOptions = {add: true};
             this.model = new CertificateModel({
@@ -68,47 +73,95 @@ define([
             CustomMatchers(this);
         });
 
-        it('JSON collection parsing into model', function () {
-            var CERTIFICATE_JSON = '[{"name": "Test certificate name", "description": "Test certificate description", "signatories":"[]"}]';
-            this.collection.parse(CERTIFICATE_JSON);
-            var model = this.collection.at(1);
-            expect(model.get('name')).toEqual('Test certificate name');
-            expect(model.get('description')).toEqual('Test certificate description');
+        describe('Certificate details view', function() {
+
+            it('JSON string collection parsing into model', function () {
+                var CERTIFICATE_JSON = '[{"name": "Test certificate name", "description": "Test certificate description", "signatories":"[]"}]';
+                this.collection.parse(CERTIFICATE_JSON);
+                var model = this.collection.at(1);
+                expect(model.get('name')).toEqual('Test certificate name');
+                expect(model.get('description')).toEqual('Test certificate description');
+            });
+
+            it('JSON object collection parsing into model', function () {
+                var CERTIFICATE_JSON_OBJECT = [{"name": "Test certificate name", "description": "Test certificate description", "signatories":"[]"}];
+                this.collection.parse(CERTIFICATE_JSON_OBJECT);
+                var model = this.collection.at(1);
+                expect(model.get('name')).toEqual('Test certificate name');
+                expect(model.get('description')).toEqual('Test certificate description');
+            });
+
+            it('should render properly', function () {
+                expect(this.view.$el).toContainText('Test Name');
+                expect(this.view.$('.delete')).toExist();
+                expect(this.view.$('.edit')).toExist();
+            });
+
+            it('can edit certificate', function(){
+                this.view.$('.edit').click();
+                // The Certificate Model should be in 'edit' mode
+                expect(this.model.get('editing')).toBe(true);
+            });
+
+            it('show certificate details', function(){
+                this.view.$('.show-details').click();
+
+                // The "Certificate Description" field should be visible.
+                expect(this.view.$(SELECTORS.description)).toContainText('Test Description');
+            });
+
+
+            it('hide certificate details', function(){
+                this.view.render(true);
+                this.view.$('.hide-details').click();
+
+                // The "Certificate Description" field should be hidden.
+                expect(this.view.$(SELECTORS.description)).not.toExist();
+            });
+
         });
 
-        it('should render properly', function () {
-            expect(this.view.$el).toContainText('Test Name');
-            expect(this.view.$('.delete')).toExist();
-            expect(this.view.$('.edit')).toExist();
-        });
+        describe('Signatory details view', function(){
 
-        it('can edit certificate', function(){
-            this.view.$('.edit').click();
-            // The Certificate Model should be in 'edit' mode
-            expect(this.model.get('editing')).toBe(true);
-        });
+            beforeEach(function() {
+                this.view.render(true);
+            });
 
-        it('show certificate details', function(){
-            this.view.$('.show-details').click();
+            it('can edit signatory on its own', function() {
 
-            // The "Certificate Description" field should be visible.
-            expect(this.view.$(SELECTORS.description)).toContainText('Test Description');
-        });
+                this.view.$(SELECTORS.edit_signatory).click();
+                expect(this.view.$(SELECTORS.inputSignatoryName)).toExist();
+                expect(this.view.$(SELECTORS.inputSignatoryTitle)).toExist();
+            });
 
-        it('show certificate signatories details', function(){
-            this.view.render(true);
-            this.view.$('.show-details').click();
+            it('signatory saved successfully after editing', function() {
 
-            // The default certificate signatory should be visible.
-            expect(this.view.$(SELECTORS.signatory_name_value)).toContainText('Signatory Name');
-            expect(this.view.$(SELECTORS.signatory_title_value)).toContainText('Signatory Title');
-        });
+                var requests = AjaxHelpers.requests(this),
+                    notificationSpy = ViewHelpers.createNotificationSpy();
 
-        it('hide certificate details', function(){
-            this.view.$('.hide-details').click();
+                this.view.$(SELECTORS.edit_signatory).click();
 
-            // The "Certificate Description" field should be hidden.
-            expect(this.view.$(SELECTORS.description)).not.toExist();
+                this.view.$(SELECTORS.inputSignatoryName).val('New Signatory Test Name');
+                this.view.$(SELECTORS.inputSignatoryTitle).val('New Signatory Test Title');
+                this.view.$(SELECTORS.signatory_panel_save).click();
+
+                ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
+                requests[0].respond(200);
+                ViewHelpers.verifyNotificationHidden(notificationSpy);
+
+                expect(this.view.$(SELECTORS.signatory_name_value)).toContainText('New Signatory Test Name');
+                expect(this.view.$(SELECTORS.signatory_title_value)).toContainText('New Signatory Test Title');
+
+            });
+
+            it('show certificate signatories details', function(){
+                this.view.$('.show-details').click();
+
+                // The default certificate signatory should be visible.
+                expect(this.view.$(SELECTORS.signatory_name_value)).toContainText('Signatory Name');
+                expect(this.view.$(SELECTORS.signatory_title_value)).toContainText('Signatory Title');
+            });
+
         });
     });
 });
