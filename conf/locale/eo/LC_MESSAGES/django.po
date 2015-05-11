@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-05-15 17:17+0000\n"
-"PO-Revision-Date: 2015-05-15 17:17:17.817605\n"
+"POT-Creation-Date: 2015-05-18 20:44+0000\n"
+"PO-Revision-Date: 2015-05-18 20:44:46.868123\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3184,9 +3184,9 @@ msgstr ""
 msgid "Both"
 msgstr "Böth Ⱡ'σяєм ι#"
 
-#: common/lib/xmodule/xmodule/course_module.py
-#: lms/templates/footer-edx-new.html lms/templates/footer.html
-#: lms/templates/static_templates/about.html
+#: common/lib/xmodule/xmodule/course_module.py lms/djangoapps/branding/api.py
+#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
+#: lms/templates/footer.html lms/templates/static_templates/about.html
 msgid "About"
 msgstr "Àßöüt Ⱡ'σяєм ιρѕ#"
 
@@ -3257,6 +3257,18 @@ msgstr ""
 "łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
 "єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
 "αυтє ιяυяє ∂σł#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Teams Configuration"
+msgstr "Téäms Çönfïgürätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter configuration for the teams feature. Expects two entries: "
+"max_team_size and topics, where topics is a list of topics."
+msgstr ""
+"Éntér çönfïgürätïön för thé téäms féätüré. Éxpéçts twö éntrïés: "
+"mäx_téäm_sïzé änd töpïçs, whéré töpïçs ïs ä lïst öf töpïçs. Ⱡ'σяєм ιρ#"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
@@ -5100,6 +5112,74 @@ msgstr "Séärçh Ⱡ'σяєм ιρѕυ#"
 msgid "Copyright"
 msgstr "Çöpýrïght Ⱡ'σяєм ιρѕυм ∂σł#"
 
+#: lms/djangoapps/branding/api.py
+msgid ""
+"© {org_name}.  All rights reserved except where noted.  EdX, Open edX and "
+"the edX and OpenEdX logos are registered trademarks or trademarks of edX "
+"Inc."
+msgstr ""
+"© {org_name}.  Àll rïghts résérvéd éxçépt whéré nötéd.  ÉdX, Öpén édX änd "
+"thé édX änd ÖpénÉdX lögös äré régïstéréd trädémärks ör trädémärks öf édX "
+"Ìnç. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ "
+"єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм"
+" νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα "
+"¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт"
+" єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
+"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ є#"
+
+#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
+#. Translators: 'Open edX' is a brand, please keep this untranslated. See
+#. http://openedx.org for more information.
+#: lms/djangoapps/branding/api.py cms/templates/widgets/footer.html
+#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
+#: lms/templates/footer.html
+msgid "Powered by Open edX"
+msgstr "Pöwéréd ßý Öpén édX Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: lms/djangoapps/branding/api.py lms/templates/footer-edx-v2.html
+#: lms/templates/footer-edx-v3.html lms/templates/footer.html
+msgid "News"
+msgstr "Néws Ⱡ'σяєм ι#"
+
+#: lms/djangoapps/branding/api.py lms/templates/footer-edx-v2.html
+#: lms/templates/footer-edx-v3.html lms/templates/footer.html
+#: lms/templates/static_templates/contact.html
+msgid "Contact"
+msgstr "Çöntäçt Ⱡ'σяєм ιρѕυм #"
+
+#: lms/djangoapps/branding/api.py lms/templates/footer-edx-v2.html
+#: lms/templates/footer.html lms/templates/static_templates/faq.html
+msgid "FAQ"
+msgstr "FÀQ Ⱡ'σяєм#"
+
+#: lms/djangoapps/branding/api.py lms/templates/footer-edx-v2.html
+msgid "edX Blog"
+msgstr "édX Blög Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/djangoapps/branding/api.py lms/templates/footer-edx-v2.html
+msgid "Donate to edX"
+msgstr "Dönäté tö édX Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/djangoapps/branding/api.py lms/templates/footer-edx-v2.html
+msgid "Jobs at edX"
+msgstr "Jößs ät édX Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This is a legal document users must agree to
+#. in order to register a new account.
+#: lms/djangoapps/branding/api.py openedx/core/djangoapps/user_api/views.py
+#: cms/templates/widgets/footer.html lms/templates/footer.html
+#: lms/templates/static_templates/tos.html
+msgid "Terms of Service"
+msgstr "Térms öf Sérvïçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views.py
+#: cms/templates/widgets/footer.html lms/templates/footer-edx-v2.html
+#: lms/templates/footer-edx-v3.html lms/templates/footer.html
+#: lms/templates/static_templates/privacy.html
+msgid "Privacy Policy"
+msgstr "Prïväçý Pölïçý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
 #: lms/djangoapps/ccx/views.py
 msgid "You must be a CCX Coach to access this view."
 msgstr ""
@@ -5322,13 +5402,7 @@ msgstr "Wörk ät {platform_name} Ⱡ'σяєм ιρѕυм ∂σłσя #"
 msgid "Contact {platform_name}"
 msgstr "Çöntäçt {platform_name} Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
-#: lms/djangoapps/certificates/views.py cms/templates/widgets/footer.html
-#: lms/templates/footer-edx-new.html lms/templates/footer.html
-#: lms/templates/static_templates/privacy.html
-msgid "Privacy Policy"
-msgstr "Prïväçý Pölïçý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views.py lms/templates/footer-edx-v3.html
 msgid "Terms of Service &amp; Honor Code"
 msgstr ""
 "Térms öf Sérvïçé &amp; Hönör Çödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
@@ -8371,26 +8445,42 @@ msgstr "Çöüld nöt süßmït phötös Ⱡ'σяєм ιρѕυм ∂σłσя ѕ�
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This is the website name of www.facebook.com.  Please
 #. translate this the way that Facebook advertises in your language.
-#: lms/envs/common.py lms/templates/dashboard/_dashboard_course_listing.html
+#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
+#. Translators: This is the website name of www.facebook.com. Please
+#. translate this the way that Facebook advertises in your language.
+#: lms/envs/common.py lms/templates/footer-edx-v3.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Facebook"
 msgstr "Fäçéßöök Ⱡ'σяєм ιρѕυм ∂#"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This is the website name of www.twitter.com.  Please
 #. translate this the way that Twitter advertises in your language.
-#: lms/envs/common.py lms/templates/dashboard/_dashboard_course_listing.html
+#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
+#. Translators: This is the website name of www.twitter.com. Please
+#. translate this the way that Twitter advertises in your language.
+#: lms/envs/common.py lms/templates/footer-edx-v3.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Twitter"
 msgstr "Twïttér Ⱡ'σяєм ιρѕυм #"
 
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This is the website name of www.linkedin.com.  Please
 #. translate this the way that LinkedIn advertises in your language.
-#: lms/envs/common.py
+#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
+#. Translators: This is the website name of www.linked.com. Please
+#. translate this the way that LinkedIn advertises in your language.
+#: lms/envs/common.py lms/templates/footer-edx-v3.html
 msgid "LinkedIn"
 msgstr "LïnkédÌn Ⱡ'σяєм ιρѕυм ∂#"
 
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This is the website name of plus.google.com.  Please
 #. translate this the way that Google+ advertises in your language.
-#: lms/envs/common.py
+#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
+#. Translators: This is the website name of plus.google.com. Please
+#. translate this the way that Google+ advertises in your language.
+#: lms/envs/common.py lms/templates/footer-edx-v3.html
 msgid "Google+"
 msgstr "Gööglé+ Ⱡ'σяєм ιρѕυм #"
 
@@ -8400,9 +8490,13 @@ msgstr "Gööglé+ Ⱡ'σяєм ιρѕυм #"
 msgid "Tumblr"
 msgstr "Tümßlr Ⱡ'σяєм ιρѕυ#"
 
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This is the website name of www.meetup.com.  Please
 #. translate this the way that MeetUp advertises in your language.
-#: lms/envs/common.py
+#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
+#. Translators: This is the website name of www.meetup.com. Please
+#. translate this the way that Meetup advertises in your language.
+#: lms/envs/common.py lms/templates/footer-edx-v3.html
 msgid "Meetup"
 msgstr "Méétüp Ⱡ'σяєм ιρѕυ#"
 
@@ -8411,6 +8505,18 @@ msgstr "Méétüp Ⱡ'σяєм ιρѕυ#"
 #: lms/envs/common.py
 msgid "Reddit"
 msgstr "Réddït Ⱡ'σяєм ιρѕυ#"
+
+#. Translators: This is the website name of https://vk.com.  Please
+#. translate this the way that VK advertises in your language.
+#: lms/envs/common.py
+msgid "VK"
+msgstr "VK Ⱡ'σя#"
+
+#. Translators: This is the website name of http://www.weibo.com.  Please
+#. translate this the way that Weibo advertises in your language.
+#: lms/envs/common.py
+msgid "Weibo"
+msgstr "Wéïßö Ⱡ'σяєм ιρѕ#"
 
 #. Translators: This is the website name of www.youtube.com.  Please
 #. translate this the way that YouTube advertises in your language.
@@ -9293,7 +9399,7 @@ msgstr "Pléäsé séléçt ýöür Çöüntrý. Ⱡ'σяєм ιρѕυм ∂σł
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
-#: openedx/core/djangoapps/user_api/views.py lms/templates/footer-edx-new.html
+#: openedx/core/djangoapps/user_api/views.py lms/templates/footer-edx-v2.html
 msgid "Terms of Service and Honor Code"
 msgstr "Térms öf Sérvïçé änd Hönör Çödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
@@ -9308,14 +9414,6 @@ msgid "You must agree to the {platform_name} {terms_of_service}."
 msgstr ""
 "Ýöü müst ägréé tö thé {platform_name} {terms_of_service}. Ⱡ'σяєм ιρѕυм ∂σłσя"
 " ѕιт αмєт, ¢σηѕє¢т#"
-
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-#. Translators: This is a legal document users must agree to
-#. in order to register a new account.
-#: openedx/core/djangoapps/user_api/views.py cms/templates/widgets/footer.html
-#: lms/templates/footer.html lms/templates/static_templates/tos.html
-msgid "Terms of Service"
-msgstr "Térms öf Sérvïçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
 msgid "The '{field_name}' field cannot be edited."
@@ -9364,6 +9462,19 @@ msgid "No data provided for user preference update"
 msgstr ""
 "Nö dätä prövïdéd för üsér préférénçé üpdäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
+
+#: cms/djangoapps/contentstore/course_group_config.py
+msgid "invalid JSON"
+msgstr "ïnvälïd JSÖN Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: cms/djangoapps/contentstore/course_group_config.py
+msgid "must have name of the configuration"
+msgstr ""
+"müst hävé nämé öf thé çönfïgürätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: cms/djangoapps/contentstore/course_group_config.py
+msgid "must have at least one group"
+msgstr "müst hävé ät léäst öné gröüp Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: cms/djangoapps/contentstore/course_info_model.py
 msgid "Invalid course update id."
@@ -9546,19 +9657,6 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Invalid prerequisite course key"
 msgstr "Ìnvälïd préréqüïsïté çöürsé kéý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "invalid JSON"
-msgstr "ïnvälïd JSÖN Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "must have name of the configuration"
-msgstr ""
-"müst hävé nämé öf thé çönfïgürätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "must have at least one group"
-msgstr "müst hävé ät léäst öné gröüp Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "This group configuration is in use and cannot be deleted."
@@ -9993,13 +10091,6 @@ msgstr ""
 "Vïsït ýöür {link_start}däshßöärd{link_end} tö séé ýöür çöürsés. Ⱡ'σяєм ιρѕυм"
 " ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
-#. Translators: 'Open edX' is a brand, please keep this untranslated. See
-#. http://openedx.org for more information.
-#: cms/templates/widgets/footer.html lms/templates/footer-edx-new.html
-#: lms/templates/footer.html
-msgid "Powered by Open edX"
-msgstr "Pöwéréd ßý Öpén édX Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
 #: cms/templates/widgets/header.html lms/templates/courseware/courseware.html
 msgid "Course Navigation"
 msgstr "Çöürsé Nävïgätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
@@ -10357,11 +10448,11 @@ msgstr "Püzzlé Léädérßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α
 msgid "User"
 msgstr "Ûsér Ⱡ'σяєм ι#"
 
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
 msgid "About edX"
 msgstr "Àßöüt édX Ⱡ'σяєм ιρѕυм ∂σł#"
 
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html
 msgid ""
 "{EdX} offers interactive online classes and MOOCs from the world's best "
 "universities. Online courses from {MITx}, {HarvardX}, {BerkeleyX}, {UTx} and"
@@ -10381,7 +10472,7 @@ msgstr ""
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
-#: lms/templates/footer-edx-new.html lms/templates/footer.html
+#: lms/templates/footer-edx-v2.html lms/templates/footer.html
 msgid ""
 "EdX, Open edX, and the edX and Open edX logos are registered trademarks or "
 "trademarks of {link_start}edX Inc.{link_end}"
@@ -10392,66 +10483,65 @@ msgstr ""
 #. Translators: {date} will be an abbreviated date, indicating when the
 #. privacy
 #. policy was most recently revised.
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html
 msgid "(Revised {date})"
 msgstr "(Révïséd {date}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #. Translators: {date} will be an abbreviated date, indicating when the
 #. privacy
 #. policy was most recently revised.
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html
 msgid "10/22/2014"
 msgstr "10/22/2014 Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
-#: lms/templates/footer-edx-new.html lms/templates/footer.html
-msgid "News"
-msgstr "Néws Ⱡ'σяєм ι#"
-
-#: lms/templates/footer-edx-new.html lms/templates/footer.html
-#: lms/templates/static_templates/contact.html
-msgid "Contact"
-msgstr "Çöntäçt Ⱡ'σяєм ιρѕυм #"
-
-#: lms/templates/footer-edx-new.html lms/templates/footer.html
-#: lms/templates/static_templates/faq.html
-msgid "FAQ"
-msgstr "FÀQ Ⱡ'σяєм#"
-
-#: lms/templates/footer-edx-new.html
-msgid "edX Blog"
-msgstr "édX Blög Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/templates/footer-edx-new.html
-msgid "Donate to edX"
-msgstr "Dönäté tö édX Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: lms/templates/footer-edx-new.html
-msgid "Jobs at edX"
-msgstr "Jößs ät édX Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html
 msgid "Follow Us"
 msgstr "Föllöw Ûs Ⱡ'σяєм ιρѕυм ∂σł#"
 
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html
 msgid "Mobile Apps"
 msgstr "Mößïlé Àpps Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
 msgid "Apple app on Apple Store"
 msgstr "Àpplé äpp ön Àpplé Störé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
 msgid "Android app on Google Play"
 msgstr "Àndröïd äpp ön Gööglé Pläý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
-#: lms/templates/footer.html lms/templates/static_templates/jobs.html
+#: lms/templates/footer-edx-v3.html
+msgid "Page Footer"
+msgstr "Pägé Föötér Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/templates/footer-edx-v3.html lms/templates/static_templates/blog.html
+msgid "Blog"
+msgstr "Blög Ⱡ'σяєм ι#"
+
+#: lms/templates/footer-edx-v3.html
+msgid "FAQs"
+msgstr "FÀQs Ⱡ'σяєм ι#"
+
+#: lms/templates/footer-edx-v3.html lms/templates/footer.html
+#: lms/templates/static_templates/jobs.html
 msgid "Jobs"
 msgstr "Jößs Ⱡ'σяєм ι#"
 
-#: lms/templates/footer.html
+#: lms/templates/footer-edx-v3.html lms/templates/static_templates/donate.html
+msgid "Donate"
+msgstr "Dönäté Ⱡ'σяєм ιρѕυ#"
+
+#: lms/templates/footer-edx-v3.html
+msgid "Sitemap"
+msgstr "Sïtémäp Ⱡ'σяєм ιρѕυм #"
+
+#: lms/templates/footer-edx-v3.html lms/templates/footer.html
 msgid "Legal"
 msgstr "Légäl Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/footer-edx-v3.html
+msgid "Website Accessibility Policy"
+msgstr "Wéßsïté Àççéssïßïlïtý Pölïçý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/templates/footer.html
 msgid ""
@@ -10957,30 +11047,6 @@ msgstr "(rélöäd ýöür pägé tö réfrésh) Ⱡ'σяєм ιρѕυм ∂σł
 #: lms/templates/manage_user_standing.html
 msgid "working"
 msgstr "wörkïng Ⱡ'σяєм ιρѕυм #"
-
-#: lms/templates/mathjax_accessible.html
-msgid ""
-"This page features MathJax technology to render mathematical formulae. To "
-"make math accessibile, we suggest using the MathPlayer plugin. Please visit "
-"the {link_start}MathPlayer Download Page{link_end} to download the plugin "
-"for your browser."
-msgstr ""
-"Thïs pägé féätürés MäthJäx téçhnölögý tö réndér mäthémätïçäl förmüläé. Tö "
-"mäké mäth äççéssïßïlé, wé süggést üsïng thé MäthPläýér plügïn. Pléäsé vïsït "
-"thé {link_start}MäthPläýér Döwnlöäd Pägé{link_end} tö döwnlöäd thé plügïn "
-"för ýöür ßröwsér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт,"
-" ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм "
-"α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ "
-"єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
-" νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgια#"
-
-#: lms/templates/mathjax_accessible.html
-msgid ""
-"Your browser does not support the MathPlayer plugin. To use MathPlayer, "
-"please use Internet Explorer 6 through 9."
-msgstr ""
-"Ýöür ßröwsér döés nöt süppört thé MäthPläýér plügïn. Tö üsé MäthPläýér, "
-"pléäsé üsé Ìntérnét Éxplörér 6 thröügh 9. Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
@@ -17787,14 +17853,6 @@ msgid ""
 msgstr ""
 "Thïs pägé léft ïnténtïönällý ßlänk. Ìt ïs nöt üséd ßý édx.örg ßüt ïs léft "
 "héré för pössïßlé üsé ßý ïnställätïöns öf Öpén édX. Ⱡ'σяєм #"
-
-#: lms/templates/static_templates/blog.html
-msgid "Blog"
-msgstr "Blög Ⱡ'σяєм ι#"
-
-#: lms/templates/static_templates/donate.html
-msgid "Donate"
-msgstr "Dönäté Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/static_templates/embargo.html
 msgid ""

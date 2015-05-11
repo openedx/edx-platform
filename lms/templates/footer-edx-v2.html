@@ -1,4 +1,5 @@
 ## mako
+## TODO (ECOM-1339): Delete this template once the V3 footer is enabled
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='static_content.html'/>
@@ -50,7 +51,7 @@
       </div>
 
       <div class="footer-about-links">
-        <a href="${marketing_link('TOS')}"><span class="copy">${_("Terms of Service and Honor Code")}</span></a>
+        <a href="${marketing_link('TOS_AND_HONOR')}"><span class="copy">${_("Terms of Service and Honor Code")}</span></a>
         <a href="${marketing_link('PRIVACY')}"><span class="copy">${_("Privacy Policy")}</span>
 	  <span class="note">
 	    ## Translators: {date} will be an abbreviated date, indicating when the privacy policy was most recently revised.
