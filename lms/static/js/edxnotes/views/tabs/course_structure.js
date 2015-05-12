@@ -4,10 +4,12 @@ define([
     'gettext', 'underscore', 'js/edxnotes/views/note_group', 'js/edxnotes/views/tab_panel',
     'js/edxnotes/views/tab_view'
 ], function (gettext, _, NoteGroupView, TabPanelView, TabView) {
+    var view = "Location in Course";
     var CourseStructureView = TabView.extend({
+        view: 'Location in Course',
         PanelConstructor: TabPanelView.extend({
             id: 'structure-panel',
-            title: 'Location in Course',
+            title: view,
 
             renderContent: function () {
                 var courseStructure = this.collection.getCourseStructure(),
@@ -47,7 +49,8 @@ define([
         tabInfo: {
             name: gettext('Location in Course'),
             identifier: 'view-course-structure',
-            icon: 'fa fa-list-ul'
+            icon: 'fa fa-list-ul',
+            view: view
         }
     });
 

@@ -8,6 +8,7 @@ from ...pages.lms.course_nav import CourseNavPage
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.edxnotes import EdxNotesUnitPage, EdxNotesPage, EdxNotesPageNoContent
 from ...fixtures.edxnotes import EdxNotesFixture, Note, Range
+from ..helpers import EventsTestMixin
 
 
 class EdxNotesTestMixin(UniqueCourseTest):
@@ -332,7 +333,7 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
             self.assertTrue(note.has_sr_label(1, 3, "Tags (space-separated)"))
 
 
-class EdxNotesPageTest(EdxNotesTestMixin):
+class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
     """
     Tests for Notes page.
     """
@@ -346,7 +347,8 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         If tags are specified, they will be used for each of the 3 notes that have tags.
         """
         xblocks = self.course_fixture.get_nested_xblocks(category="html")
-        self._add_notes([
+        # pylint: disable=attribute-defined-outside-init
+        self.raw_note_list = [
             Note(
                 usage_id=xblocks[4].locator,
                 user=self.username,
@@ -389,9 +391,10 @@ class EdxNotesPageTest(EdxNotesTestMixin):
                 course_id=self.course_fixture._course_key,
                 text="Fifth note",
                 quote="Annotate this text",
-                updated=datetime(2015, 1, 1, 1, 1, 1, 1).isoformat(),
+                updated=datetime(2015, 1, 1, 1, 1, 1, 1).isoformat()
             ),
-        ])
+        ]
+        self._add_notes(self.raw_note_list)
 
     def assertNoteContent(self, item, text=None, quote=None, unit_name=None, time_updated=None, tags=None):
         """ Verifies the expected properties of the note. """
@@ -418,6 +421,33 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         self.assertEqual(item.title, title)
         self.assertEqual(item.notes, notes)
 
+    def assert_viewed_event(self, view=None):
+        """
+        Verifies that the correct view event was captured for the Notes page.
+        """
+        # There will always be an initial event for "Recent Activity" because that is the default view.
+        actual_events = self.wait_for_events(
+            event_filter={'event_type': 'edx.course.student_notes.notes_page_viewed'},
+            number_of_matches=1 if view is None else 2
+        )
+        expected_events = [{'event': {'view': 'Recent Activity'}}]
+        if view:
+            expected_events.append({'event': {'view': view}})
+        self.assert_events_match(expected_events, actual_events)
+
+    def assert_unit_link_event(self, usage_id, view):
+        """
+        Verifies that the correct used_unit_link event was captured for the Notes page.
+        """
+        actual_events = self.wait_for_events(
+            event_filter={'event_type': 'edx.course.student_notes.used_unit_link'},
+            number_of_matches=1
+        )
+        expected_events = [
+            {'event': {'component_usage_id': usage_id, 'view': view}}
+        ]
+        self.assert_events_match(expected_events, actual_events)
+
     def test_no_content(self):
         """
         Scenario: User can see `No content` message.
@@ -438,6 +468,7 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         When I open Notes page
         Then I see 5 notes sorted by the updated date
         And I see correct content in the notes
+        And an event has fired indicating that the Recent Activity view was selected
         """
         self._add_default_notes()
         self.notes_page.visit()
@@ -485,6 +516,8 @@ class EdxNotesPageTest(EdxNotesTestMixin):
             time_updated="Jan 01, 2011 at 01:01 UTC"
         )
 
+        self.assert_viewed_event()
+
     def test_course_structure_view(self):
         """
         Scenario: User can view all notes by location in Course.
@@ -493,6 +526,7 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         And I switch to "Location in Course" view
         Then I see 2 groups, 3 sections and 5 notes
         And I see correct content in the notes and groups
+        And an event has fired indicating that the Location in Course view was selected
         """
         self._add_default_notes()
         self.notes_page.visit().switch_to_tab("structure")
@@ -575,6 +609,8 @@ class EdxNotesPageTest(EdxNotesTestMixin):
             time_updated="Jan 01, 2011 at 01:01 UTC"
         )
 
+        self.assert_viewed_event('Location in Course')
+
     def test_tags_view(self):
         """
         Scenario: User can view all notes by associated tags.
@@ -582,6 +618,7 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         When I switch to the "Tags" view
         Then I see 4 tag groups
         And I see correct content in the notes and groups
+        And an event has fired indicating that the Tags view was selected
         """
         self._add_default_notes()
         self.notes_page.visit().switch_to_tab("tags")
@@ -677,40 +714,53 @@ class EdxNotesPageTest(EdxNotesTestMixin):
             time_updated="Jan 01, 2011 at 01:01 UTC"
         )
 
+        self.assert_viewed_event('Tags')
+
     def test_easy_access_from_notes_page(self):
         """
         Scenario: Ensure that the link to the Unit works correctly.
         Given I have a course with 5 notes
         When I open Notes page
         And I click on the first unit link
-        Then I see correct text on the unit page
+        Then I see correct text on the unit page and a unit link event was fired
         When go back to the Notes page
         And I switch to "Location in Course" view
         And I click on the second unit link
-        Then I see correct text on the unit page
+        Then I see correct text on the unit page and a unit link event was fired
+        When go back to the Notes page
+        And I switch to "Tags" view
+        And I click on the first unit link
+        Then I see correct text on the unit page and a unit link event was fired
         When go back to the Notes page
         And I run the search with "Fifth" query
         And I click on the first unit link
-        Then I see correct text on the unit page
+        Then I see correct text on the unit page  and a unit link event was fired
         """
-        def assert_page(note):
+        def assert_page(note, usage_id, view):
+            """ Verify that clicking on the unit link works properly. """
             quote = note.quote
             note.go_to_unit()
             self.courseware_page.wait_for_page()
             self.assertIn(quote, self.courseware_page.xblock_component_html_content())
+            self.assert_unit_link_event(usage_id, view)
+            self.reset_event_tracking()
 
         self._add_default_notes()
         self.notes_page.visit()
         note = self.notes_page.notes[0]
-        assert_page(note)
+        assert_page(note, self.raw_note_list[4]['usage_id'], "Recent Activity")
 
         self.notes_page.visit().switch_to_tab("structure")
         note = self.notes_page.notes[1]
-        assert_page(note)
+        assert_page(note, self.raw_note_list[2]['usage_id'], "Location in Course")
+
+        self.notes_page.visit().switch_to_tab("tags")
+        note = self.notes_page.notes[0]
+        assert_page(note, self.raw_note_list[2]['usage_id'], "Tags")
 
         self.notes_page.visit().search("Fifth")
         note = self.notes_page.notes[0]
-        assert_page(note)
+        assert_page(note, self.raw_note_list[4]['usage_id'], "Search Results")
 
     def test_search_behaves_correctly(self):
         """
@@ -723,6 +773,7 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         When I run the search with "note" query
         Then I see that error message disappears
         And I see that "Search Results" tab appears with 4 notes found
+        And an event has fired indicating that the Search Results view was selected
         """
         self._add_default_notes()
         self.notes_page.visit()
@@ -773,6 +824,8 @@ class EdxNotesPageTest(EdxNotesTestMixin):
             unit_name="Test Unit 4",
             time_updated="Jan 01, 2011 at 01:01 UTC"
         )
+
+        self.assert_viewed_event('Search Results')
 
     def test_scroll_to_tag_recent_activity(self):
         """
