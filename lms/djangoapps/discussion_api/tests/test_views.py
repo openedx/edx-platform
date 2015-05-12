@@ -154,7 +154,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "anonymous_to_peers": False,
             "created_at": "2015-04-28T00:00:00Z",
             "updated_at": "2015-04-28T11:11:11Z",
-            "type": "discussion",
+            "thread_type": "discussion",
             "title": "Test Title",
             "body": "Test body",
             "pinned": False,
