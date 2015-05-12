@@ -33,6 +33,7 @@ class CourseDetails(object):
         self.org = org
         self.course_id = course_id
         self.run = run
+        self.language = None
         self.start_date = None  # 'start'
         self.end_date = None  # 'end'
         self.enrollment_start = None
@@ -80,6 +81,7 @@ class CourseDetails(object):
         course_details.pre_requisite_courses = descriptor.pre_requisite_courses
         course_details.course_image_name = descriptor.course_image
         course_details.course_image_asset_path = course_image_url(descriptor)
+        course_details.language = descriptor.language
         # Default course license is "All Rights Reserved"
         course_details.license = getattr(descriptor, "license", "all-rights-reserved")
 
@@ -178,6 +180,10 @@ class CourseDetails(object):
 
         if 'license' in jsondict:
             descriptor.license = jsondict['license']
+            dirty = True
+
+        if 'language' in jsondict and jsondict['language'] != descriptor.language:
+            descriptor.language = jsondict['language']
             dirty = True
 
         if dirty:
