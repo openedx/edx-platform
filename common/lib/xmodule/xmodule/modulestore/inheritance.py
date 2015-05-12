@@ -152,7 +152,12 @@ class InheritanceMixin(XBlockMixin):
     video_bumper = Dict(
         display_name=_("Video Bumper"),
         help=_(
-            """Identify a video, 5-15 seconds in length, to play before course videos. Enter the video ID from the Video Uploads page and zero or more transcript files in the following format: {"video_id": "ID", "transcripts": {"language": "filename.srt"}}. For example, an entry for a video with two transcripts looks like this: {"video_id": "77cef264-d6f5-4cf2-ad9d-0178ab8c77be", "transcripts": {"en": "DemoX-D01_1.srt", "uk": "DemoX-D01_1_uk.srt"}}"""
+            """Identify a video, 5-15 seconds in length, to play before course videos. Enter the video ID from"""
+            """ the Video Uploads page and zero or more transcript files in the following format:"""
+            """ {"video_id": "ID", "transcripts": {"language": "filename.srt"}}."""
+            """ For example, an entry for a video with two transcripts looks like this:"""
+            """ {"video_id": "77cef264-d6f5-4cf2-ad9d-0178ab8c77be","""
+            """ "transcripts": {"en": "DemoX-D01_1.srt", "uk": "DemoX-D01_1_uk.srt"}}"""
         ),
         scope=Scope.settings
     )
