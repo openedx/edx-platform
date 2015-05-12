@@ -11,4 +11,4 @@
 -e git+https://github.com/mckinseyacademy/xblock-poll.git@ca0e6eb4ef10c128d573c3cec015dcfee7984730#egg=xblock-poll
 -e git+https://github.com/OfficeDev/xblock-officemix/@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock_officemix-master
 -e git+https://github.com/edx/edx-notifications.git@1496385f16d2571bc5d958c17e30f3eac3869b8e#egg=edx-notifications
--e git+https://github.com/open-craft/problem-builder.git@2e72dcee04706855340d9f17d36e237fcd801ee6#egg=problem-builder
+-e git+https://github.com/open-craft/problem-builder.git@5e00f92d78da0b28ae7f39c3f03596f49bec7119#egg=problem-builder
