@@ -5,8 +5,9 @@ define([
     'underscore',
     'backbone',
     'gettext',
-    'js/discovery/facets_view'
-], function ($, _, Backbone, gettext, FacetsView) {
+    'js/discovery/facets_view',
+    'js/discovery/facet_view'
+], function ($, _, Backbone, gettext, FacetsView, FacetView) {
     'use strict';
 
     return Backbone.View.extend({
@@ -16,6 +17,7 @@ define([
         tagName: 'div',
         templateId: '#search_facets_list-tpl',
         className: 'facets',
+        facetsTypes: {},
 
         events: {
             'click li': 'addFacet',
@@ -23,7 +25,10 @@ define([
             'click .show-more': 'expand',
         },
 
-        initialize: function () {
+        initialize: function (facetsTypes) {
+            if(facetsTypes) {
+                this.facetsTypes = facetsTypes;
+            }
             this.tpl = _.template($(this.templateId).html());
             this.$el.html(this.tpl());
             this.facetViews = [];
@@ -77,10 +82,14 @@ define([
             $.each(facets, function(name, stats) {
                 var facetsView = new FacetsView();
                 self.facetViews.push(facetsView);
-                self.$facetViewsEl.append(facetsView.render(name, stats).el);
+                var displayName = name;
+                if(self.facetsTypes.hasOwnProperty(name)) {
+                    displayName = self.facetsTypes[name];
+                }
+                self.$facetViewsEl.append(facetsView.render(name, displayName, stats).el);
                 $.each(stats.terms, function(term, count) {
                     var facetView = new FacetView();
-                    facetsView.$views.append(facetView.render(term, count).el);
+                    facetsView.$views.append(facetView.render(name, term, count).el);
                     facetsView.list.push(facetView);
                 });
             });

@@ -9,7 +9,20 @@ $facet-background-color: #007db8;
   padding-bottom: ($baseline*3);
 
   .courses-container .courses {
-    width: 75%;
+    @include rtl() { $layout-direction: "RTL"; }
+    @include span-columns(9);
+
+    @include media($bp-medium) {
+      @include span-columns(4);
+    }
+
+    @include media($bp-large) {
+      @include span-columns(8);
+    }
+
+    @include media($bp-huge) {
+      @include span-columns(9);
+    }
 
     .courses-listing .courses-listing-item {
       @include fill-parent();
@@ -17,13 +30,13 @@ $facet-background-color: #007db8;
       max-height: $course-card-height;
 
       @include media($bp-medium) {
-        @include span-columns(4); // 4 of 8
-        @include omega(2n);
+        @include span-columns(8); // 4 of 8
+        @include omega(1n);
       }
 
       @include media($bp-large) {
-        @include span-columns(4); // 4 of 12
-        @include omega(3n);
+        @include span-columns(6); // 6 of 12
+        @include omega(2n);
       }
 
       @include media($bp-huge) {
@@ -215,9 +228,6 @@ $facet-background-color: #007db8;
 
 
   .search-facets{
-    /* rtl and ltr mixins are included to switch default layer direction of this block */
-    @include rtl() { $layout-direction: "LTR"; }
-    @include ltr() { $layout-direction: "RTL"; }
     @include fill-parent();
     @include omega();
     @include box-sizing(border-box);
@@ -230,12 +240,20 @@ $facet-background-color: #007db8;
     background-color: $white;
     max-height: ($baseline*100);
 
+    @include media($bp-tiny) {
+      @include span-columns(4);
+    }
+
+    @include media($bp-small) {
+      @include span-columns(3);
+    }
+
     @include media($bp-medium) {
-      @include span-columns(2);
+      @include span-columns(4);
     }
 
     @include media($bp-large) {
-      @include span-columns(3);
+      @include span-columns(4);
     }
 
     @include media($bp-huge) {
@@ -309,8 +327,8 @@ $facet-background-color: #007db8;
     }
 
     ul {
-      @include padding-left(0);
       margin: 0;
+      padding: 0;
       overflow: hidden;
       list-style: outside none none;
 
@@ -333,6 +351,8 @@ $facet-background-color: #007db8;
           @include right($baseline*0.6);
           @include box-sizing(border-box);
           @include transition(all 0.2s ease-out);
+          @include line-height(18.92);
+          position: absolute;
         }
 
         //STATE: hover
