@@ -11,8 +11,8 @@ from rest_framework.viewsets import ViewSet
 
 from opaque_keys.edx.locator import CourseLocator
 
-from discussion_api.api import get_course_topics, get_thread_list
-from discussion_api.forms import ThreadListGetForm
+from discussion_api.api import get_comment_list, get_course_topics, get_thread_list
+from discussion_api.forms import CommentListGetForm, ThreadListGetForm
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 
 
@@ -122,6 +122,73 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
             get_thread_list(
                 request,
                 form.cleaned_data["course_id"],
+                form.cleaned_data["page"],
+                form.cleaned_data["page_size"]
+            )
+        )
+
+
+class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
+    """
+    **Use Cases**
+
+        Retrieve the list of comments on a thread.
+
+    **Example Requests**
+
+        GET /api/discussion/v1/comments/?thread_id=0123456789abcde01234567
+
+    **Response Values**:
+
+        * results: The list of comments. Each item in the list includes:
+
+            * id: The id of the comment
+
+            * thread_id: The id of the comment's thread
+
+            * parent_id: The id of the comment's parent comment
+
+            * author: The username of the comment's author, or null if the
+                thread is anonymous to the requesting user
+
+            * author_label: A string indicating that the author has a special
+                role (either "staff" or "community_ta")
+
+            * created_at: The ISO 8601 timestamp for the creation of the comment
+
+            * updated_at: The ISO 8601 timestamp for the last modification of
+                the comment, which may not have been an update of the body
+
+            * raw_body: The comment's raw body text without any rendering
+                applied
+
+            * abuse_flagged: Whether the requester has flagged the comment as
+                abusive
+
+            * voted: Whether the requester has voted for the comment
+
+            * vote_count: The number of users who have voted for the comment
+
+            * children: The list of the comment's children, each having this
+                same format
+
+        * next: The URL of the next page (or null if last page)
+
+        * previous: The URL of the previous page (or null if first page)
+    """
+    def list(self, request):
+        """
+        Implements the GET method for the list endpoint as described in the
+        class docstring.
+        """
+        form = CommentListGetForm(request.GET)
+        if not form.is_valid():
+            raise ValidationError(form.errors)
+        return Response(
+            get_comment_list(
+                request,
+                form.cleaned_data["thread_id"],
+                form.cleaned_data["endorsed"],
                 form.cleaned_data["page"],
                 form.cleaned_data["page_size"]
             )
