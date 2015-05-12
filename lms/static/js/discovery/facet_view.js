@@ -18,9 +18,9 @@ define([
             this.tpl = _.template($(this.templateId).html());
         },
 
-        render: function (term, count) {
+        render: function (name, term, count) {
             this.$el.html(this.tpl({term: term, count: count}));
-            this.$el.attr('data-facet', term);
+            this.$el.attr('data-facet', name);
             return this;
         },
 

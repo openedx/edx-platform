@@ -31,11 +31,8 @@ define(['jquery', 'backbone'], function ($, Backbone) {
             else {
                 term = this.$searchField.val();
             }
-
             var trimmed = $.trim(term);
-            if (trimmed) {
-                this.trigger('search', trimmed);
-            }
+            this.trigger('search', trimmed);
             this.$message.empty();
         },
 

@@ -16,7 +16,7 @@ define([
         total: 0,
         terms: {},
         other: 0,
-        list: {},
+        list: [],
         views: {},
 
         attributes : function () {
@@ -29,8 +29,8 @@ define([
             this.tpl = _.template($(this.templateId).html());
         },
 
-        render: function (facetName, facetStats) {
-            this.$el.html(this.tpl({name: facetName, stats: facetStats}));
+        render: function (facetName, displayName, facetStats) {
+            this.$el.html(this.tpl({name: facetName, displayName: displayName, stats: facetStats}));
             this.$el.attr('data-facet', facetName);
             this.$views = this.$el.find('ul');
             return this;
