@@ -4,13 +4,15 @@ define(['backbone'], function(Backbone) {
     'use strict';
 
     return function (Collection, Form, ResultListView, FilterBarView, FacetsBarView, searchQuery) {
+        //facet types configuration - set default display names
+        var facetsTypes = {org: 'Organization', modes: 'Course Type'};
 
         var collection = new Collection([]);
         var results = new ResultListView({ collection: collection });
         var dispatcher = _.clone(Backbone.Events);
         var form = new Form();
         var filters = new FilterBarView();
-        var facetsBarView = new FacetsBarView();
+        var facetsBarView = new FacetsBarView(facetsTypes);
 
         dispatcher.listenTo(form, 'search', function (query) {
             form.showLoadingIndicator();
@@ -58,10 +60,8 @@ define(['backbone'], function(Backbone) {
             filters.addFilter(data);
         });
 
-        // kick off search if URL contains ?search_query=
-        if (searchQuery) {
-            form.doSearch(searchQuery);
-        }
+        // kick off search on page refresh
+        form.doSearch(searchQuery);
 
     };
 
