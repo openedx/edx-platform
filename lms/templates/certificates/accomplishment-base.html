@@ -38,5 +38,8 @@ document_body_class = document_body_class_append if document_body_class_append e
     </div>
 
     <%include file="_assets-secondary.html" />
+    %if badge:
+        <%include file="_badges-modal.html" />
+    %endif
 </body>
 </html>

@@ -18,8 +18,8 @@ from certificates.models import (
     CertificateStatuses,
     GeneratedCertificate,
     ExampleCertificate,
-    CertificateHtmlViewConfiguration
-)
+    CertificateHtmlViewConfiguration,
+    BadgeAssertion)
 from certificates.queue import XQueueCertInterface
 from edxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
@@ -281,6 +281,11 @@ def update_certificate_context(context, course, user, mode):
     context['accomplishment_copy_course_org'] = course.org
     context['accomplishment_copy_course_name'] = course.display_name
     context['logo_alt'] = platform_name
+    try:
+        badge = BadgeAssertion.objects.get(user=user, course_id=course.location.course_key)
+    except BadgeAssertion.DoesNotExist:
+        badge = None
+    context['badge'] = badge
 
     accd_course_org_html = '<span class="detail--xuniversity">{partner_name}</span>'.format(partner_name=course.org)
     accd_platform_name_html = '<span class="detail--company">{platform_name}</span>'.format(platform_name=platform_name)

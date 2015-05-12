@@ -597,6 +597,13 @@ class BadgeAssertion(models.Model):
         """
         return self.data['image']
 
+    @property
+    def assertion_url(self):
+        """
+        Get the public URL for the assertion.
+        """
+        return self.data['json']['id']
+
     class Meta(object):
         """
         Meta information for Django's construction of the model.

@@ -58,6 +58,9 @@
     @extend %depth-card;
 }
 
+.sr {
+    @extend %cont-text-sr;
+}
 
 // ------------------------------
 // #IMAGES
@@ -562,3 +565,89 @@
     }
 }
 
+// ------------------------------
+// #BADGES MODAL
+// ------------------------------
+.badges-overlay {
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.5); /*dim the background*/
+    vertical-align: middle;
+
+    .badges-modal {
+        color: #9b9b9b;
+        font-size: 14pt;
+        box-sizing: content-box;
+        right: 0;
+        left: 0;
+        max-width: 50%;
+        margin-right: auto;
+        margin-left: auto;
+        position: fixed;
+        top: 5em;
+        background: #ffffff;
+        z-index: 11;
+        border-top: 10px solid #03a0e1;
+        padding-right: 2em;
+        padding-left: 2em;
+        overflow-x: hidden;
+
+        h1 {
+            color: black;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 1em;
+            top: 1em;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        hr {
+            color: #cccccc;
+            border: none;
+            height: 2px;
+            width: 100%;
+            display: block;
+        }
+
+        ol {
+            margin-bottom: 0;
+            padding-left: 0;
+
+            .badges-steps {
+                list-style: none inside;
+                display: table;
+                li {
+                    counter-increment: step-counter;
+                    margin-bottom: 1em;
+                    display: table-row;
+                    ::before {
+                        content: counter(step-counter);
+                        padding-right: 2em;
+                        margin-left: .5em;
+                        font-size: 110%;
+                        color: black;
+                        font-weight: bold;
+                        display: table-cell;
+                    }
+                }
+            }
+        }
+
+        .image-container{
+            margin-left: 3em;
+        }
+
+        .backpack-logo {
+            float: right;
+            margin-left: 1em;
+        }
+    }
+}
