@@ -53,42 +53,36 @@ def is_bumper_enabled(video):
 
 def bumperize(video):
     """
-    Populate video with bumper settings, if they presented
-
-    Return tuple:
-        bumper_enabled (bool), bumper_metadata (dict)
+    Populate video with bumper settings, if they are presented.
     """
     video.bumper = {
-        'enabled': is_bumper_enabled(video),
+        'enabled': False,
         'edx_video_id': "",
         'transcripts': {},
         'metadata': None,
     }
 
-    if not video.bumper['enabled']:
+    if not is_bumper_enabled(video):
         return
 
     bumper_settings = get_bumper_settings(video)
 
     try:
-        edx_video_id, transcripts = bumper_settings['edx_video_id'], bumper_settings['transcripts']
+        video.bumper['edx_video_id'] = bumper_settings['video_id']
+        video.bumper['transcripts'] = bumper_settings['transcripts']
     except (TypeError, KeyError):
-        video.bumper['enabled'] = False
+        log.warning(
+            "Could not retrieve video bumper information from course settings"
+        )
         return
-
-    video.bumper.update({
-        'enabled': True,
-        'edx_video_id': edx_video_id,
-        'transcripts': transcripts,
-    })
 
     sources = get_bumper_sources(video)
     if not sources:
-        video.bumper['enabled'] = False
         return
 
     video.bumper.update({
-        'metadata': bumper_metadata(video, sources)
+        'metadata': bumper_metadata(video, sources),
+        'enabled': True,  # Video poster needs this.
     })
 
 
