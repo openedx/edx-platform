@@ -58,7 +58,6 @@
     @extend %depth-card;
 }
 
-
 // ------------------------------
 // #IMAGES
 // ------------------------------
@@ -554,3 +553,71 @@
     }
 }
 
+// ------------------------------
+// #BADGES MODAL
+// ------------------------------
+.badges-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: z-index(front);
+    background-color: palette(grayscale, trans); /* dim the background */
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+
+    .badges-modal {
+        @extend %copy-large;
+        box-sizing: content-box;
+        position: fixed;
+        top: spacing-vertical(large);
+        right: 0;
+        left: 0;
+        z-index: z-index(very-front);
+        max-width: 50%;
+        margin-right: auto;
+        margin-left: auto;
+        border-top: rem(10) solid palette(primary, light);
+        background: palette(grayscale, white);
+        padding-right: spacing-horizontal(large);
+        padding-left: spacing-horizontal(large);
+        overflow-x: hidden;
+        color: palette(grayscale, dark);
+
+        .close {
+            position: absolute;
+            right: spacing-horizontal(mid-small);
+            top: spacing-vertical(small);
+            font-weight: font-weight(bold);
+            cursor: pointer;
+        }
+
+        .badges-steps {
+            display: table;
+        }
+
+        .image-container{
+            // Lines the image up with the content of the above list.
+            @include ltr {
+                @include padding-left(2em);
+            }
+            @include rtl {
+                @include padding-right(1em);
+                float: right;
+            }
+        }
+
+        .backpack-logo {
+            @include float(right);
+            @include margin-left(spacing-horizontal(small));
+        }
+    }
+}
+
+.modal-hr {
+    display: block;
+    border: none;
+    background-color: palette(grayscale, light);
+    height: rem(2);
+    width: 100%;
+}
