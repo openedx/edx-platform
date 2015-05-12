@@ -1720,6 +1720,8 @@ INSTALLED_APPS = (
     # Surveys
     'survey',
 
+    'instructor_email_widget',
+
     'lms.djangoapps.lms_xblock',
 
     'openedx.core.djangoapps.content.course_structures',
