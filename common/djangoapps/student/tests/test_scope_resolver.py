@@ -147,7 +147,9 @@ class StudentTasksTestCase(ModuleStoreTestCase):
             None
         )
 
-        self.assertTrue(test_user_1.email in emails_resultset)
+        emails = [email['email'] for email in emails_resultset]
+
+        self.assertTrue(test_user_1.email in emails)
 
     def test_bad_email_resolver(self):
         """
