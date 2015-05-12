@@ -13,6 +13,7 @@ define([
         events: {
             'click .note-excerpt-more-link': 'moreHandler',
             'click .reference-unit-link': 'unitLinkHandler',
+            'click .reference-tags': 'tagHandler'
         },
 
         initialize: function (options) {
@@ -50,10 +51,16 @@ define([
             event.preventDefault();
             this.logger.emit('edx.student_notes.used_unit_link', {
                 'note_id': this.model.get('id'),
-                'component_usage_id': this.model.get('usage_id')
+                'component_usage_id': this.model.get('usage_id'),
+                'source_view': this.options.panelView
             }, REQUEST_TIMEOUT).always(_.bind(function () {
                 this.redirectTo(event.target.href);
             }, this));
+        },
+
+        tagHandler: function (event) {
+            event.preventDefault();
+            this.options.scrollToTag(event.currentTarget.text);
         },
 
         redirectTo: function (uri) {

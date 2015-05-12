@@ -108,7 +108,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
     padding-top: ($baseline*1.5);
 
     // course structure labels
-    .course-title {
+    .course-title, .tags-title {
       @extend %t-title6;
       @extend %t-weight4;
       margin: 0 0 ($baseline/2) 0;
@@ -122,6 +122,11 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
       border-bottom: $divider-visual-tertiary;
       padding-bottom: ($baseline/2);
       color: $gray-d3;
+    }
+
+    .tags-title {
+      border-bottom: $divider-visual-tertiary;
+      padding-bottom: ($baseline/2);
     }
 
     // individual note
@@ -228,10 +233,22 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
             color: $m-gray-d2;
           }
 
+          // Put commas between tags.
+          a.reference-meta.reference-tags:after {
+            content: ",";
+            color: $m-gray-d2;
+          }
+
+          // But not after the last tag.
+          a.reference-meta.reference-tags:last-child:after {
+              content: "";
+          }
+
           // needed for poor base LMS styling scope
           a.reference-meta {
             @extend %shame-link-text;
           }
+
         }
       }
 

@@ -56,7 +56,8 @@ define([
                 identifier: 'view-course-structure',
                 icon: 'fa fa-list-ul',
                 is_active: true,
-                is_closable: false
+                is_closable: false,
+                view: 'Location in Course'
             });
             expect(view.$('#structure-panel')).toExist();
             expect(chapters).toEqual(['First Chapter', 'Second Chapter']);

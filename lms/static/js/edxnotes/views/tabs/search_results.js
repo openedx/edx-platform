@@ -1,13 +1,14 @@
 ;(function (define, undefined) {
 'use strict';
 define([
-    'gettext', 'js/edxnotes/views/tab_panel', 'js/edxnotes/views/tab_view',
+    'jquery', 'underscore', 'gettext', 'js/edxnotes/views/tab_panel', 'js/edxnotes/views/tab_view',
     'js/edxnotes/views/search_box'
-], function (gettext, TabPanelView, TabView, SearchBoxView) {
+], function ($, _, gettext, TabPanelView, TabView, SearchBoxView) {
+    var view = 'Search Results';
     var SearchResultsView = TabView.extend({
         PanelConstructor: TabPanelView.extend({
             id: 'search-results-panel',
-            title: 'Search Results',
+            title: view,
             className: function () {
                 return [
                     TabPanelView.prototype.className,
@@ -46,7 +47,8 @@ define([
             identifier: 'view-search-results',
             name: gettext('Search Results'),
             icon: 'fa fa-search',
-            is_closable: true
+            is_closable: true,
+            view: view
         },
 
         initialize: function (options) {
@@ -74,11 +76,13 @@ define([
 
         getSubView: function () {
             var collection = this.getCollection();
+            debugger
             if (collection) {
                 if (collection.length) {
                     return new this.PanelConstructor({
                         collection: collection,
-                        searchQuery: this.searchResults.searchQuery
+                        searchQuery: this.searchResults.searchQuery,
+                        scrollToTag: this.options.scrollToTag
                     });
                 } else {
                     return new this.NoResultsViewConstructor({
