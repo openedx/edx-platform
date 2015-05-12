@@ -2,6 +2,8 @@
 Unit tests for cloning a course between the same and different module stores.
 """
 import json
+from django.conf import settings
+
 from opaque_keys.edx.locator import CourseLocator
 from xmodule.modulestore import ModuleStoreEnum, EdxJSONEncoder
 from contentstore.tests.utils import CourseTestCase
@@ -10,6 +12,12 @@ from student.auth import has_course_author_access
 from course_action_state.models import CourseRerunState
 from course_action_state.managers import CourseRerunUIStateManager
 from mock import patch, Mock
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.tests.factories import CourseFactory
+
+
+TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
 class CloneCourseTest(CourseTestCase):
@@ -45,6 +53,54 @@ class CloneCourseTest(CourseTestCase):
             )
             self.store.clone_course(split_course3_id, split_course4_id, self.user.id)
             self.assertCoursesEqual(split_course3_id, split_course4_id)
+
+    def test_space_in_asset_name_for_rerun_course(self):
+        """
+        Tests check the scenario where one course which has an asset with percentage(%) in its
+        name, it should re-run successfully.
+        """
+        org = 'edX'
+        course_number = 'CS101'
+        course_run = '2015_Q1'
+        display_name = 'rerun'
+        fields = {'display_name': display_name}
+        course_assets = set([u'subs_Introduction%20To%20New.srt.sjson'], )
+
+        # Create a course using split modulestore
+        course = CourseFactory.create(
+            org=org,
+            number=course_number,
+            run=course_run,
+            display_name=display_name,
+            default_store=ModuleStoreEnum.Type.split
+        )
+
+        # add an asset
+        asset_key = course.id.make_asset_key('asset', 'subs_Introduction%20To%20New.srt.sjson')
+        content = StaticContent(
+            asset_key, 'Dummy assert', 'application/json', 'dummy data',
+        )
+        contentstore().save(content)
+
+        # Get & verify all assets of the course
+        assets, count = contentstore().get_all_content_for_course(course.id)
+        self.assertEqual(count, 1)
+        self.assertEqual(set([asset['asset_key'].block_id for asset in assets]), course_assets)
+
+        # rerun from split into split
+        split_rerun_id = CourseLocator(org=org, course=course_number, run="2012_Q2")
+        CourseRerunState.objects.initiated(course.id, split_rerun_id, self.user, fields['display_name'])
+        result = rerun_course.delay(
+            unicode(course.id),
+            unicode(split_rerun_id),
+            self.user.id,
+            json.dumps(fields, cls=EdxJSONEncoder)
+        )
+
+        # Check if re-run was successful
+        self.assertEqual(result.get(), "succeeded")
+        rerun_state = CourseRerunState.objects.find_first(course_key=split_rerun_id)
+        self.assertEqual(rerun_state.state, CourseRerunUIStateManager.State.SUCCEEDED)
 
     def test_rerun_course(self):
         """

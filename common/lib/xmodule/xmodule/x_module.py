@@ -1259,7 +1259,7 @@ class MetricsMixin(object):
             )
 
 
-class DescriptorSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
+class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
     """
     Base class for :class:`Runtime`s to be used with :class:`XModuleDescriptor`s
     """
@@ -1505,7 +1505,7 @@ class XMLParsingSystem(DescriptorSystem):
                     setattr(xblock, field.name, field_value)
 
 
-class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
+class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
     """
     This is an abstraction such that x_modules can function independent
     of the courseware (e.g. import into other types of courseware, LMS,
