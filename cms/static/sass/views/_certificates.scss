@@ -707,6 +707,10 @@
               input {
                 border-color: $red;
               }
+
+              .message-error{
+                color: $red;
+              }
           }
         }
       }

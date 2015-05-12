@@ -31,9 +31,10 @@ function(ListItemEditorView, Signatory, SignatoryEditor, _, $, gettext) {
 
         initialize: function() {
             // Set up the initial state of the attributes set for this model instance
-            _.bindAll(this, "onSignatoryRemoved");
+            _.bindAll(this, "onSignatoryRemoved", "clearErrorMessage");
             this.eventAgg = _.extend({}, Backbone.Events);
             this.eventAgg.bind("onSignatoryRemoved", this.onSignatoryRemoved);
+            this.eventAgg.bind("onSignatoryUpdated", this.clearErrorMessage);
             ListItemEditorView.prototype.initialize.call(this);
             this.template = this.loadTemplate('certificate-editor');
         },
@@ -42,6 +43,10 @@ function(ListItemEditorView, Signatory, SignatoryEditor, _, $, gettext) {
             // Event handler for model deletions
             this.model.setOriginalAttributes();
             this.render();
+        },
+
+        clearErrorMessage: function(model) {
+            this.$('.certificate-edit-error').remove();
         },
 
         render: function() {

@@ -53,7 +53,10 @@ function(ViewUtils, PromptView, NotificationView, TemplateUtils, _, $, gettext) 
 
         render: function() {
             // Assemble the editor view for this model
-            var attributes = $.extend({}, this.model.attributes, {
+            var attributes = $.extend({
+                modelIsValid: this.model.isValid(),
+                error: this.model.validationError
+            }, this.model.attributes, {
                 signatory_number: this.getModelIndex(this.model) + 1,
                 signatories_count: this.model.collection.length,
                 isNew: this.model.isNew(),
@@ -69,9 +72,9 @@ function(ViewUtils, PromptView, NotificationView, TemplateUtils, _, $, gettext) 
             if (event && event.preventDefault) { event.preventDefault(); }
             this.model.set(
                 'name',
-                this.$('.signatory-name-input').val(),
-                { silent: true }
+                this.$('.signatory-name-input').val()
             );
+            this.eventAgg.trigger("onSignatoryUpdated", this.model);
         },
 
         setSignatoryTitle: function(event) {
@@ -79,9 +82,9 @@ function(ViewUtils, PromptView, NotificationView, TemplateUtils, _, $, gettext) 
             if (event && event.preventDefault) { event.preventDefault(); }
             this.model.set(
                 'title',
-                this.$('.signatory-title-input').val(),
-                { silent: true }
+                this.$('.signatory-title-input').val()
             );
+            this.eventAgg.trigger("onSignatoryUpdated", this.model);
         },
 
         setSignatoryOrganization: function(event) {
@@ -89,9 +92,9 @@ function(ViewUtils, PromptView, NotificationView, TemplateUtils, _, $, gettext) 
             if (event && event.preventDefault) { event.preventDefault(); }
             this.model.set(
                 'organization',
-                this.$('.signatory-organization-input').val(),
-                { silent: true }
+                this.$('.signatory-organization-input').val()
             );
+            this.eventAgg.trigger("onSignatoryUpdated", this.model);
         },
 
         setSignatoriesValues: function() {
