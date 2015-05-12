@@ -221,7 +221,7 @@ class VideoStudentViewHandlers(object):
         if dispatch.startswith('translation'):
             if dispatch.startswith('translation_bumper'):
                 # if we here, then bumper is available,
-                self.bumper_transcripts = getattr(self, 'video_bumper')['transcripts']
+                self.bumper_transcripts = getattr(self, 'video_bumper')['transcripts']  # pylint: disable=W0201
                 bumper = True
                 language = dispatch.replace('translation_bumper', '').strip('/')
 
@@ -281,7 +281,7 @@ class VideoStudentViewHandlers(object):
         elif dispatch.startswith('available_translations'):
             if dispatch.startswith('available_translations_bumper'):
                 # if we here, then bumper is available,
-                self.bumper_transcripts = getattr(self, 'video_bumper')['transcripts']
+                self.bumper_transcripts = getattr(self, 'video_bumper')['transcripts']  # pylint: disable=W0201
                 bumper = True
             available_translations = self.available_translations(bumper=bumper)
             if available_translations:
