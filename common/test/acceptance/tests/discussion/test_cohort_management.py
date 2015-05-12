@@ -4,6 +4,7 @@ End-to-end tests related to the cohort management on the LMS Instructor Dashboar
 """
 
 from datetime import datetime
+from flaky import flaky
 
 from pytz import UTC, utc
 from bok_choy.promise import EmptyPromise
@@ -427,6 +428,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         message = "There must be one cohort to which students can automatically be assigned."
         self.assertEqual(message, self.cohort_management_page.assignment_settings_message)
 
+    @flaky  # TODO fix this, see TNL-2176
     def test_cohort_enable_disable(self):
         """
         Scenario: Cohort Enable/Disable checkbox related functionality is working as intended.
