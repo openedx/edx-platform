@@ -1330,15 +1330,17 @@ PIPELINE_CSS = {
     },
     'style-certificates': {
         'source_filenames': [
-            'certificates/css/main-ltr.css',
+            'sass/certificates/main-ltr.css',
+            'css/vendor/font-awesome.css',
         ],
-        'output_filename': 'css/certificates-style.css',
+        'output_filename': 'css/certificates-style.css'
     },
     'style-certificates-rtl': {
         'source_filenames': [
-            'certificates/css/main-rtl.css',
+            'sass/certificates/main-rtl.css',
+            'css/vendor/font-awesome.css',
         ],
-        'output_filename': 'css/certificates-style-rtl.css',
+        'output_filename': 'css/certificates-style-rtl.css'
     },
 }
 
