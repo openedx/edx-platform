@@ -1022,6 +1022,14 @@ class ContentStoreTest(ContentStoreTestCase):
         """Test new course creation - happy path"""
         self.assert_created_course()
 
+    @override_settings(DEFAULT_COURSE_LANGUAGE='hr')
+    def test_create_course_default_language(self):
+        """Test new course creation and verify default language"""
+        test_course_data = self.assert_created_course()
+        course_id = _get_course_id(self.store, test_course_data)
+        course_module = self.store.get_course(course_id)
+        self.assertEquals(course_module.language, 'hr')
+
     def test_create_course_with_dots(self):
         """Test new course creation with dots in the name"""
         self.course_data['org'] = 'org.foo.bar'

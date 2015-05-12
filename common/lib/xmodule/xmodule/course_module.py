@@ -23,6 +23,7 @@ from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
 from .fields import Date
 from django.utils.timezone import UTC
 
+
 log = logging.getLogger(__name__)
 
 # Make '_' a no-op so we can scrape strings
@@ -850,6 +851,12 @@ class CourseFields(object):
         ),
         default=None,
         scope=Scope.settings,
+    )
+    language = String(
+        display_name=_("Course Language"),
+        help=_("Specify the language of your course."),
+        default=None,
+        scope=Scope.settings
     )
 
     teams_configuration = Dict(
