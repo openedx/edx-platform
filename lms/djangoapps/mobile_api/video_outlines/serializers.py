@@ -140,20 +140,19 @@ def find_urls(course_id, block, child_to_parent, request):
 
     kwargs = {'course_id': unicode(course_id)}
     if chapter_id is None:
-        no_chapter_url = reverse("courseware", kwargs=kwargs, request=request)
-        return no_chapter_url, no_chapter_url
+        course_url = reverse("courseware", kwargs=kwargs, request=request)
+        return course_url, course_url
 
     kwargs['chapter'] = chapter_id
     if section is None:
-        no_section_url = reverse("courseware_chapter", kwargs=kwargs, request=request)
-        return no_section_url, no_section_url
+        chapter_url = reverse("courseware_chapter", kwargs=kwargs, request=request)
+        return chapter_url, chapter_url
 
     kwargs['section'] = section.url_name
-    if position is None:
-        no_position_url = reverse("courseware_section", kwargs=kwargs, request=request)
-        return no_position_url, no_position_url
-
     section_url = reverse("courseware_section", kwargs=kwargs, request=request)
+    if position is None:
+        return section_url, section_url
+
     kwargs['position'] = position
     unit_url = reverse("courseware_position", kwargs=kwargs, request=request)
     return unit_url, section_url
