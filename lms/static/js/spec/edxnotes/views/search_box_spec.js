@@ -73,7 +73,7 @@ define([
             );
         });
 
-        it('should log the edx.student_notes.searched event properly', function () {
+        it('should log the edx.course.student_notes.searched event properly', function () {
             var requests = AjaxHelpers.requests(this);
             submitForm(this.searchBox, 'test_text');
             AjaxHelpers.respondWithJson(requests, {
@@ -81,7 +81,7 @@ define([
                 rows: [null, null]
             });
 
-            expect(Logger.log).toHaveBeenCalledWith('edx.student_notes.searched', {
+            expect(Logger.log).toHaveBeenCalledWith('edx.course.student_notes.searched', {
                 'number_of_results': 2,
                 'search_string': 'test_text'
             });

@@ -98,6 +98,7 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
                 "tokenUrl": "/tokenUrl",
                 "endpoint": "/endpoint",
                 "debug": settings.DEBUG,
+                "eventStringLimit": settings.TRACK_MAX_EVENT / 6,
             },
         }
         self.assertEqual(

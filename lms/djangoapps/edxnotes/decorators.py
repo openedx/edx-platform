@@ -47,6 +47,7 @@ def edxnotes(cls):
                     "tokenUrl": get_token_url(self.runtime.course_id),
                     "endpoint": get_endpoint(),
                     "debug": settings.DEBUG,
+                    "eventStringLimit": settings.TRACK_MAX_EVENT / 6,
                 },
             })
 
