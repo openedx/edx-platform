@@ -1077,7 +1077,7 @@ class TestVideoWithBumper(TestVideo):
         })
 
         get_bumper_settings.return_value = {
-            "edx_video_id": "edx_video_id",
+            "video_id": "edx_video_id",
             "transcripts": {},
         }
         with override_settings(FEATURES=self.FEATURES):
@@ -1101,7 +1101,7 @@ class TestVideoWithBumper(TestVideo):
         }
 
         get_bumper_settings.return_value = {
-            "edx_video_id": "edx_video_id",
+            "video_id": "edx_video_id",
             "transcripts": {},
         }
 
