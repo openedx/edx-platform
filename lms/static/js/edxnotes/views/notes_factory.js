@@ -34,7 +34,7 @@ define([
                 tokenUrl: params.tokenUrl
             },
             events: {
-                stringLimit: 300
+                stringLimit: params.eventStringLimit
             },
             store: {
                 prefix: prefix,
