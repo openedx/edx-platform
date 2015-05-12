@@ -18,7 +18,7 @@
                     </span>
                 <% } %>
                 <input id="certificate-name-<%= uniqueId %>" class="collection-name-input input-text" name="certificate-name" type="text" placeholder="<%= gettext("Name of the certificate") %>" value="<%= name %>" aria-describedby="certificate-name-<%=uniqueId %>-tip">
-                <span id="certificate-name-<%= uniqueId %>-tip"> class="tip tip-stacked"><%= gettext("Name of the certificate") %></span>
+                <span id="certificate-name-<%= uniqueId %>-tip" class="tip tip-stacked"><%= gettext("Name of the certificate") %></span>
             </div>
             <div class="input-wrap field text add-certificate-description">
                 <label for="certificate-description-<%= uniqueId %>"><%= gettext("Description") %></label>
@@ -31,7 +31,7 @@
          </header>
         <div class="signatory-edit-list"> </div>
         <span>
-           <button class="action action-add-signatory" type="button" href="javascript:void(0);"><%= gettext("Add Signatory") %></button>
+           <button class="action action-add-signatory" type="button"><%= gettext("Add Signatory") %></button>
            <span class="tip tip-stacked"><%= gettext("(Up to 4 signatories are allowed for a certificate)") %></span>
         </span>
     </div>

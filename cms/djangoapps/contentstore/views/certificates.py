@@ -74,6 +74,7 @@ class CertificateManager(object):
         # Ensure a signatories list is always returned
         if certificate.get("signatories") is None:
             certificate["signatories"] = []
+        certificate["editing"] = False
         return certificate
 
     @staticmethod
@@ -141,7 +142,7 @@ class CertificateManager(object):
         }
 
     @staticmethod
-    def deserialize_certificate(course, json_string):
+    def deserialize_certificate(course, value):
         """
         Deserialize from a JSON representation into a Certificate object.
         'value' should be either a Certificate instance, or a valid JSON string

@@ -20,7 +20,7 @@
 
 <%block name="requirejs">
   require(["js/certificates/factories/certificates_page_factory"], function(CertificatesPageFactory) {
-      CertificatesPageFactory('${certificates}', "${certificate_url}", "${course_outline_url}");
+      CertificatesPageFactory(${json.dumps(certificates)}, "${certificate_url}", "${course_outline_url}");
   });
 </%block>
 
