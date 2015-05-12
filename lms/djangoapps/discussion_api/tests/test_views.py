@@ -121,6 +121,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ThreadViewSet list"""
     def setUp(self):
         super(ThreadViewSetListTest, self).setUp()
+        self.author = UserFactory.create()
         self.url = reverse("thread-list")
 
     def test_course_id_missing(self):
@@ -141,10 +142,16 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         )
 
     def test_basic(self):
+        self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
         source_threads = [{
             "id": "test_thread",
             "course_id": unicode(self.course.id),
             "commentable_id": "test_topic",
+            "group_id": None,
+            "user_id": str(self.author.id),
+            "username": self.author.username,
+            "anonymous": False,
+            "anonymous_to_peers": False,
             "created_at": "2015-04-28T00:00:00Z",
             "updated_at": "2015-04-28T11:11:11Z",
             "type": "discussion",
@@ -152,6 +159,8 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "body": "Test body",
             "pinned": False,
             "closed": False,
+            "abuse_flaggers": [],
+            "votes": {"up_count": 4},
             "comments_count": 5,
             "unread_comments_count": 3,
         }]
@@ -159,6 +168,10 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "id": "test_thread",
             "course_id": unicode(self.course.id),
             "topic_id": "test_topic",
+            "group_id": None,
+            "group_name": None,
+            "author": self.author.username,
+            "author_label": None,
             "created_at": "2015-04-28T00:00:00Z",
             "updated_at": "2015-04-28T11:11:11Z",
             "type": "discussion",
@@ -166,6 +179,10 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "raw_body": "Test body",
             "pinned": False,
             "closed": False,
+            "following": False,
+            "abuse_flagged": False,
+            "voted": True,
+            "vote_count": 4,
             "comment_count": 5,
             "unread_comment_count": 3,
         }]
@@ -190,6 +207,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         })
 
     def test_pagination(self):
+        self.register_get_user_response(self.user)
         self.register_get_threads_response([], page=1, num_pages=1)
         response = self.client.get(
             self.url,

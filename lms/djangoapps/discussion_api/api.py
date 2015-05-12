@@ -14,7 +14,8 @@ from django_comment_common.models import (
     Role,
 )
 from lms.lib.comment_client.thread import Thread
-from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id
+from lms.lib.comment_client.user import User
+from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id, get_cohort_names
 
 
 def get_course_topics(course, user):
@@ -76,17 +77,38 @@ def get_course_topics(course, user):
     }
 
 
-def _cc_thread_to_api_thread(thread):
+def _cc_thread_to_api_thread(thread, cc_user, staff_user_ids, ta_user_ids, group_ids_to_names):
     """
     Convert a thread data dict from the comment_client format (which is a direct
     representation of the format returned by the comments service) to the format
     used in this API
+
+    Arguments:
+      thread (comment_client.thread.Thread): The thread to convert
+      cc_user (comment_client.user.User): The comment_client representation of
+        the requesting user
+      staff_user_ids (set): The set of user ids for users with the Moderator or
+        Administrator role in the course
+      ta_user_ids (set): The set of user ids for users with the Community TA
+        role in the course
+      group_ids_to_names (dict): A mapping of group ids to names
+
+    Returns:
+      dict: The discussion_api format representation of the thread.
     """
+    is_anonymous = (
+        thread["anonymous"] or
+        (
+            thread["anonymous_to_peers"] and
+            int(cc_user["id"]) not in (staff_user_ids | ta_user_ids)
+        )
+    )
     ret = {
         key: thread[key]
         for key in [
             "id",
             "course_id",
+            "group_id",
             "created_at",
             "updated_at",
             "type",
@@ -97,21 +119,33 @@ def _cc_thread_to_api_thread(thread):
     }
     ret.update({
         "topic_id": thread["commentable_id"],
+        "group_name": group_ids_to_names.get(thread["group_id"]),
+        "author": None if is_anonymous else thread["username"],
+        "author_label": (
+            None if is_anonymous else
+            "staff" if int(thread["user_id"]) in staff_user_ids else
+            "community_ta" if int(thread["user_id"]) in ta_user_ids else
+            None
+        ),
         "raw_body": thread["body"],
+        "following": thread["id"] in cc_user["subscribed_thread_ids"],
+        "abuse_flagged": cc_user["id"] in thread["abuse_flaggers"],
+        "voted": thread["id"] in cc_user["upvoted_ids"],
+        "vote_count": thread["votes"]["up_count"],
         "comment_count": thread["comments_count"],
         "unread_comment_count": thread["unread_comments_count"],
     })
     return ret
 
 
-def get_thread_list(request, course_key, page, page_size):
+def get_thread_list(request, course, page, page_size):
     """
     Return the list of all discussion threads pertaining to the given course
 
     Parameters:
 
     request: The django request objects used for build_absolute_uri
-    course_key: The key of the course to get discussion threads for
+    course: The course to get discussion threads for
     page: The page number (1-indexed) to retrieve
     page_size: The number of threads to retrieve per page
 
@@ -121,13 +155,14 @@ def get_thread_list(request, course_key, page, page_size):
     discussion_api.views.ThreadViewSet for more detail.
     """
     user_is_privileged = Role.objects.filter(
-        course_id=course_key,
+        course_id=course.id,
         name__in=[FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA],
         users=request.user
     ).exists()
+    cc_user = User.from_django_user(request.user).retrieve()
     threads, result_page, num_pages, _ = Thread.search({
-        "course_id": unicode(course_key),
-        "group_id": None if user_is_privileged else get_cohort_id(request.user, course_key),
+        "course_id": unicode(course.id),
+        "group_id": None if user_is_privileged else get_cohort_id(request.user, course.id),
         "sort_key": "date",
         "sort_order": "desc",
         "page": page,
@@ -138,6 +173,25 @@ def get_thread_list(request, course_key, page, page_size):
     # behavior and return a 404 in that case
     if result_page != page:
         raise Http404
+    # TODO: cache staff_user_ids and ta_user_ids if we need to improve perf
+    staff_user_ids = {
+        user.id
+        for role in Role.objects.filter(
+            name__in=[FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR],
+            course_id=course.id
+        )
+        for user in role.users.all()
+    }
+    ta_user_ids = {
+        user.id
+        for role in Role.objects.filter(name=FORUM_ROLE_COMMUNITY_TA, course_id=course.id)
+        for user in role.users.all()
+    }
+    # For now, the only groups are cohorts
+    group_ids_to_names = get_cohort_names(course)
 
-    results = [_cc_thread_to_api_thread(thread) for thread in threads]
+    results = [
+        _cc_thread_to_api_thread(thread, cc_user, staff_user_ids, ta_user_ids, group_ids_to_names)
+        for thread in threads
+    ]
     return get_paginated_data(request, results, page, num_pages)

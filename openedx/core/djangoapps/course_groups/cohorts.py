@@ -293,6 +293,12 @@ def get_course_cohorts(course, assignment_type=None):
     query_set = query_set.filter(cohort__assignment_type=assignment_type) if assignment_type else query_set
     return list(query_set)
 
+
+def get_cohort_names(course):
+    """Return a dict that maps cohort ids to names for the given course"""
+    return {cohort.id: cohort.name for cohort in get_course_cohorts(course)}
+
+
 ### Helpers for cohort management views
 
 
