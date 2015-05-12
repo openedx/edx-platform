@@ -736,7 +736,7 @@ class YouTubeVideoTest(VideoBaseTest):
             u'video_bumper': {
                 u'value': {
                     "transcripts": {},
-                    "edx_video_id": "edx_video_id"
+                    "video_id": "edx_video_id"
                 }
             }
         }
