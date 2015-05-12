@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 # pylint: disable=abstract-method
 """Video is ungraded Xmodule for support video content.
@@ -262,7 +263,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             cdn_eval = False
             cdn_exp_group = None
 
-        self.youtube_streams = youtube_streams or create_youtube_string(self)
+        self.youtube_streams = youtube_streams or create_youtube_string(self)  # pylint: disable=W0201
         metadata = {
             'saveStateUrl': self.system.ajax_url + '/save_user_state',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
@@ -311,7 +312,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         bumperize(self)
 
         context = {
-            'bumper_metadata': json.dumps(self.bumper['metadata']),
+            'bumper_metadata': json.dumps(self.bumper['metadata']),  # pylint: disable=E1101
             'metadata': json.dumps(OrderedDict(metadata)),
             'poster': json.dumps(get_poster(self)),
             'branding_info': branding_info,
