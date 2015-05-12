@@ -127,7 +127,7 @@ class CohortManagementSection(PageObject):
             return self.q(css='.message-title').text[0] == u'You currently have no cohorts configured'
         # The page may be in either the traditional management state, or an 'add new cohort' state.
         # Confirm the CSS class is visible because the CSS class can exist on the page even in different states.
-        return self.q(css='.cohort-management-nav').visible or self.q(css='.new-cohort-form').visible
+        return self.q(css='.cohorts-state-section').visible or self.q(css='.new-cohort-form').visible
 
     def _bounded_selector(self, selector):
         """
