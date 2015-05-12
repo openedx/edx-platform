@@ -4,7 +4,7 @@ define([
     'gettext', 'jquery', 'underscore', 'js/edxnotes/views/note_group', 'js/edxnotes/views/tab_panel',
     'js/edxnotes/views/tab_view'
 ], function (gettext, $, _, NoteGroupView, TabPanelView, TabView) {
-
+    var view = 'Tags';
     var TagsView = TabView.extend({
         scrollToTag: function(tagName) {
             var titleElement, displayedTitle;
@@ -29,7 +29,7 @@ define([
 
         PanelConstructor: TabPanelView.extend({
             id: 'tags-panel',
-            title: 'Tags',
+            title: view,
             // Translators: this is a title shown before all Notes that have no associated tags. It is put within
             // brackets to differentiate it from user-defined tags, but it should still be translated.
             noTags: gettext('[no tags]'),  // User-defined tags cannot have spaces, so no risk of a collision.
@@ -126,7 +126,8 @@ define([
             // in order to group similar notes together and help with search.
             name: gettext('Tags'),
             identifier: 'view-tags',
-            icon: 'fa fa-tag'
+            icon: 'fa fa-tag',
+            view: view
         }
     });
 

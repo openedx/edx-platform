@@ -63,7 +63,8 @@ define([
                 identifier: 'view-recent-activity',
                 icon: 'fa fa-clock-o',
                 is_active: true,
-                is_closable: false
+                is_closable: false,
+                view: 'Recent Activity'
             });
             expect(view.$('#recent-panel')).toExist();
             expect(view.$('.note')).toHaveLength(3);

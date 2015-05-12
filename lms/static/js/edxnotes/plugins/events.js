@@ -85,10 +85,12 @@ define([
 
         annotationEditorShown: function (editor, annotation) {
             this.oldNoteText = annotation.text || '';
+            this.oldTags = annotation.tags || [];
         },
 
         annotationEditorHidden: function () {
             this.oldNoteText = null;
+            this.oldTags = null;
         },
 
         annotationUpdated: function (annotation) {
@@ -96,7 +98,8 @@ define([
             if (!this.isNew(annotation)) {
                 data = _.extend(
                     this.getDefaultData(annotation),
-                    this.getText('old_note_text', this.oldNoteText)
+                    this.getText('old_note_text', this.oldNoteText),
+                    this.getTextArray('old_tags', this.oldTags)
                 );
                 this.log('edx.course.student_notes.edited', data);
             }
@@ -119,7 +122,8 @@ define([
                     'component_usage_id': annotation.usage_id
                 },
                 this.getText('note_text', annotation.text),
-                this.getText('highlighted_content', annotation.quote)
+                this.getText('highlighted_content', annotation.quote),
+                this.getTextArray('tags', annotation.tags)
             );
         },
 
@@ -134,6 +138,29 @@ define([
             }
 
             info[fieldName] = text;
+            info[fieldName + '_truncated'] = truncated;
+
+            return info;
+        },
+
+        getTextArray: function (fieldName, textArray) {
+            var info = {}, truncated = false, limit = this.options.stringLimit, totalLength=0, returnArray=[], i;
+
+            if (_.isNumber(limit) && _.isArray(textArray)) {
+                for (i=0; i < textArray.length; i++) {
+                    if (_.isString(textArray[i]) && totalLength + textArray[i].length > limit) {
+                        truncated = true;
+                        break;
+                    }
+                    totalLength += textArray[i].length;
+                    returnArray[i] = textArray[i];
+                }
+            }
+            else {
+                returnArray = textArray;
+            }
+
+            info[fieldName] = returnArray;
             info[fieldName + '_truncated'] = truncated;
 
             return info;
