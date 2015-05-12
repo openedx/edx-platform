@@ -8,7 +8,7 @@
              <a class="bookmarks-results-list-item" href="<%= bookmark.get('usage_id') %>" aria-describedby="bookmark-type-<%= index %> bookmark-date-<%= index %>" target="_blank">
                 <div class="list-item-content">
                     <div class="list-item-left-section">
-                        <h3> <%= bookmark.get('breadcrumbTrail') %> </h3>
+                        <h3 class="list-item-breadcrumbtrail"> <%= bookmark.get('breadcrumbTrail') %> </h3>
                         <p id="bookmark-date-<%= index %>" class="list-item-date"> <%= gettext("Bookmarked on") %> <%= bookmark.get('userFriendlyDate') %> </p>
                     </div>
 
@@ -24,7 +24,7 @@
         <a class="bookmarks-results-list-item" href="http://www.edx.org" aria-labelledby="bookmark-link-3" aria-describedby="bookmark-type-3 bookmark-date-3" target="_blank">
             <div class="list-item-content">
                 <div class="list-item-left-section">
-                    <h3 id="bookmark-link-3"> FIRST > SECOND > THIRD </h3>
+                    <h3 id="bookmark-link-3"  class="list-item-breadcrumbtrail"> FIRST > SECOND > THIRD </h3>
                     <p id="bookmark-date-3" class="list-item-date"> Bookmarked on January 1, 2050 </p>
                 </div>
 
@@ -37,17 +37,18 @@
 
     </div>
 
-<% } else { %>
+<!--below else is remove so that reviewers can see how the empty bookmarks message look like.
+in reality boomarked list view and empty bookmarks message will never show together-->
 
     <div class="bookmarks-empty" tabindex="0">
         <div class="bookmarks-empty-header">
             <i class="icon fa fa-bookmark-o bookmarks-empty-header-icon" aria-hidden="true"></i>
-            It looks like your bookmarks list is empty!
+            You have not bookmarked any courseware pages yet.!
             <br>
         </div>
         <div  class="bookmarks-empty-detail">
             <span class="bookmarks-empty-detail-title">
-                <%= gettext("Use bookmarks to quickly reference courseware pages you would like to return to. Toggle the bookmark button on courseware page to save that page to this list. An example bookmark toggle is shown here for reference.") %>
+                <%= gettext("Use bookmarks to help you easily return to courseware pages. To bookmark a page, select Bookmark in the upper right corner of that page. To see a list of all your bookmarks, select Bookmarks in the upper left corner of any courseware page.") %>
             </span>
             <span class="bookmarks-empty-detail-bookmark-button" aria-hidden="true">
                 <i class="icon fa fa-bookmark-o bookmarks-empty-header-icon"></i>

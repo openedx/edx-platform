@@ -14,9 +14,6 @@
             'errorMessage': gettext('An error has occurred. Please try again.'),
             'loadingMessage': gettext('Loading'),
 
-            events: {
-            },
-
             initialize: function () {
                 this.template = _.template($('#bookmarks_results-tpl').text());
                 _.bindAll(this, 'render');

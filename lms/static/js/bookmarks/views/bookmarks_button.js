@@ -27,9 +27,11 @@
                 if (this.bookmarksResultsView.bookmarksShown()) {
                     this.bookmarksResultsView.hideBookmarks();
                     this.$('.bookmarks-button').attr('aria-pressed', 'false');
+                    this.$('.bookmarks-button').removeClass('is-active').addClass('is-inactive');
                 } else {
                     this.bookmarksResultsView.loadBookmarks();
                     this.$('.bookmarks-button').attr('aria-pressed', 'true');
+                    this.$('.bookmarks-button').removeClass('is-inactive').addClass('is-active');
                 }
             }
         });

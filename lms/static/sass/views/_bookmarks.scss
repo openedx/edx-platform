@@ -1,6 +1,6 @@
 // Rules for placing bookmarks and search button side by side
 .wrapper-course-modes {
-  border-bottom: 1px solid lightgray;
+  border-bottom: 1px solid $gray-l3;
   display: table;
   width: 98%;
   padding: 6px 3px;
@@ -17,22 +17,24 @@
   padding: 0 3px;
   vertical-align: top;
 
-  button[aria-pressed="true"] {
-    &:before {
-      content: "\f02e";
-      font-family: FontAwesome;
+  button {
+    &.is-active {
+      &:before {
+        content: "\f02e";
+        font-family: FontAwesome;
+      }
+
+      background-color: $white;
     }
 
-    background-color: $white;
-  }
+    &.is-inactive {
+      &:before {
+          content: "\f097";
+          font-family: FontAwesome;
+      }
 
-  button[aria-pressed="false"] {
-    &:before {
-      content: "\f097";
-      font-family: FontAwesome;
+      background: none;
     }
-
-    background: none;
   }
 
   .bookmarks-button {
@@ -42,11 +44,11 @@
     width: 100%;
 
     &:hover {
-      background: none !important;
+      background: none;
     }
 
     &:focus, &:active {
-      box-shadow: none !important;
+      box-shadow: none;
     }
   }
 }
@@ -62,11 +64,11 @@
   padding-top: $baseline;
 
   .bookmarks-results-list-item {
+    display: block;
     border: 1px solid $gray;
-    padding: ($baseline/4) $baseline ($baseline/2);
+    @include padding(($baseline/4), $baseline, ($baseline/2), $baseline);
     border-radius: ($baseline/4);
     margin-bottom: $baseline;
-    display: block;
 
     &:hover {
       border-color: $link-color;
@@ -81,7 +83,7 @@
 
   .list-item-date {
     color: $gray;
-    font-size: 14px;
+    @extend %t-title7;
   }
 
   a.bookmarks-results-list-item:before {
@@ -98,8 +100,8 @@
   .list-item-left-section {
     @include float(left);
 
-    h3, p {
-      font-weight: 100;
+    .list-item-breadcrumbtrail, .list-item-date {
+      @extend %t-ultralight;
     }
   }
 
@@ -120,11 +122,11 @@
 
 .bookmarks-empty-header {
   margin-bottom: ($baseline/2);
-  font-size: 1.2em;
+  @extend %t-title5;
 }
 
 .bookmarks-empty-detail {
-  font-size: .7em;
+  @extend %t-title9;
   overflow: hidden;
 }
 
