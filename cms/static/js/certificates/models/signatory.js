@@ -26,6 +26,40 @@ function(Backbone, _, str) {
             return response;
         },
 
+        validate: function(attrs) {
+            var errors = null;
+            if(_.has(attrs, 'name') && attrs['name'].length > 40) {
+                errors = _.extend({
+                    'name': gettext('Signatory name should not be more than 40 characters long.')
+                }, errors);
+            }
+            if(_.has(attrs, 'title')){
+                var title = attrs['title'];
+                var lines = title.split(/\r\n|\r|\n/);
+                if (lines.length > 2) {
+                    errors = _.extend({
+                        'title': gettext('Signatory title should span over maximum of 2 lines.')
+                    }, errors);
+                }
+                else if ((lines.length > 1 && (lines[0].length > 40 || lines[1].length > 40))
+                    || (lines.length == 1 && title.length > 40)) {
+                    errors = _.extend({
+                        'title': gettext('Signatory title should have maximum of 40 characters per line.')
+                    }, errors);
+                }
+
+            }
+            if(_.has(attrs, 'organization') && attrs['organization'].length > 40) {
+                errors = _.extend({
+                    'organization': gettext('Signatory Organization should not be more than 40 characters long.')
+                }, errors);
+            }
+            if (errors !== null){
+                return errors;
+            }
+
+        },
+
         setOriginalAttributes: function() {
             // Remember the current state of this model (enables edit->cancel use cases)
             this._originalAttributes = this.parse(this.toJSON());

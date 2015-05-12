@@ -60,6 +60,16 @@ function(Backbone, Signatory, SignatoryCollection, _, str, gettext) {
                     attributes: {name: true}
                 };
             }
+            var all_signatories_valid  = _.every(attrs.signatories.models, function(signatory){
+                return signatory.isValid();
+            });
+            if (!all_signatories_valid) {
+                return {
+                    message: gettext('Signatory field(s) has invalid data.'),
+                    attributes: {signatories: attrs.signatories.models}
+                }
+
+            }
         },
 
         reset: function() {
