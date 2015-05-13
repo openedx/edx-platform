@@ -1904,7 +1904,7 @@ class UsersApiTests(ModuleStoreTestCase):
         # mark as read
         test_uri = '{}/{}/notifications/{}/'.format(self.users_base_uri, user_id, sent_user_msg.msg.id)
         response = self.do_post(test_uri, {"read": True})
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
 
         # then verify unread count, which should be 0
         self.assertEqual(get_notifications_count_for_user(user_id, filters={'read': False}), 0)
