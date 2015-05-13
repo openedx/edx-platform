@@ -383,6 +383,9 @@ FEATURES = {
 
     # Course discovery feature
     'ENABLE_COURSE_DISCOVERY': False,
+
+    # Software secure fake page feature flag
+    'ENABLE_SOFTWARE_SECURE_FAKE': False,
 }
 
 # Ignore static asset files on import which match this pattern

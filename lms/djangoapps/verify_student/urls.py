@@ -149,3 +149,11 @@ urlpatterns = patterns(
         name="verify_student_incourse_reverify"
     ),
 )
+
+# Fake response page for incourse reverification ( software secure )
+if settings.FEATURES.get('ENABLE_SOFTWARE_SECURE_FAKE'):
+    from verify_student.tests.fake_software_secure import SoftwareSecureFakeView
+    urlpatterns += patterns(
+        'verify_student.tests.fake_software_secure',
+        url(r'^software-secure-fake-response', SoftwareSecureFakeView.as_view()),
+    )
