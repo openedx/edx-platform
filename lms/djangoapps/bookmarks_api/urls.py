@@ -3,7 +3,7 @@ Discussion API URLs
 """
 from django.conf.urls import include, patterns, url
 
-from bookmarks_api.views import BookmarksView
+from .views import BookmarksView
 
 
 urlpatterns = patterns(
@@ -11,6 +11,6 @@ urlpatterns = patterns(
     url(
         r"^v0/bookmarks/$",
         BookmarksView.as_view(),
-        name="bookmarks_api"
+        name="bookmarks"
     ),
 )
