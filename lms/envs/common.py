@@ -574,6 +574,7 @@ USAGE_KEY_PATTERN = r'(?P<usage_key_string>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@
 ASSET_KEY_PATTERN = r'(?P<asset_key_string>(?:/?c4x(:/)?/[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 
+USERNAME_PATTERN = r'(?P<username>[\w.@+-]+)'
 
 ############################## EVENT TRACKING #################################
 LMS_SEGMENT_KEY = None
@@ -1905,6 +1906,9 @@ INSTALLED_APPS = (
     'lms.djangoapps.teams',
 
     'xblock_django',
+
+    # Bookmarks
+    'bookmarks',
 
     # programs support
     'openedx.core.djangoapps.programs',
