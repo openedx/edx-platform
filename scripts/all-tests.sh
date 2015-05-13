@@ -237,4 +237,7 @@ END
 END
                 ;;
         esac
+
+        exit $EXIT
+        ;;
 esac
