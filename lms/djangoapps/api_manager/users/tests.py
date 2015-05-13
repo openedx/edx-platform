@@ -10,6 +10,9 @@ from random import randint
 import json
 import uuid
 from urllib import urlencode
+from edx_notifications.data import NotificationType, NotificationMessage
+from edx_notifications.lib.consumer import get_notifications_count_for_user
+from edx_notifications.lib.publisher import register_notification_type, publish_notification_to_user
 import mock
 
 from django.contrib.auth.models import User
@@ -1882,3 +1885,33 @@ class UsersApiTests(ModuleStoreTestCase):
         delete_uri = '{}invalid_role/courses/{}'.format(test_uri, unicode(self.course.id))
         response = self.do_delete(delete_uri)
         self.assertEqual(response.status_code, 404)
+
+    def test_mark_notification_as_read(self):
+        user_id = self._create_test_user()
+
+        msg_type = NotificationType(
+            name='open-edx.edx_notifications.lib.tests.test_publisher',
+            renderer='edx_notifications.renderers.basic.BasicSubjectBodyRenderer',
+        )
+        register_notification_type(msg_type)
+        msg = NotificationMessage(
+            namespace='test-runner',
+            msg_type=msg_type,
+            payload={
+                'foo': 'bar'
+            }
+        )
+
+        # now do happy path
+        sent_user_msg = publish_notification_to_user(user_id, msg)
+
+        # verify unread count
+        self.assertEqual(get_notifications_count_for_user(user_id, filters={'read': False}), 1)
+
+        # mark as read
+        test_uri = '{}/{}/notifications/{}/'.format(self.users_base_uri, user_id, sent_user_msg.msg.id)
+        response = self.do_post(test_uri, {"read": True})
+        self.assertEqual(response.status_code, 201)
+
+        # then verify unread count, which should be 0
+        self.assertEqual(get_notifications_count_for_user(user_id, filters={'read': False}), 0)
