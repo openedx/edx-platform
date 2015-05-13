@@ -215,14 +215,16 @@ class Signatory(object):
 
     def __init__(self, certificate, prefix, mode, index):
         self.certificate = certificate
-        self.selector = prefix + ' .signatory-details'.format(mode, index)
+        self.prefix = prefix
         self.index = index
+        self.mode = mode
 
     def get_selector(self, css=''):
         """
         Return selector fo signatory container
         """
-        return ' '.join([self.selector, css])
+        selector = self.prefix + ' .signatory-{}-view-{}'.format(self.mode, self.index)
+        return ' '.join([selector, css])
 
     def find_css(self, css_selector):
         """
@@ -258,11 +260,27 @@ class Signatory(object):
         """
         self.find_css('.signatory-title-input').first.fill(value)
 
+    @property
+    def organization(self):
+        """
+        Return signatory organization.
+        """
+        return self.find_css('.signatory-panel-body .signatory-organization-value').first.text[0]
+
+    @organization.setter
+    def organization(self, value):
+        """
+        Set signatory organization.
+        """
+        self.find_css('.signatory-organization-input').first.fill(value)
+
     def edit(self):
         """
         Open editing view for the signatory.
         """
         self.find_css('.edit-signatory').first.click()
+        self.mode = 'edit'
+        self.wait_for_signatory_edit_view()
 
     def delete(self):
         """
@@ -276,18 +294,22 @@ class Signatory(object):
         """
         Save signatory.
         """
+        # Move focus from input to save button and then click it
+        self.certificate.page.browser.execute_script(
+            "$('{} .signatory-panel-save').focus()".format(self.get_selector())
+        )
         self.find_css('.signatory-panel-save').first.click()
+        self.mode = 'details'
         self.certificate.page.wait_for_ajax()
+        self.wait_for_signatory_detail_view()
 
     def close(self):
         """
         Cancel signatory editing.
         """
         self.find_css('.signatory-panel-close').first.click()
-        EmptyPromise(
-            lambda: self.find_css('.signatory-panel-body .signatory-name-value').present,
-            'On signatory detail view'
-        ).fulfill()
+        self.mode = 'details'
+        self.wait_for_signatory_detail_view()
 
     @property
     def delete_icon_is_present(self):
@@ -295,3 +317,21 @@ class Signatory(object):
         Returns whether or not the delete icon is present.
         """
         return self.find_css('.signatory-panel-delete').present
+
+    def wait_for_signatory_edit_view(self):
+        """
+        Promise to wait until signatory edit view is loaded
+        """
+        EmptyPromise(
+            lambda: self.find_css('.signatory-panel-body .signatory-name-input').present,
+            'On signatory edit view'
+        ).fulfill()
+
+    def wait_for_signatory_detail_view(self):
+        """
+        Promise to wait until signatory details view is loaded
+        """
+        EmptyPromise(
+            lambda: self.find_css('.signatory-panel-body .signatory-name-value').present,
+            'On signatory details view'
+        ).fulfill()

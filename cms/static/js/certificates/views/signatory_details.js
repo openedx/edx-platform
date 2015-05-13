@@ -19,15 +19,20 @@ function(BaseView, ViewUtils, SignatoryEditorView, _, TemplateUtils, gettext, st
             // Determine the CSS class names for this model instance
             var index = this.model.collection.indexOf(this.model);
             return [
-                'signatory-details'
+                'signatory-details',
+                'signatory-details-view-' + index
             ].join(' ');
         },
 
         initialize: function() {
             // Set up the initial state of the attributes set for this model instance
-            this.edit_view = null;
+            this.eventAgg = _.extend({}, Backbone.Events);
+            this.edit_view = new SignatoryEditorView({
+                model: this.model,
+                isEditingAllCollections: false,
+                eventAgg: this.eventAgg
+            });
             this.template = this.loadTemplate('signatory-details');
-            this.listenTo(this.model, 'change', this.render);
         },
 
         loadTemplate: function(name) {
@@ -38,16 +43,19 @@ function(BaseView, ViewUtils, SignatoryEditorView, _, TemplateUtils, gettext, st
         editSignatory: function(event) {
             // Retrieve the edit view for this model
             if (event && event.preventDefault) { event.preventDefault(); }
-            this.edit_view =  new SignatoryEditorView({model: this.model, isEditingAllCollections: false});
             this.$el.html(this.edit_view.render());
+            this.edit_view.delegateEvents();
+            this.delegateEvents();
         },
 
         saveSignatoryData: function(event) {
             // Persist the data for this model
             if (event && event.preventDefault) { event.preventDefault(); }
             var certificate = this.model.get('certificate');
+            if (!certificate.isValid()){
+                return
+            }
             var self = this;
-            if(this.edit_view !== null) this.edit_view.setSignatoriesValues();
             ViewUtils.runOperationShowingMessage(
                 gettext('Saving'),
                 function () {

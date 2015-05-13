@@ -420,6 +420,7 @@ class CertificatesTest(StudioCourseTest):
         return {
             'name': '{prefix} Signatory Name'.format(prefix=prefix),
             'title': '{prefix} Signatory Title'.format(prefix=prefix),
+            'organization': '{prefix} Signatory Organization'.format(prefix=prefix),
         }
 
     def create_and_verify_certificate(self, name, description, existing_certs, signatories):
@@ -440,6 +441,8 @@ class CertificatesTest(StudioCourseTest):
         for idx, signatory in enumerate(signatories):
             certificate.signatories[idx].name = signatory['name']
             certificate.signatories[idx].title = signatory['title']
+            certificate.signatories[idx].organization = signatory['organization']
+
             added_signatories += 1
             if len(signatories) > added_signatories:
                 certificate.add_signatory()
@@ -561,6 +564,7 @@ class CertificatesTest(StudioCourseTest):
 
         signatory.name = 'Updated signatory name'
         signatory.title = 'Update signatory title'
+        signatory.organization = 'Updated signatory organization'
         signatory.save()
 
         self.assertEqual(len(self.certificates_page.certificates), 1)
@@ -568,6 +572,7 @@ class CertificatesTest(StudioCourseTest):
         signatory = self.certificates_page.certificates[0].signatories[0]
         self.assertIn("Updated signatory name", signatory.name)
         self.assertIn("Update signatory title", signatory.title)
+        self.assertIn("Updated signatory organization", signatory.organization)
 
         signatory.edit()
         signatory.close()

@@ -63,7 +63,6 @@ function(ViewUtils, PromptView, NotificationView, TemplateUtils, _, $, gettext) 
                 is_editing_all_collections: this.isEditingAllCollections,
                 total_saved_signatories: this.getTotalSignatoriesOnServer()
             });
-
             return $(this.el).html(this.template(attributes));
         },
 
@@ -95,13 +94,6 @@ function(ViewUtils, PromptView, NotificationView, TemplateUtils, _, $, gettext) 
                 this.$('.signatory-organization-input').val()
             );
             this.eventAgg.trigger("onSignatoryUpdated", this.model);
-        },
-
-        setSignatoriesValues: function() {
-            // set the signatories values
-            this.setSignatoryName();
-            this.setSignatoryTitle();
-            this.setSignatoryOrganization();
         },
 
         deleteItem: function(event) {
