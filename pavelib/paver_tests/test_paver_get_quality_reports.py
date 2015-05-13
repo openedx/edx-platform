@@ -1,12 +1,11 @@
-import os
-import tempfile
+"""
+Test reports that are created through the run_quality task
+"""
+
 import unittest
-from mock import patch, Mock
-from ddt import ddt, file_data
+from mock import patch
 
 import pavelib.quality
-import paver.easy
-from paver.easy import BuildFailure
 
 
 class TestGetReportFiles(unittest.TestCase):

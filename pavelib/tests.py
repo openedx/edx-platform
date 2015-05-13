@@ -272,4 +272,4 @@ def diff_coverage(options):
             )
         )
 
-        print("\n")
+        print "\n"
