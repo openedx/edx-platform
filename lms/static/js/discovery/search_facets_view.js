@@ -18,6 +18,7 @@ define([
         templateId: '#search_facets_list-tpl',
         className: 'facets',
         facetsTypes: {},
+        moreLessLinksTpl: '#more_less_links-tpl',
 
         events: {
             'click li': 'addFacet',
@@ -30,6 +31,7 @@ define([
                 this.facetsTypes = facetsTypes;
             }
             this.tpl = _.template($(this.templateId).html());
+            this.moreLessTpl = _.template($(this.moreLessLinksTpl).html());
             this.$el.html(this.tpl());
             this.facetViews = [];
             this.$facetViewsEl = this.$el.find('.search-facets-lists');
@@ -92,6 +94,9 @@ define([
                     facetsView.$views.append(facetView.render(name, term, count).el);
                     facetsView.list.push(facetView);
                 });
+                if(_.size(stats.terms) > 9) {
+                    facetsView.$el.append(self.moreLessTpl());
+                }
             });
         }
 

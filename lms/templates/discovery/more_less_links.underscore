@@ -1,0 +1,8 @@
+<div class="toggle ">
+    <a aria-hidden="true" tabindex="-1" class="show-more" href="#">
+        <%= gettext("MORE...") %>
+    </a>
+    <a aria-hidden="true" tabindex="-1" class="show-less hidden" href="#">
+        <%= gettext("LESS...") %>
+    </a>
+</div>

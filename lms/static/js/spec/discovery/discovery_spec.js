@@ -14,7 +14,9 @@ define([
     'js/discovery/filters',
     'js/discovery/filter_bar_view',
     'js/discovery/filter_view',
-    'js/discovery/search_facets_view'
+    'js/discovery/search_facets_view',
+    'js/discovery/facet_view',
+    'js/discovery/facets_view'
 ], function(
     $,
     Sinon,
@@ -31,7 +33,9 @@ define([
     FiltersCollection,
     FiltersBarView,
     FilterView,
-    SearchFacetView
+    SearchFacetView,
+    FacetView,
+    FacetsView
 ) {
     'use strict';
 
@@ -57,7 +61,48 @@ define([
                     "id": "edX/DemoX/Demo_Course"
                 }
             }
-        ]
+        ],
+        "facets": {
+            "org": {
+                "total": 26,
+                "terms": {
+                    "edX1": 1,
+                    "edX2": 1,
+                    "edX3": 1,
+                    "edX4": 1,
+                    "edX5": 1,
+                    "edX6": 1,
+                    "edX7": 1,
+                    "edX8": 1,
+                    "edX9": 1,
+                    "edX10": 1,
+                    "edX11": 1,
+                    "edX12": 1,
+                    "edX13": 1,
+                    "edX14": 1,
+                    "edX15": 1,
+                    "edX16": 1,
+                    "edX17": 1,
+                    "edX18": 1,
+                    "edX19": 1,
+                    "edX20": 1,
+                    "edX21": 1,
+                    "edX22": 1,
+                    "edX23": 1,
+                    "edX24": 1,
+                    "edX25": 1,
+                    "edX26": 1
+                },
+                "other": 0
+            },
+            "modes": {
+                "total": 1,
+                "terms": {
+                    "honor": 1
+                },
+                "other": 0
+            }
+        }
     };
 
     var FACET_LIST = [
@@ -338,7 +383,15 @@ define([
     describe('SearchFacetView', function () {
         beforeEach(function () {
             loadFixtures('js/fixtures/discovery.html');
-            this.searchFacetView = new SearchFacetView();
+            TemplateHelpers.installTemplates([
+                'templates/discovery/search_facet',
+                'templates/discovery/search_facets_section',
+                'templates/discovery/search_facets_list',
+                'templates/discovery/more_less_links'
+            ]);
+            var facetsTypes = {org: 'Organization', modes: 'Course Type'};
+            this.searchFacetView = new SearchFacetView(facetsTypes);
+            this.searchFacetView.renderFacets(JSON_RESPONSE.facets);
             this.onAddFilter = jasmine.createSpy('onAddFilter');
             this.searchFacetView.on('addFilter', this.onAddFilter);
         });
@@ -372,7 +425,7 @@ define([
 
         it('view triggers addFilter event if facet is clicked', function () {
             this.searchFacetView.delegateEvents();
-            var $facetLink = this.searchFacetView.$el.find('li a[data-value="Current"]');
+            var $facetLink = this.searchFacetView.$el.find('li a[data-value="edX1"]');
             var $facet = $facetLink.parent('li');
             $facet.trigger('click');
             expect(this.onAddFilter).toHaveBeenCalledWith(
@@ -437,8 +490,12 @@ define([
                 'templates/discovery/result_item',
                 'templates/discovery/filter',
                 'templates/discovery/filter_bar',
+                'templates/discovery/search_facet',
+                'templates/discovery/search_facets_section',
+                'templates/discovery/search_facets_list',
                 'templates/discovery/not_found',
-                'templates/discovery/error'
+                'templates/discovery/error',
+                'templates/discovery/more_less_links'
             ]);
             this.server = Sinon.fakeServer.create();
             this.app = new App(
