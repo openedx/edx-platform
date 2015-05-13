@@ -24,7 +24,7 @@ define('video/09_poster.js', ['video/00_resizer.js'], function (Resizer) {
     VideoPoster.moduleName = 'Poster';
     VideoPoster.prototype = {
         template: _.template([
-            '<div class="poster-<%= type %> poster" ',
+            '<div class="video-pre-roll is-<%= type %> poster" ',
                 'style="background-image: url(<%= url %>)">',
                 '<span tabindex="0" class="btn-play" aria-label="',
                     gettext('Play video'), '"></span>',
@@ -36,7 +36,7 @@ define('video/09_poster.js', ['video/00_resizer.js'], function (Resizer) {
                 url: this.options.poster.url,
                 type: this.options.poster.type
             }));
-            this.element.addClass('is-poster');
+            this.element.addClass('is-pre-roll');
             this.resizer = new Resizer({
                 element: this.container,
                 elementRatio: 16/9,
@@ -68,7 +68,7 @@ define('video/09_poster.js', ['video/00_resizer.js'], function (Resizer) {
         destroy: function () {
             this.element.off('play destroy', this.destroy);
             $(window).off('resize.poster');
-            this.element.removeClass('is-poster');
+            this.element.removeClass('is-pre-roll');
             this.resizer.destroy();
             this.el.remove();
         }
