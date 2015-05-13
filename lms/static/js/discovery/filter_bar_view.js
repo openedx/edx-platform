@@ -52,13 +52,16 @@ define([
         },
 
         addFilter: function(data) {
-            var filter = new Filter(data);
-            var filterView = new FilterView({model: filter});
-            this.collection.add(filter);
-            this.filtersList.append(filterView.render().el);
-            this.trigger('search', this.getSearchTerm(), this.collection);
-            if (this.$el.hasClass('hidden')) {
-                this.showClearAllButton();
+            var currentfilter = this.collection.findWhere(data);
+            if(typeof currentfilter === 'undefined') {
+                var filter = new Filter(data);
+                var filterView = new FilterView({model: filter});
+                this.collection.add(filter);
+                this.filtersList.append(filterView.render().el);
+                this.trigger('search', this.getSearchTerm(), this.collection);
+                if (this.$el.hasClass('hidden')) {
+                    this.showClearAllButton();
+                }
             }
         },
 
