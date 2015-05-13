@@ -82,25 +82,23 @@ class NamespaceEnrollmentsScopeResolver(NotificationUserScopeResolver):
     def resolve(self, scope_name, scope_context, instance_context):
         """
         The entry point to resolve a scope_name with a given scope_context
+
+        scope_context must include a 'namespace' key/value pair to indicate
+        what course_id needs to be resolved
         """
 
         if scope_name != 'namespace_scope':
             # we can't resolve any other scopes
+            # The API expects a None (not an exception) if this
+            # particular resolver is not able to resolve a scope_name
+            # which it does not know about.
             return None
 
         if 'namespace' not in scope_context:
             # did not receive expected parameters
-            return None
+            raise KeyError('Missing course_id in scope_context')
 
-        course_id = scope_context['namespace']
-
-        if not isinstance(course_id , CourseKey):
-            try:
-                course_key = CourseKey.from_string(course_id)
-            except InvalidKeyError:
-               course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-        else:
-            course_key = course_id
+        course_key = _get_course_key_from_string(scope_context['namespace'])
 
         query = User.objects.select_related('courseenrollment')
 
@@ -122,7 +120,7 @@ class NamespaceEnrollmentsScopeResolver(NotificationUserScopeResolver):
 
         query = query.values(*fields)
         query = query.filter(
-            courseenrollment__is_active=1,
+            courseenrollment__is_active=True,
             courseenrollment__course_id=course_key
         )
         return query
