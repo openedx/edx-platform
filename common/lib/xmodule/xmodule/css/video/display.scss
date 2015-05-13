@@ -27,7 +27,8 @@ div.video {
     }
   }
 
-  &.is-poster {
+  // CASE: video pre-roll state
+  &.is-pre-roll {
     .slider {
       visibility: hidden;
     }
@@ -289,7 +290,7 @@ div.video {
         }
       }
 
-      div.vcr {
+      .vcr {
         float: left;
         list-style: none;
         margin: 0 lh() 0 0;
@@ -300,14 +301,13 @@ div.video {
           font-size: em(14);
         }
 
-        a {
+        .video_control {
           @extend %video-button;
           float: left;
           background-image: url('../images/vcr.png');
           background-position: 15px 15px ;
           background-repeat: no-repeat;
           border-left: none;
-          box-shadow: 1px 0 0 #555;
           padding: 0 lh(.75);
           width: 14px;
 
@@ -340,8 +340,8 @@ div.video {
         }
 
         div.vidtime {
+          @extend %t-strong;
           float: left;
-          font-weight: bold;
           line-height: 46px; //height of play pause buttons
           -webkit-font-smoothing: antialiased;
           padding-left: lh(.75);
@@ -515,9 +515,12 @@ div.video {
             background-image: url('../images/volume.png');
             background-position: 10px center;
             background-repeat: no-repeat;
-            border-left: none;
             width: 30px;
             height: 46px;
+          }
+
+          &:not(:first-child) > a {
+            border-left: none;
           }
 
           .volume-slider-container {
@@ -697,7 +700,7 @@ div.video {
     }
 
     ol.subtitles {
-        display: none;
+        @extend .is-hidden;
     }
 
     ol.subtitles.html5 {
@@ -810,7 +813,7 @@ div.video {
     }
   }
 
-  .poster-youtube {
+  .video-pre-roll {
     @extend %ui-depth3;
     position: absolute;
     top: 0;
@@ -820,12 +823,11 @@ div.video {
     background-position: 50% 50%;
     background-repeat: no-repeat;
     background-size: 100%;
-    background-color: #000;
-  }
+    background-color: $black;
 
-  .poster-html5 {
-    @extend .poster-youtube;
-    background-size: 15%;
+    &.is-html5 {
+      background-size: 15%;
+    }
   }
 }
 
