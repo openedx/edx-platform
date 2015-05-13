@@ -264,10 +264,11 @@ def _get_enabled_provider_by_name(provider_name):
 
 def _get_url(view_name, backend_name, auth_entry=None, redirect_url=None,
              enroll_course_id=None, email_opt_in=None, extra_params=None,
-             **kwargs):
+             url_params=None):
     """Creates a URL to hook into social auth endpoints."""
-    kwargs['backend'] = backend_name
-    url = reverse(view_name, kwargs=kwargs)
+    url_params = url_params or {}
+    url_params['backend'] = backend_name
+    url = reverse(view_name, kwargs=url_params)
 
     query_params = OrderedDict()
     if auth_entry:
@@ -327,7 +328,7 @@ def get_disconnect_url(provider_name, association_id):
     """
     backend_name = _get_enabled_provider_by_name(provider_name).BACKEND_CLASS.name
     if association_id:
-        return _get_url('social:disconnect_individual', backend_name, association_id=association_id)
+        return _get_url('social:disconnect_individual', backend_name, url_params={'association_id': association_id})
     else:
         return _get_url('social:disconnect', backend_name)
 
