@@ -85,12 +85,12 @@
       </div>
       <div class="field datepair">
         <b>${_('Start Date')}</b><br/>
-        <input placeholder="Date" type="date" class="date" name="start_date"/>
+        <input placeholder="Date" type="text" class="date" name="start_date"/>
         <input placeholder="time" type="time" class="time" name="start_time"/>
       </div>
       <div class="field datepair">
         <b>${_('Due Date')}</b> ${_('(Optional)')}<br/>
-        <input placeholder="Date" type="date" class="date" name="due_date"/>
+        <input placeholder="Date" type="text" class="date" name="due_date"/>
         <input placeholder="time" type="time" class="time" name="due_time"/>
       </div>
       <div class="field">
@@ -123,6 +123,19 @@ $(function() {
     $('.datepair .date').datepicker({
         'dateFormat': 'yy-mm-dd',
         'autoclose': true
+    });
+    $('.datepair .date').change(function() {
+       var date = $(this).val();
+       var dateParts;
+       var year;
+       if (date) {
+          dateParts = date.split('-');
+          year = parseInt(dateParts[0]);
+          if (year >= 0 && year < 100) {
+              year = year + 2000;
+              $(this).val(year + "-" + dateParts[1] + "-" + dateParts[2]);
+          }
+       }
     });
 });
 </script>
