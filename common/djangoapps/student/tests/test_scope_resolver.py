@@ -62,7 +62,9 @@ class StudentTasksTestCase(ModuleStoreTestCase):
         resolver = CourseEnrollmentsScopeResolver()
 
         self.assertIsNone(resolver.resolve('bad', {'course_id': 'foo'}, None))
-        self.assertIsNone(resolver.resolve('course_enrollments', {'bad': 'foo'}, None))
+
+        with self.assertRaises(KeyError):
+            self.assertIsNone(resolver.resolve('course_enrollments', {'bad': 'foo'}, None))
 
     def test_namespace_scope(self):
         """
@@ -139,7 +141,7 @@ class StudentTasksTestCase(ModuleStoreTestCase):
 
         resolver = StudentEmailScopeResolver()
 
-        emails_resultset = resolver.resolve(
+        resolved_scopes = resolver.resolve(
             'user_email_resolver',
             {
                 'user_id': test_user_1.id,
@@ -147,7 +149,7 @@ class StudentTasksTestCase(ModuleStoreTestCase):
             None
         )
 
-        emails = [email['email'] for email in emails_resultset]
+        emails = [resolved_scope['email'] for resolved_scope in resolved_scopes]
 
         self.assertTrue(test_user_1.email in emails)
 

@@ -1407,3 +1407,26 @@ class UsersRolesCoursesDetail(SecureAPIView):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
 
         return Response({}, status=status.HTTP_204_NO_CONTENT)
+
+
+class UsersNotificationsDetail(SecureAPIView):
+    """
+    Allows for a caller to mark a user's notification as read,
+    passed in by msg_id. Note that the user_msg_id must belong
+    to the user_id passed in
+    """
+    def post(self, request, user_id, msg_id):
+        """
+        POST /api/users/{user_id}/notifications/{msg_id}
+
+        payload:
+            {
+                'read': 'True' or 'False'
+            }
+        """
+
+        read = bool(request.DATA['read'])
+
+        mark_notification_read(int(user_id), int(msg_id), read=read)
+
+        return Response({}, status=status.HTTP_201_CREATED)
