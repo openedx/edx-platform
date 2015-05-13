@@ -144,6 +144,8 @@ def preprocess_collection(user, course, collection):
                 u"quote": sanitize_html(model["quote"]),
                 u"updated": dateutil_parse(model["updated"]),
             })
+            if "tags" in model:
+                model.update({u"tags": [sanitize_html(tag) for tag in model["tags"]]})
             usage_id = model["usage_id"]
             if usage_id in cache:
                 model.update(cache[usage_id])
