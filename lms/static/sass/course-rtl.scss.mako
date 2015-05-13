@@ -20,8 +20,3 @@
 % endif
 
 @import 'build-course'; // shared app style assets/rendering
-
-## Import styles for search
-% if env["FEATURES"].get("ENABLE_COURSEWARE_SEARCH"):
-    @import 'search/_search';
-% endif

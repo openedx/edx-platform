@@ -30,12 +30,3 @@
 
 @import 'build-lms'; // shared app style assets/rendering
 
-## Import styles for search
-% if env["FEATURES"].get("ENABLE_DASHBOARD_SEARCH", False):
-  @import 'search/_search';
-% endif
-
-@import 'developer'; // used for any developer-created scss that needs further polish/refactoring
-@import 'shame';     // used for any bad-form/orphaned scss
-## NOTE: needed here for cascade and dependency purposes, but not a great permanent solution
-

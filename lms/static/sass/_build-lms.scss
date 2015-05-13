@@ -68,4 +68,12 @@
 @import 'discussion/utilities/developer';
 @import 'discussion/utilities/shame';
 
+// search
+@import 'search/_search';
+
+// news
 @import 'news';
+
+// overrides
+@import 'developer'; // used for any developer-created scss that needs further polish/refactoring
+@import 'shame';     // used for any bad-form/orphaned scss
