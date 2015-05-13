@@ -15,10 +15,11 @@ from django_comment_client.tests.group_id import (
     NonCohortedTopicGroupIdTestMixin
 )
 from django_comment_client.tests.unicode import UnicodeTestMixin
-from django_comment_client.tests.utils import CohortedTestCase, ContentGroupTestCase
+from django_comment_client.tests.utils import CohortedTestCase
 from django_comment_client.utils import strip_none
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from util.testing import UrlResetMixin
+from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (

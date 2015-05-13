@@ -1954,6 +1954,32 @@ def calculate_grades_csv(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
+def problem_grade_report(request, course_id):
+    """
+    Request a CSV showing students' grades for all problems in the
+    course.
+
+    AlreadyRunningError is raised if the course's grades are already being
+    updated.
+    """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    try:
+        instructor_task.api.submit_problem_grade_report(request, course_key)
+        success_status = _("Your problem grade report is being generated! "
+                           "You can view the status of the generation task in the 'Pending Instructor Tasks' section.")
+        return JsonResponse({"status": success_status})
+    except AlreadyRunningError:
+        already_running_status = _("A problem grade report is already being generated. "
+                                   "Check the 'Pending Instructor Tasks' table for the status of the task. "
+                                   "When completed, the report will be available for download in the table below.")
+        return JsonResponse({
+            "status": already_running_status
+        })
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
 @require_query_params('rolename')
 def list_forum_members(request, course_id):
     """

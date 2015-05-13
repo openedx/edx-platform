@@ -15,12 +15,12 @@ from edxmako import add_lookup
 
 from django_comment_client.tests.factories import RoleFactory
 from django_comment_client.tests.unicode import UnicodeTestMixin
-from django_comment_client.tests.utils import ContentGroupTestCase
 import django_comment_client.utils as utils
 
 from courseware.tests.factories import InstructorFactory
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 

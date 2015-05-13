@@ -14,9 +14,9 @@ from celery.states import SUCCESS, FAILURE
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
+from openedx.core.djangoapps.util.testing import TestConditionalContent
 from capa.tests.response_xml_factory import (CodeResponseXMLFactory,
                                              CustomResponseXMLFactory)
-from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.partitions.partitions import Group, UserPartition
@@ -465,103 +465,10 @@ class TestDeleteProblemTask(TestIntegrationTask):
         self.assertEqual(instructor_task.task_state, SUCCESS)
 
 
-class TestGradeReportConditionalContent(TestReportMixin, TestIntegrationTask):
+class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent, TestIntegrationTask):
     """
-    Check that grade export works when graded content exists within
-    split modules.
+    Test grade report in cases where there are problems contained within split tests.
     """
-    def setUp(self):
-        """
-        Set up a course with graded problems within a split test.
-
-        Course hierarchy is as follows (modeled after how split tests
-        are created in studio):
-        -> course
-            -> chapter
-                -> sequential (graded)
-                    -> vertical
-                        -> split_test
-                            -> vertical (Group A)
-                                -> problem
-                            -> vertical (Group B)
-                                -> problem
-        """
-        super(TestGradeReportConditionalContent, self).setUp()
-
-        # Create user partitions
-        self.user_partition_group_a = 0
-        self.user_partition_group_b = 1
-        self.partition = UserPartition(
-            0,
-            'first_partition',
-            'First Partition',
-            [
-                Group(self.user_partition_group_a, 'Group A'),
-                Group(self.user_partition_group_b, 'Group B')
-            ]
-        )
-
-        # Create course with group configurations and grading policy
-        self.initialize_course(
-            course_factory_kwargs={
-                'user_partitions': [self.partition],
-                'grading_policy': {
-                    "GRADER": [{
-                        "type": "Homework",
-                        "min_count": 1,
-                        "drop_count": 0,
-                        "short_label": "HW",
-                        "weight": 1.0
-                    }]
-                }
-            }
-        )
-
-        # Create users and partition them
-        self.student_a = self.create_student('student_a')
-        self.student_b = self.create_student('student_b')
-        UserCourseTagFactory(
-            user=self.student_a,
-            course_id=self.course.id,
-            key='xblock.partition_service.partition_{0}'.format(self.partition.id),  # pylint: disable=no-member
-            value=str(self.user_partition_group_a)
-        )
-        UserCourseTagFactory(
-            user=self.student_b,
-            course_id=self.course.id,
-            key='xblock.partition_service.partition_{0}'.format(self.partition.id),  # pylint: disable=no-member
-            value=str(self.user_partition_group_b)
-        )
-
-        # Create a vertical to contain our split test
-        problem_vertical = ItemFactory.create(
-            parent_location=self.problem_section.location,
-            category='vertical',
-            display_name='Problem Unit'
-        )
-
-        # Create the split test and child vertical containers
-        vertical_a_url = self.course.id.make_usage_key('vertical', 'split_test_vertical_a')
-        vertical_b_url = self.course.id.make_usage_key('vertical', 'split_test_vertical_b')
-        self.split_test = ItemFactory.create(
-            parent_location=problem_vertical.location,
-            category='split_test',
-            display_name='Split Test',
-            user_partition_id=self.partition.id,  # pylint: disable=no-member
-            group_id_to_child={str(index): url for index, url in enumerate([vertical_a_url, vertical_b_url])}
-        )
-        self.vertical_a = ItemFactory.create(
-            parent_location=self.split_test.location,
-            category='vertical',
-            display_name='Group A problem container',
-            location=vertical_a_url
-        )
-        self.vertical_b = ItemFactory.create(
-            parent_location=self.split_test.location,
-            category='vertical',
-            display_name='Group B problem container',
-            location=vertical_b_url
-        )
 
     def verify_csv_task_success(self, task_result):
         """

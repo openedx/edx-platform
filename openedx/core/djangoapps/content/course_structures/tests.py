@@ -68,8 +68,8 @@ class CourseStructureTaskTests(ModuleStoreTestCase):
             }
         }
         structure_json = json.dumps(structure)
-        cs = CourseStructure.objects.create(course_id=self.course.id, structure_json=structure_json)
-        self.assertEqual(cs.structure_json, structure_json)
+        structure = CourseStructure.objects.create(course_id=self.course.id, structure_json=structure_json)
+        self.assertEqual(structure.structure_json, structure_json)
 
         # Reload the data to ensure the init signal is fired to decompress the data.
         cs = CourseStructure.objects.get(course_id=self.course.id)
@@ -90,6 +90,41 @@ class CourseStructureTaskTests(ModuleStoreTestCase):
         structure_json = json.dumps(structure)
         cs = CourseStructure.objects.create(course_id=self.course.id, structure_json=structure_json)
         self.assertDictEqual(cs.structure, structure)
+
+    def test_ordered_blocks(self):
+        structure = {
+            'root': 'a/b/c',
+            'blocks': {
+                'a/b/c': {
+                    'id': 'a/b/c',
+                    'children': [
+                        'g/h/i'
+                    ]
+                },
+                'd/e/f': {
+                    'id': 'd/e/f',
+                    'children': []
+                },
+                'g/h/i': {
+                    'id': 'h/j/k',
+                    'children': [
+                        'j/k/l',
+                        'd/e/f'
+                    ]
+                },
+                'j/k/l': {
+                    'id': 'j/k/l',
+                    'children': []
+                }
+            }
+        }
+        in_order_blocks = ['a/b/c', 'g/h/i', 'j/k/l', 'd/e/f']
+        structure_json = json.dumps(structure)
+        retrieved_course_structure = CourseStructure.objects.create(
+            course_id=self.course.id, structure_json=structure_json
+        )
+
+        self.assertEqual(retrieved_course_structure.ordered_blocks.keys(), in_order_blocks)
 
     def test_block_with_missing_fields(self):
         """
