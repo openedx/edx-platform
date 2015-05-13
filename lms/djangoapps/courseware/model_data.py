@@ -234,9 +234,18 @@ class FieldDataCache(object):
         """
         Returns a map of scopes to fields in that scope that should be cached
         """
+        if not self.descriptors:
+            return {}
+
         scope_map = defaultdict(set)
-        for descriptor in descriptors:
-            for field in descriptor.fields.values():
+        block_classes = set(descriptor.__class__ for descriptor in self.descriptors)
+        block_classes.update(
+            self.descriptors[0].runtime.load_aside_type(aside_type)
+            for aside_type
+            in self.asides
+        )
+        for block_class in block_classes:
+            for field in block_class.fields.values():
                 scope_map[field.scope].add(field)
         return scope_map
 

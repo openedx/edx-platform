@@ -96,6 +96,9 @@ FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
 # Enable student notes
 FEATURES['ENABLE_EDXNOTES'] = True
 
+# Use the auto_auth workflow for creating users and logging them in
+FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
+
 # Unfortunately, we need to use debug mode to serve staticfiles
 DEBUG = True
 
