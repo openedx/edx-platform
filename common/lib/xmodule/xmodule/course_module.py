@@ -846,6 +846,15 @@ class CourseFields(object):
         scope=Scope.settings,
     )
 
+    credit_eligibility = Boolean(
+        display_name=_("Course Credit Eligibility"),
+        help=_(
+            "Set the course credit eligibility to credit/non-credit."
+        ),
+        default=False,
+        scope=Scope.settings,
+    )
+
 
 class CourseModule(CourseFields, SequenceModule):  # pylint: disable=abstract-method
     """
