@@ -233,6 +233,13 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
             color: $m-gray-d2;
           }
 
+          // CASE: tag matches a search query
+          a.reference-meta.reference-tags .note-highlight {
+            // needed because .note-highlight is a span, which overrides link styles
+            @extend %shame-link-text;
+            background-color: $result-highlight-color-base;
+          }
+
           // Put commas between tags.
           a.reference-meta.reference-tags:after {
             content: ",";
