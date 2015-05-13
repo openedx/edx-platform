@@ -37,13 +37,12 @@
 
     </div>
 
-<!--below else is remove so that reviewers can see how the empty bookmarks message look like.
-in reality boomarked list view and empty bookmarks message will never show together-->
+<% } else {%>
 
     <div class="bookmarks-empty" tabindex="0">
         <div class="bookmarks-empty-header">
             <i class="icon fa fa-bookmark-o bookmarks-empty-header-icon" aria-hidden="true"></i>
-            You have not bookmarked any courseware pages yet.!
+            You have not bookmarked any courseware pages yet.
             <br>
         </div>
         <div  class="bookmarks-empty-detail">
@@ -56,4 +55,5 @@ in reality boomarked list view and empty bookmarks message will never show toget
             </span>
         </div>
     </div>
+
 <% } %>

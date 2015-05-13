@@ -1,14 +1,14 @@
 define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
-        'js/bookmarks/collections/bookmarks',
         'js/bookmarks/models/bookmark',
+        'js/bookmarks/collections/bookmarks',
         'js/bookmarks/views/bookmarks_button',
         'js/bookmarks/views/bookmarks_results'
        ],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, BookmarksCollection, BookmarksModel, BookmarksButtonView,
+    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, BookmarksModel, BookmarksCollection, BookmarksButtonView,
               BookmarksResultsView) {
         'use strict';
 
-        describe("lms.courseware.bookmarks", function () {
+        describe("edx.lms.bookmarks", function () {
 
             beforeEach(function () {
                 setFixtures('<div class="courseware-bookmarks-button"></div><section id="courseware-search-results"></section>');
@@ -20,7 +20,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 );
             });
 
-            describe("BookmarksButtonView", function () {
+            describe("Bookmarks Button View", function () {
 
                 it("works as expected", function () {
 
@@ -43,11 +43,11 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     expect(bookmarksButtonView.$('.bookmarks-button').attr('aria-pressed')).toBe("true");
 
                     bookmarksButtonView.$('.bookmarks-button').click();
-                    expect(bookmarksButtonView.$('.bookmarks-button').attr('aria-pressed')).toBe("false");
+                    expect(bookmarksButtonView.$('.bookmarks-button').attr('aria-pressed')).toBe("falsejjj");
                 });
             });
 
-            describe("BookmarksResultsView", function () {
+            describe("Bookmarks Results View", function () {
 
             });
         });
