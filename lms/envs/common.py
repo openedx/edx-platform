@@ -386,6 +386,9 @@ FEATURES = {
 
     # Software secure fake page feature flag
     'ENABLE_SOFTWARE_SECURE_FAKE': False,
+
+    # Teams feature
+    'ENABLE_TEAMS': False,
 }
 
 # Ignore static asset files on import which match this pattern

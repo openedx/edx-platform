@@ -846,6 +846,15 @@ class CourseFields(object):
         scope=Scope.settings,
     )
 
+    teams_configuration = Dict(
+        display_name=_("Teams Configuration"),
+        help=_(
+            "Enter configuration for the teams feature. Expects two entries: max_team_size and topics, where "
+            "topics is a list of topics."
+        ),
+        scope=Scope.settings
+    )
+
 
 class CourseModule(CourseFields, SequenceModule):  # pylint: disable=abstract-method
     """
@@ -1408,3 +1417,28 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         return "course_{}".format(
             b32encode(unicode(self.location.course_key)).replace('=', padding_char)
         )
+
+    @property
+    def teams_enabled(self):
+        """
+        Returns whether or not teams has been enabled for this course.
+
+        Currently, teams are considered enabled when at least one topic has been configured for the course.
+        """
+        if self.teams_configuration:
+            return len(self.teams_configuration.get('topics', [])) > 0
+        return False
+
+    @property
+    def teams_max_size(self):
+        """
+        Returns the max size for teams if teams has been configured, else None.
+        """
+        return self.teams_configuration.get('max_team_size', None)
+
+    @property
+    def teams_topics(self):
+        """
+        Returns the topics that have been configured for teams for this course, else None.
+        """
+        return self.teams_configuration.get('topics', None)
