@@ -295,12 +295,12 @@
 
       // CASE: right to left layout
       @include rtl {
-       background: transparent url("../images/drag-handles.png") no-repeat left center;
+       background: transparent url($static-path + "/images/drag-handles.png") no-repeat left center;
       }
 
       // CASE: left to right layout
       @include ltr {
-        background: transparent url("../images/drag-handles.png") no-repeat right center;
+        background: transparent url($static-path + "/images/drag-handles.png") no-repeat right center;
       }
     }
 

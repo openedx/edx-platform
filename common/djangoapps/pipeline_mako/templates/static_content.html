@@ -2,6 +2,9 @@
 from staticfiles.storage import staticfiles_storage
 from pipeline_mako import compressed_css, compressed_js
 from django.utils.translation import get_language_bidi
+from mako.exceptions import TemplateLookupException
+
+from microsite_configuration import microsite
 %>
 
 <%def name='url(file, raw=False)'><%
@@ -73,3 +76,15 @@ source, template_path = _loader.load_template_source(path)
         }).call(this, require || RequireJS.require);
     </script>
 </%def>
+
+<%def name="optional_include_mako(file, with_microsite=False)"><%
+# http://stackoverflow.com/q/21219531
+if with_microsite:
+    file = microsite.get_template_path(file)
+try:
+    tmpl = self.get_template(file)
+except TemplateLookupException:
+    pass
+else:
+    content.write(tmpl.render_context(context))
+%></%def>

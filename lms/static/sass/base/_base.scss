@@ -179,7 +179,7 @@ span.edx {
   width: 20px;
   height: 20px;
   margin-left: -($baseline/2);
-  background: url(../images/spinner.gif) no-repeat;
+  background: url($static-path + '/images/spinner.gif') no-repeat;
 }
 
 mark {
@@ -205,7 +205,7 @@ mark {
     width: 27px;
     height: 24px;
     margin-right: ($baseline*0.75);
-    background: url(../images/large-white-error-icon.png) no-repeat;
+    background: url($static-path + '/images/large-white-error-icon.png') no-repeat;
   }
 
   .inner-wrapper {

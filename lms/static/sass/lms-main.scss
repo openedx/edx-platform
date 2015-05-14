@@ -1,0 +1,18 @@
+// lms - css application architecture
+// ====================
+
+// libs and resets *do not edit*
+@import 'bourbon/bourbon'; // lib - bourbon
+@import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
+
+// BASE  *default edX offerings*
+// ====================
+
+// base - utilities
+@import 'base/reset';
+@import 'base/variables';
+@import 'base/mixins';
+
+//<THEME-OVERRIDE>
+
+@import 'build-lms'; // shared app style assets/rendering

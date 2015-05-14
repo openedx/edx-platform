@@ -11,6 +11,7 @@
 // * +Timing
 // * +Archetype UI
 // * +Specific UI
+// * +Paths
 // * +Deprecated
 
 $baseline: 20px;
@@ -212,6 +213,10 @@ $ui-link-color-focus: $blue-s1;
 // ====================
 $ui-notification-height: ($baseline*10);
 $ui-update-color: $blue-l4;
+
+// +Paths
+// ====================
+$static-path: '..' !default;
 
 // +Deprecated
 // ====================
