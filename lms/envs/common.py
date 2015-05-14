@@ -369,6 +369,9 @@ FEATURES = {
     # enable beacons for lms onload event statistics
     'ENABLE_ONLOAD_BEACON': False,
 
+    # Toggle platform-wide course licensing
+    'LICENSING': False,
+
     # Certificates Web/HTML Views
     'CERTIFICATES_HTML_VIEW': False,
 

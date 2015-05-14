@@ -29,6 +29,10 @@ def parse_license(lic):
 % elif license_type == "creative-commons":
     <%
     possible = ["by", "nc", "nd", "sa"]
+    names = {
+       "by": _("Attribution"), "nc": _("Noncommercial"),
+       "nd": _("No Derivatives"), "sa": _("Share Alike")
+    }
     enabled = [opt for opt in possible
                if license_options.get(opt) or license_options.get(opt.upper())]
     version = license_options.get("ver", "4.0")
@@ -36,16 +40,17 @@ def parse_license(lic):
         enabled = ["zero"]
         version = license_options.get("ver", "1.0")
     %>
-    <a rel="license" href="https://creativecommons.org/licenses/${'-'.join(enabled)}/${version}/">
+    <a rel="license" href="https://creativecommons.org/licenses/${'-'.join(enabled)}/${version}/" target="_blank">
     % if button:
         <img src="https://licensebuttons.net/l/${'-'.join(enabled)}/${version}/${button_size}.png"
              alt="${license}"
              />
         </a>
     % else:
-        <i aria-hidden="true" class="icon-cc"></i>
+        ## <span> must come before <i> icon or else spacing gets messed up
+        <span class="sr">${_("Creative Commons licensed content, with terms as follow:")}&nbsp;</span><i aria-hidden="true" class="icon-cc"></i>
         % for option in enabled:
-            <i aria-hidden="true" class="icon-cc-${option}"></i>
+            <span class="sr">${names[option]}&nbsp;</span><i aria-hidden="true" class="icon-cc-${option}"></i>
         % endfor
         <span class="license-text">${_("Some Rights Reserved")}</span>
     % endif

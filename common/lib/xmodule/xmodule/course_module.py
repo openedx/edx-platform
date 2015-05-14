@@ -1023,8 +1023,9 @@ class CourseDescriptor(CourseFields, LicenseMixin, SequenceDescriptor):
             wiki_xml_object.set('slug', self.wiki_slug)
             xml_object.append(wiki_xml_object)
 
-        # handle license specifically
-        self.add_license_to_xml(xml_object)
+        # handle license specifically. Default the course to have a license
+        # of "All Rights Reserved", if a license is not explicitly set.
+        self.add_license_to_xml(xml_object, default="all-rights-reserved")
 
         return xml_object
 

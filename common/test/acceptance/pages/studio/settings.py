@@ -81,6 +81,10 @@ class SettingsPage(CoursePage):
 
     @property
     def course_license(self):
+        """
+        Property. Returns the text of the license type for the course
+        ("All Rights Reserved" or "Creative Commons")
+        """
         license_types_css = "section.license ul.license-types li.license-type"
         self.wait_for_element_presence(
             license_types_css,
@@ -89,10 +93,20 @@ class SettingsPage(CoursePage):
         selected = self.q(css=license_types_css + " button.is-selected")
         if selected.is_present():
             return selected.text[0]
+
+        # Look for the license text that will be displayed by default,
+        # if no button is yet explicitly selected
+        license_text = self.q(css='section.license span.license-text')
+        if license_text.is_present():
+            return license_text.text[0]
         return None
 
     @course_license.setter
     def course_license(self, license_name):
+        """
+        Sets the course license to the given license_name
+        (str, "All Rights Reserved" or "Creative Commons")
+        """
         license_types_css = "section.license ul.license-types li.license-type"
         self.wait_for_element_presence(
             license_types_css,

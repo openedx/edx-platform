@@ -106,33 +106,18 @@ define(["js/views/license", "js/models/license", "js/common_helpers/template_hel
             );
             // SA and ND conflict
             var SA = this.view.$("li[data-option=SA]");
-            expect(SA).toHaveClass("is-disabled");
-            // try to turn on SA option, fail
+            // try to turn on SA option
             SA.click()
-            // no change
-            expect(this.model.get("options")).toEqual(
-                {"ver": "4.0", "BY": true, "NC": true, "ND": true, "SA": false}
-            );
-            // turn off ND
-            var ND = this.view.$("li[data-option=ND]");
-            expect(ND).not.toHaveClass("is-disabled");
-            ND.click()
-            expect(this.model.get("options")).toEqual(
-                {"ver": "4.0", "BY": true, "NC": true, "ND": false, "SA": false}
-            );
-            // turn on SA
-            SA = this.view.$("li[data-option=SA]");
-            expect(SA).not.toHaveClass("is-disabled");
-            SA.click()
+            // ND should no longer be selected
             expect(this.model.get("options")).toEqual(
                 {"ver": "4.0", "BY": true, "NC": true, "ND": false, "SA": true}
             );
-            // try to turn on ND option, fail
+
+            // try to turn on ND option
             ND = this.view.$("li[data-option=ND]");
-            expect(ND).toHaveClass("is-disabled");
             ND.click();
             expect(this.model.get("options")).toEqual(
-                {"ver": "4.0", "BY": true, "NC": true, "ND": false, "SA": true}
+                {"ver": "4.0", "BY": true, "NC": true, "ND": true, "SA": false}
             );
         });
 
@@ -147,7 +132,8 @@ define(["js/views/license", "js/models/license", "js/common_helpers/template_hel
             this.view = new LicenseView({model: this.model, showPreview: true});
             this.view.render()
             expect(this.view.$(".license-preview").length).toEqual(1)
-            expect(this.view.$(".license-preview")).toHaveText("");
+	    // Expect default text to be "All Rights Reserved"
+            expect(this.view.$(".license-preview")).toContainText("All Rights Reserved");
             this.view.$("li[data-license=creative-commons] button").click();
             expect(this.view.$(".license-preview").length).toEqual(1)
             expect(this.view.$(".license-preview")).toContainText("Some Rights Reserved");

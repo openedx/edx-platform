@@ -207,9 +207,14 @@ ${fragment.foot_html()}
   </div>
 </div>
 <div class="container-footer">
-  % if settings.FEATURES.get("LICENSING", False) and getattr(course, "license", None):
+  % if settings.FEATURES.get("LICENSING", False):
     <div class="course-license">
+    % if getattr(course, "license", None):
       <%include file="../license.html" args="license=course.license" />
+    % else:
+      ## Default course license: All Rights Reserved, if none is explicitly set.
+      <%include file="../license.html" args="license='all-rights-reserved'" />
+    % endif
     </div>
   % endif
 </div>

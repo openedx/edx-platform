@@ -488,6 +488,9 @@ class XBlockWrapper(PageObject):
         type_in_codemirror(self, index, text, find_prefix='$("{}").find'.format(self.editor_selector))
 
     def set_license(self, license_type):
+        """
+        Uses the UI to set the course's license to the given license_type (str)
+        """
         css_selector = (
             "ul.license-types li[data-license={license_type}] button"
         ).format(license_type=license_type)

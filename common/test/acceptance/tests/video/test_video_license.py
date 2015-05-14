@@ -1,4 +1,7 @@
 # coding: utf-8
+"""
+Acceptance tests for licensing of the Video module
+"""
 from __future__ import unicode_literals
 from nose.plugins.attrib import attr
 from ..studio.base_studio_test import StudioCourseTest
@@ -11,8 +14,11 @@ from ...fixtures.course import XBlockFixtureDesc
 
 @attr('shard_1')
 class VideoLicenseTest(StudioCourseTest):
-
-    def setUp(self):
+    """
+    Tests for video module-level licensing (that is, setting the license,
+    for a specific video module, to All Rights Reserved or Creative Commons)
+    """
+    def setUp(self):  # pylint: disable=arguments-differ
         super(VideoLicenseTest, self).setUp()
 
         self.lms_courseware = CoursewarePage(
@@ -107,4 +113,4 @@ class VideoLicenseTest(StudioCourseTest):
         self.assertTrue(video.is_present())
         video_license = self.lms_courseware.q(css=".vert .xblock.xmodule_VideoModule .xblock-license")
         self.assertTrue(video_license.is_present())
-        self.assertEqual(video_license.text[0], "Some Rights Reserved")
+        self.assertIn("Some Rights Reserved", video_license.text[0])

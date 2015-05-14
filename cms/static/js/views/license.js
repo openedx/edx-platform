@@ -92,10 +92,17 @@ define(["js/views/baseview", "underscore"], function(BaseView, _) {
         onLicenseClick: function(e) {
             var $li = $(e.srcElement || e.target).closest('li');
             var licenseType = $li.data("license");
-            this.model.set({
-                "type": licenseType,
-                "options": this.getDefaultOptionsForLicenseType(licenseType)
-            });
+
+	    // Check that we've selected a different license type than what's currently selected
+	    if (licenseType != this.model.attributes.type) {
+		this.model.set({
+                    "type": licenseType,
+                    "options": this.getDefaultOptionsForLicenseType(licenseType)
+		});
+		// Fire the change event manually
+		this.model.trigger("change change:type")
+	    }
+	    e.preventDefault();
         },
 
         onOptionClick: function(e) {
@@ -117,17 +124,19 @@ define(["js/views/baseview", "underscore"], function(BaseView, _) {
                 licenseOptions[optionKey] = currentOptionValue;
             }
             // check for conflicts
-            if (currentOptionValue && optionInfo.conflictsWith &&
-                    _.any(optionInfo.conflictsWith, function (key) { return licenseOptions[key];})) {
-                // conflict! don't set new options
-                // need some feedback here
-                return;
-            } else {
-                this.model.set({"options": licenseOptions})
-                // Backbone has trouble identifying when objects change, so we'll
-                // fire the change event manually.
-                this.model.trigger("change change:options")
+            if (currentOptionValue && optionInfo.conflictsWith) {
+		var conflicts = optionInfo.conflictsWith;
+		for (var i=0; i<conflicts.length; i++) {
+		    // Uncheck all conflicts
+		    licenseOptions[conflicts[i]] = false;
+		    console.log(licenseOptions);
+		}
             }
+
+            this.model.set({"options": licenseOptions})
+            // Backbone has trouble identifying when objects change, so we'll
+            // fire the change event manually.
+            this.model.trigger("change change:options")
             e.preventDefault();
         }
 

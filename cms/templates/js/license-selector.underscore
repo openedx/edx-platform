@@ -42,9 +42,7 @@
                 <% var optionInfo = license.options[optionKey]; %>
                 <% if (optionInfo.type == "boolean") { %>
                     <% var optionSelected = model.options[optionKey]; %>
-                    <% var optionDisabled = optionInfo.disabled ||
-                            (optionInfo.conflictsWith && _.any(optionInfo.conflictsWith, function(key) {return model.options[key];}));
-                    %>
+                    <% var optionDisabled = optionInfo.disabled %>
                     <li data-option="<%- optionKey %>"
                         class="action-item license-option
                                <% if (optionSelected) { print("is-selected"); } %>
@@ -76,7 +74,7 @@
             <%= gettext("License Display") %>
         </h4>
         <p class="tip">
-            <%= gettext("The following message will be displayed at the bottom of the courseware pages within your course.") %>
+            <%= gettext("The following message will be displayed at the bottom of the courseware pages within your course:") %>
         </p>
         <div class="license-preview">
         <% // keep this synchronized with the contents of common/templates/license.html %>
@@ -99,14 +97,17 @@
                     alt="<%- typeof licenseString == "string" ? licenseString : "" %>"
                     />
             <% } else { %>
-                <i aria-hidden="true" class="icon-cc"></i>
+	        <% //<span> must come before <i> icon or else spacing gets messed up %>
+                <span class="sr">gettext("Creative Commons licensed content, with terms as follow:")&nbsp;</span><i aria-hidden="true" class="icon-cc"></i>
                 <% _.each(enabled, function(option) { %>
-                        <i aria-hidden="true" class="icon-cc-<%- option %>"></i>
+                        <span class="sr"><%- license.options[option.toUpperCase()].name %>&nbsp;</span><i aria-hidden="true" class="icon-cc-<%- option %>"></i>
                 <% }); %>
                 <span class="license-text"><%= gettext("Some Rights Reserved") %></span>
             <% } %>
         <% } else { %>
             <%= typeof licenseString == "string" ? licenseString : "" %>
+            <% // Default to ARR license %>
+            © <span class="license-text"><%= gettext("All Rights Reserved") %></span>
         <% } %>
         </a>
     </div>

@@ -90,6 +90,9 @@ class CoursewarePage(CoursePage):
 
     @property
     def course_license(self):
+        """
+        Returns the course license text, if present. Else returns None.
+        """
         element = self.q(css="#content .container-footer .course-license")
         if element.is_present():
             return element.text[0]

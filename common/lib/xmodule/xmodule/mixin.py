@@ -41,7 +41,7 @@ class LicenseMixin(XBlockMixin):
             definition['license'] = license
         return definition
 
-    def add_license_to_xml(self, node):
+    def add_license_to_xml(self, node, default=None):
         """
         When generating XML from an XBlock, this method will add the XBlock's
         license to the XML representation before it is serialized.
@@ -49,7 +49,7 @@ class LicenseMixin(XBlockMixin):
         to this method, rather than reimplementing it in their XML export
         functions.
         """
-        if getattr(self, "license", None):
+        if getattr(self, "license", default):
             node.set('license', self.license)
 
 
