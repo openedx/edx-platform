@@ -105,6 +105,7 @@ define(['underscore'], function(_) {
     };
 
     getDefaultNotes = function () {
+        // Note that the server returns notes in reverse chronological order (newest first).
         return [
             {
                 chapter: getChapter('Second Chapter', 0, 1, [1, 'w_n', 0]),
@@ -113,7 +114,8 @@ define(['underscore'], function(_) {
                 created: 'December 11, 2014 at 11:12AM',
                 updated: 'December 11, 2014 at 11:12AM',
                 text: 'Third added model',
-                quote: 'Note 4'
+                quote: 'Note 4',
+                tags: ['Pumpkin', 'pumpkin', 'yummy']
             },
             {
                 chapter: getChapter('Second Chapter', 0, 1, [1, 'w_n', 0]),
@@ -131,7 +133,8 @@ define(['underscore'], function(_) {
                 created: 'December 11, 2014 at 11:11AM',
                 updated: 'December 11, 2014 at 11:11AM',
                 text: 'Second added model',
-                quote: 'Note 3'
+                quote: 'Note 3',
+                tags: ['yummy']
             },
             {
                 chapter: getChapter('Second Chapter', 0, 1, [1, 'w_n', 0]),
@@ -140,7 +143,8 @@ define(['underscore'], function(_) {
                 created: 'December 11, 2014 at 11:10AM',
                 updated: 'December 11, 2014 at 11:10AM',
                 text: 'First added model',
-                quote: 'Note 2'
+                quote: 'Note 2',
+                tags: ['PUMPKIN', 'pie']
             },
             {
                 chapter: getChapter('First Chapter', 1, 0, [2]),
@@ -149,7 +153,8 @@ define(['underscore'], function(_) {
                 created: 'December 11, 2014 at 11:10AM',
                 updated: 'December 11, 2014 at 11:10AM',
                 text: 'First added model',
-                quote: 'Note 1'
+                quote: 'Note 1',
+                tags: ['pie', 'pumpkin']
             }
         ];
     };

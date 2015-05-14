@@ -1,8 +1,8 @@
 ;(function (define, undefined) {
 'use strict';
 define([
-    'underscore', 'backbone', 'js/edxnotes/models/tab'
-], function (_, Backbone, TabModel) {
+    'jquery', 'underscore', 'backbone', 'js/edxnotes/models/tab'
+], function ($, _, Backbone, TabModel) {
     var TabView = Backbone.View.extend({
         PanelConstructor: null,
 
@@ -52,6 +52,7 @@ define([
             // If the view is already rendered, destroy it.
             this.destroySubView();
             this.renderContent().always(this.hideLoadingIndicator);
+            this.$('.sr-is-focusable.sr-tab-panel').focus();
             return this;
         },
 
@@ -63,7 +64,7 @@ define([
 
         getSubView: function () {
             var collection = this.getCollection();
-            return new this.PanelConstructor({collection: collection});
+            return new this.PanelConstructor({collection: collection, scrollToTag: this.options.scrollToTag});
         },
 
         destroySubView: function () {
