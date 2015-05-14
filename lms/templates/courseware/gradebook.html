@@ -38,7 +38,7 @@
 <section class="container">
 <div class="gradebook-wrapper">
   <section class="gradebook-content">
-    <h1>${_("Gradebook")}</h1>
+    <h1 tabindex="0">${_("Gradebook")}</h1>
 
     <table class="student-table">
       <thead>
@@ -72,9 +72,9 @@
         <thead>
           <tr> <!-- Header Row -->
             %for section in templateSummary['section_breakdown']:
-              <th><div class="assignment-label">${section['label']}</div></th>
+              <th><div class="assignment-label" tabindex="0">${section['label']}</div></th>
             %endfor
-            <th><div class="assignment-label">Total</div></th>
+            <th><div class="assignment-label" tabindex="0">Total</div></th>
           </tr>
         </thead>
 
@@ -90,7 +90,7 @@
 
             data_class = "grade_" + letter_grade
           %>
-          <td class="${data_class}" data-percent="${fraction}">${ "{0:.0f}".format( 100 * fraction ) }</td>
+          <td class="${data_class}" data-percent="${fraction}" tabindex="0">${ "{0:.0f}".format( 100 * fraction ) }</td>
         </%def>
 
         <tbody>
