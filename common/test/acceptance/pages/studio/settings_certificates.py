@@ -3,7 +3,6 @@ Course Certificates pages.
 """
 from bok_choy.promise import EmptyPromise
 from .course_page import CoursePage
-from .utils import confirm_prompt
 
 
 class CertificatesPage(CoursePage):
@@ -49,6 +48,17 @@ class CertificatesPage(CoursePage):
         Creates new certificate when at least one already exists
         """
         self.q(css=self.certficate_css + " .action-add").first.click()
+
+    def show_confirmation_prompt(self):
+        """
+        Show confirmation prompt and clicks delete button.
+        We can't use confirm_prompt because its wait_for_notification is flaky when asynchronous operation
+        completed very quickly.
+        """
+        self.wait_for_element_visibility('.prompt', 'Prompt is visible')
+        self.wait_for_element_visibility('.prompt .action-primary', 'Confirmation button is visible')
+        self.q(css='.prompt .action-primary').click()
+        self.wait_for_ajax()
 
     @property
     def no_certificates_message_shown(self):
@@ -132,7 +142,7 @@ class Certificate(object):
         Delete the certificate
         """
         self.find_css('.actions .delete').first.click()
-        confirm_prompt(self.page)
+        self.page.show_confirmation_prompt()
         self.page.wait_for_ajax()
 
     def save(self):
@@ -287,7 +297,7 @@ class Signatory(object):
         Delete the signatory
         """
         self.find_css('.signatory-panel-delete').first.click()
-        confirm_prompt(self.certificate.page)
+        self.certificate.page.show_confirmation_prompt()
         self.certificate.page.wait_for_ajax()
 
     def save(self):
