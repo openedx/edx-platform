@@ -16,25 +16,8 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
       @extend %ui-no-list;
 
       .courses-listing-item {
-        @include rtl() { $layout-direction: "RTL"; }
-        @include fill-parent();
         margin: ($baseline*0.75) 0 ($baseline*1.5) 0;
         max-height: $course-card-height;
-
-        @include media($bp-medium) {
-          @include span-columns(4); // 4 of 8
-          @include omega(2n);
-        }
-
-        @include media($bp-large) {
-          @include span-columns(4); // 4 of 12
-          @include omega(3n);
-        }
-
-        @include media($bp-huge) {
-          @include span-columns(3); // 3 of 12
-          @include omega(4n);
-        }
       }
     }
 
@@ -160,3 +143,26 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
     }
   }
 }
+
+/* Set homepage specific media queries */
+.home .courses-container .courses .courses-listing .courses-listing-item {
+
+  @include rtl() { $layout-direction: "RTL"; }
+  @include fill-parent();
+
+  @include media($bp-medium) {
+    @include span-columns(4); // 4 of 8
+    @include omega(2n);
+  }
+
+  @include media($bp-large) {
+    @include span-columns(4); // 4 of 12
+    @include omega(3n);
+  }
+
+  @include media($bp-huge) {
+    @include span-columns(3); // 3 of 12
+    @include omega(4n);
+  }
+}
+

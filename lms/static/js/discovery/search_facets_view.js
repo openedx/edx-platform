@@ -4,8 +4,10 @@ define([
     'jquery',
     'underscore',
     'backbone',
-    'gettext'
-], function ($, _, Backbone, gettext) {
+    'gettext',
+    'js/discovery/facets_view',
+    'js/discovery/facet_view'
+], function ($, _, Backbone, gettext, FacetsView, FacetView) {
     'use strict';
 
     return Backbone.View.extend({
@@ -13,8 +15,10 @@ define([
         el: '.search-facets',
 
         tagName: 'div',
-        templateId: '#search_facets-tpl',
+        templateId: '#search_facets_list-tpl',
         className: 'facets',
+        facetsTypes: {},
+        moreLessLinksTpl: '#more_less_links-tpl',
 
         events: {
             'click li': 'addFacet',
@@ -22,12 +26,19 @@ define([
             'click .show-more': 'expand',
         },
 
-        initialize: function () {
-            // Empty for now.
+        initialize: function (facetsTypes) {
+            if(facetsTypes) {
+                this.facetsTypes = facetsTypes;
+            }
+            this.tpl = _.template($(this.templateId).html());
+            this.moreLessTpl = _.template($(this.moreLessLinksTpl).html());
+            this.$el.html(this.tpl());
+            this.facetViews = [];
+            this.$facetViewsEl = this.$el.find('.search-facets-lists');
         },
 
         render: function () {
-            // Empty for now.
+
         },
 
         collapse: function(event) {
@@ -61,6 +72,32 @@ define([
             var value = $target.find('.facet-option').data('value');
             var data = {type: $target.data('facet'), query: value};
             this.trigger('addFilter', data);
+        },
+
+        renderFacets: function(facets) {
+            var self = this;
+            // Remove old facets
+            $.each(this.facetViews, function(key, facets) {
+                facets.remove();
+            });
+            // Render new facets
+            $.each(facets, function(name, stats) {
+                var facetsView = new FacetsView();
+                self.facetViews.push(facetsView);
+                var displayName = name;
+                if(self.facetsTypes.hasOwnProperty(name)) {
+                    displayName = self.facetsTypes[name];
+                }
+                self.$facetViewsEl.append(facetsView.render(name, displayName, stats).el);
+                $.each(stats.terms, function(term, count) {
+                    var facetView = new FacetView();
+                    facetsView.$views.append(facetView.render(name, term, count).el);
+                    facetsView.list.push(facetView);
+                });
+                if(_.size(stats.terms) > 9) {
+                    facetsView.$el.append(self.moreLessTpl());
+                }
+            });
         }
 
     });
