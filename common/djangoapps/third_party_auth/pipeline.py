@@ -209,7 +209,7 @@ class ProviderUserState(object):
 
     def get_unlink_form_name(self):
         """Gets the name used in HTML forms that unlink a provider account."""
-        return self.provider.NAME + '_unlink_form'
+        return self.provider.provider_id + '_unlink_form'
 
 
 def get(request):
@@ -239,7 +239,7 @@ def get_authenticated_user(auth_provider, username, uid):
         user has no social auth associated with the given backend.
         AssertionError: if the user is not authenticated.
     """
-    match = models.DjangoStorage.user.get_social_auth(provider=auth_provider.BACKEND_CLASS.name, uid=uid)
+    match = models.DjangoStorage.user.get_social_auth(provider=auth_provider.backend_name, uid=uid)
 
     if not match or match.user.username != username:
         raise User.DoesNotExist
@@ -249,12 +249,12 @@ def get_authenticated_user(auth_provider, username, uid):
     return user
 
 
-def _get_enabled_provider_by_name(provider_name):
-    """Gets an enabled provider by its NAME member or throws."""
-    enabled_provider = provider.Registry.get(provider_name)
+def _get_enabled_provider(provider_id):
+    """Gets an enabled provider by its provider_id member or throws."""
+    enabled_provider = provider.Registry.get(provider_id)
 
     if not enabled_provider:
-        raise ValueError('Provider %s not enabled' % provider_name)
+        raise ValueError('Provider %s not enabled' % provider_id)
 
     return enabled_provider
 
@@ -301,11 +301,11 @@ def get_complete_url(backend_name):
     return _get_url('social:complete', backend_name)
 
 
-def get_disconnect_url(provider_name, association_id):
+def get_disconnect_url(provider_id, association_id):
     """Gets URL for the endpoint that starts the disconnect pipeline.
 
     Args:
-        provider_name: string. Name of the provider.BaseProvider child you want
+        provider_id: string identifier of the models.ProviderConfig child you want
             to disconnect from.
         association_id: int. Optional ID of a specific row in the UserSocialAuth
             table to disconnect (useful if multiple providers use a common backend)
@@ -314,21 +314,21 @@ def get_disconnect_url(provider_name, association_id):
         String. URL that starts the disconnection pipeline.
 
     Raises:
-        ValueError: if no provider is enabled with the given name.
+        ValueError: if no provider is enabled with the given ID.
     """
-    backend_name = _get_enabled_provider_by_name(provider_name).BACKEND_CLASS.name
+    backend_name = _get_enabled_provider(provider_id).backend_name
     if association_id:
         return _get_url('social:disconnect_individual', backend_name, url_params={'association_id': association_id})
     else:
         return _get_url('social:disconnect', backend_name)
 
 
-def get_login_url(provider_name, auth_entry, redirect_url=None):
+def get_login_url(provider_id, auth_entry, redirect_url=None):
     """Gets the login URL for the endpoint that kicks off auth with a provider.
 
     Args:
-        provider_name: string. The name of the provider.Provider that has been
-            enabled.
+        provider_id: string identifier of the models.ProviderConfig child you want
+            to disconnect from.
         auth_entry: string. Query argument specifying the desired entry point
             for the auth pipeline. Used by the pipeline for later branching.
             Must be one of _AUTH_ENTRY_CHOICES.
@@ -341,13 +341,13 @@ def get_login_url(provider_name, auth_entry, redirect_url=None):
         String. URL that starts the auth pipeline for a provider.
 
     Raises:
-        ValueError: if no provider is enabled with the given provider_name.
+        ValueError: if no provider is enabled with the given provider_id.
     """
     assert auth_entry in _AUTH_ENTRY_CHOICES
-    enabled_provider = _get_enabled_provider_by_name(provider_name)
+    enabled_provider = _get_enabled_provider(provider_id)
     return _get_url(
         'social:begin',
-        enabled_provider.BACKEND_CLASS.name,
+        enabled_provider.backend_name,
         auth_entry=auth_entry,
         redirect_url=redirect_url,
         extra_params=enabled_provider.get_url_params(),

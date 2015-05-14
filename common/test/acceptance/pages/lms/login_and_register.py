@@ -232,7 +232,7 @@ class CombinedLoginAndRegisterPage(PageObject):
         Only the "Dummy" provider is used for bok choy because it is the only
         one that doesn't send traffic to external servers.
         """
-        self.q(css="button.{}-Dummy".format(self.current_form)).click()
+        self.q(css="button.{}-oa2-dummy".format(self.current_form)).click()
 
     def password_reset(self, email):
         """Navigates to, fills in, and submits the password reset form.
