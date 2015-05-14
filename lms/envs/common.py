@@ -1272,14 +1272,12 @@ PIPELINE_CSS = {
     'style-main': {
         'source_filenames': [
             'sass/lms-main.css',
-            'sass/ie.css'
         ],
         'output_filename': 'css/lms-main.css',
     },
     'style-main-rtl': {
         'source_filenames': [
             'sass/lms-main-rtl.css',
-            'sass/ie-rtl.css'
         ],
         'output_filename': 'css/lms-main-rtl.css',
     },
