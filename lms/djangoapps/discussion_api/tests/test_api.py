@@ -351,6 +351,7 @@ class GetCourseTopicsTest(ModuleStoreTestCase):
         self.assertEqual(staff_actual, staff_expected)
 
 
+@ddt.ddt
 class ContentTestMixin(CommentsServiceMockMixin):
     """A mixin for tests of discussion content."""
     def setUp(self):
@@ -367,6 +368,12 @@ class ContentTestMixin(CommentsServiceMockMixin):
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
         self.author = UserFactory.create()
         self.cohort = CohortFactory.create(course_id=self.course.id)
+
+    def create_role(self, role_name, users, course=None):
+        """Create a Role in self.course with the given name and users"""
+        course = course or self.course
+        role = Role.objects.create(name=role_name, course_id=course.id)
+        role.users = users
 
     def make_cs_thread(self, thread_data=None):
         """
@@ -425,6 +432,74 @@ class ContentTestMixin(CommentsServiceMockMixin):
             ret.update(comment_data)
         return ret
 
+    def _get_anonymity_test_result(self, anonymous, anonymous_to_peers):
+        """
+        Get the result of calling the API for content of the appropriate type
+        having anonymous and anonymous_to_peers set according to the arguments
+        """
+        raise NotImplemented
+
+    @ddt.data(
+        (FORUM_ROLE_ADMINISTRATOR, True, False, True),
+        (FORUM_ROLE_ADMINISTRATOR, False, True, False),
+        (FORUM_ROLE_MODERATOR, True, False, True),
+        (FORUM_ROLE_MODERATOR, False, True, False),
+        (FORUM_ROLE_COMMUNITY_TA, True, False, True),
+        (FORUM_ROLE_COMMUNITY_TA, False, True, False),
+        (FORUM_ROLE_STUDENT, True, False, True),
+        (FORUM_ROLE_STUDENT, False, True, True),
+    )
+    @ddt.unpack
+    def test_anonymity(self, role_name, anonymous, anonymous_to_peers, expected_api_anonymous):
+        """
+        Test that content is properly made anonymous.
+
+        Content should be anonymous iff the anonymous field is true or the
+        anonymous_to_peers field is true and the requester does not have a
+        privileged role.
+
+        role_name is the name of the requester's role.
+        anonymous is the value of the anonymous field in the content.
+        anonymous_to_peers is the value of the anonymous_to_peers field in the
+          content.
+        expected_api_anonymous is whether the content should actually be
+          anonymous in the API output when requested by a user with the given
+          role.
+        """
+        self.create_role(role_name, [self.user])
+        result = self._get_anonymity_test_result(anonymous, anonymous_to_peers)
+        actual_api_anonymous = result["results"][0]["author"] is None
+        self.assertEqual(actual_api_anonymous, expected_api_anonymous)
+
+    @ddt.data(
+        (FORUM_ROLE_ADMINISTRATOR, False, "staff"),
+        (FORUM_ROLE_ADMINISTRATOR, True, None),
+        (FORUM_ROLE_MODERATOR, False, "staff"),
+        (FORUM_ROLE_MODERATOR, True, None),
+        (FORUM_ROLE_COMMUNITY_TA, False, "community_ta"),
+        (FORUM_ROLE_COMMUNITY_TA, True, None),
+        (FORUM_ROLE_STUDENT, False, None),
+        (FORUM_ROLE_STUDENT, True, None),
+    )
+    @ddt.unpack
+    def test_author_labels(self, role_name, anonymous, expected_label):
+        """
+        Test correctness of the author_label field.
+
+        The label should be "staff", "staff", or "community_ta" for the
+        Administrator, Moderator, and Community TA roles, respectively, but
+        the label should not be present if the thread is anonymous.
+
+        role_name is the name of the author's role.
+        anonymous is the value of the anonymous field in the content.
+        expected_label is the expected value of the author_label field in the
+          API output.
+        """
+        self.create_role(role_name, [self.author])
+        result = self._get_anonymity_test_result(anonymous, False)
+        actual_label = result["results"][0]["author_label"]
+        self.assertEqual(actual_label, expected_label)
+
 
 @ddt.ddt
 class GetThreadListTest(ContentTestMixin, ModuleStoreTestCase):
@@ -438,12 +513,6 @@ class GetThreadListTest(ContentTestMixin, ModuleStoreTestCase):
         self.register_get_threads_response(threads, page, num_pages)
         ret = get_thread_list(self.request, course.id, page, page_size)
         return ret
-
-    def create_role(self, role_name, users):
-        """Create a Role in self.course with the given name and users"""
-        role = Role.objects.create(name=role_name, course_id=self.course.id)
-        role.users = users
-        role.save()
 
     def test_nonexistent_course(self):
         with self.assertRaises(Http404):
@@ -644,8 +713,7 @@ class GetThreadListTest(ContentTestMixin, ModuleStoreTestCase):
         cohort_course = CourseFactory.create(cohort_config={"cohorted": course_is_cohorted})
         CourseEnrollmentFactory.create(user=self.user, course_id=cohort_course.id)
         CohortFactory.create(course_id=cohort_course.id, users=[self.user])
-        role = Role.objects.create(name=role_name, course_id=cohort_course.id)
-        role.users = [self.user]
+        self.create_role(role_name, [self.user], cohort_course)
         self.get_thread_list([], course=cohort_course)
         actual_has_group = "group_id" in httpretty.last_request().querystring
         expected_has_group = (course_is_cohorted and role_name == FORUM_ROLE_STUDENT)
@@ -683,71 +751,13 @@ class GetThreadListTest(ContentTestMixin, ModuleStoreTestCase):
         with self.assertRaises(Http404):
             get_thread_list(self.request, self.course.id, page=4, page_size=10)
 
-    @ddt.data(
-        (FORUM_ROLE_ADMINISTRATOR, True, False, True),
-        (FORUM_ROLE_ADMINISTRATOR, False, True, False),
-        (FORUM_ROLE_MODERATOR, True, False, True),
-        (FORUM_ROLE_MODERATOR, False, True, False),
-        (FORUM_ROLE_COMMUNITY_TA, True, False, True),
-        (FORUM_ROLE_COMMUNITY_TA, False, True, False),
-        (FORUM_ROLE_STUDENT, True, False, True),
-        (FORUM_ROLE_STUDENT, False, True, True),
-    )
-    @ddt.unpack
-    def test_anonymity(self, role_name, anonymous, anonymous_to_peers, expected_api_anonymous):
-        """
-        Test that a thread is properly made anonymous.
-
-        A thread should be anonymous iff the anonymous field is true or the
-        anonymous_to_peers field is true and the requester does not have a
-        privileged role.
-
-        role_name is the name of the requester's role.
-        thread_anon is the value of the anonymous field in the thread data.
-        thread_anon_to_peers is the value of the anonymous_to_peers field in the
-          thread data.
-        expected_api_anonymous is whether the thread should actually be
-          anonymous in the API output when requested by a user with the given
-          role.
-        """
-        self.create_role(role_name, [self.user])
-        result = self.get_thread_list([
+    def _get_anonymity_test_result(self, anonymous, anonymous_to_peers):
+        return self.get_thread_list([
             self.make_cs_thread({
                 "anonymous": anonymous,
                 "anonymous_to_peers": anonymous_to_peers,
             })
         ])
-        actual_api_anonymous = result["results"][0]["author"] is None
-        self.assertEqual(actual_api_anonymous, expected_api_anonymous)
-
-    @ddt.data(
-        (FORUM_ROLE_ADMINISTRATOR, False, "staff"),
-        (FORUM_ROLE_ADMINISTRATOR, True, None),
-        (FORUM_ROLE_MODERATOR, False, "staff"),
-        (FORUM_ROLE_MODERATOR, True, None),
-        (FORUM_ROLE_COMMUNITY_TA, False, "community_ta"),
-        (FORUM_ROLE_COMMUNITY_TA, True, None),
-        (FORUM_ROLE_STUDENT, False, None),
-        (FORUM_ROLE_STUDENT, True, None),
-    )
-    @ddt.unpack
-    def test_author_labels(self, role_name, anonymous, expected_label):
-        """
-        Test correctness of the author_label field.
-
-        The label should be "staff", "staff", or "community_ta" for the
-        Administrator, Moderator, and Community TA roles, respectively, but
-        the label should not be present if the thread is anonymous.
-
-        role_name is the name of the author's role.
-        anonymous is the value of the anonymous field in the thread data.
-        expected_label is the expected value of the author_label field in the
-          API output.
-        """
-        self.create_role(role_name, [self.author])
-        result = self.get_thread_list([self.make_cs_thread({"anonymous": anonymous})])
-        actual_label = result["results"][0]["author_label"]
-        self.assertEqual(actual_label, expected_label)
 
 
 @ddt.ddt
@@ -801,8 +811,7 @@ class GetCommentListTest(ContentTestMixin, ModuleStoreTestCase):
         cohort_course = CourseFactory.create(cohort_config={"cohorted": course_is_cohorted})
         CourseEnrollmentFactory.create(user=self.user, course_id=cohort_course.id)
         cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.user])
-        role = Role.objects.create(name=role_name, course_id=cohort_course.id)
-        role.users = [self.user]
+        self.create_role(role_name, [self.user], cohort_course)
         thread = self.make_cs_thread({
             "course_id": unicode(cohort_course.id),
             "group_id": (
@@ -884,7 +893,7 @@ class GetCommentListTest(ContentTestMixin, ModuleStoreTestCase):
             }
         )
 
-    def test_discussion_content(self):
+    def test_comment_content(self):
         thread_id = "test_thread"
         self.register_get_user_response(self.user, upvoted_ids=["test_comment_3"])
         source_comments = [
@@ -1158,3 +1167,15 @@ class GetCommentListTest(ContentTestMixin, ModuleStoreTestCase):
         # Page past the end
         with self.assertRaises(Http404):
             self.get_comment_list(thread, endorsed=True, page=2, page_size=10)
+
+    def _get_anonymity_test_result(self, anonymous, anonymous_to_peers):
+        return self.get_comment_list(
+            self.make_cs_thread({
+                "children": [
+                    self.make_cs_comment({
+                        "anonymous": anonymous,
+                        "anonymous_to_peers": anonymous_to_peers,
+                    })
+                ]
+            })
+        )
