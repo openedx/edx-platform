@@ -29,7 +29,7 @@
   <div id="new-ccx-schedule"></div>
 </div>
 
-<section id="enter-date-modal" class="modal" aria-hidden="true">
+<section id="enter-date-modal" class="modal" tabindex="0">
   <div class="inner-wrapper" role="dialog">
     <button class="close-modal">
       <i class="icon fa fa-remove"></i>
@@ -38,7 +38,7 @@
       </span>
     </button>
     <header>
-      <h2></h2>
+      <h2 role="heading" tabindex="0"></h2>
     </header>
     <form role="form">
       <div class="field datepair">
@@ -57,10 +57,10 @@
   <div class="ccx-sidebar-panel" id="dirty-schedule">
     <h2>${_('Save changes')}</h2>
     <form role="form">
-      <p>${_("You have unsaved changes.")}</p>
+      <p id="save_changes_hint">${_("You have unsaved changes.")}</p>
       <div class="field">
         <br/>
-        <button id="save-changes">${_("Save changes")}</button>
+        <button id="save-changes" aria-describedby="save_changes_hint">${_("Save changes")}</button>
       </div>
     </form>
   </div>
@@ -72,26 +72,30 @@
     <h2>${_('Schedule a Unit')}</h2>
     <form role="form" id="add-unit" name="add-unit" class="ccx-form">
       <div class="field">
-        <b>${_('Section')}</b><br/>
-        <select name="chapter"></select>
+        <label id="section_label" for="chapter"><b>${_('Section')}</b></label>
+        <select aria-describedby="section_label" name="chapter" id="chapter" role="listbox"></select>
       </div>
       <div class="field">
-        <b>${_('Subsection')}</b><br/>
-        <select name="sequential"></select>
+        <label id="sub_section_label" for="sequential"><b>${_('Subsection')}</b></label>
+        <select aria-describedby="sub_section_label" name="sequential" id="sequential" role="listbox"></select>
       </div>
       <div class="field">
-        <b>${_('Unit')}</b><br/>
-        <select name="vertical"></select>
+        <label id="unit_label" for="vertical"><b>${_('Unit')}</b></label>
+        <select aria-describedby="unit_label" name="vertical" id="vertical" role="listbox"></select>
       </div>
       <div class="field datepair">
-        <b>${_('Start Date')}</b><br/>
-        <input placeholder="Date" type="date" class="date" name="start_date"/>
-        <input placeholder="time" type="time" class="time" name="start_time"/>
+        <label for="start_date_time"><b>${_('Start Date')}</b></label>
+        <span id="start_date_time">
+          <input placeholder="Date" type="date" class="date" name="start_date"/>
+          <input placeholder="time" type="time" class="time" name="start_time"/>
+        </span>
       </div>
       <div class="field datepair">
-        <b>${_('Due Date')}</b> ${_('(Optional)')}<br/>
-        <input placeholder="Date" type="date" class="date" name="due_date"/>
-        <input placeholder="time" type="time" class="time" name="due_time"/>
+        <label for="due_date_time"><b>${_('Due Date')}</b> ${_('(Optional)')}</label>
+        <span id="due_date_time">
+          <input placeholder="Date" type="date" class="date" name="due_date"/>
+          <input placeholder="time" type="time" class="time" name="due_time"/>
+        </span>
       </div>
       <div class="field">
         <br/>
