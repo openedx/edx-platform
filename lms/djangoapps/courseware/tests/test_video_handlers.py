@@ -275,7 +275,7 @@ class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):
         super(TestTranscriptAvailableTranslationsBumperDispatch, self).setUp()
         self.item_descriptor.render(STUDENT_VIEW)
         self.item = self.item_descriptor.xmodule_runtime.xmodule_instance
-        self.dispatch = "available_translations_bumper"
+        self.dispatch = "available_translations/?is_bumper=1"
         self.item.video_bumper = {"transcripts": {"en": ""}}
 
     def test_available_translation_en(self):
@@ -366,8 +366,9 @@ class TestTranscriptDownloadDispatch(TestVideo):
         request = Request.blank('/download')
         response = self.item.transcript(request=request, dispatch='download')
         self.assertEqual(response.status, '404 Not Found')
+        transcripts = self.item.get_transcripts_info()
         with self.assertRaises(NotFoundError):
-            self.item.get_transcript()
+            self.item.get_transcript(transcripts)
 
     @patch('xmodule.video_module.VideoModule.get_transcript', return_value=('Subs!', u"塞.srt", 'application/x-subrip; charset=utf-8'))
     def test_download_non_en_non_ascii_filename(self, __):
@@ -417,10 +418,10 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         ('/translation/ru?videoId=12345', 'translation/ru', '404 Not Found'),
         # Youtube_id is invalid or does not exist
         ('/translation/uk?videoId=9855256955511225', 'translation/uk', '404 Not Found'),
-        ('/translation_bumper', 'translation_bumper', '400 Bad Request'),
-        ('/translation_bumper/ru', 'translation_bumper/ru', '404 Not Found'),
-        ('/translation_bumper/ru?videoId=12345', 'translation_bumper/ru', '404 Not Found'),
-        ('/translation_bumper/uk?videoId=9855256955511225', 'translation_bumper/uk', '404 Not Found'),
+        ('/translation?is_bumper=1', 'translation', '400 Bad Request'),
+        ('/translation/ru?is_bumper=1', 'translation/ru', '404 Not Found'),
+        ('/translation/ru?videoId=12345&is_bumper=1', 'translation/ru', '404 Not Found'),
+        ('/translation/uk?videoId=9855256955511225&is_bumper=1', 'translation/uk', '404 Not Found'),
     )
     @ddt.unpack
     def test_translation_fails(self, url, dispatch, status_code):
@@ -429,17 +430,17 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         self.assertEqual(response.status, status_code)
 
     @ddt.data(
-        ('translation/en', attach_sub),
-        ('translation_bumper/en', attach_bumper_transcript))
+        ('translation/en?videoId={}', 'translation/en', attach_sub),
+        ('translation/en?videoId={}&is_bumper=1', 'translation/en', attach_bumper_transcript))
     @ddt.unpack
-    def test_translaton_en_youtube_success(self, dispatch, attach):
+    def test_translaton_en_youtube_success(self, url, dispatch, attach):
         subs = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
         good_sjson = _create_file(json.dumps(subs))
         _upload_sjson_file(good_sjson, self.item_descriptor.location)
         subs_id = _get_subs_id(good_sjson.name)
 
         attach(self.item, subs_id)
-        request = Request.blank('/{}?videoId={}'.format(dispatch, subs_id))
+        request = Request.blank(url.format(subs_id))
         response = self.item.transcript(request=request, dispatch=dispatch)
         self.assertDictEqual(json.loads(response.body), subs)
 
@@ -487,16 +488,16 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         self.assertDictEqual(json.loads(response.body), calculated_1_5)
 
     @ddt.data(
-        ('translation/en', attach_sub),
-        ('translation_bumper/en', attach_bumper_transcript))
+        ('translation/en', 'translation/en', attach_sub),
+        ('translation/en?is_bumper=1', 'translation/en', attach_bumper_transcript))
     @ddt.unpack
-    def test_translaton_en_html5_success(self, dispatch, attach):
+    def test_translaton_en_html5_success(self, url, dispatch, attach):
         good_sjson = _create_file(json.dumps(TRANSCRIPT))
         _upload_sjson_file(good_sjson, self.item_descriptor.location)
         subs_id = _get_subs_id(good_sjson.name)
 
         attach(self.item, subs_id)
-        request = Request.blank(dispatch)
+        request = Request.blank(url)
         response = self.item.transcript(request=request, dispatch=dispatch)
         self.assertDictEqual(json.loads(response.body), TRANSCRIPT)
 
@@ -564,10 +565,10 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         # translate with static fallback
         ('/translation/uk', 'translation/uk', '404 Not Found'),
         (
-            '/translation_bumper/en', 'translation_bumper/en', '307 Temporary Redirect', 'OEoXaMPEzfM',
+            '/translation/en?is_bumper=1', 'translation/en', '307 Temporary Redirect', 'OEoXaMPEzfM',
             attach_bumper_transcript
         ),
-        ('/translation_bumper/uk', 'translation_bumper/uk', '404 Not Found'),
+        ('/translation/uk?is_bumper=1', 'translation/uk', '404 Not Found'),
     )
     @ddt.unpack
     def test_translation_static_transcript(self, url, dispatch, status_code, sub=None, attach=None):
@@ -763,7 +764,8 @@ class TestGetTranscript(TestVideo):
         _upload_sjson_file(good_sjson, self.item.location)
         self.item.sub = _get_subs_id(good_sjson.name)
 
-        text, filename, mime_type = self.item.get_transcript()
+        transcripts = self.item.get_transcripts_info()
+        text, filename, mime_type = self.item.get_transcript(transcripts)
 
         expected_text = textwrap.dedent("""\
             0
@@ -800,7 +802,8 @@ class TestGetTranscript(TestVideo):
 
         _upload_sjson_file(good_sjson, self.item.location)
         self.item.sub = _get_subs_id(good_sjson.name)
-        text, filename, mime_type = self.item.get_transcript("txt")
+        transcripts = self.item.get_transcripts_info()
+        text, filename, mime_type = self.item.get_transcript(transcripts, transcript_format="txt")
         expected_text = textwrap.dedent("""\
             Hi, welcome to Edx.
             Let's start with what is on your screen right now.""")
@@ -810,15 +813,15 @@ class TestGetTranscript(TestVideo):
         self.assertEqual(mime_type, 'text/plain; charset=utf-8')
 
     def test_en_with_empty_sub(self):
-
+        transcripts = self.item.get_transcripts_info()
         # no self.sub, self.youttube_1_0 exist, but no file in assets
         with self.assertRaises(NotFoundError):
-            self.item.get_transcript()
+            self.item.get_transcript(transcripts)
 
         # no self.sub and no self.youtube_1_0
         self.item.youtube_id_1_0 = None
         with self.assertRaises(ValueError):
-            self.item.get_transcript()
+            self.item.get_transcript(transcripts)
 
         # no self.sub but youtube_1_0 exists with file in assets
         good_sjson = _create_file(content=textwrap.dedent("""\
@@ -840,7 +843,7 @@ class TestGetTranscript(TestVideo):
         _upload_sjson_file(good_sjson, self.item.location)
         self.item.youtube_id_1_0 = _get_subs_id(good_sjson.name)
 
-        text, filename, mime_type = self.item.get_transcript()
+        text, filename, mime_type = self.item.get_transcript(transcripts)
         expected_text = textwrap.dedent("""\
             0
             00:00:00,270 --> 00:00:02,720
@@ -861,7 +864,8 @@ class TestGetTranscript(TestVideo):
         self.srt_file.seek(0)
         _upload_file(self.srt_file, self.item_descriptor.location, u"塞.srt")
 
-        text, filename, mime_type = self.item.get_transcript()
+        transcripts = self.item.get_transcripts_info()
+        text, filename, mime_type = self.item.get_transcript(transcripts)
         expected_text = textwrap.dedent("""
         0
         00:00:00,12 --> 00:00:00,100
@@ -877,8 +881,9 @@ class TestGetTranscript(TestVideo):
         _upload_sjson_file(good_sjson, self.item.location)
         self.item.sub = _get_subs_id(good_sjson.name)
 
+        transcripts = self.item.get_transcripts_info()
         with self.assertRaises(ValueError):
-            self.item.get_transcript()
+            self.item.get_transcript(transcripts)
 
     def test_key_error(self):
         good_sjson = _create_file(content="""
@@ -897,5 +902,6 @@ class TestGetTranscript(TestVideo):
         _upload_sjson_file(good_sjson, self.item.location)
         self.item.sub = _get_subs_id(good_sjson.name)
 
+        transcripts = self.item.get_transcripts_info()
         with self.assertRaises(KeyError):
-            self.item.get_transcript()
+            self.item.get_transcript(transcripts)

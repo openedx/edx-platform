@@ -286,8 +286,7 @@ function (VideoPlayer, i18n) {
 
         state.videoType = 'html5';
 
-        if (!state.config.sub || !state.config.sub.length) {
-            state.config.sub = '';
+        if (!_.keys(state.config.transcriptLanguages).length) {
             state.config.showCaptions = false;
         }
         state.setSpeed(state.speed);
@@ -396,6 +395,13 @@ function (VideoPlayer, i18n) {
                      }
                 },
                 config = {};
+
+            data = _.extend({
+                startTime: 0,
+                endTime: null,
+                sub: '',
+                streams: ''
+            }, data);
 
             $.each(data, function(option, value) {
                 // Extract option that is in `extractKeys`.

@@ -9,6 +9,8 @@ from collections import OrderedDict
 from datetime import datetime, timedelta
 from django.conf import settings
 
+from .video_utils import set_query_parameter
+
 try:
     import edxval.api as edxval_api
 except ImportError:
@@ -110,19 +112,22 @@ def bumper_metadata(video, sources):
     """
     Generate bumper metadata.
     """
-    unused_track_url, bumper_transcript_language, bumper_languages = video.get_transcripts_for_student(
-        video.bumper['transcripts'], bumper=True
-    )
+    transcripts = video.get_transcripts_info(is_bumper=True)
+    unused_track_url, bumper_transcript_language, bumper_languages = video.get_transcripts_for_student(transcripts)
 
     metadata = OrderedDict({
+        'saveStateUrl': video.system.ajax_url + '/save_user_state',
+        'showCaptions': json.dumps(video.show_captions),
         'sources': sources,
-        'showCaptions': json.dumps(bool(video.bumper['transcripts'])),  # TODO: clarify - send it, Anton?
+        'streams': '',
         'transcriptLanguage': bumper_transcript_language,
         'transcriptLanguages': bumper_languages,
-        'transcriptTranslationUrl': video.runtime.handler_url(video, 'transcript', 'translation_bumper').rstrip('/?'),
-        'transcriptAvailableTranslationsUrl': video.runtime.handler_url(
-            video, 'transcript', 'available_translations_bumper'
-        ).rstrip('/?'),
+        'transcriptTranslationUrl': set_query_parameter(
+            video.runtime.handler_url(video, 'transcript', 'translation/__lang__').rstrip('/?'), 'is_bumper', 1
+        ),
+        'transcriptAvailableTranslationsUrl': set_query_parameter(
+            video.runtime.handler_url(video, 'transcript', 'available_translations').rstrip('/?'), 'is_bumper', 1
+        ),
     })
 
     return metadata
