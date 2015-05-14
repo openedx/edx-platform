@@ -1,4 +1,3 @@
-
 import os
 import unittest
 from pavelib.utils.test.suites.bokchoy_suite import BokChoyTestSuite

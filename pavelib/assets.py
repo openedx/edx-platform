@@ -8,7 +8,6 @@ from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 import glob
 import traceback
-import os
 from .utils.envs import Env
 from .utils.cmd import cmd, django_cmd
 
