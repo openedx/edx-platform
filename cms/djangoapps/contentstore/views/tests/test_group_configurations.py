@@ -7,7 +7,7 @@ import json
 from mock import patch
 from contentstore.utils import reverse_course_url, reverse_usage_url
 from contentstore.views.component import SPLIT_TEST_COMPONENT_TYPE
-from contentstore.views.course import GroupConfiguration
+from contentstore.course_group_config import GroupConfiguration
 from contentstore.tests.utils import CourseTestCase
 from xmodule.partitions.partitions import Group, UserPartition
 from xmodule.modulestore.tests.factories import ItemFactory

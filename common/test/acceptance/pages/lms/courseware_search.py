@@ -37,3 +37,10 @@ class CoursewareSearchPage(CoursePage):
         """
         self.enter_search_term(text)
         self.search()
+
+    def clear_search(self):
+        """
+        Clear search bar after search.
+        """
+        self.q(css=self.search_bar_selector + ' .cancel-button').click()
+        self.wait_for_element_visibility('#course-content', 'Search bar is cleared')

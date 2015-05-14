@@ -2246,6 +2246,8 @@ PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM = 12
 
 # Use None for the default search engine
 SEARCH_ENGINE = None
+# Use LMS specific search initializer
+SEARCH_INITIALIZER = "lms.lib.courseware_search.lms_search_initializer.LmsSearchInitializer"
 # Use the LMS specific result processor
 SEARCH_RESULT_PROCESSOR = "lms.lib.courseware_search.lms_result_processor.LmsSearchResultProcessor"
 # Use the LMS specific filter generator
