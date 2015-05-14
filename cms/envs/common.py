@@ -459,17 +459,17 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/cms-style-vendor-tinymce-skin.css',
     },
-    'style-app': {
+    'style-main': {
         'source_filenames': [
-            'sass/style-app.css',
+            'sass/studio-main.css',
         ],
-        'output_filename': 'css/cms-style-app.css',
+        'output_filename': 'css/studio-main.css',
     },
-    'style-app-rtl': {
+    'style-main-rtl': {
         'source_filenames': [
-            'sass/style-app-rtl.css',
+            'sass/studio-main-rtl.css',
         ],
-        'output_filename': 'css/cms-style-app-rtl.css',
+        'output_filename': 'css/studio-main-rtl.css',
     },
     'style-xmodule-annotations': {
         'source_filenames': [
