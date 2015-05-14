@@ -30,9 +30,15 @@ ${page_title_breadcrumbs(course_name())}
 </script>
 % endfor
 
-% for template_name in ["bookmarks_button", "bookmarks_results"]:
+% for template_name in ["bookmarks_button", "bookmarks_list"]:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="bookmarks/${template_name}.underscore" />
+</script>
+% endfor
+
+% for template_name in ["message"]:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="views/${template_name}.underscore" />
 </script>
 % endfor
 
@@ -212,10 +218,12 @@ ${fragment.foot_html()}
       ${fragment.body_html()}
     </section>
 
-    <!--% if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):-->
-      <section id="courseware-search-results" class="search-results courseware-search-results" data-course-id="${course.id}">
+      <section id="courseware-results-wrapper">
+        <div id="loading-message" aria-live="assertive" aria-relevant="all"></div>
+        <div id="error-message" aria-live="polite"></div>
+        <div id="courseware-results-list" class="search-results" data-course-id="${course.id}"></div>
       </section>
-    <!--% endif-->
+
   </div>
 </div>
 

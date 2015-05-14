@@ -1,19 +1,21 @@
-define(['backbone', 'jquery', 'underscore', 'js/views/message_banner'
+define(['backbone', 'jquery', 'underscore', 'js/views/message'
        ],
-    function (Backbone, $, _, MessageBannerView) {
+    function (Backbone, $, _, MessageView) {
         'use strict';
 
-        describe("MessageBannerView", function () {
+        describe("MessageView", function () {
 
             beforeEach(function () {
                 setFixtures('<div class="message-banner"></div>');
                 TemplateHelpers.installTemplate("templates/fields/message_banner");
+                TemplateHelpers.installTemplate("templates/views/message");
             });
 
             it('renders message correctly', function() {
                 var messageSelector = '.message-banner';
-                var messageView = new MessageBannerView({
-                    el: $(messageSelector)
+                var messageView = new MessageView({
+                    el: $(messageSelector),
+                    templateId: '#message_banner-tpl'
                 });
 
                 messageView.showMessage('I am message view');

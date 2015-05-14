@@ -8,8 +8,8 @@
              <a class="bookmarks-results-list-item" href="<%= bookmark.get('usage_id') %>" aria-describedby="bookmark-type-<%= index %> bookmark-date-<%= index %>" target="_blank">
                 <div class="list-item-content">
                     <div class="list-item-left-section">
-                        <h3 class="list-item-breadcrumbtrail"> <%= bookmark.get('breadcrumbTrail') %> </h3>
-                        <p id="bookmark-date-<%= index %>" class="list-item-date"> <%= gettext("Bookmarked on") %> <%= bookmark.get('userFriendlyDate') %> </p>
+                        <h3 class="list-item-breadcrumbtrail"> <%= breadcrumbTrail(bookmark.get('path')) %> </h3>
+                        <p id="bookmark-date-<%= index %>" class="list-item-date"> <%= gettext("Bookmarked on") %> <%= userFriendlyDate(bookmark.get('created')) %> </p>
                     </div>
 
                     <p id="bookmark-type-<%= index %>" class="list-item-right-section">
