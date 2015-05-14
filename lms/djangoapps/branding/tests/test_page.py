@@ -162,7 +162,6 @@ class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertIn('pre requisite course', resp.content)
         self.assertIn('course that has pre requisite', resp.content)
 
-
 class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
     """
     Test for Index page course cards sorting
@@ -196,6 +195,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
 
     @patch('student.views.render_to_response', RENDER_MOCK)
     @patch('courseware.views.render_to_response', RENDER_MOCK)
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
     def test_course_cards_sorted_by_default_sorting(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
@@ -221,6 +221,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
     @patch('student.views.render_to_response', RENDER_MOCK)
     @patch('courseware.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_SORTING_BY_START_DATE': False})
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
     def test_course_cards_sorted_by_start_date_disabled(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
