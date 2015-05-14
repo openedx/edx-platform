@@ -2317,6 +2317,16 @@ for app_name in OPTIONAL_APPS:
 # See common/djangoapps/third_party_auth/settings.py for configuration details.
 THIRD_PARTY_AUTH = {}
 
+SOCIAL_AUTH_STRATEGY = 'third_party_auth.strategy.SocialStrategy'
+THIRD_PARTY_AUTH_BACKENDS = [
+    # This is a list of which backends are allowed to be enabled on this system.
+    # Adding a backend here does not enable it; that is done via the Django admin
+    'social.backends.google.GoogleOAuth2',
+    'social.backends.linkedin.LinkedinOAuth2',
+    'social.backends.facebook.FacebookOAuth2',
+    'third_party_auth.saml.SAMLAuthBackend',
+]
+
 ### ADVANCED_SECURITY_CONFIG
 # Empty by default
 ADVANCED_SECURITY_CONFIG = {}
