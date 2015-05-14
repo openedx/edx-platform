@@ -16,7 +16,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.block_types import BlockTypeKeyV1
 from opaque_keys.edx.asides import AsideUsageKeyV1
 
-from django.db import DatabaseError
+from django.db import DatabaseError, IntegrityError
 
 from xblock.runtime import KeyValueStore
 from xblock.exceptions import KeyValueMultiSaveError, InvalidScopeError
@@ -411,7 +411,7 @@ class DjangoKeyValueStore(KeyValueStore):
                 # If save is successful on this scope, add the saved fields to
                 # the list of successful saves
                 saved_fields.extend([field.field_name for field in field_objects[field_object]])
-            except DatabaseError:
+            except DatabaseError, IntegrityError:
                 log.exception('Error saving fields %r', field_objects[field_object])
                 raise KeyValueMultiSaveError(saved_fields)
 
