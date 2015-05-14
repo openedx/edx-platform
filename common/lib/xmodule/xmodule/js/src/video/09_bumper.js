@@ -60,6 +60,7 @@ define('video/09_bumper.js',[], function () {
 
         skip: function () {
             this.element.trigger('skip', [this.doNotShowAgain]);
+            this.state.storage.setItem('isBumperShown', true);
             this.showMainVideoHandler();
         },
 
@@ -85,7 +86,6 @@ define('video/09_bumper.js',[], function () {
             if (this.doNotShowAgain) {
                 _.extend(info, {do_not_show_again_bumper: true});
             }
-            this.state.storage.setItem('isBumperShown', true);
             this.state.videoSaveStatePlugin.saveState(true, info);
         },
 

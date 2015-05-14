@@ -35,6 +35,11 @@ define('video/09_play_placeholder.js', [], function() {
             delete this.state.videoPlayPlaceholder;
         },
 
+        /**
+         * Indicates whether the placeholder should be shown. We display it
+         * for html5 videos on iPad and Android devices.
+         * @return {Boolean}
+         */
         shouldBeShown: function () {
             return /iPad|Android/i.test(this.state.isTouch[0]) && !this.state.isYoutubeType();
         },

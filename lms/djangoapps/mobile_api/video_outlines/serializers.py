@@ -207,7 +207,8 @@ def video_summary(video_profiles, course_id, video_descriptor, request, local_ca
     size = default_encoded_video.get('file_size', 0)
 
     # Transcripts...
-    transcript_langs = video_descriptor.available_translations(verify_assets=False)
+    transcripts_info = video_descriptor.get_transcripts_info()
+    transcript_langs = video_descriptor.available_translations(transcripts_info, verify_assets=False)
 
     transcripts = {
         lang: reverse(
@@ -228,7 +229,7 @@ def video_summary(video_profiles, course_id, video_descriptor, request, local_ca
         "duration": duration,
         "size": size,
         "transcripts": transcripts,
-        "language": video_descriptor.get_default_transcript_language(video_descriptor.transcripts),
+        "language": video_descriptor.get_default_transcript_language(transcripts_info),
         "encoded_videos": video_data.get('profiles')
     }
     ret.update(always_available_data)

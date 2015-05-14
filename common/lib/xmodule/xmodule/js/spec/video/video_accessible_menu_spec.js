@@ -57,24 +57,6 @@
                     });
                     */
                 });
-
-                it('add ARIA attributes to button, menu, and menu items links',
-                   function () {
-                    expect(button).toHaveAttrs({
-                        'role': 'button',
-                        'title': '.srt',
-                        'aria-disabled': 'false'
-                    });
-
-                    expect(menuList).toHaveAttr('role', 'menu');
-
-                    menuItemsLinks.each(function(){
-                        expect($(this)).toHaveAttrs({
-                            'role': 'menuitem',
-                            'aria-disabled': 'false'
-                        });
-                    });
-                });
             });
 
             describe('when running', function () {
