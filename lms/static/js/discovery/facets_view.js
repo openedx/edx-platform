@@ -18,12 +18,7 @@ define([
         other: 0,
         list: [],
         views: {},
-
-        attributes : function () {
-            return {
-                'data-parent-element' : 'sidebar'
-            };
-        },
+        attributes: {'data-parent-element' : 'sidebar'},
 
         initialize: function () {
             this.tpl = _.template($(this.templateId).html());

@@ -314,7 +314,6 @@ $facet-background-color: #007db8;
 
     section {
       margin: 0;
-      border-top: 1px solid $courseware-button-border-color;
       padding: ($baseline/2) 0;
     }
 
@@ -387,6 +386,10 @@ $facet-background-color: #007db8;
           }
         }
       }
+    }
+
+    .search-facets-lists section {
+      border-top: 1px solid $courseware-button-border-color;
     }
 
     .toggle {
