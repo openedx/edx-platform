@@ -52,6 +52,13 @@
     <div class="member-list-widget">
       <div class="member-list">
         <h2> ${_("Student List Management")}</h2>
+        %if messages:
+          %for message in messages:
+            %if message.extra_tags == "ccx_coach_invite_user_not_found":
+                <div class="request-response-error">${message}</div>
+            %endif
+          %endfor
+        %endif
         <table>
           <thead>
             <tr>
