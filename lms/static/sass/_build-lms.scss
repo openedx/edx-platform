@@ -3,8 +3,6 @@
 
 // About: Sass compile for the LMS Elements that are shared between LTR and RTL UI. Configuration and vendor specific imports happen before this shared set of imports are compiled in the main-*.scss files.
 
-@import 'base/base';
-
 // base - assets
 @import 'base/font_face';
 @import 'base/extends';
