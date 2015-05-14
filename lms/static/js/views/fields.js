@@ -238,7 +238,8 @@
                     title: this.options.title,
                     screenReaderTitle: this.options.screenReaderTitle || this.options.title,
                     value: this.modelValue(),
-                    message: this.helpMessage
+                    message: this.helpMessage,
+                    isTitle: this.options.screenReaderTitle || false
                 }));
                 this.delegateEvents();
                 return this;
