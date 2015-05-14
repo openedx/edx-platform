@@ -9,6 +9,7 @@
                 .createSpy('onTouchBasedDevice').andReturn(null);
             state = jasmine.initializePlayer('video_with_bumper.html');
             $('.poster .btn-play').click();
+            jasmine.Clock.useMock();
         });
 
         afterEach(function () {
@@ -29,6 +30,7 @@
 
         it('can show the main video on error', function () {
             state.el.trigger('error');
+            jasmine.Clock.tick(20);
             expect($('.is-bumper')).not.toExist();
             waitsFor(function () {
                 return state.el.hasClass('is-playing');
@@ -37,6 +39,7 @@
 
         it('can show the main video once bumper ends', function () {
             state.el.trigger('ended');
+            jasmine.Clock.tick(20);
             expect($('.is-bumper')).not.toExist();
             waitsFor(function () {
                 return state.el.hasClass('is-playing');
@@ -44,7 +47,8 @@
         });
 
         it('can show the main video on skip', function () {
-            state.el.trigger('skip');
+            state.bumperState.videoBumper.skip();
+            jasmine.Clock.tick(20);
             expect($('.is-bumper')).not.toExist();
             waitsFor(function () {
                 return state.el.hasClass('is-playing');
@@ -53,6 +57,7 @@
 
         it('can stop the bumper video playing if it is too long', function () {
             state.el.trigger('timeupdate', [state.bumperState.videoBumper.maxBumperDuration + 1]);
+            jasmine.Clock.tick(20);
             expect($('.is-bumper')).not.toExist();
             waitsFor(function () {
                 return state.el.hasClass('is-playing');
@@ -63,7 +68,7 @@
             var saveState = jasmine.createSpy('saveState');
             state.bumperState.videoSaveStatePlugin.saveState = saveState;
             state.el.trigger('ended');
-            expect(state.storage.getItem('isBumperShown')).toBeTruthy();
+            jasmine.Clock.tick(20);
             expect(saveState).toHaveBeenCalledWith(true, {
                 date_last_view_bumper: true});
         });
@@ -71,8 +76,9 @@
         it('can save appropriate states correctly on skip', function () {
             var saveState = jasmine.createSpy('saveState');
             state.bumperState.videoSaveStatePlugin.saveState = saveState;
-            state.el.trigger('skip');
+            state.bumperState.videoBumper.skip();
             expect(state.storage.getItem('isBumperShown')).toBeTruthy();
+            jasmine.Clock.tick(20);
             expect(saveState).toHaveBeenCalledWith(true, {
                 date_last_view_bumper: true});
         });
@@ -81,7 +87,7 @@
             var saveState = jasmine.createSpy('saveState');
             state.bumperState.videoSaveStatePlugin.saveState = saveState;
             state.el.trigger('error');
-            expect(state.storage.getItem('isBumperShown')).toBeTruthy();
+            jasmine.Clock.tick(20);
             expect(saveState).toHaveBeenCalledWith(true, {
                 date_last_view_bumper: true});
         });
@@ -90,7 +96,7 @@
             var saveState = jasmine.createSpy('saveState');
             state.bumperState.videoSaveStatePlugin.saveState = saveState;
             state.bumperState.videoBumper.skipAndDoNotShowAgain();
-            expect(state.storage.getItem('isBumperShown')).toBeTruthy();
+            jasmine.Clock.tick(20);
             expect(saveState).toHaveBeenCalledWith(true, {
                 date_last_view_bumper: true, do_not_show_again_bumper: true});
         });

@@ -69,35 +69,35 @@
                 var el = $(element).find('.video'),
                     id = el.attr('id').replace(/video_/, ''),
                     storage = VideoStorage('VideoState', id),
+                    bumperMetadata = el.data('bumper-metadata'),
+                    mainVideoModules = [FocusGrabber, VideoControl, VideoPlayPlaceholder,
+                        VideoPlayPauseControl, VideoProgressSlider, VideoSpeedControl, VideoVolumeControl,
+                        VideoQualityControl, VideoFullScreen, VideoCaption, VideoCommands, VideoContextMenu,
+                        VideoSaveStatePlugin, VideoEventsPlugin],
+                    bumperVideoModules = [VideoControl, VideoPlaySkipControl, VideoSkipControl,
+                        VideoVolumeControl, VideoCaption, VideoCommands, VideoSaveStatePlugin, VideoEventsPlugin],
                     state = {
                         el: el,
                         id: id,
                         metadata: el.data('metadata'),
                         storage: storage,
                         options: {},
-                        youtubeXhr: youtubeXhr
-                    },
-                    bumperMetadata = el.data('bumper-metadata'),
-                    mainVideoModules = [FocusGrabber, VideoAccessibleMenu, VideoControl, VideoPlayPlaceholder,
-                        VideoPlayPauseControl, VideoProgressSlider, VideoSpeedControl, VideoVolumeControl,
-                        VideoQualityControl, VideoFullScreen, VideoCaption, VideoCommands, VideoContextMenu,
-                        VideoSaveStatePlugin, VideoEventsPlugin],
-                    bumperVideoModules = [VideoAccessibleMenu, VideoControl, VideoPlaySkipControl, VideoSkipControl,
-                        VideoVolumeControl, VideoCaption, VideoCommands, VideoSaveStatePlugin, VideoEventsPlugin];
+                        youtubeXhr: youtubeXhr,
+                        modules: mainVideoModules
+                    };
 
                 var getBumperState = function (metadata) {
-                    var bumperState = $.extend(true, {}, state, {metadata: metadata}, {
-                        metadata: {
-                            savedVideoPosition: 0,
-                            speed: '1.0',
-                            startTime: 0,
-                            endTime: null,
-                            streams: []
-                        }
-                    });
+                    var bumperState = $.extend(true, {
+                            el: el,
+                            id: id,
+                            storage: storage,
+                            options: {},
+                            youtubeXhr: youtubeXhr
+                        }, {metadata: metadata});
+
                     bumperState.modules = bumperVideoModules;
                     bumperState.options = {
-                        SaveStatePlugin: {events: ['transcript_download:change', 'language_menu:change']},
+                        SaveStatePlugin: {events: ['language_menu:change']},
                         EventsPlugin: {data: {is_bumper: true}}
                     };
                     return bumperState;
@@ -110,10 +110,13 @@
                     };
                 };
 
-                state.modules = mainVideoModules;
+                new VideoAccessibleMenu(el, {
+                    storage: storage,
+                    saveStateUrl: state.metadata.saveStateUrl
+                });
 
                 if (bumperMetadata) {
-                    new VideoPoster(state.el, {
+                    new VideoPoster(el, {
                         poster: el.data('poster'),
                         onClick: _.once(function () {
                             var mainVideoPlayer = player(state), bumper, bumperState;

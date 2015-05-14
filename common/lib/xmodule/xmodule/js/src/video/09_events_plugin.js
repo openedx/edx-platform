@@ -30,29 +30,12 @@ define('video/09_events_plugin.js', [], function() {
     EventsPlugin.moduleName = 'EventsPlugin';
     EventsPlugin.prototype = {
         destroy: function () {
-            this.state.el.off({
-                'ready': this.onReady,
-                'play': this.onPlay,
-                'pause': this.onPause,
-                'ended stop': this.onEnded,
-                'seek': this.onSeek,
-                'skip': this.onSkip,
-                'speedchange': this.onSpeedChange,
-                'language_menu:show': this.onShowLanguageMenu,
-                'language_menu:hide': this.onHideLanguageMenu,
-                'captions:show': this.onShowCaptions,
-                'captions:hide': this.onHideCaptions,
-                'destroy': this.destroy
-            });
+            this.state.el.off(this.events);
             delete this.state.videoEventsPlugin;
         },
 
         initialize: function() {
-            this.bindHandlers();
-        },
-
-        bindHandlers: function() {
-            this.state.el.on({
+            this.events = {
                 'ready': this.onReady,
                 'play': this.onPlay,
                 'pause': this.onPause,
@@ -65,7 +48,12 @@ define('video/09_events_plugin.js', [], function() {
                 'captions:show': this.onShowCaptions,
                 'captions:hide': this.onHideCaptions,
                 'destroy': this.destroy
-            });
+            };
+            this.bindHandlers();
+        },
+
+        bindHandlers: function() {
+            this.state.el.on(this.events);
         },
 
         onReady: function () {

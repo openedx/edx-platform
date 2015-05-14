@@ -142,12 +142,12 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
     ]}
     js_module_name = "Video"
 
-    def get_transcripts_for_student(self, transcripts, bumper=False):
+    def get_transcripts_for_student(self, transcripts):
         """Return transcript information necessary for rendering the XModule student view.
         This is more or less a direct extraction from `get_html`.
 
         Args:
-            bumper (boolean) Return transcripts information for video bumper
+            transcripts (dict): A dict with all transcripts and a sub.
 
         Returns:
             Tuple of (track_url, transcript_language, sorted_languages)
@@ -156,31 +156,27 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             sorted_languages -> dictionary of available transcript languages
         """
         track_url = None
-        if self.download_track and not bumper:
+        sub, other_lang = transcripts["sub"], transcripts["transcripts"]
+        if self.download_track:
             if self.track:
                 track_url = self.track
-            elif self.sub or self.transcripts:
+            elif sub or other_lang:
                 track_url = self.runtime.handler_url(self, 'transcript', 'download').rstrip('/?')
 
-        if not transcripts and not bumper:
-            transcript_language = u'en'
-            languages = {'en': 'English'}
-        else:
-            transcript_language = self.get_default_transcript_language(transcripts, bumper=bumper)
+        transcript_language = self.get_default_transcript_language(transcripts)
 
-            native_languages = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
-            languages = {
-                lang: native_languages.get(lang, display)
-                for lang, display in settings.ALL_LANGUAGES
-                if lang in transcripts
-            }
-
-            if self.sub and not bumper:
-                languages['en'] = 'English'
+        native_languages = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
+        languages = {
+            lang: native_languages.get(lang, display)
+            for lang, display in settings.ALL_LANGUAGES
+            if lang in other_lang
+        }
+        if not other_lang or (other_lang and sub):
+            languages['en'] = 'English'
 
         # OrderedDict for easy testing of rendered context in tests
         sorted_languages = sorted(languages.items(), key=itemgetter(1))
-        if 'table' in transcripts:
+        if 'table' in other_lang:
             sorted_languages.insert(0, ('table', 'Table of Contents'))
 
         sorted_languages = OrderedDict(sorted_languages)
@@ -246,7 +242,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             elif self.html5_sources:
                 download_video_link = self.html5_sources[0]
 
-        track_url, transcript_language, sorted_languages = self.get_transcripts_for_student(self.transcripts)
+        track_url, transcript_language, sorted_languages = self.get_transcripts_for_student(self.get_transcripts_info())
 
         # CDN_VIDEO_URLS is only to be used here and will be deleted
         # TODO(ali@edx.org): Delete this after the CDN experiment has completed.
@@ -290,7 +286,9 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
 
             'ytApiUrl': settings.YOUTUBE['API'],
             'ytTestUrl': settings.YOUTUBE['TEST_URL'],
-            'transcriptTranslationUrl': self.runtime.handler_url(self, 'transcript', 'translation').rstrip('/?'),
+            'transcriptTranslationUrl': self.runtime.handler_url(
+                self, 'transcript', 'translation/__lang__'
+            ).rstrip('/?'),
             'transcriptAvailableTranslationsUrl': self.runtime.handler_url(
                 self, 'transcript', 'available_translations'
             ).rstrip('/?'),
@@ -697,7 +695,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         def _update_transcript_for_index(language=None):
             """ Find video transcript - if not found, don't update index """
             try:
-                transcript = self.get_transcript(transcript_format='txt', lang=language)[0].replace("\n", " ")
+                transcripts = self.get_transcripts_info()
+                transcript = self.get_transcript(
+                    transcripts, transcript_format='txt', lang=language
+                )[0].replace("\n", " ")
                 transcript_index_name = "transcript_{}".format(language if language else self.transcript_language)
                 video_body.update({transcript_index_name: transcript})
             except NotFoundError:
