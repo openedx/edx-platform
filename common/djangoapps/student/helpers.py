@@ -231,8 +231,9 @@ def auth_pipeline_urls(auth_entry, redirect_url=None):
         return {}
 
     return {
-        provider.NAME: third_party_auth.pipeline.get_login_url(provider.NAME, auth_entry, redirect_url=redirect_url)
-        for provider in third_party_auth.provider.Registry.enabled()
+        provider.provider_id: third_party_auth.pipeline.get_login_url(
+            provider.provider_id, auth_entry, redirect_url=redirect_url
+        ) for provider in third_party_auth.provider.Registry.enabled()
     }
 
 

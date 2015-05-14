@@ -166,7 +166,7 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
 
         # Now unlink the account (To test the account settings view and also to prevent cross-test side effects)
         account_settings = AccountSettingsPage(self.browser).visit()
-        field_id = "auth-dummy"
+        field_id = "auth-oa2-dummy"
         account_settings.wait_for_field(field_id)
         self.assertEqual("Unlink", account_settings.link_title_for_link_field(field_id))
         account_settings.click_on_link_in_link_field(field_id)
@@ -305,7 +305,7 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
 
         # Now unlink the account (To test the account settings view and also to prevent cross-test side effects)
         account_settings = AccountSettingsPage(self.browser).visit()
-        field_id = "auth-dummy"
+        field_id = "auth-oa2-dummy"
         account_settings.wait_for_field(field_id)
         self.assertEqual("Unlink", account_settings.link_title_for_link_field(field_id))
         account_settings.click_on_link_in_link_field(field_id)

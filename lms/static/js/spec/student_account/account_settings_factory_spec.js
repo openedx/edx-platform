@@ -32,12 +32,14 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             var AUTH_DATA = {
                 'providers': [
                     {
+                        'id': 'oa2-network1',
                         'name': "Network1",
                         'connected': true,
                         'connect_url': 'yetanother1.com/auth/connect',
                         'disconnect_url': 'yetanother1.com/auth/disconnect'
                     },
                     {
+                        'id': 'oa2-network2',
                         'name': "Network2",
                         'connected': true,
                         'connect_url': 'yetanother2.com/auth/connect',
