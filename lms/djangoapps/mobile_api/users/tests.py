@@ -10,7 +10,7 @@ from certificates.models import CertificateStatuses
 from certificates.tests.factories import GeneratedCertificateFactory
 
 from .. import errors
-from ..testutils import MobileAPITestCase, MobileAuthTestMixin, MobileAuthUserTestMixin, MobileEnrolledCourseAccessTestMixin
+from ..testutils import MobileAPITestCase, MobileAuthTestMixin, MobileAuthUserTestMixin, MobileCourseAccessTestMixin
 from .serializers import CourseEnrollmentSerializer
 
 
@@ -43,7 +43,7 @@ class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
         self.assertTrue(self.username in response['location'])
 
 
-class TestUserEnrollmentApi(MobileAPITestCase, MobileAuthUserTestMixin, MobileEnrolledCourseAccessTestMixin):
+class TestUserEnrollmentApi(MobileAPITestCase, MobileAuthUserTestMixin, MobileCourseAccessTestMixin):
     """
     Tests for /api/mobile/v0.5/users/<user_name>/course_enrollments/
     """
@@ -160,7 +160,7 @@ class CourseStatusAPITestCase(MobileAPITestCase):
         )
 
 
-class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin, MobileEnrolledCourseAccessTestMixin):
+class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin, MobileCourseAccessTestMixin):
     """
     Tests for GET of /api/mobile/v0.5/users/<user_name>/course_status_info/{course_id}
     """
@@ -178,7 +178,7 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin, Mobi
         )
 
 
-class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin, MobileEnrolledCourseAccessTestMixin):
+class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin, MobileCourseAccessTestMixin):
     """
     Tests for PATCH of /api/mobile/v0.5/users/<user_name>/course_status_info/{course_id}
     """

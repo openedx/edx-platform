@@ -124,7 +124,6 @@ def _has_access_course_desc(user, action, course):
     'load' -- load the courseware, see inside the course
     'load_forum' -- can load and contribute to the forums (one access level for now)
     'load_mobile' -- can load from a mobile context
-    'load_mobile_no_enrollment_check' -- can load from a mobile context without checking for enrollment
     'enroll' -- enroll.  Checks for enrollment window,
                   ACCESS_REQUIRE_STAFF_FOR_COURSE,
     'see_exists' -- can see that the course exists.
@@ -158,29 +157,19 @@ def _has_access_course_desc(user, action, course):
         Can this user access this course from a mobile device?
         """
         return (
-            # check mobile requirements
-            can_load_mobile_no_enroll_check() and
-            # check enrollment
-            (
-                CourseEnrollment.is_enrolled(user, course.id) or
-                _has_staff_access_to_descriptor(user, course, course.id)
-            )
-        )
-
-    def can_load_mobile_no_enroll_check():
-        """
-        Can this enrolled user access this course from a mobile device?
-        Note: does not check for enrollment since it is assumed the caller has done so.
-        """
-        return (
             # check start date
             can_load() and
             # check mobile_available flag
             is_mobile_available_for_user(user, course) and
-            # check staff access, if not then check for unfulfilled milestones
             (
+                # either is a staff user or
                 _has_staff_access_to_descriptor(user, course, course.id) or
-                not any_unfulfilled_milestones(course.id, user.id)
+                (
+                    # check enrollment
+                    CourseEnrollment.is_enrolled(user, course.id) and
+                    # check for unfulfilled milestones
+                    not any_unfulfilled_milestones(course.id, user.id)
+                )
             )
         )
 
@@ -307,7 +296,6 @@ def _has_access_course_desc(user, action, course):
         'view_courseware_with_prerequisites': can_view_courseware_with_prerequisites,
         'load_forum': can_load_forum,
         'load_mobile': can_load_mobile,
-        'load_mobile_no_enrollment_check': can_load_mobile_no_enroll_check,
         'enroll': can_enroll,
         'see_exists': see_exists,
         'staff': lambda: _has_staff_access_to_descriptor(user, course, course.id),
