@@ -1,7 +1,7 @@
 ;(function (define, undefined) {
     'use strict';
-    define(['gettext', 'jquery', 'underscore', 'backbone', 'js/views/message'],
-        function (gettext, $, _, Backbone, MessageView) {
+    define(['gettext', 'jquery', 'underscore', 'backbone', 'moment'],
+        function (gettext, $, _, Backbone, moment) {
 
         return Backbone.View.extend({
 
@@ -14,7 +14,11 @@
             errorMessage: gettext('An error has occurred. Please try again.'),
             loadingMessage: gettext('Loading'),
 
-            url: '/api/bookmarks/v1/bookmarksss',
+            url: '/api/bookmarks/v1/bookmarks',
+
+            events : {
+                'click .bookmarks-results-list-item': 'visitBookmark'
+            },
 
             initialize: function (options) {
                 this.template = _.template($('#bookmarks_list-tpl').text());
@@ -27,9 +31,11 @@
                 var data = {
                     bookmarks: this.collection.models,
                     breadcrumbTrail: this.breadcrumbTrail,
-                    userFriendlyDate: this.userFriendlyDate
+                    userFriendlyDate: this.userFriendlyDate,
+                    bookmarkUrl: this.bookmarkUrl
                 };
                 this.$el.html(this.template(data));
+                this.delegateEvents();
                 return this;
             },
 
@@ -43,7 +49,7 @@
                 this.collection.url = this.url;
                 this.collection.fetch({
                     reset: true,
-                    data: {course_id: 'a/b/c', fields: 'path', page: 1, page_size: 65536}
+                    data: {course_id: this.getCourseId(), fields: 'path', page: 1, page_size: 65536}
                 }).done(function () {
                     view.hideLoadingMessage();
                     view.render();
@@ -54,18 +60,26 @@
                 });
             },
 
+            visitBookmark: function (event) {
+                window.location = event.target.pathname;
+            },
+
+            getCourseId: function() {
+              return this.$el.data('courseId');
+            },
+
             breadcrumbTrail: function (bookmarkPath) {
                 var separator = ' <i class="icon fa fa-caret-right" aria-hidden="true"></i><span class="sr">-</span> ';
                 return _.pluck(bookmarkPath, 'display_name').join(separator);
             },
 
-            // TODO! This utility method will be moved to some proper place OR maybe remove at all.
             userFriendlyDate: function (isoDate) {
-                // Convert ISO 8601 date string to user friendly format
-                // "2014-09-23T14:00:00Z"     >>      September 23, 2014
-                var dt = new Date(isoDate);
-                var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-                return MONTHS[dt.getMonth()] + ' ' + dt.getDay() + ', ' + dt.getFullYear();
+                moment.locale(window.navigator.userLanguage || window.navigator.language);
+                return moment(isoDate).format('LL')
+            },
+
+            bookmarkUrl: function (courseId, usageId) {
+                return '/courses/' + courseId + '/jump_to/' + usageId
             },
 
             isVisible: function () {
@@ -79,7 +93,7 @@
 
             showBookmarksContainer: function () {
                 $(this.coursewareContentElement).hide();
-                // Empty it if there anything in it.
+                // Empty el if there anything in it so that we are in clean state.
                 this.$el.html('');
                 this.$el.show();
             },
