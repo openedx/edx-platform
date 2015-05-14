@@ -1269,19 +1269,19 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-style-vendor-tinymce-skin.css',
     },
-    'style-app': {
+    'style-main': {
         'source_filenames': [
-            'sass/application.css',
+            'sass/lms-main.css',
             'sass/ie.css'
         ],
-        'output_filename': 'css/lms-style-app.css',
+        'output_filename': 'css/lms-main.css',
     },
-    'style-app-rtl': {
+    'style-main-rtl': {
         'source_filenames': [
-            'sass/application-rtl.css',
+            'sass/lms-main-rtl.css',
             'sass/ie-rtl.css'
         ],
-        'output_filename': 'css/lms-style-app-rtl.css',
+        'output_filename': 'css/lms-main-rtl.css',
     },
     'style-course-vendor': {
         'source_filenames': [
@@ -1291,25 +1291,25 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-style-course-vendor.css',
     },
+    'style-course': {
+        'source_filenames': [
+            'sass/lms-course.css',
+            'xmodule/modules.css',
+        ],
+        'output_filename': 'css/lms-course.css',
+    },
+    'style-course-rtl': {
+        'source_filenames': [
+            'sass/lms-course-rtl.css',
+            'xmodule/modules.css',
+        ],
+        'output_filename': 'css/lms-course-rtl.css',
+    },
     'style-student-notes': {
         'source_filenames': [
             'css/vendor/edxnotes/annotator.min.css',
         ],
         'output_filename': 'css/lms-style-student-notes.css',
-    },
-    'style-course': {
-        'source_filenames': [
-            'sass/course.css',
-            'xmodule/modules.css',
-        ],
-        'output_filename': 'css/lms-style-course.css',
-    },
-    'style-course-rtl': {
-        'source_filenames': [
-            'sass/course-rtl.css',
-            'xmodule/modules.css',
-        ],
-        'output_filename': 'css/lms-style-course-rtl.css',
     },
     'style-xmodule-annotations': {
         'source_filenames': [
