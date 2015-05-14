@@ -5,7 +5,7 @@ define('video/09_poster.js', ['video/00_resizer.js'], function (Resizer) {
      * Poster module.
      * @exports video/09_play_skip_control.js
      * @constructor
-     * @param {Object} element
+     * @param {jquery Element} element
      * @param {Object} options
      */
     var VideoPoster = function (element, options) {

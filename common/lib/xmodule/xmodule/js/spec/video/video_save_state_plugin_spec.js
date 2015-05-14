@@ -194,17 +194,6 @@
             });
         });
 
-        it('can save state on changing transcript download format', function () {
-            state.el.trigger('transcript_download:change', ['txt']);
-            expect($.ajax).toHaveBeenCalledWith({
-                url: state.config.saveStateUrl,
-                type: 'POST',
-                async: true,
-                dataType: 'json',
-                data: {transcript_download_format: 'txt'}
-            });
-        });
-
         it('can save state on language change', function () {
             state.el.trigger('language_menu:change', ['ua']);
             expect(state.storage.setItem).toHaveBeenCalledWith('language', 'ua');
@@ -230,11 +219,10 @@
                 'speedchange': plugin.onSpeedChange,
                 'play': plugin.bindUnloadHandler,
                 'pause destroy': plugin.saveStateHandler,
-                'transcript_download:change': plugin.onTranscriptDownload,
                 'language_menu:change': plugin.onLanguageChange,
-                'youtube_availability': plugin.onYoutubeAvailability,
-                'destroy': plugin.destroy
+                'youtube_availability': plugin.onYoutubeAvailability
             });
+            expect($.fn.off).toHaveBeenCalledWith('destroy', plugin.destroy);
             expect($.fn.off).toHaveBeenCalledWith('unload', plugin.onUnload);
         });
     });

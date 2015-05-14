@@ -7,6 +7,8 @@ from collections import OrderedDict
 import logging
 import urllib
 import requests
+from urllib import urlencode
+from urlparse import parse_qs, urlsplit, urlunsplit
 
 from django.conf import settings
 
@@ -98,3 +100,16 @@ def get_poster(video):
         poster["type"] = "html5"
 
     return poster
+
+
+def set_query_parameter(url, param_name, param_value):
+    """
+    Given a URL, set or replace a query parameter and return the
+    modified URL.
+    """
+    scheme, netloc, path, query_string, fragment = urlsplit(url)
+    query_params = parse_qs(query_string)
+    query_params[param_name] = [param_value]
+    new_query_string = urlencode(query_params, doseq=True)
+
+    return urlunsplit((scheme, netloc, path, new_query_string, fragment))

@@ -50,8 +50,8 @@
           % if transcript_download_format:
             <a href="${track}">${_('Download transcript')}</a>
             <div class="a11y-menu-container">
-                <a class="a11y-menu-button" href="#" title="${'.' + transcript_download_format}">${'.' + transcript_download_format}</a>
-                <ol class="a11y-menu-list">
+                <a class="a11y-menu-button" href="#" title="${'.' + transcript_download_format}" role="button" aria-disabled="false">${'.' + transcript_download_format}</a>
+                <ol class="a11y-menu-list" role="menu">
                 % for item in transcript_download_formats_list:
                   % if item['value'] == transcript_download_format:
                   <li class="a11y-menu-item active">
@@ -60,7 +60,7 @@
                   % endif
                   ## This is necessary so we don't scrape 'display_name' as a string.
                   <% dname = item['display_name'] %>
-                      <a class="a11y-menu-item-link" href="#${item['value']}" title="${_(dname)}" data-value="${item['value']}">
+                      <a class="a11y-menu-item-link" href="#${item['value']}" title="${_(dname)}" data-value="${item['value']}" role="menuitem" aria-disabled="false">
                         ${_(dname)}
                       </a>
                   </li>

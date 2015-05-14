@@ -65,6 +65,12 @@ function (Sjson, AsyncProcess) {
                     'destroy': this.destroy
                 })
                 .removeClass('is-captions-rendered');
+            if (this.fetchXHR && this.fetchXHR.abort) {
+                this.fetchXHR.abort();
+            }
+            if (this.availableTranslationsXHR && this.availableTranslationsXHR.abort) {
+                this.availableTranslationsXHR.abort();
+            }
             this.subtitlesEl.remove();
             this.container.remove();
             delete this.state.videoCaption;
@@ -83,10 +89,7 @@ function (Sjson, AsyncProcess) {
 
             if (_.keys(languages).length) {
                 this.renderLanguageMenu(languages);
-                if (this.fetchCaption()) {
-                    this.state.el.find('.video-wrapper').after(this.subtitlesEl);
-                    this.state.el.find('.secondary-controls').append(this.container);
-                }
+                this.fetchCaption();
             }
         },
 
@@ -281,12 +284,11 @@ function (Sjson, AsyncProcess) {
             var self = this,
                 state = this.state,
                 language = state.getCurrentLanguage(),
+                url = state.config.transcriptTranslationUrl.replace('__lang__', language),
                 data, youtubeId;
 
             if (this.loaded) {
                 this.hideCaptions(false);
-            } else {
-                this.hideCaptions(state.hide_captions, false);
             }
 
             if (this.fetchXHR && this.fetchXHR.abort) {
@@ -300,16 +302,14 @@ function (Sjson, AsyncProcess) {
                     return false;
                 }
 
-                data = {
-                    videoId: youtubeId
-                };
+                data = {videoId: youtubeId};
             }
 
             state.el.removeClass('is-captions-rendered');
             // Fetch the captions file. If no file was specified, or if an error
             // occurred, then we hide the captions panel, and the "CC" button
             this.fetchXHR = $.ajaxWithPrefix({
-                url: state.config.transcriptTranslationUrl + '/' + language,
+                url: url,
                 notifyOnError: false,
                 data: data,
                 success: function (sjson) {
@@ -334,7 +334,9 @@ function (Sjson, AsyncProcess) {
                         } else {
                             self.renderCaption(start, captions);
                         }
-
+                        self.hideCaptions(state.hide_captions, false);
+                        self.state.el.find('.video-wrapper').after(self.subtitlesEl);
+                        self.state.el.find('.secondary-controls').append(self.container);
                         self.bindHandlers();
                     }
 
@@ -370,7 +372,7 @@ function (Sjson, AsyncProcess) {
             var self = this,
                 state = this.state;
 
-            return $.ajaxWithPrefix({
+            this.availableTranslationsXHR = $.ajaxWithPrefix({
                 url: state.config.transcriptAvailableTranslationsUrl,
                 notifyOnError: false,
                 success: function (response) {
@@ -393,6 +395,8 @@ function (Sjson, AsyncProcess) {
                     self.hideSubtitlesEl.hide();
                 }
             });
+
+            return this.availableTranslationsXHR;
         },
 
         /**

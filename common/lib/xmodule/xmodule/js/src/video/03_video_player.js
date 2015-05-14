@@ -177,8 +177,7 @@ function (HTML5Video, Resizer) {
                 events: {
                     onReady: state.videoPlayer.onReady,
                     onStateChange: state.videoPlayer.onStateChange,
-                    onPlaybackQualityChange: state.videoPlayer
-                        .onPlaybackQualityChange,
+                    onPlaybackQualityChange: state.videoPlayer.onPlaybackQualityChange,
                     onError: state.videoPlayer.onError
                 }
             });
@@ -296,8 +295,7 @@ function (HTML5Video, Resizer) {
             events: {
                 onReady: state.videoPlayer.onReady,
                 onStateChange: state.videoPlayer.onStateChange,
-                onPlaybackQualityChange: state.videoPlayer
-                    .onPlaybackQualityChange,
+                onPlaybackQualityChange: state.videoPlayer.onPlaybackQualityChange,
                 onError: state.videoPlayer.onError
             }
         });
