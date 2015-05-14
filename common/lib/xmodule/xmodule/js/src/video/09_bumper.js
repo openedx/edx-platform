@@ -39,8 +39,10 @@ define('video/09_bumper.js',[], function () {
         },
 
         showMainVideoHandler: function () {
-            this.saveState();
-            this.showMainVideo();
+            setTimeout(function () {
+                this.saveState();
+                this.showMainVideo();
+            }.bind(this), 20);
         },
 
         destroyAndResolve: function () {
@@ -57,7 +59,8 @@ define('video/09_bumper.js',[], function () {
         },
 
         skip: function () {
-            this.element.trigger('skip');
+            this.element.trigger('skip', [this.doNotShowAgain]);
+            this.showMainVideoHandler();
         },
 
         skipAndDoNotShowAgain: function () {
@@ -67,13 +70,12 @@ define('video/09_bumper.js',[], function () {
 
         skipByDuration: function (event, time) {
             if (time > this.maxBumperDuration) {
-                this.showMainVideoHandler();
                 this.element.trigger('ended');
             }
         },
 
         bindHandlers: function () {
-            var events = ['ended', 'skip', 'error'].join(' ');
+            var events = ['ended', 'error'].join(' ');
             this.element.on(events, this.showMainVideoHandler);
             this.element.on('timeupdate', this.skipByDuration);
         },
@@ -88,7 +90,7 @@ define('video/09_bumper.js',[], function () {
         },
 
         destroy: function () {
-            var events = ['ended', 'skip', 'error'].join(' ');
+            var events = ['ended', 'error'].join(' ');
             this.element.off(events, this.showMainVideoHandler);
             this.element.off({
                 'timeupdate': this.skipByDuration,
