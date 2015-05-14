@@ -7,6 +7,7 @@ from track.backends.django import DjangoBackend, TrackingLog
 
 class TestDjangoBackend(TestCase):
     def setUp(self):
+        super(TestDjangoBackend, self).setUp()
         self.backend = DjangoBackend()
 
     def test_django_backend(self):

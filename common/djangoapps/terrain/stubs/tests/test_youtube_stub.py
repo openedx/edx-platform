@@ -10,6 +10,7 @@ from ..youtube import StubYouTubeService
 class StubYouTubeServiceTest(unittest.TestCase):
 
     def setUp(self):
+        super(StubYouTubeServiceTest, self).setUp()
         self.server = StubYouTubeService()
         self.url = "http://127.0.0.1:{0}/".format(self.server.port)
         self.server.config['time_to_response'] = 0.0
