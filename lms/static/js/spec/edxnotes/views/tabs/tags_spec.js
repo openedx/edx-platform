@@ -62,7 +62,8 @@ define([
                 identifier: 'view-tags',
                 icon: 'fa fa-tag',
                 is_active: true,
-                is_closable: false
+                is_closable: false,
+                view: 'Tags'
             });
             expect(view.$('#tags-panel')).toExist();
 

@@ -23,7 +23,7 @@ define([
                 }
             }));
 
-            return new NoteItemView({model: model, scrollToTag: scrollToTag}).render();
+            return new NoteItemView({model: model, scrollToTag: scrollToTag, view: "Test View"}).render();
         };
 
         beforeEach(function() {
@@ -88,10 +88,11 @@ define([
             spyOn(view, 'redirectTo');
             view.$('.reference-unit-link').click();
             expect(Logger.log).toHaveBeenCalledWith(
-                'edx.student_notes.used_unit_link',
+                'edx.course.student_notes.used_unit_link',
                 {
                     'note_id': 'id-123',
-                    'component_usage_id': 'usage_id-123'
+                    'component_usage_id': 'usage_id-123',
+                    'view': 'Test View'
                 },
                 null,
                 {

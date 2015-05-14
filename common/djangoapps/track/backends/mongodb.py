@@ -7,6 +7,7 @@ import logging
 import pymongo
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
+from bson.errors import BSONError
 
 from track.backends import BaseBackend
 
@@ -89,8 +90,9 @@ class MongoBackend(BaseBackend):
         """Insert the event in to the Mongo collection"""
         try:
             self.collection.insert(event, manipulate=False)
-        except PyMongoError:
-            # The event will be lost in case of a connection error.
+        except (PyMongoError, BSONError):
+            # The event will be lost in case of a connection error or any error
+            # that occurs when trying to insert the event into Mongo.
             # pymongo will re-connect/re-authenticate automatically
             # during the next event.
             msg = 'Error inserting to MongoDB event tracker backend'

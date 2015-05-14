@@ -9,13 +9,15 @@ define([
                 id: 'note-123',
                 text: 'text-123',
                 quote: 'quote-123',
-                usage_id: 'usage-123'
+                usage_id: 'usage-123',
+                tags: ["tag1", "tag2"]
             },
             noteWithoutId = {
                 user: 'user-123',
                 text: 'text-123',
                 quote: 'quote-123',
-                usage_id: 'usage-123'
+                usage_id: 'usage-123',
+                tags: ["tag1", "tag2"]
             };
 
         beforeEach(function() {
@@ -66,6 +68,8 @@ define([
                     'note_id': 'note-123',
                     'note_text': 'text-123',
                     'note_text_truncated': false,
+                    'tags': ["tag1", "tag2"],
+                    'tags_truncated': false,
                     'highlighted_content': 'quote-123',
                     'highlighted_content_truncated': false,
                     'component_usage_id': 'usage-123'
@@ -75,7 +79,7 @@ define([
 
         it('should log the edx.course.student_notes.edited event properly', function() {
             var oldNote = note,
-                newNote = $.extend({}, note, {text: 'text-456'});
+                newNote = $.extend({}, note, {text: 'text-456', tags: []});
 
             this.annotator.publish('annotationEditorShown', [this.annotator.editor, oldNote]);
             expect(this.annotator.plugins.Events.oldNoteText).toBe('text-123');
@@ -89,6 +93,10 @@ define([
                     'old_note_text_truncated': false,
                     'note_text': 'text-456',
                     'note_text_truncated': false,
+                    'old_tags': ["tag1", "tag2"],
+                    'old_tags_truncated': false,
+                    'tags': [],
+                    'tags_truncated': false,
                     'highlighted_content': 'quote-123',
                     'highlighted_content_truncated': false,
                     'component_usage_id': 'usage-123'
@@ -116,6 +124,8 @@ define([
                     'note_id': 'note-123',
                     'note_text': 'text-123',
                     'note_text_truncated': false,
+                    'tags': ["tag1", "tag2"],
+                    'tags_truncated': false,
                     'highlighted_content': 'quote-123',
                     'highlighted_content_truncated': false,
                     'component_usage_id': 'usage-123'
@@ -129,10 +139,11 @@ define([
         });
 
         it('should truncate values of some fields', function() {
-            var oldNote = $.extend({}, note, {text: Helpers.LONG_TEXT}),
+            var oldNote = $.extend({}, note, {text: Helpers.LONG_TEXT, tags: ["review", Helpers.LONG_TEXT]}),
                 newNote = $.extend({}, note, {
                     text: Helpers.LONG_TEXT + '123',
-                    quote: Helpers.LONG_TEXT + '123'
+                    quote: Helpers.LONG_TEXT + '123',
+                    tags: ["short", "tags", "will", "stay", Helpers.LONG_TEXT]
                 });
 
             this.annotator.publish('annotationEditorShown', [this.annotator.editor, oldNote]);
@@ -145,6 +156,10 @@ define([
                     'note_id': 'note-123',
                     'old_note_text': Helpers.TRUNCATED_TEXT,
                     'old_note_text_truncated': true,
+                    'old_tags': ["review"],
+                    'old_tags_truncated': true,
+                    'tags': ["short", "tags", "will", "stay"],
+                    'tags_truncated': true,
                     'note_text': Helpers.TRUNCATED_TEXT,
                     'note_text_truncated': true,
                     'highlighted_content': Helpers.TRUNCATED_TEXT,
