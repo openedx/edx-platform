@@ -38,7 +38,7 @@ define([
         },
 
         render: function () {
-
+            return this;
         },
 
         collapse: function(event) {

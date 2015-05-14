@@ -33,7 +33,7 @@ define([
         },
 
         render: function () {
-            // Empty for now.
+            return this;
         },
 
         changeQueryFilter: function(query) {
