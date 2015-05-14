@@ -245,6 +245,16 @@ def render_html_view(request):
     context = {}
     configuration = CertificateHtmlViewConfiguration.get_config()
     context = configuration.get('default', {})
+    active_certificate = None
+
+    def _get_certificate_signatories(active_cert):
+        """
+        Return a list of signatories of an active certificate.
+        """
+        signatories = []
+        if active_cert.get('signatories', False):
+            signatories = active_cert['signatories']
+        return signatories
 
     invalid_template_path = 'certificates/invalid.html'
 
@@ -278,6 +288,15 @@ def render_html_view(request):
         )
     except GeneratedCertificate.DoesNotExist:
         return render_to_response(invalid_template_path, context)
+
+    if course.certificates:
+        # iterate the list of certificates in the descriptor.
+        for cert in course.certificates['certificates']:
+            #TODO : course certificates will have a flag 'active_cert', it requires to be implement in backbone model.
+            # on the basis of this flag , we will get active certificate from the list.
+            # currently we are assuming the first certificate in the list as an active certificate.
+            active_certificate = cert
+            break
 
     # Override the defaults with any mode-specific static values
     context.update(configuration.get(certificate.mode, {}))
@@ -447,5 +466,8 @@ def render_html_view(request):
         platform_name=platform_name,
         certificate_type=context.get("certificate_type")
     )
+
+    if active_certificate:
+        context['signatories'] = _get_certificate_signatories(active_certificate)
 
     return render_to_response("certificates/valid.html", context)

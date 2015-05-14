@@ -1,0 +1,14 @@
+<div>
+   <span style="margin-bottom: 15px; display: block; font-weight: 600">
+       ${'Certificate Signatories:'}
+   </span>
+
+   % for signatory in signatories:
+    <div class="signatory" style="width: 20%; float: left; margin-right: 5%; text-align: center; color: #85888a;">
+        <h4>
+            ${signatory['name']}
+            <small style="display: block;">${signatory['title']}</small>
+        </h4>
+   </div>
+   % endfor
+</div>
