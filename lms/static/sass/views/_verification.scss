@@ -1320,7 +1320,7 @@
         display: block;
         width: 45px;
         height: 45px;
-        background: transparent url('../images/verified-ribbon.png') no-repeat 0 0;
+        background: transparent url($static-path + '/images/verified-ribbon.png') no-repeat 0 0;
       }
 
       .action-intro, .action-select {

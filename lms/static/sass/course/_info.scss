@@ -33,7 +33,7 @@ div.info-wrapper {
         h2 {
           font-size: $body-font-size;
           font-weight: bold;
-          background: url('../images/calendar-icon.png') 0 center no-repeat;
+          background: url($static-path + '/images/calendar-icon.png') 0 center no-repeat;
           padding-left: $baseline;
         }
 
@@ -183,7 +183,7 @@ div.info-wrapper {
         }
 
         div.hitarea {
-          background-image: url('../images/treeview-default.gif') no-repeat;
+          background-image: url($static-path + '/images/treeview-default.gif') no-repeat;
           display: block;
           height: 100%;
           margin-left: 0;
