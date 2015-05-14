@@ -48,7 +48,6 @@ if FEATURES.get('PROFILER'):
 # dashboard to the Analytics Dashboard.
 ANALYTICS_DASHBOARD_URL = None
 
-    
 
 ################################ DEBUG TOOLBAR ################################
 FEATURES['DEBUG_TOOLBAR'] = True

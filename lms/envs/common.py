@@ -296,11 +296,11 @@ FEATURES = {
     # Enables the new navigation template and styles. This should be enabled
     # when the styles appropriately match the edX.org website.
     'ENABLE_NEW_EDX_HEADER': False,
-    
+
     # When a logged in user goes to the homepage ('/') should the user be
     # redirected to the dashboard - this is default Open edX behavior. Set to
     # False to not redirect the user
-    'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER': True,    
+    'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER': True,
 
     # When a user goes to the homepage ('/') the user see the
     # courses listed in the announcement dates order - this is default Open edX behavior.
@@ -1650,12 +1650,12 @@ INSTALLED_APPS = (
     'survey',
 
     'lms.djangoapps.lms_xblock',
-    
+
     # EDX API application
     'api_manager',
 
     # Social Engagement
-    'social_engagement',    
+    'social_engagement',
 )
 
 ######################### MARKETING SITE ###############################
@@ -2099,6 +2099,14 @@ NOTIFICATION_CHANNEL_PROVIDERS = {
 NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = {
     '*': 'durable',  # default global mapping
 }
+
+NOTIFICATION_DAILY_DIGEST_SUBJECT = "Your unread notifications for '{display_name}'"
+NOTIFICATION_WEEKLY_DIGEST_SUBJECT = "Your unread notifications for '{display_name}'"
+NOTIFICATION_BRANDED_DEFAULT_LOGO = 'edx_notifications/img/edx-openedx-logo-tag.png'
+NOTIFICATION_EMAIL_FROM_ADDRESS = ''
+NOTIFICATION_APP_HOSTNAME = SITE_NAME
+NOTIFICATION_EMAIL_CLICK_LINK_URL_FORMAT = "http://{hostname}{url_path}"
+NOTIFICATION_DIGEST_SEND_TIMEFILTERED = True
 
 # Country code overrides
 # Used by django-countries
