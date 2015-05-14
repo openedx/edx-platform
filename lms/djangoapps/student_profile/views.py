@@ -1,7 +1,5 @@
 """ Views for a student's profile information. """
 
-import pyuca
-
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django_countries import countries
@@ -67,15 +65,6 @@ def learner_profile_context(logged_in_user, profile_username, user_is_staff, bui
     """
     profile_user = User.objects.get(username=profile_username)
 
-    collator = pyuca.Collator()
-    sort_key = lambda item: collator.sort_key(unicode(item[1]))
-
-    country_options = [
-        (country_code, _(country_name))  # pylint: disable=translation-of-non-string
-        for country_code, country_name in sorted(
-            countries.countries, key=sort_key
-        )
-    ]
     own_profile = (logged_in_user.username == profile_username)
 
     account_settings_data = get_account_settings(logged_in_user, profile_username)
@@ -102,7 +91,7 @@ def learner_profile_context(logged_in_user, profile_username, user_is_staff, bui
             'account_settings_page_url': reverse('account_settings'),
             'has_preferences_access': (logged_in_user.username == profile_username or user_is_staff),
             'own_profile': own_profile,
-            'country_options': country_options,
+            'country_options': list(countries),
             'language_options': settings.ALL_LANGUAGES,
             'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
         }

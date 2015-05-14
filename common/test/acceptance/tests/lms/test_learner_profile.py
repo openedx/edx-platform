@@ -47,7 +47,7 @@ class LearnerProfileTestMixin(EventsTestMixin):
         Fill in the public profile fields of a user.
         """
         profile_page.value_for_dropdown_field('language_proficiencies', 'English')
-        profile_page.value_for_dropdown_field('country', 'United Kingdom')
+        profile_page.value_for_dropdown_field('country', 'United Arab Emirates')
         profile_page.value_for_textarea_field('bio', 'Nothing Special')
 
     def visit_profile_page(self, username, privacy=None):

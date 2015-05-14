@@ -3,7 +3,6 @@
 import logging
 import json
 from ipware.ip import get_ip
-import pyuca
 
 from django.conf import settings
 from django.contrib import messages
@@ -339,16 +338,6 @@ def account_settings_context(request):
     """
     user = request.user
 
-    collator = pyuca.Collator()
-    sort_key = lambda item: collator.sort_key(unicode(item[1]))
-
-    country_options = [
-        (country_code, _(country_name))  # pylint: disable=translation-of-non-string
-        for country_code, country_name in sorted(
-            countries.countries, key=sort_key
-        )
-    ]
-
     year_of_birth_options = [(unicode(year), unicode(year)) for year in UserProfile.VALID_YEARS]
 
     context = {
@@ -356,7 +345,7 @@ def account_settings_context(request):
         'duplicate_provider': None,
         'fields': {
             'country': {
-                'options': country_options,
+                'options': list(countries),
             }, 'gender': {
                 'options': [(choice[0], _(choice[1])) for choice in UserProfile.GENDER_CHOICES],  # pylint: disable=translation-of-non-string
             }, 'language': {
