@@ -23,7 +23,7 @@ from util.json_request import JsonResponse
 from mock import patch
 
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
-from xmodule_modifiers import wrap_xblock
+from openedx.core.lib.xblock_utils import wrap_xblock
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore.django import modulestore
 from xblock.field_data import DictFieldData

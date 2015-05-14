@@ -22,7 +22,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.html_module import CourseInfoModule
 
-from xmodule_modifiers import get_course_update_items
+from openedx.core.lib.xblock_utils import get_course_update_items
 from cms.djangoapps.contentstore.push_notification import enqueue_push_course_update
 
 # # This should be in a class which inherits from XmlDescriptor

@@ -9,7 +9,7 @@ from django.http import Http404, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from edxmako.shortcuts import render_to_string
 
-from xmodule_modifiers import replace_static_urls, wrap_xblock, wrap_fragment, request_token
+from openedx.core.lib.xblock_utils import replace_static_urls, wrap_xblock, wrap_fragment, request_token
 from xmodule.x_module import PREVIEW_VIEWS, STUDENT_VIEW, AUTHOR_VIEW
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor
