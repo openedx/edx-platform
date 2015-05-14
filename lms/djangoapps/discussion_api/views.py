@@ -2,7 +2,6 @@
 Discussion API views
 """
 from django.core.exceptions import ValidationError
-from django.http import Http404
 
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -12,11 +11,9 @@ from rest_framework.viewsets import ViewSet
 
 from opaque_keys.edx.locator import CourseLocator
 
-from courseware.courses import get_course_with_access
-from discussion_api.api import get_course_topics, get_thread_list
-from discussion_api.forms import ThreadListGetForm
+from discussion_api.api import get_comment_list, get_course_topics, get_thread_list
+from discussion_api.forms import CommentListGetForm, ThreadListGetForm
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
-from xmodule.tabs import DiscussionTab
 
 
 class _ViewMixin(object):
@@ -26,17 +23,6 @@ class _ViewMixin(object):
     """
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (IsAuthenticated,)
-
-    def get_course_or_404(self, user, course_key):
-        """
-        Get the course descriptor, raising Http404 if the course is not found,
-        the user cannot access forums for the course, or the discussion tab is
-        disabled for the course.
-        """
-        course = get_course_with_access(user, 'load_forum', course_key)
-        if not any([isinstance(tab, DiscussionTab) for tab in course.tabs]):
-            raise Http404
-        return course
 
 
 class CourseTopicsView(_ViewMixin, DeveloperErrorViewMixin, APIView):
@@ -68,8 +54,7 @@ class CourseTopicsView(_ViewMixin, DeveloperErrorViewMixin, APIView):
     def get(self, request, course_id):
         """Implements the GET method as described in the class docstring."""
         course_key = CourseLocator.from_string(course_id)
-        course = self.get_course_or_404(request.user, course_key)
-        return Response(get_course_topics(course, request.user))
+        return Response(get_course_topics(course_key, request.user))
 
 
 class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
@@ -133,11 +118,77 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         form = ThreadListGetForm(request.GET)
         if not form.is_valid():
             raise ValidationError(form.errors)
-        course = self.get_course_or_404(request.user, form.cleaned_data["course_id"])
         return Response(
             get_thread_list(
                 request,
-                course,
+                form.cleaned_data["course_id"],
+                form.cleaned_data["page"],
+                form.cleaned_data["page_size"]
+            )
+        )
+
+
+class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
+    """
+    **Use Cases**
+
+        Retrieve the list of comments on a thread.
+
+    **Example Requests**
+
+        GET /api/discussion/v1/comments/?thread_id=0123456789abcde01234567
+
+    **Response Values**:
+
+        * results: The list of comments. Each item in the list includes:
+
+            * id: The id of the comment
+
+            * thread_id: The id of the comment's thread
+
+            * parent_id: The id of the comment's parent comment
+
+            * author: The username of the comment's author, or null if the
+                thread is anonymous to the requesting user
+
+            * author_label: A string indicating that the author has a special
+                role (either "staff" or "community_ta")
+
+            * created_at: The ISO 8601 timestamp for the creation of the comment
+
+            * updated_at: The ISO 8601 timestamp for the last modification of
+                the comment, which may not have been an update of the body
+
+            * raw_body: The comment's raw body text without any rendering
+                applied
+
+            * abuse_flagged: Whether the requester has flagged the comment as
+                abusive
+
+            * voted: Whether the requester has voted for the comment
+
+            * vote_count: The number of users who have voted for the comment
+
+            * children: The list of the comment's children, each having this
+                same format
+
+        * next: The URL of the next page (or null if last page)
+
+        * previous: The URL of the previous page (or null if first page)
+    """
+    def list(self, request):
+        """
+        Implements the GET method for the list endpoint as described in the
+        class docstring.
+        """
+        form = CommentListGetForm(request.GET)
+        if not form.is_valid():
+            raise ValidationError(form.errors)
+        return Response(
+            get_comment_list(
+                request,
+                form.cleaned_data["thread_id"],
+                form.cleaned_data["endorsed"],
                 form.cleaned_data["page"],
                 form.cleaned_data["page_size"]
             )
