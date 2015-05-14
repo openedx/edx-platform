@@ -196,6 +196,29 @@ function (VideoPlayer) {
             });
         });
 
+        describe('onStateChange Youtube', function(){
+            describe('when the video is ended', function () {
+                beforeEach(function () {
+                    state = jasmine.initializePlayerYouTube();
+
+                    state.videoEl = $('video, iframe');
+                    spyOn($.fn, 'trigger').andCallThrough();
+                    state.videoPlayer.onStateChange({
+                        data: YT.PlayerState.ENDED
+                    });
+                });
+
+                it('pause the video control', function () {
+                    expect($('.video_control')).toHaveClass('play');
+                });
+
+                it('trigger pause and ended events', function () {
+                    expect($.fn.trigger).toHaveBeenCalledWith('pause', {});
+                    expect($.fn.trigger).toHaveBeenCalledWith('ended', {});
+                });
+            });
+        });
+
         describe('onStateChange', function () {
             describe('when the video is unstarted', function () {
                 beforeEach(function () {

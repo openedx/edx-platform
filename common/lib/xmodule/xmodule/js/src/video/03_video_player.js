@@ -553,6 +553,11 @@ function (HTML5Video, Resizer) {
         // `duration`. In this case, slider doesn't reach the end point of
         // timeline.
         this.videoPlayer.updatePlayTime(time);
+
+        // Emit 'pause_video' event when a video ends if Player is of Youtube
+        if (this.isYoutubeType()) {
+            this.el.trigger('pause', arguments);
+        }
         this.el.trigger('ended', arguments);
     }
 
