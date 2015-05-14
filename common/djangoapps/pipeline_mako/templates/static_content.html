@@ -73,3 +73,14 @@ source, template_path = _loader.load_template_source(path)
         }).call(this, require || RequireJS.require);
     </script>
 </%def>
+
+<%def name="optional_include_mako(name)"><%
+from mako.exceptions import TemplateLookupException
+# http://stackoverflow.com/q/21219531
+try:
+    tmpl = self.get_template(name)
+except TemplateLookupException:
+    pass
+else:
+    content.write(tmpl.render_context(context))
+%></%def>
