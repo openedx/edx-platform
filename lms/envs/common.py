@@ -2385,10 +2385,6 @@ for app_name in OPTIONAL_APPS:
             continue
     INSTALLED_APPS += (app_name,)
 
-# Stub for third_party_auth options.
-# See common/djangoapps/third_party_auth/settings.py for configuration details.
-THIRD_PARTY_AUTH = {}
-
 ### ADVANCED_SECURITY_CONFIG
 # Empty by default
 ADVANCED_SECURITY_CONFIG = {}

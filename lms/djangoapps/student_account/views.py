@@ -171,15 +171,16 @@ def _third_party_auth_context(request, redirect_to):
     if third_party_auth.is_enabled():
         context["providers"] = [
             {
-                "name": enabled.NAME,
-                "iconClass": enabled.ICON_CLASS,
+                "id": enabled.provider_id,
+                "name": enabled.name,
+                "iconClass": enabled.icon_class,
                 "loginUrl": pipeline.get_login_url(
-                    enabled.NAME,
+                    enabled.provider_id,
                     pipeline.AUTH_ENTRY_LOGIN,
                     redirect_url=redirect_to,
                 ),
                 "registerUrl": pipeline.get_login_url(
-                    enabled.NAME,
+                    enabled.provider_id,
                     pipeline.AUTH_ENTRY_REGISTER,
                     redirect_url=redirect_to,
                 ),
@@ -190,13 +191,14 @@ def _third_party_auth_context(request, redirect_to):
         running_pipeline = pipeline.get(request)
         if running_pipeline is not None:
             current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
-            context["currentProvider"] = current_provider.NAME
-            context["finishAuthUrl"] = pipeline.get_complete_url(current_provider.BACKEND_CLASS.name)
+            context["currentProvider"] = current_provider.name
+            context["finishAuthUrl"] = pipeline.get_complete_url(current_provider.backend_name)
 
         # Check for any error messages we may want to display:
         for msg in messages.get_messages(request):
             if msg.extra_tags.split()[0] == "social-auth":
-                context['errorMessage'] = unicode(msg)
+                # msg may or may not be translated. Try translating [again] in case we are able to:
+                context['errorMessage'] = _(msg)  # pylint: disable=translation-of-non-string
                 break
 
     return context
@@ -368,19 +370,20 @@ def account_settings_context(request):
         auth_states = pipeline.get_provider_user_states(user)
 
         context['auth']['providers'] = [{
-            'name': state.provider.NAME,  # The name of the provider e.g. Facebook
+            'id': state.provider.provider_id,
+            'name': state.provider.name,  # The name of the provider e.g. Facebook
             'connected': state.has_account,  # Whether the user's edX account is connected with the provider.
             # If the user is not connected, they should be directed to this page to authenticate
             # with the particular provider.
             'connect_url': pipeline.get_login_url(
-                state.provider.NAME,
+                state.provider.provider_id,
                 pipeline.AUTH_ENTRY_ACCOUNT_SETTINGS,
                 # The url the user should be directed to after the auth process has completed.
                 redirect_url=reverse('account_settings'),
             ),
             # If the user is connected, sending a POST request to this url removes the connection
             # information for this provider from their edX account.
-            'disconnect_url': pipeline.get_disconnect_url(state.provider.NAME, state.association_id),
+            'disconnect_url': pipeline.get_disconnect_url(state.provider.provider_id, state.association_id),
         } for state in auth_states]
 
     return context

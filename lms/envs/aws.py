@@ -536,29 +536,21 @@ TIME_ZONE_DISPLAYED_FOR_DEADLINES = ENV_TOKENS.get("TIME_ZONE_DISPLAYED_FOR_DEAD
 X_FRAME_OPTIONS = ENV_TOKENS.get('X_FRAME_OPTIONS', X_FRAME_OPTIONS)
 
 ##### Third-party auth options ################################################
-THIRD_PARTY_AUTH = AUTH_TOKENS.get('THIRD_PARTY_AUTH', THIRD_PARTY_AUTH)
-
-# The reduced session expiry time during the third party login pipeline. (Value in seconds)
-SOCIAL_AUTH_PIPELINE_TIMEOUT = ENV_TOKENS.get('SOCIAL_AUTH_PIPELINE_TIMEOUT', 600)
-
-##### SAML configuration for third_party_auth #####
-
-if 'SOCIAL_AUTH_TPA_SAML_SP_ENTITY_ID' in ENV_TOKENS:
-    SOCIAL_AUTH_TPA_SAML_SP_ENTITY_ID = ENV_TOKENS.get('SOCIAL_AUTH_TPA_SAML_SP_ENTITY_ID')
-    SOCIAL_AUTH_TPA_SAML_SP_NAMEID_FORMAT = ENV_TOKENS.get('SOCIAL_AUTH_TPA_SAML_SP_NAMEID_FORMAT', 'unspecified')
-    SOCIAL_AUTH_TPA_SAML_SP_EXTRA = ENV_TOKENS.get('SOCIAL_AUTH_TPA_SAML_SP_EXTRA', {})
-    SOCIAL_AUTH_TPA_SAML_ORG_INFO = ENV_TOKENS.get('SOCIAL_AUTH_TPA_SAML_ORG_INFO')
-    SOCIAL_AUTH_TPA_SAML_TECHNICAL_CONTACT = ENV_TOKENS.get(
-        'SOCIAL_AUTH_TPA_SAML_TECHNICAL_CONTACT',
-        {"givenName": "Technical Support", "emailAddress": TECH_SUPPORT_EMAIL}
+if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+    AUTHENTICATION_BACKENDS = (
+        ENV_TOKENS.get('THIRD_PARTY_AUTH_BACKENDS', [
+            'social.backends.google.GoogleOAuth2',
+            'social.backends.linkedin.LinkedinOAuth2',
+            'social.backends.facebook.FacebookOAuth2',
+            'third_party_auth.saml.SAMLAuthBackend',
+        ]) + list(AUTHENTICATION_BACKENDS)
     )
-    SOCIAL_AUTH_TPA_SAML_SUPPORT_CONTACT = ENV_TOKENS.get(
-        'SOCIAL_AUTH_TPA_SAML_SUPPORT_CONTACT',
-        {"givenName": "Support", "emailAddress": TECH_SUPPORT_EMAIL}
-    )
-    SOCIAL_AUTH_TPA_SAML_SECURITY_CONFIG = ENV_TOKENS.get('SOCIAL_AUTH_TPA_SAML_SECURITY_CONFIG', {})
-    SOCIAL_AUTH_TPA_SAML_SP_PUBLIC_CERT = AUTH_TOKENS.get('SOCIAL_AUTH_TPA_SAML_SP_PUBLIC_CERT')
-    SOCIAL_AUTH_TPA_SAML_SP_PRIVATE_KEY = AUTH_TOKENS.get('SOCIAL_AUTH_TPA_SAML_SP_PRIVATE_KEY')
+
+    # The reduced session expiry time during the third party login pipeline. (Value in seconds)
+    SOCIAL_AUTH_PIPELINE_TIMEOUT = ENV_TOKENS.get('SOCIAL_AUTH_PIPELINE_TIMEOUT', 600)
+
+    # third_party_auth config moved to ConfigurationModels. This is for data migration only:
+    THIRD_PARTY_AUTH_OLD_CONFIG = AUTH_TOKENS.get('THIRD_PARTY_AUTH', None)
 
 ##### OAUTH2 Provider ##############
 if FEATURES.get('ENABLE_OAUTH2_PROVIDER'):

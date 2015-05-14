@@ -23,7 +23,7 @@ from openedx.core.djangoapps.user_api.accounts.api import activate_account, crea
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH
 from student.tests.factories import CourseModeFactory, UserFactory
 from student_account.views import account_settings_context
-from third_party_auth.tests.testutil import simulate_running_pipeline
+from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -204,7 +204,7 @@ class StudentAccountUpdateTest(UrlResetMixin, TestCase):
 
 
 @ddt.ddt
-class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase):
+class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase):
     """ Tests for the student account views that update the user's account information. """
 
     USERNAME = "bob"
@@ -214,6 +214,9 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         super(StudentAccountLoginAndRegistrationTest, self).setUp('embargo')
+        # For these tests, two third party auth providers are enabled by default:
+        self.configure_google_provider(enabled=True)
+        self.configure_facebook_provider(enabled=True)
 
     @ddt.data(
         ("account_login", "login"),
@@ -290,7 +293,7 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
     @ddt.unpack
     def test_third_party_auth(self, url_name, current_backend, current_provider):
         params = [
-            ('course_id', 'edX/DemoX/Demo_Course'),
+            ('course_id', 'course-v1:Org+Course+Run'),
             ('enrollment_action', 'enroll'),
             ('course_mode', 'honor'),
             ('email_opt_in', 'true'),
@@ -310,12 +313,14 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
         # This relies on the THIRD_PARTY_AUTH configuration in the test settings
         expected_providers = [
             {
+                "id": "oa2-facebook",
                 "name": "Facebook",
                 "iconClass": "fa-facebook",
                 "loginUrl": self._third_party_login_url("facebook", "login", params),
                 "registerUrl": self._third_party_login_url("facebook", "register", params)
             },
             {
+                "id": "oa2-google-oauth2",
                 "name": "Google",
                 "iconClass": "fa-google-plus",
                 "loginUrl": self._third_party_login_url("google-oauth2", "login", params),
@@ -347,11 +352,14 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
 
     def _assert_third_party_auth_data(self, response, current_backend, current_provider, providers):
         """Verify that third party auth info is rendered correctly in a DOM data attribute. """
+        finish_auth_url = None
+        if current_backend:
+            finish_auth_url = reverse("social:complete", kwargs={"backend": current_backend}) + "?"
         auth_info = markupsafe.escape(
             json.dumps({
                 "currentProvider": current_provider,
                 "providers": providers,
-                "finishAuthUrl": "/auth/complete/{}?".format(current_backend) if current_backend else None,
+                "finishAuthUrl": finish_auth_url,
                 "errorMessage": None,
             })
         )
@@ -382,7 +390,7 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
         })
 
 
-class AccountSettingsViewTest(TestCase):
+class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase):
     """ Tests for the account settings view. """
 
     USERNAME = 'student'
@@ -405,6 +413,10 @@ class AccountSettingsViewTest(TestCase):
 
         self.request = RequestFactory()
         self.request.user = self.user
+
+        # For these tests, two third party auth providers are enabled by default:
+        self.configure_google_provider(enabled=True)
+        self.configure_facebook_provider(enabled=True)
 
         # Python-social saves auth failure notifcations in Django messages.
         # See pipeline.get_duplicate_provider() for details.
