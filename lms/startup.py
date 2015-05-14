@@ -29,8 +29,11 @@ def run():
 
     add_mimetypes()
 
-    if settings.FEATURES.get('USE_CUSTOM_THEME', False):
+    if getattr(settings, "THEME_DIR", None):
         enable_theme()
+
+    if settings.FEATURES.get('USE_CUSTOM_THEME', False):
+        enable_stanford_theme()
 
     if settings.FEATURES.get('USE_MICROSITES', False):
         enable_microsites()
@@ -58,7 +61,7 @@ def add_mimetypes():
     mimetypes.add_type('application/font-woff', '.woff')
 
 
-def enable_theme():
+def enable_stanford_theme():
     """
     Enable the settings for a custom theme, whose files should be stored
     in ENV_ROOT/themes/THEME_NAME (e.g., edx_all/themes/stanford).
@@ -66,7 +69,7 @@ def enable_theme():
     # Workaround for setting THEME_NAME to an empty
     # string which is the default due to this ansible
     # bug: https://github.com/ansible/ansible/issues/4812
-    if settings.THEME_NAME == "":
+    if getattr(settings, "THEME_NAME", "") == "":
         settings.THEME_NAME = None
         return
 
@@ -131,6 +134,31 @@ def enable_microsites():
         edxmako.paths.add_lookup('main', microsites_root)
 
         settings.STATICFILES_DIRS.insert(0, microsites_root)
+
+
+def enable_theme():
+    """
+    Add directories to relevant paths for comprehensive theming.
+    """
+    assert getattr(settings, "THEME_DIR", None), "settings.THEME_DIR is not defined"
+    theme_dir = settings.THEME_DIR
+
+    templates_dir = theme_dir / "lms" / "templates"
+    if templates_dir.isdir():
+        settings.TEMPLATE_DIRS.insert(0, templates_dir)
+        edxmako.paths.add_lookup('main', templates_dir, prepend=True)
+
+    staticfiles_dir = theme_dir / "lms" / "static"
+    if staticfiles_dir.isdir():
+        settings.STATICFILES_DIRS.append(staticfiles_dir)
+
+    locale_dir = theme_dir / "lms" / "conf" / "locale"
+    if locale_dir.isdir():
+        settings.LOCALE_PATHS.insert(0, locale_dir)
+
+    favicon = theme_dir / "lms" / "static" / "images" / "favicon.ico"
+    if favicon.isfile():
+        settings.FAVICON_PATH = str(favicon)
 
 
 def enable_third_party_auth():

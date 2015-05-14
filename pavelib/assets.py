@@ -24,7 +24,6 @@ SASS_DIRS = {
 SASS_LOAD_PATHS = ['common/static', 'common/static/sass']
 SASS_CACHE_PATH = '/tmp/sass-cache'
 
-
 edxapp_env = Env()
 if edxapp_env.feature_flags.get('USE_CUSTOM_THEME', False):
     theme_name = edxapp_env.env_tokens.get('THEME_NAME', '')
@@ -32,6 +31,17 @@ if edxapp_env.feature_flags.get('USE_CUSTOM_THEME', False):
     theme_root = parent_dir / "themes" / theme_name
     COFFEE_DIRS.append(theme_root)
     SASS_DIRS[theme_root / "static" / "sass"] = None
+
+if edxapp_env.env_tokens.get("THEME_DIR", False):
+    theme_dir = path(edxapp_env.env_tokens["THEME_DIR"])
+    lms_sass = theme_dir / "lms" / "static" / "sass"
+    lms_css = theme_dir / "lms" / "static" / "css"
+    if lms_sass.isdir():
+        SASS_DIRS[lms_sass] = lms_css if lms_css.isdir() else None
+    studio_sass = theme_dir / "studio" / "static" / "sass"
+    studio_css = theme_dir / "studio" / "static" / "css"
+    if studio_sass.isdir():
+        SASS_DIRS[studio_sass] = studio_css if studio_css.isdir() else None
 
 
 class CoffeeScriptWatcher(PatternMatchingEventHandler):
@@ -156,16 +166,6 @@ def compile_sass(debug=False):
     sh(cmd(*parts))
 
 
-def compile_templated_sass(systems, settings):
-    """
-    Render Mako templates for Sass files.
-    `systems` is a list of systems (e.g. 'lms' or 'studio' or both)
-    `settings` is the Django settings module to use.
-    """
-    for sys in systems:
-        sh(django_cmd(sys, settings, 'preprocess_assets'))
-
-
 def process_xmodule_assets():
     """
     Process XModule static assets.
@@ -241,7 +241,6 @@ def update_assets(args):
     )
     args = parser.parse_args(args)
 
-    compile_templated_sass(args.system, args.settings)
     process_xmodule_assets()
     compile_coffeescript()
     compile_sass(args.debug)

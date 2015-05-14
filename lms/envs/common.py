@@ -198,7 +198,7 @@ FEATURES = {
     # Enable URL that shows information about the status of variuous services
     'ENABLE_SERVICE_STATUS': False,
 
-    # Toggle to indicate use of a custom theme
+    # Toggle to indicate use of the Stanford theming system
     'USE_CUSTOM_THEME': False,
 
     # Don't autoplay videos for students
@@ -428,6 +428,8 @@ ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edx-platform is in
 COURSES_ROOT = ENV_ROOT / "data"
 
 DATA_DIR = COURSES_ROOT
+
+THEME_DIR = REPO_ROOT / "themes" / "red-theme"
 
 # TODO: Remove the rest of the sys.path modification here and in cms/envs/common.py
 sys.path.append(REPO_ROOT)
@@ -1334,20 +1336,6 @@ PIPELINE_CSS = {
             'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/skin.min.css'
         ],
         'output_filename': 'css/lms-style-vendor-tinymce-skin.css',
-    },
-    'style-main': {
-        # this is unnecessary and can be removed
-        'source_filenames': [
-            'css/lms-main.css',
-        ],
-        'output_filename': 'css/lms-main.css',
-    },
-    'style-main-rtl': {
-        # this is unnecessary and can be removed
-        'source_filenames': [
-            'css/lms-main-rtl.css',
-        ],
-        'output_filename': 'css/lms-main-rtl.css',
     },
     'style-course-vendor': {
         'source_filenames': [

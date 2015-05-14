@@ -6,6 +6,11 @@ $baseline: 20px;
 
 // ====================
 
+// PATH
+$lms-path: '..' !default;
+
+// ====================
+
 // LAYOUT: grid
 $gw-column: 80px;
 $gw-gutter: 20px;
@@ -18,10 +23,10 @@ $fg-min-width: 810px;
 // ====================
 
 // FONTS
-$sans-serif: 'Open Sans', $verdana, sans-serif;
-$monospace: Monaco, 'Bitstream Vera Sans Mono', 'Lucida Console', monospace;
+$sans-serif: 'Open Sans', $verdana, sans-serif !default;
+$monospace: Monaco, 'Bitstream Vera Sans Mono', 'Lucida Console', monospace !default;
 $body-font-family: $sans-serif;
-$serif: $georgia;
+$serif: $georgia !default;
 
 // FONT-WEIGHTS
 $font-light: 300;
@@ -239,13 +244,13 @@ $text-color: $dark-gray;
 
 $dark-trans-bg: rgba(0, 0, 0, .75);
 
-$body-bg: rgb(250,250,250);
-$container-bg: $white;
+$body-bg: rgb(250,250,250) !default;
+$container-bg: $white !default;
 $header-image: linear-gradient(-90deg, rgba(255,255,255, 1), rgba(230,230,230, 0.9));
-$header-bg: $white;
+$header-bg: $white !default;
 $courseware-header-image: linear-gradient(top, rgb(255,255,255), rgb(238,238,238));
 $courseware-header-bg: transparent;
-$footer-bg: $white;
+$footer-bg: $white !default;
 $courseware-footer-border: none;
 $courseware-footer-shadow: none;
 $courseware-footer-margin: 0px;
@@ -364,7 +369,7 @@ $dot-color: $light-gray;
 $dashboard-course-cover-border: $light-gray;
 
 // MISC: course assets
-$content-wrapper-bg: $white;
+$content-wrapper-bg: $white !default;
 $course-bg-color: #f2f2f2;
 $course-bg-image: url(../images/bg-texture.png);
 $account-content-wrapper-bg: shade($body-bg, 2%);
