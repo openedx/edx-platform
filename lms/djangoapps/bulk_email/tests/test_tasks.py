@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Unit tests for LMS instructor-initiated background tasks.
 
@@ -28,6 +29,8 @@ from celery.states import SUCCESS, FAILURE
 
 from django.conf import settings
 from django.core.management import call_command
+
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from bulk_email.models import CourseEmail, Optout, SEND_TO_ALL
 
@@ -404,3 +407,15 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
     def test_failure_on_ses_domain_not_confirmed(self):
         self._test_immediate_failure(SESDomainNotConfirmedError(403, "You're out of bounds!"))
+
+    def test_bulk_emails_with_unicode_course_image_name(self):
+        # Test bulk email with unicode characters in course image name
+        course_image = u'在淡水測試.jpg'
+        self.course = CourseFactory.create(course_image=course_image)
+
+        num_emails = 1
+        self._create_students(num_emails)
+
+        with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
+            get_conn.return_value.send_messages.side_effect = cycle([None])
+            self._test_run_with_task(send_bulk_course_email, 'emailed', num_emails, num_emails)
