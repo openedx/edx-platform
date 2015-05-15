@@ -81,7 +81,7 @@ function () {
 
         if (value) {
             state.videoAccessibleMenu.setValue(value);
-            downloadLink.text(interpolate(gettext('Download transcript (%(transcript_filetype)s)?'), { transcript_filetype: transcript_filetype }, true));
+            downloadLink.text(outputButtonText(transcript_filetype));
         }
     }
 
@@ -208,12 +208,10 @@ function () {
                     _previousMenuItemLink(this.menuItemsLinks, index).focus();
                     break;
                 // Scroll down  menu, wrapping at the bottom. Keep menu open.
-
                 case KEY.DOWN:
                     _nextMenuItemLink(this.menuItemsLinks, index).focus();
                     break;
                 // Close menu.
-
                 case KEY.TAB:
                     _closeMenu(this);
                     // TODO
@@ -222,7 +220,6 @@ function () {
                     // forward to Volume button.
                     break;
                 // Close menu, give focus to button and change file type.
-
                 case KEY.ENTER:
                 case KEY.SPACE:
                     this.button.focus();
@@ -230,7 +227,6 @@ function () {
                     _closeMenu(this);
                     break;
                 // Close menu and give focus to speed control.
-
                 case KEY.ESCAPE:
                     _closeMenu(this);
                     this.button.focus();
@@ -239,11 +235,8 @@ function () {
             return false;
 
         } else if (target.is('.has-dropdown')) {
-
-            switch(keyCode) {
-                case KEY.DOWN:
-                    _focusOnFirst(this);
-                    break;
+            if (KEY.DOWN == keyCode) {
+                _focusOnFirst(this);
             }
             return false;
         } else {
@@ -257,7 +250,6 @@ function () {
                     this.menuItemsLinks.last().focus();
                     break;
                 // Close menu.
-
                 case KEY.ESCAPE:
                     _closeMenu(this);
                     break;
@@ -319,6 +311,10 @@ function () {
     // them available and sets up their context is makeFunctionsPublic().
     // ***************************************************************
 
+    function outputButtonText(fileType) {
+        return interpolate(gettext('Download transcript (%(fileType)s)?'), { fileType: fileType }, true);
+    }
+
     function changeFileType(event) {
         var fileType = $(event.currentTarget).data('value'),
             button = $('.download-link'),
@@ -329,8 +325,8 @@ function () {
         this.storage.setItem('transcript_download_format', fileType);
 
         wrapper.find(button)
-            .text(interpolate(gettext('Download transcript (%(fileType)s)?'), { fileType: fileType }, true))
-                .focus();
+            .text(outputButtonText(fileType))
+            .focus();
     }
 
 });

@@ -469,7 +469,7 @@ class VideoPage(PageObject):
         transcript_selector = self.get_element_selector(VIDEO_MENUS['transcript-format-new'])
 
         # check if we have a transcript with correct format
-        if '.' + transcript_format not in self.q(css=transcript_selector).text[0]:
+        if transcript_format not in self.q(css=transcript_selector).text[0]:
             return False
 
         formats = {
@@ -477,7 +477,7 @@ class VideoPage(PageObject):
             'txt': 'text/plain',
         }
 
-        transcript_url_selector = self.get_element_selector(VIDEO_BUTTONS['download_transcript'])
+        transcript_url_selector = self.get_element_selector(VIDEO_MENUS['transcript-format-new'])
         url = self.q(css=transcript_url_selector).attrs('href')[0]
         result, headers, content = self._get_transcript(url)
 
