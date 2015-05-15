@@ -1,23 +1,23 @@
+## coding=utf-8
+<%namespace name='static' file='static_content.html'/>
+<%!
+from django.utils.http import urlquote_plus
+from django.utils.translation import ugettext as _
+from django.utils.translation import get_language_bidi
+from microsite_configuration import microsite
+from microsite_configuration import page_title_breadcrumbs
+
+dir_rtl = 'rtl' if get_language_bidi() else 'ltr'
+%>
 <!DOCTYPE html>
 <!--[if lte IE 9]><html class="ie ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
 <!--[if !IE]><!--><html lang="${LANGUAGE_CODE}"><!--<![endif]-->
-<%
-    # set doc language direction
-    from django.utils.translation import get_language_bidi
-    dir_rtl = 'rtl' if get_language_bidi() else 'ltr'
-%>
 <head dir="${dir_rtl}">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     % if responsive:
     <meta name="viewport" content="width=device-width, initial-scale=1">
     % endif
-<%! from django.utils.translation import ugettext as _ %>
-<%! from microsite_configuration import microsite %>
-<%! from microsite_configuration import page_title_breadcrumbs %>
-
-<%namespace name='static' file='static_content.html'/>
-<%! from django.utils.http import urlquote_plus %>
 
 ## Define a couple of helper functions to make life easier when
 ## embedding theme conditionals into templates. All inheriting
