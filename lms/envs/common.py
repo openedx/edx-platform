@@ -623,6 +623,9 @@ EVENT_TRACKING_BACKENDS = {
                     'OPTIONS': {
                         'whitelist': []
                     }
+                },
+                {
+                    'ENGINE': 'track.shim.GoogleAnalyticsProcessor'
                 }
             ]
         }
