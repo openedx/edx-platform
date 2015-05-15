@@ -247,15 +247,6 @@ def render_html_view(request):
     context = configuration.get('default', {})
     active_certificate = None
 
-    def _get_certificate_signatories(active_cert):
-        """
-        Return a list of signatories of an active certificate.
-        """
-        signatories = []
-        if active_cert.get('signatories', False):
-            signatories = active_cert['signatories']
-        return signatories
-
     invalid_template_path = 'certificates/invalid.html'
 
     # Translators:  This text is bound to the HTML 'title' element of the page and appears
@@ -468,6 +459,6 @@ def render_html_view(request):
     )
 
     if active_certificate:
-        context['signatories'] = _get_certificate_signatories(active_certificate)
+        context['signatories'] = active_certificate.get('signatories', [])
 
     return render_to_response("certificates/valid.html", context)
