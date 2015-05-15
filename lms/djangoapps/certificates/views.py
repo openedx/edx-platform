@@ -459,6 +459,10 @@ def render_html_view(request):
     )
 
     if active_certificate:
+        # Override the course name with course_title
+        if active_certificate.get('course_title', ''):
+            context['accomplishment_copy_course_name'] = active_certificate['course_title']
+
         context['signatories'] = active_certificate.get('signatories', [])
 
     return render_to_response("certificates/valid.html", context)
