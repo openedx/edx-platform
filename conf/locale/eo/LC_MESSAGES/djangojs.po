@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-05-08 17:44+0000\n"
-"PO-Revision-Date: 2015-05-08 17:46:14.061416\n"
+"POT-Creation-Date: 2015-05-15 17:15+0000\n"
+"PO-Revision-Date: 2015-05-15 17:17:18.152233\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2284,7 +2284,15 @@ msgstr "Séärçh Ⱡ'σяєм ιρѕυ#"
 msgid "Users"
 msgstr "Ûsérs Ⱡ'σяєм ιρѕ#"
 
+#. Translators: 'Tags' is the name of the view (noun) within the Student Notes
+#. page that shows all
+#. notes organized by the tags the student has associated with them (if any).
+#. When defining a
+#. note in the courseware, the student can choose to associate 1 or more tags
+#. with the note
+#. in order to group similar notes together and help with search.
 #: common/static/js/vendor/ova/catch/js/catch.js
+#: lms/static/js/edxnotes/views/tabs/tags.js
 msgid "Tags"
 msgstr "Tägs Ⱡ'σяєм ι#"
 
@@ -2363,6 +2371,12 @@ msgid "Error generating grades. Please try again."
 msgstr ""
 "Érrör générätïng grädés. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Error generating problem grade report. Please try again."
+msgstr ""
+"Érrör générätïng prößlém grädé répört. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "File Name"
@@ -3402,6 +3416,14 @@ msgid "No results found for \"%(query_string)s\". Please try searching again."
 msgstr ""
 "Nö résülts föünd för \"%(query_string)s\". Pléäsé trý séärçhïng ägäïn. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#. Translators: this is a title shown before all Notes that have no associated
+#. tags. It is put within
+#. brackets to differentiate it from user-defined tags, but it should still be
+#. translated.
+#: lms/static/js/edxnotes/views/tabs/tags.js
+msgid "[no tags]"
+msgstr "[nö tägs] Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/static/js/groups/views/cohort_discussions.js
 #: lms/static/js/groups/views/cohort_discussions_course_wide.js
@@ -5372,10 +5394,6 @@ msgstr "Nöté Ⱡ'σяєм ι#"
 #: lms/templates/edxnotes/note-item.underscore
 msgid "You commented..."
 msgstr "Ýöü çömméntéd... Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: lms/templates/edxnotes/note-item.underscore
-msgid "References"
-msgstr "Référénçés Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Noted in:"

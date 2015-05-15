@@ -65,6 +65,7 @@
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2014
 # Juan Fernando Villa <elite.linux@gmail.com>, 2015
+# Juan <juan.marrero@utec.edu.uy>, 2015
 # Nuri Plans Toral <nplans@gmail.com>, 2014
 # paul ochoa <palichis@solid-ec.org>, 2015
 # Thomas Alberto Castro Acosta <snaketh@gmail.com>, 2014
@@ -85,7 +86,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-05-08 17:28+0000\n"
+"POT-Creation-Date: 2015-05-15 17:04+0000\n"
 "PO-Revision-Date: 2015-05-06 19:54+0000\n"
 "Last-Translator: Juan Camilo Montoya Franco <juan.montoya@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
@@ -2277,7 +2278,15 @@ msgstr "Buscar"
 msgid "Users"
 msgstr "Usuarios"
 
+#. Translators: 'Tags' is the name of the view (noun) within the Student Notes
+#. page that shows all
+#. notes organized by the tags the student has associated with them (if any).
+#. When defining a
+#. note in the courseware, the student can choose to associate 1 or more tags
+#. with the note
+#. in order to group similar notes together and help with search.
 #: common/static/js/vendor/ova/catch/js/catch.js
+#: lms/static/js/edxnotes/views/tabs/tags.js
 msgid "Tags"
 msgstr "Etiquetas"
 
@@ -2351,6 +2360,10 @@ msgstr "Error al obtener la configuración de calificaciones."
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating grades. Please try again."
 msgstr "Error al generar las calificaciones. Por favor inténtelo nuevamente."
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Error generating problem grade report. Please try again."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "File Name"
@@ -3264,6 +3277,14 @@ msgid "No results found for \"%(query_string)s\". Please try searching again."
 msgstr ""
 "No se encontraron resultados para \"%(query_string)s\". Por favor intente "
 "nuevamente."
+
+#. Translators: this is a title shown before all Notes that have no associated
+#. tags. It is put within
+#. brackets to differentiate it from user-defined tags, but it should still be
+#. translated.
+#: lms/static/js/edxnotes/views/tabs/tags.js
+msgid "[no tags]"
+msgstr ""
 
 #: lms/static/js/groups/views/cohort_discussions.js
 #: lms/static/js/groups/views/cohort_discussions_course_wide.js
@@ -5007,10 +5028,6 @@ msgstr "Nota"
 #: lms/templates/edxnotes/note-item.underscore
 msgid "You commented..."
 msgstr "Usted comentó..."
-
-#: lms/templates/edxnotes/note-item.underscore
-msgid "References"
-msgstr "Referencias"
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Noted in:"
