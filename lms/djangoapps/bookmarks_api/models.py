@@ -45,4 +45,7 @@ class Bookmark(models.Model):
             raise ValidationError('Bookmark must contain at least one path.')
 
         bookmark_dict['_path'] = json.dumps(path)
-        return cls(**bookmark_dict).save()
+        bookmark = cls(**bookmark_dict)
+        bookmark.save()
+
+        return bookmark

@@ -4,7 +4,7 @@ https://openedx.atlassian.net/wiki/display/TNL/Bookmarks+API
 """
 import logging
 
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError, MultipleObjectsReturned
 from django.utils.translation import ugettext as _
 from django.http import Http404
 
@@ -118,12 +118,14 @@ class BookmarksView(ListCreateAPIView):
             )
             raise Http404
 
+        path_list = location_path[:2] if location_path else list()
+        path_list.reverse()
         bookmarks_dict = {
             "usage_key": usage_key,
             "course_key": course_key,
             "user": request.user,
             "display_name": module_item.display_name,
-            "_path": location_path[:2] if location_path else list()
+            "_path": path_list
         }
         try:
             bookmark = Bookmark.create(bookmarks_dict)
@@ -131,7 +133,7 @@ class BookmarksView(ListCreateAPIView):
             log.debug(error, exc_info=True)
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(bookmark, status=status.HTTP_201_CREATED)
+        return Response(serializers.BookmarkSerializer(bookmark).data, status=status.HTTP_201_CREATED)
 
 
 class BookmarksDetailView(APIView):
@@ -218,7 +220,6 @@ class BookmarksDetailView(APIView):
 
             # usage_key's course_key may have an empty run property
             usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
-            course_key = usage_key.course_key
         except InvalidKeyError:
             error_message = _(u"invalid usage id '{usage_key_string}'".format(usage_key_string=usage_key_string))
             return Response(
@@ -228,5 +229,9 @@ class BookmarksDetailView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-        Bookmark.objects.filter(course_key=course_key, user=user).delete()
+        try:
+            Bookmark.objects.get(usage_key=usage_key, user=user).delete()
+        except ObjectDoesNotExist:
+            return Response('Bookmark not found! No update performed.', status=status.HTTP_404_NOT_FOUND)
+
         return Response(status=status.HTTP_204_NO_CONTENT)
