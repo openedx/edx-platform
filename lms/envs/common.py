@@ -62,7 +62,6 @@ DISCUSSION_SETTINGS = {
 
 # Features
 FEATURES = {
-    'SAMPLE': False,
     'USE_DJANGO_PIPELINE': True,
 
     'DISPLAY_DEBUG_INFO_TO_STAFF': True,
