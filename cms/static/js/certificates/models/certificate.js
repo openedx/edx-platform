@@ -19,6 +19,7 @@ function (_, str, Backbone, BackboneRelational, BackboneAssociations, gettext, C
         defaults: {
             name: 'Name of the certificate',
             description: 'Description of the certificate',
+            course_title: 'Title of the course',
             version: 1
         },
 
