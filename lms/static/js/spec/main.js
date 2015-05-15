@@ -98,9 +98,12 @@
             'js/bookmarks/models/bookmark': 'js/bookmarks/models/bookmark',
             'js/bookmarks/views/bookmarks_button': 'js/bookmarks/views/bookmarks_button',
             'js/bookmarks/views/bookmarks_list': 'js/bookmarks/views/bookmarks_list',
+            'js/views/message': 'js/views/message',
 
             // edxnotes
-            'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min'
+            'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min',
+
+            "moment": "js/vendor/moment-with-locales.min"
         },
         shim: {
             'gettext': {

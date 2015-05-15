@@ -14,9 +14,9 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 loadFixtures('js/fixtures/bookmarks/bookmarks.html');
                 TemplateHelpers.installTemplates(
                     [
+                        'templates/views/message',
                         'templates/bookmarks/bookmarks_button',
-                        'templates/bookmarks/bookmarks_list',
-                        'templates/views/message'
+                        'templates/bookmarks/bookmarks_list'
                     ]
                 );
             });
@@ -55,7 +55,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                                 ]
                             }
                         ]
-                    }
+                    };
                 };
 
                 var verifyBookmarkedData = function (view, expectedData) {
@@ -118,7 +118,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                     AjaxHelpers.respondWithJson(requests, createBookmarksData());
 
-                    bookmarksListView.$('.bookmarks-results-list-item').trigger('click');
+                    bookmarksListView.$('.bookmarks-results-list-item').click();
                     expect(bookmarksListView.visitBookmark).toHaveBeenCalled();
                 });
 

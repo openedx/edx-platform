@@ -1,7 +1,7 @@
 ;(function (define, undefined) {
     'use strict';
     define(['gettext', 'jquery', 'underscore', 'backbone', 'moment'],
-        function (gettext, $, _, Backbone, moment) {
+        function (gettext, $, _, Backbone) {
 
         return Backbone.View.extend({
 
@@ -74,8 +74,9 @@
             },
 
             userFriendlyDate: function (isoDate) {
+                // What is the correct/right way to set locale?
                 moment.locale(window.navigator.userLanguage || window.navigator.language);
-                return moment(isoDate).format('LL')
+                return moment(isoDate).format('LL');
             },
 
             bookmarkUrl: function (courseId, usageId) {
