@@ -58,18 +58,6 @@
       % endif
     </div>
 
-    % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-      <div class="course-search">
-        <form>
-          <div class="course-search-bar">
-            <input class="search-input" type="text" placeholder="${_("Search for a course")}"></input>
-          </div>
-          <button class="search-button" type="submit">
-            <i class="icon fa fa-search" aria-hidden="true"></i>
-          </button>
-        </form>
-      </div>
-    % endif
   </header>
   <section class="courses-container">
     <section class="highlighted-courses">

@@ -33,28 +33,35 @@ define([
         },
 
         render: function () {
-            // Empty for now.
+            return this;
         },
 
         changeQueryFilter: function(query) {
+            var queryModel = this.collection.getQueryModel();
+            if (typeof queryModel !== 'undefined') {
+                this.collection.remove(queryModel);
+            }
+
             if (query) {
                 var data = {query: query, type: 'search_string'};
-                var queryModel = this.collection.getQueryModel();
-                if (typeof queryModel !== 'undefined') {
-                    this.collection.remove(queryModel);
-                }
                 this.addFilter(data);
+            }
+            else {
+                this.startSearch();
             }
         },
 
         addFilter: function(data) {
-            var filter = new Filter(data);
-            var filterView = new FilterView({model: filter});
-            this.collection.add(filter);
-            this.filtersList.append(filterView.render().el);
-            this.trigger('search', this.getSearchTerm(), this.collection);
-            if (this.$el.hasClass('hidden')) {
-                this.showClearAllButton();
+            var currentfilter = this.collection.findWhere(data);
+            if(typeof currentfilter === 'undefined') {
+                var filter = new Filter(data);
+                var filterView = new FilterView({model: filter});
+                this.collection.add(filter);
+                this.filtersList.append(filterView.render().el);
+                this.trigger('search', this.getSearchTerm(), this.collection);
+                if (this.$el.hasClass('hidden')) {
+                    this.showClearAllButton();
+                }
             }
         },
 
@@ -66,12 +73,7 @@ define([
                 type: $target.data('type')
             });
             this.collection.remove(clearModel);
-            if (this.collection.length === 0) {
-                this.trigger('clear');
-            }
-            else {
-                this.trigger('search', this.getSearchTerm(), this.collection);
-            }
+            this.startSearch();
         },
 
         clearFilters: function() {
@@ -99,6 +101,15 @@ define([
                 return queryModel.get('query');
             }
             return '';
+        },
+
+        startSearch: function() {
+            if (this.collection.length === 0) {
+                this.trigger('clear');
+            }
+            else {
+                this.trigger('search', this.getSearchTerm(), this.collection);
+            }
         }
 
     });
