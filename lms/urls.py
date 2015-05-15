@@ -662,6 +662,6 @@ handler500 = 'static_template_view.views.render_500'
 
 # display error page templates, for testing purposes
 urlpatterns += (
-    url(r'404', handler404),
-    url(r'500', handler500),
+    url(r'^404$', handler404),
+    url(r'^500$', handler500),
 )
