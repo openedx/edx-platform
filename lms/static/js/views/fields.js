@@ -114,7 +114,11 @@
 
                 setTimeout(function () {
                     if ((context === view.lastSuccessMessageContext) && (view.getNotificationMessage() === successMessage)) {
-                        view.showHelpMessage();
+                        if (view.editable === 'toggle') {
+                            view.showCanEditMessage(true);
+                        } else {
+                            view.showHelpMessage();
+                        }
                     }
                 }, messageRevertDelay);
             },

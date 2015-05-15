@@ -15,19 +15,23 @@
         return function (options) {
 
             var learnerProfileElement = $('.wrapper-profile');
-            var defaultVisibility = options.default_visibility;
+
+            var accountSettingsModel = new AccountSettingsModel(
+                _.extend(
+                    options.account_settings_data,
+                    {'default_public_account_fields': options.default_public_account_fields}
+                ),
+                {parse: true}
+            );
             var AccountPreferencesModelWithDefaults = AccountPreferencesModel.extend({
                 defaults: {
-                    account_privacy: defaultVisibility
+                    account_privacy: options.default_visibility
                 }
             });
-            var accountPreferencesModel = new AccountPreferencesModelWithDefaults();
-            accountPreferencesModel.url = options.preferences_api_url;
+            var accountPreferencesModel = new AccountPreferencesModelWithDefaults(options.preferences_data);
 
-            var accountSettingsModel = new AccountSettingsModel({
-                'default_public_account_fields': options.default_public_account_fields
-            });
             accountSettingsModel.url = options.accounts_api_url;
+            accountPreferencesModel.url = options.preferences_api_url;
 
             var editable = options.own_profile ? 'toggle' : 'never';
 
@@ -122,10 +126,6 @@
                 sectionTwoFieldViews: sectionTwoFieldViews
             });
 
-            var showLoadingError = function () {
-                learnerProfileView.showLoadingError();
-            };
-
             var getProfileVisibility = function() {
                 if (options.has_preferences_access) {
                     return accountPreferencesModel.get('account_privacy');
@@ -146,26 +146,12 @@
                 learnerProfileView.render();
             };
 
-            accountSettingsModel.fetch({
-                success: function () {
-                    // Fetch the preferences model if the user has access
-                    if (options.has_preferences_access) {
-                        accountPreferencesModel.fetch({
-                            success: function() {
-                                if (accountSettingsModel.get('requires_parental_consent')) {
-                                    accountPreferencesModel.set('account_privacy', 'private');
-                                }
-                                showLearnerProfileView();
-                            },
-                            error: showLoadingError
-                        });
-                    }
-                    else {
-                        showLearnerProfileView();
-                    }
-                },
-                error: showLoadingError
-            });
+            if (options.has_preferences_access) {
+                if (accountSettingsModel.get('requires_parental_consent')) {
+                    accountPreferencesModel.set('account_privacy', 'private');
+                }
+            }
+            showLearnerProfileView();
 
             return {
                 accountSettingsModel: accountSettingsModel,
