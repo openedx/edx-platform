@@ -38,6 +38,8 @@ from track import contexts
 from eventtracking import tracker
 from importlib import import_module
 
+from south.modelsinspector import add_introspection_rules
+
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 import lms.lib.comment_client as cc
@@ -1748,6 +1750,33 @@ class EntranceExamConfiguration(models.Model):
             except EntranceExamConfiguration.DoesNotExist:
                 can_skip = False
         return can_skip
+
+
+class LanguageField(models.CharField):
+    """Represents a language from the ISO 639-1 language set."""
+
+    def __init__(self, *args, **kwargs):
+        """Creates a LanguageField.
+
+        Accepts all the same kwargs as a CharField, except for max_length and
+        choices. help_text defaults to a description of the ISO 639-1 set.
+        """
+        kwargs.pop('max_length', None)
+        kwargs.pop('choices', None)
+        help_text = kwargs.pop(
+            'help_text',
+            _("The ISO 639-1 language code for this language."),
+        )
+        super(LanguageField, self).__init__(
+            max_length=16,
+            choices=settings.ALL_LANGUAGES,
+            help_text=help_text,
+            *args,
+            **kwargs
+        )
+
+
+add_introspection_rules([], [r"^student\.models\.LanguageField"])
 
 
 class LanguageProficiency(models.Model):

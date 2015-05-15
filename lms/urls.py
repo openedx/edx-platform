@@ -431,6 +431,7 @@ if settings.COURSEWARE_ENABLED:
     if settings.FEATURES["ENABLE_TEAMS"]:
         # Teams endpoints
         urlpatterns += (
+            url(r'^api/team/', include('teams.api_urls')),
             url(r'^courses/{}/teams'.format(settings.COURSE_ID_PATTERN), include('teams.urls'), name="teams_endpoints"),
         )
 
