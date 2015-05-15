@@ -41,6 +41,28 @@ var edx = edx || {},
                 });
             },
 
+            handlerIsAction: function(key, menu) {
+                if (key === 38) { // UP
+                    _dropdown.previousMenuItemLink(focused, menu);
+                } else if (key === 40) { // DOWN
+                    _dropdown.nextMenuItemLink(focused, menu);
+                } else if (key === 27) { // ESC
+                    _dropdown.closeDropdownMenus();
+                }
+            },
+
+            handlerIsButton: function(key, el) {
+                if (key === 40 || key === 13) { // DOWN or ENTER
+                    _dropdown.openDropdownMenu(el);
+                }
+            },
+
+            handlerIsMenu: function(key, menu) {
+                if (key === 40) { // DOWN
+                    _dropdown.focusFirstItem(menu);
+                }
+            },
+
             listenForKeypress: function() {
 
                 _dropdown.opts.page.on('keydown', function(e) {
@@ -56,57 +78,16 @@ var edx = edx || {},
                     if (focused.is('.action')) {
                         // Key handlers for when a menu item has focus
                         menu = focused.closest('.dropdown-menu');
-
-                        switch (keyCode) {
-                            case 38:
-                                _dropdown.previousMenuItemLink(focused, menu);
-                                break;
-
-                            case 40:
-                                _dropdown.nextMenuItemLink(focused, menu);
-                                break;
-
-                            case 27:
-                                _dropdown.closeDropdownMenus();
-                                break;
-                        }
+                        _dropdown.handlerIsAction(keyCode, menu);
 
                     } else if (focused.is('.has-dropdown')) {
                         // Key handlers for when the button that opens the menu has focus
-                        switch(keyCode) {
-                            case 40:
-                                _dropdown.openDropdownMenu(focused);
-                                break;
+                        _dropdown.handlerIsButton(keyCode, focused);
 
-                            case 13:
-                                _dropdown.openDropdownMenu(focused);
-                                break;
-
-                            case 27:
-                                _dropdown.closeDropdownMenus();
-                                break;
-                        }
                     } else if (focused.is('.dropdown-menu')) {
                         // Key handlers for when the menu itself has focus, before an item within it receives focus
                         menu = focused.closest('.dropdown-menu');
-
-                        switch(keyCode) {
-                            case 40:
-                                _dropdown.focusFirstItem(menu);
-                                break;
-
-                            case 27:
-                                _dropdown.closeDropdownMenus();
-                                break;
-                        }
-                    } else {
-
-                        switch(keyCode) {
-                            case 13:
-                            case 38:
-                            case 40:
-                            case 27:
-                        }
+                        _dropdown.handlerIsMenu(keyCode, menu);
                     }
                 });
             },
@@ -144,8 +125,7 @@ var edx = edx || {},
                 var open = _dropdown.opts.page.find(_dropdown.opts.menu).not(':focus');
 
                 if (open) {
-                    open
-                        .removeClass(_dropdown.opts.menu_active)
+                    open.removeClass(_dropdown.opts.menu_active)
                         .addClass(_dropdown.opts.menu_inactive);
 
                     open.parent()
@@ -159,8 +139,7 @@ var edx = edx || {},
                 var open = _dropdown.opts.page.find(_dropdown.opts.menu);
 
                 if (open) {
-                    open
-                        .removeClass(_dropdown.opts.menu_active)
+                    open.removeClass(_dropdown.opts.menu_active)
                         .addClass(_dropdown.opts.menu_inactive);
 
                     open.parent()
@@ -179,8 +158,7 @@ var edx = edx || {},
                     el.addClass(_dropdown.opts.button_active)
                         .attr('aria-expanded', 'true');
 
-                    menu
-                        .removeClass(_dropdown.opts.menu_inactive)
+                    menu.removeClass(_dropdown.opts.menu_inactive)
                         .addClass(_dropdown.opts.menu_active);
 
                     _dropdown.setFocus(menu);
@@ -191,21 +169,23 @@ var edx = edx || {},
             setFocus: function(menu) {
                 var first = menu.children('.dropdown-item').first().find('.action');
 
-                menu
-                    .focus();
+                menu.focus();
             },
 
             setOrientation: function(el) {
 
-                el.parent().find(_dropdown.opts.menu)
+                el.parent()
+                    .find(_dropdown.opts.menu)
                     .removeClass(_dropdown.opts.menu_align + 'left')
                     .removeClass(_dropdown.opts.menu_align + 'right');
 
                 if (el.offset().left > _dropdown.opts.midpoint) {
-                    el.parent().find(_dropdown.opts.menu)
+                    el.parent()
+                        .find(_dropdown.opts.menu)
                         .addClass(_dropdown.opts.menu_align + 'right');
                 } else {
-                    el.parent().find(_dropdown.opts.menu)
+                    el.parent()
+                        .find(_dropdown.opts.menu)
                         .addClass(_dropdown.opts.menu_align + 'left');
                 }
             }
