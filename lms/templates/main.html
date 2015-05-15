@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<!--[if lte IE 9]><html class="ie ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
-<!--[if !IE]><!--><html lang="${LANGUAGE_CODE}"><!--<![endif]-->
+<html lang="${LANGUAGE_CODE}">
 <%
     # set doc language direction
     from django.utils.translation import get_language_bidi
@@ -132,8 +131,6 @@
 <body class="${dir_rtl} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
   <div class="window-wrap" dir="${dir_rtl}">
     <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to main content")}</a>
-
-    <%include file="mathjax_accessible.html" />
 
     % if not disable_header:
         <%include file="${header_file}" />
