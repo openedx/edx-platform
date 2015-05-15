@@ -2,7 +2,6 @@
 
   @include box-sizing(border-box);
   position: relative;
-  padding: ($baseline/4);
 
   .search-field-wrapper {
     position: relative;
@@ -125,7 +124,8 @@
 
 
 .courseware-search-bar {
-  box-shadow: 0 1px 0 $white inset, 0 -1px 0 $shadow-l1 inset;
+  width: 60%;
+  padding: 0 3px;
 }
 
 
@@ -172,6 +172,3 @@
   }
 }
 
-.courseware-search-results {
-  padding: ($baseline*2);
-}

@@ -30,6 +30,18 @@ ${page_title_breadcrumbs(course_name())}
 </script>
 % endfor
 
+% for template_name in ["bookmarks_button", "bookmarks_list"]:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="bookmarks/${template_name}.underscore" />
+</script>
+% endfor
+
+% for template_name in ["message_view"]:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="${template_name}.underscore" />
+</script>
+% endfor
+
 </%block>
 
 <%block name="headextra">
@@ -148,22 +160,28 @@ ${fragment.foot_html()}
         <a href="#">${_("close")}</a>
       </header>
 
-      % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
-        <div id="courseware-search-bar" class="search-bar courseware-search-bar" role="search" aria-label="Course">
-          <form>
-            <label for="course-search-input" class="sr">${_('Course Search')}</label>
-            <div class="search-field-wrapper">
-              <input id="course-search-input" type="text" class="search-field"/>
-              <button type="submit" class="search-button">
-                ${_('search')} <i class="icon fa fa-search" aria-hidden="true"></i>
-              </button>
-              <button type="button" class="cancel-button" aria-label="${_('Clear search')}">
-                <i class="icon fa fa-remove" aria-hidden="true"></i>
-              </button>
+      <div class="wrapper-course-modes">
+
+          <div class="courseware-bookmarks-button"></div>
+
+          % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+            <div id="courseware-search-bar" class="search-bar courseware-search-bar" role="search" aria-label="Course">
+              <form>
+                <label for="course-search-input" class="sr">${_('Course Search')}</label>
+                <div class="search-field-wrapper">
+                  <input id="course-search-input" type="text" class="search-field"/>
+                  <button type="submit" class="search-button">
+                    ${_('search')} <i class="icon fa fa-search" aria-hidden="true"></i>
+                  </button>
+                  <button type="button" class="cancel-button" aria-label="${_('Clear search')}">
+                    <i class="icon fa fa-remove" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </form>
             </div>
-          </form>
-        </div>
-      % endif
+          % endif
+
+      </div>
 
       <div id="accordion" style="display: none">
         <nav aria-label="${_('Course Navigation')}">
@@ -199,12 +217,25 @@ ${fragment.foot_html()}
 
       ${fragment.body_html()}
     </section>
-    % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
-      <section id="courseware-search-results" class="search-results courseware-search-results" data-course-id="${course.id}">
+
+      <section id="courseware-results-wrapper">
+        <div id="loading-message" aria-live="assertive" aria-relevant="all"></div>
+        <div id="error-message" aria-live="polite"></div>
+        <div id="courseware-results-list" class="search-results" data-course-id="${course.id}" data-lang-code="${lang_code}"></div>
       </section>
-    % endif
+
   </div>
 </div>
+
+<%block name="bookmarks">
+    <script>
+        (function (require) {
+          require(['js/bookmarks/views/bookmarks_button'], function(bookmarksButtonView) {
+            new bookmarksButtonView({}).render();
+          });
+        }).call(this, require || RequireJS.require);
+    </script>
+</%block>
 
 <nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
   ## Utility: Chat

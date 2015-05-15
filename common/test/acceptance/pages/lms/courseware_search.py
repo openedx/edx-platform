@@ -16,7 +16,7 @@ class CoursewareSearchPage(CoursePage):
     @property
     def search_results(self):
         """ search results list showing """
-        return self.q(css='#courseware-search-results')
+        return self.q(css='#courseware-results-list')
 
     def is_browser_on_page(self):
         """ did we find the search bar in the UI """

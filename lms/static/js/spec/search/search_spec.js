@@ -478,7 +478,7 @@ define([
 
         function beforeEachHelper(SearchResultsView) {
             appendSetFixtures(
-                '<section id="courseware-search-results"></section>' +
+                '<div id="courseware-results-list"></div>' +
                 '<section id="course-content"></section>' +
                 '<section id="dashboard-search-results"></section>' +
                 '<section id="my-courses"></section>'
@@ -674,7 +674,7 @@ define([
             beforeEach(function () {
                 loadFixtures('js/fixtures/search/course_search_form.html');
                 appendSetFixtures(
-                    '<section id="courseware-search-results"></section>' +
+                    '<div id="courseware-results-list"></div>' +
                     '<section id="course-content"></section>'
                 );
                 loadTemplates.call(this);
@@ -690,7 +690,7 @@ define([
                 );
                 spyOn(Backbone.history, 'navigate');
                 this.$contentElement = $('#course-content');
-                this.$searchResults = $('#courseware-search-results');
+                this.$searchResults = $('#courseware-results-list');
             });
 
             afterEach(function () {

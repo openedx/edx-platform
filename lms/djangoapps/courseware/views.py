@@ -83,6 +83,10 @@ from eventtracking import tracker
 import analytics
 from courseware.url_helpers import get_redirect_url
 
+from lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
+
+
 log = logging.getLogger("edx.courseware")
 
 template_imports = {'urllib': urllib}
@@ -399,6 +403,10 @@ def _index_bulk_op(request, course_key, chapter, section, position):
 
     masquerade = setup_masquerade(request, course_key, staff_access)
 
+    lang_code = get_user_preference(request.user, LANGUAGE_KEY)
+    if not lang_code:
+        lang_code = settings.LANGUAGE_CODE
+
     try:
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             course_key, user, course, depth=2)
@@ -423,6 +431,7 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             'masquerade': masquerade,
             'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
             'reverifications': fetch_reverify_banner_info(request, course_key),
+            'lang_code': lang_code
         }
 
         now = datetime.now(UTC())

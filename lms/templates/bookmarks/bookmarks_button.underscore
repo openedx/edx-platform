@@ -1,0 +1,3 @@
+<button type="button" class="bookmarks-button is-inactive" aria-pressed="false">
+    Bookmarks
+</button>
