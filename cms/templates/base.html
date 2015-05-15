@@ -7,10 +7,8 @@ import json
 <%namespace name='static' file='static_content.html'/>
 
 <!doctype html>
-<!--[if IE 7]><html class="ie7 lte9 lte8 lte7" lang="${LANGUAGE_CODE}"><![endif]-->
-<!--[if IE 8]><html class="ie8 lte9 lte8" lang="${LANGUAGE_CODE}"><![endif]-->
-<!--[if IE 9]><html class="ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
-<!--[if gt IE 9]><!--><html lang="${LANGUAGE_CODE}"><!--<![endif]-->
+<!--[if lte IE 9]><html class="ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
+<!--[if !IE]><<!--><html lang="${LANGUAGE_CODE}"><!--<![endif]-->
 <%
     # set doc language direction
     from django.utils.translation import get_language_bidi
