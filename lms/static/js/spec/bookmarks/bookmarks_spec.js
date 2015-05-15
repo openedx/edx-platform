@@ -2,7 +2,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
         'js/bookmarks/models/bookmark',
         'js/bookmarks/collections/bookmarks',
         'js/bookmarks/views/bookmarks_button',
-        'js/bookmarks/views/bookmarks_list'
+        'js/bookmarks/views/bookmarks_list',
+        'moment'
        ],
     function (Backbone, $, _, AjaxHelpers, TemplateHelpers, BookmarksModel, BookmarksCollection, BookmarksButtonView,
               BookmarksListView) {
@@ -14,7 +15,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 loadFixtures('js/fixtures/bookmarks/bookmarks.html');
                 TemplateHelpers.installTemplates(
                     [
-                        'templates/views/message',
+                        'templates/message_view',
                         'templates/bookmarks/bookmarks_button',
                         'templates/bookmarks/bookmarks_list'
                     ]
@@ -64,7 +65,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     usageId = expectedData.results[0].usage_id;
 
                     expect(view.$('.bookmarks-results-list-item')).toHaveAttr('href', view.bookmarkUrl(courseId, usageId));
-                    expect(view.$('.list-item-breadcrumbtrail').html().trim()).toBe(view.breadcrumbTrail(expectedData.results[0].path));
+                    expect(view.$('.list-item-breadcrumbtrail').html().trim()).toBe(view.breadcrumbTrail(expectedData.results[0].path, expectedData.results[0].display_name));
                     expect(view.$('.list-item-date').text().trim()).toBe('Bookmarked on ' + view.userFriendlyDate(expectedData.results[0].created));
                 };
 
@@ -89,11 +90,11 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 it("has rendered bookmarked list correctly", function () {
                     var requests = AjaxHelpers.requests(this);
-                    var url = bookmarksButtonView.bookmarksListView.url + '?course_id=COURSE_ID&fields=path&page=1&page_size=65536';
+                    var url = bookmarksButtonView.bookmarksListView.url + '?course_id=COURSE_ID&fields=path';
                     var expectedData = createBookmarksData();
                     var bookmarksListView = bookmarksButtonView.bookmarksListView;
 
-                    spyOn(bookmarksListView, 'getCourseId').andReturn('COURSE_ID');
+                    spyOn(bookmarksListView, 'courseId').andReturn('COURSE_ID');
                     bookmarksButtonView.render();
                     bookmarksButtonView.$('.bookmarks-button').click();
 

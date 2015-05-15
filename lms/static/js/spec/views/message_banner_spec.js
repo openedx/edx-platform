@@ -8,7 +8,7 @@ define(['backbone', 'jquery', 'underscore', 'js/views/message'
             beforeEach(function () {
                 setFixtures('<div class="message-banner"></div><div class="message"></div>');
                 TemplateHelpers.installTemplate("templates/fields/message_banner");
-                TemplateHelpers.installTemplate("templates/views/message");
+                TemplateHelpers.installTemplate("templates/message_view");
             });
 
             var createMessageView = function (messageContainer, templateId) {

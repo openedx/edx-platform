@@ -7,7 +7,7 @@
         return Backbone.View.extend({
 
             initialize: function (options) {
-                var templateId = _.isUndefined(options.templateId) ? '#message-tpl' : options.templateId;
+                var templateId = _.isUndefined(options.templateId) ? '#message_view-tpl' : options.templateId;
                 this.template = _.template($(templateId).text());
             },
 

@@ -1,7 +1,9 @@
 ;(function (define, undefined) {
     'use strict';
     define(['gettext', 'jquery', 'underscore', 'backbone', 'moment'],
-        function (gettext, $, _, Backbone) {
+        function (gettext, $, _, Backbone, _moment) {
+
+        var moment = _moment || window.moment;
 
         return Backbone.View.extend({
 
@@ -51,7 +53,7 @@
                 this.collection.url = this.url;
                 this.collection.fetch({
                     reset: true,
-                    data: {course_id: this.courseId, fields: 'path', page: 1, page_size: 65536}
+                    data: {course_id: this.courseId, fields: 'path'}
                 }).done(function () {
                     view.hideLoadingMessage();
                     view.render();

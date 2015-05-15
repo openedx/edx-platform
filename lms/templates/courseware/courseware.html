@@ -36,9 +36,9 @@ ${page_title_breadcrumbs(course_name())}
 </script>
 % endfor
 
-% for template_name in ["message"]:
+% for template_name in ["message_view"]:
 <script type="text/template" id="${template_name}-tpl">
-    <%static:include path="views/${template_name}.underscore" />
+    <%static:include path="${template_name}.underscore" />
 </script>
 % endfor
 
