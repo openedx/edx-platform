@@ -58,6 +58,7 @@ class EcommerceApiClientTest(TestCase):
         actual_header = httpretty.last_request().headers['Authorization']
         expected_payload = {
             'username': self.user.username,
+            'full_name': self.user.profile.name,
             'email': self.user.email,
             'tracking_context': {
                 'lms_user_id': self.user.id,  # pylint: disable=no-member
