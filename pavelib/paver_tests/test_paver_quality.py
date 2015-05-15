@@ -9,6 +9,7 @@ from ddt import ddt, file_data
 
 import pavelib.quality
 import paver.easy
+import paver.tasks
 from paver.easy import BuildFailure
 
 
@@ -63,6 +64,19 @@ class TestPaverRunQuality(unittest.TestCase):
     def setUp(self):
         super(TestPaverRunQuality, self).setUp()
 
+        # test_no_diff_quality_failures seems to alter the way that paver
+        # executes these lines is subsequent tests.
+        # https://github.com/paver/paver/blob/master/paver/tasks.py#L175-L180
+        #
+        # The other tests don't appear to have the same impact. This was
+        # causing a test order dependency. This line resets that state
+        # of environment._task_in_progress so that the paver commands in the
+        # tests will be considered top level tasks by paver, and we can predict
+        # which path it will chose in the above code block.
+        #
+        # TODO: Figure out why one test is altering the state to begin with.
+        paver.tasks.environment = paver.tasks.Environment()
+
         # mock the @needs decorator to skip it
         self._mock_paver_needs = patch.object(pavelib.quality.run_quality, 'needs').start()
         self._mock_paver_needs.return_value = 0
@@ -80,7 +94,6 @@ class TestPaverRunQuality(unittest.TestCase):
         _mock_pep8_violations = MagicMock(
             return_value=(1, ['lms/envs/common.py:32:2: E225 missing whitespace around operator'])
         )
-
         with patch('pavelib.quality._get_pep8_violations', _mock_pep8_violations):
             with self.assertRaises(SystemExit):
                 pavelib.quality.run_quality("")
@@ -117,8 +130,9 @@ class TestPaverRunQuality(unittest.TestCase):
         pylint should not be run
         """
         self._mock_paver_sh.side_effect = [Exception('unrecognized failure!'), 0]
-        with self.assertRaises(Exception):
+        with self.assertRaises(SystemExit):
             pavelib.quality.run_quality("")
+            self.assertRaises(Exception)
         # Test that pylint is NOT called by counting calls
         self.assertEqual(self._mock_paver_sh.call_count, 1)
 
