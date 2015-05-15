@@ -1,6 +1,8 @@
 .wrapper-course-material {
   @include clearfix();
   @include box-sizing(border-box);
+  @extend %ui-print-excluded;
+
   border-bottom: none;
   margin: 0 auto 0;
   padding: 0;

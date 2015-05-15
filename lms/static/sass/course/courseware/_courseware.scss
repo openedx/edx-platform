@@ -12,6 +12,8 @@ html.video-fullscreen{
 }
 
 .wrap-instructor-info {
+  @extend %ui-print-excluded;
+
   margin: ($baseline/2) ($baseline/4) 0 0;
   overflow: hidden;
 
@@ -240,6 +242,10 @@ div.course-wrapper {
         padding: 0;
       }
     }
+
+    @media print {
+      padding: 0 2mm;
+    }
   }
 
   &.closed {
@@ -273,6 +279,10 @@ div.course-wrapper {
     section.course-content {
       width: flex-grid(11.5) + flex-gutter();
     }
+  }
+
+  @media print {
+    border: 0;
   }
 }
 
