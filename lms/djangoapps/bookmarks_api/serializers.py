@@ -21,4 +21,4 @@ class BookmarkSerializer(serializers.HyperlinkedModelSerializer, ReadOnlyFieldsS
         """
         Gets the bookmark id.
         """
-        return "%s, %s" % (bookmark.user.username, bookmark.usage_key)
+        return "%s,%s" % (bookmark.user.username, bookmark.usage_key)
