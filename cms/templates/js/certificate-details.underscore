@@ -12,15 +12,23 @@
             <span class="certificate-value"><%= id %></span>
         </li>
      <% } %>
-        <li class="sr collection-description certificate-description">
-            <%= description %>
-        </li>
-        <li class="collection-description certificate-description">
+     <% if (showDetails) { %>
+        <% if (course_title) { %>
+            <li class="collection-course-title certificate-course-title">
+                <span><%= gettext('Course Title') %>: </span>
+                <%= course_title %>
+            </li>
+        <% } %>
+        <% if (description) { %>
+            <li class="collection-description certificate-description">
+                <%= description %>
+            </li>
+        <% } %>
          <header>
            <span class="title"><%= gettext("Course Signatories") %></span>
          </header>
          <div class="signatory-details-list"></div>
-        </li>
+    <% } %>
    </ol>
 
     <ul class="actions certificate-actions">
