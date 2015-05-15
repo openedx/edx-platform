@@ -8,7 +8,7 @@
              <a class="bookmarks-results-list-item" href="<%= bookmarkUrl(bookmark.get('course_id'), bookmark.get('usage_id')) %>" aria-describedby="bookmark-type-<%= index %> bookmark-date-<%= index %>">
                 <div class="list-item-content">
                     <div class="list-item-left-section">
-                        <h3 class="list-item-breadcrumbtrail"> <%= breadcrumbTrail(bookmark.get('path')) %> </h3>
+                        <h3 class="list-item-breadcrumbtrail"> <%= breadcrumbTrail(bookmark.get('path'), bookmark.get('display_name')) %> </h3>
                         <p id="bookmark-date-<%= index %>" class="list-item-date"> <%= gettext("Bookmarked on") %> <%= userFriendlyDate(bookmark.get('created')) %> </p>
                     </div>
 

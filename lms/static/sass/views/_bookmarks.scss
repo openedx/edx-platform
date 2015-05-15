@@ -99,6 +99,7 @@
 
   .list-item-left-section {
     @include float(left);
+    width: 90%;
 
     .list-item-breadcrumbtrail, .list-item-date {
       @extend %t-ultralight;
@@ -140,8 +141,4 @@
   border: 1px solid $gray-l4;
   padding: ($baseline/4);
   border-radius: ($baseline/10);
-}
-
-.search-info {
-
 }

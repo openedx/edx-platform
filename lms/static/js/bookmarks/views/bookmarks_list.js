@@ -14,7 +14,7 @@
             errorMessage: gettext('An error has occurred. Please try again.'),
             loadingMessage: gettext('Loading'),
 
-            url: '/api/bookmarks/v1/bookmarks',
+            url: '/api/bookmarks/v0/bookmarks/',
 
             events : {
                 'click .bookmarks-results-list-item': 'visitBookmark'
@@ -24,7 +24,9 @@
                 this.template = _.template($('#bookmarks_list-tpl').text());
                 this.loadingMessageView = options.loadingMessageView;
                 this.errorMessageView = options.errorMessageView;
-                _.bindAll(this, 'render');
+                this.courseId = $(this.el).data('courseId');
+                this.langCode = $(this.el).data('langCode');
+                _.bindAll(this, 'render', 'breadcrumbTrail', 'userFriendlyDate', 'bookmarkUrl');
             },
 
             render: function () {
@@ -49,7 +51,7 @@
                 this.collection.url = this.url;
                 this.collection.fetch({
                     reset: true,
-                    data: {course_id: this.getCourseId(), fields: 'path', page: 1, page_size: 65536}
+                    data: {course_id: this.courseId, fields: 'path', page: 1, page_size: 65536}
                 }).done(function () {
                     view.hideLoadingMessage();
                     view.render();
@@ -64,18 +66,15 @@
                 window.location = event.target.pathname;
             },
 
-            getCourseId: function() {
-              return this.$el.data('courseId');
-            },
-
-            breadcrumbTrail: function (bookmarkPath) {
+            breadcrumbTrail: function (bookmarkPath, unitDisplayName) {
                 var separator = ' <i class="icon fa fa-caret-right" aria-hidden="true"></i><span class="sr">-</span> ';
-                return _.pluck(bookmarkPath, 'display_name').join(separator);
+                var names = _.pluck(bookmarkPath, 'display_name');
+                names.push(unitDisplayName);
+                return names.join(separator);
             },
 
             userFriendlyDate: function (isoDate) {
-                // What is the correct/right way to set locale?
-                moment.locale(window.navigator.userLanguage || window.navigator.language);
+                moment.locale(this.langCode);
                 return moment(isoDate).format('LL');
             },
 
