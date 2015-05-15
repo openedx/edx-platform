@@ -18,9 +18,11 @@ set -e
 #       - "lms-unit": Run the LMS Python unit tests
 #       - "cms-unit": Run the CMS Python unit tests
 #       - "commonlib-js-unit": Run the JavaScript tests and the Python unit
-#         tests from the common/lib directory
-#       - "lms-acceptance": Run the acceptance (Selenium) tests for the LMS
-#       - "cms-acceptance": Run the acceptance (Selenium) tests for Studio
+#           tests from the common/lib directory
+#       - "lms-acceptance": Run the acceptance (Selenium/Lettuce) tests for
+#           the LMS
+#       - "cms-acceptance": Run the acceptance (Selenium/Lettuce) tests for
+#           Studio
 #       - "bok-choy": Run acceptance tests that use the bok-choy framework
 #
 #   `SHARD` is a number indicating which subset of the tests to build.
@@ -30,13 +32,6 @@ set -e
 #       the 'shard_n' attribute will run in the nth shard. If there isn't a
 #       shard explicitly assigned, the test will run in the last shard (the one
 #       with the highest number).
-#
-#       For the lettuce acceptance tests, ("lms-" and "cms-acceptance") they
-#       are decorated with "@shard_{}" (e.g. @shard_1 for the first shard).
-#       The lettuce tests must have a shard specified to be run in jenkins,
-#       as there is no shard that runs unspecified tests. (NOTE: We no longer
-#       have multiple shards for lettuce tests)
-#
 #
 #   Jenkins configuration:
 #
@@ -117,7 +112,17 @@ END
         paver test_js --coverage --skip_clean || { EXIT=1; }
         paver test_lib --skip_clean --extra_args="--with-flaky" --cov_args="-p" || { EXIT=1; }
 
-        # This is to ensure that the build status of the shard is properly set
+        # This is to ensure that the build status of the shard is properly set.
+        # Because we are running two paver commands in a row, we need to capture
+        # their return codes in order to exit with a non-zero code if either of
+        # them fail. We put the || clause there because otherwise, when a paver
+        # command fails, this entire script will exit, and not run the second
+        # paver command in this case statement. So instead of exiting, the value
+        # of a variable named EXIT will be set to 1 if either of the paver
+        # commands fail. We then use this variable's value as our exit code.
+        # Note that by default the value of this variable EXIT is not set, so if
+        # neither command fails then the exit command resolves to simply exit
+        # which is considered successful.
         exit $EXIT
         ;;
 
