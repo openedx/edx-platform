@@ -95,8 +95,6 @@ urlpatterns = (
 
     # Profile Images API endpoints
     url(r'^api/profile_images/', include('openedx.core.djangoapps.profile_images.urls')),
-
-    url(r'^api/bookmarks/', include('openedx.core.djangoapps.bookmarks.urls')),
 )
 
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
