@@ -47,6 +47,24 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 log = logging.getLogger(__name__)
 
 
+class InstructorDashboardViewType(object):
+    """
+    Defines the Instructor Dashboard view type that is shown as a course tab.
+    """
+
+    name = "instructor"
+    title = _('Instructor')
+    view_name = "instructor_dashboard"
+    is_persistent = False
+
+    @classmethod
+    def is_enabled(cls, course, settings, user=None):  # pylint: disable=unused-argument,redefined-outer-name
+        """
+        Returns true if the specified user has staff access.
+        """
+        return user and has_access(user, 'staff', course, course.id)
+
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def instructor_dashboard_2(request, course_id):

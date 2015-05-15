@@ -64,15 +64,6 @@ def get_current_ccx():
     return _CCX_CONTEXT.ccx
 
 
-def get_current_request():
-    """
-    Return the active request, so that we can get context information in places
-    where it is limited, like in the tabs.
-    """
-    request = _CCX_CONTEXT.request
-    return request
-
-
 def get_override_for_ccx(ccx, block, name, default=None):
     """
     Gets the value of the overridden field for the `ccx`.  `block` and `name`

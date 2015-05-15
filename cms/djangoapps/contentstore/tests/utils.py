@@ -95,7 +95,7 @@ class CourseTestCase(ModuleStoreTestCase):
         client = AjaxEnabledTestClient()
         if authenticate:
             client.login(username=nonstaff.username, password=password)
-            nonstaff.is_authenticated = True
+        nonstaff.is_authenticated = lambda: authenticate
         return client, nonstaff
 
     def populate_course(self, branching=2):

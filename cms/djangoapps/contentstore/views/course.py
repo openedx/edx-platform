@@ -23,7 +23,7 @@ from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
-from xmodule.tabs import PDFTextbookTabs
+from xmodule.tabs import PDFTextbookTabs, CourseTabManager
 from xmodule.partitions.partitions import UserPartition
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
@@ -1069,20 +1069,14 @@ def _modify_tabs_to_components(request, course_module):
         'open_ended': (is_advanced_component_present, OPEN_ENDED_COMPONENT_TYPES),
         # notes tab
         'notes': (is_advanced_component_present, NOTE_COMPONENT_TYPES),
-        # student notes tab
-        'edxnotes': (is_field_value_true, ['edxnotes'])
     }
 
     tabs_changed = False
-    for tab_type in tab_component_map.keys():
-        check, component_types = tab_component_map[tab_type]
-        try:
-            tab_enabled = check(request, component_types)
-        except TypeError:
-            # user has failed to put iterable value into advanced component list.
-            # return immediately and let validation handle.
-            return
 
+    def update_tab(tab_type, tab_enabled):
+        """
+        Adds or removes a course tab based upon whether it is enabled.
+        """
         if tab_enabled:
             # check passed, some of this component_types are present, adding tab
             if _add_tab(request, tab_type, course_module):
@@ -1093,6 +1087,24 @@ def _modify_tabs_to_components(request, course_module):
             if _remove_tab(request, tab_type, course_module):
                 # tab indeed was removed, the change needs to propagate
                 tabs_changed = True
+
+    for tab_type in tab_component_map.keys():
+        check, component_types = tab_component_map[tab_type]
+        try:
+            tab_enabled = check(request, component_types)
+        except TypeError:
+            # user has failed to put iterable value into advanced component list.
+            # return immediately and let validation handle.
+            return
+        update_tab(tab_type, tab_enabled)
+
+    # Additionally update any tabs related to course views
+    # TODO: convert all the tabs to course views
+    for tab_type in CourseTabManager.get_tab_types().values():
+        field_name = getattr(tab_type, "feature_flag_field_name", None)
+        if field_name:
+            tab_enabled = is_field_value_true(request, [field_name])
+            update_tab(tab_type, tab_enabled)
 
     return tabs_changed
 

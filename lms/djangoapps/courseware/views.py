@@ -51,8 +51,6 @@ from .entrance_exams import (
 from courseware.models import StudentModule, StudentModuleHistory
 from course_modes.models import CourseMode
 
-from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
-
 from open_ended_grading import open_ended_notifications
 from student.models import UserTestGroup, CourseEnrollment
 from student.views import single_course_reverification_info, is_course_blocked

@@ -5,7 +5,11 @@ from mock import patch
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.test.client import RequestFactory
 from django.test.utils import override_settings
+
+from courseware.tabs import get_course_tab_list
+from courseware.tests.factories import UserFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 
 from student.tests.factories import AdminFactory
@@ -53,6 +57,21 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         return 'Demographic data is now available in <a href="http://example.com/courses/{}" ' \
                'target="_blank">Example</a>.'.format(unicode(self.course.id))
+
+    def test_instructor_tab(self):
+        """
+        Verify that the instructor tab appears for staff only.
+        """
+        def has_instructor_tab(user, course):
+            """Returns true if the "Instructor" tab is shown."""
+            request = RequestFactory().request()
+            request.user = user
+            tabs = get_course_tab_list(request, course)
+            return len([tab for tab in tabs if tab.name == 'Instructor']) == 1
+
+        self.assertTrue(has_instructor_tab(self.instructor, self.course))
+        student = UserFactory.create()
+        self.assertFalse(has_instructor_tab(student, self.course))
 
     def test_default_currency_in_the_html_response(self):
         """
