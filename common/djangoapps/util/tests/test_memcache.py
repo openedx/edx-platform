@@ -17,6 +17,7 @@ class MemcacheTest(TestCase):
                           [129, 500, 2 ** 8 - 1, 2 ** 8 + 1, 2 ** 16 - 1])
 
     def setUp(self):
+        super(MemcacheTest, self).setUp()
         self.cache = get_cache('default')
 
     def test_safe_key(self):

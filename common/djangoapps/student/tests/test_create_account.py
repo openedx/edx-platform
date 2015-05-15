@@ -45,6 +45,7 @@ class TestCreateAccount(TestCase):
     """Tests for account creation"""
 
     def setUp(self):
+        super(TestCreateAccount, self).setUp()
         self.username = "test_user"
         self.url = reverse("create_account")
         self.request_factory = RequestFactory()
@@ -477,6 +478,7 @@ class TestCreateAccountValidation(TestCase):
 class TestCreateCommentsServiceUser(TransactionTestCase):
 
     def setUp(self):
+        super(TestCreateCommentsServiceUser, self).setUp()
         self.username = "test_user"
         self.url = reverse("create_account")
         self.params = {

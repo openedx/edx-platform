@@ -21,6 +21,7 @@ class MicroSiteSessionCookieTests(TestCase):
     """
 
     def setUp(self):
+        super(MicroSiteSessionCookieTests, self).setUp()
         # create a test client
         self.client = Client()
 

@@ -17,6 +17,7 @@ class StubEdxNotesServiceTest(unittest.TestCase):
         """
         Start the stub server.
         """
+        super(StubEdxNotesServiceTest, self).setUp()
         self.server = StubEdxNotesService()
         dummy_notes = self._get_dummy_notes(count=2)
         self.server.add_notes(dummy_notes)

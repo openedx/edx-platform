@@ -95,10 +95,9 @@ class EdxNotesTestMixin(UniqueCourseTest):
                 ),
             )).install()
 
-        AutoAuthPage(self.browser, username=self.username, email=self.email, course_id=self.course_id).visit()
+        self.addCleanup(self.edxnotes_fixture.cleanup)
 
-    def tearDown(self):
-        self.edxnotes_fixture.cleanup()
+        AutoAuthPage(self.browser, username=self.username, email=self.email, course_id=self.course_id).visit()
 
     def _add_notes(self):
         xblocks = self.course_fixture.get_nested_xblocks(category="html")

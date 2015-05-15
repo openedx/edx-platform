@@ -12,6 +12,7 @@ class RoleAssignmentTest(TestCase):
     """
 
     def setUp(self):
+        super(RoleAssignmentTest, self).setUp()
         # Check a staff account because those used to get the Moderator role
         self.staff_user = User.objects.create_user(
             "patty",

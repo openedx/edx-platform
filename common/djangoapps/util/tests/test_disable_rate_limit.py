@@ -30,6 +30,7 @@ class DisableRateLimitTest(TestCase):
     """Check that we can disable rate limiting for perf testing. """
 
     def setUp(self):
+        super(DisableRateLimitTest, self).setUp()
         cache.clear()
         self.view = FakeApiView()
 

@@ -52,6 +52,7 @@ class FilenameGeneratorTestCase(TestCase):
     NOW = datetime.strptime('1974-06-22T01:02:03', '%Y-%m-%dT%H:%M:%S').replace(tzinfo=UTC())
 
     def setUp(self):
+        super(FilenameGeneratorTestCase, self).setUp()
         datetime_patcher = patch.object(
             util.file, 'datetime',
             Mock(wraps=datetime)
@@ -84,6 +85,7 @@ class StoreUploadedFileTestCase(TestCase):
     """
 
     def setUp(self):
+        super(StoreUploadedFileTestCase, self).setUp()
         self.request = Mock(spec=HttpRequest)
         self.file_content = "test file content"
         self.request.FILES = {"uploaded_file": SimpleUploadedFile("tempfile.csv", self.file_content)}
@@ -92,6 +94,7 @@ class StoreUploadedFileTestCase(TestCase):
         self.default_max_size = 2000000
 
     def tearDown(self):
+        super(StoreUploadedFileTestCase, self).tearDown()
         if self.file_storage and self.stored_file_name:
             self.file_storage.delete(self.stored_file_name)
 

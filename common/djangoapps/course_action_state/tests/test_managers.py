@@ -19,6 +19,7 @@ class TestCourseActionStateManagerBase(TestCase):
     Base class for testing Course Action State Managers.
     """
     def setUp(self):
+        super(TestCourseActionStateManagerBase, self).setUp()
         self.course_key = CourseLocator("test_org", "test_course_num", "test_run")
 
 

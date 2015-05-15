@@ -14,6 +14,7 @@ class StubOraServiceTest(unittest.TestCase):
         """
         Start the stub server.
         """
+        super(StubOraServiceTest, self).setUp()
         self.server = StubOraService()
         self.addCleanup(self.server.shutdown)
 

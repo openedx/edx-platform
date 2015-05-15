@@ -11,6 +11,7 @@ from terrain.stubs.http import StubHttpService, StubHttpRequestHandler, require_
 class StubHttpServiceTest(unittest.TestCase):
 
     def setUp(self):
+        super(StubHttpServiceTest, self).setUp()
         self.server = StubHttpService()
         self.addCleanup(self.server.shutdown)
         self.url = "http://127.0.0.1:{0}/set_config".format(self.server.port)
@@ -86,6 +87,7 @@ class RequireParamTest(unittest.TestCase):
     """
 
     def setUp(self):
+        super(RequireParamTest, self).setUp()
         self.server = RequireHttpService()
         self.addCleanup(self.server.shutdown)
         self.url = "http://127.0.0.1:{port}".format(port=self.server.port)

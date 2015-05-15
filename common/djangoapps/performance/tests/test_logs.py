@@ -19,6 +19,7 @@ class PerformanceTrackingTest(TestCase):
     """
 
     def setUp(self):
+        super(PerformanceTrackingTest, self).setUp()
         self.request_factory = RequestFactory()
         self.stream = StringIO()
         self.handler = logging.StreamHandler(self.stream)
