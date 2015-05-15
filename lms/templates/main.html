@@ -133,8 +133,6 @@ dir_rtl = 'rtl' if get_language_bidi() else 'ltr'
   <div class="window-wrap" dir="${dir_rtl}">
     <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to main content")}</a>
 
-    <%include file="mathjax_accessible.html" />
-
     % if not disable_header:
         <%include file="${header_file}" />
     % endif
