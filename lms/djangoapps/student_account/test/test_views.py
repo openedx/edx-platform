@@ -299,12 +299,14 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
         # This relies on the THIRD_PARTY_AUTH configuration in the test settings
         expected_providers = [
             {
+                "id": "oa2-facebook",
                 "name": "Facebook",
                 "iconClass": "fa-facebook",
                 "loginUrl": self._third_party_login_url("facebook", "login"),
                 "registerUrl": self._third_party_login_url("facebook", "register")
             },
             {
+                "id": "oa2-google-oauth2",
                 "name": "Google",
                 "iconClass": "fa-google-plus",
                 "loginUrl": self._third_party_login_url("google-oauth2", "login"),
@@ -332,6 +334,7 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
         )
         expected_providers = [
             {
+                "id": "oa2-facebook",
                 "name": "Facebook",
                 "iconClass": "fa-facebook",
                 "loginUrl": self._third_party_login_url(
@@ -346,6 +349,7 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
                 )
             },
             {
+                "id": "oa2-google-oauth2",
                 "name": "Google",
                 "iconClass": "fa-google-plus",
                 "loginUrl": self._third_party_login_url(
@@ -380,6 +384,7 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
         shoppingcart_url = reverse("shoppingcart.views.show_cart")
         expected_providers = [
             {
+                "id": "oa2-facebook",
                 "name": "Facebook",
                 "iconClass": "fa-facebook",
                 "loginUrl": self._third_party_login_url(
@@ -394,6 +399,7 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
                 )
             },
             {
+                "id": "oa2-google-oauth2",
                 "name": "Google",
                 "iconClass": "fa-google-plus",
                 "loginUrl": self._third_party_login_url(
@@ -426,6 +432,7 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
             # the ?next param sends users to the blocked message.
             expected_providers = [
                 {
+                    "id": "oa2-facebook",
                     "name": "Facebook",
                     "iconClass": "fa-facebook",
                     "loginUrl": self._third_party_login_url(
@@ -440,6 +447,7 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
                     )
                 },
                 {
+                    "id": "oa2-google-oauth2",
                     "name": "Google",
                     "iconClass": "fa-google-plus",
                     "loginUrl": self._third_party_login_url(

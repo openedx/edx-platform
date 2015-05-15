@@ -39,7 +39,7 @@ def auth_pipeline_urls(auth_entry, redirect_url=None, course_id=None, email_opt_
             be treated as False, and the user will be opted out of organization-wide email.
 
     Returns:
-        dict mapping provider names to URLs
+        dict mapping provider IDs to URLs
 
     """
     if not third_party_auth_enabled():
@@ -67,8 +67,8 @@ def auth_pipeline_urls(auth_entry, redirect_url=None, course_id=None, email_opt_
         pipeline_redirect = None
 
     return {
-        provider.NAME: pipeline.get_login_url(
-            provider.NAME, auth_entry,
+        provider.provider_id: pipeline.get_login_url(
+            provider.provider_id, auth_entry,
             enroll_course_id=course_id,
             email_opt_in=email_opt_in,
             redirect_url=pipeline_redirect

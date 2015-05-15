@@ -9,7 +9,18 @@ from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModel
 from .models import OAuth2ProviderConfig, SAMLProviderConfig, SAMLConfiguration, SAMLProviderData
 
 admin.site.register(OAuth2ProviderConfig, KeyedConfigurationModelAdmin)
-admin.site.register(SAMLProviderConfig, KeyedConfigurationModelAdmin)
+
+
+class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
+    """ Django Admin class for SAMLProviderConfig """
+    def get_list_display(self, request):
+        """ Don't show every single field in the admin change list """
+        return (
+            'name', 'enabled', 'backend_name', 'metadata_source', 'icon_class',
+            'change_date', 'changed_by', 'edit_link'
+        )
+
+admin.site.register(SAMLProviderConfig, SAMLProviderConfigAdmin)
 
 
 class SAMLConfigurationAdmin(ConfigurationModelAdmin):

@@ -22,8 +22,9 @@ def _load_backend_classes(base_class=BaseAuth):
         auth_class = module_member(class_path)
         if issubclass(auth_class, base_class):
             yield auth_class
-_PSA_OAUTH2_BACKENDS = {backend_class.name: backend_class for backend_class in _load_backend_classes(BaseOAuth2)}
-_PSA_SAML_BACKENDS = {backend_class.name: backend_class for backend_class in _load_backend_classes(SAMLAuth)}
+_PSA_BACKENDS = {backend_class.name: backend_class for backend_class in _load_backend_classes()}
+_PSA_OAUTH2_BACKENDS = [backend_class.name for backend_class in _load_backend_classes(BaseOAuth2)]
+_PSA_SAML_BACKENDS = [backend_class.name for backend_class in _load_backend_classes(SAMLAuth)]
 
 
 def clean_json(value, of_type):
@@ -45,17 +46,80 @@ class ProviderConfig(ConfigurationModel):
     """
     icon_class = models.CharField(max_length=50, default='fa-signin')
     name = models.CharField(max_length=50, blank=False)
+    prefix = None  # used for provider_id. Set to a string value in subclass
     backend_name = None  # Set to a field or fixed value in subclass
     # "enabled" field is inherited from ConfigurationModel
 
     class Meta(object):  # pylint: disable=missing-docstring
         abstract = True
 
+    @property
+    def provider_id(self):
+        """ Unique string key identifying this provider. Must be URL and css class friendly. """
+        assert self.prefix is not None
+        return "-".join((self.prefix, ) + tuple(getattr(self, field) for field in self.KEY_FIELDS))
+
+    @property
+    def backend_class(self):
+        """ Get the python-social-auth backend class used for this provider """
+        return _PSA_BACKENDS[self.backend_name]
+
+    def get_url_params(self):
+        """ Get a dict of GET parameters to append to login links for this provider """
+        return {}
+
+    def is_active_for_pipeline(self, pipeline):
+        """ Is this provider being used for the specified pipeline? """
+        return self.backend_name == pipeline['backend']
+
+    def match_social_auth(self, social_auth):
+        """ Is this provider being used for this UserSocialAuth entry? """
+        return self.backend_name == social_auth.provider
+
+    @classmethod
+    def get_register_form_data(cls, pipeline_kwargs):
+        """Gets dict of data to display on the register form.
+
+        common.djangoapps.student.views.register_user uses this to populate the
+        new account creation form with values supplied by the user's chosen
+        provider, preventing duplicate data entry.
+
+        Args:
+            pipeline_kwargs: dict of string -> object. Keyword arguments
+                accumulated by the pipeline thus far.
+
+        Returns:
+            Dict of string -> string. Keys are names of form fields; values are
+            values for that field. Where there is no value, the empty string
+            must be used.
+        """
+        # Details about the user sent back from the provider.
+        details = pipeline_kwargs.get('details')
+
+        # Get the username separately to take advantage of the de-duping logic
+        # built into the pipeline. The provider cannot de-dupe because it can't
+        # check the state of taken usernames in our system. Note that there is
+        # technically a data race between the creation of this value and the
+        # creation of the user object, so it is still possible for users to get
+        # an error on submit.
+        suggested_username = pipeline_kwargs.get('username')
+
+        return {
+            'email': details.get('email', ''),
+            'name': details.get('fullname', ''),
+            'username': suggested_username,
+        }
+
+    def get_authentication_backend(self):
+        """Gets associated Django settings.AUTHENTICATION_BACKEND string."""
+        return '{}.{}'.format(self.backend_class.__module__, self.backend_class.__name__)
+
 
 class OAuth2ProviderConfig(ProviderConfig):
     """
     Configuration Entry for an OAuth2 based provider.
     """
+    prefix = 'oa2'
     KEY_FIELDS = ('backend_name', )  # Backend name is unique
     backend_name = models.CharField(
         max_length=50, choices=[(name, name) for name in _PSA_OAUTH2_BACKENDS], blank=False, db_index=True)
@@ -72,26 +136,62 @@ class OAuth2ProviderConfig(ProviderConfig):
         super(OAuth2ProviderConfig, self).clean()
         self.other_settings = clean_json(self.other_settings, dict)
 
+    def get_setting(self, name):
+        """ Get the value of a setting, or raise KeyError """
+        if name in ("KEY", "SECRET"):
+            return getattr(self, name.lower())
+        if self.other_settings:
+            other_settings = json.loads(self.other_settings)
+            assert isinstance(other_settings, dict), "other_settings should be a JSON object (dictionary)"
+            return other_settings[name]
+        raise KeyError
+
 
 class SAMLProviderConfig(ProviderConfig):
     """
     Configuration Entry for a SAML/Shibboleth provider.
     """
+    prefix = 'saml'
     KEY_FIELDS = ('idp_slug', )
     backend_name = models.CharField(
         max_length=50, default='tpa-saml', choices=[(name, name) for name in _PSA_SAML_BACKENDS], blank=False)
     idp_slug = models.SlugField(max_length=30, db_index=True)
     metadata_source = models.CharField(max_length=255, help_text="Generally this is a URL to a metadata XML file")
-    attr_user_permanent_id = models.CharField(max_length=128)
-    attr_full_name = models.CharField(max_length=128)
-    attr_first_name = models.CharField(max_length=128)
-    attr_last_name = models.CharField(max_length=128)
-    attr_username = models.CharField(max_length=128)
-    attr_email = models.CharField(max_length=128)
+    attr_user_permanent_id = models.CharField(
+        max_length=128, blank=True, verbose_name="User ID Attribute",
+        help_text="URN of the SAML attribute that we can use as a unique, persistent user ID. Leave blank for default.")
+    attr_full_name = models.CharField(
+        max_length=128, blank=True, verbose_name="Full Name Attribute",
+        help_text="URN of SAML attribute containing the user's full name. Leave blank for default.")
+    attr_first_name = models.CharField(
+        max_length=128, blank=True, verbose_name="First Name Attribute",
+        help_text="URN of SAML attribute containing the user's first name. Leave blank for default.")
+    attr_last_name = models.CharField(
+        max_length=128, blank=True, verbose_name="Last Name Attribute",
+        help_text="URN of SAML attribute containing the user's last name. Leave blank for default.")
+    attr_username = models.CharField(
+        max_length=128, blank=True, verbose_name="Username Hint Attribute",
+        help_text="URN of SAML attribute to use as a suggested username for this user. Leave blank for default.")
+    attr_email = models.CharField(
+        max_length=128, blank=True, verbose_name="Email Attribute",
+        help_text="URN of SAML attribute containing the user's email address[es]. Leave blank for default.")
 
     class Meta(object):  # pylint: disable=missing-docstring
         verbose_name = "Provider Configuration (SAML IdP)"
         verbose_name_plural = "Provider Configuration (SAML IdPs)"
+
+    def get_url_params(self):
+        """ Get a dict of GET parameters to append to login links for this provider """
+        return {'idp': self.idp_slug}
+
+    def is_active_for_pipeline(self, pipeline):
+        """ Is this provider being used for the specified pipeline? """
+        return self.backend_name == pipeline['backend'] and self.idp_slug == pipeline['kwargs']['response']['idp_name']
+
+    def match_social_auth(self, social_auth):
+        """ Is this provider being used for this UserSocialAuth entry? """
+        prefix = self.idp_slug + ":"
+        return self.backend_name == social_auth.provider and social_auth.uid.startswith(prefix)
 
 
 class SAMLConfiguration(ConfigurationModel):
