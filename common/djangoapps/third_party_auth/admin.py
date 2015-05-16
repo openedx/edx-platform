@@ -16,9 +16,18 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
     def get_list_display(self, request):
         """ Don't show every single field in the admin change list """
         return (
-            'name', 'enabled', 'backend_name', 'metadata_source', 'icon_class',
-            'change_date', 'changed_by', 'edit_link'
+            'name', 'enabled', 'backend_name', 'entity_id', 'metadata_source',
+            'has_data', 'icon_class', 'change_date', 'changed_by', 'edit_link'
         )
+
+    def has_data(self, inst):
+        """ Does we have cached metadata for this SAML provider? """
+        if not inst.is_active:
+            return None  # N/A
+        data = SAMLProviderData.current(inst.entity_id)
+        return bool(data and data.is_valid())
+    has_data.short_description = u'Metadata Ready'
+    has_data.boolean = True
 
 admin.site.register(SAMLProviderConfig, SAMLProviderConfigAdmin)
 
@@ -42,4 +51,11 @@ class SAMLConfigurationAdmin(ConfigurationModelAdmin):
     key_summary.allow_tags = True
 
 admin.site.register(SAMLConfiguration, SAMLConfigurationAdmin)
-admin.site.register(SAMLProviderData, KeyedConfigurationModelAdmin)
+
+
+class SAMLProviderDataAdmin(admin.ModelAdmin):
+    """ Django Admin class for SAMLProviderData """
+    list_display = ('entity_id', 'is_valid', 'fetched_at', 'expires_at', 'sso_url')
+    readonly_fields = ('is_valid', )
+
+admin.site.register(SAMLProviderData, SAMLProviderDataAdmin)

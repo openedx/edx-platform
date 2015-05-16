@@ -2,14 +2,15 @@
 Models used to implement SAML SSO support in third_party_auth
 (inlcuding Shibboleth support)
 """
-from config_models.models import ConfigurationModel
+from config_models.models import ConfigurationModel, cache
 from django.conf import settings
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.db import models
+from django.utils import timezone
 import json
 from social.backends.base import BaseAuth
 from social.backends.oauth import BaseOAuth2
-from social.backends.saml import SAMLAuth
+from social.backends.saml import SAMLAuth, SAMLIdentityProvider
 from social.utils import module_member
 
 
@@ -156,6 +157,7 @@ class SAMLProviderConfig(ProviderConfig):
     backend_name = models.CharField(
         max_length=50, default='tpa-saml', choices=[(name, name) for name in _PSA_SAML_BACKENDS], blank=False)
     idp_slug = models.SlugField(max_length=30, db_index=True)
+    entity_id = models.CharField(max_length=255)
     metadata_source = models.CharField(max_length=255, help_text="Generally this is a URL to a metadata XML file")
     attr_user_permanent_id = models.CharField(
         max_length=128, blank=True, verbose_name="User ID Attribute",
@@ -192,6 +194,30 @@ class SAMLProviderConfig(ProviderConfig):
         """ Is this provider being used for this UserSocialAuth entry? """
         prefix = self.idp_slug + ":"
         return self.backend_name == social_auth.provider and social_auth.uid.startswith(prefix)
+
+    def get_config(self):
+        """
+        Return a SAMLIdentityProvider instance for use by SAMLAuthBackend.
+
+        Essentially this just returns the values of this object and its
+        associated 'SAMLProviderData' entry.
+        """
+        conf = {}
+        attrs = (
+            'attr_user_permanent_id', 'attr_full_name', 'attr_first_name',
+            'attr_last_name', 'attr_username', 'attr_email', 'entity_id')
+        for field in attrs:
+            val = getattr(self, field)
+            if val:
+                conf[field] = val
+        # Now get the data fetched automatically from the metadata.xml:
+        data = SAMLProviderData.current(self.entity_id)
+        if not data or not data.is_valid():
+            raise ImproperlyConfigured("No SAMLProviderData available for {}".format(self.entity_id))
+        conf['x509cert'] = data.public_key
+        conf['url'] = data.sso_url
+        conf['binding'] = data.binding
+        return SAMLIdentityProvider(self.idp_slug, **conf)
 
 
 class SAMLConfiguration(ConfigurationModel):
@@ -239,18 +265,51 @@ class SAMLConfiguration(ConfigurationModel):
         return other_config[name]  # SECURITY_CONFIG, SP_NAMEID_FORMATS, SP_EXTRA
 
 
-class SAMLProviderData(ConfigurationModel):
+class SAMLProviderData(models.Model):
     """
-    Data about a SAML IdP that is generally fetched automatically.
+    Data about a SAML IdP that is fetched automatically by 'manage.py saml pull'
 
     This data is only required during the actual authentication process.
     """
-    KEY_FIELDS = ('idp_slug', )
-    idp_slug = models.SlugField(max_length=30, db_index=True)
-    entity_id = models.CharField(max_length=255)
-    sso_url = models.URLField()
+    cache_timeout = 600
+    fetched_at = models.DateTimeField(db_index=True, null=False)
+    expires_at = models.DateTimeField(db_index=True, null=True)
+
+    entity_id = models.CharField(max_length=255, db_index=True)  # This is the key for lookups in this table
+    sso_url = models.URLField(verbose_name="SSO URL")
     public_key = models.TextField()
+    binding = models.CharField(max_length=128, default='urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect', blank=True)
 
     class Meta(object):  # pylint: disable=missing-docstring
         verbose_name = "SAML Provider Data"
         verbose_name_plural = verbose_name
+        ordering = ('-fetched_at', )
+
+    def is_valid(self):
+        """ Is this data valid? """
+        if self.expires_at and timezone.now() > self.expires_at:
+            return False
+        return bool(self.entity_id and self.sso_url and self.public_key)
+    is_valid.boolean = True
+
+    @classmethod
+    def cache_key_name(cls, entity_id):
+        """ Return the name of the key to use to cache the current data """
+        return 'configuration/{}/current/{}'.format(cls.__name__, entity_id)
+
+    @classmethod
+    def current(cls, entity_id):
+        """
+        Return the active data entry, if any, otherwise None
+        """
+        cached = cache.get(cls.cache_key_name(entity_id))
+        if cached is not None:
+            return cached
+
+        try:
+            current = cls.objects.filter(entity_id=entity_id).order_by('-fetched_at')[0]
+        except IndexError:
+            current = None
+
+        cache.set(cls.cache_key_name(entity_id), current, cls.cache_timeout)
+        return current

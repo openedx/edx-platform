@@ -33,13 +33,14 @@ class Migration(SchemaMigration):
             ('name', self.gf('django.db.models.fields.CharField')(max_length=50)),
             ('backend_name', self.gf('django.db.models.fields.CharField')(default='tpa-saml', max_length=50)),
             ('idp_slug', self.gf('django.db.models.fields.SlugField')(max_length=30)),
+            ('entity_id', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('metadata_source', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('attr_user_permanent_id', self.gf('django.db.models.fields.CharField')(max_length=128)),
-            ('attr_full_name', self.gf('django.db.models.fields.CharField')(max_length=128)),
-            ('attr_first_name', self.gf('django.db.models.fields.CharField')(max_length=128)),
-            ('attr_last_name', self.gf('django.db.models.fields.CharField')(max_length=128)),
-            ('attr_username', self.gf('django.db.models.fields.CharField')(max_length=128)),
-            ('attr_email', self.gf('django.db.models.fields.CharField')(max_length=128)),
+            ('attr_user_permanent_id', self.gf('django.db.models.fields.CharField')(max_length=128, blank=True)),
+            ('attr_full_name', self.gf('django.db.models.fields.CharField')(max_length=128, blank=True)),
+            ('attr_first_name', self.gf('django.db.models.fields.CharField')(max_length=128, blank=True)),
+            ('attr_last_name', self.gf('django.db.models.fields.CharField')(max_length=128, blank=True)),
+            ('attr_username', self.gf('django.db.models.fields.CharField')(max_length=128, blank=True)),
+            ('attr_email', self.gf('django.db.models.fields.CharField')(max_length=128, blank=True)),
         ))
         db.send_create_signal('third_party_auth', ['SAMLProviderConfig'])
 
@@ -60,13 +61,12 @@ class Migration(SchemaMigration):
         # Adding model 'SAMLProviderData'
         db.create_table('third_party_auth_samlproviderdata', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('change_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('changed_by', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, on_delete=models.PROTECT)),
-            ('enabled', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('idp_slug', self.gf('django.db.models.fields.SlugField')(max_length=30)),
-            ('entity_id', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('fetched_at', self.gf('django.db.models.fields.DateTimeField')(db_index=True)),
+            ('expires_at', self.gf('django.db.models.fields.DateTimeField')(null=True, db_index=True)),
+            ('entity_id', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
             ('sso_url', self.gf('django.db.models.fields.URLField')(max_length=200)),
             ('public_key', self.gf('django.db.models.fields.TextField')()),
+            ('binding', self.gf('django.db.models.fields.CharField')(default='urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect', max_length=128, blank=True)),
         ))
         db.send_create_signal('third_party_auth', ['SAMLProviderData'])
 
@@ -149,16 +149,17 @@ class Migration(SchemaMigration):
         },
         'third_party_auth.samlproviderconfig': {
             'Meta': {'object_name': 'SAMLProviderConfig'},
-            'attr_email': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'attr_first_name': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'attr_full_name': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'attr_last_name': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'attr_user_permanent_id': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'attr_username': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
+            'attr_email': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
+            'attr_first_name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
+            'attr_full_name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
+            'attr_last_name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
+            'attr_user_permanent_id': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
+            'attr_username': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
             'backend_name': ('django.db.models.fields.CharField', [], {'default': "'tpa-saml'", 'max_length': '50'}),
             'change_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'changed_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True', 'on_delete': 'models.PROTECT'}),
             'enabled': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'entity_id': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'icon_class': ('django.db.models.fields.CharField', [], {'default': "'fa-signin'", 'max_length': '50'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'idp_slug': ('django.db.models.fields.SlugField', [], {'max_length': '30'}),
@@ -166,13 +167,12 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
         },
         'third_party_auth.samlproviderdata': {
-            'Meta': {'object_name': 'SAMLProviderData'},
-            'change_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'changed_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True', 'on_delete': 'models.PROTECT'}),
-            'enabled': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'entity_id': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'Meta': {'ordering': "('-fetched_at',)", 'object_name': 'SAMLProviderData'},
+            'binding': ('django.db.models.fields.CharField', [], {'default': "'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'", 'max_length': '128', 'blank': 'True'}),
+            'entity_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
+            'expires_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'db_index': 'True'}),
+            'fetched_at': ('django.db.models.fields.DateTimeField', [], {'db_index': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'idp_slug': ('django.db.models.fields.SlugField', [], {'max_length': '30'}),
             'public_key': ('django.db.models.fields.TextField', [], {}),
             'sso_url': ('django.db.models.fields.URLField', [], {'max_length': '200'})
         }

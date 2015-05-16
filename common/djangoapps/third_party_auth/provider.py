@@ -21,10 +21,9 @@ class Registry(object):
             if provider.enabled:
                 yield provider
         if SAMLConfiguration.is_enabled():
-            # TODO: Cache this?
-            idp_names = SAMLProviderConfig.objects.values_list('idp_slug', flat=True).distinct()
-            for idp_name in idp_names:
-                provider = SAMLProviderConfig.current(idp_name)
+            idp_slugs = SAMLProviderConfig.key_values('idp_slug', flat=True)
+            for idp_slug in idp_slugs:
+                provider = SAMLProviderConfig.current(idp_slug)
                 if provider.enabled and provider.backend_name in _PSA_SAML_BACKENDS:
                     yield provider
 
@@ -79,8 +78,7 @@ class Registry(object):
             if provider.enabled:
                 yield provider
         elif backend_name in _PSA_SAML_BACKENDS and SAMLConfiguration.is_enabled():
-            # TODO: Cache this idp names query?
-            idp_names = SAMLProviderConfig.objects.values_list('idp_slug', flat=True).distinct()
+            idp_names = SAMLProviderConfig.key_values('idp_slug', flat=True)
             for idp_name in idp_names:
                 provider = SAMLProviderConfig.current(idp_name)
                 if provider.backend_name == backend_name and provider.enabled:

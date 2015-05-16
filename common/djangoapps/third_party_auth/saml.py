@@ -1,7 +1,7 @@
 """
 Slightly customized python-social-auth backend for SAML 2.0 support
 """
-from social.backends.saml import SAMLIdentityProvider, SAMLAuth
+from social.backends.saml import SAMLAuth
 
 
 class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
@@ -13,11 +13,8 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
 
     def get_idp(self, idp_name):
         """ Given the name of an IdP, get a SAMLIdentityProvider instance """
-        from .provider import Registry  # Import here to avoid circular import
-        for provider in Registry.enabled():
-            if issubclass(provider.BACKEND_CLASS, SAMLAuth) and provider.IDP["id"] == idp_name:
-                return SAMLIdentityProvider(idp_name, **provider.IDP)
-        raise KeyError("SAML IdP {} not found.".format(idp_name))
+        from .models import SAMLProviderConfig
+        return SAMLProviderConfig.current(idp_name).get_config()
 
     def setting(self, name, default=None):
         """ Get a setting, from SAMLConfiguration """
