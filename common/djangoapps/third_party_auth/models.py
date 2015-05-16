@@ -213,7 +213,8 @@ class SAMLProviderConfig(ProviderConfig):
         # Now get the data fetched automatically from the metadata.xml:
         data = SAMLProviderData.current(self.entity_id)
         if not data or not data.is_valid():
-            raise ImproperlyConfigured("No SAMLProviderData available for {}".format(self.entity_id))
+            raise ImproperlyConfigured(
+                "No SAMLProviderData found for {}. Run 'manage.py saml pull' to fix or debug.".format(self.entity_id))
         conf['x509cert'] = data.public_key
         conf['url'] = data.sso_url
         conf['binding'] = data.binding
