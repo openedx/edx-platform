@@ -5,6 +5,7 @@ import json
 from mock import Mock, patch
 from nose.plugins.attrib import attr
 from functools import partial
+import ddt
 
 from courseware.model_data import DjangoKeyValueStore
 from courseware.model_data import InvalidScopeError, FieldDataCache
@@ -20,7 +21,7 @@ from xblock.fields import Scope, BlockScope, ScopeIds
 from xblock.exceptions import KeyValueMultiSaveError
 from xblock.core import XBlock
 from django.test import TestCase
-from django.db import DatabaseError
+from django.db import DatabaseError, IntegrityError
 
 
 def mock_field(scope, name):
@@ -100,6 +101,7 @@ class OtherUserFailureTestMixin(object):
 
 
 @attr('shard_1')
+@ddt.ddt
 class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
     """Tests for user_state storage via StudentModule"""
     other_key_factory = partial(DjangoKeyValueStore.Key, Scope.user_state, 2, location('usage_id'))  # user_id=2, not 1
@@ -196,7 +198,8 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
         for key in kv_dict:
             self.assertEquals(self.kvs.get(key), kv_dict[key])
 
-    def test_set_many_failure(self):
+    @ddt.data(DatabaseError, IntegrityError)
+    def test_set_many_failure(self, save_error):
         "Test failures when setting many fields that are scoped to Scope.user_state"
         kv_dict = self.construct_kv_dict()
         # because we're patching the underlying save, we need to ensure the
@@ -204,7 +207,7 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
         for key in kv_dict:
             self.kvs.set(key, 'test_value')
 
-        with patch('django.db.models.Model.save', side_effect=DatabaseError):
+        with patch('django.db.models.Model.save', side_effect=save_error):
             with self.assertRaises(KeyValueMultiSaveError) as exception_context:
                 self.kvs.set_many(kv_dict)
         self.assertEquals(len(exception_context.exception.saved_field_names), 0)
@@ -259,6 +262,7 @@ class TestMissingStudentModule(TestCase):
 
 
 @attr('shard_1')
+@ddt.ddt
 class StorageTestBase(object):
     """
     A base class for that gets subclassed when testing each of the scopes.
@@ -360,14 +364,15 @@ class StorageTestBase(object):
         for key in kv_dict:
             self.assertEquals(self.kvs.get(key), kv_dict[key])
 
-    def test_set_many_failure(self):
+    @ddt.data(DatabaseError, IntegrityError)
+    def test_set_many_failure(self, save_error):
         """Test that setting many regular fields with a DB error """
         kv_dict = self.construct_kv_dict()
         with self.assertNumQueries(6):
             for key in kv_dict:
                 self.kvs.set(key, 'test value')
 
-        with patch('django.db.models.Model.save', side_effect=[None, DatabaseError]):
+        with patch('django.db.models.Model.save', side_effect=[None, save_error]):
             with self.assertRaises(KeyValueMultiSaveError) as exception_context:
                 self.kvs.set_many(kv_dict)
 
