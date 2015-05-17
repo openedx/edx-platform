@@ -29,6 +29,7 @@ django-mptt==0.5.5
 django-openid-auth==0.4
 django-robots==0.9.1
 django-sekizai==0.6.1
+django-sendfile==0.3.7
 django-ses==0.4.1
 django-storages==1.1.5
 django-threaded-multihost==1.4-1

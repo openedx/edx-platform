@@ -1465,6 +1465,15 @@ PIPELINE_UGLIFYJS_BINARY = 'node_modules/.bin/uglifyjs'
 # Setting that will only affect the edX version of django-pipeline until our changes are merged upstream
 PIPELINE_COMPILE_INPLACE = True
 
+# By default, use the "simple" backend for sendfiles
+# This will simply serve files from disk.
+# In production, we should use the "nginx" backend
+# so nginx will serve the files for us.
+# See https://github.com/johnsensible/django-sendfile
+SENDFILE_ROOT = STATIC_ROOT
+SENDFILE_URL = STATIC_URL
+SENDFILE_BACKEND = "sendfile.backends.simple"
+
 ################################# CELERY ######################################
 
 # Message configuration

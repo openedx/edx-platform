@@ -1,6 +1,4 @@
-'''
-Django admin pages for Video Branding Configuration.
-'''
+"""Django admin pages for branding configuration. """
 from django.contrib import admin
 from config_models.admin import ConfigurationModelAdmin
 
