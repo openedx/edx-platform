@@ -694,6 +694,7 @@ class DiscussionLinkTestCase(TabTestCase):
         discussion_link_in_course="",
         is_staff=True,
         is_enrolled=True,
+        is_hideable=False,
     ):
         """Helper function to verify whether the discussion tab exists and can be displayed"""
         self.course.tabs = tab_list
@@ -707,6 +708,14 @@ class DiscussionLinkTestCase(TabTestCase):
             ),
             expected_can_display_value
         )
+
+        if is_hideable:
+            # Test that the discussion tab can be hidden
+            self.assertEquals(discussion.is_hideable, True)
+            self.assertEquals(discussion['is_hidden'], False)
+            discussion.is_hidden = True
+            self.assertEquals(discussion['is_hidden'], True)
+            discussion.is_hidden = False
 
     def test_explicit_discussion_link(self):
         """Test that setting discussion_link overrides everything else"""
@@ -735,6 +744,7 @@ class DiscussionLinkTestCase(TabTestCase):
             tab_list=self.tabs_with_discussion,
             expected_discussion_link="default_discussion_link",
             expected_can_display_value=True,
+            is_hideable=True,
         )
 
     def test_tabs_without_discussion(self):

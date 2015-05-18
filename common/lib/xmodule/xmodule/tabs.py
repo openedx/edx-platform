@@ -360,7 +360,7 @@ class WikiTab(HideableTab):
         return super(WikiTab, cls).validate(tab_dict, raise_error) and need_name(tab_dict, raise_error)
 
 
-class DiscussionTab(EnrolledOrStaffTab):
+class DiscussionTab(HideableTab, EnrolledOrStaffTab):
     """
     A tab only for the new Berkeley discussion forums.
     """
@@ -373,6 +373,7 @@ class DiscussionTab(EnrolledOrStaffTab):
             name=tab_dict['name'] if tab_dict else _('Discussion'),
             tab_id=self.type,
             link_func=link_reverse_func('django_comment_client.forum.views.forum_form_discussion'),
+            tab_dict=tab_dict,
         )
 
     def can_display(self, course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):
