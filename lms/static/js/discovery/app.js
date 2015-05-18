@@ -5,7 +5,7 @@ define(['backbone'], function(Backbone) {
 
     return function (Collection, Form, ResultListView, FilterBarView, FacetsBarView, searchQuery) {
         //facet types configuration - set default display names
-        var facetsTypes = {org: 'Organization', modes: 'Course Type'};
+        var facetsTypes = COURSE_DISCOVERY_MEANININGS;
 
         var collection = new Collection([]);
         var results = new ResultListView({ collection: collection });
