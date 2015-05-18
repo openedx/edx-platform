@@ -129,7 +129,7 @@ class DjangoKeyValueStore(KeyValueStore):
     def _raise_unless_scope_is_allowed(self, key):
         """Raise an InvalidScopeError if key.scope is not in self._allowed_scopes."""
         if key.scope not in self._allowed_scopes:
-            raise InvalidScopeError(key)
+            raise InvalidScopeError(key, self._allowed_scopes)
 
 
 new_contract("DjangoKeyValueStore", DjangoKeyValueStore)
