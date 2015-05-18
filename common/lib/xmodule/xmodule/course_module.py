@@ -856,6 +856,16 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
+    minimum_grade_credit = Float(
+        display_name=_("Minimum Grade for Credit"),
+        help=_(
+            "The minimum grade that a learner must earn to receive credit in the course, "
+            "as a decimal between 0.0 and 1.0. For example, for 75%, enter 0.75."
+        ),
+        default=0.8,
+        scope=Scope.settings,
+    )
+
 
 class CourseModule(CourseFields, SequenceModule):  # pylint: disable=abstract-method
     """
