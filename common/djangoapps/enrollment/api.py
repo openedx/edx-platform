@@ -225,7 +225,8 @@ def update_enrollment(user_id, course_id, mode=None, is_active=None):
         }
 
     """
-    _validate_course_mode(course_id, mode)
+    if mode is not None:
+        _validate_course_mode(course_id, mode)
     enrollment = _data_api().update_course_enrollment(user_id, course_id, mode=mode, is_active=is_active)
     if enrollment is None:
         msg = u"Course Enrollment not found for user {user} in course {course}".format(user=user_id, course=course_id)
