@@ -3,7 +3,7 @@ Tests for instructor.basic
 """
 
 import json
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from django.core.urlresolvers import reverse
 from mock import patch
 from student.roles import CourseSalesAdminRole
@@ -14,8 +14,9 @@ from shoppingcart.models import (
 )
 from course_modes.models import CourseMode
 from instructor_analytics.basic import (
-    sale_record_features, sale_order_record_features, enrolled_students_features, course_registration_features,
-    coupon_codes_features, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
+    sale_record_features, sale_order_record_features, enrolled_students_features,
+    course_registration_features, coupon_codes_features, list_may_enroll,
+    AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
 )
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from courseware.tests.factories import InstructorFactory
@@ -43,6 +44,11 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
                 "company": "Open edX Inc {}".format(user.id),
             })
             user.profile.save()
+        self.students_who_may_enroll = list(self.users) + [UserFactory() for _ in range(5)]
+        for student in self.students_who_may_enroll:
+            CourseEnrollmentAllowed.objects.create(
+                email=student.email, course_id=self.course_key
+            )
 
     def test_enrolled_students_features_username(self):
         self.assertIn('username', AVAILABLE_FEATURES)
@@ -112,6 +118,14 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
     def test_available_features(self):
         self.assertEqual(len(AVAILABLE_FEATURES), len(STUDENT_FEATURES + PROFILE_FEATURES))
         self.assertEqual(set(AVAILABLE_FEATURES), set(STUDENT_FEATURES + PROFILE_FEATURES))
+
+    def test_list_may_enroll(self):
+        may_enroll = list_may_enroll(self.course_key, ['email'])
+        self.assertEqual(len(may_enroll), len(self.students_who_may_enroll) - len(self.users))
+        email_adresses = [student.email for student in self.students_who_may_enroll]
+        for student in may_enroll:
+            self.assertEqual(student.keys(), ['email'])
+            self.assertIn(student['email'], email_adresses)
 
 
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})

@@ -96,6 +96,12 @@ REPORTS_DATA = (
         'instructor_api_endpoint': 'get_enrollment_report',
         'task_api_endpoint': 'instructor_task.api.submit_detailed_enrollment_features_csv',
         'extra_instructor_api_kwargs': {}
+    },
+    {
+        'report_type': 'students who may enroll',
+        'instructor_api_endpoint': 'get_students_who_may_enroll',
+        'task_api_endpoint': 'instructor_task.api.submit_calculate_may_enroll_csv',
+        'extra_instructor_api_kwargs': {},
     }
 )
 
@@ -208,6 +214,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ('calculate_grades_csv', {}),
             ('get_students_features', {}),
             ('get_enrollment_report', {}),
+            ('get_students_who_may_enroll', {}),
         ]
         # Endpoints that only Instructors can access
         self.instructor_level_endpoints = [
@@ -1977,6 +1984,12 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         for student in self.students:
             CourseEnrollment.enroll(student, self.course.id)
 
+        self.students_who_may_enroll = self.students + [UserFactory() for _ in range(5)]
+        for student in self.students_who_may_enroll:
+            CourseEnrollmentAllowed.objects.create(
+                email=student.email, course_id=self.course.id
+            )
+
     def register_with_redemption_code(self, user, code):
         """
         enroll user using a registration code
@@ -2270,6 +2283,30 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         res_json = json.loads(response.content)
 
         self.assertEqual('cohort' in res_json['feature_names'], is_cohorted)
+
+    def test_get_students_who_may_enroll(self):
+        """
+        Test whether get_students_who_may_enroll returns an appropriate
+        status message when users request a CSV file of students who
+        may enroll in a course.
+        """
+        url = reverse(
+            'get_students_who_may_enroll',
+            kwargs={'course_id': unicode(self.course.id)}
+        )
+        # Successful case:
+        response = self.client.get(url, {})
+        res_json = json.loads(response.content)
+        self.assertIn('status', res_json)
+        self.assertNotIn('already in progress', res_json['status'])
+        # CSV generation already in progress:
+        with patch('instructor_task.api.submit_calculate_may_enroll_csv') as submit_task_function:
+            error = AlreadyRunningError()
+            submit_task_function.side_effect = error
+            response = self.client.get(url, {})
+            res_json = json.loads(response.content)
+            self.assertIn('status', res_json)
+            self.assertIn('already in progress', res_json['status'])
 
     def test_access_course_finance_admin_with_invalid_course_key(self):
         """

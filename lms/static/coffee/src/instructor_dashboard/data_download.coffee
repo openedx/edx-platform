@@ -20,6 +20,7 @@ class DataDownload
     # gather elements
     @$list_studs_btn = @$section.find("input[name='list-profiles']'")
     @$list_studs_csv_btn = @$section.find("input[name='list-profiles-csv']'")
+    @$list_may_enroll_csv_btn = @$section.find("input[name='list-may-enroll-csv']")
     @$list_anon_btn = @$section.find("input[name='list-anon-ids']'")
     @$grade_config_btn = @$section.find("input[name='dump-gradeconf']'")
     @$calculate_grades_csv_btn = @$section.find("input[name='calculate-grades-csv']'")
@@ -95,6 +96,20 @@ class DataDownload
           @$download_display_table.append $table_placeholder
           grid = new Slick.Grid($table_placeholder, grid_data, columns, options)
           # grid.autosizeColumns()
+
+    @$list_may_enroll_csv_btn.click (e) =>
+      @clear_display()
+
+      url = @$list_may_enroll_csv_btn.data 'endpoint'
+      $.ajax
+        dataType: 'json'
+        url: url
+        error: (std_ajax_err) =>
+          @$reports_request_response_error.text gettext("Error generating list of students who may enroll. Please try again.")
+          $(".msg-error").css({"display":"block"})
+        success: (data) =>
+          @$reports_request_response.text data['status']
+          $(".msg-confirm").css({"display":"block"})
 
     @$grade_config_btn.click (e) =>
       url = @$grade_config_btn.data 'endpoint'
