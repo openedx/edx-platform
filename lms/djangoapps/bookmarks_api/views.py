@@ -9,12 +9,13 @@ from django.utils.translation import ugettext as _
 from django.http import Http404
 
 
-from rest_framework.generics import ListCreateAPIView
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import permissions
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
+from rest_framework.generics import ListCreateAPIView
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -26,7 +27,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 
 from .models import Bookmark
-from student.models import User
+from .api import get_bookmark
 
 
 log = logging.getLogger(__name__)
@@ -46,6 +47,7 @@ class BookmarksView(ListCreateAPIView):
 
     def get_queryset(self):
         course_id = self.request.QUERY_PARAMS.get('course_id', None)
+        fields = self.request.QUERY_PARAMS.get('fields', None)
 
         if not course_id:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -54,9 +56,11 @@ class BookmarksView(ListCreateAPIView):
         except InvalidKeyError:
             log.error("Invalid course id '{course_id}'")
             return list()
-        results = Bookmark.objects.filter(course_key=course_key, user__id=self.request.user.id).order_by('-created')
 
-        return results
+        results_queryset = Bookmark.objects.filter(course_key=course_key, user__id=self.request.user.id).values("course_key", "usage_key", "display_name", "created").order_by('-created')
+        # serializer = serializers.BookmarkSerializer(results, many=True, fields_to_remove=['path'])
+
+        return results_queryset
 
     def post(self, request):
         """
@@ -155,44 +159,24 @@ class BookmarksDetailView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         try:
-            user = User.objects.get(username=username)
-        except ObjectDoesNotExist:
-            error_message = u'The user {} does not exist.'.format(username)
+            bookmarks_dict = get_bookmark(request.user, usage_key_string)
+        except ObjectDoesNotExist as ex:
             return Response(
                 {
-                    "developer_message": error_message,
-                    "user_message": error_message
+                    "developer_message": ex.message,
+                    "user_message": _(ex.message)
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-        try:
-            usage_key = UsageKey.from_string(usage_key_string)
-
-            # usage_key's course_key may have an empty run property
-            usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
-        except InvalidKeyError:
-            error_message = _(u"invalid usage id '{usage_key_string}'".format(usage_key_string=usage_key_string))
+        except InvalidKeyError as ex:
             return Response(
                 {
-                    "developer_message": error_message,
-                    "user_message": error_message
+                    "developer_message": ex.message,
+                    "user_message": _(ex.message)
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-        try:
-            bookmark = Bookmark.objects.get(usage_key=usage_key, user=user)
-        except (ObjectDoesNotExist, MultipleObjectsReturned):
-            error_message = u'The bookmark does not exist.'
-            return Response(
-                {
-                    "developer_message": error_message,
-                    "user_message": error_message
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        return Response(serializers.BookmarkSerializer(bookmark).data)
+        return Response(bookmarks_dict)
 
     def delete(self, request, username=None, usage_key_string=None):
         """
@@ -204,34 +188,23 @@ class BookmarksDetailView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         try:
-            user = User.objects.get(username=username)
-        except ObjectDoesNotExist:
-            error_message = u'The user {} does not exist.'.format(username)
+            bookmark = get_bookmark(request.user, usage_key_string, serialized=False)
+        except ObjectDoesNotExist as ex:
             return Response(
                 {
-                    "developer_message": error_message,
-                    "user_message": error_message
+                    "developer_message": ex.message,
+                    "user_message": _(ex.message)
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-        try:
-            usage_key = UsageKey.from_string(usage_key_string)
-
-            # usage_key's course_key may have an empty run property
-            usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
-        except InvalidKeyError:
-            error_message = _(u"invalid usage id '{usage_key_string}'".format(usage_key_string=usage_key_string))
+        except InvalidKeyError as ex:
             return Response(
                 {
-                    "developer_message": error_message,
-                    "user_message": error_message
+                    "developer_message": ex.message,
+                    "user_message": _(ex.message)
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-        try:
-            Bookmark.objects.get(usage_key=usage_key, user=user).delete()
-        except ObjectDoesNotExist:
-            return Response('Bookmark not found! No update performed.', status=status.HTTP_404_NOT_FOUND)
+        bookmark.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
