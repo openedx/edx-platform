@@ -174,6 +174,32 @@ class TestGetHtmlMethod(BaseTestXmodule):
     def setUp(self):
         super(TestGetHtmlMethod, self).setUp()
         self.setup_course()
+        self.default_metadata_dict = OrderedDict({
+            "saveStateUrl": "",
+            "autoplay": settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
+            "streams": "1.00:3_yD_cEKoCk",
+            "sub": "a_sub_file.srt.sjson",
+            "sources": '[]',
+            "captionDataDir": None,
+            "showCaptions": "true",
+            "generalSpeed": 1.0,
+            "speed": None,
+            "savedVideoPosition": 0.0,
+            "start": 3603.0,
+            "end": 3610.0,
+            "transcriptLanguage": "en",
+            "transcriptLanguages": OrderedDict({"en": "English"}),
+            "ytTestTimeout": 1500,
+            "ytApiUrl": "www.youtube.com/iframe_api",
+            "ytTestUrl": "gdata.youtube.com/feeds/api/videos/",
+            "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
+                self.item_descriptor, 'transcript', 'translation/__lang__'
+            ).rstrip('/?'),
+            "transcriptAvailableTranslationsUrl": self.item_descriptor.xmodule_runtime.handler_url(
+                self.item_descriptor, 'transcript', 'available_translations'
+            ).rstrip('/?'),
+            "autohideHtml5": False,
+        })
 
     def test_get_html_track(self):
         SOURCE_XML = """
@@ -249,32 +275,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
         }
 
         for data in cases:
-            metadata = OrderedDict({
-                "saveStateUrl": "",
-                "autoplay": settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
-                "streams": "1.00:3_yD_cEKoCk",
-                "sub": "a_sub_file.srt.sjson",
-                "sources": sources,
-                "captionDataDir": None,
-                "showCaptions": "true",
-                "generalSpeed": 1.0,
-                "speed": None,
-                "savedVideoPosition": 0.0,
-                "start": 3603.0,
-                "end": 3610.0,
-                "transcriptLanguage": "en",
-                "transcriptLanguages": OrderedDict({"en": "English"}),
-                "ytTestTimeout": 1500,
-                "ytApiUrl": "www.youtube.com/iframe_api",
-                "ytTestUrl": "gdata.youtube.com/feeds/api/videos/",
-                "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation/__lang__'
-                ).rstrip('/?'),
-                "transcriptAvailableTranslationsUrl": self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'available_translations'
-                ).rstrip('/?'),
-                "autohideHtml5": False,
-            })
+            metadata = self.default_metadata_dict
+            metadata['sources'] = sources
             DATA = SOURCE_XML.format(
                 download_track=data['download_track'],
                 track=data['track'],
@@ -384,32 +386,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'download_video_link': u'example.mp4',
             'handout': None,
             'id': self.item_descriptor.location.html_id(),
-            'metadata': OrderedDict({
-                "saveStateUrl": "",
-                "autoplay": settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
-                "streams": "1.00:3_yD_cEKoCk",
-                "sub": "a_sub_file.srt.sjson",
-                "sources": '[]',
-                "captionDataDir": None,
-                "showCaptions": "true",
-                "generalSpeed": 1.0,
-                "speed": None,
-                "savedVideoPosition": 0.0,
-                "start": 3603.0,
-                "end": 3610.0,
-                "transcriptLanguage": "en",
-                "transcriptLanguages": OrderedDict({"en": "English"}),
-                "ytTestTimeout": 1500,
-                "ytApiUrl": "www.youtube.com/iframe_api",
-                "ytTestUrl": "gdata.youtube.com/feeds/api/videos/",
-                "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation/__lang__'
-                ).rstrip('/?'),
-                "transcriptAvailableTranslationsUrl": self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'available_translations'
-                ).rstrip('/?'),
-                "autohideHtml5": False,
-            }),
+            'metadata': self.default_metadata_dict,
             'track': None,
             'transcript_download_format': 'srt',
             'transcript_download_formats_list': [
@@ -536,6 +513,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
         }
 
         # Video found for edx_video_id
+        metadata = self.default_metadata_dict
+        metadata['autoplay'] = False
+        metadata['sources'] = ""
         initial_context = {
             'branding_info': None,
             'license': None,
@@ -553,32 +533,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
-            'metadata': OrderedDict({
-                "saveStateUrl": "",
-                "autoplay": False,
-                "streams": "1.00:3_yD_cEKoCk",
-                "sub": "a_sub_file.srt.sjson",
-                "sources": '',
-                "captionDataDir": None,
-                "showCaptions": "true",
-                "generalSpeed": 1.0,
-                "speed": None,
-                "savedVideoPosition": 0.0,
-                "start": 3603.0,
-                "end": 3610.0,
-                "transcriptLanguage": "en",
-                "transcriptLanguages": OrderedDict({"en": "English"}),
-                "ytTestTimeout": 1500,
-                "ytApiUrl": "www.youtube.com/iframe_api",
-                "ytTestUrl": "gdata.youtube.com/feeds/api/videos/",
-                "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation/__lang__'
-                ).rstrip('/?'),
-                "transcriptAvailableTranslationsUrl": self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'available_translations'
-                ).rstrip('/?'),
-                "autohideHtml5": False
-            })
+            'metadata': metadata
         }
 
         DATA = SOURCE_XML.format(
@@ -666,6 +621,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
         }
 
         # Video found for edx_video_id
+        metadata = self.default_metadata_dict
+        metadata['sources'] = ""
         initial_context = {
             'branding_info': None,
             'license': None,
@@ -683,32 +640,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
-            'metadata': OrderedDict({
-                "saveStateUrl": "",
-                "autoplay": settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
-                "streams": "1.00:3_yD_cEKoCk",
-                "sub": "a_sub_file.srt.sjson",
-                "sources": '',
-                "captionDataDir": None,
-                "showCaptions": "true",
-                "generalSpeed": 1.0,
-                "speed": None,
-                "savedVideoPosition": 0.0,
-                "start": 3603.0,
-                "end": 3610.0,
-                "transcriptLanguage": "en",
-                "transcriptLanguages": OrderedDict({"en": "English"}),
-                "ytTestTimeout": 1500,
-                "ytApiUrl": "www.youtube.com/iframe_api",
-                "ytTestUrl": "gdata.youtube.com/feeds/api/videos/",
-                "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation/__lang__'
-                ).rstrip('/?'),
-                "transcriptAvailableTranslationsUrl": self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'available_translations'
-                ).rstrip('/?'),
-                "autohideHtml5": False
-            })
+            'metadata': metadata,
         }
 
         DATA = SOURCE_XML.format(
@@ -815,32 +747,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'download_video_link': None,
             'handout': None,
             'id': None,
-            'metadata': OrderedDict({
-                "saveStateUrl": "",
-                "autoplay": settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
-                "streams": "1.00:3_yD_cEKoCk",
-                "sub": "a_sub_file.srt.sjson",
-                "sources": '[]',
-                "captionDataDir": None,
-                "showCaptions": "true",
-                "generalSpeed": 1.0,
-                "speed": None,
-                "savedVideoPosition": 0.0,
-                "start": 3603.0,
-                "end": 3610.0,
-                "transcriptLanguage": "en",
-                "transcriptLanguages": OrderedDict({"en": "English"}),
-                "ytTestTimeout": 1500,
-                "ytApiUrl": "www.youtube.com/iframe_api",
-                "ytTestUrl": "gdata.youtube.com/feeds/api/videos/",
-                "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation/__lang__'
-                ).rstrip('/?'),
-                "transcriptAvailableTranslationsUrl": self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'available_translations'
-                ).rstrip('/?'),
-                "autohideHtml5": False,
-            }),
+            'metadata': self.default_metadata_dict,
             'track': None,
             'transcript_download_format': 'srt',
             'transcript_download_formats_list': [
