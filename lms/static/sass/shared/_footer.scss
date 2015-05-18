@@ -289,6 +289,10 @@ $edx-footer-bg-color: rgb(252,252,252);
 .edx-footer-new {
   background: $edx-footer-bg-color;
 
+  @media print {
+    @include padding(10px, 10px, 0, 10px);
+  }
+
   // NOTE: resetting older footer styles - can be removed once not needed
   box-shadow: none;
   border-top: none;
@@ -300,10 +304,19 @@ $edx-footer-bg-color: rgb(252,252,252);
     @extend %edx-footer-reset;
     @extend %edx-footer-section;
     width: flex-grid(6,12);
+
+    @media print {
+      @include margin-right(0);
+      @include padding-right(0);
+      width: flex-grid(12,12);
+      border: none;
+      min-height: 0;
+    }
   }
 
   .footer-about-title {
     @extend %edx-footer-title;
+    @extend %ui-print-excluded;
   }
 
   .footer-about-logo, .footer-about-openedx {
@@ -324,14 +337,19 @@ $edx-footer-bg-color: rgb(252,252,252);
 
   .footer-about-logo {
     @include float(left);
+    @extend %ui-print-excluded;
   }
 
   .footer-about-openedx-logo {
     @include float(right);
+    @media print {
+      @include float(left);
+    }
   }
 
   .footer-about-copy {
     @extend %t-copy-sub1;
+    @extend %ui-print-excluded;
     margin-bottom: $edx-footer-spacing;
     color: rgb(61, 62, 63);
     clear: both;
@@ -357,9 +375,14 @@ $edx-footer-bg-color: rgb(252,252,252);
       display: inline-block;
       margin-bottom: ($edx-footer-spacing/2);
     }
+
+    @media print {
+      margin-bottom: 0;
+    }
   }
 
   .footer-about-links {
+    @extend %ui-print-excluded;
 
     a {
       @extend %edx-footer-link;
@@ -376,6 +399,7 @@ $edx-footer-bg-color: rgb(252,252,252);
   .footer-nav {
     @extend %edx-footer-reset;
     @extend %edx-footer-section;
+    @extend %ui-print-excluded;
     width: flex-grid(3,12);
   }
 
@@ -397,8 +421,8 @@ $edx-footer-bg-color: rgb(252,252,252);
   .footer-follow {
     @extend %edx-footer-reset;
     @extend %edx-footer-section;
+    @extend %ui-print-excluded;
     width: flex-grid(3,12);
-
   }
 
   .footer-follow-title {

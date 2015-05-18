@@ -62,7 +62,6 @@ DISCUSSION_SETTINGS = {
 
 # Features
 FEATURES = {
-    'SAMPLE': False,
     'USE_DJANGO_PIPELINE': True,
 
     'DISPLAY_DEBUG_INFO_TO_STAFF': True,
@@ -1272,19 +1271,17 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-style-vendor-tinymce-skin.css',
     },
-    'style-app': {
+    'style-main': {
         'source_filenames': [
-            'sass/application.css',
-            'sass/ie.css'
+            'sass/lms-main.css',
         ],
-        'output_filename': 'css/lms-style-app.css',
+        'output_filename': 'css/lms-main.css',
     },
-    'style-app-rtl': {
+    'style-main-rtl': {
         'source_filenames': [
-            'sass/application-rtl.css',
-            'sass/ie-rtl.css'
+            'sass/lms-main-rtl.css',
         ],
-        'output_filename': 'css/lms-style-app-rtl.css',
+        'output_filename': 'css/lms-main-rtl.css',
     },
     'style-course-vendor': {
         'source_filenames': [
@@ -1294,25 +1291,25 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-style-course-vendor.css',
     },
+    'style-course': {
+        'source_filenames': [
+            'sass/lms-course.css',
+            'xmodule/modules.css',
+        ],
+        'output_filename': 'css/lms-course.css',
+    },
+    'style-course-rtl': {
+        'source_filenames': [
+            'sass/lms-course-rtl.css',
+            'xmodule/modules.css',
+        ],
+        'output_filename': 'css/lms-course-rtl.css',
+    },
     'style-student-notes': {
         'source_filenames': [
             'css/vendor/edxnotes/annotator.min.css',
         ],
         'output_filename': 'css/lms-style-student-notes.css',
-    },
-    'style-course': {
-        'source_filenames': [
-            'sass/course.css',
-            'xmodule/modules.css',
-        ],
-        'output_filename': 'css/lms-style-course.css',
-    },
-    'style-course-rtl': {
-        'source_filenames': [
-            'sass/course-rtl.css',
-            'xmodule/modules.css',
-        ],
-        'output_filename': 'css/lms-style-course-rtl.css',
     },
     'style-xmodule-annotations': {
         'source_filenames': [
@@ -2228,6 +2225,8 @@ PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM = 12
 
 # Use None for the default search engine
 SEARCH_ENGINE = None
+# Use LMS specific search initializer
+SEARCH_INITIALIZER = "lms.lib.courseware_search.lms_search_initializer.LmsSearchInitializer"
 # Use the LMS specific result processor
 SEARCH_RESULT_PROCESSOR = "lms.lib.courseware_search.lms_result_processor.LmsSearchResultProcessor"
 # Use the LMS specific filter generator

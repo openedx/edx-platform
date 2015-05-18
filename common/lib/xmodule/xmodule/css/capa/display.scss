@@ -269,6 +269,13 @@ div.problem {
       }
     }
 
+    // Hides equation previews in symbolic response problems when printing
+    [id^='display'].equation {
+      @media print {
+        display:none;
+      }
+    }
+
     span {
       &.unanswered, &.ui-icon-bullet {
         display: inline-block;
@@ -628,6 +635,10 @@ div.problem {
       height: ($baseline*2);
       vertical-align: middle;
       font-weight: 600;
+
+      @media print {
+        display: none;
+      }
     }
 
     .save {

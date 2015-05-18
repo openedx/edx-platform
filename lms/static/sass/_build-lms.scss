@@ -1,7 +1,7 @@
 // ------------------------------
 // LMS: Shared Build Compile
 
-// About: Sass compile for the LMS Elements that are shared between LTR and RTL UI. Configuration and vendor specific imports happen before this shared set of imports are compiled in the main-*.scss files.
+// About: Sass compile for the LMS Elements that are shared between LTR and RTL UI. Configuration and vendor specific imports happen before this shared set of imports are compiled in the lms-main-*.scss files.
 
 // base - assets
 @import 'base/font_face';

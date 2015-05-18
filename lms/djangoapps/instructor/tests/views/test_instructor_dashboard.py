@@ -8,10 +8,10 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from courseware.tests.helpers import LoginEnrollmentTestCase
 
-from student.tests.factories import AdminFactory
+from student.tests.factories import AdminFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from shoppingcart.models import PaidCourseRegistration
+from shoppingcart.models import PaidCourseRegistration, Order, CourseRegCodeItem
 from course_modes.models import CourseMode
 from student.roles import CourseFinanceAdminRole
 
@@ -151,3 +151,31 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # link to dashboard shown
         expected_message = self.get_dashboard_demographic_message()
         self.assertTrue(expected_message in response.content)
+
+    def add_course_to_user_cart(self, cart, course_key):
+        """
+        adding course to user cart
+        """
+        reg_item = PaidCourseRegistration.add_to_order(cart, course_key)
+        return reg_item
+
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
+    def test_total_credit_cart_sales_amount(self):
+        """
+        Test to check the total amount for all the credit card purchases.
+        """
+        student = UserFactory.create()
+        self.client.login(username=student.username, password="test")
+        student_cart = Order.get_cart_for_user(student)
+        item = self.add_course_to_user_cart(student_cart, self.course.id)
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': 4})
+        self.assertEqual(resp.status_code, 200)
+        student_cart.purchase()
+
+        self.client.login(username=self.instructor.username, password="test")
+        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
+        single_purchase_total = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
+        bulk_purchase_total = CourseRegCodeItem.get_total_amount_of_purchased_item(self.course.id)
+        total_amount = single_purchase_total + bulk_purchase_total
+        response = self.client.get(self.url)
+        self.assertIn('{currency}{amount}'.format(currency='$', amount=total_amount), response.content)

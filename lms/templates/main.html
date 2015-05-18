@@ -63,7 +63,7 @@ dir_rtl = 'rtl' if get_language_bidi() else 'ltr'
   <link rel="icon" type="image/x-icon" href="${static.url(microsite.get_value('favicon_path', settings.FAVICON_PATH))}" />
 
   <%static:css group='style-vendor'/>
-  <%static:css group='style-app'/>
+  <%static:css group='style-main'/>
 
   % if disable_courseware_js:
     <%static:js group='base_vendor'/>
@@ -132,8 +132,6 @@ dir_rtl = 'rtl' if get_language_bidi() else 'ltr'
 <body class="${dir_rtl} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
   <div class="window-wrap" dir="${dir_rtl}">
     <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to main content")}</a>
-
-    <%include file="mathjax_accessible.html" />
 
     % if not disable_header:
         <%include file="${header_file}" />
