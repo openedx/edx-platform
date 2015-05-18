@@ -250,6 +250,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
 
 
 @attr('shard_1')
+@ddt.ddt
 class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):
     """
     Test video handler that provide available translations info.
@@ -278,23 +279,15 @@ class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):
         self.dispatch = "available_translations/?is_bumper=1"
         self.item.video_bumper = {"transcripts": {"en": ""}}
 
-    def test_available_translation_en(self):
+    @ddt.data("en", "uk")
+    def test_available_translation_en_and_non_en(self, lang):
         filename = os.path.split(self.srt_file.name)[1]
         _upload_file(self.srt_file, self.item_descriptor.location, filename)
-        self.item.video_bumper["transcripts"]["en"] = filename
+        self.item.video_bumper["transcripts"][lang] = filename
 
         request = Request.blank('/' + self.dispatch)
         response = self.item.transcript(request=request, dispatch=self.dispatch)
-        self.assertEqual(json.loads(response.body), ['en'])
-
-    def test_available_translation_non_en(self):
-        filename = os.path.split(self.srt_file.name)[1]
-        _upload_file(self.srt_file, self.item_descriptor.location, filename)
-
-        self.item.video_bumper["transcripts"]["uk"] = filename
-        request = Request.blank('/' + self.dispatch)
-        response = self.item.transcript(request=request, dispatch=self.dispatch)
-        self.assertEqual(json.loads(response.body), ['uk'])
+        self.assertEqual(json.loads(response.body), [lang])
 
     def test_multiple_available_translations(self):
         en_translation = _create_srt_file()
