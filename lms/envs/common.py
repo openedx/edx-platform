@@ -1736,6 +1736,9 @@ INSTALLED_APPS = (
     'cors_csrf',
 
     'commerce',
+
+    # Bookmarks API
+    'bookmarks_api',
 )
 
 ######################### CSRF #########################################
