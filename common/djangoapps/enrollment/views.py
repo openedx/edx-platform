@@ -257,13 +257,16 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
             * user:  The user ID of the currently logged in user. Optional. You cannot use the command to enroll a different user.
 
             * mode: The Course Mode for the enrollment. Individual users cannot upgrade their enrollment mode from
-              'honor'. Only server to server requests can enroll with other modes. Optional.
+              'honor'. Only server-to-server requests can enroll with other modes. Optional.
+
+            * is_active: A Boolean indicating whether the enrollment is active. Only server-to-server requests are
+              allowed to deactivate an enrollment. Optional.
 
             * course details: A collection that contains:
 
                 * course_id: The unique identifier for the course.
 
-            * email_opt_in: A boolean indicating whether the user
+            * email_opt_in: A Boolean indicating whether the user
               wishes to opt into email from the organization running this course. Optional.
 
         **Response Values**
@@ -313,9 +316,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
     # cross-domain CSRF.
     @method_decorator(ensure_csrf_cookie_cross_domain)
     def get(self, request):
-        """
-            Gets a list of all course enrollments for the currently logged in user.
-        """
+        """Gets a list of all course enrollments for the currently logged in user."""
         username = request.GET.get('user', request.user.username)
         if request.user.username != username and not self.has_api_key_permissions(request):
             # Return a 404 instead of a 403 (Unauthorized). If one user is looking up
@@ -334,8 +335,10 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
             )
 
     def post(self, request):
-        """
-            Enrolls the currently logged in user in a course.
+        """Enrolls the currently logged-in user in a course.
+
+        Server-to-server calls may deactivate or modify the mode of existing enrollments. All other requests
+        go through `add_enrollment()`, which allows creation of new and reactivation of old enrollments.
         """
         # Get the User, Course ID, and Mode from the request.
         username = request.DATA.get('user', request.user.username)
@@ -407,22 +410,28 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
             )
 
         try:
-            # Check if the user is currently enrolled, and if it is the same as the current enrolled mode. We do not
-            # have to check if it is inactive or not, because if it is, we are still upgrading if the mode is different,
-            # and either path will re-activate the enrollment.
-            #
-            # Only server-to-server calls will currently be allowed to modify the mode for existing enrollments. All
-            # other requests will go through add_enrollment(), which will allow creating of new enrollments, and
-            # re-activating enrollments
+            is_active = request.DATA.get('is_active')
+            # Check if the requested activation status is None or a Boolean
+            if is_active is not None and not isinstance(is_active, bool):
+                return Response(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    data={
+                        'message': (u"'{value}' is an invalid enrollment activation status.").format(value=is_active)
+                    }
+                )
+
             enrollment = api.get_enrollment(username, unicode(course_id))
             if has_api_key_permissions and enrollment and enrollment['mode'] != mode:
-                response = api.update_enrollment(username, unicode(course_id), mode=mode)
+                response = api.update_enrollment(username, unicode(course_id), mode=mode, is_active=is_active)
             else:
+                # Will reactivate inactive enrollments.
                 response = api.add_enrollment(username, unicode(course_id), mode=mode)
+
             email_opt_in = request.DATA.get('email_opt_in', None)
             if email_opt_in is not None:
                 org = course_id.org
                 update_email_opt_in(request.user, org, email_opt_in)
+
             return Response(response)
         except CourseModeNotFoundError as error:
             return Response(
