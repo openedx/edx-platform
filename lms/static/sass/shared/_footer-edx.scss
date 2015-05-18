@@ -1,0 +1,164 @@
+// edX theme: LMS Footer
+// ====================
+@import '../base/grid-settings';
+@import 'neat/neat'; // lib - Neat
+
+
+$edx-footer-link-color: rgb(0, 158, 231);
+$edx-footer-bg-color: rgb(252,252,252);
+
+
+// Aggressively scoped for Drupal
+// ==============================
+// These styles are being loaded on Drupal, LMS and WordPress
+// sites so the scope has to be aggressive to override default
+// CMS styles
+footer#footer-edx-v3 {
+  @include outer-container;
+  @include box-sizing(border-box);
+  background: $edx-footer-bg-color;
+  padding: 20px;
+
+  p {
+    @include font-size(14);
+    @include line-height(14);
+    font-family: $sans-serif;
+  }
+
+  .site-nav,
+  .legal-notices {
+    a {
+      @include font-size(14);
+      @include line-height(14);
+      @include margin-right(20px);
+      color: $edx-footer-link-color;
+
+      &:last-of-type {
+        @include margin-right(0);
+      }
+    }
+  }
+
+  .footer-logo,
+  .site-details,
+  .external-links {
+    @include span-columns(12);
+  }
+
+  .site-details,
+  .external-links {
+    margin-top: 5px;
+  }
+
+  .footer-logo {
+    margin-bottom: 30px;
+  }
+
+  .legal-notices {
+    margin: 20px 0 30px;
+  }
+
+  .openedx-link {
+    width: 141px;
+    margin-bottom: 30px;
+
+    a {
+      display: inline-block;
+    }
+
+    img {
+      width: 100%;
+    }
+  }
+
+  .social-media-links,
+  .mobile-app-links {
+    @include clearfix();
+  }
+
+  .social-media-links {
+    margin-bottom: 30px;
+  }
+
+  .sm-link {
+    @include float(left);
+    @include margin(0, 0, 10px, 12px);
+    @include font-size(28);
+    @include line-height(28);
+    width: 30px;
+    height: 30px;
+    line-height: 1;
+    position: relative;
+    display: inline;
+    background: none;
+    text-align: center;
+
+    &:first-of-type {
+      @include margin-left(0);
+    }
+
+    &:hover {
+      opacity: 0.7;
+    }
+
+    .icon {
+      font-family: 'FontAwesome';
+      color: $edx-footer-link-color;
+    }
+  }
+
+  .app-link {
+    @include float(left);
+    @include margin-right(10px);
+    position: relative;
+    display: inline-block;
+
+    &:last-of-type {
+      @include margin-right(0);
+    }
+
+    img {
+      height: 40px;
+    }
+  }
+
+  @include media( $edx-bp-large ) {
+    padding: 20px 10px;
+
+    .site-details {
+      @include span-columns(7);
+    }
+
+    .external-links {
+      @include span-columns(5);
+    }
+
+    .social-media-links,
+    .mobile-app-links {
+      @include float(right);
+    }
+
+    .social-media-links {
+      width: calc();
+      margin-bottom: 40px;
+    }
+  }
+
+  @include media( $edx-bp-huge ) {
+    .footer-logo {
+      @include span-columns(2);
+    }
+
+    .site-details {
+      @include span-columns(6);
+    }
+
+    .external-links {
+      @include span-columns(4);
+    }
+
+    .social-media-links {
+      margin-bottom: 50px;
+    }
+  }
+}

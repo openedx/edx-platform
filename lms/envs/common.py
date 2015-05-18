@@ -341,6 +341,9 @@ FEATURES = {
     # Show the mobile app links in the footer
     'ENABLE_FOOTER_MOBILE_APP_LINKS': False,
 
+    # Use version 3 of the footer (added May 2015)
+    'ENABLE_FOOTER_V3': False,
+
     # Let students save and manage their annotations
     'ENABLE_EDXNOTES': False,
 
@@ -1172,6 +1175,7 @@ dashboard_js = (
 )
 discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
 rwd_header_footer_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/common_helpers/rwd_header_footer.js'))
+footer_edx_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/footer-edx.js'))
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
 open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
 notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.js'))
@@ -1328,6 +1332,18 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-style-xmodule-annotations.css',
     },
+    'style-edx-footer': {
+        'source_filenames': [
+            'sass/footer-v3.css',
+        ],
+        'output_filename': 'css/lms-footer-edx.css',
+    },
+    'style-edx-footer-rtl': {
+        'source_filenames': [
+            'sass/footer-v3-rtl.css',
+        ],
+        'output_filename': 'css/lms-footer-edx-rtl.css',
+    },
 }
 
 
@@ -1420,6 +1436,10 @@ PIPELINE_JS = {
     'ccx': {
         'source_filenames': ccx_js,
         'output_filename': 'js/ccx.js'
+    },
+    'footer_edx': {
+        'source_filenames': footer_edx_js,
+        'output_filename': 'js/footer_edx.js'
     }
 }
 
@@ -1764,16 +1784,25 @@ MKTG_URL_LINK_MAP = {
 ################# Social Media Footer Links #######################
 # The names list controls the order of social media
 # links in the footer.
-SOCIAL_MEDIA_FOOTER_NAMES = [
-    "facebook",
-    "twitter",
-    "linkedin",
-    "google_plus",
-    "tumblr",
-    "meetup",
-    "reddit",
-    "youtube",
-]
+if FEATURES.get('ENABLE_FOOTER_V3'):
+    SOCIAL_MEDIA_FOOTER_NAMES = [
+        "facebook",
+        "twitter",
+        "linkedin",
+        "weibo",
+        "vk",
+    ]
+else:
+    SOCIAL_MEDIA_FOOTER_NAMES = [
+        "facebook",
+        "twitter",
+        "linkedin",
+        "google_plus",
+        "tumblr",
+        "meetup",
+        "reddit",
+        "youtube",
+    ]
 
 # The footer URLs dictionary maps social footer names
 # to URLs defined in configuration.
@@ -1823,6 +1852,18 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # translate this the way that Reddit advertises in your language.
         "title": _("Reddit"),
         "icon": "fa-reddit-square"
+    },
+    "vk": {
+        # Translators: This is the website name of https://vk.com.  Please
+        # translate this the way that VK advertises in your language.
+        "title": _("VK"),
+        "icon": "fa-vk"
+    },
+    "weibo": {
+        # Translators: This is the website name of http://www.weibo.com.  Please
+        # translate this the way that Weibo advertises in your language.
+        "title": _("Weibo"),
+        "icon": "fa-weibo"
     },
     "youtube": {
         # Translators: This is the website name of www.youtube.com.  Please

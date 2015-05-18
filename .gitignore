@@ -78,6 +78,8 @@ lms/static/sass/lms-main.scss
 lms/static/sass/lms-main-rtl.scss
 lms/static/sass/lms-course.scss
 lms/static/sass/lms-course-rtl.scss
+lms/static/sass/lms-footer-edx.scss
+lms/static/sass/lms-footer-edx-rtl.scss
 cms/static/css/
 cms/static/sass/*.css
 cms/static/sass/*.css.map
