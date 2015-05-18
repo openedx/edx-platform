@@ -80,9 +80,8 @@ function (VideoPlayer) {
                 events = {
                     onReady:                 state.videoPlayer.onReady,
                     onStateChange:           state.videoPlayer.onStateChange,
-                    onPlaybackQualityChange: state.videoPlayer
-                        .onPlaybackQualityChange,
-                    onError:                 state.videoPlayer.onError,
+                    onPlaybackQualityChange: state.videoPlayer.onPlaybackQualityChange,
+                    onError:                 state.videoPlayer.onError
                 };
 
                 expect(YT.Player).toHaveBeenCalledWith('id', {
