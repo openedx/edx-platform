@@ -1,5 +1,24 @@
 """
-Classes to provide the LMS runtime data storage to XBlocks
+Classes to provide the LMS runtime data storage to XBlocks.
+
+:class:`DjangoKeyValueStore`: An XBlock :class:`~KeyValueStore` which
+    stores a subset of xblocks scopes as Django ORM objects. It wraps
+    :class:`~FieldDataCache` to provide an XBlock-friendly interface.
+
+
+:class:`FieldDataCache`: A object which provides a read-through prefetch cache
+    of data to support XBlock fields within a limited set of scopes.
+
+The remaining classes in this module provide read-through prefetch cache implementations
+for specific scopes. The individual classes provide the knowledge of what are the essential
+pieces of information for each scope, and thus how to cache, prefetch, and create new field data
+entries.
+
+UserStateCache: A cache for Scope.user_state
+UserStateSummaryCache: A cache for Scope.user_state_summary
+PreferencesCache: A cache for Scope.preferences
+UserInfoCache: A cache for Scope.user_info
+DjangoOrmFieldCache: A base-class for single-row-per-field caches.
 """
 
 import json
@@ -681,7 +700,7 @@ class UserInfoCache(DjangoOrmFieldCache):
 class FieldDataCache(object):
     """
     A cache of django model objects needed to supply the data
-    for a module and its decendants
+    for a module and its descendants
     """
     def __init__(self, descriptors, course_id, user, select_for_update=False, asides=None):
         '''
@@ -736,13 +755,13 @@ class FieldDataCache(object):
 
     def add_descriptor_descendents(self, descriptor, depth=None, descriptor_filter=lambda descriptor: True):
         """
-        Add all descendents of `descriptor` to this FieldDataCache.
+        Add all descendants of `descriptor` to this FieldDataCache.
 
         Arguments:
             descriptor: An XModuleDescriptor
-            depth is the number of levels of descendent modules to load StudentModules for, in addition to
-                the supplied descriptor. If depth is None, load all descendent StudentModules
-            descriptor_filter is a function that accepts a descriptor and return wether the StudentModule
+            depth is the number of levels of descendant modules to load StudentModules for, in addition to
+                the supplied descriptor. If depth is None, load all descendant StudentModules
+            descriptor_filter is a function that accepts a descriptor and return whether the field data
                 should be cached
         """
 
@@ -782,9 +801,9 @@ class FieldDataCache(object):
         course_id: the course in the context of which we want StudentModules.
         user: the django user for whom to load modules.
         descriptor: An XModuleDescriptor
-        depth is the number of levels of descendent modules to load StudentModules for, in addition to
-            the supplied descriptor. If depth is None, load all descendent StudentModules
-        descriptor_filter is a function that accepts a descriptor and return wether the StudentModule
+        depth is the number of levels of descendant modules to load StudentModules for, in addition to
+            the supplied descriptor. If depth is None, load all descendant StudentModules
+        descriptor_filter is a function that accepts a descriptor and return whether the field data
             should be cached
         select_for_update: Ignored
         """
