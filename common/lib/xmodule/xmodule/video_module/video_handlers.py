@@ -197,7 +197,9 @@ class VideoStudentViewHandlers(object):
         """
         Entry point for transcript handlers for student_view.
 
-        Request GET may contain `videoId` for `translation` dispatch.
+        Request GET contains:
+            (optional) `videoId` for `translation` dispatch.
+            `is_bumper=1` flag for bumper case.
 
         Dispatches, (HTTP GET):
             /translation/[language_id]
