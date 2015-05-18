@@ -119,7 +119,6 @@ def make_minimal_cs_comment(overrides=None):
         "abuse_flaggers": [],
         "votes": {"up_count": 0},
         "endorsed": False,
-        "endorsement": None,
         "children": [],
     }
     ret.update(overrides or {})
