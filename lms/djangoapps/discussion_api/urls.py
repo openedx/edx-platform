@@ -6,11 +6,12 @@ from django.conf.urls import include, patterns, url
 
 from rest_framework.routers import SimpleRouter
 
-from discussion_api.views import CourseTopicsView, ThreadViewSet
+from discussion_api.views import CommentViewSet, CourseTopicsView, ThreadViewSet
 
 
 ROUTER = SimpleRouter()
 ROUTER.register("threads", ThreadViewSet, base_name="thread")
+ROUTER.register("comments", CommentViewSet, base_name="comment")
 
 urlpatterns = patterns(
     "discussion_api",

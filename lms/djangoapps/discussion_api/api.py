@@ -1,15 +1,19 @@
 """
 Discussion API internal interface
 """
+from django.core.exceptions import ValidationError
 from django.http import Http404
 
 from collections import defaultdict
 
+from opaque_keys.edx.locator import CourseLocator
+
 from courseware.courses import get_course_with_access
 from discussion_api.pagination import get_paginated_data
-from discussion_api.serializers import ThreadSerializer, get_context
+from discussion_api.serializers import CommentSerializer, ThreadSerializer, get_context
 from django_comment_client.utils import get_accessible_discussion_modules
 from lms.lib.comment_client.thread import Thread
+from lms.lib.comment_client.utils import CommentClientRequestError
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id
 from xmodule.tabs import DiscussionTab
 
@@ -122,4 +126,85 @@ def get_thread_list(request, course_key, page, page_size):
         raise Http404
 
     results = [ThreadSerializer(thread, context=context).data for thread in threads]
+    return get_paginated_data(request, results, page, num_pages)
+
+
+def get_comment_list(request, thread_id, endorsed, page, page_size):
+    """
+    Return the list of comments in the given thread.
+
+    Parameters:
+
+        request: The django request object used for build_absolute_uri and
+          determining the requesting user.
+
+        thread_id: The id of the thread to get comments for.
+
+        endorsed: Boolean indicating whether to get endorsed or non-endorsed
+          comments (or None for all comments). Must be None for a discussion
+          thread and non-None for a question thread.
+
+        page: The page number (1-indexed) to retrieve
+
+        page_size: The number of comments to retrieve per page
+
+    Returns:
+
+        A paginated result containing a list of comments; see
+        discussion_api.views.CommentViewSet for more detail.
+    """
+    response_skip = page_size * (page - 1)
+    try:
+        cc_thread = Thread(id=thread_id).retrieve(
+            recursive=True,
+            user_id=request.user.id,
+            mark_as_read=True,
+            response_skip=response_skip,
+            response_limit=page_size
+        )
+    except CommentClientRequestError:
+        # page and page_size are validated at a higher level, so the only
+        # possible request error is if the thread doesn't exist
+        raise Http404
+
+    course_key = CourseLocator.from_string(cc_thread["course_id"])
+    course = _get_course_or_404(course_key, request.user)
+    context = get_context(course, request.user)
+
+    # Ensure user has access to the thread
+    if not context["is_requester_privileged"] and cc_thread["group_id"]:
+        requester_cohort = get_cohort_id(request.user, course_key)
+        if requester_cohort is not None and cc_thread["group_id"] != requester_cohort:
+            raise Http404
+
+    # Responses to discussion threads cannot be separated by endorsed, but
+    # responses to question threads must be separated by endorsed due to the
+    # existing comments service interface
+    if cc_thread["thread_type"] == "question":
+        if endorsed is None:
+            raise ValidationError({"endorsed": ["This field is required for question threads."]})
+        elif endorsed:
+            # CS does not apply resp_skip and resp_limit to endorsed responses
+            # of a question post
+            responses = cc_thread["endorsed_responses"][response_skip:(response_skip + page_size)]
+            resp_total = len(cc_thread["endorsed_responses"])
+        else:
+            responses = cc_thread["non_endorsed_responses"]
+            resp_total = cc_thread["non_endorsed_resp_total"]
+    else:
+        if endorsed is not None:
+            raise ValidationError(
+                {"endorsed": ["This field may not be specified for discussion threads."]}
+            )
+        responses = cc_thread["children"]
+        resp_total = cc_thread["resp_total"]
+
+    # The comments service returns the last page of results if the requested
+    # page is beyond the last page, but we want be consistent with DRF's general
+    # behavior and return a 404 in that case
+    if not responses and page != 1:
+        raise Http404
+    num_pages = (resp_total + page_size - 1) / page_size if resp_total else 1
+
+    results = [CommentSerializer(response, context=context).data for response in responses]
     return get_paginated_data(request, results, page, num_pages)
