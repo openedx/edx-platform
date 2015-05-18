@@ -915,6 +915,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                 services["user"] = self.user_service
             services["settings"] = SettingsService()
 
+            if self.request_cache:
+                services["request_cache"] = self.request_cache
+
             system = CachingDescriptorSystem(
                 modulestore=self,
                 course_key=course_key,

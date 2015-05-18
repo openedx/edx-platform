@@ -671,6 +671,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         if user_service is not None:
             self.services["user"] = user_service
 
+        if self.request_cache is not None:
+            self.services["request_cache"] = self.request_cache
+
         self.signal_handler = signal_handler
 
     def close_connections(self):
