@@ -66,6 +66,7 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         super(LmsSearchFilterGeneratorTestCase, self).setUp()
         self.build_courses()
         self.user_partition = None
+        self.split_test_user_partition = None
         self.first_cohort = None
         self.second_cohort = None
         self.user = UserFactory.create(username="jack", email="jack@fake.edx.org", password='test')
@@ -140,48 +141,48 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
 
         self.split_test_user_partition.scheme.name = "random"
 
-        self.sequential = ItemFactory.create(
+        sequential = ItemFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name="Lesson 2",
             publish_item=True,
         )
 
-        self.vertical = ItemFactory.create(
-            parent_location=self.sequential.location,
+        vertical = ItemFactory.create(
+            parent_location=sequential.location,
             category='vertical',
             display_name='Subsection 3',
             publish_item=True,
         )
 
-        self.split_test_unit = ItemFactory.create(
-            parent_location=self.vertical.location,
+        split_test_unit = ItemFactory.create(
+            parent_location=vertical.location,
             category='split_test',
             user_partition_id=0,
             display_name="Test Content Experiment 1",
         )
 
-        self.condition_1_vertical = ItemFactory.create(
-            parent_location=self.split_test_unit.location,
+        condition_1_vertical = ItemFactory.create(
+            parent_location=split_test_unit.location,
             category="vertical",
             display_name="Group ID 1",
         )
 
-        self.condition_2_vertical = ItemFactory.create(
-            parent_location=self.split_test_unit.location,
+        condition_2_vertical = ItemFactory.create(
+            parent_location=split_test_unit.location,
             category="vertical",
             display_name="Group ID 2",
         )
 
-        self.html_unit1 = ItemFactory.create(
-            parent_location=self.condition_1_vertical.location,
+        ItemFactory.create(
+            parent_location=condition_1_vertical.location,
             category="html",
             display_name="Group A",
             publish_item=True,
         )
 
-        self.html_unit2 = ItemFactory.create(
-            parent_location=self.condition_2_vertical.location,
+        ItemFactory.create(
+            parent_location=condition_2_vertical.location,
             category="html",
             display_name="Group B",
             publish_item=True,
