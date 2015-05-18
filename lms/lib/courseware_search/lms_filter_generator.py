@@ -8,6 +8,8 @@ from student.models import CourseEnrollment
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.django import modulestore
+from xmodule.split_test_module import get_split_user_partitions
 
 from search.filter_generator import SearchFilterGenerator
 from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
@@ -22,6 +24,8 @@ class LmsSearchFilterGenerator(SearchFilterGenerator):
         filter_dictionary = super(LmsSearchFilterGenerator, self).filter_dictionary(**kwargs)
         if 'user' in kwargs and 'course_id' in kwargs and kwargs['course_id']:
             user = kwargs['user']
+
+            content_groups = []
             try:
                 course_key = CourseKey.from_string(kwargs['course_id'])
             except InvalidKeyError:
@@ -38,7 +42,24 @@ class LmsSearchFilterGenerator(SearchFilterGenerator):
                     user,
                     cohorted_user_partition,
                 )
-                filter_dictionary['content_groups'] = unicode(partition_group.id) if partition_group else None
+
+                if partition_group:
+                    content_groups.append(unicode(partition_group.id))
+
+            course = modulestore().get_course(course_key)
+
+            for split_test_user_partition in get_split_user_partitions(course.user_partitions):
+                partition_group = split_test_user_partition.scheme.get_group_for_user(
+                    course_key,
+                    user,
+                    split_test_user_partition,
+                    assign=False,
+                )
+
+                if partition_group:
+                    content_groups.append(unicode(partition_group.id))
+
+            filter_dictionary['content_groups'] = content_groups if content_groups else None
         return filter_dictionary
 
     def field_dictionary(self, **kwargs):
