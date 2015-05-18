@@ -1,32 +1,26 @@
 <div class="collection-details wrapper-certificate">
     <header class="collection-header">
-        <h3 class="title">
-            <a href="#" class="toggle detail-toggle <% if (showDetails){ print('hide'); } else { print('show'); } %>-details">
-                <i class="ui-toggle-expansion icon fa fa-caret-<% if (showDetails){ print('down'); } else { print('right'); } %>" aria-hidden="true"></i>
-                <%= name %>
-            </a>
+        <h3 class="sr title">
+            <%= name %>
         </h3>
     </header>
 
    <ol class="collection-info certificate-info certificate-info-<% if(showDetails){ print('block'); } else { print('inline'); } %>">
      <% if (!_.isUndefined(id)) { %>
-         <li class="certificate-id">
+         <li class="sr certificate-id">
             <span class="certificate-label"><%= gettext('ID') %>: </span>
             <span class="certificate-value"><%= id %></span>
         </li>
      <% } %>
-     <% if (showDetails) { %>
-        <li class="collection-description certificate-description">
+        <li class="sr collection-description certificate-description">
             <%= description %>
         </li>
         <li class="collection-description certificate-description">
          <header>
-           <span class="title-2"><%= gettext("Course Signatories") %></span>
+           <span class="title"><%= gettext("Course Signatories") %></span>
          </header>
          <div class="signatory-details-list"></div>
         </li>
-
-      <% } %>
    </ol>
 
     <ul class="actions certificate-actions">

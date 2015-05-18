@@ -21,7 +21,7 @@
             <legend class="sr"><%= gettext("Certificate Signatory Configuration") %></legend>
             <div class="input-wrap field text add-signatory-name <% if(error && error.name) { print('error'); } %>">
                 <label for="signatory-name-<%= signatory_number %>"><%= gettext("Name ") %></label>
-                <input id="signatory-name-<%= signatory_number %>" class="collection-name-input input-text signatory-name-input" name="signatory-name" type="text" placeholder="<%= gettext("Name of the signatory") %>" value="<%= name %>"  aria-describedby="signatory-name-<%= signatory_number %>-tip">
+                <input id="signatory-name-<%= signatory_number %>" class="collection-name-input input-text signatory-name-input" name="signatory-name" type="text" placeholder="<%= gettext("Name of the signatory") %>" value="<%= name %>"  aria-describedby="signatory-name-<%= signatory_number %>-tip" maxlength="40">
                 <span id="signatory-name-<%= signatory_number %>-tip" class="tip tip-stacked"><%= gettext("Maximum 40 characters") %></span>
                 <% if(error && error.name) { %>
                   <span class="message-error"><%= error.name %></span>
@@ -29,7 +29,7 @@
             </div>
             <div class="input-wrap field text add-signatory-title <% if(error && error.title) { print('error'); } %>">
                 <label for="signatory-title-<%= signatory_number %>"><%= gettext("Title ") %></label>
-                <textarea id="signatory-title-<%= signatory_number %>" class="collection-name-input text input-text signatory-title-input" name="signatory-title" cols="40" rows="2" placeholder="<%= gettext("Title of the signatory") %>"  aria-describedby="signatory-title-<%= signatory_number %>-tip"><%= title %></textarea>
+                <textarea id="signatory-title-<%= signatory_number %>" class="collection-name-input text input-text signatory-title-input" name="signatory-title" cols="40" rows="2" placeholder="<%= gettext("Title of the signatory") %>"  aria-describedby="signatory-title-<%= signatory_number %>-tip" maxlength="80"><%= title %></textarea>
                 <span id="signatory-title-<%= signatory_number %>-tip" class="tip tip-stacked"><%= gettext("2 Lines, 40 characters each") %></span>
                 <% if(error && error.title) { %>
                   <span class="message-error"><%= error.title %></span>
@@ -37,7 +37,7 @@
             </div>
             <div class="input-wrap field text add-signatory-organization <% if(error && error.organization) { print('error'); } %>">
                 <label for="signatory-organization-<%= signatory_number %>"><%= gettext("Organization ") %></label>
-                <input id="signatory-organization-<%= signatory_number %>" class="collection-name-input input-text signatory-organization-input" name="signatory-organization" type="text" placeholder="<%= gettext("Organization of the signatory") %>" value="<%= organization %>"  aria-describedby="signatory-organization-<%= signatory_number %>-tip">
+                <input id="signatory-organization-<%= signatory_number %>" class="collection-name-input input-text signatory-organization-input" name="signatory-organization" type="text" placeholder="<%= gettext("Organization of the signatory") %>" value="<%= organization %>"  aria-describedby="signatory-organization-<%= signatory_number %>-tip" maxlength="40">
                 <span id="signatory-organization-<%= signatory_number %>-tip" class="tip tip-stacked"><%= gettext("Maximum 40 characters") %></span>
                 <% if(error && error.organization) { %>
                   <span class="message-error"><%= error.organization %></span>
