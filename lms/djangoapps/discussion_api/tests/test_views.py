@@ -42,11 +42,6 @@ class DiscussionAPIViewTestMixin(CommentsServiceMockMixin, UrlResetMixin):
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
         self.client.login(username=self.user.username, password=self.password)
 
-    def login_unenrolled_user(self):
-        """Create a user not enrolled in the course and log it in"""
-        unenrolled_user = UserFactory.create(password=self.password)
-        self.client.login(username=unenrolled_user.username, password=self.password)
-
     def assert_response_correct(self, response, expected_status, expected_content):
         """
         Assert that the response has the given status code and parsed content
@@ -71,7 +66,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         super(CourseTopicsViewTest, self).setUp()
         self.url = reverse("course_topics", kwargs={"course_id": unicode(self.course.id)})
 
-    def test_non_existent_course(self):
+    def test_404(self):
         response = self.client.get(
             reverse("course_topics", kwargs={"course_id": "non/existent/course"})
         )
@@ -81,26 +76,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             {"developer_message": "Not found."}
         )
 
-    def test_not_enrolled(self):
-        self.login_unenrolled_user()
-        response = self.client.get(self.url)
-        self.assert_response_correct(
-            response,
-            404,
-            {"developer_message": "Not found."}
-        )
-
-    def test_discussions_disabled(self):
-        self.course.tabs = [tab for tab in self.course.tabs if not isinstance(tab, DiscussionTab)]
-        modulestore().update_item(self.course, self.user.id)
-        response = self.client.get(self.url)
-        self.assert_response_correct(
-            response,
-            404,
-            {"developer_message": "Not found."}
-        )
-
-    def test_get(self):
+    def test_get_success(self):
         response = self.client.get(self.url)
         self.assert_response_correct(
             response,
@@ -132,9 +108,8 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             {"field_errors": {"course_id": "This field is required."}}
         )
 
-    def test_not_enrolled(self):
-        self.login_unenrolled_user()
-        response = self.client.get(self.url, {"course_id": unicode(self.course.id)})
+    def test_404(self):
+        response = self.client.get(self.url, {"course_id": unicode("non/existent/course")})
         self.assert_response_correct(
             response,
             404,
