@@ -21,7 +21,9 @@ define([
 
         render: function () {
             this.className = this.model.get('type');
-            this.$el.html(this.tpl(this.model.attributes));
+            var data = this.model.attributes;
+            data.name = data.name || data.query;
+            this.$el.html(this.tpl(data));
             return this;
         },
 

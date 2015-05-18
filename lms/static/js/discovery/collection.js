@@ -74,7 +74,12 @@ define([
             var results = response['results'] || [];
             this.latestModelsCount = results.length;
             this.totalCount = response.total;
-            this.facets = response.facets;
+            if (typeof response.facets !== 'undefined') {
+                this.facets = response.facets;
+            }
+            else {
+                this.facets = [];
+            }
             return _.map(results, function (result) {
                 return result.data;
             });
