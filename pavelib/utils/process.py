@@ -16,7 +16,7 @@ def kill_process(proc):
     """
     p1_group = psutil.Process(proc.pid)
 
-    child_pids = p1_group.get_children(recursive=True)
+    child_pids = p1_group.children(recursive=True)
 
     for child_pid in child_pids:
         os.kill(child_pid.pid, signal.SIGKILL)

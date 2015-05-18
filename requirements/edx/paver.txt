@@ -1,7 +1,7 @@
 # Requirements to run Paver
-Paver==1.2.1
-psutil==1.2.1
-lazy==1.1
-path.py==7.2
-watchdog==0.7.1
+Paver==1.2.4
+psutil==2.2.1
+lazy==1.2
+path.py==7.3
+watchdog==0.8.3
 python-memcached
