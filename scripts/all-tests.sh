@@ -15,28 +15,23 @@ set -e
 #   Possible values are:
 #
 #       - "quality": Run the quality (pep8/pylint) checks
-#       - "unit": Run the JavaScript and Python unit tests
-#            (also tests building the Sphinx documentation,
-#             because we couldn't think of a better place to put it)
-#       - "lms-acceptance": Run the acceptance (Selenium) tests for the LMS
-#       - "cms-acceptance": Run the acceptance (Selenium) tests for Studio
+#       - "lms-unit": Run the LMS Python unit tests
+#       - "cms-unit": Run the CMS Python unit tests
+#       - "commonlib-js-unit": Run the JavaScript tests and the Python unit
+#           tests from the common/lib directory
+#       - "lms-acceptance": Run the acceptance (Selenium/Lettuce) tests for
+#           the LMS
+#       - "cms-acceptance": Run the acceptance (Selenium/Lettuce) tests for
+#           Studio
 #       - "bok-choy": Run acceptance tests that use the bok-choy framework
 #
-#   `SHARD` is a number (1, 2, or 3) indicating which subset of the tests
-#       to build.  Currently, "lms-acceptance" and "bok-choy" each have two
-#       shards (1 and 2), "cms-acceptance" has three shards (1, 2, and 3),
-#       and all the other test suites have one shard.
+#   `SHARD` is a number indicating which subset of the tests to build.
 #
-#       For the "bok-choy", the tests are put into shard groups using the nose
-#       'attr' decorator (e.g. "@attr('shard_1')").  Currently, anything with
-#       the 'shard_1' attribute will run in the first shard.  All other bok-choy
-#       tests will run in shard 2.
-#
-#       For the lettuce acceptance tests, ("lms-" and "cms-acceptance") they
-#       are decorated with "@shard_{}" (e.g. @shard_1 for the first shard).
-#       The lettuce tests must have a shard specified to be run in jenkins,
-#       as there is no shard that runs unspecified tests.
-#
+#       For "bok-choy" and "lms-unit", the tests are put into shard groups
+#       using the nose'attr' decorator (e.g. "@attr('shard_1')"). Anything with
+#       the 'shard_n' attribute will run in the nth shard. If there isn't a
+#       shard explicitly assigned, the test will run in the last shard (the one
+#       with the highest number).
 #
 #   Jenkins configuration:
 #
@@ -95,126 +90,79 @@ END
         exit $EXIT
         ;;
 
-    # TODO: Remove the "unit" TEST_SUITE in favor of "lms-unit", etc.
-    # For now it is left in here so that there is not a time limit on how fast
-    # we need to update the groovy script in the jenkins config after merging
-    # the changes needed to shard out the unit tests.
-    "unit")
-        case "$SHARD" in
-            "lms")
-                SHARD=1 paver test_system -s lms --extra_args="--with-flaky" --cov_args="-p" || { EXIT=1; }
-                ;;
-            "cms-js-commonlib")
-                SHARD=1 paver test_system -s cms --extra_args="--with-flaky" --cov_args="-p" || { EXIT=1; }
-                SHARD=1 paver test_js --coverage --skip_clean || { EXIT=1; }
-                SHARD=1 paver test_lib --skip_clean --extra_args="--with-flaky" --cov_args="-p" || { EXIT=1; }
-                ;;
-            *)
-                paver test --extra_args="--with-flaky"
-                paver coverage
-                ;;
-        esac
-        exit $EXIT
-        ;;
-
     "lms-unit")
         case "$SHARD" in
             "1")
-                paver test_system -s lms --extra_args="--attr='shard_1' --with-flaky" --cov_args="-p" || { EXIT=1; }
+                paver test_system -s lms --extra_args="--attr='shard_1' --with-flaky" --cov_args="-p"
                 ;;
             "2")
-                paver test_system -s lms --extra_args="--attr='shard_1=False' --with-flaky" --cov_args="-p" || { EXIT=1; }
+                paver test_system -s lms --extra_args="--attr='shard_1=False' --with-flaky" --cov_args="-p"
                 ;;
             *)
-                paver test_system -s lms --extra_args="--with-flaky" --cov_args="-p" || { EXIT=1; }
+                paver test_system -s lms --extra_args="--with-flaky" --cov_args="-p"
                 ;;
         esac
-        exit $EXIT
         ;;
 
     "cms-unit")
-        paver test_system -s cms --extra_args="--with-flaky" --cov_args="-p" || { EXIT=1; }
-        exit $EXIT
+        paver test_system -s cms --extra_args="--with-flaky" --cov_args="-p"
         ;;
 
     "commonlib-js-unit")
         paver test_js --coverage --skip_clean || { EXIT=1; }
         paver test_lib --skip_clean --extra_args="--with-flaky" --cov_args="-p" || { EXIT=1; }
+
+        # This is to ensure that the build status of the shard is properly set.
+        # Because we are running two paver commands in a row, we need to capture
+        # their return codes in order to exit with a non-zero code if either of
+        # them fail. We put the || clause there because otherwise, when a paver
+        # command fails, this entire script will exit, and not run the second
+        # paver command in this case statement. So instead of exiting, the value
+        # of a variable named EXIT will be set to 1 if either of the paver
+        # commands fail. We then use this variable's value as our exit code.
+        # Note that by default the value of this variable EXIT is not set, so if
+        # neither command fails then the exit command resolves to simply exit
+        # which is considered successful.
         exit $EXIT
         ;;
 
     "lms-acceptance")
-        case "$SHARD" in
-
-            "all")
-                paver test_acceptance -s lms --extra_args="-v 3"
-                ;;
-
-            "2")
-                mkdir -p reports
-                mkdir -p reports/acceptance
-                cat > reports/acceptance/xunit.xml <<END
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="nosetests" tests="1" errors="0" failures="0" skip="0">
-<testcase classname="lettuce.tests" name="shard_placeholder" time="0.001"></testcase>
-</testsuite>
-END
-                ;;
-            *)
-                paver test_acceptance -s lms --extra_args="-v 3"
-                ;;
-        esac
+        paver test_acceptance -s lms --extra_args="-v 3"
         ;;
 
     "cms-acceptance")
-        case "$SHARD" in
-
-            "all"|"1")
-                paver test_acceptance -s cms --extra_args="-v 3"
-                ;;
-
-            "2"|"3")
-                mkdir -p reports/acceptance
-                cat > reports/acceptance/xunit.xml <<END
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="nosetests" tests="1" errors="0" failures="0" skip="0">
-<testcase classname="lettuce.tests" name="shard_placeholder" time="0.001"></testcase>
-</testsuite>
-END
-                ;;
-
-        esac
+        paver test_acceptance -s cms --extra_args="-v 3"
         ;;
 
     "bok-choy")
         case "$SHARD" in
 
             "all")
-                paver test_bokchoy || { EXIT=1; }
+                paver test_bokchoy
                 ;;
 
             "1")
-                paver test_bokchoy --extra_args="-a shard_1 --with-flaky" || { EXIT=1; }
+                paver test_bokchoy --extra_args="-a shard_1 --with-flaky"
                 ;;
 
             "2")
-                paver test_bokchoy --extra_args="-a 'shard_2' --with-flaky" || { EXIT=1; }
+                paver test_bokchoy --extra_args="-a 'shard_2' --with-flaky"
                 ;;
 
             "3")
-                paver test_bokchoy --extra_args="-a 'shard_3' --with-flaky" || { EXIT=1; }
+                paver test_bokchoy --extra_args="-a 'shard_3' --with-flaky"
                 ;;
 
             "4")
-                paver test_bokchoy --extra_args="-a 'shard_4' --with-flaky" || { EXIT=1; }
+                paver test_bokchoy --extra_args="-a 'shard_4' --with-flaky"
                 ;;
 
             "5")
-                paver test_bokchoy --extra_args="-a 'shard_5' --with-flaky" || { EXIT=1; }
+                paver test_bokchoy --extra_args="-a 'shard_5' --with-flaky"
                 ;;
 
             "6")
-                paver test_bokchoy --extra_args="-a shard_1=False,shard_2=False,shard_3=False,shard_4=False,shard_5=False --with-flaky" || { EXIT=1; }
+                paver test_bokchoy --extra_args="-a shard_1=False,shard_2=False,shard_3=False,shard_4=False,shard_5=False --with-flaky"
                 ;;
 
             # Default case because if we later define another bok-choy shard on Jenkins
@@ -237,7 +185,5 @@ END
 END
                 ;;
         esac
-
-        exit $EXIT
         ;;
 esac
