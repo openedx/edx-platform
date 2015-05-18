@@ -6,7 +6,6 @@ import logging
 
 from django.core.exceptions import ObjectDoesNotExist, ValidationError, MultipleObjectsReturned
 from django.utils.translation import ugettext as _
-from django.http import Http404
 
 
 from rest_framework import status
@@ -20,7 +19,7 @@ from rest_framework.views import APIView
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from bookmarks_api import serializers
+from bookmarks import serializers
 from openedx.core.lib.api.serializers import PaginationSerializer
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -33,6 +32,11 @@ from .api import get_bookmark
 log = logging.getLogger(__name__)
 
 
+
+DEFAULT_FIELDS = ["id", "course_id", "usage_id", "created"]
+OPTIONAL_FIELDS = ['display_name', 'path']
+
+
 class BookmarksView(ListCreateAPIView):
     """
     List all bookmarks or create.
@@ -40,14 +44,26 @@ class BookmarksView(ListCreateAPIView):
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
 
-    paginate_by = 1000
+    paginate_by = 30
     paginate_by_param = 'page_size'
     pagination_serializer_class = PaginationSerializer
     serializer_class = serializers.BookmarkSerializer
 
+    def get_serializer_context(self):
+        """
+        Extra context provided to the serializer class.
+        """
+        context = super(BookmarksView, self).get_serializer_context()
+        if self.request.method == 'POST':
+            return context
+        optional_fields = self.request.QUERY_PARAMS.get('fields', [])
+        optional_fields_list = optional_fields.split(',') if optional_fields else []
+        context['fields'] = DEFAULT_FIELDS + [field for field in optional_fields_list
+                                                   if field in OPTIONAL_FIELDS]
+        return context
+
     def get_queryset(self):
         course_id = self.request.QUERY_PARAMS.get('course_id', None)
-        fields = self.request.QUERY_PARAMS.get('fields', None)
 
         if not course_id:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -55,10 +71,9 @@ class BookmarksView(ListCreateAPIView):
             course_key = CourseKey.from_string(course_id)
         except InvalidKeyError:
             log.error("Invalid course id '{course_id}'")
-            return list()
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        results_queryset = Bookmark.objects.filter(course_key=course_key, user__id=self.request.user.id).values("course_key", "usage_key", "display_name", "created").order_by('-created')
-        # serializer = serializers.BookmarkSerializer(results, many=True, fields_to_remove=['path'])
+        results_queryset = Bookmark.objects.filter(course_key=course_key, user=self.request.user).order_by('-created')
 
         return results_queryset
 
@@ -69,7 +84,7 @@ class BookmarksView(ListCreateAPIView):
         Returns 400 request if bad payload is sent or it was empty object.
         """
         if not request.DATA:
-            error_message = _("No data provided for bookmark")
+            error_message = _("No data provided")
             return Response(
                 {
                     "developer_message": error_message,
@@ -80,7 +95,7 @@ class BookmarksView(ListCreateAPIView):
 
         usage_id = request.DATA.get('usage_id', None)
         if not usage_id:
-            error_message = _('No usage id provided for bookmark')
+            error_message = _('No usage id provided')
             return Response(
                 {
                     "developer_message": error_message,
@@ -95,49 +110,35 @@ class BookmarksView(ListCreateAPIView):
             # usage_key's course_key may have an empty run property
             usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
             course_key = usage_key.course_key
-        except InvalidKeyError:
-            error_message = _(u"invalid usage id '{usage_id}'".format(usage_id=usage_id))
+        except InvalidKeyError as exception:
             return Response(
                 {
-                    "developer_message": error_message,
-                    "user_message": error_message
+                    "developer_message": exception.message,
+                    "user_message": _(u"Invalid usage id: '{usage_id}'".format(usage_id=usage_id))
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        try:
-            module_item = modulestore().get_item(usage_key)
-
-            parent = module_item.get_parent()
-            location_path = []
-            while parent is not None:
-                display_name = parent.display_name if parent.display_name else _("(Unnamed)")
-                location_path.append({"display_name": display_name, "usage_id": unicode(parent.location)})
-                parent = parent.get_parent()
-        except ItemNotFoundError:
-            log.warn(
-                "Invalid location for usage_id: {usage_id}".format(
-                    usage_id=usage_id
-                )
-            )
-            raise Http404
-
-        path_list = location_path[:2] if location_path else list()
-        path_list.reverse()
-        bookmarks_dict = {
+        bookmarks_data = {
             "usage_key": usage_key,
             "course_key": course_key,
             "user": request.user,
-            "display_name": module_item.display_name,
-            "_path": path_list
         }
-        try:
-            bookmark = Bookmark.create(bookmarks_dict)
-        except ValidationError as error:
-            log.debug(error, exc_info=True)
-            return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(serializers.BookmarkSerializer(bookmark).data, status=status.HTTP_201_CREATED)
+        try:
+            bookmark = Bookmark.create(bookmarks_data)
+        except ItemNotFoundError as exception:
+            return Response(
+                {
+                    "developer_message": exception.message,
+                    "user_message": _(u"Invalid usage id: '{usage_id}'".format(usage_id=usage_id))
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        return Response(
+            serializers.BookmarkSerializer(bookmark).data,
+            status=status.HTTP_201_CREATED
+        )
 
 
 class BookmarksDetailView(APIView):
@@ -149,7 +150,40 @@ class BookmarksDetailView(APIView):
 
     serializer_class = serializers.BookmarkSerializer
 
-    def get(self, request, username=None, usage_key_string=None):
+    def get(self, request, username=None, usage_id=None):
+        """
+
+        :return:
+        """
+        if request.user.username != username:
+            # Return a 404. If one user is looking up the other users.
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        optional_fields = self.request.QUERY_PARAMS.get('fields', [])
+        optional_fields = optional_fields.split(',') if optional_fields else []
+        optional_fields_to_add = DEFAULT_FIELDS + [field for field in optional_fields if field in OPTIONAL_FIELDS]
+
+        try:
+            bookmarks_data = get_bookmark(request.user, usage_id, fields_to_add=optional_fields_to_add)
+        except (ObjectDoesNotExist, MultipleObjectsReturned) as exception:
+            return Response(
+                {
+                    "developer_message": exception.message,
+                    "user_message": _(u'The bookmark does not exist.')
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except InvalidKeyError as exception:
+            return Response(
+                {
+                    "developer_message": exception.message,
+                    "user_message": _(u"Invalid usage id: '{usage_id}'".format(usage_id=usage_id))
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        return Response(bookmarks_data)
+
+    def delete(self, request, username=None, usage_id=None):
         """
 
         :return:
@@ -159,49 +193,20 @@ class BookmarksDetailView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         try:
-            bookmarks_dict = get_bookmark(request.user, usage_key_string)
-        except ObjectDoesNotExist as ex:
+            bookmark = get_bookmark(request.user, usage_id, serialized=False)
+        except (ObjectDoesNotExist, MultipleObjectsReturned) as exception:
             return Response(
                 {
-                    "developer_message": ex.message,
-                    "user_message": _(ex.message)
+                    "developer_message": exception.message,
+                    "user_message": _(u'The bookmark does not exist.')
                 },
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_404_NOT_FOUND
             )
-        except InvalidKeyError as ex:
+        except InvalidKeyError as exception:
             return Response(
                 {
-                    "developer_message": ex.message,
-                    "user_message": _(ex.message)
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        return Response(bookmarks_dict)
-
-    def delete(self, request, username=None, usage_key_string=None):
-        """
-
-        :return:
-        """
-        if request.user.username != username:
-            # Return a 404. If one user is looking up the other users.
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        try:
-            bookmark = get_bookmark(request.user, usage_key_string, serialized=False)
-        except ObjectDoesNotExist as ex:
-            return Response(
-                {
-                    "developer_message": ex.message,
-                    "user_message": _(ex.message)
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        except InvalidKeyError as ex:
-            return Response(
-                {
-                    "developer_message": ex.message,
-                    "user_message": _(ex.message)
+                    "developer_message": exception.message,
+                    "user_message": _(u"Invalid usage id: '{usage_id}'".format(usage_id=usage_id))
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )

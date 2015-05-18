@@ -9,7 +9,7 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         # Adding model 'Bookmark'
-        db.create_table('bookmarks_api_bookmark', (
+        db.create_table('bookmarks_bookmark', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
             ('course_key', self.gf('xmodule_django.models.CourseKeyField')(max_length=255, db_index=True)),
@@ -19,12 +19,12 @@ class Migration(SchemaMigration):
             ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
         ))
-        db.send_create_signal('bookmarks_api', ['Bookmark'])
+        db.send_create_signal('bookmarks', ['Bookmark'])
 
 
     def backwards(self, orm):
         # Deleting model 'Bookmark'
-        db.delete_table('bookmarks_api_bookmark')
+        db.delete_table('bookmarks_bookmark')
 
 
     models = {
@@ -57,7 +57,7 @@ class Migration(SchemaMigration):
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
             'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         },
-        'bookmarks_api.bookmark': {
+        'bookmarks.bookmark': {
             'Meta': {'object_name': 'Bookmark'},
             '_path': ('django.db.models.fields.TextField', [], {'null': 'True', 'db_column': "'path'", 'blank': 'True'}),
             'course_key': ('xmodule_django.models.CourseKeyField', [], {'max_length': '255', 'db_index': 'True'}),
@@ -77,4 +77,4 @@ class Migration(SchemaMigration):
         }
     }
 
-    complete_apps = ['bookmarks_api']
+    complete_apps = ['bookmarks']

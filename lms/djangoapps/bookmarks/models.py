@@ -1,16 +1,19 @@
 
 import json
+import logging
 
 from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
 from django.db import models
 
+from xmodule.modulestore.django import modulestore
 from xmodule_django.models import CourseKeyField, LocationKeyField
+
+log = logging.getLogger(__name__)
 
 
 class Bookmark(models.Model):
     """
-    Unit Bookmarks model.
+    Bookmarks model.
     """
     user = models.ForeignKey(User)
     course_key = CourseKeyField(max_length=255, db_index=True)
@@ -23,28 +26,39 @@ class Bookmark(models.Model):
     @property
     def path(self):
         """
-        Jsonify the path
+        Parse the path json from the _path field and return it.
         """
         return json.loads(self._path)
 
     @path.setter
     def path(self, value):
         """
-        Un-Jsonify the path
+        Sets the Parsed path to json.
         """
         self._path = json.dumps(value)
 
     @classmethod
-    def create(cls, bookmark_dict):
+    def create(cls, bookmarks_data, block=None):
         """
         Create the bookmark object.
         """
-        path = bookmark_dict.get('_path', list())
+        if not block:
+            block = modulestore().get_item(bookmarks_data['usage_key'])
 
-        if len(path) < 1:
-            raise ValidationError('Bookmark must contain at least one path.')
+        bookmarks_data['display_name'] = block.display_name
+        bookmarks_data['_path'] = json.dumps(cls.get_path(block))
 
-        bookmark_dict['_path'] = json.dumps(path)
-
-        bookmark, __ = cls.objects.get_or_create(**bookmark_dict)
+        bookmark, __ = cls.objects.get_or_create(**bookmarks_data)
         return bookmark
+
+    @staticmethod
+    def get_path(block):
+        parent = block.get_parent()
+        parents_data = []
+
+        while parent is not None and parent.location.block_type not in ['course', 'vertical']:
+            parents_data.append({"display_name": parent.display_name, "usage_id": unicode(parent.location)})
+            parent = parent.get_parent()
+
+        parents_data.reverse()
+        return parents_data

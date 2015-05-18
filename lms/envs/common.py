@@ -1734,8 +1734,8 @@ INSTALLED_APPS = (
 
     'commerce',
 
-    # Bookmarks API
-    'bookmarks_api',
+    # Bookmarks
+    'bookmarks',
 )
 
 ######################### CSRF #########################################

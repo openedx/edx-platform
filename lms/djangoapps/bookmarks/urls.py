@@ -10,7 +10,7 @@ from .views import BookmarksView, BookmarksDetailView
 USERNAME_PATTERN = '(?P<username>[\w.@+-]+)'
 
 urlpatterns = patterns(
-    "bookmarks_api",
+    "bookmarks",
     url(
         r"^v0/bookmarks/$",
         BookmarksView.as_view(),
@@ -19,7 +19,7 @@ urlpatterns = patterns(
     url(
         r"^v0/bookmarks/{username},{usage_key}/$".format(
             username=USERNAME_PATTERN,
-            usage_key=settings.USAGE_KEY_PATTERN
+            usage_key=settings.USAGE_ID_PATTERN
         ),
         BookmarksDetailView.as_view(),
         name="bookmarks_detail"
