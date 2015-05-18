@@ -70,8 +70,31 @@ define([
             event.preventDefault();
             var $target = $(event.currentTarget);
             var value = $target.find('.facet-option').data('value');
-            var data = {type: $target.data('facet'), query: value};
+            var name = $target.find('.facet-option').data('text');
+            var data = {type: $target.data('facet'), query: value, name: name};
             this.trigger('addFilter', data);
+        },
+
+        displayName: function(name, term){
+            if(this.facetsTypes.hasOwnProperty(name)) {
+                if(term) {
+                    if (typeof this.facetsTypes[name].terms !== 'undefined') {
+                        return this.facetsTypes[name].terms.hasOwnProperty(term) ? this.facetsTypes[name].terms[term] : term;
+                    }
+                    else {
+                        return term;
+                    }
+                }
+                else if(this.facetsTypes[name].hasOwnProperty('name')) {
+                    return this.facetsTypes[name]['name'];
+                }
+                else {
+                    return name;
+                }
+            }
+            else{
+                return term ? term : name;
+            }
         },
 
         renderFacets: function(facets) {
@@ -84,14 +107,10 @@ define([
             $.each(facets, function(name, stats) {
                 var facetsView = new FacetsView();
                 self.facetViews.push(facetsView);
-                var displayName = name;
-                if(self.facetsTypes.hasOwnProperty(name)) {
-                    displayName = self.facetsTypes[name];
-                }
-                self.$facetViewsEl.append(facetsView.render(name, displayName, stats).el);
+                self.$facetViewsEl.append(facetsView.render(name, self.displayName(name), stats).el);
                 $.each(stats.terms, function(term, count) {
                     var facetView = new FacetView();
-                    facetsView.$views.append(facetView.render(name, term, count).el);
+                    facetsView.$views.append(facetView.render(name, self.displayName(name, term), term, count).el);
                     facetsView.list.push(facetView);
                 });
                 if(_.size(stats.terms) > 9) {

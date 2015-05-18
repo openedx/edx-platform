@@ -1,4 +1,5 @@
 <%!
+  import json
   from django.utils.translation import ugettext as _
   from microsite_configuration import microsite
 %>
@@ -12,6 +13,13 @@
       <%static:include path="discovery/${template_name}.underscore" />
   </script>
   % endfor
+  <script type="text/javascript">;(function (define) {{
+      define('course_discovery_meanings', function() {{
+          'use strict';
+          return ${json.dumps(course_discovery_meanings)};
+        }});
+      }})(define || RequireJS.define);
+  </script>
 </%block>
 
 <%block name="js_extra">

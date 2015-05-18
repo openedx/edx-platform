@@ -1,11 +1,11 @@
 ;(function (define) {
 
-define(['backbone'], function(Backbone) {
+define(['backbone', 'course_discovery_meanings'], function(Backbone, meanings) {
     'use strict';
 
     return function (Collection, Form, ResultListView, FilterBarView, FacetsBarView, searchQuery) {
         //facet types configuration - set default display names
-        var facetsTypes = {org: 'Organization', modes: 'Course Type'};
+        var facetsTypes = meanings;
 
         var collection = new Collection([]);
         var results = new ResultListView({ collection: collection });
