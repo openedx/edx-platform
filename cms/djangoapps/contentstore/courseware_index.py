@@ -153,7 +153,10 @@ class SearchIndexerBase(object):
         # list - those are ready to be destroyed
         indexed_items = set()
 
-        def get_version_agnostic_item_location(item):
+        def get_item_location(item):
+            """
+            Gets the version agnostic item location
+            """
             return item.location.version_agnostic().replace(branch=None)
 
         def index_item(item, skip_index=False, groups_usage_info=None):
@@ -183,15 +186,15 @@ class SearchIndexerBase(object):
                 for vertical in item.get_children():
                     group_id = int(vertical.display_name.split(" ")[2])
                     groups_usage_info.update({
-                        unicode(get_version_agnostic_item_location(vertical)): [group_id],
+                        unicode(get_item_location(vertical)): [group_id],
                     })
                     for component in vertical.get_children():
                         groups_usage_info.update({
-                            unicode(get_version_agnostic_item_location(component)): [group_id]
+                            unicode(get_item_location(component)): [group_id]
                         })
 
             if groups_usage_info:
-                item_location = get_version_agnostic_item_location(item)
+                item_location = get_item_location(item)
                 item_content_groups = groups_usage_info.get(unicode(item_location), None)
 
             item_id = unicode(cls._id_modifier(item.scope_ids.usage_id))
