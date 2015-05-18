@@ -4,7 +4,7 @@ E2E tests for the LMS.
 """
 import time
 
-from flaky import flaky
+from unittest import skip
 
 from .helpers import UniqueCourseTest
 from ..pages.studio.auto_auth import AutoAuthPage
@@ -122,7 +122,7 @@ class AnnotatableProblemTest(UniqueCourseTest):
         )
         return annotation_component_page
 
-    @flaky  # TODO fix TNL-1590
+    @skip  # TODO fix TNL-1590
     def test_annotation_component(self):
         """
         Test annotation components links to annotation problems.
