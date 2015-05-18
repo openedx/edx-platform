@@ -49,7 +49,7 @@ function (VideoPlayer) {
                     expect(state.videoCaption).toBeDefined();
                     expect(state.speed).toEqual('1.50');
                     expect(state.config.transcriptTranslationUrl)
-                        .toEqual('/transcript/translation');
+                        .toEqual('/transcript/translation/__lang__');
                 });
 
                 it('create video speed control', function () {

@@ -15,8 +15,8 @@ define('video/09_save_state_plugin.js', [], function() {
             return new SaveStatePlugin(state, i18n, options);
         }
 
-        _.bindAll(this, 'onSpeedChange', 'saveStateHandler', 'bindUnloadHandler', 'onUnload', 'onTranscriptDownload',
-            'onYoutubeAvailability', 'onLanguageChange', 'destroy');
+        _.bindAll(this, 'onSpeedChange', 'saveStateHandler', 'bindUnloadHandler', 'onUnload', 'onYoutubeAvailability',
+            'onLanguageChange', 'destroy');
         this.state = state;
         this.options = _.extend({events: []}, options);
         this.state.videoSaveStatePlugin = this;
@@ -30,43 +30,33 @@ define('video/09_save_state_plugin.js', [], function() {
     SaveStatePlugin.moduleName = 'SaveStatePlugin';
     SaveStatePlugin.prototype = {
         destroy: function () {
-            this.state.el.off({
-                'speedchange': this.onSpeedChange,
-                'play': this.bindUnloadHandler,
-                'pause destroy': this.saveStateHandler,
-                'transcript_download:change': this.onTranscriptDownload,
-                'language_menu:change': this.onLanguageChange,
-                'youtube_availability': this.onYoutubeAvailability,
-                'destroy': this.destroy
-            });
+            this.state.el.off(this.events).off('destroy', this.destroy);
             $(window).off('unload', this.onUnload);
             delete this.state.videoSaveStatePlugin;
         },
 
         initialize: function() {
+            this.events = {
+                'speedchange': this.onSpeedChange,
+                'play': this.bindUnloadHandler,
+                'pause destroy': this.saveStateHandler,
+                'language_menu:change': this.onLanguageChange,
+                'youtube_availability': this.onYoutubeAvailability
+            };
             this.bindHandlers();
         },
 
         bindHandlers: function() {
-            var eventMapping = {
-                'speedchange': this.onSpeedChange,
-                'play': this.bindUnloadHandler,
-                'pause destroy': this.saveStateHandler,
-                'transcript_download:change': this.onTranscriptDownload,
-                'language_menu:change': this.onLanguageChange,
-                'youtube_availability': this.onYoutubeAvailability
-            };
-
             if (this.options.events.length) {
                 _.each(this.options.events, function (eventName) {
                     var callback;
-                    if (_.has(eventMapping, eventName)) {
-                        callback = eventMapping[eventName];
+                    if (_.has(this.events, eventName)) {
+                        callback = this.events[eventName];
                         this.state.el.on(eventName, callback);
                     }
                 }, this);
             } else {
-                this.state.el.on(eventMapping);
+                this.state.el.on(this.events);
             }
             this.state.el.on('destroy', this.destroy);
         },
@@ -87,11 +77,6 @@ define('video/09_save_state_plugin.js', [], function() {
 
         onUnload: function () {
             this.saveState();
-        },
-
-        onTranscriptDownload: function (event, fileType) {
-            this.saveState(true, {'transcript_download_format': fileType});
-            this.state.storage.setItem('transcript_download_format', fileType);
         },
 
         onLanguageChange: function (event, langCode) {

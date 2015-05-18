@@ -27,7 +27,7 @@ VIDEO_BUTTONS = {
 }
 
 CSS_CLASS_NAMES = {
-    'closed_captions': '.closed .subtitles',
+    'closed_captions': '.video.closed',
     'captions_rendered': '.video.is-captions-rendered',
     'captions': '.subtitles',
     'captions_text': '.subtitles > li',
@@ -300,6 +300,7 @@ class VideoPage(PageObject):
             bool: True means captions are visible, False means captions are not visible
 
         """
+        self.wait_for_ajax()
         caption_state_selector = self.get_element_selector(CSS_CLASS_NAMES['closed_captions'])
         return not self.q(css=caption_state_selector).present
 

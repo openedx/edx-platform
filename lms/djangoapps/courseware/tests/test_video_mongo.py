@@ -11,7 +11,7 @@ from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from xmodule.video_module import VideoDescriptor, bumper_utils
+from xmodule.video_module import VideoDescriptor, bumper_utils, video_utils
 from xmodule.x_module import STUDENT_VIEW
 from xmodule.tests.test_video import VideoDescriptorTestBase
 from xmodule.tests.test_import import DummySystem
@@ -62,7 +62,7 @@ class TestVideoYouTube(TestVideo):
                 "ytApiUrl": "www.youtube.com/iframe_api",
                 "ytTestUrl": "gdata.youtube.com/feeds/api/videos/",
                 "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation'
+                    self.item_descriptor, 'transcript', 'translation/__lang__'
                 ).rstrip('/?'),
                 "transcriptAvailableTranslationsUrl": self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript', 'available_translations'
@@ -138,7 +138,7 @@ class TestVideoNonYouTube(TestVideo):
                 "ytApiUrl": "www.youtube.com/iframe_api",
                 "ytTestUrl": "gdata.youtube.com/feeds/api/videos/",
                 "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation'
+                    self.item_descriptor, 'transcript', 'translation/__lang__'
                 ).rstrip('/?'),
                 "transcriptAvailableTranslationsUrl": self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript', 'available_translations'
@@ -265,7 +265,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 "ytApiUrl": "www.youtube.com/iframe_api",
                 "ytTestUrl": "gdata.youtube.com/feeds/api/videos/",
                 "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation'
+                    self.item_descriptor, 'transcript', 'translation/__lang__'
                 ).rstrip('/?'),
                 "transcriptAvailableTranslationsUrl": self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript', 'available_translations'
@@ -289,7 +289,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 'transcriptLanguages': {"en": "English"} if not data['transcripts'] else {"uk": u'Українська'},
                 'transcriptLanguage': u'en' if not data['transcripts'] or data.get('sub') else u'uk',
                 'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation'
+                    self.item_descriptor, 'transcript', 'translation/__lang__'
                 ).rstrip('/?'),
                 'transcriptAvailableTranslationsUrl': self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript', 'available_translations'
@@ -399,7 +399,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 "ytApiUrl": "www.youtube.com/iframe_api",
                 "ytTestUrl": "gdata.youtube.com/feeds/api/videos/",
                 "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation'
+                    self.item_descriptor, 'transcript', 'translation/__lang__'
                 ).rstrip('/?'),
                 "transcriptAvailableTranslationsUrl": self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript', 'available_translations'
@@ -427,7 +427,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             expected_context = dict(initial_context)
             expected_context['metadata'].update({
                 'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation'
+                    self.item_descriptor, 'transcript', 'translation/__lang__'
                 ).rstrip('/?'),
                 'transcriptAvailableTranslationsUrl': self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript', 'available_translations'
@@ -567,7 +567,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 "ytApiUrl": "www.youtube.com/iframe_api",
                 "ytTestUrl": "gdata.youtube.com/feeds/api/videos/",
                 "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation'
+                    self.item_descriptor, 'transcript', 'translation/__lang__'
                 ).rstrip('/?'),
                 "transcriptAvailableTranslationsUrl": self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript', 'available_translations'
@@ -588,7 +588,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         expected_context = dict(initial_context)
         expected_context['metadata'].update({
             'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                self.item_descriptor, 'transcript', 'translation'
+                self.item_descriptor, 'transcript', 'translation/__lang__'
             ).rstrip('/?'),
             'transcriptAvailableTranslationsUrl': self.item_descriptor.xmodule_runtime.handler_url(
                 self.item_descriptor, 'transcript', 'available_translations'
@@ -696,7 +696,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 "ytApiUrl": "www.youtube.com/iframe_api",
                 "ytTestUrl": "gdata.youtube.com/feeds/api/videos/",
                 "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation'
+                    self.item_descriptor, 'transcript', 'translation/__lang__'
                 ).rstrip('/?'),
                 "transcriptAvailableTranslationsUrl": self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript', 'available_translations'
@@ -717,7 +717,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         expected_context = dict(initial_context)
         expected_context['metadata'].update({
             'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                self.item_descriptor, 'transcript', 'translation'
+                self.item_descriptor, 'transcript', 'translation/__lang__'
             ).rstrip('/?'),
             'transcriptAvailableTranslationsUrl': self.item_descriptor.xmodule_runtime.handler_url(
                 self.item_descriptor, 'transcript', 'available_translations'
@@ -827,7 +827,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 "ytApiUrl": "www.youtube.com/iframe_api",
                 "ytTestUrl": "gdata.youtube.com/feeds/api/videos/",
                 "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation'
+                    self.item_descriptor, 'transcript', 'translation/__lang__'
                 ).rstrip('/?'),
                 "transcriptAvailableTranslationsUrl": self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript', 'available_translations'
@@ -856,7 +856,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             expected_context = dict(initial_context)
             expected_context['metadata'].update({
                 'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation'
+                    self.item_descriptor, 'transcript', 'translation/__lang__'
                 ).rstrip('/?'),
                 'transcriptAvailableTranslationsUrl': self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript', 'available_translations'
@@ -1112,16 +1112,22 @@ class TestVideoWithBumper(TestVideo):
         expected_context = {
             'branding_info': None,
             'bumper_metadata': json.dumps(OrderedDict({
+                'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
+                "showCaptions": "true",
                 "sources": ["http://test_bumper.mp4"],
-                "showCaptions": "false",
+                'streams': '',
                 "transcriptLanguage": "en",
-                "transcriptLanguages": {},
-                "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation_bumper'
-                ).rstrip('/?'),
-                "transcriptAvailableTranslationsUrl": self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'available_translations_bumper'
-                ).rstrip('/?')
+                "transcriptLanguages": {"en": "English"},
+                "transcriptTranslationUrl": video_utils.set_query_parameter(
+                    self.item_descriptor.xmodule_runtime.handler_url(
+                        self.item_descriptor, 'transcript', 'translation/__lang__'
+                    ).rstrip('/?'), 'is_bumper', 1
+                ),
+                "transcriptAvailableTranslationsUrl": video_utils.set_query_parameter(
+                    self.item_descriptor.xmodule_runtime.handler_url(
+                        self.item_descriptor, 'transcript', 'available_translations'
+                    ).rstrip('/?'), 'is_bumper', 1
+                ),
             })),
             'cdn_eval': False,
             'cdn_exp_group': None,
@@ -1148,7 +1154,7 @@ class TestVideoWithBumper(TestVideo):
                 "ytApiUrl": "www.youtube.com/iframe_api",
                 "ytTestUrl": "gdata.youtube.com/feeds/api/videos/",
                 "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation'
+                    self.item_descriptor, 'transcript', 'translation/__lang__'
                 ).rstrip('/?'),
                 "transcriptAvailableTranslationsUrl": self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript', 'available_translations'
