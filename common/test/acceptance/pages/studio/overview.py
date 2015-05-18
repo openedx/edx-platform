@@ -579,6 +579,13 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         return self.children(CourseOutlineChild)
 
+    @property
+    def license(self):
+        """
+        Returns the course license text, if present. Else returns None.
+        """
+        return self.q(css=".license-value").first.text[0]
+
 
 class CourseOutlineModal(object):
     MODAL_SELECTOR = ".wrapper-modal-window"

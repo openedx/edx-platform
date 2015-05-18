@@ -25,6 +25,7 @@ from pkg_resources import resource_string
 
 from django.conf import settings
 
+from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
 
@@ -41,6 +42,7 @@ from .video_xfields import VideoFields
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 
 from xmodule.video_module import manage_video_subtitles_save
+from xmodule.mixin import LicenseMixin
 
 # The following import/except block for edxval is temporary measure until
 # edxval is a proper XBlock Runtime Service.
@@ -282,10 +284,13 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'transcript_languages': json.dumps(sorted_languages),
             'transcript_translation_url': self.runtime.handler_url(self, 'transcript', 'translation').rstrip('/?'),
             'transcript_available_translations_url': self.runtime.handler_url(self, 'transcript', 'available_translations').rstrip('/?'),
+            'license': getattr(self, "license", None),
         })
 
 
-class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers, TabsEditingDescriptor, EmptyDataRawDescriptor):
+@XBlock.wants("settings")
+class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers,
+                      TabsEditingDescriptor, EmptyDataRawDescriptor):
     """
     Descriptor for `VideoModule`.
     """
@@ -380,6 +385,12 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
     @property
     def editable_metadata_fields(self):
         editable_fields = super(VideoDescriptor, self).editable_metadata_fields
+
+        settings_service = self.runtime.service(self, 'settings')
+        if settings_service:
+            xb_settings = settings_service.get_settings_bucket(self)
+            if not xb_settings.get("licensing_enabled", False) and "license" in editable_fields:
+                del editable_fields["license"]
 
         if self.source_visible:
             editable_fields['source']['non_editable'] = True
@@ -482,6 +493,9 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 xml.append(edxval_api.export_to_xml(self.edx_video_id))
             except edxval_api.ValVideoNotFoundError:
                 pass
+
+        # handle license specifically
+        self.add_license_to_xml(xml)
 
         return xml
 
@@ -641,6 +655,9 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 field_data['edx_video_id'],
                 course_id=getattr(id_generator, 'target_course_id', None)
             )
+
+        # load license if it exists
+        field_data = LicenseMixin.parse_license_from_xml(field_data, xml)
 
         return field_data
 

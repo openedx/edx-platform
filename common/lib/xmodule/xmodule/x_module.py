@@ -620,8 +620,9 @@ class XModuleMixin(XModuleFields, XBlockMixin):
         fields = getattr(self, 'unmixed_class', self.__class__).fields
 
         for field in fields.values():
-
-            if field.scope != Scope.settings or field in self.non_editable_metadata_fields:
+            if field in self.non_editable_metadata_fields:
+                continue
+            if field.scope not in (Scope.settings, Scope.content):
                 continue
 
             metadata_fields[field.name] = self._create_metadata_editor_info(field)
@@ -681,6 +682,8 @@ class XModuleMixin(XModuleFields, XBlockMixin):
             editor_type = "Dict"
         elif isinstance(field, RelativeTime):
             editor_type = "RelativeTime"
+        elif isinstance(field, String) and field.name == "license":
+            editor_type = "License"
         metadata_field_editor_info['type'] = editor_type
         metadata_field_editor_info['options'] = [] if values is None else values
 

@@ -176,6 +176,7 @@
   // course status
   // --------------------
   .course-status {
+    float: $bi-app-left;
     margin-bottom: $baseline;
 
     .status-release {
@@ -214,6 +215,12 @@
         opacity: 1.0;
       }
     }
+  }
+
+  // REMOVE BEFORE MERGE - removed outline styling here from cms
+
+  .wrapper-dnd {
+    clear: both;
   }
 
   // outline

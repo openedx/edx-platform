@@ -1,6 +1,8 @@
+# coding: utf-8
 """
 Course Schedule and Details Settings page.
 """
+from __future__ import unicode_literals
 from bok_choy.promise import EmptyPromise
 
 from .course_page import CoursePage
@@ -16,6 +18,13 @@ class SettingsPage(CoursePage):
 
     def is_browser_on_page(self):
         return self.q(css='body.view-settings').present
+
+    def refresh_and_wait_for_load(self):
+        """
+        Refresh the page and wait for all resources to load.
+        """
+        self.browser.refresh()
+        self.wait_for_page()
 
     def get_elements(self, css_selector):
         self.wait_for_element_presence(
@@ -69,6 +78,50 @@ class SettingsPage(CoursePage):
                 '#entrance-exam-minimum-score-pct',
                 'Entrance exam minimum score percent is invisible'
             )
+
+    @property
+    def course_license(self):
+        """
+        Property. Returns the text of the license type for the course
+        ("All Rights Reserved" or "Creative Commons")
+        """
+        license_types_css = "section.license ul.license-types li.license-type"
+        self.wait_for_element_presence(
+            license_types_css,
+            "license type buttons are present",
+        )
+        selected = self.q(css=license_types_css + " button.is-selected")
+        if selected.is_present():
+            return selected.text[0]
+
+        # Look for the license text that will be displayed by default,
+        # if no button is yet explicitly selected
+        license_text = self.q(css='section.license span.license-text')
+        if license_text.is_present():
+            return license_text.text[0]
+        return None
+
+    @course_license.setter
+    def course_license(self, license_name):
+        """
+        Sets the course license to the given license_name
+        (str, "All Rights Reserved" or "Creative Commons")
+        """
+        license_types_css = "section.license ul.license-types li.license-type"
+        self.wait_for_element_presence(
+            license_types_css,
+            "license type buttons are present",
+        )
+        button_xpath = (
+            "//section[contains(@class, 'license')]"
+            "//ul[contains(@class, 'license-types')]"
+            "//li[contains(@class, 'license-type')]"
+            "//button[contains(text(),'{license_name}')]"
+        ).format(license_name=license_name)
+        button = self.q(xpath=button_xpath)
+        if not button.present:
+            raise Exception("Invalid license name: {name}".format(name=license_name))
+        button.click()
 
     def save_changes(self, wait_for_confirmation=True):
         """

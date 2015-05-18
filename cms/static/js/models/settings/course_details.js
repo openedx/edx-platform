@@ -15,6 +15,7 @@ var CourseDetails = Backbone.Model.extend({
         overview: "",
         intro_video: null,
         effort: null,	// an int or null,
+        license: null,
         course_image_name: '', // the filename
         course_image_asset_path: '', // the full URL (/c4x/org/course/num/asset/filename)
         pre_requisite_courses: [],

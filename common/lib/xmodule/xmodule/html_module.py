@@ -87,7 +87,7 @@ class HtmlModule(HtmlModuleMixin):
     pass
 
 
-class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
+class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):  # pylint: disable=abstract-method
     """
     Module for putting raw html in a course
     """
@@ -263,6 +263,9 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
 
     @property
     def non_editable_metadata_fields(self):
+        """
+        `use_latex_compiler` should not be editable in the Studio settings editor.
+        """
         non_editable_fields = super(HtmlDescriptor, self).non_editable_metadata_fields
         non_editable_fields.append(HtmlDescriptor.use_latex_compiler)
         return non_editable_fields
