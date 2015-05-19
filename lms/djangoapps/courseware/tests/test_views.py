@@ -262,8 +262,10 @@ class ViewsTestCase(ModuleStoreTestCase):
         response = self.client.get(request_url)
         self.assertEqual(response.status_code, 404)
 
-    @unittest.skip
     def test_unicode_handling_in_url(self):
+        """
+        Check that view returns 404 if unicode character appears in the url.
+        """
         url_parts = [
             '/courses',
             self.course.id.to_deprecated_string(),
