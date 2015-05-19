@@ -24,6 +24,17 @@
                 <input id="certificate-course-title-<%= uniqueId %>" class="certificate-course-title-input input-text" name="certificate-course-title" type="text" placeholder="<%= gettext("Course title") %>" value="<%= course_title %>" aria-describedby="certificate-course-title-<%=uniqueId %>-tip">
                 <span id="certificate-course-title-<%= uniqueId %>-tip" class="tip tip-stacked"><%= gettext("Title of the course") %></span>
             </div>
+            <div class="input-wrap field text add-org-logo">
+                <label for="certificate-org-logo-<%= uniqueId %>"><%= gettext("Organization Logo") %></label>
+                <div class="current-org-logo" <% if (org_logo_path == "") { print('style="display:none"'); } %>><span class="wrapper-org-logo"><img class="org-logo" src="<%= org_logo_path %>" alt="Organization Logo"></span></div>
+                <div class="org-logo-upload-wrapper">
+                  <div class="org-logo-upload-input-wrapper">
+                    <input id="certificate-org-logo-<%= uniqueId %>" class="collection-name-input input-text org-logo-input" name="org-logo-path" type="text" placeholder="<%= gettext("Path to organization logo") %>" value="<%= org_logo_path %>" aria-describedby="certificate-org-logo-<%=uniqueId %>-tip">
+                    <span id="certificate-org-logo-<%=uniqueId %>-tip" class="tip tip-stacked"><%= gettext("Maximum logo height 125px, width variable") %></span>
+                  </div>
+                  <button type="button" class="action action-upload-org-logo">Upload Organization Logo</button>
+                </div>
+            </div>
         </fieldset>
          <header>
             <span class="title"><%= gettext("Certificate Signatories") %></legend>
