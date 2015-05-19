@@ -43,6 +43,7 @@ class EnrollmentTestMixin(object):
             email_opt_in=None,
             as_server=False,
             mode=CourseMode.HONOR,
+            is_active=None,
     ):
         """
         Enroll in the course and verify the response's status code. If the expected status is 200, also validates
@@ -61,6 +62,10 @@ class EnrollmentTestMixin(object):
             },
             'user': username
         }
+
+        if is_active is not None:
+            data['is_active'] = is_active
+
         if email_opt_in is not None:
             data['email_opt_in'] = email_opt_in
 
@@ -72,13 +77,31 @@ class EnrollmentTestMixin(object):
         response = self.client.post(url, json.dumps(data), content_type='application/json', **extra)
         self.assertEqual(response.status_code, expected_status)
 
-        if expected_status in [status.HTTP_200_OK, status.HTTP_200_OK]:
+        if expected_status == status.HTTP_200_OK:
             data = json.loads(response.content)
             self.assertEqual(course_id, data['course_details']['course_id'])
-            self.assertEqual(mode, data['mode'])
-            self.assertTrue(data['is_active'])
+
+            if mode is not None:
+                self.assertEqual(mode, data['mode'])
+
+            if is_active is not None:
+                self.assertEqual(is_active, data['is_active'])
+            else:
+                self.assertTrue(data['is_active'])
 
         return response
+
+    def assert_enrollment_activation(self, expected_activation, expected_mode=CourseMode.VERIFIED):
+        """Change an enrollment's activation and verify its activation and mode are as expected."""
+        self.assert_enrollment_status(
+            as_server=True,
+            mode=None,
+            is_active=expected_activation,
+            expected_status=status.HTTP_200_OK
+        )
+        actual_mode, actual_activation = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+        self.assertEqual(actual_activation, expected_activation)
+        self.assertEqual(actual_mode, expected_mode)
 
 
 @override_settings(EDX_API_KEY="i am a key")
@@ -502,6 +525,39 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
         course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
         self.assertTrue(is_active)
         self.assertEqual(course_mode, CourseMode.HONOR)
+
+    def test_deactivate_enrollment(self):
+        """With the right API key, deactivate (i.e., unenroll from) an existing enrollment."""
+        # Create an honor and verified mode for a course. This allows an update.
+        for mode in [CourseMode.HONOR, CourseMode.VERIFIED]:
+            CourseModeFactory.create(
+                course_id=self.course.id,
+                mode_slug=mode,
+                mode_display_name=mode,
+            )
+
+        # Create a 'verified' enrollment
+        self.assert_enrollment_status(as_server=True, mode=CourseMode.VERIFIED)
+
+        # Check that the enrollment is 'verified' and active.
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
+        course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+        self.assertTrue(is_active)
+        self.assertEqual(course_mode, CourseMode.VERIFIED)
+
+        # Verify that a non-Boolean enrollment status is treated as invalid.
+        self.assert_enrollment_status(
+            as_server=True,
+            mode=None,
+            is_active='foo',
+            expected_status=status.HTTP_400_BAD_REQUEST
+        )
+
+        # Verify that the enrollment has been deactivated, and that the mode is unchanged.
+        self.assert_enrollment_activation(False)
+
+        # Verify that enrollment deactivation is idempotent.
+        self.assert_enrollment_activation(False)
 
     def test_change_mode_from_user(self):
         """Users should not be able to alter the enrollment mode on an enrollment. """
