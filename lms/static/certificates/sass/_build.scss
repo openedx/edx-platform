@@ -1,45 +1,53 @@
 // ------------------------------
 // Open edX Certificates: Shared Build Compile
 
-@import '../vendor/normalize/normalize';
+// About: Sass compile for Open edX Certificates elements that are shared between LTR and RTL UI. Configuration and vendor specific imports happen before this shared set of imports are compiled in the main-*.scss files.
 
 // ------------------------------
 // #UTILITIES
 // ------------------------------
-@import 'utilities/mixins';
+@import '../../../../static/pattern-library/sass/utilities/functions';
+@import '../../../../static/pattern-library/sass/utilities/variables';
+@import '../../../../static/pattern-library/sass/utilities/mixins';
+@import '../../../../static/pattern-library/sass/utilities/helpers';
+
+@import 'utilities.scss';
+
+// ------------------------------
+// #VENDOR
+// ------------------------------
+@import '../vendor/fontawesome/sass/font-awesome.scss';
 
 // ------------------------------
 // #BASE
 // ------------------------------
-@import 'base/fonts';
-@import 'base/graphics';
-@import 'base/anims';
-@import 'base/typography';
-@import 'base/reset';
+@import '../../../../static/pattern-library/sass/base/normalize';
+@import '../../../../static/pattern-library/sass/base/reset';
+@import '../../../../static/pattern-library/sass/base/typography';
+
+@import 'base.scss';
 
 // ------------------------------
 // #COMPONENTS
 // ------------------------------
-@import 'components/controls';
-@import 'components/navigation';
-@import 'components/header';
-@import 'components/footer';
+@import '../../../../static/pattern-library/sass/components/colors';
+@import '../../../../static/pattern-library/sass/components/buttons';
+@import '../../../../static/pattern-library/sass/components/headings';
+@import '../../../../static/pattern-library/sass/components/copy';
+
+@import 'components.scss';
+
+// ------------------------------
+// #LAYOUTS
+// ------------------------------
+@import 'layouts';
 
 // ------------------------------
 // #VIEWS
 // ------------------------------
-@import 'views/certificate';
-@import 'views/valid';
-@import 'views/invalid';
-@import 'views/validate';
-
-// ------------------------------
-// #CONTEXTS
-// ------------------------------
-@import 'contexts/print';
-@import 'contexts/ie';
+@import 'views';
 
 // ------------------------------
 // #SHAME
 // ------------------------------
-@import 'utilities/shame';
+@import 'overrides';

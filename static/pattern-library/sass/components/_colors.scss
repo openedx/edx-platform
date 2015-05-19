@@ -1,0 +1,269 @@
+// ------------------------------
+// edX Pattern Library: Components - Colors
+
+// About: Contains base styling for demonstration and utility color palette stylng.
+// ----------------------------
+
+// #SWATCH LAYOUT
+// #SWATCH RENDERING
+// ----------------------------
+
+// ----------------------------
+// #SWATCH LAYOUT
+// ----------------------------
+.example {
+    @include transition(all timing(x-fast) ease-in-out);
+    border: 1px solid palette(grayscale, x-light);
+    border-radius: spacing-horizontal(xx-small);
+    margin-bottom: spacing-vertical(mid-small);
+    padding: spacing-vertical(x-small) spacing-horizontal(small);
+    box-shadow: 0 rem(2) rem(2) 0 palette(grayscale, xx-trans);
+    background: palette(grayscale, white);
+    color: palette(grayscale, white);
+
+    // STATE: hover, focus, and active
+    &:hover, &:focus, &:active {
+        @include transform(scale(1.05));
+        box-shadow: 0 rem(2) rem(2) 0 palette(grayscale, x-trans);
+    }
+}
+
+.swatch-color {
+    display: block;
+    margin-bottom: spacing-vertical(x-small);
+    padding: spacing-vertical(mid-large) spacing-horizontal(mid-small);
+    @include text-align(center);
+
+    .color-class {
+        font-size: font-size(small);
+        text-transform: lowercase;
+
+        // CASE: light text on dark bg
+        &.lod {
+            color: palette(grayscale, white);
+        }
+
+        // CASE: dark text on light bg
+        &.dol {
+            color: palette(grayscale, black);
+        }
+    }
+
+    // CASE: base color
+    &.base {
+
+        .color-class {
+            font-weight: font-weight(bold);
+        }
+    }
+}
+
+.swatch-meta {
+    padding: spacing-vertical(xx-small) spacing-horizontal(small);
+    white-space: nowrap;
+    font-size: font-size(small);
+    @include text-align(center);
+    color: palette(grayscale, dark);
+
+    .color-rgb {
+        @include ellipsis();
+    }
+}
+
+// ----------------------------
+// #SWATCH RENDERING
+// ----------------------------
+.brand-primary {
+
+    &.base {
+        background: palette(primary, base);
+    }
+
+    &.light {
+        background: palette(primary, light);
+    }
+
+    &.x-light {
+        background: palette(primary, x-light);
+    }
+
+    &.dark {
+        background: palette(primary, dark);
+    }
+
+    &.x-dark {
+        background: palette(primary, x-dark);
+    }
+
+    &.accent {
+        background: palette(primary, accent);
+    }
+
+    &.x-accent {
+        background: palette(primary, x-accent);
+    }
+}
+
+.brand-secondary {
+    background: palette(secondary, base);
+
+    &.base {
+        background: palette(secondary, base);
+    }
+
+    &.light {
+        background: palette(secondary, light);
+    }
+
+    &.x-light {
+        background: palette(secondary, x-light);
+    }
+
+    &.dark {
+        background: palette(secondary, dark);
+    }
+
+    &.x-dark {
+        background: palette(secondary, x-dark);
+    }
+
+    &.accent {
+        background: palette(secondary, accent);
+    }
+}
+
+.grayscale {
+    background: palette(grayscale, base);
+
+    &.base {
+        background: palette(grayscale, base);
+    }
+
+    &.light {
+        background: palette(grayscale, light);
+    }
+
+    &.x-light {
+        background: palette(grayscale, x-light);
+    }
+
+    &.white {
+        background: palette(grayscale, white);
+    }
+
+    &.white-t {
+        background: palette(grayscale, white-t);
+    }
+
+    &.dark {
+        background: palette(grayscale, dark);
+    }
+
+    &.x-dark {
+        background: palette(grayscale, x-dark);
+    }
+
+    &.black {
+        background: palette(grayscale, black);
+    }
+
+    &.black-t {
+        background: palette(grayscale, black-t);
+    }
+
+    &.trans {
+        background: palette(grayscale, trans);
+    }
+
+    &.x-trans {
+        background: palette(grayscale, x-trans);
+    }
+
+    &.xx-trans {
+        background: palette(grayscale, xx-trans);
+    }
+}
+
+.grayscale-cool {
+    background: palette(grayscale-cool, base);
+
+    &.base {
+        background: palette(grayscale-cool, base);
+    }
+
+    &.light {
+        background: palette(grayscale-cool, light);
+    }
+
+    &.x-light {
+        background: palette(grayscale-cool, x-light);
+    }
+
+    &.dark {
+        background: palette(grayscale-cool, dark);
+    }
+
+    &.x-dark {
+        background: palette(grayscale-cool, x-dark);
+    }
+
+    &.trans {
+        background: palette(grayscale-cool, trans);
+    }
+
+    &.x-trans {
+        background: palette(grayscale-cool, x-trans);
+    }
+
+    &.xx-trans {
+        background: palette(grayscale-cool, xx-trans);
+    }
+}
+
+.success {
+    background: palette(success, base);
+
+    &.base {
+        background: palette(success, base);
+    }
+
+    &.light {
+        background: palette(success, light);
+    }
+
+    &.dark {
+        background: palette(success, dark);
+    }
+}
+
+.warning {
+    background: palette(warning, base);
+
+    &.base {
+        background: palette(warning, base);
+    }
+
+    &.light {
+        background: palette(warning, light);
+    }
+
+    &.dark {
+        background: palette(warning, dark);
+    }
+}
+
+.error {
+    background: palette(error, base);
+
+    &.base {
+        background: palette(error, base);
+    }
+
+    &.light {
+        background: palette(error, light);
+    }
+
+    &.dark {
+        background: palette(error, dark);
+    }
+}

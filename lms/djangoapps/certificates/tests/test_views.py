@@ -204,6 +204,34 @@ class CertificatesViewsTests(ModuleStoreTestCase):
         )
         CertificateHtmlViewConfigurationFactory.create()
 
+    def _add_course_certificates(self, count=1, signatory_count=0):
+        """
+        Create certificate for the course.
+        """
+        signatories = [
+            {
+                'name': 'Signatory_Name ' + str(i),
+                'title': 'Signatory_Title ' + str(i),
+                'id': i
+            } for i in xrange(0, signatory_count)
+
+        ]
+
+        certificates = [
+            {
+                'id': i,
+                'name': 'Name ' + str(i),
+                'description': 'Description ' + str(i),
+                'course_title': 'course_title_' + str(i),
+                'signatories': signatories,
+                'version': 1
+            } for i in xrange(0, count)
+        ]
+
+        self.course.certificates = {'certificates': certificates}
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
+
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_valid_certificate(self):
         test_url = '/certificates/html?course={}'.format(unicode(self.course.id))
@@ -223,6 +251,43 @@ class CertificatesViewsTests(ModuleStoreTestCase):
         test_url = '/certificates/html?course={}'.format(unicode(self.course.id))
         response = self.client.get(test_url)
         self.assertIn(str(self.cert.verify_uuid), response.content)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_render_html_view_with_valid_signatories(self):
+        test_url = '/certificates/html?course={}'.format(unicode(self.course.id))
+        self._add_course_certificates(count=1, signatory_count=2)
+        response = self.client.get(test_url)
+        self.assertIn('course_title_0', response.content)
+        self.assertIn('Signatory_Name 0', response.content)
+        self.assertIn('Signatory_Title 0', response.content)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_course_display_name_not_override_with_course_title(self):
+        # if certificate in descriptor has not course_title then course name should not be overridden with this title.
+        test_url = '/certificates/html?course={}'.format(unicode(self.course.id))
+        test_certificates = [
+            {
+                'id': 0,
+                'name': 'Name 0',
+                'description': 'Description 0',
+                'signatories': [],
+                'version': 1
+            }
+        ]
+        self.course.certificates = {'certificates': test_certificates}
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
+        response = self.client.get(test_url)
+        self.assertNotIn('test_course_title_0', response.content)
+        self.assertIn('refundable course', response.content)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_render_html_view_without_signatories(self):
+        test_url = '/certificates/html?course={}'.format(unicode(self.course.id))
+        self._add_course_certificates(count=1, signatory_count=0)
+        response = self.client.get(test_url)
+        self.assertNotIn('Signatory_Name 0', response.content)
+        self.assertNotIn('Signatory_Title 0', response.content)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_DISABLED)
     def test_render_html_view_invalid_feature_flag(self):
