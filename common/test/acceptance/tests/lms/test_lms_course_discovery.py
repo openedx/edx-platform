@@ -29,6 +29,8 @@ class CourseDiscoveryTest(WebAppTest):
         with open(self.TEST_INDEX_FILENAME, "w+") as index_file:
             json.dump({}, index_file)
 
+        self.addCleanup(os.remove, self.TEST_INDEX_FILENAME)
+
         super(CourseDiscoveryTest, self).setUp()
         self.page = CourseDiscoveryPage(self.browser)
 
@@ -54,9 +56,6 @@ class CourseDiscoveryTest(WebAppTest):
                     'enrollment_start': datetime.datetime(1970, 1, 1).isoformat()
                 }
             ).install()
-
-    def cleanUp(self):
-        os.remove(self.TEST_INDEX_FILENAME)
 
     def _auto_auth(self, username, email, staff):
         """
