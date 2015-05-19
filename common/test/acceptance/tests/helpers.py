@@ -24,6 +24,7 @@ from xmodule.partitions.tests.test_partitions import MockUserPartitionScheme
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from unittest import TestCase
 
 
 from ..pages.common import BASE_URL
@@ -282,7 +283,7 @@ def get_modal_alert(browser):
     return browser.switch_to.alert
 
 
-class EventsTestMixin(object):
+class EventsTestMixin(TestCase):
     """
     Helpers and setup for running tests that evaluate events emitted
     """
