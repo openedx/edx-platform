@@ -1,7 +1,7 @@
 """
 Acceptance tests for Studio's Setting pages
 """
-from base_studio_test import StudioCourseTest
+from .base_studio_test import StudioCourseTest
 from ...pages.studio.settings_certificates import CertificatesPage
 
 
