@@ -1,0 +1,149 @@
+// ------------------------------
+// edX Pattern Library: Helpers
+
+// About: Sass partial for defining extends and re-usable elements at the Sass compile level.
+
+// #UTILITIES
+// #RESETS
+
+// ----------------------------
+// #UTILITIES
+// ----------------------------
+// visual disabled
+%state-disabled {
+    pointer-events: none;
+    outline: none;
+    cursor: default;
+}
+
+// presentational wrapper
+%wrapper {
+    @include clearfix();
+    width: 100%;
+}
+
+// remove spacing from first/last children
+%clear-first-child {
+
+    &:first-child {
+        margin-top: 0;
+        padding-top: 0;
+        border-top: none;
+    }
+}
+
+%clear-last-child {
+
+    &:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+}
+
+// accessibility
+%a11y-hide {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
+%a11y-hide-image-text {
+    overflow: hidden;
+    text-indent: 100%;
+    white-space: nowrap;
+}
+
+// ----------------------------
+// #UTILITIES
+// ----------------------------
+// reset of lists
+%reset-lists {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-indent: 0;
+}
+
+%list-unstyled {
+    @extend %reset-lists;
+
+    li,
+    dt,
+    dd {
+        margin: 0;
+        padding: 0;
+    }
+}
+
+%list-inline {
+    @extend %list-unstyled;
+
+    li,
+    dt,
+    dd {
+        display: inline-block;
+    }
+}
+
+// reset of typography
+%reset-headings {
+    margin: 0 0 spacing-horizontal(base) 0;
+    font-family: $headings-base-font-family;
+    font-weight: $headings-base-font-weight;
+    font-size: font-size(base);
+    line-height: line-height(base);
+    color: $headings-base-color;
+}
+
+// reset of copy
+%reset-copy {
+    font-family: $text-base-font-family;
+}
+
+// reset of code
+%reset-code {
+    font-family: $font-family-monospace;
+    font-size: font-size(base);
+    line-height: line-height(large);
+    color: $text-base-color;
+}
+
+// reset of links
+%link {
+    @include transition(
+        color timing(xx-fast) ease-in-out 0s,
+        border-color timing(xx-fast) ease-in-out 0s
+    );
+
+    border-bottom: 1px solid $transparent;
+    color: palette(primary, base);
+    text-decoration: none;
+
+    // STATE: hover, active, focus
+    &:hover,
+    &:active,
+    &:focus {
+        border-bottom-color: palette(primary, accent);
+        color: palette(primary, accent);
+    }
+
+    // STATE: is disabled
+    &:disabled,
+    &.is-disabled {
+        display: none; // :)
+        color: palette(grayscale, light);
+    }
+
+    // STATE: is pressed or active
+    &:active,
+    &.is-pressed,
+    &.is-active {
+        color: palette(primary, dark);
+    }
+}
