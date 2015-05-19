@@ -2,21 +2,20 @@
 Tests for the BadgeHandler, which communicates with the Badgr Server.
 """
 from django.test.utils import override_settings
+from django.db.models.fields.files import ImageFieldFile
 from lazy.lazy import lazy
 from mock import patch, Mock, call
-from certificates.models import BadgeAssertion
+from certificates.models import BadgeAssertion, BadgeImageConfiguration
 from xmodule.modulestore.tests.factories import CourseFactory
 from certificates.badge_handler import BadgeHandler
+from certificates.tests.factories import BadgeImageConfigurationFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_DIR
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 BADGR_SETTINGS = {
     'BADGR_API_TOKEN': '12345',
     'BADGR_BASE_URL': 'https://example.com',
     'BADGR_ISSUER_SLUG': 'test-issuer',
-    'BADGR_IMAGE_SOURCES': {
-        'honor': TEST_DATA_DIR / "badges" / "bulb.svg"
-    }
 }
 
 
@@ -36,6 +35,7 @@ class BadgeHandlerTestCase(ModuleStoreTestCase):
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.location.course_key, mode='honor')
         # Need for force empty this dict on each run.
         BadgeHandler.badges = {}
+        BadgeImageConfigurationFactory()
 
     @lazy
     def handler(self):
@@ -92,9 +92,9 @@ class BadgeHandlerTestCase(ModuleStoreTestCase):
         self.handler.create_badge('honor')
         args, kwargs = post.call_args
         self.assertEqual(args[0], 'https://example.com/v1/issuer/issuers/test-issuer/badges')
-        self.assertEqual(kwargs['files']['image'][0], BADGR_SETTINGS['BADGR_IMAGE_SOURCES']['honor'])
-        self.assertIsInstance(kwargs['files']['image'][1], file)
-        self.assertEqual(kwargs['files']['image'][2], 'image/svg+xml')
+        self.assertEqual(kwargs['files']['image'][0], BadgeImageConfiguration.objects.get(mode='honor').icon.name)
+        self.assertIsInstance(kwargs['files']['image'][1], ImageFieldFile)
+        self.assertEqual(kwargs['files']['image'][2], 'image/png')
         self.check_headers(kwargs['headers'])
         self.assertEqual(
             kwargs['data'],

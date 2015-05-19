@@ -1,7 +1,8 @@
-from factory.django import DjangoModelFactory
+from factory.django import DjangoModelFactory, ImageField
 
 from certificates.models import (
-    GeneratedCertificate, CertificateStatuses, CertificateHtmlViewConfiguration, CertificateWhitelist, BadgeAssertion
+    GeneratedCertificate, CertificateStatuses, CertificateHtmlViewConfiguration, CertificateWhitelist, BadgeAssertion,
+    BadgeImageConfiguration,
 )
 
 
@@ -27,6 +28,14 @@ class CertificateWhitelistFactory(DjangoModelFactory):
 
 class BadgeAssertionFactory(DjangoModelFactory):
     FACTORY_FOR = BadgeAssertion
+
+
+class BadgeImageConfigurationFactory(DjangoModelFactory):
+
+    FACTORY_FOR = BadgeImageConfiguration
+
+    mode = 'honor'
+    icon = ImageField(color='blue', height=50, width=50, filename='test.png', format='PNG')
 
 
 class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):

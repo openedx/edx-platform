@@ -12,7 +12,7 @@ from django.core.urlresolvers import reverse
 from eventtracking import tracker
 from lazy import lazy
 from requests.packages.urllib3.exceptions import HTTPError
-from certificates.models import BadgeAssertion
+from certificates.models import BadgeAssertion, BadgeImageConfiguration
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
@@ -98,18 +98,15 @@ class BadgeHandler(object):
         Create the badge spec for a course's mode.
         """
         course = modulestore().get_course(self.course_key)
-        if mode not in settings.BADGR_IMAGE_SOURCES:
-            raise KeyError("No image specified for course mode {} in BADGR_IMAGE_SOURCES!".format(mode))
-        image_name = settings.BADGR_IMAGE_SOURCES[mode]
-        image = open(image_name, 'rb')
+        image = BadgeImageConfiguration.image_for_mode(mode)
         # We don't want to bother validating the file any further than making sure we can detect its MIME type,
         # for HTTP. The Badgr-Server should tell us if there's anything in particular wrong with it.
-        content_type, __ = mimetypes.guess_type(image_name)
+        content_type, __ = mimetypes.guess_type(image.name)
         if not content_type:
             raise ValueError(
                 "Could not determine content-type of image! Make sure it is a properly named .png or .svg file."
             )
-        files = {'image': (image_name, image, content_type)}
+        files = {'image': (image.name, image, content_type)}
         try:
             domain = unicode(Site.objects.get_current().domain)
         except Site.DoesNotExist:

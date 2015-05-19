@@ -57,7 +57,7 @@ from django.db import models, transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields.json import JSONField
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
@@ -336,7 +336,7 @@ class ExampleCertificate(TimeStampedModel):
 
     description = models.CharField(
         max_length=255,
-        help_text=ugettext_lazy(
+        help_text=_(
             u"A human-readable description of the example certificate.  "
             u"For example, 'verified' or 'honor' to differentiate between "
             u"two types of certificates."
@@ -351,7 +351,7 @@ class ExampleCertificate(TimeStampedModel):
         default=_make_uuid,
         db_index=True,
         unique=True,
-        help_text=ugettext_lazy(
+        help_text=_(
             u"A unique identifier for the example certificate.  "
             u"This is used when we receive a response from the queue "
             u"to determine which example certificate was processed."
@@ -362,7 +362,7 @@ class ExampleCertificate(TimeStampedModel):
         max_length=255,
         default=_make_uuid,
         db_index=True,
-        help_text=ugettext_lazy(
+        help_text=_(
             u"An access key for the example certificate.  "
             u"This is used when we receive a response from the queue "
             u"to validate that the sender is the same entity we asked "
@@ -373,12 +373,12 @@ class ExampleCertificate(TimeStampedModel):
     full_name = models.CharField(
         max_length=255,
         default=EXAMPLE_FULL_NAME,
-        help_text=ugettext_lazy(u"The full name that will appear on the certificate.")
+        help_text=_(u"The full name that will appear on the certificate.")
     )
 
     template = models.CharField(
         max_length=255,
-        help_text=ugettext_lazy(u"The template file to use when generating the certificate.")
+        help_text=_(u"The template file to use when generating the certificate.")
     )
 
     # Outputs from certificate generation
@@ -390,20 +390,20 @@ class ExampleCertificate(TimeStampedModel):
             (STATUS_SUCCESS, 'Success'),
             (STATUS_ERROR, 'Error')
         ),
-        help_text=ugettext_lazy(u"The status of the example certificate.")
+        help_text=_(u"The status of the example certificate.")
     )
 
     error_reason = models.TextField(
         null=True,
         default=None,
-        help_text=ugettext_lazy(u"The reason an error occurred during certificate generation.")
+        help_text=_(u"The reason an error occurred during certificate generation.")
     )
 
     download_url = models.CharField(
         max_length=255,
         null=True,
         default=None,
-        help_text=ugettext_lazy(u"The download URL for the generated certificate.")
+        help_text=_(u"The download URL for the generated certificate.")
     )
 
     def update_status(self, status, error_reason=None, download_url=None):
@@ -601,6 +601,49 @@ class BadgeAssertion(models.Model):
         Meta information for Django's construction of the model.
         """
         unique_together = (('course_id', 'user'),)
+
+
+class BadgeImageConfiguration(models.Model):
+    """
+    Contains the configuration for badges for a specific mode. The mode
+    """
+    mode = models.CharField(
+        max_length=125,
+        help_text=_(u"The course mode this image is for, like 'verified' or 'honor'."),
+        unique=True,
+    )
+    icon = models.ImageField(
+        # Actual max is 256KB, but need overhead for badge baking. This should be more than enough.
+        help_text=_(
+            u"Badge images must be square PNG files. To use with Mozilla Backpack, the filesize should be "
+            u"under 250 kilobytes."
+        ),
+        upload_to='badges',
+    )
+    default = models.BooleanField(
+        help_text=_(
+            u"Set this if this image should be the default image for any modes not specified. You may have only one "
+            u"default image."
+        )
+    )
+
+    def clean(self):
+        """
+        Make sure there's not more than one default.
+        """
+        if self.default and self.objects.filter(default=True).exclude(id=self.id):
+            raise ValidationError(_(u"Cannot have more than one default image!"))
+
+    @classmethod
+    def image_for_mode(cls, mode):
+        """
+        Get the image for a particular mode.
+        """
+        try:
+            return cls.objects.get(mode=mode).icon
+        except cls.DoesNotExist:
+            # Fall back to default, if there is one.
+            return cls.objects.get(default=True).icon
 
 
 @receiver(post_save, sender=GeneratedCertificate)
