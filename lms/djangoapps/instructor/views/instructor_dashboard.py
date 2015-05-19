@@ -38,7 +38,7 @@ from course_modes.models import CourseMode, CourseModesArchive
 from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
 from certificates.models import CertificateGenerationConfiguration
 from certificates import api as certs_api
-from openedx.core.lib.plugins.api import CourseViewType
+from openedx.core.djangoapps.course_views.course_views import CourseViewType
 
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 from .tools import get_units_with_due_date, title_or_url, bulk_email_is_enabled_for_course
@@ -55,10 +55,10 @@ class InstructorDashboardViewType(CourseViewType):
     name = "instructor"
     title = _('Instructor')
     view_name = "instructor_dashboard"
-    is_persistent = False
+    is_dynamic = True    # The "Instructor" tab is instead dynamically added when it is enabled
 
     @classmethod
-    def is_enabled(cls, course, settings, user=None):  # pylint: disable=unused-argument,redefined-outer-name
+    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument,redefined-outer-name
         """
         Returns true if the specified user has staff access.
         """

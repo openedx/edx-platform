@@ -373,25 +373,6 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
                 '{0} is a template course'.format(course)
             )
 
-    def test_static_tab_names(self):
-
-        def get_tab_name(index):
-            """
-            Helper function for pulling out the name of a given static tab.
-
-            Assumes the information is desired for courses[4] ('toy' course).
-            """
-            course = self.draft_store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
-            return course.tabs[index]['name']
-
-        # There was a bug where model.save was not getting called after the static tab name
-        # was set set for tabs that have a URL slug. 'Syllabus' and 'Resources' fall into that
-        # category, but for completeness, I'm also testing 'Course Info' and 'Discussion' (no url slug).
-        assert_equals('Course Info', get_tab_name(1))
-        assert_equals('Syllabus', get_tab_name(2))
-        assert_equals('Resources', get_tab_name(3))
-        assert_equals('Discussion', get_tab_name(4))
-
     def test_contentstore_attrs(self):
         """
         Test getting, setting, and defaulting the locked attr and arbitrary attrs.

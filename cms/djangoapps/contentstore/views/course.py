@@ -16,20 +16,19 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseNotFound, HttpResponse, Http404
 from util.json_request import JsonResponse, JsonResponseBadRequest
 from util.date_utils import get_default_time_display
-from util.db import generate_int_id, MYSQL_MAX_INT
 from edxmako.shortcuts import render_to_response
 
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
-from xmodule.tabs import PDFTextbookTabs, CourseTab, CourseTabManager
+from xmodule.tabs import CourseTab
+from openedx.core.djangoapps.course_views.course_views import CourseViewTypeManager
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import Location
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.lib.plugins.api import CourseViewType
 
 from django_future.csrf import ensure_csrf_cookie
 from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
@@ -46,10 +45,8 @@ from contentstore.utils import (
     get_lms_link_for_item,
     reverse_course_url,
     reverse_library_url,
-    reverse_usage_url,
     reverse_url,
     remove_all_instructors,
-    EXTRA_TAB_PANELS,
 )
 from models.settings.course_details import CourseDetails, CourseSettingsEncoder
 from models.settings.course_grading import CourseGradingModel
@@ -58,9 +55,6 @@ from util.json_request import expect_json
 from util.string_utils import _has_non_ascii_characters
 from student.auth import has_studio_write_access, has_studio_read_access
 from .component import (
-    OPEN_ENDED_COMPONENT_TYPES,
-    NOTE_COMPONENT_TYPES,
-    ADVANCED_COMPONENT_POLICY_KEY,
     SPLIT_TEST_COMPONENT_TYPE,
     ADVANCED_COMPONENT_TYPES,
 )
@@ -84,7 +78,6 @@ from course_action_state.models import CourseRerunState, CourseRerunUIStateManag
 from course_action_state.managers import CourseActionStateItemNotFoundError
 from microsite_configuration import microsite
 from xmodule.course_module import CourseFields
-from xmodule.split_test_module import get_split_user_partitions
 from student.auth import has_course_author_access
 
 from util.milestones_helpers import (
@@ -994,86 +987,36 @@ def grading_handler(request, course_key_string, grader_index=None):
                 return JsonResponse()
 
 
-def is_advanced_component_present(request, advanced_components):
-    """
-    Return True when one of `advanced_components` is present in the request.
-
-    raises TypeError
-    when request.ADVANCED_COMPONENT_POLICY_KEY is malformed (not iterable)
-    """
-    if ADVANCED_COMPONENT_POLICY_KEY not in request.json:
-        return False
-
-    new_advanced_component_list = request.json[ADVANCED_COMPONENT_POLICY_KEY]['value']
-    for ac_type in advanced_components:
-        if ac_type in new_advanced_component_list and ac_type in ADVANCED_COMPONENT_TYPES:
-            return True
-
-
-def is_field_value_true(request, field_list):
-    """
-    Return True when one of field values is set to True by request
-    """
-    return any([request.json.get(field, {}).get('value') for field in field_list])
-
-
 def _refresh_course_tabs(request, course_module):
     """
     Automatically adds/removes tabs if changes to the course require them.
     """
-    tab_component_map = {
-        # 'tab_type': (check_function, list_of_checked_components_or_values),
-
-        # open ended tab by combinedopendended or peergrading module
-        'open_ended': (is_advanced_component_present, OPEN_ENDED_COMPONENT_TYPES),
-        # notes tab
-        'notes': (is_advanced_component_present, NOTE_COMPONENT_TYPES),
-    }
 
     def update_tab(tabs, tab_type, tab_enabled):
         """
         Adds or removes a course tab based upon whether it is enabled.
         """
-        tab_panel = _get_tab_panel_for_type(tab_type)
-        if tab_enabled:
+        tab_panel = {
+            "type": tab_type.name,
+            "name": tab_type.title,
+        }
+        has_tab = tab_panel in tabs
+        if tab_enabled and not has_tab:
             tabs.append(CourseTab.from_json(tab_panel))
-        elif tab_panel in tabs:
+        elif not tab_enabled and has_tab:
             tabs.remove(tab_panel)
 
     course_tabs = copy.copy(course_module.tabs)
 
-    for tab_type in tab_component_map.keys():
-        check, component_types = tab_component_map[tab_type]
-        try:
-            tab_enabled = check(request, component_types)
-        except TypeError:
-            # user has failed to put iterable value into advanced component list.
-            # return immediately and let validation handle.
-            return
-        update_tab(course_tabs, tab_type, tab_enabled)
-
-    # Additionally update any persistent tabs provided by course views
-    for tab_type in CourseTabManager.get_tab_types().values():
-        if issubclass(tab_type, CourseViewType) and tab_type.is_persistent:
-            tab_enabled = tab_type.is_enabled(course_module, settings, user=request.user)
+    # Additionally update any tabs that are provided by non-dynamic course views
+    for tab_type in CourseViewTypeManager.get_course_view_types():
+        if not tab_type.is_dynamic and tab_type.is_default:
+            tab_enabled = tab_type.is_enabled(course_module, user=request.user)
             update_tab(course_tabs, tab_type, tab_enabled)
 
     # Save the tabs into the course if they have been changed
-    if not course_tabs == course_module.tabs:
+    if course_tabs != course_module.tabs:
         course_module.tabs = course_tabs
-
-
-def _get_tab_panel_for_type(tab_type):
-    """
-    Returns a tab panel representation for the specified tab type.
-    """
-    tab_panel = EXTRA_TAB_PANELS.get(tab_type)
-    if tab_panel:
-        return tab_panel
-    return {
-        "name": tab_type.title,
-        "type": tab_type.name
-    }
 
 
 @login_required
@@ -1107,7 +1050,7 @@ def advanced_settings_handler(request, course_key_string):
                 try:
                     # validate data formats and update the course module.
                     # Note: don't update mongo yet, but wait until after any tabs are changed
-                    is_valid, errors, updated_data = CourseMetadata.validate_from_json(
+                    is_valid, errors, updated_data = CourseMetadata.validate_and_update_from_json(
                         course_module,
                         request.json,
                         user=request.user,
@@ -1238,8 +1181,8 @@ def textbooks_list_handler(request, course_key_string):
                     textbook["id"] = tid
                     tids.add(tid)
 
-            if not any(tab['type'] == PDFTextbookTabs.type for tab in course.tabs):
-                course.tabs.append(PDFTextbookTabs())
+            if not any(tab['type'] == 'pdf_textbooks' for tab in course.tabs):
+                course.tabs.append(CourseTab.load('pdf_textbooks'))
             course.pdf_textbooks = textbooks
             store.update_item(course, request.user.id)
             return JsonResponse(course.pdf_textbooks)
@@ -1255,8 +1198,8 @@ def textbooks_list_handler(request, course_key_string):
             existing = course.pdf_textbooks
             existing.append(textbook)
             course.pdf_textbooks = existing
-            if not any(tab['type'] == PDFTextbookTabs.type for tab in course.tabs):
-                course.tabs.append(PDFTextbookTabs())
+            if not any(tab['type'] == 'pdf_textbooks' for tab in course.tabs):
+                course.tabs.append(CourseTab.load('pdf_textbooks'))
             store.update_item(course, request.user.id)
             resp = JsonResponse(textbook, status=201)
             resp["Location"] = reverse_course_url(

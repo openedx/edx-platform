@@ -14,6 +14,7 @@ from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
 from courseware.tests.factories import StudentModuleFactory  # pylint: disable=import-error
 from courseware.tests.helpers import LoginEnrollmentTestCase  # pylint: disable=import-error
+from courseware.tabs import get_course_tab_list
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from django.test import RequestFactory
@@ -773,21 +774,24 @@ class TestSwitchActiveCCX(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
 
 @ddt.ddt
-class CCXCoachTabTestCase(unittest.TestCase):
+class CCXCoachTabTestCase(ModuleStoreTestCase):
     """
     Test case for CCX coach tab.
     """
     def setUp(self):
         super(CCXCoachTabTestCase, self).setUp()
-        self.course = MagicMock()
-        self.course.id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
-        self.settings = MagicMock()
-        self.settings.FEATURES = {}
+        self.course = CourseFactory.create()
+        self.user = UserFactory.create()
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
+        role = CourseCcxCoachRole(self.course.id)
+        role.add_users(self.user)
 
     def check_ccx_tab(self):
         """Helper function for verifying the ccx tab."""
-        tab = tabs.CcxCoachTab({'type': tabs.CcxCoachTab.type, 'name': 'CCX Coach'})
-        return tab
+        request = RequestFactory().request()
+        request.user = self.user
+        all_tabs = get_course_tab_list(request, self.course)
+        return any(tab.type == 'ccx_coach' for tab in all_tabs)
 
     @ddt.data(
         (True, True, True),
@@ -796,22 +800,17 @@ class CCXCoachTabTestCase(unittest.TestCase):
         (False, False, False),
         (True, None, False)
     )
-    @patch('ccx.overrides.get_current_request', ccx_dummy_request)
     @ddt.unpack
     def test_coach_tab_for_ccx_advance_settings(self, ccx_feature_flag, enable_ccx, expected_result):
         """
         Test ccx coach tab state (visible or hidden) depending on the value of enable_ccx flag, ccx feature flag.
         """
-        tab = self.check_ccx_tab()
-        self.settings.FEATURES = {'CUSTOM_COURSES_EDX': ccx_feature_flag}
-
-        self.course.enable_ccx = enable_ccx
-        self.assertEquals(
-            expected_result,
-            tab.can_display(
-                self.course, self.settings, is_user_authenticated=True, is_user_staff=False, is_user_enrolled=True
+        with self.settings(FEATURES={'CUSTOM_COURSES_EDX': ccx_feature_flag}):
+            self.course.enable_ccx = enable_ccx
+            self.assertEquals(
+                expected_result,
+                self.check_ccx_tab()
             )
-        )
 
 
 def flatten(seq):

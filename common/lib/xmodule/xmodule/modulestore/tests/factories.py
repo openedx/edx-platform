@@ -13,8 +13,8 @@ import dogstats_wrapper as dog_stats_api
 from opaque_keys.edx.locations import Location
 from opaque_keys.edx.keys import UsageKey
 from xblock.core import XBlock
-from xmodule.tabs import StaticTab
 from xmodule.modulestore import prefer_xmodules, ModuleStoreEnum
+from xmodule.tabs import CourseTab
 from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
 
 
@@ -277,10 +277,7 @@ class ItemFactory(XModuleFactory):
 
                 course = store.get_course(location.course_key)
                 course.tabs.append(
-                    StaticTab(
-                        name=display_name,
-                        url_slug=location.name,
-                    )
+                    CourseTab.load('static_tab', name='Static Tab', url_slug=location.name)
                 )
                 store.update_item(course, user_id)
 

@@ -24,7 +24,6 @@ from django_comment_client.utils import get_accessible_discussion_modules
 from lms.lib.comment_client.thread import Thread
 from lms.lib.comment_client.utils import CommentClientRequestError
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id
-from xmodule.tabs import DiscussionTab
 
 
 def _get_course_or_404(course_key, user):
@@ -34,7 +33,7 @@ def _get_course_or_404(course_key, user):
     disabled for the course.
     """
     course = get_course_with_access(user, 'load_forum', course_key)
-    if not any([isinstance(tab, DiscussionTab) for tab in course.tabs]):
+    if not any([tab.type == 'discussion' for tab in course.tabs]):
         raise Http404
     return course
 

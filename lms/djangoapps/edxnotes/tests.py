@@ -25,14 +25,14 @@ from xmodule.tabs import CourseTab
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from courseware.tabs import get_course_tab_list
-from student.tests.factories import UserFactory
+from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
 
 def enable_edxnotes_for_the_course(course, user_id):
     """
     Enable EdxNotes for the course.
     """
-    course.tabs.append(CourseTab.from_json({"type": "edxnotes", "name": "Notes"}))
+    course.tabs.append(CourseTab.load("edxnotes"))
     modulestore().update_item(course, user_id)
 
 
@@ -798,6 +798,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         super(EdxNotesViewsTest, self).setUp()
         self.course = CourseFactory.create(edxnotes=True)
         self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
         self.client.login(username=self.user.username, password="edx")
         self.notes_page_url = reverse("edxnotes", args=[unicode(self.course.id)])
         self.search_url = reverse("search_notes", args=[unicode(self.course.id)])
@@ -820,10 +821,16 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
             request = RequestFactory().request()
             request.user = user
             tabs = get_course_tab_list(request, course)
-            return len([tab for tab in tabs if tab.name == 'Notes']) == 1
+            return len([tab for tab in tabs if tab.type == 'edxnotes']) == 1
 
         self.assertFalse(has_notes_tab(self.user, self.course))
         enable_edxnotes_for_the_course(self.course, self.user.id)
+        # disable course.edxnotes
+        self.course.edxnotes = False
+        self.assertFalse(has_notes_tab(self.user, self.course))
+
+        # reenable course.edxnotes
+        self.course.edxnotes = True
         self.assertTrue(has_notes_tab(self.user, self.course))
 
     # pylint: disable=unused-argument

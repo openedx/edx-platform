@@ -150,11 +150,12 @@ class CourseMetadata(object):
         return cls.update_from_dict(key_values, descriptor, user)
 
     @classmethod
-    def validate_from_json(cls, descriptor, jsondict, user, filter_tabs=True):
+    def validate_and_update_from_json(cls, descriptor, jsondict, user, filter_tabs=True):
         """
         Validate the values in the json dict (validated by xblock fields from_json method)
 
-        If all fields validate, go ahead and update those values on the object and return it.
+        If all fields validate, go ahead and update those values on the object and return it without
+        persisting it to the DB.
         If not, return the error objects list.
 
         Returns:

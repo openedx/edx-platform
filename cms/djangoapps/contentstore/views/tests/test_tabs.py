@@ -8,7 +8,7 @@ from contentstore.utils import reverse_course_url
 from xmodule.x_module import STUDENT_VIEW
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.tabs import CourseTabList, WikiTab
+from xmodule.tabs import CourseTabList
 from xmodule.modulestore.django import modulestore
 
 
@@ -52,7 +52,7 @@ class TabsPageTests(CourseTestCase):
             self.client.ajax_post(
                 self.url,
                 data=json.dumps({
-                    'tab_id_locator': {'tab_id': WikiTab.type},
+                    'tab_id_locator': {'tab_id': 'courseware'},
                     'unsupported_request': None,
                 }),
             )
@@ -158,10 +158,9 @@ class TabsPageTests(CourseTestCase):
         self.assertEqual(new_tab.is_hidden, new_is_hidden_setting)
 
     def test_toggle_tab_visibility(self):
-        """Test toggling of tab visiblity"""
-
-        self.check_toggle_tab_visiblity(WikiTab.type, True)
-        self.check_toggle_tab_visiblity(WikiTab.type, False)
+        """Test toggling of tab visibility"""
+        self.check_toggle_tab_visiblity('wiki', True)
+        self.check_toggle_tab_visiblity('wiki', False)
 
     def test_toggle_invalid_tab_visibility(self):
         """Test toggling visibility of an invalid tab"""

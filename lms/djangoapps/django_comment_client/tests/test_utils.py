@@ -6,11 +6,8 @@ from nose.plugins.attrib import attr
 from pytz import UTC
 from django.utils.timezone import UTC as django_utc
 
-from django_comment_client.tests.factories import RoleFactory
-from django_comment_client.tests.unicode import UnicodeTestMixin
-import django_comment_client.utils as utils
 from django.core.urlresolvers import reverse
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from edxmako import add_lookup
 
 from django_comment_client.tests.factories import RoleFactory
@@ -18,8 +15,9 @@ from django_comment_client.tests.unicode import UnicodeTestMixin
 import django_comment_client.utils as utils
 
 from courseware.tests.factories import InstructorFactory
+from courseware.tabs import get_course_tab_list
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -951,3 +949,37 @@ class RenderMustacheTests(TestCase):
         """
         add_lookup('main', '', package=__name__)
         self.assertEqual(utils.render_mustache('test.mustache', {}), 'Testing 1 2 3.\n')
+
+
+class DiscussionTabTestCase(ModuleStoreTestCase):
+    """ Test visibility of the discussion tab. """
+
+    def setUp(self):
+        super(DiscussionTabTestCase, self).setUp()
+        self.course = CourseFactory.create()
+        self.enrolled_user = UserFactory.create()
+        self.staff_user = AdminFactory.create()
+        CourseEnrollmentFactory.create(user=self.enrolled_user, course_id=self.course.id)
+        self.unenrolled_user = UserFactory.create()
+
+    def discussion_tab_present(self, user):
+        """ Returns true if the user has access to the discussion tab. """
+        request = RequestFactory().request()
+        request.user = user
+        all_tabs = get_course_tab_list(request, self.course)
+        return any(tab.type == 'discussion' for tab in all_tabs)
+
+    def test_tab_access(self):
+        with self.settings(FEATURES={'ENABLE_DISCUSSION_SERVICE': True}):
+            self.assertTrue(self.discussion_tab_present(self.staff_user))
+            self.assertTrue(self.discussion_tab_present(self.enrolled_user))
+            self.assertFalse(self.discussion_tab_present(self.unenrolled_user))
+
+    @mock.patch('ccx.overrides.get_current_ccx')
+    def test_tab_settings(self, mock_get_ccx):
+        mock_get_ccx.return_value = True
+        with self.settings(FEATURES={'ENABLE_DISCUSSION_SERVICE': False}):
+            self.assertFalse(self.discussion_tab_present(self.enrolled_user))
+
+        with self.settings(FEATURES={'CUSTOM_COURSES_EDX': True}):
+            self.assertFalse(self.discussion_tab_present(self.enrolled_user))

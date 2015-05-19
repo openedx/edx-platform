@@ -44,7 +44,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
-from xmodule.tabs import DiscussionTab
 
 
 def _remove_discussion_tab(course, user_id):
@@ -53,7 +52,7 @@ def _remove_discussion_tab(course, user_id):
 
     user_id is passed to the modulestore as the editor of the module.
     """
-    course.tabs = [tab for tab in course.tabs if not isinstance(tab, DiscussionTab)]
+    course.tabs = [tab for tab in course.tabs if not tab.type == 'discussion']
     modulestore().update_item(course, user_id)
 
 

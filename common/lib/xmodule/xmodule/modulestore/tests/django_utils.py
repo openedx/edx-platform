@@ -22,7 +22,6 @@ from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.modulestore.tests.sample_courses import default_block_info_tree, TOY_BLOCK_INFO_TREE
 from xmodule.modulestore.tests.factories import XMODULE_FACTORY_LOCK
-from xmodule.tabs import CoursewareTab, CourseInfoTab, StaticTab, DiscussionTab, ProgressTab, WikiTab
 
 
 class StoreConstructors(object):
@@ -379,15 +378,6 @@ class ModuleStoreTestCase(TestCase):
                 "wiki_slug": "toy",
                 "display_name": "Toy Course",
                 "graded": True,
-                "tabs": [
-                    CoursewareTab(),
-                    CourseInfoTab(),
-                    StaticTab(name="Syllabus", url_slug="syllabus"),
-                    StaticTab(name="Resources", url_slug="resources"),
-                    DiscussionTab(),
-                    WikiTab(),
-                    ProgressTab(),
-                ],
                 "discussion_topics": {"General": {"id": "i4x-edX-toy-course-2012_Fall"}},
                 "graceperiod": datetime.timedelta(days=2, seconds=21599),
                 "start": datetime.datetime(2015, 07, 17, 12, tzinfo=pytz.utc),
