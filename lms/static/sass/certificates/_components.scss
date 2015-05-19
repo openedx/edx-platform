@@ -243,7 +243,7 @@
     }
 
     .accomplishment-statement-lead {
-        @extend %hd-2;
+        @extend .hd-2;
     }
 
     .accomplishment-recipient {
@@ -497,7 +497,7 @@
     }
 
     .accomplishment-rendering {
-        background: palette(grayscale, white-t) url('../images/bg-distinguished.png') center no-repeat;
+        background: palette(grayscale, white-t) url('../../certificates/images/bg-distinguished.png') center no-repeat;
         background-size: 65%;
 
         .deco-corner-tl {
