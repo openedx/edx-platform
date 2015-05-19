@@ -53,11 +53,16 @@ class Bookmark(models.Model):
 
     @staticmethod
     def get_path(block):
+        """
+        Returns List of dicts containing {"usage_id": "", display_name:""} for the XBlocks
+        from the top of the course tree till the parent of the bookmarked XBlock.
+        """
         parent = block.get_parent()
         parents_data = []
 
-        while parent is not None and parent.location.block_type not in ['course', 'vertical']:
+        while parent is not None and parent.location.block_type not in ['course']:
             parents_data.append({"display_name": parent.display_name, "usage_id": unicode(parent.location)})
             parent = parent.get_parent()
+        parents_data = parents_data[:2]  # To exclude the unit/vertical block information.
         parents_data.reverse()
         return parents_data

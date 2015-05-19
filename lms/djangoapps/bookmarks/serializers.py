@@ -38,6 +38,6 @@ class BookmarkSerializer(serializers.ModelSerializer):
 
     def get_id(self, bookmark):
         """
-        Gets the bookmark id.
+        Gets the bookmark id {username, usage_id}.
         """
         return "%s,%s" % (bookmark.user.username, bookmark.usage_key)

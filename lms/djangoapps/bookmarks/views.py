@@ -70,7 +70,7 @@ class BookmarksView(ListCreateAPIView):
 
             * usage_id: String. The identifier string of the bookmark's XBlock.
 
-            * display_name: String. Display name of the XBlock.
+            * display_name: (optional) String. Display name of the XBlock.
 
             * path: (optional) List of dicts containing {"usage_id": "", display_name:""} for the XBlocks
                 from the top of the course tree till the parent of the bookmarked XBlock.
@@ -78,7 +78,6 @@ class BookmarksView(ListCreateAPIView):
             * created: ISO 8601 String. The timestamp of bookmark's creation.
 
     """
-
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
 
@@ -103,13 +102,11 @@ class BookmarksView(ListCreateAPIView):
     def get_queryset(self):
         course_id = self.request.QUERY_PARAMS.get('course_id', None)
 
-        if not course_id:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
         try:
             course_key = CourseKey.from_string(course_id)
         except InvalidKeyError:
             log.error("Invalid course id '{course_id}'")
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return []
 
         results_queryset = Bookmark.objects.filter(course_key=course_key, user=self.request.user).order_by('-created')
 
@@ -117,9 +114,7 @@ class BookmarksView(ListCreateAPIView):
 
     def post(self, request):
         """
-        Create a new bookmark.
-
-        Returns 400 request if bad payload is sent or it was empty object.
+        POST /api/bookmarks/v0/bookmarks/?course_id={course_id1}
         """
         if not request.DATA:
             error_message = _("No data provided")
@@ -181,7 +176,43 @@ class BookmarksView(ListCreateAPIView):
 
 class BookmarksDetailView(APIView):
     """
-    List all bookmarks or create.
+    **Use Cases**
+
+        Get or Delete a specific bookmark.
+
+    **Example Requests**:
+
+        GET /api/bookmarks/v0/bookmarks/{username},{usage_id}?fields=path&display_name
+
+        DELETE /api/bookmarks/v0/bookmarks/{username},{usage_id}?fields=path&display_name
+
+    **Response Values for GET**
+        Users can only delete their own bookmarks
+
+        * id: String. The identifier string for the bookmark": {user_id},{usage_id}.
+
+        * course_id: String. The identifier string of the bookmark's course.
+
+        * usage_id: String. The identifier string of the bookmark's XBlock.
+
+        * display_name: (optional) String. Display name of the XBlock.
+
+        * path: (optional) List of dicts containing {"usage_id": "", display_name:""} for the XBlocks
+            from the top of the course tree till the parent of the bookmarked XBlock.
+
+        * created: ISO 8601 String. The timestamp of bookmark's creation.
+
+    **Response for DELETE**
+
+        A successful delete returns a 204 and no content.
+
+        Users can only delete their own bookmarks. If the requesting user
+        does not have username "username", this method will return with a
+        status of 404.
+
+        If the specified bookmark does not exist, this method returns a
+        404.
+
     """
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
@@ -190,8 +221,7 @@ class BookmarksDetailView(APIView):
 
     def get(self, request, username=None, usage_id=None):
         """
-
-        :return:
+        GET /api/bookmarks/v0/bookmarks/{username},{usage_id}?fields=path&display_name
         """
         if request.user.username != username:
             # Return a 404. If one user is looking up the other users.
@@ -223,8 +253,7 @@ class BookmarksDetailView(APIView):
 
     def delete(self, request, username=None, usage_id=None):
         """
-
-        :return:
+        DELETE /api/bookmarks/v0/bookmarks/{username},{usage_id}
         """
         if request.user.username != username:
             # Return a 404. If one user is looking up the other users.
