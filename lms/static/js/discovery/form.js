@@ -48,9 +48,10 @@ define(['jquery', 'backbone'], function ($, Backbone) {
         },
 
         showNotFoundMessage: function (term) {
-            var msg = term != '' ?
-                interpolate(gettext('We couldn\'t find any results for "%s."'), [term]) :
-                gettext('We couldn\'t find any results.');
+            var msg = interpolate(
+                gettext('We couldn\'t find any results for "%s".'),
+                [_.escape(term)]
+            );
             this.$message.html(msg);
         },
 
