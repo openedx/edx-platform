@@ -4,9 +4,6 @@ Adds support for first class features that can be added to the edX platform.
 
 from stevedore.extension import ExtensionManager
 
-# Stevedore extension point namespaces
-COURSE_VIEW_TYPE_NAMESPACE = 'openedx.course_view_type'
-
 
 class PluginError(Exception):
     """
@@ -46,44 +43,3 @@ class PluginManager(object):
                 namespace=cls.NAMESPACE  # pylint: disable=no-member
             ))
         return plugins[name]
-
-
-class CourseViewType(object):
-    """
-    Base class of all course view type plugins.
-    """
-    name = None
-    title = None
-    view_name = None
-    is_persistent = False
-
-    # The course field that indicates that this feature is enabled
-    feature_flag_field_name = None
-
-    @classmethod
-    def is_enabled(cls, course, settings, user=None):  # pylint: disable=unused-argument
-        """Returns true if this course view is enabled in the course.
-
-        Args:
-            course (CourseDescriptor): the course using the feature
-            settings (dict): a dict of configuration settings
-            user (User): the user interacting with the course
-        """
-        raise NotImplementedError()
-
-    @classmethod
-    def validate(cls, tab_dict, raise_error=True):  # pylint: disable=unused-argument
-        """
-        Validates the given dict-type `tab_dict` object to ensure it contains the expected keys.
-        This method should be overridden by subclasses that require certain keys to be persisted in the tab.
-        """
-        return True
-
-
-class CourseViewTypeManager(PluginManager):
-    """
-    Manager for all of the course view types that have been made available.
-
-    All course view types should implement `CourseViewType`.
-    """
-    NAMESPACE = COURSE_VIEW_TYPE_NAMESPACE

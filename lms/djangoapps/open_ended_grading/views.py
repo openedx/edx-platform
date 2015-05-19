@@ -4,7 +4,10 @@ from django.views.decorators.cache import cache_control
 from edxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 
+from openedx.core.djangoapps.course_views.course_views import CourseViewType
+
 from courseware.courses import get_course_with_access
+from courseware.access import has_access
 
 from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
 import json
@@ -60,6 +63,61 @@ ALERT_DICT = {
     'Problems you have submitted': _("New grades have been returned"),
     'Flagged Submissions': _("Submissions have been flagged for review"),
 }
+
+
+class StaffGradingTab(CourseViewType):
+    """
+    A tab for staff grading.
+    """
+    name = 'staff_grading'
+    title = _("Staff grading")
+    view_name = "staff_grading"
+
+    @classmethod
+    def is_enabled(cls, course, django_settings, user=None):  # pylint: disable=unused-argument
+        if "combinedopenended" not in course.advanced_modules:
+            return False
+        if not user:
+            return True
+        return has_access(user, 'staff', course, course.id)
+
+
+class PeerGradingTab(CourseViewType):
+    """
+    A tab for peer grading.
+    """
+    name = 'peer_grading'
+    # Translators: "Peer grading" appears on a tab that allows
+    # students to view open-ended problems that require grading
+    title = _("Peer grading")
+    view_name = "peer_grading"
+
+    @classmethod
+    def is_enabled(cls, course, settings, user=None):  # pylint: disable=unused-argument
+        if "combinedopenended" not in course.advanced_modules:
+            return False
+        if not user:
+            return True
+        return user.is_authenticated()
+
+
+class OpenEndedGradingTab(CourseViewType):
+    """
+    A tab for open ended grading.
+    """
+    name = 'open_ended'
+    # Translators: "Open Ended Panel" appears on a tab that, when clicked, opens up a panel that
+    # displays information about open-ended problems that a user has submitted or needs to grade
+    title = _("Open Ended Panel")
+    view_name = "open_ended_notifications"
+
+    @classmethod
+    def is_enabled(cls, course, settings, user=None):  # pylint: disable=unused-argument
+        if "combinedopenended" not in course.advanced_modules:
+            return False
+        if not user:
+            return True
+        return user.is_authenticated()
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)

@@ -1,17 +1,26 @@
-"""Tests for Tab classes"""
+""" Tests of specific tabs. """
+
 from mock import MagicMock, patch
-import xmodule.tabs as tabs
 import unittest
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from courseware.tabs import (
+    CoursewareViewType, CourseInfoViewType, ProgressCourseViewType,
+    StaticCourseViewType, ExternalDiscussionCourseViewType, ExternalLinkCourseViewType
+)
+import xmodule.tabs as xmodule_tabs
+import openedx.core.djangoapps.course_views.course_views as tabs
+from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
-class TabTestCase(unittest.TestCase):
+class TabTestCase(ModuleStoreTestCase):
     """Base class for Tab-related test cases."""
     def setUp(self):
         super(TabTestCase, self).setUp()
 
-        self.course = MagicMock()
-        self.course.id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        self.course = CourseFactory.create(org='edX', course='toy', run='2012_Fall')
         self.fake_dict_tab = {'fake_key': 'fake_value'}
         self.settings = MagicMock()
         self.settings.FEATURES = {}
@@ -22,22 +31,17 @@ class TabTestCase(unittest.TestCase):
         """
         Creates a mock user with the specified properties.
         """
-        user = MagicMock()
+        user = UserFactory()
         user.name = 'mock_user'
         user.is_staff = is_staff
         user.is_enrolled = is_enrolled
         user.is_authenticated = lambda: is_authenticated
         return user
 
-    @patch('xmodule.tabs.is_user_enrolled_or_staff')
-    @patch('xmodule.tabs.is_user_staff')
-    def is_tab_enabled(self, tab, course, settings, user, is_staff_mock=None, is_enrolled_or_staff_mock=None):
+    def is_tab_enabled(self, tab, course, settings, user):
         """
         Returns true if the specified tab is enabled.
         """
-        is_staff_mock.return_value = user.is_staff
-        is_enrolled_or_staff_mock.return_value = user.is_enrolled or user.is_staff
-
         return tab.is_enabled(course, settings, user=user)
 
     def set_up_books(self, num_books):
@@ -70,7 +74,10 @@ class TabTestCase(unittest.TestCase):
             Can be 'None' if the given tab class does not have any keys to validate.
         """
         # create tab
-        tab = tab_class(dict_tab)
+        if issubclass(tab_class, tabs.CourseViewType):
+            tab = tab_class.create_tab(tab_dict=dict_tab)
+        else:
+            tab = tab_class(tab_dict=dict_tab)
 
         # name is as expected
         self.assertEqual(tab.name, expected_name)
@@ -84,7 +91,7 @@ class TabTestCase(unittest.TestCase):
         # validate tab
         self.assertTrue(tab.validate(dict_tab))
         if invalid_dict_tab:
-            with self.assertRaises(tabs.InvalidTabsException):
+            with self.assertRaises(xmodule_tabs.InvalidTabsException):
                 tab.validate(invalid_dict_tab)
 
         # check get and set methods
@@ -114,12 +121,12 @@ class TabTestCase(unittest.TestCase):
         self.assertEquals(serialized_tab, deserialized_tab)
 
     def check_can_display_results(
-        self,
-        tab,
-        expected_value=True,
-        for_authenticated_users_only=False,
-        for_staff_only=False,
-        for_enrolled_users_only=False
+            self,
+            tab,
+            expected_value=True,
+            for_authenticated_users_only=False,
+            for_staff_only=False,
+            for_enrolled_users_only=False
     ):
         """Checks can display results for various users"""
         if for_staff_only:
@@ -157,21 +164,113 @@ class TabTestCase(unittest.TestCase):
         self.assertEquals(tab[key], old_value)
 
 
+class TabListTestCase(TabTestCase):
+    """Base class for Test cases involving tab lists."""
+
+    def setUp(self):
+        super(TabListTestCase, self).setUp()
+
+        # invalid tabs
+        self.invalid_tabs = [
+            # less than 2 tabs
+            [{'type': CoursewareViewType.name}],
+            # missing course_info
+            [{'type': CoursewareViewType.name}, {'type': 'discussion', 'name': 'fake_name'}],
+            # incorrect order
+            [{'type': CourseInfoViewType.name, 'name': 'fake_name'}, {'type': CoursewareViewType.name}],
+        ]
+
+        # tab types that should appear only once
+        unique_tab_types = [
+            CoursewareViewType.name,
+            CourseInfoViewType.name,
+            'textbooks',
+            'pdf_textbooks',
+            'html_textbooks',
+        ]
+
+        for unique_tab_type in unique_tab_types:
+            self.invalid_tabs.append([
+                {'type': CoursewareViewType.name},
+                {'type': CourseInfoViewType.name, 'name': 'fake_name'},
+                # add the unique tab multiple times
+                {'type': unique_tab_type},
+                {'type': unique_tab_type},
+            ])
+
+        # valid tabs
+        self.valid_tabs = [
+            # empty list
+            [],
+            # all valid tabs
+            [
+                {'type': CoursewareViewType.name},
+                {'type': CourseInfoViewType.name, 'name': 'fake_name'},
+                {'type': 'discussion', 'name': 'fake_name'},
+                {'type': ExternalLinkCourseViewType.name, 'name': 'fake_name', 'link': 'fake_link'},
+                {'type': 'textbooks'},
+                {'type': 'pdf_textbooks'},
+                {'type': 'html_textbooks'},
+                {'type': ProgressCourseViewType.name, 'name': 'fake_name'},
+                {'type': StaticCourseViewType.name, 'name': 'fake_name', 'url_slug': 'schlug'},
+                {'type': 'syllabus'},
+            ],
+            # with external discussion
+            [
+                {'type': CoursewareViewType.name},
+                {'type': CourseInfoViewType.name, 'name': 'fake_name'},
+                {'type': ExternalDiscussionCourseViewType.name, 'name': 'fake_name', 'link': 'fake_link'}
+            ],
+        ]
+
+        self.all_valid_tab_list = xmodule_tabs.CourseTabList().from_json(self.valid_tabs[1])
+
+
+class ValidateTabsTestCase(TabListTestCase):
+    """Test cases for validating tabs."""
+
+    def test_validate_tabs(self):
+        tab_list = xmodule_tabs.CourseTabList()
+        for invalid_tab_list in self.invalid_tabs:
+            with self.assertRaises(xmodule_tabs.InvalidTabsException):
+                tab_list.from_json(invalid_tab_list)
+
+        for valid_tab_list in self.valid_tabs:
+            from_json_result = tab_list.from_json(valid_tab_list)
+            self.assertEquals(len(from_json_result), len(valid_tab_list))
+
+    def test_invalid_tab_type(self):
+        """
+        Verifies that having an unrecognized tab type does not cause
+        the tabs to be undisplayable.
+        """
+        tab_list = xmodule_tabs.CourseTabList()
+        self.assertEquals(
+            len(tab_list.from_json([
+                {'type': CoursewareViewType.name},
+                {'type': CourseInfoViewType.name, 'name': 'fake_name'},
+                {'type': 'no_such_type'}
+            ])),
+            2
+        )
+
+
 class ProgressTestCase(TabTestCase):
     """Test cases for Progress Tab."""
 
     def check_progress_tab(self):
         """Helper function for verifying the progress tab."""
         return self.check_tab(
-            tab_class=tabs.ProgressTab,
-            dict_tab={'type': tabs.ProgressTab.type, 'name': 'same'},
+            tab_class=ProgressCourseViewType,
+            dict_tab={'type': ProgressCourseViewType.name, 'name': 'same'},
             expected_link=self.reverse('progress', args=[self.course.id.to_deprecated_string()]),
-            expected_tab_id=tabs.ProgressTab.type,
+            expected_tab_id=ProgressCourseViewType.name,
             invalid_dict_tab=None,
         )
 
-    def test_progress(self):
-
+    @patch('student.models.CourseEnrollment.is_enrolled')
+    def test_progress(self, is_enrolled):
+        is_enrolled.return_value = True
         self.course.hide_progress_tab = False
         tab = self.check_progress_tab()
         self.check_can_display_results(
@@ -185,75 +284,6 @@ class ProgressTestCase(TabTestCase):
         )
 
 
-class WikiTestCase(TabTestCase):
-    """Test cases for Wiki Tab."""
-
-    def check_wiki_tab(self):
-        """Helper function for verifying the wiki tab."""
-        return self.check_tab(
-            tab_class=tabs.WikiTab,
-            dict_tab={'type': tabs.WikiTab.type, 'name': 'same'},
-            expected_link=self.reverse('course_wiki', args=[self.course.id.to_deprecated_string()]),
-            expected_tab_id=tabs.WikiTab.type,
-            invalid_dict_tab=self.fake_dict_tab,
-        )
-
-    def test_wiki_enabled_and_public(self):
-        """
-        Test wiki tab when Enabled setting is True and the wiki is open to
-        the public.
-        """
-        self.settings.WIKI_ENABLED = True
-        self.course.allow_public_wiki_access = True
-        tab = self.check_wiki_tab()
-        self.check_can_display_results(tab)
-
-    def test_wiki_enabled_and_not_public(self):
-        """
-        Test wiki when it is enabled but not open to the public
-        """
-        self.settings.WIKI_ENABLED = True
-        self.course.allow_public_wiki_access = False
-        tab = self.check_wiki_tab()
-        self.check_can_display_results(tab, for_enrolled_users_only=True, for_staff_only=True)
-
-    def test_wiki_enabled_false(self):
-        """Test wiki tab when Enabled setting is False"""
-
-        self.settings.WIKI_ENABLED = False
-        tab = self.check_wiki_tab()
-        self.check_can_display_results(tab, expected_value=False)
-
-    def test_wiki_visibility(self):
-        """Test toggling of visibility of wiki tab"""
-
-        wiki_tab = tabs.WikiTab()
-        self.assertTrue(wiki_tab.is_hideable)
-        wiki_tab.is_hidden = True
-        self.assertTrue(wiki_tab['is_hidden'])
-        self.check_tab_json_methods(wiki_tab)
-        self.check_tab_equality(wiki_tab, wiki_tab.to_json())
-        wiki_tab['is_hidden'] = False
-        self.assertFalse(wiki_tab.is_hidden)
-
-
-class ExternalLinkTestCase(TabTestCase):
-    """Test cases for External Link Tab."""
-
-    def test_external_link(self):
-
-        link_value = 'link_value'
-        tab = self.check_tab(
-            tab_class=tabs.ExternalLinkTab,
-            dict_tab={'type': tabs.ExternalLinkTab.type, 'name': 'same', 'link': link_value},
-            expected_link=link_value,
-            expected_tab_id=None,
-            invalid_dict_tab=self.fake_dict_tab,
-        )
-        self.check_can_display_results(tab)
-        self.check_get_and_set_method_for_key(tab, 'link')
-
-
 class StaticTabTestCase(TabTestCase):
     """Test cases for Static Tab."""
 
@@ -262,8 +292,8 @@ class StaticTabTestCase(TabTestCase):
         url_slug = 'schmug'
 
         tab = self.check_tab(
-            tab_class=tabs.StaticTab,
-            dict_tab={'type': tabs.StaticTab.type, 'name': 'same', 'url_slug': url_slug},
+            tab_class=StaticCourseViewType,
+            dict_tab={'type': StaticCourseViewType.name, 'name': 'same', 'url_slug': url_slug},
             expected_link=self.reverse('static_tab', args=[self.course.id.to_deprecated_string(), url_slug]),
             expected_tab_id='static_tab_schmug',
             invalid_dict_tab=self.fake_dict_tab,
@@ -282,27 +312,25 @@ class TextbooksTestCase(TabTestCase):
 
         self.dict_tab = MagicMock()
         self.course.tabs = [
-            tabs.CoursewareTab(),
-            tabs.CourseInfoTab(),
-            tabs.TextbookTabs(),
-            tabs.PDFTextbookTabs(),
-            tabs.HtmlTextbookTabs(),
+            xmodule_tabs.CourseTab.from_json({'type': 'textbooks'}),
+            xmodule_tabs.CourseTab.from_json({'type': 'pdf_textbooks'}),
+            xmodule_tabs.CourseTab.from_json({'type': 'html_textbooks'}),
         ]
-        self.num_textbook_tabs = sum(1 for tab in self.course.tabs if isinstance(tab, tabs.TextbookTabsBase))
+        self.num_textbook_tabs = sum(1 for tab in self.course.tabs if tab.type in [
+            'textbooks', 'pdf_textbooks', 'html_textbooks'
+        ])
         self.num_textbooks = self.num_textbook_tabs * len(self.books)
 
-    @patch('xmodule.tabs.is_user_enrolled_or_staff')
-    def test_textbooks_enabled(self, is_enrolled_or_staff_mock):
-        is_enrolled_or_staff_mock.return_value = True
+    def test_textbooks_enabled(self):
 
         type_to_reverse_name = {'textbook': 'book', 'pdftextbook': 'pdf_book', 'htmltextbook': 'html_book'}
 
         self.settings.FEATURES['ENABLE_TEXTBOOK'] = True
         num_textbooks_found = 0
         user = self.create_mock_user(is_authenticated=True, is_staff=False, is_enrolled=True)
-        for tab in tabs.CourseTabList.iterate_displayable(self.course, self.settings, user=user):
+        for tab in xmodule_tabs.CourseTabList.iterate_displayable(self.course, self.settings, user=user):
             # verify all textbook type tabs
-            if isinstance(tab, tabs.SingleTextbookTab):
+            if tab.type == 'single_textbook':
                 book_type, book_index = tab.tab_id.split("/", 1)
                 expected_link = self.reverse(
                     type_to_reverse_name[book_type],
@@ -312,98 +340,6 @@ class TextbooksTestCase(TabTestCase):
                 self.assertTrue(tab.name.startswith('Book{0}'.format(book_index)))
                 num_textbooks_found = num_textbooks_found + 1
         self.assertEquals(num_textbooks_found, self.num_textbooks)
-
-    def test_textbooks_disabled(self):
-
-        self.settings.FEATURES['ENABLE_TEXTBOOK'] = False
-        tab = tabs.TextbookTabs(self.dict_tab)
-        self.check_can_display_results(tab, for_authenticated_users_only=True, expected_value=False)
-
-
-class GradingTestCase(TabTestCase):
-    """Test cases for Grading related Tabs."""
-
-    def check_grading_tab(self, tab_class, name, link_value):
-        """Helper function for verifying the grading tab."""
-        return self.check_tab(
-            tab_class=tab_class,
-            dict_tab={'type': tab_class.type, 'name': name},
-            expected_name=name,
-            expected_link=self.reverse(link_value, args=[self.course.id.to_deprecated_string()]),
-            expected_tab_id=tab_class.type,
-            invalid_dict_tab=None,
-        )
-
-    def test_grading_tabs(self):
-
-        peer_grading_tab = self.check_grading_tab(
-            tabs.PeerGradingTab,
-            'Peer grading',
-            'peer_grading'
-        )
-        self.check_can_display_results(peer_grading_tab, for_authenticated_users_only=True)
-        open_ended_grading_tab = self.check_grading_tab(
-            tabs.OpenEndedGradingTab,
-            'Open Ended Panel',
-            'open_ended_notifications'
-        )
-        self.check_can_display_results(open_ended_grading_tab, for_authenticated_users_only=True)
-        staff_grading_tab = self.check_grading_tab(
-            tabs.StaffGradingTab,
-            'Staff grading',
-            'staff_grading'
-        )
-        self.check_can_display_results(staff_grading_tab, for_staff_only=True)
-
-
-class NotesTestCase(TabTestCase):
-    """Test cases for Notes Tab."""
-
-    def check_notes_tab(self):
-        """Helper function for verifying the notes tab."""
-        return self.check_tab(
-            tab_class=tabs.NotesTab,
-            dict_tab={'type': tabs.NotesTab.type, 'name': 'same'},
-            expected_link=self.reverse('notes', args=[self.course.id.to_deprecated_string()]),
-            expected_tab_id=tabs.NotesTab.type,
-            invalid_dict_tab=self.fake_dict_tab,
-        )
-
-    def test_notes_tabs_enabled(self):
-        self.settings.FEATURES['ENABLE_STUDENT_NOTES'] = True
-        tab = self.check_notes_tab()
-        self.check_can_display_results(tab, for_authenticated_users_only=True)
-
-    def test_notes_tabs_disabled(self):
-        self.settings.FEATURES['ENABLE_STUDENT_NOTES'] = False
-        tab = self.check_notes_tab()
-        self.check_can_display_results(tab, expected_value=False)
-
-
-class SyllabusTestCase(TabTestCase):
-    """Test cases for Syllabus Tab."""
-
-    def check_syllabus_tab(self, expected_can_display_value):
-        """Helper function for verifying the syllabus tab."""
-
-        name = 'Syllabus'
-        tab = self.check_tab(
-            tab_class=tabs.SyllabusTab,
-            dict_tab={'type': tabs.SyllabusTab.type, 'name': name},
-            expected_name=name,
-            expected_link=self.reverse('syllabus', args=[self.course.id.to_deprecated_string()]),
-            expected_tab_id=tabs.SyllabusTab.type,
-            invalid_dict_tab=None,
-        )
-        self.check_can_display_results(tab, expected_value=expected_can_display_value)
-
-    def test_syllabus_tab_enabled(self):
-        self.course.syllabus_present = True
-        self.check_syllabus_tab(True)
-
-    def test_syllabus_tab_disabled(self):
-        self.course.syllabus_present = False
-        self.check_syllabus_tab(False)
 
 
 class KeyCheckerTestCase(unittest.TestCase):
@@ -418,10 +354,10 @@ class KeyCheckerTestCase(unittest.TestCase):
 
     def test_key_checker(self):
 
-        self.assertTrue(tabs.key_checker(self.valid_keys)(self.dict_value, raise_error=False))
-        self.assertFalse(tabs.key_checker(self.invalid_keys)(self.dict_value, raise_error=False))
-        with self.assertRaises(tabs.InvalidTabsException):
-            tabs.key_checker(self.invalid_keys)(self.dict_value)
+        self.assertTrue(xmodule_tabs.key_checker(self.valid_keys)(self.dict_value, raise_error=False))
+        self.assertFalse(xmodule_tabs.key_checker(self.invalid_keys)(self.dict_value, raise_error=False))
+        with self.assertRaises(xmodule_tabs.InvalidTabsException):
+            xmodule_tabs.key_checker(self.invalid_keys)(self.dict_value)
 
 
 class NeedNameTestCase(unittest.TestCase):
@@ -436,131 +372,50 @@ class NeedNameTestCase(unittest.TestCase):
         self.invalid_dict = {'a': 1, 'b': 2}
 
     def test_need_name(self):
-        self.assertTrue(tabs.need_name(self.valid_dict1))
-        self.assertTrue(tabs.need_name(self.valid_dict2))
-        self.assertTrue(tabs.need_name(self.valid_dict3))
-        with self.assertRaises(tabs.InvalidTabsException):
-            tabs.need_name(self.invalid_dict)
-
-
-class TabListTestCase(TabTestCase):
-    """Base class for Test cases involving tab lists."""
-
-    def setUp(self):
-        super(TabListTestCase, self).setUp()
-
-        # invalid tabs
-        self.invalid_tabs = [
-            # less than 2 tabs
-            [{'type': tabs.CoursewareTab.type}],
-            # missing course_info
-            [{'type': tabs.CoursewareTab.type}, {'type': tabs.DiscussionTab.type, 'name': 'fake_name'}],
-            # incorrect order
-            [{'type': tabs.CourseInfoTab.type, 'name': 'fake_name'}, {'type': tabs.CoursewareTab.type}],
-            # invalid type
-            [{'type': tabs.CoursewareTab.type}, {'type': tabs.CourseInfoTab.type, 'name': 'fake_name'}, {'type': 'fake_type'}],
-        ]
-
-        # tab types that should appear only once
-        unique_tab_types = [
-            tabs.CourseInfoTab.type,
-            tabs.CoursewareTab.type,
-            tabs.NotesTab.type,
-            tabs.TextbookTabs.type,
-            tabs.PDFTextbookTabs.type,
-            tabs.HtmlTextbookTabs.type,
-        ]
-
-        for unique_tab_type in unique_tab_types:
-            self.invalid_tabs.append([
-                {'type': tabs.CoursewareTab.type},
-                {'type': tabs.CourseInfoTab.type, 'name': 'fake_name'},
-                # add the unique tab multiple times
-                {'type': unique_tab_type},
-                {'type': unique_tab_type},
-            ])
-
-        # valid tabs
-        self.valid_tabs = [
-            # empty list
-            [],
-            # all valid tabs
-            [
-                {'type': tabs.CoursewareTab.type},
-                {'type': tabs.CourseInfoTab.type, 'name': 'fake_name'},
-                {'type': tabs.WikiTab.type, 'name': 'fake_name'},
-                {'type': tabs.DiscussionTab.type, 'name': 'fake_name'},
-                {'type': tabs.ExternalLinkTab.type, 'name': 'fake_name', 'link': 'fake_link'},
-                {'type': tabs.TextbookTabs.type},
-                {'type': tabs.PDFTextbookTabs.type},
-                {'type': tabs.HtmlTextbookTabs.type},
-                {'type': tabs.ProgressTab.type, 'name': 'fake_name'},
-                {'type': tabs.StaticTab.type, 'name': 'fake_name', 'url_slug': 'schlug'},
-                {'type': tabs.PeerGradingTab.type},
-                {'type': tabs.StaffGradingTab.type},
-                {'type': tabs.OpenEndedGradingTab.type},
-                {'type': tabs.NotesTab.type, 'name': 'fake_name'},
-                {'type': tabs.SyllabusTab.type},
-            ],
-            # with external discussion
-            [
-                {'type': tabs.CoursewareTab.type},
-                {'type': tabs.CourseInfoTab.type, 'name': 'fake_name'},
-                {'type': tabs.ExternalDiscussionTab.type, 'name': 'fake_name', 'link': 'fake_link'}
-            ],
-        ]
-
-        self.all_valid_tab_list = tabs.CourseTabList().from_json(self.valid_tabs[1])
-
-
-class ValidateTabsTestCase(TabListTestCase):
-    """Test cases for validating tabs."""
-
-    def test_validate_tabs(self):
-        tab_list = tabs.CourseTabList()
-        for invalid_tab_list in self.invalid_tabs:
-            with self.assertRaises(tabs.InvalidTabsException):
-                tab_list.from_json(invalid_tab_list)
-
-        for valid_tab_list in self.valid_tabs:
-            from_json_result = tab_list.from_json(valid_tab_list)
-            self.assertEquals(len(from_json_result), len(valid_tab_list))
+        self.assertTrue(xmodule_tabs.need_name(self.valid_dict1))
+        self.assertTrue(xmodule_tabs.need_name(self.valid_dict2))
+        self.assertTrue(xmodule_tabs.need_name(self.valid_dict3))
+        with self.assertRaises(xmodule_tabs.InvalidTabsException):
+            xmodule_tabs.need_name(self.invalid_dict)
 
 
 class CourseTabListTestCase(TabListTestCase):
     """Testing the generator method for iterating through displayable tabs"""
 
+    def has_tab(self, tab_list, tab_type):
+        """ Searches the given lab_list for a given tab_type. """
+        for tab in tab_list:
+            if tab.type == tab_type:
+                return True
+        return False
+
     def test_initialize_default_without_syllabus(self):
         self.course.tabs = []
         self.course.syllabus_present = False
-        tabs.CourseTabList.initialize_default(self.course)
-        self.assertTrue(tabs.SyllabusTab() not in self.course.tabs)
+        xmodule_tabs.CourseTabList.initialize_default(self.course)
+        self.assertFalse(self.has_tab(self.course.tabs, 'syllabus'))
 
     def test_initialize_default_with_syllabus(self):
         self.course.tabs = []
         self.course.syllabus_present = True
-        tabs.CourseTabList.initialize_default(self.course)
-        self.assertTrue(tabs.SyllabusTab() in self.course.tabs)
+        xmodule_tabs.CourseTabList.initialize_default(self.course)
+        self.assertTrue(self.has_tab(self.course.tabs, 'syllabus'))
 
     def test_initialize_default_with_external_link(self):
         self.course.tabs = []
         self.course.discussion_link = "other_discussion_link"
-        tabs.CourseTabList.initialize_default(self.course)
-        self.assertTrue(tabs.ExternalDiscussionTab(link_value="other_discussion_link") in self.course.tabs)
-        self.assertTrue(tabs.DiscussionTab() not in self.course.tabs)
+        xmodule_tabs.CourseTabList.initialize_default(self.course)
+        self.assertTrue(self.has_tab(self.course.tabs, 'external_discussion'))
+        self.assertFalse(self.has_tab(self.course.tabs, 'discussion'))
 
     def test_initialize_default_without_external_link(self):
         self.course.tabs = []
         self.course.discussion_link = ""
-        tabs.CourseTabList.initialize_default(self.course)
-        self.assertTrue(tabs.ExternalDiscussionTab() not in self.course.tabs)
-        self.assertTrue(tabs.DiscussionTab() in self.course.tabs)
+        xmodule_tabs.CourseTabList.initialize_default(self.course)
+        self.assertFalse(self.has_tab(self.course.tabs, 'external_discussion'))
+        self.assertTrue(self.has_tab(self.course.tabs, 'discussion'))
 
-    @patch('xmodule.tabs.is_user_enrolled_or_staff')
-    @patch('xmodule.tabs.is_user_staff')
-    def test_iterate_displayable(self, is_staff_mock, is_enrolled_or_staff_mock):
-        is_staff_mock.return_value = True
-        is_enrolled_or_staff_mock.return_value = True
+    def test_iterate_displayable(self):
         # enable all tab types
         self.settings.FEATURES['ENABLE_TEXTBOOK'] = True
         self.settings.FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
@@ -575,7 +430,7 @@ class CourseTabListTestCase(TabListTestCase):
         self.course.tabs = self.all_valid_tab_list
 
         # enumerate the tabs with no user
-        for i, tab in enumerate(tabs.CourseTabList.iterate_displayable(
+        for i, tab in enumerate(xmodule_tabs.CourseTabList.iterate_displayable(
                 self.course,
                 self.settings,
                 inline_collections=False
@@ -583,8 +438,9 @@ class CourseTabListTestCase(TabListTestCase):
             self.assertEquals(tab.type, self.course.tabs[i].type)
 
         # enumerate the tabs with a staff user
-        user = self.create_mock_user(is_authenticated=True, is_staff=True, is_enrolled=True)
-        for i, tab in enumerate(tabs.CourseTabList.iterate_displayable(
+        user = UserFactory(is_staff=True)
+        CourseEnrollment.enroll(user, self.course.id)
+        for i, tab in enumerate(xmodule_tabs.CourseTabList.iterate_displayable(
                 self.course,
                 self.settings,
                 user=user
@@ -598,15 +454,15 @@ class CourseTabListTestCase(TabListTestCase):
 
         # test including non-empty collections
         self.assertIn(
-            tabs.HtmlTextbookTabs(),
-            list(tabs.CourseTabList.iterate_displayable(self.course, self.settings, inline_collections=False)),
+            {'type': 'html_textbooks'},
+            list(xmodule_tabs.CourseTabList.iterate_displayable(self.course, self.settings, inline_collections=False)),
         )
 
         # test not including empty collections
         self.course.html_textbooks = []
         self.assertNotIn(
-            tabs.HtmlTextbookTabs(),
-            list(tabs.CourseTabList.iterate_displayable(self.course, self.settings, inline_collections=False)),
+            {'type': 'html_textbooks'},
+            list(xmodule_tabs.CourseTabList.iterate_displayable(self.course, self.settings, inline_collections=False)),
         )
 
     def test_get_tab_by_methods(self):
@@ -615,10 +471,10 @@ class CourseTabListTestCase(TabListTestCase):
         for tab in self.course.tabs:
 
             # get tab by type
-            self.assertEquals(tabs.CourseTabList.get_tab_by_type(self.course.tabs, tab.type), tab)
+            self.assertEquals(xmodule_tabs.CourseTabList.get_tab_by_type(self.course.tabs, tab.type), tab)
 
             # get tab by id
-            self.assertEquals(tabs.CourseTabList.get_tab_by_id(self.course.tabs, tab.tab_id), tab)
+            self.assertEquals(xmodule_tabs.CourseTabList.get_tab_by_id(self.course.tabs, tab.tab_id), tab)
 
 
 class DiscussionLinkTestCase(TabTestCase):
@@ -628,15 +484,9 @@ class DiscussionLinkTestCase(TabTestCase):
         super(DiscussionLinkTestCase, self).setUp()
 
         self.tabs_with_discussion = [
-            tabs.CoursewareTab(),
-            tabs.CourseInfoTab(),
-            tabs.DiscussionTab(),
-            tabs.TextbookTabs(),
+            xmodule_tabs.CourseTab.from_json({'type': 'discussion'}),
         ]
         self.tabs_without_discussion = [
-            tabs.CoursewareTab(),
-            tabs.CourseInfoTab(),
-            tabs.TextbookTabs(),
         ]
 
     @staticmethod
@@ -644,31 +494,33 @@ class DiscussionLinkTestCase(TabTestCase):
         """Custom reverse function"""
         def reverse_discussion_link(viewname, args):
             """reverse lookup for discussion link"""
-            if viewname == "django_comment_client.forum.views.forum_form_discussion" and args == [course.id.to_deprecated_string()]:
+            if viewname == "django_comment_client.forum.views.forum_form_discussion" and args == [unicode(course.id)]:
                 return "default_discussion_link"
         return reverse_discussion_link
 
     def check_discussion(
-        self, tab_list,
-        expected_discussion_link,
-        expected_can_display_value,
-        discussion_link_in_course="",
-        is_staff=True,
-        is_enrolled=True,
+            self, tab_list,
+            expected_discussion_link,
+            expected_can_display_value,
+            discussion_link_in_course="",
+            is_staff=True,
+            is_enrolled=True,
     ):
         """Helper function to verify whether the discussion tab exists and can be displayed"""
         self.course.tabs = tab_list
         self.course.discussion_link = discussion_link_in_course
-        discussion_tab = tabs.CourseTabList.get_discussion(self.course)
+        discussion_tab = xmodule_tabs.CourseTabList.get_discussion(self.course)
         user = self.create_mock_user(is_authenticated=True, is_staff=is_staff, is_enrolled=is_enrolled)
-        self.assertEquals(
-            (
-                discussion_tab is not None and
-                self.is_tab_enabled(discussion_tab, self.course, self.settings, user) and
-                (discussion_tab.link_func(self.course, self._reverse(self.course)) == expected_discussion_link)
-            ),
-            expected_can_display_value
-        )
+        with patch('student.models.CourseEnrollment.is_enrolled') as check_is_enrolled:
+            check_is_enrolled.return_value = is_enrolled
+            self.assertEquals(
+                (
+                    discussion_tab is not None and
+                    self.is_tab_enabled(discussion_tab, self.course, self.settings, user) and
+                    (discussion_tab.link_func(self.course, self._reverse(self.course)) == expected_discussion_link)
+                ),
+                expected_can_display_value
+            )
 
     def test_explicit_discussion_link(self):
         """Test that setting discussion_link overrides everything else"""

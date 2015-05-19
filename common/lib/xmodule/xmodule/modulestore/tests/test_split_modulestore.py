@@ -1,6 +1,7 @@
 """
     Test split modulestore w/o using any django stuff.
 """
+from mock import patch
 import datetime
 from importlib import import_module
 from path import path
@@ -34,6 +35,14 @@ from xmodule.modulestore.edit_info import EditInfoMixin
 
 BRANCH_NAME_DRAFT = ModuleStoreEnum.BranchName.draft
 BRANCH_NAME_PUBLISHED = ModuleStoreEnum.BranchName.published
+
+
+def mock_tab_from_json(tab_dict):
+    """
+    Mocks out the CourseTab.from_json to just return the tab_dict itself so that we don't have to deal
+    with plugin errors.
+    """
+    return tab_dict
 
 
 @attr('mongo')
@@ -596,7 +605,8 @@ class SplitModuleCourseTests(SplitModuleTest):
     Course CRUD operation tests
     '''
 
-    def test_get_courses(self):
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_get_courses(self, _from_json):
         courses = modulestore().get_courses(branch=BRANCH_NAME_DRAFT)
         # should have gotten 3 draft courses
         self.assertEqual(len(courses), 3, "Wrong number of courses")
@@ -635,7 +645,8 @@ class SplitModuleCourseTests(SplitModuleTest):
         courses = modulestore().get_courses(branch=BRANCH_NAME_DRAFT)
         self.assertEqual(len(courses), 3)
 
-    def test_branch_requests(self):
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_branch_requests(self, _from_json):
         # query w/ branch qualifier (both draft and published)
         def _verify_published_course(courses_published):
             """ Helper function for verifying published course. """
@@ -665,7 +676,8 @@ class SplitModuleCourseTests(SplitModuleTest):
             locator_key_fields=['org', 'course', 'run']
         )
 
-    def test_get_course(self):
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_get_course(self, _from_json):
         '''
         Test the various calling forms for get_course
         '''

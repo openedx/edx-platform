@@ -12,7 +12,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from courseware.courses import get_course_by_id
 from courseware.tests.helpers import get_request_for_user, LoginEnrollmentTestCase
 from courseware.tests.factories import InstructorFactory, StaffFactory
-from xmodule import tabs
+from xmodule import tabs as xmodule_tabs
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MIXED_TOY_MODULESTORE, TEST_DATA_MIXED_CLOSED_MODULESTORE
 )
@@ -38,6 +38,10 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             category="static_tab", parent_location=self.course.location,
             data="OOGIE BLOOGIE", display_name="new_tab"
         )
+        self.course.tabs.append(xmodule_tabs.CourseTab.from_json({
+            'type': 'static_tab', 'name': 'New Tab', 'url_slug': 'new_tab',
+        }))
+        self.course.save()
         self.toy_course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
     def test_logged_in(self):
@@ -63,7 +67,7 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.setup_user()
         course = get_course_by_id(self.toy_course_key)
         request = get_request_for_user(self.user)
-        tab = tabs.CourseTabList.get_tab_by_slug(course.tabs, 'resources')
+        tab = xmodule_tabs.CourseTabList.get_tab_by_slug(course.tabs, 'resources')
 
         # Test render works okay
         tab_content = get_static_tab_contents(request, course, tab)
@@ -223,27 +227,22 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
 
 @attr('shard_1')
-class TextBookTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+class TextBookCourseViewsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Validate tab behavior when dealing with textbooks.
     """
     MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
 
     def setUp(self):
-        super(TextBookTabsTestCase, self).setUp()
+        super(TextBookCourseViewsTestCase, self).setUp()
 
         self.course = CourseFactory.create()
         self.set_up_books(2)
-        self.course.tabs = [
-            tabs.CoursewareTab(),
-            tabs.CourseInfoTab(),
-            tabs.TextbookTabs(),
-            tabs.PDFTextbookTabs(),
-            tabs.HtmlTextbookTabs(),
-        ]
         self.setup_user()
         self.enroll(self.course)
-        self.num_textbook_tabs = sum(1 for tab in self.course.tabs if isinstance(tab, tabs.TextbookTabsBase))
+        self.num_textbook_tabs = sum(1 for tab in self.course.tabs if tab.type in [
+            'textbooks', 'pdf_textbooks', 'html_textbooks'
+        ])
         self.num_textbooks = self.num_textbook_tabs * len(self.books)
 
     def set_up_books(self, num_books):
@@ -265,7 +264,7 @@ class TextBookTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         num_of_textbooks_found = 0
         for tab in course_tab_list:
             # Verify links of all textbook type tabs.
-            if isinstance(tab, tabs.SingleTextbookTab):
+            if tab.type == 'single_textbook':
                 book_type, book_index = tab.tab_id.split("/", 1)
                 expected_link = reverse(
                     type_to_reverse_name[book_type],
@@ -275,3 +274,9 @@ class TextBookTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
                 self.assertEqual(tab_link, expected_link)
                 num_of_textbooks_found += 1
         self.assertEqual(num_of_textbooks_found, self.num_textbooks)
+
+    def test_textbooks_disabled(self):
+
+        with self.settings(FEATURES={'ENABLE_TEXTBOOK': False}):
+            tab = xmodule_tabs.CourseTab.from_json({'type': 'textbooks'})
+            self.assertFalse(tab.is_enabled(self.course, settings, self.user))

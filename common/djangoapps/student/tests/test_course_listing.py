@@ -112,20 +112,6 @@ class TestCourseListing(ModuleStoreTestCase):
         self._create_course_with_access_groups(course_location, default_store=ModuleStoreEnum.Type.mongo)
         mongo_store.delete_course(course_location, ModuleStoreEnum.UserID.test)
 
-        course_location = mongo_store.make_course_key('testOrg', 'erroredCourse', 'RunBabyRun')
-        course = self._create_course_with_access_groups(course_location, default_store=ModuleStoreEnum.Type.mongo)
-        course_db_record = mongo_store._find_one(course.location)
-        course_db_record.setdefault('metadata', {}).get('tabs', []).append({
-            "type": "wiko",
-            "name": "Wiki",
-        })
-        mongo_store.collection.update(
-            {'_id': course.location.to_deprecated_son()},
-            {'$set': {
-                'metadata.tabs': course_db_record['metadata']['tabs'],
-            }},
-        )
-
         courses_list = list(get_course_enrollment_pairs(self.student, None, []))
         self.assertEqual(len(courses_list), 1, courses_list)
         self.assertEqual(courses_list[0][0].id, good_location)

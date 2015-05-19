@@ -35,7 +35,8 @@ class TestXMLModuleStore(unittest.TestCase):
         store = XMLModuleStore(DATA_DIR, source_dirs=[])
         self.assertEqual(store.get_modulestore_type(), ModuleStoreEnum.Type.xml)
 
-    def test_unicode_chars_in_xml_content(self):
+    @patch('xmodule.tabs.CourseTabList.initialize_default')
+    def test_unicode_chars_in_xml_content(self, _initialize_default_mock):
         # edX/full/6.002_Spring_2012 has non-ASCII chars, and during
         # uniquification of names, would raise a UnicodeError. It no longer does.
 

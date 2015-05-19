@@ -4,10 +4,10 @@ Registers the "edX Notes" feature for the edX platform.
 
 from django.utils.translation import ugettext as _
 
-from openedx.core.lib.plugins.api import CourseViewType
+from courseware.tabs import EnrolledCourseViewType
 
 
-class EdxNotesCourseViewType(CourseViewType):
+class EdxNotesCourseViewType(EnrolledCourseViewType):
     """
     The representation of the edX Notes course view type.
     """
@@ -15,10 +15,6 @@ class EdxNotesCourseViewType(CourseViewType):
     name = "edxnotes"
     title = _("Notes")
     view_name = "edxnotes"
-    is_persistent = True
-
-    # The course field that indicates that this feature is enabled
-    feature_flag_field_name = "edxnotes"
 
     @classmethod
     def is_enabled(cls, course, settings, user=None):  # pylint: disable=unused-argument
@@ -29,4 +25,6 @@ class EdxNotesCourseViewType(CourseViewType):
             settings (dict): a dict of configuration settings
             user (User): the user interacting with the course
         """
-        return course.edxnotes
+        if not course.edxnotes:
+            return False
+        return super(EdxNotesCourseViewType, cls).is_enabled(course, settings, user=user)
