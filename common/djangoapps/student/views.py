@@ -51,11 +51,13 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from course_modes.models import CourseMode
 from shoppingcart.api import order_history
 from student.models import (
-    Registration, UserProfile, PendingNameChange,
-    PendingEmailChange, CourseEnrollment, unique_id_for_user,
-    CourseEnrollmentAllowed, UserStanding, LoginFailures,
-    create_comments_service_user, PasswordHistory, UserSignupSource,
-    DashboardConfiguration, LinkedInAddToProfileConfiguration)
+    anonymous_id_for_user, Registration, UserProfile,
+    PendingNameChange, PendingEmailChange, CourseEnrollment,
+    unique_id_for_user, CourseEnrollmentAllowed, UserStanding,
+    LoginFailures, create_comments_service_user, PasswordHistory,
+    UserSignupSource, DashboardConfiguration,
+    LinkedInAddToProfileConfiguration
+)
 from student.forms import AccountCreationForm, PasswordResetFormNoActive
 
 from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow
@@ -1765,9 +1767,9 @@ def auto_auth(request):
 
     # Provide the user with a valid CSRF token
     # then return a 200 response
-    success_msg = u"{} user {} ({}) with password {} and user_id {}".format(
+    success_msg = u"{} user {} ({}) with password {} and user_id {} and anonymous user_id {}".format(
         u"Logged in" if login_when_done else "Created",
-        username, email, password, user.id
+        username, email, password, user.id, anonymous_id_for_user(user, None)
     )
     response = HttpResponse(success_msg)
     response.set_cookie('csrftoken', csrf(request)['csrf_token'])
