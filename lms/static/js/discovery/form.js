@@ -15,8 +15,6 @@ define(['jquery', 'backbone'], function ($, Backbone) {
             this.$searchButton = this.$el.find('button');
             this.$message = this.$el.find('#discovery-message');
             this.$loadingIndicator = this.$el.find('#loading-indicator');
-            this.errorTemplate = _.template($('#error-tpl').html());
-            this.notFoundTemplate = _.template($('#not_found-tpl').html());
         },
 
         submitForm: function (event) {
@@ -48,14 +46,15 @@ define(['jquery', 'backbone'], function ($, Backbone) {
             this.$loadingIndicator.addClass('hidden');
         },
 
-        showNotFoundMessage: function (searchTerm) {
-            var msg = this.notFoundTemplate({term: searchTerm});
+        showNotFoundMessage: function (term) {
+            var msg = term != '' ?
+                interpolate(gettext('We couldn\'t find any results for "%s."'), [term]) :
+                gettext('We couldn\'t find any results.');
             this.$message.html(msg);
         },
 
         showErrorMessage: function () {
-            var msg = this.errorTemplate();
-            this.$message.html(msg);
+            this.$message.html(gettext('There was an error, try searching again.'));
         }
 
     });
