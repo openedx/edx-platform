@@ -1,1 +1,0 @@
-<%= interpolate(gettext("We couldn't find any results for \"%s.\""), [term]) %>

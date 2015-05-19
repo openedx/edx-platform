@@ -257,10 +257,6 @@ define([
 
         beforeEach(function () {
             loadFixtures('js/fixtures/discovery.html');
-            TemplateHelpers.installTemplates([
-                'templates/discovery/not_found',
-                'templates/discovery/error'
-            ]);
             this.form = new DiscoveryForm();
             this.onSearch = jasmine.createSpy('onSearch');
             this.form.on('search', this.onSearch);
@@ -443,11 +439,7 @@ define([
         beforeEach(function () {
             jasmine.Clock.useMock();
             loadFixtures('js/fixtures/discovery.html');
-            TemplateHelpers.installTemplates([
-                'templates/discovery/result_item',
-                'templates/discovery/not_found',
-                'templates/discovery/error'
-            ]);
+            TemplateHelpers.installTemplate('templates/discovery/result_item');
             var collection = new Collection([JSON_RESPONSE.results[0].data]);
             collection.latestModelsCount = 1;
             this.view = new ResultListView({ collection: collection });
@@ -493,8 +485,6 @@ define([
                 'templates/discovery/search_facet',
                 'templates/discovery/search_facets_section',
                 'templates/discovery/search_facets_list',
-                'templates/discovery/not_found',
-                'templates/discovery/error',
                 'templates/discovery/more_less_links'
             ]);
             this.server = Sinon.fakeServer.create();
