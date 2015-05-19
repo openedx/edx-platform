@@ -16,6 +16,7 @@ metadata:
        [x] French
        [ ] Hungarian
 
+
        Note: Make sure you select all of the correct options—there may be more than one!
 
        [explanation]
@@ -28,18 +29,16 @@ data: |
         <p>When you add the component, be sure to select <strong>Settings</strong> 
         to specify a <strong>Display Name</strong> and other values that apply.</p>
         <p>You can use the following example problem as a model.</p>
-        <fieldset>
-          <legend>The following languages are in the Indo-European family:</legend>
-          <choiceresponse>
-            <checkboxgroup direction="vertical">
-              <choice correct="true" name="urdu">Urdu</choice>
-              <choice correct="false" name="finnish">Finnish</choice>
-              <choice correct="true" name="marathi">Marathi</choice>
-              <choice correct="true" name="french">French</choice>
-              <choice correct="false" name="hungarian">Hungarian</choice>
-            </checkboxgroup>
-          </choiceresponse>
-        </fieldset>
+        <legend>The following languages are in the Indo-European family:</legend>
+        <choiceresponse>
+          <checkboxgroup direction="vertical">
+            <choice correct="true" name="urdu">Urdu</choice>
+            <choice correct="false" name="finnish">Finnish</choice>
+            <choice correct="true" name="marathi">Marathi</choice>
+            <choice correct="true" name="french">French</choice>
+            <choice correct="false" name="hungarian">Hungarian</choice>
+          </checkboxgroup>
+        </choiceresponse>
         <p><strong>Note</strong>: Make sure you select all of the correct options—there may be more than one!</p>
         <solution>
          <div class="detailed-solution">

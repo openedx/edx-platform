@@ -509,7 +509,7 @@ describe 'MarkdownEditingDescriptor', ->
         [Explanation]
         """)
       expect(data).toEqual("""<problem>
-    <p>Who lead the civil right movement in the United States of America?</p>
+    <legend>Who lead the civil right movement in the United States of America?</legend>
     <stringresponse answer="w*.?s*Luther Kings*.*" type="ci regexp" >
       <textline label="Who lead the civil right movement in the United States of America?" size="20"/>
     </stringresponse>
@@ -541,14 +541,14 @@ describe 'MarkdownEditingDescriptor', ->
       expect(data).toEqual("""<problem>
     <p>France is a country in Europe.</p>
     
-    <p>What is the capital of France?</p>
+    <legend>What is the capital of France?</legend>
     <stringresponse answer="Paris" type="ci" >
       <textline label="What is the capital of France?" size="20"/>
     </stringresponse>
     
     <p>Germany is a country in Europe, too.</p>
     
-    <p>What is the capital of Germany?</p>
+    <legend>What is the capital of Germany?</legend>
     <multiplechoiceresponse>
       <choicegroup label="What is the capital of Germany?" type="MultipleChoice">
         <choice correct="false">Bonn</choice>
@@ -574,11 +574,12 @@ describe 'MarkdownEditingDescriptor', ->
         ( ) Hamburg
         (x) Berlin
         ( ) Donut
+
         """)
       expect(data).toEqual("""<problem>
     <p>France is a country in Europe.</p>
-    
-    <p>What is the capital of France?</p>
+
+    <legend>What is the capital of France?</legend>
     <stringresponse answer="Paris" type="ci" >
       <textline label="What is the capital of France?" size="20"/>
     </stringresponse>
@@ -594,8 +595,8 @@ describe 'MarkdownEditingDescriptor', ->
         <choice correct="false">Donut</choice>
       </choicegroup>
     </multiplechoiceresponse>
-    
-    
+
+
     </problem>""")
     it 'tests malformed labels', ->
       data = MarkdownEditingDescriptor.markdownToXml("""
@@ -604,7 +605,7 @@ describe 'MarkdownEditingDescriptor', ->
         >>What is the capital of France?<
         = Paris
 
-        blah>>What is the capital of <<Germany?<<
+        >>What is the capital of <<Germany?<<
         ( ) Bonn
         ( ) Hamburg
         (x) Berlin
@@ -618,7 +619,7 @@ describe 'MarkdownEditingDescriptor', ->
       <textline size="20"/>
     </stringresponse>
     
-    <p>blahWhat is the capital of Germany?</p>
+    <legend>What is the capital of Germany?</legend>
     <multiplechoiceresponse>
       <choicegroup label="What is the capital of &lt;&lt;Germany?" type="MultipleChoice">
         <choice correct="false">Bonn</choice>
@@ -636,7 +637,7 @@ describe 'MarkdownEditingDescriptor', ->
       = 3.14159 +- .02
       """)
       expect(data).toEqual("""<problem>
-    <p>Enter the numerical value of Pi:</p>
+    <legend>Enter the numerical value of Pi:</legend>
     <numericalresponse answer="3.14159">
       <responseparam type="tolerance" default=".02" />
       <formulaequationinput label="Enter the numerical value of Pi:" />
@@ -650,7 +651,7 @@ describe 'MarkdownEditingDescriptor', ->
       = Paris
       """)
       expect(data).toEqual("""<problem>
-    <p>What is the "capital" of France & the 'best' > place < to live"?</p>
+    <legend>What is the "capital" of France & the 'best' > place < to live"?</legend>
     <stringresponse answer="Paris" type="ci" >
       <textline label="What is the &quot;capital&quot; of France &amp; the &apos;best&apos; &gt; place &lt; to live&quot;?" size="20"/>
     </stringresponse>

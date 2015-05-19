@@ -214,6 +214,7 @@ class InputTypeBase(object):
         self.hintmode = feedback.get('hintmode', None)
         self.input_state = state.get('input_state', {})
         self.answervariable = state.get("answervariable", None)
+        self.question_label = state.get("question_label", None)
 
         # put hint above msg if it should be displayed
         if self.hintmode == 'always':
@@ -313,6 +314,7 @@ class InputTypeBase(object):
         context.update(self._extra_context())
         if self.answervariable:
             context.update({'answervariable': self.answervariable})
+        context.update({'question_label': self.question_label if self.question_label is not None else ""})
         return context
 
     def _extra_context(self):

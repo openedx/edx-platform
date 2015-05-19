@@ -126,6 +126,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         self.context = {'id': '1',
                         'choices': choices,
                         'status': Status('correct'),
+                        'question_label': 'test',
                         'label': 'test',
                         'input_type': 'checkbox',
                         'name_array_suffix': '1',
@@ -141,6 +142,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         self.context['status'] = Status('correct')
         self.context['input_type'] = 'checkbox'
         self.context['value'] = ['1', '2']
+        self.context['question_label'] = ['']
 
         # Should mark the entire problem correct
         xml = self.render_to_xml(self.context)
@@ -222,8 +224,8 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         (not the entire problem) is marked correct.
         """
         conditions = [
-            {'input_type': 'radio', 'value': '2'},
-            {'input_type': 'radio', 'value': ['2']}]
+            {'input_type': 'radio', 'question_label': '', 'value': '2'},
+            {'input_type': 'radio', 'question_label': '', 'value': ['2']}]
 
         self.context['status'] = Status('correct')
 
@@ -270,16 +272,16 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         """
 
         conditions = [
-            {'input_type': 'radio', 'status': Status('correct'), 'value': ''},
-            {'input_type': 'radio', 'status': Status('correct'), 'value': '2'},
-            {'input_type': 'radio', 'status': Status('correct'), 'value': ['2']},
-            {'input_type': 'radio', 'status': Status('incorrect'), 'value': '2'},
-            {'input_type': 'radio', 'status': Status('incorrect'), 'value': []},
-            {'input_type': 'radio', 'status': Status('incorrect'), 'value': ['2']},
-            {'input_type': 'checkbox', 'status': Status('correct'), 'value': []},
-            {'input_type': 'checkbox', 'status': Status('correct'), 'value': ['2']},
-            {'input_type': 'checkbox', 'status': Status('incorrect'), 'value': []},
-            {'input_type': 'checkbox', 'status': Status('incorrect'), 'value': ['2']}]
+            {'input_type': 'radio', 'status': Status('correct'), 'question_label': '', 'value': ''},
+            {'input_type': 'radio', 'status': Status('correct'), 'question_label': '', 'value': '2'},
+            {'input_type': 'radio', 'status': Status('correct'), 'question_label': '', 'value': ['2']},
+            {'input_type': 'radio', 'status': Status('incorrect'), 'question_label': '', 'value': '2'},
+            {'input_type': 'radio', 'status': Status('incorrect'), 'question_label': '', 'value': []},
+            {'input_type': 'radio', 'status': Status('incorrect'), 'question_label': '', 'value': ['2']},
+            {'input_type': 'checkbox', 'status': Status('correct'), 'question_label': '', 'value': []},
+            {'input_type': 'checkbox', 'status': Status('correct'), 'question_label': '', 'value': ['2']},
+            {'input_type': 'checkbox', 'status': Status('incorrect'), 'question_label': '', 'value': []},
+            {'input_type': 'checkbox', 'status': Status('incorrect'), 'question_label': '', 'value': ['2']}]
 
         self.context['show_correctness'] = 'never'
         self.context['submitted_message'] = 'Test message'
@@ -315,9 +317,9 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         """
 
         conditions = [
-            {'input_type': 'radio', 'status': Status('unsubmitted'), 'value': ''},
-            {'input_type': 'radio', 'status': Status('unsubmitted'), 'value': []},
-            {'input_type': 'checkbox', 'status': Status('unsubmitted'), 'value': []},
+            {'input_type': 'radio', 'status': Status('unsubmitted'), 'question_label': '', 'value': ''},
+            {'input_type': 'radio', 'status': Status('unsubmitted'), 'question_label': '', 'value': []},
+            {'input_type': 'checkbox', 'status': Status('unsubmitted'), 'question_label': '', 'value': []},
 
             # These tests expose bug #365
             # When the bug is fixed, uncomment these cases.
@@ -341,8 +343,8 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
 
     def test_label(self):
         xml = self.render_to_xml(self.context)
-        xpath = "//fieldset[@aria-label='%s']" % self.context['label']
-        self.assert_has_xpath(xml, xpath, self.context)
+        xpath = "//fieldset/legend"
+        self.assert_has_text(xml, xpath, self.context['question_label'])
 
 
 class TextlineTemplateTest(TemplateTestCase):
@@ -925,7 +927,7 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
         (not the entire problem) is marked correct."""
 
         conditions = [
-            {'input_type': 'radio', 'value': self.VALUE_DICT}]
+            {'input_type': 'radio', 'question_label': '', 'value': self.VALUE_DICT}]
 
         self.context['status'] = 'correct'
 
@@ -945,7 +947,7 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
         (not the entire problem) is marked incorrect."""
 
         conditions = [
-            {'input_type': 'radio', 'value': self.VALUE_DICT}]
+            {'input_type': 'radio', 'question_label': '', 'value': self.VALUE_DICT}]
 
         self.context['status'] = 'incorrect'
 
