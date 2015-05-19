@@ -26,8 +26,7 @@ define('video/09_poster.js', ['video/00_resizer.js'], function (Resizer) {
         template: _.template([
             '<div class="video-pre-roll is-<%= type %> poster" ',
                 'style="background-image: url(<%= url %>)">',
-                '<span tabindex="0" class="btn-play" aria-label="',
-                    gettext('Play video'), '"></span>',
+                '<button class="btn-play">', gettext('Play video'), '</button>',
             '</div>'
         ].join('')),
 
