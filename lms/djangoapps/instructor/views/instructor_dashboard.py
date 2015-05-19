@@ -23,7 +23,7 @@ from util.json_request import JsonResponse
 from mock import patch
 
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
-from xmodule_modifiers import wrap_xblock
+from openedx.core.lib.xblock_utils import wrap_xblock
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore.django import modulestore
 from xblock.field_data import DictFieldData
@@ -33,7 +33,7 @@ from courseware.courses import get_course_by_id, get_studio_url
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
-from shoppingcart.models import Coupon, PaidCourseRegistration
+from shoppingcart.models import Coupon, PaidCourseRegistration, CourseRegCodeItem
 from course_modes.models import CourseMode, CourseModesArchive
 from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
 from certificates.models import CertificateGenerationConfiguration
@@ -158,7 +158,9 @@ def _section_e_commerce(course, access, paid_mode, coupons_enabled):
 
     total_amount = None
     if access['finance_admin']:
-        total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(course_key)
+        single_purchase_total = PaidCourseRegistration.get_total_amount_of_purchased_item(course_key)
+        bulk_purchase_total = CourseRegCodeItem.get_total_amount_of_purchased_item(course_key)
+        total_amount = single_purchase_total + bulk_purchase_total
 
     section_data = {
         'section_key': 'e-commerce',

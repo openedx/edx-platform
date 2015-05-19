@@ -1,25 +1,23 @@
-<!DOCTYPE html>
-<!--[if IE 7]><html class="ie ie7 lte9 lte8 lte7" lang="${LANGUAGE_CODE}"><![endif]-->
-<!--[if IE 8]><html class="ie ie8 lte9 lte8" lang="${LANGUAGE_CODE}"><![endif]-->
-<!--[if IE 9]><html class="ie ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
-<!--[if gt IE 9]><!--><html lang="${LANGUAGE_CODE}"><!--<![endif]-->
-<%
-    # set doc language direction
-    from django.utils.translation import get_language_bidi
-    dir_rtl = 'rtl' if get_language_bidi() else 'ltr'
+## coding=utf-8
+<%namespace name='static' file='static_content.html'/>
+<%!
+from django.utils.http import urlquote_plus
+from django.utils.translation import ugettext as _
+from django.utils.translation import get_language_bidi
+from microsite_configuration import microsite
+from microsite_configuration import page_title_breadcrumbs
+
+dir_rtl = 'rtl' if get_language_bidi() else 'ltr'
 %>
+<!DOCTYPE html>
+<!--[if lte IE 9]><html class="ie ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
+<!--[if !IE]><!--><html lang="${LANGUAGE_CODE}"><!--<![endif]-->
 <head dir="${dir_rtl}">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     % if responsive:
     <meta name="viewport" content="width=device-width, initial-scale=1">
     % endif
-<%! from django.utils.translation import ugettext as _ %>
-<%! from microsite_configuration import microsite %>
-<%! from microsite_configuration import page_title_breadcrumbs %>
-
-<%namespace name='static' file='static_content.html'/>
-<%! from django.utils.http import urlquote_plus %>
 
 ## Define a couple of helper functions to make life easier when
 ## embedding theme conditionals into templates. All inheriting
@@ -65,7 +63,7 @@
   <link rel="icon" type="image/x-icon" href="${static.url(microsite.get_value('favicon_path', settings.FAVICON_PATH))}" />
 
   <%static:css group='style-vendor'/>
-  <%static:css group='style-app'/>
+  <%static:css group='style-main'/>
 
   % if disable_courseware_js:
     <%static:js group='base_vendor'/>
@@ -117,10 +115,6 @@
     <%include file="${header_extra_file}" />
   % endif
 
-  <!--[if lt IE 9]>
-    <script src="${static.url('js/html5shiv.js')}"></script>
-  <![endif]-->
-
   <%include file="widgets/optimizely.html" />
   <%include file="widgets/segment-io.html" />
 
@@ -139,8 +133,6 @@
   <div class="window-wrap" dir="${dir_rtl}">
     <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to main content")}</a>
 
-    <%include file="mathjax_accessible.html" />
-
     % if not disable_header:
         <%include file="${header_file}" />
     % endif
@@ -156,8 +148,10 @@
           <%
             if theme_enabled() and not is_microsite():
               footer_file = 'theme-footer.html'
+            elif settings.FEATURES.get('IS_EDX_DOMAIN', False) and  settings.FEATURES.get('ENABLE_FOOTER_V3', True) and not is_microsite():
+              footer_file = microsite.get_template_path('footer-edx-v3.html')
             elif settings.FEATURES.get('IS_EDX_DOMAIN', False) and not is_microsite():
-              footer_file = microsite.get_template_path('footer-edx-new.html')
+              footer_file = microsite.get_template_path('footer-edx-v2.html')
             else:
               footer_file = microsite.get_template_path('footer.html')
           %>

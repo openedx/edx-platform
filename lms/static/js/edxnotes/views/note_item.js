@@ -13,6 +13,7 @@ define([
         events: {
             'click .note-excerpt-more-link': 'moreHandler',
             'click .reference-unit-link': 'unitLinkHandler',
+            'click .reference-tags': 'tagHandler'
         },
 
         initialize: function (options) {
@@ -54,6 +55,11 @@ define([
             }, REQUEST_TIMEOUT).always(_.bind(function () {
                 this.redirectTo(event.target.href);
             }, this));
+        },
+
+        tagHandler: function (event) {
+            event.preventDefault();
+            this.options.scrollToTag(event.currentTarget.text);
         },
 
         redirectTo: function (uri) {

@@ -1,6 +1,11 @@
 // studio - views - course settings
 // ====================
+// Table of Contents
+// * +Settings - Base / All
+// * +Settings - Licenses
 
+// +Settings - Base / All
+// ====================
 .view-settings {
   @include text-align(left);
   @include direction();
@@ -104,10 +109,11 @@
       margin-top: ($baseline/4);
       color: $gray-d1;
     }
-    .tip-inline{
-    display: inline;
-    margin-left: 5px;
-  }
+
+    .tip-inline {
+      display: inline;
+      @include margin-left($baseline/4);
+    }
 
     .message-error {
       @extend %t-copy-sub1;
@@ -149,6 +155,7 @@
            }
          }
       }
+
       #heading-entrance-exam{
         font-weight: 600;
       }
@@ -156,6 +163,7 @@
       label[for="entrance-exam-enabled"] {
         font-size: 14px;
       }
+
       .field {
         margin: 0 0 ($baseline*2) 0;
 

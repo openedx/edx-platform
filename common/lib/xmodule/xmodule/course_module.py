@@ -16,6 +16,7 @@ from xmodule.exceptions import UndefinedContext
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.graders import grader_from_conf
 from xmodule.tabs import CourseTabList
+from xmodule.mixin import LicenseMixin
 import json
 
 from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
@@ -846,6 +847,15 @@ class CourseFields(object):
         scope=Scope.settings,
     )
 
+    teams_configuration = Dict(
+        display_name=_("Teams Configuration"),
+        help=_(
+            "Enter configuration for the teams feature. Expects two entries: max_team_size and topics, where "
+            "topics is a list of topics."
+        ),
+        scope=Scope.settings
+    )
+
 
 class CourseModule(CourseFields, SequenceModule):  # pylint: disable=abstract-method
     """
@@ -855,7 +865,10 @@ class CourseModule(CourseFields, SequenceModule):  # pylint: disable=abstract-me
     """
 
 
-class CourseDescriptor(CourseFields, SequenceDescriptor):
+class CourseDescriptor(CourseFields, LicenseMixin, SequenceDescriptor):
+    """
+    The descriptor for the course XModule
+    """
     module_class = CourseModule
 
     def __init__(self, *args, **kwargs):
@@ -986,9 +999,11 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             xml_object.remove(wiki_tag)
 
         definition, children = super(CourseDescriptor, cls).definition_from_xml(xml_object, system)
-
         definition['textbooks'] = textbooks
         definition['wiki_slug'] = wiki_slug
+
+        # load license if it exists
+        definition = LicenseMixin.parse_license_from_xml(definition, xml_object)
 
         return definition, children
 
@@ -1007,6 +1022,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             wiki_xml_object = etree.Element('wiki')
             wiki_xml_object.set('slug', self.wiki_slug)
             xml_object.append(wiki_xml_object)
+
+        # handle license specifically. Default the course to have a license
+        # of "All Rights Reserved", if a license is not explicitly set.
+        self.add_license_to_xml(xml_object, default="all-rights-reserved")
 
         return xml_object
 
@@ -1408,3 +1427,28 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         return "course_{}".format(
             b32encode(unicode(self.location.course_key)).replace('=', padding_char)
         )
+
+    @property
+    def teams_enabled(self):
+        """
+        Returns whether or not teams has been enabled for this course.
+
+        Currently, teams are considered enabled when at least one topic has been configured for the course.
+        """
+        if self.teams_configuration:
+            return len(self.teams_configuration.get('topics', [])) > 0
+        return False
+
+    @property
+    def teams_max_size(self):
+        """
+        Returns the max size for teams if teams has been configured, else None.
+        """
+        return self.teams_configuration.get('max_team_size', None)
+
+    @property
+    def teams_topics(self):
+        """
+        Returns the topics that have been configured for teams for this course, else None.
+        """
+        return self.teams_configuration.get('topics', None)

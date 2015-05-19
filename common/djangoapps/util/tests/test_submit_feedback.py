@@ -21,6 +21,7 @@ from student.tests.test_microsite import fake_microsite_get_value
 class SubmitFeedbackTest(TestCase):
     def setUp(self):
         """Set up data for the test case"""
+        super(SubmitFeedbackTest, self).setUp()
         self._request_factory = RequestFactory()
         self._anon_user = AnonymousUser()
         self._auth_user = UserFactory.create(

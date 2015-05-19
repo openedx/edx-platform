@@ -174,9 +174,10 @@ ${fragment.foot_html()}
           % endif
         </nav>
       </div>
+
     </div>
 % endif
-    <section class="course-content" id="course-content">
+    <section class="course-content" id="course-content" role="main" aria-label=“Content”>
         % if getattr(course, 'entrance_exam_enabled') and \
            getattr(course, 'entrance_exam_minimum_score_pct') and \
            entrance_exam_current_score is not UNDEFINED:
@@ -204,6 +205,18 @@ ${fragment.foot_html()}
       </section>
     % endif
   </div>
+</div>
+<div class="container-footer">
+  % if settings.FEATURES.get("LICENSING", False):
+    <div class="course-license">
+    % if getattr(course, "license", None):
+      <%include file="../license.html" args="license=course.license" />
+    % else:
+      ## Default course license: All Rights Reserved, if none is explicitly set.
+      <%include file="../license.html" args="license='all-rights-reserved'" />
+    % endif
+    </div>
+  % endif
 </div>
 
 <nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">

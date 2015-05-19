@@ -28,6 +28,7 @@ class ModuleIsolation(object):
 class TestLazyMod(unittest.TestCase):
 
     def setUp(self):
+        super(TestLazyMod, self).setUp()
         # Each test will remove modules that it imported.
         self.addCleanup(ModuleIsolation().clean_up)
 

@@ -1,0 +1,115 @@
+<div class="wrapper-license">
+    <h3 class="label setting-label">
+        <%= gettext("License Type") %>
+    </h3>
+    <ul class="license-types">
+        <% var link_start_tpl = '<a href="{url}" target="_blank">'; %>
+        <% _.each(licenseInfo, function(license, licenseType) { %>
+            <li class="license-type" data-license="<%- licenseType %>">
+                <button name="license-<%- licenseType %>"
+                        class="action license-button <% if(model.type === licenseType) { print("is-selected"); } %>"
+                        aria-pressed="<%- (model.type === licenseType).toString() %>"
+                        <% if (license.tooltip) { %>data-tooltip="<%- license.tooltip %>"<% } %>>
+                    <%- license.name %>
+                </button>
+                <p class="tip">
+                    <% if(license.url) { %>
+                        <a href="<%- license.url %>" target="_blank">
+                            <%= gettext("Learn more about {license_name}")
+                                        .replace("{license_name}", license.name)
+                            %>
+                        </a>
+                    <% } else { %>
+                        &nbsp;
+                    <% } %>
+                </p>
+            </li>
+        <% }) %>
+    </ul>
+
+<% var license = licenseInfo[model.type]; %>
+<% if(license && !_.isEmpty(license.options)) { %>
+    <div class="wrapper-license-options">
+        <h4 class="label setting-label">
+            <%- gettext("Options for {license_name}").replace("{license_name}", license.name) %>
+        </h4>
+        <p class='tip tip-inline'>
+            <%- gettext("The following options are available for the {license_name} license.")
+                        .replace("{license_name}", license.name) %>
+        </p>
+        <ul class="license-options">
+            <% _.each(license.option_order, function(optionKey) { %>
+                <% var optionInfo = license.options[optionKey]; %>
+                <% if (optionInfo.type == "boolean") { %>
+                    <% var optionSelected = model.options[optionKey]; %>
+                    <% var optionDisabled = optionInfo.disabled %>
+                    <li data-option="<%- optionKey %>"
+                        class="action-item license-option
+                               <% if (optionSelected) { print("is-selected"); } %>
+                               <% if (optionDisabled) { print("is-disabled"); } else { print("is-clickable"); } %>"
+                    >
+                        <input type="checkbox"
+                               id="<%- model.type %>-<%- optionKey %>"
+                               name="<%- model.type %>-<%- optionKey %>"
+                               aria-describedby="<%- optionKey %>-explanation"
+                               <% if(optionSelected) { print('checked="checked"'); } %>
+                               <% if(optionDisabled) { print('disabled="disabled"'); } %>
+                        />
+                        <label for="<%- model.type %>-<%- optionKey %>" class="option-name">
+                            <%- optionInfo.name %>
+                        </label>
+                        <div id="<%- optionKey %>-explanation" class="explanation">
+                            <%- optionInfo.help %>
+                        </div>
+                    </li>
+                <% } // could implement other types here %>
+            <% }) %>
+        </ul>
+    </div>
+<% } %>
+
+<% if (showPreview) { %>
+    <div class="wrapper-license-preview">
+        <h4 class="label setting-label">
+            <%= gettext("License Display") %>
+        </h4>
+        <p class="tip">
+            <%= gettext("The following message will be displayed at the bottom of the courseware pages within your course:") %>
+        </p>
+        <div class="license-preview">
+        <% // keep this synchronized with the contents of common/templates/license.html %>
+        <% if (model.type === "all-rights-reserved") { %>
+            © <span class="license-text"><%= gettext("All Rights Reserved") %></span>
+        <% } else if (model.type === "creative-commons") {
+             var possible = ["by", "nc", "nd", "sa"];
+             var enabled = _.filter(possible, function(option) {
+                 return model.options[option] === true || model.options[option.toUpperCase()] === true;
+             });
+             var version = model.options.ver || "4.0";
+             if (_.isEmpty(enabled)) {
+                    enabled = ["zero"];
+                    version = model.options.ver || "1.0";
+             }
+        %>
+            <a rel="license" href="https://creativecommons.org/licenses/<%- enabled.join("-") %>/<%- version %>/">
+            <% if (previewButton) { %>
+                <img src="https://licensebuttons.net/l/<%- enabled.join("-") %>/<%- version %>/<%- typeof buttonSize == "string" ? buttonSize : "88x31" %>.png"
+                    alt="<%- typeof licenseString == "string" ? licenseString : "" %>"
+                    />
+            <% } else { %>
+	        <% //<span> must come before <i> icon or else spacing gets messed up %>
+                <span class="sr">gettext("Creative Commons licensed content, with terms as follow:")&nbsp;</span><i aria-hidden="true" class="icon-cc"></i>
+                <% _.each(enabled, function(option) { %>
+                        <span class="sr"><%- license.options[option.toUpperCase()].name %>&nbsp;</span><i aria-hidden="true" class="icon-cc-<%- option %>"></i>
+                <% }); %>
+                <span class="license-text"><%= gettext("Some Rights Reserved") %></span>
+            <% } %>
+        <% } else { %>
+            <%= typeof licenseString == "string" ? licenseString : "" %>
+            <% // Default to ARR license %>
+            © <span class="license-text"><%= gettext("All Rights Reserved") %></span>
+        <% } %>
+        </a>
+    </div>
+<% } %>
+</div>

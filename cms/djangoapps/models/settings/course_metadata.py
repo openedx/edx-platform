@@ -74,6 +74,10 @@ class CourseMetadata(object):
                 not settings.FEATURES.get("DASHBOARD_SHARE_SETTINGS").get("CUSTOM_COURSE_URLS")):
             filtered_list.append('social_sharing_url')
 
+        # Do not show teams configuration if feature is disabled.
+        if not settings.FEATURES.get('ENABLE_TEAMS'):
+            filtered_list.append('teams_configuration')
+
         return filtered_list
 
     @classmethod

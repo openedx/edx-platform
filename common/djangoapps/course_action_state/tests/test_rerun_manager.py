@@ -14,6 +14,7 @@ class TestCourseRerunStateManager(TestCase):
     Test class for testing the CourseRerunUIStateManager.
     """
     def setUp(self):
+        super(TestCourseRerunStateManager, self).setUp()
         self.source_course_key = CourseLocator("source_org", "source_course_num", "source_run")
         self.course_key = CourseLocator("test_org", "test_course_num", "test_run")
         self.created_user = UserFactory()

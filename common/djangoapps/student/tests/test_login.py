@@ -32,6 +32,7 @@ class LoginTest(TestCase):
     '''
 
     def setUp(self):
+        super(LoginTest, self).setUp()
         # Create one user and save it to the database
         self.user = UserFactory.build(username='test', email='test@edx.org')
         self.user.set_password('test_password')

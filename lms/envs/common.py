@@ -40,6 +40,7 @@ from django.utils.translation import ugettext_lazy as _
 from .discussionsettings import *
 import dealer.git
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
+from xmodule.mixin import LicenseMixin
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
@@ -62,7 +63,6 @@ DISCUSSION_SETTINGS = {
 
 # Features
 FEATURES = {
-    'SAMPLE': False,
     'USE_DJANGO_PIPELINE': True,
 
     'DISPLAY_DEBUG_INFO_TO_STAFF': True,
@@ -342,6 +342,9 @@ FEATURES = {
     # Show the mobile app links in the footer
     'ENABLE_FOOTER_MOBILE_APP_LINKS': False,
 
+    # Use version 3 of the footer (added May 2015)
+    'ENABLE_FOOTER_V3': False,
+
     # Let students save and manage their annotations
     'ENABLE_EDXNOTES': False,
 
@@ -369,6 +372,9 @@ FEATURES = {
     # enable beacons for lms onload event statistics
     'ENABLE_ONLOAD_BEACON': False,
 
+    # Toggle platform-wide course licensing
+    'LICENSING': False,
+
     # Certificates Web/HTML Views
     'CERTIFICATES_HTML_VIEW': False,
 
@@ -386,6 +392,9 @@ FEATURES = {
 
     # Software secure fake page feature flag
     'ENABLE_SOFTWARE_SECURE_FAKE': False,
+
+    # Teams feature
+    'ENABLE_TEAMS': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -671,6 +680,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore import prefer_xmodules
 from xmodule.x_module import XModuleMixin
 
+# These are the Mixins that should be added to every XBlock.
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin)
@@ -1170,6 +1180,7 @@ dashboard_js = (
 )
 discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
 rwd_header_footer_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/common_helpers/rwd_header_footer.js'))
+footer_edx_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/footer-edx.js'))
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
 open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
 notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.js'))
@@ -1269,19 +1280,18 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-style-vendor-tinymce-skin.css',
     },
-    'style-app': {
+    'style-main': {
         'source_filenames': [
-            'sass/application.css',
-            'sass/ie.css'
+            'sass/lms-main.css',
+            'css/edx-cc.css',
         ],
-        'output_filename': 'css/lms-style-app.css',
+        'output_filename': 'css/lms-main.css',
     },
-    'style-app-rtl': {
+    'style-main-rtl': {
         'source_filenames': [
-            'sass/application-rtl.css',
-            'sass/ie-rtl.css'
+            'sass/lms-main-rtl.css',
         ],
-        'output_filename': 'css/lms-style-app-rtl.css',
+        'output_filename': 'css/lms-main-rtl.css',
     },
     'style-course-vendor': {
         'source_filenames': [
@@ -1291,25 +1301,25 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-style-course-vendor.css',
     },
+    'style-course': {
+        'source_filenames': [
+            'sass/lms-course.css',
+            'xmodule/modules.css',
+        ],
+        'output_filename': 'css/lms-course.css',
+    },
+    'style-course-rtl': {
+        'source_filenames': [
+            'sass/lms-course-rtl.css',
+            'xmodule/modules.css',
+        ],
+        'output_filename': 'css/lms-course-rtl.css',
+    },
     'style-student-notes': {
         'source_filenames': [
             'css/vendor/edxnotes/annotator.min.css',
         ],
         'output_filename': 'css/lms-style-student-notes.css',
-    },
-    'style-course': {
-        'source_filenames': [
-            'sass/course.css',
-            'xmodule/modules.css',
-        ],
-        'output_filename': 'css/lms-style-course.css',
-    },
-    'style-course-rtl': {
-        'source_filenames': [
-            'sass/course-rtl.css',
-            'xmodule/modules.css',
-        ],
-        'output_filename': 'css/lms-style-course-rtl.css',
     },
     'style-xmodule-annotations': {
         'source_filenames': [
@@ -1327,6 +1337,18 @@ PIPELINE_CSS = {
             'js/vendor/ova/catch/css/main.css'
         ],
         'output_filename': 'css/lms-style-xmodule-annotations.css',
+    },
+    'style-edx-footer': {
+        'source_filenames': [
+            'sass/footer-v3.css',
+        ],
+        'output_filename': 'css/lms-footer-edx.css',
+    },
+    'style-edx-footer-rtl': {
+        'source_filenames': [
+            'sass/footer-v3-rtl.css',
+        ],
+        'output_filename': 'css/lms-footer-edx-rtl.css',
     },
 }
 
@@ -1420,6 +1442,10 @@ PIPELINE_JS = {
     'ccx': {
         'source_filenames': ccx_js,
         'output_filename': 'js/ccx.js'
+    },
+    'footer_edx': {
+        'source_filenames': footer_edx_js,
+        'output_filename': 'js/footer_edx.js'
     }
 }
 
@@ -1764,16 +1790,25 @@ MKTG_URL_LINK_MAP = {
 ################# Social Media Footer Links #######################
 # The names list controls the order of social media
 # links in the footer.
-SOCIAL_MEDIA_FOOTER_NAMES = [
-    "facebook",
-    "twitter",
-    "linkedin",
-    "google_plus",
-    "tumblr",
-    "meetup",
-    "reddit",
-    "youtube",
-]
+if FEATURES.get('ENABLE_FOOTER_V3'):
+    SOCIAL_MEDIA_FOOTER_NAMES = [
+        "facebook",
+        "twitter",
+        "linkedin",
+        "weibo",
+        "vk",
+    ]
+else:
+    SOCIAL_MEDIA_FOOTER_NAMES = [
+        "facebook",
+        "twitter",
+        "linkedin",
+        "google_plus",
+        "tumblr",
+        "meetup",
+        "reddit",
+        "youtube",
+    ]
 
 # The footer URLs dictionary maps social footer names
 # to URLs defined in configuration.
@@ -1823,6 +1858,18 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # translate this the way that Reddit advertises in your language.
         "title": _("Reddit"),
         "icon": "fa-reddit-square"
+    },
+    "vk": {
+        # Translators: This is the website name of https://vk.com.  Please
+        # translate this the way that VK advertises in your language.
+        "title": _("VK"),
+        "icon": "fa-vk"
+    },
+    "weibo": {
+        # Translators: This is the website name of http://www.weibo.com.  Please
+        # translate this the way that Weibo advertises in your language.
+        "title": _("Weibo"),
+        "icon": "fa-weibo"
     },
     "youtube": {
         # Translators: This is the website name of www.youtube.com.  Please

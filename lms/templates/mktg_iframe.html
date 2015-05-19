@@ -1,9 +1,7 @@
 <%namespace name='static' file='static_content.html'/>
 <!DOCTYPE html>
-<!--[if IE 7]><html class="ie ie7 lte9 lte8 lte7 view-iframe" lang="${LANGUAGE_CODE}"><![endif]-->
-<!--[if IE 8]><html class="ie ie8 lte9 lte8 view-iframe" lang="${LANGUAGE_CODE}"><![endif]-->
-<!--[if IE 9]><html class="ie ie9 lte9 view-iframe" lang="${LANGUAGE_CODE}"><![endif]-->
-<!--[if gt IE 9]><!--><html class="view-iframe" lang="${LANGUAGE_CODE}"><!--<![endif]-->
+<!--[if lte IE 9]><html class="ie ie9 lte9 view-iframe" lang="${LANGUAGE_CODE}"><![endif]-->
+<!--[if !IE]><!--><html class="view-iframe" lang="${LANGUAGE_CODE}"><!--<![endif]-->
 <head>
   <%block name="title"></%block>
 
@@ -12,12 +10,8 @@
   <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
 
   <%static:css group='style-vendor'/>
-  <%static:css group='style-app'/>
+  <%static:css group='style-main'/>
   <%static:js group='base_vendor'/>
-
-  <!--[if lt IE 9]>
-    <script src="${static.url('js/html5shiv.js')}"></script>
-  <![endif]-->
 
   <%block name="headextra"/>
 

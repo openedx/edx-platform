@@ -11,10 +11,12 @@ from student.models import CourseEnrollment
 
 from xmodule.partitions.partitions import Group, UserPartition
 from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartitionScheme
+from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory, config_course_cohorts
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
 from openedx.core.djangoapps.course_groups.views import link_cohort_to_partition_group
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 from lms.lib.courseware_search.lms_filter_generator import LmsSearchFilterGenerator
 
 
@@ -49,6 +51,13 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
             publish_item=True,
         )
 
+        self.chapter2 = ItemFactory.create(
+            parent_location=self.courses[1].location,
+            category='chapter',
+            display_name="Week 1",
+            publish_item=True,
+        )
+
         self.groups = [Group(1, 'Group 1'), Group(2, 'Group 2')]
 
         self.content_groups = [1, 2]
@@ -57,6 +66,7 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         super(LmsSearchFilterGeneratorTestCase, self).setUp()
         self.build_courses()
         self.user_partition = None
+        self.split_test_user_partition = None
         self.first_cohort = None
         self.second_cohort = None
         self.user = UserFactory.create(username="jack", email="jack@fake.edx.org", password='test')
@@ -113,6 +123,88 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
 
         self.courses[0].save()
         modulestore().update_item(self.courses[0], self.user.id)
+
+    def add_splittest_with_content_groups(self, groups=None):
+        """
+        Adds split test and two content groups to second course in courses list.
+        """
+        if groups is None:
+            groups = self.groups
+
+        self.split_test_user_partition = UserPartition(
+            id=0,
+            name='Partition 2',
+            description='This is partition 2',
+            groups=groups,
+            scheme=RandomUserPartitionScheme
+        )
+
+        self.split_test_user_partition.scheme.name = "random"
+
+        sequential = ItemFactory.create(
+            parent_location=self.chapter.location,
+            category='sequential',
+            display_name="Lesson 2",
+            publish_item=True,
+        )
+
+        vertical = ItemFactory.create(
+            parent_location=sequential.location,
+            category='vertical',
+            display_name='Subsection 3',
+            publish_item=True,
+        )
+
+        split_test_unit = ItemFactory.create(
+            parent_location=vertical.location,
+            category='split_test',
+            user_partition_id=0,
+            display_name="Test Content Experiment 1",
+        )
+
+        condition_1_vertical = ItemFactory.create(
+            parent_location=split_test_unit.location,
+            category="vertical",
+            display_name="Group ID 1",
+        )
+
+        condition_2_vertical = ItemFactory.create(
+            parent_location=split_test_unit.location,
+            category="vertical",
+            display_name="Group ID 2",
+        )
+
+        ItemFactory.create(
+            parent_location=condition_1_vertical.location,
+            category="html",
+            display_name="Group A",
+            publish_item=True,
+        )
+
+        ItemFactory.create(
+            parent_location=condition_2_vertical.location,
+            category="html",
+            display_name="Group B",
+            publish_item=True,
+        )
+
+        self.courses[1].user_partitions = [self.split_test_user_partition]
+        self.courses[1].save()
+        modulestore().update_item(self.courses[1], self.user.id)
+
+    def add_user_to_splittest_group(self):
+        """
+        adds user to a random split test group
+        """
+        self.split_test_user_partition.scheme.get_group_for_user(
+            CourseKey.from_string(unicode(self.courses[1].id)),
+            self.user,
+            self.split_test_user_partition,
+            assign=True,
+        )
+
+        self.courses[1].save()
+        modulestore().update_item(self.courses[1], self.user.id)
 
     def test_course_id_not_provided(self):
         """
@@ -205,7 +297,7 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
 
         self.assertTrue('start_date' in filter_dictionary)
         self.assertEqual(unicode(self.courses[0].id), field_dictionary['course'])
-        self.assertEqual(unicode(self.content_groups[0]), filter_dictionary['content_groups'])
+        self.assertEqual([unicode(self.content_groups[0])], filter_dictionary['content_groups'])
 
     def test_content_multiple_groups_id_provided(self):
         """
@@ -233,7 +325,7 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         self.assertTrue('start_date' in filter_dictionary)
         self.assertEqual(unicode(self.courses[0].id), field_dictionary['course'])
         # returns only first group, relevant to current user
-        self.assertEqual(unicode(self.content_groups[0]), filter_dictionary['content_groups'])
+        self.assertEqual([unicode(self.content_groups[0])], filter_dictionary['content_groups'])
 
     def test_content_group_id_not_provided(self):
         """
@@ -265,6 +357,44 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         self.assertTrue('start_date' in filter_dictionary)
         self.assertEqual(unicode(self.courses[0].id), field_dictionary['course'])
         self.assertEqual(None, filter_dictionary['content_groups'])
+
+    def test_split_test_with_content_groups_user_not_assigned(self):
+        """
+        Tests that we don't get content group ID when user is not assigned to a split test group
+        """
+        self.add_splittest_with_content_groups()
+
+        field_dictionary, filter_dictionary, _ = LmsSearchFilterGenerator.generate_field_filters(
+            user=self.user,
+            course_id=unicode(self.courses[1].id)
+        )
+
+        self.assertTrue('start_date' in filter_dictionary)
+        self.assertEqual(unicode(self.courses[1].id), field_dictionary['course'])
+        self.assertEqual(None, filter_dictionary['content_groups'])
+
+    def test_split_test_with_content_groups_user_assigned(self):
+        """
+        Tests that we get content group ID when user is assigned to a split test group
+        """
+        self.add_splittest_with_content_groups()
+        self.add_user_to_splittest_group()
+
+        field_dictionary, filter_dictionary, _ = LmsSearchFilterGenerator.generate_field_filters(
+            user=self.user,
+            course_id=unicode(self.courses[1].id)
+        )
+
+        partition_group = self.split_test_user_partition.scheme.get_group_for_user(
+            CourseKey.from_string(unicode(self.courses[1].id)),
+            self.user,
+            self.split_test_user_partition,
+            assign=False,
+        )
+
+        self.assertTrue('start_date' in filter_dictionary)
+        self.assertEqual(unicode(self.courses[1].id), field_dictionary['course'])
+        self.assertEqual([unicode(partition_group.id)], filter_dictionary['content_groups'])
 
     def test_invalid_course_key(self):
         """

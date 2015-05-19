@@ -49,6 +49,7 @@ class TestUserEnrollmentApi(MobileAPITestCase, MobileAuthUserTestMixin, MobileEn
     """
     REVERSE_INFO = {'name': 'courseenrollment-detail', 'params': ['username']}
     ALLOW_ACCESS_TO_UNRELEASED_COURSE = True
+    ALLOW_ACCESS_TO_MILESTONE_COURSE = True
 
     def verify_success(self, response):
         super(TestUserEnrollmentApi, self).verify_success(response)

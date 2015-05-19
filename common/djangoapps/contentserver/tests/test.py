@@ -200,6 +200,7 @@ class ParseRangeHeaderTestCase(unittest.TestCase):
     """
 
     def setUp(self):
+        super(ParseRangeHeaderTestCase, self).setUp()
         self.content_length = 10000
 
     def test_bytes_unit(self):

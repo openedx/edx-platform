@@ -49,6 +49,7 @@ from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError
 from xmodule.modulestore.inheritance import InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
 from xmodule.modulestore.xml import CourseLocationManager
+from xmodule.services import SettingsService
 
 log = logging.getLogger(__name__)
 
@@ -900,6 +901,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
             if self.user_service:
                 services["user"] = self.user_service
+            services["settings"] = SettingsService()
 
             system = CachingDescriptorSystem(
                 modulestore=self,

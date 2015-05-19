@@ -2,6 +2,7 @@
 """
 End-to-end tests for Student's Profile Page.
 """
+from flaky import flaky
 from contextlib import contextmanager
 
 from datetime import datetime
@@ -46,7 +47,7 @@ class LearnerProfileTestMixin(EventsTestMixin):
         Fill in the public profile fields of a user.
         """
         profile_page.value_for_dropdown_field('language_proficiencies', 'English')
-        profile_page.value_for_dropdown_field('country', 'United Kingdom')
+        profile_page.value_for_dropdown_field('country', 'United Arab Emirates')
         profile_page.value_for_textarea_field('bio', 'Nothing Special')
 
     def visit_profile_page(self, username, privacy=None):
@@ -697,6 +698,7 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self.verify_profile_page_is_private(profile_page, is_editable=False)
         self.verify_profile_page_view_event(username, different_user_id, visibility=self.PRIVACY_PRIVATE)
 
+    @flaky  # TODO fix this, see TNL-2199
     def test_different_user_public_profile(self):
         """
         Scenario: Verify that desired fields are shown when looking at a different user's public profile.

@@ -68,6 +68,12 @@ FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
 # Enable student notes
 FEATURES['ENABLE_EDXNOTES'] = True
 
+# Enable teams feature
+FEATURES['ENABLE_TEAMS'] = True
+
+# Enable custom content licensing
+FEATURES['LICENSING'] = True
+
 ########################### Entrance Exams #################################
 FEATURES['ENTRANCE_EXAMS'] = True
 

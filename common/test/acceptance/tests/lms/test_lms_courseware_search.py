@@ -49,6 +49,7 @@ class CoursewareSearchTest(UniqueCourseTest):
         # create test file in which index for this test will live
         with open(self.TEST_INDEX_FILENAME, "w+") as index_file:
             json.dump({}, index_file)
+        self.addCleanup(os.remove, self.TEST_INDEX_FILENAME)
 
         super(CoursewareSearchTest, self).setUp()
         self.courseware_search_page = CoursewareSearchPage(self.browser, self.course_id)
@@ -76,9 +77,6 @@ class CoursewareSearchTest(UniqueCourseTest):
                 XBlockFixtureDesc('sequential', 'Subsection 2')
             )
         ).install()
-
-    def tearDown(self):
-        os.remove(self.TEST_INDEX_FILENAME)
 
     def _auto_auth(self, username, email, staff):
         """

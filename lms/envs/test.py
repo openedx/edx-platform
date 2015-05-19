@@ -449,14 +449,11 @@ MONGODB_LOG = {
 # Enable EdxNotes for tests.
 FEATURES['ENABLE_EDXNOTES'] = True
 
+# Enable teams feature for tests.
+FEATURES['ENABLE_TEAMS'] = True
+
 # Add milestones to Installed apps for testing
 INSTALLED_APPS += ('milestones', )
-
-# MILESTONES
-FEATURES['MILESTONES_APP'] = True
-
-# ENTRANCE EXAMS
-FEATURES['ENTRANCE_EXAMS'] = True
 
 # Enable courseware search for tests
 FEATURES['ENABLE_COURSEWARE_SEARCH'] = True

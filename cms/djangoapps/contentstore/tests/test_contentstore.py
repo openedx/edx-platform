@@ -5,6 +5,7 @@ import mock
 from mock import patch
 import shutil
 import lxml.html
+from lxml import etree
 import ddt
 
 from datetime import timedelta
@@ -1834,6 +1835,44 @@ class RerunCourseTest(ContentStoreTestCase):
             self.assertEquals(rerun_state.state, CourseRerunUIStateManager.State.FAILED)
             self.assertTrue(rerun_state.message.endswith("traceback"))
             self.assertEqual(len(rerun_state.message), CourseRerunState.MAX_MESSAGE_LENGTH)
+
+
+class ContentLicenseTest(ContentStoreTestCase):
+    """
+    Tests around content licenses
+    """
+    def test_course_license_export(self):
+        content_store = contentstore()
+        root_dir = path(mkdtemp_clean())
+        self.course.license = "creative-commons: BY SA"
+        self.store.update_item(self.course, None)
+        export_course_to_xml(self.store, content_store, self.course.id, root_dir, 'test_license')
+        fname = "{block}.xml".format(block=self.course.scope_ids.usage_id.block_id)
+        run_file_path = root_dir / "test_license" / "course" / fname
+        run_xml = etree.parse(run_file_path.open())
+        self.assertEqual(run_xml.getroot().get("license"), "creative-commons: BY SA")
+
+    def test_video_license_export(self):
+        content_store = contentstore()
+        root_dir = path(mkdtemp_clean())
+        video_descriptor = ItemFactory.create(
+            parent_location=self.course.location, category='video',
+            license="all-rights-reserved"
+        )
+        export_course_to_xml(self.store, content_store, self.course.id, root_dir, 'test_license')
+        fname = "{block}.xml".format(block=video_descriptor.scope_ids.usage_id.block_id)
+        video_file_path = root_dir / "test_license" / "video" / fname
+        video_xml = etree.parse(video_file_path.open())
+        self.assertEqual(video_xml.getroot().get("license"), "all-rights-reserved")
+
+    def test_license_import(self):
+        course_items = import_course_from_xml(
+            self.store, self.user.id, TEST_DATA_DIR, ['toy'], create_if_not_present=True
+        )
+        course = course_items[0]
+        self.assertEqual(course.license, "creative-commons: BY")
+        videos = self.store.get_items(course.id, qualifiers={'category': 'video'})
+        self.assertEqual(videos[0].license, "all-rights-reserved")
 
 
 class EntryPageTestCase(TestCase):

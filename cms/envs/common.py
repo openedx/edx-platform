@@ -50,6 +50,7 @@ from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.authoring_mixin import AuthoringMixin
 import dealer.git
 from xmodule.modulestore.edit_info import EditInfoMixin
+from xmodule.mixin import LicenseMixin
 
 ############################ FEATURE CONFIGURATION #############################
 STUDIO_NAME = "Studio"
@@ -142,6 +143,9 @@ FEATURES = {
     # Toggle course entrance exams feature
     'ENTRANCE_EXAMS': False,
 
+    # Toggle platform-wide course licensing
+    'LICENSING': False,
+
     # Enable the courseware search functionality
     'ENABLE_COURSEWARE_INDEX': False,
 
@@ -155,7 +159,10 @@ FEATURES = {
     'DASHBOARD_SHARE_SETTINGS': {
         # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in lms/envs/common.py
         'CUSTOM_COURSE_URLS': False
-    }
+    },
+
+    # Teams feature
+    'ENABLE_TEAMS': False,
 }
 
 ENABLE_JASMINE = False
@@ -309,6 +316,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore import prefer_xmodules
 from xmodule.x_module import XModuleMixin
 
+# These are the Mixins that should be added to every XBlock.
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (
@@ -459,17 +467,18 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/cms-style-vendor-tinymce-skin.css',
     },
-    'style-app': {
+    'style-main': {
         'source_filenames': [
-            'sass/style-app.css',
+            'sass/studio-main.css',
+            'css/edx-cc.css',
         ],
-        'output_filename': 'css/cms-style-app.css',
+        'output_filename': 'css/studio-main.css',
     },
-    'style-app-rtl': {
+    'style-main-rtl': {
         'source_filenames': [
-            'sass/style-app-rtl.css',
+            'sass/studio-main-rtl.css',
         ],
-        'output_filename': 'css/cms-style-app-rtl.css',
+        'output_filename': 'css/studio-main-rtl.css',
     },
     'style-xmodule-annotations': {
         'source_filenames': [
@@ -937,5 +946,11 @@ SEARCH_ENGINE = None
 ELASTIC_FIELD_MAPPINGS = {
     "start_date": {
         "type": "date"
+    }
+}
+
+XBLOCK_SETTINGS = {
+    "VideoDescriptor": {
+        "licensing_enabled": FEATURES.get("LICENSING", False)
     }
 }

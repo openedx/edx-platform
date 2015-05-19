@@ -201,6 +201,7 @@ class EmbargoMessageUrlApiTests(UrlResetMixin, ModuleStoreTestCase):
         self.course = CourseFactory.create()
 
     def tearDown(self):
+        super(EmbargoMessageUrlApiTests, self).tearDown()
         cache.clear()
 
     @ddt.data(

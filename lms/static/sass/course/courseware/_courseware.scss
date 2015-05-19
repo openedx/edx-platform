@@ -12,6 +12,8 @@ html.video-fullscreen{
 }
 
 .wrap-instructor-info {
+  @extend %ui-print-excluded;
+
   margin: ($baseline/2) ($baseline/4) 0 0;
   overflow: hidden;
 
@@ -39,12 +41,63 @@ html.video-fullscreen{
   }
 }
 
+.content-wrapper {
+
+  .container-footer {
+    margin: 0 auto;
+    max-width: grid-width(12);
+    min-width: 760px;
+    width: flex-grid(12);
+    color: $gray;
+    text-align: $bi-app-right;
+  }
+}
+
+.content-wrapper {
+
+  .course-license, .xblock-license {
+    @include text-align(right);
+    @extend %t-title7;
+    display: block;
+    width: auto;
+    padding: ($baseline/4) 0;
+
+    span {
+      color: inherit;
+    }
+
+    a:link, a:visited {
+      color: $gray;
+    }
+    a:active, a:hover {
+      color: $link-hover;
+    }
+
+    .license-label,
+    .license-value,
+    .license-actions {
+      display: inline-block;
+      vertical-align: middle;
+      margin-bottom: 0;
+    }
+
+    i {
+      font-style: normal;
+    }
+
+    img {
+      display: inline;
+    }
+  }
+}
+
+// TO-DO should this be content wrapper? 
 div.course-wrapper {
   position: relative;
 
   section.course-content {
     @extend .content;
-    padding: 40px;
+    padding: ($baseline*2);
     line-height: 1.6;
 
     h1 {
@@ -58,12 +111,6 @@ div.course-wrapper {
         display: none;
         margin-bottom: 0;
       }
-    }
-
-    .sr-is-focusable,
-    .sr-is-focusable:focus,
-    .sr-is-focusable:active {
-      outline: none;
     }
 
     .sequential-status-message {
@@ -246,6 +293,10 @@ div.course-wrapper {
         padding: 0;
       }
     }
+
+    @media print {
+      padding: 0 2mm;
+    }
   }
 
   &.closed {
@@ -279,6 +330,10 @@ div.course-wrapper {
     section.course-content {
       width: flex-grid(11.5) + flex-gutter();
     }
+  }
+
+  @media print {
+    border: 0;
   }
 }
 

@@ -181,6 +181,15 @@ class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
             self.runtime.add_block_as_child_node(child, xml_object)
         return xml_object
 
+    @property
+    def non_editable_metadata_fields(self):
+        """
+        `is_entrance_exam` should not be editable in the Studio settings editor.
+        """
+        non_editable_fields = super(SequenceDescriptor, self).non_editable_metadata_fields
+        non_editable_fields.append(self.fields['is_entrance_exam'])
+        return non_editable_fields
+
     def index_dictionary(self):
         """
         Return dictionary prepared with module content and type for indexing.

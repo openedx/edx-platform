@@ -1,6 +1,7 @@
 <%! import json %>
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils.translation import ugettext as _ %>
+<%! from xmodule.modulestore import EdxJSONEncoder %>
 
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
@@ -38,7 +39,7 @@
     <script>
           (function (require) {
             require(['js/student_profile/views/learner_profile_factory'], function(setupLearnerProfile) {
-                var options = ${ json.dumps(data) };
+                var options = ${ json.dumps(data, cls=EdxJSONEncoder) };
                 setupLearnerProfile(options);
             });
           }).call(this, require || RequireJS.require);

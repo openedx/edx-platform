@@ -9,6 +9,7 @@ REPO_DIR = os.getcwd()
 class TestPaverBokChoyCmd(unittest.TestCase):
 
     def setUp(self):
+        super(TestPaverBokChoyCmd, self).setUp()
         self.request = BokChoyTestSuite('')
 
     def _expected_command(self, expected_text_append, expected_default_store=None):

@@ -16,6 +16,7 @@ class TagsMiddlewareTest(TestCase):
     Test the UserTagsEventContextMiddleware
     """
     def setUp(self):
+        super(TagsMiddlewareTest, self).setUp()
         self.middleware = UserTagsEventContextMiddleware()
         self.user = UserFactory.create()
         self.other_user = UserFactory.create()

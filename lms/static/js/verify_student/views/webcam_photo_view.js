@@ -82,6 +82,7 @@
                     this.stream = stream;
                     video.src = this.URL.createObjectURL( stream );
                     video.play();
+                    this.trigger('webcam-loaded');
                 },
 
                 getVideo: function() {
@@ -220,6 +221,7 @@
 
             _.extend( this.backend, Backbone.Events );
             this.listenTo( this.backend, 'error', this.handleError );
+            this.listenTo( this.backend, 'webcam-loaded', this.handleWebcamLoaded );
         },
 
         isSupported: function() {
@@ -283,6 +285,11 @@
                 // Enable the submit button
                 this.setSubmitButtonEnabled( true );
             }
+        },
+
+        handleWebcamLoaded: function( errorTitle, errorMsg ) {
+            // Hide the text behind camera
+            $( "#camera .placeholder-art", this.el ).hide();
         },
 
         handleError: function( errorTitle, errorMsg ) {

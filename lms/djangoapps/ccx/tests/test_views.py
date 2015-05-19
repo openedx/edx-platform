@@ -118,13 +118,6 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         from django.core import mail
         return mail.outbox
 
-    def tearDown(self):
-        """
-        Undo patches.
-        """
-        super(TestCoachDashboard, self).tearDown()
-        patch.stopall()
-
     def test_not_a_coach(self):
         """
         User is not a coach, should get Forbidden response.
