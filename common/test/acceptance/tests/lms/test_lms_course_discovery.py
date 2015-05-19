@@ -55,8 +55,7 @@ class CourseDiscoveryTest(WebAppTest):
                 }
             ).install()
 
-    def tearDown(self):
-        super(CourseDiscoveryTest, self).tearDown()
+    def cleanUp(self):
         os.remove(self.TEST_INDEX_FILENAME)
 
     def _auto_auth(self, username, email, staff):
