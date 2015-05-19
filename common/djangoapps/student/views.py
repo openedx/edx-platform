@@ -1537,17 +1537,6 @@ def create_account_with_params(request, params):
 
     create_comments_service_user(user)
 
-    context = {
-        'name': profile.name,
-        'key': registration.activation_key,
-    }
-
-    # composes activation email
-    subject = render_to_string('emails/activation_email_subject.txt', context)
-    # Email subject *must not* contain newlines
-    subject = ''.join(subject.splitlines())
-    message = render_to_string('emails/activation_email.txt', context)
-
     # Don't send email if we are:
     #
     # 1. Doing load testing.
@@ -1565,6 +1554,17 @@ def create_account_with_params(request, params):
         not (do_external_auth and settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'))
     )
     if send_email:
+        context = {
+            'name': profile.name,
+            'key': registration.activation_key,
+        }
+
+        # composes activation email
+        subject = render_to_string('emails/activation_email_subject.txt', context)
+        # Email subject *must not* contain newlines
+        subject = ''.join(subject.splitlines())
+        message = render_to_string('emails/activation_email.txt', context)
+
         from_address = microsite.get_value(
             'email_from_address',
             settings.DEFAULT_FROM_EMAIL
