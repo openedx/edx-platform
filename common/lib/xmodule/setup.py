@@ -54,7 +54,7 @@ setup(
     version="0.1",
     packages=find_packages(exclude=["tests"]),
     install_requires=[
-        'distribute',
+        'setuptools',
         'docopt',
         'capa',
         'path.py',

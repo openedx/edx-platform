@@ -441,27 +441,6 @@ if [[ -n $compile ]]; then
     rm -rf numpy-${NUMPY_VER} scipy-${SCIPY_VER}
 fi
 
-# building correct version of distribute from source
-DISTRIBUTE_VER="0.6.28"
-output "Building Distribute"
-SITE_PACKAGES="$WORKON_HOME/edx-platform/lib/python2.7/site-packages"
-cd "$SITE_PACKAGES"
-curl -sSLO http://pypi.python.org/packages/source/d/distribute/distribute-${DISTRIBUTE_VER}.tar.gz
-tar -xzvf distribute-${DISTRIBUTE_VER}.tar.gz
-cd distribute-${DISTRIBUTE_VER}
-python setup.py install
-cd ..
-rm distribute-${DISTRIBUTE_VER}.tar.gz
-
-DISTRIBUTE_VERSION=`pip freeze | grep distribute`
-
-if [[ "$DISTRIBUTE_VERSION" == "distribute==0.6.28" ]]; then
-  output "Distribute successfully installed"
-else
-  error "Distribute failed to build correctly. This script requires a working version of Distribute 0.6.28 in your virtualenv's python installation"
-  exit 1
-fi
-
 case `uname -s` in
     Darwin)
         # on mac os x get the latest distribute and pip
