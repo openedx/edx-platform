@@ -59,6 +59,5 @@ class Bookmark(models.Model):
         while parent is not None and parent.location.block_type not in ['course', 'vertical']:
             parents_data.append({"display_name": parent.display_name, "usage_id": unicode(parent.location)})
             parent = parent.get_parent()
-
         parents_data.reverse()
         return parents_data

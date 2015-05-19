@@ -2,7 +2,6 @@
 Serializer file for Bookmarks.
 """
 from rest_framework import serializers
-from .views import DEFAULT_FIELDS
 
 from .models import Bookmark
 
@@ -16,6 +15,7 @@ class BookmarkSerializer(serializers.ModelSerializer):
         try:
             fields = kwargs['context'].pop('fields', [])
         except KeyError:
+            from .views import DEFAULT_FIELDS
             fields = DEFAULT_FIELDS
         # Instantiate the superclass normally
         super(BookmarkSerializer, self).__init__(*args, **kwargs)

@@ -19,7 +19,7 @@ from rest_framework.views import APIView
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from bookmarks import serializers
+from bookmarks.serializers import BookmarkSerializer
 from openedx.core.lib.api.serializers import PaginationSerializer
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -32,22 +32,60 @@ from .api import get_bookmark
 log = logging.getLogger(__name__)
 
 
-
 DEFAULT_FIELDS = ["id", "course_id", "usage_id", "created"]
 OPTIONAL_FIELDS = ['display_name', 'path']
 
 
 class BookmarksView(ListCreateAPIView):
     """
-    List all bookmarks or create.
+    **Use Case**
+
+        Get a paginated list of bookmarks in particular course.
+        Each page in the list can contain up to 30 bookmarks by default.
+
+        Create/Post a new bookmark for particular Xblock.
+
+    **Example Requests**
+
+          GET /api/bookmarks/v0/bookmarks/?course_id={course_id1}
+
+          POST /api/bookmarks/v0/bookmarks/?course_id={course_id1}
+
+    **Response Values**
+
+        * count: The number of bookmarks in a course.
+
+        * next: The URI to the next page of bookmarks.
+
+        * previous: The URI to the previous page of bookmarks.
+
+        * num_pages: The number of pages listing bookmarks.
+
+        * results:  A list of bookmarks returned. Each collection in the list
+          contains these fields.
+
+            * id: String. The identifier string for the bookmark": {user_id},{usage_id}.
+
+            * course_id: String. The identifier string of the bookmark's course.
+
+            * usage_id: String. The identifier string of the bookmark's XBlock.
+
+            * display_name: String. Display name of the XBlock.
+
+            * path: (optional) List of dicts containing {"usage_id": "", display_name:""} for the XBlocks
+                from the top of the course tree till the parent of the bookmarked XBlock.
+
+            * created: ISO 8601 String. The timestamp of bookmark's creation.
+
     """
+
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
 
     paginate_by = 30
     paginate_by_param = 'page_size'
     pagination_serializer_class = PaginationSerializer
-    serializer_class = serializers.BookmarkSerializer
+    serializer_class = BookmarkSerializer
 
     def get_serializer_context(self):
         """
@@ -136,7 +174,7 @@ class BookmarksView(ListCreateAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         return Response(
-            serializers.BookmarkSerializer(bookmark).data,
+            BookmarkSerializer(bookmark).data,
             status=status.HTTP_201_CREATED
         )
 
@@ -148,7 +186,7 @@ class BookmarksDetailView(APIView):
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
 
-    serializer_class = serializers.BookmarkSerializer
+    serializer_class = BookmarkSerializer
 
     def get(self, request, username=None, usage_id=None):
         """
