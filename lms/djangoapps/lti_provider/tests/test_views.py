@@ -278,7 +278,7 @@ class RenderCoursewareTest(TestCase):
             'disable_footer': True,
             'disable_tabs': True,
             'staff_access': 'StaffAccess',
-            'xqa_server': 'http://example.com/xqa',
+            'xqa_server': 'http://your_xqa_server.com',
         }
         request = build_run_request()
         views.render_courseware(request, ALL_PARAMS.copy())
