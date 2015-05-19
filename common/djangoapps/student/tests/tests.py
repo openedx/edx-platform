@@ -60,6 +60,7 @@ class CourseEndingTest(TestCase):
         link2_expected = "http://www.mysurvey.com?unique={UNIQUE_ID}".format(UNIQUE_ID=user_id)
         self.assertEqual(process_survey_link(link2, user), link2_expected)
 
+    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
     def test_cert_info(self):
         user = Mock(username="fred")
         survey_url = "http://a_survey.com"
