@@ -5,6 +5,8 @@ import ddt
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from mock import patch
+from django.test.utils import override_settings
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -35,6 +37,32 @@ class CertificateDisplayTest(ModuleStoreTestCase):
     def test_display_verified_certificate(self, enrollment_mode):
         self._create_certificate(enrollment_mode)
         self._check_can_download_certificate()
+
+    @ddt.data('verified')
+    @override_settings(CERT_NAME_SHORT='Test_Certificate')
+    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
+    def test_linked_student_to_web_view_credential(self, enrollment_mode):
+
+        test_url = u'{url}?course_id={course_id}'.format(
+            url=reverse('cert_html_view'),
+            course_id=unicode(self.course.id))
+
+        self._create_certificate(enrollment_mode)
+        certificates = [
+            {
+                'id': 0,
+                'name': 'Test Name',
+                'description': 'Test Description',
+                'signatories': [],
+                'version': 1
+            }
+        ]
+        self.course.certificates = {'certificates': certificates}
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
+        response = self.client.get(reverse('dashboard'))
+        self.assertContains(response, u'View Test_Certificate')
+        self.assertContains(response, test_url)
 
     def _create_certificate(self, enrollment_mode):
         """Simulate that the user has a generated certificate. """

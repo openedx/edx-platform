@@ -335,7 +335,15 @@ def _cert_info(user, course, cert_status, course_mode):
         status_dict['show_survey_button'] = False
 
     if status == 'ready':
-        if 'download_url' not in cert_status:
+        # showing the certificate web view button if certificate is ready state and feature flags are enabled.
+        if course.certificates and settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
+            status_dict.update({
+                'show_cert_web_view': True,
+                'cert_web_view_url': u'{url}?course_id={course_id}'.format(
+                    url=reverse('cert_html_view'),
+                    course_id=unicode(course.id)
+                )})
+        elif 'download_url' not in cert_status:
             log.warning(
                 u"User %s has a downloadable cert for %s, but no download url",
                 user.username,
