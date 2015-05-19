@@ -55,7 +55,7 @@ class Command(BaseCommand):
             return
 
         try:
-            enrolled_students = CourseEnrollment.users_enrolled_in(course_id)
+            enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id)
             print "Total students enrolled in {0}: {1}".format(course_id, enrolled_students.count())
 
             calculate_task_statistics(enrolled_students, course, usage_key, task_number)

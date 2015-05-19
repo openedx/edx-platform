@@ -576,7 +576,7 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
     start_time = time()
     start_date = datetime.now(UTC)
     status_interval = 100
-    enrolled_students = CourseEnrollment.users_enrolled_in(course_id)
+    enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id)
     task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 
     fmt = u'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
@@ -772,7 +772,7 @@ def upload_problem_grade_report(_xmodule_instance_args, _entry_id, course_id, _t
     start_time = time()
     start_date = datetime.now(UTC)
     status_interval = 100
-    enrolled_students = CourseEnrollment.users_enrolled_in(course_id)
+    enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id)
     task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 
     # This struct encapsulates both the display names of each static item in the
@@ -843,7 +843,7 @@ def upload_students_csv(_xmodule_instance_args, _entry_id, course_id, task_input
     """
     start_time = time()
     start_date = datetime.now(UTC)
-    enrolled_students = CourseEnrollment.users_enrolled_in(course_id)
+    enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id)
     task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 
     current_step = {'step': 'Calculating Profile Info'}
@@ -877,7 +877,7 @@ def upload_enrollment_report(_xmodule_instance_args, _entry_id, course_id, _task
     start_time = time()
     start_date = datetime.now(UTC)
     status_interval = 100
-    students_in_course = CourseEnrollment.enrolled_and_dropped_out_users(course_id)
+    students_in_course = CourseEnrollment.objects.enrolled_and_dropped_out_users(course_id)
     task_progress = TaskProgress(action_name, students_in_course.count(), start_time)
 
     fmt = u'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'

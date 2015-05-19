@@ -857,7 +857,7 @@ def course_about(request, course_id):
         # Used to provide context to message to student if enrollment not allowed
         can_enroll = has_access(request.user, 'enroll', course)
         invitation_only = course.invitation_only
-        is_course_full = CourseEnrollment.is_course_full(course)
+        is_course_full = CourseEnrollment.objects.is_course_full(course)
 
         # Register button should be disabled if one of the following is true:
         # - Student is already registered for course

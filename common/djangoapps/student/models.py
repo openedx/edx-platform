@@ -736,6 +736,66 @@ class AlreadyEnrolledError(CourseEnrollmentException):
     pass
 
 
+class CourseEnrollmentManager(models.Manager):
+    """
+    Custom manager for CourseEnrollment with Table-level filter methods.
+    """
+
+    def num_enrolled_in(self, course_id):
+        """
+        Returns the count of active enrollments in a course.
+
+        'course_id' is the course_id to return enrollments
+        """
+
+        enrollment_number = super(CourseEnrollmentManager, self).get_query_set().filter(
+            course_id=course_id,
+            is_active=1
+        ).count()
+
+        return enrollment_number
+
+    def is_course_full(self, course):
+        """
+        Returns a boolean value regarding whether a course has already reached it's max enrollment
+        capacity
+        """
+        is_course_full = False
+        if course.max_student_enrollments_allowed is not None:
+            is_course_full = self.num_enrolled_in(course.id) >= course.max_student_enrollments_allowed
+        return is_course_full
+
+    def users_enrolled_in(self, course_id):
+        """Return a queryset of User for every user enrolled in the course."""
+        return User.objects.filter(
+            courseenrollment__course_id=course_id,
+            courseenrollment__is_active=True
+        )
+
+    def enrollment_counts(self, course_id):
+        """
+        Returns a dictionary that stores the total enrollment count for a course, as well as the
+        enrollment count for each individual mode.
+        """
+        # Unfortunately, Django's "group by"-style queries look super-awkward
+        query = use_read_replica_if_available(
+            super(CourseEnrollmentManager, self).get_query_set().filter(course_id=course_id, is_active=True).values(
+                'mode').order_by().annotate(Count('mode')))
+        total = 0
+        enroll_dict = defaultdict(int)
+        for item in query:
+            enroll_dict[item['mode']] = item['mode__count']
+            total += item['mode__count']
+        enroll_dict['total'] = total
+        return enroll_dict
+
+    def enrolled_and_dropped_out_users(self, course_id):
+        """Return a queryset of Users in the course."""
+        return User.objects.filter(
+            courseenrollment__course_id=course_id
+        )
+
+
 class CourseEnrollment(models.Model):
     """
     Represents a Student's Enrollment record for a single Course. You should
@@ -761,6 +821,8 @@ class CourseEnrollment(models.Model):
     # Represents the modes that are possible. We'll update this later with a
     # list of possible values.
     mode = models.CharField(default="honor", max_length=100)
+
+    objects = CourseEnrollmentManager()
 
     class Meta:
         unique_together = (('user', 'course_id'),)
@@ -832,17 +894,6 @@ class CourseEnrollment(models.Model):
             return None
 
     @classmethod
-    def num_enrolled_in(cls, course_id):
-        """
-        Returns the count of active enrollments in a course.
-
-        'course_id' is the course_id to return enrollments
-        """
-        enrollment_number = CourseEnrollment.objects.filter(course_id=course_id, is_active=1).count()
-
-        return enrollment_number
-
-    @classmethod
     def is_enrollment_closed(cls, user, course):
         """
         Returns a boolean value regarding whether the user has access to enroll in the course. Returns False if the
@@ -852,17 +903,6 @@ class CourseEnrollment(models.Model):
         # in CourseEnrollment.enroll
         from courseware.access import has_access  # pylint: disable=import-error
         return not has_access(user, 'enroll', course)
-
-    @classmethod
-    def is_course_full(cls, course):
-        """
-        Returns a boolean value regarding whether a course has already reached it's max enrollment
-        capacity
-        """
-        is_course_full = False
-        if course.max_student_enrollments_allowed is not None:
-            is_course_full = cls.num_enrolled_in(course.id) >= course.max_student_enrollments_allowed
-        return is_course_full
 
     def update_enrollment(self, mode=None, is_active=None, skip_refund=False):
         """
@@ -1015,7 +1055,7 @@ class CourseEnrollment(models.Model):
                 )
                 raise EnrollmentClosedError
 
-            if CourseEnrollment.is_course_full(course):
+            if CourseEnrollment.objects.is_course_full(course):
                 log.warning(
                     u"User %s failed to enroll in full course %s",
                     user.username,
@@ -1186,37 +1226,6 @@ class CourseEnrollment(models.Model):
     @classmethod
     def enrollments_for_user(cls, user):
         return CourseEnrollment.objects.filter(user=user, is_active=1)
-
-    @classmethod
-    def users_enrolled_in(cls, course_id):
-        """Return a queryset of User for every user enrolled in the course."""
-        return User.objects.filter(
-            courseenrollment__course_id=course_id,
-            courseenrollment__is_active=True
-        )
-
-    @classmethod
-    def enrolled_and_dropped_out_users(cls, course_id):
-        """Return a queryset of Users in the course."""
-        return User.objects.filter(
-            courseenrollment__course_id=course_id
-        )
-
-    @classmethod
-    def enrollment_counts(cls, course_id):
-        """
-        Returns a dictionary that stores the total enrollment count for a course, as well as the
-        enrollment count for each individual mode.
-        """
-        # Unfortunately, Django's "group by"-style queries look super-awkward
-        query = use_read_replica_if_available(cls.objects.filter(course_id=course_id, is_active=True).values('mode').order_by().annotate(Count('mode')))
-        total = 0
-        enroll_dict = defaultdict(int)
-        for item in query:
-            enroll_dict[item['mode']] = item['mode__count']
-            total += item['mode__count']
-        enroll_dict['total'] = total
-        return enroll_dict
 
     def is_paid_course(self):
         """
