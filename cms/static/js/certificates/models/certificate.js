@@ -20,6 +20,7 @@ function (_, str, Backbone, BackboneRelational, BackboneAssociations, gettext, C
             name: 'Name of the certificate',
             description: 'Description of the certificate',
             course_title: 'Title of the course',
+            org_logo_path: '',
             version: 1
         },
 
