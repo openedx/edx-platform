@@ -12,8 +12,11 @@ We do intend to enable page factories on the LMS too.
 */
 
 define([
-    'js/certificates/collections/certificates', 'js/certificates/models/certificate', 'js/certificates/views/certificates_page'
-], function(CertificatesCollection, Certificate, CertificatesPage) {
+    'js/certificates/collections/certificates',
+    'js/certificates/models/certificate',
+    'js/certificates/views/certificates_page'
+],
+function(CertificatesCollection, Certificate, CertificatesPage) {
     'use strict';
     return function (certificatesJson, certificateUrl, courseOutlineUrl) {
         // Initialize the model collection, passing any necessary options to the constructor

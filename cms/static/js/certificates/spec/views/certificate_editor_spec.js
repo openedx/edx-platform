@@ -1,19 +1,22 @@
 // Jasmine Test Suite: Certifiate Editor View
 
 define([
-    'underscore', 'js/models/course',
+    'underscore',
+    'js/models/course',
     'js/certificates/models/certificate',
     'js/certificates/models/signatory',
     'js/certificates/collections/certificates',
     'js/certificates/views/certificate_editor',
     'js/views/feedback_notification',
-    'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
-    'js/spec_helpers/view_helpers', 'js/spec_helpers/validation_helpers', 'js/certificates/spec/custom_matchers',
+    'js/common_helpers/ajax_helpers',
+    'js/common_helpers/template_helpers',
+    'js/spec_helpers/view_helpers',
+    'js/spec_helpers/validation_helpers',
+    'js/certificates/spec/custom_matchers',
     'jasmine-stealth'
-], function(
-    _, Course, CertificateModel, SignatoryModel, CertificatesCollection, CertificateEditorView,
-    Notification, AjaxHelpers, TemplateHelpers, ViewHelpers, ValidationHelpers, CustomMatchers
-) {
+],
+function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, CertificateEditorView,
+         Notification, AjaxHelpers, TemplateHelpers, ViewHelpers, ValidationHelpers, CustomMatchers) {
     'use strict';
 
     var MAX_SIGNATORIES = 4;
@@ -180,7 +183,7 @@ define([
 
                     // now delete anyone of the signatory, Add signatory should be enabled.
                     var signatory = this.model.get('signatories').at(0);
-                    var text = 'Are you sure you want to delete "'+ signatory.get('title') +'" as a signatory?';
+                    var text = 'Are you sure you want to remove "'+ signatory.get('name') +'" from the list of signatories?';
                     clickDeleteItem(this, text, SELECTORS.signatory_panel_delete + ':first');
                     expect(this.view.$(SELECTORS.action_add_signatory)).not.toHaveClass('disableClick');
                 }

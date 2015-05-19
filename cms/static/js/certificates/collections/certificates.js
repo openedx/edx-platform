@@ -1,7 +1,8 @@
 // Backbone.js Application Collection: Certificates
 
 define([
-    'backbone', 'js/certificates/models/certificate'
+    'backbone',
+    'js/certificates/models/certificate'
 ],
 function(Backbone, Certificate) {
     'use strict';

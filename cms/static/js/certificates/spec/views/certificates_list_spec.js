@@ -1,7 +1,8 @@
 // Jasmine Test Suite: Certificate List View
 
 define([
-    'underscore', 'js/models/course',
+    'underscore',
+    'js/models/course',
     'js/certificates/collections/certificates',
     'js/certificates/models/certificate',
     'js/certificates/views/certificate_details',
@@ -9,14 +10,16 @@ define([
     'js/certificates/views/certificate_item',
     'js/certificates/views/certificates_list',
     'js/views/feedback_notification',
-    'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
-    'js/spec_helpers/view_helpers', 'js/spec_helpers/assertion_helpers', 'js/spec_helpers/validation_helpers'
+    'js/common_helpers/ajax_helpers',
+    'js/common_helpers/template_helpers',
+    'js/spec_helpers/view_helpers',
+    'js/spec_helpers/assertion_helpers',
+    'js/spec_helpers/validation_helpers',
     'jasmine-stealth'
-], function(
-    _, Course, CertificateModel, CertificatesCollection,
-    CertificateDetailsView, CertificatesListView, CertificateEditorView, CertificateItemView,
-    Notification, AjaxHelpers, TemplateHelpers, ViewHelpers, ValidationHelpers
-) {
+],
+function(_, Course, CertificatesCollection, CertificateModel, CertificateDetailsView, CertificateEditorView,
+         CertificateItemView, CertificatesListView, Notification, AjaxHelpers, TemplateHelpers, ViewHelpers,
+         AssertionHelpers, ValidationHelpers) {
     'use strict';
 
     var SELECTORS = {
@@ -32,7 +35,6 @@ define([
         warningIcon: '.wrapper-certificate-validation > i',
         note: '.wrapper-delete-button'
     };
-
 
     beforeEach(function() {
         window.course = new Course({

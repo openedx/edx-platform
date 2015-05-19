@@ -15,7 +15,8 @@ from contentstore.views.certificates import CertificateManager
 CERTIFICATE_JSON = {
     u'name': u'Test certificate',
     u'description': u'Test description',
-    u'version': CERTIFICATE_SCHEMA_VERSION
+    u'version': CERTIFICATE_SCHEMA_VERSION,
+    u'course_title': 'Course Title Override'
 }
 
 CERTIFICATE_JSON_WITH_SIGNATORIES = {

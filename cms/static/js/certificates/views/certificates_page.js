@@ -1,11 +1,14 @@
 // Backbone Application View: Certificates Page
 
 define([
-    'jquery', 'underscore', 'gettext', 'js/views/pages/base_page',
+    'jquery',
+    'underscore',
+    'gettext',
     'js/common_helpers/page_helpers',
+    'js/views/pages/base_page',
     'js/certificates/views/certificates_list'
 ],
-function ($, _, gettext, BasePage, PageHelpers, CertificatesListView) {
+function ($, _, gettext, PageHelpers, BasePage, CertificatesListView) {
     'use strict';
     var CertificatesPage = BasePage.extend({
 
@@ -16,25 +19,12 @@ function ($, _, gettext, BasePage, PageHelpers, CertificatesListView) {
             this.certificatesListView = new CertificatesListView({
                 collection: this.certificatesCollection
             });
-
         },
 
         renderPage: function() {
             // Override the base operation with a class-specific workflow
-            var hash = PageHelpers.getLocationHash();
             this.$('.wrapper-certificates.certificates-list').append(this.certificatesListView.render().el);
-            if (hash) {
-                // Strip leading '#' to get id string to match
-                this.expandCertificate(hash.replace('#', ''));
-            }
             return $.Deferred().resolve().promise();
-        },
-
-        expandCertificate: function (id) {
-            // Locate the certificate having a corresponding identifier
-            var certificate = this.certificates.findWhere({
-                id: parseInt(id)
-            });
         }
     });
     return CertificatesPage;

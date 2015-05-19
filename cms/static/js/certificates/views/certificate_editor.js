@@ -1,7 +1,15 @@
 // Backbone Application View: Certificate Editor
 
-define(['js/views/list_item_editor', 'js/certificates/models/signatory', 'js/certificates/views/signatory_editor', 'underscore', 'jquery', 'gettext'],
-function(ListItemEditorView, Signatory, SignatoryEditor, _, $, gettext) {
+define([
+    'jquery',
+    'underscore',
+    'backbone',
+    'gettext',
+    'js/views/list_item_editor',
+    'js/certificates/models/signatory',
+    'js/certificates/views/signatory_editor'
+],
+function($, _, Backbone, gettext, ListItemEditorView, SignatoryModel, SignatoryEditorView) {
     'use strict';
     var MIN_SIGNATORIES_LIMIT = 1;
     var MAX_SIGNATORIES_LIMIT = 4;
@@ -55,7 +63,7 @@ function(ListItemEditorView, Signatory, SignatoryEditor, _, $, gettext) {
             var self = this;
             // Ensure we have at least one signatory associated with the certificate.
             this.model.get("signatories").each(function( modelSignatory) {
-                var signatory_view = new SignatoryEditor({
+                var signatory_view = new SignatoryEditorView({
                     model: modelSignatory,
                     isEditingAllCollections: true,
                     eventAgg: self.eventAgg
@@ -68,7 +76,7 @@ function(ListItemEditorView, Signatory, SignatoryEditor, _, $, gettext) {
 
         addSignatory: function() {
             // Append a new signatory to the certificate model's signatories collection
-            var signatory = new Signatory({certificate: this.getSaveableModel()});
+            var signatory = new SignatoryModel({certificate: this.getSaveableModel()});
             this.render();
         },
 

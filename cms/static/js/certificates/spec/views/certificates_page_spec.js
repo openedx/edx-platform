@@ -1,10 +1,14 @@
 // Jasmine Test Suite: Certifiate Page View
 
 define([
-    'jquery', 'underscore', 'js/certificates/views/certificates_page',
-    'js/certificates/models/certificate', 'js/certificates/collections/certificates',
-    'js/common_helpers/template_helpers'
-], function ($, _, CertificatesPage, CertificateModel, CertificateCollection, TemplateHelpers) {
+    'jquery',
+    'underscore',
+    'js/common_helpers/template_helpers',
+    'js/certificates/views/certificates_page',
+    'js/certificates/models/certificate',
+    'js/certificates/collections/certificates'
+],
+function ($, _, TemplateHelpers, CertificatesPage, CertificateModel, CertificateCollection) {
     'use strict';
     describe('CertificatesPage', function() {
         var mockCertificatesPage = readFixtures(

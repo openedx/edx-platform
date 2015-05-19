@@ -2,10 +2,12 @@
 // Renders an editor view or a details view depending on the state of the underlying model.
 
 define([
-    'js/views/list_item', 'js/certificates/views/certificate_details', 'js/certificates/views/certificate_editor', 'gettext'
-], function(
-    ListItemView, CertificateDetailsView, CertificateEditorView, gettext
-) {
+    'gettext',
+    'js/views/list_item',
+    'js/certificates/views/certificate_details',
+    'js/certificates/views/certificate_editor'
+],
+function (gettext, ListItemView, CertificateDetailsView, CertificateEditorView) {
     'use strict';
     var CertificateItemView = ListItemView.extend({
         events: {

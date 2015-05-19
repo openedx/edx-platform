@@ -94,7 +94,6 @@ define(["jquery", "js/views/feedback_notification", "js/views/feedback_prompt", 
             }
         };
 
-
         clickDeleteItem = function (that, promptSpy, promptText) {
             that.view.$('.delete').click();
             ViewHelpers.verifyPromptShowing(promptSpy, promptText);
@@ -111,7 +110,6 @@ define(["jquery", "js/views/feedback_notification", "js/views/feedback_prompt", 
             ViewHelpers.verifyNotificationShowing(notificationSpy, /Deleting/);
         };
 
-
         submitAndVerifyFormSuccess = function (view, requests, notificationSpy) {
             view.$('form').submit();
             ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
@@ -125,9 +123,6 @@ define(["jquery", "js/views/feedback_notification", "js/views/feedback_prompt", 
             AjaxHelpers.respondWithError(requests);
             ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
         };
-
-
-
 
         return {
             'installViewTemplates': installViewTemplates,
