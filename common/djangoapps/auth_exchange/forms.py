@@ -39,9 +39,15 @@ class AccessTokenExchangeForm(ScopeMixin, OAuthForm):
         return field_val
 
     def clean_access_token(self):
+        """
+        Validates and returns the "access_token" field.
+        """
         return self._require_oauth_field("access_token")
 
     def clean_client_id(self):
+        """
+        Validates and returns the "client_id" field.
+        """
         return self._require_oauth_field("client_id")
 
     def clean(self):

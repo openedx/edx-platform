@@ -1,3 +1,4 @@
+# pylint: disable=no-member
 """
 Tests for OAuth token exchange views
 """
@@ -12,9 +13,10 @@ from django.test import TestCase
 import httpretty
 import provider.constants
 from provider import scope
-from provider.oauth2.models import AccessToken
+from provider.oauth2.models import AccessToken, Client
 
-from oauth_exchange.tests.utils import AccessTokenExchangeTestMixin
+from auth_exchange.tests.utils import AccessTokenExchangeTestMixin
+from student.tests.factories import UserFactory
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 
 
@@ -55,12 +57,15 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
 
     def test_single_access_token(self):
         def extract_token(response):
+            """
+            Returns the access token from the response payload.
+            """
             return json.loads(response.content)["access_token"]
 
         self._setup_provider_response(success=True)
         for single_access_token in [True, False]:
             with mock.patch(
-                "oauth_exchange.views.constants.SINGLE_ACCESS_TOKEN",
+                "auth_exchange.views.constants.SINGLE_ACCESS_TOKEN",
                 single_access_token
             ):
                 first_response = self.client.post(self.url, self.data)
@@ -113,3 +118,38 @@ class AccessTokenExchangeViewTestGoogle(
     Tests for AccessTokenExchangeView used with Google
     """
     pass
+
+
+@unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
+class TestLoginWithAccessTokenView(TestCase):
+    """
+    Tests for LoginWithAccessTokenView
+    """
+    def setUp(self):
+        super(TestLoginWithAccessTokenView, self).setUp()
+        self.user = UserFactory()
+        self.oauth2_client = Client.objects.create(client_type=provider.constants.CONFIDENTIAL)
+
+    def _verify_response(self, access_token, expected_status_code, expected_num_cookies):
+        """
+        Calls the login_with_access_token endpoint and verifies the response given the expected values.
+        """
+        url = reverse("login_with_access_token")
+        response = self.client.post(url, HTTP_AUTHORIZATION="Bearer {0}".format(access_token))
+        self.assertEqual(response.status_code, expected_status_code)
+        self.assertEqual(len(response.cookies), expected_num_cookies)
+
+    def test_success(self):
+        access_token = AccessToken.objects.create(
+            token="test_access_token",
+            client=self.oauth2_client,
+            user=self.user,
+        )
+        self._verify_response(access_token, expected_status_code=204, expected_num_cookies=1)
+        self.assertEqual(len(self.client.cookies), 1)
+        self.assertEqual(self.client.session['_auth_user_id'], self.user.id)
+
+    def test_unauthenticated(self):
+        self._verify_response("invalid_token", expected_status_code=401, expected_num_cookies=0)
+        self.assertEqual(len(self.client.cookies), 0)
+        self.assertNotIn("session_key", self.client.session)

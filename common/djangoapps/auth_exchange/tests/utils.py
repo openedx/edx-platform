@@ -14,7 +14,7 @@ class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
     * _assert_error(data, expected_error, expected_error_description)
     * _assert_success(data, expected_scopes)
     """
-    def setUp(self):
+    def setUp(self):  # pylint: disable=arguments-differ
         super(AccessTokenExchangeTestMixin, self).setUp()
 
         # Initialize to minimal data
