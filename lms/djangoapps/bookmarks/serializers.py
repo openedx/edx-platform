@@ -27,12 +27,12 @@ class BookmarkSerializer(serializers.ModelSerializer):
             for field_name in existing - allowed:
                 self.fields.pop(field_name)
 
-    id = serializers.SerializerMethodField('get_id')
+    id = serializers.SerializerMethodField('get_id')  # pylint: disable=invalid-name
     path = serializers.Field(source='path')
     usage_id = serializers.Field(source='usage_key')
     course_id = serializers.Field(source='course_key')
 
-    class Meta:
+    class Meta(object):  # pylint: disable=missing-docstring
         model = Bookmark
         fields = ("id", "course_id", "usage_id", "display_name", "path", "created")
 

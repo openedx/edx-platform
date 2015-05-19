@@ -1,7 +1,7 @@
 """
 File contains bookmark api method(s).
 """
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.keys import UsageKey
 
 from xmodule.modulestore.django import modulestore
 from bookmarks.serializers import BookmarkSerializer

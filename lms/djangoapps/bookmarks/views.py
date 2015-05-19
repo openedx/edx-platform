@@ -4,7 +4,7 @@ https://openedx.atlassian.net/wiki/display/TNL/Bookmarks+API
 """
 import logging
 
-from django.core.exceptions import ObjectDoesNotExist, ValidationError, MultipleObjectsReturned
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.utils.translation import ugettext as _
 
 
@@ -95,8 +95,7 @@ class BookmarksView(ListCreateAPIView):
             return context
         optional_fields = self.request.QUERY_PARAMS.get('fields', [])
         optional_fields_list = optional_fields.split(',') if optional_fields else []
-        context['fields'] = DEFAULT_FIELDS + [field for field in optional_fields_list
-                                                   if field in OPTIONAL_FIELDS]
+        context['fields'] = DEFAULT_FIELDS + [field for field in optional_fields_list if field in OPTIONAL_FIELDS]
         return context
 
     def get_queryset(self):
@@ -147,7 +146,7 @@ class BookmarksView(ListCreateAPIView):
             return Response(
                 {
                     "developer_message": exception.message,
-                    "user_message": _(u"Invalid usage id: '{usage_id}'".format(usage_id=usage_id))
+                    "user_message": _(u"Invalid usage id")
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
@@ -164,7 +163,7 @@ class BookmarksView(ListCreateAPIView):
             return Response(
                 {
                     "developer_message": exception.message,
-                    "user_message": _(u"Invalid usage id: '{usage_id}'".format(usage_id=usage_id))
+                    "user_message": _(u"Invalid usage id")
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
@@ -245,7 +244,7 @@ class BookmarksDetailView(APIView):
             return Response(
                 {
                     "developer_message": exception.message,
-                    "user_message": _(u"Invalid usage id: '{usage_id}'".format(usage_id=usage_id))
+                    "user_message": _(u"Invalid usage id")
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
@@ -273,7 +272,7 @@ class BookmarksDetailView(APIView):
             return Response(
                 {
                     "developer_message": exception.message,
-                    "user_message": _(u"Invalid usage id: '{usage_id}'".format(usage_id=usage_id))
+                    "user_message": _(u"Invalid usage id")
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )

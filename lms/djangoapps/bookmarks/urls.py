@@ -3,11 +3,11 @@ Unit Bookmark API URLs
 """
 
 from django.conf import settings
-from django.conf.urls import include, patterns, url
+from django.conf.urls import patterns, url
 
 from .views import BookmarksView, BookmarksDetailView
 
-USERNAME_PATTERN = '(?P<username>[\w.@+-]+)'
+USERNAME_PATTERN = r'(?P<username>[\w.@+-]+)'
 
 urlpatterns = patterns(
     "bookmarks",

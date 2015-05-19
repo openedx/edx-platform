@@ -1,3 +1,6 @@
+"""
+This File contains Model for Bookmarks.
+"""
 
 import json
 import logging
