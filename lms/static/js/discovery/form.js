@@ -29,16 +29,17 @@ define(['jquery', 'backbone'], function ($, Backbone) {
             else {
                 term = this.$searchField.val();
             }
-            var trimmed = $.trim(term);
-            this.trigger('search', trimmed);
+            this.trigger('search', $.trim(term));
             this.$message.empty();
         },
 
         clearSearch: function () {
+            this.$message.empty();
             this.$searchField.val('');
         },
 
         showLoadingIndicator: function () {
+            this.$message.empty();
             this.$loadingIndicator.removeClass('hidden');
         },
 
