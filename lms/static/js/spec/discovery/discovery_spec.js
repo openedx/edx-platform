@@ -1,8 +1,8 @@
 define([
     'jquery',
-    'sinon',
     'backbone',
     'logger',
+    'js/common_helpers/ajax_helpers',
     'js/common_helpers/template_helpers',
     'js/discovery/app',
     'js/discovery/collection',
@@ -19,9 +19,9 @@ define([
     'js/discovery/facets_view'
 ], function(
     $,
-    Sinon,
     Backbone,
     Logger,
+    AjaxHelpers,
     TemplateHelpers,
     App,
     Collection,
@@ -113,11 +113,9 @@ define([
     var SEARCH_FILTER = {"type": "search_string", "query": "search3"};
 
 
-
     describe('Collection', function () {
 
         beforeEach(function () {
-            this.server = Sinon.fakeServer.create();
             this.collection = new Collection();
 
             this.onSearch = jasmine.createSpy('onSearch');
@@ -130,15 +128,10 @@ define([
             this.collection.on('error', this.onError);
         });
 
-        afterEach(function () {
-            this.server.restore();
-        });
-
         it('sends a request and parses the json result', function () {
+            var requests = AjaxHelpers.requests(this);
             this.collection.performSearch('search string');
-            this.server.respondWith('POST', this.collection.url, [200, {}, JSON.stringify(JSON_RESPONSE)]);
-            this.server.respond();
-
+            AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
             expect(this.onSearch).toHaveBeenCalled();
             expect(this.collection.totalCount).toEqual(365);
             expect(this.collection.latestModels()[0].attributes).toEqual(JSON_RESPONSE.results[0].data);
@@ -146,31 +139,33 @@ define([
         });
 
         it('handles errors', function () {
+            var requests = AjaxHelpers.requests(this);
             this.collection.performSearch('search string');
-            this.server.respond();
+            AjaxHelpers.respondWithError(requests);
             expect(this.onSearch).not.toHaveBeenCalled();
             expect(this.onError).toHaveBeenCalled();
             this.collection.loadNextPage();
-            this.server.respond();
+            AjaxHelpers.respondWithError(requests);
             expect(this.onSearch).not.toHaveBeenCalled();
             expect(this.onError).toHaveBeenCalled();
         });
 
         it('loads next page', function () {
+            var requests = AjaxHelpers.requests(this);
             var response = { total: 35, results: [] };
             this.collection.loadNextPage();
-            this.server.respond('POST', this.collection.url, [200, {}, JSON.stringify(response)]);
+            AjaxHelpers.respondWithJson(requests, response);
             expect(this.onNext).toHaveBeenCalled();
             expect(this.onError).not.toHaveBeenCalled();
         });
 
         it('sends correct paging parameters', function () {
-            this.collection.performSearch('search string');
+            var requests = AjaxHelpers.requests(this);
             var response = { total: 52, results: [] };
-            this.server.respondWith('POST', this.collection.url, [200, {}, JSON.stringify(response)]);
-            this.server.respond();
+            this.collection.performSearch('search string');
+            AjaxHelpers.respondWithJson(requests, response);
             this.collection.loadNextPage();
-            this.server.respond();
+            AjaxHelpers.respondWithJson(requests, response);
             spyOn($, 'ajax');
             this.collection.loadNextPage();
             expect($.ajax.mostRecentCall.args[0].url).toEqual(this.collection.url);
@@ -182,12 +177,13 @@ define([
         });
 
         it('has next page', function () {
+            var requests = AjaxHelpers.requests(this);
             var response = { total: 35, access_denied_count: 5, results: [] };
             this.collection.performSearch('search string');
-            this.server.respond('POST', this.collection.url, [200, {}, JSON.stringify(response)]);
+            AjaxHelpers.respondWithJson(requests, response);
             expect(this.collection.hasNextPage()).toEqual(true);
             this.collection.loadNextPage();
-            this.server.respond();
+            AjaxHelpers.respondWithJson(requests, response);
             expect(this.collection.hasNextPage()).toEqual(false);
         });
 
@@ -487,7 +483,6 @@ define([
                 'templates/discovery/search_facets_list',
                 'templates/discovery/more_less_links'
             ]);
-            this.server = Sinon.fakeServer.create();
             this.app = new App(
                 Collection,
                 DiscoveryForm,
@@ -497,61 +492,56 @@ define([
             );
         });
 
-        afterEach(function () {
-            this.server.restore();
-        });
-
         it('performs search', function () {
+            var requests = AjaxHelpers.requests(this);
             $('.discovery-input').val('test');
             $('.discovery-submit').trigger('click');
-            this.server.respondWith('POST', '/search/course_discovery/', [200, {}, JSON.stringify(JSON_RESPONSE)]);
-            this.server.respond();
+            AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
             expect($('.courses-listing article').length).toEqual(1);
             expect($('.courses-listing .course-title')).toContainHtml('edX Demonstration Course');
             expect($('.active-filter').length).toBe(1);
         });
 
         it('loads more', function () {
+            var requests = AjaxHelpers.requests(this);
             jasmine.Clock.useMock();
             $('.discovery-input').val('test');
             $('.discovery-submit').trigger('click');
-            this.server.respondWith('POST', '/search/course_discovery/', [200, {}, JSON.stringify(JSON_RESPONSE)]);
-            this.server.respond();
+            AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
             expect($('.courses-listing article').length).toEqual(1);
             expect($('.courses-listing .course-title')).toContainHtml('edX Demonstration Course');
             window.scroll(0, $(document).height());
             $(window).trigger('scroll');
             jasmine.Clock.tick(500);
-            this.server.respondWith('POST', '/search/course_discovery/', [200, {}, JSON.stringify(JSON_RESPONSE)]);
-            this.server.respond();
+            AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
             expect($('.courses-listing article').length).toEqual(2);
         });
 
         it('displays not found message', function () {
+            var requests = AjaxHelpers.requests(this);
             $('.discovery-input').val('asdfasdf');
             $('.discovery-submit').trigger('click');
-            this.server.respondWith('POST', '/search/course_discovery/', [200, {}, '{}']);
-            this.server.respond();
+            AjaxHelpers.respondWithJson(requests, {});
             expect($('#discovery-message')).not.toBeEmpty();
             expect($('.courses-listing article').length).toEqual(1);
             expect($('.courses-listing .course-title')).toContainHtml('title');
         });
 
         it('displays error message', function () {
+            var requests = AjaxHelpers.requests(this);
             $('.discovery-input').val('asdfasdf');
             $('.discovery-submit').trigger('click');
-            this.server.respondWith('POST', '/search/course_discovery/', [404, {}, '']);
-            this.server.respond();
+            AjaxHelpers.respondWithError(requests, 404);
             expect($('#discovery-message')).not.toBeEmpty();
             expect($('.courses-listing article').length).toEqual(1);
             expect($('.courses-listing .course-title')).toContainHtml('title');
         });
 
         it('check filters and bar removed on clear all', function () {
+            var requests = AjaxHelpers.requests(this);
             $('.discovery-input').val('test');
             $('.discovery-submit').trigger('click');
-            this.server.respondWith('POST', '/search/course_discovery/', [200, {}, JSON.stringify(JSON_RESPONSE)]);
-            this.server.respond();
+            AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
             expect($('.active-filter').length).toBe(1);
             expect($('#filter-bar')).not.toHaveClass('hidden');
             $('#clear-all-filters').trigger('click');
@@ -560,10 +550,10 @@ define([
         });
 
         it('check filters and bar removed on last filter cleared', function () {
+            var requests = AjaxHelpers.requests(this);
             $('.discovery-input').val('test');
             $('.discovery-submit').trigger('click');
-            this.server.respondWith('POST', '/search/course_discovery/', [200, {}, JSON.stringify(JSON_RESPONSE)]);
-            this.server.respond();
+            AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
             expect($('.active-filter').length).toBe(1);
             var $filter = $('.active-filter');
             $filter.find('a').trigger('click');
