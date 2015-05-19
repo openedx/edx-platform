@@ -74,6 +74,20 @@ define([
             this.trigger('addFilter', data);
         },
 
+        displayName: function(name, term){
+            if(this.facetsTypes.hasOwnProperty(name)){
+                if(term){
+                    return this.facetsTypes[name].hasOwnProperty(term) ? this.facetsTypes[name][term] : term;
+                }
+                else{
+                    return this.facetsTypes[name]['_' + name];
+                }
+            }
+            else{
+                return term ? term : name;
+            }
+        },
+
         renderFacets: function(facets) {
             var self = this;
             // Remove old facets
@@ -84,14 +98,10 @@ define([
             $.each(facets, function(name, stats) {
                 var facetsView = new FacetsView();
                 self.facetViews.push(facetsView);
-                var displayName = name;
-                if(self.facetsTypes.hasOwnProperty(name)) {
-                    displayName = self.facetsTypes[name];
-                }
-                self.$facetViewsEl.append(facetsView.render(name, displayName, stats).el);
+                self.$facetViewsEl.append(facetsView.render(name, self.displayName(name), stats).el);
                 $.each(stats.terms, function(term, count) {
                     var facetView = new FacetView();
-                    facetsView.$views.append(facetView.render(name, term, count).el);
+                    facetsView.$views.append(facetView.render(name, self.displayName(name, term), count).el);
                     facetsView.list.push(facetView);
                 });
                 if(_.size(stats.terms) > 9) {

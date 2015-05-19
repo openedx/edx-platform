@@ -129,6 +129,21 @@ FEATURES['ENABLE_DASHBOARD_SEARCH'] = True
 FEATURES['CERTIFICATES_HTML_VIEW'] = True
 
 
+from django.utils.translation import ugettext as _
+LANGUAGE_MAP = {lang: display for lang, display in ALL_LANGUAGES}
+LANGUAGE_MAP['_language'] = _('Language')
+COURSE_DISCOVERY_MEANININGS = {
+    'org': {
+        '_org': _('Organization'),
+    },
+    'modes': {
+        '_modes': _('Course Type'),
+        'honor': _('Honor'),
+        'verified': _('Verified'),
+    },
+    'language': LANGUAGE_MAP,
+}
+
 #####################################################################
 # See if the developer has any local overrides.
 try:
