@@ -523,7 +523,7 @@ define([
             $('.discovery-submit').trigger('click');
             AjaxHelpers.respondWithJson(requests, {});
             expect($('#discovery-message')).not.toBeEmpty();
-            expect($('.courses-listing article').length).toEqual(1);
+            expect($('.courses-listing').toBeEmpty();
             expect($('.courses-listing .course-title')).toContainHtml('title');
         });
 
@@ -533,7 +533,7 @@ define([
             $('.discovery-submit').trigger('click');
             AjaxHelpers.respondWithError(requests, 404);
             expect($('#discovery-message')).not.toBeEmpty();
-            expect($('.courses-listing article').length).toEqual(1);
+            expect($('.courses-listing')).toBeEmpty();
             expect($('.courses-listing .course-title')).toContainHtml('title');
         });
 
