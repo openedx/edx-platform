@@ -48,7 +48,7 @@ define([
 
             event.preventDefault();
 
-            $ul.css('max-height', '').addClass('collapse');
+            $ul.addClass('collapse');
             $el.addClass('hidden');
             $more.removeClass('hidden');
         },
@@ -62,7 +62,7 @@ define([
             event.preventDefault();
 
             $el.addClass('hidden');
-            $ul.removeClass('collapse').css('max-height', facets * itemHeight + 'px');
+            $ul.removeClass('collapse');
             $el.siblings('.show-less').removeClass('hidden');
         },
 
