@@ -13,11 +13,7 @@ from ...pages.studio.overview import CourseOutlinePage
 from ...pages.studio.settings import SettingsPage
 from ...pages.studio.settings_advanced import AdvancedSettingsPage
 from ...pages.studio.settings_group_configurations import GroupConfigurationsPage
-<<<<<<< HEAD
 from ...pages.lms.courseware import CoursewarePage
-=======
-from ...pages.studio.settings_certificates import CertificatesPage
->>>>>>> d3cb5cc... Add certificates mini-app to Studio
 from unittest import skip
 from textwrap import dedent
 from xmodule.partitions.partitions import Group

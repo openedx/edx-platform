@@ -278,6 +278,7 @@ define([
     "js/certificates/spec/models/certificate_spec",
     "js/certificates/spec/views/certificate_details_spec",
     "js/certificates/spec/views/certificate_editor_spec",
+    #"js/certificates/spec/views/certificate_list_spec",
 
     # these tests are run separately in the cms-squire suite, due to process
     # isolation issues with Squire.js

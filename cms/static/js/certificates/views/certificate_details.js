@@ -1,9 +1,14 @@
 // Backbone Application View: Certificate Details
 
 define([
-    'js/views/baseview', 'underscore', 'js/certificates/models/signatory', 'js/certificates/views/signatory_details', 'gettext', 'underscore.string'
+    'underscore',
+    'underscore.string',
+    'gettext',
+    'js/views/baseview',
+    'js/certificates/models/signatory',
+    'js/certificates/views/signatory_details'
 ],
-function(BaseView, _, Signatory, SignatoryDetails, gettext, str) {
+function(_, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView) {
     'use strict';
     var CertificateDetailsView = BaseView.extend({
         tagName: 'div',
@@ -59,7 +64,7 @@ function(BaseView, _, Signatory, SignatoryDetails, gettext, str) {
             if(showDetails) {
                 var self = this;
                 this.model.get("signatories").each(function (modelSignatory) {
-                    var signatory_detail_view = new SignatoryDetails({model: modelSignatory});
+                    var signatory_detail_view = new SignatoryDetailsView({model: modelSignatory});
                     self.$('div.signatory-details-list').append($(signatory_detail_view.render().$el));
                 });
             }

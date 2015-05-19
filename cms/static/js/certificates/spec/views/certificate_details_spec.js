@@ -1,18 +1,21 @@
 // Jasmine Test Suite: Certifiate Details View
 
 define([
-    'underscore', 'js/models/course',
+    'underscore',
+    'js/models/course',
     'js/certificates/collections/certificates',
     'js/certificates/models/certificate',
     'js/certificates/views/certificate_details',
     'js/views/feedback_notification',
-    'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
-    'js/spec_helpers/view_helpers', 'js/spec_helpers/validation_helpers',
-    'js/certificates/spec/custom_matchers', 'jasmine-stealth'
-], function(
-    _, Course, CertificatesCollection, CertificateModel, CertificateDetailsView,
-    Notification, AjaxHelpers, TemplateHelpers, ViewHelpers, ValidationHelpers, CustomMatchers
-) {
+    'js/common_helpers/ajax_helpers',
+    'js/common_helpers/template_helpers',
+    'js/spec_helpers/view_helpers',
+    'js/spec_helpers/validation_helpers',
+    'js/certificates/spec/custom_matchers',
+    'jasmine-stealth'
+],
+function(_, Course, CertificatesCollection, CertificateModel, CertificateDetailsView,
+         Notification, AjaxHelpers, TemplateHelpers, ViewHelpers, ValidationHelpers, CustomMatchers) {
     'use strict';
 
     var SELECTORS = {

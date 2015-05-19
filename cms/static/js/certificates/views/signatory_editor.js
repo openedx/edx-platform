@@ -1,7 +1,16 @@
 // Backbone Application View: Signatory Editor
 
-define(['js/views/utils/view_utils', "js/views/feedback_prompt", "js/views/feedback_notification", 'js/utils/templates', 'underscore', 'jquery', 'gettext'],
-function(ViewUtils, PromptView, NotificationView, TemplateUtils, _, $, gettext) {
+define([
+    'jquery',
+    'underscore',
+    'backbone',
+    'gettext',
+    'js/utils/templates',
+    'js/views/utils/view_utils',
+    'js/views/feedback_prompt',
+    'js/views/feedback_notification'
+],
+function ($, _, Backbone, gettext, TemplateUtils, ViewUtils, PromptView, NotificationView) {
     'use strict';
     var SignatoryEditorView = Backbone.View.extend({
         tagName: 'div',
@@ -102,8 +111,9 @@ function(ViewUtils, PromptView, NotificationView, TemplateUtils, _, $, gettext) 
             var certificate = this.model.get('certificate');
             var model = this.model;
             var self = this;
+            var titleText = gettext('Are you sure you want to remove "<%= signatoryName %>" from the list of signatories?');
             var confirm = new PromptView.Warning({
-                title: gettext('Are you sure you want to delete "'+model.get('title') +'" as a signatory?'),
+                title: _.template(titleText, {signatoryName: model.get('name')}),
                 message: gettext('This action cannot be undone.'),
                 actions: {
                     primary: {

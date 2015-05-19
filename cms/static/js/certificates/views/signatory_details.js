@@ -2,9 +2,16 @@
 
 
 define([
-    'js/views/baseview', 'js/views/utils/view_utils', 'js/certificates/views/signatory_editor', 'underscore', "js/utils/templates", 'gettext', 'underscore.string'
+   'underscore',
+   'underscore.string',
+   'backbone',
+   'gettext',
+   'js/utils/templates',
+   'js/views/utils/view_utils',
+   'js/views/baseview',
+   'js/certificates/views/signatory_editor'
 ],
-function(BaseView, ViewUtils, SignatoryEditorView, _, TemplateUtils, gettext, str) {
+function (_, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, SignatoryEditorView) {
     'use strict';
     var SignatoryDetailsView = BaseView.extend({
         tagName: 'div',

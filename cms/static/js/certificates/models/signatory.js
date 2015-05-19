@@ -1,9 +1,13 @@
 // Backbone.js Application Model: Certificate Signatory
 
 define([
-    'backbone', 'underscore', 'underscore.string', 'gettext', 'backbone-relational'
+    'underscore',
+    'underscore.string',
+    'backbone',
+    'backbone-relational',
+    'gettext'
 ],
-function(Backbone, _, str) {
+function(_, str, Backbone, BackboneRelational, gettext) {
     'use strict';
     _.str = str;
 

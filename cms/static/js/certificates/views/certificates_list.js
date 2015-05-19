@@ -1,8 +1,11 @@
 // Backbone Application View: Certificates List
 
 define([
-    'js/views/list', 'js/certificates/views/certificate_item', 'gettext'
-], function(ListView, CertificateItemView, gettext) {
+    'gettext',
+    'js/views/list',
+    'js/certificates/views/certificate_item'
+],
+function (gettext, ListView, CertificateItemView) {
     'use strict';
     var CertificatesListView = ListView.extend({
         tagName: 'div',

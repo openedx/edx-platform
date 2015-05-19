@@ -1,7 +1,10 @@
 // Jasmine Test Suite: Certifiate Model
 
-define(['js/certificates/models/certificate', 'js/certificates/collections/certificates'],
-    function(CertificateModel, CertificateCollection) {
+define([
+    'js/certificates/models/certificate',
+    'js/certificates/collections/certificates'
+],
+function(CertificateModel, CertificateCollection) {
     'use strict';
 
     describe('CertificateModel', function() {
