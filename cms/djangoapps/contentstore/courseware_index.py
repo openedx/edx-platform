@@ -12,6 +12,7 @@ from django.core.urlresolvers import resolve
 
 from contentstore.utils import course_image_url
 from contentstore.course_group_config import GroupConfiguration
+from contentstore.views.component import SPLIT_TEST_COMPONENT_TYPE
 from course_modes.models import CourseMode
 from eventtracking import tracker
 from search.search_engine_base import SearchEngine
@@ -182,7 +183,9 @@ class SearchIndexerBase(object):
 
             item_content_groups = None
 
-            if item.category == "split_test":
+            if item.category == SPLIT_TEST_COMPONENT_TYPE:
+                if groups_usage_info is None and item.has_children:
+                    groups_usage_info = {}
                 for vertical in item.get_children():
                     group_id = int(vertical.display_name.split(" ")[2])
                     groups_usage_info.update({
@@ -194,8 +197,7 @@ class SearchIndexerBase(object):
                         })
 
             if groups_usage_info:
-                item_location = get_item_location(item)
-                item_content_groups = groups_usage_info.get(unicode(item_location), None)
+                item_content_groups = groups_usage_info.get(unicode(get_item_location(item)), None)
 
             item_id = unicode(cls._id_modifier(item.scope_ids.usage_id))
             indexed_items.add(item_id)
