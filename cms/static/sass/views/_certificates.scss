@@ -313,6 +313,49 @@
               border-color: $red;
             }
         }
+        .org-logo-upload-wrapper {
+          @include clearfix();
+          width: flex-grid(12,12);
+
+          .org-logo-upload-input-wrapper {
+            float: left;
+            width: flex-grid(7,12);
+            margin-right: flex-gutter();
+          }
+
+          .action-upload-org-logo {
+            @extend %ui-btn-flat-outline;
+            float: right;
+            width: flex-grid(4,12);
+            margin-top: ($baseline/4);
+            padding: ($baseline/2) $baseline;
+          }
+        }
+
+        .current-org-logo {
+          margin-bottom: ($baseline/2);
+          padding: ($baseline/2) $baseline;
+          background: $gray-l5;
+          text-align: center;
+
+          .wrapper-org-logo {
+            display: block;
+            width: 375px;
+            height: 200px;
+            overflow: hidden;
+            margin: 0 auto;
+            border: 1px solid $gray-l4;
+            box-shadow: 0 1px 1px $shadow-l1;
+            padding: ($baseline/2);
+            background: $white;
+          }
+
+          .org-logo {
+            display: block;
+            width: 100%;
+            min-height: 100%;
+          }
+        }
       }
 
       label.required {
