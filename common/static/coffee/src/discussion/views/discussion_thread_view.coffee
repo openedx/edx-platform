@@ -22,12 +22,6 @@ if Backbone?
       if @mode not in ["tab", "inline"]
         throw new Error("invalid mode: " + @mode)
 
-      # Quick fix to have an actual model when we're receiving new models from
-      # the server.
-      @model.collection.on "reset", (collection) =>
-        id = @model.get("id")
-        @model = collection.get(id) if collection.get(id)
-
       @createShowView()
       @responses = new Comments()
       @loadedResponses = false
