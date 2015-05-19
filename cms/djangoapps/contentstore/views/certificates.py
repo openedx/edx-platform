@@ -139,6 +139,7 @@ class CertificateManager(object):
             "name": certificate_data['name'],
             "description": certificate_data['description'],
             "version": CERTIFICATE_SCHEMA_VERSION,
+            "course_title": certificate_data['course_title'],
             "signatories": certificate_data['signatories']
         }
 
