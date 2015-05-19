@@ -428,6 +428,12 @@ if settings.COURSEWARE_ENABLED:
         url(r'^api/branding/v1/', include('branding.api_urls')),
     )
 
+    if settings.FEATURES["ENABLE_TEAMS"]:
+        # Teams endpoints
+        urlpatterns += (
+            url(r'^courses/{}/teams'.format(settings.COURSE_ID_PATTERN), include('teams.urls'), name="teams_endpoints"),
+        )
+
     # allow course staff to change to student view of courseware
     if settings.FEATURES.get('ENABLE_MASQUERADE'):
         urlpatterns += (

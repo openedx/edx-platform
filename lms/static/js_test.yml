@@ -35,6 +35,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/jasmine-imagediff.js
     - xmodule_js/common_static/js/vendor/require.js
     - js/RequireJS-namespace-undefine.js
+    - xmodule_js/common_static/js/vendor/requirejs/text.js
     - xmodule_js/common_static/js/vendor/jquery.min.js
     - xmodule_js/common_static/js/vendor/jquery-ui.min.js
     - xmodule_js/common_static/js/vendor/jquery.cookie.js
@@ -64,10 +65,12 @@ lib_paths:
 src_paths:
     - js
     - js/common_helpers
+    - teams/js
 
 # Paths to spec (test) JavaScript files
 spec_paths:
     - js/spec
+    - teams/js/spec
 
 # Paths to fixture files (optional)
 # The fixture path will be set automatically when using jasmine-jquery.
@@ -91,6 +94,7 @@ fixture_paths:
     - js/fixtures/edxnotes
     - js/fixtures/search
     - templates/search
+    - teams/templates
     - templates/discovery
 
 requirejs:
