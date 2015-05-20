@@ -122,7 +122,6 @@ class AnnotatableProblemTest(UniqueCourseTest):
         )
         return annotation_component_page
 
-    @skip  # TODO fix TNL-1590
     def test_annotation_component(self):
         """
         Test annotation components links to annotation problems.
