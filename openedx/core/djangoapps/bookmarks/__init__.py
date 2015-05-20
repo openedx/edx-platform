@@ -1,6 +1,8 @@
 """
 Bookmarks module.
 """
+from collections import namedtuple
+
 
 DEFAULT_FIELDS = [
     'id',
@@ -14,3 +16,5 @@ OPTIONAL_FIELDS = [
     'display_name',
     'path',
 ]
+
+PathItem = namedtuple('PathItem', ['usage_key', 'display_name'])
