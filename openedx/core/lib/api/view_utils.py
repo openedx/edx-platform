@@ -32,7 +32,7 @@ class DeveloperErrorViewMixin(object):
                 response_obj["developer_message"] = non_field_error_list[0]
             if message_dict:
                 response_obj["field_errors"] = {
-                    field: message_dict[field][0]
+                    field: {"developer_message": message_dict[field][0]}
                     for field in message_dict
                 }
             return Response(response_obj, status=400)

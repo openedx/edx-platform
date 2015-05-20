@@ -6,11 +6,17 @@ from django.http import Http404
 
 from collections import defaultdict
 
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseLocator
 
 from courseware.courses import get_course_with_access
 from discussion_api.pagination import get_paginated_data
 from discussion_api.serializers import CommentSerializer, ThreadSerializer, get_context
+from django_comment_client.base.views import (
+    THREAD_CREATED_EVENT_NAME,
+    get_thread_created_event_data,
+    track_forum_event,
+)
 from django_comment_client.utils import get_accessible_discussion_modules
 from lms.lib.comment_client.thread import Thread
 from lms.lib.comment_client.utils import CommentClientRequestError
@@ -208,3 +214,46 @@ def get_comment_list(request, thread_id, endorsed, page, page_size):
 
     results = [CommentSerializer(response, context=context).data for response in responses]
     return get_paginated_data(request, results, page, num_pages)
+
+
+def create_thread(request, thread_data):
+    """
+    Create a thread.
+
+    Parameters:
+
+        request: The django request object used for build_absolute_uri and
+          determining the requesting user.
+
+        thread_data: The data for the created thread.
+
+    Returns:
+
+        The created thread; see discussion_api.views.ThreadViewSet for more
+        detail.
+    """
+    course_id = thread_data.get("course_id")
+    if not course_id:
+        raise ValidationError({"course_id": ["This field is required."]})
+    try:
+        course_key = CourseLocator.from_string(course_id)
+        course = _get_course_or_404(course_key, request.user)
+    except (Http404, InvalidKeyError):
+        raise ValidationError({"course_id": ["Invalid value."]})
+
+    context = get_context(course, request)
+    serializer = ThreadSerializer(data=thread_data, context=context)
+    if not serializer.is_valid():
+        raise ValidationError(serializer.errors)
+    serializer.save()
+
+    thread = serializer.object
+    track_forum_event(
+        request,
+        THREAD_CREATED_EVENT_NAME,
+        course,
+        thread,
+        get_thread_created_event_data(thread, followed=False)
+    )
+
+    return serializer.data

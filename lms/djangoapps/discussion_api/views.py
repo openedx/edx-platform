@@ -11,7 +11,7 @@ from rest_framework.viewsets import ViewSet
 
 from opaque_keys.edx.locator import CourseLocator
 
-from discussion_api.api import get_comment_list, get_course_topics, get_thread_list
+from discussion_api.api import create_thread, get_comment_list, get_course_topics, get_thread_list
 from discussion_api.forms import CommentListGetForm, ThreadListGetForm
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 
@@ -61,11 +61,20 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
     """
     **Use Cases**
 
-        Retrieve the list of threads for a course.
+        Retrieve the list of threads for a course or post a new thread.
 
     **Example Requests**:
 
         GET /api/discussion/v1/threads/?course_id=ExampleX/Demo/2015
+
+        POST /api/discussion/v1/threads
+        {
+          "course_id": "foo/bar/baz",
+          "topic_id": "quux",
+          "type": "discussion",
+          "title": "Title text",
+          "body": "Body text"
+        }
 
     **GET Parameters**:
 
@@ -75,40 +84,56 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
         * page_size: The number of items per page (default is 10, max is 100)
 
-    **Response Values**:
+    **POST Parameters**:
 
-        * results: The list of threads. Each item in the list includes:
+        * course_id (required): The course to create the thread in
 
-            * id: The id of the thread
+        * topic_id (required): The topic to create the thread in
 
-            * course_id: The id of the thread's course
+        * type (required): The thread's type (either "question" or "discussion")
 
-            * topic_id: The id of the thread's topic
+        * title (required): The thread's title
 
-            * created_at: The ISO 8601 timestamp for the creation of the thread
+        * raw_body (required): The thread's raw body text
 
-            * updated_at: The ISO 8601 timestamp for the last modification of
-                the thread, which may not have been an update of the title/body
+    **GET Response Values**:
 
-            * type: The thread's type (either "question" or "discussion")
-
-            * title: The thread's title
-
-            * raw_body: The thread's raw body text without any rendering applied
-
-            * pinned: Boolean indicating whether the thread has been pinned
-
-            * closed: Boolean indicating whether the thread has been closed
-
-            * comment_count: The number of comments within the thread
-
-            * unread_comment_count: The number of comments within the thread
-                that were created or updated since the last time the user read
-                the thread
+        * results: The list of threads; each item in the list has the same
+            fields as the POST response below
 
         * next: The URL of the next page (or null if first page)
 
         * previous: The URL of the previous page (or null if last page)
+
+    **POST response values**:
+
+        * id: The id of the thread
+
+        * course_id: The id of the thread's course
+
+        * topic_id: The id of the thread's topic
+
+        * created_at: The ISO 8601 timestamp for the creation of the thread
+
+        * updated_at: The ISO 8601 timestamp for the last modification of
+            the thread, which may not have been an update of the title/body
+
+        * type: The thread's type (either "question" or "discussion")
+
+        * title: The thread's title
+
+        * raw_body: The thread's raw body text without any rendering applied
+
+        * pinned: Boolean indicating whether the thread has been pinned
+
+        * closed: Boolean indicating whether the thread has been closed
+
+        * comment_count: The number of comments within the thread
+
+        * unread_comment_count: The number of comments within the thread
+            that were created or updated since the last time the user read
+            the thread
+
     """
     def list(self, request):
         """
@@ -126,6 +151,13 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
                 form.cleaned_data["page_size"]
             )
         )
+
+    def create(self, request):
+        """
+        Implements the POST method for the list endpoint as described in the
+        class docstring.
+        """
+        return Response(create_thread(request, request.DATA))
 
 
 class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
