@@ -1,7 +1,7 @@
 
 import os
 import unittest
-from pavelib.utils.test.suites.bokchoy_suite import BokChoyTestSuite
+from pavelib.utils.test.suites import BokChoyTestSuite
 
 REPO_DIR = os.getcwd()
 
