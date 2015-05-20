@@ -53,13 +53,11 @@ class BadgeHandlerTestCase(ModuleStoreTestCase):
         self.assertEqual(self.handler.badge_create_url, 'https://example.com/v1/issuer/issuers/test-issuer/badges')
         self.assertEqual(
             self.handler.badge_url('honor'),
-            'https://example.com/v1/issuer/issuers/test-issuer/badges/'
-            'fc5519bfbeff40a53dc6d36a894f5c468c7020edc3858cb86046bc8740c9c1f0'
+            'https://example.com/v1/issuer/issuers/test-issuer/badges/edxcourse_testtest_run_honor_fc5519b'
         )
         self.assertEqual(
             self.handler.assertion_url('honor'),
-            'https://example.com/v1/issuer/issuers/test-issuer/badges/'
-            'fc5519bfbeff40a53dc6d36a894f5c468c7020edc3858cb86046bc8740c9c1f0/assertions'
+            'https://example.com/v1/issuer/issuers/test-issuer/badges/edxcourse_testtest_run_honor_fc5519b/assertions'
         )
 
     def check_headers(self, headers):
@@ -75,7 +73,11 @@ class BadgeHandlerTestCase(ModuleStoreTestCase):
         """
         self.assertEqual(
             self.handler.course_slug('honor'),
-            'fc5519bfbeff40a53dc6d36a894f5c468c7020edc3858cb86046bc8740c9c1f0'
+            'edxcourse_testtest_run_honor_fc5519b'
+        )
+        self.assertEqual(
+            self.handler.course_slug('verified'),
+            'edxcourse_testtest_run_verified_a199ec0'
         )
 
     def test_get_headers(self):
@@ -100,7 +102,7 @@ class BadgeHandlerTestCase(ModuleStoreTestCase):
             kwargs['data'],
             {
                 'name': 'Badged',
-                'slug': 'fc5519bfbeff40a53dc6d36a894f5c468c7020edc3858cb86046bc8740c9c1f0',
+                'slug': 'edxcourse_testtest_run_honor_fc5519b',
                 'criteria': 'http://example.com/courses/edX/course_test/test_run/about',
             }
         )
@@ -109,7 +111,7 @@ class BadgeHandlerTestCase(ModuleStoreTestCase):
         """
         Make sure ensure_badge_created doesn't call create_badge if we know the badge is already there.
         """
-        BadgeHandler.badges['fc5519bfbeff40a53dc6d36a894f5c468c7020edc3858cb86046bc8740c9c1f0'] = True
+        BadgeHandler.badges['edxcourse_testtest_run_honor_fc5519b'] = True
         self.handler.create_badge = Mock()
         self.handler.ensure_badge_created('honor')
         self.assertFalse(self.handler.create_badge.called)
@@ -119,7 +121,7 @@ class BadgeHandlerTestCase(ModuleStoreTestCase):
         response = Mock()
         response.status_code = 200
         get.return_value = response
-        self.assertNotIn('fc5519bfbeff40a53dc6d36a894f5c468c7020edc3858cb86046bc8740c9c1f0', BadgeHandler.badges)
+        self.assertNotIn('edxcourse_testtest_run_honor_fc5519b', BadgeHandler.badges)
         self.handler.create_badge = Mock()
         self.handler.ensure_badge_created('honor')
         self.assertTrue(get.called)
@@ -127,10 +129,10 @@ class BadgeHandlerTestCase(ModuleStoreTestCase):
         self.assertEqual(
             args[0],
             'https://example.com/v1/issuer/issuers/test-issuer/badges/'
-            'fc5519bfbeff40a53dc6d36a894f5c468c7020edc3858cb86046bc8740c9c1f0'
+            'edxcourse_testtest_run_honor_fc5519b'
         )
         self.check_headers(kwargs['headers'])
-        self.assertTrue(BadgeHandler.badges['fc5519bfbeff40a53dc6d36a894f5c468c7020edc3858cb86046bc8740c9c1f0'])
+        self.assertTrue(BadgeHandler.badges['edxcourse_testtest_run_honor_fc5519b'])
         self.assertFalse(self.handler.create_badge.called)
 
     @patch('requests.get')
@@ -138,12 +140,12 @@ class BadgeHandlerTestCase(ModuleStoreTestCase):
         response = Mock()
         response.status_code = 404
         get.return_value = response
-        self.assertNotIn('fc5519bfbeff40a53dc6d36a894f5c468c7020edc3858cb86046bc8740c9c1f0', BadgeHandler.badges)
+        self.assertNotIn('edxcourse_testtest_run_honor_fc5519b', BadgeHandler.badges)
         self.handler.create_badge = Mock()
         self.handler.ensure_badge_created('honor')
         self.assertTrue(self.handler.create_badge.called)
         self.assertEqual(self.handler.create_badge.call_args, call('honor'))
-        self.assertTrue(BadgeHandler.badges['fc5519bfbeff40a53dc6d36a894f5c468c7020edc3858cb86046bc8740c9c1f0'])
+        self.assertTrue(BadgeHandler.badges['edxcourse_testtest_run_honor_fc5519b'])
 
     @patch('requests.post')
     def test_create_assertion(self, post):
@@ -156,7 +158,7 @@ class BadgeHandlerTestCase(ModuleStoreTestCase):
         self.assertEqual(
             args[0],
             'https://example.com/v1/issuer/issuers/test-issuer/badges/'
-            'fc5519bfbeff40a53dc6d36a894f5c468c7020edc3858cb86046bc8740c9c1f0/assertions'
+            'edxcourse_testtest_run_honor_fc5519b/assertions'
         )
         self.check_headers(kwargs['headers'])
         self.assertEqual(kwargs['data'], {'email': 'example@example.com'})

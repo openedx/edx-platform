@@ -4,6 +4,7 @@ BadgeHandler object-- used to award Badges to users who have completed courses.
 import hashlib
 import logging
 import mimetypes
+from django.template.defaultfilters import slugify
 import requests
 
 from django.conf import settings
@@ -60,8 +61,13 @@ class BadgeHandler(object):
     def course_slug(self, mode):
         """
         Slug ought to be deterministic and limited in size so it's not too big for Badgr.
+
+        Badgr's max slug length is 255.
         """
-        return hashlib.sha256(u"{}{}".format(unicode(self.course_key), unicode(mode))).hexdigest()
+        # Seven digits should be enough to realistically avoid collisions. That's what git services use.
+        digest = hashlib.sha256(u"{}{}".format(unicode(self.course_key), unicode(mode))).hexdigest()[:7]
+        base_slug = slugify(unicode(self.course_key) + u'_{}_'.format(mode))[:248]
+        return base_slug + digest
 
     def log_if_raised(self, response):
         """
@@ -71,7 +77,9 @@ class BadgeHandler(object):
             response.raise_for_status()
         except HTTPError:
             LOGGER.error(
-                u"Encountered an error when contacting the Badgr-Server. Response status was %s.\n%s",
+                u"Encountered an error when contacting the Badgr-Server. Request sent to %s with headers %s.\n"
+                u"Response status was %s.\n%s",
+                repr(response.request.url), repr(response.request.headers),
                 response.status_code, response.body
             )
             raise
@@ -104,7 +112,7 @@ class BadgeHandler(object):
         content_type, __ = mimetypes.guess_type(image.name)
         if not content_type:
             raise ValueError(
-                "Could not determine content-type of image! Make sure it is a properly named .png or .svg file."
+                "Could not determine content-type of image! Make sure it is a properly named .png file."
             )
         files = {'image': (image.name, image, content_type)}
         try:
@@ -134,7 +142,7 @@ class BadgeHandler(object):
             'edx.badges.assertion.created', {
                 'user': user.id,
                 'course_id': unicode(self.course_key),
-                'mode': mode,
+                'enrollment_mode': mode,
                 'assertion': assertion.data
             }
         )
