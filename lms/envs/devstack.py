@@ -77,6 +77,12 @@ def should_show_debug_toolbar(_):
 
 PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
 
+# For local development, use the development backend for sendfiles.
+# In production, we'll use nginx to serve the files for us,
+# but devstack doesn't run nginx.
+# See https://github.com/johnsensible/django-sendfile
+SENDFILE_BACKEND = "sendfile.backends.development"
+
 ########################### VERIFIED CERTIFICATES #################################
 
 FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
