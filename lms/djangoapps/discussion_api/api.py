@@ -10,6 +10,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseLocator
 
 from courseware.courses import get_course_with_access
+from discussion_api.forms import ThreadCreateExtrasForm
 from discussion_api.pagination import get_paginated_data
 from discussion_api.serializers import CommentSerializer, ThreadSerializer, get_context
 from django_comment_client.base.views import (
@@ -243,17 +244,24 @@ def create_thread(request, thread_data):
 
     context = get_context(course, request)
     serializer = ThreadSerializer(data=thread_data, context=context)
-    if not serializer.is_valid():
-        raise ValidationError(serializer.errors)
+    extras_form = ThreadCreateExtrasForm(thread_data)
+    if not (serializer.is_valid() and extras_form.is_valid()):
+        raise ValidationError(dict(serializer.errors.items() + extras_form.errors.items()))
     serializer.save()
 
     thread = serializer.object
+    ret = serializer.data
+    following = extras_form.cleaned_data["following"]
+    if following:
+        context["cc_requester"].follow(thread)
+        ret["following"] = True
+
     track_forum_event(
         request,
         THREAD_CREATED_EVENT_NAME,
         course,
         thread,
-        get_thread_created_event_data(thread, followed=False)
+        get_thread_created_event_data(thread, followed=following)
     )
 
     return serializer.data

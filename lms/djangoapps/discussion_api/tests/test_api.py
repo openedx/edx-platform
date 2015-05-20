@@ -3,6 +3,7 @@ Tests for Discussion API internal interface
 """
 from datetime import datetime, timedelta
 import itertools
+from urlparse import urlparse
 
 import ddt
 import httpretty
@@ -1064,6 +1065,23 @@ class CreateThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestC
                 "user_forums_roles": [FORUM_ROLE_STUDENT],
                 "user_course_roles": [],
             }
+        )
+
+    def test_following(self):
+        self.register_post_thread_response({"id": "test_id"})
+        self.register_subscription_response(self.user)
+        data = self.minimal_data.copy()
+        data["following"] = "True"
+        result = create_thread(self.request, data)
+        self.assertEqual(result["following"], True)
+        cs_request = httpretty.last_request()
+        self.assertEqual(
+            urlparse(cs_request.path).path,
+            "/api/v1/users/{}/subscriptions".format(self.user.id)
+        )
+        self.assertEqual(
+            cs_request.parsed_body,
+            {"source_type": ["thread"], "source_id": ["test_id"]}
         )
 
     def test_course_id_missing(self):
