@@ -703,7 +703,7 @@ class FieldDataCache(object):
     for a module and its descendants
     """
     def __init__(self, descriptors, course_id, user, select_for_update=False, asides=None):
-        '''
+        """
         Find any courseware.models objects that are needed by any descriptor
         in descriptors. Attempts to minimize the number of queries to the database.
         Note: Only modules that have store_state = True or have shared
@@ -715,7 +715,7 @@ class FieldDataCache(object):
         user: The user for which to cache data
         select_for_update: Ignored
         asides: The list of aside types to load, or None to prefetch no asides.
-        '''
+        """
         if asides is None:
             self.asides = []
         else:
@@ -823,7 +823,7 @@ class FieldDataCache(object):
 
     @contract(key=DjangoKeyValueStore.Key)
     def get(self, key):
-        '''
+        """
         Load the field value specified by `key`.
 
         Arguments:
@@ -831,7 +831,7 @@ class FieldDataCache(object):
 
         Returns: The found value
         Raises: KeyError if key isn't found in the cache
-        '''
+        """
 
         if key.scope.user == UserScope.ONE and not self.user.is_anonymous():
             # If we're getting user data, we expect that the key matches the
