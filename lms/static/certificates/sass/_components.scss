@@ -3,10 +3,7 @@
 
 // About: styling for specific UI components ranging from global to modular.
 
-// #OVERRIDE - COPY
-// #OVERRIDE - HEADINGS
-// #OVERRIDE - BUTTONS
-
+// #HEADINGS
 // #DEPTH
 // #MESSAGES
 // #IMAGES
@@ -19,6 +16,15 @@
 // #ACCOMPLISHMENT RELATED
 // #CERTIFICATE
 // #ABOUT
+
+// ------------------------------
+// #HEADINGS
+// ------------------------------
+%hd-subsection {
+    margin-bottom: spacing-vertical(mid-small);
+    border-bottom: rem(2) solid palette(grayscale-cool, x-light);
+    padding-bottom: spacing-vertical(x-small);
+}
 
 // ------------------------------
 // #DEPTH
