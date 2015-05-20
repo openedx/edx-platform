@@ -832,9 +832,9 @@ function (Sjson, AsyncProcess) {
             event.preventDefault();
 
             if (this.state.el.hasClass('closed')) {
-                this.hideCaptions(false);
+                this.hideCaptions(false, true, true);
             } else {
-                this.hideCaptions(true);
+                this.hideCaptions(true, true, true);
             }
         },
 
@@ -846,7 +846,7 @@ function (Sjson, AsyncProcess) {
         * @param {boolean} update_cookie Flag to update or not the cookie.
         *
         */
-        hideCaptions: function (hide_captions, update_cookie) {
+        hideCaptions: function (hide_captions, update_cookie, trigger_event) {
             var hideSubtitlesEl = this.hideSubtitlesEl,
                 state = this.state, text;
 
@@ -858,13 +858,17 @@ function (Sjson, AsyncProcess) {
                 state.captionsHidden = true;
                 state.el.addClass('closed');
                 text = gettext('Turn on captions');
-                this.state.el.trigger('captions:hide');
+                if (trigger_event) {
+                    this.state.el.trigger('captions:hide');
+                }
             } else {
                 state.captionsHidden = false;
                 state.el.removeClass('closed');
                 this.scrollCaption();
                 text = gettext('Turn off captions');
-                this.state.el.trigger('captions:show');
+                if (trigger_event) {
+                    this.state.el.trigger('captions:show');
+                }
             }
 
             hideSubtitlesEl
