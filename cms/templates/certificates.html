@@ -50,7 +50,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
           % if certificates is None:
             <div class="notice notice-incontext notice-moduledisabled">
                 <p class="copy">
-                    ${_("This module is disabled at the moment.")}
+                    ${_("This module is not enabled.")}
                 </p>
             </div>
           % else:
@@ -64,7 +64,8 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
         <div class="bit">
           <div class="certificates-doc">
             <h2 class="title-3">${_("Certificates")}</h2>
-            <p>${_("Explanatory text about course certificates (web view) should go here")}</p>
+            <p>${_("Upon successful completion of your course, learners receive a certificate to acknowledge their accomplishment. Course team members with the Admin role in Studio can create course certificates based on templates that exist for your organization.")}</p>
+            <p>${_("Course team members with the Admin role can also add signatory names for a certificate, and upload assets including signature image files for signatories. {em_start}Note:{em_end} Signature images are used only for verified certificates.").format(em_start='<strong>', em_end="</strong>")}</p>
             <p>${_("Click {em_start}New Certificate{em_end} to add a new certificate. To edit a certficate, hover over its box and click {em_start}Edit{em_end}. You can delete a certificate only if it has not been issued to a learner. To delete a certificate, hover over its box and click the delete icon.").format(em_start="<strong>", em_end="</strong>")}</p>
             <p><a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn More")}</a></p>
           </div>
