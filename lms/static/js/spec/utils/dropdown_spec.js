@@ -22,7 +22,7 @@ define([
                 expect(button.length).toBe(1);
                 expect(wrapper.length).toBe(button.length);
                 expect(menu.length).toBe(wrapper.length);
-                expect(menu_item.length).toBeGreaterThan(0);
+                expect(menu_item.length).toBe(1);
                 expect(menu_action.length).toBe(menu_item.length);
             });
 
@@ -91,10 +91,12 @@ define([
 
                 for (i = last_item; i >= 0; i--) {
                     menu_item.eq(i).trigger(keyPressEvent(KEY.UP));
+                    expect(menu_item.eq(i).focus).toHaveBeenCalled();
                 }
 
                 for (i = 0; i <= last_item; i++) {
                     menu_item.eq(i).trigger(keyPressEvent(KEY.DOWN));
+                    expect(menu_item.eq(i).focus).toHaveBeenCalled();
                 }
             });
 
