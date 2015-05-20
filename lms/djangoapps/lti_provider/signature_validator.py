@@ -2,8 +2,6 @@
 Subclass of oauthlib's RequestValidator that checks an OAuth signature.
 """
 
-from django.core.exceptions import ObjectDoesNotExist
-
 from oauthlib.oauth1 import SignatureOnlyEndpoint
 from oauthlib.oauth1 import RequestValidator
 
@@ -91,7 +89,7 @@ class SignatureValidator(RequestValidator):
         """
         try:
             return LtiConsumer.objects.get(consumer_key=client_key).consumer_secret
-        except ObjectDoesNotExist:
+        except LtiConsumer.DoesNotExist:
             return None
 
     def verify(self, request):
