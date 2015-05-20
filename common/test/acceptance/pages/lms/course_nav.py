@@ -140,7 +140,9 @@ class CourseNavPage(PageObject):
         """
         # Retrieve the subsection title for the section
         # Add one to the list index to get the CSS index, which starts at one
-        subsection_css = 'nav>div.chapter-content-container:nth-of-type({0})>div>ol>li>a>p:nth-of-type(1)'.format(section_index)
+        subsection_css = 'nav>.chapter-content-container:nth-of-type({0})>div>ol>li>a>p:nth-of-type(1)'.format(
+            section_index
+        )
 
         # If the element is visible, we can get its text directly
         # Otherwise, we need to get the HTML

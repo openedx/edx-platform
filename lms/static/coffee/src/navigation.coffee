@@ -34,8 +34,8 @@ class @Navigation
     $('.course-wrapper').toggleClass('closed')
 
   setChapter: ->
-    $('#accordion .is-open').removeClass('is-open').attr('aria-expanded' , 'false').attr('aria-pressed' , 'false')
-    $(this).closest('.chapter').addClass('is-open').attr('aria-expanded' , 'true').attr('aria-pressed' , 'true')
+    $('#accordion .is-open').removeClass('is-open').attr('aria-expanded' , 'false').attr('aria-pressed' , 'false').find('h3 span').removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e')
+    $(this).closest('.chapter').addClass('is-open').attr('aria-expanded' , 'true').attr('aria-pressed' , 'true').find('h3 span').removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s')
     $('.ui-accordion-content-active').attr('aria-hidden', 'true')
     $('.ui-accordion-content-active').parent().hide()
     $('#accordion .ui-accordion-content-active').removeClass('ui-accordion-content-active')
