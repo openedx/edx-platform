@@ -101,16 +101,22 @@ class BadgeHandler(object):
             self.create_badge(mode)
         BadgeHandler.badges[self.course_slug(mode)] = True
 
-    def badge_name_field(self, course, mode):
+    @staticmethod
+    def badge_name_field(course, mode):
         """
         Get the name for the badge, based on the course name. Max size is 255.
         """
-        return _(u"{course_display_name} ({course_mode}, {start_date} to {end_date})").format(
+        return _(u"{course_display_name} ({course_mode})").format(
             course_display_name=course.display_name,
             course_mode=_(mode),
-            start_date=course.start.date(),
-            end_date=course.end.date()
         )[:255]
+
+    @staticmethod
+    def badge_description(course):
+        return _(u"{start_date} to {end_date}").format(
+            start_date=course.start.date(),
+            end_date=course.end.date(),
+        )
 
     def create_badge(self, mode):
         """
@@ -130,7 +136,8 @@ class BadgeHandler(object):
         data = {
             'name': self.badge_name_field(course, mode),
             'criteria': u'http://{}{}'.format(settings.SITE_NAME, about_path),
-            'slug': self.course_slug(mode)
+            'slug': self.course_slug(mode),
+            'description': self.badge_description(course)
         }
         result = requests.post(self.badge_create_url, headers=self.get_headers(), data=data, files=files)
         self.log_if_raised(result)
