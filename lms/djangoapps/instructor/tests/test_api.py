@@ -3968,6 +3968,7 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
     NOT_COMPLETED = "not completed"
 
     def setUp(self):
+        super(TestEmailQueries, self).setUp()
         self.course = CourseFactory.create(
             org="edX",
             number="emailToy",
@@ -4367,6 +4368,7 @@ class TestCourseTreeLookup(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
 
     def setUp(self):
+        super(TestCourseTreeLookup, self).setUp()
         self.course = CourseFactory.create(
             org="edX",
             number="emailToy2",
