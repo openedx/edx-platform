@@ -242,7 +242,7 @@ class TestMissingStudentModule(TestCase):
 
     def test_set_field_in_missing_student_module(self):
         "Test that setting a field in a missing StudentModule creates the student module"
-        self.assertEquals(0, sum(len(cache) for cache in self.field_data_cache.cache.values()))
+        self.assertEquals(0, len(self.field_data_cache))
         self.assertEquals(0, StudentModule.objects.all().count())
 
         # We are updating a problem, so we write to courseware_studentmodulehistory

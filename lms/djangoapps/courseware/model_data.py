@@ -951,3 +951,6 @@ class FieldDataCache(object):
             return None
 
         return self.cache[key.scope].last_modified(key)
+
+    def __len__(self):
+        return sum(len(cache) for cache in self.cache.values())
