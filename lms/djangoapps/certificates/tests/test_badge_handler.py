@@ -103,7 +103,7 @@ class BadgeHandlerTestCase(ModuleStoreTestCase):
             {
                 'name': 'Badged',
                 'slug': 'edxcourse_testtest_run_honor_fc5519b',
-                'criteria': 'http://example.com/courses/edX/course_test/test_run/about',
+                'criteria': 'http://edx.org/courses/edX/course_test/test_run/about',
             }
         )
 

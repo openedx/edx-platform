@@ -8,7 +8,6 @@ from django.template.defaultfilters import slugify
 import requests
 
 from django.conf import settings
-from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from eventtracking import tracker
 from lazy import lazy
@@ -115,14 +114,10 @@ class BadgeHandler(object):
                 "Could not determine content-type of image! Make sure it is a properly named .png file."
             )
         files = {'image': (image.name, image, content_type)}
-        try:
-            domain = unicode(Site.objects.get_current().domain)
-        except Site.DoesNotExist:
-            domain = u'example.com'
         about_path = reverse('about_course', kwargs={'course_id': unicode(self.course_key)})
         data = {
             'name': course.display_name,
-            'criteria': u'http://{}{}'.format(domain, about_path),
+            'criteria': u'http://{}{}'.format(settings.SITE_NAME, about_path),
             'slug': self.course_slug(mode)
         }
         result = requests.post(self.badge_create_url, headers=self.get_headers(), data=data, files=files)
