@@ -1025,6 +1025,7 @@ class TestVideoWithBumper(TestVideo):
         sources = [u'example.mp4', u'example.webm']
         expected_context = {
             'branding_info': None,
+            'license': None,
             'bumper_metadata': json.dumps(OrderedDict({
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 "showCaptions": "true",
