@@ -31,8 +31,9 @@ function(_, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView) {
 
         initialize: function() {
             // Set up the initial state of the attributes set for this model instance
+            this.showDetails = true;
             this.template = this.loadTemplate('certificate-details');
-            this.listenTo(this.model, 'change', this.render);
+            this.listenTo(this.model, 'change', this.render());
         },
 
         editCertificate: function(event) {
@@ -58,10 +59,10 @@ function(_, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView) {
             // Expand to show all model data, if requested
             var attrs = $.extend({}, this.model.attributes, {
                 index: this.model.collection.indexOf(this.model),
-                showDetails: showDetails || false
+                showDetails: this.showDetails || showDetails || false
             });
             this.$el.html(this.template(attrs));
-            if(showDetails) {
+            if(this.showDetails || showDetails) {
                 var self = this;
                 this.model.get("signatories").each(function (modelSignatory) {
                     var signatory_detail_view = new SignatoryDetailsView({model: modelSignatory});
