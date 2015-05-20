@@ -15,45 +15,4 @@
         <%include file="_about-edx.html" />
         <%include file="_about-accomplishments.html" />
     </div>
-<<<<<<< HEAD
-
-    <article class="accomplishment ${accomplishment_class_append}" id="validation-accomplishment">
-      <div class="accomplishment-statement">
-        <p class="copy">
-          <span class="copy-name">${accomplishment_copy_name}</span>
-          <span class="copy-context">${accomplishment_copy_description_full}</span>
-          <span class="copy-course">
-            <span class="copy-course-org">${accomplishment_copy_course_org}</span>
-            <span class="copy-course-name">${accomplishment_copy_course_name}</span>
-          </span>
-          <span class="copy-context">${accomplishment_copy_course_description}</span>
-        </p>
-          % if signatories:
-            <%include file="_certificate-signatories.html" />
-          % endif
-      </div>
-      <div class="accomplishment-details">
-        <h3 class="title title-lvl2 sr">${accomplishment_more_title}</h3>
-        <ul class="list list-metadata">
-          <li class="item certificate-type">
-            <span class="label">${_("Certificate Type")}</span>
-            <span class="value">
-              ${certificate_type_title}
-              <span class="explanation">${certificate_type_description}</span>
-            </span>
-          </li>
-          <li class="item certificate-id">
-            <span class="label">${certificate_id_number_title}</span>
-            <span class="value">${certificate_id_number}</span>
-          </li>
-          <li class="item certificate-date">
-            <span class="label">${certificate_date_issued_title}</span>
-            <span class="value">${certificate_date_issued}</span>
-          </li>
-        </ul>
-      </div>
-    </article>
-  </section>
-=======
->>>>>>> adding initial static rendering/styling for Open edX web certs
 </div>
