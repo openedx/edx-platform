@@ -56,29 +56,17 @@
 %>
 
 <section class="find-courses">
-
-  <header class="search">
-    <div class="inner-wrapper main-search">
-      <hgroup>
-        <div class="logo">
-          <img src="${logo_file}" alt="${logo_alt_text}" />
-        </div>
-        <h2>${course_index_overlay_text}</h2>
-      </hgroup>
-    </div>
-  </header>
-
   <section class="courses-container">
 
     % if course_discovery_enabled:
-    <div id="discovery-form" role="search" aria-label="course">
-      <form>
+    <div id="discovery-form" role="search" aria-label="course" class="wrapper-search-context">
+      <form class="wrapper-search-input">
         <input class="discovery-input" placeholder="${_('Search for a course')}" type="text"/><!-- removes spacing
         --><button type="submit" class="button postfix discovery-submit" aria-label="${_('Search')}">
           <i class="icon fa fa-search" aria-hidden="true"></i>
         </button>
       </form>
-      <div id="discovery-message"></div>
+      <div id="discovery-message" class="search-status-label"></div>
       <div aria-live="polite" aria-relevant="all">
         <div id="loading-indicator" class="hidden">
           <i class="icon fa fa-spinner fa-spin"></i> ${_('Loading')}
