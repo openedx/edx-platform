@@ -1,6 +1,7 @@
 """
 Tests for the BadgeHandler, which communicates with the Badgr Server.
 """
+from datetime import datetime, timedelta
 from django.test.utils import override_settings
 from django.db.models.fields.files import ImageFieldFile
 from lazy.lazy import lazy
@@ -30,7 +31,11 @@ class BadgeHandlerTestCase(ModuleStoreTestCase):
         """
         super(BadgeHandlerTestCase, self).setUp()
         # Need key to be deterministic to test slugs.
-        self.course = CourseFactory.create(org='edX', course='course_test', run='test_run', display_name='Badged')
+        self.course = CourseFactory.create(
+            org='edX', course='course_test', run='test_run', display_name='Badged',
+            start=datetime(year=2015, month=5, day=19),
+            end=datetime(year=2015, month=5, day=20)
+        )
         self.user = UserFactory.create(email='example@example.com')
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.location.course_key, mode='honor')
         # Need for force empty this dict on each run.
@@ -101,7 +106,7 @@ class BadgeHandlerTestCase(ModuleStoreTestCase):
         self.assertEqual(
             kwargs['data'],
             {
-                'name': 'Badged',
+                'name': 'Badged (honor, 2015-05-19 to 2015-05-20)',
                 'slug': 'edxcourse_testtest_run_honor_fc5519b',
                 'criteria': 'http://edx.org/courses/edX/course_test/test_run/about',
             }

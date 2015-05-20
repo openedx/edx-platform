@@ -5,6 +5,7 @@ import hashlib
 import logging
 import mimetypes
 from django.template.defaultfilters import slugify
+from django.utils.translation import ugettext as _
 import requests
 
 from django.conf import settings
@@ -100,6 +101,17 @@ class BadgeHandler(object):
             self.create_badge(mode)
         BadgeHandler.badges[self.course_slug(mode)] = True
 
+    def badge_name_field(self, course, mode):
+        """
+        Get the name for the badge, based on the course name. Max size is 255.
+        """
+        return _(u"{course_display_name} ({course_mode}, {start_date} to {end_date})").format(
+            course_display_name=course.display_name,
+            course_mode=_(mode),
+            start_date=course.start.date(),
+            end_date=course.end.date()
+        )[:255]
+
     def create_badge(self, mode):
         """
         Create the badge spec for a course's mode.
@@ -116,7 +128,7 @@ class BadgeHandler(object):
         files = {'image': (image.name, image, content_type)}
         about_path = reverse('about_course', kwargs={'course_id': unicode(self.course_key)})
         data = {
-            'name': course.display_name,
+            'name': self.badge_name_field(course, mode),
             'criteria': u'http://{}{}'.format(settings.SITE_NAME, about_path),
             'slug': self.course_slug(mode)
         }
