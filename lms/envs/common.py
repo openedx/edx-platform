@@ -1938,7 +1938,7 @@ INSTALLED_APPS = (
     'xblock_django',
 
     # Bookmarks
-    'bookmarks',
+    'openedx.core.djangoapps.bookmarks',
 )
 
 ######################### CSRF #########################################

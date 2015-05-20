@@ -37,13 +37,13 @@ from courseware.entrance_exams import (
 )
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
-from lms.djangoapps.bookmarks.services import BookmarksService
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, unquote_slashes, quote_slashes
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from openedx.core.lib.xblock_utils import (
     replace_course_urls,
     replace_jump_to_id_urls,

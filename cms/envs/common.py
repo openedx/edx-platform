@@ -797,6 +797,9 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.import_export',
 
     'xblock_django',
+
+    # Bookmarks
+    'openedx.core.djangoapps.bookmarks',
 )
 
 
