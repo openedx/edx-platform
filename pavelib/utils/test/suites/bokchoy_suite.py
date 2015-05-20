@@ -4,7 +4,7 @@ Class used for defining and running Bok Choy acceptance test suite
 from time import sleep
 
 from paver.easy import sh
-from pavelib.utils.test.suites import TestSuite
+from pavelib.utils.test.suites.suite import TestSuite
 from pavelib.utils.envs import Env
 from pavelib.utils.test import bokchoy_utils
 from pavelib.utils.test import utils as test_utils
