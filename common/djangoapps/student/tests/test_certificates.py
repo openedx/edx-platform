@@ -45,7 +45,8 @@ class CertificateDisplayTest(ModuleStoreTestCase):
 
         test_url = u'{url}?course={course_id}'.format(
             url=reverse('cert_html_view'),
-            course_id=unicode(self.course.id))
+            course_id=unicode(self.course.id)  # pylint: disable=no-member
+        )
 
         self._create_certificate(enrollment_mode)
         certificates = [
@@ -58,7 +59,7 @@ class CertificateDisplayTest(ModuleStoreTestCase):
             }
         ]
         self.course.certificates = {'certificates': certificates}
-        self.course.save()
+        self.course.save()   # pylint: disable=no-member
         self.store.update_item(self.course, self.user.id)
         response = self.client.get(reverse('dashboard'))
         self.assertContains(response, u'View Test_Certificate')
