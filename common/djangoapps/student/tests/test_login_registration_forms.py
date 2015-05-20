@@ -11,12 +11,12 @@ from django.core.urlresolvers import reverse
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import CourseModeFactory
+from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
-# This relies on third party auth being enabled and configured
-# in the test settings.  See the setting `THIRD_PARTY_AUTH`
-# and the feature flag `ENABLE_THIRD_PARTY_AUTH`
+# This relies on third party auth being enabled in the test
+# settings with the feature flag `ENABLE_THIRD_PARTY_AUTH`
 THIRD_PARTY_AUTH_BACKENDS = ["google-oauth2", "facebook"]
 THIRD_PARTY_AUTH_PROVIDERS = ["Google", "Facebook"]
 
@@ -37,7 +37,7 @@ def _third_party_login_url(backend_name, auth_entry, course_id=None, redirect_ur
 
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class LoginFormTest(UrlResetMixin, ModuleStoreTestCase):
+class LoginFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase):
     """Test rendering of the login form. """
     @patch.dict(settings.FEATURES, {"ENABLE_COMBINED_LOGIN_REGISTRATION": False})
     def setUp(self):
@@ -48,6 +48,8 @@ class LoginFormTest(UrlResetMixin, ModuleStoreTestCase):
         self.course_id = unicode(self.course.id)
         self.course_modes_url = reverse("course_modes_choose", kwargs={"course_id": self.course_id})
         self.courseware_url = reverse("courseware", args=[self.course_id])
+        self.configure_google_provider(enabled=True)
+        self.configure_facebook_provider(enabled=True)
 
     @patch.dict(settings.FEATURES, {"ENABLE_THIRD_PARTY_AUTH": False})
     @ddt.data(THIRD_PARTY_AUTH_PROVIDERS)
@@ -149,7 +151,7 @@ class LoginFormTest(UrlResetMixin, ModuleStoreTestCase):
 
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class RegisterFormTest(UrlResetMixin, ModuleStoreTestCase):
+class RegisterFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase):
     """Test rendering of the registration form. """
     @patch.dict(settings.FEATURES, {"ENABLE_COMBINED_LOGIN_REGISTRATION": False})
     def setUp(self):
@@ -159,6 +161,8 @@ class RegisterFormTest(UrlResetMixin, ModuleStoreTestCase):
         self.course = CourseFactory.create()
         self.course_id = unicode(self.course.id)
         self.course_modes_url = reverse("course_modes_choose", kwargs={"course_id": self.course_id})
+        self.configure_google_provider(enabled=True)
+        self.configure_facebook_provider(enabled=True)
 
     @patch.dict(settings.FEATURES, {"ENABLE_THIRD_PARTY_AUTH": False})
     @ddt.data(*THIRD_PARTY_AUTH_PROVIDERS)

@@ -5,13 +5,15 @@ Used by Django and non-Django tests; must not have Django deps.
 """
 
 from contextlib import contextmanager
-import unittest
+from django.conf import settings
+import django.test
 import mock
 
-from third_party_auth import provider
+from third_party_auth.models import OAuth2ProviderConfig, SAMLProviderConfig, SAMLConfiguration, cache as config_cache
 
 
 AUTH_FEATURES_KEY = 'ENABLE_THIRD_PARTY_AUTH'
+AUTH_FEATURE_ENABLED = AUTH_FEATURES_KEY in settings.FEATURES
 
 
 class FakeDjangoSettings(object):
@@ -23,22 +25,66 @@ class FakeDjangoSettings(object):
             setattr(self, key, value)
 
 
-class TestCase(unittest.TestCase):
-    """Base class for auth test cases."""
-
-    # Allow access to protected methods (or module-protected methods) under
-    # test.
-    # pylint: disable-msg=protected-access
-
-    def setUp(self):
-        super(TestCase, self).setUp()
-        self._original_providers = provider.Registry._get_all()
-        provider.Registry._reset()
+class ThirdPartyAuthTestMixin(object):
+    """ Helper methods useful for testing third party auth functionality """
 
     def tearDown(self):
-        provider.Registry._reset()
-        provider.Registry.configure_once(self._original_providers)
-        super(TestCase, self).tearDown()
+        config_cache.clear()
+        super(ThirdPartyAuthTestMixin, self).tearDown()
+
+    def enable_saml(self, **kwargs):
+        """ Enable SAML support (via SAMLConfiguration, not for any particular provider) """
+        kwargs.setdefault('enabled', True)
+        SAMLConfiguration(**kwargs).save()
+
+    @staticmethod
+    def configure_oauth_provider(**kwargs):
+        """ Update the settings for an OAuth2-based third party auth provider """
+        obj = OAuth2ProviderConfig(**kwargs)
+        obj.save()
+        return obj
+
+    def configure_saml_provider(self, **kwargs):
+        """ Update the settings for a SAML-based third party auth provider """
+        self.assertTrue(SAMLConfiguration.is_enabled(), "SAML Provider Configuration only works if SAML is enabled.")
+        obj = SAMLProviderConfig(**kwargs)
+        obj.save()
+        return obj
+
+    @classmethod
+    def configure_google_provider(cls, **kwargs):
+        """ Update the settings for the Google third party auth provider/backend """
+        kwargs.setdefault("name", "Google")
+        kwargs.setdefault("backend_name", "google-oauth2")
+        kwargs.setdefault("icon_class", "fa-google-plus")
+        kwargs.setdefault("key", "test-fake-key.apps.googleusercontent.com")
+        kwargs.setdefault("secret", "opensesame")
+        return cls.configure_oauth_provider(**kwargs)
+
+    @classmethod
+    def configure_facebook_provider(cls, **kwargs):
+        """ Update the settings for the Facebook third party auth provider/backend """
+        kwargs.setdefault("name", "Facebook")
+        kwargs.setdefault("backend_name", "facebook")
+        kwargs.setdefault("icon_class", "fa-facebook")
+        kwargs.setdefault("key", "FB_TEST_APP")
+        kwargs.setdefault("secret", "opensesame")
+        return cls.configure_oauth_provider(**kwargs)
+
+    @classmethod
+    def configure_linkedin_provider(cls, **kwargs):
+        """ Update the settings for the LinkedIn third party auth provider/backend """
+        kwargs.setdefault("name", "LinkedIn")
+        kwargs.setdefault("backend_name", "linkedin-oauth2")
+        kwargs.setdefault("icon_class", "fa-linkedin")
+        kwargs.setdefault("key", "test")
+        kwargs.setdefault("secret", "test")
+        return cls.configure_oauth_provider(**kwargs)
+
+
+class TestCase(ThirdPartyAuthTestMixin, django.test.TestCase):
+    """Base class for auth test cases."""
+    pass
 
 
 @contextmanager
