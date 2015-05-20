@@ -9,14 +9,19 @@ import httpretty
 import mock
 from pytz import UTC
 
+from django.core.exceptions import ValidationError
 from django.http import Http404
 from django.test.client import RequestFactory
 
 from opaque_keys.edx.locator import CourseLocator
 
 from courseware.tests.factories import BetaTesterFactory, StaffFactory
-from discussion_api.api import get_course_topics, get_thread_list
-from discussion_api.tests.utils import CommentsServiceMockMixin
+from discussion_api.api import get_comment_list, get_course_topics, get_thread_list
+from discussion_api.tests.utils import (
+    CommentsServiceMockMixin,
+    make_minimal_cs_comment,
+    make_minimal_cs_thread,
+)
 from django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
@@ -378,12 +383,6 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
         ret = get_thread_list(self.request, course.id, page, page_size)
         return ret
 
-    def create_role(self, role_name, users):
-        """Create a Role in self.course with the given name and users"""
-        role = Role.objects.create(name=role_name, course_id=self.course.id)
-        role.users = users
-        role.save()
-
     def test_nonexistent_course(self):
         with self.assertRaises(Http404):
             get_thread_list(self.request, CourseLocator.from_string("non/existent/course"), 1, 1)
@@ -573,3 +572,368 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
         self.register_get_threads_response([], page=3, num_pages=3)
         with self.assertRaises(Http404):
             get_thread_list(self.request, self.course.id, page=4, page_size=10)
+
+
+@ddt.ddt
+class GetCommentListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
+    """Test for get_comment_list"""
+    def setUp(self):
+        super(GetCommentListTest, self).setUp()
+        httpretty.reset()
+        httpretty.enable()
+        self.addCleanup(httpretty.disable)
+        self.maxDiff = None  # pylint: disable=invalid-name
+        self.user = UserFactory.create()
+        self.register_get_user_response(self.user)
+        self.request = RequestFactory().get("/test_path")
+        self.request.user = self.user
+        self.course = CourseFactory.create()
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
+        self.author = UserFactory.create()
+
+    def make_minimal_cs_thread(self, overrides=None):
+        """
+        Create a thread with the given overrides, plus the course_id if not
+        already in overrides.
+        """
+        overrides = overrides.copy() if overrides else {}
+        overrides.setdefault("course_id", unicode(self.course.id))
+        return make_minimal_cs_thread(overrides)
+
+    def get_comment_list(self, thread, endorsed=None, page=1, page_size=1):
+        """
+        Register the appropriate comments service response, then call
+        get_comment_list and return the result.
+        """
+        self.register_get_thread_response(thread)
+        return get_comment_list(self.request, thread["id"], endorsed, page, page_size)
+
+    def test_nonexistent_thread(self):
+        thread_id = "nonexistent_thread"
+        self.register_get_thread_error_response(thread_id, 404)
+        with self.assertRaises(Http404):
+            get_comment_list(self.request, thread_id, endorsed=False, page=1, page_size=1)
+
+    def test_nonexistent_course(self):
+        with self.assertRaises(Http404):
+            self.get_comment_list(self.make_minimal_cs_thread({"course_id": "non/existent/course"}))
+
+    def test_not_enrolled(self):
+        self.request.user = UserFactory.create()
+        with self.assertRaises(Http404):
+            self.get_comment_list(self.make_minimal_cs_thread())
+
+    def test_discussions_disabled(self):
+        _remove_discussion_tab(self.course, self.user.id)
+        with self.assertRaises(Http404):
+            self.get_comment_list(self.make_minimal_cs_thread())
+
+    @ddt.data(
+        *itertools.product(
+            [
+                FORUM_ROLE_ADMINISTRATOR,
+                FORUM_ROLE_MODERATOR,
+                FORUM_ROLE_COMMUNITY_TA,
+                FORUM_ROLE_STUDENT,
+            ],
+            [True, False],
+            ["no_group", "match_group", "different_group"],
+        )
+    )
+    @ddt.unpack
+    def test_group_access(self, role_name, course_is_cohorted, thread_group_state):
+        cohort_course = CourseFactory.create(cohort_config={"cohorted": course_is_cohorted})
+        CourseEnrollmentFactory.create(user=self.user, course_id=cohort_course.id)
+        cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.user])
+        role = Role.objects.create(name=role_name, course_id=cohort_course.id)
+        role.users = [self.user]
+        thread = self.make_minimal_cs_thread({
+            "course_id": unicode(cohort_course.id),
+            "group_id": (
+                None if thread_group_state == "no_group" else
+                cohort.id if thread_group_state == "match_group" else
+                cohort.id + 1
+            ),
+        })
+        expected_error = (
+            role_name == FORUM_ROLE_STUDENT and
+            course_is_cohorted and
+            thread_group_state == "different_group"
+        )
+        try:
+            self.get_comment_list(thread)
+            self.assertFalse(expected_error)
+        except Http404:
+            self.assertTrue(expected_error)
+
+    @ddt.data(True, False)
+    def test_discussion_endorsed(self, endorsed_value):
+        with self.assertRaises(ValidationError) as assertion:
+            self.get_comment_list(
+                self.make_minimal_cs_thread({"thread_type": "discussion"}),
+                endorsed=endorsed_value
+            )
+        self.assertEqual(
+            assertion.exception.message_dict,
+            {"endorsed": ["This field may not be specified for discussion threads."]}
+        )
+
+    def test_question_without_endorsed(self):
+        with self.assertRaises(ValidationError) as assertion:
+            self.get_comment_list(
+                self.make_minimal_cs_thread({"thread_type": "question"}),
+                endorsed=None
+            )
+        self.assertEqual(
+            assertion.exception.message_dict,
+            {"endorsed": ["This field is required for question threads."]}
+        )
+
+    def test_empty(self):
+        discussion_thread = self.make_minimal_cs_thread(
+            {"thread_type": "discussion", "children": [], "resp_total": 0}
+        )
+        self.assertEqual(
+            self.get_comment_list(discussion_thread),
+            {"results": [], "next": None, "previous": None}
+        )
+
+        question_thread = self.make_minimal_cs_thread({
+            "thread_type": "question",
+            "endorsed_responses": [],
+            "non_endorsed_responses": [],
+            "non_endorsed_resp_total": 0
+        })
+        self.assertEqual(
+            self.get_comment_list(question_thread, endorsed=False),
+            {"results": [], "next": None, "previous": None}
+        )
+        self.assertEqual(
+            self.get_comment_list(question_thread, endorsed=True),
+            {"results": [], "next": None, "previous": None}
+        )
+
+    def test_basic_query_params(self):
+        self.get_comment_list(
+            self.make_minimal_cs_thread({
+                "children": [make_minimal_cs_comment()],
+                "resp_total": 71
+            }),
+            page=6,
+            page_size=14
+        )
+        self.assert_query_params_equal(
+            httpretty.httpretty.latest_requests[-2],
+            {
+                "recursive": ["True"],
+                "user_id": [str(self.user.id)],
+                "mark_as_read": ["True"],
+                "resp_skip": ["70"],
+                "resp_limit": ["14"],
+            }
+        )
+
+    def test_discussion_content(self):
+        source_comments = [
+            {
+                "id": "test_comment_1",
+                "thread_id": "test_thread",
+                "user_id": str(self.author.id),
+                "username": self.author.username,
+                "anonymous": False,
+                "anonymous_to_peers": False,
+                "created_at": "2015-05-11T00:00:00Z",
+                "updated_at": "2015-05-11T11:11:11Z",
+                "body": "Test body",
+                "abuse_flaggers": [],
+                "votes": {"up_count": 4},
+                "children": [],
+            },
+            {
+                "id": "test_comment_2",
+                "thread_id": "test_thread",
+                "user_id": str(self.author.id),
+                "username": self.author.username,
+                "anonymous": True,
+                "anonymous_to_peers": False,
+                "created_at": "2015-05-11T22:22:22Z",
+                "updated_at": "2015-05-11T33:33:33Z",
+                "body": "More content",
+                "abuse_flaggers": [str(self.user.id)],
+                "votes": {"up_count": 7},
+                "children": [],
+            }
+        ]
+        expected_comments = [
+            {
+                "id": "test_comment_1",
+                "thread_id": "test_thread",
+                "parent_id": None,
+                "author": self.author.username,
+                "author_label": None,
+                "created_at": "2015-05-11T00:00:00Z",
+                "updated_at": "2015-05-11T11:11:11Z",
+                "raw_body": "Test body",
+                "abuse_flagged": False,
+                "voted": False,
+                "vote_count": 4,
+                "children": [],
+            },
+            {
+                "id": "test_comment_2",
+                "thread_id": "test_thread",
+                "parent_id": None,
+                "author": None,
+                "author_label": None,
+                "created_at": "2015-05-11T22:22:22Z",
+                "updated_at": "2015-05-11T33:33:33Z",
+                "raw_body": "More content",
+                "abuse_flagged": True,
+                "voted": False,
+                "vote_count": 7,
+                "children": [],
+            },
+        ]
+        actual_comments = self.get_comment_list(
+            self.make_minimal_cs_thread({"children": source_comments})
+        )["results"]
+        self.assertEqual(actual_comments, expected_comments)
+
+    def test_question_content(self):
+        thread = self.make_minimal_cs_thread({
+            "thread_type": "question",
+            "endorsed_responses": [make_minimal_cs_comment({"id": "endorsed_comment"})],
+            "non_endorsed_responses": [make_minimal_cs_comment({"id": "non_endorsed_comment"})],
+            "non_endorsed_resp_total": 1,
+        })
+
+        endorsed_actual = self.get_comment_list(thread, endorsed=True)
+        self.assertEqual(endorsed_actual["results"][0]["id"], "endorsed_comment")
+
+        non_endorsed_actual = self.get_comment_list(thread, endorsed=False)
+        self.assertEqual(non_endorsed_actual["results"][0]["id"], "non_endorsed_comment")
+
+    @ddt.data(
+        ("discussion", None, "children", "resp_total"),
+        ("question", False, "non_endorsed_responses", "non_endorsed_resp_total"),
+    )
+    @ddt.unpack
+    def test_cs_pagination(self, thread_type, endorsed_arg, response_field, response_total_field):
+        """
+        Test cases in which pagination is done by the comments service.
+
+        thread_type is the type of thread (question or discussion).
+        endorsed_arg is the value of the endorsed argument.
+        repsonse_field is the field in which responses are returned for the
+          given thread type.
+        response_total_field is the field in which the total number of responses
+          is returned for the given thread type.
+        """
+        # N.B. The mismatch between the number of children and the listed total
+        # number of responses is unrealistic but convenient for this test
+        thread = self.make_minimal_cs_thread({
+            "thread_type": thread_type,
+            response_field: [make_minimal_cs_comment()],
+            response_total_field: 5,
+        })
+
+        # Only page
+        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=1, page_size=5)
+        self.assertIsNone(actual["next"])
+        self.assertIsNone(actual["previous"])
+
+        # First page of many
+        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=1, page_size=2)
+        self.assertEqual(actual["next"], "http://testserver/test_path?page=2")
+        self.assertIsNone(actual["previous"])
+
+        # Middle page of many
+        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=2, page_size=2)
+        self.assertEqual(actual["next"], "http://testserver/test_path?page=3")
+        self.assertEqual(actual["previous"], "http://testserver/test_path?page=1")
+
+        # Last page of many
+        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=3, page_size=2)
+        self.assertIsNone(actual["next"])
+        self.assertEqual(actual["previous"], "http://testserver/test_path?page=2")
+
+        # Page past the end
+        thread = self.make_minimal_cs_thread({
+            "thread_type": thread_type,
+            response_field: [],
+            response_total_field: 5
+        })
+        with self.assertRaises(Http404):
+            self.get_comment_list(thread, endorsed=endorsed_arg, page=2, page_size=5)
+
+    def test_question_endorsed_pagination(self):
+        thread = self.make_minimal_cs_thread({
+            "thread_type": "question",
+            "endorsed_responses": [
+                make_minimal_cs_comment({"id": "comment_{}".format(i)}) for i in range(10)
+            ]
+        })
+
+        def assert_page_correct(page, page_size, expected_start, expected_stop, expected_next, expected_prev):
+            """
+            Check that requesting the given page/page_size returns the expected
+            output
+            """
+            actual = self.get_comment_list(thread, endorsed=True, page=page, page_size=page_size)
+            result_ids = [result["id"] for result in actual["results"]]
+            self.assertEqual(
+                result_ids,
+                ["comment_{}".format(i) for i in range(expected_start, expected_stop)]
+            )
+            self.assertEqual(
+                actual["next"],
+                "http://testserver/test_path?page={}".format(expected_next) if expected_next else None
+            )
+            self.assertEqual(
+                actual["previous"],
+                "http://testserver/test_path?page={}".format(expected_prev) if expected_prev else None
+            )
+
+        # Only page
+        assert_page_correct(
+            page=1,
+            page_size=10,
+            expected_start=0,
+            expected_stop=10,
+            expected_next=None,
+            expected_prev=None
+        )
+
+        # First page of many
+        assert_page_correct(
+            page=1,
+            page_size=4,
+            expected_start=0,
+            expected_stop=4,
+            expected_next=2,
+            expected_prev=None
+        )
+
+        # Middle page of many
+        assert_page_correct(
+            page=2,
+            page_size=4,
+            expected_start=4,
+            expected_stop=8,
+            expected_next=3,
+            expected_prev=1
+        )
+
+        # Last page of many
+        assert_page_correct(
+            page=3,
+            page_size=4,
+            expected_start=8,
+            expected_stop=10,
+            expected_next=None,
+            expected_prev=2
+        )
+
+        # Page past the end
+        with self.assertRaises(Http404):
+            self.get_comment_list(thread, endorsed=True, page=2, page_size=10)
