@@ -15,19 +15,18 @@ from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
 from student.models import CourseEnrollment
 from contentstore.views.certificates import CertificateManager
-from contentstore.views.exception import AssetNotFoundException
 
 CERTIFICATE_JSON = {
     u'name': u'Test certificate',
     u'description': u'Test description',
     u'version': CERTIFICATE_SCHEMA_VERSION,
-    u'course_title': 'Course Title Override'
 }
 
 CERTIFICATE_JSON_WITH_SIGNATORIES = {
     u'name': u'Test certificate',
     u'description': u'Test description',
     u'version': CERTIFICATE_SCHEMA_VERSION,
+    u'course_title': 'Course Title Override',
     u'signatories': [
         {
             "name": "Bob Smith",
@@ -231,7 +230,6 @@ class CertificatesListHandlerTestCase(CourseTestCase, CertificatesBaseTestCase, 
 
         # in html response
         result = self.client.get_html(self._url())
-        print self._url()
         self.assertIn('Test certificate', result.content)
         self.assertIn('Test description', result.content)
 
@@ -325,6 +323,7 @@ class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase
             u'version': CERTIFICATE_SCHEMA_VERSION,
             u'name': u'Test certificate',
             u'description': u'Test description',
+            u'course_title': u'Course Title Override',
             u'signatories': []
         }
 
@@ -349,7 +348,9 @@ class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase
             u'version': CERTIFICATE_SCHEMA_VERSION,
             u'name': u'New test certificate',
             u'description': u'New test description',
+            u'course_title': u'Course Title Override',
             u'signatories': []
+
         }
 
         response = self.client.put(
@@ -369,11 +370,11 @@ class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase
         self.assertEqual(course_certificates[1].get('name'), u'New test certificate')
         self.assertEqual(course_certificates[1].get('description'), 'New test description')
 
-    def test_can_delete_certificate(self):
+    def test_can_delete_certificate_with_signatories(self):
         """
         Delete certificate
         """
-        self._add_course_certificates(count=2)
+        self._add_course_certificates(count=2, signatory_count=1)
         response = self.client.delete(
             self._url(cid=1),
             content_type="application/json",
@@ -415,6 +416,7 @@ class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase
         )
         self.assertEqual(response.status_code, 204)
         self.reload_course()
+
         # Verify that certificates are properly updated in the course.
         certificates = self.course.certificates['certificates']
         self.assertEqual(len(certificates[1].get("signatories")), 2)
@@ -425,14 +427,13 @@ class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase
         """
         self._add_course_certificates(count=2, signatory_count=4)
         test_url = '{}/signatories/3'.format(self._url(cid=1))
-        with self.assertRaises(AssetNotFoundException):
-            response = self.client.delete(
-                test_url,
-                content_type="application/json",
-                HTTP_ACCEPT="application/json",
-                HTTP_X_REQUESTED_WITH="XMLHttpRequest",
-            )
-            self.assertEqual(response.status_code, 500)
+        response = self.client.delete(
+            test_url,
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 204)
 
     def test_delete_signatory_non_existing_certificate(self):
         """
