@@ -4,7 +4,7 @@
 Mobile API Overview
 ################################################
 
-Use the eMobile API to build mobile applications for students to
+Use the Mobile API to build mobile applications for students to
 view course information and videos for courses on your instance of Open edX.
 
 ******************************************
