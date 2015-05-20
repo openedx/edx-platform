@@ -6,7 +6,7 @@ from .exceptions import (ItemNotFoundError, NoPathToItem)
 LOGGER = getLogger(__name__)
 
 
-def path_to_location(modulestore, usage_key):
+def path_to_location(modulestore, usage_key, full_path=False):
     '''
     Try to find a course_id/chapter/section[/position] path to location in
     modulestore.  The courseware insists that the first level in the course is
@@ -15,6 +15,7 @@ def path_to_location(modulestore, usage_key):
     Args:
         modulestore: which store holds the relevant objects
         usage_key: :class:`UsageKey` the id of the location to which to generate the path
+        full_path: :class:`Bool` if True, return the full path to location. Default is False.
 
     Raises
         ItemNotFoundError if the location doesn't exist.
@@ -80,6 +81,9 @@ def path_to_location(modulestore, usage_key):
         path = find_path_to_course()
         if path is None:
             raise NoPathToItem(usage_key)
+
+        if full_path:
+            return path
 
         n = len(path)
         course_id = path[0].course_key
