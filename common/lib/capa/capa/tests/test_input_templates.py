@@ -388,9 +388,9 @@ class TextlineTemplateTest(TemplateTestCase):
             xpath = "//div[@class='%s ']" % div_class
             self.assert_has_xpath(xml, xpath, self.context)
 
-            # Expect that we get a <p> with class="status"
+            # Expect that we get a <span> with class="status"
             # (used to by CSS to draw the green check / red x)
-            self.assert_has_text(xml, "//p[@class='status']",
+            self.assert_has_text(xml, "//span[@class='status']",
                                  status_mark, exact=False)
 
     def test_label(self):

@@ -10,9 +10,11 @@
         % endif
         />
 
-      <p class="status" id="${id}_status">
-           ${status.display_name}
-      </p>
+      <span class="status" id="${id}_status" data-tooltip="This is ${status.display_name}.">
+        <span class="sr">
+          ${status.display_name}
+        </span>
+      </span>
 
       <div id="input_${id}_preview" class="equation">
         \[\]

@@ -82,6 +82,28 @@ $gray-d2: shade($gray,40%); // #4c4c4c
 $gray-d3: shade($gray,60%); // #323232
 $gray-d4: shade($gray,80%); // #191919
 
+// TO-DO: once existing lms $blue is removed, change $cms-blue to $blue. 
+$cms-blue: rgb(0, 159, 230);
+$blue-l1: tint($cms-blue,20%);
+$blue-l2: tint($cms-blue,40%);
+$blue-l3: tint($cms-blue,60%);
+$blue-l4: tint($cms-blue,80%);
+$blue-l5: tint($cms-blue,90%);
+$blue-d1: shade($cms-blue,20%);
+$blue-d2: shade($cms-blue,40%);
+$blue-d3: shade($cms-blue,60%);
+$blue-d4: shade($cms-blue,80%);
+$blue-s1: saturate($cms-blue,15%);
+$blue-s2: saturate($cms-blue,30%);
+$blue-s3: saturate($cms-blue,45%);
+$blue-u1: desaturate($cms-blue,15%);
+$blue-u2: desaturate($cms-blue,30%);
+$blue-u3: desaturate($cms-blue,45%);
+$blue-t0: rgba($cms-blue, 0.125);
+$blue-t1: rgba($cms-blue, 0.25);
+$blue-t2: rgba($cms-blue, 0.50);
+$blue-t3: rgba($cms-blue, 0.75);
+
 $pink: rgb(182,37,103); // #b72567;
 $pink-l1: tint($pink,20%);
 $pink-l2: tint($pink,40%);
