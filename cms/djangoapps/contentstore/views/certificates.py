@@ -39,7 +39,7 @@ from util.json_request import JsonResponse
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
 from contentstore.views.assets import delete_asset
-from contentstore.views.exception import CertificateValidationError
+from contentstore.views.exception import CertificateValidationError, AssetNotFoundException
 from django.core.exceptions import PermissionDenied
 
 CERTIFICATE_SCHEMA_VERSION = 1
@@ -68,7 +68,11 @@ def _delete_asset(course_key, asset_key_string):
         if '/' == asset_key_string[0]:
             asset_key_string = asset_key_string[1:]
         asset_key = AssetKey.from_string(asset_key_string)
-        delete_asset(course_key, asset_key)
+        try:
+            delete_asset(course_key, asset_key)
+        # If the asset was not found, it doesn't have to be deleted...
+        except AssetNotFoundException:
+            pass
 
 
 class CertificateManager(object):
@@ -149,14 +153,19 @@ class CertificateManager(object):
         We use direct access here for specific keys in order to enforce their presence
         """
         certificate_data = certificate.certificate_data
-        return {
+        certificate_response = {
             "id": certificate_data['id'],
             "name": certificate_data['name'],
             "description": certificate_data['description'],
             "version": CERTIFICATE_SCHEMA_VERSION,
-            "course_title": certificate_data['course_title'],
             "signatories": certificate_data['signatories']
         }
+
+        # Some keys are not required, such as the title override...
+        if certificate_data.get('course_title'):
+            certificate_response["course_title"] = certificate_data['course_title']
+
+        return certificate_response
 
     @staticmethod
     def deserialize_certificate(course, value):
@@ -195,9 +204,13 @@ class CertificateManager(object):
         """
         for index, cert in enumerate(course.certificates['certificates']):
             if int(cert['id']) == int(certificate_id):
+                certificate = course.certificates['certificates'][index]
+                # Remove any signatory assets prior to dropping the entire cert record from the course
+                for sig_index, signatory in enumerate(certificate.get('signatories')):  # pylint: disable=unused-variable
+                    _delete_asset(course.id, signatory['signature_image_path'])
+                # Now drop the certificate record
                 course.certificates['certificates'].pop(index)
                 store.update_item(course, request.user.id)
-                CertificateManager.remove_signatory_signature_images(course, cert)
                 break
 
     # pylint-disable: unused-variable
@@ -215,14 +228,6 @@ class CertificateManager(object):
                         store.update_item(course, request.user.id)
                         break
 
-    @staticmethod
-    def remove_signatory_signature_images(course, certificate):
-        """
-        Remove the signature images for all signatories in specified certificate
-        """
-        for sig_index, signatory in enumerate(certificate.get('signatories')):  # pylint: disable=unused-variable
-            _delete_asset(course.id, signatory['signature_image_path'])
-
 
 class Certificate(object):
     """
@@ -233,7 +238,7 @@ class Certificate(object):
         Instantiate a Certificate object instance using the provided information.
         """
         self.course = course
-        self.__certificate_data = certificate_data
+        self._certificate_data = certificate_data
         self.id = certificate_data['id']  # pylint: disable=invalid-name
 
     @property
@@ -241,14 +246,7 @@ class Certificate(object):
         """
         Retrieve the locally-stored certificate data from the Certificate object via a helper method
         """
-        return self.__certificate_data
-
-    @certificate_data.setter
-    def certificate_data(self, value):
-        """
-        Set certificate name.
-        """
-        self.__certificate_data = value
+        return self._certificate_data
 
 
 @login_required
