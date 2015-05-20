@@ -107,7 +107,7 @@ def get_thread_list(request, course_key, page, page_size):
     discussion_api.views.ThreadViewSet for more detail.
     """
     course = _get_course_or_404(course_key, request.user)
-    context = get_context(course, request.user)
+    context = get_context(course, request)
     threads, result_page, num_pages, _ = Thread.search({
         "course_id": unicode(course.id),
         "group_id": (
@@ -169,7 +169,7 @@ def get_comment_list(request, thread_id, endorsed, page, page_size):
 
     course_key = CourseLocator.from_string(cc_thread["course_id"])
     course = _get_course_or_404(course_key, request.user)
-    context = get_context(course, request.user, cc_thread)
+    context = get_context(course, request, cc_thread)
 
     # Ensure user has access to the thread
     if not context["is_requester_privileged"] and cc_thread["group_id"]:

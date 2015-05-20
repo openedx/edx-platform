@@ -32,6 +32,7 @@ from django_comment_common.models import (
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from util.testing import UrlResetMixin
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -356,8 +357,9 @@ class GetCourseTopicsTest(ModuleStoreTestCase):
 
 
 @ddt.ddt
-class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
+class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestCase):
     """Test for get_thread_list"""
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(GetThreadListTest, self).setUp()
         httpretty.reset()
@@ -485,6 +487,9 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "vote_count": 4,
                 "comment_count": 5,
                 "unread_comment_count": 3,
+                "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_0",
+                "endorsed_comment_list_url": None,
+                "non_endorsed_comment_list_url": None,
             },
             {
                 "id": "test_thread_id_1",
@@ -507,6 +512,13 @@ class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "vote_count": 9,
                 "comment_count": 18,
                 "unread_comment_count": 0,
+                "comment_list_url": None,
+                "endorsed_comment_list_url": (
+                    "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_1&endorsed=True"
+                ),
+                "non_endorsed_comment_list_url": (
+                    "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_1&endorsed=False"
+                ),
             },
         ]
         self.assertEqual(

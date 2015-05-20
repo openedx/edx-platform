@@ -5,6 +5,9 @@ import itertools
 
 import ddt
 import httpretty
+import mock
+
+from django.test.client import RequestFactory
 
 from discussion_api.serializers import CommentSerializer, ThreadSerializer, get_context
 from discussion_api.tests.utils import (
@@ -20,13 +23,15 @@ from django_comment_common.models import (
     Role,
 )
 from student.tests.factories import UserFactory
+from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 
 
 @ddt.ddt
-class SerializerTestMixin(CommentsServiceMockMixin):
+class SerializerTestMixin(CommentsServiceMockMixin, UrlResetMixin):
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(SerializerTestMixin, self).setUp()
         httpretty.reset()
@@ -35,6 +40,8 @@ class SerializerTestMixin(CommentsServiceMockMixin):
         self.maxDiff = None  # pylint: disable=invalid-name
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
+        self.request = RequestFactory().get("/dummy")
+        self.request.user = self.user
         self.course = CourseFactory.create()
         self.author = UserFactory.create()
 
@@ -137,7 +144,7 @@ class ThreadSerializerTest(SerializerTestMixin, ModuleStoreTestCase):
         Create a serializer with an appropriate context and use it to serialize
         the given thread, returning the result.
         """
-        return ThreadSerializer(thread, context=get_context(self.course, self.user)).data
+        return ThreadSerializer(thread, context=get_context(self.course, self.request)).data
 
     def test_basic(self):
         thread = {
@@ -182,7 +189,23 @@ class ThreadSerializerTest(SerializerTestMixin, ModuleStoreTestCase):
             "vote_count": 4,
             "comment_count": 5,
             "unread_comment_count": 3,
+            "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
+            "endorsed_comment_list_url": None,
+            "non_endorsed_comment_list_url": None,
         }
+        self.assertEqual(self.serialize(thread), expected)
+
+        thread["thread_type"] = "question"
+        expected.update({
+            "type": "question",
+            "comment_list_url": None,
+            "endorsed_comment_list_url": (
+                "http://testserver/api/discussion/v1/comments/?thread_id=test_thread&endorsed=True"
+            ),
+            "non_endorsed_comment_list_url": (
+                "http://testserver/api/discussion/v1/comments/?thread_id=test_thread&endorsed=False"
+            ),
+        })
         self.assertEqual(self.serialize(thread), expected)
 
     def test_group(self):
@@ -227,7 +250,7 @@ class CommentSerializerTest(SerializerTestMixin, ModuleStoreTestCase):
         Create a serializer with an appropriate context and use it to serialize
         the given comment, returning the result.
         """
-        context = get_context(self.course, self.user, make_minimal_cs_thread(thread_data))
+        context = get_context(self.course, self.request, make_minimal_cs_thread(thread_data))
         return CommentSerializer(comment, context=context).data
 
     def test_basic(self):
