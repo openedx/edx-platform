@@ -12,6 +12,7 @@ from instructor.views.data_access_constants import DatabaseFields, TEMPORARY_QUE
 import random
 import datetime
 from instructor.tasks_helper import get_problem_users, get_section_users
+from celery import group
 
 
 @task(base=EmailWidgetTask)  # pylint: disable=not-callable
@@ -67,6 +68,7 @@ def make_subqueries(course_id, group_id, queries):
     """
     Issues the subqueries associated with a group query
     """
+    tasks = []
     for query in queries:
         query = StudentQuery(
             query.query_type,
@@ -75,7 +77,10 @@ def make_subqueries(course_id, group_id, queries):
             query.filter_on,
             query.entity_name,
         )
-        make_single_query.apply_async(args=(course_id, query, group_id), kwargs={'origin': QueryOrigin.EMAIL})
+        tasks.append(make_single_query.si(course_id, query, group_id,origin=QueryOrigin.EMAIL))
+    res = group(tasks)()
+    # blocks until all single queries are finished
+    res.get()
 
 
 def purge_temporary_queries():
