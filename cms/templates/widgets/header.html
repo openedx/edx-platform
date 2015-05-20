@@ -34,6 +34,7 @@
             grading_url = reverse('contentstore.views.grading_handler', kwargs={'course_key_string': unicode(course_key)})
             advanced_settings_url = reverse('contentstore.views.advanced_settings_handler', kwargs={'course_key_string': unicode(course_key)})
             tabs_url = reverse('contentstore.views.tabs_handler', kwargs={'course_key_string': unicode(course_key)})
+            credit_eligibility_url = reverse('contentstore.views.credit_eligibility_handler', kwargs={'course_key_string': unicode(course_key)})
       %>
       <h2 class="info-course">
         <span class="sr">${_("Current Course:")}</span>
@@ -122,6 +123,13 @@
                     <a href="${reverse('export_git', kwargs=dict(course_key_string=unicode(course_key)))}">${_("Export to Git")}</a>
                   </li>
                   % endif
+
+                  % if settings.FEATURES.get('ENABLE_CREDIT_ELIGIBILITY'):
+                  <li class="nav-item nav-course-tools-credit-eligibility">
+                      <a href="${credit_eligibility_url}">${_("Credit Eligibility")}</a>
+                  </li>
+                  % endif
+
                 </ul>
               </div>
             </div>

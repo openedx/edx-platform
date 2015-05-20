@@ -1,0 +1,40 @@
+<%inherit file="base.html" />
+<%def name="online_help_token()"><% return "advanced" %></%def>
+<%namespace name='static' file='static_content.html'/>
+<%!
+  from django.utils.translation import ugettext as _
+  from contentstore import utils
+  from django.utils.html import escapejs
+%>
+<%block name="title">${_("Advanced Settings")}</%block>
+
+<%block name="content">
+    <div class="wrapper-mast wrapper">
+      <header class="mast has-actions has-subtitle">
+        <h1 class="page-header">
+          <small class="subtitle">${_("Tools")}</small>
+          <span class="sr">&gt; </span>${_("Credit Eligibity")}
+        </h1>
+      </header>
+    </div>
+
+        <h3 class="title title-3">${_("Credit eligiblity requirements")}</h3>
+        <nav class="nav-page checklists-current">
+        % if requirements:
+            % for requirement in requirements['requirements']:
+              <ol class="component-actions">
+                <li class="nav-item">
+                    ${requirement['namespace']}
+
+                    ${requirement['name']}
+
+                    ${requirement['criteria']}
+                </li>
+              </ol>
+             % endfor
+        % else:
+            No Requirements available.
+        % endif
+        </nav>
+
+</%block>

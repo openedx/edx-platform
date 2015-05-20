@@ -172,6 +172,12 @@ if settings.FEATURES.get('ENTRANCE_EXAMS'):
         url(r'^course/{}/entrance_exam/?$'.format(settings.COURSE_KEY_PATTERN), 'contentstore.views.entrance_exam'),
     )
 
+# enable credit eligibility feature
+if settings.FEATURES.get('ENABLE_CREDIT_ELIGIBILITY'):
+    urlpatterns += (
+        url(r'^view_credit_eligibility/{}$'.format(COURSELIKE_KEY_PATTERN), 'contentstore.views.credit_eligibility_handler'),
+    )
+
 if settings.DEBUG:
     try:
         from .urls_dev import urlpatterns as dev_urlpatterns

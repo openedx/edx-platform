@@ -163,6 +163,9 @@ FEATURES = {
 
     # Teams feature
     'ENABLE_TEAMS': False,
+
+    # Credit eligibility feature
+    'ENABLE_CREDIT_ELIGIBILITY': False,
 }
 
 ENABLE_JASMINE = False

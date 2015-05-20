@@ -21,6 +21,7 @@ from .user import *
 from .tabs import *
 from .videos import *
 from .transcripts_ajax import *
+from .credit_eligibility import *
 try:
     from .dev import *
 except ImportError:
