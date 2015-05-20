@@ -52,6 +52,7 @@
             'video/09_bumper.js',
             'video/09_save_state_plugin.js',
             'video/09_events_plugin.js',
+            'video/09_events_bumper_plugin.js',
             'video/09_poster.js',
             'video/10_commands.js',
             'video/095_video_context_menu.js'
@@ -60,7 +61,8 @@
             VideoStorage, initialize, FocusGrabber, VideoAccessibleMenu, VideoControl, VideoFullScreen,
             VideoQualityControl, VideoProgressSlider, VideoVolumeControl, VideoSpeedControl, VideoCaption,
             VideoPlayPlaceholder, VideoPlayPauseControl, VideoPlaySkipControl, VideoSkipControl, VideoBumper,
-            VideoSaveStatePlugin, VideoEventsPlugin, VideoPoster, VideoCommands, VideoContextMenu
+            VideoSaveStatePlugin, VideoEventsPlugin, VideoEventsBumperPlugin, VideoPoster, VideoCommands,
+            VideoContextMenu
         ) {
             var youtubeXhr = null,
                 oldVideo = window.Video;
@@ -75,7 +77,7 @@
                         VideoQualityControl, VideoFullScreen, VideoCaption, VideoCommands, VideoContextMenu,
                         VideoSaveStatePlugin, VideoEventsPlugin],
                     bumperVideoModules = [VideoControl, VideoPlaySkipControl, VideoSkipControl,
-                        VideoVolumeControl, VideoCaption, VideoCommands, VideoSaveStatePlugin, VideoEventsPlugin],
+                        VideoVolumeControl, VideoCaption, VideoCommands, VideoSaveStatePlugin, VideoEventsBumperPlugin],
                     state = {
                         el: el,
                         id: id,
@@ -97,8 +99,7 @@
 
                     bumperState.modules = bumperVideoModules;
                     bumperState.options = {
-                        SaveStatePlugin: {events: ['language_menu:change']},
-                        EventsPlugin: {data: {is_bumper: true}}
+                        SaveStatePlugin: {events: ['language_menu:change']}
                     };
                     return bumperState;
                 };
