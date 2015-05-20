@@ -183,7 +183,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
 
                     // now delete anyone of the signatory, Add signatory should be enabled.
                     var signatory = this.model.get('signatories').at(0);
-                    var text = 'Are you sure you want to remove "'+ signatory.get('name') +'" from the list of signatories?';
+                    var text = 'Delete "'+ signatory.get('name') +'" from the list of signatories?';
                     clickDeleteItem(this, text, SELECTORS.signatory_panel_delete + ':first');
                     expect(this.view.$(SELECTORS.action_add_signatory)).not.toHaveClass('disableClick');
                 }
