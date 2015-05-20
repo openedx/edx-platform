@@ -1,4 +1,4 @@
-var edx = edx || {},
+    var edx = edx || {},
 
     Dropdown = (function() {
 
@@ -46,8 +46,6 @@ var edx = edx || {},
                     dropdown.previousMenuItemLink(focused, menu);
                 } else if (key === 40) { // DOWN
                     dropdown.nextMenuItemLink(focused, menu);
-                } else if (key === 27) { // ESC
-                    dropdown.closeDropdownMenus();
                 }
             },
 
