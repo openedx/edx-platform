@@ -212,6 +212,8 @@ class CertificatesViewsTests(ModuleStoreTestCase):
             {
                 'name': 'Signatory_Name ' + str(i),
                 'title': 'Signatory_Title ' + str(i),
+                'organization': 'Signatory_Organization ' + str(i),
+                'signature_image_path': '/static/certificates/images/demo-sig{}.png'.format(i),
                 'id': i
             } for i in xrange(0, signatory_count)
 
@@ -260,6 +262,8 @@ class CertificatesViewsTests(ModuleStoreTestCase):
         self.assertIn('course_title_0', response.content)
         self.assertIn('Signatory_Name 0', response.content)
         self.assertIn('Signatory_Title 0', response.content)
+        self.assertIn('Signatory_Organization 0', response.content)
+        self.assertIn('/static/certificates/images/demo-sig0.png', response.content)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_course_display_name_not_override_with_course_title(self):
