@@ -3,7 +3,7 @@
 
 header.global {
   @extend %ui-depth1;
-  border-bottom: 1px solid $m-gray;
+  border-bottom: 4px solid $courseware-border-bottom-color;
   box-shadow: 0 1px 5px 0 $shadow-l1;
   background: $header-bg;
   height: 76px;
