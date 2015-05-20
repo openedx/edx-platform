@@ -10,7 +10,7 @@ define([
     'js/views/feedback_prompt',
     'js/views/feedback_notification',
     'js/models/uploads',
-    'js/views/uploads' 
+    'js/views/uploads'
 ],
 function ($, _, Backbone, gettext, TemplateUtils, ViewUtils, PromptView, NotificationView, FileUploadModel, FileUploadDialog) {
     'use strict';
@@ -125,7 +125,7 @@ function ($, _, Backbone, gettext, TemplateUtils, ViewUtils, PromptView, Notific
             var certificate = this.model.get('certificate');
             var model = this.model;
             var self = this;
-            var titleText = gettext('Are you sure you want to remove "<%= signatoryName %>" from the list of signatories?');
+            var titleText = gettext('Delete "<%= signatoryName %>" from the list of signatories?');
             var confirm = new PromptView.Warning({
                 title: _.template(titleText, {signatoryName: model.get('name')}),
                 message: gettext('This action cannot be undone.'),
