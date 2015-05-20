@@ -5,6 +5,7 @@ from instructor_email_widget.models import GroupedQuery, SubqueryForGroupedQuery
 from instructor_email_widget.models import SavedQuery, StudentsForQuery, TemporaryQuery
 from student.models import CourseEnrollment
 from django.contrib.auth.models import User
+from django.db import transaction
 from instructor.views.data_access_constants import INCLUSION_MAP
 from instructor.views.data_access_constants import Inclusion, QueryStatus
 from instructor.views.data_access_constants import DatabaseFields, TEMPORARY_QUERY_LIFETIME
@@ -98,6 +99,14 @@ def save_group_name(group_id, group_name):
     group.save()
     return True
 
+# todo: this is needed for django versions < 1.6
+@transaction.commit_manually
+def flush_transactions():
+    """
+    This is needed to synchronize the db state
+    """
+    transaction.commit()
+
 
 def get_group_query_students(course_id, group_id):
     """
@@ -106,6 +115,8 @@ def get_group_query_students(course_id, group_id):
     _group, queries, _relation = get_saved_queries(course_id, group_id)
     # wait for the queries to finish before proceeding
     make_subqueries.apply_async(args=(course_id, group_id, queries)).get()
+    # the previous functions alter the state so we call flush_transactions to make sure we are most up-to-date
+    flush_transactions()
     queried_students = retrieve_grouped_query(course_id, group_id)
     return queried_students
 
