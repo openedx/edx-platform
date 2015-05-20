@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponseBadRequest, HttpResponseForbidden, Http404
 from django.views.decorators.csrf import csrf_exempt
 
 from courseware.access import has_access
@@ -14,7 +14,9 @@ from courseware.courses import get_course_with_access
 from courseware.module_render import get_module_by_usage_id
 from edxmako.shortcuts import render_to_response
 from lti_provider.signature_validator import SignatureValidator
-from opaque_keys.edx.keys import CourseKey
+from lms_xblock.runtime import unquote_slashes
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys import InvalidKeyError
 
 # LTI launch parameters that must be present for a successful launch
 REQUIRED_PARAMETERS = [
@@ -64,8 +66,11 @@ def lti_launch(request, course_id, usage_id):
     # Store the course, and usage ID in the session to prevent privilege
     # escalation if a staff member in one course tries to access material in
     # another.
-    params['course_id'] = course_id
-    params['usage_id'] = usage_id
+    course_key, usage_key = parse_course_and_usage_keys(course_id, usage_id)
+    if not course_key:
+        raise Http404('Invalid course or usage key')
+    params['course_key'] = course_key
+    params['usage_key'] = usage_key
     request.session[LTI_SESSION_KEY] = params
 
     if not request.user.is_authenticated():
@@ -140,7 +145,7 @@ def restore_params_from_session(request):
     if LTI_SESSION_KEY not in request.session:
         return None
     session_params = request.session[LTI_SESSION_KEY]
-    additional_params = ['course_id', 'usage_id']
+    additional_params = ['course_key', 'usage_key']
     return get_required_parameters(session_params, additional_params)
 
 
@@ -154,13 +159,12 @@ def render_courseware(request, lti_params):
     :return: an HttpResponse object that contains the template and necessary
     context to render the courseware.
     """
-    usage_id = lti_params['usage_id']
-    course_id = lti_params['course_id']
-    course_key = CourseKey.from_string(course_id)
+    usage_key = lti_params['usage_key']
+    course_key = lti_params['course_key']
     user = request.user
     course = get_course_with_access(user, 'load', course_key)
     staff = has_access(request.user, 'staff', course)
-    instance, _ = get_module_by_usage_id(request, course_id, usage_id)
+    instance, _ = get_module_by_usage_id(request, str(course_key), str(usage_key))
 
     fragment = instance.render('student_view', context=request.GET)
 
@@ -173,7 +177,26 @@ def render_courseware(request, lti_params):
         'disable_footer': True,
         'disable_tabs': True,
         'staff_access': staff,
-        'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://your_xqa_server.com'),
+        'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://example.com/xqa'),
     }
 
     return render_to_response('courseware/courseware.html', context)
+
+
+def parse_course_and_usage_keys(course_id, usage_id):
+    """
+    Convert course and usage ID strings into key objects. Return a tuple of
+    (course_key, usage_key), or (None, None) if the translation fails.
+    """
+    try:
+        course_key = CourseKey.from_string(course_id)
+    except InvalidKeyError:
+        return None, None
+    if not course_key:
+        return None, None
+    try:
+        usage_id = unquote_slashes(usage_id)
+        usage_key = UsageKey.from_string(usage_id).map_into_course(course_key)
+    except InvalidKeyError:
+        return None, None
+    return course_key, usage_key

@@ -78,7 +78,7 @@ class SignatureValidatorTest(TestCase):
         Verify that validate_client_key succeeds if the client key exists in the
         database
         """
-        LtiConsumer.objects.create(key='client_key', secret='client_secret')
+        LtiConsumer.objects.create(consumer_key='client_key', consumer_secret='client_secret')
         self.assertTrue(SignatureValidator().validate_client_key('client_key', None))
 
     def test_validate_missing_key(self):
@@ -93,7 +93,7 @@ class SignatureValidatorTest(TestCase):
         Verify that get_client_secret returns the right value if the key is in
         the database
         """
-        LtiConsumer.objects.create(key='client_key', secret='client_secret')
+        LtiConsumer.objects.create(consumer_key='client_key', consumer_secret='client_secret')
         secret = SignatureValidator().get_client_secret('client_key', None)
         self.assertEqual(secret, 'client_secret')
 

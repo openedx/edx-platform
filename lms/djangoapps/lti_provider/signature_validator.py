@@ -79,7 +79,7 @@ class SignatureValidator(RequestValidator):
 
         :return: True if the key is valid, False if it is not.
         """
-        return LtiConsumer.objects.filter(key=client_key).count() == 1
+        return LtiConsumer.objects.filter(consumer_key=client_key).count() == 1
 
     def get_client_secret(self, client_key, request):
         """
@@ -90,7 +90,7 @@ class SignatureValidator(RequestValidator):
         present, or None if the key does not exist in the database.
         """
         try:
-            return LtiConsumer.objects.get(key=client_key).secret
+            return LtiConsumer.objects.get(consumer_key=client_key).consumer_secret
         except ObjectDoesNotExist:
             return None
 
