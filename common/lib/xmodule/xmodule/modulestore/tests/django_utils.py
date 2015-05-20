@@ -18,10 +18,12 @@ from request_cache.middleware import RequestCache
 from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
 from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore, clear_existing_modulestores
+from xmodule.modulestore.django import modulestore, clear_existing_modulestores, SignalHandler
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.modulestore.tests.sample_courses import default_block_info_tree, TOY_BLOCK_INFO_TREE
 from xmodule.modulestore.tests.factories import XMODULE_FACTORY_LOCK
+
+from openedx.core.djangoapps.bookmarks.signals import trigger_update_xblocks_cache_task
 
 
 class StoreConstructors(object):
@@ -267,6 +269,8 @@ class ModuleStoreTestCase(TestCase):
         OverrideFieldData.provider_classes = None
 
         super(ModuleStoreTestCase, self).setUp()
+
+        SignalHandler.course_published.disconnect(trigger_update_xblocks_cache_task)
 
         self.store = modulestore()
 
