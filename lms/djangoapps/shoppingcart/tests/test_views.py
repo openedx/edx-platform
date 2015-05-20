@@ -35,8 +35,8 @@ from shoppingcart.views import _can_download_report, _get_date_from_str
 from shoppingcart.models import (
     Order, CertificateItem, PaidCourseRegistration, CourseRegCodeItem,
     Coupon, CourseRegistrationCode, RegistrationCodeRedemption,
-    DonationConfiguration
-)
+    DonationConfiguration,
+    CouponRedemption)
 from student.tests.factories import UserFactory, AdminFactory, CourseModeFactory
 from courseware.tests.factories import InstructorFactory
 from student.models import CourseEnrollment
@@ -674,11 +674,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
 
         self.assertEqual(resp.status_code, 200)
         self.assertEquals(self.cart.orderitem_set.count(), 1)
-        info_log.assert_called_with(
-            'order item %s removed for user %s',
-            str(cert_item.id),
-            self.user
-        )
+        info_log.assert_called_with("order item %s removed for user %s", str(cert_item.id), self.user)
 
     @patch('shoppingcart.views.log.info')
     def test_remove_coupon_redemption_on_clear_cart(self, info_log):
@@ -1402,6 +1398,8 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
             display_name='Testing Super Course',
             metadata={"invitation_only": False}
         )
+        self.percentage_discount = 20.0
+        self.coupon_code = 'asdsad'
         self.course_mode = CourseMode(course_id=self.testing_course.id,
                                       mode_slug="honor",
                                       mode_display_name="honor cert",
@@ -1411,6 +1409,14 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
         self.now = datetime.now(pytz.UTC)
         self.tomorrow = self.now + timedelta(days=1)
         self.nextday = self.tomorrow + timedelta(days=1)
+
+    def add_coupon(self, course_key, is_active, code):
+        """
+        add dummy coupon into models
+        """
+        coupon = Coupon(code=code, description='testing code', course_id=course_key,
+                        percentage_discount=self.percentage_discount, created_by=self.user, is_active=is_active)
+        coupon.save()
 
     def login_user(self):
         """
@@ -1422,19 +1428,32 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
     def test_to_check_that_cart_item_enrollment_is_closed(self):
         self.login_user()
         reg_item1 = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
-        PaidCourseRegistration.add_to_order(self.cart, self.testing_course.id)
+        expired_course_item = PaidCourseRegistration.add_to_order(self.cart, self.testing_course.id)
 
         # update the testing_course enrollment dates
         self.testing_course.enrollment_start = self.tomorrow
         self.testing_course.enrollment_end = self.nextday
         self.testing_course = self.update_course(self.testing_course, self.user.id)
 
+        # now add the same coupon code to the second course(testing_course)
+        self.add_coupon(self.testing_course.id, True, self.coupon_code)
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
+        self.assertEqual(resp.status_code, 200)
+
+        coupon_redemption = CouponRedemption.objects.filter(coupon__course_id=getattr(expired_course_item, 'course_id'),
+                                                            order=expired_course_item.order_id)
+        self.assertEqual(coupon_redemption.count(), 1)
         # testing_course enrollment is closed but the course is in the cart
         # so we delete that item from the cart and display the message in the cart
+        # coupon redemption entry should also be deleted when the item is expired.
         resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
         self.assertEqual(resp.status_code, 200)
         self.assertIn("{course_name} has been removed because the enrollment period has closed.".format(course_name=self.testing_course.display_name), resp.content)
 
+        # now the redemption entry should be deleted from the table.
+        coupon_redemption = CouponRedemption.objects.filter(coupon__course_id=getattr(expired_course_item, 'course_id'),
+                                                            order=expired_course_item.order_id)
+        self.assertEqual(coupon_redemption.count(), 0)
         ((template, context), _tmp) = render_mock.call_args
         self.assertEqual(template, 'shoppingcart/shopping_cart.html')
         self.assertEqual(context['order'], self.cart)

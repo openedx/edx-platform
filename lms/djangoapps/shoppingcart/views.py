@@ -174,7 +174,7 @@ def show_cart(request):
 
     if is_any_course_expired:
         for expired_item in expired_cart_items:
-            Order.remove_cart_item_from_order(expired_item)
+            Order.remove_cart_item_from_order(expired_item, request.user)
         cart.update_order_type()
 
     appended_expired_course_names = ", ".join(expired_cart_item_names)
@@ -232,40 +232,10 @@ def remove_item(request):
     else:
         item = items[0]
         if item.user == request.user:
-            order_item_course_id = getattr(item, 'course_id')
-            item.delete()
-            log.info(
-                u'order item %s removed for user %s',
-                item_id,
-                request.user,
-            )
-            remove_code_redemption(order_item_course_id, item_id, item, request.user)
+            Order.remove_cart_item_from_order(item, request.user)
             item.order.update_order_type()
 
     return HttpResponse('OK')
-
-
-def remove_code_redemption(order_item_course_id, item_id, item, user):
-    """
-    If an item removed from shopping cart then we will remove
-    the corresponding redemption info of coupon code
-    """
-    try:
-        # Try to remove redemption information of coupon code, If exist.
-        coupon_redemption = CouponRedemption.objects.get(
-            user=user,
-            coupon__course_id=order_item_course_id if order_item_course_id else CourseKeyField.Empty,
-            order=item.order_id
-        )
-        coupon_redemption.delete()
-        log.info(
-            u'Coupon "%s" redemption entry removed for user "%s" for order item "%s"',
-            coupon_redemption.coupon.code,
-            user,
-            item_id,
-        )
-    except CouponRedemption.DoesNotExist:
-        log.debug(u'Code redemption does not exist for order item id=%s.', item_id)
 
 
 @login_required
@@ -276,7 +246,7 @@ def reset_code_redemption(request):
     """
     cart = Order.get_cart_for_user(request.user)
     cart.reset_cart_items_prices()
-    CouponRedemption.delete_coupon_redemption(request.user, cart)
+    CouponRedemption.remove_coupon_redemption_from_cart(request.user, cart)
     return HttpResponse('reset')
 
 

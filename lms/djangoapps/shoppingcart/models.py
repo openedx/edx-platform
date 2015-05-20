@@ -181,13 +181,16 @@ class Order(models.Model):
         return False
 
     @classmethod
-    def remove_cart_item_from_order(cls, item):
+    def remove_cart_item_from_order(cls, item, user):
         """
         Removes the item from the cart if the item.order.status == 'cart'.
+        Also removes any code redemption associated with the order_item
         """
         if item.order.status == 'cart':
-            log.info("Item {0} removed from the user cart".format(item.id))
+            log.info("order item %s removed for user %s", str(item.id), user)
             item.delete()
+            # remove any redemption entry associated with the item
+            CouponRedemption.remove_code_redemption_from_item(item, user)
 
     @property
     def total_cost(self):
@@ -1235,7 +1238,31 @@ class CouponRedemption(models.Model):
     coupon = models.ForeignKey(Coupon, db_index=True)
 
     @classmethod
-    def delete_coupon_redemption(cls, user, cart):
+    def remove_code_redemption_from_item(cls, item, user):
+        """
+        If an item removed from shopping cart then we will remove
+        the corresponding redemption info of coupon code
+        """
+        order_item_course_id = getattr(item, 'course_id')
+        try:
+            # Try to remove redemption information of coupon code, If exist.
+            coupon_redemption = cls.objects.get(
+                user=user,
+                coupon__course_id=order_item_course_id if order_item_course_id else CourseKeyField.Empty,
+                order=item.order_id
+            )
+            coupon_redemption.delete()
+            log.info(
+                u'Coupon "%s" redemption entry removed for user "%s" for order item "%s"',
+                coupon_redemption.coupon.code,
+                user,
+                str(item.id),
+            )
+        except CouponRedemption.DoesNotExist:
+            log.debug(u'Code redemption does not exist for order item id=%s.', str(item.id))
+
+    @classmethod
+    def remove_coupon_redemption_from_cart(cls, user, cart):
         """
         This method delete coupon redemption
         """
