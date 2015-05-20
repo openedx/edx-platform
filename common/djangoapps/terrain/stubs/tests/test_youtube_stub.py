@@ -19,6 +19,7 @@ class StubYouTubeServiceTest(unittest.TestCase):
         response = requests.get(self.url + 'unused_url')
         self.assertEqual("Unused url", response.content)
 
+    @unittest.skip('Failing intermittently due to inconsistent responses from YT. See TE-871')
     def test_video_url(self):
         response = requests.get(
             self.url + 'test_youtube/OEoXaMPEzfM?v=2&alt=jsonc&callback=callback_func'
