@@ -2,17 +2,14 @@
 """
 E2E tests for the LMS.
 """
-import time
-
-from unittest import skip
+from flaky import flaky
+from textwrap import dedent
 
 from .helpers import UniqueCourseTest
 from ..pages.studio.auto_auth import AutoAuthPage
 from ..pages.lms.courseware import CoursewarePage
 from ..pages.lms.annotation_component import AnnotationComponentPage
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc
-from ..fixtures.xqueue import XQueueResponseFixture
-from textwrap import dedent
 
 
 def _correctness(choice, target):
@@ -122,7 +119,7 @@ class AnnotatableProblemTest(UniqueCourseTest):
         )
         return annotation_component_page
 
-    @skip  # TODO fix TNL-1590
+    @flaky(max_runs=20, min_passes=20)
     def test_annotation_component(self):
         """
         Test annotation components links to annotation problems.
