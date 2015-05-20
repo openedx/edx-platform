@@ -163,9 +163,11 @@ class BookmarksTest(BookmarksTestMixin):
 
         bookmarked_breadcrumbs = self.bookmarks.breadcrumbs()
 
-        # Verify bookmarked breadcrumbs and link navigation
-        for index, problem_info in enumerate(self.COURSE_TREE_INFO):
-            self.assertEqual(bookmarked_breadcrumbs[index], problem_info)
+        # Verify bookmarked breadcrumbs
+        self.assertItemsEqual(bookmarked_breadcrumbs, self.COURSE_TREE_INFO)
+
+        # Verify link navigation
+        for index in range(2):
             self.bookmarks.click_bookmark(index)
             self.courseware_page.wait_for_page()
             self.assertEqual(xblocks[index].locator, self.courseware_page.active_usage_id())
