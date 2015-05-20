@@ -1,4 +1,7 @@
+""" Module contains the test for models """
+
 import ddt
+
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from openedx.core.djangoapps.credit.exceptions import InvalidCreditRequirements

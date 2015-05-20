@@ -1,4 +1,9 @@
+""" Module for testing the tasks """
+
+from datetime import datetime
+
 from django.utils.timezone import UTC
+
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import SignalHandler
@@ -6,7 +11,6 @@ from openedx.core.djangoapps.credit.api import get_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.djangoapps.credit.signals import listen_for_course_publish
 from xmodule.modulestore.tests.factories import CourseFactory
-from datetime import datetime
 
 
 class TestTaskExecution(ModuleStoreTestCase):
@@ -24,7 +28,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         self.course = CourseFactory.create(start=datetime(2015, 3, 1, tzinfo=UTC))
         self.add_credit_course()
 
-    def test_task_indexing_course(self):
+    def test_task_adding_requirements(self):
         """ Making sure that the receiver correctly fires off the task when invoked by signal """
 
         requirements = get_credit_requirements(self.course_key)

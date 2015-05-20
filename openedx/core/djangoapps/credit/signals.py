@@ -1,6 +1,7 @@
 """ This file contains the receiver of publish signals of course """
 
 from django.dispatch import receiver
+
 from xmodule.modulestore.django import SignalHandler
 
 

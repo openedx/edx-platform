@@ -1,3 +1,5 @@
+""" Module contains the tests for api """
+
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from openedx.core.djangoapps.credit.exceptions import InvalidCreditRequirements
@@ -89,6 +91,8 @@ class ApiTestCases(ModuleStoreTestCase):
         self.assertEquals(len(get_credit_requirements(self.course_key)), 1)
 
     def add_credit_course(self):
+        """ Mark the course as a credit """
+
         credit_course = CreditCourse(course_key=self.course_key)
         credit_course.save()
         return credit_course

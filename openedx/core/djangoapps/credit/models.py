@@ -5,15 +5,17 @@ Models for Credit Eligibility for courses.
 Credit courses allow students to receive university credit for
 successful completion of a course on EdX
 """
-from django.db.utils import IntegrityError
 
 import logging
 
+from django.db.utils import IntegrityError
 from django.db import models
+from jsonfield.fields import JSONField
+
 from model_utils.models import TimeStampedModel
 from openedx.core.djangoapps.credit.exceptions import InvalidCreditRequirements
 from xmodule_django.models import CourseKeyField
-from jsonfield.fields import JSONField
+
 
 log = logging.getLogger(__name__)
 
