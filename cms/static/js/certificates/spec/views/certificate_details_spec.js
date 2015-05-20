@@ -24,6 +24,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
         itemView: '.certificates-list-item',
         name: '.certificate-name',
         description: '.certificate-description',
+        course_title: '.certificate-course-title',
         errorMessage: '.certificate-edit-error',
         inputName: '.collection-name-input',
         inputDescription: '.certificate-description-input',
@@ -56,7 +57,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
         delete window.course;
     });
 
-    describe('Certificate details views', function() {
+    describe('Certificate Details Spec:', function() {
         var setValuesToInputs = function (view, values) {
             _.each(values, function (value, selector) {
                 if (SELECTORS[selector]) {
@@ -71,7 +72,8 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
             this.newModelOptions = {add: true};
             this.model = new CertificateModel({
                 name: 'Test Name',
-                description: 'Test Description'
+                description: 'Test Description',
+                course_title: 'Test Course Title Override'
 
             }, this.newModelOptions);
 
@@ -86,61 +88,78 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
             CustomMatchers(this);
         });
 
-        describe('Certificate details view', function() {
+        describe('The Certificate Details view', function() {
 
-            it('JSON string collection parsing into model', function () {
-                var CERTIFICATE_JSON = '[{"name": "Test certificate name", "description": "Test certificate description", "signatories":"[]"}]';
+            it('should parse a JSON string collection into a Backbone model collection', function () {
+                var CERTIFICATE_JSON = '[{"name": "Test certificate name", "description": "Test certificate description", "course_title":"Test certificate course title override", "signatories":"[]"}]';
                 this.collection.parse(CERTIFICATE_JSON);
                 var model = this.collection.at(1);
                 expect(model.get('name')).toEqual('Test certificate name');
                 expect(model.get('description')).toEqual('Test certificate description');
+                expect(model.get('course_title')).toEqual('Test certificate course title override');
             });
 
-            it('JSON object collection parsing into model', function () {
-                var CERTIFICATE_JSON_OBJECT = [{"name": "Test certificate name", "description": "Test certificate description", "signatories":"[]"}];
+            it('should parse a JSON object collection into a Backbone model collection', function () {
+                var CERTIFICATE_JSON_OBJECT = [{
+                    "name": "Test certificate name 2",
+                    "description": "Test certificate description 2",
+                    "course_title":"Test certificate course title override 2",
+                    "signatories":"[]"
+                }];
                 this.collection.parse(CERTIFICATE_JSON_OBJECT);
                 var model = this.collection.at(1);
-                expect(model.get('name')).toEqual('Test certificate name');
-                expect(model.get('description')).toEqual('Test certificate description');
+                expect(model.get('name')).toEqual('Test certificate name 2');
+                expect(model.get('description')).toEqual('Test certificate description 2');
             });
 
-            it('should render properly', function () {
-                expect(this.view.$el).toContainText('Test Name');
-                expect(this.view.$('.delete')).toExist();
-                expect(this.view.$('.edit')).toExist();
-            });
-
-            it('can edit certificate', function(){
-                this.view.$('.edit').click();
-                // The Certificate Model should be in 'edit' mode
-                expect(this.model.get('editing')).toBe(true);
-            });
-
-            it('show certificate details', function(){
-                this.view.$('.show-details').click();
-
-                // The "Certificate Description" field should be visible.
+            it('should display the certificate description', function () {
+                expect(this.view.$(SELECTORS.description)).toExist();
+                console.log(this.view.$(SELECTORS.description).text());
                 expect(this.view.$(SELECTORS.description)).toContainText('Test Description');
             });
 
+            it('should display the certificate course title override', function () {
+                expect(this.view.$(SELECTORS.course_title)).toExist();
+                expect(this.view.$(SELECTORS.course_title)).toContainText('Test Course Title Override');
+            });
 
-            it('hide certificate details', function(){
-                this.view.render(true);
-                this.view.$('.hide-details').click();
+            it('should present an Edit action', function () {
+                expect(this.view.$('.edit')).toExist();
+            });
 
-                // The "Certificate Description" field should be hidden.
-                expect(this.view.$(SELECTORS.description)).not.toExist();
+            it('should change to "edit" mode when clicking the Edit button', function(){
+                expect(this.view.$('.action-edit .edit').toExist();
+                expect(this.model.get('editing')).toBe(false);
+                this.view.$('.action-edit .edit').click();
+                expect(this.model.get('editing')).toBe(true);
+            });
+
+
+            it('should present a Delete action', function () {
+                expect(this.view.$('.action-delete .delete')).toExist();
+            });
+
+            it('should prompt the user when when clicking the Delete button', function(){
+                expect(this.view.$('.action-delete .delete').toExist();
+                this.view.$('.action-delete .delete').click();
             });
 
         });
 
-        describe('Signatory details view', function(){
+        describe('Signatory details', function(){
 
             beforeEach(function() {
                 this.view.render(true);
             });
 
-            it('can edit signatory on its own', function() {
+            it('displays certificate signatories details', function(){
+                this.view.$('.show-details').click();
+                expect(this.view.$(SELECTORS.signatory_name_value)).toContainText('Name of the signatory');
+                expect(this.view.$(SELECTORS.signatory_title_value)).toContainText('Title of the signatory');
+                expect(this.view.$(SELECTORS.signatory_organization_value)).toContainText('Organization of the signatory');
+            });
+
+            it('supports in-line editing of signatory information', function() {
 
                 this.view.$(SELECTORS.edit_signatory).click();
                 expect(this.view.$(SELECTORS.inputSignatoryName)).toExist();
@@ -148,7 +167,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 expect(this.view.$(SELECTORS.inputSignatoryOrganization)).toExist();
             });
 
-            it('signatory saved successfully after editing', function() {
+            it('correctly persists changes made during in-line signatory editing', function() {
 
                 var requests = AjaxHelpers.requests(this),
                     notificationSpy = ViewHelpers.createNotificationSpy();
@@ -180,14 +199,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 expect(this.view.$(SELECTORS.signatory_organization_value)).toContainText('New Signatory Test Organization');
             });
 
-            it('show certificate signatories details', function(){
-                this.view.$('.show-details').click();
 
-                // The default certificate signatory should be visible.
-                expect(this.view.$(SELECTORS.signatory_name_value)).toContainText('Name of the signatory');
-                expect(this.view.$(SELECTORS.signatory_title_value)).toContainText('Title of the signatory');
-                expect(this.view.$(SELECTORS.signatory_organization_value)).toContainText('Organization of the signatory');
-            });
         });
     });
 });
