@@ -624,8 +624,7 @@ class BadgeImageConfiguration(models.Model):
     icon = models.ImageField(
         # Actual max is 256KB, but need overhead for badge baking. This should be more than enough.
         help_text=_(
-            u"Badge images must be square PNG files. To use with Mozilla Backpack, the filesize should be "
-            u"under 250 kilobytes."
+            u"Badge images must be square PNG files. The filesize should be under 250 kilobytes."
         ),
         upload_to='badges',
         validators=[validate_badge_image]
