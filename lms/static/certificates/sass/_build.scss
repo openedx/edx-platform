@@ -11,12 +11,7 @@
 @import '../../../../static/pattern-library/sass/utilities/mixins';
 @import '../../../../static/pattern-library/sass/utilities/helpers';
 
-@import 'utilities.scss';
-
-// ------------------------------
-// #VENDOR
-// ------------------------------
-@import '../vendor/fontawesome/sass/font-awesome.scss';
+@import 'utilities';
 
 // ------------------------------
 // #BASE
@@ -25,7 +20,7 @@
 @import '../../../../static/pattern-library/sass/base/reset';
 @import '../../../../static/pattern-library/sass/base/typography';
 
-@import 'base.scss';
+@import 'base';
 
 // ------------------------------
 // #COMPONENTS
@@ -35,7 +30,7 @@
 @import '../../../../static/pattern-library/sass/components/headings';
 @import '../../../../static/pattern-library/sass/components/copy';
 
-@import 'components.scss';
+@import 'components';
 
 // ------------------------------
 // #LAYOUTS
