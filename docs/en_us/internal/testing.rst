@@ -494,10 +494,10 @@ To view test coverage:
 3. Reports are located in the ``reports`` folder. The command generates
    HTML and XML (Cobertura format) reports.
 
-Code Style Quality
+Python Code Style Quality
 ------------------
 
-To view code style quality (including pep8 and pylint violations)::
+To view Python code style quality (including pep8 and pylint violations)::
 
     paver run_quality
 
@@ -530,6 +530,20 @@ More specific options are below.
 
    ``system`` is an optional argument here. It defaults to
    ``cms,lms,common``.
+   
+
+JavaScript Code Style Quality
+------------------
+
+To view JavaScript code style quality::
+
+    paver run_jshint
+    
+-  This command also comes with a ``--limit`` switch, for example::
+
+	paver run_jshint --limit=700
+
+
 
 Testing using queue servers
 ---------------------------

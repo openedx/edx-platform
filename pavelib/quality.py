@@ -241,6 +241,86 @@ def run_complexity():
 
 
 @task
+@needs('pavelib.prereqs.install_node_prereqs')
+@cmdopts([
+    ("limit=", "l", "limit for number of acceptable violations"),
+])
+def run_jshint(options):
+    """
+    Runs jshint on static asset directories
+    """
+
+    violations_limit = int(getattr(options, 'limit', -1))
+
+    jshint_report_dir = (Env.REPORT_DIR / "jshint")
+    jshint_report = jshint_report_dir / "jshint.report"
+    _prepare_report_dir(jshint_report_dir)
+
+    jshint_directories = ["common/static/js", "cms/static/js", "lms/static/js"]
+
+    sh(
+        "jshint {list} --config .jshintrc >> {jshint_report}".format(
+            list=(" ".join(jshint_directories)), jshint_report=jshint_report
+        ),
+        ignore_error=True
+    )
+    num_violations = _get_count_from_last_line(jshint_report)
+
+    if not num_violations:
+        raise BuildFailure("Error in calculating total number of violations.")
+
+    # Record the metric
+    _write_metric(str(num_violations), (Env.METRICS_DIR / "jshint"))
+
+    # Fail if number of violations is greater than the limit
+    if num_violations > violations_limit > -1:
+        raise Exception(
+            "JSHint Failed. Too many violations ({count}).\nThe limit is {violations_limit}.".format(
+                count=num_violations, violations_limit=violations_limit
+            )
+        )
+
+
+def _write_metric(metric, filename):
+    """
+    Write a given metric to a given file
+    Used for things like reports/metrics/jshint, which will simply tell you the number of
+    jshint violations found
+    """
+    with open(filename, "w") as metric_file:
+        metric_file.write(metric)
+
+
+def _prepare_report_dir(dir_name):
+    """
+    Sets a given directory to a created, but empty state
+    """
+    dir_name.rmtree_p()
+    dir_name.mkdir_p()
+
+
+def _get_last_report_line(filename):
+    """
+    Returns the last line of a given file. Used for getting output from quality output files.
+    """
+    with open(filename, 'r') as report_file:
+        lines = report_file.readlines()
+        return lines[len(lines) - 1]
+
+
+def _get_count_from_last_line(filename):
+    """
+    This will return the number in a line that looks something like "3000 errors found". It is returning
+    the digits only (as an integer).
+    """
+    last_line = _get_last_report_line(filename)
+    try:
+        return int(re.search(r'^\d+', last_line).group(0))
+    except AttributeError:
+        return None
+
+
+@task
 @needs('pavelib.prereqs.install_python_prereqs')
 @cmdopts([
     ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
