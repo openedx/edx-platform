@@ -108,11 +108,16 @@ class BadgeHandler(object):
         """
         return _(u"{course_display_name} ({course_mode})").format(
             course_display_name=course.display_name,
+            # Course modes may be translated, but this whole string won't be available for translation.
+            # pylint: disable=translation-of-non-string
             course_mode=_(mode),
         )[:255]
 
     @staticmethod
     def badge_description(course):
+        """
+        Returns the badge
+        """
         return _(u"{start_date} to {end_date}").format(
             start_date=course.start.date(),
             end_date=course.end.date(),

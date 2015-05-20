@@ -1,7 +1,7 @@
 """
 Tests for the BadgeHandler, which communicates with the Badgr Server.
 """
-from datetime import datetime, timedelta
+from datetime import datetime
 from django.test.utils import override_settings
 from django.db.models.fields.files import ImageFieldFile
 from lazy.lazy import lazy

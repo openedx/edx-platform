@@ -50,7 +50,6 @@ import json
 import logging
 import uuid
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
@@ -603,6 +602,16 @@ class BadgeAssertion(models.Model):
         unique_together = (('course_id', 'user'),)
 
 
+def validate_badge_image(image):
+    """
+    Validates that a particular image is small enough, of the right type, and square to be a badge.
+    """
+    if image.width != image.height:
+        raise ValidationError(_(u"Badge image not square!"))
+    if not image.size < (250 * 1024):
+        raise ValidationError(_(u"Badge image must be less than 250KB."))
+
+
 class BadgeImageConfiguration(models.Model):
     """
     Contains the configuration for badges for a specific mode. The mode
@@ -619,6 +628,7 @@ class BadgeImageConfiguration(models.Model):
             u"under 250 kilobytes."
         ),
         upload_to='badges',
+        validators=[validate_badge_image]
     )
     default = models.BooleanField(
         help_text=_(
@@ -631,7 +641,8 @@ class BadgeImageConfiguration(models.Model):
         """
         Make sure there's not more than one default.
         """
-        if self.default and self.objects.filter(default=True).exclude(id=self.id):
+        # pylint: disable=no-member
+        if self.default and BadgeImageConfiguration.objects.filter(default=True).exclude(id=self.id):
             raise ValidationError(_(u"Cannot have more than one default image!"))
 
     @classmethod

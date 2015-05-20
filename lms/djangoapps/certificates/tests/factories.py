@@ -1,3 +1,5 @@
+# Factories are self documenting
+# pylint: disable=missing-docstring
 from factory.django import DjangoModelFactory, ImageField
 
 from certificates.models import (
@@ -6,8 +8,6 @@ from certificates.models import (
 )
 
 
-# Factories are self documenting
-# pylint: disable=missing-docstring
 class GeneratedCertificateFactory(DjangoModelFactory):
 
     FACTORY_FOR = GeneratedCertificate
