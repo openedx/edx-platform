@@ -1,22 +1,10 @@
-    var edx = edx || {},
-
+var edx = edx || {},
     Dropdown = (function() {
 
         var dropdown = {
 
-            opts: {
-                page: $(document),
-                midpoint: ($(window).width() / 2),
-                button: $('.button-more.has-dropdown'),
-                button_active: 'is-active',
-                menu: $('.dropdown-menu'),
-                menu_inactive: 'is-hidden',
-                menu_active: 'is-visible',
-                menu_align: 'align-',
-                text_align: 'control-text-align'
-            },
-
             init: function(parent) {
+                dropdown.optsSet();
 
                 if (dropdown.opts.button.length && dropdown.opts.menu.length) {
 
@@ -29,8 +17,21 @@
                 }
             },
 
-            listenForClick: function() {
+            optsSet: function() {
+                dropdown.opts = {
+                    page: $(document),
+                    midpoint: ($(window).width() / 2),
+                    button: $('.button-more.has-dropdown'),
+                    button_active: 'is-active',
+                    menu: $('.dropdown-menu'),
+                    menu_inactive: 'is-hidden',
+                    menu_active: 'is-visible',
+                    menu_align: 'align-',
+                    text_align: 'control-text-align'
+                };
+            },
 
+            listenForClick: function() {
                 dropdown.opts.button.on('click', function() {
                     dropdown.closeDropdownMenus(); // close any open menus
                     dropdown.openDropdownMenu($(this)); // then open the chosen menu
@@ -41,7 +42,7 @@
                 });
             },
 
-            handlerIsAction: function(key, menu) {
+            handlerIsAction: function(key, menu, focused) {
                 if (key === 38) { // UP
                     dropdown.previousMenuItemLink(focused, menu);
                 } else if (key === 40) { // DOWN
@@ -62,7 +63,6 @@
             },
 
             listenForKeypress: function() {
-
                 dropdown.opts.page.on('keydown', function(e) {
                     var keyCode = e.keyCode,
                         focused = $(e.currentTarget.activeElement),
@@ -76,7 +76,7 @@
                     if (focused.is('.action')) {
                         // Key handlers for when a menu item has focus
                         menu = focused.closest('.dropdown-menu');
-                        dropdown.handlerIsAction(keyCode, menu);
+                        dropdown.handlerIsAction(keyCode, menu, focused);
 
                     } else if (focused.is('.has-dropdown')) {
                         // Key handlers for when the button that opens the menu has focus
