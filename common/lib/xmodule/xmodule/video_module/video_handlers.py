@@ -46,7 +46,7 @@ class VideoStudentViewHandlers(object):
         accepted_keys = [
             'speed', 'saved_video_position', 'transcript_language',
             'transcript_download_format', 'youtube_is_available',
-            'date_last_view_bumper', 'do_not_show_again_bumper'
+            'bumper_last_view_date', 'do_not_show_again_bumper'
         ]
 
         conversions = {
@@ -63,7 +63,7 @@ class VideoStudentViewHandlers(object):
                     else:
                         value = data[key]
 
-                    if key == 'date_last_view_bumper':
+                    if key == 'bumper_last_view_date':
                         value = datetime.utcnow()
 
                     setattr(self, key, value)

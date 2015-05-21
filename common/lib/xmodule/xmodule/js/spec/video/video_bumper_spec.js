@@ -70,7 +70,7 @@
             state.el.trigger('ended');
             jasmine.Clock.tick(20);
             expect(saveState).toHaveBeenCalledWith(true, {
-                date_last_view_bumper: true});
+                bumper_last_view_date: true});
         });
 
         it('can save appropriate states correctly on skip', function () {
@@ -80,7 +80,7 @@
             expect(state.storage.getItem('isBumperShown')).toBeTruthy();
             jasmine.Clock.tick(20);
             expect(saveState).toHaveBeenCalledWith(true, {
-                date_last_view_bumper: true});
+                bumper_last_view_date: true});
         });
 
          it('can save appropriate states correctly on error', function () {
@@ -89,7 +89,7 @@
             state.el.trigger('error');
             jasmine.Clock.tick(20);
             expect(saveState).toHaveBeenCalledWith(true, {
-                date_last_view_bumper: true});
+                bumper_last_view_date: true});
         });
 
         it('can save appropriate states correctly on skip and do not show again', function () {
@@ -98,7 +98,7 @@
             state.bumperState.videoBumper.skipAndDoNotShowAgain();
             jasmine.Clock.tick(20);
             expect(saveState).toHaveBeenCalledWith(true, {
-                date_last_view_bumper: true, do_not_show_again_bumper: true});
+                bumper_last_view_date: true, do_not_show_again_bumper: true});
         });
 
         it('can destroy itself', function () {

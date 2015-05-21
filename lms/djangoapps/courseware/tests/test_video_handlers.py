@@ -149,7 +149,7 @@ class TestVideo(BaseTestXmodule):
             {'saved_video_position': "00:00:10"},
             {'transcript_language': 'uk'},
             {'do_not_show_again_bumper': True},
-            {'date_last_view_bumper': True},
+            {'bumper_last_view_date': True},
             {'demoo�': 'sample'}
         ]
         for sample in data:
@@ -177,9 +177,9 @@ class TestVideo(BaseTestXmodule):
         self.assertEqual(self.item_descriptor.do_not_show_again_bumper, True)
 
         with freezegun.freeze_time(datetime.now()):
-            self.assertEqual(self.item_descriptor.date_last_view_bumper, None)
-            self.item_descriptor.handle_ajax('save_user_state', {'date_last_view_bumper': True})
-            self.assertEqual(self.item_descriptor.date_last_view_bumper, datetime.utcnow())
+            self.assertEqual(self.item_descriptor.bumper_last_view_date, None)
+            self.item_descriptor.handle_ajax('save_user_state', {'bumper_last_view_date': True})
+            self.assertEqual(self.item_descriptor.bumper_last_view_date, datetime.utcnow())
 
         response = self.item_descriptor.handle_ajax('save_user_state', {u'demoo�': "sample"})
         self.assertEqual(json.loads(response)['success'], True)
