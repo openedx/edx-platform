@@ -35,8 +35,7 @@
                 host_component_id: 'id',
                 bumper_id: 'xmodule/include/fixtures/test.mp4',
                 code: 'html5',
-                duration: 20,
-                name: 'edx.video.bumper.loaded'
+                duration: 20
             });
         });
 
@@ -47,8 +46,7 @@
                 bumper_id: 'xmodule/include/fixtures/test.mp4',
                 code: 'html5',
                 currentTime: 10,
-                duration: 20,
-                name: 'edx.video.bumper.played'
+                duration: 20
             });
         });
 
@@ -59,8 +57,7 @@
                 bumper_id: 'xmodule/include/fixtures/test.mp4',
                 code: 'html5',
                 currentTime: 10,
-                duration: 20,
-                name: 'edx.video.bumper.stopped'
+                duration: 20
             });
 
             Logger.log.reset();
@@ -70,8 +67,7 @@
                 bumper_id: 'xmodule/include/fixtures/test.mp4',
                 code: 'html5',
                 currentTime: 10,
-                duration: 20,
-                name: 'edx.video.bumper.stopped'
+                duration: 20
             });
         });
 
@@ -82,8 +78,7 @@
                 bumper_id: 'xmodule/include/fixtures/test.mp4',
                 code: 'html5',
                 currentTime: 10,
-                duration: 20,
-                name: 'edx.video.bumper.skipped'
+                duration: 20
             });
         });
 
@@ -94,54 +89,49 @@
                 bumper_id: 'xmodule/include/fixtures/test.mp4',
                 code: 'html5',
                 currentTime: 10,
-                duration: 20,
-                name: 'edx.video.bumper.dismissed'
+                duration: 20
             });
         });
 
-        it('can emit "edx.video.bumper.cc_menu_shown" event', function () {
+        it('can emit "edx.video.bumper.transcript.menu.shown" event', function () {
             state.el.trigger('language_menu:show');
-            expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.cc_menu_shown', {
+            expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.transcript.menu.shown', {
                 host_component_id: 'id',
                 bumper_id: 'xmodule/include/fixtures/test.mp4',
                 code: 'html5',
-                duration: 20,
-                name: 'edx.video.bumper.cc_menu_shown'
+                duration: 20
             });
         });
 
-        it('can emit "edx.video.bumper.cc_menu_hidden" event', function () {
+        it('can emit "edx.video.bumper.transcript.menu.hidden" event', function () {
             state.el.trigger('language_menu:hide');
-            expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.cc_menu_hidden', {
+            expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.transcript.menu.hidden', {
                 host_component_id: 'id',
                 bumper_id: 'xmodule/include/fixtures/test.mp4',
                 code: 'html5',
-                duration: 20,
-                name: 'edx.video.bumper.cc_menu_hidden'
+                duration: 20
             });
         });
 
-        it('can emit "edx.video.bumper.transcript_shown" event', function () {
+        it('can emit "edx.video.bumper.transcript.shown" event', function () {
             state.el.trigger('captions:show');
-            expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.transcript_shown', {
+            expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.transcript.shown', {
                 host_component_id: 'id',
                 bumper_id: 'xmodule/include/fixtures/test.mp4',
                 code: 'html5',
                 current_time: 10,
-                duration: 20,
-                name: 'edx.video.bumper.transcript_shown'
+                duration: 20
             });
         });
 
-        it('can emit "edx.video.bumper.transcript_hidden" event', function () {
+        it('can emit "edx.video.bumper.transcript.hidden" event', function () {
             state.el.trigger('captions:hide');
-            expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.transcript_hidden', {
+            expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.transcript.hidden', {
                 host_component_id: 'id',
                 bumper_id: 'xmodule/include/fixtures/test.mp4',
                 code: 'html5',
                 current_time: 10,
-                duration: 20,
-                name: 'edx.video.bumper.transcript_hidden'
+                duration: 20
             });
         });
 

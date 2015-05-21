@@ -106,7 +106,7 @@
 
                 var player = function (state) {
                     return function () {
-                        state.metadata.autoplay = true;
+                        _.extend(state.metadata, {autoplay: true, focusFirstControl: true});
                         initialize(state, element);
                     };
                 };
