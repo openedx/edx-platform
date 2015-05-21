@@ -1302,7 +1302,7 @@ def is_course_passed(course, grade_summary=None, student=None, request=None):
     if grade_summary is None:
         grade_summary = grades.grade(student, request, course)
 
-    return success_cutoff and grade_summary['percent'] > success_cutoff
+    return success_cutoff and grade_summary['percent'] >= success_cutoff
 
 
 @require_POST

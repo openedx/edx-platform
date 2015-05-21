@@ -846,6 +846,8 @@ class IsCoursePassedTests(ModuleStoreTestCase):
     Tests for the is_course_passed helper function
     """
 
+    SUCCESS_CUTOFF = 0.5
+
     def setUp(self):
         super(IsCoursePassedTests, self).setUp()
 
@@ -854,7 +856,7 @@ class IsCoursePassedTests(ModuleStoreTestCase):
             org='edx',
             number='verified',
             display_name='Verified Course',
-            grade_cutoffs={'cutoff': 0.75, 'Pass': 0.5}
+            grade_cutoffs={'cutoff': 0.75, 'Pass': self.SUCCESS_CUTOFF}
         )
         self.request = RequestFactory()
 
@@ -873,6 +875,13 @@ class IsCoursePassedTests(ModuleStoreTestCase):
         # Mocking the grades.grade
         # If user has below passing marks then False will return
         self.assertFalse(views.is_course_passed(self.course, None, self.student, self.request))
+
+    @patch('courseware.grades.grade', Mock(return_value={'percent': SUCCESS_CUTOFF}))
+    def test_user_with_passing_marks_and_achieved_marks_equal(self):
+        # Mocking the grades.grade
+        # If user's achieved passing marks are equal to the required passing
+        # marks then it will return True
+        self.assertTrue(views.is_course_passed(self.course, None, self.student, self.request))
 
 
 @attr('shard_1')
