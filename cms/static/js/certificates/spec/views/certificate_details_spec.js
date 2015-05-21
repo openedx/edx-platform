@@ -128,19 +128,17 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
             });
 
             it('should change to "edit" mode when clicking the Edit button', function(){
-                expect(this.view.$('.action-edit .edit').toExist();
-                expect(this.model.get('editing')).toBe(false);
+                expect(this.view.$('.action-edit .edit')).toExist();
                 this.view.$('.action-edit .edit').click();
                 expect(this.model.get('editing')).toBe(true);
             });
-
 
             it('should present a Delete action', function () {
                 expect(this.view.$('.action-delete .delete')).toExist();
             });
 
             it('should prompt the user when when clicking the Delete button', function(){
-                expect(this.view.$('.action-delete .delete').toExist();
+                expect(this.view.$('.action-delete .delete')).toExist();
                 this.view.$('.action-delete .delete').click();
             });
 

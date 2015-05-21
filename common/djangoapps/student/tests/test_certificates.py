@@ -12,7 +12,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
-from certificates.utils import get_certificate_url
+from certificates.utils import get_certificate_url  # pylint: disable=import-error
 
 # pylint: disable=no-member
 
@@ -45,21 +45,10 @@ class CertificateDisplayTest(ModuleStoreTestCase):
     @override_settings(CERT_NAME_SHORT='Test_Certificate')
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     def test_linked_student_to_web_view_credential(self, enrollment_mode):
-<<<<<<< HEAD
-
-        test_url = u'{url}?course={course_id}'.format(
-            url=reverse('cert_html_view'),
-<<<<<<< HEAD
-            course_id=unicode(self.course.id))
-=======
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=self.course.id.to_deprecated_string())
->>>>>>> 7dd4968... SOL-398 Web View: Public Access
-=======
-            course_id=unicode(self.course.id)  # pylint: disable=no-member
+            course_id=unicode(self.course.id)
         )
->>>>>>> 40afc04... Post-merge branch stabilization
 
         self._create_certificate(enrollment_mode)
         certificates = [
@@ -74,7 +63,9 @@ class CertificateDisplayTest(ModuleStoreTestCase):
         self.course.certificates = {'certificates': certificates}
         self.course.save()   # pylint: disable=no-member
         self.store.update_item(self.course, self.user.id)
+
         response = self.client.get(reverse('dashboard'))
+
         self.assertContains(response, u'View Test_Certificate')
         self.assertContains(response, test_url)
 
