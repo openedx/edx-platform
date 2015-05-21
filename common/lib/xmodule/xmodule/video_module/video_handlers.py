@@ -46,7 +46,7 @@ class VideoStudentViewHandlers(object):
         accepted_keys = [
             'speed', 'saved_video_position', 'transcript_language',
             'transcript_download_format', 'youtube_is_available',
-            'bumper_last_view_date', 'do_not_show_again_bumper'
+            'bumper_last_view_date', 'bumper_do_not_show_again'
         ]
 
         conversions = {

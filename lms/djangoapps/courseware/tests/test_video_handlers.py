@@ -148,7 +148,7 @@ class TestVideo(BaseTestXmodule):
             {'speed': 2.0},
             {'saved_video_position': "00:00:10"},
             {'transcript_language': 'uk'},
-            {'do_not_show_again_bumper': True},
+            {'bumper_do_not_show_again': True},
             {'bumper_last_view_date': True},
             {'demoo�': 'sample'}
         ]
@@ -172,9 +172,9 @@ class TestVideo(BaseTestXmodule):
         self.item_descriptor.handle_ajax('save_user_state', {'transcript_language': "uk"})
         self.assertEqual(self.item_descriptor.transcript_language, 'uk')
 
-        self.assertEqual(self.item_descriptor.do_not_show_again_bumper, False)
-        self.item_descriptor.handle_ajax('save_user_state', {'do_not_show_again_bumper': True})
-        self.assertEqual(self.item_descriptor.do_not_show_again_bumper, True)
+        self.assertEqual(self.item_descriptor.bumper_do_not_show_again, False)
+        self.item_descriptor.handle_ajax('save_user_state', {'bumper_do_not_show_again': True})
+        self.assertEqual(self.item_descriptor.bumper_do_not_show_again, True)
 
         with freezegun.freeze_time(datetime.now()):
             self.assertEqual(self.item_descriptor.bumper_last_view_date, None)
