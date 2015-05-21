@@ -18,6 +18,8 @@ from monkey_patch import third_party_auth
 import xmodule.x_module
 import lms_xblock.runtime
 
+from microsite_configuration import microsite
+
 log = logging.getLogger(__name__)
 
 
@@ -31,8 +33,7 @@ def run():
     if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
         enable_third_party_auth()
 
-    if settings.FEATURES.get('USE_MICROSITES', False):
-        enable_microsites_pre_startup()
+    microsite.enable_microsites(log)
 
     django.setup()
 
@@ -42,9 +43,6 @@ def run():
 
     if settings.FEATURES.get('USE_CUSTOM_THEME', False):
         enable_stanford_theme()
-
-    if settings.FEATURES.get('USE_MICROSITES', False):
-        enable_microsites()
 
     # Initialize Segment analytics module by setting the write_key.
     if settings.LMS_SEGMENT_KEY:
@@ -119,56 +117,12 @@ def enable_stanford_theme():
     settings.LOCALE_PATHS = (theme_root / 'conf/locale',) + settings.LOCALE_PATHS
 
 
-def enable_microsites_pre_startup():
-    """
-    The TEMPLATE_ENGINE directory to search for microsite templates
-    in non-mako templates must be loaded before the django startup
-    """
-    microsites_root = settings.MICROSITE_ROOT_DIR
-    microsite_config_dict = settings.MICROSITE_CONFIGURATION
-
-    if microsite_config_dict:
-        settings.DEFAULT_TEMPLATE_ENGINE['DIRS'].append(microsites_root)
-
-
 def enable_microsites():
     """
-    Enable the use of microsites, which are websites that allow
-    for subdomains for the edX platform, e.g. foo.edx.org
+    Calls the enable_microsites function in the microsite backend.
+    Here for backwards compatibility
     """
-
-    microsites_root = settings.MICROSITE_ROOT_DIR
-    microsite_config_dict = settings.MICROSITE_CONFIGURATION
-
-    for ms_name, ms_config in microsite_config_dict.items():
-        # Calculate the location of the microsite's files
-        ms_root = microsites_root / ms_name
-        ms_config = microsite_config_dict[ms_name]
-
-        # pull in configuration information from each
-        # microsite root
-
-        if ms_root.isdir():
-            # store the path on disk for later use
-            ms_config['microsite_root'] = ms_root
-
-            template_dir = ms_root / 'templates'
-            ms_config['template_dir'] = template_dir
-
-            ms_config['microsite_name'] = ms_name
-            log.info('Loading microsite %s', ms_root)
-        else:
-            # not sure if we have application logging at this stage of
-            # startup
-            log.error('Error loading microsite %s. Directory does not exist', ms_root)
-            # remove from our configuration as it is not valid
-            del microsite_config_dict[ms_name]
-
-    # if we have any valid microsites defined, let's wire in the Mako and STATIC_FILES search paths
-    if microsite_config_dict:
-        edxmako.paths.add_lookup('main', microsites_root)
-
-        settings.STATICFILES_DIRS.insert(0, microsites_root)
+    microsite.enable_microsites(log)
 
 
 def enable_third_party_auth():
