@@ -22,7 +22,7 @@
   @import '${env.get('THEME_NAME')}';
 % endif
 
-footer#footer-edx-v3 {
+footer#footer-openedx {
     @import 'base/extends';
 
     // base - starter

@@ -83,7 +83,7 @@ var edx = edx || {};
                 },
 
                 render: function( html ) {
-                    _fn.$el.html( html );
+                    $(html).replaceAll(_fn.$el);
                 }
             }
         };
