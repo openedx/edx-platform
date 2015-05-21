@@ -174,7 +174,7 @@ class VideoFields(LicenseMixin):
         scope=Scope.settings,
         default="",
     )
-    date_last_view_bumper = DateTime(
+    bumper_last_view_date = DateTime(
         display_name=_("Date of the last view of the bumper"),
         scope=Scope.preferences,
     )

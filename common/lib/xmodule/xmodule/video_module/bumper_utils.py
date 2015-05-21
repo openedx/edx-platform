@@ -38,12 +38,12 @@ def is_bumper_enabled(video):
     Returns:
          bool.
     """
-    date_last_view_bumper = getattr(video, 'date_last_view_bumper', None)
+    bumper_last_view_date = getattr(video, 'bumper_last_view_date', None)
     utc_now = datetime.utcnow().replace(tzinfo=pytz.utc)
     periodicity = settings.FEATURES.get('SHOW_BUMPER_PERIODICITY', 0)
     has_viewed = any([
         getattr(video, 'do_not_show_again_bumper'),
-        (date_last_view_bumper and date_last_view_bumper + timedelta(seconds=periodicity) > utc_now)
+        (bumper_last_view_date and bumper_last_view_date + timedelta(seconds=periodicity) > utc_now)
     ])
     is_studio = getattr(video.system, "is_author_mode", False)
     return bool(
