@@ -16,6 +16,7 @@ from opaque_keys.edx.locator import CourseLocator
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from certificates.utils import get_certificate_url
 
 from certificates.models import ExampleCertificateSet, ExampleCertificate, GeneratedCertificate
 from certificates.tests.factories import CertificateHtmlViewConfigurationFactory
@@ -236,27 +237,31 @@ class CertificatesViewsTests(ModuleStoreTestCase):
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_valid_certificate(self):
-        test_url = '/certificates/html?course={}'.format(unicode(self.course.id))
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=self.course.id.to_deprecated_string()  # pylint: disable=no-member
+        )
         response = self.client.get(test_url)
         self.assertIn(str(self.cert.verify_uuid), response.content)
 
         # Hit any "verified" mode-specific branches
         self.cert.mode = 'verified'
         self.cert.save()
-        test_url = '/certificates/html?course={}'.format(unicode(self.course.id))
         response = self.client.get(test_url)
         self.assertIn(str(self.cert.verify_uuid), response.content)
 
         # Hit any 'xseries' mode-specific branches
         self.cert.mode = 'xseries'
         self.cert.save()
-        test_url = '/certificates/html?course={}'.format(unicode(self.course.id))
         response = self.client.get(test_url)
         self.assertIn(str(self.cert.verify_uuid), response.content)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_with_valid_signatories(self):
-        test_url = '/certificates/html?course={}'.format(unicode(self.course.id))
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=self.course.id.to_deprecated_string()  # pylint: disable=no-member
+        )
         self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url)
         self.assertIn('course_title_0', response.content)
@@ -268,7 +273,10 @@ class CertificatesViewsTests(ModuleStoreTestCase):
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_course_display_name_not_override_with_course_title(self):
         # if certificate in descriptor has not course_title then course name should not be overridden with this title.
-        test_url = '/certificates/html?course={}'.format(unicode(self.course.id))
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=self.course.id.to_deprecated_string()  # pylint: disable=no-member
+        )
         test_certificates = [
             {
                 'id': 0,
@@ -287,7 +295,10 @@ class CertificatesViewsTests(ModuleStoreTestCase):
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_without_signatories(self):
-        test_url = '/certificates/html?course={}'.format(unicode(self.course.id))
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=self.course.id.to_deprecated_string()  # pylint: disable=no-member
+        )
         self._add_course_certificates(count=1, signatory_count=0)
         response = self.client.get(test_url)
         self.assertNotIn('Signatory_Name 0', response.content)
@@ -295,25 +306,38 @@ class CertificatesViewsTests(ModuleStoreTestCase):
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_DISABLED)
     def test_render_html_view_invalid_feature_flag(self):
-        test_url = '/certificates/html?course={}'.format(unicode(self.course.id))
-        response = self.client.get(test_url)
-        self.assertIn('invalid', response.content)
-
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_render_html_view_missing_course_id(self):
-        test_url = '/certificates/html'
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=self.course.id.to_deprecated_string()  # pylint: disable=no-member
+        )
         response = self.client.get(test_url)
         self.assertIn('invalid', response.content)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_invalid_course_id(self):
-        test_url = '/certificates/html?course=az-23423-4vs'
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id='az/23423/4vs'
+        )
+
         response = self.client.get(test_url)
         self.assertIn('invalid', response.content)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_invalid_course(self):
-        test_url = '/certificates/html?course=missing/course/key'
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id='missing/course/key'
+        )
+        response = self.client.get(test_url)
+        self.assertIn('invalid', response.content)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_render_html_view_invalid_user(self):
+        test_url = get_certificate_url(
+            user_id=111,
+            course_id=self.course.id.to_deprecated_string()  # pylint: disable=no-member
+        )
         response = self.client.get(test_url)
         self.assertIn('invalid', response.content)
 
@@ -321,6 +345,9 @@ class CertificatesViewsTests(ModuleStoreTestCase):
     def test_render_html_view_invalid_certificate(self):
         self.cert.delete()
         self.assertEqual(len(GeneratedCertificate.objects.all()), 0)
-        test_url = '/certificates/html?course={}'.format(unicode(self.course.id))
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=self.course.id.to_deprecated_string()  # pylint: disable=no-member
+        )
         response = self.client.get(test_url)
         self.assertIn('invalid', response.content)
