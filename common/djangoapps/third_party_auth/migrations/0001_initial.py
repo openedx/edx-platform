@@ -67,7 +67,6 @@ class Migration(SchemaMigration):
             ('entity_id', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
             ('sso_url', self.gf('django.db.models.fields.URLField')(max_length=200)),
             ('public_key', self.gf('django.db.models.fields.TextField')()),
-            ('binding', self.gf('django.db.models.fields.CharField')(default='urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect', max_length=128, blank=True)),
         ))
         db.send_create_signal('third_party_auth', ['SAMLProviderData'])
 
@@ -170,7 +169,6 @@ class Migration(SchemaMigration):
         },
         'third_party_auth.samlproviderdata': {
             'Meta': {'ordering': "('-fetched_at',)", 'object_name': 'SAMLProviderData'},
-            'binding': ('django.db.models.fields.CharField', [], {'default': "'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'", 'max_length': '128', 'blank': 'True'}),
             'entity_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
             'expires_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'db_index': 'True'}),
             'fetched_at': ('django.db.models.fields.DateTimeField', [], {'db_index': 'True'}),

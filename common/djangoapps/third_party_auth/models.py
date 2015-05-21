@@ -239,7 +239,6 @@ class SAMLProviderConfig(ProviderConfig):
                 "No SAMLProviderData found for {}. Run 'manage.py saml pull' to fix or debug.".format(self.entity_id))
         conf['x509cert'] = data.public_key
         conf['url'] = data.sso_url
-        conf['binding'] = data.binding
         return SAMLIdentityProvider(self.idp_slug, **conf)
 
 
@@ -301,7 +300,6 @@ class SAMLProviderData(models.Model):
     entity_id = models.CharField(max_length=255, db_index=True)  # This is the key for lookups in this table
     sso_url = models.URLField(verbose_name="SSO URL")
     public_key = models.TextField()
-    binding = models.CharField(max_length=128, default='urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect', blank=True)
 
     class Meta(object):  # pylint: disable=missing-docstring
         verbose_name = "SAML Provider Data"

@@ -18,11 +18,6 @@ class MetadataParseError(Exception):
     """ An error occurred while parsing the SAML metadata from an IdP """
     pass
 
-SUPPORTED_SSO_BINDINGS = (  # In order of preference:
-    "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
-    "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
-)
-
 
 class Command(BaseCommand):
     """ manage.py commands to manage SAML/Shibboleth SSO """
@@ -81,8 +76,8 @@ class Command(BaseCommand):
 
                 for entity_id in entity_ids:
                     print("→ Processing IdP with entityID {}".format(entity_id))
-                    public_key, binding, sso_url, expires_at = self._parse_metadata_xml(xml, entity_id)
-                    self._update_data(entity_id, public_key, binding, sso_url, expires_at)
+                    public_key, sso_url, expires_at = self._parse_metadata_xml(xml, entity_id)
+                    self._update_data(entity_id, public_key, sso_url, expires_at)
             except Exception as err:  # pylint: disable=broad-except
                 print("→ ERROR: {}".format(err.message))
 
@@ -90,7 +85,7 @@ class Command(BaseCommand):
     def _parse_metadata_xml(cls, xml, entity_id):
         """
         Given an XML document containing SAML 2.0 metadata, parse it and return a tuple of
-        (public_key, binding, sso_url, expires_at) for the specified entityID.
+        (public_key, sso_url, expires_at) for the specified entityID.
 
         Raises MetadataParseError if anything is wrong.
         """
@@ -117,7 +112,7 @@ class Command(BaseCommand):
         if 'urn:oasis:names:tc:SAML:2.0:protocol' not in sso_desc.get("protocolSupportEnumeration"):
             raise MetadataParseError("This IdP does not support SAML 2.0")
 
-        # Now we just need to get the public_key, sso_url, and binding
+        # Now we just need to get the public_key and sso_url
         public_key = sso_desc.findtext("./{}//{}".format(
             cls.tag_name("KeyDescriptor"), "{http://www.w3.org/2000/09/xmldsig#}X509Certificate"
         ))
@@ -126,27 +121,21 @@ class Command(BaseCommand):
         public_key = public_key.replace(" ", "")
         binding_elements = sso_desc.iterfind("./{}".format(cls.tag_name("SingleSignOnService")))
         sso_bindings = {element.get('Binding'): element.get('Location') for element in binding_elements}
-        binding = None
-        sso_url = None
-        for want_binding in SUPPORTED_SSO_BINDINGS:
-            if want_binding in sso_bindings:
-                binding = want_binding
-                sso_url = sso_bindings[binding]
-                break  # Bindings are in a preferred order
-        if not binding or not sso_url:
-            raise MetadataParseError("Unable to find supported SSO binding.")
-        return public_key, binding, sso_url, expires_at
+        try:
+            # The only binding supported by python-saml and python-social-auth is HTTP-Redirect:
+            sso_url = sso_bindings['urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect']
+        except KeyError:
+            raise MetadataParseError("Unable to find SSO URL with HTTP-Redirect binding.")
+        return public_key, sso_url, expires_at
 
     @staticmethod
-    def _update_data(entity_id, public_key, binding, sso_url, expires_at):
+    def _update_data(entity_id, public_key, sso_url, expires_at):
         """
         Update/Create the SAMLProviderData for the given entity ID.
         """
         data_obj = SAMLProviderData.current(entity_id)
         fetched_at = datetime.datetime.now()
-        if data_obj and (data_obj.public_key == public_key and
-                         data_obj.binding == binding and
-                         data_obj.sso_url == sso_url):
+        if data_obj and (data_obj.public_key == public_key and data_obj.sso_url == sso_url):
             data_obj.expires_at = expires_at
             data_obj.fetched_at = fetched_at
             data_obj.save()
@@ -158,6 +147,5 @@ class Command(BaseCommand):
                 expires_at=expires_at,
                 sso_url=sso_url,
                 public_key=public_key,
-                binding=binding,
             )
             print("→ Created new record for SAMLProviderData")
