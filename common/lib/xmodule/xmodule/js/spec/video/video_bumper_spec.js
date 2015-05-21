@@ -1,7 +1,13 @@
 (function (WAIT_TIMEOUT) {
     'use strict';
     describe('VideoBumper', function () {
-        var state, oldOTBD;
+        var state, oldOTBD, waitForPlaying;
+
+        waitForPlaying = function (state) {
+            waitsFor(function () {
+                return state.el.hasClass('is-playing');
+            }, 'Player is not playing.', WAIT_TIMEOUT);
+        };
 
         beforeEach(function () {
             oldOTBD = window.onTouchBasedDevice;
@@ -32,36 +38,28 @@
             state.el.trigger('error');
             jasmine.Clock.tick(20);
             expect($('.is-bumper')).not.toExist();
-            waitsFor(function () {
-                return state.el.hasClass('is-playing');
-            }, 'Player is not playing.', WAIT_TIMEOUT);
+            waitForPlaying(state);
         });
 
         it('can show the main video once bumper ends', function () {
             state.el.trigger('ended');
             jasmine.Clock.tick(20);
             expect($('.is-bumper')).not.toExist();
-            waitsFor(function () {
-                return state.el.hasClass('is-playing');
-            }, 'Player is not playing.', WAIT_TIMEOUT);
+            waitForPlaying(state);
         });
 
         it('can show the main video on skip', function () {
             state.bumperState.videoBumper.skip();
             jasmine.Clock.tick(20);
             expect($('.is-bumper')).not.toExist();
-            waitsFor(function () {
-                return state.el.hasClass('is-playing');
-            }, 'Player is not playing.', WAIT_TIMEOUT);
+            waitForPlaying(state);
         });
 
         it('can stop the bumper video playing if it is too long', function () {
             state.el.trigger('timeupdate', [state.bumperState.videoBumper.maxBumperDuration + 1]);
             jasmine.Clock.tick(20);
             expect($('.is-bumper')).not.toExist();
-            waitsFor(function () {
-                return state.el.hasClass('is-playing');
-            }, 'Player is not playing.', WAIT_TIMEOUT);
+            waitForPlaying(state);
         });
 
         it('can save appropriate states correctly on ended', function () {

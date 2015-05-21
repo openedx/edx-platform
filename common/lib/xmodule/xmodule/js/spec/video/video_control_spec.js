@@ -588,10 +588,15 @@
         });
 
         it('can focus the first control', function () {
-            var controls;
+            var btnPlay;
             state = jasmine.initializePlayer({focusFirstControl: true});
             btnPlay = state.el.find('.video-controls .play');
-            expect(btnPlay).toBeFocused();
+            waitsFor(function () {
+                return state.el.hasClass('is-initialized');
+            }, 'Player is not initialized', WAIT_TIMEOUT);
+            runs(function () {
+                expect(btnPlay).toBeFocused();
+            });
         });
     });
 }).call(this, window.WAIT_TIMEOUT);
