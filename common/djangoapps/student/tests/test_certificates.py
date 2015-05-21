@@ -12,6 +12,9 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
+from certificates.utils import get_certificate_url
+
+# pylint: disable=no-member
 
 
 @ddt.ddt
@@ -42,11 +45,9 @@ class CertificateDisplayTest(ModuleStoreTestCase):
     @override_settings(CERT_NAME_SHORT='Test_Certificate')
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     def test_linked_student_to_web_view_credential(self, enrollment_mode):
-
-        test_url = u'{url}?course={course_id}'.format(
-            url=reverse('cert_html_view'),
-            course_id=unicode(self.course.id)  # pylint: disable=no-member
-        )
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=self.course.id.to_deprecated_string())
 
         self._create_certificate(enrollment_mode)
         certificates = [
