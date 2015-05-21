@@ -178,7 +178,7 @@ class VideoFields(LicenseMixin):
         display_name=_("Date of the last view of the bumper"),
         scope=Scope.preferences,
     )
-    do_not_show_again_bumper = Boolean(
+    bumper_do_not_show_again = Boolean(
         display_name=_("Do not show bumper again"),
         scope=Scope.preferences,
         default=False,

@@ -98,7 +98,7 @@
             state.bumperState.videoBumper.skipAndDoNotShowAgain();
             jasmine.Clock.tick(20);
             expect(saveState).toHaveBeenCalledWith(true, {
-                bumper_last_view_date: true, do_not_show_again_bumper: true});
+                bumper_last_view_date: true, bumper_do_not_show_again: true});
         });
 
         it('can destroy itself', function () {

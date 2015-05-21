@@ -84,7 +84,7 @@ define('video/09_bumper.js',[], function () {
         saveState: function () {
             var info = {bumper_last_view_date: true};
             if (this.doNotShowAgain) {
-                _.extend(info, {do_not_show_again_bumper: true});
+                _.extend(info, {bumper_do_not_show_again: true});
             }
             this.state.videoSaveStatePlugin.saveState(true, info);
         },
