@@ -69,7 +69,7 @@ class BadgeHandler(object):
         base_slug = slugify(unicode(self.course_key) + u'_{}_'.format(mode))[:248]
         return base_slug + digest
 
-    def log_if_raised(self, response):
+    def log_if_raised(self, response, data):
         """
         Log server response if there was an error.
         """
@@ -78,8 +78,10 @@ class BadgeHandler(object):
         except HTTPError:
             LOGGER.error(
                 u"Encountered an error when contacting the Badgr-Server. Request sent to %s with headers %s.\n"
+                u"and data values %s\n"
                 u"Response status was %s.\n%s",
                 repr(response.request.url), repr(response.request.headers),
+                repr(data),
                 response.status_code, response.body
             )
             raise
@@ -118,10 +120,13 @@ class BadgeHandler(object):
         """
         Returns the badge
         """
-        return _(u"{start_date} to {end_date}").format(
-            start_date=course.start.date(),
-            end_date=course.end.date(),
-        )
+        if course.end:
+            return _(u"{start_date} to {end_date}").format(
+                start_date=course.start.date(),
+                end_date=course.end.date(),
+            )
+        else:
+            return u"{start_date}".format(course.end.date())
 
     def create_badge(self, mode):
         """
@@ -138,22 +143,24 @@ class BadgeHandler(object):
             )
         files = {'image': (image.name, image, content_type)}
         about_path = reverse('about_course', kwargs={'course_id': unicode(self.course_key)})
+        scheme = u"https" if settings.HTTPS == "on" else u"http"
         data = {
             'name': self.badge_name_field(course, mode),
-            'criteria': u'http://{}{}'.format(settings.SITE_NAME, about_path),
+            'criteria': u'{}://{}{}'.format(scheme, settings.SITE_NAME, about_path),
             'slug': self.course_slug(mode),
             'description': self.badge_description(course)
         }
         result = requests.post(self.badge_create_url, headers=self.get_headers(), data=data, files=files)
-        self.log_if_raised(result)
+        self.log_if_raised(result, data)
 
     def create_assertion(self, user, mode):
         """
         Register an assertion with the Badgr server for a particular user in a particular course mode for
         this course.
         """
-        response = requests.post(self.assertion_url(mode), headers=self.get_headers(), data={'email': user.email})
-        self.log_if_raised(response)
+        data = {'email': user.email}
+        response = requests.post(self.assertion_url(mode), headers=self.get_headers(), data=data)
+        self.log_if_raised(response, data)
         assertion, __ = BadgeAssertion.objects.get_or_create(course_id=self.course_key, user=user)
         assertion.data = response.json()
         assertion.save()

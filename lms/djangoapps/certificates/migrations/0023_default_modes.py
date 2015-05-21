@@ -20,6 +20,9 @@ class Migration(DataMigration):
                 File(open(settings.PROJECT_ROOT / 'static' / 'images' / 'default-badges' / file_name))
             )
             conf.save()
+        honor = orm.BadgeImageConfiguration.objects.get(mode='honor')
+        honor.default = True
+        honor.save()
 
     def backwards(self, orm):
         """Do nothing, assumptions too dangerous."""
