@@ -60,7 +60,7 @@ from student.forms import AccountCreationForm, PasswordResetFormNoActive
 
 from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow
 from certificates.models import CertificateStatuses, certificate_status_for_student
-from certificates.utils import get_certificate_url
+from certificates.utils import get_certificate_url  # pylint: disable=import-error
 from dark_lang.models import DarkLangConfig
 
 from xmodule.modulestore.django import modulestore
