@@ -93,7 +93,7 @@ function () {
     // ***************************************************************
 
     function focusFirst() {
-        this.videoControl.el.find('a, button').first().focus();
+        this.videoControl.el.find('.vcr a, .vcr button').first().focus();
     }
 
     function show() {

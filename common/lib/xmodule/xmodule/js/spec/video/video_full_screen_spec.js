@@ -21,12 +21,12 @@
                 state = jasmine.initializePlayer();
             });
 
-            it('render the fullscreen control', function () {
+            it('renders the fullscreen control', function () {
                 expect($('.add-fullscreen')).toExist();
                 expect(state.videoFullScreen.fullScreenState).toBe(false);
             });
 
-            it('add ARIA attributes to fullscreen control', function () {
+            it('correctly adds ARIA attributes to fullscreen control', function () {
                 var fullScreenControl = $('.add-fullscreen');
 
                 expect(fullScreenControl).toHaveAttrs({
@@ -36,7 +36,7 @@
                 });
             });
 
-            it('event handler to toggle fullscreen mode', function () {
+            it('correctly triggers the event handler to toggle fullscreen mode', function () {
                 spyOn(state.videoFullScreen, 'exit');
                 spyOn(state.videoFullScreen, 'enter');
 
@@ -49,7 +49,7 @@
                 expect(state.videoFullScreen.exit).toHaveBeenCalled();
             });
 
-            it('updates ARIA on state change', function () {
+            it('correctly updates ARIA on state change', function () {
                 var fullScreenControl = $('.add-fullscreen');
                 fullScreenControl.click();
                 expect(fullScreenControl).toHaveAttrs({
@@ -65,7 +65,7 @@
                 });
             });
 
-            it('out of fullscreen by pressing esc', function () {
+            it('correctly can out of fullscreen by pressing esc', function () {
                 spyOn(state.videoCommands, 'execute');
                 var esc = $.Event('keyup');
                 esc.keyCode = 27;
