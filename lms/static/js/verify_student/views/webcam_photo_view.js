@@ -245,18 +245,18 @@
             );
             $( this.el ).html( renderedHtml );
 
-            var resetBtn = this.$el.find('#webcam_reset_button');
-            var captureBtn = this.$el.find('#webcam_capture_button');
+            var $resetBtn = this.$el.find('#webcam_reset_button'),
+                $captureBtn = this.$el.find('#webcam_capture_button');
 
             // Install event handlers
-            resetBtn.on( 'click', _.bind( this.reset, this ) );
-            captureBtn.on( 'click', _.bind( this.capture, this ) );
+            $resetBtn.on( 'click', _.bind( this.reset, this ) );
+            $captureBtn.on( 'click', _.bind( this.capture, this ) );
 
-            resetBtn.on( 'keyup', _.bind( this.reset_by_enter, this ) );
-            captureBtn.on( 'keyup', _.bind( this.capture_by_enter, this ) );
+            $resetBtn.on( 'keyup', _.bind( this.reset_by_enter, this ) );
+            $captureBtn.on( 'keyup', _.bind( this.capture_by_enter, this ) );
 
             // Show the capture button
-            captureBtn.removeClass('is-hidden');
+            $captureBtn.removeClass('is-hidden');
 
             return this;
         },
