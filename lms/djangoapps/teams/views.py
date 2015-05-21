@@ -1,8 +1,6 @@
-from edxmako.shortcuts import render_to_response
+from django.shortcuts import render_to_response
 from opaque_keys.edx.keys import CourseKey
 from courseware.courses import get_course_with_access
-
-from . import TEAMS_NAMESPACE
 
 
 def teams_dashboard(request, course_id):
@@ -15,4 +13,4 @@ def teams_dashboard(request, course_id):
         "course": course,
     }
 
-    return render_to_response("teams/teams.html", context, namespace=TEAMS_NAMESPACE)
+    return render_to_response("teams/teams.html", context)
