@@ -111,7 +111,14 @@ if __name__ == "__main__":
     startup = importlib.import_module(edx_args.startup)
     startup.run()
 
+    # Prevent django-nose from passing --collect to nosetests
+    # while still leaving it on sys.argv so that runserver sees it during
+    # restart
+    from django_nose.runner import BaseRunner
+    BaseRunner.django_opts.append('--contracts')
+
     from django.core.management import execute_from_command_line
 
-    sys.argv[1:] = django_args
-    execute_from_command_line(sys.argv)
+    # We don't modify sys.argv here, because the runserver management command uses the raw
+    # sys.argv values to restart the shell using the python reloader.
+    execute_from_command_line([sys.argv[0]] + django_args)
