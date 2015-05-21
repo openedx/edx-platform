@@ -418,6 +418,12 @@ class ContentLicenseTest(StudioCourseTest):
             self.course_info['number'],
             self.course_info['run']
         )
+        self.settings_page = SettingsPage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
         self.lms_courseware = CoursewarePage(
             self.browser,
             self.course_id,
