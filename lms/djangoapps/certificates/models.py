@@ -593,7 +593,7 @@ class BadgeAssertion(models.Model):
         """
         Get the image for this assertion.
         """
-        return self.data['json']['image']
+        return self.data['image']
 
     class Meta(object):
         """

@@ -6,7 +6,9 @@ from django.test.utils import override_settings
 from django.db.models.fields.files import ImageFieldFile
 from lazy.lazy import lazy
 from mock import patch, Mock, call
+from openedx.core.lib.tests.assertions.events import assert_event_matches
 from certificates.models import BadgeAssertion, BadgeImageConfiguration
+from track.tests import EventTrackingTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from certificates.badge_handler import BadgeHandler
 from certificates.tests.factories import BadgeImageConfigurationFactory
@@ -21,7 +23,7 @@ BADGR_SETTINGS = {
 
 
 @override_settings(**BADGR_SETTINGS)
-class BadgeHandlerTestCase(ModuleStoreTestCase):
+class BadgeHandlerTestCase(ModuleStoreTestCase, EventTrackingTestCase):
     """
     Tests the BadgeHandler object
     """
@@ -155,10 +157,16 @@ class BadgeHandlerTestCase(ModuleStoreTestCase):
 
     @patch('requests.post')
     def test_create_assertion(self, post):
-        result = {'json': {'image': 'http://www.example.com/example.png'}}
+        result = {
+            'json': {'id': 'http://www.example.com/example'},
+            'image': 'http://www.example.com/example.png',
+            'slug': 'test_assertion_slug',
+            'issuer': 'https://example.com/v1/issuer/issuers/test-issuer',
+        }
         response = Mock()
         response.json.return_value = result
         post.return_value = response
+        self.recreate_tracker()
         self.handler.create_assertion(self.user, 'honor')
         args, kwargs = post.call_args
         self.assertEqual(
@@ -171,3 +179,17 @@ class BadgeHandlerTestCase(ModuleStoreTestCase):
         badge = BadgeAssertion.objects.get(user=self.user, course_id=self.course.location.course_key)
         self.assertEqual(badge.data, result)
         self.assertEqual(badge.image_url, 'http://www.example.com/example.png')
+        assert_event_matches({
+            'name': 'edx.badges.assertion.created',
+            'data': {
+                'user': self.user.id,
+                'course_id': unicode(self.course.location.course_key),
+                'enrollment_mode': 'honor',
+                'assertion_image_url': 'http://www.example.com/example.png',
+                'assertion_json_url': 'http://www.example.com/example',
+                'assertion_slug': 'test_assertion_slug',
+                'badge_slug': 'edxcourse_testtest_run_honor_fc5519b',
+                'issuer': 'https://example.com/v1/issuer/issuers/test-issuer',
+            }
+        }, self.get_event())
+

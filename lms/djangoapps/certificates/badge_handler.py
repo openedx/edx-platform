@@ -153,6 +153,23 @@ class BadgeHandler(object):
         result = requests.post(self.badge_create_url, headers=self.get_headers(), data=data, files=files)
         self.log_if_raised(result, data)
 
+    def send_assertion_created_event(self, user, mode, assertion):
+        """
+        Send an analytics event to record the creation of a badge assertion.
+        """
+        tracker.emit(
+            'edx.badges.assertion.created', {
+                'user': user.id,
+                'course_id': unicode(self.course_key),
+                'enrollment_mode': mode,
+                'assertion_image_url': assertion.data['image'],
+                'assertion_json_url': assertion.data['json']['id'],
+                'assertion_slug': assertion.data['slug'],
+                'badge_slug': self.course_slug(mode),
+                'issuer': assertion.data['issuer'],
+            }
+        )
+
     def create_assertion(self, user, mode):
         """
         Register an assertion with the Badgr server for a particular user in a particular course mode for
@@ -164,14 +181,7 @@ class BadgeHandler(object):
         assertion, __ = BadgeAssertion.objects.get_or_create(course_id=self.course_key, user=user)
         assertion.data = response.json()
         assertion.save()
-        tracker.emit(
-            'edx.badges.assertion.created', {
-                'user': user.id,
-                'course_id': unicode(self.course_key),
-                'enrollment_mode': mode,
-                'assertion': assertion.data
-            }
-        )
+        self.send_assertion_created_event(user, mode, assertion)
 
     def award(self, user):
         """
