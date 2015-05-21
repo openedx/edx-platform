@@ -33,6 +33,7 @@ function () {
             hideControls: hideControls,
             show: show,
             showControls: showControls,
+            focusFirst: focusFirst,
             updateVcrVidTime: updateVcrVidTime
         };
 
@@ -43,9 +44,11 @@ function () {
         this.el.off({
             'mousemove': this.videoControl.showControls,
             'keydown': this.videoControl.showControls,
-            'destroy': this.videoControl.destroy
+            'destroy': this.videoControl.destroy,
+            'initialize': this.videoControl.focusFirst
         });
-        this.el.off('controls');
+
+        this.el.off('controls:show');
         delete this.videoControl;
     }
 
@@ -77,6 +80,9 @@ function () {
             });
         }
 
+        if (state.config.focusFirstControl) {
+            state.el.on('initialize', state.videoControl.focusFirst);
+        }
         state.el.on('destroy', state.videoControl.destroy);
     }
 
@@ -85,6 +91,10 @@ function () {
     // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
     // The magic private function that makes them available and sets up their context is makeFunctionsPublic().
     // ***************************************************************
+
+    function focusFirst() {
+        this.videoControl.el.find('a, button').first().focus();
+    }
 
     function show() {
         this.videoControl.el.removeClass('is-hidden');

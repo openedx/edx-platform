@@ -71,19 +71,19 @@ define('video/09_events_bumper_plugin.js', [], function() {
         },
 
         onShowLanguageMenu: function () {
-            this.log('edx.video.bumper.cc_menu_shown');
+            this.log('edx.video.bumper.transcript.menu.shown');
         },
 
         onHideLanguageMenu: function () {
-            this.log('edx.video.bumper.cc_menu_hidden');
+            this.log('edx.video.bumper.transcript.menu.hidden');
         },
 
         onShowCaptions: function () {
-            this.log('edx.video.bumper.transcript_shown', {current_time: this.getCurrentTime()});
+            this.log('edx.video.bumper.transcript.shown', {current_time: this.getCurrentTime()});
         },
 
         onHideCaptions: function () {
-            this.log('edx.video.bumper.transcript_hidden', {current_time: this.getCurrentTime()});
+            this.log('edx.video.bumper.transcript.hidden', {current_time: this.getCurrentTime()});
         },
 
         getCurrentTime: function () {
@@ -101,7 +101,6 @@ define('video/09_events_bumper_plugin.js', [], function() {
                 host_component_id: this.state.id,
                 bumper_id: this.state.config.sources[0] || '',
                 duration: this.getDuration(),
-                name: eventName,
                 code: 'html5'
             }, data, this.options.data);
             Logger.log(eventName, logInfo);
