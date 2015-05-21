@@ -29,16 +29,15 @@ class ApiTestCases(ModuleStoreTestCase):
 
     def test_set_credit_requirements_invalid_requirements(self):
         self.add_credit_course()
-        with self.assertRaises(InvalidCreditRequirements):
-            requirements = [
-                {
-                    "namespace": "grade",
-                    "name": "grade",
-                    "configuration": {
-                        "min_grade": "in valid requirements"
-                    }
+        requirements = [
+            {
+                "namespace": "grade",
+                "configuration": {
+                    "min_grade": 0.8
                 }
-            ]
+            }
+        ]
+        with self.assertRaises(InvalidCreditRequirements):
             set_credit_requirements(self.course_key, requirements)
 
     def test_set_credit_requirements(self):
@@ -48,18 +47,14 @@ class ApiTestCases(ModuleStoreTestCase):
                 "namespace": "grade",
                 "name": "grade",
                 "configuration": {
-                    "min_grade": {
                         "min_grade": 0.8
-                    }
                 }
             },
             {
                 "namespace": "grade",
                 "name": "grade",
                 "configuration": {
-                    "min_grade": {
                         "min_grade": 0.8
-                    }
                 }
             }
         ]
@@ -72,18 +67,14 @@ class ApiTestCases(ModuleStoreTestCase):
                 "namespace": "grade",
                 "name": "grade",
                 "configuration": {
-                    "min_grade": {
-                        "min_grade": 0.8
-                    }
+                    "min_grade": 0.8
                 }
             },
             {
                 "namespace": "grade",
                 "name": "grade",
                 "configuration": {
-                    "min_grade": {
-                        "min_grade": 0.8
-                    }
+                    "min_grade": 0.8
                 }
             }
         ]
@@ -93,6 +84,6 @@ class ApiTestCases(ModuleStoreTestCase):
     def add_credit_course(self):
         """ Mark the course as a credit """
 
-        credit_course = CreditCourse(course_key=self.course_key)
+        credit_course = CreditCourse(course_key=self.course_key, enabled=True)
         credit_course.save()
         return credit_course

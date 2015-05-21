@@ -23,22 +23,32 @@ class TestTaskExecution(ModuleStoreTestCase):
 
     def setUp(self):
         super(TestTaskExecution, self).setUp()
-        SignalHandler.course_published.disconnect(listen_for_course_publish())
-        self.course_key = CourseKey.from_string("edX/DemoX/Demo_Course")
-        self.course = CourseFactory.create(start=datetime(2015, 3, 1, tzinfo=UTC))
-        self.add_credit_course()
+
+        SignalHandler.course_published.disconnect(listen_for_course_publish)
+        self.course = CourseFactory.create(start=datetime(2015, 3, 1))
+
+    def test_task_adding_requirements_invalid_course(self):
+        """ Making sure that the receiver correctly fires off the task when invoked by signal """
+
+        requirements = get_credit_requirements(self.course.id)
+        self.assertEquals(len(requirements["requirements"]), 0)
+        listen_for_course_publish(self, self.course.id)
+
+        requirements = get_credit_requirements(self.course.id)
+        self.assertEquals(len(requirements["requirements"]), 0)
 
     def test_task_adding_requirements(self):
         """ Making sure that the receiver correctly fires off the task when invoked by signal """
 
-        requirements = get_credit_requirements(self.course_key)
+        self.add_credit_course(self.course.id)
+        requirements = get_credit_requirements(self.course.id)
         self.assertEquals(len(requirements["requirements"]), 0)
-
         listen_for_course_publish(self, self.course.id)
 
+        requirements = get_credit_requirements(self.course.id)
         self.assertEquals(len(requirements["requirements"]), 1)
 
-    def add_credit_course(self):
-        credit_course = CreditCourse(course_key=self.course_key)
+    def add_credit_course(self, course_key):
+        credit_course = CreditCourse(course_key=course_key, enabled=True)
         credit_course.save()
         return credit_course
