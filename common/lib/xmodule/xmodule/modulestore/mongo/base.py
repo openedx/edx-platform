@@ -1905,7 +1905,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         self.collection.create_index('definition.children', sparse=True)
 
         # To allow prioritizing draft vs published material
-        self.collection.create_index('_id.revision')
+        self.collection.create_index(['_id.revision', pymongo.DESCENDING])
 
     # Some overrides that still need to be implemented by subclasses
     def convert_to_draft(self, location, user_id):
