@@ -3,16 +3,18 @@ API related to providing field overrides for individual students.  This is used
 by the individual custom courses feature.
 """
 import json
-import threading
-
-from contextlib import contextmanager
+import logging
 
 from django.db import transaction, IntegrityError
 
 from courseware.field_overrides import FieldOverrideProvider  # pylint: disable=import-error
-from ccx import ACTIVE_CCX_KEY  # pylint: disable=import-error
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
 
-from .models import CcxMembership, CcxFieldOverride
+from .models import CcxMembership, CcxFieldOverride, CustomCourseForEdX
+
+
+log = logging.getLogger(__name__)
 
 
 class CustomCoursesForEdxOverrideProvider(FieldOverrideProvider):
@@ -25,43 +27,42 @@ class CustomCoursesForEdxOverrideProvider(FieldOverrideProvider):
         """
         Just call the get_override_for_ccx method if there is a ccx
         """
-        ccx = get_current_ccx()
+        # The incoming block might be a CourseKey instance of some type, a
+        # UsageKey instance of some type, or it might be something that has a
+        # location attribute.  That location attribute will be a UsageKey
+        ccx = course_id = None
+        identifier = getattr(block, 'id', None)
+        if isinstance(identifier, CourseKey):
+            course_id = block.id
+        elif isinstance(identifier, UsageKey):
+            course_id = block.id.course_key
+        elif hasattr(block, 'location'):
+            course_id = block.location.course_key
+        else:
+            msg = "Unable to get course id when calculating ccx overide for block type {}"
+            log.error(msg.format(type(block)))
+        if course_id is not None:
+            ccx = get_current_ccx(course_id)
         if ccx:
             return get_override_for_ccx(ccx, block, name, default)
         return default
 
 
-class _CcxContext(threading.local):
+def get_current_ccx(course_id):
     """
-    A threading local used to implement the `with_ccx` context manager, that
-    keeps track of the CCX currently set as the context.
+    Return the ccx that is active for this course.
     """
+    # ensure that the ID passed in is a CourseKey instance of some type.
+    if isinstance(course_id, CourseKey):
+        course_key = course_id
+    else:
+        course_key = CourseKey.from_string(course_id)
+
     ccx = None
-    request = None
-
-
-_CCX_CONTEXT = _CcxContext()
-
-
-@contextmanager
-def ccx_context(ccx):
-    """
-    A context manager which can be used to explicitly set the CCX that is in
-    play for field overrides.  This mechanism overrides the standard mechanism
-    of looking in the user's session to see if they are enrolled in a CCX and
-    viewing that CCX.
-    """
-    prev = _CCX_CONTEXT.ccx
-    _CCX_CONTEXT.ccx = ccx
-    yield
-    _CCX_CONTEXT.ccx = prev
-
-
-def get_current_ccx():
-    """
-    Return the ccx that is active for this request.
-    """
-    return _CCX_CONTEXT.ccx
+    if isinstance(course_key, CCXLocator):
+        ccx_id = course_key.ccx
+        ccx = CustomCourseForEdX.objects.get(pk=ccx_id)
+    return ccx
 
 
 def get_override_for_ccx(ccx, block, name, default=None):
@@ -85,9 +86,14 @@ def _get_overrides_for_ccx(ccx, block):
     overrides set on this block for this CCX.
     """
     overrides = {}
+    # block as passed in may have a location specific to a CCX, we must strip
+    # that for this query
+    location = block.location
+    if isinstance(block.location, CCXBlockUsageLocator):
+        location = block.location.to_block_locator()
     query = CcxFieldOverride.objects.filter(
         ccx=ccx,
-        location=block.location
+        location=location
     )
     for override in query:
         field = block.fields[override.field]
@@ -141,35 +147,3 @@ def clear_override_for_ccx(ccx, block, name):
 
     except CcxFieldOverride.DoesNotExist:
         pass
-
-
-class CcxMiddleware(object):
-    """
-    Checks to see if current session is examining a CCX and sets the CCX as
-    the current CCX for the override machinery if so.
-    """
-    def process_request(self, request):
-        """
-        Do the check.
-        """
-        ccx_id = request.session.get(ACTIVE_CCX_KEY, None)
-        if ccx_id is not None:
-            try:
-                membership = CcxMembership.objects.get(
-                    student=request.user, active=True, ccx__id__exact=ccx_id
-                )
-                _CCX_CONTEXT.ccx = membership.ccx
-            except CcxMembership.DoesNotExist:
-                # if there is no membership, be sure to unset the active ccx
-                _CCX_CONTEXT.ccx = None
-                request.session.pop(ACTIVE_CCX_KEY)
-
-        _CCX_CONTEXT.request = request
-
-    def process_response(self, request, response):  # pylint: disable=unused-argument
-        """
-        Clean up afterwards.
-        """
-        _CCX_CONTEXT.ccx = None
-        _CCX_CONTEXT.request = None
-        return response

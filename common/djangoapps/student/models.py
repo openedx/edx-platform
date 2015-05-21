@@ -1195,6 +1195,13 @@ class CourseEnrollment(models.Model):
         """
         if not user.is_authenticated():
             return False
+
+        # unwrap CCXLocators so that we use the course as the access control
+        # source
+        from ccx_keys.locator import CCXLocator
+        if isinstance(course_key, CCXLocator):
+            course_key = course_key.to_course_locator()
+
         try:
             record = CourseEnrollment.objects.get(user=user, course_id=course_key)
             return record.is_active

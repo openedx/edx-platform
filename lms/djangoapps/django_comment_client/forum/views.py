@@ -65,7 +65,7 @@ class DiscussionTab(EnrolledTab):
             return False
 
         if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
-            if get_current_ccx():
+            if get_current_ccx(course.id):
                 return False
         return settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE')
 

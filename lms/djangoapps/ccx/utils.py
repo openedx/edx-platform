@@ -14,6 +14,7 @@ from edxmako.shortcuts import render_to_string  # pylint: disable=import-error
 from microsite_configuration import microsite  # pylint: disable=import-error
 from xmodule.modulestore.django import modulestore
 from xmodule.error_module import ErrorDescriptor
+from ccx_keys.locator import CCXLocator
 
 from .models import (
     CcxMembership,
@@ -138,7 +139,6 @@ def get_email_params(ccx, auto_enroll, secure=True):
     get parameters for enrollment emails
     """
     protocol = 'https' if secure else 'http'
-    course_id = ccx.course_id
 
     stripped_site_name = microsite.get_value(
         'SITE_NAME',
@@ -154,7 +154,7 @@ def get_email_params(ccx, auto_enroll, secure=True):
         site=stripped_site_name,
         path=reverse(
             'course_root',
-            kwargs={'course_id': course_id.to_deprecated_string()}
+            kwargs={'course_id':  CCXLocator.from_course_locator(ccx.course_id, ccx.id)}
         )
     )
 
@@ -165,7 +165,7 @@ def get_email_params(ccx, auto_enroll, secure=True):
             site=stripped_site_name,
             path=reverse(
                 'about_course',
-                kwargs={'course_id': course_id.to_deprecated_string()}
+                kwargs={'course_id':  CCXLocator.from_course_locator(ccx.course_id, ccx.id)}
             )
         )
 
@@ -239,44 +239,6 @@ def send_mail_to_student(student, param_dict):
             [student],
             fail_silently=False
         )
-
-
-def get_all_ccx_for_user(user):
-    """return all CCXS to which the user is registered
-
-    Returns a list of dicts: {
-        ccx_name: <formatted title of CCX course>
-        ccx_url: <url to view this CCX>
-        ccx_active: True if this ccx is currently the 'active' one
-        mooc_name: <formatted title of the MOOC course for this CCX>
-        mooc_url: <url to view this MOOC>
-    }
-    """
-    if user.is_anonymous():
-        return []
-    current_active_ccx = get_current_ccx()
-    memberships = []
-    for membership in CcxMembership.memberships_for_user(user):
-        course = get_course_by_id(membership.ccx.course_id)
-        ccx = membership.ccx
-        ccx_title = ccx.display_name
-        mooc_title = get_course_about_section(course, 'title')
-        url = reverse(
-            'switch_active_ccx',
-            args=[course.id.to_deprecated_string(), membership.ccx.id]
-        )
-        mooc_url = reverse(
-            'switch_active_ccx',
-            args=[course.id.to_deprecated_string(), ]
-        )
-        memberships.append({
-            'ccx_name': ccx_title,
-            'ccx_url': url,
-            'active': membership.ccx == current_active_ccx,
-            'mooc_name': mooc_title,
-            'mooc_url': mooc_url,
-        })
-    return memberships
 
 
 def get_ccx_membership_triplets(user, course_org_filter, org_filter_out_set):

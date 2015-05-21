@@ -16,11 +16,12 @@ from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
 from student.tests.factories import (  # pylint: disable=import-error
     AdminFactory,
     UserFactory,
-    CourseEnrollmentFactory,
-    AnonymousUserFactory,
 )
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase,
+    TEST_DATA_SPLIT_MODULESTORE)
 from xmodule.modulestore.tests.factories import CourseFactory
+from ccx_keys.locator import CCXLocator
 
 
 @attr('shard_1')
@@ -128,6 +129,7 @@ class TestEmailEnrollmentState(ModuleStoreTestCase):
 class TestGetEmailParams(ModuleStoreTestCase):
     """tests for ccx.utils.get_email_params
     """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
     def setUp(self):
         """
         Set up tests
@@ -157,7 +159,7 @@ class TestGetEmailParams(ModuleStoreTestCase):
         self.assertFalse(set(params.keys()) - set(self.all_keys))
 
     def test_ccx_id_in_params(self):
-        expected_course_id = self.ccx.course_id.to_deprecated_string()
+        expected_course_id = unicode(CCXLocator.from_course_locator(self.ccx.course_id, self.ccx.id))
         params = self.call_fut()
         self.assertEqual(params['course'], self.ccx)
         for url_key in self.url_keys:
@@ -185,6 +187,7 @@ class TestGetEmailParams(ModuleStoreTestCase):
 class TestEnrollEmail(ModuleStoreTestCase):
     """tests for the enroll_email function from ccx.utils
     """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
     def setUp(self):
         super(TestEnrollEmail, self).setUp()
         # unbind the user created by the parent, so we can create our own when
@@ -365,6 +368,7 @@ class TestEnrollEmail(ModuleStoreTestCase):
 # TODO: deal with changes in behavior for auto_enroll
 class TestUnenrollEmail(ModuleStoreTestCase):
     """Tests for the unenroll_email function from ccx.utils"""
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
     def setUp(self):
         super(TestUnenrollEmail, self).setUp()
         # unbind the user created by the parent, so we can create our own when
@@ -508,70 +512,3 @@ class TestUnenrollEmail(ModuleStoreTestCase):
         self.check_enrollment_state(before, True, self.user, True)
         # no email was sent to the student
         self.assertEqual(self.outbox, [])
-
-
-@attr('shard_1')
-class TestUserCCXList(ModuleStoreTestCase):
-    """Unit tests for ccx.utils.get_all_ccx_for_user"""
-
-    def setUp(self):
-        """Create required infrastructure for tests"""
-        super(TestUserCCXList, self).setUp()
-        self.course = CourseFactory.create()
-        coach = AdminFactory.create()
-        role = CourseCcxCoachRole(self.course.id)
-        role.add_users(coach)
-        self.ccx = CcxFactory(course_id=self.course.id, coach=coach)
-        enrollment = CourseEnrollmentFactory.create(course_id=self.course.id)
-        self.user = enrollment.user
-        self.anonymous = AnonymousUserFactory.create()
-
-    def register_user_in_ccx(self, active=False):
-        """create registration of self.user in self.ccx
-
-        registration will be inactive unless active=True
-        """
-        CcxMembershipFactory(ccx=self.ccx, student=self.user, active=active)
-
-    def get_course_title(self):
-        """Get course title"""
-        from courseware.courses import get_course_about_section  # pylint: disable=import-error
-        return get_course_about_section(self.course, 'title')
-
-    def call_fut(self, user):
-        """Call function under test"""
-        from ccx.utils import get_all_ccx_for_user  # pylint: disable=import-error
-        return get_all_ccx_for_user(user)
-
-    def test_anonymous_sees_no_ccx(self):
-        memberships = self.call_fut(self.anonymous)
-        self.assertEqual(memberships, [])
-
-    def test_unenrolled_sees_no_ccx(self):
-        memberships = self.call_fut(self.user)
-        self.assertEqual(memberships, [])
-
-    def test_enrolled_inactive_sees_no_ccx(self):
-        self.register_user_in_ccx()
-        memberships = self.call_fut(self.user)
-        self.assertEqual(memberships, [])
-
-    def test_enrolled_sees_a_ccx(self):
-        self.register_user_in_ccx(active=True)
-        memberships = self.call_fut(self.user)
-        self.assertEqual(len(memberships), 1)
-
-    def test_data_structure(self):
-        self.register_user_in_ccx(active=True)
-        memberships = self.call_fut(self.user)
-        this_membership = memberships[0]
-        self.assertTrue(this_membership)
-        # structure contains the expected keys
-        for key in ['ccx_name', 'ccx_url']:
-            self.assertTrue(key in this_membership.keys())
-        url_parts = [self.course.id.to_deprecated_string(), str(self.ccx.id)]
-        # all parts of the ccx url are present
-        for part in url_parts:
-            self.assertTrue(part in this_membership['ccx_url'])
-        actual_name = self.ccx.display_name
-        self.assertEqual(actual_name, this_membership['ccx_name'])

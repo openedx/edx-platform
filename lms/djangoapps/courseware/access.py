@@ -43,6 +43,7 @@ from util.milestones_helpers import (
     get_pre_requisite_courses_not_completed,
     any_unfulfilled_milestones,
 )
+from ccx_keys.locator import CCXLocator
 
 import dogstats_wrapper as dog_stats_api
 
@@ -91,6 +92,9 @@ def has_access(user, action, obj, course_key=None):
     if not user:
         user = AnonymousUser()
 
+    if isinstance(course_key, CCXLocator):
+        course_key = course_key.to_course_locator()
+
     # delegate the work to type-specific functions.
     # (start with more specific types, then get more general)
     if isinstance(obj, CourseDescriptor):
@@ -107,6 +111,8 @@ def has_access(user, action, obj, course_key=None):
         return _has_access_descriptor(user, action, obj, course_key)
 
     if isinstance(obj, CourseKey):
+        if isinstance(obj, CCXLocator):
+            obj = obj.to_course_locator()
         return _has_access_course_key(user, action, obj)
 
     if isinstance(obj, UsageKey):

@@ -193,6 +193,10 @@ def modulestore():
             settings.MODULESTORE['default'].get('OPTIONS', {})
         )
 
+        if settings.FEATURES.get('CUSTOM_COURSES_EDX'):
+            from ccx.modulestore import CCXModulestoreWrapper
+            _MIXED_MODULESTORE = CCXModulestoreWrapper(_MIXED_MODULESTORE)
+
     return _MIXED_MODULESTORE
 
 
