@@ -7,6 +7,7 @@ from django.db.models.fields.files import ImageFieldFile
 from lazy.lazy import lazy
 from mock import patch, Mock, call
 from certificates.models import BadgeAssertion, BadgeImageConfiguration
+from openedx.core.lib.tests.assertions.events import assert_event_matches
 from track.tests import EventTrackingTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from certificates.badge_handler import BadgeHandler
@@ -155,7 +156,7 @@ class BadgeHandlerTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         self.assertTrue(BadgeHandler.badges['edxcourse_testtest_run_honor_fc5519b'])
 
     @patch('requests.post')
-    def test_create_assertion(self, post):
+    def test_badge_creation_event(self, post):
         result = {
             'json': {'id': 'http://www.example.com/example'},
             'image': 'http://www.example.com/example.png',
@@ -174,7 +175,22 @@ class BadgeHandlerTestCase(ModuleStoreTestCase, EventTrackingTestCase):
             'edxcourse_testtest_run_honor_fc5519b/assertions'
         )
         self.check_headers(kwargs['headers'])
-        self.assertEqual(kwargs['data'], {'email': 'example@example.com'})
-        badge = BadgeAssertion.objects.get(user=self.user, course_id=self.course.location.course_key)
-        self.assertEqual(badge.data, result)
-        self.assertEqual(badge.image_url, 'http://www.example.com/example.png')
+        assertion = BadgeAssertion.objects.get(user=self.user, course_id=self.course.location.course_key)
+        self.assertEqual(assertion.data, result)
+        self.assertEqual(assertion.image_url, 'http://www.example.com/example.png')
+        self.assertEqual(kwargs['data'], {
+            'email': 'example@example.com',
+            'evidence': 'https://edx.org/certificates/user/2/course/edX/course_test/test_run?evidence_visit=1'
+        })
+        assert_event_matches({
+            'name': 'edx.badges.assertion.created',
+            'data': {
+                'user_id': self.user.id,
+                'course_id': unicode(self.course.location.course_key),
+                'enrollment_mode': 'honor',
+                'assertion_id': assertion.id,
+                'assertion_image_url': 'http://www.example.com/example.png',
+                'assertion_json_url': 'http://www.example.com/example',
+                'issuer': 'https://example.com/v1/issuer/issuers/test-issuer',
+            }
+        }, self.get_event())

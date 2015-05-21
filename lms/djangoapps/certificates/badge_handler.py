@@ -4,9 +4,10 @@ BadgeHandler object-- used to award Badges to users who have completed courses.
 import hashlib
 import logging
 import mimetypes
+from eventtracking import tracker
+import requests
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext as _
-import requests
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -120,6 +121,13 @@ class BadgeHandler(object):
                 course_mode=mode,
             )
 
+    def site_prefix(self):
+        """
+        Get the prefix for the site URL-- protocol and server name.
+        """
+        scheme = u"https" if settings.HTTPS == "on" else u"http"
+        return u'{}://{}'.format(scheme, settings.SITE_NAME)
+
     def create_badge(self, mode):
         """
         Create the badge spec for a course's mode.
@@ -135,27 +143,48 @@ class BadgeHandler(object):
             )
         files = {'image': (image.name, image, content_type)}
         about_path = reverse('about_course', kwargs={'course_id': unicode(self.course_key)})
-        scheme = u"https" if settings.HTTPS == "on" else u"http"
         data = {
             'name': course.display_name,
-            'criteria': u'{}://{}{}'.format(scheme, settings.SITE_NAME, about_path),
+            'criteria': u'{}{}'.format(self.site_prefix(), about_path),
             'slug': self.course_slug(mode),
             'description': self.badge_description(course, mode)
         }
         result = requests.post(self.badge_create_url, headers=self.get_headers(), data=data, files=files)
         self.log_if_raised(result, data)
 
+    def send_assertion_created_event(self, user, assertion):
+        """
+        Send an analytics event to record the creation of a badge assertion.
+        """
+        tracker.emit(
+            'edx.badges.assertion.created', {
+                'user_id': user.id,
+                'course_id': unicode(self.course_key),
+                'enrollment_mode': assertion.mode,
+                'assertion_id': assertion.id,
+                'assertion_image_url': assertion.data['image'],
+                'assertion_json_url': assertion.data['json']['id'],
+                'issuer': assertion.data['issuer'],
+            }
+        )
+
     def create_assertion(self, user, mode):
         """
         Register an assertion with the Badgr server for a particular user in a particular course mode for
         this course.
         """
-        data = {'email': user.email}
+        data = {
+            'email': user.email,
+            'evidence': self.site_prefix() + reverse(
+                'cert_html_view', kwargs={'user_id': user.id, 'course_id': unicode(self.course_key)}
+            ) + '?evidence_visit=1'
+        }
         response = requests.post(self.assertion_url(mode), headers=self.get_headers(), data=data)
         self.log_if_raised(response, data)
-        assertion, __ = BadgeAssertion.objects.get_or_create(course_id=self.course_key, user=user)
+        assertion, __ = BadgeAssertion.objects.get_or_create(course_id=self.course_key, user=user, mode=mode)
         assertion.data = response.json()
         assertion.save()
+        self.send_assertion_created_event(user, assertion)
 
     def award(self, user):
         """

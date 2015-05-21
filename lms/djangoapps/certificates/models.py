@@ -595,6 +595,7 @@ class BadgeAssertion(models.Model):
         """
         Get the image for this assertion.
         """
+
         return self.data['image']
 
     @property
@@ -608,7 +609,7 @@ class BadgeAssertion(models.Model):
         """
         Meta information for Django's construction of the model.
         """
-        unique_together = (('course_id', 'user'),)
+        unique_together = (('course_id', 'user', 'mode'),)
 
 
 def validate_badge_image(image):
