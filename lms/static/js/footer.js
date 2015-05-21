@@ -5,7 +5,7 @@ var edx = edx || {};
 
     edx.footer = (function() {
         var _fn = {
-            el: '#footer-edx-v3',
+            el: '#edx-branding-footer',
 
             init: function() {
                 _fn.$el = _fn.$el || $( _fn.el );
@@ -14,7 +14,7 @@ var edx = edx || {};
                  *  Only continue if the expected element
                  *  to add footer to is in the DOM
                  */
-                if ( _fn.$el.length > -1 ) {
+                if ( _fn.$el.length > 0 ) {
                     _fn.footer.get();
                 }
             },
@@ -27,7 +27,7 @@ var edx = edx || {};
                      *  Only continue if the expected element
                      *  to add footer to is in the DOM
                      */
-                    if ( _fn.$el.length > -1 ) {
+                    if ( _fn.$el.length > 0 ) {
                         _fn.analytics.eventListener();
                     }
                 },
@@ -53,8 +53,27 @@ var edx = edx || {};
 
             footer: {
                 get: function() {
+                    var url = _fn.$el.data('base-url') || 'https://courses.edx.org',
+                        language = _fn.$el.data('language') || false,
+                        showOpenEdXLogo = Boolean(_fn.$el.data('show-openedx-logo')) || false,
+                        params = [];
+
+                    if (showOpenEdXLogo) {
+                        params.push('show-openedx-logo="1"');
+                    }
+
+                    if (language) {
+                        params.push('language=' + language);
+                    }
+
+                    url = url + '/api/v1/branding/footer.html';
+
+                    if (params) {
+                        url = url + '?' + params.join('&');
+                    }
+
                     $.ajax({
-                        url: 'https://courses.edx.org/api/v1/branding/footer',
+                        url: url,
                         type: 'GET',
                         dataType: 'html',
                         success: function( data ) {
@@ -64,7 +83,7 @@ var edx = edx || {};
                 },
 
                 render: function( html ) {
-                    _fn.$el.html( html );
+                    $(html).replaceAll(_fn.$el);
                 }
             }
         };
@@ -75,6 +94,6 @@ var edx = edx || {};
         };
     })();
 
-    // Initialize the analytics events
+    edx.footer.load();
     edx.footer.analytics();
 })(jQuery);
