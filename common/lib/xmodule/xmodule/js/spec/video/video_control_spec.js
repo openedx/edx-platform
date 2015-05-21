@@ -586,5 +586,12 @@
             state.videoControl.destroy();
             expect(state.videoControl).toBeUndefined();
         });
+
+        it('can focus the first control', function () {
+            var controls;
+            state = jasmine.initializePlayer({focusFirstControl: true});
+            btnPlay = state.el.find('.video-controls .play');
+            expect(btnPlay).toBeFocused();
+        });
     });
 }).call(this, window.WAIT_TIMEOUT);
