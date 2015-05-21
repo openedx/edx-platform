@@ -20,7 +20,7 @@
                 <span id="certificate-description-<%= uniqueId %>-tip" class="tip tip-stacked"><%= gettext("Description of the certificate") %></span>
             </div>
             <div class="input-wrap field text add-certificate-course-title">
-                <label for="certificate-course-title-<%= uniqueId %>"><%= gettext("Course Title") %></label>
+                <label for="certificate-course-title-<%= uniqueId %>"><%= gettext("Course Title Override") %></label>
                 <input id="certificate-course-title-<%= uniqueId %>" class="certificate-course-title-input input-text" name="certificate-course-title" type="text" placeholder="<%= gettext("Course title") %>" value="<%= course_title %>" aria-describedby="certificate-course-title-<%=uniqueId %>-tip">
                 <span id="certificate-course-title-<%= uniqueId %>-tip" class="tip tip-stacked"><%= gettext("Title of the course") %></span>
             </div>
