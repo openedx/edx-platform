@@ -767,3 +767,15 @@ class DiscussionLinkTestCase(TabTestCase):
             is_enrolled=is_enrolled,
             is_staff=is_staff
         )
+
+    def test_discussion_visibility(self):
+        """Test that the discussion tab can be hidden."""
+        self.settings.FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
+        self.course.tabs = self.tabs_with_discussion
+        self.course.discussion_link = ''
+        discussion = tabs.CourseTabList.get_discussion(self.course)
+        self.assertTrue(discussion.is_hideable)
+        self.assertFalse(discussion['is_hidden'])
+        discussion.is_hidden = True
+        self.assertTrue(discussion['is_hidden'])
+        discussion.is_hidden = False
