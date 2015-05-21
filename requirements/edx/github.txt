@@ -34,7 +34,7 @@ git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c
 -e git+https://github.com/edx/codejail.git@6b17c33a89bef0ac510926b1d7fea2748b73aadd#egg=codejail
 -e git+https://github.com/edx/js-test-tool.git@v0.1.6#egg=js_test_tool
 -e git+https://github.com/edx/event-tracking.git@0.2.0#egg=event-tracking
--e git+https://github.com/edx/bok-choy.git@v0.3.4#egg=bok_choy
+-e git+https://github.com/edx/bok-choy.git@1c968796129f4d281e112804b889b6f369f52011#egg=bok_choy
 -e git+https://github.com/edx-solutions/django-splash.git@7579d052afcf474ece1239153cffe1c89935bc4f#egg=django-splash
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
 -e git+https://github.com/edx/edx-ora2.git@release-2015-05-08T16.15#egg=edx-ora2
