@@ -159,7 +159,7 @@ class BadgeHandler(object):
         """
         tracker.emit(
             'edx.badges.assertion.created', {
-                'user': user.id,
+                'user_id': user.id,
                 'course_id': unicode(self.course_key),
                 'enrollment_mode': mode,
                 'assertion_image_url': assertion.data['image'],

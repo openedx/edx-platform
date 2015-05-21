@@ -182,7 +182,7 @@ class BadgeHandlerTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         assert_event_matches({
             'name': 'edx.badges.assertion.created',
             'data': {
-                'user': self.user.id,
+                'user_id': self.user.id,
                 'course_id': unicode(self.course.location.course_key),
                 'enrollment_mode': 'honor',
                 'assertion_image_url': 'http://www.example.com/example.png',
