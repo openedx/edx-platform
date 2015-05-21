@@ -41,6 +41,7 @@ class Migration(SchemaMigration):
             ('attr_last_name', self.gf('django.db.models.fields.CharField')(max_length=128, blank=True)),
             ('attr_username', self.gf('django.db.models.fields.CharField')(max_length=128, blank=True)),
             ('attr_email', self.gf('django.db.models.fields.CharField')(max_length=128, blank=True)),
+            ('other_settings', self.gf('django.db.models.fields.TextField')(blank=True)),
         ))
         db.send_create_signal('third_party_auth', ['SAMLProviderConfig'])
 
@@ -164,7 +165,8 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'idp_slug': ('django.db.models.fields.SlugField', [], {'max_length': '30'}),
             'metadata_source': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
+            'other_settings': ('django.db.models.fields.TextField', [], {'blank': 'True'})
         },
         'third_party_auth.samlproviderdata': {
             'Meta': {'ordering': "('-fetched_at',)", 'object_name': 'SAMLProviderData'},

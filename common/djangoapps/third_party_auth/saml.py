@@ -1,7 +1,8 @@
 """
 Slightly customized python-social-auth backend for SAML 2.0 support
 """
-from social.backends.saml import SAMLAuth
+from social.backends.saml import SAMLAuth, OID_EDU_PERSON_ENTITLEMENT
+from social.exceptions import AuthFailed
 
 
 class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
@@ -28,3 +29,16 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
             return self._config.get_setting(name)
         except KeyError:
             return self.strategy.setting(name, default)
+
+    def _check_entitlements(self, idp, attributes):
+        """
+        Check if we require the presence of any specific eduPersonEntitlement.
+
+        raise AuthFailed if the user should not be authenticated, or do nothing
+        to allow the login pipeline to continue.
+        """
+        if "requiredEntitlements" in idp.conf:
+            entitlements = attributes.get(OID_EDU_PERSON_ENTITLEMENT, [])
+            for expected in idp.conf['requiredEntitlements']:
+                if expected not in entitlements:
+                    raise AuthFailed("User does not have the required eduPersonEntitlement {}".format(expected))

@@ -177,6 +177,25 @@ class SAMLProviderConfig(ProviderConfig):
     attr_email = models.CharField(
         max_length=128, blank=True, verbose_name="Email Attribute",
         help_text="URN of SAML attribute containing the user's email address[es]. Leave blank for default.")
+    other_settings = models.TextField(
+        verbose_name="Advanced settings", blank=True,
+        help_text=(
+            'For advanced use cases, enter a JSON object with addtional configuration. '
+            'The tpa-saml backend supports only {"requiredEntitlements": ["urn:..."]} '
+            'which can be used to require the presence of a specific eduPersonEntitlement.'
+        ))
+
+    def clean(self):
+        """ Standardize and validate fields """
+        super(SAMLProviderConfig, self).clean()
+        self.other_settings = self.other_settings.strip()
+        if self.other_settings:
+            try:
+                conf = json.loads(self.other_settings)
+                if not isinstance(conf, dict):
+                    raise ValueError
+            except ValueError:
+                raise ValidationError("Advanced settings must be a JSON object or left blank.")
 
     class Meta(object):  # pylint: disable=missing-docstring
         verbose_name = "Provider Configuration (SAML IdP)"
@@ -202,7 +221,10 @@ class SAMLProviderConfig(ProviderConfig):
         Essentially this just returns the values of this object and its
         associated 'SAMLProviderData' entry.
         """
-        conf = {}
+        if self.other_settings:
+            conf = json.loads(self.other_settings)
+        else:
+            conf = {}
         attrs = (
             'attr_user_permanent_id', 'attr_full_name', 'attr_first_name',
             'attr_last_name', 'attr_username', 'attr_email', 'entity_id')
