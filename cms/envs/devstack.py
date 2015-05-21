@@ -80,6 +80,12 @@ FEATURES['ENTRANCE_EXAMS'] = True
 
 ################################ COURSE LICENSES ################################
 FEATURES['LICENSING'] = True
+# Needed to enable licensing on video modules
+XBLOCK_SETTINGS = {
+    "VideoDescriptor": {
+        "licensing_enabled": True
+    }
+}
 
 ################################ SEARCH INDEX ################################
 FEATURES['ENABLE_COURSEWARE_INDEX'] = True
