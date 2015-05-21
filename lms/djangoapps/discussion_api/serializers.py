@@ -1,6 +1,8 @@
 """
 Discussion API serializers
 """
+from django.contrib.auth.models import User as DjangoUser
+
 from rest_framework import serializers
 
 from django_comment_common.models import (
@@ -9,14 +11,14 @@ from django_comment_common.models import (
     FORUM_ROLE_MODERATOR,
     Role,
 )
-from lms.lib.comment_client.user import User
+from lms.lib.comment_client.user import User as CommentClientUser
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_names
 
 
-def get_context(course, requester):
+def get_context(course, requester, thread=None):
     """
     Returns a context appropriate for use with ThreadSerializer or
-    CommentSerializer.
+    (if thread is provided) CommentSerializer.
     """
     # TODO: cache staff_user_ids and ta_user_ids if we need to improve perf
     staff_user_ids = {
@@ -38,7 +40,8 @@ def get_context(course, requester):
         "is_requester_privileged": requester.id in staff_user_ids or requester.id in ta_user_ids,
         "staff_user_ids": staff_user_ids,
         "ta_user_ids": ta_user_ids,
-        "cc_requester": User.from_django_user(requester).retrieve(),
+        "cc_requester": CommentClientUser.from_django_user(requester).retrieve(),
+        "thread": thread,
     }
 
 
@@ -59,6 +62,13 @@ class _ContentSerializer(serializers.Serializer):
         # id is an invalid class attribute name, so we must declare a different
         # name above and modify it here
         self.fields["id"] = self.fields.pop("id_")
+
+    def _is_user_privileged(self, user_id):
+        """
+        Returns a boolean indicating whether the given user_id identifies a
+        privileged user.
+        """
+        return user_id in self.context["staff_user_ids"] or user_id in self.context["ta_user_ids"]
 
     def _is_anonymous(self, obj):
         """
@@ -156,11 +166,48 @@ class CommentSerializer(_ContentSerializer):
     """
     thread_id = serializers.CharField()
     parent_id = serializers.SerializerMethodField("get_parent_id")
+    endorsed = serializers.BooleanField()
+    endorsed_by = serializers.SerializerMethodField("get_endorsed_by")
+    endorsed_by_label = serializers.SerializerMethodField("get_endorsed_by_label")
+    endorsed_at = serializers.SerializerMethodField("get_endorsed_at")
     children = serializers.SerializerMethodField("get_children")
 
     def get_parent_id(self, _obj):
         """Returns the comment's parent's id (taken from the context)."""
         return self.context.get("parent_id")
+
+    def get_endorsed_by(self, obj):
+        """
+        Returns the username of the endorsing user, if the information is
+        available and would not identify the author of an anonymous thread.
+        """
+        endorsement = obj.get("endorsement")
+        if endorsement:
+            endorser_id = int(endorsement["user_id"])
+            # Avoid revealing the identity of an anonymous non-staff question
+            # author who has endorsed a comment in the thread
+            if not (
+                    self._is_anonymous(self.context["thread"]) and
+                    not self._is_user_privileged(endorser_id)
+            ):
+                return DjangoUser.objects.get(id=endorser_id).username
+        return None
+
+    def get_endorsed_by_label(self, obj):
+        """
+        Returns the role label (i.e. "staff" or "community_ta") for the
+        endorsing user
+        """
+        endorsement = obj.get("endorsement")
+        if endorsement:
+            return self._get_user_label(int(endorsement["user_id"]))
+        else:
+            return None
+
+    def get_endorsed_at(self, obj):
+        """Returns the timestamp for the endorsement, if available."""
+        endorsement = obj.get("endorsement")
+        return endorsement["time"] if endorsement else None
 
     def get_children(self, obj):
         """Returns the list of the comment's children, serialized."""

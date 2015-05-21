@@ -745,6 +745,7 @@ class GetCommentListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "created_at": "2015-05-11T00:00:00Z",
                 "updated_at": "2015-05-11T11:11:11Z",
                 "body": "Test body",
+                "endorsed": False,
                 "abuse_flaggers": [],
                 "votes": {"up_count": 4},
                 "children": [],
@@ -759,6 +760,7 @@ class GetCommentListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "created_at": "2015-05-11T22:22:22Z",
                 "updated_at": "2015-05-11T33:33:33Z",
                 "body": "More content",
+                "endorsed": False,
                 "abuse_flaggers": [str(self.user.id)],
                 "votes": {"up_count": 7},
                 "children": [],
@@ -774,6 +776,10 @@ class GetCommentListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "created_at": "2015-05-11T00:00:00Z",
                 "updated_at": "2015-05-11T11:11:11Z",
                 "raw_body": "Test body",
+                "endorsed": False,
+                "endorsed_by": None,
+                "endorsed_by_label": None,
+                "endorsed_at": None,
                 "abuse_flagged": False,
                 "voted": False,
                 "vote_count": 4,
@@ -788,6 +794,10 @@ class GetCommentListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "created_at": "2015-05-11T22:22:22Z",
                 "updated_at": "2015-05-11T33:33:33Z",
                 "raw_body": "More content",
+                "endorsed": False,
+                "endorsed_by": None,
+                "endorsed_by_label": None,
+                "endorsed_at": None,
                 "abuse_flagged": True,
                 "voted": False,
                 "vote_count": 7,
@@ -812,6 +822,22 @@ class GetCommentListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
 
         non_endorsed_actual = self.get_comment_list(thread, endorsed=False)
         self.assertEqual(non_endorsed_actual["results"][0]["id"], "non_endorsed_comment")
+
+    def test_endorsed_by_anonymity(self):
+        """
+        Ensure thread anonymity is properly considered in serializing
+        endorsed_by.
+        """
+        thread = self.make_minimal_cs_thread({
+            "anonymous": True,
+            "children": [
+                make_minimal_cs_comment({
+                    "endorsement": {"user_id": str(self.author.id), "time": "2015-05-18T12:34:56Z"}
+                })
+            ]
+        })
+        actual_comments = self.get_comment_list(thread)["results"]
+        self.assertIsNone(actual_comments[0]["endorsed_by"])
 
     @ddt.data(
         ("discussion", None, "children", "resp_total"),

@@ -1,6 +1,8 @@
 """
 Tests for Discussion API serializers
 """
+import itertools
+
 import ddt
 import httpretty
 
@@ -199,7 +201,12 @@ class ThreadSerializerTest(SerializerTestMixin, ModuleStoreTestCase):
 @ddt.ddt
 class CommentSerializerTest(SerializerTestMixin, ModuleStoreTestCase):
     """Tests for CommentSerializer."""
-    def make_cs_content(self, overrides):
+    def setUp(self):
+        super(CommentSerializerTest, self).setUp()
+        self.endorser = UserFactory.create()
+        self.endorsed_at = "2015-05-18T12:34:56Z"
+
+    def make_cs_content(self, overrides=None, with_endorsement=False):
         """
         Create a comment with the given overrides, plus some useful test data.
         """
@@ -207,15 +214,21 @@ class CommentSerializerTest(SerializerTestMixin, ModuleStoreTestCase):
             "user_id": str(self.author.id),
             "username": self.author.username
         }
-        merged_overrides.update(overrides)
+        if with_endorsement:
+            merged_overrides["endorsement"] = {
+                "user_id": str(self.endorser.id),
+                "time": self.endorsed_at
+            }
+        merged_overrides.update(overrides or {})
         return make_minimal_cs_comment(merged_overrides)
 
-    def serialize(self, comment):
+    def serialize(self, comment, thread_data=None):
         """
         Create a serializer with an appropriate context and use it to serialize
         the given comment, returning the result.
         """
-        return CommentSerializer(comment, context=get_context(self.course, self.user)).data
+        context = get_context(self.course, self.user, make_minimal_cs_thread(thread_data))
+        return CommentSerializer(comment, context=context).data
 
     def test_basic(self):
         comment = {
@@ -228,6 +241,7 @@ class CommentSerializerTest(SerializerTestMixin, ModuleStoreTestCase):
             "created_at": "2015-04-28T00:00:00Z",
             "updated_at": "2015-04-28T11:11:11Z",
             "body": "Test body",
+            "endorsed": False,
             "abuse_flaggers": [],
             "votes": {"up_count": 4},
             "children": [],
@@ -241,12 +255,73 @@ class CommentSerializerTest(SerializerTestMixin, ModuleStoreTestCase):
             "created_at": "2015-04-28T00:00:00Z",
             "updated_at": "2015-04-28T11:11:11Z",
             "raw_body": "Test body",
+            "endorsed": False,
+            "endorsed_by": None,
+            "endorsed_by_label": None,
+            "endorsed_at": None,
             "abuse_flagged": False,
             "voted": False,
             "vote_count": 4,
             "children": [],
         }
         self.assertEqual(self.serialize(comment), expected)
+
+    @ddt.data(
+        *itertools.product(
+            [
+                FORUM_ROLE_ADMINISTRATOR,
+                FORUM_ROLE_MODERATOR,
+                FORUM_ROLE_COMMUNITY_TA,
+                FORUM_ROLE_STUDENT,
+            ],
+            [True, False]
+        )
+    )
+    @ddt.unpack
+    def test_endorsed_by(self, endorser_role_name, thread_anonymous):
+        """
+        Test correctness of the endorsed_by field.
+
+        The endorser should be anonymous iff the thread is anonymous to the
+        requester, and the endorser is not a privileged user.
+
+        endorser_role_name is the name of the endorser's role.
+        thread_anonymous is the value of the anonymous field in the thread.
+        """
+        self.create_role(endorser_role_name, [self.endorser])
+        serialized = self.serialize(
+            self.make_cs_content(with_endorsement=True),
+            thread_data={"anonymous": thread_anonymous}
+        )
+        actual_endorser_anonymous = serialized["endorsed_by"] is None
+        expected_endorser_anonymous = endorser_role_name == FORUM_ROLE_STUDENT and thread_anonymous
+        self.assertEqual(actual_endorser_anonymous, expected_endorser_anonymous)
+
+    @ddt.data(
+        (FORUM_ROLE_ADMINISTRATOR, "staff"),
+        (FORUM_ROLE_MODERATOR, "staff"),
+        (FORUM_ROLE_COMMUNITY_TA, "community_ta"),
+        (FORUM_ROLE_STUDENT, None),
+    )
+    @ddt.unpack
+    def test_endorsed_by_labels(self, role_name, expected_label):
+        """
+        Test correctness of the endorsed_by_label field.
+
+        The label should be "staff", "staff", or "community_ta" for the
+        Administrator, Moderator, and Community TA roles, respectively.
+
+        role_name is the name of the author's role.
+        expected_label is the expected value of the author_label field in the
+          API output.
+        """
+        self.create_role(role_name, [self.endorser])
+        serialized = self.serialize(self.make_cs_content(with_endorsement=True))
+        self.assertEqual(serialized["endorsed_by_label"], expected_label)
+
+    def test_endorsed_at(self):
+        serialized = self.serialize(self.make_cs_content(with_endorsement=True))
+        self.assertEqual(serialized["endorsed_at"], self.endorsed_at)
 
     def test_children(self):
         comment = self.make_cs_content({

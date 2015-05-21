@@ -174,6 +174,18 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
             * raw_body: The comment's raw body text without any rendering applied
 
+            * endorsed: Boolean indicating whether the comment has been endorsed
+                (by a privileged user or, for a question thread, the thread
+                author)
+
+            * endorsed_by: The username of the endorsing user, if available
+
+            * endorsed_by_label: A label indicating whether the endorsing user
+                has a special role in the course (see author_label)
+
+            * endorsed_at: The ISO 8601 timestamp for the endorsement, if
+                available
+
             * abuse_flagged: Boolean indicating whether the requesting user has
               flagged the comment for abuse
 
