@@ -806,12 +806,13 @@ class TestGetTranscript(TestVideo):
         self.assertEqual(mime_type, 'text/plain; charset=utf-8')
 
     def test_en_with_empty_sub(self):
-        transcripts = self.item.get_transcripts_info()
+
+        transcripts = {"transcripts": {}, "sub": ""}
         # no self.sub, self.youttube_1_0 exist, but no file in assets
         with self.assertRaises(NotFoundError):
             self.item.get_transcript(transcripts)
 
-        # no self.sub and no self.youtube_1_0
+        # no self.sub and no self.youtube_1_0, no non-en transcritps
         self.item.youtube_id_1_0 = None
         with self.assertRaises(ValueError):
             self.item.get_transcript(transcripts)
