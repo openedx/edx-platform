@@ -1,5 +1,8 @@
 """URL handlers related to certificate handling by LMS"""
 from datetime import datetime
+from django.shortcuts import redirect, get_object_or_404
+from eventtracking import tracker
+from opaque_keys.edx.locator import CourseLocator
 import dogstats_wrapper as dog_stats_api
 import json
 import logging
@@ -18,10 +21,11 @@ from certificates.models import (
     CertificateStatuses,
     GeneratedCertificate,
     ExampleCertificate,
-    CertificateHtmlViewConfiguration
-)
+    CertificateHtmlViewConfiguration,
+    BadgeAssertion)
 from certificates.queue import XQueueCertInterface
 from edxmako.shortcuts import render_to_response
+from util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -449,3 +453,25 @@ def render_html_view(request):
     )
 
     return render_to_response("certificates/valid.html", context)
+
+
+@ensure_valid_course_key
+def track_share_redirect(request__unused, course_id, network, student_username):
+    """
+    Tracks when a user downloads a badge for sharing.
+    """
+    course_id = CourseLocator.from_string(course_id)
+    assertion = get_object_or_404(BadgeAssertion, user__username=student_username, course_id=course_id)
+    tracker.emit(
+        'edx.badges.assertion.shared', {
+            'course_id': unicode(course_id),
+            'social_network': network,
+            'assertion_id': assertion.id,
+            'assertion_json_url': assertion.data['json']['id'],
+            'assertion_image_url': assertion.image_url,
+            'user_id': assertion.user.id,
+            'enrollment_mode': assertion.mode,
+            'issuer': assertion.data['issuer'],
+        }
+    )
+    return redirect(assertion.image_url)

@@ -870,6 +870,14 @@ def course_about(request, course_id):
         # get prerequisite courses display names
         pre_requisite_courses = get_prerequisite_courses_display(course)
 
+        if request.GET.get('badge_referred', 'False') == 'True':
+            tracker.emit(
+                'edx.badges.badge.criteria_visit', {
+                    'course_id': unicode(course_key),
+                    'enrollment_mode': request.GET.get('mode', '')
+                }
+            )
+
         return render_to_response('courseware/course_about.html', {
             'course': course,
             'staff_access': staff_access,
