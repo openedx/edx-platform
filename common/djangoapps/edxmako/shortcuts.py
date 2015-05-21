@@ -12,17 +12,16 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import logging
 from django.template import Context
 from django.http import HttpResponse
-from django.conf import settings
-from django.core.urlresolvers import reverse
+import logging
+
+from microsite_configuration import microsite
 
 from edxmako import lookup_template
 from edxmako.middleware import get_template_request_context
-from microsite_configuration import microsite
-
-
+from django.conf import settings
+from django.core.urlresolvers import reverse
 log = logging.getLogger(__name__)
 
 
@@ -82,15 +81,9 @@ def open_source_footer_context_processor(request):
     """
     Checks the site name to determine whether to use the edX.org footer or the Open Source Footer.
     """
-    # TODO (ECOM-1339): Remove this import once the v3 footer is enabled.
-    from branding import api as branding_api
-
     return dict(
         [
-            ("IS_EDX_DOMAIN", settings.FEATURES.get('IS_EDX_DOMAIN', False)),
-
-            # TODO (ECOM-1339): Remove this import once the v3 footer is enabled.
-            ("ENABLE_BRANDING_API", branding_api.is_enabled())
+            ("IS_EDX_DOMAIN", settings.FEATURES.get('IS_EDX_DOMAIN', False))
         ]
     )
 
