@@ -126,7 +126,7 @@ class BadgeHandler(object):
                 end_date=course.end.date(),
             )
         else:
-            return u"{start_date}".format(course.end.date())
+            return u"{start_date}".format(start_date=course.start.date())
 
     def create_badge(self, mode):
         """
