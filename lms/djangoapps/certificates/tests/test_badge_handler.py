@@ -192,4 +192,3 @@ class BadgeHandlerTestCase(ModuleStoreTestCase, EventTrackingTestCase):
                 'issuer': 'https://example.com/v1/issuer/issuers/test-issuer',
             }
         }, self.get_event())
-
