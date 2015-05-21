@@ -36,13 +36,19 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
         warningIcon: '.wrapper-certificate-validation > i',
         note: '.wrapper-delete-button',
         action_add_signatory: '.action-add-signatory',
-        signatory_panel_delete: '.signatory-panel-delete'
+        signatory_panel_delete: '.signatory-panel-delete',
+        uploadSignatureButton:'.action-upload-signature',
+        uploadDialog: 'form.upload-dialog',
+        uploadDialogButton: '.action-upload',
+        uploadDialogFileInput: 'form.upload-dialog input[type=file]',
+        uploadOrgLogoButton: '.action-upload-org-logo'
     };
 
     var submitForm = function (view, requests, notificationSpy) {
         view.$('form').submit();
+        var requestIndex = requests.length - 1;
         ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
-        requests[0].respond(200);
+        requests[requestIndex].respond(200);
         ViewHelpers.verifyNotificationHidden(notificationSpy);
     };
 
@@ -62,6 +68,12 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
         ViewHelpers.verifyPromptShowing(promptSpy, promptText);
         ViewHelpers.confirmPrompt(promptSpy);
         ViewHelpers.verifyPromptHidden(promptSpy);
+    };
+
+    var uploadFile = function (file_path, requests){
+        $(SELECTORS.uploadDialogFileInput).change();
+        $(SELECTORS.uploadDialogButton).click();
+        AjaxHelpers.respondWithJson(requests, {asset: {url: file_path}});
     };
 
     beforeEach(function() {
@@ -89,6 +101,9 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 }
             });
         };
+        var basicModalTpl = readFixtures('basic-modal.underscore'),
+        modalButtonTpl = readFixtures('modal-button.underscore'),
+        uploadDialogTpl = readFixtures('upload-dialog.underscore');
 
         beforeEach(function() {
             TemplateHelpers.installTemplates(['certificate-editor', 'signatory-editor'], true);
@@ -112,6 +127,16 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
         });
 
         describe('Basic', function () {
+            beforeEach(function(){
+                appendSetFixtures($("<script>", { id: "basic-modal-tpl", type: "text/template" }).text(basicModalTpl));
+                appendSetFixtures($("<script>", { id: "modal-button-tpl", type: "text/template" }).text(modalButtonTpl));
+                appendSetFixtures($("<script>", { id: "upload-dialog-tpl", type: "text/template" }).text(uploadDialogTpl));
+            });
+
+            afterEach(function(){
+                $('.wrapper-modal-window-assetupload').remove();
+            });
+
             it('can render properly', function() {
                 expect(this.view.$("[name='certificate-name']").val()).toBe('Test Name')
                 expect(this.view.$("[name='certificate-description']").val()).toBe('Test Description')
@@ -201,6 +226,9 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 setValuesToInputs(this.view, {
                     inputCertificateDescription: 'New Test Description'
                 });
+                this.view.$(SELECTORS.uploadOrgLogoButton).click();
+                var org_logo_path = '/c4x/edX/DemoX/asset/org-logo.png';
+                uploadFile(org_logo_path, requests);
 
                 setValuesToInputs(this.view, {
                     inputSignatoryName: 'New Signatory Name'
@@ -216,11 +244,15 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                     inputSignatoryOrganization: 'New Signatory Organization'
                 });
                 this.view.$(SELECTORS.inputSignatoryOrganization).trigger('change');
+                this.view.$(SELECTORS.uploadSignatureButton).click();
+                var sinature_image_path = '/c4x/edX/DemoX/asset/Signature-450.png';
+                uploadFile(sinature_image_path, requests);
 
                 submitForm(this.view, requests, notificationSpy);
                 expect(this.model).toBeCorrectValuesInModel({
                     name: 'New Test Name',
-                    description: 'New Test Description'
+                    description: 'New Test Description',
+                    org_logo_path: org_logo_path
                 });
 
                 // get the first signatory from the signatories collection.
@@ -229,6 +261,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 expect(signatory.get('name')).toEqual('New Signatory Name');
                 expect(signatory.get('title')).toEqual('New Signatory Title');
                 expect(signatory.get('organization')).toEqual('New Signatory Organization');
+                expect(signatory.get('signature_image_path')).toEqual(sinature_image_path);
             });
         });
     });
