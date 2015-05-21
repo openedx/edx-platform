@@ -313,24 +313,23 @@ def footer(request, extension="json"):
     if not branding_api.is_enabled():
         raise Http404
 
-    # Override the language if necessary
-    language = request.GET.get('language')
-    if language is not None:
-        translation.activate(language)
-
     # Show the OpenEdX logo in the footer
     show_openedx_logo = bool(request.GET.get('show-openedx-logo', False))
 
-    # Render the footer information based on the extension
-    if extension == "json":
-        footer_dict = branding_api.get_footer(is_secure=request.is_secure())
-        return JsonResponse(footer_dict, 200, content_type="application/json; charset=utf-8")
-    elif extension == "html":
-        content = _render_footer_html(show_openedx_logo)
-        return HttpResponse(content, status=200)
-    elif extension == "css":
-        return _send_footer_static(request, _footer_css_name())
-    elif extension == "js":
-        return _send_footer_static(request, path("js") / settings.FOOTER_JS)
-    else:
-        raise Http404
+    # Override the language if necessary
+    language = request.GET.get('language', translation.get_language())
+    with translation.override(language):
+
+        # Render the footer information based on the extension
+        if extension == "json":
+            footer_dict = branding_api.get_footer(is_secure=request.is_secure())
+            return JsonResponse(footer_dict, 200, content_type="application/json; charset=utf-8")
+        elif extension == "html":
+            content = _render_footer_html(show_openedx_logo)
+            return HttpResponse(content, status=200)
+        elif extension == "css":
+            return _send_footer_static(request, _footer_css_name())
+        elif extension == "js":
+            return _send_footer_static(request, path("js") / settings.FOOTER_JS)
+        else:
+            raise Http404

@@ -43,6 +43,7 @@ footer#footer-edx-v3 {
   .site-details,
   .external-links {
     @include span-columns(12);
+    @include float(left);
   }
 
   .site-details,
@@ -127,10 +128,12 @@ footer#footer-edx-v3 {
 
     .site-details {
       @include span-columns(7);
+      @include float(left);
     }
 
     .external-links {
       @include span-columns(5);
+      @include float(left);
     }
 
     .social-media-links,
@@ -147,14 +150,17 @@ footer#footer-edx-v3 {
   @include media( $edx-bp-huge ) {
     .footer-logo {
       @include span-columns(2);
+      @include float(left);
     }
 
     .site-details {
       @include span-columns(6);
+      @include float(left);
     }
 
     .external-links {
       @include span-columns(4);
+      @include float(left);
     }
 
     .social-media-links {

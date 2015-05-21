@@ -63,7 +63,7 @@ var edx = edx || {};
                     }
 
                     if (language) {
-                        params.push('language="' + language + '"');
+                        params.push('language=' + language);
                     }
 
                     url = url + '/api/v1/branding/footer.html';
