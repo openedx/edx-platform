@@ -4,14 +4,18 @@ Models used to implement SAML SSO support in third_party_auth
 """
 from config_models.models import ConfigurationModel, cache
 from django.conf import settings
-from django.core.exceptions import ValidationError, ImproperlyConfigured
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 import json
+import logging
 from social.backends.base import BaseAuth
 from social.backends.oauth import BaseOAuth2
 from social.backends.saml import SAMLAuth, SAMLIdentityProvider
+from social.exceptions import SocialAuthBaseException
 from social.utils import module_member
+
+log = logging.getLogger(__name__)
 
 
 # A dictionary of {name: class} entries for each python-social-auth backend available.
@@ -39,6 +43,18 @@ def clean_json(value, of_type):
     if not isinstance(value_python, of_type):
         raise ValidationError("Expected a JSON {}".format(of_type))
     return json.dumps(value_python, indent=4)
+
+
+class AuthNotConfigured(SocialAuthBaseException):
+    """ Exception when SAMLProviderData or other required info is missing """
+    def __init__(self, provider_name):
+        super(AuthNotConfigured, self).__init__()
+        self.provider_name = provider_name
+
+    def __str__(self):
+        return 'Authentication with {} is currently unavailable.'.format(
+            self.provider_name
+        )
 
 
 class ProviderConfig(ConfigurationModel):
@@ -235,8 +251,8 @@ class SAMLProviderConfig(ProviderConfig):
         # Now get the data fetched automatically from the metadata.xml:
         data = SAMLProviderData.current(self.entity_id)
         if not data or not data.is_valid():
-            raise ImproperlyConfigured(
-                "No SAMLProviderData found for {}. Run 'manage.py saml pull' to fix or debug.".format(self.entity_id))
+            log.error("No SAMLProviderData found for %s. Run 'manage.py saml pull' to fix or debug.", self.entity_id)
+            raise AuthNotConfigured(provider_name=self.name)
         conf['x509cert'] = data.public_key
         conf['url'] = data.sso_url
         return SAMLIdentityProvider(self.idp_slug, **conf)

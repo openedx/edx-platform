@@ -360,6 +360,12 @@ def signin_user(request):
     if request.user.is_authenticated():
         return redirect(reverse('dashboard'))
 
+    third_party_auth_error = None
+    for msg in messages.get_messages(request):
+        if msg.extra_tags.split()[0] == "social-auth":
+            third_party_auth_error = unicode(msg)
+            break
+
     course_id = request.GET.get('course_id')
     email_opt_in = request.GET.get('email_opt_in')
     context = {
@@ -375,6 +381,7 @@ def signin_user(request):
             'platform_name',
             settings.PLATFORM_NAME
         ),
+        'third_party_auth_error': third_party_auth_error
     }
 
     return render_to_response('login.html', context)

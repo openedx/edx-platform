@@ -170,7 +170,8 @@ def _third_party_auth_context(request):
     """
     context = {
         "currentProvider": None,
-        "providers": []
+        "providers": [],
+        "errorMessage": None,
     }
 
     course_id = request.GET.get("course_id")
@@ -235,6 +236,12 @@ def _third_party_auth_context(request):
         if running_pipeline is not None:
             current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
             context["currentProvider"] = current_provider.name
+
+        # Check for any error messages we may want to display:
+        for msg in messages.get_messages(request):
+            if msg.extra_tags.split()[0] == "social-auth":
+                context['errorMessage'] = unicode(msg)
+                break
 
     return context
 

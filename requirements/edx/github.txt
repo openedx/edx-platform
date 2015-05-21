@@ -30,7 +30,7 @@ git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b
 git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c4aee6e76b9abe61cc808
 # For SAML Support (To be moved to PyPi installation in base.txt once our changes are merged):
 -e git+https://github.com/open-craft/python-saml.git@9602b8133056d8c3caa7c3038761147df3d4b257#egg=python-saml
--e git+https://github.com/open-craft/python-social-auth.git@8493545b1f1ab6dcdeda3350bc36fd89efbf53bf#egg=python-social-auth
+-e git+https://github.com/open-craft/python-social-auth.git@02ab628b8961b969021de87aeb23551da4e751b7#egg=python-social-auth
 
 # Our libraries:
 -e git+https://github.com/cpennington/XBlock.git@e9c4d441d1eaf7c9f176b873fe23e24c1152dba6#egg=XBlock

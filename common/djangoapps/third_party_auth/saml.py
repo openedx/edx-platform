@@ -1,8 +1,11 @@
 """
 Slightly customized python-social-auth backend for SAML 2.0 support
 """
+import logging
 from social.backends.saml import SAMLAuth, OID_EDU_PERSON_ENTITLEMENT
-from social.exceptions import AuthFailed
+from social.exceptions import AuthForbidden
+
+log = logging.getLogger(__name__)
 
 
 class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
@@ -34,11 +37,13 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         """
         Check if we require the presence of any specific eduPersonEntitlement.
 
-        raise AuthFailed if the user should not be authenticated, or do nothing
+        raise AuthForbidden if the user should not be authenticated, or do nothing
         to allow the login pipeline to continue.
         """
         if "requiredEntitlements" in idp.conf:
             entitlements = attributes.get(OID_EDU_PERSON_ENTITLEMENT, [])
             for expected in idp.conf['requiredEntitlements']:
                 if expected not in entitlements:
-                    raise AuthFailed("User does not have the required eduPersonEntitlement {}".format(expected))
+                    log.warning(
+                        "SAML user from IdP %s rejected due to missing eduPersonEntitlement %s", idp.name, expected)
+                    raise AuthForbidden(self)

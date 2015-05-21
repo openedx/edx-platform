@@ -162,6 +162,15 @@ from microsite_configuration import microsite
         <p class="instructions"> </p>
       </div>
 
+      % if third_party_auth_error:
+        <div role="alert" class="status message third-party-auth-error is-shown" tabindex="-1">
+          <h3 class="message-title">${_("We're sorry, that didn't work.")} </h3>
+          <ul class="message-copy">
+            <li>${third_party_auth_error}</li>
+          </ul>
+        </div>
+      % endif
+
       <p class="instructions sr">
         ${_('Please provide the following information to log into your {platform_name} account. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.').format(platform_name=platform_name)}
       </p>
