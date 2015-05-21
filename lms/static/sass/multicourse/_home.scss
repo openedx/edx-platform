@@ -26,7 +26,7 @@ $course-search-input-height: ($button-size);
       @extend .animation-home-header-pop-up;
       position: relative;
       margin: 0 auto;
-      padding: ($baseline*5) ($baseline/2);
+      padding: ($baseline*3);
       min-width: ($baseline*38);
       max-width: ($baseline*60);
     }
@@ -82,15 +82,14 @@ $course-search-input-height: ($button-size);
           @include padding-right($button-size);
           @include padding-left($baseline*0.5);
           @extend %ui-depth1;
-          @extend %t-icon4;
-          @extend %t-demi-strong;
+          @extend %t-title5;
           border: 2px solid $gray-l3;
           border-radius: 3px;
           box-shadow: none;
           width: 100%;
           height: $course-search-input-height;
           color: $black;
-          font-style: $sans-serif;
+          font-style: normal;
 
           // STATE: focus
           &:focus {
