@@ -589,7 +589,7 @@ class VideoTranscriptsMixin(object):
         If language is not 'en', give back transcript in proper language and format.
         """
         if not lang:
-            lang = self.transcript_language
+            lang = self.get_default_transcript_language(transcripts)
 
         sub, other_lang = transcripts["sub"], transcripts["transcripts"]
         if lang == 'en':
