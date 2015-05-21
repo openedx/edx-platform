@@ -12,7 +12,6 @@ from mock import patch
 from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false  # pylint: disable=E0611
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from reverification.tests.factories import MidcourseReverificationWindowFactory
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -220,17 +219,12 @@ class TestPhotoVerification(ModuleStoreTestCase):
 
     def test_fetch_photo_id_image(self):
         user = UserFactory.create()
-        orig_attempt = SoftwareSecurePhotoVerification(user=user, window=None)
+        orig_attempt = SoftwareSecurePhotoVerification(user=user)
         orig_attempt.save()
 
         old_key = orig_attempt.photo_id_key
 
-        window = MidcourseReverificationWindowFactory(
-            course_id=SlashSeparatedCourseKey("pony", "rainbow", "dash"),
-            start_date=datetime.now(pytz.utc) - timedelta(days=5),
-            end_date=datetime.now(pytz.utc) + timedelta(days=5)
-        )
-        new_attempt = SoftwareSecurePhotoVerification(user=user, window=window)
+        new_attempt = SoftwareSecurePhotoVerification(user=user)
         new_attempt.save()
         new_attempt.fetch_photo_id_image()
         assert_equals(new_attempt.photo_id_key, old_key)
@@ -366,45 +360,6 @@ class TestPhotoVerification(ModuleStoreTestCase):
         status = SoftwareSecurePhotoVerification.user_status(user)
         self.assertEquals(status, ('must_reverify', "No photo ID was provided."))
 
-        # test for correct status for reverifications
-        window = MidcourseReverificationWindowFactory()
-        reverify_status = SoftwareSecurePhotoVerification.user_status(user=user, window=window)
-        self.assertEquals(reverify_status, ('must_reverify', ''))
-
-        reverify_attempt = SoftwareSecurePhotoVerification(user=user, window=window)
-        reverify_attempt.status = 'approved'
-        reverify_attempt.save()
-
-        reverify_status = SoftwareSecurePhotoVerification.user_status(user=user, window=window)
-        self.assertEquals(reverify_status, ('approved', ''))
-
-        reverify_attempt.status = 'denied'
-        reverify_attempt.save()
-
-        reverify_status = SoftwareSecurePhotoVerification.user_status(user=user, window=window)
-        self.assertEquals(reverify_status, ('denied', ''))
-
-        reverify_attempt.status = 'approved'
-        # pylint: disable=protected-access
-        reverify_attempt.created_at = SoftwareSecurePhotoVerification._earliest_allowed_date() + timedelta(days=-1)
-        reverify_attempt.save()
-        reverify_status = SoftwareSecurePhotoVerification.user_status(user=user, window=window)
-        message = 'Your {platform_name} verification has expired.'.format(platform_name=settings.PLATFORM_NAME)
-        self.assertEquals(reverify_status, ('expired', message))
-
-    def test_display(self):
-        user = UserFactory.create()
-        window = MidcourseReverificationWindowFactory()
-        attempt = SoftwareSecurePhotoVerification(user=user, window=window, status="denied")
-        attempt.save()
-
-        # We expect the verification to be displayed by default
-        self.assertEquals(SoftwareSecurePhotoVerification.display_status(user, window), True)
-
-        # Turn it off
-        SoftwareSecurePhotoVerification.display_off(user.id)
-        self.assertEquals(SoftwareSecurePhotoVerification.display_status(user, window), False)
-
     def test_parse_error_msg_success(self):
         user = UserFactory.create()
         attempt = SoftwareSecurePhotoVerification(user=user)
@@ -508,10 +463,9 @@ class TestPhotoVerification(ModuleStoreTestCase):
 
     @ddt.unpack
     @ddt.data(
-        {'enrollment_mode': 'honor', 'status': (None, None), 'output': 'N/A'},
-        {'enrollment_mode': 'verified', 'status': (False, False), 'output': 'Not ID Verified'},
-        {'enrollment_mode': 'verified', 'status': (True, True), 'output': 'ID Verified'},
-        {'enrollment_mode': 'verified', 'status': (True, False), 'output': 'ID Verification Expired'}
+        {'enrollment_mode': 'honor', 'status': None, 'output': 'N/A'},
+        {'enrollment_mode': 'verified', 'status': False, 'output': 'Not ID Verified'},
+        {'enrollment_mode': 'verified', 'status': True, 'output': 'ID Verified'},
     )
     def test_verification_status_for_user(self, enrollment_mode, status, output):
         """
@@ -520,112 +474,12 @@ class TestPhotoVerification(ModuleStoreTestCase):
         user = UserFactory.create()
         course = CourseFactory.create()
 
-        user_reverified_path = 'verify_student.models.SoftwareSecurePhotoVerification.user_is_reverified_for_all'
         with patch('verify_student.models.SoftwareSecurePhotoVerification.user_is_verified') as mock_verification:
-            with patch(user_reverified_path) as mock_re_verification:
-                mock_verification.return_value = status[0]
-                mock_re_verification.return_value = status[1]
 
-                status = SoftwareSecurePhotoVerification.verification_status_for_user(user, course.id, enrollment_mode)
-                self.assertEqual(status, output)
+            mock_verification.return_value = status
 
-
-@patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
-@patch('verify_student.models.S3Connection', new=MockS3Connection)
-@patch('verify_student.models.Key', new=MockKey)
-@patch('verify_student.models.requests.post', new=mock_software_secure_post)
-class TestMidcourseReverification(ModuleStoreTestCase):
-    """ Tests for methods that are specific to midcourse SoftwareSecurePhotoVerification objects """
-
-    def setUp(self):
-        super(TestMidcourseReverification, self).setUp()
-        self.course = CourseFactory.create()
-        self.user = UserFactory.create()
-
-    def test_user_is_reverified_for_all(self):
-
-        # if there are no windows for a course, this should return True
-        self.assertTrue(SoftwareSecurePhotoVerification.user_is_reverified_for_all(self.course.id, self.user))
-
-        # first, make three windows
-        window1 = MidcourseReverificationWindowFactory(
-            course_id=self.course.id,
-            start_date=datetime.now(pytz.UTC) - timedelta(days=15),
-            end_date=datetime.now(pytz.UTC) - timedelta(days=13),
-        )
-
-        window2 = MidcourseReverificationWindowFactory(
-            course_id=self.course.id,
-            start_date=datetime.now(pytz.UTC) - timedelta(days=10),
-            end_date=datetime.now(pytz.UTC) - timedelta(days=8),
-        )
-
-        window3 = MidcourseReverificationWindowFactory(
-            course_id=self.course.id,
-            start_date=datetime.now(pytz.UTC) - timedelta(days=5),
-            end_date=datetime.now(pytz.UTC) - timedelta(days=3),
-        )
-
-        # make two SSPMidcourseReverifications for those windows
-        attempt1 = SoftwareSecurePhotoVerification(
-            status="approved",
-            user=self.user,
-            window=window1
-        )
-        attempt1.save()
-
-        attempt2 = SoftwareSecurePhotoVerification(
-            status="approved",
-            user=self.user,
-            window=window2
-        )
-        attempt2.save()
-
-        # should return False because only 2 of 3 windows have verifications
-        self.assertFalse(SoftwareSecurePhotoVerification.user_is_reverified_for_all(self.course.id, self.user))
-
-        attempt3 = SoftwareSecurePhotoVerification(
-            status="must_retry",
-            user=self.user,
-            window=window3
-        )
-        attempt3.save()
-
-        # should return False because the last verification exists BUT is not approved
-        self.assertFalse(SoftwareSecurePhotoVerification.user_is_reverified_for_all(self.course.id, self.user))
-
-        attempt3.status = "approved"
-        attempt3.save()
-
-        # should now return True because all windows have approved verifications
-        self.assertTrue(SoftwareSecurePhotoVerification.user_is_reverified_for_all(self.course.id, self.user))
-
-    def test_original_verification(self):
-        orig_attempt = SoftwareSecurePhotoVerification(user=self.user)
-        orig_attempt.save()
-        window = MidcourseReverificationWindowFactory(
-            course_id=self.course.id,
-            start_date=datetime.now(pytz.UTC) - timedelta(days=15),
-            end_date=datetime.now(pytz.UTC) - timedelta(days=13),
-        )
-        midcourse_attempt = SoftwareSecurePhotoVerification(user=self.user, window=window)
-        self.assertEquals(midcourse_attempt.original_verification(user=self.user), orig_attempt)
-
-    def test_user_has_valid_or_pending(self):
-        window = MidcourseReverificationWindowFactory(
-            course_id=self.course.id,
-            start_date=datetime.now(pytz.UTC) - timedelta(days=15),
-            end_date=datetime.now(pytz.UTC) - timedelta(days=13),
-        )
-
-        attempt = SoftwareSecurePhotoVerification(status="must_retry", user=self.user, window=window)
-        attempt.save()
-
-        assert_false(SoftwareSecurePhotoVerification.user_has_valid_or_pending(user=self.user, window=window))
-
-        attempt.status = "approved"
-        attempt.save()
-        assert_true(SoftwareSecurePhotoVerification.user_has_valid_or_pending(user=self.user, window=window))
+            status = SoftwareSecurePhotoVerification.verification_status_for_user(user, course.id, enrollment_mode)
+            self.assertEqual(status, output)
 
 
 @ddt.ddt

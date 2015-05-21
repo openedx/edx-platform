@@ -10,8 +10,10 @@ from util.validate_on_save import ValidateOnSaveMixin
 from xmodule_django.models import CourseKeyField
 
 
-class MidcourseReverificationWindow(ValidateOnSaveMixin, models.Model):
+class MidcourseReverificationWindow(ValidateOnSaveMixin, models.Model):  # TODO (ECOM-1494): Delete this model.
     """
+    This model has been deprecated and will be removed in a future release.
+
     Defines the start and end times for midcourse reverification for a particular course.
 
     There can be many MidcourseReverificationWindows per course, but they cannot have

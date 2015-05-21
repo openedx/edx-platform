@@ -42,21 +42,13 @@
       edx.dashboard.legacy.init({
         dashboard: "${reverse('dashboard')}",
         signInUser: "${reverse('signin_user')}",
-        changeEmailSettings: "${reverse('change_email_settings')}",
-        verifyToggleBannerFailedOff: "${reverse('verify_student_toggle_failed_banner_off')}",
+        changeEmailSettings: "${reverse('change_email_settings')}"
       });
     });
   </script>
 </%block>
 
 <div class="dashboard-notifications" tabindex="-1">
-    % if reverifications["must_reverify"] or reverifications["denied"]:
-        ## Section Element must be outside of the re-verify template. The template is re-used for courseware, and has separate styling.
-        <section class="dashboard-banner">
-            <%include file='dashboard/_dashboard_prompt_midcourse_reverify.html' />
-        </section>
-    % endif
-
     %if message:
         <section class="dashboard-banner">
             ${message}
@@ -174,8 +166,6 @@
         % endif
 
         <%include file='dashboard/_dashboard_status_verification.html' />
-
-        <%include file='dashboard/_dashboard_reverification_sidebar.html' />
 
       </ul>
     </section>

@@ -217,44 +217,12 @@ def reverification_info(course_enrollment_pairs, user, statuses):
             dict["must_reverify"] = [some information]
     """
     reverifications = defaultdict(list)
-    for (course, enrollment) in course_enrollment_pairs:
-        info = single_course_reverification_info(user, course, enrollment)
-        if info:
-            reverifications[info.status].append(info)
 
     # Sort the data by the reverification_end_date
     for status in statuses:
         if reverifications[status]:
             reverifications[status].sort(key=lambda x: x.date)
     return reverifications
-
-
-def single_course_reverification_info(user, course, enrollment):  # pylint: disable=invalid-name
-    """Returns midcourse reverification-related information for user with enrollment in course.
-
-    If a course has an open re-verification window, and that user has a verified enrollment in
-    the course, we return a tuple with relevant information. Returns None if there is no info..
-
-    Args:
-        user (User): the user we want to get information for
-        course (Course): the course in which the student is enrolled
-        enrollment (CourseEnrollment): the object representing the type of enrollment user has in course
-
-    Returns:
-        ReverifyInfo: (course_id, course_name, course_number, date, status)
-        OR, None: None if there is no re-verification info for this enrollment
-    """
-    window = MidcourseReverificationWindow.get_window(course.id, datetime.datetime.now(UTC))
-
-    # If there's no window OR the user is not verified, we don't get reverification info
-    if (not window) or (enrollment.mode != "verified"):
-        return None
-    return ReverifyInfo(
-        course.id, course.display_name, course.number,
-        window.end_date.strftime('%B %d, %Y %X %p'),
-        SoftwareSecurePhotoVerification.user_status(user, window)[0],
-        SoftwareSecurePhotoVerification.display_status(user, window),
-    )
 
 
 def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):

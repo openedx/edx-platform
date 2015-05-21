@@ -8,7 +8,6 @@ import json
 import cgi
 
 from datetime import datetime
-from collections import defaultdict
 from django.utils import translation
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
@@ -51,11 +50,9 @@ from .entrance_exams import (
 from courseware.models import StudentModule, StudentModuleHistory
 from course_modes.models import CourseMode
 
-from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
-
 from open_ended_grading import open_ended_notifications
 from student.models import UserTestGroup, CourseEnrollment
-from student.views import single_course_reverification_info, is_course_blocked
+from student.views import is_course_blocked
 from util.cache import cache, cache_if_anonymous
 from xblock.fragment import Fragment
 from xmodule.modulestore.django import modulestore
@@ -422,7 +419,6 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             'studio_url': studio_url,
             'masquerade': masquerade,
             'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
-            'reverifications': fetch_reverify_banner_info(request, course_key),
         }
 
         now = datetime.now(UTC())
@@ -676,7 +672,6 @@ def course_info(request, course_id):
 
         staff_access = has_access(request.user, 'staff', course)
         masquerade = setup_masquerade(request, course_key, staff_access)  # allow staff to masquerade on the info page
-        reverifications = fetch_reverify_banner_info(request, course_key)
         studio_url = get_studio_url(course, 'course_info')
 
         # link to where the student should go to enroll in the course:
@@ -695,7 +690,6 @@ def course_info(request, course_id):
             'staff_access': staff_access,
             'masquerade': masquerade,
             'studio_url': studio_url,
-            'reverifications': reverifications,
             'show_enroll_banner': show_enroll_banner,
             'url_to_enroll': url_to_enroll,
         }
@@ -1058,7 +1052,6 @@ def _progress(request, course_key, student_id):
         'grade_summary': grade_summary,
         'staff_access': staff_access,
         'student': student,
-        'reverifications': fetch_reverify_banner_info(request, course_key),
         'passed': is_course_passed(course, grade_summary),
         'show_generate_cert_btn': show_generate_cert_btn
     }
@@ -1070,23 +1063,6 @@ def _progress(request, course_key, student_id):
         response = render_to_response('courseware/progress.html', context)
 
     return response
-
-
-def fetch_reverify_banner_info(request, course_key):
-    """
-    Fetches needed context variable to display reverification banner in courseware
-    """
-    reverifications = defaultdict(list)
-    user = request.user
-    if not user.id:
-        return reverifications
-    enrollment = CourseEnrollment.get_enrollment(request.user, course_key)
-    if enrollment is not None:
-        course = modulestore().get_course(course_key)
-        info = single_course_reverification_info(user, course, enrollment)
-        if info:
-            reverifications[info.status].append(info)
-    return reverifications
 
 
 @login_required
