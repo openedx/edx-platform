@@ -60,6 +60,7 @@ from student.forms import AccountCreationForm, PasswordResetFormNoActive
 
 from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow
 from certificates.models import CertificateStatuses, certificate_status_for_student
+from certificates.utils import get_certificate_url
 from dark_lang.models import DarkLangConfig
 
 from xmodule.modulestore.django import modulestore
@@ -339,10 +340,11 @@ def _cert_info(user, course, cert_status, course_mode):
         if course.certificates and settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
             status_dict.update({
                 'show_cert_web_view': True,
-                'cert_web_view_url': u'{url}?course={course_id}'.format(
-                    url=reverse('cert_html_view'),
-                    course_id=unicode(course.id)
-                )})
+                'cert_web_view_url': u'{url}'.format(
+                    url=get_certificate_url(
+                        user_id=user.id,
+                        course_id=course.id.to_deprecated_string()))
+            })
         elif 'download_url' not in cert_status:
             log.warning(
                 u"User %s has a downloadable cert for %s, but no download url",

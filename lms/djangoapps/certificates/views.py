@@ -32,6 +32,11 @@ from util.bad_request_rate_limiter import BadRequestRateLimiter
 logger = logging.getLogger(__name__)
 
 
+# pylint: disable=missing-docstring
+class CourseDoesNotExist(Exception):
+    pass
+
+
 @csrf_exempt
 def request_certificate(request):
     """Request the on-demand creation of a certificate for some user, course.
@@ -234,78 +239,47 @@ def update_example_certificate(request):
     return JsonResponse({'return_code': 0})
 
 
-# pylint: disable=too-many-statements, bad-continuation
-@login_required
-def render_html_view(request):
+def get_certificate_description(mode, certificate_type, platform_name):
     """
-    This view generates an HTML representation of the specified student's certificate
-    If a certificate is not available, we display a "Sorry!" screen instead
+    :return certificate_type_description on the basis of current mode
     """
-    # Initialize the template context and bootstrap with default values from configuration
-    context = {}
-    configuration = CertificateHtmlViewConfiguration.get_config()
-    context = configuration.get('default', {})
-    active_certificate = None
+    certificate_type_description = None
+    if mode == 'honor':
+        # Translators:  This text describes the 'Honor' course certificate type.
+        certificate_type_description = _("An {cert_type} Certificate signifies that an {platform_name} "
+                                         "learner has agreed to abide by {platform_name}'s honor code and "
+                                         "completed all of the required tasks for this course under its "
+                                         "guidelines.").format(cert_type=certificate_type,
+                                                               platform_name=platform_name)
+    elif mode == 'verified':
+        # Translators:  This text describes the 'ID Verified' course certificate type, which is a higher level of
+        # verification offered by edX.  This type of verification is useful for professional education/certifications
+        certificate_type_description = _("An {cert_type} Certificate signifies that an {platform_name} "
+                                         "learner has agreed to abide by {platform_name}'s honor code and "
+                                         "completed all of the required tasks for this course under its "
+                                         "guidelines, as well as having their photo ID checked to verify "
+                                         "their identity.").format(cert_type=certificate_type,
+                                                                   platform_name=platform_name)
+    elif mode == 'xseries':
+        # Translators:  This text describes the 'XSeries' course certificate type.  An XSeries is a collection of
+        # courses related to each other in a meaningful way, such as a specific topic or theme, or even an organization
+        certificate_type_description = _("An {cert_type} Certificate demonstrates a high level of "
+                                         "achievement in a program of study, and includes verification of "
+                                         "the student's identity.").format(cert_type=certificate_type)
+    return certificate_type_description
 
-    invalid_template_path = 'certificates/invalid.html'
 
-    # Translators:  This text is bound to the HTML 'title' element of the page and appears
-    # in the browser title bar when a requested certificate is not found or recognized
-    context['document_title'] = _("Invalid Certificate")
-
-    # Feature Flag check
-    if not settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
-        return render_to_response(invalid_template_path, context)
-
-    course_id = request.GET.get('course', None)
-    context['course'] = course_id
-    if not course_id:
-        return render_to_response(invalid_template_path, context)
-
-    # Course Lookup
-    try:
-        course_key = CourseKey.from_string(course_id)
-    except InvalidKeyError:
-        return render_to_response(invalid_template_path, context)
-    course = modulestore().get_course(course_key)
-    if not course:
-        return render_to_response(invalid_template_path, context)
-
-    # Certificate Lookup
-    try:
-        certificate = GeneratedCertificate.objects.get(
-            user=request.user,
-            course_id=course_key
-        )
-    except GeneratedCertificate.DoesNotExist:
-        return render_to_response(invalid_template_path, context)
-
-    if course.certificates:
-        # iterate the list of certificates in the descriptor.
-        for cert in course.certificates['certificates']:
-            #TODO : course certificates will have a flag 'active_cert', it requires to be implement in backbone model.
-            # on the basis of this flag , we will get active certificate from the list.
-            # currently we are assuming the first certificate in the list as an active certificate.
-            active_certificate = cert
-            break
-
-    # Override the defaults with any mode-specific static values
-    context.update(configuration.get(certificate.mode, {}))
-    # Override further with any course-specific static values
-    context.update(course.cert_html_view_overrides)
-
+def update_certificate_context(context, course, user, mode):
+    """
+    update the certificate context
+    """
     # Populate dynamic output values using the course/certificate data loaded above
-    user_fullname = request.user.profile.name
+    user_fullname = user.profile.name
     platform_name = context.get('platform_name')
+    certificate_type = context.get('certificate_type')
     context['accomplishment_copy_name'] = user_fullname
     context['accomplishment_copy_course_org'] = course.org
     context['accomplishment_copy_course_name'] = course.display_name
-    context['certificate_id_number'] = certificate.verify_uuid
-    context['certificate_verify_url'] = "{prefix}{uuid}{suffix}".format(
-        prefix=context.get('certificate_verify_url_prefix'),
-        uuid=certificate.verify_uuid,
-        suffix=context.get('certificate_verify_url_suffix')
-    )
     context['logo_alt'] = platform_name
 
     accd_course_org_html = '<span class="detail--xuniversity">{partner_name}</span>'.format(partner_name=course.org)
@@ -324,13 +298,6 @@ def render_html_view(request):
 
     # Translators:  This line appears on the page just before the generation date for the certificate
     context['certificate_date_issued_title'] = _("Issued On:")
-
-    # Translators:  The format of the date includes the full name of the month
-    context['certificate_date_issued'] = _('{month} {day}, {year}').format(
-        month=certificate.modified_date.strftime("%B"),
-        day=certificate.modified_date.day,
-        year=certificate.modified_date.year
-    )
 
     # Translators:  The Certificate ID Number is an alphanumeric value unique to each individual certificate
     context['certificate_id_number_title'] = _('Certificate ID Number')
@@ -398,35 +365,6 @@ def render_html_view(request):
 
     context['logo_subtitle'] = _("Certificate Validation")
 
-    if certificate.mode == 'honor':
-        # Translators:  This text describes the 'Honor' course certificate type.
-        context['certificate_type_description'] = _("An {cert_type} Certificate signifies that an {platform_name} "
-                                                    "learner has agreed to abide by {platform_name}'s honor code and "
-                                                    "completed all of the required tasks for this course under its "
-                                                    "guidelines.").format(
-            cert_type=context.get('certificate_type'),
-            platform_name=platform_name
-        )
-    elif certificate.mode == 'verified':
-        # Translators:  This text describes the 'ID Verified' course certificate type, which is a higher level of
-        # verification offered by edX.  This type of verification is useful for professional education/certifications
-        context['certificate_type_description'] = _("An {cert_type} Certificate signifies that an {platform_name} "
-                                                    "learner has agreed to abide by {platform_name}'s honor code and "
-                                                    "completed all of the required tasks for this course under its "
-                                                    "guidelines, as well as having their photo ID checked to verify "
-                                                    "their identity.").format(
-            cert_type=context.get('certificate_type'),
-            platform_name=platform_name
-        )
-    elif certificate.mode == 'xseries':
-        # Translators:  This text describes the 'XSeries' course certificate type.  An XSeries is a collection of
-        # courses related to each other in a meaningful way, such as a specific topic or theme, or even an organization
-        context['certificate_type_description'] = _("An {cert_type} Certificate demonstrates a high level of "
-                                                    "achievement in a program of study, and includes verification of "
-                                                    "the student's identity.").format(
-            cert_type=context.get('certificate_type')
-        )
-
     # Translators:  This is the copyright line which appears at the bottom of the certificate page/screen
     context['copyright_text'] = _('&copy; {year} {platform_name}. All rights reserved.').format(
         year=datetime.now().year,
@@ -457,6 +395,80 @@ def render_html_view(request):
         platform_name=platform_name,
         certificate_type=context.get("certificate_type")
     )
+
+    certificate_type_description = get_certificate_description(mode, certificate_type, platform_name)
+    if certificate_type_description:
+        context['certificate_type_description'] = certificate_type_description
+
+
+# pylint: disable=too-many-statements, bad-continuation, unused-argument
+def render_html_view(request, user_id, course_id):
+    """
+    This public view generates an HTML representation of the specified student's certificate
+    If a certificate is not available, we display a "Sorry!" screen instead
+    """
+    context = {}
+    configuration = CertificateHtmlViewConfiguration.get_config()
+    context = configuration.get('default', {})
+    active_certificate = None
+
+    invalid_template_path = 'certificates/invalid.html'
+
+    # Translators:  This text is bound to the HTML 'title' element of the page and appears
+    # in the browser title bar when a requested certificate is not found or recognized
+    context['document_title'] = _("Invalid Certificate")
+
+    # Feature Flag check
+    if not settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
+        return render_to_response(invalid_template_path, context)
+
+    try:
+        course_key = CourseKey.from_string(course_id)
+        user = User.objects.get(id=user_id)
+        course = modulestore().get_course(course_key)
+
+        if not course:
+            raise CourseDoesNotExist
+
+        certificate = GeneratedCertificate.objects.get(
+            user=user,
+            course_id=course_key
+        )
+
+    except (User.DoesNotExist, GeneratedCertificate.DoesNotExist, InvalidKeyError, CourseDoesNotExist):
+        return render_to_response(invalid_template_path, context)
+
+    context['course_id'] = course_id
+
+    if course.certificates:
+        # iterate the list of certificates in the descriptor.
+        for cert in course.certificates['certificates']:
+            #TODO : course certificates will have a flag 'active_cert', it requires to be implement in backbone model.
+            # on the basis of this flag , we will get active certificate from the list.
+            # currently we are assuming the first certificate in the list as an active certificate.
+            active_certificate = cert
+            break
+
+    # Override the defaults with any mode-specific static values
+    context.update(configuration.get(certificate.mode, {}))
+    context['certificate_id_number'] = certificate.verify_uuid
+    context['certificate_verify_url'] = "{prefix}{uuid}{suffix}".format(
+        prefix=context.get('certificate_verify_url_prefix'),
+        uuid=certificate.verify_uuid,
+        suffix=context.get('certificate_verify_url_suffix')
+    )
+
+    # Translators:  The format of the date includes the full name of the month
+    context['certificate_date_issued'] = _('{month} {day}, {year}').format(
+        month=certificate.modified_date.strftime("%B"),
+        day=certificate.modified_date.day,
+        year=certificate.modified_date.year
+    )
+
+    # Override further with any course-specific static values
+    context.update(course.cert_html_view_overrides)
+
+    update_certificate_context(context, course, user, certificate.mode)
 
     if active_certificate:
         # Override the course name with course_title
