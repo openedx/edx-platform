@@ -1,5 +1,12 @@
 """
-Course Certificates pages.
+Course Certificates page objects.
+The methods in these classes are organized into several conceptual buckets:
+    * Helpers: General utility methods used throughout, such as css selection helpers
+    * Properties: Specific page/object field getters/setters (mainly for form inputs)
+    * Wait Actions: EmptyPromises used to ensure element availabilty prior to performing an action
+    * Click Actions: Specific element invocations -- mainly links/buttons but anything clickable
+    * Workflows: Complex orchestrations involving any/all of the above
+
 """
 import os
 
@@ -9,11 +16,16 @@ from .course_page import CoursePage
 
 class CertificatesPage(CoursePage):
     """
-    Course certificates page.
+    Course Certificates page object wrapper
+    Further below you will also find page objects for Certificates and Signatories
     """
 
     url_path = "certificates"
     certficate_css = ".certificates-list"
+
+    ################
+    # Helpers
+    ################
 
     def is_browser_on_page(self):
         """
@@ -31,6 +43,10 @@ class CertificatesPage(CoursePage):
 
         return True
 
+    ################
+    # Properties
+    ################
+
     @property
     def certificates(self):
         """
@@ -38,27 +54,6 @@ class CertificatesPage(CoursePage):
         """
         css = self.certficate_css + ' .wrapper-collection'
         return [Certificate(self, self.certficate_css, index) for index in xrange(len(self.q(css=css)))]
-
-    def create_first_certificate(self):
-        """
-        Creates new certificate when there are none initially defined.
-        """
-        self.q(css=self.certficate_css + " .new-button").first.click()
-
-    def add_certificate(self):
-        """
-        Creates new certificate when at least one already exists
-        """
-        self.q(css=self.certficate_css + " .action-add").first.click()
-
-    def wait_for_confirmation_prompt(self):
-        """
-        Show confirmation prompt
-        We can't use confirm_prompt because its wait_for_notification is flaky when asynchronous operation
-        completed very quickly.
-        """
-        self.wait_for_element_visibility('.prompt', 'Prompt is visible')
-        self.wait_for_element_visibility('.prompt .action-primary', 'Confirmation button is visible')
 
     @property
     def no_certificates_message_shown(self):
@@ -74,16 +69,53 @@ class CertificatesPage(CoursePage):
         """
         return self.q(css='.wrapper-content ' + self.certficate_css + ' .no-content').text[0]
 
+    ################
+    # Wait Actions
+    ################
+
+    def wait_for_confirmation_prompt(self):
+        """
+        Show confirmation prompt
+        We can't use confirm_prompt because its wait_for_notification is flaky when asynchronous operation
+        completed very quickly.
+        """
+        self.wait_for_element_visibility('.prompt', 'Prompt is visible')
+        self.wait_for_element_visibility('.prompt .action-primary', 'Confirmation button is visible')
+
+    ################
+    # Click Actions
+    ################
+
+    def click_first_certificate_button(self):
+        """
+        Clicks the 'Create your first certificate' button, which is only displayed at zero state
+        """
+        self.q(css=self.certficate_css + " .new-button").first.click()
+
+    def click_add_certificate_button(self):
+        """
+        Clicks the 'Add new certificate' button, which is displayed when certificates already exist
+        """
+        self.q(css=self.certficate_css + " .action-add").first.click()
+
+    ################
+    # Workflows
+    ################
+
 
 class Certificate(object):
     """
-    Certificate wrapper.
+    Certificate page object wrapper
     """
 
     def __init__(self, page, prefix, index):
         self.page = page
         self.selector = prefix + ' .certificates-list-item-{}'.format(index)
         self.index = index
+
+    ################
+    # Helpers
+    ################
 
     def get_selector(self, css=''):
         """
@@ -97,75 +129,15 @@ class Certificate(object):
         """
         return self.page.q(css=self.get_selector(css=css_selector))
 
-    def toggle(self):
-        """
-        Expand/collapse certificate configuration.
-        """
-        self.find_css('a.detail-toggle').first.click()
-
-    @property
-    def signatories(self):
-        """
-        Return list of the signatories for the certificate.
-        """
-        css = self.selector + ' .signatory-' + self.mode
-        return [Signatory(self, self.selector, self.mode, index) for index in xrange(len(self.page.q(css=css)))]
-
-    @property
-    def is_expanded(self):
-        """
-        Certificate details are expanded.
-        """
-        return self.find_css('a.detail-toggle.hide-details').present
-
     def get_text(self, css):
         """
         Return text for the defined by css locator.
         """
         return self.find_css(css).first.text[0]
 
-    def edit(self):
-        """
-        Open editing view for the certificate.
-        """
-        self.find_css('.action-edit .edit').first.click()
-
-    @property
-    def delete_button_is_present(self):
-        """
-        Returns whether or not the delete icon is present.
-        """
-        return self.find_css('.actions .delete').present
-
-    def delete_certificate(self):
-        """
-        Delete the certificate
-        """
-        # pylint: disable=pointless-statement
-        self.delete_button_is_present
-        self.find_css('.actions .delete').first.click()
-        self.page.wait_for_confirmation_prompt()
-        self.find_css('.action-primary').first.click()
-        self.page.wait_for_ajax()
-
-    def save(self):
-        """
-        Save certificate.
-        """
-        self.find_css('.action-primary').first.click()
-        self.page.wait_for_ajax()
-
-    def cancel(self):
-        """
-        Cancel certificate editing.
-        """
-        self.find_css('.action-secondary').first.click()
-
-    def add_signatory(self):
-        """
-        Add signatory to certificate
-        """
-        self.find_css('.action-add-signatory').first.click()
+    ################
+    # Properties
+    ################
 
     @property
     def validation_message(self):
@@ -197,7 +169,7 @@ class Certificate(object):
         """
         Return certificate name.
         """
-        return self.get_text('.title')
+        return self.get_text('.name')
 
     @name.setter
     def name(self, value):
@@ -220,17 +192,126 @@ class Certificate(object):
         """
         self.find_css('.certificate-description-input').first.fill(value)
 
+    @property
+    def course_title(self):
+        """
+        Return certificate course title override field.
+        """
+        return self.get_text('.certificate-course-title')
+
+    @course_title.setter
+    def course_title(self, value):
+        """
+        Set certificate course title override field.
+        """
+        self.find_css('.certificate-course-title-input').first.fill(value)
+
+    @property
+    def signatories(self):
+        """
+        Return list of the signatories for the certificate.
+        """
+        css = self.selector + ' .signatory-' + self.mode
+        return [Signatory(self, self.selector, self.mode, index) for index in xrange(len(self.page.q(css=css)))]
+
+    ################
+    # Wait Actions
+    ################
+
+    def wait_for_certificate_delete_button(self):
+        """
+        Returns whether or not the certificate delete icon is present.
+        """
+        return self.find_css('.actions .delete').present
+
+    def wait_for_hide_details_toggle(self):
+        """
+        Certificate details are expanded.
+        """
+        return self.find_css('a.detail-toggle.hide-details').present
+
+    ################
+    # Click Actions
+    ################
+
+    def click_create_certificate_button(self):
+        """
+        Create a new certificate.
+        """
+        self.find_css('.action-primary').first.click()
+        self.page.wait_for_ajax()
+
+    def click_save_certificate_button(self):
+        """
+        Save certificate.
+        """
+        self.find_css('.action-primary').first.click()
+        self.page.wait_for_ajax()
+
+    def click_add_signatory_button(self):
+        """
+        Add signatory to certificate
+        """
+        self.find_css('.action-add-signatory').first.click()
+
+    def click_edit_certificate_button(self):
+        """
+        Open editing view for the certificate.
+        """
+        self.find_css('.action-edit .edit').first.click()
+
+    def click_cancel_edit_certificate(self):
+        """
+        Cancel certificate editing.
+        """
+        self.find_css('.action-secondary').first.click()
+
+    def click_certificate_details_toggle(self):
+        """
+        Expand/collapse certificate configuration.
+        """
+        self.find_css('a.detail-toggle').first.click()
+
+    ################
+    # Workflows
+    ################
+
+    def delete_certificate(self):
+        """
+        Delete the certificate
+        """
+        self.wait_for_certificate_delete_button()
+        self.find_css('.actions .delete').first.click()
+        self.page.wait_for_confirmation_prompt()
+        self.find_css('.action-primary').first.click()
+        self.page.wait_for_ajax()
+
 
 class Signatory(object):
     """
-    Signatory wrapper.
+    Signatory page object wrapper
     """
-
     def __init__(self, certificate, prefix, mode, index):
         self.certificate = certificate
         self.prefix = prefix
         self.index = index
         self.mode = mode
+
+    ################
+    # Helpers
+    ################
+
+    @staticmethod
+    def file_path(filename):
+        """
+        Construct file path to be uploaded from the data upload folder.
+
+        Arguments:
+            filename (str): asset filename
+
+        """
+        # Should grab common point between this page module and the data folder.
+        return os.sep.join(__file__.split(os.sep)[:-4]) + '/data/uploads/' + filename
 
     def get_selector(self, css=''):
         """
@@ -244,6 +325,10 @@ class Signatory(object):
         Find elements as defined by css locator.
         """
         return self.certificate.page.q(css=self.get_selector(css=css_selector))
+
+    ################
+    # Properties
+    ################
 
     @property
     def name(self):
@@ -287,6 +372,10 @@ class Signatory(object):
         """
         self.find_css('.signatory-organization-input').first.fill(value)
 
+    ################
+    # Workflows
+    ################
+
     def edit(self):
         """
         Open editing view for the signatory.
@@ -300,8 +389,8 @@ class Signatory(object):
         Delete the signatory
         """
         # pylint: disable=pointless-statement
-        self.delete_icon_is_present
-        self.find_css('.signatory-panel-delete').first.click()
+        self.wait_for_signatory_delete_icon()
+        self.click_signatory_delete_icon()
         self.wait_for_signatory_delete_prompt()
 
         self.certificate.page.q(css='#prompt-warning a.button.action-primary').first.click()
@@ -328,27 +417,14 @@ class Signatory(object):
         self.mode = 'details'
         self.wait_for_signatory_detail_view()
 
-    @staticmethod
-    def file_path(filename):
-        """
-        Construct file path to be uploaded from the data upload folder.
-
-        Arguments:
-            filename (str): asset filename
-
-        """
-        # Should grab common point between this page module and the data folder.
-        return os.sep.join(__file__.split(os.sep)[:-4]) + '/data/uploads/' + filename
-
     def upload_signature_image(self, image_filename):
         """
         Opens upload image dialog and upload given image file.
         """
+        self.wait_for_signature_image_upload_button()
         self.find_css('.action-upload-signature').first.click()
-        EmptyPromise(
-            lambda: self.certificate.page.q(css='.assetupload-modal .upload-dialog').present,
-            'Signature image upload dialog opened'
-        ).fulfill()
+        self.find_css('.action-upload-signature').first.click()
+        self.wait_for_signature_image_upload_prompt()
 
         asset_file_path = self.file_path(image_filename)
         self.certificate.page.q(
@@ -368,12 +444,19 @@ class Signatory(object):
             'Upload dialog is removed after uploading image'
         ).fulfill()
 
+    ################
+    # Wait Actions
+    ################
+
     @property
-    def delete_icon_is_present(self):
+    def wait_for_signatory_delete_icon(self):
         """
         Returns whether or not the delete icon is present.
         """
-        return self.find_css('.signatory-panel-delete').present
+        EmptyPromise(
+            lambda: self.certificate.page.q(css='.signatory-panel-delete').present,
+            'Delete icon is displayed'
+        ).fulfill()
 
     def wait_for_signatory_delete_prompt(self):
         """
@@ -402,9 +485,40 @@ class Signatory(object):
             'On signatory details view'
         ).fulfill()
 
+    def wait_for_signature_image_upload_prompt(self):
+        """
+        Promise to wait until signatory image upload prompt is visible
+        """
+        EmptyPromise(
+            lambda: self.certificate.page.q(css='.assetupload-modal .action-upload').present,
+            'Signature image upload dialog opened'
+        ).fulfill()
+
+    def wait_for_signature_image_upload_button(self):
+        """
+        Promise to wait until signatory image upload button is visible
+        """
+        EmptyPromise(
+            lambda: self.certificate.page.q(css=".action-upload-signature").first.present,
+            'Signature image upload button available'
+        ).fulfill()
+
     @property
-    def signature_image_is_present(self):
+    def wait_for_signature_image(self):
         """
-        Returns whether or not the signature image is present.
+        Promise for the signature image to be displayed
         """
-        return self.find_css('.current-signature-image .signature-image').present
+        EmptyPromise(
+            lambda: self.certificate.page.q(css=".current-signature-image .signature-image").present,
+            'Signature image available'
+        ).fulfill()
+
+    ################
+    # Click Actions
+    ################
+
+    def click_signatory_delete_icon(self):
+        """
+        Clicks the signatory deletion icon/action
+        """
+        self.find_css('.signatory-panel-delete').first.click()

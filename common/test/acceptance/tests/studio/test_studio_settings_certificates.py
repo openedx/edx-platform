@@ -28,18 +28,20 @@ class CertificatesTest(StudioCourseTest):
             'organization': '{prefix} Signatory Organization'.format(prefix=prefix),
         }
 
-    def create_and_verify_certificate(self, name, description, existing_certs, signatories):
+    def create_and_verify_certificate(self, course_title_override, existing_certs, signatories):
         """
         Creates a new certificate and verifies that it was properly created.
         """
         self.assertEqual(existing_certs, len(self.certificates_page.certificates))
         if existing_certs == 0:
-            self.certificates_page.create_first_certificate()
+            self.certificates_page.click_first_certificate_button()
         else:
-            self.certificates_page.add_certificate()
+            self.certificates_page.click_add_certificate_button()
+
         certificate = self.certificates_page.certificates[existing_certs]
-        certificate.name = name
-        certificate.description = description
+
+        # Set the certificate properties
+        certificate.course_title = course_title_override
 
         # add signatories
         added_signatories = 0
@@ -48,17 +50,15 @@ class CertificatesTest(StudioCourseTest):
             certificate.signatories[idx].title = signatory['title']
             certificate.signatories[idx].organization = signatory['organization']
             certificate.signatories[idx].upload_signature_image('Signature-{}.png'.format(idx))
-            self.assertTrue(certificate.signatories[idx].signature_image_is_present)
 
             added_signatories += 1
             if len(signatories) > added_signatories:
-                certificate.add_signatory()
+                certificate.click_add_signatory_button()
 
         # Save the certificate
         self.assertEqual(certificate.get_text('.action-primary'), "Create")
-        self.assertFalse(certificate.delete_button_is_present)
-        certificate.save()
-        self.assertIn(name, certificate.name)
+        certificate.click_create_certificate_button()
+        self.assertIn(course_title_override, certificate.course_title)
         return certificate
 
     def test_no_certificates_by_default(self):
@@ -81,7 +81,7 @@ class CertificatesTest(StudioCourseTest):
         Scenario: Ensure that the certificates can be created and edited correctly.
         Given I have a course without certificates
         When I click button 'Add your first Certificate'
-        And I set new the name, description and two signatories and click the button 'Create'
+        And I set new the course title override and signatory and click the button 'Create'
         Then I see the new certificate is added and has correct data
         And I click 'New Certificate' button
         And I set the name and click the button 'Create'
@@ -92,25 +92,23 @@ class CertificatesTest(StudioCourseTest):
         """
         self.certificates_page.visit()
         self.create_and_verify_certificate(
-            "New Certificate",
-            "Description of first certificate",
+            "Course Title Override",
             0,
             [self.make_signatory_data('first'), self.make_signatory_data('second')]
         )
         second_certificate = self.create_and_verify_certificate(
-            "Second Certificate",
-            "Description of first certificate",
+            "Course Title Override 2",
             1,
             [self.make_signatory_data('third'), self.make_signatory_data('forth')]
         )
 
         # Edit the second certificate
-        second_certificate.edit()
-        second_certificate.name = "Updated Second Certificate"
+        second_certificate.click_edit_certificate_button()
+        second_certificate.course_title = "Updated Course Title Override 2"
         self.assertEqual(second_certificate.get_text('.action-primary'), "Save")
-        second_certificate.save()
+        second_certificate.click_save_certificate_button()
 
-        self.assertIn("Updated Second Certificate", second_certificate.name)
+        self.assertIn("Updated Course Title Override 2", second_certificate.course_title)
 
     def test_can_delete_certificate(self):
         """
@@ -124,13 +122,12 @@ class CertificatesTest(StudioCourseTest):
         """
         self.certificates_page.visit()
         certificate = self.create_and_verify_certificate(
-            "New Certificate",
-            "Description of first certificate",
+            "Course Title Override",
             0,
             [self.make_signatory_data('first'), self.make_signatory_data('second')]
         )
 
-        self.assertTrue(certificate.delete_button_is_present)
+        certificate.wait_for_certificate_delete_button()
 
         self.assertEqual(len(self.certificates_page.certificates), 1)
 
@@ -145,7 +142,7 @@ class CertificatesTest(StudioCourseTest):
         Scenario: Ensure that the certificates can be created with signatories and edited correctly.
         Given I have a course without certificates
         When I click button 'Add your first Certificate'
-        And I set new the name, description and signatory and click the button 'Create'
+        And I set new the course title override and signatory and click the button 'Create'
         Then I see the new certificate is added and has one signatory inside it
         When I click 'Edit' button of signatory panel
         And I set the name and click the button 'Save' icon
@@ -158,8 +155,7 @@ class CertificatesTest(StudioCourseTest):
         """
         self.certificates_page.visit()
         certificate = self.create_and_verify_certificate(
-            "New Certificate",
-            "Description of first certificate",
+            "Course Title Override",
             0,
             [self.make_signatory_data('first')]
         )
@@ -185,26 +181,6 @@ class CertificatesTest(StudioCourseTest):
 
         self.assertIn("Updated signatory name", signatory.name)
 
-    def test_must_supply_certificate_name(self):
-        """
-        Scenario: Ensure that validation of the certificates works correctly.
-        Given I have a course without certificates
-        And I create new certificate without specifying a name click the button 'Create'
-        Then I see error message "Certificate name is required."
-        When I set a name and click the button 'Create'
-        Then I see the certificate is saved successfully
-        """
-        self.certificates_page.visit()
-        self.certificates_page.create_first_certificate()
-        certificate = self.certificates_page.certificates[0]
-        certificate.name = ""
-        certificate.save()
-        self.assertEqual(certificate.mode, 'edit')
-        self.assertEqual("Certificate name is required.", certificate.validation_message)
-        certificate.name = "First Certificate Name"
-        certificate.save()
-        self.assertIn("First Certificate Name", certificate.name)
-
     def test_can_cancel_creation_of_certificate(self):
         """
         Scenario: Ensure that creation of a certificate can be canceled correctly.
@@ -214,8 +190,8 @@ class CertificatesTest(StudioCourseTest):
         Then I see that there is no certificates in the course
         """
         self.certificates_page.visit()
-        self.certificates_page.create_first_certificate()
+        self.certificates_page.click_first_certificate_button()
         certificate = self.certificates_page.certificates[0]
-        certificate.name = "First Certificate Name"
-        certificate.cancel()
+        certificate.course_title = "Title Override"
+        certificate.click_cancel_edit_certificate()
         self.assertEqual(len(self.certificates_page.certificates), 0)

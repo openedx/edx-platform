@@ -33,7 +33,7 @@ function(_, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView) {
             // Set up the initial state of the attributes set for this model instance
             this.showDetails = true;
             this.template = this.loadTemplate('certificate-details');
-            this.listenTo(this.model, 'change', this.render());
+            this.listenTo(this.model, 'change', this.render);
         },
 
         editCertificate: function(event) {
