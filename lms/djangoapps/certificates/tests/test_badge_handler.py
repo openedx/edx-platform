@@ -6,7 +6,6 @@ from django.test.utils import override_settings
 from django.db.models.fields.files import ImageFieldFile
 from lazy.lazy import lazy
 from mock import patch, Mock, call
-from openedx.core.lib.tests.assertions.events import assert_event_matches
 from certificates.models import BadgeAssertion, BadgeImageConfiguration
 from track.tests import EventTrackingTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

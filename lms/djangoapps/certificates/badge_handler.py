@@ -10,7 +10,6 @@ import requests
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from eventtracking import tracker
 from lazy import lazy
 from requests.packages.urllib3.exceptions import HTTPError
 from certificates.models import BadgeAssertion, BadgeImageConfiguration
