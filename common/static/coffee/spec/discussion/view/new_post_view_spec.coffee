@@ -226,12 +226,6 @@ describe "NewPostView", ->
           mode: "tab"
         )
 
-      checkVisibility = (view, expectedVisible) =>
-        view.render()
-        expect(view.$(".js-group-select").is(":visible")).toEqual(expectedVisible)
-        if expectedVisible
-          expect(view.$(".js-group-select").prop("disabled")).toEqual(false)
-
       it "is not visible to students", ->
         checkVisibility(@view, false)
 

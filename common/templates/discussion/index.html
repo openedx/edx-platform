@@ -12,10 +12,12 @@
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
+
+<%include file="_js_head_dependencies.html" />
 </%block>
 
 <%block name="js_extra">
-<%include file="/discussion/_js_body_dependencies.html" />
+<%include file="_js_body_dependencies.html" />
 <%static:js group='discussion'/>
 <script language="javascript">
     $(function () {
@@ -28,4 +30,4 @@
 
 <%include file="_discussion_course_navigation.html" args="active_page='discussion'" />
 
-<%include file="/discussion/_discussion_course.html" />
+<%include file="_course_discussion_section.html" />
