@@ -47,11 +47,13 @@ def i_should_see_that_course_in_my_dashboard(_step, doesnt_appear, course):
 
 @step(u'I unenroll from the course numbered "([^"]*)"')
 def i_unenroll_from_that_course(_step, course):
-    more_actions_dropdown_link_selector = '[id*=dropdown-for-0]'
-    assert world.is_css_present(more_actions_dropdown_link_selector)
-    world.css_click(more_actions_dropdown_link_selector)
+    dropdown_selector = '[id*=dropdown-for-0]'
+    assert world.is_css_present(dropdown_selector)
+    world.css_click(dropdown_selector)
 
-    unregister_css = 'a.action-unenroll[data-course-number*="{course_number}"][href*=unenroll-modal]'.format(course_number=course)
+    unregister_css = '.action-unenroll[data-course-number*="{course_number}"][href*=unenroll-modal]'.format(
+        course_number=course
+    )
     assert world.is_css_present(unregister_css)
     world.css_click(unregister_css)
 
