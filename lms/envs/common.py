@@ -1293,6 +1293,7 @@ PIPELINE_CSS = {
     'style-main-rtl': {
         'source_filenames': [
             'sass/lms-main-rtl.css',
+            'css/edx-cc.css',
         ],
         'output_filename': 'css/lms-main-rtl.css',
     },
