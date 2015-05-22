@@ -57,6 +57,7 @@ source scripts/jenkins-common.sh
 
 # Violations thresholds for failing the build
 PYLINT_THRESHOLD=7350
+JSHINT_THRESHOLD=3700
 
 # If the environment variable 'SHARD' is not set, default to 'all'.
 # This could happen if you are trying to use this script from
@@ -78,6 +79,10 @@ case "$TEST_SUITE" in
         paver run_quality -p 100
 
         mkdir -p reports
+        echo "Finding jshint violations and storing report..."
+        PATH=$PATH:node_modules/.bin
+        paver run_jshint -l $JSHINT_THRESHOLD > jshint.log || { cat jshint.log; EXIT=1; }
+        echo "Running code complexity report (python)."
         paver run_complexity > reports/code_complexity.log || echo "Unable to calculate code complexity. Ignoring error."
         # Need to create an empty test result so the post-build
         # action doesn't fail the build.
