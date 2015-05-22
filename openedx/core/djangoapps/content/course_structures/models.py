@@ -53,6 +53,7 @@ class CourseStructure(TimeStampedModel):
         for child_node in cur_block['children']:
             self._traverse_tree(child_node, unordered_structure, ordered_blocks, parent=block)
 
+'''
 import django
 from django.db.models.fields import *
 from django.utils.timezone import UTC
@@ -260,6 +261,7 @@ class CourseOverviewDescriptor(CourseOverviewFields):
         return "course_{}".format(
             b32encode(unicode(self.location.course_key)).replace('=', padding_char)
         )
+'''
 
 # Signals must be imported in a file that is automatically loaded at app startup (e.g. models.py). We import them
 # at the end of this file to avoid circular dependencies.
