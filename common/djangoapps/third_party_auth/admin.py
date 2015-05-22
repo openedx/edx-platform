@@ -58,4 +58,9 @@ class SAMLProviderDataAdmin(admin.ModelAdmin):
     list_display = ('entity_id', 'is_valid', 'fetched_at', 'expires_at', 'sso_url')
     readonly_fields = ('is_valid', )
 
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # editing an existing object
+            return self.model._meta.get_all_field_names()  # pylint: disable=protected-access
+        return self.readonly_fields
+
 admin.site.register(SAMLProviderData, SAMLProviderDataAdmin)

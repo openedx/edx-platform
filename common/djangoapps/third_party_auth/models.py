@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Models used to implement SAML SSO support in third_party_auth
 (inlcuding Shibboleth support)
@@ -61,8 +62,13 @@ class ProviderConfig(ConfigurationModel):
     """
     Abstract Base Class for configuring a third_party_auth provider
     """
-    icon_class = models.CharField(max_length=50, default='fa-signin')
-    name = models.CharField(max_length=50, blank=False)
+    icon_class = models.CharField(
+        max_length=50, default='fa-signin',
+        help_text=(
+            'The Font Awesome (or custom) icon class to use on the login button for this provider. '
+            'Examples: fa-google-plus, fa-facebook, fa-linkedin, fa-signin, fa-university'
+        ))
+    name = models.CharField(max_length=50, blank=False, help_text="Name of this provider (shown to users)")
     prefix = None  # used for provider_id. Set to a string value in subclass
     backend_name = None  # Set to a field or fixed value in subclass
     # "enabled" field is inherited from ConfigurationModel
@@ -139,10 +145,16 @@ class OAuth2ProviderConfig(ProviderConfig):
     prefix = 'oa2'
     KEY_FIELDS = ('backend_name', )  # Backend name is unique
     backend_name = models.CharField(
-        max_length=50, choices=[(name, name) for name in _PSA_OAUTH2_BACKENDS], blank=False, db_index=True)
-    key = models.TextField(blank=True)
-    secret = models.TextField(blank=True)
-    other_settings = models.TextField(blank=True)  # JSON field with other settings, if any. Usually blank.
+        max_length=50, choices=[(name, name) for name in _PSA_OAUTH2_BACKENDS], blank=False, db_index=True,
+        help_text=(
+            "Which python-social-auth OAuth2 provider backend to use. "
+            "The list of backend choices is determined by the THIRD_PARTY_AUTH_BACKENDS setting."
+            # To be precise, it's set by AUTHENTICATION_BACKENDS - which aws.py sets from THIRD_PARTY_AUTH_BACKENDS
+        )
+    )
+    key = models.TextField(blank=True, verbose_name="Client ID")
+    secret = models.TextField(blank=True, verbose_name="Client Secret")
+    other_settings = models.TextField(blank=True, help_text="Optional JSON object with advanced settings, if any.")
 
     class Meta(object):  # pylint: disable=missing-docstring
         verbose_name = "Provider Configuration (OAuth2)"
@@ -171,10 +183,22 @@ class SAMLProviderConfig(ProviderConfig):
     prefix = 'saml'
     KEY_FIELDS = ('idp_slug', )
     backend_name = models.CharField(
-        max_length=50, default='tpa-saml', choices=[(name, name) for name in _PSA_SAML_BACKENDS], blank=False)
-    idp_slug = models.SlugField(max_length=30, db_index=True)
-    entity_id = models.CharField(max_length=255)
-    metadata_source = models.CharField(max_length=255, help_text="Generally this is a URL to a metadata XML file")
+        max_length=50, default='tpa-saml', choices=[(name, name) for name in _PSA_SAML_BACKENDS], blank=False,
+        help_text="Which python-social-auth provider backend to use. 'tpa-saml' is the standard edX SAML backend.")
+    idp_slug = models.SlugField(
+        max_length=30, db_index=True,
+        help_text=(
+            'A short string uniquely identifying this provider. '
+            'Cannot contain spaces and should be a usable as a CSS class. Examples: "ubc", "mit-staging"'
+        ))
+    entity_id = models.CharField(
+        max_length=255, verbose_name="Entity ID", help_text="Example: https://idp.testshib.org/idp/shibboleth-wrong")
+    metadata_source = models.CharField(
+        max_length=255,
+        help_text=(
+            "URL to this provider's XML metadata. Should be an HTTPS URL. "
+            "Example: https://www.testshib.org/metadata/testshib-providers.xml"
+        ))
     attr_user_permanent_id = models.CharField(
         max_length=128, blank=True, verbose_name="User ID Attribute",
         help_text="URN of the SAML attribute that we can use as a unique, persistent user ID. Leave blank for default.")
@@ -204,14 +228,7 @@ class SAMLProviderConfig(ProviderConfig):
     def clean(self):
         """ Standardize and validate fields """
         super(SAMLProviderConfig, self).clean()
-        self.other_settings = self.other_settings.strip()
-        if self.other_settings:
-            try:
-                conf = json.loads(self.other_settings)
-                if not isinstance(conf, dict):
-                    raise ValueError
-            except ValueError:
-                raise ValidationError("Advanced settings must be a JSON object or left blank.")
+        self.other_settings = clean_json(self.other_settings, dict)
 
     class Meta(object):  # pylint: disable=missing-docstring
         verbose_name = "Provider Configuration (SAML IdP)"
@@ -264,16 +281,27 @@ class SAMLConfiguration(ConfigurationModel):
     Service Provider and allow users to authenticate via third party SAML
     Identity Providers (IdPs)
     """
-    private_key = models.TextField()
-    public_key = models.TextField()
-    entity_id = models.CharField(max_length=255, default="http://saml.example.com")
+    private_key = models.TextField(
+        help_text=(
+            'To generate a key pair as two files, run '
+            '"openssl req -new -x509 -days 3652 -nodes -out saml.crt -keyout saml.key". '
+            'Paste the contents of saml.key here.'
+        )
+    )
+    public_key = models.TextField(help_text="Public key certificate.")
+    entity_id = models.CharField(max_length=255, default="http://saml.example.com", verbose_name="Entity ID")
     org_info_str = models.TextField(
         verbose_name="Organization Info",
         default='{"en-US": {"url": "http://www.example.com", "displayname": "Example Inc.", "name": "example"}}',
         help_text="JSON dictionary of 'url', 'displayname', and 'name' for each language",
     )
     other_config_str = models.TextField(
-        default='{\n"SECURITY_CONFIG": {"metadataCacheDuration": 604800, "signMetadata": false}\n}')
+        default='{\n"SECURITY_CONFIG": {"metadataCacheDuration": 604800, "signMetadata": false}\n}',
+        help_text=(
+            "JSON object defining advanced settings that are passed on to python-saml. "
+            "Valid keys that can be set here include: SECURITY_CONFIG, SP_NAMEID_FORMATS, SP_EXTRA"
+        ),
+    )
 
     class Meta(object):  # pylint: disable=missing-docstring
         verbose_name = "SAML Configuration"
@@ -284,6 +312,11 @@ class SAMLConfiguration(ConfigurationModel):
         super(SAMLConfiguration, self).clean()
         self.org_info_str = clean_json(self.org_info_str, dict)
         self.other_config_str = clean_json(self.other_config_str, dict)
+
+        self.private_key = self.private_key.replace("-----BEGIN PRIVATE KEY-----", "").strip()
+        self.private_key = self.private_key.replace("-----END PRIVATE KEY-----", "").strip()
+        self.public_key = self.public_key.replace("-----BEGIN CERTIFICATE-----", "").strip()
+        self.public_key = self.public_key.replace("-----END CERTIFICATE-----", "").strip()
 
     def get_setting(self, name):
         """ Get the value of a setting, or raise KeyError """
