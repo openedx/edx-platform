@@ -1,15 +1,12 @@
 import json
 import logging
-
 from collections import OrderedDict
 from model_utils.models import TimeStampedModel
-
 from util.models import CompressedTextField
+
 from xmodule_django.models import CourseKeyField
 
-
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
-
 
 class CourseStructure(TimeStampedModel):
     course_id = CourseKeyField(max_length=255, db_index=True, unique=True, verbose_name='Course ID')

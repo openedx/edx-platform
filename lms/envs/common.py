@@ -43,6 +43,9 @@ from xmodule.modulestore.modulestore_settings import update_module_store_setting
 from xmodule.mixin import LicenseMixin
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
+# TODO me: remove this along with anything else starting in kdbg_
+kdbg_ENABLE_PYINSTRUMENT = True
+
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
 PLATFORM_NAME = "Your Platform Name Here"
@@ -1130,6 +1133,10 @@ MIDDLEWARE_CLASSES = (
     'microsite_configuration.middleware.MicrositeSessionCookieDomainMiddleware',
 )
 
+if kdbg_ENABLE_PYINSTRUMENT:
+    MIDDLEWARE_CLASSES += ('pyinstrument.middleware.ProfilerMiddleware',)
+    PYINSTRUMENT_USE_SIGNAL = False
+
 # Clickjacking protection can be enabled by setting this to 'DENY'
 X_FRAME_OPTIONS = 'ALLOW'
 
@@ -1753,6 +1760,7 @@ INSTALLED_APPS = (
 
     'openedx.core.djangoapps.content.course_structures',
     'course_structure_api',
+    'openedx.core.djangoapps.content.course_overviews',
 
     # Mailchimp Syncing
     'mailing',
