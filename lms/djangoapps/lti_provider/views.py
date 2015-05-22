@@ -4,7 +4,9 @@ LTI Provider view functions
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.contrib.auth.views import redirect_to_login
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseForbidden, Http404
 from django.views.decorators.csrf import csrf_exempt
@@ -13,8 +15,10 @@ from courseware.access import has_access
 from courseware.courses import get_course_with_access
 from courseware.module_render import get_module_by_usage_id
 from edxmako.shortcuts import render_to_response
+from lti_provider.models import LtiUser
 from lti_provider.signature_validator import SignatureValidator
 from lms_xblock.runtime import unquote_slashes
+from lti_provider.users import create_lti_user, lti_to_edx_user_id, switch_user
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys import InvalidKeyError
 
@@ -22,7 +26,7 @@ from opaque_keys import InvalidKeyError
 REQUIRED_PARAMETERS = [
     'roles', 'context_id', 'oauth_version', 'oauth_consumer_key',
     'oauth_signature', 'oauth_signature_method', 'oauth_timestamp',
-    'oauth_nonce'
+    'oauth_nonce', 'user_id'
 ]
 
 LTI_SESSION_KEY = 'lti_provider_parameters'
@@ -63,6 +67,19 @@ def lti_launch(request, course_id, usage_id):
     params = get_required_parameters(request.POST)
     if not params:
         return HttpResponseBadRequest()
+
+    try:
+        lti_user = LtiUser.objects.get(lti_user_id=params['user_id'])
+    except ObjectDoesNotExist:
+        # This is the first time that the user has been here. Create an account.
+        lti_user = create_lti_user(params)
+        pass
+    edx_user_id = lti_user.edx_user_id
+    if not (request.user.is_authenticated() and
+            request.user.username == edx_user_id):
+        # The user is logged in as somebody else. Switch them to the LTI user
+        switch_user(request, lti_user)
+
     # Store the course, and usage ID in the session to prevent privilege
     # escalation if a staff member in one course tries to access material in
     # another.
@@ -72,10 +89,6 @@ def lti_launch(request, course_id, usage_id):
     params['course_key'] = course_key
     params['usage_key'] = usage_key
     request.session[LTI_SESSION_KEY] = params
-
-    if not request.user.is_authenticated():
-        run_url = reverse('lti_provider.views.lti_run')
-        return redirect_to_login(run_url, settings.LOGIN_URL)
 
     return lti_run(request)
 
