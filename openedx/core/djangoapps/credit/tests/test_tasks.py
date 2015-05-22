@@ -31,22 +31,22 @@ class TestTaskExecution(ModuleStoreTestCase):
         """ Making sure that the receiver correctly fires off the task when invoked by signal """
 
         requirements = get_credit_requirements(self.course.id)
-        self.assertEquals(len(requirements["requirements"]), 0)
+        self.assertEquals(len(requirements), 0)
         listen_for_course_publish(self, self.course.id)
 
         requirements = get_credit_requirements(self.course.id)
-        self.assertEquals(len(requirements["requirements"]), 0)
+        self.assertEquals(len(requirements), 0)
 
     def test_task_adding_requirements(self):
         """ Making sure that the receiver correctly fires off the task when invoked by signal """
 
         self.add_credit_course(self.course.id)
         requirements = get_credit_requirements(self.course.id)
-        self.assertEquals(len(requirements["requirements"]), 0)
+        self.assertEquals(len(requirements), 0)
         listen_for_course_publish(self, self.course.id)
 
         requirements = get_credit_requirements(self.course.id)
-        self.assertEquals(len(requirements["requirements"]), 1)
+        self.assertEquals(len(requirements), 1)
 
     def add_credit_course(self, course_key):
         credit_course = CreditCourse(course_key=course_key, enabled=True)

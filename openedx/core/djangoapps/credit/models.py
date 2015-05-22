@@ -11,7 +11,6 @@ import logging
 from django.db.utils import IntegrityError
 from django.db import models
 from jsonfield.fields import JSONField
-
 from model_utils.models import TimeStampedModel
 from openedx.core.djangoapps.credit.exceptions import InvalidCreditRequirements
 from xmodule_django.models import CourseKeyField
@@ -21,7 +20,7 @@ log = logging.getLogger(__name__)
 
 
 class CreditCourse(models.Model):
-    """Model for tracking the credit course."""
+    """Model for tracking a credit course."""
 
     course_key = CourseKeyField(max_length=255, db_index=True, unique=True)
     enabled = models.BooleanField(default=False)
@@ -31,7 +30,6 @@ class CreditCourse(models.Model):
         """ Check that given course is credit or not
 
         Args:
-            cls(CreditCourse): The class name
             course_key(CourseKey): The course identifier
 
         Returns:
@@ -44,14 +42,13 @@ class CreditCourse(models.Model):
         """ Get the credit course if exists
 
         Args:
-            cls(CreditCourse): The class name
             course_key(CourseKey): The course identifier
 
         Raises:
-            CreditCourse.DoesNotExist if the given course does not exist
+            DoesNotExist if no CreditCourse exists for the given course key.
 
         Returns:
-            CreditCourse objects if exist else raises the CreditCourse.DoesNotExist
+            CreditCourse if one exists for the given course key.
         """
         return cls.objects.get(course_key=course_key, enabled=True)
 
@@ -88,17 +85,16 @@ class CreditRequirement(TimeStampedModel):
     @classmethod
     def add_course_requirement(cls, credit_course, requirement):
         """ Add requirements to given course
+        Args:
+            credit_course(CreditCourse): The identifier for credit course course
+            requirements(dict): Dict of requirements to be added
 
-    Args:
-        credit_course(CreditCourse): The identifier for credit course course
-        requirements(dict): Dict of requirements to be added
+        Raises:
+            InvalidCreditRequirements if any issue on requirement
 
-    Raises:
-        InvalidCreditRequirements if any issue on requirement
-
-    Returns:
-        None
-    """
+        Returns:
+            None
+        """
         try:
             cls.objects.create(
                 course=credit_course,
@@ -109,17 +105,17 @@ class CreditRequirement(TimeStampedModel):
         except IntegrityError:
             # skip the duplicate entry
             pass
-        except Exception:  # pylint: disable=bare-except
+        except:  # pylint: disable=bare-except
             raise InvalidCreditRequirements
 
     @classmethod
     def get_course_requirements(cls, course_key, namespace=None):
         """ Get requirements to given course
 
-    Args:
-        credit_course(CreditCourse): The identifier for credit course course
-        requirements(dict): Dict of requirements to be added
-    """
+        Args:
+            credit_course(CreditCourse): The identifier for credit course course
+            requirements(dict): Dict of requirements to be added
+        """
         requirements = CreditRequirement.objects.filter(course__course_key=course_key, active=True)
         if namespace:
             requirements = requirements.filter(namespace=namespace)

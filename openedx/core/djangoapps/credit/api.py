@@ -1,5 +1,5 @@
-""" Contains the APIs for course credit requirements
-"""
+""" Contains the APIs for course credit requirements """
+
 from models import CreditRequirement, CreditCourse
 from exceptions import InvalidCreditRequirements
 
@@ -51,7 +51,7 @@ def set_credit_requirements(course_key, requirements):
         raise InvalidCreditRequirements
 
 
-def get_credit_requirements(course_key, namespacce=None):
+def get_credit_requirements(course_key, namespace=None):
     """ Returns the requirements of given course and namespace
 
     Args:
@@ -89,14 +89,12 @@ def get_credit_requirements(course_key, namespacce=None):
         Dict of requirements in the given namespace
     """
 
-    requirements = CreditRequirement.get_course_requirements(course_key, namespacce)
-    return {
-        "requirements": [
-            {
-                "namespace": requirement.namespace,
-                "name": requirement.name,
-                "criteria": requirement.configuration
-            }
-            for requirement in requirements
-        ]
-    }
+    requirements = CreditRequirement.get_course_requirements(course_key, namespace)
+    return [
+        {
+            "namespace": requirement.namespace,
+            "name": requirement.name,
+            "criteria": requirement.configuration
+        }
+        for requirement in requirements
+    ]
