@@ -24,7 +24,6 @@ from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
 from student.roles import CourseStaffRole
 from student.models import unique_id_for_user
 from xmodule import peer_grading_module
-from xmodule.x_module import DescriptorSystem
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -289,7 +288,7 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
             open_ended_grading_interface=test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
             mixins=settings.XBLOCK_MIXINS,
             error_descriptor_class=ErrorDescriptor,
-            descriptor_runtime=Mock(spec=DescriptorSystem, name="descriptor_runtime"),
+            descriptor_runtime=None,
         )
         self.descriptor = peer_grading_module.PeerGradingDescriptor(self.system, field_data, ScopeIds(None, None, None, None))
         self.descriptor.xmodule_runtime = self.system

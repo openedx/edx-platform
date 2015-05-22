@@ -120,7 +120,7 @@ class SystemTestSuite(NoseTestSuite):
     @property
     def cmd(self):
         cmd = (
-            './manage.py {system} --contracts test --verbosity={verbosity} '
+            './manage.py {system} test --verbosity={verbosity} '
             '{test_id} {test_opts} --traceback --settings=test {extra} '
             '--with-xunit --xunit-file={xunit_report}'.format(
                 system=self.root,
