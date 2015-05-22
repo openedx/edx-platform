@@ -42,7 +42,9 @@ var edx = edx || {},
                 });
             },
 
-            handlerIsAction: function(key, menu, focused) {
+            handlerIsAction: function(key, menu, focused, e) {
+                e.preventDefault();
+
                 if (key === 38) { // UP
                     dropdown.previousMenuItemLink(focused, menu);
                 } else if (key === 40) { // DOWN
@@ -50,13 +52,17 @@ var edx = edx || {},
                 }
             },
 
-            handlerIsButton: function(key, el) {
+            handlerIsButton: function(key, el, e) {
+                e.preventDefault();
+
                 if (key === 40 || key === 13) { // DOWN or ENTER
                     dropdown.openDropdownMenu(el);
                 }
             },
 
-            handlerIsMenu: function(key, menu) {
+            handlerIsMenu: function(key, menu, e) {
+                e.preventDefault();
+
                 if (key === 40) { // DOWN
                     dropdown.focusFirstItem(menu);
                 }
@@ -76,16 +82,16 @@ var edx = edx || {},
                     if (focused.is('.action')) {
                         // Key handlers for when a menu item has focus
                         menu = focused.closest('.dropdown-menu');
-                        dropdown.handlerIsAction(keyCode, menu, focused);
+                        dropdown.handlerIsAction(keyCode, menu, focused, e);
 
                     } else if (focused.is('.has-dropdown')) {
                         // Key handlers for when the button that opens the menu has focus
-                        dropdown.handlerIsButton(keyCode, focused);
+                        dropdown.handlerIsButton(keyCode, focused, e);
 
                     } else if (focused.is('.dropdown-menu')) {
                         // Key handlers for when the menu itself has focus, before an item within it receives focus
                         menu = focused.closest('.dropdown-menu');
-                        dropdown.handlerIsMenu(keyCode, menu);
+                        dropdown.handlerIsMenu(keyCode, menu, e);
                     }
                 });
             },
