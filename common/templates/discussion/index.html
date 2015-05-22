@@ -36,33 +36,4 @@ from django.core.urlresolvers import reverse
 
 <%include file="_discussion_course_navigation.html" args="active_page='discussion'" />
 
-<%block name="content">
-<section class="discussion container" id="discussion-container"
-         data-roles="${roles}"
-         data-course-id="${course_id}"
-         data-course-name="${course.display_name_with_default}"
-         data-user-info="${user_info}"
-         data-user-create-comment="${can_create_comment}"
-         data-user-create-subcomment="${can_create_subcomment}"
-         data-read-only="false"
-         data-threads="${threads}"
-         data-thread-pages="${thread_pages}"
-         data-content-info="${annotated_content_info}"
-         data-sort-preference="${sort_preference}"
-         data-flag-moderator="${flag_moderator}"
-         data-user-cohort-id="${user_cohort}"
-         data-course-settings="${course_settings}">
-    <div class="discussion-body">
-        <div class="forum-nav" role="complementary" aria-label="${_("Discussion thread list")}"></div>
-        <div class="discussion-column" id="discussion-column">
-            <main id="main" aria-label="Content" tabindex="-1">
-                <article class="new-post-article" style="display: none" tabindex="-1" aria-label="${_("New topic form")}"></article>
-                <div class="forum-content"></div>
-            </main>
-        </div>
-    </div>
-</section>
-</%block>
-
-<%include file="_underscore_templates.html" />
-<%include file="_thread_list_template.html" />
+<%include file="_course_discussion_section.html" />
