@@ -122,8 +122,8 @@ var DetailsView = ValidatingView.extend({
     setupDatePicker: function (fieldName) {
         var cacheModel = this.model;
         var div = this.$el.find('#' + this.fieldToSelectorMap[fieldName]);
-        var datefield = $(div).find("input:.date");
-        var timefield = $(div).find("input:.time");
+        var datefield = $(div).find("input.date");
+        var timefield = $(div).find("input.time");
         var cachethis = this;
         var setfield = function () {
             var newVal = DateUtils.getDate(datefield, timefield),
