@@ -233,7 +233,9 @@
         },
 
         render: function() {
-            var renderedHtml;
+            var renderedHtml,
+                $resetBtn,
+                $captureBtn;
 
             // Set the submit button to disabled by default
             this.setSubmitButtonEnabled( false );
@@ -245,8 +247,8 @@
             );
             $( this.el ).html( renderedHtml );
 
-            var $resetBtn = this.$el.find('#webcam_reset_button'),
-                $captureBtn = this.$el.find('#webcam_capture_button');
+            $resetBtn = this.$el.find('#webcam_reset_button');
+            $captureBtn = this.$el.find('#webcam_capture_button');
 
             // Install event handlers
             $resetBtn.on( 'click', _.bind( this.reset, this ) );
