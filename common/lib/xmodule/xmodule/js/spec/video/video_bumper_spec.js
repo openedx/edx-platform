@@ -85,6 +85,7 @@
             var saveState = jasmine.createSpy('saveState');
             state.bumperState.videoSaveStatePlugin.saveState = saveState;
             state.el.trigger('error');
+            expect(state.storage.getItem('isBumperShown')).toBeTruthy();
             jasmine.Clock.tick(20);
             expect(saveState).toHaveBeenCalledWith(true, {
                 bumper_last_view_date: true});
@@ -94,6 +95,7 @@
             var saveState = jasmine.createSpy('saveState');
             state.bumperState.videoSaveStatePlugin.saveState = saveState;
             state.bumperState.videoBumper.skipAndDoNotShowAgain();
+            expect(state.storage.getItem('isBumperShown')).toBeTruthy();
             jasmine.Clock.tick(20);
             expect(saveState).toHaveBeenCalledWith(true, {
                 bumper_last_view_date: true, bumper_do_not_show_again: true});
