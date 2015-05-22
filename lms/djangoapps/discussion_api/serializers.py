@@ -1,7 +1,11 @@
 """
 Discussion API serializers
 """
+from urllib import urlencode
+from urlparse import urlunparse
+
 from django.contrib.auth.models import User as DjangoUser
+from django.core.urlresolvers import reverse
 
 from rest_framework import serializers
 
@@ -15,7 +19,7 @@ from lms.lib.comment_client.user import User as CommentClientUser
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_names
 
 
-def get_context(course, requester, thread=None):
+def get_context(course, request, thread=None):
     """
     Returns a context appropriate for use with ThreadSerializer or
     (if thread is provided) CommentSerializer.
@@ -34,8 +38,10 @@ def get_context(course, requester, thread=None):
         for role in Role.objects.filter(name=FORUM_ROLE_COMMUNITY_TA, course_id=course.id)
         for user in role.users.all()
     }
+    requester = request.user
     return {
         # For now, the only groups are cohorts
+        "request": request,
         "group_ids_to_names": get_cohort_names(course),
         "is_requester_privileged": requester.id in staff_user_ids or requester.id in ta_user_ids,
         "staff_user_ids": staff_user_ids,
@@ -137,6 +143,9 @@ class ThreadSerializer(_ContentSerializer):
     following = serializers.SerializerMethodField("get_following")
     comment_count = serializers.IntegerField(source="comments_count")
     unread_comment_count = serializers.IntegerField(source="unread_comments_count")
+    comment_list_url = serializers.SerializerMethodField("get_comment_list_url")
+    endorsed_comment_list_url = serializers.SerializerMethodField("get_endorsed_comment_list_url")
+    non_endorsed_comment_list_url = serializers.SerializerMethodField("get_non_endorsed_comment_list_url")
 
     def __init__(self, *args, **kwargs):
         super(ThreadSerializer, self).__init__(*args, **kwargs)
@@ -154,6 +163,32 @@ class ThreadSerializer(_ContentSerializer):
         thread.
         """
         return obj["id"] in self.context["cc_requester"]["subscribed_thread_ids"]
+
+    def get_comment_list_url(self, obj, endorsed=None):
+        """
+        Returns the URL to retrieve the thread's comments, optionally including
+        the endorsed query parameter.
+        """
+        if (
+                (obj["thread_type"] == "question" and endorsed is None) or
+                (obj["thread_type"] == "discussion" and endorsed is not None)
+        ):
+            return None
+        path = reverse("comment-list")
+        query_dict = {"thread_id": obj["id"]}
+        if endorsed is not None:
+            query_dict["endorsed"] = endorsed
+        return self.context["request"].build_absolute_uri(
+            urlunparse(("", "", path, "", urlencode(query_dict), ""))
+        )
+
+    def get_endorsed_comment_list_url(self, obj):
+        """Returns the URL to retrieve the thread's endorsed comments."""
+        return self.get_comment_list_url(obj, endorsed=True)
+
+    def get_non_endorsed_comment_list_url(self, obj):
+        """Returns the URL to retrieve the thread's non-endorsed comments."""
+        return self.get_comment_list_url(obj, endorsed=False)
 
 
 class CommentSerializer(_ContentSerializer):

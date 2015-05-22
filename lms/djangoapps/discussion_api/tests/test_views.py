@@ -158,6 +158,9 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "vote_count": 4,
             "comment_count": 5,
             "unread_comment_count": 3,
+            "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
+            "endorsed_comment_list_url": None,
+            "non_endorsed_comment_list_url": None,
         }]
         self.register_get_threads_response(source_threads, page=1, num_pages=2)
         response = self.client.get(self.url, {"course_id": unicode(self.course.id)})
