@@ -82,8 +82,7 @@ def refund_seat(course_enrollment, request_user):
 
     try:
         refund_ids = ecommerce_api_client(request_user or unenrolled_user).refunds.post(
-            course_id=course_key_str,
-            username=unenrolled_user.username,
+            {'course_id': course_key_str, 'username': unenrolled_user.username}
         )
     except HttpClientError, exc:
         if exc.response.status_code == 403 and request_user != unenrolled_user:
