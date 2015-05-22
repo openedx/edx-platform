@@ -54,28 +54,19 @@ class CourseStructure(TimeStampedModel):
             self._traverse_tree(child_node, unordered_structure, ordered_blocks, parent=block)
 
 import django
-from base64 import b32encode
 from django.db.models.fields import *
+from django.utils.timezone import UTC
+from base64 import b32encode
 
+from xmodule.partitions.partitions import NoSuchUserPartitionError
 
-class CourseOverviewCacheModel(django.db.models.Model):
+# TODO: is this the proper way of importing from local apps?
+from common.lib.xmodule.xmodule.course_module import CourseFields
+from common.lib.xmodule.xmodule.fields import Date
 
-    # Source: CourseFields
-    enrollment_start = DateField()
-    enrollment_end = DateField()
-    start = DateField()
-    end = DateField()
-    pre_requisite_courses = TextField()  # JSON representation of a list of course keys
-    end_of_course_survey_url = TextField()
-    display_name = TextField()
-    mobile_available = BooleanField()
-    facebook_url = TextField()
-    enrollment_domain = TextField()
-    certificates_display_behavior = TextField()
-    display_organization = TextField()
-    display_coursenumber = TextField()
-    invitation_only = BooleanField()
-    catalog_visibility = TextField()
+class CourseOverviewFields(django.db.models.Model):
+
+    # TODO me: figure out (de)serialization of objects
 
     # Source: InheritanceMixin
     user_partitions = TextField()  # JSON representation of a UserPartitionList
@@ -88,13 +79,51 @@ class CourseOverviewCacheModel(django.db.models.Model):
     visible_to_staff_only = BooleanField()
     group_access = TextField()  # JSON represnetation of a GroupAccessDict
 
-class CourseOverview(CourseOverviewFields):
+    # Source: CourseFields
+    enrollment_start = DateField()
+    enrollment_end = DateField()
+    start = DateField()
+    end = DateField()
+    advertised_start = TextField()
+    pre_requisite_courses = TextField()  # JSON representation of a list of course keys
+    end_of_course_survey_url = TextField()
+    display_name = TextField()
+    mobile_available = BooleanField()
+    facebook_url = TextField()
+    enrollment_domain = TextField()
+    certificates_display_behavior = TextField()
+    display_organization = TextField()
+    display_coursenumber = TextField()
+    invitation_only = BooleanField()
+    catalog_visibility = TextField()
+    social_sharing_url = TextField()
+    cert_name_short = TextField()
+    cert_name_long = TextField()
+
+class CourseOverviewDescriptor(CourseOverviewFields):
+
+    # Source XModuleMixin
+
+    @property
+    def url_name(self):
+        return self.location.name
+
+    @property
+    def display_name_with_default(self):
+        """
+        Return a display name for the module: use display_name if defined in
+        metadata, otherwise convert the url name.
+        """
+        name = self.display_name
+        if name is None:
+            name = self.url_name.replace('_', ' ')
+        return name.replace('<', '&lt;').replace('>', '&gt;')
 
     # Source: LmsBlockMixin
 
     @property
     def merged_group_access(self):
-        # TODO: confirm simplifying assumption that self.get_parent() is None
+        # TODO me: confirm simplifying assumption that self.get_parent() is None
         return self.group_access or {}
 
     def _get_user_partition(self, user_partition_id):
@@ -108,7 +137,14 @@ class CourseOverview(CourseOverviewFields):
 
         raise NoSuchUserPartitionError("could not find a UserPartition with ID [{}]".format(user_partition_id))
 
-    # Source:
+    # Source: CourseDescriptor
+
+    def may_certify(self):
+        """
+        Return True if it is acceptable to show the student a certificate download link
+        """
+        show_early = self.certificates_display_behavior in ('early_with_info', 'early_no_info') or self.certificates_show_before_end
+        return show_early or self.has_ended()
 
     def has_ended(self):
         """
@@ -120,20 +156,77 @@ class CourseOverview(CourseOverviewFields):
 
         return datetime.now(UTC()) > self.end
 
+    def has_started(self):
+        return datetime.now(UTC()) > self.start
+
+    @property
+    def id(self):
+        """Return the course_id for this course"""
+        return self.location.course_key
+
+    def start_datetime_text(self, format_string="SHORT_DATE"):
+        """
+        Returns the desired text corresponding the course's start date and time in UTC.  Prefers .advertised_start,
+        then falls back to .start
+        """
+        # TODO me: how to get runtime? Or if we can't, should we just cache this property?
+        i18n = self.runtime.service(self, "i18n")
+        _ = i18n.ugettext
+        strftime = i18n.strftime
+
+        def try_parse_iso_8601(text):
+            try:
+                result = Date().from_json(text)
+                if result is None:
+                    result = text.title()
+                else:
+                    result = strftime(result, format_string)
+                    if format_string == "DATE_TIME":
+                        result = self._add_timezone_string(result)
+            except ValueError:
+                result = text.title()
+
+            return result
+
+        if isinstance(self.advertised_start, basestring):
+            return try_parse_iso_8601(self.advertised_start)
+        elif self.start_date_is_still_default:
+            # Translators: TBD stands for 'To Be Determined' and is used when a course
+            # does not yet have an announced start date.
+            return _('TBD')
+        else:
+            when = self.advertised_start or self.start
+
+            if format_string == "DATE_TIME":
+                return self._add_timezone_string(strftime(when, format_string))
+
+            return strftime(when, format_string)
+
+    @property
+    def start_date_is_still_default(self):
+        """
+        Checks if the start date set for the course is still default, i.e. .start has not been modified,
+        and .advertised_start has not been set.
+        """
+        return self.advertised_start is None and self.start == CourseFields.start.default
+
+    def end_datetime_text(self, format_string="SHORT_DATE"):
+        """
+        Returns the end date or date_time for the course formatted as a string.
+
+        If the course does not have an end date set (course.end is None), an empty string will be returned.
+        """
+        if self.end is None:
+            return ''
+        else:
+            # TODO me: how to get runtime? Or if we can't, should we just cache this property?
+            strftime = self.runtime.service(self, "i18n").strftime
+            date_time = strftime(self.end, format_string)
+            return date_time if format_string == "SHORT_DATE" else self._add_timezone_string(date_time)
+
     @property
     def number(self):
         return self.location.course
-
-
-    def may_certify(self):
-        """
-        Return True if it is acceptable to show the student a certificate download link
-        """
-        show_early = self.certificates_display_behavior in ('early_with_info', 'early_no_info') or self.certificates_show_before_end
-        return show_early or self.has_ended()
-
-    def has_started(self):
-        return datetime.now(UTC()) > self.start
 
     @property
     def display_number_with_default(self):
@@ -144,15 +237,6 @@ class CourseOverview(CourseOverviewFields):
             return self.display_coursenumber
 
         return self.number
-
-    @property
-    def number(self):
-        return self.location.course
-
-    @property
-    def id(self):
-        """Return the course_id for this course"""
-        return self.location.course_key
 
     @property
     def org(self):
@@ -167,7 +251,6 @@ class CourseOverview(CourseOverviewFields):
             return self.display_organization
 
         return self.org
-
 
     def clean_id(self, padding_char='='):
         """
