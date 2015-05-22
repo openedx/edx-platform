@@ -20,27 +20,6 @@
   <div style="display: block; clear: both; height: 1px;"></div>
   % endif
 
-  <section class="discussion container" id="discussion-container"
-           data-roles="${roles}"
-           data-course-id="${course_id}"
-           data-user-info="${user_info}"
-           data-threads="${threads}"
-           data-thread-pages="${thread_pages}"
-           data-content-info="${annotated_content_info}"
-           data-sort-preference="${sort_preference}"
-           data-flag-moderator="${flag_moderator}"
-           data-user-cohort-id="${user_cohort}"
-           data-course-settings="${course_settings}">
-    <div class="discussion-body">
-      <div class="forum-nav"></div>
-      <div class="discussion-column">
-        <article class="new-post-article" style="display: none"></article>
-        <div class="forum-content"></div>
-      </div>
-    </div>
-  </section>
-
-  <%include file="_underscore_templates.html" />
-  <%include file="_thread_list_template.html" />
+  <%include file="_course_discussion_section.html" />
 
 </div>
