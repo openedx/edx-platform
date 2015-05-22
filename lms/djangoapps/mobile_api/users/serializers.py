@@ -13,6 +13,8 @@ class CourseField(serializers.RelatedField):
     """Custom field to wrap a CourseDescriptor object. Read-only."""
 
     def to_native(self, course):
+        # TODO next: change course -> course_overview
+
         course_id = unicode(course.id)
         request = self.context.get('request', None)
         if request:
