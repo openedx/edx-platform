@@ -186,6 +186,17 @@
         // TYPE: success
         &.item-progresspoint-success {
 
+          .item-progresspoint-success-date {
+            display: none;
+            margin-left: 5px;
+          }
+
+          &.is-complete {
+
+            .item-progresspoint-success-date {
+              display: inline;
+            }
+          }
         }
 
 
@@ -217,6 +228,8 @@
           }
 
           .fa-cog {
+            @include animation(fa-spin 2s infinite linear);
+
             visibility: visible;
             opacity: 1.0;
           }

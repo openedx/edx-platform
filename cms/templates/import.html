@@ -115,7 +115,7 @@ else:
 
             <li class="item-progresspoint item-progresspoint-unpack is-started">
               <span class="deco status-visual">
-                <i class="icon fa fa-cog fa-spin"></i>
+                <i class="icon fa fa-cog"></i>
                 <i class="icon fa fa-warning"></i>
               </span>
 
@@ -167,7 +167,10 @@ else:
               </span>
 
               <div class="status-detail">
-                <h3 class="title">${_("Success")}</h3>
+                <h3 class="title">
+                  ${_("Success")}
+                  <span class="item-progresspoint-success-date"></span>
+                </h3>
                 <p class="copy">
                     %if library:
                         ${_("Your imported content has now been integrated into this library")}
