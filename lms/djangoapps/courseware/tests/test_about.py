@@ -2,7 +2,6 @@
 Test the about xblock
 """
 import datetime
-from openedx.core.lib.tests.assertions.events import assert_event_matches
 import pytz
 
 from django.conf import settings
@@ -182,22 +181,6 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, EventTrackingT
         url = reverse('about_course', args=[unicode(pre_requisite_course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
-
-    def test_badge_criteria_event(self):
-        """
-        Verify that the proper analytics event is sent when someone looks at the criteria link in a badge.
-        """
-        self.recreate_tracker()
-        url = reverse('about_course', args=[unicode(self.course.id)])
-        url += '?mode=honor&badge_referred=True'
-        self.client.get(url)
-        assert_event_matches({
-            'name': 'edx.badges.badge.criteria_visit',
-            'data': {
-                'course_id': unicode(self.course.id),
-                'enrollment_mode': 'honor'
-            }
-        }, self.get_event())
 
 
 @attr('shard_1')
