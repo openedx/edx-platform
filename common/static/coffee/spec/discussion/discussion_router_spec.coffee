@@ -132,6 +132,33 @@ describe 'DiscussionRouter', ->
       }),
     ]
 
+    @other_threads = {
+      '12': DiscussionViewSpecHelper.makeThreadWithProps({
+        id: "12",
+        title: "Thread12",
+        votes: {up_count: '74'},
+        comments_count: 0,
+        pinned: false,
+        created_at: '2015-04-03T20:05:39Z',
+      }),
+      '15': DiscussionViewSpecHelper.makeThreadWithProps({
+        id: "15",
+        title: "Thread15",
+        votes: {up_count: '92'},
+        comments_count: 0,
+        pinned: true,
+        created_at: '2015-05-01T19:4:03Z',
+      }),
+      '112': DiscussionViewSpecHelper.makeThreadWithProps({
+        id: "112",
+        title: "Thread112",
+        votes: {up_count: '1'},
+        comments_count: 2,
+        pinned: false,
+        created_at: '2015-06-09T20:05:39Z',
+      })
+    }
+
     spyOn(DiscussionUtil, 'makeWmdEditor')
     @discussion = new Discussion(_.map(@threads, (thread_spec) -> new Thread(thread_spec)), {pages: 2, sort: 'date'})
     @course_settings = new DiscussionCourseSettings({
@@ -159,23 +186,27 @@ describe 'DiscussionRouter', ->
         spyOn(@router, 'renderThreadView')
         # precondition check - thread is in router's collection
         expect(@router.discussion.get(thread_id)).not.toBeUndefined()
+
         @router.showThread("irrelevant forum name", thread_id)
         expect($.ajax).not.toHaveBeenCalled()
         expect(@router.renderThreadView).toHaveBeenCalled()
+        expect(@router.thread.id).toBe(thread_id)
 
     missingCheck = (forum_name, thread_id) ->
       it "requests thread #{thread_id} in forum #{forum_name} if not already in collection", ->
 
         DiscussionSpecHelper.makeAjaxSpy(
-          (params) -> expect(params.url.path()).toBe(DiscussionUtil.urlFor('retrieve_single_thread', forum_name, thread_id))
+          (params) =>
+            expect(params.url.path()).toBe(DiscussionUtil.urlFor('retrieve_single_thread', forum_name, thread_id))
+            params.success({content: @other_threads[thread_id]})
         )
         spyOn(@router, 'renderThreadView')
-        # precondition check - thread is in router's collection
+        # precondition check - thread is not in router's collection
         expect(@router.discussion.get(thread_id)).toBeUndefined()
+
         @router.showThread(forum_name, thread_id)
-        # in this case showThread makes a hidden async ajax request - it's hard to hook inot it, so it's simpler and
-        # sufficient to just schedule assertion to run as soon as possible, but not immediately
-        setTimeout (() -> expect(@router.renderThreadView).toHaveBeenCalled()), 0
+        expect(@router.renderThreadView).toHaveBeenCalled()
+        expect(@router.thread.id).toBe(thread_id)
 
 
     existingCheck('1')
