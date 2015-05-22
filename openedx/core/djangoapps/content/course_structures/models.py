@@ -69,6 +69,7 @@ from xblock.fields import List
 class CourseOverviewFields(django.db.models.Model):
 
     # Source: None; specific to this class
+    id = CharField(max_length=255, unique=True, db_index=True)
     modulestore_type = CharField(max_length=5)  # 'split', 'mongo', or 'xml'
 
     # TODO me: find out where these variables are from...
@@ -162,11 +163,6 @@ class CourseOverviewDescriptor(CourseOverviewFields):
 
     def has_started(self):
         return datetime.now(UTC()) > self.start
-
-    @property
-    def id(self):
-        """Return the course_id for this course"""
-        return self.location.course_key
 
     def start_datetime_text(self, format_string="SHORT_DATE"):
         """
