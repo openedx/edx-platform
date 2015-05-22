@@ -768,8 +768,6 @@ STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
 ]
-for ui_app in ["teams"]:
-    STATICFILES_DIRS += [ PROJECT_ROOT / "djangoapps" / ui_app / "static" ]
 
 FAVICON_PATH = 'images/favicon.ico'
 
@@ -2117,6 +2115,7 @@ for app_name in OPTIONAL_APPS:
         except ImportError:
             continue
     INSTALLED_APPS += (app_name,)
+
 
 # Stub for third_party_auth options.
 # See common/djangoapps/third_party_auth/settings.py for configuration details.
