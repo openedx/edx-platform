@@ -44,7 +44,6 @@ define(['jquery', 'js/utils/dropdown'], function($) {
             }
 
             it('opens the menu on button click', function() {
-                // console.log(button.length);
                 button.focus();
                 button.click();
                 expect(button).toHaveClass('is-active');

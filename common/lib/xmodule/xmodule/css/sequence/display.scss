@@ -45,7 +45,6 @@ $sequence--border-color: #C8C8C8;
   }
 
   .left-shadow {
-    @extend %ui-depth4;
     @include linear-gradient(left, $shadow, $transparent);
     position: absolute;
     top: 0;
@@ -57,7 +56,6 @@ $sequence--border-color: #C8C8C8;
   }
 
   .right-shadow {
-    @extend %ui-depth4;
     @include linear-gradient(right, $shadow, $transparent);
     position: absolute;
     top: 0;
@@ -69,7 +67,6 @@ $sequence--border-color: #C8C8C8;
   }
 
   .sequence-list-wrapper {
-    @extend %ui-depth2;
     @include linear-gradient(top, #ddd, #eee);
     position: relative;
     border: 1px solid $gray-l3;
@@ -242,7 +239,6 @@ $sequence--border-color: #C8C8C8;
 }
 
 .sequence-nav-button {
-  @extend %ui-depth3;
   @include transition(all .2s $ease-in-out-quad 0s);
   position: absolute;
   display: block;
