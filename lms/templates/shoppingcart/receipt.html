@@ -79,7 +79,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
             % if reg_code_info['is_redeemed']:
             <td>${reg_code_info['redemption_url']}</td>
             % else:
-            <td><a href="${reg_code_info['redemption_url']}" data-base-url="${site_name}">${reg_code_info['redemption_url']}</a></td>
+            <td><a class="redemption-url" href="${reg_code_info['redemption_url']}" data-base-url="${site_name}">${reg_code_info['redemption_url']}</a></td>
             % endif
             <td>
               % if reg_code_info['is_redeemed']:
@@ -304,17 +304,16 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
               </span>
             </h3>
 
-            <h1>${_(" {course_name} ").format(course_name=course.display_name)}
-              <span class="pull-right">
-                % if course_start_time:
-                  ${course_start_time}
-                %endif
-                -
-                % if course_end_time:
-                  ${course_end_time}
-                %endif
-              </span>
-            </h1>
+            <h1>${course.display_name}</h1>
+            <span class="pull-right">
+              % if course_start_time:
+                ${course_start_time}
+              %endif
+              -
+              % if course_end_time:
+                ${course_end_time}
+              %endif
+            </span>
             <hr/>
             <div class="three-col">
               % if item.status == "purchased":
