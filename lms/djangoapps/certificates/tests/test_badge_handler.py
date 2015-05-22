@@ -179,4 +179,3 @@ class BadgeHandlerTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         badge = BadgeAssertion.objects.get(user=self.user, course_id=self.course.location.course_key)
         self.assertEqual(badge.data, result)
         self.assertEqual(badge.image_url, 'http://www.example.com/example.png')
-

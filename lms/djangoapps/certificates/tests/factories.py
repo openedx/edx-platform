@@ -29,6 +29,8 @@ class CertificateWhitelistFactory(DjangoModelFactory):
 class BadgeAssertionFactory(DjangoModelFactory):
     FACTORY_FOR = BadgeAssertion
 
+    mode = 'honor'
+
 
 class BadgeImageConfigurationFactory(DjangoModelFactory):
 

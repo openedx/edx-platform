@@ -13,12 +13,22 @@ class Migration(SchemaMigration):
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
             ('course_id', self.gf('xmodule_django.models.CourseKeyField')(default=None, max_length=255, blank=True)),
+            ('mode', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('data', self.gf('django.db.models.fields.TextField')(default='{}')),
         ))
         db.send_create_signal('certificates', ['BadgeAssertion'])
 
         # Adding unique constraint on 'BadgeAssertion', fields ['course_id', 'user']
         db.create_unique('certificates_badgeassertion', ['course_id', 'user_id'])
+
+        # Adding model 'BadgeImageConfiguration'
+        db.create_table('certificates_badgeimageconfiguration', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('mode', self.gf('django.db.models.fields.CharField')(unique=True, max_length=125)),
+            ('icon', self.gf('django.db.models.fields.files.ImageField')(max_length=100)),
+            ('default', self.gf('django.db.models.fields.BooleanField')(default=False)),
+        ))
+        db.send_create_signal('certificates', ['BadgeImageConfiguration'])
 
 
     def backwards(self, orm):
@@ -27,6 +37,9 @@ class Migration(SchemaMigration):
 
         # Deleting model 'BadgeAssertion'
         db.delete_table('certificates_badgeassertion')
+
+        # Deleting model 'BadgeImageConfiguration'
+        db.delete_table('certificates_badgeimageconfiguration')
 
 
     models = {
@@ -64,7 +77,15 @@ class Migration(SchemaMigration):
             'course_id': ('xmodule_django.models.CourseKeyField', [], {'default': 'None', 'max_length': '255', 'blank': 'True'}),
             'data': ('django.db.models.fields.TextField', [], {'default': "'{}'"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'mode': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
+        },
+        'certificates.badgeimageconfiguration': {
+            'Meta': {'object_name': 'BadgeImageConfiguration'},
+            'default': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'icon': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'mode': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '125'})
         },
         'certificates.certificategenerationconfiguration': {
             'Meta': {'object_name': 'CertificateGenerationConfiguration'},
@@ -98,7 +119,7 @@ class Migration(SchemaMigration):
         },
         'certificates.examplecertificate': {
             'Meta': {'object_name': 'ExampleCertificate'},
-            'access_key': ('django.db.models.fields.CharField', [], {'default': "'62ae426a07c44e19927c2fb90801a0cc'", 'max_length': '255', 'db_index': 'True'}),
+            'access_key': ('django.db.models.fields.CharField', [], {'default': "'fa917079f0aa4f969e92bd8722d082c6'", 'max_length': '255', 'db_index': 'True'}),
             'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
             'description': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'download_url': ('django.db.models.fields.CharField', [], {'default': 'None', 'max_length': '255', 'null': 'True'}),
@@ -109,7 +130,7 @@ class Migration(SchemaMigration):
             'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'}),
             'status': ('django.db.models.fields.CharField', [], {'default': "'started'", 'max_length': '255'}),
             'template': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'uuid': ('django.db.models.fields.CharField', [], {'default': "'1e1e36b80e30466abfa6d0ee3fd8a97b'", 'unique': 'True', 'max_length': '255', 'db_index': 'True'})
+            'uuid': ('django.db.models.fields.CharField', [], {'default': "'ac948bae296c4d54a87bdd3e6c177adf'", 'unique': 'True', 'max_length': '255', 'db_index': 'True'})
         },
         'certificates.examplecertificateset': {
             'Meta': {'object_name': 'ExampleCertificateSet'},

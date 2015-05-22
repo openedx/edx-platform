@@ -586,6 +586,8 @@ class BadgeAssertion(models.Model):
     """
     user = models.ForeignKey(User)
     course_id = CourseKeyField(max_length=255, blank=True, default=None)
+    # Mode a badge was awarded for.
+    mode = models.CharField(max_length=100)
     data = JSONField()
 
     @property
