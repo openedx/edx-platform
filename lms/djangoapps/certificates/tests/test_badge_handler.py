@@ -179,16 +179,4 @@ class BadgeHandlerTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         badge = BadgeAssertion.objects.get(user=self.user, course_id=self.course.location.course_key)
         self.assertEqual(badge.data, result)
         self.assertEqual(badge.image_url, 'http://www.example.com/example.png')
-        assert_event_matches({
-            'name': 'edx.badges.assertion.created',
-            'data': {
-                'user_id': self.user.id,
-                'course_id': unicode(self.course.location.course_key),
-                'enrollment_mode': 'honor',
-                'assertion_image_url': 'http://www.example.com/example.png',
-                'assertion_json_url': 'http://www.example.com/example',
-                'assertion_slug': 'test_assertion_slug',
-                'badge_slug': 'edxcourse_testtest_run_honor_fc5519b',
-                'issuer': 'https://example.com/v1/issuer/issuers/test-issuer',
-            }
-        }, self.get_event())
+
