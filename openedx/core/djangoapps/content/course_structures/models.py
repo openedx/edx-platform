@@ -53,7 +53,6 @@ class CourseStructure(TimeStampedModel):
         for child_node in cur_block['children']:
             self._traverse_tree(child_node, unordered_structure, ordered_blocks, parent=block)
 
-'''
 import django
 from django.db.models.fields import *
 from django.utils.timezone import UTC
@@ -61,38 +60,42 @@ from base64 import b32encode
 
 from xmodule.partitions.partitions import NoSuchUserPartitionError
 
-# TODO: is this the proper way of importing from local apps?
-from common.lib.xmodule.xmodule.course_module import CourseFields
-from common.lib.xmodule.xmodule.fields import Date
+# TODO me: is this the proper way of importing from local apps?
+from xmodule.course_module import CourseFields
+from xmodule.fields import Date
+from lms.djangoapps.lms_xblock.mixin import GroupAccessDict
+from xblock.fields import List
 
 class CourseOverviewFields(django.db.models.Model):
 
-    # TODO me: figure out (de)serialization of objects
+    # Source: None; specific to this class
+    modulestore_type = CharField(max_length=5)  # 'split', 'mongo', or 'xml'
 
-    # Source: InheritanceMixin
-    user_partitions = TextField()  # JSON representation of a UserPartitionList
-
-    # Source: XModuleMixin
-    location = CharField(max_length=255)  # TODO: confirm this is the correct way to store
-
-    # Source: LmsBlockMixin
+    # TODO me: find out where these variables are from...
+    # it might be InheritanceMixin and LmsBlockMixin, but those aren't in CourseDescriptor's inheritance tree
+    user_partitions = ???   # TODO me: how to store UserParitionList
+    static_asset_path = TextField()
     ispublic = BooleanField()
     visible_to_staff_only = BooleanField()
-    group_access = TextField()  # JSON represnetation of a GroupAccessDict
+    group_access = ???  # TODO me: how to store GroupAccessDict
 
-    # Source: CourseFields
+    # Source: XModuleMixin (x_module.py)
+    location = ???
+
+    # Source: CourseFields (course_module.py)
     enrollment_start = DateField()
     enrollment_end = DateField()
     start = DateField()
     end = DateField()
     advertised_start = TextField()
-    pre_requisite_courses = TextField()  # JSON representation of a list of course keys
+    pre_requisite_courses = ???  # TODO me: how to store list of course_ids
     end_of_course_survey_url = TextField()
     display_name = TextField()
     mobile_available = BooleanField()
     facebook_url = TextField()
     enrollment_domain = TextField()
     certificates_display_behavior = TextField()
+    course_image = TextField()
     display_organization = TextField()
     display_coursenumber = TextField()
     invitation_only = BooleanField()
@@ -102,6 +105,24 @@ class CourseOverviewFields(django.db.models.Model):
     cert_name_long = TextField()
 
 class CourseOverviewDescriptor(CourseOverviewFields):
+
+    # TODO me: find out where these methods are from...
+    # it might be LmsBlockMixin, but it isn't in CourseDescriptor's inheritance tree
+
+    @property
+    def merged_group_access(self):
+        return self.group_access or {}
+
+    def _get_user_partition(self, user_partition_id):
+        """
+        Returns the user partition with the specified id.  Raises
+        `NoSuchUserPartitionError` if the lookup fails.
+        """
+        for user_partition in self.user_partitions:
+            if user_partition.id == user_partition_id:
+                return user_partition
+
+        raise NoSuchUserPartitionError("could not find a UserPartition with ID [{}]".format(user_partition_id))
 
     # Source XModuleMixin
 
@@ -120,25 +141,7 @@ class CourseOverviewDescriptor(CourseOverviewFields):
             name = self.url_name.replace('_', ' ')
         return name.replace('<', '&lt;').replace('>', '&gt;')
 
-    # Source: LmsBlockMixin
-
-    @property
-    def merged_group_access(self):
-        # TODO me: confirm simplifying assumption that self.get_parent() is None
-        return self.group_access or {}
-
-    def _get_user_partition(self, user_partition_id):
-        """
-        Returns the user partition with the specified id.  Raises
-        `NoSuchUserPartitionError` if the lookup fails.
-        """
-        for user_partition in self.user_partitions:
-            if user_partition.id == user_partition_id:
-                return user_partition
-
-        raise NoSuchUserPartitionError("could not find a UserPartition with ID [{}]".format(user_partition_id))
-
-    # Source: CourseDescriptor
+     # Source: CourseDescriptor
 
     def may_certify(self):
         """
@@ -261,7 +264,7 @@ class CourseOverviewDescriptor(CourseOverviewFields):
         return "course_{}".format(
             b32encode(unicode(self.location.course_key)).replace('=', padding_char)
         )
-'''
+
 
 # Signals must be imported in a file that is automatically loaded at app startup (e.g. models.py). We import them
 # at the end of this file to avoid circular dependencies.

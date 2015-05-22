@@ -235,7 +235,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
             user__username=self.kwargs['username'],
             is_active=True
         ).order_by('created').reverse()
-        # TODO next: change course -> course_overview
+        # TODO me: change course -> course_overview
         return [
             enrollment for enrollment in enrollments
             if enrollment.course and is_mobile_available_for_user(self.request.user, enrollment.course)

@@ -831,7 +831,7 @@ class CourseEnrollment(models.Model):
     scattered across our views.
     """
 
-    # TODO next: make sure changing course -> course_overview doesn't break everything
+    # TODO me: make sure changing course -> course_overview doesn't break everything
 
     MODEL_TAGS = ['course_id', 'is_active', 'mode']
 
@@ -1307,7 +1307,8 @@ class CourseEnrollment(models.Model):
     def username(self):
         return self.user.username
 
-    # TODO next: change this to course_overview
+    # TODO me: change this to course_overview
+    # TODO me: make this cache return value in RAM
     @property
     def course(self):
         return modulestore().get_course(self.course_id)

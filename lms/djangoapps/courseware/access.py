@@ -91,7 +91,7 @@ def has_access(user, action, obj, course_key=None):
     if not user:
         user = AnonymousUser()
 
-    # TODO next: add CourseOverviewFields case
+    # TODO me: add CourseOverviewFields case
 
     # delegate the work to type-specific functions.
     # (start with more specific types, then get more general)
@@ -233,7 +233,7 @@ def _has_access_course_desc(user, action, course):
                 DEPRECATION_VSCOMPAT_EVENT,
                 tags=(
                     "location:has_access_course_desc_see_exists",
-                    u"course:{}".format(course),  # TODO next: figure out if this will cause problem with CourseOverviewFields
+                    u"course:{}".format(course),  # TODO me: figure out if this will cause problem with CourseOverviewFields
                 )
             )
 
@@ -649,7 +649,7 @@ def _has_staff_access_to_descriptor(user, descriptor, course_key):
 
 
 def is_mobile_available_for_user(user, course):
-    # TODO next: change course -> course_overview
+    # TODO me: see who uses this, and possibly change course -> course_overview
     """
     Returns whether the given course is mobile_available for the given user.
     Checks:

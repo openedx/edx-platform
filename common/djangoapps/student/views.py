@@ -231,7 +231,7 @@ def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
     Get the relevant set of (Course, CourseEnrollment) pairs to be displayed on
     a student's dashboard.
     """
-    # TODO next: make this not return tuples anymore because that's dumb
+    # TODO me: make this not return tuples anymore because that's dumb
     for enrollment in CourseEnrollment.enrollments_for_user(user):
         store = modulestore()
         with store.bulk_operations(enrollment.course_id):
