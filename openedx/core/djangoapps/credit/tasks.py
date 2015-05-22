@@ -7,7 +7,7 @@ from celery.utils.log import get_task_logger
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
-from api import set_credit_requirements
+from .api import set_credit_requirements
 from openedx.core.djangoapps.credit.exceptions import InvalidCreditRequirements
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -48,5 +48,5 @@ def get_min_grade_for_credit(course):
     """
     try:
         return course.min_grade
-    except:
+    except:  # pylint: disable=bare-except
         return 0.8

@@ -102,6 +102,13 @@ class ModelTestCases(ModuleStoreTestCase):
         self.assertEquals(len(requirements), 1)
 
     def add_credit_course(self):
+        """ Add the course as a credit
+
+        Returns:
+            CreditCourse object added
+
+        """
+
         credit_course = CreditCourse(course_key=self.course_key, enabled=True)
         credit_course.save()
         return credit_course

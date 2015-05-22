@@ -3,7 +3,7 @@
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from openedx.core.djangoapps.credit.exceptions import InvalidCreditRequirements
-from openedx.core.djangoapps.credit.models import CreditCourse, CreditRequirement
+from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.djangoapps.credit.api import set_credit_requirements, get_credit_requirements
 
 
@@ -47,14 +47,14 @@ class ApiTestCases(ModuleStoreTestCase):
                 "namespace": "grade",
                 "name": "grade",
                 "configuration": {
-                        "min_grade": 0.8
+                    "min_grade": 0.8
                 }
             },
             {
                 "namespace": "grade",
                 "name": "grade",
                 "configuration": {
-                        "min_grade": 0.8
+                    "min_grade": 0.8
                 }
             }
         ]

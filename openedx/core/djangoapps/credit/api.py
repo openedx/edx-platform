@@ -1,7 +1,7 @@
 """ Contains the APIs for course credit requirements """
 
-from models import CreditRequirement, CreditCourse
-from exceptions import InvalidCreditRequirements
+from .models import CreditRequirement, CreditCourse
+from .exceptions import InvalidCreditRequirements
 
 
 def set_credit_requirements(course_key, requirements):

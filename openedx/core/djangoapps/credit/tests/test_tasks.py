@@ -2,9 +2,6 @@
 
 from datetime import datetime
 
-from django.utils.timezone import UTC
-
-from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import SignalHandler
 from openedx.core.djangoapps.credit.api import get_credit_requirements
@@ -49,6 +46,13 @@ class TestTaskExecution(ModuleStoreTestCase):
         self.assertEquals(len(requirements), 1)
 
     def add_credit_course(self, course_key):
+        """ Add the course as a credit
+
+        Args:
+            course_key(CourseKey): identifier for the course
+        Returns:
+            CreditCourse object added
+        """
         credit_course = CreditCourse(course_key=course_key, enabled=True)
         credit_course.save()
         return credit_course

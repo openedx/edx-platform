@@ -2,4 +2,5 @@
 
 
 class InvalidCreditRequirements(Exception):
+    """ Contains exceptions related to credit module """
     pass
