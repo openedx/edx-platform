@@ -830,6 +830,9 @@ class CourseEnrollment(models.Model):
     checking course dates, user permissions, etc.) This logic is currently
     scattered across our views.
     """
+
+    # TODO next: make sure changing course -> course_overview doesn't break everything
+
     MODEL_TAGS = ['course_id', 'is_active', 'mode']
 
     user = models.ForeignKey(User)
@@ -1304,6 +1307,7 @@ class CourseEnrollment(models.Model):
     def username(self):
         return self.user.username
 
+    # TODO next: change this to course_overview
     @property
     def course(self):
         return modulestore().get_course(self.course_id)

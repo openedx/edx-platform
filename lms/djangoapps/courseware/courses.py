@@ -114,6 +114,8 @@ def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=
 
 
 def course_image_url(course):
+    # TODO next: note that this is polymorphic between CourseDescriptor and CourseOverviewFields
+    # TODO next: see if modulestore().get_modulestore_type still works
     """Try to look up the image url for the course.  If it's not found,
     log an error and return the dead link"""
     if course.static_asset_path or modulestore().get_modulestore_type(course.id) == ModuleStoreEnum.Type.xml:

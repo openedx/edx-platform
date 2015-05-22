@@ -169,7 +169,6 @@ class TextbookList(List):
                 continue
         return json_data
 
-
 class CourseFields(object):
     lti_passports = List(
         display_name=_("LTI Passports"),
