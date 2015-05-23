@@ -534,6 +534,9 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
         ]) + list(AUTHENTICATION_BACKENDS)
     )
 
+    # third_party_auth config moved to ConfigurationModels. This is for data migration only:
+    THIRD_PARTY_AUTH_OLD_CONFIG = AUTH_TOKENS.get('THIRD_PARTY_AUTH', None)
+
 ##### OAUTH2 Provider ##############
 if FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
     OAUTH_OIDC_ISSUER = ENV_TOKENS['OAUTH_OIDC_ISSUER']
