@@ -162,6 +162,9 @@ setup_instructor_dashboard_sections = (idash_content) ->
     constructor: window.InstructorDashboard.sections.Membership
     $element: idash_content.find ".#{CSS_IDASH_SECTION}#membership"
   ,
+    constructor: window.InstructorDashboard.sections.Queries
+    $element: idash_content.find ".#{CSS_IDASH_SECTION}#queries"
+  ,
     constructor: window.InstructorDashboard.sections.StudentAdmin
     $element: idash_content.find ".#{CSS_IDASH_SECTION}#student_admin"
   ,

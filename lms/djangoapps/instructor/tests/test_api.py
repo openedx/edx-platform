@@ -248,8 +248,7 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
 
         delete_url = reverse('delete_temp_query', kwargs={'course_id': self.course_key})
-        use_delete_url = '/'.join([delete_url, str(query_id)])
-        response = self.client.get(use_delete_url)
+        response = self.client.post(delete_url, {'query_id': query_id})
         return response
 
     def _delete_batch_temp_query(self, query_ids):
@@ -261,7 +260,7 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         delete_args = {
             'existing': ','.join(query_ids),
         }
-        response = self.client.get(delete_url, delete_args)
+        response = self.client.post(delete_url, delete_args)
         return response
 
     def _check_against_students(self, students, correct_list):
@@ -333,8 +332,7 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
 
         delete_url = reverse('delete_saved_query', kwargs={'course_id': self.course_key})
-        use_delete_url = '/'.join([delete_url, str(query_id)])
-        response = self.client.get(use_delete_url)
+        response = self.client.post(delete_url, {'query_id': query_id})
         return response
 
     def _get_saved_queries(self):

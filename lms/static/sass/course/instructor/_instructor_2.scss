@@ -892,7 +892,19 @@ section.instructor-dashboard-content-2 {
       }
     }
   }
+}
 
+// view - queries
+// --------------------
+.instructor-dashboard-wrapper-2 section.idash-section#queries {
+
+  .queries-section {
+    margin-bottom: ($baseline*1.5);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
 
   .email-lists-management {
 
