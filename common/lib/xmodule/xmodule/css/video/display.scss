@@ -35,8 +35,12 @@ div.video {
 
     .video-player {
       position: relative;
-      top: 0 !important;
-      left: 0 !important;
+      &:before {
+        display: block;
+        content: "";
+        width: 100%;
+        padding-top: 55%;
+      }
     }
   }
 

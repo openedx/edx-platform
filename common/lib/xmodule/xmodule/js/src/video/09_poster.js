@@ -36,11 +36,6 @@ define('video/09_poster.js', ['video/00_resizer.js'], function (Resizer) {
                 type: this.options.poster.type
             }));
             this.element.addClass('is-pre-roll');
-            this.resizer = new Resizer({
-                element: this.container,
-                elementRatio: 16/9,
-                container: this.element
-            }).delta.add(47, 'height').setMode('width');
             this.render();
             this.bindHandlers();
         },
