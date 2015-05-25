@@ -1,0 +1,10 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<div class="bookmark-button-wrapper">
+    <button class="btn bookmark-button ${bookmarked}">
+        <i class="fa fa-fw fa-bookmark"></i>
+        ${_("Bookmark")}
+    </button>
+</div>
+
+${frag_content}

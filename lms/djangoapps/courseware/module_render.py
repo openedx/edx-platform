@@ -63,7 +63,8 @@ from openedx.core.lib.xblock_utils import (
     replace_static_urls,
     add_staff_markup,
     wrap_xblock,
-    request_token
+    request_token,
+    add_bookmark_button
 )
 from xmodule.lti_module import LTIModule
 from xmodule.x_module import XModuleDescriptor
@@ -579,6 +580,9 @@ def get_module_system_for_user(user, field_data_cache,
         if has_access(user, 'staff', descriptor, course_id):
             has_instructor_access = has_access(user, 'instructor', descriptor, course_id)
             block_wrappers.append(partial(add_staff_markup, user, has_instructor_access))
+
+    bookmark_button = partial(add_bookmark_button)
+    block_wrappers.append(bookmark_button) if bookmark_button else None
 
     # These modules store data using the anonymous_student_id as a key.
     # To prevent loss of data, we will continue to provide old modules with

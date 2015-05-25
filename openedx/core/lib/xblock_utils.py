@@ -208,6 +208,22 @@ def grade_histogram(module_id):
     return grades
 
 
+@contract(block=XBlock, view=basestring, frag=Fragment, context="dict|None")
+def add_bookmark_button(block, view, frag, context):
+    # bookmarked = block.is_block_bookmarked
+    if isinstance(block, VerticalBlock) and (not context or not context.get('child_of_vertical', False)):
+        # frag.content += render_to_string("bookmark_button.html", {"bookmarked": "bookmarked"})
+        return wrap_fragment(
+            frag,
+            render_to_string(
+                "bookmark_button.html",
+                {'frag_content': frag.content, 'bookmarked': 'bookmarked'}
+            )
+        )
+    else:
+        return frag
+
+
 @contract(user=User, has_instructor_access=bool, block=XBlock, view=basestring, frag=Fragment, context="dict|None")
 def add_staff_markup(user, has_instructor_access, block, view, frag, context):  # pylint: disable=unused-argument
     """
