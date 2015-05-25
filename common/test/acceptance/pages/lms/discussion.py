@@ -464,6 +464,13 @@ class InlineDiscussionThreadPage(DiscussionThreadPage):
     def is_thread_anonymous(self):
         return not self.q(css=".posted-details > .username").present
 
+    @wait_for_js
+    def check_if_selector_is_focused(self, selector):
+        """
+        Check if selector is focused
+        """
+        return self.browser.execute_script("return $('{}').is(':focus')".format(selector))
+
 
 class DiscussionUserProfilePage(CoursePage):
 
