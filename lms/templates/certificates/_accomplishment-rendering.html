@@ -1,4 +1,9 @@
 <%namespace name='static' file='../static_content.html'/>
+<%
+accomplishment_course_title =  accomplishment_copy_course_name
+if certificate_data and certificate_data.get('course_title', ''):
+    accomplishment_course_title =  certificate_data.get('course_title', '')
+%>
 
 <article class="accomplishment accomplishment-main">
 
@@ -25,7 +30,7 @@
                     <span class="accomplishment-course hd-1 emphasized">
                         <span class="accomplishment-course-org">${accomplishment_copy_course_org}  </span>
                         <span class="accomplishment-course-number">101x</span>:
-                        <span class="accomplishment-course-name">${accomplishment_copy_course_name}</span>
+                        <span class="accomplishment-course-name">${accomplishment_course_title}</span>
                     </span>
                 </p>
 
@@ -37,17 +42,19 @@
 
                 <div class="wrapper-signatories">
                     <ul class="list-signatories">
-                        % for signatory in signatories:
-                        <li class="signatory">
-                            <img class="signatory-signature" src="${signatory['signature_image_path']}" alt="${signatory['name']}">
+                        % if certificate_data:
+                            % for signatory in certificate_data.get('signatories', []):
+                            <li class="signatory">
+                                <img class="signatory-signature" src="${static.url(signatory['signature_image_path'])}" alt="${signatory['name']}">
 
-                            <h4 class="signatory-name hd-5">${signatory['name']}</h4>
-                            <p class="signatory-credentials copy copy-micro">
-                                <span class="role">${signatory['title']}</span>
-                                <span class="organization">${signatory['organization']}</span>
-                            </p>
-                        </li>
-                        % endfor
+                                <h4 class="signatory-name hd-5">${signatory['name']}</h4>
+                                <p class="signatory-credentials copy copy-micro">
+                                    <span class="role">${signatory['title']}</span>
+                                    <span class="organization">${signatory['organization']}</span>
+                                </p>
+                            </li>
+                            % endfor
+                        % endif
                     </ul>
                 </div>
             </div>
@@ -58,27 +65,16 @@
                 <ul class="wrapper-orgs list-orgs list-orgs-4+">
                     <li class="wrapper-organization">
                         <div class="organization organization-edX">
-                            <img class="organization-logo" src="${static.url("images/default-theme/logo.png")}" alt="Organization Name">
+                            <img class="organization-logo" src="${static.url('/static/certificates/images/logo-edx.svg')}" alt="open edX">
                         </div>
                     </li>
-
+                    % if certificate_data and certificate_data.get('org_logo_path', ''):
                     <li class="wrapper-organization">
                         <div class="organization organization-harvardX">
-                            <img class="organization-logo" src="${static.url("images/default-theme/logo.png")}" alt="Organization Name">
+                            <img class="organization-logo" src="${static.url(certificate_data['org_logo_path'])}" alt="Organization Name">
                         </div>
                     </li>
-
-                    <li class="wrapper-organization">
-                        <div class="organization organization-MITx">
-                            <img class="organization-logo" src="${static.url("images/default-theme/logo.png")}" alt="Organization Name">
-                        </div>
-                    </li>
-
-                    <li class="wrapper-organization">
-                        <div class="organization organization-UQx">
-                            <img class="organization-logo" src="${static.url("images/default-theme/logo.png")}" alt="Organization Name">
-                        </div>
-                    </li>
+                    % endif
                 </ul>
             </div>
         </div>
