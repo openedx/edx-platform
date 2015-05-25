@@ -1,9 +1,9 @@
 (function (define) {
 'use strict';
-define('video/09_poster.js', ['video/00_resizer.js'], function (Resizer) {
+define('video/09_poster.js', [], function () {
     /**
      * Poster module.
-     * @exports video/09_play_skip_control.js
+     * @exports video/09_poster.js
      * @constructor
      * @param {jquery Element} element
      * @param {Object} options
@@ -14,7 +14,6 @@ define('video/09_poster.js', ['video/00_resizer.js'], function (Resizer) {
         }
 
         _.bindAll(this, 'onClick', 'destroy');
-        this.dfd = $.Deferred();
         this.element = element;
         this.container = element.find('.video-player');
         this.options = options || {};
@@ -41,12 +40,8 @@ define('video/09_poster.js', ['video/00_resizer.js'], function (Resizer) {
         },
 
         bindHandlers: function () {
-            var self = this;
             this.el.on('click', this.onClick);
-            this.element.on('play destroy', this.destroy);
-            $(window).on('resize.poster', _.debounce(function () {
-                self.resizer.align();
-            }, 100));
+            this.element.on('destroy', this.destroy);
         },
 
         render: function () {
@@ -57,13 +52,11 @@ define('video/09_poster.js', ['video/00_resizer.js'], function (Resizer) {
             if (_.isFunction(this.options.onClick)) {
                 this.options.onClick();
             }
+            this.destroy();
         },
 
         destroy: function () {
-            this.element.off('play destroy', this.destroy);
-            $(window).off('resize.poster');
-            this.element.removeClass('is-pre-roll');
-            this.resizer.destroy();
+            this.element.off('destroy', this.destroy).removeClass('is-pre-roll');
             this.el.remove();
         }
     };
