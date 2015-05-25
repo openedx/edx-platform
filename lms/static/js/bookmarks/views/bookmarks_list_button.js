@@ -16,8 +16,6 @@
             },
 
             initialize: function () {
-                this.template = _.template($('#bookmarks_button-tpl').text());
-
                 this.bookmarksListView = new BookmarksListView({
                     collection: new BookmarksCollection(),
                     loadingMessageView: new MessageView({el: $(this.loadingMessageElement)}),

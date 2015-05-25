@@ -126,6 +126,10 @@ div.course-wrapper {
       }
     }
 
+    .sequence .path {
+      margin-bottom: ($baseline/2);
+    }
+
     div#seq_content {
       h1 {
         background: none;
