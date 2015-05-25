@@ -273,6 +273,10 @@ class UploadTestCase(AssetsTestCase):
         resp = self.upload_asset()
         self.assertEquals(resp.status_code, 200)
 
+    def test_upload_image(self):
+        resp = self.upload_asset("test_image", asset_type="image")
+        self.assertEquals(resp.status_code, 200)
+
     def test_no_file(self):
         resp = self.client.post(self.url, {"name": "file.txt"}, "application/json")
         self.assertEquals(resp.status_code, 400)
@@ -436,10 +440,15 @@ class DeleteAssetTestCase(AssetsTestCase):
         # First, upload something.
         self.asset_name = 'delete_test'
         self.asset = self.get_sample_asset(self.asset_name)
+        self.image_asset = self.get_sample_asset(self.asset_name, asset_type="image")
 
         response = self.client.post(self.url, {"name": self.asset_name, "file": self.asset})
         self.assertEquals(response.status_code, 200)
         self.uploaded_url = json.loads(response.content)['asset']['url']
+
+        response = self.client.post(self.url, {"name": self.asset_name, "file": self.image_asset})
+        self.assertEquals(response.status_code, 200)
+        self.uploaded_image_url = json.loads(response.content)['asset']['url']
 
         self.asset_location = AssetLocation.from_deprecated_string(self.uploaded_url)
         self.content = contentstore().find(self.asset_location)
@@ -448,6 +457,13 @@ class DeleteAssetTestCase(AssetsTestCase):
         """ Tests the happy path :) """
         test_url = reverse_course_url(
             'assets_handler', self.course.id, kwargs={'asset_key_string': unicode(self.uploaded_url)})
+        resp = self.client.delete(test_url, HTTP_ACCEPT="application/json")
+        self.assertEquals(resp.status_code, 204)
+
+    def test_delete_image_type_asset(self):
+        """ Tests deletion of image type asset """
+        test_url = reverse_course_url(
+            'assets_handler', self.course.id, kwargs={'asset_key_string': unicode(self.uploaded_image_url)})
         resp = self.client.delete(test_url, HTTP_ACCEPT="application/json")
         self.assertEquals(resp.status_code, 204)
 
@@ -462,6 +478,7 @@ class DeleteAssetTestCase(AssetsTestCase):
         """ Tests the sad path :( """
         test_url = reverse_course_url(
             'assets_handler', self.course.id, kwargs={'asset_key_string': unicode(self.uploaded_url)})
-        self.content.thumbnail_location = '/invalid/thumbnail/location'
+        self.content.thumbnail_location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/invalid')
+        contentstore().save(self.content)
         resp = self.client.delete(test_url, HTTP_ACCEPT="application/json")
         self.assertEquals(resp.status_code, 204)
