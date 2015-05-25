@@ -1,14 +1,14 @@
-""" Module contains the tests for api """
+""" Tests for credit course api """
 
 from opaque_keys.edx.keys import CourseKey
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from openedx.core.djangoapps.credit.api import get_credit_requirements, set_credit_requirements
 from openedx.core.djangoapps.credit.exceptions import InvalidCreditRequirements
 from openedx.core.djangoapps.credit.models import CreditCourse
-from openedx.core.djangoapps.credit.api import set_credit_requirements, get_credit_requirements
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class ApiTestCases(ModuleStoreTestCase):
-    """ Test for models """
+    """ Tests for credit course api """
 
     def setUp(self, **kwargs):
         super(ApiTestCases, self).setUp()

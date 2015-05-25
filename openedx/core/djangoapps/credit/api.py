@@ -1,7 +1,7 @@
 """ Contains the APIs for course credit requirements """
 
-from .models import CreditRequirement, CreditCourse
 from .exceptions import InvalidCreditRequirements
+from .models import CreditCourse, CreditRequirement
 
 
 def set_credit_requirements(course_key, requirements):
@@ -36,6 +36,7 @@ def set_credit_requirements(course_key, requirements):
                         "criteria": {"min_grade": 0.8},
                     },
                 ])
+
     Raises:
         InvalidCreditRequirements
 
@@ -52,14 +53,14 @@ def set_credit_requirements(course_key, requirements):
 
 
 def get_credit_requirements(course_key, namespace=None):
-    """ Returns the requirements of given course and namespace
+    """ Returns the requirements of a given course and namespace
 
     Args:
         course_key(CourseKey): The identifier for course
         namespace(str): Namespace of requirements
 
     Example:
-        >>> get_credit_requirements("course-v1-ASUx-DemoX-1T2015")
+        >>> get_credit_requirements("course-v1-edX-DemoX-1T2015")
                 {
                     requirements =
                     [
@@ -85,6 +86,7 @@ def get_credit_requirements(course_key, namespace=None):
                         },
                     ]
                 }
+
     Returns:
         Dict of requirements in the given namespace
     """

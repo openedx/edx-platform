@@ -8,8 +8,9 @@ successful completion of a course on EdX
 
 import logging
 
-from django.db.utils import IntegrityError
 from django.db import models
+from django.db.utils import IntegrityError
+
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
 from openedx.core.djangoapps.credit.exceptions import InvalidCreditRequirements
@@ -110,11 +111,14 @@ class CreditRequirement(TimeStampedModel):
 
     @classmethod
     def get_course_requirements(cls, course_key, namespace=None):
-        """ Get requirements to given course
+        """ Get credit requirements of a given course
 
         Args:
-            credit_course(CreditCourse): The identifier for credit course course
-            requirements(dict): Dict of requirements to be added
+            course_key(CourseKey): The identifier for a course
+            namespace(str): namespace of credit course requirements
+
+        Returns:
+            QuerySet of CreditRequirement model
         """
         requirements = CreditRequirement.objects.filter(course__course_key=course_key, active=True)
         if namespace:

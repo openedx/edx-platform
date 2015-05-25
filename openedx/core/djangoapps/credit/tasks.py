@@ -1,22 +1,21 @@
-"""
-This file contains celery tasks for credit views
-"""
+""" This file contains celery tasks for credit course views """
 
+from .api import set_credit_requirements
 from celery.task import task
 from celery.utils.log import get_task_logger
-from opaque_keys.edx.keys import CourseKey
-from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
-from .api import set_credit_requirements
+from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.credit.exceptions import InvalidCreditRequirements
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+
 
 LOGGER = get_task_logger(__name__)
 
 
 @task()
 def update_course_requirements(course_id):
-    """ Updates course requirements table for course.
+    """ Updates course requirements table for a course.
 
      Args:
         course_id(str): A string representation of course identifier
@@ -44,8 +43,8 @@ def update_course_requirements(course_id):
 
 
 def get_min_grade_for_credit(course):
-    """ This is a dummy function to continue work.
-    """
+    """ This is a dummy function to continue work. """
+    #  TODO: Remove this function before merging this PR
     try:
         return course.min_grade
     except:  # pylint: disable=bare-except
