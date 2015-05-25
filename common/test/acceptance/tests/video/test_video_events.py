@@ -148,23 +148,24 @@ class VideoEventsTest(VideoEventsTestMixin):
         assert_events_equal(static_fields_pattern, load_video_event)
 
 
-def seek_video_and_skip(video):
-    video.wait_for_position('0:05')
-    video.click_player_button('skip_bumper')
 
-
-def seek_video_and_dismiss(video):
-    video.wait_for_position('0:05')
-    video.click_player_button('do_not_show_again')
-
-
-def wait_for_state(video, state='finished'):
-    video.wait_for_state(state)
 
 
 @ddt.ddt
 class VideoBumperEventsTest(VideoEventsTestMixin):
     """ Test bumper video event emission """
+
+    # helper methods
+    def seek_video_and_skip(self):
+        self.video.wait_for_position('0:05')
+        self.video.click_player_button('skip_bumper')
+
+    def seek_video_and_dismiss(self):
+        self.video.wait_for_position('0:05')
+        self.video.click_player_button('do_not_show_again')
+
+    def wait_for_state(self, state='finished'):
+        self.video.wait_for_state(state)
 
     def add_bumper(self):
         additional_data = {
@@ -197,10 +198,16 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
 
         def is_video_event(event):
             """Filter out anything other than the video events of interest"""
-            return event['event_type'] in ('edx.video.bumper.loaded', 'edx.video.bumper.played',
-                'edx.video.bumper.skipped', 'edx.video.bumper.stopped', 'load_video', 'play_video',
+            return event['event_type'] in (
+                'edx.video.bumper.loaded',
+                'edx.video.bumper.played',
+                'edx.video.bumper.skipped',
+                'edx.video.bumper.dismissed',
+                'edx.video.bumper.stopped',
+                'load_video',
+                'play_video',
                 'pause_video'
-            )
+            ) and self.video.state != 'buffering'
 
         captured_events = []
         self.add_bumper()
@@ -209,10 +216,23 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
             self.video.click_on_poster()
             self.video.wait_for_video_bumper_render()
             sources, duration = self.video.sources[0], self.video.duration
-            action(self.video)
-            self.video.wait_for_video_player_render(autoplay=True)
+            action(self)
+            self.video.click_player_button('pause')
 
-        for idx, video_event in enumerate(captured_events):
+        # filter subsequent events that appear due to bufferisation: edx.video.bumper.played
+        # As bumper does not emit pause event, we filter subsequent edx.video.bumper.played events from
+        # the list, except first.
+        filtered_events = []
+        for video_event in captured_events:
+            if (
+                filtered_events
+                and video_event['event_type'] == filtered_events[-1]['event_type']
+                and video_event['event_type'] == 'edx.video.bumper.played'
+            ):
+                continue
+            filtered_events.append(video_event)
+
+        for idx, video_event in enumerate(filtered_events):
             if (idx < 3):
                 self.assert_bumper_payload_contains_ids(video_event, sources, duration)
             else:
@@ -225,7 +245,6 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
                 self.assert_valid_control_event_at_time(video_event, 0)
             elif idx == 2:
                 assert_event_matches({'event_type': event_type}, video_event)
-                self.assert_valid_control_event_at_time(video_event, self.video.seconds)
             elif idx == 3:
                 assert_event_matches({'event_type': 'load_video'}, video_event)
             elif idx == 4:

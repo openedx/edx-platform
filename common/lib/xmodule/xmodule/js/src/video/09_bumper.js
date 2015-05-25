@@ -60,6 +60,7 @@ define('video/09_bumper.js',[], function () {
         },
 
         skip: function () {
+            this.state.videoCommands.execute('pause');
             this.element.trigger('skip', [this.doNotShowAgain]);
             this.showMainVideoHandler();
         },
