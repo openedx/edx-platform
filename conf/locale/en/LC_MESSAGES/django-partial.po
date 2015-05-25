@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-04-14 23:50+0000\n"
-"PO-Revision-Date: 2015-04-14 23:53:54.161385\n"
+"POT-Creation-Date: 2015-05-25 02:47+0000\n"
+"PO-Revision-Date: 2015-05-25 02:48:54.257672\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -76,7 +76,7 @@ msgstr ""
 #: lms/djangoapps/class_dashboard/dashboard_data.py:473
 #: lms/djangoapps/class_dashboard/dashboard_data.py:531
 #: lms/djangoapps/class_dashboard/dashboard_data.py:562
-#: lms/djangoapps/instructor/views/api.py:956
+#: lms/djangoapps/instructor/views/api.py:957
 msgid "Name"
 msgstr ""
 
@@ -208,8 +208,8 @@ msgid "Error en identificador."
 msgstr ""
 
 #: common/djangoapps/student/validators.py:16
-#: common/djangoapps/student/views.py:2273
-#: common/djangoapps/student/views.py:2290
+#: common/djangoapps/student/views.py:2282
+#: common/djangoapps/student/views.py:2299
 msgid "Invalid ID"
 msgstr ""
 
@@ -261,175 +261,175 @@ msgstr ""
 msgid "There was an error receiving your login information. Please email us."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1103
+#: common/djangoapps/student/views.py:1112
 msgid ""
 "This account has been temporarily locked due to excessive login failures. "
 "Try again later."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1110
+#: common/djangoapps/student/views.py:1119
 msgid ""
 "Your password has expired due to password policy on this account. You must "
 "reset your password before you can log in again. Please click the \"Forgot "
 "Password\" link on this page to reset your password before logging in again."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1127
+#: common/djangoapps/student/views.py:1136
 msgid "Too many failed login attempts. Try again later."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1145
+#: common/djangoapps/student/views.py:1154
 msgid "Email or password is incorrect."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1211
+#: common/djangoapps/student/views.py:1220
 msgid ""
 "This account has not been activated. We have sent another activation "
 "message. Please check your e-mail for the activation instructions."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1312
+#: common/djangoapps/student/views.py:1321
 msgid "Please enter a username"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1317
+#: common/djangoapps/student/views.py:1326
 msgid "Please choose an option"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1324
+#: common/djangoapps/student/views.py:1333
 msgid "User with username {} does not exist"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1332
+#: common/djangoapps/student/views.py:1341
 msgid "Successfully disabled {}'s account"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1336
+#: common/djangoapps/student/views.py:1345
 msgid "Successfully reenabled {}'s account"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1339
+#: common/djangoapps/student/views.py:1348
 msgid "Unexpected account status"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1407
+#: common/djangoapps/student/views.py:1416
 msgid "An account with the Public Username '{username}' already exists."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1412
+#: common/djangoapps/student/views.py:1421
 msgid "An account with the Email '{email}' already exists."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1503
+#: common/djangoapps/student/views.py:1512
 msgid "Error (401 {field}). E-mail us."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1509
+#: common/djangoapps/student/views.py:1518
 msgid "To enroll, you must follow the honor code."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1525
+#: common/djangoapps/student/views.py:1534
 msgid "You must accept the terms of service."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1549
+#: common/djangoapps/student/views.py:1558
 msgid "Username must be minimum of two characters long"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1550
+#: common/djangoapps/student/views.py:1559
 msgid "A properly formatted e-mail is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1551
+#: common/djangoapps/student/views.py:1560
 msgid "Your legal name must be a minimum of two characters long"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1552
+#: common/djangoapps/student/views.py:1561
 msgid "A valid password is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1553
+#: common/djangoapps/student/views.py:1562
 msgid "Accepting Terms of Service is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1554
+#: common/djangoapps/student/views.py:1563
 msgid "Agreeing to the Honor Code is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1555
+#: common/djangoapps/student/views.py:1564
 msgid "A level of education is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1556
+#: common/djangoapps/student/views.py:1565
 msgid "Your gender is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1557
+#: common/djangoapps/student/views.py:1566
 msgid "Your year of birth is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1558
+#: common/djangoapps/student/views.py:1567
 msgid "Your mailing address is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1559
+#: common/djangoapps/student/views.py:1568
 msgid "A description of your goals is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1560
+#: common/djangoapps/student/views.py:1569
 msgid "A city is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1561
+#: common/djangoapps/student/views.py:1570
 msgid "A country is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1567
+#: common/djangoapps/student/views.py:1576
 msgid "You are missing one or more required fields"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1578
+#: common/djangoapps/student/views.py:1587
 msgid "Username cannot be more than {num} characters long"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1579
+#: common/djangoapps/student/views.py:1588
 msgid "Email cannot be more than {num} characters long"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1590
+#: common/djangoapps/student/views.py:1599
 msgid "A valid ID is required."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1600
+#: common/djangoapps/student/views.py:1609
 msgid "CEDULA/PASAPORTE Existente"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1608
+#: common/djangoapps/student/views.py:1617
 msgid "Valid e-mail is required."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1615
+#: common/djangoapps/student/views.py:1624
 msgid "Username should only consist of A-Z and 0-9, with no spaces."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1629
-#: common/djangoapps/student/views.py:1980
+#: common/djangoapps/student/views.py:1638
+#: common/djangoapps/student/views.py:1989
 msgid "Password: "
 msgstr ""
 
-#: common/djangoapps/student/views.py:1649
+#: common/djangoapps/student/views.py:1658
 msgid "Username and password fields cannot match"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1730
+#: common/djangoapps/student/views.py:1739
 msgid "Could not send activation e-mail."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1921
+#: common/djangoapps/student/views.py:1930
 msgid "Unknown error. Please e-mail us to let us know how it happened."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1989
+#: common/djangoapps/student/views.py:1998
 msgid ""
 "You are re-using a password that you have used recently. You must have {num}"
 " distinct password before reusing a previous password."
@@ -439,7 +439,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: common/djangoapps/student/views.py:1998
+#: common/djangoapps/student/views.py:2007
 msgid ""
 "You are resetting passwords too frequently. Due to security policies, {num} "
 "day must elapse between password resets."
@@ -449,39 +449,39 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: common/djangoapps/student/views.py:2009
+#: common/djangoapps/student/views.py:2018
 msgid "Password reset unsuccessful"
 msgstr ""
 
-#: common/djangoapps/student/views.py:2046
+#: common/djangoapps/student/views.py:2055
 msgid "No inactive user with this e-mail exists"
 msgstr ""
 
-#: common/djangoapps/student/views.py:2064
+#: common/djangoapps/student/views.py:2073
 msgid "Unable to send reactivation email"
 msgstr ""
 
-#: common/djangoapps/student/views.py:2083
+#: common/djangoapps/student/views.py:2092
 msgid "Invalid password"
 msgstr ""
 
-#: common/djangoapps/student/views.py:2092
+#: common/djangoapps/student/views.py:2101
 msgid "Valid e-mail address required."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2099
+#: common/djangoapps/student/views.py:2108
 msgid "An account with this e-mail already exists."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2117
+#: common/djangoapps/student/views.py:2126
 msgid "Old email is the same as the new email."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2141
+#: common/djangoapps/student/views.py:2150
 msgid "Unable to send email activation link. Please try again later."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2230
+#: common/djangoapps/student/views.py:2239
 msgid "Name required"
 msgstr ""
 
@@ -3767,7 +3767,7 @@ msgstr ""
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py:473
 #: lms/djangoapps/class_dashboard/dashboard_data.py:531
-#: lms/djangoapps/instructor/views/api.py:955
+#: lms/djangoapps/instructor/views/api.py:956
 #: lms/djangoapps/instructor/views/legacy.py:543
 #: lms/djangoapps/instructor/views/legacy.py:736
 #: lms/djangoapps/instructor/views/tools.py:259
@@ -4261,27 +4261,27 @@ msgstr ""
 msgid "File is not attached."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:890
+#: lms/djangoapps/instructor/views/api.py:891
 msgid "Invoice number '{0}' does not exist."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:903
+#: lms/djangoapps/instructor/views/api.py:904
 msgid "The sale associated with this invoice has already been invalidated."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:906
+#: lms/djangoapps/instructor/views/api.py:907
 msgid "Invoice number {0} has been invalidated."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:915
+#: lms/djangoapps/instructor/views/api.py:916
 msgid "This invoice is already active."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:919
+#: lms/djangoapps/instructor/views/api.py:920
 msgid "The registration codes for invoice {0} have been re-activated."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:954
+#: lms/djangoapps/instructor/views/api.py:955
 msgid "User ID"
 msgstr ""
 
@@ -4291,7 +4291,7 @@ msgstr ""
 #. meant to hold the user's email address.
 #. Translators: This label appears above a field on the password reset
 #. form meant to hold the user's email address.
-#: lms/djangoapps/instructor/views/api.py:957
+#: lms/djangoapps/instructor/views/api.py:958
 #: lms/djangoapps/instructor/views/instructor_dashboard.py:379
 #: openedx/core/djangoapps/user_api/views.py:77
 #: openedx/core/djangoapps/user_api/views.py:314
@@ -4299,102 +4299,102 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:958
+#: lms/djangoapps/instructor/views/api.py:959
 msgid "Language"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:959
+#: lms/djangoapps/instructor/views/api.py:960
 msgid "Location"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:960
+#: lms/djangoapps/instructor/views/api.py:961
 msgid "Birth Year"
 msgstr ""
 
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's gender.
-#: lms/djangoapps/instructor/views/api.py:961
+#: lms/djangoapps/instructor/views/api.py:962
 #: openedx/core/djangoapps/user_api/views.py:451
 msgid "Gender"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:962
+#: lms/djangoapps/instructor/views/api.py:963
 msgid "Level of Education"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:963
+#: lms/djangoapps/instructor/views/api.py:964
 msgid "Mailing Address"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:964
+#: lms/djangoapps/instructor/views/api.py:965
 msgid "Goals"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:970
+#: lms/djangoapps/instructor/views/api.py:971
 msgid "Cohort"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:986
+#: lms/djangoapps/instructor/views/api.py:987
 msgid ""
 "Your enrolled student profile report is being generated! You can view the "
 "status of the generation task in the 'Pending Instructor Tasks' section."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:989
+#: lms/djangoapps/instructor/views/api.py:990
 msgid ""
 "An enrolled student profile report generation task is already in progress. "
 "Check the 'Pending Instructor Tasks' table for the status of the task. When "
 "completed, the report will be available for download in the table below."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:1018
+#: lms/djangoapps/instructor/views/api.py:1019
 msgid "The file must contain a 'cohort' column containing cohort names."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:1020
+#: lms/djangoapps/instructor/views/api.py:1021
 msgid "The file must contain a 'username' column, an 'email' column, or both."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:1211
+#: lms/djangoapps/instructor/views/api.py:1212
 msgid "Unable to generate redeem codes because of course misconfiguration."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:1294
+#: lms/djangoapps/instructor/views/api.py:1295
 #: lms/djangoapps/shoppingcart/models.py:410
 msgid "pdf download unavailable right now, please contact support."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:1537
+#: lms/djangoapps/instructor/views/api.py:1538
 msgid "Module does not exist."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:1540
+#: lms/djangoapps/instructor/views/api.py:1541
 msgid "An error occurred while deleting the score."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:1718
+#: lms/djangoapps/instructor/views/api.py:1719
 msgid ""
 "Your grade report is being generated! You can view the status of the "
 "generation task in the 'Pending Instructor Tasks' section."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:1721
+#: lms/djangoapps/instructor/views/api.py:1722
 msgid ""
 "A grade report generation task is already in progress. Check the 'Pending "
 "Instructor Tasks' table for the status of the task. When completed, the "
 "report will be available for download in the table below."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:2003
+#: lms/djangoapps/instructor/views/api.py:2004
 msgid "Successfully changed due date for student {0} for {1} to {2}"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:2024
+#: lms/djangoapps/instructor/views/api.py:2025
 msgid ""
 "Successfully removed invalid due date extension (unit has no due date)."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:2029
+#: lms/djangoapps/instructor/views/api.py:2030
 msgid "Successfully reset due date for student {0} for {1} to {2}"
 msgstr ""
 
@@ -5853,7 +5853,7 @@ msgstr ""
 msgid "Verification photos received"
 msgstr ""
 
-#: lms/envs/common.py:2008
+#: lms/envs/common.py:2009
 msgid "Taiwan"
 msgstr ""
 
