@@ -148,9 +148,6 @@ class VideoEventsTest(VideoEventsTestMixin):
         assert_events_equal(static_fields_pattern, load_video_event)
 
 
-
-
-
 @ddt.ddt
 class VideoBumperEventsTest(VideoEventsTestMixin):
     """ Test bumper video event emission """
@@ -217,9 +214,8 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
             self.video.wait_for_video_bumper_render()
             sources, duration = self.video.sources[0], self.video.duration
             action(self)
-            self.video.click_player_button('pause')
 
-        # filter subsequent events that appear due to bufferisation: edx.video.bumper.played
+        # Filter subsequent events that appear due to bufferisation: edx.video.bumper.played
         # As bumper does not emit pause event, we filter subsequent edx.video.bumper.played events from
         # the list, except first.
         filtered_events = []
@@ -236,7 +232,7 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
             if (idx < 3):
                 self.assert_bumper_payload_contains_ids(video_event, sources, duration)
             else:
-                self.assert_payload_contains_ids(video_event);
+                self.assert_payload_contains_ids(video_event)
 
             if idx == 0:
                 assert_event_matches({'event_type': 'edx.video.bumper.loaded'}, video_event)
