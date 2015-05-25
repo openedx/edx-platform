@@ -42,6 +42,7 @@ from courseware.entrance_exams import (
 )
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
+from lms.djangoapps.bookmarks.services import BookmarksService
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, unquote_slashes, quote_slashes
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
@@ -715,6 +716,8 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             "reverification": ReverificationService(),
             'proctoring': ProctoringService(),
             'credit': CreditService(),
+            'reverification': ReverificationService(),
+            'bookmarks': BookmarksService(user=user),
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access

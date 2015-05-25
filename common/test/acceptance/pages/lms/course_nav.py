@@ -193,13 +193,13 @@ class CourseNavPage(PageObject):
             )
 
     # Regular expression to remove HTML span tags from a string
-    REMOVE_SPAN_TAG_RE = re.compile(r'<span.+/span>')
+    REMOVE_SPAN_TAG_RE = re.compile(r'</span>(.+)<span')
 
     def _clean_seq_titles(self, element):
         """
         Clean HTML of sequence titles, stripping out span tags and returning the first line.
         """
-        return self.REMOVE_SPAN_TAG_RE.sub('', element.get_attribute('innerHTML')).strip().split('\n')[0]
+        return self.REMOVE_SPAN_TAG_RE.search(element.get_attribute('innerHTML')).groups()[0].strip()
 
     def go_to_sequential_position(self, sequential_position):
         """

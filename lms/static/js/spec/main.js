@@ -87,6 +87,13 @@
             // Discussion classes loaded explicitly until they are converted to use RequireJS
             'DiscussionModuleView': 'xmodule_js/common_static/coffee/src/discussion/discussion_module_view',
 
+            'js/bookmarks/collections/bookmarks': 'js/bookmarks/collections/bookmarks',
+            'js/bookmarks/models/bookmark': 'js/bookmarks/models/bookmark',
+            'js/bookmarks/views/bookmarks_list_button': 'js/bookmarks/views/bookmarks_list_button',
+            'js/bookmarks/views/bookmarks_list': 'js/bookmarks/views/bookmarks_list',
+            'js/bookmarks/views/bookmark_button': 'js/bookmarks/views/bookmark_button',
+            'js/views/message': 'js/views/message',
+
             // edxnotes
             'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min',
 
@@ -738,7 +745,8 @@
         'lms/include/teams/js/spec/views/team_join_spec.js'
         'lms/include/js/spec/discovery/discovery_spec.js',
         'lms/include/js/spec/ccx/schedule_spec.js',
-        'lms/include/js/spec/bookmarks/bookmarks_spec.js'
+        'lms/include/js/spec/bookmarks/bookmarks_list_view_spec.js',
+        'lms/include/js/spec/bookmarks/bookmark_button_view_spec.js'
     ]);
 
 }).call(this, requirejs, define);
