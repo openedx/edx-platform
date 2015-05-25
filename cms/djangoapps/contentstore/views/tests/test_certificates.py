@@ -203,6 +203,7 @@ class CertificatesListHandlerTestCase(CourseTestCase, CertificatesBaseTestCase, 
             u'version': CERTIFICATE_SCHEMA_VERSION,
             u'name': u'Test certificate',
             u'description': u'Test description',
+            u'org_logo_path': '',
             u'signatories': []
         }
         response = self.client.ajax_post(
@@ -324,6 +325,7 @@ class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase
             u'name': u'Test certificate',
             u'description': u'Test description',
             u'course_title': u'Course Title Override',
+            u'org_logo_path': '',
             u'signatories': []
         }
 
@@ -349,6 +351,7 @@ class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase
             u'name': u'New test certificate',
             u'description': u'New test description',
             u'course_title': u'Course Title Override',
+            u'org_logo_path': '',
             u'signatories': []
 
         }

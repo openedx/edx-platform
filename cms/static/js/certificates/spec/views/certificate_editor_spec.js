@@ -32,6 +32,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
         inputSignatoryName: '.signatory-name-input',
         inputSignatoryTitle: '.signatory-title-input',
         inputSignatoryOrganization: '.signatory-organization-input',
+        inputSignatorySignature: '.signatory-signature-input',
         warningMessage: '.certificate-validation-text',
         warningIcon: '.wrapper-certificate-validation > i',
         note: '.wrapper-delete-button',
@@ -41,7 +42,8 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
         uploadDialog: 'form.upload-dialog',
         uploadDialogButton: '.action-upload',
         uploadDialogFileInput: 'form.upload-dialog input[type=file]',
-        uploadOrgLogoButton: '.action-upload-org-logo'
+        uploadOrgLogoButton: '.action-upload-org-logo',
+        saveCertificateButton: 'button.action-primary'
     };
 
     var submitForm = function (view, requests, notificationSpy) {
@@ -59,7 +61,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
             ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
     };
 
-    var clickDeleteItem = function (that, promptText, element) {
+    var clickDeleteItem = function (that, promptText, element, url) {
         var requests = AjaxHelpers.requests(that),
             promptSpy = ViewHelpers.createPromptSpy(),
             notificationSpy = ViewHelpers.createNotificationSpy();
@@ -67,6 +69,21 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
 
         ViewHelpers.verifyPromptShowing(promptSpy, promptText);
         ViewHelpers.confirmPrompt(promptSpy);
+        ViewHelpers.verifyPromptHidden(promptSpy);
+        if (!_.isUndefined(url)  && !_.isEmpty(url)){
+            AjaxHelpers.expectJsonRequest(requests, 'POST', url);
+            expect(_.last(requests).requestHeaders['X-HTTP-Method-Override']).toBe('DELETE');
+            ViewHelpers.verifyNotificationShowing(notificationSpy, /Deleting/);
+            AjaxHelpers.respondWithNoContent(requests);
+            ViewHelpers.verifyNotificationHidden(notificationSpy);
+        }
+    };
+
+    var showConfirmPromptAndClickCancel = function (view, element, promptText) {
+        var promptSpy = ViewHelpers.createPromptSpy();
+        view.$(element).click();
+        ViewHelpers.verifyPromptShowing(promptSpy, promptText);
+        ViewHelpers.confirmPrompt(promptSpy, true);
         ViewHelpers.verifyPromptHidden(promptSpy);
     };
 
@@ -98,6 +115,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
             _.each(values, function (value, selector) {
                 if (SELECTORS[selector]) {
                     view.$(SELECTORS[selector]).val(value);
+                    view.$(SELECTORS[selector]).trigger('change');
                 }
             });
         };
@@ -214,6 +232,76 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 }
             );
 
+            it('signatories should not save when title has more than 40 characters per line', function() {
+                this.view.$(SELECTORS.action_add_signatory).click();
+                setValuesToInputs(this.view, {
+                    inputCertificateName: 'New Certificate Name'
+                });
+
+                setValuesToInputs(this.view, {
+                    inputSignatoryName: 'New Signatory Name'
+                });
+
+                setValuesToInputs(this.view, {
+                    inputSignatoryTitle: 'New Signatory title longer than 40 characters on one line'
+                });
+
+                setValuesToInputs(this.view, {
+                    inputSignatoryOrganization: 'New Signatory Organization longer than 40 characters'
+                });
+
+                this.view.$(SELECTORS.saveCertificateButton).click();
+                expect(this.view.$('.certificate-edit-error')).toHaveClass('is-shown');
+            });
+
+            it('signatories should not save when title span on more than 2 lines', function() {
+                this.view.$(SELECTORS.action_add_signatory).click();
+                setValuesToInputs(this.view, {
+                    inputCertificateName: 'New Certificate Name'
+                });
+
+                setValuesToInputs(this.view, {
+                    inputSignatoryName: 'New Signatory Name longer than 40 characters'
+                });
+
+                setValuesToInputs(this.view, {
+                    inputSignatoryTitle: 'Signatory Title \non three \nlines'
+                });
+
+                setValuesToInputs(this.view, {
+                    inputSignatorySignature: '/c4x/edX/DemoX/asset/Signature-450.png'
+                });
+
+                this.view.$(SELECTORS.saveCertificateButton).click();
+                expect(this.view.$('.certificate-edit-error')).toHaveClass('is-shown');
+            });
+
+            it('user can delete those signatories already saved', function() {
+                this.view.$(SELECTORS.action_add_signatory).click();
+                var total_signatories = this.model.get('signatories').length;
+                var signatory = this.model.get('signatories').at(0);
+                var signatory_url = '/certificates/signatory';
+                signatory.url = signatory_url;
+                spyOn(signatory, "isNew").andReturn(false);
+                var text = 'Delete "'+ signatory.get('name') +'" from the list of signatories?';
+                clickDeleteItem(this, text, SELECTORS.signatory_panel_delete + ':first', signatory_url);
+                expect(this.model.get('signatories').length).toEqual(total_signatories - 1);
+            });
+
+            it('can cancel deletion of signatories', function() {
+                this.view.$(SELECTORS.action_add_signatory).click();
+                var signatory = this.model.get('signatories').at(0);
+                spyOn(signatory, "isNew").andReturn(false);
+                // add one more signatory
+                this.view.$(SELECTORS.action_add_signatory).click();
+                var total_signatories = this.model.get('signatories').length;
+                var signatory_url = '/certificates/signatory';
+                signatory.url = signatory_url;
+                var text = 'Delete "'+ signatory.get('name') +'" from the list of signatories?';
+                showConfirmPromptAndClickCancel(this.view, SELECTORS.signatory_panel_delete + ':first', text);
+                expect(this.model.get('signatories').length).toEqual(total_signatories);
+            });
+
             it('signatories should save properly', function() {
                 var requests = AjaxHelpers.requests(this),
                     notificationSpy = ViewHelpers.createNotificationSpy();
@@ -233,17 +321,15 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 setValuesToInputs(this.view, {
                     inputSignatoryName: 'New Signatory Name'
                 });
-                this.view.$(SELECTORS.inputSignatoryName).trigger('change');
 
                 setValuesToInputs(this.view, {
                     inputSignatoryTitle: 'New Signatory Title'
                 });
-                this.view.$(SELECTORS.inputSignatoryTitle).trigger('change');
 
                 setValuesToInputs(this.view, {
                     inputSignatoryOrganization: 'New Signatory Organization'
                 });
-                this.view.$(SELECTORS.inputSignatoryOrganization).trigger('change');
+
                 this.view.$(SELECTORS.uploadSignatureButton).click();
                 var sinature_image_path = '/c4x/edX/DemoX/asset/Signature-450.png';
                 uploadFile(sinature_image_path, requests);
