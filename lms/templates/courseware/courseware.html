@@ -20,6 +20,13 @@ ${page_title_breadcrumbs(course_name())}
 </title></%block>
 
 <%block name="header_extras">
+
+% for template_name in ["message_banner"]:
+    <script type="text/template" id="${template_name}-tpl">
+        <%static:include path="fields/${template_name}.underscore" />
+    </script>
+% endfor
+
 % for template_name in ["image-modal"]:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="common/templates/${template_name}.underscore" />
@@ -150,6 +157,8 @@ ${fragment.foot_html()}
 
 </%block>
 
+<div class="coursewide-message-banner" aria-live="polite"></div>
+
 % if default_tab:
   <%include file="/courseware/course_navigation.html" />
 % else:
@@ -167,7 +176,7 @@ ${fragment.foot_html()}
 
       <div class="wrapper-course-modes">
 
-          <div class="courseware-bookmarks-button">
+          <div class="courseware-bookmarks-button" data-bookmarks-api-url="${bookmarks_api_url}">
               <button type="button" class="bookmarks-list-button is-inactive" aria-pressed="false">
                   ${_('Bookmarks')}
               </button>

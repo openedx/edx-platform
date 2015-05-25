@@ -25,6 +25,7 @@ class CoursewareTest(UniqueCourseTest):
         super(CoursewareTest, self).setUp()
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
+        self.course_nav = CourseNavPage(self.browser)
 
         self.course_outline = CourseOutlinePage(
             self.browser,
@@ -34,12 +35,12 @@ class CoursewareTest(UniqueCourseTest):
         )
 
         # Install a course with sections/problems, tabs, updates, and handouts
-        course_fix = CourseFixture(
+        self.course_fix = CourseFixture(
             self.course_info['org'], self.course_info['number'],
             self.course_info['run'], self.course_info['display_name']
         )
 
-        course_fix.add_children(
+        self.course_fix.add_children(
             XBlockFixtureDesc('chapter', 'Test Section 1').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection 1').add_children(
                     XBlockFixtureDesc('problem', 'Test Problem 1')
@@ -70,6 +71,10 @@ class CoursewareTest(UniqueCourseTest):
         self.course_outline.q(css=".subsection-header-actions .configure-button").first.click()
         self.course_outline.q(css="#start_date").fill("01/01/2030")
         self.course_outline.q(css=".action-save").first.click()
+
+    def _create_breadcrumb(self, index):
+        """ Create breadcrumb """
+        return ['Test Section {}'.format(index), 'Test Subsection {}'.format(index), 'Test Problem {}'.format(index)]
 
     def _auto_auth(self, username, email, staff):
         """
@@ -107,6 +112,23 @@ class CoursewareTest(UniqueCourseTest):
         self.courseware_page.visit()
         # Problem name should be "TEST PROBLEM 2".
         self.assertEqual(self.problem_page.problem_name, 'TEST PROBLEM 2')
+
+    def test_course_tree_breadcrumb(self):
+        """
+        Scenario: Correct course tree breadcrumb is shown.
+
+        Given that I am a registered user
+        And I visit my courseware page
+        Then I should see correct course tree breadcrumb
+        """
+        self.courseware_page.visit()
+
+        xblocks = self.course_fix.get_nested_xblocks(category="problem")
+        for index in range(1, len(xblocks) + 1):
+            self.course_nav.go_to_section('Test Section {}'.format(index), 'Test Subsection {}'.format(index))
+            courseware_page_breadcrumb = self.courseware_page.breadcrumb
+            expected_breadcrumb = self._create_breadcrumb(index)
+            self.assertEqual(courseware_page_breadcrumb, expected_breadcrumb)
 
 
 class CoursewareMultipleVerticalsTest(UniqueCourseTest):

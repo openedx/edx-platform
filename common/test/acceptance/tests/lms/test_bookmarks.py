@@ -2,17 +2,15 @@
 """
 End-to-end tests for the courseware unit bookmarks.
 """
-import json
-import requests
 
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.lms.bookmarks import BookmarksPage
 from ...pages.lms.courseware import CoursewarePage
+from ...pages.lms.course_nav import CourseNavPage
 from ...pages.studio.overview import CourseOutlinePage
 from ...pages.common.logout import LogoutPage
 
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
-from ...fixtures import LMS_BASE_URL
 from ..helpers import EventsTestMixin, UniqueCourseTest, is_404_page
 
 
@@ -22,30 +20,29 @@ class BookmarksTestMixin(EventsTestMixin, UniqueCourseTest):
     """
     USERNAME = "STUDENT"
     EMAIL = "student@example.com"
-    COURSE_TREE_INFO = [
-        ['TestSection1', 'TestSubsection1', 'TestProblem1'],
-        ['TestSection2', 'TestSubsection2', 'TestProblem2']
-    ]
 
-    def create_course_fixture(self):
-        """ Create course fixture """
+    def create_course_fixture(self, num_chapters):
+        """
+        Create course fixture
+
+        Arguments:
+            num_chapters: number of chapters to create
+        """
         self.course_fixture = CourseFixture(  # pylint: disable=attribute-defined-outside-init
             self.course_info['org'], self.course_info['number'],
             self.course_info['run'], self.course_info['display_name']
         )
 
-        self.course_fixture.add_children(
-            XBlockFixtureDesc('chapter', self.COURSE_TREE_INFO[0][0]).add_children(
-                XBlockFixtureDesc('sequential', self.COURSE_TREE_INFO[0][1]).add_children(
-                    XBlockFixtureDesc('problem', self.COURSE_TREE_INFO[0][2])
+        xblocks = []
+        for index in range(num_chapters):
+            xblocks += [
+                XBlockFixtureDesc('chapter', 'TestSection{}'.format(index)).add_children(
+                    XBlockFixtureDesc('sequential', 'TestSubsection{}'.format(index)).add_children(
+                        XBlockFixtureDesc('vertical', 'TestVertical{}'.format(index))
+                    )
                 )
-            ),
-            XBlockFixtureDesc('chapter', self.COURSE_TREE_INFO[1][0]).add_children(
-                XBlockFixtureDesc('sequential', self.COURSE_TREE_INFO[1][1]).add_children(
-                    XBlockFixtureDesc('problem', self.COURSE_TREE_INFO[1][2])
-                )
-            )
-        ).install()
+            ]
+        self.course_fixture.add_children(*xblocks).install()
 
 
 class BookmarksTest(BookmarksTestMixin):
@@ -66,35 +63,64 @@ class BookmarksTest(BookmarksTestMixin):
             self.course_info['run']
         )
 
-        self.create_course_fixture()
+        self.courseware_page = CoursewarePage(self.browser, self.course_id)
+        self.bookmarks_page = BookmarksPage(self.browser, self.course_id)
+        self.course_nav = CourseNavPage(self.browser)
+
+    def _test_setup(self, num_chapters=2):
+        """
+        Setup test settings.
+
+        Arguments:
+            num_chapters: number of chapters to create in course
+        """
+        self.create_course_fixture(num_chapters)
 
         # Auto-auth register for the course.
         AutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL, course_id=self.course_id).visit()
 
-        self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.courseware_page.visit()
-        self.bookmarks = BookmarksPage(self.browser, self.course_id)
 
-        # Use auto-auth to retrieve the session for a logged in user
-        self.session = requests.Session()
-        response = self.session.get(LMS_BASE_URL + "/auto_auth?username=STUDENT&email=student@example.com")
-        self.assertTrue(response.ok, "Failed to get session info")
+    def _bookmark_unit(self, index):
+        """
+        Bookmark a unit
 
-    def _bookmark_unit(self, course_id, usage_id):
-        """ Bookmark a single unit """
-        csrftoken = self.session.cookies['csrftoken']
-        headers = {'Content-type': 'application/json', "X-CSRFToken": csrftoken}
-        url = LMS_BASE_URL + "/api/bookmarks/v0/bookmarks/?course_id=" + course_id + '&fields=path'
-        data = json.dumps({'usage_id': usage_id})
+        Arguments:
+            index: unit index to bookmark
+        """
+        self.course_nav.go_to_section('TestSection{}'.format(index), 'TestSubsection{}'.format(index))
+        self.courseware_page.click_bookmark_unit_button()
 
-        response = self.session.post(url, data=data, headers=headers, cookies=self.session.cookies)
-        response = json.loads(response.text)
-        self.assertTrue(response['usage_id'] == usage_id, "Failed to bookmark unit")
+    def _bookmark_units(self, num_units):
+        """
+        Bookmark first `num_units` units by visiting them
 
-    def _bookmarks_blocks(self, xblocks):
-        """ Bookmark all units in a course """
-        for xblock in xblocks:
-            self._bookmark_unit(self.course_id, usage_id=xblock.locator)
+        Arguments:
+            num_units(int): Number of units to bookmarks
+        """
+        for index in range(num_units):
+            self._bookmark_unit(index)
+
+    def _breadcrumb(self, num_units):
+        """
+        Creates breadcrumbs for the first `num_units`
+
+        Arguments:
+            num_units(int): Number of units for which we want to create breadcrumbs
+
+        Returns:
+            list of breadcrumbs
+        """
+        breadcrumbs = []
+        for index in range(num_units):
+            breadcrumbs.append(
+                [
+                    'TestSection{}'.format(index),
+                    'TestSubsection{}'.format(index),
+                    'TestVertical{}'.format(index)
+                ]
+            )
+        return breadcrumbs
 
     def _delete_section(self, index):
         """ Delete a section at index `index` """
@@ -119,6 +145,39 @@ class BookmarksTest(BookmarksTestMixin):
         self.courseware_page.visit()
         self.courseware_page.wait_for_page()
 
+    def _toggle_bookmark_and_verify(self, bookmark_icon_state, bookmark_button_state, bookmarked_count):
+        """
+        Bookmark/Un-Bookmark a unit and then verify
+        """
+        self.assertTrue(self.courseware_page.bookmark_button_visible)
+        self.courseware_page.click_bookmark_unit_button()
+        self.assertEqual(self.courseware_page.bookmark_icon_visible, bookmark_icon_state)
+        self.assertEqual(self.courseware_page.bookmark_button_state, bookmark_button_state)
+        self.bookmarks_page.click_bookmarks_button()
+        self.assertEqual(self.bookmarks_page.count(), bookmarked_count)
+
+    def test_bookmark_button(self):
+        """
+        Scenario: Bookmark unit button toggles correctly
+
+        Given that I am a registered user
+        And I visit my courseware page
+        For first 2 units
+            I visit the unit
+            And I can see the Bookmark button
+            When I click on Bookmark button
+            Then unit should be bookmarked
+            Then I click again on the bookmark button
+            And I should see a unit un-bookmarked
+        """
+        self._test_setup()
+        for index in range(2):
+            self.course_nav.go_to_section('TestSection{}'.format(index), 'TestSubsection{}'.format(index))
+
+            self._toggle_bookmark_and_verify(True, 'bookmarked', 1)
+            self.bookmarks_page.click_bookmarks_button(False)
+            self._toggle_bookmark_and_verify(False, '', 0)
+
     def test_empty_bookmarks_list(self):
         """
         Scenario: An empty bookmarks list is shown if there are no bookmarked units.
@@ -130,15 +189,16 @@ class BookmarksTest(BookmarksTestMixin):
         Then I should see an empty bookmarks list
         And empty bookmarks list content is correct
         """
-        self.assertTrue(self.bookmarks.bookmarks_button_visible())
-        self.bookmarks.click_bookmarks_button()
-        self.assertEqual(self.bookmarks.results_header_text(), 'MY BOOKMARKS')
-        self.assertEqual(self.bookmarks.empty_header_text(), 'You have not bookmarked any courseware pages yet.')
+        self._test_setup()
+        self.assertTrue(self.bookmarks_page.bookmarks_button_visible())
+        self.bookmarks_page.click_bookmarks_button()
+        self.assertEqual(self.bookmarks_page.results_header_text(), 'MY BOOKMARKS')
+        self.assertEqual(self.bookmarks_page.empty_header_text(), 'You have not bookmarked any courseware pages yet.')
 
         empty_list_text = ("Use bookmarks to help you easily return to courseware pages. To bookmark a page, "
                            "select Bookmark in the upper right corner of that page. To see a list of all your "
                            "bookmarks, select Bookmarks in the upper left corner of any courseware page.")
-        self.assertEqual(self.bookmarks.empty_list_text(), empty_list_text)
+        self.assertEqual(self.bookmarks_page.empty_list_text(), empty_list_text)
 
     def test_bookmarks_list(self):
         """
@@ -160,27 +220,30 @@ class BookmarksTest(BookmarksTestMixin):
         # discarded by the current version of MySQL we are using due to the
         # lack of support. Due to which order of bookmarked units will be
         # incorrect.
-        xblocks = self.course_fixture.get_nested_xblocks(category="problem")
-        self._bookmarks_blocks(xblocks)
+        self._test_setup()
+        self._bookmark_units(2)
 
-        self.bookmarks.click_bookmarks_button()
-        self.assertTrue(self.bookmarks.results_present())
-        self.assertEqual(self.bookmarks.results_header_text(), 'MY BOOKMARKS')
-        self.assertEqual(self.bookmarks.count(), 2)
+        self.bookmarks_page.click_bookmarks_button()
+        self.assertTrue(self.bookmarks_page.results_present())
+        self.assertEqual(self.bookmarks_page.results_header_text(), 'MY BOOKMARKS')
+        self.assertEqual(self.bookmarks_page.count(), 2)
 
-        bookmarked_breadcrumbs = self.bookmarks.breadcrumbs()
+        bookmarked_breadcrumbs = self.bookmarks_page.breadcrumbs()
 
         # Verify bookmarked breadcrumbs
-        self.assertItemsEqual(bookmarked_breadcrumbs, self.COURSE_TREE_INFO)
+        breadcrumbs = self._breadcrumb(2)
+        self.assertItemsEqual(bookmarked_breadcrumbs, breadcrumbs)
 
+        # get usage ids for units
+        xblocks = self.course_fixture.get_nested_xblocks(category="vertical")
         xblock_usage_ids = [xblock.locator for xblock in xblocks]
         # Verify link navigation
         for index in range(2):
-            self.bookmarks.click_bookmark(index)
+            self.bookmarks_page.click_bookmarked_block(index)
             self.courseware_page.wait_for_page()
             self.assertTrue(self.courseware_page.active_usage_id() in xblock_usage_ids)
             self.courseware_page.visit().wait_for_page()
-            self.bookmarks.click_bookmarks_button()
+            self.bookmarks_page.click_bookmarks_button()
 
     def test_unreachable_bookmark(self):
         """
@@ -195,13 +258,34 @@ class BookmarksTest(BookmarksTestMixin):
         When I click on deleted bookmark
         Then I should navigated to 404 page
         """
-        self._bookmarks_blocks(self.course_fixture.get_nested_xblocks(category="problem"))
-
+        self._test_setup()
+        self._bookmark_units(2)
         self._delete_section(0)
 
-        self.bookmarks.click_bookmarks_button()
-        self.assertTrue(self.bookmarks.results_present())
-        self.assertEqual(self.bookmarks.count(), 2)
+        self.bookmarks_page.click_bookmarks_button()
+        self.assertTrue(self.bookmarks_page.results_present())
+        self.assertEqual(self.bookmarks_page.count(), 2)
 
-        self.bookmarks.click_bookmark(0)
+        self.bookmarks_page.click_bookmarked_block(1)
         self.assertTrue(is_404_page(self.browser))
+
+    def test_page_size_limit(self):
+        """
+        Scenario: We can get more bookmarks if page size is greater than default page size.
+        Note:
+            * Current Bookmarks API page_size value is 10.
+            * page_size value in bookmarks client side is set to 500.
+
+        Given that I am a registered user
+        And I visit my courseware page
+        And I have bookmarked all the units available
+        Then I click on Bookmarks button
+        And I should see a bookmarked list
+        And bookmark list contains 11 bookmarked items
+        """
+        self._test_setup(11)
+        self._bookmark_units(11)
+
+        self.bookmarks_page.click_bookmarks_button()
+        self.assertTrue(self.bookmarks_page.results_present())
+        self.assertEqual(self.bookmarks_page.count(), 11)
