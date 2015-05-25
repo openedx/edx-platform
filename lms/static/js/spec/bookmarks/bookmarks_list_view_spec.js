@@ -1,13 +1,13 @@
 define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
-        'js/bookmarks/views/bookmarks_button'
+        'js/bookmarks/views/bookmarks_list_button'
        ],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, BookmarksButtonView) {
+    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, BookmarksListButtonView) {
         'use strict';
 
         describe("lms.courseware.bookmarks", function () {
 
             var bookmarksButtonView;
-            var BOOKMARKS_API_URL = '/api/bookmarks/v0/bookmarks/';
+            var BOOKMARKS_API_URL = '/api/bookmarks/v1/bookmarks/';
 
             beforeEach(function () {
                 loadFixtures('js/fixtures/bookmarks/bookmarks.html');
@@ -18,7 +18,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     ]
                 );
 
-                bookmarksButtonView = new BookmarksButtonView();
+                bookmarksButtonView = new BookmarksListButtonView();
 
                 this.addMatchers({
                    toHaveBeenCalledWithUrl: function (expectedUrl) {
@@ -124,7 +124,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
             it("has rendered bookmarked list correctly", function () {
                 var requests = AjaxHelpers.requests(this);
-                var url = BOOKMARKS_API_URL + '?course_id=COURSE_ID&fields=display_name%2Cpath';
+                var url = BOOKMARKS_API_URL + '?course_id=COURSE_ID&page_size=500&fields=display_name%2Cpath';
                 var expectedData = createBookmarksData(3);
 
                 spyOn(bookmarksButtonView.bookmarksListView, 'courseId').andReturn('COURSE_ID');

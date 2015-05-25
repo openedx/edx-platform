@@ -4,6 +4,7 @@ import warnings
 
 from lxml import etree
 
+from xblock.core import XBlock
 from xblock.fields import Integer, Scope, Boolean
 from xblock.fragment import Fragment
 from pkg_resources import resource_string
@@ -49,9 +50,13 @@ class SequenceFields(object):
     )
 
 
+# pylint: disable=abstract-method
+@XBlock.needs("user")
+@XBlock.needs("bookmarks")
 class SequenceModule(SequenceFields, XModule):
-    ''' Layout module which lays out content in a temporal sequence
-    '''
+    """
+    Layout module which lays out content in a temporal sequence
+    """
     js = {
         'coffee': [resource_string(__name__, 'js/src/sequence/display.coffee')],
         'js': [resource_string(__name__, 'js/src/sequence/display/jquery.sequence.js')],
@@ -111,8 +116,16 @@ class SequenceModule(SequenceFields, XModule):
         contents = []
 
         fragment = Fragment()
+        context = context or {}
 
+        bookmarks_service = self.runtime.service(self, "bookmarks")
+        context["username"] = self.runtime.service(self, "user").get_current_user().opt_attrs['edx-platform.username']
+
+        display_names = [self.get_parent().display_name or '', self.display_name or '']
         for child in self.get_display_items():
+            is_bookmarked = bookmarks_service.is_bookmarked(usage_key=child.scope_ids.usage_id)
+            context["bookmarked"] = is_bookmarked
+
             progress = child.get_progress()
             rendered_child = child.render(STUDENT_VIEW, context)
             fragment.add_frag_resources(rendered_child)
@@ -126,6 +139,8 @@ class SequenceModule(SequenceFields, XModule):
                 'progress_detail': Progress.to_js_detail_str(progress),
                 'type': child.get_icon_class(),
                 'id': child.scope_ids.usage_id.to_deprecated_string(),
+                'bookmarked': is_bookmarked,
+                'path': " > ".join(display_names + [child.display_name or '']),
             }
             if childinfo['title'] == '':
                 childinfo['title'] = child.display_name_with_default
