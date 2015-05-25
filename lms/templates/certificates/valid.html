@@ -3,13 +3,12 @@
 <% mako.runtime.UNDEFINED = '' %>
 
 <%inherit file="accomplishment-base.html" />
-
+% if user.is_authenticated() and user.id == int(accomplishment_user_id):
 <%include file="_accomplishment-banner.html" />
-
+% endif
 <%include file="_accomplishment-introduction.html" />
 
 <%include file="_accomplishment-rendering.html" />
-
 <div class="wrapper-about">
     <div class="about">
         <%include file="_about-edx.html" />
