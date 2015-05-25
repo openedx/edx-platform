@@ -643,7 +643,7 @@ $light-border: 1px solid $gray-l5;
       padding: ($baseline/2) 0;
       width: 50%;
 
-      b {
+      .billing-detail-label {
         @include margin-right($baseline);
         @extend %t-copy-sub1;
         display: inline-block;
@@ -651,12 +651,14 @@ $light-border: 1px solid $gray-l5;
         vertical-align: top;
       }
 
-      label {
+      .billing-detail-value {
         @extend %t-copy-sub1;
         display: inline-block;
         margin: 0;
+        cursor: text;
         width: ($baseline*60);
         word-wrap: break-word;
+        color: $gray-d3;
         font-style: normal;
       }
     }
