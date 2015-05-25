@@ -158,6 +158,7 @@ class CertificateManager(object):
             "name": certificate_data['name'],
             "description": certificate_data['description'],
             "version": CERTIFICATE_SCHEMA_VERSION,
+            "org_logo_path": certificate_data.get('org_logo_path', ''),
             "signatories": certificate_data['signatories']
         }
 
