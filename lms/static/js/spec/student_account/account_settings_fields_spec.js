@@ -70,6 +70,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 data = {'language': FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]};
                 view.$(selector).val(data[fieldData.valueAttribute]).change();
+                view.$(selector).focusout();
                 FieldViewsSpecHelpers.expectAjaxRequestWithData(requests, data);
                 AjaxHelpers.respondWithNoContent(requests);
 
@@ -102,6 +103,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 var data = {'language_proficiencies': [{'code': FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]}]};
                 view.$(selector).val(FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]).change();
+                view.$(selector).focusout();
                 FieldViewsSpecHelpers.expectAjaxRequestWithData(requests, data);
                 AjaxHelpers.respondWithNoContent(requests);
             });

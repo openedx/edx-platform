@@ -214,6 +214,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                     if(editable === 'toggle') { view.showEditMode(true); }
                     view.$('.u-field-value > select').val(FieldViewsSpecHelpers.SELECT_OPTIONS[0]).change();
+                    view.$('.u-field-value > select').focusout();
                     expect(view.fieldValue()).toBe(FieldViewsSpecHelpers.SELECT_OPTIONS[0][0]);
 
                     AjaxHelpers.respondWithNoContent(requests);
