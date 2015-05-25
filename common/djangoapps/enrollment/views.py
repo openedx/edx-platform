@@ -72,7 +72,7 @@ class EnrollmentView(APIView, ApiKeyPermissionMixIn):
 
         **Example Requests**:
 
-            GET /api/enrollment/v1/enrollment/{user_id},{course_id}
+            GET /api/enrollment/v1/enrollment/{username},{course_id}
 
         **Response Values**
 
