@@ -118,7 +118,7 @@ class VideoPage(PageObject):
     @wait_for_js
     def wait_for_video_bumper_render(self):
         """
-        Wait until Poster, Video Bumper and main Video Player are Rendered Completely.
+        Wait until Poster, Video Pre-Roll and main Video Player are Rendered Completely.
         """
         self.wait_for_video_class()
         self.wait_for_element_presence(CSS_CLASS_NAMES['video_init'], 'Video Player Initialized')
