@@ -67,8 +67,8 @@
     margin-bottom: $baseline;
 
     &:hover {
-      border-color: $link-color;
-      color: $link-color;
+      border-color: $m-blue;
+      color: $m-blue;
     }
   }
 
@@ -87,6 +87,7 @@
     position: relative;
     top: -7px;
     font-family: FontAwesome;
+    color: $m-blue;
   }
 
   .list-item-content {
@@ -124,4 +125,59 @@
 
 .bookmarks-empty-detail {
   @extend %t-copy-sub1;
+}
+
+
+// Rules for bookmark icon shown on each sequence nav item
+i.bookmarked {
+  top: -3px;
+  position: absolute;
+  left: ($baseline/4);
+}
+
+
+// Rules for bookmark button's different styles
+.bookmark-button-wrapper {
+  text-align: right;
+  margin-bottom: 10px;
+}
+
+@mixin base-style($border-color, $content-color) {
+  background: none;
+  border: 1px solid $border-color;
+  border-radius: ($baseline/4);
+  color: $content-color;
+
+  &:focus, &:active {
+    box-shadow: none;
+  }
+}
+
+@mixin icon-style($content, $color) {
+  &:before {
+    content: $content;
+    font-family: FontAwesome;
+    color: $color;
+  }
+}
+
+@mixin hover-style($border-color, $content-color, $icon-content) {
+  &:hover {
+    background: none;
+    border: 1px solid $border-color;
+    color: $content-color;
+    @include icon-style($icon-content, $content-color);
+  }
+}
+
+.bookmark-button.bookmarked {
+  @include base-style($m-blue, $m-blue);
+  @include icon-style("\f02e", $m-blue);
+  @include hover-style($light-gray, $black, "\f097");
+}
+
+.bookmark-button:not(.bookmarked) {
+  @include base-style($light-gray, $black);
+  @include icon-style("\f097", $black);
+  @include hover-style($m-blue, $m-blue, "\f02e");
 }

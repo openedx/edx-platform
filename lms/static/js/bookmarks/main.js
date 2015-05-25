@@ -1,7 +1,7 @@
 RequireJS.require([
-    'js/bookmarks/views/bookmarks_button'
-], function (BookmarksButton) {
+    'js/bookmarks/views/bookmarks_list_button'
+], function (BookmarksListButton) {
     'use strict';
 
-    return new BookmarksButton();
+    return new BookmarksListButton();
 });

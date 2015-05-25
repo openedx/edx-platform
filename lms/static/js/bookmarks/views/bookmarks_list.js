@@ -16,6 +16,8 @@
             errorMessage: gettext('An error has occurred. Please try again.'),
             loadingMessage: gettext('Loading'),
 
+            PAGE_SIZE: 500,
+
             events : {
                 'click .bookmarks-results-list-item': 'visitBookmark'
             },
@@ -48,7 +50,7 @@
 
                 this.collection.fetch({
                     reset: true,
-                    data: {course_id: this.courseId, fields: 'display_name,path'}
+                    data: {course_id: this.courseId, page_size: this.PAGE_SIZE, fields: 'display_name,path'}
                 }).done(function () {
                     view.hideLoadingMessage();
                     view.render();

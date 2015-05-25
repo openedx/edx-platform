@@ -7,7 +7,7 @@ from .course_page import CoursePage
 
 class BookmarksPage(CoursePage):
     """
-    Coursware Bookmarks Page.
+    Courseware Bookmarks Page.
     """
     url = None
     url_path = "courseware/"
@@ -23,10 +23,11 @@ class BookmarksPage(CoursePage):
         """ Check if bookmarks button is visible """
         return self.q(css=self.BOOKMARKS_BUTTON_SELECTOR).visible
 
-    def click_bookmarks_button(self):
+    def click_bookmarks_button(self, wait_for_results=True):
         """ Click on Bookmarks button """
         self.q(css=self.BOOKMARKS_BUTTON_SELECTOR).first.click()
-        EmptyPromise(self.results_present, "Bookmarks results present").fulfill()
+        if wait_for_results:
+            EmptyPromise(self.results_present, "Bookmarks results present").fulfill()
 
     def results_present(self):
         """ Check if bookmarks results are present """
@@ -53,9 +54,9 @@ class BookmarksPage(CoursePage):
         breadcrumbs = self.q(css=self.BOOKMARKED_BREADCRUMBS).text
         return [breadcrumb.replace('\n', '').split('-') for breadcrumb in breadcrumbs]
 
-    def click_bookmark(self, index):
+    def click_bookmarked_block(self, index):
         """
-        Click on bookmark at index `index`
+        Click on bookmarked block at index `index`
 
         Arguments:
             index (int): bookmark index in the list
