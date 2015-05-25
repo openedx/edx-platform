@@ -417,6 +417,7 @@ def render_html_view(request, user_id, course_id):
     # Translators:  This text is bound to the HTML 'title' element of the page and appears
     # in the browser title bar when a requested certificate is not found or recognized
     context['document_title'] = _("Invalid Certificate")
+    context['accomplishment_user_id'] = user_id
 
     # Feature Flag check
     if not settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
@@ -471,10 +472,6 @@ def render_html_view(request, user_id, course_id):
     update_certificate_context(context, course, user, certificate.mode)
 
     if active_certificate:
-        # Override the course name with course_title
-        if active_certificate.get('course_title', ''):
-            context['accomplishment_copy_course_name'] = active_certificate['course_title']
-
-        context['signatories'] = active_certificate.get('signatories', [])
+        context['certificate_data'] = active_certificate
 
     return render_to_response("certificates/valid.html", context)

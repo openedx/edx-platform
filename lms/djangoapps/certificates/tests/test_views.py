@@ -226,6 +226,7 @@ class CertificatesViewsTests(ModuleStoreTestCase):
                 'name': 'Name ' + str(i),
                 'description': 'Description ' + str(i),
                 'course_title': 'course_title_' + str(i),
+                'org_logo_path': '/t4x/orgX/testX/asset/org-logo-{}.png'.format(i),
                 'signatories': signatories,
                 'version': 1
             } for i in xrange(0, count)
@@ -265,6 +266,7 @@ class CertificatesViewsTests(ModuleStoreTestCase):
         self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url)
         self.assertIn('course_title_0', response.content)
+        self.assertIn('/t4x/orgX/testX/asset/org-logo-0.png', response.content)
         self.assertIn('Signatory_Name 0', response.content)
         self.assertIn('Signatory_Title 0', response.content)
         self.assertIn('Signatory_Organization 0', response.content)
@@ -292,6 +294,27 @@ class CertificatesViewsTests(ModuleStoreTestCase):
         response = self.client.get(test_url)
         self.assertNotIn('test_course_title_0', response.content)
         self.assertIn('refundable course', response.content)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_certificate_view_without_org_logo(self):
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=self.course.id.to_deprecated_string()  # pylint: disable=no-member
+        )
+        test_certificates = [
+            {
+                'id': 0,
+                'name': 'Certificate Name 0',
+                'signatories': [],
+                'version': 1
+            }
+        ]
+        self.course.certificates = {'certificates': test_certificates}
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
+        response = self.client.get(test_url)
+        # make sure response html has only one organization logo container for edX
+        self.assertContains(response, "<li class=\"wrapper-organization\">", 1)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_without_signatories(self):
