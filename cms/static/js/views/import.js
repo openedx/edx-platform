@@ -16,7 +16,6 @@ define(
             'ERROR'      : 4
         }
 
-        var error = null;
         var current = { stage: 0, state: STATE.READY };
         var file = { name: null, url: null };
         var timeout = { id: null, delay: 1000 };
@@ -29,6 +28,15 @@ define(
         /********** Private functions *****************************************/
 
         /**
+         * Destroys any event listener Import might have needed
+         * during the process the import
+         *
+         */
+        var destroyEventListeners = function () {
+            window.onbeforeunload = null;
+        }
+
+        /**
          * Makes Import feedback status list visible
          *
          */
@@ -37,17 +45,32 @@ define(
         };
 
         /**
-         * Sets the Import on the "success" status
+         * Initializes the event listeners
          *
          */
+        var initEventListeners = function () {
+            window.onbeforeunload = function () {
+                if (current.stage <= 1 ) {
+                    return gettext('Your import is in progress; navigating away will abort it.');
+                }
+            }
+        }
+
+        /**
+         * Sets the Import on the "success" status
+         * (callbacks: complete)
+         *
+         * If it wasn't already, marks the stored import as "completed",
+         * and updates its date timestamp
+         */
         var success = function () {
-            window.onbeforeunload = null;
             current.state = STATE.SUCCESS;
 
             if (CourseImport.storedImport().completed !== true) {
                 storeImport(true);
             }
 
+            destroyEventListeners();
             updateFeedbackList();
 
             if (typeof CourseImport.callbacks.complete === 'function') {
@@ -58,8 +81,12 @@ define(
         /**
          * Updates the Import feedback status list
          *
+         * @param {string} [currStageMsg=''] The message to show on the
+         *   current stage (for now only in case of error)
          */
-        var updateFeedbackList = function () {
+        var updateFeedbackList = function (currStageMsg) {
+            var $checkmark = $dom.successStage.find('.icon');
+            currStageMsg = currStageMsg || '';
 
             function completeStage(stage) {
                 $(stage)
@@ -74,8 +101,6 @@ define(
                     .find('p.error').remove().end()
                     .find('p.copy').show();
             }
-
-            var $checkmark = $dom.successStage.find('.icon');
 
             switch (current.state) {
                 case STATE.READY:
@@ -110,7 +135,7 @@ define(
                     var $prev = $dom.stages.slice(0, current.stage + 1);
                     var $curr = $dom.stages.eq(current.stage);
                     var $next = $dom.stages.slice(current.stage + 1);
-                    var message = error || gettext("There was an error with the upload");
+                    var error = currStageMsg || gettext("There was an error with the upload");
 
                     _.map($prev, completeStage);
                     _.map($next, resetStage);
@@ -121,7 +146,7 @@ define(
                             .addClass('has-error')
                             .find('p.copy')
                             .hide()
-                            .after("<p class='copy error'>" + message + "</p>");
+                            .after("<p class='copy error'>" + error + "</p>");
                     }
 
                     break;
@@ -148,7 +173,7 @@ define(
             }));
         }
 
-        /********** Public functions *************************************************/
+        /********** Public functions ******************************************/
 
         var CourseImport = {
 
@@ -161,6 +186,7 @@ define(
 
             /**
              * Sets the Import in the "error" status.
+             * (callbacks: complete)
              *
              * Immediately stops any further polling from the server.
              * Displays the error message at the list element that corresponds
@@ -170,14 +196,12 @@ define(
              * @param {int} [stage=current.stage] Stage of import process at which error occurred.
              */
             error: function (msg, stage) {
-                window.onbeforeunload = null
-
                 current.stage = Math.abs(stage || current.stage); // Could be negative
                 current.state = STATE.ERROR;
-                error = msg;
 
+                destroyEventListeners();
                 clearTimeout(timeout.id);
-                updateFeedbackList();
+                updateFeedbackList(msg);
 
                 if (typeof this.callbacks.complete === 'function') {
                     this.callbacks.complete();
@@ -258,17 +282,12 @@ define(
              *     about the import status
              */
             start: function (fileName, fileUrl) {
-                window.onbeforeunload = function () {
-                    if (current.stage <= 1 ) {
-                        return gettext('Your import is in progress; navigating away will abort it.');
-                    }
-                }
+                current.state = STATE.IN_PROGRESS;
 
                 file.name = fileName;
                 file.url = fileUrl;
 
-                current.state = STATE.IN_PROGRESS;
-
+                initEventListeners();
                 storeImport();
                 displayFeedbackList();
                 updateFeedbackList();
