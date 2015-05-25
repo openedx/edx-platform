@@ -712,35 +712,6 @@ def create_order(request):
     actual use is to add a single product to the user's cart and request
     immediate checkout.
     """
-    # Only submit photos if photo data is provided by the client.
-    # TODO (ECOM-188): Once the A/B test of decoupling verified / payment
-    # completes, we may be able to remove photo submission from this step
-    # entirely.
-    submit_photo = (
-        'face_image' in request.POST and
-        'photo_id_image' in request.POST
-    )
-
-    if (
-        submit_photo and not
-        SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user)
-    ):
-        attempt = SoftwareSecurePhotoVerification(user=request.user)
-        try:
-            b64_face_image = request.POST['face_image'].split(",")[1]
-            b64_photo_id_image = request.POST['photo_id_image'].split(",")[1]
-        except IndexError:
-            log.error(u"Invalid image data during photo verification.")
-            context = {
-                'success': False,
-            }
-            return JsonResponse(context)
-        attempt.upload_face_image(b64_face_image.decode('base64'))
-        attempt.upload_photo_id_image(b64_photo_id_image.decode('base64'))
-        attempt.mark_ready()
-
-        attempt.save()
-
     course_id = request.POST['course_id']
     course_id = CourseKey.from_string(course_id)
     donation_for_course = request.session.get('donation_for_course', {})
