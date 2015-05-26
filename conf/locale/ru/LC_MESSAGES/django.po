@@ -15,7 +15,8 @@
 # Евгений Козлов <eudjin@gmail.com>, 2014
 # Evgeniya <eugenia000@gmail.com>, 2013
 # Katerina <rosemaily@gmail.com>, 2014
-# Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
+# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015
+# Maksimenkova Olga <omaksimenkova@hse.ru>, 2014-2015
 # Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
 # Maria Artemieva <maria.m.artemieva@gmail.com>, 2015
 # mcha121 <mcha-12-1@bk.ru>, 2014
@@ -50,6 +51,7 @@
 # berseneva, 2013
 # Dmitriy <polevaiabrest@gmail.com>, 2014
 # Evgeniya <eugenia000@gmail.com>, 2013
+# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
 # Michael Savin <m.savin.ru@gmail.com>, 2015
 # Nikolay K Medvedev <elsin16@gmail.com>, 2014
@@ -80,6 +82,7 @@
 # Gubin Pavel <pashkun73@gmail.com>, 2013
 # Ihor Polyakov <ihor.polyakov@gmail.com>, 2014
 # Katerina <rosemaily@gmail.com>, 2014
+# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015
 # KhJulia <lnujulia@ukr.net>, 2014
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014-2015
 # Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
@@ -130,6 +133,7 @@
 # Евгений Козлов <eudjin@gmail.com>, 2014
 # Gubin Pavel <pashkun73@gmail.com>, 2013
 # Glad <alexander.gladunov@gmail.com>, 2015
+# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
 # Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
 # mcha121 <mcha-12-1@bk.ru>, 2014
@@ -159,6 +163,7 @@
 # 
 # Translators:
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
+# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
 # Katerina <rosemaily@gmail.com>, 2014
 # W01fdalE <vershinin.a@donnu.edu.ua>, 2014
@@ -167,9 +172,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-05-15 17:06+0000\n"
-"PO-Revision-Date: 2015-04-22 04:14+0000\n"
-"Last-Translator: Michael Savin <m.savin.ru@gmail.com>\n"
+"POT-Creation-Date: 2015-05-26 15:30+0000\n"
+"PO-Revision-Date: 2015-05-25 11:11+0000\n"
+"Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/edx-platform/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2698,8 +2703,8 @@ msgstr ""
 msgid "Both"
 msgstr ""
 
-#: lms/templates/footer-edx-new.html lms/templates/footer.html
-#: lms/templates/static_templates/about.html
+#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
+#: lms/templates/footer.html lms/templates/static_templates/about.html
 msgid "About"
 msgstr "О нас"
 
@@ -2743,6 +2748,26 @@ msgid ""
 "provide a URL (such as the URL to a course About page) that social media "
 "sites can link to. URLs must be fully qualified. For example: "
 "http://www.edx.org/course/Introduction-to-MOOCs-ITM001"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Teams Configuration"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter configuration for the teams feature. Expects two entries: "
+"max_team_size and topics, where topics is a list of topics."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Minimum Grade for Credit"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"The minimum grade that a learner must earn to receive credit in the course, "
+"as a decimal between 0.0 and 1.0. For example, for 75%, enter 0.75."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3202,6 +3227,15 @@ msgstr ""
 msgid ""
 "Could not parse LTI passport: {lti_passport}. Should be \"id:key:secret\" "
 "string."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/mixin.py
+msgid "License"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/mixin.py
+msgid ""
+"A license defines how the contents of this block can be shared and reused."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py
@@ -4304,12 +4338,13 @@ msgstr ""
 msgid "Contact {platform_name}"
 msgstr ""
 
-#: cms/templates/widgets/footer.html lms/templates/footer-edx-new.html
-#: lms/templates/footer.html lms/templates/static_templates/privacy.html
+#: cms/templates/widgets/footer.html lms/templates/footer-edx-v2.html
+#: lms/templates/footer-edx-v3.html lms/templates/footer.html
+#: lms/templates/static_templates/privacy.html
 msgid "Privacy Policy"
 msgstr "Политика конфиденциальности"
 
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views.py lms/templates/footer-edx-v3.html
 msgid "Terms of Service &amp; Honor Code"
 msgstr ""
 
@@ -4426,6 +4461,16 @@ msgstr "Балл"
 msgid "problems"
 msgstr ""
 
+#: lms/djangoapps/commerce/signals.py lms/djangoapps/shoppingcart/models.py
+msgid "[Refund] User-Requested Refund"
+msgstr ""
+
+#: lms/djangoapps/commerce/signals.py
+msgid ""
+"A refund request has been initiated for {username} ({email}). To process "
+"this request, please visit the link(s) below."
+msgstr ""
+
 #. Translators: this string includes wiki markup.  Leave the ** and the _
 #. alone.
 #: lms/djangoapps/course_wiki/views.py
@@ -4444,11 +4489,18 @@ msgstr ""
 msgid "Visit a course wiki to add an article."
 msgstr ""
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This will look like '$50', where {currency_symbol} is a symbol
 #. such as '$' and {price} is a
 #. numerical amount in that currency. Adjust this display as needed for your
 #. language.
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: currency_symbol is a symbol indicating type of currency, ex
+#. "$".
+#. This string would look like this when all variables are in:
+#. "$500.00"
 #: lms/djangoapps/courseware/views.py
+#: lms/templates/shoppingcart/shopping_cart.html
 msgid "{currency_symbol}{price}"
 msgstr ""
 
@@ -5806,10 +5858,6 @@ msgid "Enrollment codes for Course: {course_name}"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
-msgid "[Refund] User-Requested Refund"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/models.py
 msgid "Mode {mode} does not exist for {course_id}"
 msgstr ""
 
@@ -6659,14 +6707,22 @@ msgstr ""
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the website name of www.facebook.com.  Please
 #. translate this the way that Facebook advertises in your language.
-#: lms/envs/common.py lms/templates/dashboard/_dashboard_course_listing.html
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: This is the website name of www.facebook.com. Please
+#. translate this the way that Facebook advertises in your language.
+#: lms/envs/common.py lms/templates/footer-edx-v3.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Facebook"
 msgstr ""
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the website name of www.twitter.com.  Please
 #. translate this the way that Twitter advertises in your language.
-#: lms/envs/common.py lms/templates/dashboard/_dashboard_course_listing.html
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: This is the website name of www.twitter.com. Please
+#. translate this the way that Twitter advertises in your language.
+#: lms/envs/common.py lms/templates/footer-edx-v3.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Twitter"
 msgstr ""
 
@@ -6688,9 +6744,13 @@ msgstr "Google+"
 msgid "Tumblr"
 msgstr ""
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the website name of www.meetup.com.  Please
 #. translate this the way that MeetUp advertises in your language.
-#: lms/envs/common.py
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: This is the website name of www.meetup.com. Please
+#. translate this the way that Meetup advertises in your language.
+#: lms/envs/common.py lms/templates/footer-edx-v3.html
 msgid "Meetup"
 msgstr ""
 
@@ -6698,6 +6758,18 @@ msgstr ""
 #. translate this the way that Reddit advertises in your language.
 #: lms/envs/common.py
 msgid "Reddit"
+msgstr ""
+
+#. Translators: This is the website name of https://vk.com.  Please
+#. translate this the way that VK advertises in your language.
+#: lms/envs/common.py
+msgid "VK"
+msgstr ""
+
+#. Translators: This is the website name of http://www.weibo.com.  Please
+#. translate this the way that Weibo advertises in your language.
+#: lms/envs/common.py
+msgid "Weibo"
 msgstr ""
 
 #. Translators: This is the website name of www.youtube.com.  Please
@@ -7445,7 +7517,7 @@ msgstr ""
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
-#: openedx/core/djangoapps/user_api/views.py lms/templates/footer-edx-new.html
+#: openedx/core/djangoapps/user_api/views.py lms/templates/footer-edx-v2.html
 msgid "Terms of Service and Honor Code"
 msgstr ""
 
@@ -7494,6 +7566,18 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/views.py
 msgid "No data provided for user preference update"
+msgstr ""
+
+#: cms/djangoapps/contentstore/course_group_config.py
+msgid "invalid JSON"
+msgstr ""
+
+#: cms/djangoapps/contentstore/course_group_config.py
+msgid "must have name of the configuration"
+msgstr ""
+
+#: cms/djangoapps/contentstore/course_group_config.py
+msgid "must have at least one group"
 msgstr ""
 
 #: cms/djangoapps/contentstore/course_info_model.py
@@ -7638,18 +7722,6 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Invalid prerequisite course key"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "invalid JSON"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "must have name of the configuration"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "must have at least one group"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
@@ -8041,8 +8113,8 @@ msgstr ""
 
 #. Translators: 'Open edX' is a brand, please keep this untranslated. See
 #. http://openedx.org for more information.
-#: cms/templates/widgets/footer.html lms/templates/footer-edx-new.html
-#: lms/templates/footer.html
+#: cms/templates/widgets/footer.html lms/templates/footer-edx-v2.html
+#: lms/templates/footer-edx-v3.html lms/templates/footer.html
 msgid "Powered by Open edX"
 msgstr ""
 
@@ -8058,6 +8130,34 @@ msgstr "Помощь"
 #: cms/templates/widgets/header.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html
 msgid "Sign Out"
+msgstr ""
+
+#: common/templates/license.html
+msgid "All Rights Reserved"
+msgstr ""
+
+#: common/templates/license.html
+msgid "Attribution"
+msgstr ""
+
+#: common/templates/license.html
+msgid "Noncommercial"
+msgstr ""
+
+#: common/templates/license.html
+msgid "No Derivatives"
+msgstr ""
+
+#: common/templates/license.html
+msgid "Share Alike"
+msgstr ""
+
+#: common/templates/license.html
+msgid "Creative Commons licensed content, with terms as follow:"
+msgstr ""
+
+#: common/templates/license.html
+msgid "Some Rights Reserved"
 msgstr ""
 
 #: common/templates/course_modes/choose.html
@@ -8341,11 +8441,11 @@ msgstr ""
 msgid "User"
 msgstr "Пользователь"
 
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
 msgid "About edX"
 msgstr ""
 
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html
 msgid ""
 "{EdX} offers interactive online classes and MOOCs from the world's best "
 "universities. Online courses from {MITx}, {HarvardX}, {BerkeleyX}, {UTx} and"
@@ -8358,7 +8458,7 @@ msgstr ""
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
-#: lms/templates/footer-edx-new.html lms/templates/footer.html
+#: lms/templates/footer-edx-v2.html lms/templates/footer.html
 msgid ""
 "EdX, Open edX, and the edX and Open edX logos are registered trademarks or "
 "trademarks of {link_start}edX Inc.{link_end}"
@@ -8367,65 +8467,91 @@ msgstr ""
 #. Translators: {date} will be an abbreviated date, indicating when the
 #. privacy
 #. policy was most recently revised.
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html
 msgid "(Revised {date})"
 msgstr ""
 
 #. Translators: {date} will be an abbreviated date, indicating when the
 #. privacy
 #. policy was most recently revised.
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html
 msgid "10/22/2014"
 msgstr ""
 
-#: lms/templates/footer-edx-new.html lms/templates/footer.html
+#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
+#: lms/templates/footer.html
 msgid "News"
 msgstr "Новости"
 
-#: lms/templates/footer-edx-new.html lms/templates/footer.html
-#: lms/templates/static_templates/contact.html
+#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
+#: lms/templates/footer.html lms/templates/static_templates/contact.html
 msgid "Contact"
 msgstr ""
 
-#: lms/templates/footer-edx-new.html lms/templates/footer.html
+#: lms/templates/footer-edx-v2.html lms/templates/footer.html
 #: lms/templates/static_templates/faq.html
 msgid "FAQ"
 msgstr ""
 
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html
 msgid "edX Blog"
 msgstr ""
 
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html
 msgid "Donate to edX"
 msgstr ""
 
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html
 msgid "Jobs at edX"
 msgstr ""
 
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html
 msgid "Follow Us"
 msgstr ""
 
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html
 msgid "Mobile Apps"
 msgstr ""
 
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
 msgid "Apple app on Apple Store"
 msgstr ""
 
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
 msgid "Android app on Google Play"
 msgstr ""
 
-#: lms/templates/footer.html lms/templates/static_templates/jobs.html
+#: lms/templates/footer-edx-v3.html
+msgid "Page Footer"
+msgstr ""
+
+#: lms/templates/footer-edx-v3.html lms/templates/static_templates/blog.html
+msgid "Blog"
+msgstr "Блог"
+
+#: lms/templates/footer-edx-v3.html
+msgid "FAQs"
+msgstr ""
+
+#: lms/templates/footer-edx-v3.html lms/templates/footer.html
+#: lms/templates/static_templates/jobs.html
 msgid "Jobs"
 msgstr "Вакансии"
 
-#: lms/templates/footer.html
+#: lms/templates/footer-edx-v3.html lms/templates/static_templates/donate.html
+msgid "Donate"
+msgstr ""
+
+#: lms/templates/footer-edx-v3.html
+msgid "Sitemap"
+msgstr ""
+
+#: lms/templates/footer-edx-v3.html lms/templates/footer.html
 msgid "Legal"
+msgstr ""
+
+#: lms/templates/footer-edx-v3.html
+msgid "Website Accessibility Policy"
 msgstr ""
 
 #: lms/templates/footer.html
@@ -8838,20 +8964,6 @@ msgstr "(перезагрузите страницу для обновления
 msgid "working"
 msgstr ""
 
-#: lms/templates/mathjax_accessible.html
-msgid ""
-"This page features MathJax technology to render mathematical formulae. To "
-"make math accessibile, we suggest using the MathPlayer plugin. Please visit "
-"the {link_start}MathPlayer Download Page{link_end} to download the plugin "
-"for your browser."
-msgstr ""
-
-#: lms/templates/mathjax_accessible.html
-msgid ""
-"Your browser does not support the MathPlayer plugin. To use MathPlayer, "
-"please use Internet Explorer 6 through 9."
-msgstr ""
-
 #: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
 msgid "There has been an error on the {platform_name} servers"
@@ -8902,6 +9014,7 @@ msgid "My Profile"
 msgstr ""
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: lms/templates/shoppingcart/shopping_cart.html
 msgid "Shopping Cart"
 msgstr "Корзина"
 
@@ -8945,7 +9058,7 @@ msgstr ""
 msgid "your answer"
 msgstr ""
 
-#: lms/templates/problem.html
+#: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
 msgid "Reset"
 msgstr ""
 
@@ -14006,6 +14119,11 @@ msgstr ""
 msgid "View Courses"
 msgstr "Посмотреть курс"
 
+#: lms/templates/shoppingcart/cybersource_form.html
+#: lms/templates/shoppingcart/shopping_cart_flow.html
+msgid "Payment"
+msgstr ""
+
 #: lms/templates/shoppingcart/download_report.html
 msgid "Download CSV Data"
 msgstr ""
@@ -14160,10 +14278,6 @@ msgid "Course Dates"
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
-msgid " {course_name} "
-msgstr ""
-
-#: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Price per student:"
 msgstr ""
@@ -14261,8 +14375,18 @@ msgstr ""
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid ""
 "{course_names} has been removed because the enrollment period has closed."
+msgid_plural ""
+"{course_names} have been removed because the enrollment period has closed."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Cover Image"
 msgstr ""
 
+#. Translators: "Registration for:" is followed by a course name
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Registration for:"
 msgstr ""
@@ -14276,11 +14400,33 @@ msgid "Students:"
 msgstr ""
 
 #: lms/templates/shoppingcart/shopping_cart.html
+msgid "Input quantity and press enter."
+msgstr ""
+
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "discount or activation code"
+msgstr ""
+
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Apply"
+msgstr ""
+
+#: lms/templates/shoppingcart/shopping_cart.html
 msgid "code has been applied"
 msgstr ""
 
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "TOTAL:"
+msgstr ""
+
+#. Translators: currency_symbol l is a symbol indicating type of currency, ex
+#. "$". currency_abbr is
+#. an abbreviation for the currency, ex "USD". This string would look like
+#. this
+#. when all variables are in:
+#. "$500.00 USD"
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "{currency_symbol}{price} {currency_abbr}"
 msgstr ""
 
 #: lms/templates/shoppingcart/shopping_cart.html
@@ -14294,6 +14440,10 @@ msgid ""
 "After this purchase is complete, {username} will be enrolled in this course."
 msgstr ""
 
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Empty Cart"
+msgstr ""
+
 #: lms/templates/shoppingcart/shopping_cart_flow.html
 msgid "Shopping cart"
 msgstr "Корзина"
@@ -14303,14 +14453,14 @@ msgid "{platform_name} -  Shopping Cart"
 msgstr ""
 
 #: lms/templates/shoppingcart/shopping_cart_flow.html
+msgid "Steps"
+msgstr ""
+
+#: lms/templates/shoppingcart/shopping_cart_flow.html
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/reverification_confirmation.html
 msgid "Review"
 msgstr "Просмотреть"
-
-#: lms/templates/shoppingcart/shopping_cart_flow.html
-msgid "Payment"
-msgstr ""
 
 #: lms/templates/shoppingcart/shopping_cart_flow.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -14342,14 +14492,6 @@ msgstr ""
 msgid ""
 "This page left intentionally blank. It is not used by edx.org but is left "
 "here for possible use by installations of Open edX."
-msgstr ""
-
-#: lms/templates/static_templates/blog.html
-msgid "Blog"
-msgstr "Блог"
-
-#: lms/templates/static_templates/donate.html
-msgid "Donate"
 msgstr ""
 
 #: lms/templates/static_templates/embargo.html
@@ -17417,6 +17559,20 @@ msgstr ""
 msgid ""
 "The score student must meet in order to successfully complete the entrance "
 "exam. "
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Course Content License"
+msgstr ""
+
+#. Translators: At the course settings, the editor is able to select the
+#. default course content license.
+#. The course content will have this license set, some assets can override the
+#. license with their own.
+#. In the form, the license selector for course content is described using the
+#. following string:
+#: cms/templates/settings.html
+msgid "Select the default license for course content"
 msgstr ""
 
 #: cms/templates/settings.html
