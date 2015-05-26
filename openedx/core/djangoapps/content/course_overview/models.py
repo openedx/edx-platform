@@ -7,28 +7,27 @@ from django.db.models.fields import *
 from django.utils.timezone import UTC
 from django.utils.translation import ugettext
 
-from xmodule_django.models import CourseKeyField
+from xmodule_django.models import CourseKeyField, UsageKeyField
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import NoSuchUserPartitionError
 from xmodule.course_module import CourseFields
 from xmodule.fields import Date
 from xmodule.modulestore.inheritance import UserPartition
-from opaque_keys.edx.locator import CourseLocator
 
 from south.modelsinspector import add_introspection_rules
 custom_fields = [
     'UserPartitionListCacheField',
     'GroupAccessDictCacheField',
-    'CourseLocatorCacheField',
     'CourseIdListCacheField'
 ]
 for s in custom_fields:
+    #add_introspection_rules([], [r"^course_overview\.models\." + s])
     add_introspection_rules([], ["openedx.core.djangoapps.content.course_overview.models." + s])
 
 
 # TODO me: make sure all these fields work...
 
-class UserPartitionListCacheField(Field):
+class UserPartitionListCacheField(TextField):
     def __init__(self, *args, **kwargs):
         super(UserPartitionListCacheField, self).__init__(*args, **kwargs)
 
@@ -40,7 +39,7 @@ class UserPartitionListCacheField(Field):
         strings = json.loads(data)
         return [UserPartition.from_json(s) for s in strings]
 
-class GroupAccessDictCacheField(Field):
+class GroupAccessDictCacheField(TextField):
     def __init__(self, *args, **kwargs):
         super(GroupAccessDictCacheField, self).__init__(*args, **kwargs)
 
@@ -50,17 +49,7 @@ class GroupAccessDictCacheField(Field):
     def to_internal_value(self, data):
         return json.loads(data)
 
-class CourseLocatorCacheField(Field):
-    def __init__(self, *args, **kwargs):
-        super(CourseLocatorCacheField, self).__init__(*args, **kwargs)
-
-    def to_representation(self, obj):
-        return CourseLocator.to_string(obj)  # TODO me: does this method exist?
-
-    def to_internal_value(self, data):
-        return CourseLocator.from_string(data)
-
-class CourseIdListCacheField(Field):
+class CourseIdListCacheField(TextField):
     def __init__(self, *args, **kwargs):
         super(CourseIdListCacheField, self).__init__(*args, **kwargs)
 
@@ -85,7 +74,7 @@ class CourseOverviewFields(django.db.models.Model):
     group_access = GroupAccessDictCacheField()
 
     # Source: XModuleMixin (x_module.py)
-    location = CourseLocatorCacheField()
+    location = UsageKeyField(max_length=255)
 
     # Source: CourseFields (course_module.py)
     enrollment_start = DateField()
