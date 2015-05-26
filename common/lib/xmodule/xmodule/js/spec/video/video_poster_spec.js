@@ -8,7 +8,6 @@
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice').andReturn(null);
             state = jasmine.initializePlayer('video_with_bumper.html');
-            $('.poster .btn-play').click();
         });
 
         afterEach(function () {
@@ -36,7 +35,7 @@
         });
 
         it('destroy itself on "play" event', function () {
-            state.el.trigger('play');
+            $('.btn-play').click();
             expect($('.poster')).not.toExist();
         });
     });
