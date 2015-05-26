@@ -197,7 +197,7 @@ class Certificate(object):
         """
         Return certificate course title override field.
         """
-        return self.get_text('.certificate-course-title')
+        return self.get_text('.course-title-override .certificate-value')
 
     @course_title.setter
     def course_title(self, value):

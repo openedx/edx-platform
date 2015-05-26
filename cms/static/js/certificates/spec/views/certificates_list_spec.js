@@ -12,28 +12,17 @@ define([
     'js/views/feedback_notification',
     'js/common_helpers/ajax_helpers',
     'js/common_helpers/template_helpers',
-    'js/spec_helpers/view_helpers',
-    'js/spec_helpers/assertion_helpers',
-    'js/spec_helpers/validation_helpers',
-    'jasmine-stealth'
+    'js/certificates/spec/custom_matchers'
 ],
 function(_, Course, CertificatesCollection, CertificateModel, CertificateDetailsView, CertificateEditorView,
-         CertificateItemView, CertificatesListView, Notification, AjaxHelpers, TemplateHelpers, ViewHelpers,
-         AssertionHelpers, ValidationHelpers) {
+         CertificateItemView, CertificatesListView, Notification, AjaxHelpers, TemplateHelpers, CustomMatchers) {
     'use strict';
 
     var SELECTORS = {
-        detailsView: '.certificate-details',
-        editView: '.certificate-edit',
         itemView: '.certificates-list-item',
-        name: '.certificate-name',
-        description: '.certificate-description',
-        errorMessage: '.certificate-edit-error',
-        inputName: '.collection-name-input',
-        inputDescription: '.certificate-description-input',
-        warningMessage: '.certificate-validation-text',
-        warningIcon: '.wrapper-certificate-validation > i',
-        note: '.wrapper-delete-button'
+        noContent: '.no-content',
+        newCertificateButton: '.new-button'
+
     };
 
     beforeEach(function() {
@@ -46,41 +35,6 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
             revision: 'course_rev'
         });
 
-        this.addMatchers({
-
-            toContainText: function(text) {
-                var trimmedText = $.trim(this.actual.text());
-
-                if (text && $.isFunction(text.test)) {
-                    return text.test(trimmedText);
-                } else {
-                    return trimmedText.indexOf(text) !== -1;
-                }
-            },
-
-            toBeCorrectValuesInInputs: function (values) {
-                var expected = {
-                    name: this.actual.$(SELECTORS.inputName).val(),
-                    description: this.actual
-                        .$(SELECTORS.inputDescription).val()
-                };
-
-                return _.isEqual(values, expected);
-            },
-
-            toBeCorrectValuesInModel: function (values) {
-                return _.every(values, function (value, key) {
-                    return this.actual.get(key) === value;
-                }.bind(this));
-            },
-
-            toHaveDefaultNames: function (values) {
-                var actualValues = $.map(this.actual, function (item) {
-                    return $(item).val();
-                });
-                return _.isEqual(actualValues, values);
-            }
-        });
     });
 
     afterEach(function() {
@@ -95,18 +49,25 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 ['certificate-editor', 'certificate-edit', 'list']
             );
 
-            this.model = new Certificate({ id: 0 });
-            this.collection = new CertificateCollection();
+            this.model = new CertificateModel({
+                course_title: 'Test Course Title Override'
+            }, {add: true});
+
+            this.collection = new CertificatesCollection([], {
+                certificateUrl: '/certificates/'+ window.course.id
+            });
             this.view = new CertificatesListView({
                 collection: this.collection
             });
             appendSetFixtures(this.view.render().el);
+            CustomMatchers(this);
         });
 
         describe('empty template', function () {
             it('should be rendered if no certificates', function() {
-                expect(this.view.$el).toContainText(emptyMessage);
-                expect(this.view.$('.new-button')).toExist();
+                expect(this.view.$(SELECTORS.noContent)).toExist();
+                expect(this.view.$(SELECTORS.noContent)).toContainText(emptyMessage);;
+                expect(this.view.$(SELECTORS.newCertificateButton)).toExist();
                 expect(this.view.$(SELECTORS.itemView)).not.toExist();
             });
 
