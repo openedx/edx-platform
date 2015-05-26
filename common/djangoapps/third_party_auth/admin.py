@@ -21,7 +21,7 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         )
 
     def has_data(self, inst):
-        """ Does we have cached metadata for this SAML provider? """
+        """ Do we have cached metadata for this SAML provider? """
         if not inst.is_active:
             return None  # N/A
         data = SAMLProviderData.current(inst.entity_id)

@@ -8,7 +8,6 @@ from django.core.management.base import BaseCommand, CommandError
 from lxml import etree
 import requests
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
-from requests.exceptions import HTTPError, SSLError
 from third_party_auth.models import SAMLConfiguration, SAMLProviderConfig, SAMLProviderData
 
 #pylint: disable=superfluous-parens,no-member
@@ -28,7 +27,7 @@ class Command(BaseCommand):
             raise CommandError("saml requires one argument: pull")
 
         if not SAMLConfiguration.is_enabled():
-            print("Warning: SAML support is disabled via SAMLConfiguration.")
+            self.stdout.write("Warning: SAML support is disabled via SAMLConfiguration.\n")
 
         subcommand = args[0]
 
@@ -58,14 +57,11 @@ class Command(BaseCommand):
         # Now fetch the metadata:
         for url, entity_ids in url_map.items():
             try:
-                print("\n→ Fetching {}".format(url))
+                self.stdout.write("\n→ Fetching {}\n".format(url))
                 if not url.lower().startswith('https'):
-                    print("→ WARNING: This URL is not secure! It should use HTTPS.")
-                try:
-                    response = requests.get(url, verify=True)
-                    response.raise_for_status()
-                except (HTTPError, SSLError):
-                    raise
+                    self.stdout.write("→ WARNING: This URL is not secure! It should use HTTPS.\n")
+                response = requests.get(url, verify=True)  # May raise HTTPError or SSLError
+                response.raise_for_status()  # May raise an HTTPError
 
                 try:
                     parser = etree.XMLParser(remove_comments=True)
@@ -75,11 +71,11 @@ class Command(BaseCommand):
                 # TODO: Can use OneLogin_Saml2_Utils to validate signed XML if anyone is using that
 
                 for entity_id in entity_ids:
-                    print("→ Processing IdP with entityID {}".format(entity_id))
+                    self.stdout.write("→ Processing IdP with entityID {}\n".format(entity_id))
                     public_key, sso_url, expires_at = self._parse_metadata_xml(xml, entity_id)
                     self._update_data(entity_id, public_key, sso_url, expires_at)
             except Exception as err:  # pylint: disable=broad-except
-                print("→ ERROR: {}".format(err.message))
+                self.stderr.write("→ ERROR: {}\n\n".format(err.message))
 
     @classmethod
     def _parse_metadata_xml(cls, xml, entity_id):
@@ -128,8 +124,7 @@ class Command(BaseCommand):
             raise MetadataParseError("Unable to find SSO URL with HTTP-Redirect binding.")
         return public_key, sso_url, expires_at
 
-    @staticmethod
-    def _update_data(entity_id, public_key, sso_url, expires_at):
+    def _update_data(self, entity_id, public_key, sso_url, expires_at):
         """
         Update/Create the SAMLProviderData for the given entity ID.
         """
@@ -139,7 +134,7 @@ class Command(BaseCommand):
             data_obj.expires_at = expires_at
             data_obj.fetched_at = fetched_at
             data_obj.save()
-            print("→ Updated existing SAMLProviderData. Nothing has changed.")
+            self.stdout.write("→ Updated existing SAMLProviderData. Nothing has changed.\n")
         else:
             SAMLProviderData.objects.create(
                 entity_id=entity_id,
@@ -148,4 +143,4 @@ class Command(BaseCommand):
                 sso_url=sso_url,
                 public_key=public_key,
             )
-            print("→ Created new record for SAMLProviderData")
+            self.stdout.write("→ Created new record for SAMLProviderData\n")

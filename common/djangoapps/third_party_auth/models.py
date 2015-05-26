@@ -192,7 +192,7 @@ class SAMLProviderConfig(ProviderConfig):
             'Cannot contain spaces and should be a usable as a CSS class. Examples: "ubc", "mit-staging"'
         ))
     entity_id = models.CharField(
-        max_length=255, verbose_name="Entity ID", help_text="Example: https://idp.testshib.org/idp/shibboleth-wrong")
+        max_length=255, verbose_name="Entity ID", help_text="Example: https://idp.testshib.org/idp/shibboleth")
     metadata_source = models.CharField(
         max_length=255,
         help_text=(
