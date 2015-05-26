@@ -299,15 +299,6 @@ class CourseOverviewDescriptor(CourseOverviewFields):
             b32encode(unicode(self.location.course_key)).replace('=', padding_char)
         )
 
-def get_course_overview(course_id):
-    try:
-        course_overview = CourseOverviewFields.objects.get(id=course_id)
-    except CourseOverviewFields.DoesNotExist:
-        course = modulestore().get_course(course_id)
-        course_overview = CourseOverviewDescriptor.create_from_course(course)
-        course_overview.save()
-    return course_overview
-
 # Signals must be imported in a file that is automatically loaded at app startup (e.g. models.py). We import them
 # at the end of this file to avoid circular dependencies.
 import signals  # pylint: disable=unused-import
