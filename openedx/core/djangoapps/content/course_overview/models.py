@@ -15,6 +15,17 @@ from xmodule.fields import Date
 from xmodule.modulestore.inheritance import UserPartition
 from opaque_keys.edx.locator import CourseLocator
 
+from south.modelsinspector import add_introspection_rules
+custom_fields = [
+    'UserPartitionListCacheField',
+    'GroupAccessDictCacheField',
+    'CourseLocatorCacheField',
+    'CourseIdListCacheField'
+]
+for s in custom_fields:
+    add_introspection_rules([], ["openedx.core.djangoapps.content.course_overview.models." + s])
+
+
 # TODO me: make sure all these fields work...
 
 class UserPartitionListCacheField(Field):
