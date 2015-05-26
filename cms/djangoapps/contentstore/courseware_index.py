@@ -12,7 +12,6 @@ from django.core.urlresolvers import resolve
 
 from contentstore.utils import course_image_url
 from contentstore.course_group_config import GroupConfiguration, RANDOM_SCHEME
-from contentstore.views.component import SPLIT_TEST_COMPONENT_TYPE
 from course_modes.models import CourseMode
 from eventtracking import tracker
 from search.search_engine_base import SearchEngine
@@ -183,15 +182,13 @@ class SearchIndexerBase(object):
 
             item_content_groups = None
 
-            if item.category == SPLIT_TEST_COMPONENT_TYPE:
+            if item.category == "split_test":
                 user_partitions = item.user_partitions
-
                 split_partitions = []
                 if user_partitions:
                     for user_partition in user_partitions:
                         if user_partition.scheme.name == RANDOM_SCHEME:
                             split_partitions.append(user_partition)
-
                 for vertical in item.get_children():
                     if split_partitions:
                         for user_partition in split_partitions:

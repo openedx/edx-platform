@@ -5,6 +5,7 @@ from pytz import UTC
 from django.dispatch import receiver
 
 from xmodule.modulestore.django import SignalHandler
+from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer
 
 
 @receiver(SignalHandler.course_published)
@@ -14,7 +15,6 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
     """
     # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
     from .tasks import update_search_index
-    from contentstore.courseware_index import CoursewareSearchIndexer
     if CoursewareSearchIndexer.indexing_is_enabled():
         update_search_index.delay(unicode(course_key), datetime.now(UTC).isoformat())
 
@@ -26,6 +26,5 @@ def listen_for_library_update(sender, library_key, **kwargs):  # pylint: disable
     """
     # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
     from .tasks import update_library_index
-    from contentstore.courseware_index import LibrarySearchIndexer
     if LibrarySearchIndexer.indexing_is_enabled():
         update_library_index.delay(unicode(library_key), datetime.now(UTC).isoformat())
