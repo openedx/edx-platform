@@ -2,6 +2,7 @@
 Discussion API test utilities
 """
 import json
+import re
 
 import httpretty
 
@@ -19,6 +20,25 @@ class CommentsServiceMockMixin(object):
                 "num_pages": num_pages,
             }),
             status=200
+        )
+
+    def register_post_thread_response(self, response_overrides):
+        """Register a mock response for POST on the CS commentable endpoint"""
+        def callback(request, _uri, headers):
+            """
+            Simulate the thread creation endpoint by returning the provided data
+            along with the data from response_overrides.
+            """
+            response_data = make_minimal_cs_thread(
+                {key: val[0] for key, val in request.parsed_body.items()}
+            )
+            response_data.update(response_overrides)
+            return (200, headers, json.dumps(response_data))
+
+        httpretty.register_uri(
+            httpretty.POST,
+            re.compile(r"http://localhost:4567/api/v1/(\w+)/threads"),
+            body=callback
         )
 
     def register_get_thread_error_response(self, thread_id, status_code):

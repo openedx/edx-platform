@@ -2,6 +2,7 @@
 Tests for Discussion API serializers
 """
 import itertools
+from urlparse import urlparse
 
 import ddt
 import httpretty
@@ -125,8 +126,8 @@ class SerializerTestMixin(CommentsServiceMockMixin, UrlResetMixin):
 
 
 @ddt.ddt
-class ThreadSerializerTest(SerializerTestMixin, ModuleStoreTestCase):
-    """Tests for ThreadSerializer."""
+class ThreadSerializerSerializationTest(SerializerTestMixin, ModuleStoreTestCase):
+    """Tests for ThreadSerializer serialization."""
     def make_cs_content(self, overrides):
         """
         Create a thread with the given overrides, plus some useful test data.
@@ -366,3 +367,76 @@ class CommentSerializerTest(SerializerTestMixin, ModuleStoreTestCase):
         self.assertEqual(serialized["children"][1]["parent_id"], "test_root")
         self.assertEqual(serialized["children"][1]["children"][0]["id"], "test_grandchild")
         self.assertEqual(serialized["children"][1]["children"][0]["parent_id"], "test_child_2")
+
+
+@ddt.ddt
+class ThreadSerializerDeserializationTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestCase):
+    """Tests for ThreadSerializer deserialization."""
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super(ThreadSerializerDeserializationTest, self).setUp()
+        httpretty.reset()
+        httpretty.enable()
+        self.addCleanup(httpretty.disable)
+        self.register_post_thread_response({"id": "test_id"})
+        self.course = CourseFactory.create()
+        self.user = UserFactory.create()
+        self.register_get_user_response(self.user)
+        self.request = RequestFactory().get("/dummy")
+        self.request.user = self.user
+        self.minimal_data = {
+            "course_id": unicode(self.course.id),
+            "topic_id": "test_topic",
+            "type": "discussion",
+            "title": "Test Title",
+            "raw_body": "Test body",
+        }
+
+    def save_and_reserialize(self, data):
+        """
+        Create a serializer with the given data, ensure that it is valid, save
+        the result, and return the full thread data from the serializer.
+        """
+        serializer = ThreadSerializer(data=data, context=get_context(self.course, self.request))
+        self.assertTrue(serializer.is_valid())
+        serializer.save()
+        return serializer.data
+
+    def test_minimal(self):
+        saved = self.save_and_reserialize(self.minimal_data)
+        self.assertEqual(
+            urlparse(httpretty.last_request().path).path,
+            "/api/v1/test_topic/threads"
+        )
+        self.assertEqual(
+            httpretty.last_request().parsed_body,
+            {
+                "course_id": [unicode(self.course.id)],
+                "commentable_id": ["test_topic"],
+                "thread_type": ["discussion"],
+                "title": ["Test Title"],
+                "body": ["Test body"],
+                "user_id": [str(self.user.id)],
+            }
+        )
+        self.assertEqual(saved["id"], "test_id")
+
+    def test_missing_field(self):
+        for field in self.minimal_data:
+            data = self.minimal_data.copy()
+            data.pop(field)
+            serializer = ThreadSerializer(data=data)
+            self.assertFalse(serializer.is_valid())
+            self.assertEqual(
+                serializer.errors,
+                {field: ["This field is required."]}
+            )
+
+    def test_type(self):
+        data = self.minimal_data.copy()
+        data["type"] = "question"
+        self.save_and_reserialize(data)
+
+        data["type"] = "invalid_type"
+        serializer = ThreadSerializer(data=data)
+        self.assertFalse(serializer.is_valid())

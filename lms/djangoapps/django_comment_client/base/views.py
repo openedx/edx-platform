@@ -37,6 +37,8 @@ log = logging.getLogger(__name__)
 
 TRACKING_MAX_FORUM_BODY = 2000
 
+THREAD_CREATED_EVENT_NAME = "edx.forum.thread.created"
+
 
 def permitted(fn):
     @functools.wraps(fn)
@@ -95,6 +97,26 @@ def track_forum_event(request, event_name, course, obj, data, id_map=None):
     ]
 
     tracker.emit(event_name, data)
+
+
+def get_thread_created_event_data(thread, followed):
+    """
+    Get the event data payload for thread creation (excluding fields populated
+    by track_forum_event)
+    """
+    return {
+        'commentable_id': thread.commentable_id,
+        'group_id': thread.get("group_id"),
+        'thread_type': thread.thread_type,
+        'title': thread.title,
+        'anonymous': thread.anonymous,
+        'anonymous_to_peers': thread.anonymous_to_peers,
+        'options': {'followed': followed},
+        # There is a stated desire for an 'origin' property that will state
+        # whether this thread was created via courseware or the forum.
+        # However, the view does not contain that data, and including it will
+        # likely require changes elsewhere.
+    }
 
 
 @require_POST
@@ -156,19 +178,7 @@ def create_thread(request, course_id, commentable_id):
         user = cc.User.from_django_user(request.user)
         user.follow(thread)
 
-    event_data = {
-        'title': thread.title,
-        'commentable_id': commentable_id,
-        'options': {'followed': follow},
-        'anonymous': anonymous,
-        'thread_type': thread.thread_type,
-        'group_id': group_id,
-        'anonymous_to_peers': anonymous_to_peers,
-        # There is a stated desire for an 'origin' property that will state
-        # whether this thread was created via courseware or the forum.
-        # However, the view does not contain that data, and including it will
-        # likely require changes elsewhere.
-    }
+    event_data = get_thread_created_event_data(thread, follow)
     data = thread.to_dict()
 
     # Calls to id map are expensive, but we need this more than once.
@@ -177,7 +187,7 @@ def create_thread(request, course_id, commentable_id):
 
     add_courseware_context([data], course, request.user, id_map=id_map)
 
-    track_forum_event(request, 'edx.forum.thread.created',
+    track_forum_event(request, THREAD_CREATED_EVENT_NAME,
                       course, thread, event_data, id_map=id_map)
 
     if request.is_ajax():

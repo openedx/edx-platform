@@ -15,6 +15,7 @@ from django_comment_common.models import (
     FORUM_ROLE_MODERATOR,
     Role,
 )
+from lms.lib.comment_client.thread import Thread
 from lms.lib.comment_client.user import User as CommentClientUser
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_names
 
@@ -134,15 +135,18 @@ class ThreadSerializer(_ContentSerializer):
     """
     course_id = serializers.CharField()
     topic_id = serializers.CharField(source="commentable_id")
-    group_id = serializers.IntegerField()
+    group_id = serializers.IntegerField(read_only=True)
     group_name = serializers.SerializerMethodField("get_group_name")
-    type_ = serializers.ChoiceField(source="thread_type", choices=("discussion", "question"))
+    type_ = serializers.ChoiceField(
+        source="thread_type",
+        choices=[(val, val) for val in ["discussion", "question"]]
+    )
     title = serializers.CharField()
-    pinned = serializers.BooleanField()
-    closed = serializers.BooleanField()
+    pinned = serializers.BooleanField(read_only=True)
+    closed = serializers.BooleanField(read_only=True)
     following = serializers.SerializerMethodField("get_following")
-    comment_count = serializers.IntegerField(source="comments_count")
-    unread_comment_count = serializers.IntegerField(source="unread_comments_count")
+    comment_count = serializers.IntegerField(source="comments_count", read_only=True)
+    unread_comment_count = serializers.IntegerField(source="unread_comments_count", read_only=True)
     comment_list_url = serializers.SerializerMethodField("get_comment_list_url")
     endorsed_comment_list_url = serializers.SerializerMethodField("get_endorsed_comment_list_url")
     non_endorsed_comment_list_url = serializers.SerializerMethodField("get_non_endorsed_comment_list_url")
@@ -189,6 +193,11 @@ class ThreadSerializer(_ContentSerializer):
     def get_non_endorsed_comment_list_url(self, obj):
         """Returns the URL to retrieve the thread's non-endorsed comments."""
         return self.get_comment_list_url(obj, endorsed=False)
+
+    def restore_object(self, attrs, instance=None):
+        if instance:
+            raise ValueError("ThreadSerializer cannot be used for updates.")
+        return Thread(user_id=self.context["cc_requester"]["id"], **attrs)
 
 
 class CommentSerializer(_ContentSerializer):
