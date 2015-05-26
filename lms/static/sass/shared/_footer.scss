@@ -1,5 +1,7 @@
 // Open edX: LMS footer
 // ====================
+@import 'susy/susy';
+@import '../base/grid-settings';
 
 .wrapper-footer {
   box-shadow: 0 -1px 5px 0 $shadow-l1;
@@ -9,12 +11,9 @@
   clear: both;
 
   footer#footer-openedx {
-    @include clearfix();
     @include box-sizing(border-box);
-    max-width: grid-width(12);
-    min-width: 760px;
-    width: flex-grid(12);
-    margin: 0 auto;
+    @include container();
+    @include span(12 of 12);
 
     p, ol, ul {
       font-family: $sans-serif;
@@ -38,9 +37,7 @@
 
     // colophon
     .colophon {
-      @include margin-right(flex-gutter());
-      width: flex-grid(8,12);
-      @include float(left);
+      @include span(8 of 12);
 
       .nav-colophon {
         @include clearfix();
@@ -65,7 +62,6 @@
       }
 
       .colophon-about {
-        @include clearfix();
 
         img {
           width: 68px;
@@ -75,8 +71,7 @@
         }
 
         p {
-          float: left;
-          width: flex-grid(6,8);
+          @include span(6 of 8);
           margin-left: $baseline;
           padding-left: $baseline;
           font-size: em(13);
@@ -87,9 +82,7 @@
 
     // references
     .references {
-      margin: -10px 0 0 0;
-      width: flex-grid(4,12);
-      display: inline-block;
+      @include span(4 of 12);
     }
 
     .wrapper-logo {
@@ -132,7 +125,7 @@
 
     .nav-social {
       margin: 0;
-      text-align: right;
+      @include text-align(right);
 
       li {
         display: inline-block;
@@ -157,8 +150,7 @@
 
     // platform Open edX logo and link
     .footer-about-openedx {
-      @include float(right);
-      width: flex-grid(3,12);
+      @include span(3 of 12);
       display: inline-block;
       vertical-align: bottom;
       @include text-align(right);
@@ -179,11 +171,11 @@
     footer {
 
       .copyright {
-        text-align: right;
+        @include text-align(right);
       }
 
       .nav-legal {
-        text-align: right;
+        @include text-align(right);
       }
     }
   }

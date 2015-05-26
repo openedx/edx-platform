@@ -4,20 +4,31 @@
 $learn-more-horizontal-position: calc(50% - 100px); // calculate the left position for "LEARN MORE" content
 
 .courses-container {
-  @include outer-container;
+  @include container();
   padding: ($baseline*0.9) ($baseline/2) 0 ($baseline/2);
 
   .courses {
-    @include row();
-    @include float(left);
     width:100%;
 
     .courses-listing {
       @extend %ui-no-list;
 
       .courses-listing-item {
+        @include span(12);
         margin: ($baseline*0.75) 0 ($baseline*1.5) 0;
         max-height: $course-card-height;
+
+        @include susy-breakpoint($bp-medium, $susy) {
+          @include gallery(6 of 12);
+        }
+
+        @include susy-breakpoint($bp-large, $susy) {
+          @include gallery(4 of 12);
+        }
+
+        @include susy-breakpoint($bp-huge, $susy) {
+          @include gallery(3 of 12);
+        }
       }
     }
 
@@ -129,7 +140,7 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
     @include margin-right(0);
     text-align: center;
 
-    @include media($large-min-width) {
+    @include susy-breakpoint($bp-large, $susy) {
       @include margin-right($baseline*0.5);
       @include text-align(right);
     }
@@ -146,23 +157,18 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
 
 /* Set homepage specific media queries */
 .home .courses-container .courses .courses-listing .courses-listing-item {
+  @include span(12 of 12);
 
-  @include rtl() { $layout-direction: "RTL"; }
-  @include fill-parent();
-
-  @include media($bp-medium) {
-    @include span-columns(4); // 4 of 8
-    @include omega(2n);
+  @include susy-breakpoint($bp-medium, $susy) {
+    @include gallery(6 of 12);
   }
 
-  @include media($bp-large) {
-    @include span-columns(4); // 4 of 12
-    @include omega(3n);
+  @include susy-breakpoint($bp-large, $susy) {
+    @include gallery(4 of 12);
   }
 
-  @include media($bp-huge) {
-    @include span-columns(3); // 3 of 12
-    @include omega(4n);
+  @include susy-breakpoint($bp-huge, $susy) {
+    @include gallery(3 of 12);
   }
 }
 

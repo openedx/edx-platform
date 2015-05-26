@@ -3,10 +3,13 @@
 
 // libs and resets *do not edit*
 @import 'bourbon/bourbon'; // lib - bourbon
+@import 'susy/susy';
+@import 'breakpoint/breakpoint';
 @import 'vendor/bi-app/bi-app-rtl'; // set the layout for right to left languages
 
 // base - utilities
 @import 'base/variables';
+@import 'base/variables-rtl';
 @import 'base/mixins';
 
 ## THEMING

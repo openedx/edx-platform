@@ -1,5 +1,3 @@
-@import '../base/grid-settings';
-
 header.global {
   @extend %ui-depth1;
   border-bottom: 1px solid $m-gray;
@@ -766,7 +764,7 @@ header.global-new {
       }
     }
 
-    @include media( $edx-bp-large ) {
+    @include susy-breakpoint($edx-bp-large, $susy) {
       .wrapper-header {
         width: 100%;
         min-width: 800px;
@@ -829,7 +827,7 @@ header.global-new {
       }
     }
 
-    @include media( $edx-bp-huge ) {
+    @include susy-breakpoint($edx-bp-huge, $susy) {
       .wrapper-header {
         padding: 17px 0;
       }

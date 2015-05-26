@@ -1,5 +1,4 @@
 @import '../base/grid-settings';
-@import 'neat/neat'; // lib - Neat
 
 $facet-text-color: #3d3e3f;
 $facet-background-color: #007db8;
@@ -39,79 +38,75 @@ $facet-background-color: #007db8;
       }
     }
 
+
+    .courses-listing-item {
+      @include span(12 of 12);
+      margin: ($baseline*0.75) 0 ($baseline*1.5) 0;
+      max-height: $course-card-height;
+
+      @include susy-breakpoint($bp-medium, $susy) {
+        @include gallery(6 of 12);
+      }
+
+      @include susy-breakpoint($bp-large, $susy) {
+        @include gallery(4 of 12);
+      }
+
+      @include susy-breakpoint($bp-huge, $susy) {
+        @include gallery(3 of 12);
+      }
+    }
+
+
     .courses {
-      @include rtl() { $layout-direction: "RTL"; }
 
       .courses-listing .courses-listing-item {
-        @include fill-parent();
+        @include span(12 of 12);
         margin: ($baseline*0.75) 0 ($baseline*1.5) 0;
         max-height: $course-card-height;
       }
 
-      /* Style grid settings if course discovery turned on */
       &:not(.no-course-discovery) {
-        @include span-columns(9);
+        @include span(9 of 12);
 
-        @include media($bp-medium) {
-          @include span-columns(4);
+        @include susy-breakpoint($bp-medium, $susy) {
+          @include span(6 of 12);
         }
 
-        @include media($bp-large) {
-          @include span-columns(8);
+        @include susy-breakpoint($bp-large, $susy) {
+          @include span(8 of 12);
         }
 
-        @include media($bp-huge) {
-          @include span-columns(9);
+        @include susy-breakpoint($bp-huge, $susy) {
+          @include span(9 of 12);
         }
 
         .courses-listing .courses-listing-item {
-          @include media($bp-medium) {
-            @include span-columns(8); // 4 of 8
-            @include omega(1n);
+          @include susy-breakpoint($bp-medium, $susy) {
+            @include gallery(6 of 12);
           }
 
-          @include media($bp-large) {
-            @include span-columns(6); // 6 of 12
-            @include omega(2n);
-          }
-
-          @include media($bp-huge) {
-            @include span-columns(4); // 4 of 12
-            @include omega(3n);
+          @include susy-breakpoint($bp-huge, $susy) {
+            @include gallery(4 of 12);
           }
         }
       }
 
-      /* Style grid settings if course discovery turned off */
+      // Style grid settings if course discovery turned off
       &.no-course-discovery{
-        @include span-columns(12);
-
-        @include media($bp-medium) {
-          @include span-columns(8);
-        }
-
-        @include media($bp-large) {
-          @include span-columns(12);
-        }
-
-        @include media($bp-huge) {
-          @include span-columns(12);
-        }
+        @include span(12 of 12);
 
         .courses-listing .courses-listing-item {
-          @include media($bp-medium) {
-            @include span-columns(4); // 4 of 8
-            @include omega(2n);
+          @include susy-breakpoint($bp-medium, $susy) {
+            @include gallery(6 of 12);
           }
 
-          @include media($bp-large) {
-            @include span-columns(4); // 4 of 12
-            @include omega(3n);
+          @include susy-breakpoint($bp-large, $susy) {
+            @include gallery(4 of 12);
           }
 
-          @include media($bp-huge) {
-            @include span-columns(3); // 3 of 12
-            @include omega(4n);
+          @include susy-breakpoint($bp-huge, $susy) {
+            @include gallery(3 of 12);
           }
         }
       }
@@ -300,8 +295,7 @@ $facet-background-color: #007db8;
 
 
   .search-facets{
-    @include fill-parent();
-    @include omega();
+    @include span(12 of 12);
     @include box-sizing(border-box);
     @extend %ui-depth1;
     position: relative;
@@ -312,24 +306,25 @@ $facet-background-color: #007db8;
     background-color: $white;
     max-height: ($baseline*100);
 
-    @include media($bp-tiny) {
-      @include span-columns(4);
+
+    @include susy-breakpoint($bp-tiny, $susy) {
+      @include span(12 of 12);
     }
 
-    @include media($bp-small) {
-      @include span-columns(3);
+    @include susy-breakpoint($bp-small, $susy) {
+      @include span(9 of 12);
     }
 
-    @include media($bp-medium) {
-      @include span-columns(4);
+    @include susy-breakpoint($bp-medium, $susy) {
+      @include span(6 of 12);
     }
 
-    @include media($bp-large) {
-      @include span-columns(4);
+    @include susy-breakpoint($bp-large, $susy) {
+      @include span(4 of 12);
     }
 
-    @include media($bp-huge) {
-      @include span-columns(3);
+    @include susy-breakpoint($bp-huge, $susy) {
+      @include span(3 of 12);
     }
 
     &.phone-menu {

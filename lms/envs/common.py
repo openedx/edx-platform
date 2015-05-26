@@ -221,10 +221,10 @@ FEATURES = {
     'ENABLE_INSTRUCTOR_LEGACY_DASHBOARD': True,
 
     # Is this an edX-owned domain? (used for edX specific messaging and images)
-    'IS_EDX_DOMAIN': False,
+    'IS_EDX_DOMAIN': True,
 
     # Toggle to enable certificates of courses on dashboard
-    'ENABLE_VERIFIED_CERTIFICATES': False,
+    'ENABLE_VERIFIED_CERTIFICATES': True,
 
     # Allow use of the hint managment instructor view.
     'ENABLE_HINTER_INSTRUCTOR_VIEW': False,
@@ -299,7 +299,7 @@ FEATURES = {
     'ENABLE_THIRD_PARTY_AUTH': False,
 
     # Toggle to enable alternate urls for marketing links
-    'ENABLE_MKTG_SITE': False,
+    'ENABLE_MKTG_SITE': True,
 
     # Prevent concurrent logins per user
     'PREVENT_CONCURRENT_LOGINS': True,
@@ -327,7 +327,7 @@ FEATURES = {
     'ENABLE_COURSE_BLOCKS_NAVIGATION_API': False,
 
     # Enable the combined login/registration form
-    'ENABLE_COMBINED_LOGIN_REGISTRATION': False,
+    'ENABLE_COMBINED_LOGIN_REGISTRATION': True,
 
     # Enable organizational email opt-in
     'ENABLE_MKTG_EMAIL_OPT_IN': False,

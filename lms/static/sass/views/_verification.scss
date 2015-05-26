@@ -636,7 +636,7 @@
 
     .requirements {
       margin-bottom: 10px;
-      @include outer-container;
+      @include container();
 
       .title {
         @extend %hd-lv3;
@@ -652,7 +652,7 @@
         box-shadow: 1px 1px 3px #888888;
 
         // TODO Determine why this is not responsive.
-        @include span-columns(6);
+        @include span(6);
       }
     }
 
@@ -1158,14 +1158,15 @@
 
   .content-supplementary {
     @include box-sizing(border-box);
-    @include outer-container;
-    @include span-columns(12);
+    @include container();
+    @include span(12);
 
     .list-help {
       @include clearfix();
 
       .help-item {
-        @include fill-parent;
+        box-sizing: border-box;
+        width: 100%;
         margin-bottom: 25px;
 
         &:last-child {
@@ -1174,14 +1175,15 @@
       }
     }
 
-    @include media( 550px ) {
+    @media screen and (min-width: 550px) {
+
       .list-help {
         .help-item {
-          @include span-columns(4);
+          @include span(4);
           margin-bottom: 0;
 
           &.help-item-technical {
-            @include span-columns(8);
+            @include span(8);
           }
         }
       }
@@ -1206,8 +1208,9 @@
       margin: ($baseline*2) 0;
 
       .deco-divider {
-        @include fill-parent;
         @include float(left);
+        box-sizing: border-box;
+        width: 100%;
       }
     }
 
@@ -1216,8 +1219,9 @@
     }
 
     .register-choice {
-      @include fill-parent;
       @include margin(0, flex-gutter(), $baseline, 0);
+      box-sizing: border-box;
+      width: 100%;
       border-top: ($baseline/4) solid $m-gray-d4;
       padding: $baseline ($baseline*1.5);
       background: $m-gray-l4;
@@ -1232,9 +1236,10 @@
       }
 
       .list-actions {
-        @include fill-parent;
         @include text-align(right);
         @include float(right);
+        box-sizing: border-box;
+        width: 100%;
         margin: ($baseline/4) 0;
         border-top: none;
         clear: both;
@@ -1263,7 +1268,8 @@
       }
 
       .action-select {
-        @include fill-parent;
+        box-sizing: border-box;
+        width: 100%;
 
         input {
           @extend %t-weight4;
@@ -1316,7 +1322,8 @@
       }
 
       .action-intro {
-        @include fill-parent;
+        box-sizing: border-box;
+        width: 100%;
         @extend %copy-detail;
         @include text-align(left);
       }
@@ -1343,7 +1350,7 @@
     }
 
     .help-register {
-      @include span-columns(4);
+      @include span(4);
 
       .title {
         @extend %hd-lv4;
@@ -1375,7 +1382,8 @@
 
     .contribution-options {
       @include clearfix();
-      @include fill-parent;
+      box-sizing: border-box;
+      width: 100%;
       margin: 0;
 
       &:after{
@@ -1384,9 +1392,10 @@
       }
 
       .field {
-        @include fill-parent;
         @include float(left);
         @include margin(0, ($baseline/2), ($baseline/2), 0);
+        box-sizing: border-box;
+        width: 100%;
         padding: ($baseline/2) ($baseline*0.75);
         background: $m-gray-t0;
 
@@ -1424,10 +1433,11 @@
       }
     }
 
-    @include media(min-width 550px max-width 768px) {
+    @media screen and (min-width: 550px) and (max-width: 768px) {
+
       .contribution-options {
         .field {
-          @include span-columns(6);
+          @include span(6);
 
           &:nth-of-type(even) {
             @include margin-right(0);
@@ -1451,7 +1461,7 @@
       }
     }
 
-    @include media( $edx-bp-large ) {
+    @include susy-breakpoint($edx-bp-large, $susy) {
       .contribution-options {
         .field {
           width: auto;
@@ -1460,7 +1470,7 @@
 
       .register-choice {
         .list-actions {
-          @include span-columns(4);
+          @include span(4);
           width: auto;
         }
 
@@ -1474,7 +1484,7 @@
       }
     }
 
-    @include media( $edx-bp-huge ) {
+    @include susy-breakpoint($edx-bp-huge, $susy) {
       .register-choice {
         .list-actions {
           @include float(right);
