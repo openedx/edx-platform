@@ -465,6 +465,9 @@
       @include margin-right($baseline/2);
     }
   }
+  .action-add-hidden {
+    visibility: hidden;
+  }
 }
 
 // * +Main - Certificate

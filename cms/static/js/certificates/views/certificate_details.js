@@ -68,6 +68,11 @@ function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView) {
                     self.$('div.signatory-details-list').append($(signatory_detail_view.render().$el));
                 });
             }
+
+            if(this.model.collection.length > 0 && window.certWebPreview) {
+                window.certWebPreview.show();
+            }
+
             return this;
         }
     });
