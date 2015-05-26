@@ -30,7 +30,7 @@ git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b
 git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c4aee6e76b9abe61cc808
 
 # Our libraries:
--e git+https://github.com/cpennington/XBlock.git@e9c4d441d1eaf7c9f176b873fe23e24c1152dba6#egg=XBlock
+-e git+https://github.com/edx/XBlock.git@1934a2978cdd3e2414486c74b76e3040ff1fb138#egg=XBlock
 -e git+https://github.com/edx/codejail.git@6b17c33a89bef0ac510926b1d7fea2748b73aadd#egg=codejail
 -e git+https://github.com/edx/js-test-tool.git@v0.1.6#egg=js_test_tool
 -e git+https://github.com/edx/event-tracking.git@0.2.0#egg=event-tracking

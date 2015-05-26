@@ -48,7 +48,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory, check_mongo_calls
-from xmodule.x_module import XModuleDescriptor, XModule, STUDENT_VIEW, CombinedSystem, DescriptorSystem
+from xmodule.x_module import XModuleDescriptor, XModule, STUDENT_VIEW, CombinedSystem
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -76,27 +76,6 @@ class EmptyXModuleDescriptor(XModuleDescriptor):  # pylint: disable=abstract-met
     Empty XModule for testing with no dependencies.
     """
     module_class = EmptyXModule
-
-
-class GradedStatelessXBlock(XBlock):
-    """
-    This XBlock exists to test grade storage for blocks that don't store
-    student state in a scoped field.
-    """
-
-    @XBlock.json_handler
-    def set_score(self, json_data, suffix):  # pylint: disable=unused-argument
-        """
-        Set the score for this testing XBlock.
-        """
-        self.runtime.publish(
-            self,
-            'grade',
-            {
-                'value': json_data['grade'],
-                'max_value': 1
-            }
-        )
 
 
 @attr('shard_1')
@@ -181,7 +160,8 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         }
 
         # Patch getmodule to return our mock module
-        with patch('courseware.module_render.load_single_xblock', return_value=self.mock_module):
+        with patch('courseware.module_render.find_target_student_module') as get_fake_module:
+            get_fake_module.return_value = self.mock_module
             # call xqueue_callback with our mocked information
             request = self.request_factory.post(self.callback_url, data)
             render.xqueue_callback(request, self.course_key, self.mock_user.id, self.mock_module.id, self.dispatch)
@@ -196,7 +176,8 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
             'xqueue_body': 'hello world',
         }
 
-        with patch('courseware.module_render.load_single_xblock', return_value=self.mock_module):
+        with patch('courseware.module_render.find_target_student_module') as get_fake_module:
+            get_fake_module.return_value = self.mock_module
             # Test with missing xqueue data
             with self.assertRaises(Http404):
                 request = self.request_factory.post(self.callback_url, {})
@@ -356,7 +337,8 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.course_key = self.create_toy_course()
         self.location = self.course_key.make_usage_key('chapter', 'Overview')
         self.toy_course = modulestore().get_course(self.course_key)
-        self.mock_user = UserFactory.create()
+        self.mock_user = UserFactory()
+        self.mock_user.id = 1
         self.request_factory = RequestFactory()
 
         # Construct a mock module for the modulestore to return
@@ -495,33 +477,6 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 'bad_handler',
                 'bad_dispatch',
             )
-
-    @XBlock.register_temp_plugin(GradedStatelessXBlock, identifier='stateless_scorer')
-    def test_score_without_student_state(self):
-        course = CourseFactory.create()
-        block = ItemFactory.create(category='stateless_scorer', parent=course)
-
-        request = self.request_factory.post(
-            'dummy_url',
-            data=json.dumps({"grade": 0.75}),
-            content_type='application/json'
-        )
-        request.user = self.mock_user
-
-        response = render.handle_xblock_callback(
-            request,
-            unicode(course.id),
-            quote_slashes(unicode(block.scope_ids.usage_id)),
-            'set_score',
-            '',
-        )
-        self.assertEquals(response.status_code, 200)
-        student_module = StudentModule.objects.get(
-            student=self.mock_user,
-            module_state_key=block.scope_ids.usage_id,
-        )
-        self.assertEquals(student_module.grade, 0.75)
-        self.assertEquals(student_module.max_grade, 1)
 
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_XBLOCK_VIEW_ENDPOINT': True})
     def test_xblock_view_handler(self):
@@ -1108,7 +1063,7 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
             location=location,
             static_asset_path=None,
             _runtime=Mock(
-                spec=DescriptorSystem,
+                spec=Runtime,
                 resources_fs=None,
                 mixologist=Mock(_mixins=(), name='mixologist'),
                 name='runtime',

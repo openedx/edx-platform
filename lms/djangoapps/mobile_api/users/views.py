@@ -147,12 +147,14 @@ class UserCourseStatus(views.APIView):
                 scope=Scope.user_state,
                 user_id=request.user.id,
                 block_scope_id=course.location,
-                field_name='position'
+                field_name=None
             )
-            original_store_date = field_data_cache.last_modified(key)
-            if original_store_date is not None and modification_date < original_store_date:
-                # old modification date so skip update
-                return self._get_course_info(request, course)
+            student_module = field_data_cache.find(key)
+            if student_module:
+                original_store_date = student_module.modified
+                if modification_date < original_store_date:
+                    # old modification date so skip update
+                    return self._get_course_info(request, course)
 
         save_positions_recursively_up(request.user, request, field_data_cache, module)
         return self._get_course_info(request, course)

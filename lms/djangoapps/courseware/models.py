@@ -13,7 +13,6 @@ ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
 import logging
-import itertools
 
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -30,49 +29,10 @@ from xmodule_django.models import CourseKeyField, LocationKeyField, BlockTypeKey
 log = logging.getLogger("edx.courseware")
 
 
-def chunks(items, chunk_size):
-    """
-    Yields the values from items in chunks of size chunk_size
-    """
-    items = list(items)
-    return (items[i:i + chunk_size] for i in xrange(0, len(items), chunk_size))
-
-
-class ChunkingManager(models.Manager):
-    """
-    :class:`~Manager` that adds an additional method :meth:`chunked_filter` to provide
-    the ability to make select queries with specific chunk sizes.
-    """
-    def chunked_filter(self, chunk_field, items, **kwargs):
-        """
-        Queries model_class with `chunk_field` set to chunks of size `chunk_size`,
-        and all other parameters from `**kwargs`.
-
-        This works around a limitation in sqlite3 on the number of parameters
-        that can be put into a single query.
-
-        Arguments:
-            chunk_field (str): The name of the field to chunk the query on.
-            items: The values for of chunk_field to select. This is chunked into ``chunk_size``
-                chunks, and passed as the value for the ``chunk_field`` keyword argument to
-                :meth:`~Manager.filter`. This implies that ``chunk_field`` should be an
-                ``__in`` key.
-            chunk_size (int): The size of chunks to pass. Defaults to 500.
-        """
-        chunk_size = kwargs.pop('chunk_size', 500)
-        res = itertools.chain.from_iterable(
-            self.filter(**dict([(chunk_field, chunk)] + kwargs.items()))
-            for chunk in chunks(items, chunk_size)
-        )
-        return res
-
-
 class StudentModule(models.Model):
     """
     Keeps student state for a particular module in a particular course.
     """
-    objects = ChunkingManager()
-
     MODEL_TAGS = ['course_id', 'module_type']
 
     # For a homework problem, contains a JSON
@@ -182,8 +142,6 @@ class XBlockFieldBase(models.Model):
     """
     Base class for all XBlock field storage.
     """
-    objects = ChunkingManager()
-
     class Meta(object):  # pylint: disable=missing-docstring
         abstract = True
 

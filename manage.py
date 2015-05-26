@@ -113,5 +113,4 @@ if __name__ == "__main__":
 
     from django.core.management import execute_from_command_line
 
-    sys.argv[1:] = django_args
-    execute_from_command_line(sys.argv)
+    execute_from_command_line([sys.argv[0]] + django_args)
