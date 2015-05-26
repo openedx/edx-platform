@@ -5,14 +5,6 @@ define([
     'use strict';
 
     return function (feedbackUrl, library) {
-        var dbError;
-
-        if (library) {
-            dbError = gettext('There was an error while importing the new library to our database.');
-        } else {
-            dbError = gettext('There was an error while importing the new course to our database.');
-        }
-
         var bar = $('.progress-bar'),
             fill = $('.progress-fill'),
             submitBtn = $('.submit-button'),
@@ -24,14 +16,21 @@ define([
                 dbError + '\n'
             ],
             previousImport = Import.storedImport(),
+            dbError,
             file;
 
-        Import.callbacks.complete = function () {
+        var onComplete = function () {
             bar.hide();
             chooseBtn
                 .find('.copy').html(gettext("Choose new file")).end()
                 .show();
-        };
+        }
+
+        if (library) {
+            dbError = gettext('There was an error while importing the new library to our database.');
+        } else {
+            dbError = gettext('There was an error while importing the new course to our database.');
+        }
 
         // Display the status of last file upload on page load
         if (previousImport) {
@@ -43,7 +42,7 @@ define([
                 chooseBtn.hide();
             }
 
-            Import.resume();
+            Import.resume().then(onComplete);
         }
 
         $('#fileupload').fileupload({
@@ -64,7 +63,7 @@ define([
                         Import.start(
                             file.name,
                             feedbackUrl.replace('fillerName', file.name)
-                        );
+                        ).then(onComplete);
 
                         submitBtn.hide();
                         data.submit().complete(function (result, textStatus, xhr) {
@@ -72,20 +71,15 @@ define([
                                 var serverMsg, errMsg, stage;
 
                                 try{
-                                    serverMsg = $.parseJSON(result.responseText);
+                                    serverMsg = $.parseJSON(result.responseText) || {};
                                 } catch (e) {
                                     return;
                                 }
 
-                                errMsg = serverMsg.hasOwnProperty('ErrMsg') ? serverMsg.ErrMsg : '' ;
+                                errMsg = serverMsg.hasOwnProperty('ErrMsg') ? serverMsg.ErrMsg : '';
+                                stage = Math.abs(serverMsg.Stage || 0);
 
-                                if (serverMsg.hasOwnProperty('Stage')) {
-                                    stage = Math.abs(serverMsg.Stage);
-                                    Import.error(defaults[stage] + errMsg, stage);
-                                }
-                                else {
-                                    alert(gettext('Your import has failed.') + '\n\n' + errMsg);
-                                }
+                                Import.error(defaults[stage] + errMsg, stage);
                             }
                         });
                     });

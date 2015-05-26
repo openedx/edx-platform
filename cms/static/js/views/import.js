@@ -9,14 +9,25 @@ define(
 
         /********** Private properties ****************************************/
 
+        var COOKIE_NAME = 'lastfileupload';
+
+        var STAGE = {
+            'UPLOADING': 0,
+            'UNPACKING': 1,
+            'VERIFYING': 2,
+            'UPDATING' : 3,
+            'SUCCESS'  : 4
+        };
+
         var STATE = {
             'READY'      : 1,
             'IN_PROGRESS': 2,
             'SUCCESS'    : 3,
             'ERROR'      : 4
-        }
+        };
 
         var current = { stage: 0, state: STATE.READY };
+        var deferred = null;
         var file = { name: null, url: null };
         var timeout = { id: null, delay: 1000 };
         var $dom = {
@@ -34,7 +45,7 @@ define(
          */
         var destroyEventListeners = function () {
             window.onbeforeunload = null;
-        }
+        };
 
         /**
          * Makes Import feedback status list visible
@@ -50,15 +61,27 @@ define(
          */
         var initEventListeners = function () {
             window.onbeforeunload = function () {
-                if (current.stage <= 1 ) {
+                if (current.stage <= STAGE.UNPACKING) {
                     return gettext('Your import is in progress; navigating away will abort it.');
                 }
             }
-        }
+        };
+
+        /**
+         * Stores in a cookie the current import data
+         *
+         * @param {boolean} [completed=false] If the import has been completed or not
+         */
+        var storeImport = function (completed) {
+            $.cookie(COOKIE_NAME, JSON.stringify({
+                file: file,
+                date: moment().valueOf(),
+                completed: completed || false
+            }));
+        };
 
         /**
          * Sets the Import on the "success" status
-         * (callbacks: complete)
          *
          * If it wasn't already, marks the stored import as "completed",
          * and updates its date timestamp
@@ -73,9 +96,7 @@ define(
             destroyEventListeners();
             updateFeedbackList();
 
-            if (typeof CourseImport.callbacks.complete === 'function') {
-                CourseImport.callbacks.complete();
-            }
+            deferred.resolve();
         };
 
         /**
@@ -85,13 +106,30 @@ define(
          *   current stage (for now only in case of error)
          */
         var updateFeedbackList = function (currStageMsg) {
-            var $checkmark = $dom.successStage.find('.icon');
+            var $checkmark, $curr, $prev, $next;
+            var date, successUnix, time;
+
+            $checkmark = $dom.successStage.find('.icon');
             currStageMsg = currStageMsg || '';
 
             function completeStage(stage) {
                 $(stage)
                     .removeClass("is-not-started is-started")
                     .addClass("is-complete");
+            }
+
+            function errorStage(stage) {
+                var $stage = $(stage);
+                var error = currStageMsg;
+
+                if (!$stage.hasClass('has-error')) {
+                    $stage
+                        .removeClass('is-started')
+                        .addClass('has-error')
+                        .find('p.copy')
+                        .hide()
+                        .after("<p class='copy error'>" + error + "</p>");
+                }
             }
 
             function resetStage(stage) {
@@ -109,8 +147,8 @@ define(
                     break;
 
                 case STATE.IN_PROGRESS:
-                    var $prev = $dom.stages.slice(0, current.stage);
-                    var $curr = $dom.stages.eq(current.stage);
+                    $prev = $dom.stages.slice(0, current.stage);
+                    $curr = $dom.stages.eq(current.stage);
 
                     _.map($prev, completeStage);
                     $curr.removeClass("is-not-started").addClass("is-started");
@@ -118,9 +156,9 @@ define(
                     break;
 
                 case STATE.SUCCESS:
-                    var successUnix = CourseImport.storedImport().date;
-                    var date = moment(successUnix).utc().format('MM/DD/YYYY');
-                    var time = moment(successUnix).utc().format('HH:mm');
+                    successUnix = CourseImport.storedImport().date;
+                    date = moment(successUnix).utc().format('MM/DD/YYYY');
+                    time = moment(successUnix).utc().format('HH:mm');
 
                     _.map($dom.stages, completeStage);
 
@@ -132,22 +170,13 @@ define(
 
                 case STATE.ERROR:
                     // Make all stages up to, and including, the error stage 'complete'.
-                    var $prev = $dom.stages.slice(0, current.stage + 1);
-                    var $curr = $dom.stages.eq(current.stage);
-                    var $next = $dom.stages.slice(current.stage + 1);
-                    var error = currStageMsg || gettext("There was an error with the upload");
+                    $prev = $dom.stages.slice(0, current.stage + 1);
+                    $curr = $dom.stages.eq(current.stage);
+                    $next = $dom.stages.slice(current.stage + 1);
 
                     _.map($prev, completeStage);
                     _.map($next, resetStage);
-
-                    if (!$curr.hasClass('has-error')) {
-                        $curr
-                            .removeClass('is-started')
-                            .addClass('has-error')
-                            .find('p.copy')
-                            .hide()
-                            .after("<p class='copy error'>" + error + "</p>");
-                    }
+                    errorStage($curr);
 
                     break;
             }
@@ -159,34 +188,12 @@ define(
             }
         };
 
-
-        /**
-         * Stores in a cookie the current import data
-         *
-         * @param {boolean} [completed=false] If the import has been completed or not
-         */
-        var storeImport = function (completed) {
-            $.cookie('lastfileupload', JSON.stringify({
-                file: file,
-                date: moment().valueOf(),
-                completed: completed || false
-            }));
-        }
-
         /********** Public functions ******************************************/
 
         var CourseImport = {
 
             /**
-             * A collection of callbacks.
-             * For now the only supported is 'complete', called on success/error
-             *
-             */
-            callbacks: {},
-
-            /**
              * Sets the Import in the "error" status.
-             * (callbacks: complete)
              *
              * Immediately stops any further polling from the server.
              * Displays the error message at the list element that corresponds
@@ -203,9 +210,7 @@ define(
                 clearTimeout(timeout.id);
                 updateFeedbackList(msg);
 
-                if (typeof this.callbacks.complete === 'function') {
-                    this.callbacks.complete();
-                }
+                deferred.resolve();
             },
 
             /**
@@ -217,26 +222,24 @@ define(
              * @param {int} [stage=0] Starting stage.
              */
             pollStatus: function (stage) {
-                var self = this;
-
                 if (current.state !== STATE.IN_PROGRESS) {
                     return;
                 }
 
-                current.stage = stage || 0;
+                current.stage = stage || STAGE.UPLOADING;
 
-                if (current.stage === 4) { // Succeeded
+                if (current.stage === STAGE.SUCCESS) {
                     success();
-                } else if (current.stage < 0) { // Failed
+                } else if (current.stage < STAGE.UPLOADING) { // Failed
                     this.error(gettext("Error importing course"));
                 } else { // In progress
                     updateFeedbackList();
 
                     $.getJSON(file.url, function (data) {
                         timeout.id = setTimeout(function () {
-                            self.pollStatus(data.ImportStatus);
-                        }, timeout.delay);
-                    });
+                            this.pollStatus(data.ImportStatus);
+                        }.bind(this), timeout.delay);
+                    }.bind(this));
                 }
             },
 
@@ -245,7 +248,7 @@ define(
              *
              */
             reset: function () {
-                current.stage = 0;
+                current.stage = STAGE.UPLOADING;
                 current.state = STATE.READY;
 
                 updateFeedbackList();
@@ -255,22 +258,28 @@ define(
              * Show last import status from server and start sending requests
              * to the server for status updates
              *
+             * @return {jQuery promise}
              */
             resume: function () {
-                var self = this;
-
-                file = self.storedImport().file;
+                deferred = $.Deferred();
+                file = this.storedImport().file;
 
                 $.getJSON(file.url, function (data) {
                     current.stage = data.ImportStatus;
 
-                    if (current.stage !== 0) {
-                        current.state = STATE.IN_PROGRESS;
-                        displayFeedbackList();
+                    displayFeedbackList();
 
-                        self.pollStatus(current.stage);
+                    if (current.stage !== STAGE.UPLOADING) {
+                        current.state = STATE.IN_PROGRESS;
+
+                        this.pollStatus(current.stage);
+                    } else {
+                        // An import in the upload stage cannot be resumed
+                        this.error(gettext("There was an error with the upload"));
                     }
-                });
+                }.bind(this));
+
+                return deferred.promise();
             },
 
             /**
@@ -280,9 +289,11 @@ define(
              * @param {string} fileName The name of the file to import
              * @param {string} fileUrl The full URL to use to query the server
              *     about the import status
+             * @return {jQuery promise}
              */
             start: function (fileName, fileUrl) {
                 current.state = STATE.IN_PROGRESS;
+                deferred = $.Deferred();
 
                 file.name = fileName;
                 file.url = fileUrl;
@@ -291,6 +302,8 @@ define(
                 storeImport();
                 displayFeedbackList();
                 updateFeedbackList();
+
+                return deferred.promise();
             },
 
             /**
@@ -299,7 +312,7 @@ define(
              * @return {JSON} the data of the previous import
              */
             storedImport: function () {
-                return JSON.parse($.cookie('lastfileupload'));
+                return JSON.parse($.cookie(COOKIE_NAME));
             }
         };
 
