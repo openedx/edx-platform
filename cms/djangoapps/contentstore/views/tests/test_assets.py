@@ -309,14 +309,13 @@ class DownloadTestCase(AssetsTestCase):
     def test_metadata_found_in_modulestore(self):
         # Insert asset metadata into the modulestore (with no accompanying asset).
         asset_key = self.course.id.make_asset_key(AssetMetadata.GENERAL_ASSET_TYPE, 'pic1.jpg')
-        asset_md = AssetMetadata(
-            asset_key,
-            internal_name='EKMND332DDBK',
-            pathname='pix/archive',
-            locked=False,
-            curr_version='14',
-            prev_version='13',
-        )
+        asset_md = AssetMetadata(asset_key, {
+            'internal_name': 'EKMND332DDBK',
+            'basename': 'pix/archive',
+            'locked': False,
+            'curr_version': '14',
+            'prev_version': '13'
+        })
         modulestore().save_asset_metadata(asset_md, 15)
         # Get the asset metadata and have it be found in the modulestore.
         # Currently, no asset metadata should be found in the modulestore. The code is not yet storing it there.
