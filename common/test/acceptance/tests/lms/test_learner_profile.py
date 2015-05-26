@@ -14,11 +14,12 @@ from ...pages.lms.account_settings import AccountSettingsPage
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.learner_profile import LearnerProfilePage
 from ...pages.lms.dashboard import DashboardPage
+from bok_choy.web_app_test import WebAppTest
 
 from ..helpers import EventsTestMixin
 
 
-class LearnerProfileTestMixin(EventsTestMixin):
+class LearnerProfileTestMixin(EventsTestMixin, WebAppTest):
     """
     Mixin with helper methods for testing learner profile pages.
     """
