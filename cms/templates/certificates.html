@@ -11,7 +11,7 @@
 <%block name="bodyclass">is-signedin course view-certificates</%block>
 
 <%block name="header_extras">
-% for template_name in ["certificate-details", "certificate-editor", "signatory-editor", "signatory-details", "basic-modal", "modal-button", "list", "upload-dialog"]:
+% for template_name in ["certificate-details", "certificate-editor", "signatory-editor", "signatory-details", "basic-modal", "modal-button", "list", "upload-dialog", "certificate-web-preview"]:
   <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
   </script>
@@ -28,7 +28,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
 
 <%block name="requirejs">
   require(["js/certificates/factories/certificates_page_factory"], function(CertificatesPageFactory) {
-      CertificatesPageFactory(${json.dumps(certificates)}, "${certificate_url}", "${course_outline_url}");
+      CertificatesPageFactory(${json.dumps(certificates)}, "${certificate_url}", "${course_outline_url}", ${json.dumps(course_modes)}, ${json.dumps(certificate_web_view_url)} );
   });
 </%block>
 
@@ -39,6 +39,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
         <small class="subtitle">${_("Settings")}</small>
         <span class="sr">&gt; </span>${_("Certificates")}
       </h1>
+      <div class="preview-certificate nav-actions"></div>
     </header>
   </div>
 

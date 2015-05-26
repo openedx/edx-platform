@@ -34,8 +34,10 @@ class CertificatesTest(StudioCourseTest):
         """
         self.assertEqual(existing_certs, len(self.certificates_page.certificates))
         if existing_certs == 0:
+            self.certificates_page.wait_for_first_certificate_button()
             self.certificates_page.click_first_certificate_button()
         else:
+            self.certificates_page.wait_for_add_certificate_button()
             self.certificates_page.click_add_certificate_button()
 
         certificate = self.certificates_page.certificates[existing_certs]
@@ -76,39 +78,32 @@ class CertificatesTest(StudioCourseTest):
             self.certificates_page.no_certificates_message_text
         )
 
-    def test_can_create_and_edit_certficates(self):
+    def test_can_create_and_edit_certficate(self):
         """
         Scenario: Ensure that the certificates can be created and edited correctly.
         Given I have a course without certificates
         When I click button 'Add your first Certificate'
         And I set new the course title override and signatory and click the button 'Create'
         Then I see the new certificate is added and has correct data
-        And I click 'New Certificate' button
-        And I set the name and click the button 'Create'
-        Then I see the second certificate is added and has correct data
-        When I edit the second certificate
+        When I edit the  certificate
         And I change the name and click the button 'Save'
-        Then I see the second certificate is saved successfully and has the new name
+        Then I see the certificate is saved successfully and has the new name
         """
         self.certificates_page.visit()
-        self.create_and_verify_certificate(
+        self.certificates_page.wait_for_first_certificate_button()
+        certificate = self.create_and_verify_certificate(
             "Course Title Override",
             0,
             [self.make_signatory_data('first'), self.make_signatory_data('second')]
         )
-        second_certificate = self.create_and_verify_certificate(
-            "Course Title Override 2",
-            1,
-            [self.make_signatory_data('third'), self.make_signatory_data('forth')]
-        )
 
-        # Edit the second certificate
-        second_certificate.click_edit_certificate_button()
-        second_certificate.course_title = "Updated Course Title Override 2"
-        self.assertEqual(second_certificate.get_text('.action-primary'), "Save")
-        second_certificate.click_save_certificate_button()
+        # Edit the certificate
+        certificate.click_edit_certificate_button()
+        certificate.course_title = "Updated Course Title Override 2"
+        self.assertEqual(certificate.get_text('.action-primary'), "Save")
+        certificate.click_save_certificate_button()
 
-        self.assertIn("Updated Course Title Override 2", second_certificate.course_title)
+        self.assertIn("Updated Course Title Override 2", certificate.course_title)
 
     def test_can_delete_certificate(self):
         """
