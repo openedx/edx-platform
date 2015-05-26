@@ -11,6 +11,7 @@ from urlparse import urlparse
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from lms.djangoapps.lms_xblock.runtime import quote_slashes, unquote_slashes, LmsModuleSystem
 from xblock.fields import ScopeIds
+from xmodule.x_module import DescriptorSystem
 
 TEST_STRINGS = [
     '',
@@ -48,12 +49,12 @@ class TestHandlerUrl(TestCase):
         self.course_key = SlashSeparatedCourseKey("org", "course", "run")
         self.runtime = LmsModuleSystem(
             static_url='/static',
-            track_function=Mock(),
-            get_module=Mock(),
-            render_template=Mock(),
+            track_function=Mock(name='track_function'),
+            get_module=Mock(name='get_module'),
+            render_template=Mock(name='render_template'),
             replace_urls=str,
             course_id=self.course_key,
-            descriptor_runtime=Mock(),
+            descriptor_runtime=Mock(spec=DescriptorSystem, name='descriptor_runtime'),
         )
 
     def test_trailing_characters(self):
@@ -120,13 +121,13 @@ class TestUserServiceAPI(TestCase):
 
         self.runtime = LmsModuleSystem(
             static_url='/static',
-            track_function=Mock(),
-            get_module=Mock(),
-            render_template=Mock(),
+            track_function=Mock(name="track_function"),
+            get_module=Mock(name="get_module"),
+            render_template=Mock(name="render_template"),
             replace_urls=str,
             course_id=self.course_id,
             get_real_user=mock_get_real_user,
-            descriptor_runtime=Mock(),
+            descriptor_runtime=Mock(spec=DescriptorSystem, name="descriptor_runtime"),
         )
         self.scope = 'course'
         self.key = 'key1'
