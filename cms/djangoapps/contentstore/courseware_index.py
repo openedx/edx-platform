@@ -11,7 +11,8 @@ from django.utils.translation import ugettext as _
 from django.core.urlresolvers import resolve
 
 from contentstore.utils import course_image_url
-from contentstore.course_group_config import GroupConfiguration
+from contentstore.course_group_config import GroupConfiguration, RANDOM_SCHEME
+from contentstore.views.component import SPLIT_TEST_COMPONENT_TYPE
 from course_modes.models import CourseMode
 from eventtracking import tracker
 from search.search_engine_base import SearchEngine
@@ -182,16 +183,29 @@ class SearchIndexerBase(object):
 
             item_content_groups = None
 
-            if item.category == "split_test":
+            if item.category == SPLIT_TEST_COMPONENT_TYPE:
+                user_partitions = item.user_partitions
+
+                split_partitions = []
+                if user_partitions:
+                    for user_partition in user_partitions:
+                        if user_partition.scheme.name == RANDOM_SCHEME:
+                            split_partitions.append(user_partition)
+
                 for vertical in item.get_children():
-                    group_id = int(vertical.display_name.split(" ")[2])
-                    groups_usage_info.update({
-                        unicode(get_item_location(vertical)): [group_id],
-                    })
-                    for component in vertical.get_children():
-                        groups_usage_info.update({
-                            unicode(get_item_location(component)): [group_id]
-                        })
+                    if split_partitions:
+                        for user_partition in split_partitions:
+                            for group in user_partition.groups:
+                                group_id = unicode(group.id)
+                                child_location = item.group_id_to_child.get(group_id, None)
+                                if child_location == vertical.location:
+                                    groups_usage_info.update({
+                                        unicode(get_item_location(vertical)): [group_id],
+                                    })
+                                    for component in vertical.get_children():
+                                        groups_usage_info.update({
+                                            unicode(get_item_location(component)): [group_id]
+                                        })
 
             if groups_usage_info:
                 item_location = get_item_location(item)
