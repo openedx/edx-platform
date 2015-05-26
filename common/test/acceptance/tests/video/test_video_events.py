@@ -154,17 +154,31 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
 
     # helper methods
     def seek_video_and_skip(self):
+        """
+        Wait 5 seconds and press "skip" button.
+        """
         self.video.wait_for_position('0:05')
         self.video.click_player_button('skip_bumper')
 
     def seek_video_and_dismiss(self):
+        """
+        Wait 5 seconds and press "do not show again" button.
+        """
         self.video.wait_for_position('0:05')
         self.video.click_player_button('do_not_show_again')
 
     def wait_for_state(self, state='finished'):
+        """
+        Wait until video will be in given state.
+
+        Finished state means that video is played to the end.
+        """
         self.video.wait_for_state(state)
 
     def add_bumper(self):
+        """
+        Add video bumper to the course.
+        """
         additional_data = {
             u'video_bumper': {
                 u'value': {
@@ -220,16 +234,14 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
         # the list, except first.
         filtered_events = []
         for video_event in captured_events:
-            if (
-                filtered_events
+            if (filtered_events
                 and video_event['event_type'] == filtered_events[-1]['event_type']
-                and video_event['event_type'] == 'edx.video.bumper.played'
-            ):
+                and video_event['event_type'] == 'edx.video.bumper.played'):
                 continue
             filtered_events.append(video_event)
 
         for idx, video_event in enumerate(filtered_events):
-            if (idx < 3):
+            if idx < 3:
                 self.assert_bumper_payload_contains_ids(video_event, sources, duration)
             else:
                 self.assert_payload_contains_ids(video_event)
@@ -278,7 +290,8 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
 
         captured_events = []
         self.add_bumper()
-        with self.capture_events(lambda e: e['event_type'] == 'edx.video.bumper.loaded', captured_events=captured_events):
+        filter_event = lambda e: e['event_type'] == 'edx.video.bumper.loaded'
+        with self.capture_events(filter_event, captured_events=captured_events):
             self.navigate_to_video_no_render()
             self.video.click_on_poster()
 
