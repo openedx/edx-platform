@@ -8,7 +8,7 @@
 # Python libraries to install directly from github
 
 # Third-party:
--e git+https://github.com/edx/django-staticfiles.git@d89aae2a82f2b#egg=django-staticfiles
+-e git+https://github.com/edx/django-staticfiles.git@3260462bffd08733330a1bc73725cf3e2243b839#egg=django-staticfiles
 -e git+https://github.com/edx/django-pipeline.git@88ec8a011e481918fdc9d2682d4017c835acd8be#egg=django-pipeline
 -e git+https://github.com/edx/django-wiki.git@cd0b2b31997afccde519fe5b3365e61a9edb143f#egg=django-wiki
 -e git+https://github.com/edx/django-oauth2-provider.git@0.2.7-fork-edx-5#egg=django-oauth2-provider
