@@ -16,6 +16,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import NoSuchUserPartitionError
 from xmodule.course_module import CourseFields
 from xmodule.fields import Date
+from xmodule.modulestore.inheritance import UserPartition
+from opaque_keys.edx.locator import CourseLocator
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -61,29 +63,54 @@ class CourseStructure(TimeStampedModel):
         for child_node in cur_block['children']:
             self._traverse_tree(child_node, unordered_structure, ordered_blocks, parent=block)
 
-class JsonCacheField(django.db.models.Field):
+# TODO me: make sure all these fields work...
+
+class UserPartitionListCacheField(Field):
     def __init__(self, *args, **kwargs):
-        super(JsonCacheField, self).__init__(*args, **kwargs)
+        super(UserPartitionListCacheField, self).__init__(*args, **kwargs)
 
     def to_representation(self, obj):
-        return obj.to_json()
+        strings = [user_partition.to_json() for user_partition in obj]
+        return json.dumps(strings)
 
-    def to_internal_value(self, obj):
-        return obj.from_json()
+    def to_internal_value(self, data):
+        strings = json.loads(data)
+        return [UserPartition.from_json(s) for s in strings]
 
-class UserPartitionListCacheField(JsonCacheField):
-    pass
+class GroupAccessDictCacheField(Field):
+    def __init__(self, *args, **kwargs):
+        super(GroupAccessDictCacheField, self).__init__(*args, **kwargs)
 
-class GroupAccessDictCacheField(JsonCacheField):
-    pass
+    def to_representation(self, obj):
+        return json.dumps(obj)
 
-class CourseIdListCacheField(JsonCacheField):
-    pass
+    def to_internal_value(self, data):
+        return json.loads(data)
+
+class CourseLocatorCacheField(Field):
+    def __init__(self, *args, **kwargs):
+        super(CourseLocatorCacheField, self).__init__(*args, **kwargs)
+
+    def to_representation(self, obj):
+        return CourseLocator.to_string(obj)  # TODO me: does this method exist?
+
+    def to_internal_value(self, data):
+        return CourseLocator.from_string(data)
+
+class CourseIdListCacheField(Field):
+    def __init__(self, *args, **kwargs):
+        super(CourseIdListCacheField, self).__init__(*args, **kwargs)
+
+    def to_representation(self, obj):
+        return json.dumps(obj)
+
+    def to_internal_value(self, data):
+        return json.loads(data)
 
 class CourseOverviewFields(django.db.models.Model):
 
     # Source: None; specific to this class
-    id = CourseKeyField()
+    id = CourseKeyField(db_index=True, primary_key=True, max_length=255)
     modulestore_type = CharField(max_length=5)  # 'split', 'mongo', or 'xml'
 
     # TODO me: find out where these variables are from...
@@ -95,7 +122,7 @@ class CourseOverviewFields(django.db.models.Model):
     group_access = GroupAccessDictCacheField()
 
     # Source: XModuleMixin (x_module.py)
-    location = UsageKeyField()
+    location = CourseLocatorCacheField()
 
     # Source: CourseFields (course_module.py)
     enrollment_start = DateField()
@@ -122,7 +149,7 @@ class CourseOverviewFields(django.db.models.Model):
 
 class CourseOverviewDescriptor(CourseOverviewFields):
 
-    @classmethod
+    @staticmethod
     def create_from_course(course):
         # TODO: when we upgrade to 1.8, delete old code and uncomment new code
         modulestore_type = modulestore().get_modulestore_type(course.id)
@@ -322,7 +349,7 @@ class CourseOverviewDescriptor(CourseOverviewFields):
 
 def get_course_overview(course_id):
     try:
-        course_overview = CourseOverviewFields.get(id=course_id)
+        course_overview = CourseOverviewFields.objects.get(id=course_id)
     except CourseOverviewFields.DoesNotExist:
         course = modulestore().get_course(course_id)
         course_overview = CourseOverviewDescriptor.create_from_course(course)
