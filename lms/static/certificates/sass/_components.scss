@@ -58,10 +58,6 @@
     @extend %depth-card;
 }
 
-.sr {
-    @extend %cont-text-sr;
-}
-
 // ------------------------------
 // #IMAGES
 // ------------------------------
@@ -569,19 +565,18 @@
 // #BADGES MODAL
 // ------------------------------
 .badges-overlay {
-
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 10;
-    background-color: rgba(0, 0, 0, 0.5); /*dim the background*/
+    z-index: z-index(front);
+    background-color: palette(grayscale, trans); /*dim the background*/
     vertical-align: middle;
 
     .badges-modal {
-        color: #9b9b9b;
-        font-size: 14pt;
+        color: palette(grayscale, dark);
+        @extend %copy-large;
         box-sizing: content-box;
         right: 0;
         left: 0;
@@ -589,19 +584,15 @@
         margin-right: auto;
         margin-left: auto;
         position: fixed;
-        top: 5em;
-        background: #ffffff;
-        z-index: 11;
-        border-top: 10px solid #03a0e1;
+        top: spacing-vertical(large);
+        background: palette(grayscale, white);
+        z-index: z-index(very-front);
+        border-top: 10px solid palette(primary, light);
         padding-right: 2em;
         padding-left: 2em;
         overflow-x: hidden;
 
-        h1 {
-            color: black;
-        }
-
-        .close-modal {
+        .close {
             position: absolute;
             right: 1em;
             top: 1em;
@@ -609,45 +600,44 @@
             cursor: pointer;
         }
 
-        hr {
-            color: #cccccc;
-            border: none;
-            height: 2px;
-            width: 100%;
-            display: block;
-        }
+        .badges-steps {
+            @extend %reset-lists;
+            display: table;
 
-        ol {
-            margin-bottom: 0;
-            padding-left: 0;
+            .step {
+                counter-increment: step-counter;
+                margin-bottom: spacing-vertical(medium);
+                display: table-row;
 
-            .badges-steps {
-                list-style: none inside;
-                display: table;
-                li {
-                    counter-increment: step-counter;
-                    margin-bottom: 1em;
-                    display: table-row;
-                    ::before {
-                        content: counter(step-counter);
-                        padding-right: 2em;
-                        margin-left: .5em;
-                        font-size: 110%;
-                        color: black;
-                        font-weight: bold;
-                        display: table-cell;
-                    }
+                &:before {
+                    content: counter(step-counter);
+                    padding-right: spacing-horizontal(large);
+                    margin-left: spacing-horizontal(small);
+                    font-size: 110%;
+                    color: palette(grayscale, black);
+                    font-weight: font-weight(bold);
+                    display: table-cell;
                 }
             }
         }
 
         .image-container{
-            margin-left: 3em;
+            // Lines the image up with the content of the above list.
+            padding-left: 2.75em;
+            padding-top: spacing-vertical(medium);
         }
 
         .backpack-logo {
-            float: right;
-            margin-left: 1em;
+            @include float(right);
+            margin-left: spacing-horizontal(small);
         }
     }
+}
+
+.modal-hr {
+    background-color: palette(grayscale, light);
+    border: none;
+    height: 2px;
+    width: 100%;
+    display: block;
 }
