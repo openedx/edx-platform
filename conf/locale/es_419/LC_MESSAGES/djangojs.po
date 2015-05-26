@@ -47,6 +47,7 @@
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2014
 # Juan Fernando Villa <elite.linux@gmail.com>, 2015
+# Juan <juan.marrero@utec.edu.uy>, 2015
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
 # Natalia, 2013
 # Natalia, 2014
@@ -81,14 +82,15 @@
 # Javier Galnares Arias <javigalnares@yahoo.es>, 2015
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2014
+# Juan <juan.marrero@utec.edu.uy>, 2015
 # karlman72 <karlman72@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-05-15 17:04+0000\n"
-"PO-Revision-Date: 2015-05-06 19:54+0000\n"
-"Last-Translator: Juan Camilo Montoya Franco <juan.montoya@edunext.co>\n"
+"POT-Creation-Date: 2015-05-26 15:28+0000\n"
+"PO-Revision-Date: 2015-05-23 14:13+0000\n"
+"Last-Translator: Cristian Salamea <ovnicraft@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1687,6 +1689,11 @@ msgstr ""
 "\n"
 "¿Desea pasar al Editor avanzado y convertir el problema a formato XML?"
 
+#. Translators: This is the title of the text explaining a problem
+#: common/lib/xmodule/xmodule/js/src/problem/edit.js
+msgid "Explanation"
+msgstr "Explicación"
+
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 msgid ""
 "Sequence error! Cannot navigate to %(tab_name)s in the current "
@@ -1894,8 +1901,8 @@ msgstr "..."
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "there is currently %(numVotes)s vote"
 msgid_plural "there are currently %(numVotes)s votes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "actualmente tiene %(numVotes)s voto"
+msgstr[1] "actualmente tiene %(numVotes)s votos"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "%(numVotes)s Vote"
@@ -2322,8 +2329,14 @@ msgid "Reply"
 msgstr "Responder"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
+#: lms/templates/edxnotes/note-item.underscore
+#, fuzzy
 msgid "Tags:"
-msgstr "Etiquetas"
+msgstr ""
+"#-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#\n"
+"Etiquetas\n"
+"#-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#\n"
+"Etiquetas:"
 
 #: lms/static/coffee/src/calculator.js
 msgid "Open Calculator"
@@ -2364,6 +2377,7 @@ msgstr "Error al generar las calificaciones. Por favor inténtelo nuevamente."
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating problem grade report. Please try again."
 msgstr ""
+"Error al generar el reporte de calificaciones. Por favor intente nuevamente."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "File Name"
@@ -3284,7 +3298,7 @@ msgstr ""
 #. translated.
 #: lms/static/js/edxnotes/views/tabs/tags.js
 msgid "[no tags]"
-msgstr ""
+msgstr "[Sin etiquetas]"
 
 #: lms/static/js/groups/views/cohort_discussions.js
 #: lms/static/js/groups/views/cohort_discussions_course_wide.js
@@ -3486,6 +3500,8 @@ msgid ""
 "The name that identifies you throughout {platform_name}. You cannot change "
 "your username."
 msgstr ""
+"En nombre que lo identifica en el sitio de {platform_name}. No podrá ser "
+"cambiado."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/templates/student_profile/profile.underscore
@@ -3497,6 +3513,8 @@ msgid ""
 "The name that appears on your certificates. Other learners never see your "
 "full name."
 msgstr ""
+"El nombre que aparecerá en sus certificados. Otros usuarios nunca verán su "
+"nombre completo."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Email Address"
@@ -3507,6 +3525,9 @@ msgid ""
 "The email address you use to sign in. Communications from {platform_name} "
 "and your courses are sent to this address."
 msgstr ""
+"La dirección de correo que usa para iniciar sesión. Las comunicaciones de "
+"{platform_name} y las relacionadas con sus cursos serán enviadas a esta "
+"dirección."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/templates/student_account/account.underscore
@@ -3540,6 +3561,8 @@ msgid ""
 "The language used throughout this site. This site is currently available in "
 "a limited number of languages."
 msgstr ""
+"El idioma que usará para el sitio. Actualmente solo hay disponibilidad de "
+"usar un número limitado de idiomas."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Country or Region"
@@ -3583,6 +3606,8 @@ msgstr "Hemos enviado un mensaje de confirmación a {new_email_address}."
 msgid ""
 "You must sign out and sign back in before your language changes take effect."
 msgstr ""
+"Debe cerrar sesión y volver a iniciar para que se aplique el cambio de "
+"idioma"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "We've sent a message to {email_address}. "
@@ -3626,7 +3651,7 @@ msgstr "Guardado"
 
 #: lms/static/js/student_profile/views/learner_profile_factory.js
 msgid "{platform_name} learners can see my:"
-msgstr ""
+msgstr "Los usuarios de {platform_name} pueden ver mi:"
 
 #: lms/static/js/student_profile/views/learner_profile_factory.js
 msgid "Limited Profile"
@@ -3657,6 +3682,9 @@ msgid ""
 "Tell other learners a little about yourself: where you live, what your "
 "interests are, why you're taking courses, or what you hope to learn."
 msgstr ""
+"Comparta con otros usuarios algo sobre usted: donde vive, cuales son sus "
+"intereses, porque está tomando estos cursos, o cuales son sus expectativas "
+"de aprendizaje."
 
 #: lms/static/js/student_profile/views/learner_profile_fields.js
 msgid "Account Settings page."
@@ -3682,7 +3710,7 @@ msgstr ""
 
 #: lms/static/js/student_profile/views/learner_profile_fields.js
 msgid "Profile Image"
-msgstr ""
+msgstr "Foto de perfil"
 
 #: lms/static/js/student_profile/views/learner_profile_fields.js
 msgid "Profile image for {username}"
@@ -3708,33 +3736,33 @@ msgstr "No se publicaron las fotos"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Professional Education Verified Certificate"
-msgstr ""
+msgstr "Certificado Verificado de educación profesional"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Professional Education"
-msgstr ""
+msgstr "Educación profesional"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Verified Certificate upgrade"
-msgstr ""
+msgstr "Ascender a un Certificado Verificado"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Verified Certificate"
-msgstr ""
+msgstr "Certificado Verificado"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Pay with Credit Card"
-msgstr ""
+msgstr "Pagar con tarjeta de crédito"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Pay with PayPal"
-msgstr ""
+msgstr "Pagar con PayPall"
 
 #. Translators: 'processor' is the name of a third-party payment processing
 #. vendor (example: "PayPal")
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Pay with {processor}"
-msgstr ""
+msgstr "Pagar con {processor}"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "An error has occurred. Please try again."
@@ -4388,6 +4416,83 @@ msgstr ""
 "Formato de archivo no soportado. Por favor cargue un archivo con extensión "
 "<code>tar.gz</code>."
 
+#: cms/static/js/views/license.js cms/templates/js/license-selector.underscore
+msgid "All Rights Reserved"
+msgstr "Todos los Derechos Reservados"
+
+#: cms/static/js/views/license.js
+msgid "You reserve all rights for your work"
+msgstr "Usted reserva todos los derechos por su trabajo"
+
+#: cms/static/js/views/license.js
+msgid "Creative Commons"
+msgstr "Creative Commons"
+
+#: cms/static/js/views/license.js
+msgid "You waive some rights for your work, such that others can use it too"
+msgstr ""
+"Usted renuncia a algunos derechos de su trabajo para que otros puedan usarlo"
+" también. "
+
+#: cms/static/js/views/license.js
+msgid "Version"
+msgstr "Versión"
+
+#: cms/static/js/views/license.js
+msgid "Attribution"
+msgstr "Atribución"
+
+#: cms/static/js/views/license.js
+msgid ""
+"Allow others to copy, distribute, display and perform your copyrighted work "
+"but only if they give credit the way you request. Currently, this option is "
+"required."
+msgstr ""
+"Permitir que otros copien, distribuyan, muestren y represente su trabajo con"
+" derechos de autor siempre y cuando se reconozca el crédito correspondiente "
+"de la forma especificada por el autor. Actualmente esta opción es requerida."
+
+#: cms/static/js/views/license.js
+msgid "Noncommercial"
+msgstr "No comercial"
+
+#: cms/static/js/views/license.js
+msgid ""
+"Allow others to copy, distribute, display and perform your work - and "
+"derivative works based upon it - but for noncommercial purposes only."
+msgstr ""
+"Permitir que otros copien, distribuyan, muestren y representen su trabajo – "
+"y otros trabajos derivados basados en éste solamente para fines no "
+"comerciales."
+
+#: cms/static/js/views/license.js
+msgid "No Derivatives"
+msgstr "No Derivadas"
+
+#: cms/static/js/views/license.js
+msgid ""
+"Allow others to copy, distribute, display and perform only verbatim copies "
+"of your work, not derivative works based upon it. This option is "
+"incompatible with \"Share Alike\"."
+msgstr ""
+"Permitir que otros copien, distribuyan, muestren y representen solamente "
+"copias literales de su trabajo, pero no trabajos derivados basados en éste. "
+"Esta opción es incompatible con “Compartir Igual”"
+
+#: cms/static/js/views/license.js
+msgid "Share Alike"
+msgstr "Compartir como"
+
+#: cms/static/js/views/license.js
+msgid ""
+"Allow others to distribute derivative works only under a license identical "
+"to the license that governs your work. This option is incompatible with \"No"
+" Derivatives\"."
+msgstr ""
+"Permitir la distribución de obras derivadas solamente bajo una licencia "
+"idéntica a la licencia que regula la obra original. Esta opción es "
+"incompatible con “No Derivadas”. "
+
 #. Translators: "item_display_name" is the name of the item to be deleted.
 #: cms/static/js/views/list_item.js
 msgid "Delete this %(item_display_name)s?"
@@ -4934,7 +5039,7 @@ msgstr "eliminar"
 
 #: lms/templates/commerce/receipt.underscore
 msgid "Thank you! We have received your payment."
-msgstr ""
+msgstr "Gracias! Hemos recibido su pago."
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -4987,7 +5092,7 @@ msgstr "No hay recibo disponible"
 
 #: lms/templates/commerce/receipt.underscore
 msgid "Go to Dashboard"
-msgstr ""
+msgstr "Ir al panel de control"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -5007,7 +5112,7 @@ msgstr "¿Desea confirmar su identidad después?"
 
 #: lms/templates/commerce/receipt.underscore
 msgid "Verify Now"
-msgstr ""
+msgstr "Verificar ahora"
 
 #: lms/templates/dashboard/donation.underscore
 msgid "Donate"
@@ -5277,7 +5382,7 @@ msgstr "Lo sentimos, no se encuentran resultados"
 
 #: lms/templates/search/dashboard_search_results.underscore
 msgid "Back to Dashboard"
-msgstr ""
+msgstr "Volver al Panel de Control"
 
 #: lms/templates/search/search_error.underscore
 msgid "There was an error, try searching again."
@@ -5484,7 +5589,7 @@ msgstr "Error:"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "What You Need for Verification"
-msgstr ""
+msgstr "Lo que necesita para la verificación"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/intro_step.underscore
@@ -5498,16 +5603,20 @@ msgid ""
 "You need a computer that has a webcam. When you receive a browser prompt, "
 "make sure that you allow access to the camera."
 msgstr ""
+"Necesita un equipo que tenga una webcam. Cuando reciba un mensaje desde su "
+"navegador web, asegúrese de permitir el acceso a su webcam."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "Photo Identification"
-msgstr ""
+msgstr "Identificación fotográfica."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
 "You need a driver's license, passport, or other government-issued ID that "
 "has your name and photo."
 msgstr ""
+"Necesita el documento de identidad, licencia de conducir, pasaporte u otra "
+"identificación certificada por el gobierno, que contenga su foto y nombre."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -5519,28 +5628,32 @@ msgid ""
 "When your face is in position, use the camera button %(icon)s below to take "
 "your photo."
 msgstr ""
+"Luego de colocar su rostro en posición, haga clic en el siguiente icono  "
+"%(icon)s para tomar la foto."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "To take a successful photo, make sure that:"
-msgstr ""
+msgstr "Para tomar la foto correctamente, asegúrese de: "
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "Your face is well-lit."
-msgstr ""
+msgstr "El rostro esté bien iluminado"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "Your entire face fits inside the frame."
-msgstr ""
+msgstr "Su cara está completamente dentro del marco de la foto."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "The photo of your face matches the photo on your ID."
-msgstr ""
+msgstr "La foto de su documento coincide con la foto de su cara."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
 "To use the current photo, select the camera button %(icon)s. To take another"
 " photo, select the retake button %(icon)s."
 msgstr ""
+"Para usar la foto actual, seleccione el botón con la camara %(icon)s. Para "
+"tomar una nueva foto, seleccione el botón de nueva toma %(icon)s."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -5778,7 +5891,7 @@ msgstr "Su estado de verificación es válido hasta %(verificationGoodUntil)s."
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "price"
-msgstr ""
+msgstr "precio"
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Thank you! We have received your payment for %(courseName)s."
@@ -6322,6 +6435,44 @@ msgstr ""
 #: cms/templates/js/group-edit.underscore
 msgid "delete group"
 msgstr "borrar grupo"
+
+#: cms/templates/js/license-selector.underscore
+msgid "License Type"
+msgstr "Tipo de Licencia"
+
+#: cms/templates/js/license-selector.underscore
+msgid "Learn more about {license_name}"
+msgstr "Saber más sobre  {license_name}"
+
+#: cms/templates/js/license-selector.underscore
+msgid "Options for {license_name}"
+msgstr "Opciones para  {license_name}"
+
+#: cms/templates/js/license-selector.underscore
+msgid "The following options are available for the {license_name} license."
+msgstr ""
+"Las siguientes opciones están disponibles para {license_name}  licencia"
+
+#: cms/templates/js/license-selector.underscore
+msgid "License Display"
+msgstr "Muestra de la Licencia"
+
+#: cms/templates/js/license-selector.underscore
+msgid ""
+"The following message will be displayed at the bottom of the courseware "
+"pages within your course:"
+msgstr ""
+"El siguiente mensaje será mostrado al final de las páginas de los cursos. "
+
+#: cms/templates/js/license-selector.underscore
+msgid "Creative Commons licensed content, with terms as follow:"
+msgstr ""
+"Contenido con licencia Creative Commons de acuerdo a los siguientes "
+"términos:"
+
+#: cms/templates/js/license-selector.underscore
+msgid "Some Rights Reserved"
+msgstr "Algunos Derechos Reservados"
 
 #: cms/templates/js/list.underscore
 msgid "Add your first %(item_type)s"

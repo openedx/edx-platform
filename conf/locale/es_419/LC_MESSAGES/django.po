@@ -168,7 +168,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-05-15 17:06+0000\n"
+"POT-Creation-Date: 2015-05-26 15:30+0000\n"
 "PO-Revision-Date: 2014-12-30 16:21+0000\n"
 "Last-Translator: Cristian Salamea <ovnicraft@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
@@ -3004,8 +3004,8 @@ msgid "Both"
 msgstr "Ambos"
 
 #: common/lib/xmodule/xmodule/course_module.py
-#: lms/templates/footer-edx-new.html lms/templates/footer.html
-#: lms/templates/static_templates/about.html
+#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
+#: lms/templates/footer.html lms/templates/static_templates/about.html
 msgid "About"
 msgstr "Acerca de"
 
@@ -3062,6 +3062,29 @@ msgstr ""
 "(como la URL de la página de acerca de el curso) que las redes sociales "
 "pueden utilizar con sus publicaciones. Estas URLs deben estar completas, es "
 "decir por ejemplo: http://www.edx.org/course/Introduction-to-MOOCs-ITM001"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Teams Configuration"
+msgstr "Equipo de Configuración"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter configuration for the teams feature. Expects two entries: "
+"max_team_size and topics, where topics is a list of topics."
+msgstr ""
+"Ingresar la configuración para la característica de equipos. Esperar dos "
+"entradas posibles: tamaño máximo del equipo y temas, donde temas es una "
+"lista de temas. "
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Minimum Grade for Credit"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"The minimum grade that a learner must earn to receive credit in the course, "
+"as a decimal between 0.0 and 1.0. For example, for 75%, enter 0.75."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
@@ -3591,6 +3614,17 @@ msgid ""
 msgstr ""
 "No ha sido posible leer el pasaporte LTI: {lti_passport}. Debería ser una "
 "cadena \"id:key:secret\""
+
+#: common/lib/xmodule/xmodule/mixin.py
+msgid "License"
+msgstr "Licencia"
+
+#: common/lib/xmodule/xmodule/mixin.py
+msgid ""
+"A license defines how the contents of this block can be shared and reused."
+msgstr ""
+"Una licencia define cómo se pueden compartir y reutilizar los contenidos de "
+"este bloque. "
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py
 msgid "Show Single Problem"
@@ -4890,12 +4924,12 @@ msgid "Contact {platform_name}"
 msgstr "Contactar a {platform_name}"
 
 #: lms/djangoapps/certificates/views.py cms/templates/widgets/footer.html
-#: lms/templates/footer-edx-new.html lms/templates/footer.html
-#: lms/templates/static_templates/privacy.html
+#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
+#: lms/templates/footer.html lms/templates/static_templates/privacy.html
 msgid "Privacy Policy"
 msgstr "Política de privacidad"
 
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views.py lms/templates/footer-edx-v3.html
 msgid "Terms of Service &amp; Honor Code"
 msgstr "Términos del servicio &amp; código de honor"
 
@@ -5030,6 +5064,16 @@ msgstr "Puntaje"
 msgid "problems"
 msgstr "problemas"
 
+#: lms/djangoapps/commerce/signals.py lms/djangoapps/shoppingcart/models.py
+msgid "[Refund] User-Requested Refund"
+msgstr "[Refund] Devolución solicitada por el usuario"
+
+#: lms/djangoapps/commerce/signals.py
+msgid ""
+"A refund request has been initiated for {username} ({email}). To process "
+"this request, please visit the link(s) below."
+msgstr ""
+
 #. Translators: this string includes wiki markup.  Leave the ** and the _
 #. alone.
 #: lms/djangoapps/course_wiki/views.py
@@ -5113,7 +5157,7 @@ msgstr "Tu certificado estará disponible cuando apruebes el curso."
 
 #: lms/djangoapps/courseware/views.py
 msgid "Certificate is being created."
-msgstr ""
+msgstr "Ha comenzado a crearse el certificado"
 
 #: lms/djangoapps/courseware/features/video.py
 msgid "ERROR: No playable video sources found!"
@@ -5739,6 +5783,8 @@ msgid ""
 "Your problem grade report is being generated! You can view the status of the"
 " generation task in the 'Pending Instructor Tasks' section."
 msgstr ""
+"Su reporte de calificaciones de problemas está siendo generado! Puede ver el"
+" estado de la tarea en la sección 'Tareas de instructor pendientes'."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -5746,6 +5792,10 @@ msgid ""
 "Instructor Tasks' table for the status of the task. When completed, the "
 "report will be available for download in the table below."
 msgstr ""
+"Ya está siendo generado un reporte de calificaciones de problemas. Revise la"
+" sección 'Tareas de instructor pendientes' para ver el estado de la tarea. "
+"Cuando se haya completado, el reporte estará disponible para descargar en la"
+" tabla a continuación."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Successfully changed due date for student {0} for {1} to {2}"
@@ -6118,7 +6168,7 @@ msgstr "calificado"
 #. progress messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "problem distribution graded"
-msgstr ""
+msgstr "Distribución de calificaciones del problema"
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
@@ -6558,10 +6608,6 @@ msgid "Enrollment codes for Course: {course_name}"
 msgstr "Códigos de Registro para el Curso: {course_name}"
 
 #: lms/djangoapps/shoppingcart/models.py
-msgid "[Refund] User-Requested Refund"
-msgstr "[Refund] Devolución solicitada por el usuario"
-
-#: lms/djangoapps/shoppingcart/models.py
 msgid "Mode {mode} does not exist for {course_id}"
 msgstr "El modo {mode} no existe para el curso {course_id}"
 
@@ -6625,6 +6671,7 @@ msgid "Invoice"
 msgstr "Factura"
 
 #: lms/djangoapps/shoppingcart/pdf.py
+#: lms/templates/commerce/checkout_receipt.html
 msgid "Receipt"
 msgstr "Recibo"
 
@@ -7519,7 +7566,7 @@ msgstr "Hubo un error verificando las fotos de su documento de identidad."
 
 #: lms/djangoapps/verify_student/models.py
 msgid "Usage id of Reverification XBlock."
-msgstr ""
+msgstr "Id de uso del XBlock de re verificación."
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Intro"
@@ -7604,26 +7651,42 @@ msgstr "No se publicaron las fotos"
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the website name of www.facebook.com.  Please
 #. translate this the way that Facebook advertises in your language.
-#: lms/envs/common.py lms/templates/dashboard/_dashboard_course_listing.html
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: This is the website name of www.facebook.com. Please
+#. translate this the way that Facebook advertises in your language.
+#: lms/envs/common.py lms/templates/footer-edx-v3.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Facebook"
 msgstr "Facebook"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the website name of www.twitter.com.  Please
 #. translate this the way that Twitter advertises in your language.
-#: lms/envs/common.py lms/templates/dashboard/_dashboard_course_listing.html
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: This is the website name of www.twitter.com. Please
+#. translate this the way that Twitter advertises in your language.
+#: lms/envs/common.py lms/templates/footer-edx-v3.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Twitter"
 msgstr "Twitter"
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the website name of www.linkedin.com.  Please
 #. translate this the way that LinkedIn advertises in your language.
-#: lms/envs/common.py
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: This is the website name of www.linked.com. Please
+#. translate this the way that LinkedIn advertises in your language.
+#: lms/envs/common.py lms/templates/footer-edx-v3.html
 msgid "LinkedIn"
 msgstr "LinkedIn"
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the website name of plus.google.com.  Please
 #. translate this the way that Google+ advertises in your language.
-#: lms/envs/common.py
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: This is the website name of plus.google.com. Please
+#. translate this the way that Google+ advertises in your language.
+#: lms/envs/common.py lms/templates/footer-edx-v3.html
 msgid "Google+"
 msgstr "Google+"
 
@@ -7633,9 +7696,13 @@ msgstr "Google+"
 msgid "Tumblr"
 msgstr "Tumblr"
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the website name of www.meetup.com.  Please
 #. translate this the way that MeetUp advertises in your language.
-#: lms/envs/common.py
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: This is the website name of www.meetup.com. Please
+#. translate this the way that Meetup advertises in your language.
+#: lms/envs/common.py lms/templates/footer-edx-v3.html
 msgid "Meetup"
 msgstr "Meetup"
 
@@ -7644,6 +7711,18 @@ msgstr "Meetup"
 #: lms/envs/common.py
 msgid "Reddit"
 msgstr "Reddit"
+
+#. Translators: This is the website name of https://vk.com.  Please
+#. translate this the way that VK advertises in your language.
+#: lms/envs/common.py
+msgid "VK"
+msgstr "VK"
+
+#. Translators: This is the website name of http://www.weibo.com.  Please
+#. translate this the way that Weibo advertises in your language.
+#: lms/envs/common.py
+msgid "Weibo"
+msgstr "Weibo"
 
 #. Translators: This is the website name of www.youtube.com.  Please
 #. translate this the way that YouTube advertises in your language.
@@ -7965,7 +8044,7 @@ msgstr "Editar"
 msgid "Save changes"
 msgstr "Guardar cambios"
 
-#: lms/templates/wiki/edit.html
+#: lms/templates/wiki/edit.html cms/templates/container.html
 msgid "Preview"
 msgstr "Vista previa"
 
@@ -8369,7 +8448,7 @@ msgstr ""
 msgid "Password"
 msgstr "Contraseña"
 
-#: lms/templates/login.html
+#: openedx/core/djangoapps/user_api/views.py lms/templates/login.html
 msgid "Remember me"
 msgstr "Recordarme"
 
@@ -8472,7 +8551,7 @@ msgstr "Por favor seleccione su país."
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
-#: openedx/core/djangoapps/user_api/views.py lms/templates/footer-edx-new.html
+#: openedx/core/djangoapps/user_api/views.py lms/templates/footer-edx-v2.html
 #, fuzzy
 msgid "Terms of Service and Honor Code"
 msgstr ""
@@ -8541,6 +8620,18 @@ msgstr ""
 msgid "No data provided for user preference update"
 msgstr "No se suministraron datos para actualizar la preferencia de usuario"
 
+#: cms/djangoapps/contentstore/course_group_config.py
+msgid "invalid JSON"
+msgstr "JSON inválido"
+
+#: cms/djangoapps/contentstore/course_group_config.py
+msgid "must have name of the configuration"
+msgstr "debe tener un nombre de configuración"
+
+#: cms/djangoapps/contentstore/course_group_config.py
+msgid "must have at least one group"
+msgstr "debe tener al menos un grupo"
+
 #: cms/djangoapps/contentstore/course_info_model.py
 msgid "Invalid course update id."
 msgstr "Id de actualización de curso inválida"
@@ -8559,7 +8650,7 @@ msgstr "Error general al indexar"
 
 #: cms/djangoapps/contentstore/courseware_index.py
 msgid "(Unnamed)"
-msgstr ""
+msgstr "(Sin nombre)"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
@@ -8712,18 +8803,6 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Invalid prerequisite course key"
 msgstr "Clave inválida del curso prerrequisito"
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "invalid JSON"
-msgstr "JSON inválido"
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "must have name of the configuration"
-msgstr "debe tener un nombre de configuración"
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "must have at least one group"
-msgstr "debe tener al menos un grupo"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "This group configuration is in use and cannot be deleted."
@@ -9128,8 +9207,8 @@ msgstr "Visite su {link_start}Panel de control{link_end} para ver sus cursos."
 
 #. Translators: 'Open edX' is a brand, please keep this untranslated. See
 #. http://openedx.org for more information.
-#: cms/templates/widgets/footer.html lms/templates/footer-edx-new.html
-#: lms/templates/footer.html
+#: cms/templates/widgets/footer.html lms/templates/footer-edx-v2.html
+#: lms/templates/footer-edx-v3.html lms/templates/footer.html
 msgid "Powered by Open edX"
 msgstr "Con la tecnología de Open edX"
 
@@ -9146,6 +9225,35 @@ msgstr "Ayuda"
 #: lms/templates/navigation.html
 msgid "Sign Out"
 msgstr "Cerrar sesión"
+
+#: common/templates/license.html
+msgid "All Rights Reserved"
+msgstr "Todos los Derechos Reservados"
+
+#: common/templates/license.html
+msgid "Attribution"
+msgstr "Atribución"
+
+#: common/templates/license.html
+msgid "Noncommercial"
+msgstr "No comercial"
+
+#: common/templates/license.html
+msgid "No Derivatives"
+msgstr "No derivadas"
+
+#: common/templates/license.html
+msgid "Share Alike"
+msgstr "Compartir igual"
+
+#: common/templates/license.html
+msgid "Creative Commons licensed content, with terms as follow:"
+msgstr ""
+"Contenido licenciado con Creative Commons, con los siguientes términos."
+
+#: common/templates/license.html
+msgid "Some Rights Reserved"
+msgstr "Algunos derechos reservados"
 
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Enrollment for {} | Choose Your Track"
@@ -9315,7 +9423,7 @@ msgstr "Errores en la carga del curso"
 
 #: lms/templates/dashboard.html
 msgid "Search Your Courses"
-msgstr ""
+msgstr "Busca tus cursos"
 
 #: lms/templates/dashboard.html lms/templates/courseware/courseware.html
 msgid "Clear search"
@@ -9455,11 +9563,11 @@ msgstr "Tablero de puntuación para acertijos"
 msgid "User"
 msgstr "Usuario"
 
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
 msgid "About edX"
 msgstr "Acerca de edX"
 
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html
 msgid ""
 "{EdX} offers interactive online classes and MOOCs from the world's best "
 "universities. Online courses from {MITx}, {HarvardX}, {BerkeleyX}, {UTx} and"
@@ -9480,7 +9588,7 @@ msgstr ""
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
-#: lms/templates/footer-edx-new.html lms/templates/footer.html
+#: lms/templates/footer-edx-v2.html lms/templates/footer.html
 msgid ""
 "EdX, Open edX, and the edX and Open edX logos are registered trademarks or "
 "trademarks of {link_start}edX Inc.{link_end}"
@@ -9491,66 +9599,92 @@ msgstr ""
 #. Translators: {date} will be an abbreviated date, indicating when the
 #. privacy
 #. policy was most recently revised.
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html
 msgid "(Revised {date})"
 msgstr "(Revisado {date})"
 
 #. Translators: {date} will be an abbreviated date, indicating when the
 #. privacy
 #. policy was most recently revised.
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html
 msgid "10/22/2014"
 msgstr "10/22/2014"
 
-#: lms/templates/footer-edx-new.html lms/templates/footer.html
+#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
+#: lms/templates/footer.html
 msgid "News"
 msgstr "Noticias"
 
-#: lms/templates/footer-edx-new.html lms/templates/footer.html
-#: lms/templates/static_templates/contact.html
+#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
+#: lms/templates/footer.html lms/templates/static_templates/contact.html
 msgid "Contact"
 msgstr "Contacto"
 
-#: lms/templates/footer-edx-new.html lms/templates/footer.html
+#: lms/templates/footer-edx-v2.html lms/templates/footer.html
 #: lms/templates/static_templates/faq.html
 msgid "FAQ"
 msgstr "Preguntas Frecuentes"
 
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html
 msgid "edX Blog"
 msgstr "Blog edX"
 
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html
 msgid "Donate to edX"
 msgstr "Donar a edX"
 
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html
 msgid "Jobs at edX"
 msgstr "Trabajos en edX"
 
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html
 msgid "Follow Us"
 msgstr "Síguenos"
 
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html
 msgid "Mobile Apps"
 msgstr "Apps móviles"
 
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
 msgid "Apple app on Apple Store"
 msgstr "app en la tienda Apple"
 
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
 msgid "Android app on Google Play"
 msgstr "App de Android en Google Play"
 
-#: lms/templates/footer.html lms/templates/static_templates/jobs.html
+#: lms/templates/footer-edx-v3.html
+msgid "Page Footer"
+msgstr "Pie de Página"
+
+#: lms/templates/footer-edx-v3.html lms/templates/static_templates/blog.html
+msgid "Blog"
+msgstr "Blog"
+
+#: lms/templates/footer-edx-v3.html
+msgid "FAQs"
+msgstr "Preguntas Frecuentes"
+
+#: lms/templates/footer-edx-v3.html lms/templates/footer.html
+#: lms/templates/static_templates/jobs.html
 msgid "Jobs"
 msgstr "Trabajos"
 
-#: lms/templates/footer.html
+#: lms/templates/footer-edx-v3.html lms/templates/static_templates/donate.html
+msgid "Donate"
+msgstr "Donar"
+
+#: lms/templates/footer-edx-v3.html
+msgid "Sitemap"
+msgstr "Mapa del Sitio"
+
+#: lms/templates/footer-edx-v3.html lms/templates/footer.html
 msgid "Legal"
 msgstr "Legal"
+
+#: lms/templates/footer-edx-v3.html
+msgid "Website Accessibility Policy"
+msgstr "Políticas de Accesibilidad del Sitio"
 
 #: lms/templates/footer.html
 msgid ""
@@ -9771,7 +9905,7 @@ msgstr ""
 
 #: lms/templates/index.html
 msgid "Search for a course"
-msgstr ""
+msgstr "Buscar curso"
 
 #: lms/templates/index.html
 msgid "View all Courses"
@@ -10001,26 +10135,6 @@ msgstr "(Recargar la página para actualizar)"
 msgid "working"
 msgstr "trabajando"
 
-#: lms/templates/mathjax_accessible.html
-msgid ""
-"This page features MathJax technology to render mathematical formulae. To "
-"make math accessibile, we suggest using the MathPlayer plugin. Please visit "
-"the {link_start}MathPlayer Download Page{link_end} to download the plugin "
-"for your browser."
-msgstr ""
-"Esta página muestra el uso de la tecnología MathJax para presentar fórmulas "
-"matemáticas. Para visualizar la matemática, sugerimos usar el plugin "
-"MathPlayer. Visite la {link_start} pagina de descarga de MathPlayer "
-"{link_end} para descargar el plugin correspondiente a su navegador."
-
-#: lms/templates/mathjax_accessible.html
-msgid ""
-"Your browser does not support the MathPlayer plugin. To use MathPlayer, "
-"please use Internet Explorer 6 through 9."
-msgstr ""
-"Su navegador no soporta el plugin de MathPlayer. Para usar MathPlayer, "
-"utilice Internet Explorer versiones 6 a 9."
-
 #: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
 msgid "There has been an error on the {platform_name} servers"
@@ -10075,6 +10189,7 @@ msgid "My Profile"
 msgstr "Mi Perfil"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: lms/templates/shoppingcart/shopping_cart.html
 msgid "Shopping Cart"
 msgstr "Carro de compras"
 
@@ -10120,7 +10235,7 @@ msgstr "Usted no tiene ninguna anotación."
 msgid "your answer"
 msgstr "Tu respuesta"
 
-#: lms/templates/problem.html
+#: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
 msgid "Reset"
 msgstr "Reiniciar"
 
@@ -11463,15 +11578,15 @@ msgstr ""
 
 #: lms/templates/commerce/checkout_receipt.html
 msgid "Could not retrieve payment information"
-msgstr ""
+msgstr "No se pudo conseguir la información del pago"
 
 #: lms/templates/commerce/checkout_receipt.html
 msgid "Loading Order Data..."
-msgstr ""
+msgstr "Cargando datos solicitados"
 
 #: lms/templates/commerce/checkout_receipt.html
 msgid "Please wait while we retrieve your order details."
-msgstr ""
+msgstr "Por favor, espere mientras recuperamos el detalle de su orden"
 
 #: lms/templates/courseware/accordion.html
 msgid "{chapter}, current chapter"
@@ -12157,6 +12272,9 @@ msgid ""
 "receive a higher grade,you can request an {link_start} updated certificate "
 "{link_end}."
 msgstr ""
+"Ahora puede descargar su certificado en formato PDF. Si continúa trabajando "
+"y recibe un mayor grado puede solicitar un {link_start}certificado "
+"actualizado{link_end}."
 
 #: lms/templates/courseware/progress.html
 msgid "PDF will open in a new browser window or tab."
@@ -13024,7 +13142,7 @@ msgstr "Dejar de seguir"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Vote for this post,"
-msgstr ""
+msgstr "Vote por esta publicación"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Report abuse"
@@ -13856,40 +13974,46 @@ msgid ""
 "Your verification for course {course_name} and assessment {assessment} has "
 "been passed."
 msgstr ""
+"La verificación del curso {course_name} y la evaluación {assessment} ha sido"
+" aprobada."
 
 #: lms/templates/emails/reverification_processed.txt
 msgid ""
 "Your verification for course {course_name} and assessment {assessment} has "
 "failed."
 msgstr ""
+"La verificación para el curso {course_name} y la evaluación {assessment} han"
+" fallado"
 
 #: lms/templates/emails/reverification_processed.txt
 msgid "You have reached your allowed attempts limit. No more retakes allowed."
 msgstr ""
+"Ha alcanzado el número máximos de intentos. No puede volver a intentar."
 
 #: lms/templates/emails/reverification_processed.txt
 msgid "Assessment date has passed and retake not allowed."
-msgstr ""
+msgstr "Ha finalizado la fecha de evaluación y no puede retomarla."
 
 #: lms/templates/emails/reverification_processed.txt
 msgid "Assessment closes on {due_date}."
-msgstr ""
+msgstr "El fecha de evaluación finaliza el {due_date}."
 
 #: lms/templates/emails/reverification_processed.txt
 msgid "Assessment is open and you have {left_attempts} attempt(s) remaining."
 msgstr ""
+"La evaluación está abierta y tiene {left_attempts} intento(s) restantes."
 
 #: lms/templates/emails/reverification_processed.txt
 msgid "Click on link below to re-verify:"
-msgstr ""
+msgstr "Haga clic en el siguiente link para volver a verificar:"
 
 #: lms/templates/emails/reverification_processed.txt
 msgid "Click on link below to go to the courseware:"
-msgstr ""
+msgstr "Haga clic en el siguiente link para ir al curso:"
 
 #: lms/templates/emails/reverification_processed.txt
 msgid "The {platform_name} Team."
-msgstr ""
+msgstr "El Equipo de {platform_name}."
 
 #: lms/templates/emails/unenroll_email_allowedmessage.txt
 msgid "Dear Student,"
@@ -14276,7 +14400,7 @@ msgstr "Generar Reportes de calificaciones"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate Problem Grade Report"
-msgstr ""
+msgstr "Generar Reportes de calificaciones de problemas"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Reports Available for Download"
@@ -15747,6 +15871,11 @@ msgstr "Su carrito de compras está vacío."
 msgid "View Courses"
 msgstr "Ver los cursos"
 
+#: lms/templates/shoppingcart/cybersource_form.html
+#: lms/templates/shoppingcart/shopping_cart_flow.html
+msgid "Payment"
+msgstr "Pago"
+
 #: lms/templates/shoppingcart/download_report.html
 msgid "Download CSV Data"
 msgstr "Descarga de Datos CSV"
@@ -15913,10 +16042,6 @@ msgid "Course Dates"
 msgstr "Fechas del curso"
 
 #: lms/templates/shoppingcart/receipt.html
-msgid " {course_name} "
-msgstr " {course_name} "
-
-#: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Price per student:"
 msgstr "Precio por estudiante:"
@@ -16025,10 +16150,16 @@ msgstr "{course_number} {course_title} Imagen de portada"
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid ""
 "{course_names} has been removed because the enrollment period has closed."
-msgstr ""
-"{course_names} ha sido removido porque el periodo de inscripcion a sido "
-"cerrado."
+msgid_plural ""
+"{course_names} have been removed because the enrollment period has closed."
+msgstr[0] ""
+msgstr[1] ""
 
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Cover Image"
+msgstr ""
+
+#. Translators: "Registration for:" is followed by a course name
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Registration for:"
 msgstr "Inscripción para:"
@@ -16042,12 +16173,34 @@ msgid "Students:"
 msgstr "Estudiantes:"
 
 #: lms/templates/shoppingcart/shopping_cart.html
+msgid "Input quantity and press enter."
+msgstr ""
+
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "discount or activation code"
+msgstr ""
+
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Apply"
+msgstr ""
+
+#: lms/templates/shoppingcart/shopping_cart.html
 msgid "code has been applied"
 msgstr "el código ha sido aplicado"
 
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "TOTAL:"
 msgstr "TOTAL:"
+
+#. Translators: currency_symbol l is a symbol indicating type of currency, ex
+#. "$". currency_abbr is
+#. an abbreviation for the currency, ex "USD". This string would look like
+#. this
+#. when all variables are in:
+#. "$500.00 USD"
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "{currency_symbol}{price} {currency_abbr}"
+msgstr ""
 
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid ""
@@ -16064,6 +16217,10 @@ msgstr ""
 "Luego de que la compra esté completa, {username} será inscrito en este "
 "curso."
 
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Empty Cart"
+msgstr ""
+
 #: lms/templates/shoppingcart/shopping_cart_flow.html
 msgid "Shopping cart"
 msgstr "Carrito de compras"
@@ -16073,14 +16230,14 @@ msgid "{platform_name} -  Shopping Cart"
 msgstr "{platform_name} - Carrito de compras"
 
 #: lms/templates/shoppingcart/shopping_cart_flow.html
+msgid "Steps"
+msgstr ""
+
+#: lms/templates/shoppingcart/shopping_cart_flow.html
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/reverification_confirmation.html
 msgid "Review"
 msgstr "Revisión"
-
-#: lms/templates/shoppingcart/shopping_cart_flow.html
-msgid "Payment"
-msgstr "Pago"
 
 #: lms/templates/shoppingcart/shopping_cart_flow.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -16119,14 +16276,6 @@ msgstr ""
 "Esta página fue dejada en blanco intencionalmente. No es utilizada por "
 "edx.org, pero está aquí para ser utilizada posiblemente en las instalaciones"
 " de Open edX."
-
-#: lms/templates/static_templates/blog.html
-msgid "Blog"
-msgstr "Blog"
-
-#: lms/templates/static_templates/donate.html
-msgid "Donate"
-msgstr "Donar"
 
 #: lms/templates/static_templates/embargo.html
 msgid ""
@@ -16237,6 +16386,10 @@ msgid ""
 " use of {platform_name} only. It will not be linked to your public profile "
 "in any way."
 msgstr ""
+"Una vez complete la información del siguiente formulario, podrá comenzar con"
+" el curso. Los campos obligatorios están marcados con un asterisco (*). La "
+"información es anónima y solo será utilizada por {platform_name}. No estará "
+"de ninguna forma ligada a su perfil público. "
 
 #: lms/templates/survey/survey.html
 msgid "You are missing the following required fields:"
@@ -16388,7 +16541,7 @@ msgstr "Edite su nombre completo"
 
 #: lms/templates/verify_student/incourse_reverify.html
 msgid "Re-Verify for {course_name}"
-msgstr ""
+msgstr "Re-verificando el curso {course_name}"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 msgid "Re-Verify"
@@ -17286,7 +17439,7 @@ msgstr "Arrastre para reorganizar"
 
 #: cms/templates/container.html
 msgid "Open the courseware in the LMS"
-msgstr ""
+msgstr "Abrir el contenido del curso en el LMS"
 
 #: cms/templates/container.html
 msgid "View Live Version"
@@ -17294,7 +17447,7 @@ msgstr "Ver la versión publicada"
 
 #: cms/templates/container.html
 msgid "Preview the courseware in the LMS"
-msgstr ""
+msgstr "Previsualizar el contenido del curso en el LMS"
 
 #: cms/templates/container.html
 msgid "Adding components"
@@ -19768,6 +19921,20 @@ msgid ""
 "exam. "
 msgstr ""
 "Puntaje que los estudiantes deben alcanzar para pasar el examen de ingreso."
+
+#: cms/templates/settings.html
+msgid "Course Content License"
+msgstr "Licencia del Contenido del Curso"
+
+#. Translators: At the course settings, the editor is able to select the
+#. default course content license.
+#. The course content will have this license set, some assets can override the
+#. license with their own.
+#. In the form, the license selector for course content is described using the
+#. following string:
+#: cms/templates/settings.html
+msgid "Select the default license for course content"
+msgstr "Seleccionar la licencia predeterminada para el contenido del curso. "
 
 #: cms/templates/settings.html
 msgid "How are these settings used?"

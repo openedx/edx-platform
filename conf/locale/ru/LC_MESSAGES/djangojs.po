@@ -17,6 +17,7 @@
 # Евгений Козлов <eudjin@gmail.com>, 2014
 # Evgeniya <eugenia000@gmail.com>, 2013
 # Katerina <rosemaily@gmail.com>, 2014
+# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
 # Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
 # mcha121 <mcha-12-1@bk.ru>, 2014
@@ -49,6 +50,7 @@
 # Dmitriy <polevaiabrest@gmail.com>, 2014
 # Evgeniya <eugenia000@gmail.com>, 2013
 # Elena Freundorfer <e_freundorfer@gmx.de>, 2014
+# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
 # Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
 # mcha121 <mcha-12-1@bk.ru>, 2014
@@ -66,6 +68,7 @@
 # 
 # Translators:
 # Dmitriy <polevaiabrest@gmail.com>, 2014
+# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
 # Michael Savin <m.savin.ru@gmail.com>, 2015
 # webslavic <webslavic@yahoo.com>, 2014
@@ -79,6 +82,7 @@
 # Translators:
 # ovoschee <all.spam.there@gmail.com>, 2014
 # Iaroslav <danwill@ukr.net>, 2015
+# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
 # mcha121 <mcha-12-1@bk.ru>, 2014
 # Michael Savin <m.savin.ru@gmail.com>, 2015
@@ -86,13 +90,14 @@
 # webslavic <webslavic@yahoo.com>, 2014
 # Weyedide <weyedide@gmail.com>, 2014-2015
 # Yana Malinovskaya <y.malinovskaya@itransition.com>, 2014
+# Yermek Alimzhanov <aermek81@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-05-15 17:04+0000\n"
-"PO-Revision-Date: 2015-05-06 19:54+0000\n"
-"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
+"POT-Creation-Date: 2015-05-26 15:28+0000\n"
+"PO-Revision-Date: 2015-05-26 15:21+0000\n"
+"Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/edx-platform/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1659,6 +1664,11 @@ msgid ""
 "If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n"
 "\n"
 "Proceed to the Advanced Editor and convert this problem to XML?"
+msgstr ""
+
+#. Translators: This is the title of the text explaining a problem
+#: common/lib/xmodule/xmodule/js/src/problem/edit.js
+msgid "Explanation"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
@@ -4192,6 +4202,69 @@ msgid ""
 "extension."
 msgstr ""
 
+#: cms/static/js/views/license.js cms/templates/js/license-selector.underscore
+msgid "All Rights Reserved"
+msgstr ""
+
+#: cms/static/js/views/license.js
+msgid "You reserve all rights for your work"
+msgstr ""
+
+#: cms/static/js/views/license.js
+msgid "Creative Commons"
+msgstr ""
+
+#: cms/static/js/views/license.js
+msgid "You waive some rights for your work, such that others can use it too"
+msgstr ""
+
+#: cms/static/js/views/license.js
+msgid "Version"
+msgstr ""
+
+#: cms/static/js/views/license.js
+msgid "Attribution"
+msgstr ""
+
+#: cms/static/js/views/license.js
+msgid ""
+"Allow others to copy, distribute, display and perform your copyrighted work "
+"but only if they give credit the way you request. Currently, this option is "
+"required."
+msgstr ""
+
+#: cms/static/js/views/license.js
+msgid "Noncommercial"
+msgstr ""
+
+#: cms/static/js/views/license.js
+msgid ""
+"Allow others to copy, distribute, display and perform your work - and "
+"derivative works based upon it - but for noncommercial purposes only."
+msgstr ""
+
+#: cms/static/js/views/license.js
+msgid "No Derivatives"
+msgstr ""
+
+#: cms/static/js/views/license.js
+msgid ""
+"Allow others to copy, distribute, display and perform only verbatim copies "
+"of your work, not derivative works based upon it. This option is "
+"incompatible with \"Share Alike\"."
+msgstr ""
+
+#: cms/static/js/views/license.js
+msgid "Share Alike"
+msgstr ""
+
+#: cms/static/js/views/license.js
+msgid ""
+"Allow others to distribute derivative works only under a license identical "
+"to the license that governs your work. This option is incompatible with \"No"
+" Derivatives\"."
+msgstr ""
+
 #. Translators: "item_display_name" is the name of the item to be deleted.
 #: cms/static/js/views/list_item.js
 msgid "Delete this %(item_display_name)s?"
@@ -5989,6 +6062,40 @@ msgstr ""
 
 #: cms/templates/js/group-edit.underscore
 msgid "delete group"
+msgstr ""
+
+#: cms/templates/js/license-selector.underscore
+msgid "License Type"
+msgstr ""
+
+#: cms/templates/js/license-selector.underscore
+msgid "Learn more about {license_name}"
+msgstr ""
+
+#: cms/templates/js/license-selector.underscore
+msgid "Options for {license_name}"
+msgstr ""
+
+#: cms/templates/js/license-selector.underscore
+msgid "The following options are available for the {license_name} license."
+msgstr ""
+
+#: cms/templates/js/license-selector.underscore
+msgid "License Display"
+msgstr ""
+
+#: cms/templates/js/license-selector.underscore
+msgid ""
+"The following message will be displayed at the bottom of the courseware "
+"pages within your course:"
+msgstr ""
+
+#: cms/templates/js/license-selector.underscore
+msgid "Creative Commons licensed content, with terms as follow:"
+msgstr ""
+
+#: cms/templates/js/license-selector.underscore
+msgid "Some Rights Reserved"
 msgstr ""
 
 #: cms/templates/js/list.underscore
