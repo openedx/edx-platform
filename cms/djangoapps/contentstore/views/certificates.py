@@ -39,7 +39,7 @@ from util.json_request import JsonResponse
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
 from contentstore.views.assets import delete_asset
-from contentstore.views.exception import CertificateValidationError, AssetNotFoundException
+from contentstore.views.exception import AssetNotFoundException
 from django.core.exceptions import PermissionDenied
 
 CERTIFICATE_SCHEMA_VERSION = 1
@@ -73,6 +73,21 @@ def _delete_asset(course_key, asset_key_string):
         # If the asset was not found, it doesn't have to be deleted...
         except AssetNotFoundException:
             pass
+
+
+# Certificates Exceptions
+class CertificateException(Exception):
+    """
+    Base exception for Certificates workflows
+    """
+    pass
+
+
+class CertificateValidationError(CertificateException):
+    """
+    An exception raised when certificate information is invalid.
+    """
+    pass
 
 
 class CertificateManager(object):
