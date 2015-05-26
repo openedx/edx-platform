@@ -2,9 +2,10 @@
 
 define([
     'backbone',
+    'gettext',
     'js/certificates/models/certificate'
 ],
-function(Backbone, Certificate) {
+function(Backbone, gettext, Certificate) {
     'use strict';
     var CertificateCollection = Backbone.Collection.extend({
         model: Certificate,
@@ -18,8 +19,20 @@ function(Backbone, Certificate) {
             var return_array;
             try {
                 return_array = JSON.parse(certificate_info);
-            } catch (e) {
-                return_array = certificate_info;
+            } catch (ex) {
+                // If it didn't parse, and `certificate_info` is an object then return as it is
+                // otherwise return empty array
+                if (typeof certificate_info === 'object'){
+                    return_array = certificate_info;
+                }
+                else {
+                    console.error(
+                        interpolate(
+                            gettext('Could not parse certificate JSON. %(message)s'), {message: ex.message}, true
+                        )
+                    );
+                    return_array = [];
+                }
             }
             return return_array;
         },

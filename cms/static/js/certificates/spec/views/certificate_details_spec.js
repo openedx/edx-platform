@@ -11,8 +11,7 @@ define([
     'js/common_helpers/template_helpers',
     'js/spec_helpers/view_helpers',
     'js/spec_helpers/validation_helpers',
-    'js/certificates/spec/custom_matchers',
-    'jasmine-stealth'
+    'js/certificates/spec/custom_matchers'
 ],
 function(_, Course, CertificatesCollection, CertificateModel, CertificateDetailsView,
          Notification, AjaxHelpers, TemplateHelpers, ViewHelpers, ValidationHelpers, CustomMatchers) {
@@ -24,7 +23,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
         itemView: '.certificates-list-item',
         name: '.certificate-name',
         description: '.certificate-description',
-        course_title: '.certificate-course-title',
+        course_title: '.course-title-override .certificate-value',
         errorMessage: '.certificate-edit-error',
         inputName: '.collection-name-input',
         inputDescription: '.certificate-description-input',
@@ -91,31 +90,30 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
         describe('The Certificate Details view', function() {
 
             it('should parse a JSON string collection into a Backbone model collection', function () {
-                var CERTIFICATE_JSON = '[{"name": "Test certificate name", "description": "Test certificate description", "course_title":"Test certificate course title override", "signatories":"[]"}]';
+                var course_title = "Test certificate course title override 2";
+                var CERTIFICATE_JSON = '[{"course_title": "' + course_title + '", "signatories":"[]"}]';
                 this.collection.parse(CERTIFICATE_JSON);
                 var model = this.collection.at(1);
-                expect(model.get('name')).toEqual('Test certificate name');
-                expect(model.get('description')).toEqual('Test certificate description');
-                expect(model.get('course_title')).toEqual('Test certificate course title override');
+                expect(model.get('course_title')).toEqual(course_title);
             });
 
             it('should parse a JSON object collection into a Backbone model collection', function () {
+                var course_title = "Test certificate course title override 2";
                 var CERTIFICATE_JSON_OBJECT = [{
-                    "name": "Test certificate name 2",
-                    "description": "Test certificate description 2",
-                    "course_title":"Test certificate course title override 2",
-                    "signatories":"[]"
+                    "course_title" : course_title,
+                    "signatories" : "[]"
                 }];
                 this.collection.parse(CERTIFICATE_JSON_OBJECT);
                 var model = this.collection.at(1);
-                expect(model.get('name')).toEqual('Test certificate name 2');
-                expect(model.get('description')).toEqual('Test certificate description 2');
+                expect(model.get('course_title')).toEqual(course_title);
             });
 
-            it('should display the certificate description', function () {
-                expect(this.view.$(SELECTORS.description)).toExist();
-                console.log(this.view.$(SELECTORS.description).text());
-                expect(this.view.$(SELECTORS.description)).toContainText('Test Description');
+            it('should have empty certificate collection if there is an error parsing certifcate JSON', function () {
+                var CERTIFICATE_INVALID_JSON = '[{"course_title": Test certificate course title override, "signatories":"[]"}]';
+                var collection_length = this.collection.length;
+                this.collection.parse(CERTIFICATE_INVALID_JSON);
+                //collection length should remain the same since we have error parsing JSON
+                expect(this.collection.length).toEqual(collection_length);
             });
 
             it('should display the certificate course title override', function () {

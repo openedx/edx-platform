@@ -278,6 +278,7 @@ def update_certificate_context(context, course, user, mode):
     platform_name = context.get('platform_name')
     certificate_type = context.get('certificate_type')
     context['accomplishment_copy_name'] = user_fullname
+    context['accomplishment_copy_username'] = user.username
     context['accomplishment_copy_course_org'] = course.org
     context['accomplishment_copy_course_name'] = course.display_name
     context['logo_alt'] = platform_name
@@ -408,10 +409,12 @@ def render_html_view(request, user_id, course_id):
     If a certificate is not available, we display a "Sorry!" screen instead
     """
     context = {}
-    configuration = CertificateHtmlViewConfiguration.get_config()
-    context = configuration.get('default', {})
-    active_certificate = None
+    context['platform_name'] = settings.PLATFORM_NAME
 
+    configuration = CertificateHtmlViewConfiguration.get_config()
+    context.update(configuration.get('default', {}))
+
+    active_certificate = None
     invalid_template_path = 'certificates/invalid.html'
 
     # Translators:  This text is bound to the HTML 'title' element of the page and appears
@@ -440,6 +443,7 @@ def render_html_view(request, user_id, course_id):
         return render_to_response(invalid_template_path, context)
 
     context['course_id'] = course_id
+    context['username'] = user.username
 
     if course.certificates:
         # iterate the list of certificates in the descriptor.
