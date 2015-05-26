@@ -1033,12 +1033,11 @@
 .status-verification {
 
   .status-title {
-    margin: 0 0 ($baseline/4) 26px;
+    margin: 0 0 ($baseline/4) 0;
   }
 
   .status-data {
-    margin: 0 0 ($baseline/2) 26px;
-    width: 80%;
+    margin: 0 0 ($baseline/2) 0;
   }
 
   .status-data-message {
@@ -1072,7 +1071,7 @@
       @include triangle(($baseline/2), $m-gray-d3, up);
       position: absolute;
       left: 45%;
-      top: -($baseline/2);
+      top: -6px;
     }
   }
 
