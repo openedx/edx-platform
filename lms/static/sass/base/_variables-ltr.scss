@@ -1,7 +1,7 @@
-// Variables for LMS (left-to-right)
-// ==================================
+// lms - utilities - variables (LTR-centric)
+// ====================
 
-// Neat
-// ==================================
-// Sets the default layout direction of the grid.
-$default-layout-direction: LTR !global;
+// grid - configuration (susy-based)
+$susy: (
+    flow: ltr,
+);
