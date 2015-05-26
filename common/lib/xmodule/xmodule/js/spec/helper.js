@@ -242,7 +242,7 @@
             loadFixtures('video_all.html');
         }
 
-        // If `params` is an object, assign it's properties as data attributes
+        // If `params` is an object, assign its properties as data attributes
         // to the main video DIV element.
         if (_.isObject(params)) {
             var metadata = _.extend($('#video_id').data('metadata'), params);

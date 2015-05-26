@@ -234,9 +234,9 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
         # the list, except first.
         filtered_events = []
         for video_event in captured_events:
-            if (filtered_events
-                and video_event['event_type'] == filtered_events[-1]['event_type']
-                and video_event['event_type'] == 'edx.video.bumper.played'):
+            is_played_event = video_event['event_type'] == 'edx.video.bumper.played'
+            appears_again = filtered_events and video_event['event_type'] == filtered_events[-1]['event_type']
+            if is_played_event and appears_again:
                 continue
             filtered_events.append(video_event)
 
