@@ -13,7 +13,6 @@ define([
 ],
 function($, _, Backbone, gettext, ListItemEditorView, SignatoryModel, SignatoryEditorView, FileUploadModel, FileUploadDialog) {
     'use strict';
-    var MIN_SIGNATORIES_LIMIT = 1;
     var MAX_SIGNATORIES_LIMIT = 4;
     var CertificateEditorView = ListItemEditorView.extend({
         tagName: 'div',
@@ -167,7 +166,7 @@ function($, _, Backbone, gettext, ListItemEditorView, SignatoryModel, SignatoryE
             var upload = new FileUploadModel({
                 title: gettext("Upload organization logo."),
                 message: gettext("Maximum logo height should be 125px."),
-                mimeTypes: ['image/png', 'image/jpg']
+                mimeTypes: ['image/png', 'image/jpeg']
             });
             var self = this;
             var modal = new FileUploadDialog({
