@@ -47,7 +47,6 @@ html.video-fullscreen{
     margin: 0 auto;
     max-width: grid-width(12);
     min-width: 760px;
-    width: flex-grid(12);
     color: $gray;
     text-align: $bi-app-right;
   }
@@ -91,7 +90,7 @@ html.video-fullscreen{
   }
 }
 
-// TO-DO should this be content wrapper? 
+// TO-DO should this be content wrapper?
 div.course-wrapper {
   position: relative;
 
