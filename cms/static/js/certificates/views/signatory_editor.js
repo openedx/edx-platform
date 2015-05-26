@@ -131,7 +131,7 @@ function ($, _, Backbone, gettext, TemplateUtils, ViewUtils, PromptView, Notific
                 message: gettext('This action cannot be undone.'),
                 actions: {
                     primary: {
-                        text: gettext('OK'),
+                        text: gettext('Delete'),
                         click: function () {
                             var deleting = new NotificationView.Mini({
                                 title: gettext('Deleting')
