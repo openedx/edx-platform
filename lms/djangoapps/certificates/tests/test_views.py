@@ -374,3 +374,16 @@ class CertificatesViewsTests(ModuleStoreTestCase):
         )
         response = self.client.get(test_url)
         self.assertIn('invalid', response.content)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_render_html_view_with_preview_mode(self):
+        self.cert.delete()
+        self.assertEqual(len(GeneratedCertificate.objects.all()), 0)
+        self._add_course_certificates(count=1, signatory_count=2)
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=self.course.id.to_deprecated_string()  # pylint: disable=no-member
+        )
+        response = self.client.get(test_url + '?preview=honor')
+        self.assertNotIn(self.course.display_name, response.content)
+        self.assertIn('course_title_0', response.content)
