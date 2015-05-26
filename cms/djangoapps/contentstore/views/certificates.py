@@ -41,6 +41,8 @@ from xmodule.modulestore.django import modulestore
 from contentstore.views.assets import delete_asset
 from contentstore.views.exception import AssetNotFoundException
 from django.core.exceptions import PermissionDenied
+from course_modes.models import CourseMode
+from contentstore.utils import get_lms_link_for_certificate_web_view
 
 CERTIFICATE_SCHEMA_VERSION = 1
 CERTIFICATE_MINIMUM_ID = 100
@@ -290,6 +292,12 @@ def certificates_list_handler(request, course_key_string):
             certificate_url = reverse_course_url('certificates.certificates_list_handler', course_key)
             course_outline_url = reverse_course_url('course_handler', course_key)
             upload_asset_url = reverse_course_url('assets_handler', course_key)
+            course_modes = [mode.slug for mode in CourseMode.modes_for_course(course.id)]
+            certificate_web_view_url = get_lms_link_for_certificate_web_view(
+                user_id=request.user.id,
+                course_key=course_key,
+                mode=course_modes[0]  # CourseMode.modes_for_course returns default mode 'honor' if doesn't find anyone.
+            )
             certificates = None
             if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
                 certificates = CertificateManager.get_certificates(course)
@@ -299,6 +307,8 @@ def certificates_list_handler(request, course_key_string):
                 'course_outline_url': course_outline_url,
                 'upload_asset_url': upload_asset_url,
                 'certificates': json.dumps(certificates),
+                'course_modes': course_modes,
+                'certificate_web_view_url': certificate_web_view_url
             })
         elif "application/json" in request.META.get('HTTP_ACCEPT'):
             # Retrieve the list of certificates for the specified course

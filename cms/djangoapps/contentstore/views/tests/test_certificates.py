@@ -15,6 +15,8 @@ from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
 from student.models import CourseEnrollment
 from contentstore.views.certificates import CertificateManager
+from django.test.utils import override_settings
+from contentstore.utils import get_lms_link_for_certificate_web_view
 
 CERTIFICATE_JSON = {
     u'name': u'Test certificate',
@@ -216,6 +218,26 @@ class CertificatesListHandlerTestCase(CourseTestCase, CertificatesBaseTestCase, 
         content = json.loads(response.content)
         self._remove_ids(content)  # pylint: disable=unused-variable
         self.assertEqual(content, expected)
+
+    @override_settings(LMS_BASE=None)
+    def test_no_lms_base_for_certificate_web_view_link(self):
+        test_link = get_lms_link_for_certificate_web_view(
+            user_id=self.user.id,
+            course_key=self.course.id,
+            mode='honor'
+        )
+        self.assertEquals(test_link, None)
+
+    @override_settings(LMS_BASE="lms_base_url")
+    def test_lms_link_for_certificate_web_view(self):
+        test_url = "//lms_base_url/certificates/user/" \
+                   + str(self.user.id) + "/course/" + unicode(self.course.id) + '?preview=honor'
+        link = get_lms_link_for_certificate_web_view(
+            user_id=self.user.id,
+            course_key=self.course.id,
+            mode='honor'
+        )
+        self.assertEquals(link, test_url)
 
     @mock.patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     def test_certificate_info_in_response(self):

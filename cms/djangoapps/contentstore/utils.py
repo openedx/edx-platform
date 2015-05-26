@@ -147,6 +147,24 @@ def get_lms_link_for_about_page(course_key):
     )
 
 
+# pylint: disable=invalid-name
+def get_lms_link_for_certificate_web_view(user_id, course_key, mode):
+    """
+    Returns the url to the certificate web view.
+    """
+    assert isinstance(course_key, CourseKey)
+
+    if settings.LMS_BASE is None:
+        return None
+
+    return u"//{certificate_web_base}/certificates/user/{user_id}/course/{course_id}?preview={mode}".format(
+        certificate_web_base=settings.LMS_BASE,
+        user_id=user_id,
+        course_id=unicode(course_key),
+        mode=mode
+    )
+
+
 def course_image_url(course):
     """Returns the image url for the course."""
     loc = StaticContent.compute_location(course.location.course_key, course.course_image)
