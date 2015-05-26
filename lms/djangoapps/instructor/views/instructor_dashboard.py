@@ -107,7 +107,7 @@ def instructor_dashboard_2(request, course_id):
 
     # Gate access to Ecommerce tab
     if course_mode_has_price and (access['finance_admin'] or access['sales_admin']):
-        sections.append(_section_e_commerce(course, access, paid_modes[0], is_white_label))
+        sections.append(_section_e_commerce(course, access, paid_modes[0], is_white_label, is_white_label))
 
     # Certificates panel
     # This is used to generate example certificates
@@ -150,7 +150,7 @@ def instructor_dashboard_2(request, course_id):
 ## section_display_name will be used to generate link titles in the nav bar.
 
 
-def _section_e_commerce(course, access, paid_mode, coupons_enabled):
+def _section_e_commerce(course, access, paid_mode, coupons_enabled, reports_enabled):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
     coupons = Coupon.objects.filter(course_id=course_key).order_by('-is_active')
@@ -183,9 +183,14 @@ def _section_e_commerce(course, access, paid_mode, coupons_enabled):
         'spent_registration_code_csv_url': reverse('spent_registration_codes', kwargs={'course_id': unicode(course_key)}),
         'set_course_mode_url': reverse('set_course_mode_price', kwargs={'course_id': unicode(course_key)}),
         'download_coupon_codes_url': reverse('get_coupon_codes', kwargs={'course_id': unicode(course_key)}),
+        'enrollment_report_url': reverse('get_enrollment_report', kwargs={'course_id': unicode(course_key)}),
+        'list_financial_report_downloads_url': reverse('list_financial_report_downloads',
+                                                       kwargs={'course_id': unicode(course_key)}),
+        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': unicode(course_key)}),
         'coupons': coupons,
         'sales_admin': access['sales_admin'],
         'coupons_enabled': coupons_enabled,
+        'reports_enabled': reports_enabled,
         'course_price': course_price,
         'total_amount': total_amount
     }
@@ -291,7 +296,7 @@ def _section_course_info(course, access):
     }
 
     if settings.FEATURES.get('DISPLAY_ANALYTICS_ENROLLMENTS'):
-        section_data['enrollment_count'] = CourseEnrollment.enrollment_counts(course_key)
+        section_data['enrollment_count'] = CourseEnrollment.objects.enrollment_counts(course_key)
 
     if settings.ANALYTICS_DASHBOARD_URL:
         dashboard_link = _get_dashboard_link(course_key)
@@ -356,7 +361,7 @@ def _section_cohort_management(course, access):
 def _is_small_course(course_key):
     """ Compares against MAX_ENROLLMENT_INSTR_BUTTONS to determine if course enrollment is considered small. """
     is_small_course = False
-    enrollment_count = CourseEnrollment.num_enrolled_in(course_key)
+    enrollment_count = CourseEnrollment.objects.num_enrolled_in(course_key)
     max_enrollment_for_buttons = settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
     if max_enrollment_for_buttons is not None:
         is_small_course = enrollment_count <= max_enrollment_for_buttons

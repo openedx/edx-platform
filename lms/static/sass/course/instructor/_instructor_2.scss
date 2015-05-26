@@ -1190,7 +1190,7 @@
 
 // view - data download
 // --------------------
-.instructor-dashboard-wrapper-2 section.idash-section#data_download {
+.instructor-dashboard-wrapper-2 section.idash-section#data_download{
   input {
     margin-bottom: 1em;
     line-height: 1.3em;
@@ -1451,6 +1451,23 @@ input[name="subject"] {
   input {
     margin-bottom: 1em;
     line-height: 1.3em;
+  }
+  .reports-download-container {
+    .data-display-table {
+      .slickgrid {
+        height: 400px;
+      }
+    }
+    .report-downloads-table {
+      .slickgrid {
+        height: 300px;
+        padding: ($baseline/4);
+      }
+      // Disable horizontal scroll bar when grid only has 1 column. Remove this CSS class when more columns added.
+      .slick-viewport {
+        overflow-x: hidden !important;
+      }
+    }
   }
   .error-msgs {
     background: #FFEEF5;

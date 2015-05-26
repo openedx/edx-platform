@@ -10,15 +10,22 @@ import ddt
 from mock import Mock, patch
 import tempfile
 import unicodecsv
+from django.core.urlresolvers import reverse
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from certificates.tests.factories import GeneratedCertificateFactory, CertificateWhitelistFactory
 from course_modes.models import CourseMode
+from courseware.tests.factories import InstructorFactory
+from instructor_task.models import ReportStore
+from instructor_task.tasks_helper import cohort_students_and_upload, upload_grades_csv, upload_students_csv, \
+    upload_enrollment_report
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin, InstructorTaskModuleTestCase
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
+from shoppingcart.models import Order, PaidCourseRegistration, CourseRegistrationCode, Invoice, \
+    CourseRegistrationCodeInvoiceItem, InvoiceTransaction
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
@@ -70,7 +77,7 @@ class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
         result = upload_grades_csv(None, None, self.course.id, None, 'graded')
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 0, 'failed': 1}, result)
 
-        report_store = ReportStore.from_config()
+        report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
         self.assertTrue(any('grade_report_err' in item[0] for item in report_store.links_for(self.course.id)))
 
     def _verify_cell_data_for_user(self, username, course_id, column_header, expected_cell_content):
@@ -80,7 +87,7 @@ class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
         with patch('instructor_task.tasks_helper._get_current_task'):
             result = upload_grades_csv(None, None, course_id, None, 'graded')
             self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
-            report_store = ReportStore.from_config()
+            report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
             report_csv_filename = report_store.links_for(course_id)[0][0]
             with open(report_store.path_to(course_id, report_csv_filename)) as csv_file:
                 for row in unicodecsv.DictReader(csv_file):
@@ -264,6 +271,176 @@ class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
 
 
+@ddt.ddt
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
+class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCourseTestCase):
+    """
+    Tests that CSV detailed enrollment generation works.
+    """
+    def setUp(self):
+        super(TestInstructorDetailedEnrollmentReport, self).setUp()
+        self.course = CourseFactory.create()
+
+        # create testing invoice 1
+        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.sale_invoice_1 = Invoice.objects.create(
+            total_amount=1234.32, company_name='Test1', company_contact_name='TestName',
+            company_contact_email='Test@company.com',
+            recipient_name='Testw', recipient_email='test1@test.com', customer_reference_number='2Fwe23S',
+            internal_reference="A", course_id=self.course.id, is_valid=True
+        )
+        self.invoice_item = CourseRegistrationCodeInvoiceItem.objects.create(
+            invoice=self.sale_invoice_1,
+            qty=1,
+            unit_price=1234.32,
+            course_id=self.course.id
+        )
+
+    def test_success(self):
+        self.create_student('student', 'student@example.com')
+        task_input = {'features': []}
+        with patch('instructor_task.tasks_helper._get_current_task'):
+            result = upload_enrollment_report(None, None, self.course.id, task_input, 'generating_enrollment_report')
+
+        self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
+
+    def test_student_paid_course_enrollment_report(self):
+        """
+        test to check the paid user enrollment csv report status
+        and enrollment source.
+        """
+        student = UserFactory()
+        student_cart = Order.get_cart_for_user(student)
+        PaidCourseRegistration.add_to_order(student_cart, self.course.id)
+        student_cart.purchase()
+
+        task_input = {'features': []}
+        with patch('instructor_task.tasks_helper._get_current_task'):
+            result = upload_enrollment_report(None, None, self.course.id, task_input, 'generating_enrollment_report')
+        self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
+        self._verify_cell_data_in_csv(student.username, 'Enrollment Source', 'Credit Card - Individual')
+        self._verify_cell_data_in_csv(student.username, 'Payment Status', 'purchased')
+
+    def test_student_used_enrollment_code_for_course_enrollment(self):
+        """
+        test to check the user enrollment source and payment status in the
+        enrollment detailed report
+        """
+        student = UserFactory()
+        self.client.login(username=student.username, password='test')
+        student_cart = Order.get_cart_for_user(student)
+        paid_course_reg_item = PaidCourseRegistration.add_to_order(student_cart, self.course.id)
+        # update the quantity of the cart item paid_course_reg_item
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'),
+                                {'ItemId': paid_course_reg_item.id, 'qty': '4'})
+        self.assertEqual(resp.status_code, 200)
+        student_cart.purchase()
+
+        course_reg_codes = CourseRegistrationCode.objects.filter(order=student_cart)
+        redeem_url = reverse('register_code_redemption', args=[course_reg_codes[0].code])
+        response = self.client.get(redeem_url)
+        self.assertEquals(response.status_code, 200)
+        # check button text
+        self.assertTrue('Activate Course Enrollment' in response.content)
+
+        response = self.client.post(redeem_url)
+        self.assertEquals(response.status_code, 200)
+
+        task_input = {'features': []}
+        with patch('instructor_task.tasks_helper._get_current_task'):
+            result = upload_enrollment_report(None, None, self.course.id, task_input, 'generating_enrollment_report')
+        self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
+        self._verify_cell_data_in_csv(student.username, 'Enrollment Source', 'Used Registration Code')
+        self._verify_cell_data_in_csv(student.username, 'Payment Status', 'purchased')
+
+    def test_student_used_invoice_unpaid_enrollment_code_for_course_enrollment(self):
+        """
+        test to check the user enrollment source and payment status in the
+        enrollment detailed report
+        """
+        student = UserFactory()
+        self.client.login(username=student.username, password='test')
+
+        course_registration_code = CourseRegistrationCode(
+            code='abcde',
+            course_id=self.course.id.to_deprecated_string(),
+            created_by=self.instructor,
+            invoice=self.sale_invoice_1,
+            invoice_item=self.invoice_item,
+            mode_slug='honor'
+        )
+        course_registration_code.save()
+
+        redeem_url = reverse('register_code_redemption', args=['abcde'])
+        response = self.client.get(redeem_url)
+        self.assertEquals(response.status_code, 200)
+        # check button text
+        self.assertTrue('Activate Course Enrollment' in response.content)
+
+        response = self.client.post(redeem_url)
+        self.assertEquals(response.status_code, 200)
+
+        task_input = {'features': []}
+        with patch('instructor_task.tasks_helper._get_current_task'):
+            result = upload_enrollment_report(None, None, self.course.id, task_input, 'generating_enrollment_report')
+        self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
+        self._verify_cell_data_in_csv(student.username, 'Enrollment Source', 'Used Registration Code')
+        self._verify_cell_data_in_csv(student.username, 'Payment Status', 'Invoice Outstanding')
+
+    def test_student_used_invoice_paid_enrollment_code_for_course_enrollment(self):
+        """
+        test to check the user enrollment source and payment status in the
+        enrollment detailed report
+        """
+        student = UserFactory()
+        self.client.login(username=student.username, password='test')
+        invoice_transaction = InvoiceTransaction(
+            invoice=self.sale_invoice_1,
+            amount=self.sale_invoice_1.total_amount,
+            status='completed',
+            created_by=self.instructor,
+            last_modified_by=self.instructor
+        )
+        invoice_transaction.save()
+        course_registration_code = CourseRegistrationCode(
+            code='abcde',
+            course_id=self.course.id.to_deprecated_string(),
+            created_by=self.instructor,
+            invoice=self.sale_invoice_1,
+            invoice_item=self.invoice_item,
+            mode_slug='honor'
+        )
+        course_registration_code.save()
+
+        redeem_url = reverse('register_code_redemption', args=['abcde'])
+        response = self.client.get(redeem_url)
+        self.assertEquals(response.status_code, 200)
+        # check button text
+        self.assertTrue('Activate Course Enrollment' in response.content)
+
+        response = self.client.post(redeem_url)
+        self.assertEquals(response.status_code, 200)
+
+        task_input = {'features': []}
+        with patch('instructor_task.tasks_helper._get_current_task'):
+            result = upload_enrollment_report(None, None, self.course.id, task_input, 'generating_enrollment_report')
+        self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
+        self._verify_cell_data_in_csv(student.username, 'Enrollment Source', 'Used Registration Code')
+        self._verify_cell_data_in_csv(student.username, 'Payment Status', 'Invoice Paid')
+
+    def _verify_cell_data_in_csv(self, username, column_header, expected_cell_content):
+        """
+        Verify that the last ReportStore CSV contains the expected content.
+        """
+        report_store = ReportStore.from_config(config_name='FINANCIAL_REPORTS')
+        report_csv_filename = report_store.links_for(self.course.id)[0][0]
+        with open(report_store.path_to(self.course.id, report_csv_filename)) as csv_file:
+            # Expand the dict reader generator so we don't lose it's content
+            for row in unicodecsv.DictReader(csv_file):
+                if row.get('Username') == username:
+                    self.assertEqual(row[column_header], expected_cell_content)
+
+
 class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
     """
     Test that the problem CSV generation works.
@@ -347,7 +524,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         result = upload_problem_grade_report(None, None, self.course.id, None, 'graded')
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 0, 'failed': 1}, result)
 
-        report_store = ReportStore.from_config()
+        report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
         self.assertTrue(any('grade_report_err' in item[0] for item in report_store.links_for(self.course.id)))
         self.verify_rows_in_csv([
             {
@@ -521,7 +698,7 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
         task_input = {'features': []}
         with patch('instructor_task.tasks_helper._get_current_task'):
             result = upload_students_csv(None, None, self.course.id, task_input, 'calculated')
-        report_store = ReportStore.from_config()
+        report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
         links = report_store.links_for(self.course.id)
 
         self.assertEquals(len(links), 1)
@@ -842,7 +1019,7 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
         """
         with patch('instructor_task.tasks_helper._get_current_task'):
             upload_grades_csv(None, None, self.course.id, None, 'graded')
-            report_store = ReportStore.from_config()
+            report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
             report_csv_filename = report_store.links_for(self.course.id)[0][0]
             with open(report_store.path_to(self.course.id, report_csv_filename)) as csv_file:
                 for row in unicodecsv.DictReader(csv_file):

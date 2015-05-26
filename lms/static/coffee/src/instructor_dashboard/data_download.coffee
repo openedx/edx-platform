@@ -9,6 +9,7 @@ such that the value can be defined later than this assignment (file load order).
 # Load utilities
 std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, arguments
 PendingInstructorTasks = -> window.InstructorDashboard.util.PendingInstructorTasks
+ReportDownloads = -> window.InstructorDashboard.util.ReportDownloads
 
 # Data Download Section
 class DataDownload
@@ -33,7 +34,7 @@ class DataDownload
     @$reports_request_response        = @$reports.find '.request-response'
     @$reports_request_response_error  = @$reports.find '.request-response-error'
 
-    @report_downloads = new ReportDownloads(@$section)
+    @report_downloads = new (ReportDownloads()) @$section
     @instructor_tasks = new (PendingInstructorTasks()) @$section
     @clear_display()
 
@@ -152,66 +153,6 @@ class DataDownload
     # Clear any CSS styling from the request-response areas
     $(".msg-confirm").css({"display":"none"})
     $(".msg-error").css({"display":"none"})
-
-
-class ReportDownloads
-  ### Report Downloads -- links expire quickly, so we refresh every 5 mins ####
-  constructor: (@$section) ->
-
-    @$report_downloads_table = @$section.find ".report-downloads-table"
-
-    POLL_INTERVAL = 20000 # 20 seconds, just like the "pending instructor tasks" table
-    @downloads_poller = new window.InstructorDashboard.util.IntervalManager(
-      POLL_INTERVAL, => @reload_report_downloads()
-    )
-
-  reload_report_downloads: ->
-    endpoint = @$report_downloads_table.data 'endpoint'
-    $.ajax
-      dataType: 'json'
-      url: endpoint
-      success: (data) =>
-        if data.downloads.length
-          @create_report_downloads_table data.downloads
-        else
-          console.log "No reports ready for download"
-      error: (std_ajax_err) => console.error "Error finding report downloads"
-
-  create_report_downloads_table: (report_downloads_data) ->
-    @$report_downloads_table.empty()
-
-    options =
-      enableCellNavigation: true
-      enableColumnReorder: false
-      rowHeight: 30
-      forceFitColumns: true
-
-    columns = [
-      id: 'link'
-      field: 'link'
-      name: gettext('File Name')
-      toolTip: gettext("Links are generated on demand and expire within 5 minutes due to the sensitive nature of student information.")
-      sortable: false
-      minWidth: 150
-      cssClass: "file-download-link"
-      formatter: (row, cell, value, columnDef, dataContext) ->
-        '<a href="' + dataContext['url'] + '">' + dataContext['name'] + '</a>'
-    ]
-
-    $table_placeholder = $ '<div/>', class: 'slickgrid'
-    @$report_downloads_table.append $table_placeholder
-    grid = new Slick.Grid($table_placeholder, report_downloads_data, columns, options)
-    grid.onClick.subscribe(
-        (event) =>
-            report_url = event.target.href
-            if report_url
-                # Record that the user requested to download a report
-                Logger.log('edx.instructor.report.downloaded', {
-                    report_url: report_url
-                })
-    )
-    grid.autosizeColumns()
-
 
 # export for use
 # create parent namespaces if they do not already exist.

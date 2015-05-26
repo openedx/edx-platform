@@ -478,6 +478,9 @@ GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
 
 GRADES_DOWNLOAD = ENV_TOKENS.get("GRADES_DOWNLOAD", GRADES_DOWNLOAD)
 
+# financial reports
+FINANCIAL_REPORTS = ENV_TOKENS.get("FINANCIAL_REPORTS", FINANCIAL_REPORTS)
+
 ##### ORA2 ######
 # Prefix for uploads of example-based assessment AI classifiers
 # This can be used to separate uploads for different environments
