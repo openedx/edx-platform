@@ -12,8 +12,7 @@ define([
     'js/common_helpers/template_helpers',
     'js/spec_helpers/view_helpers',
     'js/spec_helpers/validation_helpers',
-    'js/certificates/spec/custom_matchers',
-    'jasmine-stealth'
+    'js/certificates/spec/custom_matchers'
 ],
 function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, CertificateEditorView,
          Notification, AjaxHelpers, TemplateHelpers, ViewHelpers, ValidationHelpers, CustomMatchers) {
