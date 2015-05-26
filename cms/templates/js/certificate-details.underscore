@@ -13,19 +13,17 @@
         </li>
      <% } %>
      <% if (showDetails) { %>
-        <% if (course_title) { %>
-            <li class="collection-course-title certificate-course-title">
-                <span><%= gettext('Course Title') %>: </span>
-                <%= course_title %>
-            </li>
-        <% } %>
-        <% if (description) { %>
-            <li class="collection-description certificate-description">
-                <%= description %>
-            </li>
-        <% } %>
          <header>
-           <span class="title"><%= gettext("Course Signatories") %></span>
+           <span class="title"><%= gettext("Certificate Details") %></span>
+         </header>
+        <% if (course_title) { %>
+            <div class="course-title-override">
+                <span class="certificate-label"><%= gettext('Course Title Override') %>: </span>
+                <span class="certificate-value"><%= course_title %></span>
+            </div>
+        <% } %>
+         <header style='margin-top: 30px;'>
+           <span class="title"><%= gettext("Certificate Signatories") %></span>
          </header>
          <div class="signatory-details-list"></div>
     <% } %>
