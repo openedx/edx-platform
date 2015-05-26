@@ -1,15 +1,23 @@
 import json
 import logging
-
 from collections import OrderedDict
 from model_utils.models import TimeStampedModel
-
 from util.models import CompressedTextField
-from xmodule_django.models import CourseKeyField
+from util.date_utils import strftime_localized
+from base64 import b32encode
 
+import django.db.models
+from django.db.models.fields import *
+from django.utils.timezone import UTC
+from django.utils.translation import ugettext
+
+from xmodule_django.models import CourseKeyField, UsageKeyField
+from xmodule.modulestore.django import modulestore
+from xmodule.partitions.partitions import NoSuchUserPartitionError
+from xmodule.course_module import CourseFields
+from xmodule.fields import Date
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
-
 
 class CourseStructure(TimeStampedModel):
     course_id = CourseKeyField(max_length=255, db_index=True, unique=True, verbose_name='Course ID')
@@ -53,35 +61,41 @@ class CourseStructure(TimeStampedModel):
         for child_node in cur_block['children']:
             self._traverse_tree(child_node, unordered_structure, ordered_blocks, parent=block)
 
-import django
-from django.db.models.fields import *
-from django.utils.timezone import UTC
-from base64 import b32encode
+class JsonCacheField(django.db.models.Field):
+    def __init__(self, *args, **kwargs):
+        super(JsonCacheField, self).__init__(*args, **kwargs)
 
-from xmodule.partitions.partitions import NoSuchUserPartitionError
+    def to_representation(self, obj):
+        return obj.to_json()
 
-# TODO me: is this the proper way of importing from local apps?
-from xmodule.course_module import CourseFields
-from xmodule.fields import Date
-from lms.djangoapps.lms_xblock.mixin import GroupAccessDict
-from xblock.fields import List
+    def to_internal_value(self, obj):
+        return obj.from_json()
+
+class UserPartitionListCacheField(JsonCacheField):
+    pass
+
+class GroupAccessDictCacheField(JsonCacheField):
+    pass
+
+class CourseIdListCacheField(JsonCacheField):
+    pass
 
 class CourseOverviewFields(django.db.models.Model):
 
     # Source: None; specific to this class
-    id = CharField(max_length=255, unique=True, db_index=True)
+    id = CourseKeyField()
     modulestore_type = CharField(max_length=5)  # 'split', 'mongo', or 'xml'
 
     # TODO me: find out where these variables are from...
     # it might be InheritanceMixin and LmsBlockMixin, but those aren't in CourseDescriptor's inheritance tree
-    user_partitions = ???   # TODO me: how to store UserParitionList
+    user_partitions = UserPartitionListCacheField()
     static_asset_path = TextField()
     ispublic = BooleanField()
     visible_to_staff_only = BooleanField()
-    group_access = ???  # TODO me: how to store GroupAccessDict
+    group_access = GroupAccessDictCacheField()
 
     # Source: XModuleMixin (x_module.py)
-    location = ???
+    location = UsageKeyField()
 
     # Source: CourseFields (course_module.py)
     enrollment_start = DateField()
@@ -89,12 +103,13 @@ class CourseOverviewFields(django.db.models.Model):
     start = DateField()
     end = DateField()
     advertised_start = TextField()
-    pre_requisite_courses = ???  # TODO me: how to store list of course_ids
+    pre_requisite_courses = CourseIdListCacheField()
     end_of_course_survey_url = TextField()
     display_name = TextField()
     mobile_available = BooleanField()
     facebook_url = TextField()
     enrollment_domain = TextField()
+    certificates_show_before_end = BooleanField()
     certificates_display_behavior = TextField()
     course_image = TextField()
     display_organization = TextField()
@@ -106,6 +121,53 @@ class CourseOverviewFields(django.db.models.Model):
     cert_name_long = TextField()
 
 class CourseOverviewDescriptor(CourseOverviewFields):
+
+    @classmethod
+    def create_from_course(course):
+        # TODO: when we upgrade to 1.8, delete old code and uncomment new code
+        modulestore_type = modulestore().get_modulestore_type(course.id)
+
+        # Newer, better way of building return value (should work in Django >=1.8, but has NOT yet been tested)
+        '''
+        res = CourseOverviewDescriptor(modulestore_type=modulestore_type)
+        for field in CourseOverviewFields._meta.get_fields(include_parents=False):
+            if field.name != 'modulestore_type':
+                setattr(res, field.name, getattr(course, field.name))
+        return res
+        '''
+
+        # Old, bad way of building return value (works in all Django versions)
+        return CourseOverviewDescriptor(
+            id=course.id,
+            modulestore_type=modulestore_type,
+            user_partitions=course.user_partitions,
+            static_asset_path=course.static_asset_path,
+            ispublic=course.ispublic,
+            visible_to_staff_only=course.visible_to_staff_only,
+            group_access=course.group_access,
+            location=course.location,
+            enrollment_start=course.enrollment_start,
+            enrollment_end=course.enrollment_end,
+            start=course.start,
+            end=course.end,
+            advertised_start=course.advertised_start,
+            pre_requisite_courses=course.pre_requisite_courses,
+            end_of_course_survey_url=course.end_of_course_survey_url,
+            display_name=course.display_name,
+            mobile_available=course.mobile_available,
+            facebook_url=course.facebook_url,
+            enrollment_domain=course.enrollment_domain,
+            certificates_show_before_end = course.certificates_show_before_end,
+            certificates_display_behavior=course.certificates_display_behavior,
+            course_image=course.course_image,
+            display_organization=course.display_organization,
+            display_coursenumber=course.display_coursenumber,
+            invitation_only=course.invitation_only,
+            catalog_visibility=course.catalog_visibility,
+            social_sharing_url=course.social_sharing_url,
+            cert_name_short=course.cert_name_short,
+            cert_name_long=course.cert_name_long
+        )
 
     # TODO me: find out where these methods are from...
     # it might be LmsBlockMixin, but it isn't in CourseDescriptor's inheritance tree
@@ -142,13 +204,14 @@ class CourseOverviewDescriptor(CourseOverviewFields):
             name = self.url_name.replace('_', ' ')
         return name.replace('<', '&lt;').replace('>', '&gt;')
 
-     # Source: CourseDescriptor
+    # Source: CourseDescriptor
 
     def may_certify(self):
         """
         Return True if it is acceptable to show the student a certificate download link
         """
-        show_early = self.certificates_display_behavior in ('early_with_info', 'early_no_info') or self.certificates_show_before_end
+        show_early = self.certificates_display_behavior in ('early_with_info', 'early_no_info') \
+            or self.certificates_show_before_end
         return show_early or self.has_ended()
 
     def has_ended(self):
@@ -169,10 +232,8 @@ class CourseOverviewDescriptor(CourseOverviewFields):
         Returns the desired text corresponding the course's start date and time in UTC.  Prefers .advertised_start,
         then falls back to .start
         """
-        # TODO me: how to get runtime? Or if we can't, should we just cache this property?
-        i18n = self.runtime.service(self, "i18n")
-        _ = i18n.ugettext
-        strftime = i18n.strftime
+        _ = ugettext
+        strftime = strftime_localized
 
         def try_parse_iso_8601(text):
             try:
@@ -219,9 +280,7 @@ class CourseOverviewDescriptor(CourseOverviewFields):
         if self.end is None:
             return ''
         else:
-            # TODO me: how to get runtime? Or if we can't, should we just cache this property?
-            strftime = self.runtime.service(self, "i18n").strftime
-            date_time = strftime(self.end, format_string)
+            date_time = strftime_localized(self.end, format_string)
             return date_time if format_string == "SHORT_DATE" else self._add_timezone_string(date_time)
 
     @property
@@ -261,6 +320,14 @@ class CourseOverviewDescriptor(CourseOverviewFields):
             b32encode(unicode(self.location.course_key)).replace('=', padding_char)
         )
 
+def get_course_overview(course_id):
+    try:
+        course_overview = CourseOverviewFields.get(id=course_id)
+    except CourseOverviewFields.DoesNotExist:
+        course = modulestore().get_course(course_id)
+        course_overview = CourseOverviewDescriptor.create_from_course(course)
+        course_overview.save()
+    return course_overview
 
 # Signals must be imported in a file that is automatically loaded at app startup (e.g. models.py). We import them
 # at the end of this file to avoid circular dependencies.
