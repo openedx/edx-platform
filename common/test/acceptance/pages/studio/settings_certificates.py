@@ -82,6 +82,24 @@ class CertificatesPage(CoursePage):
         self.wait_for_element_visibility('.prompt', 'Prompt is visible')
         self.wait_for_element_visibility('.prompt .action-primary', 'Confirmation button is visible')
 
+    def wait_for_first_certificate_button(self):
+        """
+        Ensure the button is available for use
+        """
+        EmptyPromise(
+            lambda: self.q(css=self.certficate_css + " .new-button").present,
+            'Create first certificate button is displayed'
+        ).fulfill()
+
+    def wait_for_add_certificate_button(self):
+        """
+        Ensure the button is available for use
+        """
+        EmptyPromise(
+            lambda: self.q(css=self.certficate_css + " .action-add").present,
+            'Add certificate button is displayed'
+        ).fulfill()
+
     ################
     # Click Actions
     ################
