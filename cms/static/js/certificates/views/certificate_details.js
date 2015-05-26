@@ -1,6 +1,7 @@
 // Backbone Application View: Certificate Details
 
 define([
+    'jquery',
     'underscore',
     'underscore.string',
     'gettext',
@@ -8,7 +9,7 @@ define([
     'js/certificates/models/signatory',
     'js/certificates/views/signatory_details'
 ],
-function(_, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView) {
+function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView) {
     'use strict';
     var CertificateDetailsView = BaseView.extend({
         tagName: 'div',
@@ -20,8 +21,6 @@ function(_, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView) {
 
         className: function () {
             // Determine the CSS class names for this model instance
-            var index = this.model.collection.indexOf(this.model);
-
             return [
                 'collection',
                 'certificates',

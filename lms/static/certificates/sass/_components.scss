@@ -149,8 +149,9 @@
 // base accomplishment
 .accomplishment {
 
-    .accomplishment-type-symbol {
-        @extend %img-cropped;
+    .accomplishment-type-symbol .src {
+        display: block;
+        width: 100%;
     }
 }
 
@@ -214,7 +215,7 @@
     @extend %depth-card;
     position: relative;
     top: -(spacing-vertical(base));
-    border-top: rem(4) solid $cert-base-color;
+    border-top: rem(4) solid $cert-decorative-color;
 
     // type
     .accomplishment-type {
@@ -233,13 +234,10 @@
     }
 
     .accomplishment-type-symbol {
-        @extend %img-cropped;
         @include size(rem(100));
+        position: relative;
+        top: -(spacing-vertical(small));
         margin: 0 auto spacing-vertical(small) auto;
-
-        .src {
-            border: rem(4) solid $cert-base-color;
-        }
     }
 
     // statement
@@ -411,7 +409,6 @@
 .certificate {
 
     .accomplishment-rendering {
-        border-top-color: $cert-base-color;
 
         // decorative corners for certs
         .deco-corner {
@@ -534,12 +531,8 @@
         margin-bottom: 0;
     }
 
-    .accomplishment-type-symbol .src {
-        border-color: $cert-distinguished-color;
-    }
-
     .accomplishment-rendering {
-        border-top-color: $cert-distinguished-color;
+        border-color: $cert-distinguished-color;
 
         .accomplishment-type-label {
             color: $cert-distinguished-color;
