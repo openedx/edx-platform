@@ -1,5 +1,6 @@
 """URL handlers related to certificate handling by LMS"""
 from datetime import datetime
+from uuid import uuid4
 import dogstats_wrapper as dog_stats_api
 import json
 import logging
@@ -269,7 +270,7 @@ def get_certificate_description(mode, certificate_type, platform_name):
     return certificate_type_description
 
 
-def update_certificate_context(context, course, user, mode):
+def update_certificate_context(context, course, user, mode, verify_uuid, modified_date):
     """
     update the certificate context
     """
@@ -401,6 +402,21 @@ def update_certificate_context(context, course, user, mode):
     if certificate_type_description:
         context['certificate_type_description'] = certificate_type_description
 
+    # Override the defaults with any mode-specific static values
+    context['certificate_id_number'] = verify_uuid
+    context['certificate_verify_url'] = "{prefix}{uuid}{suffix}".format(
+        prefix=context.get('certificate_verify_url_prefix'),
+        uuid=verify_uuid,
+        suffix=context.get('certificate_verify_url_suffix')
+    )
+
+    # Translators:  The format of the date includes the full name of the month
+    context['certificate_date_issued'] = _('{month} {day}, {year}').format(
+        month=modified_date.strftime("%B"),
+        day=modified_date.day,
+        year=modified_date.year
+    )
+
 
 # pylint: disable=too-many-statements, bad-continuation, unused-argument
 def render_html_view(request, user_id, course_id):
@@ -409,6 +425,8 @@ def render_html_view(request, user_id, course_id):
     If a certificate is not available, we display a "Sorry!" screen instead
     """
     context = {}
+    uuid = unicode(uuid4().hex)
+    date = datetime.now().date()
     context['platform_name'] = settings.PLATFORM_NAME
 
     configuration = CertificateHtmlViewConfiguration.get_config()
@@ -434,13 +452,24 @@ def render_html_view(request, user_id, course_id):
         if not course:
             raise CourseDoesNotExist
 
+    except (User.DoesNotExist, InvalidKeyError, CourseDoesNotExist):
+        return render_to_response(invalid_template_path, context)
+
+    try:
         certificate = GeneratedCertificate.objects.get(
             user=user,
             course_id=course_key
         )
+        context.update(configuration.get(certificate.mode, {}))
+        mode = certificate.mode
+        uuid = certificate.verify_uuid
+        date = certificate.modified_date
 
-    except (User.DoesNotExist, GeneratedCertificate.DoesNotExist, InvalidKeyError, CourseDoesNotExist):
-        return render_to_response(invalid_template_path, context)
+    except GeneratedCertificate.DoesNotExist:
+        if request.GET.get('preview', None):
+            mode = request.GET.get('preview')
+        else:
+            return render_to_response(invalid_template_path, context)
 
     context['course_id'] = course_id
     context['username'] = user.username
@@ -454,26 +483,17 @@ def render_html_view(request, user_id, course_id):
             active_certificate = cert
             break
 
-    # Override the defaults with any mode-specific static values
-    context.update(configuration.get(certificate.mode, {}))
-    context['certificate_id_number'] = certificate.verify_uuid
-    context['certificate_verify_url'] = "{prefix}{uuid}{suffix}".format(
-        prefix=context.get('certificate_verify_url_prefix'),
-        uuid=certificate.verify_uuid,
-        suffix=context.get('certificate_verify_url_suffix')
-    )
-
-    # Translators:  The format of the date includes the full name of the month
-    context['certificate_date_issued'] = _('{month} {day}, {year}').format(
-        month=certificate.modified_date.strftime("%B"),
-        day=certificate.modified_date.day,
-        year=certificate.modified_date.year
-    )
-
     # Override further with any course-specific static values
     context.update(course.cert_html_view_overrides)
 
-    update_certificate_context(context, course, user, certificate.mode)
+    update_certificate_context(
+        context=context,
+        course=course,
+        user=user,
+        mode=mode,
+        verify_uuid=uuid,
+        modified_date=date
+    )
 
     if active_certificate:
         context['certificate_data'] = active_certificate
