@@ -14,19 +14,11 @@ from xmodule.course_module import CourseFields
 from xmodule.fields import Date
 from xmodule.modulestore.inheritance import UserPartition
 from xmodule.course_module import DEFAULT_START_DATE, CATALOG_VISIBILITY_CATALOG_AND_ABOUT
+from opaque_keys.edx.locator import BlockUsageLocator, UsageKey
 
-from south.modelsinspector import add_introspection_rules
-custom_fields = [
-    'UserPartitionListCacheField',
-    'GroupAccessDictCacheField',
-    'CourseIdListCacheField'
-]
-for s in custom_fields:
-    add_introspection_rules([], ["openedx.core.djangoapps.content.course_overviews.models." + s])
-
-class UserPartitionListCacheField(TextField):
+class UserPartitionListField(TextField):
     def __init__(self, *args, **kwargs):
-        super(UserPartitionListCacheField, self).__init__(*args, **kwargs)
+        super(UserPartitionListField, self).__init__(*args, **kwargs)
 
     def to_representation(self, obj):
         strings = [user_partition.to_json() for user_partition in obj]
@@ -36,9 +28,9 @@ class UserPartitionListCacheField(TextField):
         strings = json.loads(data)
         return [UserPartition.from_json(s) for s in strings]
 
-class GroupAccessDictCacheField(TextField):
+class GroupAccessDictField(TextField):
     def __init__(self, *args, **kwargs):
-        super(GroupAccessDictCacheField, self).__init__(*args, **kwargs)
+        super(GroupAccessDictField, self).__init__(*args, **kwargs)
 
     def to_representation(self, obj):
         return json.dumps(obj)
@@ -46,55 +38,62 @@ class GroupAccessDictCacheField(TextField):
     def to_internal_value(self, data):
         return json.loads(data)
 
-class CourseIdListCacheField(TextField):
+class CourseIdListField(TextField):
     def __init__(self, *args, **kwargs):
-        super(CourseIdListCacheField, self).__init__(*args, **kwargs)
+        super(CourseIdListField, self).__init__(*args, **kwargs)
 
     def to_representation(self, obj):
         return json.dumps(obj)
 
     def to_internal_value(self, data):
         return json.loads(data)
+
+from south.modelsinspector import add_introspection_rules
+custom_field_classes = [
+    UserPartitionListField,
+    GroupAccessDictField,
+    CourseIdListField,
+]
+for field_class in custom_field_classes:
+    add_introspection_rules([], ["openedx.core.djangoapps.content.course_overviews.models." + field_class.__name__])
 
 class CourseOverviewFields(django.db.models.Model):
 
     # Source: None; specific to this class
     id = CourseKeyField(db_index=True, primary_key=True, max_length=255)
     modulestore_type = CharField(max_length=5)  # 'split', 'mongo', or 'xml'
+    _location_str = CharField(max_length=255)
 
     # TODO me: find out where these variables are from...
     # it might be InheritanceMixin and LmsBlockMixin, but those aren't in CourseDescriptor's inheritance tree
-    user_partitions = UserPartitionListCacheField()
-    static_asset_path = TextField()
-    ispublic = BooleanField()
-    visible_to_staff_only = BooleanField()
-    group_access = GroupAccessDictCacheField()
-
-    # Source: XModuleMixin (x_module.py)
-    location = UsageKeyField(max_length=255)
+    user_partitions = UserPartitionListField(null=True)
+    static_asset_path = TextField(default="")
+    ispublic = NullBooleanField()
+    visible_to_staff_only = BooleanField(default=False)
+    group_access = GroupAccessDictField(null=True)
 
     # Source: CourseFields (course_module.py)
-    enrollment_start = DateField()
-    enrollment_end = DateField()
-    start = DateField(default=DEFAULT_START_DATE)
-    end = DateField()
-    advertised_start = TextField()
-    pre_requisite_courses = CourseIdListCacheField()
-    end_of_course_survey_url = TextField()
-    display_name = TextField(default="Empty")
+    enrollment_start = DateField(null=True)
+    enrollment_end = DateField(null=True)
+    start = DateField(default=DEFAULT_START_DATE, null=True)
+    end = DateField(null=True)
+    advertised_start = TextField(null=True)
+    pre_requisite_courses = CourseIdListField(null=True)
+    end_of_course_survey_url = TextField(null=True)
+    display_name = TextField(default="Empty", null=True)
     mobile_available = BooleanField(default=False)
-    facebook_url = TextField(default=None)
-    enrollment_domain = TextField()
+    facebook_url = TextField(default=None, null=True)
+    enrollment_domain = TextField(null=True)
     certificates_show_before_end = BooleanField(default=False)
-    certificates_display_behavior = TextField(default="end")
-    course_image = TextField(default="images_course_image.jpg")
-    cert_name_short = TextField(default="")
-    cert_name_long = TextField(default="")
-    display_organization = TextField()
-    display_coursenumber = TextField()
+    certificates_display_behavior = TextField(default="end", null=True)
+    course_image = TextField(default="images_course_image.jpg", null=True)
+    cert_name_short = TextField(default="", null=True)
+    cert_name_long = TextField(default="", null=True)
+    display_organization = TextField(null=True)
+    display_coursenumber = TextField(null=True)
     invitation_only = BooleanField(default=False)
-    catalog_visibility = TextField(default=CATALOG_VISIBILITY_CATALOG_AND_ABOUT)
-    social_sharing_url = TextField(default=None)
+    catalog_visibility = TextField(default=CATALOG_VISIBILITY_CATALOG_AND_ABOUT, null=True)
+    social_sharing_url = TextField(default=None, null=True)
 
 class CourseOverviewDescriptor(CourseOverviewFields):
 
@@ -105,9 +104,9 @@ class CourseOverviewDescriptor(CourseOverviewFields):
 
         # Newer, better way of building return value (should work in Django >=1.8, but has NOT yet been tested)
         '''
-        res = CourseOverviewDescriptor(modulestore_type=modulestore_type)
+        res = CourseOverviewDescriptor(modulestore_type=modulestore_type, _location_str=unicode(course.location)
         for field in CourseOverviewFields._meta.get_fields(include_parents=False):
-            if field.name != 'modulestore_type':
+            if not field.name in ['modulestore_type', '_location_str']:
                 setattr(res, field.name, getattr(course, field.name))
         return res
         '''
@@ -121,7 +120,7 @@ class CourseOverviewDescriptor(CourseOverviewFields):
             ispublic=course.ispublic,
             visible_to_staff_only=course.visible_to_staff_only,
             group_access=course.group_access,
-            location=course.location,
+            _location_str=unicode(course.location),
             enrollment_start=course.enrollment_start,
             enrollment_end=course.enrollment_end,
             start=course.start,
@@ -133,7 +132,7 @@ class CourseOverviewDescriptor(CourseOverviewFields):
             mobile_available=course.mobile_available,
             facebook_url=course.facebook_url,
             enrollment_domain=course.enrollment_domain,
-            certificates_show_before_end = course.certificates_show_before_end,
+            certificates_show_before_end=course.certificates_show_before_end,
             certificates_display_behavior=course.certificates_display_behavior,
             course_image=course.course_image,
             display_organization=course.display_organization,
@@ -163,7 +162,13 @@ class CourseOverviewDescriptor(CourseOverviewFields):
 
         raise NoSuchUserPartitionError("could not find a UserPartition with ID [{}]".format(user_partition_id))
 
-    # Source XModuleMixin
+    # Source: XModuleMixin
+
+    @property
+    def location(self):
+        if not hasattr(self, '_location'):
+            self._location = UsageKey.from_string(self._location_str).map_into_course(self.id)
+        return self._location
 
     @property
     def url_name(self):
