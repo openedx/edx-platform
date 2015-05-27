@@ -37,6 +37,7 @@ from courseware.entrance_exams import (
     get_entrance_exam_score,
     user_must_complete_entrance_exam
 )
+from lms.djangoapps.bookmarks.services import BookmarksService
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, unquote_slashes, quote_slashes
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
@@ -64,7 +65,6 @@ from openedx.core.lib.xblock_utils import (
     add_staff_markup,
     wrap_xblock,
     request_token,
-    add_bookmark_button
 )
 from xmodule.lti_module import LTIModule
 from xmodule.x_module import XModuleDescriptor
@@ -581,9 +581,6 @@ def get_module_system_for_user(user, field_data_cache,
             has_instructor_access = has_access(user, 'instructor', descriptor, course_id)
             block_wrappers.append(partial(add_staff_markup, user, has_instructor_access))
 
-    bookmark_button = partial(add_bookmark_button)
-    block_wrappers.append(bookmark_button) if bookmark_button else None
-
     # These modules store data using the anonymous_student_id as a key.
     # To prevent loss of data, we will continue to provide old modules with
     # the per-student anonymized id (as we have in the past),
@@ -649,7 +646,8 @@ def get_module_system_for_user(user, field_data_cache,
             'fs': xblock.reference.plugins.FSService(),
             'field-data': field_data,
             'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
-            "reverification": ReverificationService()
+            'reverification': ReverificationService(),
+            'bookmarks': BookmarksService(user=user)
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access

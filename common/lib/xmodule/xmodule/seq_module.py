@@ -125,6 +125,7 @@ class SequenceModule(SequenceFields, XModule):
                 'progress_detail': Progress.to_js_detail_str(progress),
                 'type': child.get_icon_class(),
                 'id': child.scope_ids.usage_id.to_deprecated_string(),
+                'bookmarked': self.runtime.service(self, "bookmarks").is_bookmarked(usage_key=child.scope_ids.usage_id),
             }
             if childinfo['title'] == '':
                 childinfo['title'] = child.display_name_with_default

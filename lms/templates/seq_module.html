@@ -21,6 +21,7 @@
            id="tab_${idx}"
            tabindex="0">
             <i class="icon fa seq_${item['type']}" aria-hidden="true"></i>
+            <i class="fa fa-fw fa-bookmark"></i>
             <p><span class="sr">${item['type']}</span> ${item['title']}</p>
           </a>
         </li>
@@ -31,7 +32,7 @@
   </div>
 
   <div class="sr-is-focusable" tabindex="-1"></div>
-
+    <%include file='bookmark_button.html' />
   % for idx, item in enumerate(items):
   <div id="seq_contents_${idx}"
     aria-labelledby="tab_${idx}"
