@@ -2,7 +2,7 @@
 Signal handling functions for use with external commerce service.
 """
 import logging
-from urlparse import urlparse
+from urlparse import urljoin
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
@@ -131,14 +131,14 @@ def send_refund_notification(course_enrollment, refund_ids):
     for_user = course_enrollment.user
     subject = _("[Refund] User-Requested Refund")
     message = _(
-        "A refund request has been initiated for {username} ({email}). To process this request, please visit the link(s) below."  # pylint: disable=line-too-long
+        "A refund request has been initiated for {username} ({email}). "
+        "To process this request, please visit the link(s) below."
     ).format(username=for_user.username, email=for_user.email)
 
-    # TODO: this manipulation of API url is temporary, pending the introduction
-    # of separate configuration items for the service's base url and api path.
-    ecommerce_url = '://'.join(urlparse(settings.ECOMMERCE_API_URL)[:2])
-
-    refund_urls = ["{}/dashboard/refunds/{}/".format(ecommerce_url, refund_id) for refund_id in refund_ids]
+    refund_urls = [
+        urljoin(settings.ECOMMERCE_PUBLIC_URL_ROOT, '/dashboard/refunds/{}/'.format(refund_id))
+        for refund_id in refund_ids
+    ]
     text_body = '\r\n'.join([message] + refund_urls + [''])
     refund_links = ['<a href="{0}">{0}</a>'.format(url) for url in refund_urls]
     html_body = '<p>{}</p>'.format('<br>'.join([message] + refund_links))
