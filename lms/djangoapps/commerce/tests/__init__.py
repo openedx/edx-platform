@@ -12,7 +12,8 @@ from commerce import ecommerce_api_client
 from student.tests.factories import UserFactory
 
 
-TEST_API_URL = 'http://example.com/api'
+TEST_PUBLIC_URL_ROOT = 'http://www.example.com'
+TEST_API_URL = 'http://www-internal.example.com/api'
 TEST_API_SIGNING_KEY = 'edx'
 TEST_BASKET_ID = 7
 TEST_ORDER_NUMBER = '100004'
