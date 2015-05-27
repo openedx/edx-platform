@@ -36,6 +36,7 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings, update_account_settings
 from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
 from openedx.core.djangoapps.user_api.errors import UserNotFound, AccountValidationError
+from openedx.core.djangoapps.credit.models import CreditRequirementStatus, CreditRequirement
 from commerce import ecommerce_api_client
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment
@@ -1006,6 +1007,18 @@ def results_callback(request):
         log.debug("Approving verification for %s", receipt_id)
         attempt.approve()
         status = "approved"
+        checkpoints = VerificationCheckpoint.objects.filter(photo_verification=attempt).all()
+        if checkpoints:
+            course_key = checkpoints[0].course_id
+            credit_requirement = CreditRequirement.get_course_requirement(
+                course_key, "reverification", checkpoints[0].checkpoint_name
+            )
+            if credit_requirement is not None:
+                try:
+                    CreditRequirementStatus.add_requirement_status(attempt.user.username, credit_requirement, "satisfied")
+                except Exception as exp:  # pylint: disable=broad-except
+                    log.warn(exp)
+
     elif result == "FAIL":
         log.debug("Denying verification for %s", receipt_id)
         attempt.deny(json.dumps(reason), error_code=error_code)
