@@ -33,8 +33,14 @@
     @extend %layout;
 
     .logo {
-        width: span(2);
+        display: block;
+        @include size(rem(100) auto);
         margin: 0 auto;
+    }
+
+    .logo-img {
+        display: block;
+        width: 100%;
     }
 }
 
@@ -185,7 +191,6 @@
     }
 
     .accomplishment-orgs {
-        margin-bottom: 0;
 
         .wrapper-orgs {
             @include text-align(center);
@@ -197,6 +202,7 @@
             width: span(6);
             height: rem(100);
             @include margin-right(spacing-horizontal(base));
+            margin-bottom: spacing-vertical(small);
 
             &:last-child {
                 @include margin-right(0);
@@ -218,7 +224,7 @@
         .organization {
             @include size(100%);
             position: relative;
-            margin-bottom: spacing-vertical(small);
+
         }
 
         .organization-logo {

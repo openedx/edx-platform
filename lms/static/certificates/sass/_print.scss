@@ -1,0 +1,325 @@
+// ------------------------------
+// // Open edX Certificates: Print Specific Styling
+
+// About: styling specific for print layouts.
+
+// #UTILITIES
+// #BASE
+// #LAYOUT
+// #ELEMENTS
+// #CASES
+
+// ------------------------------
+// #UTILITIES
+// ------------------------------
+
+// page set up - only available to modern browsers now
+@page {
+    size : landscape;
+}
+
+@media print {
+
+    // helpers
+    %print-no-background {
+        background: none !important;
+    }
+
+    %print-hide {
+        display: none !important;
+    }
+
+    %print-black-on-white {
+        background: palette(grayscale, white-t) !important;
+        color: palette(grayscale, black-t) !important;
+    }
+
+    %print-layout-wrapper {
+        padding: 0 !important;
+    }
+
+    %print-rendering-section {
+        margin-bottom: spacing-vertical(small);
+        border-bottom: none !important;
+        padding-bottom: 0 !important;
+
+        &:last-child {
+            border: none;
+            padding-bottom: 0;
+        }
+    }
+}
+
+// ------------------------------
+// #BASE
+// ------------------------------
+@media print {
+
+    // prevent images from bleeding over the edge of the printed page
+    img {
+       max-width: 100% !important;
+    }
+
+    // prevent large elements from being split across multiple pages
+    ul, img {
+       page-break-inside: avoid;
+    }
+
+    // reset body/view properties
+    html,
+    body {
+        @extend %print-black-on-white;
+    }
+
+    body {
+        margin: spacing-vertical(base) spacing-vertical(mid-small) 0 spacing-vertical(mid-small) !important;
+        padding: 0;
+    }
+
+    .wrapper-view {
+        margin-bottom: 0 !important;
+    }
+}
+
+// force background images and colors
+@media print and (color) {
+   * {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+   }
+}
+
+// ------------------------------
+// #LAYOUT
+// ------------------------------
+@media print {
+
+    // hide elements not needed for print rendering
+    .wrapper-banner-user,
+    .wrapper-about,
+    .wrapper-footer,
+    .wrapper-header,
+    .wrapper-introduction,
+    .accomplishment-metadata-title,
+    .accomplishment-metadata .accomplishment-recipient,
+    .deco-corner,
+    .accomplishment-date .label {
+        @extend %print-hide;
+    }
+
+    // remove layout wrappers' padding
+    .wrapper-introduction,
+    .wrapper-accomplishment-rendering,
+    .wrapper-accomplishment-metadata {
+        @extend %print-layout-wrapper;
+    }
+}
+
+// ------------------------------
+// #ELEMENTS
+// ------------------------------
+@media print {
+
+    // headings
+    .hd-1 {
+        font-size: font-size(x-large);
+        line-height: line-height(x-large);
+    }
+
+    .hd-2 {
+        font-size: font-size(large);
+        line-height: line-height(large);
+    }
+
+    .hd-3 {
+        font-size: font-size(mid-large);
+        line-height: line-height(mid-large);
+    }
+
+    .hd-4 {
+        font-size: font-size(base);
+        line-height: line-height(base);
+    }
+
+    .hd-5 {
+        font-size: font-size(mid-small);
+        line-height: line-height(mid-small);
+    }
+
+    .hd-6 {
+        font-size: font-size(small);
+        line-height: line-height(small);
+    }
+
+    .hd-7 {
+        font-size: font-size(x-small);
+        line-height: line-height(small);
+    }
+
+    // copy
+    .copy-lead {
+        font-size: font-size(base);
+        line-height: line-height(base);
+    }
+
+    .copy-large {
+       font-size: font-size(base);
+       line-height: line-height(base);
+    }
+
+    .copy-base {
+        font-size: font-size(small);
+        line-height: line-height(small);
+    }
+
+    .copy-meta {
+        font-size: font-size(x-small);
+        line-height: line-height(small);
+    }
+
+    .copy-micro {
+        font-size: font-size(x-small);
+        line-height: line-height(small);
+    }
+
+    // accomplishment
+    .accomplishment-main {
+        @extend %print-no-background;
+    }
+
+    .accomplishment-rendering {
+        top: 0 !important;
+        border: rem(1) solid palette(grayscale, light);
+        border-top: rem(2) solid $cert-base-color;
+        box-shadow: none;
+        padding: spacing-vertical(small) spacing-horizontal(mid-large);
+
+
+        .accomplishment-type {
+            margin-top: -(spacing-vertical(mid-large));
+        }
+
+        .accomplishment-type-symbol {
+            @include size(rem(75));
+            border: none !important;
+        }
+
+        .accomplishment-statement {
+            @extend %print-rendering-section;
+            @include text-align(left);
+        }
+
+        .accomplishment-course,
+        .accomplishment-recipient,
+        .accomplishment-summary,
+        .accomplishment-statement-detail {
+            width: 100% !important;
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        .wrapper-statement-and-signatories {
+            @include span(8 first);
+        }
+
+        .accomplishment-orgs {
+            @include span(4 last);
+            margin-bottom: 0;
+            border-bottom: none !important;
+            padding-bottom: 0 !important;
+
+            .wrapper-organization {
+                @include gallery(2 of 4);
+                margin-bottom: spacing-vertical(mid-small) !important;
+            }
+        }
+
+        .accomplishment-signatories {
+            @extend %print-rendering-section;
+            @include span(12 last);
+
+            .signatory {
+                @include gallery(3);
+            }
+
+            .signatory-signature {
+                // height: rem(60) !important;
+            }
+
+            .signatory-name {
+                font-size: font-size(x-small);
+            }
+
+            .signatory-credentials {
+                margin-bottom: 0 !important;
+            }
+
+            // CASE: > 4 signatures
+            &.has-many {
+
+                .signatory {
+                    @include gallery(2);
+                }
+            }
+        }
+    }
+
+    .wrapper-accomplishment-metadata {
+        margin-bottom: 0;
+    }
+
+    .accomplishment-metadata {
+        margin-bottom: 0;
+
+        .wrapper-metadata {
+            @include clearfix();
+            margin-bottom: 0;
+
+            .metadata {
+                margin-bottom: 0;
+                border-bottom: none !important;
+                padding-bottom: 0 !important;
+
+                .label, .value {
+                    display: inline-block;
+                    vertical-align: baseline;
+                    font-size: font-size(x-small);
+                    line-height: line-height(small);
+                }
+
+                .label {
+                    @include margin-right(spacing-horizontal(small));
+                }
+            }
+        }
+        .accomplishment-id {
+            float: left;
+            width: 65% !important;
+            margin: 0 !important;
+            @include text-align(left);
+        }
+
+        .accomplishment-date {
+            float: right;
+            width: 35% !important;
+            margin: 0 !important;
+            @include text-align(right);
+        }
+
+    }
+}
+
+// ------------------------------
+// #CASES
+// ------------------------------
+// certificate - distinguished
+@media print {
+
+    .certificate-distinguished {
+
+        .accomplishment-rendering {
+            border-top-color: $cert-distinguished-color;
+        }
+    }
+}
+

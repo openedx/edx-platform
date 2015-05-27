@@ -19,7 +19,7 @@ class Migration(DataMigration):
                 "company_privacy_url": "http://www.edx.org/edx-privacy-policy",
                 "company_tos_url": "http://www.edx.org/edx-terms-service",
                 "company_verified_certificate_url": "http://www.edx.org/verified-certificate",
-                "logo_src": "/static/certificates/images/logo-edx.svg",
+                "logo_src": "/static/certificates/images/logo-edx.png",
                 "logo_url": "http://www.edx.org"
             },
             "honor": {

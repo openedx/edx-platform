@@ -56,7 +56,7 @@ class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):
                 "company_tos_url": "http://www.edx.org/edx-terms-service",
                 "company_verified_certificate_url": "http://www.edx.org/verified-certificate",
                 "document_stylesheet_url_application": "/static/certificates/sass/main-ltr.css",
-                "logo_src": "/static/certificates/images/logo-edx.svg",
+                "logo_src": "/static/certificates/images/logo-edx.png",
                 "logo_url": "http://www.edx.org"
             },
             "honor": {
