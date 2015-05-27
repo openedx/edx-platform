@@ -7,29 +7,35 @@ import urllib
 import json
 import cgi
 
+import analytics
 from datetime import datetime
 from collections import defaultdict
-from django.utils import translation
-from django.utils.translation import ugettext as _
-from django.utils.translation import ungettext
+from markupsafe import escape
 
+from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
 from django.core.context_processors import csrf
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.decorators import login_required
-from django.utils.timezone import UTC
-from django.views.decorators.http import require_GET, require_POST
+from django.db import transaction
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
-from certificates import api as certs_api
-from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
-from django_future.csrf import ensure_csrf_cookie
+from django.utils import translation
+from django.utils.timezone import UTC
+from django.utils.translation import ugettext as _
+from django.utils.translation import ungettext
+from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.cache import cache_control
-from django.db import transaction
-from markupsafe import escape
 
+from eventtracking import tracker
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
+
+from certificates import api as certs_api
+from course_modes.models import CourseMode
 from courseware import grades
 from courseware.access import has_access, in_preview_mode, _adjust_start_date_for_beta_testers
 from courseware.courses import (
@@ -38,50 +44,47 @@ from courseware.courses import (
     sort_by_announcement,
     sort_by_start_date,
 )
-from courseware.masquerade import setup_masquerade
-from courseware.model_data import FieldDataCache
-from .module_render import toc_for_course, get_module_for_descriptor, get_module
-from .entrance_exams import (
+from courseware.entrance_exams import (
     course_has_entrance_exam,
     get_entrance_exam_content,
     get_entrance_exam_score,
     user_must_complete_entrance_exam,
     user_has_passed_entrance_exam
 )
+from courseware.masquerade import setup_masquerade
+from courseware.model_data import FieldDataCache
+from courseware.module_render import (
+    toc_for_course,
+    get_module_for_descriptor,
+    get_module,
+    get_module_by_usage_id,
+)
 from courseware.models import StudentModule, StudentModuleHistory
-from course_modes.models import CourseMode
-
-from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
-
+from courseware.url_helpers import get_redirect_url
+from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
+from instructor.enrollment import uses_shib
 from open_ended_grading import open_ended_notifications
+from microsite_configuration import microsite
+from shoppingcart.models import (
+    CourseRegistrationCode,
+    PaidCourseRegistration,
+    CourseRegCodeItem,
+    Order,
+)
+from shoppingcart.utils import is_shopping_cart_enabled
 from student.models import UserTestGroup, CourseEnrollment
 from student.views import single_course_reverification_info, is_course_blocked
+import survey.utils
+import survey.views
 from util.cache import cache, cache_if_anonymous
+from util.db import commit_on_success_with_read_committed
+from util.milestones_helpers import get_prerequisite_courses_display
+from util.views import ensure_valid_course_key
 from xblock.fragment import Fragment
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.tabs import CourseTabList, StaffGradingTab, PeerGradingTab, OpenEndedGradingTab
 from xmodule.x_module import STUDENT_VIEW
-import shoppingcart
-from shoppingcart.models import CourseRegistrationCode
-from shoppingcart.utils import is_shopping_cart_enabled
-from opaque_keys import InvalidKeyError
-from util.milestones_helpers import get_prerequisite_courses_display
-
-from microsite_configuration import microsite
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from instructor.enrollment import uses_shib
-
-from util.db import commit_on_success_with_read_committed
-
-import survey.utils
-import survey.views
-
-from util.views import ensure_valid_course_key
-from eventtracking import tracker
-import analytics
-from courseware.url_helpers import get_redirect_url
 
 log = logging.getLogger("edx.courseware")
 
@@ -844,9 +847,9 @@ def course_about(request, course_id):
             registration_price = CourseMode.min_course_price_for_currency(course_key,
                                                                           settings.PAID_COURSE_REGISTRATION_CURRENCY[0])
             if request.user.is_authenticated():
-                cart = shoppingcart.models.Order.get_cart_for_user(request.user)
-                in_cart = shoppingcart.models.PaidCourseRegistration.contained_in_order(cart, course_key) or \
-                    shoppingcart.models.CourseRegCodeItem.contained_in_order(cart, course_key)
+                cart = Order.get_cart_for_user(request.user)
+                in_cart = PaidCourseRegistration.contained_in_order(cart, course_key) or \
+                    CourseRegCodeItem.contained_in_order(cart, course_key)
 
             reg_then_add_to_cart_link = "{reg_url}?course_id={course_id}&enrollment_action=add_to_cart".format(
                 reg_url=reverse('register_user'), course_id=urllib.quote(str(course_id)))
@@ -1389,3 +1392,41 @@ def _track_successful_certificate_generation(user_id, course_id):  # pylint: dis
                 }
             }
         )
+
+
+@require_GET
+def render_chromeless_xblock(request, usage_key_string):
+    """
+    Renders a chromeless html page of an xblock
+    """
+    usage_key = UsageKey.from_string(usage_key_string)
+    usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
+    course_key = usage_key.course_key
+    course_id = unicode(course_key)
+
+    course = get_course_with_access(request.user, 'load', usage_key.course_key)
+    staff = has_access(request.user, 'staff', course)
+
+    if not CourseEnrollment.is_enrolled(request.user, usage_key.course_key) and not staff:
+        return "TODO Decide what to return on fail"
+
+    block, _ = get_module_by_usage_id(request, course_id, usage_key_string)
+
+    if not has_access(request.user, 'load', block, course_key=course_key):
+        return "TODO Decide what to return on fail"
+
+    fragment = block.render('student_view', context=request.GET)
+
+    context = {
+        'fragment': fragment,
+        'course': course,
+        'disable_accordion': True,
+        'allow_iframing': True,
+        'disable_header': True,
+        'disable_footer': True,
+        'disable_tabs': True,
+        'staff_access': staff,
+        'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://example.com/xqa'),
+    }
+
+    return render_to_response('courseware/courseware.html', context)

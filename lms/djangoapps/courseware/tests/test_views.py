@@ -17,6 +17,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import MagicMock, patch, create_autospec, Mock
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 from pytz import UTC
 from xblock.core import XBlock
@@ -1088,3 +1089,92 @@ class TestIndexView(ModuleStoreTestCase):
         # Trigger the assertions embedded in the ViewCheckerBlocks
         response = views.index(request, unicode(course.id), chapter=chapter.url_name, section=section.url_name)
         self.assertEquals(response.content.count("ViewCheckerPassed"), 3)
+
+
+class TestChromelessXblock(ModuleStoreTestCase):
+    """
+    Tests render_chromeless_xblocks
+    """
+
+    def setUp(self):
+        """
+        Creates a course, user, and xblock.
+        """
+        super(TestChromelessXblock, self).setUp()
+        self.course = CourseFactory.create()
+        self.user = UserFactory.create()
+        self.password = 'test'
+        self.username = self.user.username
+        self.xblock = ItemFactory.create(
+            parent=self.course,
+            category="problem",
+            display_name="chromeless_xblock_problem"
+        )
+        self.usage_key_string = unicode(self.xblock.location)
+
+    def test_get_xblock_html(self):
+        """
+        Tests for successful call for html page with xblock
+        """
+        self._login_and_enroll(self.course.id)
+        response = self._api_response()
+        self._check_html(response)
+
+    def test_get_xblock_when_not_enrolled(self):
+        """
+        Test for unsuccessful call for xblock when user not enrolled
+        """
+        self._login()
+        response = self._api_response()
+
+    def _check_html(self, response):
+        """
+        Checks the html for chrome
+        """
+        self.assertContains(
+            response=response,
+            text="chromeless_xblock_problem",
+        )
+        self.assertNotContains(
+            response=response,
+            text='<nav class="courseware wrapper-course-material" aria-label="Course Material">'
+        )
+        self.assertNotContains(
+            response=response,
+            text='<header id="global-navigation" class="global slim" >'
+        )
+        self.assertNotContains(
+            response=response,
+            text='<div class="wrapper wrapper-footer">'
+        )
+
+    def _api_response(self, reverse_args=None, expected_response_code=200, **kwargs):
+        """
+        Helper method for calling endpoint, verifying and returning response.
+        If expected_response_code is None, doesn't verify the response' status_code.
+        """
+        url = self._reverse_url(reverse_args, **kwargs)
+        response = self.client.get(url)
+        if expected_response_code is not None:
+            self.assertEqual(response.status_code, expected_response_code)
+        return response
+
+    def _reverse_url(self, reverse_args=None, **kwargs):  # pylint: disable=unused-argument
+        """Base implementation that returns URL for endpoint that's being tested."""
+        reverse_args = {
+            'usage_key_string': self.usage_key_string
+        }
+        return reverse('chromeless_xblock', kwargs=reverse_args)
+
+    def _login_and_enroll(self, course_id=None):
+        """Shortcut for both login and enrollment of the user."""
+        self._login()
+        self._enroll(course_id)
+
+    def _login(self):
+        """Login test user."""
+        self.client.login(username=self.username, password=self.password)
+
+    def _enroll(self, course_id=None):
+        """Enroll test user in test course."""
+        CourseEnrollment.enroll(self.user, course_id or self.course.id)
