@@ -36,7 +36,7 @@ from util.milestones_helpers import (
     get_pre_requisite_courses_not_completed,
     any_unfulfilled_milestones,
 )
-from openedx.core.djangoapps.content.course_overview.models import CourseOverviewDescriptor
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverviewDescriptor
 
 import dogstats_wrapper as dog_stats_api
 

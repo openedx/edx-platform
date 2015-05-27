@@ -85,7 +85,7 @@ class CourseOverviewFields(django.db.models.Model):
     mobile_available = BooleanField(default=False)
     facebook_url = TextField(default=None)
     enrollment_domain = TextField()
-    certificates_show_before_end = BooleanField(default=False, deprecated=True)
+    certificates_show_before_end = BooleanField(default=False)
     certificates_display_behavior = TextField(default="end")
     course_image = TextField(default="images_course_image.jpg")
     cert_name_short = TextField(default="")
