@@ -8,6 +8,7 @@ from django.contrib.auth.views import redirect_to_login
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseForbidden, Http404
 from django.views.decorators.csrf import csrf_exempt
+import logging
 
 from courseware.access import has_access
 from courseware.courses import get_course_with_access
@@ -17,6 +18,9 @@ from lti_provider.signature_validator import SignatureValidator
 from lms_xblock.runtime import unquote_slashes
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys import InvalidKeyError
+
+log = logging.getLogger("edx.lti_provider")
+
 
 # LTI launch parameters that must be present for a successful launch
 REQUIRED_PARAMETERS = [
@@ -69,9 +73,13 @@ def lti_launch(request, course_id, usage_id):
     try:
         course_key, usage_key = parse_course_and_usage_keys(course_id, usage_id)
     except InvalidKeyError:
-        raise Http404(
-            'Invalid course key {} or usage key {}'.format(course_id, usage_id)
+        log.error(
+            'Invalid course key %s or usage key %s from request %s',
+            course_id,
+            usage_id,
+            request
         )
+        raise Http404()
     params['course_key'] = course_key
     params['usage_key'] = usage_key
     request.session[LTI_SESSION_KEY] = params
