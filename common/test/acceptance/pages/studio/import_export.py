@@ -3,6 +3,7 @@ Import/Export pages.
 """
 from bok_choy.promise import EmptyPromise
 import os
+import re
 import requests
 from .utils import click_css
 from .library import LibraryPage
@@ -117,6 +118,16 @@ class ImportMixin(object):
     """
 
     url_path = "import"
+
+    @property
+    def timestamp(self):
+        """
+        The timestamp is displayed on the page as "(MM/DD/YYYY at HH:mm)"
+        It parses the timestamp and returns a (date, time) tuple
+        """
+        string = self.q(css='.item-progresspoint-success-date').text[0]
+
+        return re.match(r'\(([^ ]+).+?(\d{2}:\d{2})', string).groups()
 
     def is_browser_on_page(self):
         """
