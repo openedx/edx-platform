@@ -31,10 +31,8 @@ With the Mobile API, you can complete these tasks.
 * :ref:`Get or change user status in a course <Get or Change User Status in a
   Course>`
 
-* Get :ref:`course information<Get the Course About Page>`, :ref:`updates<Get
-  Course Updates>`, and :ref:`handouts<Get Course Handouts>` for courses the
-  user is enrolled in.
+* Get :ref:`updates<Get Course Updates>`, and :ref:`handouts<Get Course
+  Handouts>` for courses the user is enrolled in.
 
 * Get :ref:`videos<Get the Video List>` and :ref:`transcripts<Get a Video
   Transcript>` for courses the user is enrolled in.
-  

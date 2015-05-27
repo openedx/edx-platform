@@ -21,8 +21,6 @@ The following tasks and endpoints are currently supported.
      - /api/mobile/v0.5/users/{username}/course_enrollments/
    * - :ref:`Get or change user status in a course<Get or Change User Status in a Course>`
      - /api/mobile/v0.5/users/{username}/course_status_info/{course_id}
-   * - :ref:`Get a course About page<Get the Course About Page>`
-     - /api/mobile/v0.5/course_info/{organization}/{course_number}/{course_run}/about
    * - :ref:`Get updates for a course<Get Course Updates>`
      - /api/mobile/v0.5/course_info/{organization}/{course_number}/{course_run}/updates   
    * - :ref:`Get handouts for a course<Get Course Handouts>`
