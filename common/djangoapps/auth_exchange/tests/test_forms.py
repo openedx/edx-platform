@@ -1,3 +1,4 @@
+# pylint: disable=no-member
 """
 Tests for OAuth token exchange forms
 """
@@ -11,8 +12,8 @@ import httpretty
 from provider import scope
 import social.apps.django_app.utils as social_utils
 
-from oauth_exchange.forms import AccessTokenExchangeForm
-from oauth_exchange.tests.utils import AccessTokenExchangeTestMixin
+from auth_exchange.forms import AccessTokenExchangeForm
+from auth_exchange.tests.utils import AccessTokenExchangeTestMixin
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 
 

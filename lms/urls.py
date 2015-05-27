@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 
 import django.contrib.auth.views
 from microsite_configuration import microsite
-import oauth_exchange.views
+import auth_exchange.views
 
 # Uncomment the next two lines to enable the admin:
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
@@ -611,12 +611,20 @@ if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
     )
 
 # OAuth token exchange
-if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
+if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
+    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+        urlpatterns += (
+            url(
+                r'^oauth2/exchange_access_token/(?P<backend>[^/]+)/$',
+                auth_exchange.views.AccessTokenExchangeView.as_view(),
+                name="exchange_access_token"
+            ),
+        )
     urlpatterns += (
         url(
-            r'^oauth2/exchange_access_token/(?P<backend>[^/]+)/$',
-            oauth_exchange.views.AccessTokenExchangeView.as_view(),
-            name="exchange_access_token"
+            r'^oauth2/login/$',
+            auth_exchange.views.LoginWithAccessTokenView.as_view(),
+            name="login_with_access_token"
         ),
     )
 
