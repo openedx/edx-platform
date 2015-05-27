@@ -1394,6 +1394,7 @@ def _track_successful_certificate_generation(user_id, course_id):  # pylint: dis
         )
 
 
+@require_GET
 def render_chromeless_xblock(request, usage_key_string):
     """
     Renders a chromeless html page of an xblock
