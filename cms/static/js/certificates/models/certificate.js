@@ -77,8 +77,7 @@ function (_, str, Backbone, BackboneRelational, BackboneAssociations, gettext, C
                 return {
                     message: gettext('Signatory field(s) has invalid data.'),
                     attributes: {signatories: attrs.signatories.models}
-                }
-
+                };
             }
         },
 
