@@ -56,6 +56,27 @@ define(
         };
 
         /**
+         * Sets the Import in the "error" status.
+         *
+         * Immediately stops any further polling from the server.
+         * Displays the error message at the list element that corresponds
+         * to the stage where the error occurred.
+         *
+         * @param {string} msg Error message to display.
+         * @param {int} [stage=current.stage] Stage of import process at which error occurred.
+         */
+        var error = function (msg, stage) {
+            current.stage = Math.abs(stage || current.stage); // Could be negative
+            current.state = STATE.ERROR;
+
+            destroyEventListeners();
+            clearTimeout(timeout.id);
+            updateFeedbackList(msg);
+
+            deferred.resolve();
+        };
+
+        /**
          * Initializes the event listeners
          *
          */
@@ -190,24 +211,13 @@ define(
         var CourseImport = {
 
             /**
-             * Sets the Import in the "error" status.
-             *
-             * Immediately stops any further polling from the server.
-             * Displays the error message at the list element that corresponds
-             * to the stage where the error occurred.
+             * Cancels the import and sets the Object to the error state
              *
              * @param {string} msg Error message to display.
-             * @param {int} [stage=current.stage] Stage of import process at which error occurred.
+             * @param {int} stage Stage of import process at which error occurred.
              */
-            error: function (msg, stage) {
-                current.stage = Math.abs(stage || current.stage); // Could be negative
-                current.state = STATE.ERROR;
-
-                destroyEventListeners();
-                clearTimeout(timeout.id);
-                updateFeedbackList(msg);
-
-                deferred.resolve();
+            cancel: function (msg, stage) {
+                error(msg, stage);
             },
 
             /**
@@ -228,7 +238,7 @@ define(
                 if (current.stage === STAGE.SUCCESS) {
                     success();
                 } else if (current.stage < STAGE.UPLOADING) { // Failed
-                    this.error(gettext("Error importing course"));
+                    error(gettext("Error importing course"));
                 } else { // In progress
                     updateFeedbackList();
 
@@ -273,7 +283,7 @@ define(
                         this.pollStatus(current.stage);
                     } else {
                         // An import in the upload stage cannot be resumed
-                        this.error(gettext("There was an error with the upload"));
+                        error(gettext("There was an error with the upload"));
                     }
                 }.bind(this));
 

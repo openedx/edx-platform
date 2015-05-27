@@ -84,7 +84,7 @@ define([
 
                                 if (serverMsg.hasOwnProperty('Stage')) {
                                     stage = Math.abs(serverMsg.Stage);
-                                    Import.error(defaults[stage] + errMsg, stage);
+                                    Import.cancel(defaults[stage] + errMsg, stage);
                                 }
                                 // It could be that the user is simply refreshing the page
                                 // so we need to be sure this is an actual error from the server
