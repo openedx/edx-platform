@@ -110,7 +110,6 @@ function ($, _, Backbone, gettext, TemplateUtils, ViewUtils, PromptView, Notific
         },
 
         setSignatorySignatureImagePath: function(event) {
-            // #TODO should have a single method for setting these fields.
             if (event && event.preventDefault) { event.preventDefault(); }
             this.model.set(
                 'signature_image_path',

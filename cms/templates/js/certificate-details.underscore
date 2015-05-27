@@ -17,7 +17,7 @@
            <span class="title"><%= gettext("Certificate Details") %></span>
          </header>
         <% if (course_title) { %>
-            <div>
+            <div class="course-title-override">
                 <span class="certificate-label"><%= gettext('Course Title Override') %>: </span>
                 <span class="certificate-value"><%= course_title %></span>
             </div>
