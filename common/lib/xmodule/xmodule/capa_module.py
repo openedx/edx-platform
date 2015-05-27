@@ -187,6 +187,13 @@ class CapaDescriptor(CapaFields, RawDescriptor):
         registered_tags = responsetypes.registry.registered_tags()
         return set([node.tag for node in tree.iter() if node.tag in registered_tags])
 
+    @property
+    def has_responsive_ui(self):
+        """
+        Returns whether this module has support for responsive UI.
+        """
+        return self.lcp.has_responsive_ui
+
     def index_dictionary(self):
         """
         Return dictionary prepared with module content and type for indexing.
