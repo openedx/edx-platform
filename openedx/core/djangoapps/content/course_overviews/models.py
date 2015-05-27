@@ -13,6 +13,7 @@ from xmodule.partitions.partitions import NoSuchUserPartitionError
 from xmodule.course_module import CourseFields
 from xmodule.fields import Date
 from xmodule.modulestore.inheritance import UserPartition
+from xmodule.course_module import DEFAULT_START_DATE, CATALOG_VISIBILITY_CATALOG_AND_ABOUT
 
 from south.modelsinspector import add_introspection_rules
 custom_fields = [
@@ -78,25 +79,25 @@ class CourseOverviewFields(django.db.models.Model):
     # Source: CourseFields (course_module.py)
     enrollment_start = DateField()
     enrollment_end = DateField()
-    start = DateField()
+    start = DateField(default=DEFAULT_START_DATE)
     end = DateField()
     advertised_start = TextField()
     pre_requisite_courses = CourseIdListCacheField()
     end_of_course_survey_url = TextField()
-    display_name = TextField()
-    mobile_available = BooleanField()
-    facebook_url = TextField()
+    display_name = TextField(default="Empty")
+    mobile_available = BooleanField(default=False)
+    facebook_url = TextField(default=None)
     enrollment_domain = TextField()
-    certificates_show_before_end = BooleanField()
-    certificates_display_behavior = TextField()
-    course_image = TextField()
+    certificates_show_before_end = BooleanField(default=False, deprecated=True)
+    certificates_display_behavior = TextField(default="end")
+    course_image = TextField(default="images_course_image.jpg")
+    cert_name_short = TextField(default="")
+    cert_name_long = TextField(default="")
     display_organization = TextField()
     display_coursenumber = TextField()
-    invitation_only = BooleanField()
-    catalog_visibility = TextField()
-    social_sharing_url = TextField()
-    cert_name_short = TextField()
-    cert_name_long = TextField()
+    invitation_only = BooleanField(default=False)
+    catalog_visibility = TextField(default=CATALOG_VISIBILITY_CATALOG_AND_ABOUT)
+    social_sharing_url = TextField(default=None)
 
 class CourseOverviewDescriptor(CourseOverviewFields):
 
