@@ -895,8 +895,8 @@ def _compose_message_reverification_email(
         reverification_block = modulestore().get_item(usage_key)
         # Allowed attempts is 1 if not set on verification block
         allowed_attempts = 1 if reverification_block.attempts == 0 else reverification_block.attempts
-        user_attempts = VerificationStatus.get_user_attempts(user_id, course_key, relates_assessment, location_id)
-        left_attempts = allowed_attempts - user_attempts
+        used_attempts = VerificationStatus.get_user_attempts(user_id, course_key, relates_assessment, location_id)
+        left_attempts = allowed_attempts - used_attempts
         is_attempt_allowed = left_attempts > 0
         verification_open = True
         if reverification_block.due:
@@ -907,8 +907,14 @@ def _compose_message_reverification_email(
         context["verification_open"] = verification_open
         context["due_date"] = get_default_time_display(reverification_block.due)
         context["is_secure"] = is_secure
-        context["site"] = microsite.get_value('SITE_NAME', 'localhost')
-        context['platform_name'] = microsite.get_value('platform_name', settings.PLATFORM_NAME),
+
+        context['platform_name'] = microsite.get_value('platform_name', settings.PLATFORM_NAME)
+        context['support_link'] = microsite.get_value('email_from_address', settings.CONTACT_EMAIL)
+        context["allowed_attempts"] = allowed_attempts
+        context["used_attempts"] = used_attempts
+
+        site = microsite.get_value('SITE_NAME', 'localhost')
+        course_link = "{site}{courseware_url}".format(site=site, courseware_url=redirect_url)
 
         re_verification_link = reverse(
             'verify_student_incourse_reverify',
@@ -918,7 +924,15 @@ def _compose_message_reverification_email(
                 unicode(location_id)
             )
         )
-        context["reverify_link"] = re_verification_link
+
+        reverify_link = "{site}{re_verification_link}".format(site=site, re_verification_link=re_verification_link)
+        if is_secure:
+            context["course_link"] = "https://{}".format(course_link)
+            context["reverify_link"] = "https://{}".format(reverify_link)
+        else:
+            context["course_link"] = "http://{}".format(course_link)
+            context["reverify_link"] = "http://{}".format(reverify_link)
+
         message = render_to_string('emails/reverification_processed.txt', context)
         log.info(
             "Sending email to User_Id=%s. Attempts left for this user are %s. "

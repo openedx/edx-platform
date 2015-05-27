@@ -1,43 +1,31 @@
 <%namespace file="../main.html" import="stanford_theme_enabled" />
 <%! from django.utils.translation import ugettext as _ %>
 % if status == "approved":
-    ${_("Your verification for course {course_name} and assessment {assessment} "
-        "has been passed."
-    ).format(course_name=course_name, assessment=assessment)}
+${_("We have successfully verified your identity for the {assessment} assessment in the {course_name} course. To go to the courseware, select the following {course_link}."
+).format(course_name=course_name, assessment=assessment, course_link=course_link)}
 
-%else:
-    ${_("Your verification for course {course_name} and assessment {assessment} "
-        "has failed."
-    ).format(course_name=course_name, assessment=assessment)}
+% elif is_attempt_allowed and verification_open:    # if attempts are allowed and verification is still open.
+${_("We could not verify your identity for the {assessment} assessment in the {course_name} course. You have used {used_attempts} out of {allowed_attempts} attempts to verify your identity."
+).format(course_name=course_name, assessment=assessment, used_attempts=used_attempts, allowed_attempts=allowed_attempts)}
+${_("To try to verify your identity again, select the following {}.").format(reverify_link)}
 
-    % if not is_attempt_allowed:
-        ${_("You have reached your allowed attempts limit. No more retakes allowed.")}
-    % elif not verification_open:
-        ${_("Assessment date has passed and retake not allowed.")}
-    % else:
-        % if due_date:
-            ${_("Assessment closes on {due_date}.".format(due_date=due_date))}
-        % else:
-            ${_("Assessment is open and you have {left_attempts} attempt(s) remaining.".format(left_attempts=left_attempts))}
-        % endif
+% elif not is_attempt_allowed:    # if attempts are not allowed
+${_("We could not verify your identity for the {assessment} assessment in the {course_name} course. You have used {used_attempts} out of {allowed_attempts} attempts to verify your identity, and verification is no longer possible."
+).format(course_name=course_name, assessment=assessment, used_attempts=used_attempts, allowed_attempts=allowed_attempts)}
 
-        ${_("Click on link below to re-verify:")}
-        % if is_secure:
-          https://${ site }${ reverify_link }
-        % else:
-          http://${ site }${ reverify_link }
-        % endif
+% elif due_date and not verification_open:    # ICRV due_date is set and verification is close.
+${_("We could not verify your identity for the {assessment} assessment in the {course_name} course. This assessment closed on {due_date}, and verification is no longer possible."
+).format(course_name=course_name, assessment=assessment, due_date=due_date)}
+${_("To try to verify your identity again, select the following {}.").format(reverify_link)}
 
-    % endif
-% endif
+%elif not due_date and not verification_open:   # if neither duedate is set and also verification window is closed
+${_("We could not verify your identity for the {assessment} assessment in the {course_name} course.This assessment closed, and verification is no longer possible."
+).format(course_name=course_name, assessment=assessment)}
+%endif
 
-    ${_("Click on link below to go to the courseware:")}
-    % if is_secure:
-      https://${ site }${ courseware_url }
-    % else:
-      http://${ site }${ courseware_url }
-    % endif
+${_("To go to the courseware, select the following {}.").format(course_link)}
 
+${_("If you have any questions, you can contact student support {support_link}.").format(support_link=support_link)}
 
-
-${_("The {platform_name} Team.").format(platform_name=platform_name)}
+${_("Thanks,")}
+${_("The edX team")}
