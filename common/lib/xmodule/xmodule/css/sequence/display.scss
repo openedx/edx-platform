@@ -36,7 +36,7 @@ $sequence--border-color: #C8C8C8;
   // TODO (cpennington): This doesn't work anymore. XModules aren't able to
   // import from external sources.
   @extend .topbar;
-  margin: -4px 0 ($baseline*1.5);
+  margin: -4px 0 $baseline;
   position: relative;
   border-bottom: none;
 
@@ -133,6 +133,10 @@ $sequence--border-color: #C8C8C8;
             color: rgb(10, 10, 10);
           }
 
+          i.fa-bookmark {
+            color: rgb(26,161,222);
+          }
+
           &:hover, &:focus {
             background-color: $white;
             background-repeat: no-repeat;
@@ -140,6 +144,10 @@ $sequence--border-color: #C8C8C8;
 
             .icon {
               color: rgb(10, 10, 10);
+            }
+
+            i.fa-bookmark {
+              color: rgb(26,161,222);
             }
           }
         }
@@ -294,3 +302,4 @@ nav.sequence-bottom {
     outline: none;
   }
 }
+

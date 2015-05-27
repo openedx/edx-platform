@@ -38,7 +38,6 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
 
         child_context = {} if not context else copy(context)
         child_context['child_of_vertical'] = True
-
         # pylint: disable=no-member
         for child in self.get_display_items():
             rendered_child = child.render(STUDENT_VIEW, child_context)
@@ -52,6 +51,10 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         fragment.add_content(self.system.render_template('vert_module.html', {
             'items': contents,
             'xblock_context': context,
+            'bookmarked': child_context['bookmarked'],
+            'item_id': unicode(self.location),
+            'username': child_context['username'],
+            'bookmark_api_url': child_context['bookmarks_api_url']
         }))
         return fragment
 

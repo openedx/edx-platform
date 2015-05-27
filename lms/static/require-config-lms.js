@@ -68,6 +68,7 @@
             "ova": 'js/vendor/ova/ova',
             "catch": 'js/vendor/ova/catch/js/catch',
             "handlebars": 'js/vendor/ova/catch/js/handlebars-1.1.2',
+            "moment": 'xmodule_js/common_static/js/src/moment'
             // end of files needed by OVA
         },
         shim: {
@@ -147,7 +148,7 @@
                     "grouping-annotator", "diacritic-annotator", "openseadragon", "jquery-Watch", "catch", "handlebars",
                     "URI"
                 ]
-            },
+            }
             // End of needed by OVA
         }
     };

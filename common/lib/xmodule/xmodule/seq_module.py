@@ -4,6 +4,7 @@ import warnings
 
 from lxml import etree
 
+from xblock.core import XBlock
 from xblock.fields import Integer, Scope, Boolean
 from xblock.fragment import Fragment
 from pkg_resources import resource_string
@@ -47,7 +48,8 @@ class SequenceFields(object):
         scope=Scope.content,
     )
 
-
+@XBlock.needs("user")
+@XBlock.needs("bookmarks")
 class SequenceModule(SequenceFields, XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
@@ -110,9 +112,21 @@ class SequenceModule(SequenceFields, XModule):
         contents = []
 
         fragment = Fragment()
+        bookmarks_service = self.runtime.service(self, "bookmarks")
+        users_service = self.runtime.service(self, "user")
 
         for child in self.get_display_items():
+            is_bookmarked = bookmarks_service.is_bookmarked(usage_key=child.scope_ids.usage_id)
+            bookmarks_api_url = bookmarks_service.API_URL
+            current_username = users_service.get_current_user().opt_attrs['edx-platform.username']
+
+            context = {} if not context else context
+            context["bookmarked"] = is_bookmarked
+            context["username"] = current_username
+            context["bookmarks_api_url"] = bookmarks_api_url
+
             progress = child.get_progress()
+
             rendered_child = child.render(STUDENT_VIEW, context)
             fragment.add_frag_resources(rendered_child)
 
@@ -125,6 +139,7 @@ class SequenceModule(SequenceFields, XModule):
                 'progress_detail': Progress.to_js_detail_str(progress),
                 'type': child.get_icon_class(),
                 'id': child.scope_ids.usage_id.to_deprecated_string(),
+                'bookmarked': is_bookmarked,
             }
             if childinfo['title'] == '':
                 childinfo['title'] = child.display_name_with_default

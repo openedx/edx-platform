@@ -207,7 +207,6 @@ def grade_histogram(module_id):
         return []
     return grades
 
-
 @contract(user=User, has_instructor_access=bool, block=XBlock, view=basestring, frag=Fragment, context="dict|None")
 def add_staff_markup(user, has_instructor_access, block, view, frag, context):  # pylint: disable=unused-argument
     """

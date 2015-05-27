@@ -11,7 +11,7 @@
         ## implementation note: will need to figure out how to handle combining detail
         ## statuses of multiple modules in js.
         <li>
-        <a class="seq_${item['type']} inactive progress-${item['progress_status']}"
+        <a class="seq_${item['type']} inactive progress-${item['progress_status']} seq-book"
            data-id="${item['id']}"
            data-element="${idx+1}"
            href="javascript:void(0);"
@@ -20,7 +20,8 @@
            aria-controls="seq_contents_${idx}"
            id="tab_${idx}"
            tabindex="0">
-            <i class="icon fa seq_${item['type']}" aria-hidden="true"></i>
+           <i class="icon fa seq_${item['type']}" aria-hidden="true"></i>
+           <i class="fa fa-fw fa-bookmark bookmark-icon ${"is-hidden" if not item['bookmarked'] else "bookmarked"}"></i>
             <p><span class="sr">${item['type']}</span> ${item['title']}</p>
           </a>
         </li>
