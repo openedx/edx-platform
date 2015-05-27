@@ -21,8 +21,7 @@ custom_fields = [
     'CourseIdListCacheField'
 ]
 for s in custom_fields:
-    #add_introspection_rules([], [r"^course_overview\.models\." + s])
-    add_introspection_rules([], ["openedx.core.djangoapps.content.course_overview.models." + s])
+    add_introspection_rules([], ["openedx.core.djangoapps.content.course_overviews.models." + s])
 
 
 # TODO me: make sure all these fields work...
