@@ -153,14 +153,14 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
     """ Test bumper video event emission """
 
     # helper methods
-    def seek_video_and_skip(self):
+    def watch_video_and_skip(self):
         """
         Wait 5 seconds and press "skip" button.
         """
         self.video.wait_for_position('0:05')
         self.video.click_player_button('skip_bumper')
 
-    def seek_video_and_dismiss(self):
+    def watch_video_and_dismiss(self):
         """
         Wait 5 seconds and press "do not show again" button.
         """
@@ -190,21 +190,25 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
         self.course_fixture.add_advanced_settings(additional_data)
 
     @ddt.data(
-        ('edx.video.bumper.skipped', seek_video_and_skip),
-        ('edx.video.bumper.dismissed', seek_video_and_dismiss),
+        ('edx.video.bumper.skipped', watch_video_and_skip),
+        ('edx.video.bumper.dismissed', watch_video_and_dismiss),
         ('edx.video.bumper.stopped', wait_for_state)
     )
     @ddt.unpack
     def test_video_control_events(self, event_type, action):
         """
-        Scenario: Video component is rendered in the LMS in Youtube mode without HTML5 sources
-        Given the course has a Video component in "Youtube" mode
-        And I play the video
-        And I watch 5 seconds of it
-        And I pause the video
-        Then a "load_video" event is emitted
+        Scenario: Video component with pre-roll emits events correctly
+        Given the course has a Video component in "Youtube" mode with pre-roll enabled
+        And I click on the video poster
+        And the pre-roll video start playing
+        And I watch (5 seconds/5 seconds/to the end of) it
+        And I click (skip/do not show again) video button
+
+        Then a "edx.video.bumper.loaded" event is emitted
+        And a "edx.video.bumper.played" event is emitted
+        And a "edx.video.bumper.skipped/dismissed/stopped" event is emitted
+        And a "load_video" event is emitted
         And a "play_video" event is emitted
-        And a "pause_video" event is emitted
         """
 
         def is_video_event(event):
