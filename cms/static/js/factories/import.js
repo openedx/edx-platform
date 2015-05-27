@@ -5,6 +5,14 @@ define([
     'use strict';
 
     return function (feedbackUrl, library) {
+        var dbError;
+
+        if (library) {
+            dbError = gettext('There was an error while importing the new library to our database.');
+        } else {
+            dbError = gettext('There was an error while importing the new course to our database.');
+        }
+
         var bar = $('.progress-bar'),
             fill = $('.progress-fill'),
             submitBtn = $('.submit-button'),
@@ -15,8 +23,8 @@ define([
                 gettext('There was an error while verifying the file you submitted.') + '\n',
                 dbError + '\n'
             ],
+            unloading = false,
             previousImport = Import.storedImport(),
-            dbError,
             file;
 
         var onComplete = function () {
@@ -26,11 +34,7 @@ define([
                 .show();
         }
 
-        if (library) {
-            dbError = gettext('There was an error while importing the new library to our database.');
-        } else {
-            dbError = gettext('There was an error while importing the new course to our database.');
-        }
+        $(window).on('beforeunload', function (event) { unloading = true; });
 
         // Display the status of last file upload on page load
         if (previousImport) {
@@ -77,9 +81,21 @@ define([
                                 }
 
                                 errMsg = serverMsg.hasOwnProperty('ErrMsg') ? serverMsg.ErrMsg : '';
-                                stage = Math.abs(serverMsg.Stage || 0);
 
-                                Import.error(defaults[stage] + errMsg, stage);
+                                if (serverMsg.hasOwnProperty('Stage')) {
+                                    stage = Math.abs(serverMsg.Stage);
+                                    Import.error(defaults[stage] + errMsg, stage);
+                                }
+                                // It could be that the user is simply refreshing the page
+                                // so we need to be sure this is an actual error from the server
+                                else if (!unloading) {
+                                    $(window).off('beforeunload.import');
+
+                                    Import.reset();
+                                    onComplete();
+
+                                    alert(gettext('Your import has failed.') + '\n\n' + errMsg);
+                                }
                             }
                         });
                     });

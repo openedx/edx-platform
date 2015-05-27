@@ -9,7 +9,7 @@ define(
 
         /********** Private properties ****************************************/
 
-        var COOKIE_NAME = 'lastfileupload';
+        var COOKIE_NAME = 'lastimportupload';
 
         var STAGE = {
             'UPLOADING': 0,
@@ -44,7 +44,7 @@ define(
          *
          */
         var destroyEventListeners = function () {
-            window.onbeforeunload = null;
+            $(window).off('beforeunload.import');
         };
 
         /**
@@ -60,11 +60,11 @@ define(
          *
          */
         var initEventListeners = function () {
-            window.onbeforeunload = function () {
+            $(window).on('beforeunload.import', function () {
                 if (current.stage <= STAGE.UNPACKING) {
                     return gettext('Your import is in progress; navigating away will abort it.');
                 }
-            }
+            });
         };
 
         /**
@@ -119,16 +119,13 @@ define(
             }
 
             function errorStage(stage) {
-                var $stage = $(stage);
-                var error = currStageMsg;
-
-                if (!$stage.hasClass('has-error')) {
-                    $stage
+                if (!$(stage).hasClass('has-error')) {
+                    $(stage)
                         .removeClass('is-started')
                         .addClass('has-error')
                         .find('p.copy')
                         .hide()
-                        .after("<p class='copy error'>" + error + "</p>");
+                        .after("<p class='copy error'>" + currStageMsg + "</p>");
                 }
             }
 
@@ -251,6 +248,7 @@ define(
                 current.stage = STAGE.UPLOADING;
                 current.state = STATE.READY;
 
+                clearTimeout(timeout.id);
                 updateFeedbackList();
             },
 
