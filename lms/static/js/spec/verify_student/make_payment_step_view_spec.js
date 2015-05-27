@@ -103,9 +103,10 @@ define([
                 expect($el.length).toEqual(_.size(buttons));
                 _.each(buttons, function( expectedText, expectedId ) {
                     var buttonEl = $( '#' + expectedId );
+                    buttonEl.removeAttr('disabled');
                     expect( buttonEl.length ).toEqual( 1 );
                     expect( buttonEl[0] ).toHaveClass( 'payment-button' );
-                    expect( buttonEl[0].text ).toEqual( expectedText );
+                    expect( buttonEl[0] ).toHaveText( expectedText );
                     buttonEl[0].click();
                     expect(requests[requests.length - 1].requestBody.split('&')).toContain('processor=' + expectedId);
                 });

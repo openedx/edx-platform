@@ -58,7 +58,7 @@ var edx = edx || {};
         _getPaymentButtonHtml: function(processorName) {
             var self = this;
             return _.template(
-                '<a class="next action-primary payment-button" id="<%- name %>" tab-index="0"><%- text %></a> '
+                '<button class="next action-primary payment-button" id="<%- name %>" ><%- text %></button> '
             )({name: processorName, text: self._getPaymentButtonText(processorName)});
         },
 
