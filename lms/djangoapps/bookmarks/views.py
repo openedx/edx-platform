@@ -253,7 +253,7 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
         except InvalidKeyError:
             error_message = ugettext_noop(u'Invalid usage_id: {usage_id}.').format(usage_id=usage_id)
             log.error(error_message)
-            return self.error_response(error_message)
+            return self.error_response(error_message, status.HTTP_404_NOT_FOUND)
 
     def get(self, request, username=None, usage_id=None):  # pylint: disable=unused-argument
         """

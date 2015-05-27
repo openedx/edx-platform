@@ -377,7 +377,7 @@ class BookmarksDetailViewTests(BookmarksViewTestsMixin):
                 'bookmarks_detail',
                 kwargs={'username': self.user.username, 'usage_id': 'i4x'}
             ),
-            expected_status=400
+            expected_status=404
         )
         self.assertEqual(response.data['user_message'], u'Invalid usage_id: i4x.')
 
@@ -463,7 +463,7 @@ class BookmarksDetailViewTests(BookmarksViewTestsMixin):
                 'bookmarks_detail',
                 kwargs={'username': self.user.username, 'usage_id': 'i4x'}
             ),
-            expected_status=400
+            expected_status=404
         )
         self.assertEqual(response.data['user_message'], u'Invalid usage_id: i4x.')
 
