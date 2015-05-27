@@ -107,10 +107,10 @@ class BadgeHandlerTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         self.assertEqual(
             kwargs['data'],
             {
-                'name': 'Badged (honor)',
+                'name': 'Badged',
                 'slug': 'edxcourse_testtest_run_honor_fc5519b',
                 'criteria': 'https://edx.org/courses/edX/course_test/test_run/about',
-                'description': '2015-05-19 to 2015-05-20'
+                'description': 'Completed the course "Badged" (honor, 2015-05-19 - 2015-05-20)',
             }
         )
 

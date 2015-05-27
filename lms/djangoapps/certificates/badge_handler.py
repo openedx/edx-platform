@@ -103,29 +103,22 @@ class BadgeHandler(object):
         BadgeHandler.badges[self.course_slug(mode)] = True
 
     @staticmethod
-    def badge_name_field(course, mode):
+    def badge_description(course, mode):
         """
-        Get the name for the badge, based on the course name. Max size is 255.
-        """
-        return _(u"{course_display_name} ({course_mode})").format(
-            course_display_name=course.display_name,
-            # Course modes may be translated, but this whole string won't be available for translation.
-            # pylint: disable=translation-of-non-string
-            course_mode=_(mode),
-        )[:255]
-
-    @staticmethod
-    def badge_description(course):
-        """
-        Returns the badge
+        Returns a description for the earned badge.
         """
         if course.end:
-            return _(u"{start_date} to {end_date}").format(
+            return _(u'Completed the course "{course_name}" ({course_mode}, {start_date} - {end_date})').format(
                 start_date=course.start.date(),
                 end_date=course.end.date(),
+                course_name=course.display_name,
+                course_mode=mode,
             )
         else:
-            return u"{start_date}".format(start_date=course.start.date())
+            return _(u'Completed the course "{course_name}" ({course_mode})').format(
+                start_date=course.display_name,
+                course_mode=mode,
+            )
 
     def create_badge(self, mode):
         """
@@ -144,10 +137,10 @@ class BadgeHandler(object):
         about_path = reverse('about_course', kwargs={'course_id': unicode(self.course_key)})
         scheme = u"https" if settings.HTTPS == "on" else u"http"
         data = {
-            'name': self.badge_name_field(course, mode),
+            'name': course.display_name,
             'criteria': u'{}://{}{}'.format(scheme, settings.SITE_NAME, about_path),
             'slug': self.course_slug(mode),
-            'description': self.badge_description(course)
+            'description': self.badge_description(course, mode)
         }
         result = requests.post(self.badge_create_url, headers=self.get_headers(), data=data, files=files)
         self.log_if_raised(result, data)
