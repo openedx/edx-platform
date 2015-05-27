@@ -1,0 +1,212 @@
+// ------------------------------
+// // Open edX Certificates: Print Specific Styling
+
+// About: styling specific for print layouts.
+
+// #UTILITIES
+// #BASE
+// #LAYOUT
+// #ELEMENTS
+
+// ------------------------------
+// #UTILITIES
+// ------------------------------
+@media print {
+
+    // helpers
+    %print-no-background {
+        background: none !important;
+    }
+
+    %print-hide {
+        display: none;
+    }
+
+    %print-black-on-white {
+        background: palette(grayscale, white-t) !important;
+        color: palette(grayscale, black-t) !important;
+    }
+
+    %print-layout-wrapper {
+        padding: 0 !important;
+    }
+
+    %print-rendering-section {
+        margin-bottom: spacing-vertical(small);
+        border-bottom: none;
+        padding-bottom: 0;
+
+        &:last-child {
+            border: none;
+            padding-bottom: 0;
+        }
+    }
+}
+
+// ------------------------------
+// #BASE
+// ------------------------------
+@media print {
+
+    // prevent images from bleeding over the edge of the printed page
+    img {
+       max-width: 100% !important;
+    }
+
+    // ensure that content is not broken across pages when printed
+    h1, h2, h3, h4, h5, h6,
+    .hd-1, .hd-2 , .hd-3, .hd-4, .hd-5, .hd-6, .hd-7 {
+        page-break-after: avoid;
+    }
+
+    // prevent large elements from being split across multiple pages
+    ul, img {
+       page-break-inside: avoid;
+    }
+
+    // orientation
+    @page {
+        size: landscape;
+    }
+
+    // reset body/view properties
+    body {
+        @extend %print-black-on-white;
+        margin: spacing-vertical(mid-small) spacing-vertical(small) !important;
+        padding: 0;
+    }
+}
+
+// force background images and colors
+@media print and (color) {
+   * {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+   }
+}
+
+// ------------------------------
+// #LAYOUT
+// ------------------------------
+@media print {
+
+    // hide elements not needed for print rendering
+    .wrapper-banner-user,
+    .wrapper-about,
+    .wrapper-footer,
+    .wrapper-header,
+    .wrapper-introduction,
+    .accomplishment-metadata-title,
+    .accomplishment-metadata .accomplishment-recipient {
+        @extend %print-hide;
+    }
+
+    // remove layout wrappers' padding
+    .wrapper-introduction,
+    .wrapper-accomplishment-rendering {
+        @extend %print-layout-wrapper;
+    }
+
+    // remove floating/column layout
+}
+
+// ------------------------------
+// #ELEMENTS
+// ------------------------------
+@media print {
+
+    // headings
+    .hd-1 {
+        font-size: font-size(xx-large);
+        line-height: line-height(xx-large);
+    }
+
+    .hd-2 {
+        font-size: font-size(large);
+        line-height: line-height(large);
+    }
+
+    .hd-3 {
+        font-size: font-size(mid-large);
+        line-height: line-height(mid-large);
+    }
+
+    .hd-4 {
+        font-size: font-size(base);
+        line-height: line-height(base);
+    }
+
+    .hd-5 {
+        font-size: font-size(base);
+        line-height: line-height(base);
+    }
+
+    .hd-6 {
+        font-size: font-size(small);
+        line-height: line-height(small);
+    }
+
+    .hd-7 {
+        font-size: font-size(x-small);
+        line-height: line-height(small);
+    }
+
+    // copy
+    .copy-lead {
+        font-size: font-size(mid-large);
+        line-height: line-height(mid-large);
+    }
+
+    .copy-large {
+       font-size: font-size(base);
+       line-height: line-height(base);
+    }
+
+    .copy-base {
+        font-size: font-size(small);
+        line-height: line-height(small);
+    }
+
+    .copy-meta {
+        font-size: font-size(x-small);
+        line-height: line-height(small);
+    }
+
+    .copy-micro {
+        font-size: font-size(x-small);
+        line-height: line-height(small);
+    }
+
+    // accomplishment
+    .accomplishment-main {
+        @extend %print-no-background;
+    }
+
+    .accomplishment-rendering {
+        top: 0 !important;
+
+        .accomplishment-type {
+            // background: teal !important;
+            top: -(rem(40));
+        }
+
+        .accomplishment-statement {
+            background: salmon !important;
+            @extend %print-rendering-section;
+            @include span(8 first);
+            @include text-align(left);
+        }
+
+        .accomplishment-signatories {
+            background: red !important;
+            @extend %print-rendering-section;
+            @include span(4 last);
+        }
+
+        .accomplishment-orgs {
+            background: orange !important;
+            @include span(12);
+        }
+    }
+}
+
