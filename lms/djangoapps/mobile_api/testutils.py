@@ -7,8 +7,7 @@ Test utilities for mobile API tests:
   Test Mixins to be included by concrete test classes and provide implementation of common test methods:
      MobileAuthTestMixin - tests for APIs with mobile_view and is_user=False.
      MobileAuthUserTestMixin - tests for APIs with mobile_view and is_user=True.
-     MobileCourseAccessTestMixin - tests for APIs with mobile_course_access and verify_enrolled=False.
-     MobileEnrolledCourseAccessTestMixin - tests for APIs with mobile_course_access and verify_enrolled=True.
+     MobileCourseAccessTestMixin - tests for APIs with mobile_course_access.
 """
 # pylint: disable=no-member
 import ddt
@@ -130,7 +129,6 @@ class MobileAuthUserTestMixin(MobileAuthTestMixin):
 class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
     """
     Test Mixin for testing APIs marked with mobile_course_access.
-    (Use MobileEnrolledCourseAccessTestMixin when verify_enrolled is set to True.)
     Subclasses are expected to inherit from MobileAPITestCase.
     Subclasses can override verify_success, verify_failure, and init_course_access methods.
     """
@@ -197,11 +195,6 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
         else:
             self.verify_failure(response)
 
-
-class MobileEnrolledCourseAccessTestMixin(MobileCourseAccessTestMixin):
-    """
-    Test Mixin for testing APIs marked with mobile_course_access with verify_enrolled=True.
-    """
     def test_unenrolled_user(self):
         self.login()
         self.unenroll()

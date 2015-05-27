@@ -18,7 +18,7 @@ from xmodule.partitions.partitions import Group, UserPartition
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 
-from ..testutils import MobileAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseAccessTestMixin
+from ..testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
 
 
 class TestVideoAPITestCase(MobileAPITestCase):
@@ -407,7 +407,7 @@ class TestNonStandardCourseStructure(MobileAPITestCase, TestVideoAPIMixin):
 
 @ddt.ddt
 class TestVideoSummaryList(
-    TestVideoAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseAccessTestMixin, TestVideoAPIMixin  # pylint: disable=bad-continuation
+    TestVideoAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin, TestVideoAPIMixin  # pylint: disable=bad-continuation
 ):
     """
     Tests for /api/mobile/v0.5/video_outlines/courses/{course_id}..
@@ -863,7 +863,7 @@ class TestVideoSummaryList(
 
 
 class TestTranscriptsDetail(
-    TestVideoAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseAccessTestMixin, TestVideoAPIMixin  # pylint: disable=bad-continuation
+    TestVideoAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin, TestVideoAPIMixin  # pylint: disable=bad-continuation
 ):
     """
     Tests for /api/mobile/v0.5/video_outlines/transcripts/{course_id}..
