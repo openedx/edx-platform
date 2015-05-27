@@ -201,7 +201,8 @@ def render_courseware(request, lti_params):
 def parse_course_and_usage_keys(course_id, usage_id):
     """
     Convert course and usage ID strings into key objects. Return a tuple of
-    (course_key, usage_key), or (None, None) if the translation fails.
+    (course_key, usage_key), or throw an InvalidKeyError if the translation
+    fails.
     """
     course_key = CourseKey.from_string(course_id)
     usage_id = unquote_slashes(usage_id)
