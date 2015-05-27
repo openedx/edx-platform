@@ -84,7 +84,7 @@ class BookmarksTest(BookmarksTestMixin):
         """ Bookmark a single unit """
         csrftoken = self.session.cookies['csrftoken']
         headers = {'Content-type': 'application/json', "X-CSRFToken": csrftoken}
-        url = LMS_BASE_URL + "/api/bookmarks/v0/bookmarks/?course_id=" + course_id + '&fields=path'
+        url = LMS_BASE_URL + "/api/bookmarks/v1/bookmarks/?course_id=" + course_id + '&fields=path'
         data = json.dumps({'usage_id': usage_id})
 
         response = self.session.post(url, data=data, headers=headers, cookies=self.session.cookies)

@@ -7,7 +7,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
         describe("lms.courseware.bookmarks", function () {
 
             var bookmarksButtonView;
-            var BOOKMARKS_API_URL = '/api/bookmarks/v0/bookmarks/';
+            var BOOKMARKS_API_URL = '/api/bookmarks/v1/bookmarks/';
 
             beforeEach(function () {
                 loadFixtures('js/fixtures/bookmarks/bookmarks.html');
