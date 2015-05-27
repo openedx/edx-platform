@@ -79,6 +79,67 @@ course_mode_class = course_mode if course_mode else ''
                     % endif
                 </ul>
             </div>
+
+            <div class="accomplishment-signatories">
+                <h3 class="accomplishment-signatories-title hd-6 sr-only">Noted by</h3>
+
+                <div class="wrapper-signatories">
+                    <ul class="list-signatories">
+                        <li class="signatory">
+                            <img class="signatory-signature" src="${static.url("certificates/images/demo-sig1.png")}" alt="">
+
+                            <h4 class="signatory-name hd-5">Name</h4>
+                            <p class="signatory-credentials copy copy-micro">
+                                <span class="role">Title</span>
+                                <span class="organization">Department</span>
+                            </p>
+                        </li>
+
+                        <li class="signatory">
+                            <img class="signatory-signature" src="${static.url("certificates/images/demo-sig2.png")}" alt="">
+
+                            <h4 class="signatory-name hd-5">Name</h4>
+                            <p class="signatory-credentials copy copy-micro">
+                                <span class="role">Title</span>
+                                <span class="organization">Department</span>
+                            </p>
+                        </li>
+
+                        <li class="signatory">
+                            <img class="signatory-signature" src="${static.url("certificates/images/demo-sig3.png")}" alt="">
+
+                            <h4 class="signatory-name hd-5">Name</h4>
+                            <p class="signatory-credentials copy copy-micro">
+                                <span class="role">Title</span>
+                                <span class="organization">Department</span>
+                            </p>
+                        </li>
+
+                        <li class="signatory">
+                            <img class="signatory-signature" src="${static.url("certificates/images/demo-sig1.png")}" alt="">
+
+                            <h4 class="signatory-name hd-5">Name</h4>
+                            <p class="signatory-credentials copy copy-micro">
+                                <span class="role">Title</span>
+                                <span class="organization">Department</span>
+                            </p>
+                        </li>
+
+
+                        % for signatory in signatories:
+                        <li class="signatory">
+                            <img class="signatory-signature" src="${signatory['signature_image_path']}" alt="${signatory['name']}">
+
+                            <h4 class="signatory-name hd-5">${signatory['name']}</h4>
+                            <p class="signatory-credentials copy copy-micro">
+                                <span class="role">${signatory['title']}</span>
+                                <span class="organization">${signatory['organization']}</span>
+                            </p>
+                        </li>
+                        % endfor
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 
