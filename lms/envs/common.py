@@ -1636,7 +1636,6 @@ INSTALLED_APPS = (
     'static_replace',
 
     # Our courseware
-    'circuit',
     'courseware',
     'student',
 
