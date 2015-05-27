@@ -1,6 +1,7 @@
 <%!
 from django.utils.translation import ugettext as _
 from contentstore.views.helpers import xblock_studio_url
+from contentstore.utils import is_visible_to_specific_content_groups
 import json
 %>
 <%
@@ -8,7 +9,7 @@ xblock_url = xblock_studio_url(xblock)
 show_inline = xblock.has_children and not xblock_url
 section_class = "level-nesting" if show_inline else "level-element"
 collapsible_class = "is-collapsible" if xblock.has_children else ""
-label = xblock.display_name or xblock.scope_ids.block_type
+label = xblock.display_name_with_default or xblock.scope_ids.block_type
 messages = json.dumps(xblock.validate().to_json())
 %>
 
@@ -38,15 +39,23 @@ messages = json.dumps(xblock.validate().to_json())
     <div class="studio-xblock-wrapper" data-locator="${xblock.location | h}" data-course-key="${xblock.location.course_key | h}">
     % endif
 
-    <section class="wrapper-xblock ${section_class} ${collapsible_class}">
+    <section class="wrapper-xblock ${section_class} ${collapsible_class}
+    % if is_visible_to_specific_content_groups(xblock):
+        has-group-visibility-set
+    % endif
+    ">
 % endif
 
 <header class="xblock-header xblock-header-${xblock.category}">
-    <div class="xblock-header-primary">
+    <div class="xblock-header-primary
+    % if not show_preview:
+        is-collapsed
+    % endif
+    ">
         <div class="header-details">
             % if show_inline:
             <a href="#" data-tooltip="${_('Expand or Collapse')}" class="action expand-collapse collapse">
-                <i class="icon-caret-down ui-toggle-expansion"></i>
+                <i class="icon fa fa-caret-down ui-toggle-expansion"></i>
                 <span class="sr">${_('Expand or Collapse')}</span>
             </a>
             % endif
@@ -55,29 +64,50 @@ messages = json.dumps(xblock.validate().to_json())
         <div class="header-actions">
             <ul class="actions-list">
                 % if not is_root:
-                    % if not show_inline:
-                        <li class="action-item action-edit">
+                    % if can_edit:
+                        % if not show_inline:
+                            <li class="action-item action-edit">
+                                <a href="#" class="edit-button action-button">
+                                    <i class="icon fa fa-pencil"></i>
+                                    <span class="action-button-text">${_("Edit")}</span>
+                                </a>
+                            </li>
+                            % if can_edit_visibility:
+                                <li class="action-item action-visibility">
+                                    <a href="#" data-tooltip="${_("Visibility Settings")}" class="visibility-button action-button">
+                                        <i class="icon fa fa-eye" aria-hidden="true"></i>
+                                        <span class="sr">${_("Visibility")}</span>
+                                    </a>
+                                </li>
+                            % endif
+                            % if can_add:
+                                <li class="action-item action-duplicate">
+                                    <a href="#" data-tooltip="${_("Duplicate")}" class="duplicate-button action-button">
+                                    <i class="icon fa fa-copy"></i>
+                                    <span class="sr">${_("Duplicate")}</span>
+                                    </a>
+                                </li>
+                            % endif
+                        % endif
+                        % if can_add:
+                            <!-- If we can add, we can delete. -->
+                            <li class="action-item action-delete">
+                                <a href="#" data-tooltip="${_("Delete")}" class="delete-button action-button">
+                                <i class="icon fa fa-trash-o"></i>
+                                <span class="sr">${_("Delete")}</span>
+                                </a>
+                            </li>
+                        % endif
+                        % if is_reorderable:
+                            <li class="action-item action-drag">
+                                <span data-tooltip="${_('Drag to reorder')}" class="drag-handle action"></span>
+                            </li>
+                        % endif
+                    % elif not show_inline:
+                        <li class="action-item action-edit action-edit-view-only">
                             <a href="#" class="edit-button action-button">
-                                <i class="icon-pencil"></i>
-                                <span class="action-button-text">${_("Edit")}</span>
+                                <span class="action-button-text">${_("Details")}</span>
                             </a>
-                        </li>
-                        <li class="action-item action-duplicate">
-                            <a href="#" data-tooltip="${_("Duplicate")}" class="duplicate-button action-button">
-                            <i class="icon-copy"></i>
-                            <span class="sr">${_("Duplicate")}</span>
-                            </a>
-                        </li>
-                    % endif
-                    <li class="action-item action-delete">
-                        <a href="#" data-tooltip="${_("Delete")}" class="delete-button action-button">
-                        <i class="icon-trash"></i>
-                        <span class="sr">${_("Delete")}</span>
-                        </a>
-                    </li>
-                    % if is_reorderable:
-                        <li class="action-item action-drag">
-                            <span data-tooltip="${_('Drag to reorder')}" class="drag-handle action"></span>
                         </li>
                     % endif
                 % endif
@@ -94,7 +124,7 @@ messages = json.dumps(xblock.validate().to_json())
                     <a href="${xblock_url}" class="action-button">
                         ## Translators: this is a verb describing the action of viewing more details
                         <span class="action-button-text">${_('View')}</span>
-                        <i class="icon-arrow-right"></i>
+                        <i class="icon fa fa-arrow-right"></i>
                     </a>
                 </li>
             </ul>
@@ -107,14 +137,17 @@ messages = json.dumps(xblock.validate().to_json())
     <div class="wrapper-xblock-message xblock-validation-messages" data-locator="${xblock.location | h}"/>
 % endif
 
-% if is_root or not xblock_url:
-    <article class="xblock-render">
-    ${content}
-    </article>
-% else:
-    <div class="xblock-message-area">
-    ${content}
-% endif
+% if show_preview:
+    % if is_root or not xblock_url:
+        <article class="xblock-render">
+        ${content}
+        </article>
+    % else:
+        <div class="xblock-message-area">
+        ${content}
+        </div>
+    % endif
+ % endif   
 
 % if not is_root:
     </section>

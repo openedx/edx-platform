@@ -11,6 +11,7 @@ XMODULES = [
     "discuss = xmodule.backcompat_module:TranslateCustomTagDescriptor",
     "html = xmodule.html_module:HtmlDescriptor",
     "image = xmodule.backcompat_module:TranslateCustomTagDescriptor",
+    "library_content = xmodule.library_content_module:LibraryContentDescriptor",
     "error = xmodule.error_module:ErrorDescriptor",
     "peergrading = xmodule.peer_grading_module:PeerGradingDescriptor",
     "poll_question = xmodule.poll_module:PollDescriptor",
@@ -21,7 +22,6 @@ XMODULES = [
     "section = xmodule.backcompat_module:SemanticSectionDescriptor",
     "sequential = xmodule.seq_module:SequenceDescriptor",
     "slides = xmodule.backcompat_module:TranslateCustomTagDescriptor",
-    "vertical = xmodule.vertical_module:VerticalDescriptor",
     "video = xmodule.video_module:VideoDescriptor",
     "videoalpha = xmodule.video_module:VideoDescriptor",
     "videodev = xmodule.backcompat_module:TranslateCustomTagDescriptor",
@@ -31,7 +31,6 @@ XMODULES = [
     "static_tab = xmodule.html_module:StaticTabDescriptor",
     "custom_tag_template = xmodule.raw_module:RawDescriptor",
     "about = xmodule.html_module:AboutDescriptor",
-    "wrapper = xmodule.wrapper_module:WrapperDescriptor",
     "graphical_slider_tool = xmodule.gst_module:GraphicalSliderToolDescriptor",
     "annotatable = xmodule.annotatable_module:AnnotatableDescriptor",
     "textannotation = xmodule.textannotation_module:TextAnnotationDescriptor",
@@ -43,6 +42,11 @@ XMODULES = [
     "raw = xmodule.raw_module:RawDescriptor",
     "crowdsource_hinter = xmodule.crowdsource_hinter:CrowdsourceHinterDescriptor",
     "lti = xmodule.lti_module:LTIDescriptor",
+]
+XBLOCKS = [
+    "library = xmodule.library_root_xblock:LibraryRoot",
+    "vertical = xmodule.vertical_block:VerticalBlock",
+    "wrapper = xmodule.wrapper_module:WrapperBlock",
 ]
 
 setup(
@@ -64,7 +68,7 @@ setup(
     # See http://guide.python-distribute.org/creation.html#entry-points
     # for a description of entry_points
     entry_points={
-        'xblock.v1': XMODULES,
+        'xblock.v1': XMODULES + XBLOCKS,
         'xmodule.v1': XMODULES,
         'console_scripts': [
             'xmodule_assets = xmodule.static_content:main',

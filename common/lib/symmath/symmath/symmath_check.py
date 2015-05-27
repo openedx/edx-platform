@@ -287,7 +287,7 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
     if fexpect == fsym:
         return {'ok': True, 'msg': msg}
 
-    if type(fexpect) == list:
+    if isinstance(fexpect, list):
         try:
             xgiven = my_evalf(fsym, chop=True)
             dm = my_evalf(sympy.Matrix(fexpect) - sympy.Matrix(xgiven), chop=True)

@@ -20,6 +20,7 @@ var AssetView = BaseView.extend({
       url: this.model.get('url'),
       external_url: this.model.get('external_url'),
       portable_url: this.model.get('portable_url'),
+      asset_type: this.model.get_extension(),
       uniqueId: uniqueId
     }));
     this.updateLockState();
@@ -77,7 +78,7 @@ var AssetView = BaseView.extend({
   lockAsset: function(e) {
     var asset = this.model;
     var saving = new NotificationView.Mini({
-      title: gettext("Saving&hellip;")
+      title: gettext("Saving")
     }).show();
     asset.save({'locked': !asset.get('locked')}, {
       wait: true, // This means we won't re-render until we get back the success state.

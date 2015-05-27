@@ -64,9 +64,9 @@ function () {
         state.videoQualityControl.el.on('click',
             state.videoQualityControl.toggleQuality
         );
-        state.el.on('play', _.once(function () {
-            state.videoQualityControl.fetchAvailableQualities();
-        }));
+        state.el.on('play', _.once(
+            state.videoQualityControl.fetchAvailableQualities
+        ));
     }
 
     // ***************************************************************
@@ -103,6 +103,7 @@ function () {
         // HD qualities are available, show video quality control.
         if (this.config.availableHDQualities.length > 0) {
             this.trigger('videoQualityControl.showQualityControl');
+            this.trigger('videoQualityControl.onQualityChange', this.videoQualityControl.quality);
         }
         // On initialization, force the video quality to be 'large' instead of
         // 'default'. Otherwise, the player will sometimes switch to HD
@@ -115,7 +116,6 @@ function () {
     function onQualityChange(value) {
         var controlStateStr;
         this.videoQualityControl.quality = value;
-
         if (_.contains(this.config.availableHDQualities, value)) {
             controlStateStr = gettext('HD on');
             this.videoQualityControl.el
@@ -141,6 +141,7 @@ function () {
         event.preventDefault();
 
         newQuality = isHD ? 'large' : 'highres';
+        
         this.trigger('videoPlayer.handlePlaybackQualityChange', newQuality);
     }
 

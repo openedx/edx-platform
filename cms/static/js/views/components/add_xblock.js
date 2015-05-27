@@ -60,7 +60,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 event.preventDefault();
                 this.closeNewComponent(event);
                 ViewUtils.runOperationShowingMessage(
-                    gettext('Adding&hellip;'),
+                    gettext('Adding'),
                     _.bind(this.options.createComponent, this, saveData, element)
                 ).always(function() {
                     // Restore the scroll position of the buttons so that the new

@@ -1,4 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from datetime import datetime, timedelta %>
+<%! import pytz %>
 <%page args="section_data"/>
 <%include file="add_coupon_modal.html" args="section_data=section_data" />
 <%include file="edit_coupon_modal.html" args="section_data=section_data" />
@@ -10,82 +12,79 @@
       <div class="wrap">
          <h2>${_('Registration Codes')}</h2>
          <div>
-            <span class="code_tip">${_('Click to generate Registration Codes')}
-            <a id="registration_code_generation_link" href="#reg_code_generation_modal" class="add blue-button">${_('Generate Registration Codes')}</a>
+            %if section_data['sales_admin']:
+            <span class="code_tip">
+                <p>${_('Create one or more pre-paid course enrollment codes. Students can use these codes to enroll in the course.')}</p>
+                <a id="registration_code_generation_link" href="#reg_code_generation_modal" class="add blue-button">${_('Create Enrollment Codes')}</a>
             </span>
-            <p>${_('Click to generate a CSV file of all Course Registrations Codes:')}</p>
+            %endif
+            <p>${_('Download a .csv file of all enrollment codes for this course')}</p>
             <p>
             <form action="${ section_data['get_registration_code_csv_url'] }" id="download_registration_codes" method="post">
                <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-               <input type="text" name="download_company_name" placeholder="Company Name (Optional)"/>
-               <input type="submit" name="list-registration-codes-csv" value="${_("Download Registration Codes")}" data-csv="true">
+               <input type="text" name="download_company_name" placeholder="Company Name (optional)"/>
+               <input type="submit" name="list-registration-codes-csv" value="${_("Download All Enrollment Codes")}" data-csv="true">
             </form>
             </p>
-            <p>${_('Click to generate a CSV file of all Active Course Registrations Codes:')}</p>
+            <p>${_('Download a .csv file of all unused enrollment codes for this course')}</p>
             <p>
             <form action="${ section_data['active_registration_code_csv_url'] }" id="active_registration_codes" method="post">
                <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-               <input type="text" name="active_company_name" placeholder="Company Name (Optional)"/>
-               <input type="submit" name="active-registration-codes-csv" value="${_("Active Registration Codes")}" data-csv="true">
+               <input type="text" name="active_company_name" placeholder="Company Name (optional)"/>
+               <input type="submit" name="active-registration-codes-csv" value="${_("Download Unused Enrollment Codes")}" data-csv="true">
             </form>
             </p>
-            <p>${_('Click to generate a CSV file of all Spent Course Registrations Codes:')}</p>
+            <p>${_('Download a .csv file of all used enrollment codes for this course')}</p>
             <p>
             <form action="${ section_data['spent_registration_code_csv_url'] }" id="spent_registration_codes" method="post">
                <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-               <input type="text" name="spent_company_name" placeholder="Company Name (Optional)"/>
-               <input type="submit" name="spent-registration-codes-csv" value="${_("Spent Registration Codes")}" data-csv="true">
+               <input type="text" name="spent_company_name" placeholder="Company Name (optional)"/>
+               <input type="submit" name="spent-registration-codes-csv" value="${_("Download Used Enrollment Codes")}" data-csv="true">
             </form>
             </p>
            <a id="registration_code_generation_link-trigger" href="#registration_code_generation_modal" rel="leanModal"></a>
          </div>
       </div>
       <!-- end wrap -->
+      %if section_data['coupons_enabled']:
       <div class="wrap">
          <h2>${_("Course Price")}</h2>
          <div>
-            <span class="tip">${_("Course Price: ")}<span>$${section_data['course_price']}</span>
+            <span class="tip">${_("Course Price: ")}<span>${section_data['currency_symbol']}${section_data['course_price']}</span>
             %if section_data['access']['finance_admin'] is True:
             <a id="course_price_link" href="#set-course-mode-price-modal" rel="leanModal" class="add blue-button">+ ${_('Set Price')}</a>
             %endif
             </span>
          </div>
       </div>
+      %endif
       <!-- end wrap -->
-      %if section_data['access']['finance_admin'] is True:
-      <div class="wrap">
-         <h2>${_("Transactions")}</h2>
-         <div>
-            %if section_data['total_amount'] is not None:
-            <span>${_("Total Amount: ")}<span>$${section_data['total_amount']}</span></span>
-            %endif
-
-            <span class="csv_tip">${_("Click to generate a CSV file for all purchase transactions in this course")}
-                <input class="add blue-button"  type="button" name="list-purchase-transaction-csv" value="${_("Download All e-Commerce Purchases")}" data-endpoint="${ section_data['get_purchase_transaction_url'] }" data-csv="true">
-            </span>
-         </div>
-      </div><!-- end wrap -->
+      %if section_data['access']['finance_admin']:
       <div class="wrap">
          <h2>${_("Sales")}</h2>
          <div>
+            %if section_data['total_amount'] is not None:
+              <span><strong>${_("Total Credit Card Purchases: ")}</strong></span><span>${section_data['currency_symbol']}${section_data['total_amount']}</span>
+            %endif
             <span class="csv_tip">
-              <div >
-              ${_("Click to generate a CSV file for all sales records in this course")}
-                <input type="button" class="add blue-button" name="list-sale-csv" value="${_("Download All Invoice Sales")}" data-endpoint="${ section_data['get_sale_records_url'] }" data-csv="true">
-                <input type="button" class="add blue-button" name="list-order-sale-csv" value="${_("Download All Order Sales")}" data-endpoint="${ section_data['get_sale_order_records_url'] }" data-csv="true">
+              <div>
+                <p>${_("Download a .csv file for all credit card purchases or for all invoices, regardless of status")}</p>
+                <input type="button" class="add blue-button" name="list-sale-csv" value="${_("Download All Invoices")}" data-endpoint="${ section_data['get_sale_records_url'] }" data-csv="true">
+                <input type="button" class="add blue-button" name="list-order-sale-csv" value="${_("Download All Credit Card Purchases")}" data-endpoint="${ section_data['get_sale_order_records_url'] }" data-csv="true">
               </div>
             </span>
              <hr>
-             <p>${_("Enter the invoice number to invalidate or re-validate sale")}</p>
+             <p>${_("To cancel or resubmit an invoice, enter the invoice number below.")}</p>
             <span class="invalid_sale">
-               <input type="number" id="invoice_number" placeholder= "${_("Enter Invoice Number")}"/>
-               <input type="button" class="add blue-button" id="invalidate_invoice" value="${_("Invalidate Sale")}">
-               <input type="button" class="add blue-button" id="re_validate_invoice" value="${_("Revalidate Sale")}">
+               <input type="number" id="invoice_number" placeholder= "${_("Invoice Number")}"/>
+               <input type="button" class="add blue-button" id="invalidate_invoice" value="${_("Cancel Invoice")}">
+               <input type="button" class="add blue-button" id="re_validate_invoice" value="${_("Resubmit Invoice")}">
             </span>
 
          </div>
       </div><!-- end wrap -->
       %endif
+      %if section_data['coupons_enabled']:
       <div class="wrap">
          <h2>${_("Coupons List")}</h2>
          <div>
@@ -104,25 +103,30 @@
                         <tr class="coupons-headings">
                            <th class="c_code">${_("Code")}</th>
                            <th class="c_dsc">${_("Description")}</th>
+                           <th class="c_expiry">${_("Expiry Date")}</th>
                            <th class="c_discount">${_("Discount (%)")}</th>
-                           <th class="c_count">${_("Count")}</th>
+                           <th class="c_count">${_("Redeem Count")}</th>
                            <th class="c_action">${_("Actions")}</th>
                         </tr>
                      </thead>
                      <tbody>
                         %for coupon in section_data['coupons']:
+                        <% current_date = datetime.now(pytz.UTC) %>
+                        <% coupon_expiry_date = coupon.expiration_date %>
                         %if coupon.is_active == False:
                         <tr class="coupons-items inactive_coupon">
-                           %else:
+                        %elif coupon_expiry_date is not None and current_date >= coupon_expiry_date:
+                        <tr class="coupons-items expired_coupon">
+                        %else:
                         <tr class="coupons-items">
                            %endif
                             <td>${_('{code}').format(code=coupon.code)}</td>
                             <td>${_('{description}').format(description=coupon.description)}</td>
+                            <td>
+                                ${coupon.display_expiry_date}
+                            </td>
                             <td>${_('{discount}').format(discount=coupon.percentage_discount)}</td>
-                           <td>
-                              ${ coupon.couponredemption_set.all().count() }
-                           </td>
-                           <!--<td>${coupon.is_active}</td>-->
+                           <td>${ coupon.couponredemption_set.filter(order__status='purchased').count() }</td>
                            <td><a data-item-id="${coupon.id}" class='remove_coupon' href='#'>[x]</a><a href="#edit-modal" data-item-id="${coupon.id}" class="edit-right">${_('Edit')}</a></td>
                         </tr>
                         %endfor
@@ -134,6 +138,7 @@
             </div>
          </div>
       </div>
+      %endif
       <!-- end wrap -->
    </div>
 </div>
@@ -141,8 +146,8 @@
 
    $(function () {
        var icons = {
-           header: "ui-icon-circle-arrow-e",
-           activeHeader: "ui-icon-circle-arrow-s"
+           header: "ui-fa-circle-arrow-e",
+           activeHeader: "ui-fa-circle-arrow-s"
        };
        var act = 0;
        $("#accordion").accordion(
@@ -196,7 +201,7 @@
          }
          if($('#invoice_number').val() == "") {
                      $('#error-msg').attr('class','error-msgs')
-                     $('#error-msg').html("${_("Invoice number should not be empty.")}").show();
+                     $('#error-msg').html("${_('Invoice number should not be empty.')}").show();
                      return
          }
          $.ajax({
@@ -236,6 +241,12 @@
              $('input#edit_coupon_discount').val(data.coupon_discount);
              $('textarea#edit_coupon_description').val(data.coupon_description);
              $('input#edit_coupon_course_id').val(data.coupon_course_id);
+             if (data.expiry_date) {
+                 $('input#edit_coupon_expiration_date').val(data.expiry_date);
+             }
+             else {
+                $('input#edit_coupon_expiration_date').val("${_('Never Expires')}");
+             }
              $('#edit-modal-trigger').click();
            },
          error: function(jqXHR, textStatus, errorThrown) {
@@ -285,7 +296,7 @@
       var total_registration_codes = $('input[name="total_registration_codes"]').val();
       var recipient_name = $('input[name="recipient_name"]').val();
       var recipient_email = $('input[name="recipient_email"]').val();
-      var sale_price = $('input[name="sale_price"]').val();
+      var unit_price = $('input[name="unit_price"]').val();
       var company_name = $('input[name="company_name"]').val();
       var company_contact_name = $('input[name="company_contact_name"]').val();
       var company_contact_email = $('input[name="company_contact_email"]').val();
@@ -294,91 +305,91 @@
 
       if (company_name == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the company name');
+        registration_code_error.text("${_('Please enter the company name')}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (($.isNumeric(company_name))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the non-numeric value for company name');
+        registration_code_error.text("${_('Please enter the non-numeric value for company name')}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (company_contact_name == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the company contact name');
+        registration_code_error.text("${_('Please enter the company contact name')}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (($.isNumeric(company_contact_name))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the non-numeric value for company contact name');
+        registration_code_error.text("${_('Please enter the non-numeric value for company contact name')}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (company_contact_email == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the company contact email');
+        registration_code_error.text("${_('Please enter the company contact email')}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (!(validateEmail(company_contact_email))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the valid email address');
+        registration_code_error.text("${_('Please enter the valid email address')}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (recipient_name == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the recipient name');
+        registration_code_error.text("${_('Please enter the recipient name')}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (($.isNumeric(recipient_name))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the non-numeric value for recipient name');
+        registration_code_error.text("${_('Please enter the non-numeric value for recipient name')}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (recipient_email == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the recipient email');
+        registration_code_error.text("${_('Please enter the recipient email')}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (!(validateEmail(recipient_email))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the valid email address');
+        registration_code_error.text("${_('Please enter the valid email address')}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (address_line == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the billing address');
+        registration_code_error.text("${_('Please enter the billing address')}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
-      if (sale_price == '') {
+      if (unit_price == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the sale price');
+        registration_code_error.text("${_('Please enter the unit price')}");
         generate_registration_button.removeAttr('disabled');
         return false
       }
-      if (!($.isNumeric(sale_price))) {
+      if (!($.isNumeric(unit_price))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the numeric value for sale price');
+        registration_code_error.text("${_('Please enter the numeric value for unit price')}");
         generate_registration_button.removeAttr('disabled');
         return false
       }
       if (total_registration_codes == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the total registration codes');
+        registration_code_error.text("${_('Please enter the number of enrollment codes')}");
         generate_registration_button.removeAttr('disabled');
         return false
       }
       if (!($.isNumeric(total_registration_codes))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the numeric value for total registration codes');
+        registration_code_error.text("${_('Please enter the numeric value for number of enrollment codes')}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
@@ -471,6 +482,7 @@
        var coupon_discount = $.trim($('#coupon_discount').val());
        var course_id = $.trim($('#coupon_course_id').val());
        var description = $.trim($('#coupon_description').val());
+       var expiration_date = $.trim($('#coupon_expiration_date').val());
 
        // Check if empty of not
        if (code === '') {
@@ -497,7 +509,8 @@
            "code"  : code,
            "discount": coupon_discount,
            "course_id": course_id,
-           "description": description
+           "description": description,
+           "expiration_date": expiration_date
          },
          url: "${section_data['ajax_add_coupon']}",
          success: function (data) {
@@ -587,7 +600,7 @@
      $('input[name="country"]').val('');
      $('input[name="customer_reference_number"]').val('');
      $('input[name="recipient_name"]').val('');
-     $('input[name="sale_price"]').val('');
+     $('input[name="unit_price"]').val('');
      $('input[name="recipient_email"]').val('');
      $('input[name="company_contact_name"]').val('');
      $('input[name="company_contact_email"]').val('');

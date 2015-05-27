@@ -19,16 +19,12 @@ describe 'Calculator', ->
     it 'bind the calculator button', ->
       expect($('.calc')).toHandleWith 'click', @calculator.toggle
 
-    it 'bind the help button', ->
-      # These events are bind by $.hover()
-      expect($('#calculator_hint')).toHandle 'mouseover'
-      expect($('#calculator_hint')).toHandle 'mouseout'
-      expect($('#calculator_hint')).toHandle 'keydown'
+    it 'bind key up on calculator', ->
+      expect($('#calculator_wrapper')).toHandle 'keyup', @calculator.handleKeyUpOnHint
 
-    it 'prevent default behavior on help button', ->
-      $('#calculator_hint').click (e) ->
-        expect(e.isDefaultPrevented()).toBeTruthy()
-      $('#calculator_hint').click()
+    it 'bind the help button', ->
+      # This events is bind by $.click()
+      expect($('#calculator_hint')).toHandle 'click'
 
     it 'bind the calculator submit', ->
       expect($('form#calculator')).toHandleWith 'submit', @calculator.calculate
@@ -75,12 +71,25 @@ describe 'Calculator', ->
       expect($('.help')).not.toHaveClass('shown')
       expect($('.help')).toHaveAttr('aria-hidden', 'true')
 
+  describe 'handleClickOnHintButton', ->
+    it 'on click hint button hint popup becomes visible ', ->
+      e = jQuery.Event('click');
+      $('#calculator_hint').trigger(e);
+      expect($('.help')).toHaveClass 'shown'
+
   describe 'handleClickOnDocument', ->
     it 'on click out of the hint popup it becomes hidden', ->
       @calculator.showHint()
       e = jQuery.Event('click');
       $(document).trigger(e);
       expect($('.help')).not.toHaveClass 'shown'
+
+  describe 'handleClickOnHintPopup', ->
+    it 'on click of hint popup it remains visible', ->
+      @calculator.showHint()
+      e = jQuery.Event('click');
+      $('#calculator_input_help').trigger(e);
+      expect($('.help')).toHaveClass 'shown'
 
   describe 'selectHint', ->
     it 'select correct hint item', ->
@@ -108,7 +117,7 @@ describe 'Calculator', ->
 
       expect(@calculator.activeHint.attr('id')).toBe($('.hint-item').eq(0).attr('id'))
 
-    it 'Prev hint item is selected', ->
+    it 'if this was the second item, select the first one', ->
       @calculator.activeHint = $('.hint-item').eq(1)
       @calculator.prevHint()
 
@@ -118,18 +127,30 @@ describe 'Calculator', ->
       @calculator.activeHint = $('.hint-item').eq(0)
       @calculator.prevHint()
 
+      expect(@calculator.activeHint.attr('id')).toBe($('.hint-item').eq(2).attr('id'))
+
+    it 'if this was the last item, select the second last', ->
+      @calculator.activeHint = $('.hint-item').eq(2)
+      @calculator.prevHint()
+
       expect(@calculator.activeHint.attr('id')).toBe($('.hint-item').eq(1).attr('id'))
 
   describe 'nextHint', ->
 
-    it 'Next hint item is selected', ->
+    it 'if this was the first item, select the second one', ->
       @calculator.activeHint = $('.hint-item').eq(0)
       @calculator.nextHint()
 
       expect(@calculator.activeHint.attr('id')).toBe($('.hint-item').eq(1).attr('id'))
 
-    it 'If this was the last item, select the first one', ->
+    it 'If this was the second item, select the last one', ->
       @calculator.activeHint = $('.hint-item').eq(1)
+      @calculator.nextHint()
+
+      expect(@calculator.activeHint.attr('id')).toBe($('.hint-item').eq(2).attr('id'))
+
+    it 'If this was the last item, select the first one', ->
+      @calculator.activeHint = $('.hint-item').eq(2)
       @calculator.nextHint()
 
       expect(@calculator.activeHint.attr('id')).toBe($('.hint-item').eq(0).attr('id'))
@@ -263,14 +284,6 @@ describe 'Calculator', ->
             shiftKey: true
           not_called:
             'nextHint': calc
-
-        tab:
-          returnedValue: true
-          event:
-            keyCode: KEY.TAB
-            shiftKey: false
-          called:
-            'hideHint': calc
 
         esc:
           returnedValue: false

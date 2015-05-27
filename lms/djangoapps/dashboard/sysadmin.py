@@ -17,6 +17,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db import IntegrityError
 from django.http import HttpResponse, Http404
 from django.utils.decorators import method_decorator
@@ -173,7 +174,7 @@ class Users(SysadminDashboardView):
 
         msg = u''
         if settings.FEATURES['AUTH_USE_CERTIFICATES']:
-            if not '@' in uname:
+            if '@' not in uname:
                 email = '{0}@{1}'.format(uname, email_domain)
             else:
                 email = uname
@@ -196,7 +197,7 @@ class Users(SysadminDashboardView):
 
             email = uname
 
-            if not '@' in email:
+            if '@' not in email:
                 msg += _('email address required (not username)')
                 return msg
             new_password = password
@@ -470,7 +471,7 @@ class Courses(SysadminDashboardView):
             color = 'blue'
 
         msg = u"<h4 style='color:{0}'>{1}</h4>".format(color, msg_header)
-        msg += "<pre>{0}</pre>".format(escape(ret))
+        msg += u"<pre>{0}</pre>".format(escape(ret))
         return msg
 
     def import_xml_course(self, gitloc, branch):
@@ -508,7 +509,7 @@ class Courses(SysadminDashboardView):
             # new, and pull is when it is being updated from the
             # source.
             return _('Unable to clone or pull repository. Please check '
-                     'your url. Output was: {0!r}'.format(ex.output))
+                     'your url. Output was: {0!r}').format(ex.output)
 
         msg += u'<pre>{0}</pre>'.format(cmd_output)
         if not os.path.exists(gdir):
@@ -524,7 +525,7 @@ class Courses(SysadminDashboardView):
             # specific version of a courses content
             msg += u'<p>{0}</p>'.format(
                 _('Successfully switched to branch: '
-                  '{branch_name}'.format(branch_name=branch)))
+                  '{branch_name}').format(branch_name=branch))
 
         self.def_ms.try_load_course(os.path.abspath(gdir))
         errlog = self.def_ms.errored_courses.get(cdir, '')
@@ -729,6 +730,8 @@ class GitLogs(TemplateView):
         if course_id:
             course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
+        page_size = 10
+
         # Set mongodb defaults even if it isn't defined in settings
         mongo_db = {
             'host': 'localhost',
@@ -760,7 +763,7 @@ class GitLogs(TemplateView):
             # Require staff if not going to specific course
             if not request.user.is_staff:
                 raise Http404
-            cilset = CourseImportLog.objects.all().order_by('-created')
+            cilset = CourseImportLog.objects.order_by('-created')
         else:
             try:
                 course = get_course_by_id(course_id)
@@ -774,12 +777,30 @@ class GitLogs(TemplateView):
                     CourseStaffRole(course.id).has_user(request.user)):
                 raise Http404
             log.debug('course_id={0}'.format(course_id))
-            cilset = CourseImportLog.objects.filter(course_id=course_id).order_by('-created')
+            cilset = CourseImportLog.objects.filter(
+                course_id=course_id
+            ).order_by('-created')
             log.debug('cilset length={0}'.format(len(cilset)))
+
+        # Paginate the query set
+        paginator = Paginator(cilset, page_size)
+        try:
+            logs = paginator.page(request.GET.get('page'))
+        except PageNotAnInteger:
+            logs = paginator.page(1)
+        except EmptyPage:
+            # If the page is too high or low
+            given_page = int(request.GET.get('page'))
+            page = min(max(1, given_page), paginator.num_pages)
+            logs = paginator.page(page)
+
         mdb.disconnect()
-        context = {'cilset': cilset,
-                   'course_id': course_id.to_deprecated_string() if course_id else None,
-                   'error_msg': error_msg}
+        context = {
+            'logs': logs,
+            'course_id': course_id.to_deprecated_string() if course_id else None,
+            'error_msg': error_msg,
+            'page_size': page_size
+        }
 
         return render_to_response(self.template_name, context)
 

@@ -1,30 +1,41 @@
-"""This file contains (or should), all access control logic for the courseware.
+"""
+This file contains (or should), all access control logic for the courseware.
 Ideally, it will be the only place that needs to know about any special settings
-like DISABLE_START_DATES"""
+like DISABLE_START_DATES
+"""
 import logging
 from datetime import datetime, timedelta
 import pytz
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.utils.timezone import UTC
+
+from opaque_keys.edx.keys import CourseKey, UsageKey
+
+from xblock.core import XBlock
 
 from xmodule.course_module import (
     CourseDescriptor, CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
     CATALOG_VISIBILITY_ABOUT)
 from xmodule.error_module import ErrorDescriptor
-from xmodule.x_module import XModule
-
-from xblock.core import XBlock
+from xmodule.x_module import XModule, DEPRECATION_VSCOMPAT_EVENT
+from xmodule.split_test_module import get_split_user_partitions
+from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
 
 from external_auth.models import ExternalAuthMap
-from courseware.masquerade import is_masquerading_as_student
-from django.utils.timezone import UTC
+from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
+from student import auth
+from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from student.roles import (
     GlobalStaff, CourseStaffRole, CourseInstructorRole,
     OrgStaffRole, OrgInstructorRole, CourseBetaTesterRole
 )
-from student.models import CourseEnrollment, CourseEnrollmentAllowed, UserProfile
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from student.models import UserProfile
+from util.milestones_helpers import get_pre_requisite_courses_not_completed
+
+import dogstats_wrapper as dog_stats_api
+
 DEBUG_ACCESS = False
 
 log = logging.getLogger(__name__)
@@ -46,6 +57,7 @@ def has_access(user, action, obj, course_key=None):
     - visible_to_staff_only for modules
     - DISABLE_START_DATES
     - different access for instructor, staff, course staff, and students.
+    - mobile_available flag for course modules
 
     user: a Django user object. May be anonymous. If none is passed,
                     anonymous is assumed
@@ -91,7 +103,7 @@ def has_access(user, action, obj, course_key=None):
         return _has_access_location(user, action, obj, course_key)
 
     if isinstance(obj, basestring):
-        return _has_access_string(user, action, obj, course_key)
+        return _has_access_string(user, action, obj)
 
     # Passing an unknown object here is a coding error, so rather than
     # returning a default, complain.
@@ -108,6 +120,8 @@ def _has_access_course_desc(user, action, course):
 
     'load' -- load the courseware, see inside the course
     'load_forum' -- can load and contribute to the forums (one access level for now)
+    'load_mobile' -- can load from a mobile context
+    'load_mobile_no_enrollment_check' -- can load from a mobile context without checking for enrollment
     'enroll' -- enroll.  Checks for enrollment window,
                   ACCESS_REQUIRE_STAFF_FOR_COURSE,
     'see_exists' -- can see that the course exists.
@@ -147,6 +161,32 @@ def _has_access_course_desc(user, action, course):
 
         return (start is None or now > start) and (end is None or now < end)
 
+    def can_load_mobile():
+        """
+        Can this user access this course from a mobile device?
+        """
+        return (
+            # check mobile requirements
+            can_load_mobile_no_enroll_check() and
+            # check enrollment
+            (
+                CourseEnrollment.is_enrolled(user, course.id) or
+                _has_staff_access_to_descriptor(user, course, course.id)
+            )
+        )
+
+    def can_load_mobile_no_enroll_check():
+        """
+        Can this enrolled user access this course from a mobile device?
+        Note: does not check for enrollment since it is assumed the caller has done so.
+        """
+        return (
+            # check start date
+            can_load() and
+            # check mobile_available flag
+            is_mobile_available_for_user(user, course)
+        )
+
     def can_enroll():
         """
         First check if restriction of enrollment by login method is enabled, both
@@ -165,7 +205,7 @@ def _has_access_course_desc(user, action, course):
         # if using registration method to restrict (say shibboleth)
         if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
             if user is not None and user.is_authenticated() and \
-                ExternalAuthMap.objects.filter(user=user, external_domain=course.enrollment_domain):
+                    ExternalAuthMap.objects.filter(user=user, external_domain=course.enrollment_domain):
                 debug("Allow: external_auth of " + course.enrollment_domain)
                 reg_method_ok = True
             else:
@@ -210,6 +250,14 @@ def _has_access_course_desc(user, action, course):
         # properly configured enrollment_start times (if course should be
         # staff-only, set enrollment_start far in the future.)
         if settings.FEATURES.get('ACCESS_REQUIRE_STAFF_FOR_COURSE'):
+            dog_stats_api.increment(
+                DEPRECATION_VSCOMPAT_EVENT,
+                tags=(
+                    "location:has_access_course_desc_see_exists",
+                    u"course:{}".format(course),
+                )
+            )
+
             # if this feature is on, only allow courses that have ispublic set to be
             # seen by non-staff
             if course.ispublic:
@@ -242,9 +290,27 @@ def _has_access_course_desc(user, action, course):
             _has_staff_access_to_descriptor(user, course, course.id)
         )
 
+    def can_view_courseware_with_prerequisites():  # pylint: disable=invalid-name
+        """
+        Checks if prerequisite courses feature is enabled and course has prerequisites
+        and user is neither staff nor anonymous then it returns False if user has not
+        passed prerequisite courses otherwise return True.
+        """
+        if settings.FEATURES['ENABLE_PREREQUISITE_COURSES'] \
+                and not _has_staff_access_to_descriptor(user, course, course.id) \
+                and course.pre_requisite_courses \
+                and not user.is_anonymous() \
+                and get_pre_requisite_courses_not_completed(user, [course.id]):
+            return False
+        else:
+            return True
+
     checkers = {
         'load': can_load,
+        'view_courseware_with_prerequisites': can_view_courseware_with_prerequisites,
         'load_forum': can_load_forum,
+        'load_mobile': can_load_mobile,
+        'load_mobile_no_enrollment_check': can_load_mobile_no_enroll_check,
         'enroll': can_enroll,
         'see_exists': see_exists,
         'within_enrollment_period': within_enrollment_period,
@@ -319,6 +385,71 @@ def _can_load_descriptor_nonregistered(descriptor):
     return descriptor.category in NONREGISTERED_CATEGORY_WHITELIST
 
 
+def _has_group_access(descriptor, user, course_key):
+    """
+    This function returns a boolean indicating whether or not `user` has
+    sufficient group memberships to "load" a block (the `descriptor`)
+    """
+    if len(descriptor.user_partitions) == len(get_split_user_partitions(descriptor.user_partitions)):
+        # Short-circuit the process, since there are no defined user partitions that are not
+        # user_partitions used by the split_test module. The split_test module handles its own access
+        # via updating the children of the split_test module.
+        return True
+
+    # use merged_group_access which takes group access on the block's
+    # parents / ancestors into account
+    merged_access = descriptor.merged_group_access
+    # check for False in merged_access, which indicates that at least one
+    # partition's group list excludes all students.
+    if False in merged_access.values():
+        log.warning("Group access check excludes all students, access will be denied.", exc_info=True)
+        return False
+
+    # resolve the partition IDs in group_access to actual
+    # partition objects, skipping those which contain empty group directives.
+    # if a referenced partition could not be found, access will be denied.
+    try:
+        partitions = [
+            descriptor._get_user_partition(partition_id)  # pylint:disable=protected-access
+            for partition_id, group_ids in merged_access.items()
+            if group_ids is not None
+        ]
+    except NoSuchUserPartitionError:
+        log.warning("Error looking up user partition, access will be denied.", exc_info=True)
+        return False
+
+    # next resolve the group IDs specified within each partition
+    partition_groups = []
+    try:
+        for partition in partitions:
+            groups = [
+                partition.get_group(group_id)
+                for group_id in merged_access[partition.id]
+            ]
+            if groups:
+                partition_groups.append((partition, groups))
+    except NoSuchUserPartitionGroupError:
+        log.warning("Error looking up referenced user partition group, access will be denied.", exc_info=True)
+        return False
+
+    # look up the user's group for each partition
+    user_groups = {}
+    for partition, groups in partition_groups:
+        user_groups[partition.id] = partition.scheme.get_group_for_user(
+            course_key,
+            user,
+            partition,
+        )
+
+    # finally: check that the user has a satisfactory group assignment
+    # for each partition.
+    if not all(user_groups.get(partition.id) in groups for partition, groups in partition_groups):
+        return False
+
+    # all checks passed.
+    return True
+
+
 def _has_access_descriptor(user, action, descriptor, course_key=None):
     """
     Check if user has access to this descriptor.
@@ -341,8 +472,14 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         if descriptor.visible_to_staff_only and not _has_staff_access_to_descriptor(user, descriptor, course_key):
             return False
 
+        # enforce group access
+        if not _has_group_access(descriptor, user, course_key):
+            # if group_access check failed, deny access unless the requestor is staff,
+            # in which case immediately grant access.
+            return _has_staff_access_to_descriptor(user, descriptor, course_key)
+
         # If start dates are off, can always load
-        if settings.FEATURES['DISABLE_START_DATES'] and not is_masquerading_as_student(user):
+        if settings.FEATURES['DISABLE_START_DATES'] and not is_masquerading_as_student(user, course_key):
             debug("Allow: DISABLE_START_DATES")
             return True
 
@@ -420,7 +557,7 @@ def _has_access_course_key(user, action, course_key):
     return _dispatch(checkers, action, user, course_key)
 
 
-def _has_access_string(user, action, perm, course_key):
+def _has_access_string(user, action, perm):
     """
     Check if user has certain special access, specified as string.  Valid strings:
 
@@ -526,7 +663,7 @@ def _has_access_to_course(user, access_level, course_key):
         debug("Deny: no user or anon user")
         return False
 
-    if is_masquerading_as_student(user):
+    if is_masquerading_as_student(user, course_key):
         return False
 
     if GlobalStaff().has_user(user):
@@ -578,13 +715,28 @@ def _has_staff_access_to_descriptor(user, descriptor, course_key):
     return _has_staff_access_to_location(user, descriptor.location, course_key)
 
 
+def is_mobile_available_for_user(user, course):
+    """
+    Returns whether the given course is mobile_available for the given user.
+    Checks:
+        mobile_available flag on the course
+        Beta User and staff access overrides the mobile_available flag
+    """
+    return (
+        course.mobile_available or
+        auth.has_access(user, CourseBetaTesterRole(course.id)) or
+        _has_staff_access_to_descriptor(user, course, course.id)
+    )
+
+
 def get_user_role(user, course_key):
     """
     Return corresponding string if user has staff, instructor or student
     course role in LMS.
     """
-    if is_masquerading_as_student(user):
-        return 'student'
+    role = get_masquerade_role(user, course_key)
+    if role:
+        return role
     elif has_access(user, 'instructor', course_key):
         return 'instructor'
     elif has_access(user, 'staff', course_key):

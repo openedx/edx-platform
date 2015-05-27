@@ -79,6 +79,7 @@
       if(enable) {
         $submitButton.
           removeClass('is-disabled').
+          attr('aria-disabled', false).
           removeProp('disabled').
           html("${_('Create My {account_name} Account').format(account_name=account_name)}");
       }
@@ -86,7 +87,7 @@
         $submitButton.
           addClass('is-disabled').
           prop('disabled', true).
-          text("${_(u'Processing your account information…')}");
+          text("${_('Processing your account information')}");
       }
     }
   </script>
@@ -124,7 +125,7 @@
 
         % for enabled in provider.Registry.enabled():
           ## Translators: provider_name is the name of an external, third-party user authentication service (like Google or LinkedIn).
-          <button type="submit" class="button button-primary button-${enabled.NAME} register-${enabled.NAME}" onclick="thirdPartySignin(event, '${pipeline_urls[enabled.NAME]}');"><span class="icon ${enabled.ICON_CLASS}"></span>${_('Sign up with {provider_name}').format(provider_name=enabled.NAME)}</button>
+          <button type="submit" class="button button-primary button-${enabled.NAME} register-${enabled.NAME}" onclick="thirdPartySignin(event, '${pipeline_urls[enabled.NAME]}');"><span class="icon fa ${enabled.ICON_CLASS}"></span>${_('Sign up with {provider_name}').format(provider_name=enabled.NAME)}</button>
         % endfor
 
         </div>
@@ -146,7 +147,7 @@
         <p class="instructions">
           ## Translators: selected_provider is the name of an external, third-party user authentication service (like Google or LinkedIn).
           ${_("You've successfully signed in with {selected_provider}.").format(selected_provider='<strong>%s</strong>' % selected_provider)}<br />
-          ${_("We just need a little more information before you start learning with edX.")}
+          ${_("We just need a little more information before you start learning with {platform_name}.").format(platform_name=settings.PLATFORM_NAME)}
         </p>
 
         % endif
@@ -341,6 +342,8 @@
             % endif
 
             % if settings.REGISTRATION_EXTRA_FIELDS['honor_code'] != 'hidden':
+            ## If the stanford theme isn't enabled, check if we have an Honor Code link in our marketing map
+            % if not self.is_non_microsite_theme() and marketing_link('HONOR') and marketing_link('HONOR') != '#':
             <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['honor_code']} checkbox" id="field-honorcode">
               <input id="honorcode-yes" type="checkbox" name="honor_code" value="true" />
               <%
@@ -355,6 +358,7 @@
                 link_end='</a>')}</label>
             </div>
             % endif
+            % endif
           </li>
         </ol>
       </div>
@@ -362,6 +366,10 @@
 % if course_id and enrollment_action:
       <input type="hidden" name="enrollment_action" value="${enrollment_action | h}" />
       <input type="hidden" name="course_id" value="${course_id | h}" />
+% endif
+
+% if email_opt_in:
+      <input type="hidden" name="email_opt_in" value="${email_opt_in | h }" />
 % endif
 
       <div class="form-actions">

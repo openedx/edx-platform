@@ -40,7 +40,12 @@ class Command(BaseCommand):
         try:
             user = user_from_str(args[1])
         except User.DoesNotExist:
-            raise CommandError("No user {} found: expected args are ".format(args[1], self.args))
+            raise CommandError(
+                "No user {user} found: expected args are {args}".format(
+                    user=args[1],
+                    args=self.args,
+                ),
+            )
 
         org = args[2]
         course = args[3]

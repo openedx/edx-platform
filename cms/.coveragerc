@@ -1,8 +1,8 @@
 # .coveragerc for cms
 [run]
 data_file = reports/cms/.coverage
-source = cms,common/djangoapps
-omit = cms/envs/*, cms/manage.py, common/djangoapps/terrain/*, common/djangoapps/*/migrations/*
+source = cms,common/djangoapps,openedx/core/djangoapps
+omit = cms/envs/*, cms/manage.py, common/djangoapps/terrain/*, common/djangoapps/*/migrations/*, openedx/core/djangoapps/*/migrations/*
 
 [report]
 ignore_errors = True

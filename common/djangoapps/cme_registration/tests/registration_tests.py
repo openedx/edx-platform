@@ -21,6 +21,7 @@ from student.tests.factories import UserFactory
 from cme_registration.views import DENIED_COUNTRIES, validate_export_controls, setup_sub_affiliation_field
 TEST_FEATURES = settings.FEATURES.copy()
 TEST_FEATURES['USE_CME_REGISTRATION'] = True
+TEST_FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION'] = False
 
 
 @override_settings(FEATURES=TEST_FEATURES)

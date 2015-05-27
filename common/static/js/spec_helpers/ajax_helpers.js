@@ -1,6 +1,6 @@
 define(['sinon', 'underscore'], function(sinon, _) {
     var fakeServer, fakeRequests, expectRequest, expectJsonRequest,
-        respondWithJson, respondWithError, respondToDelete;
+        respondWithJson, respondWithError, respondWithTextError, responseWithNoContent;
 
     /* These utility methods are used by Jasmine tests to create a mock server or
      * get reference to mock requests. In either case, the cleanup (restore) is done with
@@ -77,16 +77,39 @@ define(['sinon', 'underscore'], function(sinon, _) {
             JSON.stringify(jsonResponse));
     };
 
-    respondWithError = function(requests, requestIndex) {
+    respondWithError = function(requests, statusCode, jsonResponse, requestIndex) {
         if (_.isUndefined(requestIndex)) {
             requestIndex = requests.length - 1;
         }
-        requests[requestIndex].respond(500,
+        if (_.isUndefined(statusCode)) {
+            statusCode = 500;
+        }
+        if (_.isUndefined(jsonResponse)) {
+            jsonResponse = {};
+        }
+        requests[requestIndex].respond(statusCode,
             { 'Content-Type': 'application/json' },
-            JSON.stringify({ }));
+            JSON.stringify(jsonResponse)
+        );
     };
 
-    respondToDelete = function(requests, requestIndex) {
+    respondWithTextError = function(requests, statusCode, textResponse, requestIndex) {
+        if (_.isUndefined(requestIndex)) {
+            requestIndex = requests.length - 1;
+        }
+        if (_.isUndefined(statusCode)) {
+            statusCode = 500;
+        }
+        if (_.isUndefined(textResponse)) {
+            textResponse = "";
+        }
+        requests[requestIndex].respond(statusCode,
+            { 'Content-Type': 'text/plain' },
+            textResponse
+        );
+    };
+
+    respondWithNoContent = function(requests, requestIndex) {
         if (_.isUndefined(requestIndex)) {
             requestIndex = requests.length - 1;
         }
@@ -101,6 +124,7 @@ define(['sinon', 'underscore'], function(sinon, _) {
         'expectJsonRequest': expectJsonRequest,
         'respondWithJson': respondWithJson,
         'respondWithError': respondWithError,
-        'respondToDelete': respondToDelete
+        'respondWithTextError': respondWithTextError,
+        'respondWithNoContent': respondWithNoContent,
     };
 });

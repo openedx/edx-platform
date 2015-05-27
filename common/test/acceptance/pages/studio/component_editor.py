@@ -4,9 +4,9 @@ from utils import click_css
 from selenium.webdriver.support.ui import Select
 
 
-class ComponentEditorView(PageObject):
+class BaseComponentEditorView(PageObject):
     """
-    A :class:`.PageObject` representing the rendered view of a component editor.
+    A base :class:`.PageObject` for the component and visibility editors.
 
     This class assumes that the editor is our default editor as displayed for xmodules.
     """
@@ -18,7 +18,7 @@ class ComponentEditorView(PageObject):
             browser (selenium.webdriver): The Selenium-controlled browser that this page is loaded in.
             locator (str): The locator that identifies which xblock this :class:`.xblock-editor` relates to.
         """
-        super(ComponentEditorView, self).__init__(browser)
+        super(BaseComponentEditorView, self).__init__(browser)
         self.locator = locator
 
     def is_browser_on_page(self):
@@ -40,6 +40,23 @@ class ComponentEditorView(PageObject):
         """
         return None
 
+    def save(self):
+        """
+        Clicks save button.
+        """
+        click_css(self, 'a.action-save')
+
+    def cancel(self):
+        """
+        Clicks cancel button.
+        """
+        click_css(self, 'a.action-cancel', require_notification=False)
+
+
+class ComponentEditorView(BaseComponentEditorView):
+    """
+    A :class:`.PageObject` representing the rendered view of a component editor.
+    """
     def get_setting_element(self, label):
         """
         Returns the index of the setting entry with given label (display name) within the Settings modal.
@@ -86,14 +103,48 @@ class ComponentEditorView(PageObject):
         else:
             return None
 
-    def save(self):
-        """
-        Clicks save button.
-        """
-        click_css(self, 'a.action-save')
 
-    def cancel(self):
+class ComponentVisibilityEditorView(BaseComponentEditorView):
+    """
+    A :class:`.PageObject` representing the rendered view of a component visibility editor.
+    """
+    OPTION_SELECTOR = '.modal-section-content li.field'
+
+    @property
+    def all_options(self):
         """
-        Clicks cancel button.
+        Return all visibility 'li' options.
         """
-        click_css(self, 'a.action-cancel', require_notification=False)
+        return self.q(css=self._bounded_selector(self.OPTION_SELECTOR)).results
+
+    @property
+    def selected_options(self):
+        """
+        Return all selected visibility 'li' options.
+        """
+        results = []
+        for option in self.all_options:
+            button = option.find_element_by_css_selector('input.input')
+            if button.is_selected():
+                results.append(option)
+        return results
+
+    def select_option(self, label_text, save=True):
+        """
+        Click the first li which has a label matching `label_text`.
+
+        Arguments:
+            label_text (str): Text of a label accompanying the input
+                which should be clicked.
+            save (boolean): Whether the "save" button should be clicked
+                afterwards.
+        Returns:
+            bool: Whether the label was found and clicked.
+        """
+        for option in self.all_options:
+            if label_text in option.text:
+                option.click()
+                if save:
+                    self.save()
+                return True
+        return False

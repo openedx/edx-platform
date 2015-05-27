@@ -16,16 +16,23 @@ def user_has_cart_context_processor(request):
     be displayed.  Anonymous users don't.
     Adds `display_shopping_cart` to the context
     """
-    display_shopping_cart = (
-        # user is logged in and
-        request.user.is_authenticated() and
-        # do we have the feature turned on
-        is_shopping_cart_enabled() and
-        # user's cart has PaidCourseRegistrations
-        Order.user_cart_has_items(
-            request.user,
-            [PaidCourseRegistration, CourseRegCodeItem]
+    def should_display_shopping_cart():
+        """
+        Returns a boolean if the user has an items in a cart whereby the shopping cart should be
+        displayed to the logged in user
+        """
+        return (
+            # user is logged in and
+            request.user.is_authenticated() and
+            # do we have the feature turned on
+            is_shopping_cart_enabled() and
+            # does the user actually have a cart (optimized query to prevent creation of a cart when not needed)
+            Order.does_user_have_cart(request.user) and
+            # user's cart has PaidCourseRegistrations or CourseRegCodeItem
+            Order.user_cart_has_items(
+                request.user,
+                [PaidCourseRegistration, CourseRegCodeItem]
+            )
         )
-    )
 
-    return {'display_shopping_cart': display_shopping_cart}
+    return {'should_display_shopping_cart_func': should_display_shopping_cart}

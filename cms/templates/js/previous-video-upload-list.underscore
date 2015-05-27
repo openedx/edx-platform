@@ -1,0 +1,20 @@
+<div class="assets-library">
+    <h3 class="assets-title"><%- gettext("Previous Uploads") %></h3>
+    <div class="wrapper-encodings-download">
+      <a href="<%- encodingsDownloadUrl %>">
+        <%- gettext("Download available encodings (.csv)") %>
+      </a>
+    </div>
+    <table class="assets-table">
+        <thead>
+            <tr>
+                <th><%- gettext("Name") %></th>
+                <th><%- gettext("Duration") %></th>
+                <th><%- gettext("Date Added") %></th>
+                <th><%- gettext("Video ID") %></th>
+                <th><%- gettext("Status") %></th>
+            </tr>
+        </thead>
+        <tbody class="js-table-body"></tbody>
+    </table>
+</div>

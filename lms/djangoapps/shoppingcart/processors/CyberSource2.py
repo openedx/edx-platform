@@ -142,6 +142,11 @@ def verify_signatures(params):
     if params.get('decision') == u'CANCEL':
         raise CCProcessorUserCancelled()
 
+    #  if the user decline the transaction
+    # if so, then auth_amount will not be passed back so we can't yet verify signatures
+    if params.get('decision') == u'DECLINE':
+        raise CCProcessorUserDeclined()
+
     # Validate the signature to ensure that the message is from CyberSource
     # and has not been tampered with.
     signed_fields = params.get('signed_field_names', '').split(',')
@@ -402,6 +407,11 @@ def _record_purchase(params, order):
     else:
         ccnum = "####"
 
+    if settings.FEATURES.get("LOG_POSTPAY_CALLBACKS"):
+        log.info(
+            "Order %d purchased with params: %s", order.id, json.dumps(params)
+        )
+
     # Mark the order as purchased and store the billing information
     order.purchase(
         first=params.get('req_bill_to_forename', ''),
@@ -428,6 +438,11 @@ def _record_payment_info(params, order):
     Returns:
         None
     """
+    if settings.FEATURES.get("LOG_POSTPAY_CALLBACKS"):
+        log.info(
+            "Order %d processed (but not completed) with params: %s", order.id, json.dumps(params)
+        )
+
     order.processor_reply_dump = json.dumps(params)
     order.save()
 
@@ -516,6 +531,15 @@ def _get_processor_exception_html(exception):
                 u"Sorry! Our payment processor sent us back a message saying that you have cancelled this transaction. "
                 u"The items in your shopping cart will exist for future purchase. "
                 u"If you feel that this is in error, please contact us with payment-specific questions at {email}."
+            ).format(
+                email=payment_support_email
+            )
+        )
+    elif isinstance(exception, CCProcessorUserDeclined):
+        return _format_error_html(
+            _(
+                u"We're sorry, but this payment was declined. The items in your shopping cart have been saved. "
+                u"If you have any questions about this transaction, please contact us at {email}."
             ).format(
                 email=payment_support_email
             )
@@ -620,10 +644,9 @@ REASONCODE_MAP.update(
             Possible fix: retry with another form of payment
             """)),
         '233': _('General decline by the processor.  Possible fix: retry with another form of payment'),
-        '234': dedent(_(
-            """
-            There is a problem with the information in your CyberSource account.  Please let us know at {0}
-            """.format(settings.PAYMENT_SUPPORT_EMAIL))),
+        '234': _(
+            "There is a problem with the information in your CyberSource account.  Please let us know at {0}"
+        ).format(settings.PAYMENT_SUPPORT_EMAIL),
         '236': _('Processor Failure.  Possible fix: retry the payment'),
         '240': dedent(_(
             """

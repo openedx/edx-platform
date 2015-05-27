@@ -1,7 +1,5 @@
 from __future__ import absolute_import
 
-from uuid import uuid4
-
 from mock import patch
 
 from django.test import TestCase

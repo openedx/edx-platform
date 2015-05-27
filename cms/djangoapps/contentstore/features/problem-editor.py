@@ -1,9 +1,9 @@
 # disable missing docstring
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 
 import json
 from lettuce import world, step
-from nose.tools import assert_equal, assert_true  # pylint: disable=E0611
+from nose.tools import assert_equal, assert_true  # pylint: disable=no-name-in-module
 from common import type_in_codemirror, open_new_course
 from advanced_settings import change_value, ADVANCED_MODULES_KEY
 from course_import import import_file

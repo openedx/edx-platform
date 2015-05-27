@@ -4,7 +4,9 @@ Instructor API endpoint urls.
 
 from django.conf.urls import patterns, url
 
-urlpatterns = patterns('',  # nopep8
+urlpatterns = patterns(
+    '',
+
     url(r'^students_update_enrollment$',
         'instructor.views.api.students_update_enrollment', name="students_update_enrollment"),
     url(r'^register_and_enroll_students$',
@@ -46,8 +48,6 @@ urlpatterns = patterns('',  # nopep8
         'instructor.views.api.save_group_name', name="save_group_name"),
     url(r'^get_students_features(?P<csv>/csv)?$',
         'instructor.views.api.get_students_features', name="get_students_features"),
-    url(r'^get_purchase_transaction(?P<csv>/csv)?$',
-        'instructor.views.api.get_purchase_transaction', name="get_purchase_transaction"),
     url(r'^get_user_invoice_preference$',
         'instructor.views.api.get_user_invoice_preference', name="get_user_invoice_preference"),
     url(r'^get_sale_records(?P<csv>/csv)?$',
@@ -64,8 +64,28 @@ urlpatterns = patterns('',  # nopep8
         'instructor.views.api.get_student_progress_url', name="get_student_progress_url"),
     url(r'^reset_student_attempts$',
         'instructor.views.api.reset_student_attempts', name="reset_student_attempts"),
-    url(r'^rescore_problem$',
-        'instructor.views.api.rescore_problem', name="rescore_problem"),
+    url(  # pylint: disable=bad-continuation
+        r'^rescore_problem$',
+        'instructor.views.api.rescore_problem',
+        name="rescore_problem"
+    ), url(
+        r'^reset_student_attempts_for_entrance_exam$',
+        'instructor.views.api.reset_student_attempts_for_entrance_exam',
+        name="reset_student_attempts_for_entrance_exam"
+    ), url(
+        r'^rescore_entrance_exam$',
+        'instructor.views.api.rescore_entrance_exam',
+        name="rescore_entrance_exam"
+    ), url(
+        r'^list_entrance_exam_instructor_tasks',
+        'instructor.views.api.list_entrance_exam_instructor_tasks',
+        name="list_entrance_exam_instructor_tasks"
+    ), url(
+        r'^mark_student_can_skip_entrance_exam',
+        'instructor.views.api.mark_student_can_skip_entrance_exam',
+        name="mark_student_can_skip_entrance_exam"
+    ),
+
     url(r'^list_instructor_tasks$',
         'instructor.views.api.list_instructor_tasks', name="list_instructor_tasks"),
     url(r'^list_background_email_tasks$',
@@ -137,4 +157,17 @@ urlpatterns = patterns('',  # nopep8
     # Generating course forums usage graph
     url(r'^graph_course_forums_usage',
         'instructor.views.api.graph_course_forums_usage', name="graph_course_forums_usage"),
+
+    # Cohort management
+    url(r'add_users_to_cohorts$',
+        'instructor.views.api.add_users_to_cohorts', name="add_users_to_cohorts"),
+
+    # Certificates
+    url(r'^generate_example_certificates$',
+        'instructor.views.api.generate_example_certificates',
+        name='generate_example_certificates'),
+
+    url(r'^enable_certificate_generation$',
+        'instructor.views.api.enable_certificate_generation',
+        name='enable_certificate_generation'),
 )

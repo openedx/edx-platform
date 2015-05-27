@@ -2,21 +2,21 @@
 @import 'neat/neat'; // lib - Neat
 
 header.global {
+  @extend %ui-depth1;
   border-bottom: 1px solid $m-gray;
-  box-shadow: 0 1px 5px 0 rgba(0,0,0, 0.1);
+  box-shadow: 0 1px 5px 0 $shadow-l1;
   background: $header-bg;
   height: 76px;
   position: relative;
   width: 100%;
-  z-index: 10;
 
-  nav {
-    @include clearfix;
+  .wrapper-header {
+    @include clearfix();
     height: 40px;
     margin: 0 auto;
-    padding: 18px 10px 0px;
+    padding: 18px ($baseline/2) 0;
     max-width: grid-width(12);
-    min-width: 760px;
+    width: 100%;
   }
 
   h1.logo {
@@ -29,6 +29,15 @@ header.global {
     }
   }
 
+  nav {
+    @include clearfix();
+    height: 40px;
+    margin: 0 auto;
+    padding: 18px ($baseline/2) 0;
+    max-width: grid-width(12);
+    min-width: 760px;
+  }
+
   .left {
     @include float(left);
   }
@@ -39,12 +48,12 @@ header.global {
 
   > li {
     display: inline-block;
-    margin-right: 20px;
+    margin-right: $baseline;
     position: relative;
     vertical-align: middle;
 
     &:last-child {
-      margin-right: 0px;
+      margin-right: 0;
     }
 
     a {
@@ -59,13 +68,13 @@ header.global {
       display: block;
       font-family: $sans-serif;
       display: inline-block;
-      margin: 0px 30px 0px 0px;
+      margin: 0 ($baseline*1.5) 0 0;
       text-decoration: none;
       text-transform: uppercase;
       text-shadow: 0 1px rgba(255,255,255, 0.6);
 
       &:last-child {
-        margin-right: 0px;
+        margin-right: 0;
       }
 
       &:hover, &:focus {
@@ -75,7 +84,7 @@ header.global {
   }
 
   .primary {
-    margin-right: 5px;
+    margin-right: ($baseline/4);
 
     > a {
       @include background-image($button-bg-image);
@@ -97,7 +106,7 @@ header.global {
       vertical-align: middle;
 
       &:last-child {
-        margin-right: 0px;
+        margin-right: 0;
       }
 
       &:hover, &:focus, &:active {
@@ -108,24 +117,25 @@ header.global {
 
   .user {
     @include float(right);
-    margin-top: 4px;
+    margin-top: ($baseline/4);
 
     > .primary {
       display: block;
       @include float(left);
-      margin: 0px;
+      margin: 0;
       position: relative;
 
       > a {
-        margin: 0px;
+        margin: 0;
         @include border-right-radius(0px);
+        background-image: none;
       }
 
       &:last-child {
         > a {
           @include border-radius(0, 4px, 4px, 0);
           @include border-left(none);
-          padding: 5px 8px 7px 8px;
+          padding: ($baseline/4) 8px 11px ($baseline/2);
 
           &.shopping-cart {
             border-radius: 4px;
@@ -138,31 +148,44 @@ header.global {
     }
 
     a.user-link {
-      @include padding(6px, 12px, 8px, 35px);
+      @include padding(5px, 12px, 10px, 10px);
       position: relative;
       text-transform: none;
       font-size: 14px;
       font-weight: bold;
       letter-spacing: 0;
 
+      .icon {
+        display: inline-block;
+        @include float(left);
+        @include margin(2px, 6px, -3px, 3px);
+        font-size: 1.2em;
+        color: $m-gray;
+      }
+
       .avatar {
-        @include background-image(url('../images/small-header-home-icon.png'));
-        background-repeat: no-repeat;
 
         // CASE: right to left layout
-        @include rtl {
-          background-position: top right;
-        }
 
-        height: 26px;
         display: inline-block;
         @include left(8px);
         opacity: 0.5;
         overflow: hidden;
-        position: absolute;
         top: 4px;
+        margin-top: 1px;
+        margin-right: 2px;
         @include transition(all 0.15s linear 0s);
-        width: 26px;
+        width: 19px;
+      }
+      div {
+        margin-top: 3px;
+        float: right;
+        margin-left: 4px;
+      }
+      div {
+        margin-top: 3px;
+        float: right;
+        margin-left: 4px;
       }
 
       &:hover, &:focus {
@@ -173,16 +196,17 @@ header.global {
     }
 
     .dropdown-menu {
-      background: $border-color-4;
+      background: $white;
       border-radius: 4px;
-      box-shadow: 0 2px 24px 0 rgba(0,0,0, 0.3);
-      border: 1px solid $border-color-3;
+      box-shadow: 0 2px 2px 0 rgba(0,0,0, 0.3);
+      border: 1px solid $gray-l3;
       display: none;
+      margin-top: 0;
       padding: 5px 10px;
       position: absolute;
       @include right(0px);
-      top: 34px;
-      width: 170px;
+      top: 37px;
+      min-width: 120px;
       z-index: 3;
 
       &.expanded {
@@ -197,14 +221,14 @@ header.global {
           bottom: 6px solid transparent;
           left: 6px solid transparent;
         }
-        box-shadow: 1px 0 0 0 $border-color-3, 0 -1px 0 0 $border-color-3;
+        box-shadow: 1px 0 0 0 $gray-l3, 0 -1px 0 0 $gray-l3;
         content: "";
         display: block;
         height: 0px;
         position: absolute;
         @include transform(rotate(-45deg));
-        @include right(12px);
-        top: -6px;
+        @include right(7px);
+        top: -5px;
         width: 0px;
       }
 
@@ -299,11 +323,6 @@ header.global {
         @extend %m-btn-primary;
       }
     }
-
-    // logged in
-    &.authenticated {
-
-    }
   }
 }
 
@@ -335,24 +354,27 @@ header.global-new {
   @extend %ui-depth1;
   /* Temp. fix until applied globally */
   @include box-sizing(border-box);
-
   position: relative;
   width: 100%;
   border-bottom: 4px solid $courseware-border-bottom-color;
-  box-shadow: 0 1px 5px 0 rgba(0,0,0, 0.1);
+  box-shadow: 0 1px 5px 0 $shadow-l1;
   background: $header-bg;
 
-  nav {
+  .wrapper-header {
     @include clearfix();
     @include box-sizing(border-box);
-    width: grid-width(12);
     height: 74px;
     margin: 0 auto;
     padding: 17px 0;
+    max-width: grid-width(12);
+
+    &:not(.rwd) {
+      min-width: grid-width(9);
+    }
   }
 
   h1.logo {
-    float: left;
+    @include float(left);
     margin: -2px 39px 0 10px;
     position: relative;
 
@@ -361,22 +383,26 @@ header.global-new {
     }
   }
 
-  .left {
-    float: left;
+  .nav-global {
+    @include float(left);
+  }
+
+  .nav-account-management {
+    margin: 0 auto;
   }
 
   .guest {
-    float: right;
+    @include float(right);
   }
 
   > li {
     display: inline-block;
-    margin-right: 20px;
+    margin-right: $baseline;
     position: relative;
     vertical-align: middle;
 
     &:last-child {
-      margin-right: 0px;
+      margin-right: 0;
     }
 
     a {
@@ -389,13 +415,13 @@ header.global-new {
       color: $link-color;
       font-family: $sans-serif;
       display: inline-block;
-      margin: 0px 30px 0px 0px;
+      margin: 0 ($baseline*1.5) 0 0;
       text-decoration: none;
       text-transform: uppercase;
       text-shadow: 0 1px rgba(255,255,255, 0.6);
 
       &:last-child {
-        margin-right: 0px;
+        margin-right: 0;
       }
 
       &:hover, &:focus {
@@ -436,7 +462,7 @@ header.global-new {
   }
 
   .user {
-    float: right;
+    @include float(right);
     margin-top: 4px;
 
     > .primary {
@@ -446,46 +472,65 @@ header.global-new {
       position: relative;
 
       > a {
-        margin: 0px;
+        margin: 0;
         @include border-right-radius(0);
+        background-image: none;
       }
 
       &:last-child {
         > a {
-          border-radius: 0 4px 4px 0;
-          border-left: none;
+          @include border-radius(0, 4px, 4px, 0);
+          @include border-left(none);
           padding: 5px 8px 7px 8px;
 
           &.shopping-cart {
             border-radius: 4px;
             border: 1px solid $border-color-2;
-            margin-right: 10px;
+            margin-right: ($baseline/2);
             padding-bottom: 6px;
           }
         }
       }
     }
-
-    a.user-link {
-      @include padding(6px, 12px, 8px, 35px);
+     a.user-link {
+      @include padding(3px, 12px, 8px, 8px);
       position: relative;
       text-transform: none;
       font-size: 14px;
       font-weight: bold;
       letter-spacing: 0;
 
+      .icon {
+        display: inline-block;
+        @include float(left);
+        @include margin(2px, 6px, -3px, 3px);
+        font-size: 1.2em;
+        color: $m-gray;
+      }
+
       .avatar {
-        @include background-image(url('../images/small-header-home-icon.png'));
-        background-repeat: no-repeat;
-        height: 26px;
+
+        // CASE: right to left layout
+
         display: inline-block;
         @include left(8px);
         opacity: 0.5;
         overflow: hidden;
-        position: absolute;
         top: 4px;
+        margin-top: 1px;
+        margin-right: 2px;
         @include transition(all 0.15s linear 0s);
-        width: 26px;
+        width: 19px;
+      }
+      div {
+        margin-top: 3px;
+        float: right;
+        margin-left: 4px;
+      }
+      div {
+        margin-top: 3px;
+        float: right;
+        margin-left: 4px;
       }
 
       &:hover, &:focus {
@@ -501,6 +546,7 @@ header.global-new {
       box-shadow: 0 2px 24px 0 rgba(0,0,0, 0.3);
       border: 1px solid $border-color-3;
       display: none;
+      margin-top: 0;
       padding: 5px 10px;
       position: absolute;
       @include right(0);
@@ -526,14 +572,14 @@ header.global-new {
         height: 0px;
         position: absolute;
         @include transform(rotate(-45deg));
-        @include right(12px);
+        @include right(7px);
         top: -6px;
         width: 0px;
       }
 
       li {
         display: block;
-        border-top: 1px dotted $border-color-2;
+        border-top: 1px solid $gray-l3;
         box-shadow: inset 0 1px 0 0 rgba(255,255,255, 0.05);
 
         &:first-child {
@@ -568,7 +614,7 @@ header.global-new {
   %default-header-nav {
     margin-top: ($baseline/4);
     list-style: none;
-    float: left;
+    @include float(left);
 
     li,
     div {
@@ -582,7 +628,7 @@ header.global-new {
         padding: 3px 10px;
         font-size: 18px;
         line-height: 24px;
-        font-weight: 500;
+        font-weight: 600;
         font-family: $header-sans-serif;
         color: $courseware-navigation-color;
 
@@ -601,7 +647,7 @@ header.global-new {
 
   .nav-courseware {
     @extend %default-header-nav;
-    float: right;
+    @include float(right);
 
     div {
       display: inline-block;
@@ -610,7 +656,7 @@ header.global-new {
       position: relative;
 
       &:last-child {
-        margin-right: 10px;
+        margin-right: ($baseline/2);
       }
 
       a {
@@ -632,14 +678,13 @@ header.global-new {
   }
 
   &.rwd {
-    nav {
-      max-width: 1180px;
+    .wrapper-header {
       width: 320px;
     }
 
     .mobile-menu-button {
+      @include float(left);
       display: inline;
-      float: left;
       text-decoration: none;
       color: $m-gray;
       font-size: 18px;
@@ -654,9 +699,9 @@ header.global-new {
 
     .logo {
       position: absolute;
-      width: 54px;
-      left: calc( 50% - 90px );
       top: 20px;
+      @include left(calc(50% - 90px));
+      width: 54px;
 
       img {
         width: 54px;
@@ -696,7 +741,7 @@ header.global-new {
       a {
         color: white;
         padding: 10px;
-        font-weight: 300;
+        font-weight: 400;
 
         &:hover,
         &:focus {
@@ -720,9 +765,10 @@ header.global-new {
       }
     }
 
-    @include media( $desktop ) {
-      nav {
+    @include media( $edx-bp-large ) {
+      .wrapper-header {
         width: 100%;
+        min-width: 800px;
       }
 
       .mobile-menu-button {
@@ -731,10 +777,9 @@ header.global-new {
 
       .logo {
         position: relative;
+        top: 0;
+        @include left(0);
         width: auto;
-        top: inherit;
-        left: inherit;
-        margin-left: 10px;
 
         img {
           width: auto;
@@ -753,7 +798,7 @@ header.global-new {
         a {
           color: $courseware-navigation-color;
           padding: 3px 10px;
-          font-weight: 500;
+          font-weight: 600;
 
           &:hover,
           &:focus {
@@ -770,7 +815,7 @@ header.global-new {
 
       .nav-courseware {
         div:last-child {
-          margin-right: 10px;
+          margin-right: ($baseline/2);
         }
       }
 
@@ -783,9 +828,9 @@ header.global-new {
       }
     }
 
-    @include media( $xl-desktop ) {
-      nav {
-        padding: 17px 10px;
+    @include media( $edx-bp-huge ) {
+      .wrapper-header {
+        padding: 17px 0;
       }
 
       .nav-global,
@@ -793,10 +838,6 @@ header.global-new {
         a {
           font-size: 18px;
         }
-      }
-
-      .logo {
-        margin-left: 0;
       }
     }
   }

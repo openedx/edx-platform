@@ -1,0 +1,151 @@
+<section id="student_admin" class="idash-section active-section">
+        
+
+
+<div>
+    <h2>Student Gradebook</h2>
+      <p>
+	Click here to view the gradebook for enrolled students. This feature is only visible to courses with a small number of total enrolled students.
+      </p>
+      <br>
+      <p>
+	<a href="/courses/PU/FSc/2014_T4/instructor/api/gradebook" class="gradebook-link"> View Gradebook </a>
+      </p>
+    <hr>
+</div>
+
+<div class="student-specific-container action-type-container">
+  <h2>Student-specific grade inspection</h2>
+  <div class="request-response-error"></div>
+  <br>
+  <label>
+  Specify the Your Platform Name Here email address or username of a student here:
+  <input type="text" name="student-select-progress" placeholder="Student Email or Username">
+  </label>
+  <br>
+
+  <div class="progress-link-wrapper">
+  <p>
+    Click this link to view the student's progress page:
+
+    <a href="" class="progress-link" data-endpoint="/courses/PU/FSc/2014_T4/instructor/api/get_student_progress_url"> Student Progress Page </a>
+  </p>
+  </div>
+
+  <hr>
+</div>
+
+<div class="student-grade-container action-type-container">
+  <h2>Student-specific grade adjustment</h2>
+  <div class="request-response-error"></div>
+  <p>
+  <label>
+  Specify the Your Platform Name Here email address or username of a student here:
+  <input type="text" name="student-select-grade" placeholder="Student Email or Username">
+  </label>
+  </p>
+  <br>
+
+  <label> Specify a problem in the course here with its complete location:
+  <input type="text" name="problem-select-single" placeholder="Problem location">
+  </label>
+
+  <p>You must provide the complete location of the problem. In the Staff Debug viewer, the location looks like this:<br>
+  <code>i4x://edX/Open_DemoX/problem/78c98390884243b89f6023745231c525</code></p>
+
+  <p>
+  Next, select an action to perform for the given user and problem:
+  </p>
+
+  <p>
+  <input type="button" name="reset-attempts-single" value="Reset Student Attempts" data-endpoint="/courses/PU/FSc/2014_T4/instructor/api/reset_student_attempts">
+
+    <input type="button" name="rescore-problem-single" value="Rescore Student Submission" data-endpoint="/courses/PU/FSc/2014_T4/instructor/api/rescore_problem">
+  </p>
+
+  <p>
+    <label> You may also delete the entire state of a student for the specified problem:
+    <input type="button" class="molly-guard" name="delete-state-single" value="Delete Student State for Problem" data-endpoint="/courses/PU/FSc/2014_T4/instructor/api/reset_student_attempts"></label>
+  </p>
+
+
+    <p id="task-history-single-help">
+      Rescoring runs in the background, and status for active tasks will appear in the 'Pending Instructor Tasks' table. To see status for all tasks submitted for this problem and student, click on this button:
+    </p>
+
+    <p><input type="button" name="task-history-single" value="Show Background Task History for Student" data-endpoint="/courses/PU/FSc/2014_T4/instructor/api/list_instructor_tasks" aria-describedby="task-history-single-help"></p>
+    <div class="task-history-single-table"></div>
+  <hr>
+</div>
+
+<div class="entrance-exam-grade-container action-type-container">
+  <h2>Entrance Exam Adjustment</h2>
+  <div class="request-response-error">Please enter a student email address or username.</div>
+  <label>
+  Student's Your Platform Name Here email address or username:
+  <input type="text" name="entrance-exam-student-select-grade" placeholder="Student Email or Username">
+  </label>
+  <br>
+
+  <p>
+  Select an action for the student's entrance exam. This action will affect every problem in the student's exam.
+  </p>
+
+  <input type="button" name="reset-entrance-exam-attempts" value="Reset Number of Student Attempts" data-endpoint="/courses/PU/FSc/2014_T4/instructor/api/reset_student_attempts_for_entrance_exam">
+
+    <input type="button" name="rescore-entrance-exam" value="Rescore All Problems" data-endpoint="/courses/PU/FSc/2014_T4/instructor/api/rescore_entrance_exam">
+  <input type="button" name="skip-entrance-exam" value="Let Student Skip Entrance Exam" data-endpoint="/courses/PU/FSc/2014_T4/instructor/api/mark_student_can_skip_entrance_exam">
+
+  <p>
+    <label> You can also delete all of the student's answers and scores for the entire entrance exam.
+    <input type="button" class="molly-guard" name="delete-entrance-exam-state" value="Delete Student's Answers and Scores" data-endpoint="/courses/PU/FSc/2014_T4/instructor/api/reset_student_attempts_for_entrance_exam"></label>
+  </p>
+
+
+    <p id="entrance-exam-task-history-help">
+      Rescoring runs in the background, and status for active tasks will appear in the 'Pending Instructor Tasks' table. To see status for all tasks submitted for this problem and student, click on this button:
+    </p>
+
+    <p><input type="button" name="entrance-exam-task-history" value="Show Student's Exam Adjustment History" data-endpoint="/courses/PU/FSc/2014_T4/instructor/api/list_entrance_exam_instructor_tasks" aria-describedby="entrance-exam-task-history-help"></p>
+    <div class="entrance-exam-task-history-table"></div>
+  <hr>
+</div>
+
+  <div class="course-specific-container action-type-container">
+    <h2>Course-specific grade adjustment</h2>
+    <div class="request-response-error"></div>
+
+    <label>
+      Specify a problem in the course here with its complete location:
+      <input type="text" name="problem-select-all" size="60" placeholder="Problem location" aria-describedby="problem-select-all-help">
+    </label>
+    <p id="problem-select-all-help">You must provide the complete location of the problem. In the Staff Debug viewer, the location looks like this:<br>
+    <code>i4x://edX/Open_DemoX/problem/78c98390884243b89f6023745231c525</code></p>
+    <p>
+      Then select an action:
+      <input type="button" class="molly-guard" name="reset-attempts-all" value="Reset ALL students' attempts" data-endpoint="/courses/PU/FSc/2014_T4/instructor/api/reset_student_attempts">
+      <input type="button" class="molly-guard" name="rescore-problem-all" value="Rescore ALL students' problem submissions" data-endpoint="/courses/PU/FSc/2014_T4/instructor/api/rescore_problem">
+    </p>
+    <p>
+    </p><p id="task-history-all-help">
+      The above actions run in the background, and status for active tasks will appear in a table on the Course Info tab. To see status for all tasks submitted for this problem, click on this button:
+    </p>
+      <p><input type="button" name="task-history-all" value="Show Background Task History for Problem" data-endpoint="/courses/PU/FSc/2014_T4/instructor/api/list_instructor_tasks" aria-describedby="task-history-all-help"></p>
+      <div class="task-history-all-table"></div>
+    <p></p>
+  </div>
+
+  <div class="running-tasks-container action-type-container">
+    <hr>
+    <h2> Pending Instructor Tasks </h2>
+    <div class="running-tasks-section" style="display: block;">
+      <p>The status for any active tasks appears in a table below. </p>
+      <br>
+
+      <div class="running-tasks-table" data-endpoint="/courses/PU/FSc/2014_T4/instructor/api/list_instructor_tasks"><div class="slickgrid slickgrid_304994 ui-widget" style="overflow: hidden; outline: 0px; position: relative;"><div tabindex="0" hidefocus="" style="position:fixed;width:0;height:0;top:0;left:0;outline:0;"></div><div class="slick-header ui-state-default" style="overflow:hidden;position:relative;"><div class="slick-header-columns" style="left: -1000px; width: 1977px;" unselectable="on"><div class="ui-state-default slick-header-column" id="slickgrid_304994task_type" title="" style="width: 93px;"><span class="slick-column-name">Task Type</span><div class="slick-resizable-handle"></div></div><div class="ui-state-default slick-header-column" id="slickgrid_304994task_input" title="" style="width: 141px;"><span class="slick-column-name">Task inputs</span><div class="slick-resizable-handle"></div></div><div class="ui-state-default slick-header-column" id="slickgrid_304994task_id" title="" style="width: 141px;"><span class="slick-column-name">Task ID</span><div class="slick-resizable-handle"></div></div><div class="ui-state-default slick-header-column" id="slickgrid_304994requester" title="" style="width: 71px;"><span class="slick-column-name">Requester</span><div class="slick-resizable-handle"></div></div><div class="ui-state-default slick-header-column" id="slickgrid_304994created" title="" style="width: 111px;"><span class="slick-column-name">Submitted</span><div class="slick-resizable-handle"></div></div><div class="ui-state-default slick-header-column" id="slickgrid_304994duration_sec" title="" style="width: 71px;"><span class="slick-column-name">Duration (sec)</span><div class="slick-resizable-handle"></div></div><div class="ui-state-default slick-header-column" id="slickgrid_304994task_state" title="" style="width: 71px;"><span class="slick-column-name">State</span><div class="slick-resizable-handle"></div></div><div class="ui-state-default slick-header-column" id="slickgrid_304994status" title="" style="width: 71px;"><span class="slick-column-name">Task Status</span><div class="slick-resizable-handle"></div></div><div class="ui-state-default slick-header-column" id="slickgrid_304994task_message" title="" style="width: 111px;"><span class="slick-column-name">Task Progress</span></div></div></div><div class="slick-headerrow ui-state-default" style="overflow: hidden; position: relative; display: none;"><div class="slick-headerrow-columns" style="width: 962px;"></div><div style="display: block; height: 1px; position: absolute; top: 0px; left: 0px; width: 962px;"></div></div><div class="slick-top-panel-scroller ui-state-default" style="overflow: hidden; position: relative; display: none;"><div class="slick-top-panel" style="width:10000px"></div></div><div class="slick-viewport" style="width: 100%; overflow-y: hidden; overflow-x: auto; outline: 0px; position: relative;"><div class="grid-canvas" style="width: 962px; height: 100px;"><div class="ui-widget-content slick-row even" style="top:0px"><div class="slick-cell l0 r0">rescore_problem</div><div class="slick-cell l1 r1">{"entrance_exam_url": "i4x://PU/FSc/chapter/d2204197cce443c4a0d5c852d4e7f638", "student": "audit"}</div><div class="slick-cell l2 r2">9955d413-eac1-441f-978d-27c60dd1c946</div><div class="slick-cell l3 r3">staff</div><div class="slick-cell l4 r4">2015-02-19T10:59:01+00:00</div><div class="slick-cell l5 r5">unknown</div><div class="slick-cell l6 r6">QUEUING</div><div class="slick-cell l7 r7">Incomplete</div><div class="slick-cell l8 r8">No status information available</div></div></div></div><div tabindex="0" hidefocus="" style="position:fixed;width:0;height:0;top:0;left:0;outline:0;"></div></div></div>
+    </div>
+    <div class="no-pending-tasks-message" style="display: none;"></div>
+  </div>
+
+
+      </section>

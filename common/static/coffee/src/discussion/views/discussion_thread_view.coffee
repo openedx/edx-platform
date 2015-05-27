@@ -77,6 +77,8 @@ if Backbone?
       closed: (closed) ->
         @$(".discussion-reply-new").toggle(not closed)
         @$('.comment-form').closest('li').toggle(not closed)
+        @$(".action-vote").toggle(not closed)
+        @$(".display-vote").toggle(closed)
         @renderAddResponseButton()
     })
 
@@ -125,7 +127,7 @@ if Backbone?
         $loading: elem
         takeFocus: true
         complete: =>
-          @responseRequest = null
+          @responsesRequest = null
         success: (data, textStatus, xhr) =>
           Content.loadContentInfos(data['annotated_content_info'])
           if @isQuestion()
@@ -142,6 +144,7 @@ if Backbone?
           )
           @trigger "thread:responses:rendered"
           @loadedResponses = true
+          $(".thread-wrapper").focus() # Sends focus to the conversation once the thread finishes loading
         error: (xhr, textStatus) =>
           return if textStatus == 'abort'
 
@@ -257,6 +260,7 @@ if Backbone?
       comment = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), votes: { up_count: 0 }, abuse_flaggers:[], endorsed: false, user_id: window.user.get("id"))
       comment.set('thread', @model.get('thread'))
       @renderResponseToList(comment, ".js-response-list")
+      @renderAttrs()
       @model.addComment()
       @renderAddResponseButton()
 
@@ -309,6 +313,7 @@ if Backbone?
     closeEditView: (event) =>
       @createShowView()
       @renderShowView()
+      @renderAttrs()
       # next call is necessary to re-render the post action controls after
       # submitting or cancelling a thread edit in inline mode.
       @$el.find(".post-extended-content").show()

@@ -31,14 +31,17 @@ def get_course_enrollment(student_id, course_id):
     return _get_fake_enrollment(student_id, course_id)
 
 
+def create_course_enrollment(student_id, course_id, mode='honor', is_active=True):
+    """Stubbed out Enrollment creation request. """
+    return add_enrollment(student_id, course_id, mode=mode, is_active=is_active)
+
+
 def update_course_enrollment(student_id, course_id, mode=None, is_active=None):
     """Stubbed out Enrollment data request."""
     enrollment = _get_fake_enrollment(student_id, course_id)
-    if not enrollment:
-        enrollment = add_enrollment(student_id, course_id)
-    if mode is not None:
+    if enrollment and mode is not None:
         enrollment['mode'] = mode
-    if is_active is not None:
+    if enrollment and is_active is not None:
         enrollment['is_active'] = is_active
     return enrollment
 

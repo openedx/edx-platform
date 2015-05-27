@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=W0212
+# pylint: disable=protected-access
 
 """Test for Video Xmodule functional logic.
 These test data read from xml, not from mongo.
@@ -16,9 +16,7 @@ course, section, subsection, unit, etc.
 """
 
 from xmodule.video_module import VideoDescriptor
-from xmodule.tests import get_test_system, LogicTest, get_test_descriptor_system
-from xblock.field_data import DictFieldData
-from xblock.fields import ScopeIds
+from xmodule.tests import LogicTest
 
 
 SOURCE_XML = """

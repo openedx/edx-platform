@@ -37,6 +37,7 @@ if Backbone?
           @numPages = response.num_pages
           @discussion.reset(response.discussion_data, {silent: false})
           history.pushState({}, "", url)
+          $("html, body").animate({ scrollTop: 0 });
         error: =>
           DiscussionUtil.discussionAlert(
             gettext("Sorry"),

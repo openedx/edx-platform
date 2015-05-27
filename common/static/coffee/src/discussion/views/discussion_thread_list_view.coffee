@@ -7,7 +7,7 @@ if Backbone?
       "click .forum-nav-browse-menu-wrapper": "ignoreClick"
       "click .forum-nav-browse-title": "selectTopicHandler"
       "keydown .forum-nav-search-input": "performSearch"
-      "click .icon-search": "performSearch"
+      "click .fa-search": "performSearch"
       "change .forum-nav-sort-control": "sortThreads"
       "click .forum-nav-thread-link": "threadSelected"
       "click .forum-nav-load-more-link": "loadMorePages"
@@ -171,7 +171,7 @@ if Backbone?
         @$(".forum-nav-thread-list").append("<li class='forum-nav-load-more'><a href='#' class='forum-nav-load-more-link'>" + gettext("Load more") + "</a></li>")
 
     getLoadingContent: (srText) ->
-      return '<div class="forum-nav-loading" tabindex="0"><span class="icon-spinner icon-spin"/><span class="sr" role="alert">' + srText + '</span></div>'
+      return '<div class="forum-nav-loading" tabindex="0"><span class="icon fa fa-spinner fa-spin"/><span class="sr" role="alert">' + srText + '</span></div>'
 
     loadMorePages: (event) =>
       if event
@@ -243,13 +243,14 @@ if Backbone?
       @trigger("thread:removed", thread_id)
 
     setActiveThread: (thread_id) ->
+      @$(".forum-nav-thread-link").find(".sr").remove()
       @$(".forum-nav-thread[data-id!='#{thread_id}'] .forum-nav-thread-link").removeClass("is-active")
-      @$(".forum-nav-thread[data-id='#{thread_id}'] .forum-nav-thread-link").addClass("is-active")
+      @$(".forum-nav-thread[data-id='#{thread_id}'] .forum-nav-thread-link").addClass("is-active").find(".forum-nav-thread-wrapper-1").prepend('<span class="sr">' + gettext("Current conversation") + '</span>')
 
     goHome: ->
       @template = _.template($("#discussion-home").html())
       $(".forum-content").html(@template)
-      $(".forum-nav-thread-list a").removeClass("is-active")
+      $(".forum-nav-thread-list a").removeClass("is-active").find(".sr").remove()
       $("input.email-setting").bind "click", @updateEmailNotifications
       url = DiscussionUtil.urlFor("notifications_status",window.user.get("id"))
       DiscussionUtil.safeAjax
@@ -426,7 +427,7 @@ if Backbone?
       @retrieveFirstPage(event)
 
     performSearch: (event) ->
-      #event.which 13 represent the Enter button 
+      #event.which 13 represent the Enter button
       if event.which == 13 or event.type == 'click'
         event.preventDefault()
         @hideBrowseMenu()

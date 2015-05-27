@@ -38,7 +38,7 @@ class ProblemPage(PageObject):
         """
         Click the Check button!
         """
-        self.q(css='div.problem input.check').click()
+        self.q(css='div.problem button.check').click()
         self.wait_for_ajax()
 
     def is_correct(self):
@@ -46,3 +46,19 @@ class ProblemPage(PageObject):
         Is there a "correct" status showing?
         """
         return self.q(css="div.problem div.capa_inputtype.textline div.correct p.status").is_present()
+
+    def click_clarification(self, index=0):
+        """
+        Click on an inline icon that can be included in problem text using an HTML <clarification> element:
+
+        Problem <clarification>clarification text hidden by an icon in rendering</clarification> Text
+        """
+        self.q(css='div.problem .clarification:nth-child({index}) i[data-tooltip]'.format(index=index + 1)).click()
+
+    @property
+    def visible_tooltip_text(self):
+        """
+        Get the text seen in any tooltip currently visible on the page.
+        """
+        self.wait_for_element_visibility('body > .tooltip', 'A tooltip is visible.')
+        return self.q(css='body > .tooltip').text[0]

@@ -13,8 +13,8 @@ class ControllerQueryService(GradingService):
 
     METRIC_NAME = 'edxapp.open_ended_grading.controller_query_service'
 
-    def __init__(self, config, system):
-        config['system'] = system
+    def __init__(self, config, render_template):
+        config['render_template'] = render_template
         super(ControllerQueryService, self).__init__(config)
         self.url = config['url'] + config['grading_controller']
         self.login_url = self.url + '/login/'
@@ -105,7 +105,7 @@ class MockControllerQueryService(object):
     Mock controller query service for testing
     """
 
-    def __init__(self, config, system):
+    def __init__(self, config, render_template):
         pass
 
     def check_for_eta(self, *args, **kwargs):

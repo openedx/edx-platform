@@ -29,7 +29,7 @@ if Backbone?
       if @showed
         @newPostForm.slideDown(300)
       else
-        @newPostForm.show()
+        @newPostForm.show().focus()
       @toggleDiscussionBtn.addClass('shown')
       @toggleDiscussionBtn.find('.button-text').html(gettext("Hide Discussion"))
       @$("section.discussion").slideDown()
@@ -97,7 +97,7 @@ if Backbone?
       else
         @$el.append($discussion)
 
-      @newPostForm = $('.new-post-article')
+      @newPostForm = this.$el.find('.new-post-article')
       @threadviews = @discussion.map (thread) =>
         view = new DiscussionThreadView(
           el: @$("article#thread_#{thread.id}"),
@@ -116,7 +116,8 @@ if Backbone?
         el: @newPostForm,
         collection: @discussion,
         course_settings: @course_settings,
-        topicId: discussionId
+        topicId: discussionId,
+        is_commentable_cohorted: response.is_commentable_cohorted
       )
       @newPostView.render()
       @listenTo( @newPostView, 'newPost:cancel', @hideNewPost )
@@ -127,7 +128,7 @@ if Backbone?
       @renderPagination(response.num_pages)
 
       if @isWaitingOnNewPost
-        @newPostForm.show()
+        @newPostForm.show().focus()
 
     addThread: (thread, collection, options) =>
       # TODO: When doing pagination, this will need to repaginate. Perhaps just reload page 1?

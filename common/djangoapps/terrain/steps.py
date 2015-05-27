@@ -1,15 +1,15 @@
-# pylint: disable=C0111
-# pylint: disable=W0621
+# pylint: disable=missing-docstring
+# pylint: disable=redefined-outer-name
 
 # Disable the "wildcard import" warning so we can bring in all methods from
 # course helpers and ui helpers
-# pylint: disable=W0401
+# pylint: disable=wildcard-import
 
 # Disable the "Unused import %s from wildcard import" warning
-# pylint: disable=W0614
+# pylint: disable=unused-wildcard-import
 
 # Disable the "unused argument" warning because lettuce uses "step"
-# pylint: disable=W0613
+# pylint: disable=unused-argument
 
 # django_url is assigned late in the process of loading lettuce,
 # so we import this as a module, and then read django_url from
@@ -19,7 +19,7 @@ import lettuce.django
 from lettuce import world, step
 from .course_helpers import *
 from .ui_helpers import *
-from nose.tools import assert_equals  # pylint: disable=E0611
+from nose.tools import assert_equals  # pylint: disable=no-name-in-module
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
@@ -233,3 +233,11 @@ def run_ipdb(_step):
     import ipdb
     ipdb.set_trace()
     assert True
+
+
+@step(u'(I am viewing|s?he views) the course team settings$')
+def view_course_team_settings(_step, whom):
+    """ navigates to course team settings page """
+    world.click_course_settings()
+    link_css = 'li.nav-course-settings-team a'
+    world.css_click(link_css)

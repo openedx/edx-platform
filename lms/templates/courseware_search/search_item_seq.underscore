@@ -1,0 +1,4 @@
+<div class='sri-excerpt'></div>
+<span class='sri-type'></span>
+<span class='sri-location'><%- location.join(' ▸ ') %></span>
+<a class="sri-link" href="<%- url %>"><%= gettext("View") %> <i class="icon fa fa-arrow-right"></i></a>

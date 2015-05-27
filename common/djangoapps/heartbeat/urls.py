@@ -1,5 +1,7 @@
 from django.conf.urls import url, patterns
 
-urlpatterns = patterns('',  # nopep8
+urlpatterns = patterns(
+    '',
+
     url(r'^$', 'heartbeat.views.heartbeat', name='heartbeat'),
 )

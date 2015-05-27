@@ -1,0 +1,115 @@
+// ------------------------------
+// Open edX Certificates: Controls
+
+// archetype: buttons
+%btn {
+  @include transition(color 0.25s ease-in-out, background 0.25s ease-in-out, box-shadow 0.25s ease-in-out);
+  box-sizing: border-box;
+  display: inline-block;
+  cursor: pointer;
+  text-decoration: none;
+
+  &:hover, &:active, &:focus {
+    text-decoration: none;
+  }
+
+  &.disabled, &[disabled] {
+    cursor: default;
+    pointer-events: none;
+  }
+}
+
+%btn-pill {
+  @extend %btn;
+  border-radius: $baseline-v/5;
+}
+
+%btn-rounded {
+  @extend %btn;
+  border-radius: ($baseline-v/2);
+}
+
+%btn-edged {
+  @extend %btn;
+  border-radius: ($baseline-v/10);
+}
+
+// primary button
+%btn-primary {
+  @extend %btn-edged;
+  @extend %t-weight3;
+  padding: ($baseline-v/2) ($baseline-h);
+  background: $bg-action-primary;
+  border-color: $bordercolor-action-primary;
+  color: $color-action-primary;
+
+
+  &:hover, &:active, &:focus {
+    background: $bg-action-primary-focus;
+    border-color: $bordercolor-action-primary-focus;
+    color: $color-action-primary-focus
+  }
+
+  &.current, &.active {
+
+    &:hover, &:active, &:focus {
+
+    }
+  }
+
+  &.disabled, &.is-disabled, &[disabled] {
+    opacity: 0.5;
+  }
+}
+
+// primary button
+%btn-secondary {
+  @extend %btn-edged;
+  @extend %t-weight3;
+  padding: ($baseline-v/2) ($baseline-h);
+  background: $bg-action-secondary;
+  border-color: $bordercolor-action-secondary;
+  color: $color-action-secondary;
+
+
+  &:hover, &:active, &:focus {
+    background: $bg-action-secondary-focus;
+    border-color: $bordercolor-action-secondary-focus;
+    color: $color-action-secondary-focus
+  }
+
+  &.current, &.active {
+
+    &:hover, &:active, &:focus {
+
+    }
+  }
+
+  &.disabled, &.is-disabled, &[disabled] {
+    opacity: 0.5;
+  }
+}
+
+// links - subtle
+%link-subtle {
+  @include transition(color $tmg-f1 ease-in-out);
+  color: $color-link;
+  text-decoration: none;
+
+  &:hover, &:focus, &:active {
+    color: $color-link-focus;
+  }
+}
+
+// links - copy
+%link-copy {
+  @include transition(color $tmg-f1 ease-in-out, border $tmg-f1 ease-in-out);
+  border-bottom: 1px solid transparent;
+  color: $color-link;
+  text-decoration: none;
+
+  &:hover, &:focus, &:active {
+    color: $color-link-focus;
+    border-color: $color-link-focus;
+  }
+}

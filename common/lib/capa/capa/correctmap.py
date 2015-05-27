@@ -46,6 +46,7 @@ class CorrectMap(object):
         hint='',
         hintmode=None,
         queuestate=None,
+        answervariable=None,    # pylint: disable=C0330
         **kwargs
     ):
 
@@ -57,6 +58,7 @@ class CorrectMap(object):
                 'hint': hint,
                 'hintmode': hintmode,
                 'queuestate': queuestate,
+                'answervariable': answervariable,
             }
 
     def __repr__(self):
@@ -122,7 +124,7 @@ class CorrectMap(object):
             return npoints
         elif self.is_correct(answer_id):
             return 1
-         # if not correct and no points have been assigned, return 0
+        # if not correct and no points have been assigned, return 0
         return 0
 
     def set_property(self, answer_id, property, value):

@@ -1,0 +1,101 @@
+// ------------------------------
+// Open edX Certificates: Navigation
+
+// general
+%nav {
+
+  ol, ul {
+    @extend %no-list !optional;
+  }
+
+  .nav-item {
+
+    .action {
+
+    }
+  }
+}
+
+// archetype: nav - horizontal
+%nav-inline {
+  @extend %nav  !optional;
+
+  .nav-item, .item {
+    display: inline-block;
+    vertical-align: middle;
+
+    .action {
+
+    }
+  }
+}
+
+// archetype: nav - vertical
+%nav-blocks {
+  @extend %nav  !optional;
+
+  .nav-item {
+    display: block;
+
+    .action {
+
+    }
+  }
+}
+
+// archetype: nav - tabs
+%nav-tabs {
+  @extend %nav  !optional;
+
+  .nav-item {
+
+    .action {
+
+    }
+  }
+}
+
+// archetype: nav - pagination
+%nav-pagination {
+  @extend %nav  !optional;
+
+  .nav-item {
+
+    .action {
+
+    }
+  }
+}
+
+// archetype: nav - dropdown
+%nav-dropdown {
+  @extend %nav  !optional;
+
+  .nav-item {
+
+    .action {
+
+    }
+  }
+}
+
+// ====================
+
+// application: secondary navigation
+%nav-secondary {
+
+  .nav-item {
+
+    .action {
+
+    }
+  }
+
+  &.horizontal {
+
+  }
+
+  &.vertical {
+
+  }
+}

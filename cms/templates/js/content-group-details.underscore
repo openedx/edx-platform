@@ -1,0 +1,58 @@
+<div class="collection-details wrapper-group-configuration">
+    <header class="collection-header">
+        <h3 class="title">
+            <a href="#" class="toggle group-toggle <% if (showContentGroupUsages){ print('hide'); } else { print('show'); } %>-groups">
+                <i class="ui-toggle-expansion icon fa fa-caret-<% if (showContentGroupUsages){ print('down'); } else { print('right'); } %>"></i>
+                <%= name %>
+            </a>
+        </h3>
+    </header>
+
+   <ol class="collection-info group-configuration-info group-configuration-info-<% if(showContentGroupUsages){ print('block'); } else { print('inline'); } %>">
+     <% if (!_.isUndefined(id)) { %>
+         <li class="group-configuration-id"
+             ><span class="group-configuration-label"><%= gettext('ID') %>: </span
+             ><span class="group-configuration-value"><%= id %></span
+         ></li>
+     <% } %>
+     <% if (!showContentGroupUsages) { %>
+          <li class="group-configuration-usage-count">
+             <%= usageCountMessage %>
+         </li>
+     <% } %>
+   </ol>
+
+    <ul class="actions group-configuration-actions">
+        <li class="action action-edit">
+            <button class="edit"><i class="icon fa fa-pencil"></i> <%= gettext("Edit") %></button>
+        </li>
+        <% if (_.isEmpty(usage)) { %>
+            <li class="action action-delete wrapper-delete-button" data-tooltip="<%= gettext('Delete') %>">
+                <button class="delete action-icon"><i class="icon fa fa-trash-o"></i><span><%= gettext("Delete") %></span></button>
+            </li>
+        <% } else { %>
+            <li class="action action-delete wrapper-delete-button" data-tooltip="<%= gettext('Cannot delete when in use by a unit') %>">
+                <button class="delete action-icon is-disabled" aria-disabled="true"><i class="icon fa fa-trash-o"></i><span><%= gettext("Delete") %></span></button>
+            </li>
+        <% } %>
+    </ul>
+</div>
+
+<% if (showContentGroupUsages) { %>
+  <div class="collection-references wrapper-group-configuration-usages">
+    <% if (!_.isEmpty(usage)) { %>
+      <h4 class="intro group-configuration-usage-text"><%= gettext('This content group is used in:') %></h4>
+      <ol class="usage group-configuration-usage">
+        <% _.each(usage, function(unit) { %>
+          <li class="usage-unit group-configuration-usage-unit">
+            <p><a href=<%= unit.url %> ><%= unit.label %></a></p>
+          </li>
+        <% }) %>
+      </ol>
+    <% } else { %>
+        <p class="group-configuration-usage-text">
+        <%= outlineAnchorMessage %>
+        </p>
+    <% } %>
+  </div>
+<% } %>

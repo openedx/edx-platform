@@ -84,7 +84,7 @@ class RenderingTest(XModuleRenderingTestBase):
 
         renderer = self.new_module_runtime()
         html = renderer.render_template("problem.html", context, None, namespace="lms.main")
-        resetbutton = '<input class="reset" type="button" value="Reset" />'
+        resetbutton = '<button class="reset" data-value="'
         self.assertIn(resetbutton, html)
 
         context['reset_button'] = False

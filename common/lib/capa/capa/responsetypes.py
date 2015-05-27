@@ -55,9 +55,11 @@ log = logging.getLogger(__name__)
 
 registry = TagRegistry()
 
-CorrectMap = correctmap.CorrectMap  # pylint: disable=C0103
+CorrectMap = correctmap.CorrectMap  # pylint: disable=invalid-name
 CORRECTMAP_PY = None
 
+# Make '_' a no-op so we can scrape strings
+_ = lambda text: text
 
 #-----------------------------------------------------------------------------
 # Exceptions
@@ -439,6 +441,7 @@ class JavascriptResponse(LoncapaResponse):
     Javascript using Node.js.
     """
 
+    human_name = _('JavaScript Input')
     tags = ['javascriptresponse']
     max_inputfields = 1
     allowed_inputfields = ['javascriptinput']
@@ -684,6 +687,7 @@ class ChoiceResponse(LoncapaResponse):
 
     """
 
+    human_name = _('Checkboxes')
     tags = ['choiceresponse']
     max_inputfields = 1
     allowed_inputfields = ['checkboxgroup', 'radiogroup']
@@ -754,6 +758,7 @@ class MultipleChoiceResponse(LoncapaResponse):
     """
     # TODO: handle direction and randomize
 
+    human_name = _('Multiple Choice')
     tags = ['multiplechoiceresponse']
     max_inputfields = 1
     allowed_inputfields = ['choicegroup']
@@ -874,7 +879,7 @@ class MultipleChoiceResponse(LoncapaResponse):
             # Both to avoid double-processing, and to feed the logs.
             if self.has_shuffle():
                 return
-            self._has_shuffle = True  # pylint: disable=W0201
+            self._has_shuffle = True  # pylint: disable=attribute-defined-outside-init
             # Move elements from tree to list for shuffling, then put them back.
             ordering = list(choicegroup.getchildren())
             for choice in ordering:
@@ -958,7 +963,7 @@ class MultipleChoiceResponse(LoncapaResponse):
             # Both to avoid double-processing, and to feed the logs.
             if self.has_answerpool():
                 return
-            self._has_answerpool = True  # pylint: disable=W0201
+            self._has_answerpool = True  # pylint: disable=attribute-defined-outside-init
 
             choices_list = list(choicegroup.getchildren())
 
@@ -1042,6 +1047,7 @@ class MultipleChoiceResponse(LoncapaResponse):
 @registry.register
 class TrueFalseResponse(MultipleChoiceResponse):
 
+    human_name = _('True/False Choice')
     tags = ['truefalseresponse']
 
     def mc_setup_response(self):
@@ -1073,6 +1079,7 @@ class OptionResponse(LoncapaResponse):
     TODO: handle direction and randomize
     """
 
+    human_name = _('Dropdown')
     tags = ['optionresponse']
     hint_tag = 'optionhint'
     allowed_inputfields = ['optioninput']
@@ -1090,6 +1097,9 @@ class OptionResponse(LoncapaResponse):
                 cmap.set(aid, 'correct')
             else:
                 cmap.set(aid, 'incorrect')
+            answer_variable = self.get_student_answer_variable_name(student_answers, aid)
+            if answer_variable:
+                cmap.set_property(aid, 'answervariable', answer_variable)
         return cmap
 
     def get_answers(self):
@@ -1097,6 +1107,18 @@ class OptionResponse(LoncapaResponse):
             'correct'), self.context)) for af in self.answer_fields])
         # log.debug('%s: expected answers=%s' % (unicode(self),amap))
         return amap
+
+    def get_student_answer_variable_name(self, student_answers, aid):
+        """
+        Return student answers variable name if exist in context else None.
+        """
+        if aid in student_answers:
+            for key, val in self.context.iteritems():
+                # convert val into unicode because student answer always be a unicode string
+                # even it is a list, dict etc.
+                if unicode(val) == student_answers[aid]:
+                    return '$' + key
+        return None
 
 #-----------------------------------------------------------------------------
 
@@ -1108,6 +1130,7 @@ class NumericalResponse(LoncapaResponse):
     to a number (e.g. `4+5/2^2`), and accepts with a tolerance.
     """
 
+    human_name = _('Numerical Input')
     tags = ['numericalresponse']
     hint_tag = 'numericalhint'
     allowed_inputfields = ['textline', 'formulaequationinput']
@@ -1308,6 +1331,7 @@ class StringResponse(LoncapaResponse):
             </hintgroup>
         </stringresponse>
     """
+    human_name = _('Text Input')
     tags = ['stringresponse']
     hint_tag = 'stringhint'
     allowed_inputfields = ['textline']
@@ -1426,6 +1450,7 @@ class CustomResponse(LoncapaResponse):
     or in a <script>...</script>
     """
 
+    human_name = _('Custom Evaluated Script')
     tags = ['customresponse']
 
     allowed_inputfields = ['textline', 'textbox', 'crystallography',
@@ -1515,7 +1540,10 @@ class CustomResponse(LoncapaResponse):
         log.debug('%s: student_answers=%s', unicode(self), student_answers)
 
         # ordered list of answer id's
-        idset = sorted(self.answer_ids)
+        # sort the responses on the bases of the problem's position number
+        # which can be found in the last place in the problem id. Then convert
+        # this number into an int, so that we sort on ints instead of strings
+        idset = sorted(self.answer_ids, key=lambda x: int(x.split("_")[-1]))
         try:
             # ordered list of answers
             submission = [student_answers[k] for k in idset]
@@ -1797,6 +1825,7 @@ class SymbolicResponse(CustomResponse):
     Symbolic math response checking, using symmath library.
     """
 
+    human_name = _('Symbolic Math Input')
     tags = ['symbolicresponse']
     max_inputfields = 1
 
@@ -1865,6 +1894,7 @@ class CodeResponse(LoncapaResponse):
 
     """
 
+    human_name = _('Code Input')
     tags = ['coderesponse']
     allowed_inputfields = ['textbox', 'filesubmission', 'matlabinput']
     max_inputfields = 1
@@ -2123,8 +2153,11 @@ class CodeResponse(LoncapaResponse):
                 parsed = False
 
             if not parsed:
-                log.error("Unable to parse external grader message as valid"
-                      " XML: score_msg['msg']=%s", msg)
+                log.error(
+                    "Unable to parse external grader message as valid"
+                    " XML: score_msg['msg']=%s",
+                    msg,
+                )
                 return fail
 
         return (True, score_result['correct'], score_result['score'], msg)
@@ -2142,6 +2175,7 @@ class ExternalResponse(LoncapaResponse):
 
     """
 
+    human_name = _('External Grader')
     tags = ['externalresponse']
     allowed_inputfields = ['textline', 'textbox']
     awdmap = {
@@ -2229,7 +2263,7 @@ class ExternalResponse(LoncapaResponse):
         cmap = CorrectMap()
         try:
             submission = [student_answers[k] for k in idset]
-        except Exception as err:  # pylint: disable=W0703
+        except Exception as err:  # pylint: disable=broad-except
             log.error(
                 'Error %s: cannot get student answer for %s; student_answers=%s',
                 err,
@@ -2244,7 +2278,7 @@ class ExternalResponse(LoncapaResponse):
 
         try:
             rxml = self.do_external_request('get_score', extra_payload)
-        except Exception as err:  # pylint: disable=W0703
+        except Exception as err:  # pylint: disable=broad-except
             log.error('Error %s', err)
             if self.capa_system.DEBUG:
                 cmap.set_dict(dict(zip(sorted(
@@ -2276,7 +2310,7 @@ class ExternalResponse(LoncapaResponse):
         try:
             rxml = self.do_external_request('get_answers', {})
             exans = json.loads(rxml.find('expected').text)
-        except Exception as err:  # pylint: disable=W0703
+        except Exception as err:  # pylint: disable=broad-except
             log.error('Error %s', err)
             if self.capa_system.DEBUG:
                 msg = '<span class="inline-error">%s</span>' % str(
@@ -2299,6 +2333,7 @@ class FormulaResponse(LoncapaResponse):
     Checking of symbolic math response using numerical sampling.
     """
 
+    human_name = _('Math Expression Input')
     tags = ['formularesponse']
     hint_tag = 'formulahint'
     allowed_inputfields = ['textline', 'formulaequationinput']
@@ -2473,7 +2508,7 @@ class FormulaResponse(LoncapaResponse):
         converted to float. Used so we can safely use Python contexts.
         """
         inp_d = dict([(k, numpy.complex(inp_d[k]))
-                      for k in inp_d if type(k) == str and
+                      for k in inp_d if isinstance(k, str) and
                       k.isalnum() and
                       isinstance(inp_d[k], numbers.Number)])
         return inp_d
@@ -2486,7 +2521,7 @@ class FormulaResponse(LoncapaResponse):
             name = hxml.get('name')
             correct_answer = contextualize_text(
                 hxml.get('answer'), self.context)
-            # pylint: disable=W0703
+            # pylint: disable=broad-except
             try:
                 correctness = self.check_formula(
                     correct_answer,
@@ -2511,6 +2546,7 @@ class SchematicResponse(LoncapaResponse):
     """
     Circuit schematic response type.
     """
+    human_name = _('Circuit Schematic Builder')
     tags = ['schematicresponse']
     allowed_inputfields = ['schematic']
 
@@ -2589,6 +2625,7 @@ class ImageResponse(LoncapaResponse):
         True, if click is inside any region or rectangle. Otherwise False.
     """
 
+    human_name = _('Image Mapped Input')
     tags = ['imageresponse']
     allowed_inputfields = ['imageinput']
 
@@ -2649,7 +2686,7 @@ class ImageResponse(LoncapaResponse):
             if correct_map[aid]['correctness'] != 'correct' and regions[aid]:
                 parsed_region = json.loads(regions[aid])
                 if parsed_region:
-                    if type(parsed_region[0][0]) != list:
+                    if not isinstance(parsed_region[0][0], list):
                         # we have [[1,2],[3,4],[5,6]] - single region
                         # instead of [[[1,2],[3,4],[5,6], [[1,2],[3,4],[5,6]]]
                         # or [[[1,2],[3,4],[5,6]]] - multiple regions syntax
@@ -2707,6 +2744,7 @@ class AnnotationResponse(LoncapaResponse):
     The response contains both a comment (student commentary) and an option (student tag).
     Only the tag is currently graded. Answers may be incorrect, partially correct, or correct.
     """
+    human_name = _('Annotation Input')
     tags = ['annotationresponse']
     allowed_inputfields = ['annotationinput']
     max_inputfields = 1
@@ -2798,7 +2836,7 @@ class AnnotationResponse(LoncapaResponse):
     def _unpack(self, json_value):
         """Unpacks a student response value submitted as JSON."""
         json_d = json.loads(json_value)
-        if type(json_d) != dict:
+        if not isinstance(json_d, dict):
             json_d = {}
 
         comment_value = json_d.get('comment', '')
@@ -2831,6 +2869,7 @@ class ChoiceTextResponse(LoncapaResponse):
     ChoiceResponse.
     """
 
+    human_name = _('Checkboxes With Text Input')
     tags = ['choicetextresponse']
     max_inputfields = 1
     allowed_inputfields = ['choicetextgroup',
@@ -3161,20 +3200,23 @@ class ChoiceTextResponse(LoncapaResponse):
 # TEMPORARY: List of all response subclasses
 # FIXME: To be replaced by auto-registration
 
-# pylint: disable=E0604
-__all__ = [CodeResponse,
-           NumericalResponse,
-           FormulaResponse,
-           CustomResponse,
-           SchematicResponse,
-           ExternalResponse,
-           ImageResponse,
-           OptionResponse,
-           SymbolicResponse,
-           StringResponse,
-           ChoiceResponse,
-           MultipleChoiceResponse,
-           TrueFalseResponse,
-           JavascriptResponse,
-           AnnotationResponse,
-           ChoiceTextResponse]
+# pylint: disable=invalid-all-object
+__all__ = [
+    CodeResponse,
+    NumericalResponse,
+    FormulaResponse,
+    CustomResponse,
+    SchematicResponse,
+    ExternalResponse,
+    ImageResponse,
+    OptionResponse,
+    SymbolicResponse,
+    StringResponse,
+    ChoiceResponse,
+    MultipleChoiceResponse,
+    TrueFalseResponse,
+    JavascriptResponse,
+    AnnotationResponse,
+    ChoiceTextResponse,
+]
+# pylint: enable=invalid-all-object

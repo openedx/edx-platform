@@ -68,7 +68,7 @@ class Command(BaseCommand):
             try:
                 module = StudentModule.objects.get(id=student_module_id)
             except StudentModule.DoesNotExist:
-                LOG.error("Unable to find student module with id = {0}: skipping... ".format(student_module_id))
+                LOG.error(u"Unable to find student module with id = %s: skipping... ", student_module_id)
                 continue
             self.remove_studentmodule_input_state(module, save_changes)
 

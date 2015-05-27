@@ -1,0 +1,117 @@
+// LMS -- elements -- navigation
+// ====================
+
+// in this document:
+// --------------------
+// +notes
+// +skip navigation
+// +utility navigation
+// +toggling utilities
+// +case - calculator spacing
+
+// +notes:
+// --------------------
+// this Sass partial should have its contents eventually abstracted out so that onboarding/non-coureware navigation is separate from in course-based navigation systems
+
+
+// +skip navigation
+// --------------------
+%nav-skip {
+  @extend %text-sr;
+}
+
+.nav-contents, .nav-skip {
+  @extend %nav-skip;
+}
+
+// +utility navigation (course utiltiies)
+// --------------------
+.nav-utilities {
+  @extend %ui-depth3;
+  position: fixed;
+  right: ($baseline/4);
+  bottom: 0;
+
+  .wrapper-utility {
+    @extend %wipe-last-child;
+    display: inline-block;
+    vertical-align: bottom;
+    @include margin-right(6px);
+  }
+
+  .utility-control {
+    @include transition(background-color $tmg-f2 ease-in-out 0s, color $tmg-f2 ease-in-out 0s);
+    position: relative;
+    bottom: -($baseline/5);
+    display: inline-block;
+    vertical-align: middle;
+    padding: ($baseline/2) ($baseline*0.75) ($baseline*0.75) ($baseline*0.75);
+    background: $black-t1;
+    color: $white;
+
+    // STATE: hover/active
+    &:hover, &:active {
+      background: $gray-d1;
+    }
+
+    // STATE: is active/in use
+    &.is-active {
+      background: $gray-d1;
+    }
+  }
+
+  // specific reset styling for any controls that are button elements
+  .utility-control-button {
+    border: none;
+    box-shadow: none;
+    text-shadow: none;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: 0;
+    border-radius: 0;
+
+    // STATE: hover/active
+    &:hover, &:active, &:focus {
+      border: none;
+      box-shadow: none;
+    }
+  }
+
+  // specific utility navigation - student notes toggling
+  .action-toggle-notes {
+    @extend %no-outline;
+
+    // STATE: is active/in use
+    &.is-active {
+      color: $student-notes-highlight-color-base;
+    }
+  }
+
+  // +toggling utilities
+  // --------------------
+  .action-toggle-message {
+    @extend %t-title8;
+    @extend %t-strong;
+    position: absolute;
+    bottom: 0;
+    @include right($baseline*2.5);
+    display: inline-block;
+    min-width: ($baseline*5);
+    padding: ($baseline/2) ($baseline*0.75);
+    opacity: 0;
+    background-color: $gray-d1;
+    color: $white;
+    text-align: center;
+
+    // STATE: is fleeting/temporary
+    &.is-fleeting {
+      @include animation(pulse-out $tmg-s2 ease-in-out);
+    }
+  }
+
+  // +case - calculator spacing (needed for overriding calculator positioning)
+  // --------------------
+  &.has-utility-calculator {
+    @include right($baseline*2.50);
+  }
+}

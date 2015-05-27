@@ -1,10 +1,11 @@
 <%inherit file="shopping_cart_flow.html" />
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django.core.urlresolvers import reverse %>
-<%! from microsite_configuration import microsite %>
 <%!
+from django.utils.translation import ugettext as _
+from django.utils.translation import ungettext
+from django.core.urlresolvers import reverse
 from courseware.courses import course_image_url, get_course_about_section, get_course_by_id
 %>
+<%! from microsite_configuration import microsite %>
 
 <%block name="billing_details_highlight">
 % if order_type == 'business':
@@ -16,35 +17,47 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
 
 <%block name="custom_content">
 <div class="container">
-  <section class="notification">
-    <h2>${_("Thank you for your Purchase!")}</h2>
-    % if (len(shoppingcart_items) == 1 and order_type == 'personal') or receipt_has_donation_item:
-      % for inst in instructions:
-        <p>${inst}</p>
-      % endfor
-    % endif
-  </section>
   <section class="wrapper confirm-enrollment shopping-cart print">
     <div class="gray-bg">
       <div class="message-left">
         <% courses_url = reverse('courses') %>
-        % if order_type == 'personal':
+        % if receipt_has_donation_item:
+          <b>${_("Thank you for your purchase!")}</b>
+          % for inst in instructions:
+            ${inst}
+          % endfor
+        % elif order_type == 'personal':
            ## in case of multiple courses in single self purchase scenario,
            ## we will show the button View Dashboard
           <% dashboard_url = reverse('dashboard') %>
-          <a href="${dashboard_url}" class="blue pull-right">${_("View Dashboard")} <i class="icon-caret-right"></i></a>
-          ${_("You have successfully been enrolled for <b>{appended_course_names}</b>. The following receipt has been emailed to"
-          " <strong>{appended_recipient_emails}</strong>").format(appended_course_names=appended_course_names, appended_recipient_emails=appended_recipient_emails)}
+          <a href="${dashboard_url}" class="blue pull-right">${_("View Dashboard")} <i class="icon fa fa-caret-right"></i></a>
+          <span class="mt-7">
+            ${_(u"You have successfully been enrolled for {course_names}. "
+                u"The following receipt has been emailed to {receipient_emails}").format(
+                  course_names=u"<b>{course_names}</b>".format(
+                    course_names=appended_course_names
+                  ),
+                  receipient_emails=u"<strong>{receipient_emails}</strong>".format(
+                    receipient_emails=appended_recipient_emails
+                  ),
+            )}
+          </span>
         % elif order_type == 'business':
-          % if total_registration_codes > 1 :
-            <% code_plural_form = 'codes' %>
-          % else:
-            <% code_plural_form = 'code' %>
-          % endif
-          ${_("You have successfully purchased <b>{total_registration_codes} course registration codes</b> "
-          "for <b>{appended_course_names}. </b>"
-           "The following receipt has been emailed to <strong>{appended_recipient_emails}</strong>"
-           ).format(total_registration_codes=total_registration_codes, appended_course_names=appended_course_names, appended_recipient_emails=appended_recipient_emails)}
+          ${ungettext(
+            "You have successfully purchased <b>{number} course registration code</b> for {course_names}.",
+            "You have successfully purchased <b>{number} course registration codes</b> for {course_names}.",
+            total_registration_codes
+          ).format(
+            number=total_registration_codes,
+            course_names=u"<b>{course_names}</b>".format(
+              course_names=appended_course_names
+            )
+          )}
+          ${_("The following receipt has been emailed to {receipient_emails}").format(
+            receipient_emails=u"<strong>{receipient_emails}</strong>".format(
+              receipient_emails=appended_recipient_emails,
+            )
+          )}
         % endif
 
       </div>
@@ -56,17 +69,25 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
         <th>${_("Course Name")}</th>
         <th>${_("Enrollment Code")}</th>
         <th>${_("Enrollment Link")}</th>
+        <th>${_("Status")}</th>
         </thead>
         <tbody>
-        % for registration_code in registration_codes:
-          <% course = get_course_by_id(registration_code.course_id, depth=0) %>
+        % for reg_code_info in reg_code_info_list:
           <tr>
-            <td>${_("{course_name}").format(course_name=course.display_name)}</td>
-            <td>${registration_code.code}</td>
-
-            <% redemption_url = reverse('register_code_redemption', args = [registration_code.code] ) %>
-            <% enrollment_url = '{redemption_url}'.format(redemption_url=redemption_url) %>
-            <td><a href="${redemption_url}">${enrollment_url}</a></td>
+            <td>${reg_code_info['course_name']}</td>
+            <td>${reg_code_info['code']}</td>
+            % if reg_code_info['is_redeemed']:
+            <td>${reg_code_info['redemption_url']}</td>
+            % else:
+            <td><a href="${reg_code_info['redemption_url']}" data-base-url="${site_name}">${reg_code_info['redemption_url']}</a></td>
+            % endif
+            <td>
+              % if reg_code_info['is_redeemed']:
+                <span class="red"></M>${_("Used")}</span>
+              % else:
+                <span class="green"></M>${_("Available")}</span>
+              % endif
+            </td>
           </tr>
         % endfor
         </tbody>
@@ -74,7 +95,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
     %endif
     <div class="bordered-bar">
       <h2>${_('Invoice')} #${order.id}<span>${_('Date of purchase')}: ${order_purchase_date} </span><span
-          class="pull-right"><a href="" onclick="window.print();" class="blue-link"><i class="icon-print"></i> ${_('Print Receipt')}</a></span>
+          class="pull-right"><a href="" onclick="window.print();" class="blue-link"><i class="icon fa fa-print"></i> ${_('Print Receipt')}</a></span>
       </h2>
     </div>
     % if order.total_cost > 0:
@@ -89,7 +110,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
                   <b>${_('Company Name')}:</b>
                   <label>
                     % if order.company_name:
-                      ${_("{company_name}").format(company_name=order.company_name)}
+                      ${order.company_name}
                     % else:
                       N/A
                     % endif
@@ -101,7 +122,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
                   <b>${_('Purchase Order Number')}:</b>
                   <label>
                     % if order.customer_reference_number:
-                      ${_("{customer_reference_number}").format(customer_reference_number=order.customer_reference_number)}
+                      ${order.customer_reference_number}
                     % else:
                       N/A
                     % endif
@@ -113,7 +134,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
                   <b>${_('Company Contact Name')}:</b>
                   <label>
                     % if order.company_contact_name:
-                      ${_("{company_contact_name}").format(company_contact_name=order.company_contact_name)}
+                      ${order.company_contact_name}
                     % else:
                       N/A
                     % endif
@@ -125,7 +146,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
                   <b>${_('Company Contact Email')}:</b>
                   <label>
                     % if order.company_contact_email:
-                      ${ order.company_contact_email }
+                      ${order.company_contact_email}
                     % else:
                       N/A
                     % endif
@@ -137,7 +158,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
                   <b>${_('Recipient Name')}:</b>
                   <label>
                     % if order.recipient_name:
-                      ${_("{recipient_name}").format(recipient_name=order.recipient_name)}
+                      ${order.recipient_name}
                     % else:
                       N/A
                     % endif
@@ -299,11 +320,11 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
               % if item.status == "purchased":
                 <div class="col-1">
                   % if item.list_price != None:
-                    <div class="price">${_('Price per student:')} <span class="line-through">  $${"{0:0.2f}".format(item.list_price)}</span>
+                    <div class="price">${_('Price per student:')} <span class="line-through">  ${currency_symbol}${"{0:0.2f}".format(item.list_price)}</span>
                     </div>
-                    <div class="price green">${_('Discount Applied:')} <span>  $${"{0:0.2f}".format(item.unit_cost)} </span></div>
+                    <div class="price green">${_('Discount Applied:')} <span>   ${currency_symbol}${"{0:0.2f}".format(item.unit_cost)} </span></div>
                   % else:
-                    <div class="price">${_('Price per student:')} <span>  $${"{0:0.2f}".format(item.unit_cost)}</span></div>
+                    <div class="price">${_('Price per student:')} <span>  ${currency_symbol}${"{0:0.2f}".format(item.unit_cost)}</span></div>
                   % endif
                 </div>
                 <div class="col-2">
@@ -317,12 +338,12 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
               % elif item.status == "refunded":
                 <div class="col-1">
                   % if item.list_price != None:
-                    <div class="price">${_('Price per student:')} <span class="line-through">  $${"{0:0.2f}".format(item.list_price)}</span>
+                    <div class="price">${_('Price per student:')} <span class="line-through">   ${currency_symbol}${"{0:0.2f}".format(item.list_price)}</span>
                     </div>
-                    <div class="price green">${_('Discount Applied:')} <span><del> $${"{0:0.2f}".format(item.unit_cost)}
+                    <div class="price green">${_('Discount Applied:')} <span><del>  ${currency_symbol}${"{0:0.2f}".format(item.unit_cost)}
                     </del></span></div>
                   % else:
-                    <div class="price">${_('Price per student:')} <span><del> $${"{0:0.2f}".format(item.unit_cost)}</del></span>
+                    <div class="price">${_('Price per student:')} <span><del>  ${currency_symbol}${"{0:0.2f}".format(item.unit_cost)}</del></span>
                     </div>
                   % endif
                 </div>
@@ -348,7 +369,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
             ${_("Note: items with strikethough like <del>this</del> have been refunded.")}
           </span>
         % endif
-        <span class="pull-right">${_("Total")}: <b>$${"{0:0.2f}".format(order.total_cost)} USD</b></span>
+        <span class="pull-right">${_("Total")}: <b> ${currency_symbol}${"{0:0.2f}".format(order.total_cost)}  ${currency.upper()}</b></span>
       </div>
     </div>
     ## Allow for a microsite to be able to insert additional text at the bottom of the page

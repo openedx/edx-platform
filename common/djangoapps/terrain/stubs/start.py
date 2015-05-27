@@ -10,6 +10,7 @@ from .youtube import StubYouTubeService
 from .ora import StubOraService
 from .lti import StubLtiService
 from .video_source import VideoSourceHttpService
+from .edxnotes import StubEdxNotesService
 
 
 USAGE = "USAGE: python -m stubs.start SERVICE_NAME PORT_NUM [CONFIG_KEY=CONFIG_VAL, ...]"
@@ -21,6 +22,7 @@ SERVICES = {
     'comments': StubCommentsService,
     'lti': StubLtiService,
     'video': VideoSourceHttpService,
+    'edxnotes': StubEdxNotesService,
 }
 
 # Log to stdout, including debug messages

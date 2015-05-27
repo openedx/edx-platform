@@ -5,7 +5,7 @@ Unit tests for stub ORA implementation.
 import unittest
 import requests
 import json
-from ..ora import StubOraService, StubOraHandler, StudentState
+from ..ora import StubOraService, StudentState
 
 
 class StubOraServiceTest(unittest.TestCase):
@@ -187,7 +187,8 @@ class StubOraServiceTest(unittest.TestCase):
             params={'course_id': 'test course'}
         )
 
-        self._assert_response(response,
+        self._assert_response(
+            response,
             {'version': 1, 'success': True, 'problem_list': []}
         )
 

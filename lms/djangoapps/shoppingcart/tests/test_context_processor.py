@@ -1,26 +1,26 @@
 """
 Unit tests for shoppingcart context_processor
 """
-from mock import patch, Mock
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.test.utils import override_settings
+from mock import patch, Mock
 
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from course_modes.tests.factories import CourseModeFactory
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from student.tests.factories import UserFactory
-from course_modes.tests.factories import CourseModeFactory
+
 from shoppingcart.models import Order, PaidCourseRegistration
 from shoppingcart.context_processor import user_has_cart_context_processor
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class UserCartContextProcessorUnitTest(ModuleStoreTestCase):
     """
     Unit test for shoppingcart context_processor
     """
     def setUp(self):
+        super(UserCartContextProcessorUnitTest, self).setUp()
+
         self.user = UserFactory.create()
         self.request = Mock()
 
@@ -41,7 +41,7 @@ class UserCartContextProcessorUnitTest(ModuleStoreTestCase):
         self.add_to_cart()
         self.request.user = self.user
         context = user_has_cart_context_processor(self.request)
-        self.assertFalse(context['display_shopping_cart'])
+        self.assertFalse(context['should_display_shopping_cart_func']())
 
     @patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': True, 'ENABLE_PAID_COURSE_REGISTRATION': False})
     def test_no_enable_paid_course_registration(self):
@@ -51,7 +51,7 @@ class UserCartContextProcessorUnitTest(ModuleStoreTestCase):
         self.add_to_cart()
         self.request.user = self.user
         context = user_has_cart_context_processor(self.request)
-        self.assertFalse(context['display_shopping_cart'])
+        self.assertFalse(context['should_display_shopping_cart_func']())
 
     @patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': True, 'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_anonymous_user(self):
@@ -60,7 +60,7 @@ class UserCartContextProcessorUnitTest(ModuleStoreTestCase):
         """
         self.request.user = AnonymousUser()
         context = user_has_cart_context_processor(self.request)
-        self.assertFalse(context['display_shopping_cart'])
+        self.assertFalse(context['should_display_shopping_cart_func']())
 
     @patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': True, 'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_no_items_in_cart(self):
@@ -69,7 +69,7 @@ class UserCartContextProcessorUnitTest(ModuleStoreTestCase):
         """
         self.request.user = self.user
         context = user_has_cart_context_processor(self.request)
-        self.assertFalse(context['display_shopping_cart'])
+        self.assertFalse(context['should_display_shopping_cart_func']())
 
     @patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': True, 'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_items_in_cart(self):
@@ -79,4 +79,4 @@ class UserCartContextProcessorUnitTest(ModuleStoreTestCase):
         self.add_to_cart()
         self.request.user = self.user
         context = user_has_cart_context_processor(self.request)
-        self.assertTrue(context['display_shopping_cart'])
+        self.assertTrue(context['should_display_shopping_cart_func']())

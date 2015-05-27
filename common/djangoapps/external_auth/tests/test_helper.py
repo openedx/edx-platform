@@ -13,11 +13,11 @@ class ExternalAuthHelperFnTest(TestCase):
         """
         Tests the _safe_postlogin_redirect function with different values of next
         """
-        HOST = 'testserver'                               # pylint: disable=C0103
-        ONSITE1 = '/dashboard'                            # pylint: disable=C0103
-        ONSITE2 = '/courses/org/num/name/courseware'      # pylint: disable=C0103
-        ONSITE3 = 'http://{}/my/custom/url'.format(HOST)  # pylint: disable=C0103
-        OFFSITE1 = 'http://www.attacker.com'              # pylint: disable=C0103
+        HOST = 'testserver'                               # pylint: disable=invalid-name
+        ONSITE1 = '/dashboard'                            # pylint: disable=invalid-name
+        ONSITE2 = '/courses/org/num/name/courseware'      # pylint: disable=invalid-name
+        ONSITE3 = 'http://{}/my/custom/url'.format(HOST)  # pylint: disable=invalid-name
+        OFFSITE1 = 'http://www.attacker.com'              # pylint: disable=invalid-name
 
         for redirect_to in [ONSITE1, ONSITE2, ONSITE3]:
             redir = _safe_postlogin_redirect(redirect_to, HOST)

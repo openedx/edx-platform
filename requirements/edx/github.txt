@@ -1,8 +1,8 @@
 # DON'T JUST ADD NEW DEPENDENCIES!!!
 #
 # If you open a pull request that adds a new dependency, you should notify:
-#   * @jtauber - to check licensing
-#   * One of @e0d, @jarv, or @feanil - to check system requirements
+#   * @mollydb - to check licensing
+#   * One of @e0d or @feanil - to check system requirements
 
 # Python libraries to install directly from github
 
@@ -10,40 +10,50 @@
 -e git+https://github.com/edx/django-staticfiles.git@d89aae2a82f2b#egg=django-staticfiles
 -e git+https://github.com/edx/django-pipeline.git@88ec8a011e481918fdc9d2682d4017c835acd8be#egg=django-pipeline
 -e git+https://github.com/edx/django-wiki.git@cd0b2b31997afccde519fe5b3365e61a9edb143f#egg=django-wiki
--e git+https://github.com/edx/django-oauth2-provider.git@0.2.7-fork-edx-2#egg=django-oauth2-provider
--e git+https://github.com/edx/MongoDBProxy.git@efe14679c9263ab491916ed960f5930127e05faf#egg=mongodb_proxy
--e git+https://github.com/gabrielfalcao/lettuce.git@cccc3978ad2df82a78b6f9648fe2e9baddd22f88#egg=lettuce
+-e git+https://github.com/edx/django-oauth2-provider.git@0.2.7-fork-edx-5#egg=django-oauth2-provider
+-e git+https://github.com/clytwynec/flaky.git@clytwynec/fix-false-success-results#egg=flaky
+-e git+https://github.com/edx/MongoDBProxy.git@25b99097615bda06bd7cdfe5669ed80dc2a7fed0#egg=mongodb_proxy
 -e git+https://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
 -e git+https://github.com/eventbrite/zendesk.git@d53fe0e81b623f084e91776bcf6369f8b7b63879#egg=zendesk
 -e git+https://github.com/un33k/django-ipware.git@42cb1bb1dc680a60c6452e8bb2b843c2a0382c90#egg=django-ipware
 -e git+https://github.com/appliedsec/pygeoip.git@95e69341cebf5a6a9fbf7c4f5439d458898bdc3b#egg=pygeoip
 -e git+https://github.com/jazkarta/edx-jsme.git@c5bfa5d361d6685d8c643838fc0055c25f8b7999#egg=edx-jsme
 -e git+https://github.com/pmitros/django-pyfs.git@d175715e0fe3367ec0f1ee429c242d603f6e8b10#egg=djpyfs
+git+https://github.com/mitocw/django-cas.git@60a5b8e5a62e63e0d5d224a87f0b489201a0c695#egg=django-cas
+-e git+https://github.com/dgrtwo/ParsePy.git@7949b9f754d1445eff8e8f20d0e967b9a6420639#egg=parse_rest
 
 # Our libraries:
--e git+https://github.com/edx/XBlock.git@2029af2a4b524310847decfb34ef39da8a30dc4e#egg=XBlock
--e git+https://github.com/edx/codejail.git@66dd5a45e5072666ff9a70c768576e9ffd1daa4b#egg=codejail
--e git+https://github.com/edx/diff-cover.git@v0.7.2#egg=diff_cover
--e git+https://github.com/edx/js-test-tool.git@v0.1.5#egg=js_test_tool
+-e git+https://github.com/edx/XBlock.git@aed464a0e2f7478e93157150ac04133a745f5f46#egg=XBlock
+-e git+https://github.com/edx/codejail.git@6b17c33a89bef0ac510926b1d7fea2748b73aadd#egg=codejail
+-e git+https://github.com/edx/js-test-tool.git@v0.1.6#egg=js_test_tool
 -e git+https://github.com/edx/event-tracking.git@0.1.0#egg=event-tracking
--e git+https://github.com/edx/bok-choy.git@4a259e3548a19e41cc39433caf68ea58d10a27ba#egg=bok_choy
+-e git+https://github.com/edx/bok-choy.git@82d2f4b72e807b10d112179c0a4abd810a001b82#egg=bok_choy
 -e git+https://github.com/edx-solutions/django-splash.git@7579d052afcf474ece1239153cffe1c89935bc4f#egg=django-splash
--e git+https://github.com/edx/acid-block.git@df1a7f0cae46567c251d507b8c72168aed8ec042#egg=acid-xblock
--e git+https://github.com/Stanford-Online/edx-ora2.git@ab3d2d1898c609bac3d7873eec476a5e38a07e2f#egg=edx-ora2
--e git+https://github.com/edx/opaque-keys.git@0.1.2#egg=opaque-keys
--e git+https://github.com/edx/ease.git@97de68448e5495385ba043d3091f570a699d5b5f#egg=ease
--e git+https://github.com/edx/i18n-tools.git@56f048af9b6868613c14aeae760548834c495011#egg=i18n-tools
--e git+https://github.com/edx/edx-oauth2-provider.git@0.3.1#egg=oauth2-provider
--e git+https://github.com/edx/edx-val.git@a3c54afe30375f7a5755ba6f6412a91de23c3b86#egg=edx-val
+-e git+https://github.com/Stanford-Online/edx-ora2.git@b891a7c5821010aa26e920faae918e449b4bbe98#egg=edx-ora2
+# Forking Submissions repo for ORA2 score override function.
+-e git+https://github.com/Stanford-Online/edx-submissions.git@b67737ef575ffd7366027c39823806c9937fce91#egg=edx-submissions
 -e git+https://github.com/edx/edx-analytics-data-api-client.git@4d934a789e3a60a516e70b4bf6617522d6ed153d#egg=edx-analytics-data-api-client
 
 # This portion of requirements.txt is now maintained only for the Stanford fork, i.e. we should update as necessary
 # Third Party XBlocks
--e git+https://github.com/mitodl/edx-sga@7e308cf676b6f41493d9cf7864296bc1c089b36b#egg=edx-sga
 -e git+https://github.com/edx-solutions/xblock-ooyala.git@32d52edaa820dbdbf846d8a84f6bccbf0b9c8218#egg=xblock_ooyala_player-master
 -e git+https://github.com/Stanford-Online/DoneXBlock.git@972d5e54a0422e9c6d822473c9bad14f16484d0f#egg=done-xblock
--e git+https://github.com/edx-solutions/xblock-utils.git@0c636f244abf1161e915ed6d15f0ef589dcd2a4e#egg=xblock-utils
--e git+https://github.com/edx-solutions/xblock-google-drive.git@31a811911612e87244f760f483998867e4883565#egg=xblock-google-drive
 -e git+https://github.com/openlearninginitiative/xblock-submit-and-compare.git@f89d3debd58003a5bfedfbaad06072ec2082259d#egg=xblock-submit-and-compare
 -e git+https://github.com/mckinseyacademy/xblock-poll.git@09e8feda40fdf77bd19b830b497ff969891e11af#egg=xblock-poll
 -e git+https://github.com/Stanford-Online/xblock-mufi.git@ee853b8a7668a87c27d13d55c0d149a04b8657b8#egg=xblock_mufi-master
+-e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
+-e git+https://github.com/edx/opaque-keys.git@1254ed4d615a428591850656f39f26509b86d30a#egg=opaque-keys
+-e git+https://github.com/edx/ease.git@97de68448e5495385ba043d3091f570a699d5b5f#egg=ease
+-e git+https://github.com/edx/i18n-tools.git@193cebd9aa784f8899ef496f2aa050b08eff402b#egg=i18n-tools
+-e git+https://github.com/edx/edx-oauth2-provider.git@0.5.1#egg=oauth2-provider
+-e git+https://github.com/edx/edx-val.git@d6087908aa3dd05ceaa7f56a21284f86c53cb3f0#egg=edx-val
+-e git+https://github.com/pmitros/RecommenderXBlock.git@9b07e807c89ba5761827d0387177f71aa57ef056#egg=recommender-xblock
+-e git+https://github.com/edx/edx-milestones.git@547f2250ee49e73ce8d7ff4e78ecf1b049892510#egg=edx-milestones
+-e git+https://github.com/edx/edx-search.git@6ce8b25a2539370de32dc7cb643ae27c9b8f798d#egg=edx-search
+git+https://github.com/edx/edx-lint.git@8bf82a32ecb8598c415413df66f5232ab8d974e9#egg=edx_lint==0.2.1
+-e git+https://github.com/edx/xblock-utils.git@581ed636c862b286002bb9a3724cc883570eb54c#egg=xblock-utils
+-e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
+-e git+https://github.com/edx/edx-reverification-block.git@1b7902db20bcefe7bd0109f866f830deaaf8d7f7#egg=edx-reverification-block
+
+# Third Party XBlocks
+-e git+https://github.com/mitodl/edx-sga@172a90fd2738f8142c10478356b2d9ed3e55334a#egg=edx-sga

@@ -66,6 +66,8 @@ class @HTMLEditingDescriptor
         schema: "html5",
         # Necessary to preserve relative URLs to our images.
         convert_urls : false,
+        # Sniff UI direction from `.wrapper-view` in studio or `.window-wrap` in LMS
+        directionality: $(".wrapper-view, .window-wrap").prop('dir'),
         content_css : tiny_mce_css_links.join(", "),
         formats : {
           # tinyMCE does block level for code by default
@@ -91,7 +93,7 @@ class @HTMLEditingDescriptor
         height: '400px',
         menubar: false,
         statusbar: false,
-        
+
         # Necessary to avoid stripping of style tags.
         valid_children : "+body[style]",
 
@@ -99,7 +101,7 @@ class @HTMLEditingDescriptor
         valid_elements: "*[*]",
         extended_valid_elements: "*[*]",
         invalid_elements: "",
-        
+
         setup: @setupTinyMCE,
         # Cannot get access to tinyMCE Editor instance (for focusing) until after it is rendered.
         # The tinyMCE callback passes in the editor as a parameter.

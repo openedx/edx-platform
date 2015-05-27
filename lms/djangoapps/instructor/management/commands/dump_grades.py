@@ -10,7 +10,6 @@ from courseware.courses import get_course_by_id
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.django import modulestore
 
 from django.core.management.base import BaseCommand
 from instructor.utils import DummyRequest

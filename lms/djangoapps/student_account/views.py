@@ -2,53 +2,51 @@
 
 import logging
 import json
+from ipware.ip import get_ip
+
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.http import (
     HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 )
 from django.shortcuts import redirect
-from django.core.urlresolvers import reverse
-from django.core.mail import send_mail
+from django.http import HttpRequest
+from django_countries import countries
+from django.core.urlresolvers import reverse, resolve
+from django.utils.translation import ugettext as _
 from django_future.csrf import ensure_csrf_cookie
-from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
-from edxmako.shortcuts import render_to_response, render_to_string
-from microsite_configuration import microsite
-import third_party_auth
 
-from user_api.api import account as account_api
-from user_api.api import profile as profile_api
+from lang_pref.api import released_languages
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from edxmako.shortcuts import render_to_response
+from microsite_configuration import microsite
+
+from embargo import api as embargo_api
+from external_auth.login_and_register import (
+    login as external_auth_login,
+    register as external_auth_register
+)
+from student.models import UserProfile
+from student.views import (
+    signin_user as old_login_view,
+    register_user as old_register_view
+)
+from student_account.helpers import auth_pipeline_urls
+import third_party_auth
+from third_party_auth import pipeline
+from util.bad_request_rate_limiter import BadRequestRateLimiter
+
+from openedx.core.djangoapps.user_api.accounts.api import request_password_change
+from openedx.core.djangoapps.user_api.errors import UserNotFound
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 
 from student_account.helpers import auth_pipeline_urls
 from student.models import UserProfile
 
 AUDIT_LOG = logging.getLogger("audit")
-
-
-@login_required
-@require_http_methods(['GET'])
-def index(request):
-    """Render the account info page.
-
-    Args:
-        request (HttpRequest)
-
-    Returns:
-        HttpResponse: 200 if the index page was sent successfully
-        HttpResponse: 302 if not logged in (redirect to login page)
-        HttpResponse: 405 if using an unsupported HTTP method
-
-    Example usage:
-
-        GET /account
-
-    """
-    return render_to_response(
-        'student_account/index.html', {
-            'disable_courseware_js': True,
-        }
-    )
 
 
 @require_http_methods(['GET'])
@@ -60,12 +58,28 @@ def login_and_registration_form(request, initial_mode="login"):
     the user_api.
 
     Keyword Args:
-        initial_mode (string): Either "login" or "registration".
+        initial_mode (string): Either "login" or "register".
 
     """
     # If we're already logged in, redirect to the dashboard
     if UserProfile.has_registered(request.user):
         return redirect(reverse('dashboard'))
+
+    # Retrieve the form descriptions from the user API
+    form_descriptions = _get_form_descriptions(request)
+
+    # If this is a microsite, revert to the old login/registration pages.
+    # We need to do this for now to support existing themes.
+    if microsite.is_request_in_microsite():
+        if initial_mode == "login":
+            return old_login_view(request)
+        elif initial_mode == "register":
+            return old_register_view(request)
+
+    # Allow external auth to intercept and handle the request
+    ext_auth_response = _external_auth_intercept(request, initial_mode)
+    if ext_auth_response is not None:
+        return ext_auth_response
 
     # Otherwise, render the combined login/registration page
     context = {
@@ -74,149 +88,24 @@ def login_and_registration_form(request, initial_mode="login"):
         'third_party_auth': json.dumps(_third_party_auth_context(request)),
         'platform_name': settings.PLATFORM_NAME,
         'account_name': settings.ACCOUNT_NAME,
-        'responsive': True
+        'responsive': True,
+
+        # Include form descriptions retrieved from the user API.
+        # We could have the JS client make these requests directly,
+        # but we include them in the initial page load to avoid
+        # the additional round-trip to the server.
+        'login_form_desc': form_descriptions['login'],
+        'registration_form_desc': form_descriptions['registration'],
+        'password_reset_form_desc': form_descriptions['password_reset'],
+
+        # We need to pass these parameters so that the header's
+        # "Sign In" button preserves the querystring params.
+        'enrollment_action': request.GET.get('enrollment_action'),
+        'course_id': request.GET.get('course_id'),
+        'course_mode': request.GET.get('course_mode'),
     }
 
     return render_to_response('student_account/login_and_register.html', context)
-
-
-@login_required
-@require_http_methods(['POST'])
-@ensure_csrf_cookie
-def email_change_request_handler(request):
-    """Handle a request to change the user's email address.
-
-    Sends an email to the newly specified address containing a link
-    to a confirmation page.
-
-    Args:
-        request (HttpRequest)
-
-    Returns:
-        HttpResponse: 200 if the confirmation email was sent successfully
-        HttpResponse: 302 if not logged in (redirect to login page)
-        HttpResponse: 400 if the format of the new email is incorrect, or if
-            an email change is requested for a user which does not exist
-        HttpResponse: 401 if the provided password (in the form) is incorrect
-        HttpResponse: 405 if using an unsupported HTTP method
-        HttpResponse: 409 if the provided email is already in use
-
-    Example usage:
-
-        POST /account/email
-
-    """
-    username = request.user.username
-    password = request.POST.get('password')
-    new_email = request.POST.get('email')
-
-    if new_email is None:
-        return HttpResponseBadRequest("Missing param 'email'")
-    if password is None:
-        return HttpResponseBadRequest("Missing param 'password'")
-
-    old_email = profile_api.profile_info(username)['email']
-
-    try:
-        key = account_api.request_email_change(username, new_email, password)
-    except (account_api.AccountEmailInvalid, account_api.AccountUserNotFound):
-        return HttpResponseBadRequest()
-    except account_api.AccountEmailAlreadyExists:
-        return HttpResponse(status=409)
-    except account_api.AccountNotAuthorized:
-        return HttpResponse(status=401)
-
-    context = {
-        'key': key,
-        'old_email': old_email,
-        'new_email': new_email,
-    }
-
-    subject = render_to_string('student_account/emails/email_change_request/subject_line.txt', context)
-    subject = ''.join(subject.splitlines())
-    message = render_to_string('student_account/emails/email_change_request/message_body.txt', context)
-
-    from_address = microsite.get_value(
-        'email_from_address',
-        settings.DEFAULT_FROM_EMAIL
-    )
-
-    # Send a confirmation email to the new address containing the activation key
-    send_mail(subject, message, from_address, [new_email])
-
-    return HttpResponse(status=200)
-
-
-@login_required
-@require_http_methods(['GET'])
-def email_change_confirmation_handler(request, key):
-    """Complete a change of the user's email address.
-
-    This is called when the activation link included in the confirmation
-    email is clicked.
-
-    Args:
-        request (HttpRequest)
-
-    Returns:
-        HttpResponse: 200 if the email change is successful, the activation key
-            is invalid, the new email is already in use, or the
-            user to which the email change will be applied does
-            not exist
-        HttpResponse: 302 if not logged in (redirect to login page)
-        HttpResponse: 405 if using an unsupported HTTP method
-
-    Example usage:
-
-        GET /account/email/confirmation/{key}
-
-    """
-    try:
-        old_email, new_email = account_api.confirm_email_change(key)
-    except account_api.AccountNotAuthorized:
-        return render_to_response(
-            'student_account/email_change_failed.html', {
-                'disable_courseware_js': True,
-                'error': 'key_invalid',
-            }
-        )
-    except account_api.AccountEmailAlreadyExists:
-        return render_to_response(
-            'student_account/email_change_failed.html', {
-                'disable_courseware_js': True,
-                'error': 'email_used',
-            }
-        )
-    except account_api.AccountInternalError:
-        return render_to_response(
-            'student_account/email_change_failed.html', {
-                'disable_courseware_js': True,
-                'error': 'internal',
-            }
-        )
-
-    context = {
-        'old_email': old_email,
-        'new_email': new_email,
-    }
-
-    subject = render_to_string('student_account/emails/email_change_confirmation/subject_line.txt', context)
-    subject = ''.join(subject.splitlines())
-    message = render_to_string('student_account/emails/email_change_confirmation/message_body.txt', context)
-
-    from_address = microsite.get_value(
-        'email_from_address',
-        settings.DEFAULT_FROM_EMAIL
-    )
-
-    # Notify both old and new emails of the change
-    send_mail(subject, message, from_address, [old_email, new_email])
-
-    return render_to_response(
-        'student_account/email_change_successful.html', {
-            'disable_courseware_js': True,
-        }
-    )
 
 
 @require_http_methods(['POST'])
@@ -256,17 +145,17 @@ def password_change_request_handler(request):
 
     if email:
         try:
-            account_api.request_password_change(email, request.get_host(), request.is_secure())
-        except account_api.AccountUserNotFound:
+            request_password_change(email, request.get_host(), request.is_secure())
+        except UserNotFound:
             AUDIT_LOG.info("Invalid password reset attempt")
             # Increment the rate limit counter
             limiter.tick_bad_request_counter(request)
 
-            return HttpResponseBadRequest("No active user with the provided email address exists.")
+            return HttpResponseBadRequest(_("No user with the provided email address exists."))
 
         return HttpResponse(status=200)
     else:
-        return HttpResponseBadRequest("No email address provided.")
+        return HttpResponseBadRequest(_("No email address provided."))
 
 
 def _third_party_auth_context(request):
@@ -286,13 +175,49 @@ def _third_party_auth_context(request):
     }
 
     course_id = request.GET.get("course_id")
+    email_opt_in = request.GET.get('email_opt_in')
+    redirect_to = request.GET.get("next")
+
+    # Check if the user is trying to enroll in a course
+    # that they don't have access to based on country
+    # access rules.
+    #
+    # If so, set the redirect URL to the blocked page.
+    # We need to set it here, rather than redirecting
+    # from within the pipeline, because a redirect
+    # from the pipeline can prevent users
+    # from completing the authentication process.
+    #
+    # Note that we can't check the user's country
+    # profile at this point, since the user hasn't
+    # authenticated.  If the user ends up being blocked
+    # by their country preference, we let them enroll;
+    # they'll still be blocked when they try to access
+    # the courseware.
+    if course_id:
+        try:
+            course_key = CourseKey.from_string(course_id)
+            redirect_url = embargo_api.redirect_if_blocked(
+                course_key,
+                ip_address=get_ip(request),
+                url=request.path
+            )
+            if redirect_url:
+                redirect_to = embargo_api.message_url_path(course_key, "enrollment")
+        except InvalidKeyError:
+            pass
+
     login_urls = auth_pipeline_urls(
-        third_party_auth.pipeline.AUTH_ENTRY_LOGIN_2,
-        course_id=course_id
+        third_party_auth.pipeline.AUTH_ENTRY_LOGIN,
+        course_id=course_id,
+        email_opt_in=email_opt_in,
+        redirect_url=redirect_to
     )
     register_urls = auth_pipeline_urls(
-        third_party_auth.pipeline.AUTH_ENTRY_REGISTER_2,
-        course_id=course_id
+        third_party_auth.pipeline.AUTH_ENTRY_REGISTER,
+        course_id=course_id,
+        email_opt_in=email_opt_in,
+        redirect_url=redirect_to
     )
 
     if third_party_auth.is_enabled():
@@ -312,5 +237,163 @@ def _third_party_auth_context(request):
                 running_pipeline.get('backend')
             )
             context["currentProvider"] = current_provider.NAME
+
+    return context
+
+
+def _get_form_descriptions(request):
+    """Retrieve form descriptions from the user API.
+
+    Arguments:
+        request (HttpRequest): The original request, used to retrieve session info.
+
+    Returns:
+        dict: Keys are 'login', 'registration', and 'password_reset';
+            values are the JSON-serialized form descriptions.
+
+    """
+    return {
+        'login': _local_server_get('/user_api/v1/account/login_session/', request.session),
+        'registration': _local_server_get('/user_api/v1/account/registration/', request.session),
+        'password_reset': _local_server_get('/user_api/v1/account/password_reset/', request.session)
+    }
+
+
+def _local_server_get(url, session):
+    """Simulate a server-server GET request for an in-process API.
+
+    Arguments:
+        url (str): The URL of the request (excluding the protocol and domain)
+        session (SessionStore): The session of the original request,
+            used to get past the CSRF checks.
+
+    Returns:
+        str: The content of the response
+
+    """
+    # Since the user API is currently run in-process,
+    # we simulate the server-server API call by constructing
+    # our own request object.  We don't need to include much
+    # information in the request except for the session
+    # (to get past through CSRF validation)
+    request = HttpRequest()
+    request.method = "GET"
+    request.session = session
+
+    # Call the Django view function, simulating
+    # the server-server API call
+    view, args, kwargs = resolve(url)
+    response = view(request, *args, **kwargs)
+
+    # Return the content of the response
+    return response.content
+
+
+def _external_auth_intercept(request, mode):
+    """Allow external auth to intercept a login/registration request.
+
+    Arguments:
+        request (Request): The original request.
+        mode (str): Either "login" or "register"
+
+    Returns:
+        Response or None
+
+    """
+    if mode == "login":
+        return external_auth_login(request)
+    elif mode == "register":
+        return external_auth_register(request)
+
+
+@login_required
+@require_http_methods(['GET'])
+def account_settings(request):
+    """Render the current user's account settings page.
+
+    Args:
+        request (HttpRequest)
+
+    Returns:
+        HttpResponse: 200 if the page was sent successfully
+        HttpResponse: 302 if not logged in (redirect to login page)
+        HttpResponse: 405 if using an unsupported HTTP method
+
+    Example usage:
+
+        GET /account/settings
+
+    """
+    return render_to_response('student_account/account_settings.html', account_settings_context(request))
+
+
+def account_settings_context(request):
+    """ Context for the account settings page.
+
+    Args:
+        request: The request object.
+
+    Returns:
+        dict
+
+    """
+    user = request.user
+
+    country_options = [
+        (country_code, _(country_name))  # pylint: disable=translation-of-non-string
+        for country_code, country_name in sorted(
+            countries.countries, key=lambda(__, name): unicode(name)
+        )
+    ]
+
+    year_of_birth_options = [(unicode(year), unicode(year)) for year in UserProfile.VALID_YEARS]
+
+    context = {
+        'auth': {},
+        'duplicate_provider': None,
+        'fields': {
+            'country': {
+                'options': country_options,
+            }, 'gender': {
+                'options': [(choice[0], _(choice[1])) for choice in UserProfile.GENDER_CHOICES],  # pylint: disable=translation-of-non-string
+            }, 'language': {
+                'options': released_languages(),
+            }, 'level_of_education': {
+                'options': [(choice[0], _(choice[1])) for choice in UserProfile.LEVEL_OF_EDUCATION_CHOICES],  # pylint: disable=translation-of-non-string
+            }, 'password': {
+                'url': reverse('password_reset'),
+            }, 'year_of_birth': {
+                'options': year_of_birth_options,
+            }, 'preferred_language': {
+                'options': settings.ALL_LANGUAGES,
+            }
+        },
+        'platform_name': settings.PLATFORM_NAME,
+        'user_accounts_api_url': reverse("accounts_api", kwargs={'username': user.username}),
+        'user_preferences_api_url': reverse('preferences_api', kwargs={'username': user.username}),
+    }
+
+    if third_party_auth.is_enabled():
+        # If the account on the third party provider is already connected with another edX account,
+        # we display a message to the user.
+        context['duplicate_provider'] = pipeline.get_duplicate_provider(messages.get_messages(request))
+
+        auth_states = pipeline.get_provider_user_states(user)
+
+        context['auth']['providers'] = [{
+            'name': state.provider.NAME,  # The name of the provider e.g. Facebook
+            'connected': state.has_account,  # Whether the user's edX account is connected with the provider.
+            # If the user is not connected, they should be directed to this page to authenticate
+            # with the particular provider.
+            'connect_url': pipeline.get_login_url(
+                state.provider.NAME,
+                pipeline.AUTH_ENTRY_ACCOUNT_SETTINGS,
+                # The url the user should be directed to after the auth process has completed.
+                redirect_url=reverse('account_settings'),
+            ),
+            # If the user is connected, sending a POST request to this url removes the connection
+            # information for this provider from their edX account.
+            'disconnect_url': pipeline.get_disconnect_url(state.provider.NAME),
+        } for state in auth_states]
 
     return context

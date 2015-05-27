@@ -4,7 +4,7 @@
 @import 'neat/neat'; // lib - Neat
 
 .wrapper-footer {
-  box-shadow: 0 -1px 5px 0 rgba(0,0,0, 0.1);
+  box-shadow: 0 -1px 5px 0 $shadow-l1;
   border-top: 1px solid tint($m-gray,50%);
   padding: 25px ($baseline/2) ($baseline*1.5) ($baseline/2);
   background: $footer-bg;
@@ -20,6 +20,11 @@
 
     p, ol, ul {
       font-family: $sans-serif;
+
+      // override needed for poorly scoped font-family styling on p a:link {}
+      a {
+        font-family: $sans-serif;
+      }
     }
 
     a {
@@ -27,11 +32,9 @@
       border-bottom: none;
       color: $link-color;
       text-decoration: none !important;
-      font-family: $sans-serif;
 
       &:hover, &:focus, &:active {
         border-bottom: 1px dotted $link-color;
-        color: $link-color;
       }
     }
 
@@ -92,7 +95,7 @@
     }
 
     .wrapper-logo {
-      margin: ($baseline*.75) 0;
+      margin: ($baseline*0.75) 0;
 
       a {
         display: inline-block;
@@ -118,15 +121,12 @@
         display: inline-block;
         font-size: em(11);
 
-        a {
-          display: block;
-        }
       }
 
-      .nav-legal-01 a {
+      .nav-legal-02 a {
 
-        &:after {
-          margin-left: 5px;
+        &:before {
+          margin-right: ($baseline/4);
           content: "-";
         }
       }
@@ -158,7 +158,7 @@
     }
 
     // platform Open edX logo and link
-    .powered-by {
+    .footer-about-openedx {
       @include float(right);
       width: flex-grid(3,12);
       display: inline-block;
@@ -207,7 +207,7 @@
 // edX theme: LMS Footer
 // ====================
 $edx-footer-spacing: ($baseline*0.75);
-$edx-footer-link-color: rgb(0, 158, 231);
+$edx-footer-link-color: $link-color;
 $edx-footer-bg-color: rgb(252,252,252);
 
 %edx-footer-reset {
@@ -215,17 +215,17 @@ $edx-footer-bg-color: rgb(252,252,252);
 }
 
 %edx-footer-section {
-  float: left;
+  @include float(left);
   min-height: ($baseline*17.5);
-  margin-right: flex-gutter();
-  border-right: 1px solid rgb(230, 230, 230);
-  padding-right: ($baseline*1.5);
+  @include margin-right(flex-gutter());
+  @include border-right(1px solid rgb(230, 230, 230));
+  @include padding-right($baseline*1.5);
 
   // CASE: last child
   &:last-child {
-    margin-right: 0;
+    @include margin-right(0);
     border: none;
-    padding-right: 0;
+    @include padding-right(0);
   }
 }
 
@@ -306,14 +306,35 @@ $edx-footer-bg-color: rgb(252,252,252);
     @extend %edx-footer-title;
   }
 
-  .footer-about-logo {
+  .footer-about-logo, .footer-about-openedx {
     margin-bottom: $edx-footer-spacing;
+
+    img {
+      height: 47px;
+    }
+
+    a {
+      display: block;
+
+      &:hover {
+        border-bottom: 0;
+      }
+    }
+  }
+
+  .footer-about-logo {
+    @include float(left);
+  }
+
+  .footer-about-openedx-logo {
+    @include float(right);
   }
 
   .footer-about-copy {
     @extend %t-copy-sub1;
     margin-bottom: $edx-footer-spacing;
     color: rgb(61, 62, 63);
+    clear: both;
 
     p {
       // NOTE: needed for poor LMS span styling
@@ -329,6 +350,12 @@ $edx-footer-bg-color: rgb(252,252,252);
     p {
       // NOTE: needed for poor LMS span styling
       color: inherit;
+    }
+
+    a {
+      @extend %edx-footer-link;
+      display: inline-block;
+      margin-bottom: ($edx-footer-spacing/2);
     }
   }
 
@@ -383,7 +410,7 @@ $edx-footer-bg-color: rgb(252,252,252);
 
     a {
       @extend %edx-footer-link;
-      margin-top: 20px;
+      margin-top: $baseline;
 
       .icon, .copy {
         display: inline-block;
@@ -418,10 +445,10 @@ $edx-footer-bg-color: rgb(252,252,252);
       @include span-columns(12);
     }
 
-    @include media( $tablet ) {
+    @include media( $edx-bp-medium ) {
     }
 
-    @include media( $desktop ) {
+    @include media( $edx-bp-large ) {
       .footer-about {
         @include span-columns(6);
       }
@@ -430,6 +457,34 @@ $edx-footer-bg-color: rgb(252,252,252);
       .footer-follow {
         @include span-columns(3);
       }
+    }
+  }
+
+  // App links
+  // --------------------
+  .footer-mobile-apps {
+    padding-top: 20px;
+
+    .mobile-app-wrapper {
+      margin: 0 0 10px 0;
+    }
+
+    a {
+      display: inline-block;
+
+      &:hover {
+        border: none;
+      }
+    }
+
+    .app-store {
+      height: auto;
+      width: 129px;
+    }
+
+    .google-play {
+      height: auto;
+      width: 129px;
     }
   }
 }

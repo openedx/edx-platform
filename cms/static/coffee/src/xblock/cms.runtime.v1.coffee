@@ -55,7 +55,7 @@ define [
         _handleSave: (data) ->
             # Starting to save, so show a notification
             if data.state == 'start'
-                message = data.message || gettext('Saving&hellip;')
+                message = data.message || gettext('Saving')
                 @notification = new NotificationView.Mini
                     title: message
                 @notification.show()

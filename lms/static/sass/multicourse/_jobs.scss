@@ -3,7 +3,7 @@
 
   q {
     display: block;
-    margin: 10px 0;
+    margin: ($baseline/2) 0;
     font-style: italic;
     text-align: justify;
   }
@@ -15,12 +15,12 @@
   }
 
   h1 + hr {
-    margin-bottom: 80px;
+    margin-bottom: ($baseline*4);
   }
 
   .message {
-    @include clearfix;
-    margin-bottom: 80px;
+    @include clearfix();
+    margin-bottom: ($baseline*4);
     position: relative;
 
     .photo {
@@ -44,7 +44,7 @@
 
       blockquote {
         margin-left: 0;
-        margin-bottom: 40px;
+        margin-bottom: ($baseline*2);
 
         &:last-child {
           margin-bottom: 0;
@@ -69,15 +69,15 @@
   }
 
   .jobs-wrapper {
-    @include clearfix;
+    @include clearfix();
     float: left;
     padding-top: 80px;
     width: flex-grid(12);
 
     > h2 {
       display: none;
-      margin-bottom: 60px;
-      padding-bottom: 20px;
+      margin-bottom: ($baseline*3);
+      padding-bottom: $baseline;
     }
 
     .jobs-sidebar {
@@ -88,7 +88,7 @@
       width: flex-grid(3);
 
       nav {
-        margin-bottom: 40px;
+        margin-bottom: ($baseline*2);
 
         a {
           display: block;
@@ -105,7 +105,7 @@
       }
 
       p + h2 {
-        margin-top: 40px;
+        margin-top: ($baseline*2);
       }
     }
 
@@ -133,7 +133,7 @@
         h3 {
           font-family: $sans-serif;
           font-weight: 700;
-          margin-bottom: 15px;
+          margin-bottom: ($baseline*0.75);
         }
 
         h4 {
@@ -141,7 +141,7 @@
           font-family: $sans-serif;
           font-weight: 700;
           margin-top: 25px;
-          margin-bottom: 10px;
+          margin-bottom: ($baseline/2);
         }
 
         ul {

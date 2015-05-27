@@ -16,6 +16,7 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
     """ unittest class """
 
     def setUp(self):
+        super(InlineAnalyticsTest, self).setUp()
         self.user = UserFactory.create()
         self.factory = RequestFactory()
         self.course = CourseFactory.create(

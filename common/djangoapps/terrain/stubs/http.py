@@ -189,7 +189,9 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         )
 
         if headers is None:
-            headers = dict()
+            headers = {
+                'Access-Control-Allow-Origin': "*",
+            }
 
         BaseHTTPRequestHandler.send_response(self, status_code)
 

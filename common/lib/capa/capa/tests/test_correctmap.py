@@ -13,6 +13,7 @@ class CorrectMapTest(unittest.TestCase):
     """
 
     def setUp(self):
+        super(CorrectMapTest, self).setUp()
         self.cmap = CorrectMap()
 
     def test_set_input_properties(self):

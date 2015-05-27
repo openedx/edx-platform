@@ -32,7 +32,8 @@ function(Backbone, _, str, ModuleUtils) {
              */
             'edited_on':null,
             /**
-             * User who last edited the xblock or any of its descendants.
+             * User who last edited the xblock or any of its descendants. Will only be present if
+             * publishing info was explicitly requested.
              */
             'edited_by':null,
             /**
@@ -44,7 +45,8 @@ function(Backbone, _, str, ModuleUtils) {
              */
             'published_on': null,
             /**
-             * User who last published the xblock, or null if never published.
+             * User who last published the xblock, or null if never published. Will only be present if
+             * publishing info was explicitly requested.
              */
             'published_by': null,
             /**
@@ -70,12 +72,14 @@ function(Backbone, _, str, ModuleUtils) {
             /**
              * The xblock which is determining the release date. For instance, for a unit,
              * this will either be the parent subsection or the grandparent section.
-             * This can be null if the release date is unscheduled.
+             * This can be null if the release date is unscheduled. Will only be present if
+             * publishing info was explicitly requested.
              */
             'release_date_from':null,
             /**
              * True if this xblock is currently visible to students. This is computed server-side
-             * so that the logic isn't duplicated on the client.
+             * so that the logic isn't duplicated on the client. Will only be present if
+             * publishing info was explicitly requested.
              */
             'currently_visible_to_students': null,
             /**
@@ -114,13 +118,34 @@ function(Backbone, _, str, ModuleUtils) {
             /**
              * The xblock which is determining the staff lock value. For instance, for a unit,
              * this will either be the parent subsection or the grandparent section.
-             * This can be null if the xblock has no inherited staff lock.
+             * This can be null if the xblock has no inherited staff lock. Will only be present if
+             * publishing info was explicitly requested.
              */
             'staff_lock_from': null,
             /**
              * True iff this xblock should display a "Contains staff only content" message.
              */
-            'staff_only_message': null
+            'staff_only_message': null,
+            /**
+             * True iff this xblock is a unit, and it has children that are only visible to certain
+             * content groups. Note that this is not a recursive property. Will only be present if
+             * publishing info was explicitly requested.
+             */
+            'has_content_group_components': null,
+            /**
+             * actions defines the state of delete, drag and child add functionality for a xblock.
+             * currently, each xblock has default value of 'True' for keys: deletable, draggable and childAddable.
+             */
+            'actions': null,
+            /**
+             * Header visible to UI.
+             */
+            'is_header_visible': null,
+            /**
+             * Optional explanatory message about the xblock.
+             */
+            'explanatory_message': null
+
         },
 
         initialize: function () {
@@ -157,11 +182,44 @@ function(Backbone, _, str, ModuleUtils) {
             return !this.get('published') || this.get('has_changes');
         },
 
+        isDeletable: function() {
+            return this.isActionRequired('deletable');
+        },
+
+        isDraggable: function() {
+            return this.isActionRequired('draggable');
+        },
+
+        isChildAddable: function(){
+            return this.isActionRequired('childAddable');
+        },
+
+        isHeaderVisible: function(){
+            if(this.get('is_header_visible') !== null) {
+              return this.get('is_header_visible');
+            }
+            return true;
+        },
+
+        /**
+         * Return true if action is required e.g. delete, drag, add new child etc or if given key is not present.
+         * @return {boolean}
+        */
+        isActionRequired: function(actionName) {
+            var actions = this.get('actions');
+            if(actions !== null) {
+                if (_.has(actions, actionName) && !actions[actionName]) {
+                    return false;
+                }
+            }
+            return true;
+        },
+
         /**
          * Return a list of convenience methods to check affiliation to the category.
          * @return {Array}
-         */
-        getCategoryHelpers: function () {
+        */
+       getCategoryHelpers: function () {
             var categories = ['course', 'chapter', 'sequential', 'vertical'],
                 helpers = {};
 
@@ -172,15 +230,15 @@ function(Backbone, _, str, ModuleUtils) {
             }, this);
 
             return helpers;
-        },
+       },
 
-        /**
-         * Check if we can edit current XBlock or not on Course Outline page.
-         * @return {Boolean}
-         */
-        isEditableOnCourseOutline: function() {
-            return this.isSequential() || this.isChapter() || this.isVertical();
-        }
+       /**
+        * Check if we can edit current XBlock or not on Course Outline page.
+        * @return {Boolean}
+        */
+       isEditableOnCourseOutline: function() {
+           return this.isSequential() || this.isChapter() || this.isVertical();
+       }
     });
     return XBlockInfo;
 });

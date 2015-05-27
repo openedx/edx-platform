@@ -3,7 +3,7 @@ import json
 import logging
 import random
 import re
-import string       # pylint: disable=W0402
+import string       # pylint: disable=deprecated-module
 import fnmatch
 import unicodedata
 import urllib
@@ -47,8 +47,6 @@ from ratelimitbackend.exceptions import RateLimitException
 
 import student.views
 from xmodule.modulestore.django import modulestore
-from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore.exceptions import ItemNotFoundError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger("edx.external_auth")

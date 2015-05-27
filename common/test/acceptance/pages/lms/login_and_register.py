@@ -42,6 +42,7 @@ class RegisterPage(PageObject):
         Fill in registration info.
         `email`, `password`, `username`, and `full_name` are the user's credentials.
         """
+        self.wait_for_element_visibility('input#email', 'Email field is shown')
         self.q(css='input#email').fill(email)
         self.q(css='input#password').fill(password)
         self.q(css='input#username').fill(username)
@@ -70,7 +71,9 @@ class CombinedLoginAndRegisterPage(PageObject):
     in the bok choy settings.
 
     When enabled, the new page is available from either
-    `/account/login` or `/account/register`.
+    `/login` or `/register`; the new page is also served at
+    `/account/login/` or `/account/register/`, where it was
+    available for a time during an A/B test.
 
     Users can reach this page while attempting to enroll
     in a course, in which case users will be auto-enrolled
@@ -120,8 +123,8 @@ class CombinedLoginAndRegisterPage(PageObject):
     def is_browser_on_page(self):
         """Check whether the combined login/registration page has loaded. """
         return (
-            self.q(css="#register-option").is_present() and
-            self.q(css="#login-option").is_present() and
+            self.q(css="#login-anchor").is_present() and
+            self.q(css="#register-anchor").is_present() and
             self.current_form is not None
         )
 
@@ -130,7 +133,10 @@ class CombinedLoginAndRegisterPage(PageObject):
         old_form = self.current_form
 
         # Toggle the form
-        self.q(css=".form-toggle:not(:checked)").click()
+        if old_form == "login":
+            self.q(css=".form-toggle[data-type='register']").click()
+        else:
+            self.q(css=".form-toggle[data-type='login']").click()
 
         # Wait for the form to change before returning
         EmptyPromise(
@@ -156,10 +162,11 @@ class CombinedLoginAndRegisterPage(PageObject):
 
         """
         # Fill in the form
+        self.wait_for_element_visibility('#register-email', 'Email field is shown')
         self.q(css="#register-email").fill(email)
-        self.q(css="#register-password").fill(password)
-        self.q(css="#register-username").fill(username)
         self.q(css="#register-name").fill(full_name)
+        self.q(css="#register-username").fill(username)
+        self.q(css="#register-password").fill(password)
         if country:
             self.q(css="#register-country option[value='{country}']".format(country=country)).click()
         if (terms_of_service):
@@ -168,7 +175,7 @@ class CombinedLoginAndRegisterPage(PageObject):
         # Submit it
         self.q(css=".register-button").click()
 
-    def login(self, email="", password="", remember_me=True):
+    def login(self, email="", password=""):
         """Fills in and submits the login form.
 
         Requires that the "login" form is visible.
@@ -179,14 +186,12 @@ class CombinedLoginAndRegisterPage(PageObject):
         Keyword Arguments:
             email (unicode): The user's email address.
             password (unicode): The user's password.
-            remember_me (boolean): If True, check the "remember me" box.
 
         """
         # Fill in the form
+        self.wait_for_element_visibility('#login-email', 'Email field is shown')
         self.q(css="#login-email").fill(email)
         self.q(css="#login-password").fill(password)
-        if remember_me:
-            self.q(css="#login-remember").click()
 
         # Submit it
         self.q(css=".login-button").click()
@@ -212,10 +217,13 @@ class CombinedLoginAndRegisterPage(PageObject):
         ).fulfill()
 
         # Fill in the form
+        self.wait_for_element_visibility('#password-reset-email', 'Email field is shown')
         self.q(css="#password-reset-email").fill(email)
 
         # Submit it
         self.q(css="button.js-reset").click()
+
+        return CombinedLoginAndRegisterPage(self.browser).wait_for_page()
 
     @property
     @unguarded
@@ -233,7 +241,7 @@ class CombinedLoginAndRegisterPage(PageObject):
             return "register"
         elif self.q(css=".login-button").visible:
             return "login"
-        elif self.q(css=".js-reset").visible or self.q(css=".js-reset-success").visible:
+        elif self.q(css=".js-reset").visible:
             return "password-reset"
 
     @property
@@ -244,6 +252,7 @@ class CombinedLoginAndRegisterPage(PageObject):
     def wait_for_errors(self):
         """Wait for errors to be visible, then return them. """
         def _check_func():
+            """Return success status and any errors that occurred."""
             errors = self.errors
             return (bool(errors), errors)
         return Promise(_check_func, "Errors are visible").fulfill()
@@ -257,6 +266,7 @@ class CombinedLoginAndRegisterPage(PageObject):
     def wait_for_success(self):
         """Wait for a success message to be visible, then return it."""
         def _check_func():
+            """Return success status and any errors that occurred."""
             success = self.success
             return (bool(success), success)
         return Promise(_check_func, "Success message is visible").fulfill()

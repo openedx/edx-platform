@@ -8,18 +8,20 @@ from unittest import skip
 from nose.plugins.attrib import attr
 from selenium.webdriver.support.ui import Select
 
-from xmodule.partitions.partitions import Group, UserPartition
+from flaky import flaky
+
+from xmodule.partitions.partitions import Group
 from bok_choy.promise import Promise, EmptyPromise
 
 from ...fixtures.course import XBlockFixtureDesc
 from ...pages.studio.component_editor import ComponentEditorView
 from ...pages.studio.overview import CourseOutlinePage, CourseOutlineUnit
-from ...pages.studio.settings_advanced import AdvancedSettingsPage
 from ...pages.studio.container import ContainerPage
 from ...pages.studio.settings_group_configurations import GroupConfigurationsPage
 from ...pages.studio.utils import add_advanced_component
 from ...pages.xblock.utils import wait_for_xblock_initialization
 from ...pages.lms.courseware import CoursewarePage
+from ..helpers import create_user_partition_json
 
 from base_studio_test import StudioCourseTest
 
@@ -80,8 +82,18 @@ class SplitTest(ContainerBase, SplitTestMixin):
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [
-                    UserPartition(0, 'Configuration alpha,beta', 'first', [Group("0", 'alpha'), Group("1", 'beta')]).to_json(),
-                    UserPartition(1, 'Configuration 0,1,2', 'second', [Group("0", 'Group 0'), Group("1", 'Group 1'), Group("2", 'Group 2')]).to_json()
+                    create_user_partition_json(
+                        0,
+                        'Configuration alpha,beta',
+                        'first',
+                        [Group("0", 'alpha'), Group("1", 'beta')]
+                    ),
+                    create_user_partition_json(
+                        1,
+                        'Configuration 0,1,2',
+                        'second',
+                        [Group("0", 'Group 0'), Group("1", 'Group 1'), Group("2", 'Group 2')]
+                    ),
                 ],
             },
         })
@@ -124,8 +136,12 @@ class SplitTest(ContainerBase, SplitTestMixin):
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [
-                    UserPartition(0, 'Configuration alpha,beta', 'first',
-                                  [Group("0", 'alpha'), Group("2", 'gamma')]).to_json()
+                    create_user_partition_json(
+                        0,
+                        'Configuration alpha,beta',
+                        'first',
+                        [Group("0", 'alpha'), Group("2", 'gamma')]
+                    )
                 ],
             },
         })
@@ -187,51 +203,28 @@ class SplitTest(ContainerBase, SplitTestMixin):
 
 
 @attr('shard_1')
-class SettingsMenuTest(StudioCourseTest):
+class GroupConfigurationsNoSplitTest(StudioCourseTest):
     """
-    Tests that Setting menu is rendered correctly in Studio
+    Tests how the Group Configuration page should look when the split_test module is not enabled.
     """
-
     def setUp(self):
-        super(SettingsMenuTest, self).setUp()
-        self.advanced_settings = AdvancedSettingsPage(
+        super(GroupConfigurationsNoSplitTest, self).setUp()
+        self.group_configurations_page = GroupConfigurationsPage(
             self.browser,
             self.course_info['org'],
             self.course_info['number'],
             self.course_info['run']
         )
-        self.advanced_settings.visit()
 
-    def test_link_exist_if_split_test_enabled(self):
+    def test_no_content_experiment_sections(self):
         """
-        Ensure that the link to the "Group Configurations" page is shown in the
-        Settings menu.
+        Scenario: if split_test module is not present in Advanced Settings, content experiment
+           parts of the Group Configurations page are not shown.
+        Given I have a course with split_test module not enabled
+        Then when I go to the Group Configurations page there are no content experiment sections
         """
-        link_css = 'li.nav-course-settings-group-configurations a'
-        self.assertFalse(self.advanced_settings.q(css=link_css).present)
-
-        self.advanced_settings.set('Advanced Module List', '["split_test"]')
-
-        self.browser.refresh()
-        self.advanced_settings.wait_for_page()
-
-        self.assertIn(
-            "split_test",
-            json.loads(self.advanced_settings.get('Advanced Module List')),
-        )
-
-        self.assertTrue(self.advanced_settings.q(css=link_css).present)
-
-    def test_link_does_not_exist_if_split_test_disabled(self):
-        """
-        Ensure that the link to the "Group Configurations" page does not exist
-        in the Settings menu.
-        """
-        link_css = 'li.nav-course-settings-group-configurations a'
-        self.advanced_settings.set('Advanced Module List', '[]')
-        self.browser.refresh()
-        self.advanced_settings.wait_for_page()
-        self.assertFalse(self.advanced_settings.q(css=link_css).present)
+        self.group_configurations_page.visit()
+        self.assertFalse(self.group_configurations_page.experiment_group_sections_present)
 
 
 @attr('shard_1')
@@ -324,7 +317,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [
-                    UserPartition(0, "Name", "Description.", groups).to_json(),
+                    create_user_partition_json(0, "Name", "Description.", groups),
                 ],
             },
         })
@@ -337,7 +330,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
 
         # Go to the Group Configuration Page
         self.page.visit()
-        config = self.page.group_configurations[0]
+        config = self.page.experiment_group_configurations[0]
 
         if associate_experiment:
             return config, split_test
@@ -372,14 +365,14 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         shown when group configurations were not added.
         Given I have a course without group configurations
         When I go to the Group Configuration page in Studio
-        Then I see "You haven't created any group configurations yet." message
-        And "Create new Group Configuration" button is available
+        Then I see "You have not created any group configurations yet." message
         """
         self.page.visit()
-        self.assertTrue(self.page.no_group_configuration_message_is_present)
+        self.assertTrue(self.page.experiment_group_sections_present)
+        self.assertTrue(self.page.no_experiment_groups_message_is_present)
         self.assertIn(
-            "You haven't created any group configurations yet.",
-            self.page.no_group_configuration_message_text
+            "You have not created any group configurations yet.",
+            self.page.no_experiment_groups_message_text
         )
 
     def test_group_configurations_have_correct_data(self):
@@ -396,14 +389,24 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [
-                    UserPartition(0, 'Name of the Group Configuration', 'Description of the group configuration.', [Group("0", 'Group 0'), Group("1", 'Group 1')]).to_json(),
-                    UserPartition(1, 'Name of second Group Configuration', 'Second group configuration.', [Group("0", 'Alpha'), Group("1", 'Beta'), Group("2", 'Gamma')]).to_json(),
+                    create_user_partition_json(
+                        0,
+                        'Name of the Group Configuration',
+                        'Description of the group configuration.',
+                        [Group("0", 'Group 0'), Group("1", 'Group 1')]
+                    ),
+                    create_user_partition_json(
+                        1,
+                        'Name of second Group Configuration',
+                        'Second group configuration.',
+                        [Group("0", 'Alpha'), Group("1", 'Beta'), Group("2", 'Gamma')]
+                    ),
                 ],
             },
         })
 
         self.page.visit()
-        config = self.page.group_configurations[0]
+        config = self.page.experiment_group_configurations[0]
         # no groups when the the configuration is collapsed
         self.assertEqual(len(config.groups), 0)
         self._assert_fields(
@@ -413,7 +416,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
             groups=["Group 0", "Group 1"]
         )
 
-        config = self.page.group_configurations[1]
+        config = self.page.experiment_group_configurations[1]
 
         self._assert_fields(
             config,
@@ -436,10 +439,10 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         Then I see the group configuration is saved successfully and has the new data
         """
         self.page.visit()
-        self.assertEqual(len(self.page.group_configurations), 0)
+        self.assertEqual(len(self.page.experiment_group_configurations), 0)
         # Create new group configuration
-        self.page.create()
-        config = self.page.group_configurations[0]
+        self.page.create_experiment_group_configuration()
+        config = self.page.experiment_group_configurations[0]
         config.name = "New Group Configuration Name"
         config.description = "New Description of the group configuration."
         config.groups[1].name = "New Group Name"
@@ -447,8 +450,8 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         config.add_group()  # Group C
 
         # Save the configuration
-        self.assertEqual(config.get_text('.action-primary'), "CREATE")
-        self.assertTrue(config.delete_button_is_absent)
+        self.assertEqual(config.get_text('.action-primary'), "Create")
+        self.assertFalse(config.delete_button_is_present)
         config.save()
 
         self._assert_fields(
@@ -464,7 +467,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.assertTrue(config.id)
         config.name = "Second Group Configuration Name"
         config.description = "Second Description of the group configuration."
-        self.assertEqual(config.get_text('.action-primary'), "SAVE")
+        self.assertEqual(config.get_text('.action-primary'), "Save")
         # Add new group
         config.add_group()  # Group D
         # Remove group with name "New Group Name"
@@ -494,8 +497,8 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         """
         self.page.visit()
         # Create new group configuration
-        self.page.create()
-        config = self.page.group_configurations[0]
+        self.page.create_experiment_group_configuration()
+        config = self.page.experiment_group_configurations[0]
         config.name = "New Group Configuration Name"
         # Add new group
         config.add_group()
@@ -531,7 +534,12 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [
-                    UserPartition(0, 'Name of the Group Configuration', 'Description of the group configuration.', [Group("0", 'Group A'), Group("1", 'Group B'), Group("2", 'Group C')]).to_json(),
+                    create_user_partition_json(
+                        0,
+                        'Name of the Group Configuration',
+                        'Description of the group configuration.',
+                        [Group("0", 'Group A'), Group("1", 'Group B'), Group("2", 'Group C')]
+                    ),
                 ],
             },
         })
@@ -540,7 +548,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         split_test = self._add_split_test_to_vertical(number=0, group_configuration_metadata={'user_partition_id': 0})
 
         self.page.visit()
-        config = self.page.group_configurations[0]
+        config = self.page.experiment_group_configurations[0]
         config.edit()
         config.name = "Second Group Configuration Name"
         # `Group C` -> `Second Group`
@@ -584,11 +592,11 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         """
         self.page.visit()
 
-        self.assertEqual(len(self.page.group_configurations), 0)
+        self.assertEqual(len(self.page.experiment_group_configurations), 0)
         # Create new group configuration
-        self.page.create()
+        self.page.create_experiment_group_configuration()
 
-        config = self.page.group_configurations[0]
+        config = self.page.experiment_group_configurations[0]
         config.name = "Name of the Group Configuration"
         config.description = "Description of the group configuration."
         # Add new group
@@ -596,7 +604,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         # Cancel the configuration
         config.cancel()
 
-        self.assertEqual(len(self.page.group_configurations), 0)
+        self.assertEqual(len(self.page.experiment_group_configurations), 0)
 
     def test_can_cancel_editing_of_group_configuration(self):
         """
@@ -610,13 +618,23 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [
-                    UserPartition(0, 'Name of the Group Configuration', 'Description of the group configuration.', [Group("0", 'Group 0'), Group("1", 'Group 1')]).to_json(),
-                    UserPartition(1, 'Name of second Group Configuration', 'Second group configuration.', [Group("0", 'Alpha'), Group("1", 'Beta'), Group("2", 'Gamma')]).to_json(),
+                    create_user_partition_json(
+                        0,
+                        'Name of the Group Configuration',
+                        'Description of the group configuration.',
+                        [Group("0", 'Group 0'), Group("1", 'Group 1')]
+                    ),
+                    create_user_partition_json(
+                        1,
+                        'Name of second Group Configuration',
+                        'Second group configuration.',
+                        [Group("0", 'Alpha'), Group("1", 'Beta'), Group("2", 'Gamma')]
+                    ),
                 ],
             },
         })
         self.page.visit()
-        config = self.page.group_configurations[0]
+        config = self.page.experiment_group_configurations[0]
         config.name = "New Group Configuration Name"
         config.description = "New Description of the group configuration."
         # Add 2 new groups
@@ -657,9 +675,9 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
 
         self.page.visit()
         # Create new group configuration
-        self.page.create()
+        self.page.create_experiment_group_configuration()
         # Leave empty required field
-        config = self.page.group_configurations[0]
+        config = self.page.experiment_group_configurations[0]
         config.description = "Description of the group configuration."
 
         try_to_save_and_verify_error_message("Group Configuration name is required.")
@@ -696,14 +714,19 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [
-                    UserPartition(0, "Name", "Description.", [Group("0", "Group A"), Group("1", "Group B")]).to_json(),
+                    create_user_partition_json(
+                        0,
+                        "Name",
+                        "Description.",
+                        [Group("0", "Group A"), Group("1", "Group B")]
+                    ),
                 ],
             },
         })
 
         # Go to the Group Configuration Page and click on outline anchor
         self.page.visit()
-        config = self.page.group_configurations[0]
+        config = self.page.experiment_group_configurations[0]
         config.toggle()
         config.click_outline_anchor()
 
@@ -728,7 +751,12 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [
-                    UserPartition(0, "Name", "Description.", [Group("0", "Group A"), Group("1", "Group B")]).to_json(),
+                    create_user_partition_json(
+                        0,
+                        "Name",
+                        "Description.",
+                        [Group("0", "Group A"), Group("1", "Group B")]
+                    ),
                 ],
             },
         })
@@ -743,7 +771,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
 
         # Go to the Group Configuration Page and click unit anchor
         self.page.visit()
-        config = self.page.group_configurations[0]
+        config = self.page.experiment_group_configurations[0]
         config.toggle()
         usage = config.usages[0]
         config.click_unit_anchor()
@@ -771,25 +799,35 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [
-                    UserPartition(0, 'Configuration 1', 'Description of the group configuration.', [Group("0", 'Group 0'), Group("1", 'Group 1')]).to_json(),
-                    UserPartition(1, 'Configuration 2', 'Second group configuration.', [Group("0", 'Alpha'), Group("1", 'Beta'), Group("2", 'Gamma')]).to_json()
+                    create_user_partition_json(
+                        0,
+                        'Configuration 1',
+                        'Description of the group configuration.',
+                        [Group("0", 'Group 0'), Group("1", 'Group 1')]
+                    ),
+                    create_user_partition_json(
+                        1,
+                        'Configuration 2',
+                        'Second group configuration.',
+                        [Group("0", 'Alpha'), Group("1", 'Beta'), Group("2", 'Gamma')]
+                    )
                 ],
             },
         })
         self.page.visit()
 
-        self.assertEqual(len(self.page.group_configurations), 2)
-        config = self.page.group_configurations[1]
+        self.assertEqual(len(self.page.experiment_group_configurations), 2)
+        config = self.page.experiment_group_configurations[1]
         # Delete first group configuration via detail view
         config.delete()
-        self.assertEqual(len(self.page.group_configurations), 1)
+        self.assertEqual(len(self.page.experiment_group_configurations), 1)
 
-        config = self.page.group_configurations[0]
+        config = self.page.experiment_group_configurations[0]
         config.edit()
         self.assertFalse(config.delete_button_is_disabled)
         # Delete first group configuration via edit view
         config.delete()
-        self.assertEqual(len(self.page.group_configurations), 0)
+        self.assertEqual(len(self.page.experiment_group_configurations), 0)
 
     def test_cannot_delete_used_group_configuration(self):
         """
@@ -804,7 +842,12 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [
-                    UserPartition(0, "Name", "Description.", [Group("0", "Group A"), Group("1", "Group B")]).to_json()
+                    create_user_partition_json(
+                        0,
+                        "Name",
+                        "Description.",
+                        [Group("0", "Group A"), Group("1", "Group B")]
+                    )
                 ],
             },
         })
@@ -816,7 +859,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         # Go to the Group Configuration Page and click unit anchor
         self.page.visit()
 
-        config = self.page.group_configurations[0]
+        config = self.page.experiment_group_configurations[0]
         self.assertTrue(config.delete_button_is_disabled)
         self.assertIn('Cannot delete when in use by an experiment', config.delete_note)
 
@@ -840,8 +883,18 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [
-                    UserPartition(0, "Name", "Description.", [Group("0", "Group A"), Group("1", "Group B")]).to_json(),
-                    UserPartition(1, 'Name of second Group Configuration', 'Second group configuration.', [Group("0", 'Alpha'), Group("1", 'Beta'), Group("2", 'Gamma')]).to_json(),
+                    create_user_partition_json(
+                        0,
+                        "Name",
+                        "Description.",
+                        [Group("0", "Group A"), Group("1", "Group B")]
+                    ),
+                    create_user_partition_json(
+                        1,
+                        'Name of second Group Configuration',
+                        'Second group configuration.',
+                        [Group("0", 'Alpha'), Group("1", 'Beta'), Group("2", 'Gamma')]
+                    ),
                 ],
             },
         })
@@ -863,12 +916,12 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.page.wait_for_page()
 
         # Appropriate Group Configuration is expanded.
-        self.assertFalse(self.page.group_configurations[0].is_expanded)
-        self.assertTrue(self.page.group_configurations[1].is_expanded)
+        self.assertFalse(self.page.experiment_group_configurations[0].is_expanded)
+        self.assertTrue(self.page.experiment_group_configurations[1].is_expanded)
 
         self.assertEqual(
             group_configuration_link_name,
-            self.page.group_configurations[1].name
+            self.page.experiment_group_configurations[1].name
         )
 
     def test_details_error_validation_message(self):
@@ -993,6 +1046,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         rendered_group_names = self.get_select_options(page=courseware_page, selector=".split-test-select")
         self.assertListEqual(group_names, rendered_group_names)
 
+    @flaky  # TODO fix this, see TNL-2035
     def test_split_test_LMS_staff_view(self):
         """
         Scenario: Ensure that split test is correctly rendered in LMS staff mode as it is

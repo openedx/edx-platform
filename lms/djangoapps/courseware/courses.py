@@ -26,6 +26,8 @@ from student.models import CourseEnrollment
 import branding
 from student.models import CourseEnrollment
 
+from opaque_keys.edx.keys import UsageKey
+
 log = logging.getLogger(__name__)
 
 
@@ -132,6 +134,10 @@ def course_image_url(course):
             url += '/' + course.course_image
         else:
             url += '/images/course_image.jpg'
+    elif course.course_image == '':
+        # if course_image is empty the url will be blank as location
+        # of the course_image does not exist
+        url = ''
     else:
         loc = StaticContent.compute_location(course.id, course.course_image)
         url = StaticContent.serialize_asset_key_with_slash(loc)
@@ -286,7 +292,15 @@ def get_course_info_section(request, course, section_key):
     if info_module is not None:
         try:
             html = info_module.render(STUDENT_VIEW).content
-            html = substitute_keywords_with_data(html, request.user.id, course.id)
+            context = {
+                'user_id': request.user.id,
+                'name': request.user.profile.name,
+                'course_title': course.display_name,
+                'course_id': course.id,
+                'course_start_date': course.start,
+                'course_end_date': course.end,
+            }
+            html = substitute_keywords_with_data(html, context)
         except Exception:  # pylint: disable=broad-except
             html = render_to_string('courseware/error-message.html', None)
             log.exception(
@@ -393,6 +407,19 @@ def registered_for_course(course, user):
     else:
       return False
 
+def sort_by_start_date(courses):
+    """
+    Returns a list of courses sorted by their start date, latest first.
+    """
+    courses = sorted(
+        courses,
+        key=lambda course: (course.has_ended(), course.start is None, course.start),
+        reverse=False
+    )
+
+    return courses
+
+
 def get_cms_course_link(course, page='course'):
     """
     Returns a link to course_index for editing the course in cms,
@@ -426,3 +453,29 @@ def get_studio_url(course, page):
     if is_studio_course and is_mongo_course:
         studio_link = get_cms_course_link(course, page)
     return studio_link
+
+
+def get_problems_in_section(section):
+    """
+    This returns a dict having problems in a section.
+    Returning dict has problem location as keys and problem
+    descriptor as values.
+    """
+
+    problem_descriptors = defaultdict()
+    if not isinstance(section, UsageKey):
+        section_key = UsageKey.from_string(section)
+    else:
+        section_key = section
+    # it will be a Mongo performance boost, if you pass in a depth=3 argument here
+    # as it will optimize round trips to the database to fetch all children for the current node
+    section_descriptor = modulestore().get_item(section_key, depth=3)
+
+    # iterate over section, sub-section, vertical
+    for subsection in section_descriptor.get_children():
+        for vertical in subsection.get_children():
+            for component in vertical.get_children():
+                if component.location.category == 'problem' and getattr(component, 'has_score', False):
+                    problem_descriptors[unicode(component.location)] = component
+
+    return problem_descriptors

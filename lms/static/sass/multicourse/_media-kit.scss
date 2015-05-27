@@ -11,7 +11,7 @@ $white: rgb(255,255,255);
   .wrapper-mediakit {
     border-radius: 4px;
     @include box-sizing(border-box);
-    box-shadow: 0 1px 10px 0 rgba(0,0,0, 0.1);
+    box-shadow: 0 1px 10px 0 $shadow-l1;
     margin: ($baseline*3) 0 0 0;
     border: 1px solid $border-color;
     padding: ($baseline*2) ($baseline*3);
@@ -38,7 +38,7 @@ $white: rgb(255,255,255);
   hr {
     @extend %faded-hr-divider-light;
     border: none;
-    margin: 0px;
+    margin: 0;
     position: relative;
     z-index: 2;
 
@@ -115,7 +115,7 @@ $white: rgb(255,255,255);
     aside {
       border-radius: 2px;
       @include box-sizing(border-box);
-      box-shadow: 0 1px 4px 0 rgba(0,0,0, 0.2);
+      box-shadow: 0 1px 4px 0 $shadow;
       width: 330px;
       float: left;
       border: 3px solid tint(rgb(96, 155, 216), 35%);
@@ -173,7 +173,7 @@ $white: rgb(255,255,255);
   .library {
     border-radius: 2px;
     @include box-sizing(border-box);
-    box-shadow: 0 1px 4px 0 rgba(0,0,0, 0.2);
+    box-shadow: 0 1px 4px 0 $shadow;
     border: 3px solid tint($light-gray,50%);
     padding: 0;
     background: tint($light-gray,50%);
@@ -222,7 +222,7 @@ $white: rgb(255,255,255);
         a {
           border-radius: 2px;
           @include box-sizing(border-box);
-          box-shadow: 0 1px 2px 0 rgba(0,0,0, 0.1);
+          box-shadow: 0 1px 2px 0 $shadow-l1;
           display: block;
           min-height: 380px;
           border: 2px solid tint($light-gray,75%);

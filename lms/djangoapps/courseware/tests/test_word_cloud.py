@@ -226,12 +226,8 @@ class TestWordCloud(BaseTestXmodule):
             for user in self.users
         }
 
-        self.assertEqual(
-            set([
-                response.status_code
-                for _, response in responses.items()
-                ]).pop(),
-            200)
+        status_codes = {response.status_code for response in responses.values()}
+        self.assertEqual(status_codes.pop(), 200)
 
         for user in self.users:
             self.assertDictEqual(
@@ -239,7 +235,8 @@ class TestWordCloud(BaseTestXmodule):
                 {
                     'status': 'fail',
                     'error': 'Unknown Command!'
-                })
+                }
+            )
 
     def test_word_cloud_constructor(self):
         """Make sure that all parameters extracted correclty from xml"""

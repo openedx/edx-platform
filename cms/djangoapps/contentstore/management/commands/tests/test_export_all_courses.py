@@ -18,10 +18,16 @@ class ExportAllCourses(ModuleStoreTestCase):
     """
     def setUp(self):
         """ Common setup. """
+        super(ExportAllCourses, self).setUp()
         self.store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
         self.temp_dir = mkdtemp()
-        self.first_course = CourseFactory.create(org="test", course="course1", display_name="run1")
-        self.second_course = CourseFactory.create(org="test", course="course2", display_name="run2")
+        self.addCleanup(shutil.rmtree, self.temp_dir)
+        self.first_course = CourseFactory.create(
+            org="test", course="course1", display_name="run1", default_store=ModuleStoreEnum.Type.mongo
+        )
+        self.second_course = CourseFactory.create(
+            org="test", course="course2", display_name="run2", default_store=ModuleStoreEnum.Type.mongo
+        )
 
     def test_export_all_courses(self):
         """
@@ -42,7 +48,3 @@ class ExportAllCourses(ModuleStoreTestCase):
         self.assertEqual(len(courses), 2)
         self.assertEqual(len(failed_export_courses), 1)
         self.assertEqual(failed_export_courses[0], unicode(second_course_id))
-
-    def tearDown(self):
-        """ Common cleanup. """
-        shutil.rmtree(self.temp_dir)

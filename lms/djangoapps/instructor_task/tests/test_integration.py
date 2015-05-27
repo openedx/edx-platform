@@ -5,9 +5,8 @@ Runs tasks on answers to course problems to validate that code
 paths actually work.
 
 """
-import csv
-import logging
 import json
+import logging
 from mock import patch
 import textwrap
 
@@ -17,7 +16,7 @@ from django.core.urlresolvers import reverse
 
 from capa.tests.response_xml_factory import (CodeResponseXMLFactory,
                                              CustomResponseXMLFactory)
-from user_api.tests.factories import UserCourseTagFactory
+from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.partitions.partitions import Group, UserPartition
@@ -28,12 +27,12 @@ from instructor_task.api import (submit_rescore_problem_for_all_students,
                                  submit_rescore_problem_for_student,
                                  submit_reset_problem_attempts_for_all_students,
                                  submit_delete_problem_state_for_all_students)
-from instructor_task.models import InstructorTask, ReportStore
+from instructor_task.models import InstructorTask
 from instructor_task.tasks_helper import upload_grades_csv
 from instructor_task.tests.test_base import (InstructorTaskModuleTestCase, TestReportMixin, TEST_COURSE_ORG,
                                              TEST_COURSE_NUMBER, OPTION_1, OPTION_2)
 from capa.responsetypes import StudentInputError
-from lms.lib.xblock.runtime import quote_slashes
+from lms.djangoapps.lms_xblock.runtime import quote_slashes
 
 
 log = logging.getLogger(__name__)
@@ -102,6 +101,8 @@ class TestRescoringTask(TestIntegrationTask):
     """
 
     def setUp(self):
+        super(TestRescoringTask, self).setUp()
+
         self.initialize_course()
         self.create_instructor('instructor')
         self.create_student('u1')
@@ -375,6 +376,7 @@ class TestResetAttemptsTask(TestIntegrationTask):
     userlist = ['u1', 'u2', 'u3', 'u4']
 
     def setUp(self):
+        super(TestResetAttemptsTask, self).setUp()
         self.initialize_course()
         self.create_instructor('instructor')
         for username in self.userlist:
@@ -443,6 +445,8 @@ class TestDeleteProblemTask(TestIntegrationTask):
     userlist = ['u1', 'u2', 'u3', 'u4']
 
     def setUp(self):
+        super(TestDeleteProblemTask, self).setUp()
+
         self.initialize_course()
         self.create_instructor('instructor')
         for username in self.userlist:
@@ -602,23 +606,6 @@ class TestGradeReportConditionalContent(TestReportMixin, TestIntegrationTask):
         """
         self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, task_result)
 
-    def verify_rows_in_csv(self, expected_rows):
-        """
-        Verify that the grades CSV contains the expected content.
-
-        Arguments:
-            expected_rows (iterable): An iterable of dictionaries, where
-                each dict represents a row of data in the grades
-                report CSV.  Each dict maps keys from the CSV header
-                to values in that row's corresponding cell.
-        """
-        report_store = ReportStore.from_config()
-        report_csv_filename = report_store.links_for(self.course.id)[0][0]
-        with open(report_store.path_to(self.course.id, report_csv_filename)) as csv_file:
-            # Expand the dict reader generator so we don't lose it's content
-            csv_rows = [row for row in csv.DictReader(csv_file)]
-            self.assertEqual(csv_rows, expected_rows)
-
     def verify_grades_in_csv(self, students_grades):
         """
         Verify that the grades CSV contains the expected grades data.
@@ -629,15 +616,30 @@ class TestGradeReportConditionalContent(TestReportMixin, TestIntegrationTask):
                 representing their grades we expect to see in the CSV.
                 For example: [student_a: {'grade': 1.0, 'HW': 1.0}]
         """
-        def merge_dicts(dict_1, dict_2):
-            """Return the union of dict_1 and dict_2"""
-            return dict(dict_1.items() + dict_2.items())
+        def merge_dicts(*dicts):
+            """
+            Return the union of dicts
+
+            Arguments:
+                dicts: tuple of dicts
+            """
+            return dict([item for d in dicts for item in d.items()])
+
+        def user_partition_group(user):
+            """Return a dict having single key with value equals to students group in partition"""
+            group_config_hdr_tpl = 'Experiment Group ({})'
+            return {
+                group_config_hdr_tpl.format(self.partition.name): self.partition.scheme.get_group_for_user(   # pylint: disable=E1101
+                    self.course.id, user, self.partition, track_function=None
+                ).name
+            }
 
         self.verify_rows_in_csv(
             [
                 merge_dicts(
                     {'id': str(student.id), 'username': student.username, 'email': student.email},
-                    grades
+                    grades,
+                    user_partition_group(student)
                 )
                 for student_grades in students_grades for student, grades in student_grades.iteritems()
             ]

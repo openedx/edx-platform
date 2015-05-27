@@ -51,7 +51,7 @@ TOY_BLOCK_INFO_TREE = [
                 }, [
                     BlockInfo(
                         "secret:toylab", "html", {
-                            "data": "<b>Lab 2A: Superposition Experiment</b>\n\n<<<<<<< Updated upstream\n<p>Isn't the toy course great?</p>\n\n<p>Let's add some markup that uses non-ascii characters.\nFor example, we should be able to write words like encyclop&aelig;dia, or foreign words like fran&ccedil;ais.\nLooking beyond latin-1, we should handle math symbols:  &pi;r&sup2 &le; &#8734.\nAnd it shouldn't matter if we use entities or numeric codes &mdash; &Omega; &ne; &pi; &equiv; &#937; &#8800; &#960;.\n</p>\n=======\n<p>Isn't the toy course great? — &le;</p>\n>>>>>>> Stashed changes\n",
+                            "data": "<b>Lab 2A: Superposition Experiment</b>\n\n\n<p>Isn't the toy course great?</p>\n\n<p>Let's add some markup that uses non-ascii characters.\n'For example, we should be able to write words like encyclop&aelig;dia, or foreign words like fran&ccedil;ais.\nLooking beyond latin-1, we should handle math symbols:  &pi;r&sup2 &le; &#8734.\nAnd it shouldn't matter if we use entities or numeric codes &mdash; &Omega; &ne; &pi; &equiv; &#937; &#8800; &#960;.\n</p>\n\n",  # pylint: disable=line-too-long
                             "xml_attributes": {"filename": ["html/secret/toylab.xml", "html/secret/toylab.xml"]},
                             "display_name": "Toy lab"
                         }, []

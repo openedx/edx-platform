@@ -69,7 +69,7 @@ function refereshPageMessage() {
 }
 
 var submitToPaymentProcessing = function() {
-  $("#pay_button").addClass('is-disabled');
+  $("#pay_button").addClass('is-disabled').attr('aria-disabled', true);
   var contribution_input = $("input[name='contribution']:checked")
   var contribution = 0;
   if(contribution_input.attr('id') == 'contribution-other') {
@@ -96,7 +96,7 @@ var submitToPaymentProcessing = function() {
       }
     },
     error:function(xhr,status,error) {
-      $("#pay_button").removeClass('is-disabled');
+      $("#pay_button").removeClass('is-disabled').attr('aria-disabled', false);
       showSubmissionError()
     }
   });

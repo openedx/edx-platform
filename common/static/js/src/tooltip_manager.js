@@ -26,7 +26,7 @@
                 'mouseover.TooltipManager': this.showTooltip,
                 'mousemove.TooltipManager': this.moveTooltip,
                 'mouseout.TooltipManager': this.hideTooltip,
-                'click.TooltipManager': this.hideTooltip
+                'click.TooltipManager': this.click
             }, this.SELECTOR);
         },
 
@@ -46,15 +46,29 @@
         },
 
         showTooltip: function(event) {
-            var tooltipText = $(event.currentTarget).attr('data-tooltip');
-            this.tooltip
-                .html(tooltipText)
-                .css(this.getCoords(event.pageX, event.pageY));
-
+            this.prepareTooltip(event.currentTarget, event.pageX, event.pageY);
             if (this.tooltipTimer) {
                 clearTimeout(this.tooltipTimer);
             }
             this.tooltipTimer = setTimeout(this.show, 500);
+        },
+
+        prepareTooltip: function(element, pageX, pageY) {
+            pageX = typeof pageX !== 'undefined' ? pageX : element.offset().left + element.width()/2;
+            pageY = typeof pageY !== 'undefined' ? pageY : element.offset().top + element.height()/2;
+            var tooltipText = $(element).attr('data-tooltip');
+            this.tooltip
+                .html(tooltipText)
+                .css(this.getCoords(pageX, pageY));
+        },
+
+        // To manually trigger a tooltip to reveal, other than through user mouse movement:
+        openTooltip: function(element) {
+            this.prepareTooltip(element);
+            this.show();
+            if (this.tooltipTimer) {
+                clearTimeout(this.tooltipTimer);
+            }
         },
 
         moveTooltip: function(event) {
@@ -68,6 +82,18 @@
             this.tooltipTimer = setTimeout(this.hide, 50);
         },
 
+        click: function(event) {
+            var showOnClick = !!$(event.currentTarget).data('tooltip-show-on-click'); // Default is false
+            if (showOnClick) {
+                this.show();
+                if (this.tooltipTimer) {
+                    clearTimeout(this.tooltipTimer);
+                }
+            } else {
+                this.hideTooltip(event);
+            }
+        },
+
         destroy: function () {
             this.tooltip.remove();
             // Unbind all delegated event handlers in the ".TooltipManager"
@@ -78,6 +104,6 @@
 
     window.TooltipManager = TooltipManager;
     $(document).ready(function () {
-        new TooltipManager(document.body);
+        window.globalTooltipManager = new TooltipManager(document.body);
     });
 }());

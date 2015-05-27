@@ -13,7 +13,7 @@ class RedirectUnenrolledMiddleware(object):
     Catch UserNotEnrolled errors thrown by `get_course_with_access` and redirect
     users to the course about page
     """
-    def process_exception(self, request, exception):
+    def process_exception(self, _request, exception):
         if isinstance(exception, UserNotEnrolled):
             course_key = exception.course_key
             return redirect(

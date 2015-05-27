@@ -54,19 +54,19 @@ describe 'Problem', ->
       expect(window.update_schematics).toHaveBeenCalled()
 
     it 'bind answer refresh on button click', ->
-      expect($('div.action input:button')).toHandleWith 'click', @problem.refreshAnswers
+      expect($('div.action button')).toHandleWith 'click', @problem.refreshAnswers
 
     it 'bind the check button', ->
-      expect($('div.action input.check')).toHandleWith 'click', @problem.check_fd
+      expect($('div.action button.check')).toHandleWith 'click', @problem.check_fd
 
     it 'bind the reset button', ->
-      expect($('div.action input.reset')).toHandleWith 'click', @problem.reset
+      expect($('div.action button.reset')).toHandleWith 'click', @problem.reset
 
     it 'bind the show button', ->
       expect($('div.action button.show')).toHandleWith 'click', @problem.show
 
     it 'bind the save button', ->
-      expect($('div.action input.save')).toHandleWith 'click', @problem.save
+      expect($('div.action button.save')).toHandleWith 'click', @problem.save
 
     it 'bind the math input', ->
       expect($('input.math')).toHandleWith 'keyup', @problem.refreshMath
@@ -77,6 +77,19 @@ describe 'Problem', ->
         ['Text', @stubbedJax, ''],
         [@problem.updateMathML, @stubbedJax, $('#input_example_1').get(0)]
       ]
+
+  describe 'bind_with_custom_input_id', ->
+    beforeEach ->
+      spyOn window, 'update_schematics'
+      MathJax.Hub.getAllJax.andReturn [@stubbedJax]
+      @problem = new Problem($('.xblock-student_view'))
+      $(@).html readFixtures('problem_content_1240.html')
+
+    it 'bind the check button', ->
+      expect($('div.action button.check')).toHandleWith 'click', @problem.check_fd
+
+    it 'bind the show button', ->
+      expect($('div.action button.show')).toHandleWith 'click', @problem.show
 
   describe 'renderProgressState', ->
     beforeEach ->
