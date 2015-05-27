@@ -75,6 +75,10 @@ class @HTMLEditingDescriptor
         },
         # Disable visual aid on borderless table.
         visual: false,
+        target_list: [
+          {title: 'New page', value: '_blank'},
+          {title: 'None', value: '_self'},
+        ]
         plugins: "textcolor, link, image, codemirror",
         codemirror: {
           path: "#{baseUrl}/js/vendor"

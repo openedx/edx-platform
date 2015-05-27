@@ -67,6 +67,12 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
                                        password='foo')
         self.client = Client()
 
+    def _setsuperuser_login(self):
+        """Makes the test user a superuser and logs them in"""
+        self.user.is_superuser = True
+        self.user.save()
+        self.client.login(username=self.user.username, password='foo')
+
     def _setstaff_login(self):
         """Makes the test user staff and logs them in"""
         GlobalStaff().add_users(self.user)

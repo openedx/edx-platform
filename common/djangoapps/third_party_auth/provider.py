@@ -115,6 +115,7 @@ class GoogleOauth2(BaseProvider):
 
     BACKEND_CLASS = google.GoogleOAuth2
     ICON_CLASS = 'fa-google-plus'
+    BACKEND_CLASS.DEFAULT_SCOPE =  ['https://www.googleapis.com/auth/userinfo.email']
     NAME = 'Google'
     SETTINGS = {
         'SOCIAL_AUTH_GOOGLE_OAUTH2_KEY': None,

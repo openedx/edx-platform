@@ -12,6 +12,7 @@ from celery.states import READY_STATES
 
 from xmodule.modulestore.django import modulestore
 
+from instructor_email_widget.models import GroupedQuery
 from instructor_task.models import InstructorTask
 from instructor_task.tasks import (
     rescore_problem,
@@ -313,6 +314,10 @@ def submit_bulk_course_email(request, course_key, email_id):
     # the InstructorTask status.
     email_obj = CourseEmail.objects.get(id=email_id)
     to_option = email_obj.to_option
+    if to_option.isdigit():
+        # Use human-readable title instead of query id
+        query = GroupedQuery.objects.get(id=int(to_option))
+        to_option = query.title or u'Query saved at ' + query.created.strftime("%m-%d-%y %H:%M")
 
     task_type = 'bulk_course_email'
     task_class = send_bulk_course_email
