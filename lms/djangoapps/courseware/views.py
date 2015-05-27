@@ -19,7 +19,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.decorators import login_required
 from django.utils.timezone import UTC
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
 from certificates import api as certs_api
@@ -39,7 +39,7 @@ from courseware.courses import (
 )
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache
-from .module_render import toc_for_course, get_module_for_descriptor, get_module
+from .module_render import toc_for_course, get_module_for_descriptor, get_module, get_module_by_usage_id
 from .entrance_exams import (
     course_has_entrance_exam,
     get_entrance_exam_content,
@@ -1344,7 +1344,8 @@ def generate_user_cert(request, course_id):
 
 
 def _track_successful_certificate_generation(user_id, course_id):  # pylint: disable=invalid-name
-    """Track an successfully certificate generation event.
+    """
+    Track a successful certificate generation event.
 
     Arguments:
         user_id (str): The ID of the user generting the certificate.
@@ -1370,3 +1371,36 @@ def _track_successful_certificate_generation(user_id, course_id):  # pylint: dis
                 }
             }
         )
+
+
+@require_http_methods(["GET", "POST"])
+def render_xblock(request, usage_key_string):
+    """
+    Returns an HttpResponse with HTML content for the xBlock with the given usage_key.
+    The returned HTML is a chromeless rendering of the xBlock (excluding content of the containing courseware).
+    """
+    usage_key = UsageKey.from_string(usage_key_string)
+    usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
+    course_key = usage_key.course_key
+
+    with modulestore().bulk_operations(course_key):
+        # verify the user has access to the course, including enrollment check
+        course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+
+        # get the block, which verifies whether the user has access to the block.
+        block, _ = get_module_by_usage_id(
+            request, unicode(course_key), unicode(usage_key), disable_staff_debug_info=True
+        )
+
+        context = {
+            'fragment': block.render('student_view', context=request.GET),
+            'course': course,
+            'disable_accordion': True,
+            'allow_iframing': True,
+            'disable_header': True,
+            'disable_window_wrap': True,
+            'disable_preview_menu': True,
+            'staff_access': has_access(request.user, 'staff', course),
+            'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://your_xqa_server.com'),
+        }
+        return render_to_response('courseware/courseware-chromeless.html', context)

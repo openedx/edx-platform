@@ -2,14 +2,17 @@
 Tests for the LTI provider views
 """
 
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
 from mock import patch, MagicMock
 
+from courseware.testutils import RenderXBlockTestMixin
 from lti_provider import views, models
 from lti_provider.signature_validator import SignatureValidator
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 LTI_DEFAULT_PARAMS = {
@@ -64,14 +67,13 @@ def build_run_request(authenticated=True):
     return request
 
 
-class LtiLaunchTest(TestCase):
+class LtiTestMixin(object):
     """
-    Tests for the lti_launch view
+    Mixin for LTI tests
     """
-
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_LTI_PROVIDER': True})
     def setUp(self):
-        super(LtiLaunchTest, self).setUp()
+        super(LtiTestMixin, self).setUp()
         # Always accept the OAuth signature
         SignatureValidator.verify = MagicMock(return_value=True)
         self.consumer = models.LtiConsumer(
@@ -81,6 +83,11 @@ class LtiLaunchTest(TestCase):
         )
         self.consumer.save()
 
+
+class LtiLaunchTest(LtiTestMixin, TestCase):
+    """
+    Tests for the lti_launch view
+    """
     @patch('lti_provider.views.render_courseware')
     def test_valid_launch(self, render):
         """
@@ -88,7 +95,7 @@ class LtiLaunchTest(TestCase):
         """
         request = build_launch_request()
         views.lti_launch(request, unicode(COURSE_KEY), unicode(USAGE_KEY))
-        render.assert_called_with(request, ALL_PARAMS)
+        render.assert_called_with(request, ALL_PARAMS['usage_key'])
 
     @patch('lti_provider.views.render_courseware')
     @patch('lti_provider.views.store_outcome_parameters')
@@ -198,28 +205,18 @@ class LtiLaunchTest(TestCase):
         self.assertEqual(response.status_code, 403)
 
 
-class LtiRunTest(TestCase):
+class LtiRunTest(LtiTestMixin, TestCase):
     """
     Tests for the lti_run view
     """
-
-    def setUp(self):
-        super(LtiRunTest, self).setUp()
-        consumer = models.LtiConsumer(
-            consumer_name='consumer',
-            consumer_key=LTI_DEFAULT_PARAMS['oauth_consumer_key'],
-            consumer_secret='secret'
-        )
-        consumer.save()
-
     @patch('lti_provider.views.render_courseware')
     def test_valid_launch(self, render):
         """
         Verifies that the view returns OK if called with the correct context
         """
         request = build_run_request()
-        response = views.lti_run(request)
-        render.assert_called_with(request, ALL_PARAMS)
+        views.lti_run(request)
+        render.assert_called_with(request, ALL_PARAMS['usage_key'])
 
     def test_forbidden_if_session_key_missing(self):
         """
@@ -269,83 +266,19 @@ class LtiRunTest(TestCase):
         self.assertEqual(consumer.instance_guid, 'instance_guid')
 
 
-class RenderCoursewareTest(TestCase):
+class LtiRunTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCase):
     """
-    Tests for the render_courseware method
+    Tests for the rendering returned by lti_run view.
+    This class overrides the get_response method, which is used by
+    the tests defined in RenderXBlockTestMixin.
     """
-
-    def setUp(self):
+    def get_response(self):
         """
-        Configure mocks for all the dependencies of the render method
+        Overridable method to get the response from the endpoint that is being tested.
         """
-        super(RenderCoursewareTest, self).setUp()
-        self.module_instance = MagicMock()
-        self.module_instance.render.return_value = "Fragment"
-        self.render_mock = self.setup_patch('lti_provider.views.render_to_response', 'Rendered page')
-        self.module_mock = self.setup_patch('lti_provider.views.get_module_by_usage_id', (self.module_instance, None))
-        self.access_mock = self.setup_patch('lti_provider.views.has_access', 'StaffAccess')
-        self.course_mock = self.setup_patch('lti_provider.views.get_course_with_access', 'CourseWithAccess')
-
-    def setup_patch(self, function_name, return_value):
-        """
-        Patch a method with a given return value, and return the mock
-        """
-        mock = MagicMock(return_value=return_value)
-        new_patch = patch(function_name, new=mock)
-        new_patch.start()
-        self.addCleanup(new_patch.stop)
-        return mock
-
-    def test_valid_launch(self):
-        """
-        Verify that the method renders a response when launched correctly
-        """
-        request = build_run_request()
-        response = views.render_courseware(request, ALL_PARAMS.copy())
-        self.assertEqual(response, 'Rendered page')
-
-    def test_course_with_access(self):
-        """
-        Verify that get_course_with_access is called with the right parameters
-        """
-        request = build_run_request()
-        views.render_courseware(request, ALL_PARAMS.copy())
-        self.course_mock.assert_called_with(request.user, 'load', COURSE_KEY)
-
-    def test_has_access(self):
-        """
-        Verify that has_access is called with the right parameters
-        """
-        request = build_run_request()
-        views.render_courseware(request, ALL_PARAMS.copy())
-        self.access_mock.assert_called_with(request.user, 'staff', 'CourseWithAccess')
-
-    def test_get_module(self):
-        """
-        Verify that get_module_by_usage_id is called with the right parameters
-        """
-        request = build_run_request()
-        views.render_courseware(request, ALL_PARAMS.copy())
-        self.module_mock.assert_called_with(request, unicode(COURSE_KEY), unicode(USAGE_KEY))
-
-    def test_render(self):
-        """
-        Verify that render is called on the right object with the right parameters
-        """
-        request = build_run_request()
-        views.render_courseware(request, ALL_PARAMS.copy())
-        self.module_instance.render.assert_called_with('student_view', context={})
-
-    def test_context(self):
-        expected_context = {
-            'fragment': 'Fragment',
-            'course': 'CourseWithAccess',
-            'disable_accordion': True,
-            'allow_iframing': True,
-            'disable_header': True,
-            'staff_access': 'StaffAccess',
-            'xqa_server': 'http://example.com/xqa',
-        }
-        request = build_run_request()
-        views.render_courseware(request, ALL_PARAMS.copy())
-        self.render_mock.assert_called_with('courseware/courseware-chromeless.html', expected_context)
+        lti_launch_url = reverse(
+            'lti_provider_launch',
+            kwargs={'course_id': unicode(self.course.id), 'usage_id': unicode(self.html_block.location)}
+        )
+        SignatureValidator.verify = MagicMock(return_value=True)
+        return self.client.post(lti_launch_url, data=LTI_DEFAULT_PARAMS)

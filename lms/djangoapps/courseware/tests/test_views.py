@@ -29,12 +29,14 @@ from certificates import api as certs_api
 from certificates.models import CertificateStatuses, CertificateGenerationConfiguration
 from certificates.tests.factories import GeneratedCertificateFactory
 from course_modes.models import CourseMode
+from courseware.testutils import RenderXBlockTestMixin
 from courseware.tests.factories import StudentModuleFactory
 from edxmako.middleware import MakoMiddleware
 from edxmako.tests import mako_middleware_process_request
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, UserFactory, CourseEnrollmentFactory
 from util.tests.test_date_utils import fake_ugettext, fake_pgettext
+from util.url import reload_django_url_config
 from util.views import ensure_valid_course_key
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -584,6 +586,7 @@ class BaseDueDateTests(ModuleStoreTestCase):
 
         course = modulestore().get_course(course.id)  # pylint: disable=no-member
         self.assertIsNotNone(course.get_children()[0].get_children()[0].due)
+        CourseEnrollmentFactory(user=self.user, course_id=course.id)
         return course
 
     def setUp(self):
@@ -752,6 +755,7 @@ class ProgressPageTests(ModuleStoreTestCase):
             grade_cutoffs={u'çü†øƒƒ': 0.75, 'Pass': 0.5},
         )
         self.course = modulestore().get_course(course.id)  # pylint: disable=no-member
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
 
         self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
         self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
@@ -1087,3 +1091,22 @@ class TestIndexView(ModuleStoreTestCase):
         # Trigger the assertions embedded in the ViewCheckerBlocks
         response = views.index(request, unicode(course.id), chapter=chapter.url_name, section=section.url_name)
         self.assertEquals(response.content.count("ViewCheckerPassed"), 3)
+
+
+class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):
+    """
+    Tests for the courseware.render_xblock endpoint.
+    This class overrides the get_response method, which is used by
+    the tests defined in RenderXBlockTestMixin.
+    """
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_RENDER_XBLOCK_API': True})
+    def setUp(self):
+        reload_django_url_config()
+        super(TestRenderXBlock, self).setUp()
+
+    def get_response(self):
+        """
+        Overridable method to get the response from the endpoint that is being tested.
+        """
+        url = reverse('render_xblock', kwargs={"usage_key_string": unicode(self.html_block.location)})
+        return self.client.get(url)
