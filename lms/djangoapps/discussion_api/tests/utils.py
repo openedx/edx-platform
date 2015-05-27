@@ -74,6 +74,17 @@ class CommentsServiceMockMixin(object):
             status=200
         )
 
+    def register_subscription_response(self, user):
+        """
+        Register a mock response for POST on the CS user subscription endpoint
+        """
+        httpretty.register_uri(
+            httpretty.POST,
+            "http://localhost:4567/api/v1/users/{id}/subscriptions".format(id=user.id),
+            body=json.dumps({}),  # body is unused
+            status=200
+        )
+
     def assert_query_params_equal(self, httpretty_request, expected_params):
         """
         Assert that the given mock request had the expected query parameters

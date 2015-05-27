@@ -96,6 +96,9 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
         * raw_body (required): The thread's raw body text
 
+        * following (optional): A boolean indicating whether the user should
+            follow the thread upon its creation; defaults to false
+
     **GET Response Values**:
 
         * results: The list of threads; each item in the list has the same

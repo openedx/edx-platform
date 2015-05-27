@@ -2,7 +2,7 @@
 Discussion API forms
 """
 from django.core.exceptions import ValidationError
-from django.forms import CharField, Form, IntegerField, NullBooleanField
+from django.forms import BooleanField, CharField, Form, IntegerField, NullBooleanField
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseLocator
@@ -35,6 +35,14 @@ class ThreadListGetForm(_PaginationForm):
             return CourseLocator.from_string(value)
         except InvalidKeyError:
             raise ValidationError("'{}' is not a valid course id".format(value))
+
+
+class ThreadCreateExtrasForm(Form):
+    """
+    A form to handle fields in thread creation that require separate
+    interactions with the comments service.
+    """
+    following = BooleanField(required=False)
 
 
 class CommentListGetForm(_PaginationForm):
