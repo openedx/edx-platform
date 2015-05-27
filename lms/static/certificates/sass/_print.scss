@@ -7,6 +7,7 @@
 // #BASE
 // #LAYOUT
 // #ELEMENTS
+// #CASES
 
 // ------------------------------
 // #UTILITIES
@@ -34,7 +35,7 @@
     %print-rendering-section {
         margin-bottom: spacing-vertical(small);
         border-bottom: none;
-        padding-bottom: 0;
+        padding-bottom: 0 !important;
 
         &:last-child {
             border: none;
@@ -56,7 +57,7 @@
     // ensure that content is not broken across pages when printed
     h1, h2, h3, h4, h5, h6,
     .hd-1, .hd-2 , .hd-3, .hd-4, .hd-5, .hd-6, .hd-7 {
-        page-break-after: avoid;
+        // page-break-after: avoid;
     }
 
     // prevent large elements from being split across multiple pages
@@ -70,9 +71,13 @@
     }
 
     // reset body/view properties
+    html,
     body {
         @extend %print-black-on-white;
-        margin: spacing-vertical(mid-small) spacing-vertical(small) !important;
+    }
+
+    body {
+        margin: spacing-vertical(small) !important;
         padding: 0;
     }
 }
@@ -97,7 +102,8 @@
     .wrapper-header,
     .wrapper-introduction,
     .accomplishment-metadata-title,
-    .accomplishment-metadata .accomplishment-recipient {
+    .accomplishment-metadata .accomplishment-recipient,
+    .accomplishment-metadata .metadata .label {
         @extend %print-hide;
     }
 
@@ -117,8 +123,8 @@
 
     // headings
     .hd-1 {
-        font-size: font-size(xx-large);
-        line-height: line-height(xx-large);
+        font-size: font-size(x-large);
+        line-height: line-height(x-large);
     }
 
     .hd-2 {
@@ -137,8 +143,8 @@
     }
 
     .hd-5 {
-        font-size: font-size(base);
-        line-height: line-height(base);
+        font-size: font-size(mid-small);
+        line-height: line-height(mid-small);
     }
 
     .hd-6 {
@@ -183,29 +189,92 @@
     }
 
     .accomplishment-rendering {
+        page-break-after: always; // always create page break after rendering
         top: 0 !important;
+        border: rem(1) solid palette(grayscale, light);
+        border-top: rem(2) solid $cert-base-color;
+        box-shadow: none;
+        padding: spacing-vertical(small) spacing-horizontal(mid-large);
+        height: 100% !important;
+
 
         .accomplishment-type {
-            // background: teal !important;
             top: -(rem(40));
         }
 
         .accomplishment-statement {
-            background: salmon !important;
             @extend %print-rendering-section;
             @include span(8 first);
             @include text-align(left);
         }
 
-        .accomplishment-signatories {
-            background: red !important;
-            @extend %print-rendering-section;
+        .accomplishment-orgs {
             @include span(4 last);
         }
 
-        .accomplishment-orgs {
-            background: orange !important;
-            @include span(12);
+        .accomplishment-signatories {
+            @extend %print-rendering-section;
+            @include span(12 last);
+
+            .signatory {
+                @include gallery(2);
+            }
+
+            .signatory-signature {
+                height: rem(60) !important;
+            }
+
+            .signatory-name {
+                font-size: font-size(x-small);
+            }
+
+            .signatory-credentials {
+                margin-bottom: 0 !important;
+            }
+        }
+    }
+
+    .accomplishment-metadata {
+
+        .wrapper-metadata .metadata {
+            margin-bottom: 0;
+            border-bottom: none;
+            padding-bottom: 0;
+
+            .value {
+                font-size: font-size(x-small);
+                line-height: line-height(small);
+                display: inline-block;
+                vertical-align: baseline;
+            }
+        }
+
+        .accomplishment-date {
+            position: absolute;
+            top: spacing-vertical(base);
+            @include left(spacing-horizontal(large));
+            @include text-align(left);
+        }
+
+        .accomplishment-id {
+            position: absolute;
+            top: right-vertical(base);
+            @include right(spacing-horizontal(large));
+            @include text-align(right);
+        }
+    }
+}
+
+// ------------------------------
+// #CASES
+// ------------------------------
+// certificate - distinguished
+@media print {
+
+    .certificate-distinguished {
+
+        .accomplishment-rendering {
+            border-top-color: $cert-distinguished-color;
         }
     }
 }
