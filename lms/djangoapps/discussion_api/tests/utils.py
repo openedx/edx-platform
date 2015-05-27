@@ -61,6 +61,56 @@ class CommentsServiceMockMixin(object):
             status=200
         )
 
+    def register_post_comment_response(self, response_overrides, thread_id=None, parent_id=None):
+        """
+        Register a mock response for POST on the CS comments endpoint for the
+        given thread or parent; exactly one of thread_id and parent_id must be
+        specified.
+        """
+        def callback(request, _uri, headers):
+            """
+            Simulate the comment creation endpoint by returning the provided data
+            along with the data from response_overrides.
+            """
+            response_data = make_minimal_cs_comment(
+                {key: val[0] for key, val in request.parsed_body.items()}
+            )
+            response_data.update(response_overrides or {})
+            return (200, headers, json.dumps(response_data))
+
+        if thread_id and not parent_id:
+            url = "http://localhost:4567/api/v1/threads/{}/comments".format(thread_id)
+        elif parent_id and not thread_id:
+            url = "http://localhost:4567/api/v1/comments/{}".format(parent_id)
+        else:  # pragma: no cover
+            raise ValueError("Exactly one of thread_id and parent_id must be provided.")
+
+        httpretty.register_uri(httpretty.POST, url, body=callback)
+
+    def register_get_comment_error_response(self, comment_id, status_code):
+        """
+        Register a mock error response for GET on the CS comment instance
+        endpoint.
+        """
+        httpretty.register_uri(
+            httpretty.GET,
+            "http://localhost:4567/api/v1/comments/{id}".format(id=comment_id),
+            body="",
+            status=status_code
+        )
+
+    def register_get_comment_response(self, response_overrides):
+        """
+        Register a mock response for GET on the CS comment instance endpoint.
+        """
+        comment = make_minimal_cs_comment(response_overrides)
+        httpretty.register_uri(
+            httpretty.GET,
+            "http://localhost:4567/api/v1/comments/{id}".format(id=comment["id"]),
+            body=json.dumps(comment),
+            status=200
+        )
+
     def register_get_user_response(self, user, subscribed_thread_ids=None, upvoted_ids=None):
         """Register a mock response for GET on the CS user instance endpoint"""
         httpretty.register_uri(

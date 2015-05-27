@@ -38,6 +38,8 @@ log = logging.getLogger(__name__)
 TRACKING_MAX_FORUM_BODY = 2000
 
 THREAD_CREATED_EVENT_NAME = "edx.forum.thread.created"
+RESPONSE_CREATED_EVENT_NAME = 'edx.forum.response.created'
+COMMENT_CREATED_EVENT_NAME = 'edx.forum.comment.created'
 
 
 def permitted(fn):
@@ -117,6 +119,29 @@ def get_thread_created_event_data(thread, followed):
         # However, the view does not contain that data, and including it will
         # likely require changes elsewhere.
     }
+
+
+def get_comment_created_event_name(comment):
+    """Get the appropriate event name for creating a response/comment"""
+    return COMMENT_CREATED_EVENT_NAME if comment.get("parent_id") else RESPONSE_CREATED_EVENT_NAME
+
+
+def get_comment_created_event_data(comment, commentable_id, followed):
+    """
+    Get the event data payload for comment creation (excluding fields populated
+    by track_forum_event)
+    """
+    event_data = {
+        'discussion': {'id': comment.thread_id},
+        'commentable_id': commentable_id,
+        'options': {'followed': followed},
+    }
+
+    parent_id = comment.get("parent_id")
+    if parent_id:
+        event_data['response'] = {'id': parent_id}
+
+    return event_data
 
 
 @require_POST
@@ -270,16 +295,8 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
         user = cc.User.from_django_user(request.user)
         user.follow(comment.thread)
 
-    event_data = {'discussion': {'id': comment.thread_id}, 'options': {'followed': followed}}
-
-    if parent_id:
-        event_data['response'] = {'id': comment.parent_id}
-        event_name = 'edx.forum.comment.created'
-    else:
-        event_name = 'edx.forum.response.created'
-
-    event_data['commentable_id'] = comment.thread.commentable_id
-
+    event_name = get_comment_created_event_name(comment)
+    event_data = get_comment_created_event_data(comment, comment.thread.commentable_id, followed)
     track_forum_event(request, event_name, course, comment, event_data)
 
     if request.is_ajax():

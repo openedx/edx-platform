@@ -15,6 +15,8 @@ from discussion_api.pagination import get_paginated_data
 from discussion_api.serializers import CommentSerializer, ThreadSerializer, get_context
 from django_comment_client.base.views import (
     THREAD_CREATED_EVENT_NAME,
+    get_comment_created_event_data,
+    get_comment_created_event_name,
     get_thread_created_event_data,
     track_forum_event,
 )
@@ -262,6 +264,51 @@ def create_thread(request, thread_data):
         course,
         thread,
         get_thread_created_event_data(thread, followed=following)
+    )
+
+    return ret
+
+
+def create_comment(request, comment_data):
+    """
+    Create a comment.
+
+    Parameters:
+
+        request: The django request object used for build_absolute_uri and
+          determining the requesting user.
+
+        comment_data: The data for the created comment.
+
+    Returns:
+
+        The created comment; see discussion_api.views.CommentViewSet for more
+        detail.
+    """
+    thread_id = comment_data.get("thread_id")
+    if not thread_id:
+        raise ValidationError({"thread_id": ["This field is required."]})
+    try:
+        thread = Thread(id=thread_id).retrieve(mark_as_read=False)
+        course_key = CourseLocator.from_string(thread["course_id"])
+        course = _get_course_or_404(course_key, request.user)
+    except (Http404, CommentClientRequestError):
+        raise ValidationError({"thread_id": ["Invalid value."]})
+
+    parent_id = comment_data.get("parent_id")
+    context = get_context(course, request, thread, parent_id)
+    serializer = CommentSerializer(data=comment_data, context=context)
+    if not serializer.is_valid():
+        raise ValidationError(serializer.errors)
+    serializer.save()
+
+    comment = serializer.object
+    track_forum_event(
+        request,
+        get_comment_created_event_name(comment),
+        course,
+        comment,
+        get_comment_created_event_data(comment, thread["commentable_id"], followed=False)
     )
 
     return serializer.data
