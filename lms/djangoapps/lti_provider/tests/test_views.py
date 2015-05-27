@@ -74,7 +74,7 @@ class LtiLaunchTest(TestCase):
         Verifies that the LTI launch succeeds when passed a valid request.
         """
         request = build_launch_request()
-        views.lti_launch(request, str(COURSE_PARAMS['course_key']), str(COURSE_PARAMS['usage_key']))
+        views.lti_launch(request, unicode(COURSE_KEY), unicode(USAGE_KEY))
         render.assert_called_with(request, ALL_PARAMS)
 
     def launch_with_missing_parameter(self, missing_param):
@@ -114,7 +114,7 @@ class LtiLaunchTest(TestCase):
         properly stored in the session
         """
         request = build_launch_request()
-        views.lti_launch(request, str(COURSE_PARAMS['course_key']), str(COURSE_PARAMS['usage_key']))
+        views.lti_launch(request, unicode(COURSE_KEY), unicode(USAGE_KEY))
         session = request.session[views.LTI_SESSION_KEY]
         self.assertEqual(session['course_key'], COURSE_KEY, 'Course key not set in the session')
         self.assertEqual(session['usage_key'], USAGE_KEY, 'Usage key not set in the session')
@@ -128,9 +128,7 @@ class LtiLaunchTest(TestCase):
         URL
         """
         request = build_launch_request(False)
-        response = views.lti_launch(
-            request, str(COURSE_PARAMS['course_key']), str(COURSE_PARAMS['usage_key'])
-        )
+        response = views.lti_launch(request, unicode(COURSE_KEY), unicode(USAGE_KEY))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], '/accounts/login?next=/lti_provider/lti_run')
 
@@ -142,6 +140,7 @@ class LtiLaunchTest(TestCase):
         SignatureValidator.verify = MagicMock(return_value=False)
         request = build_launch_request()
         response = views.lti_launch(request, None, None)
+        self.assertEqual(response.status_code, 403)
         self.assertEqual(response.status_code, 403)
 
 
@@ -253,7 +252,7 @@ class RenderCoursewareTest(TestCase):
         """
         request = build_run_request()
         views.render_courseware(request, ALL_PARAMS.copy())
-        self.module_mock.assert_called_with(request, str(ALL_PARAMS['course_key']), str(ALL_PARAMS['usage_key']))
+        self.module_mock.assert_called_with(request, unicode(COURSE_KEY), unicode(USAGE_KEY))
 
     def test_render(self):
         """

@@ -66,9 +66,12 @@ def lti_launch(request, course_id, usage_id):
     # Store the course, and usage ID in the session to prevent privilege
     # escalation if a staff member in one course tries to access material in
     # another.
-    course_key, usage_key = parse_course_and_usage_keys(course_id, usage_id)
-    if not course_key:
-        raise Http404('Invalid course or usage key')
+    try:
+        course_key, usage_key = parse_course_and_usage_keys(course_id, usage_id)
+    except InvalidKeyError:
+        raise Http404(
+            'Invalid course key {} or usage key {}'.format(course_id, usage_id)
+        )
     params['course_key'] = course_key
     params['usage_key'] = usage_key
     request.session[LTI_SESSION_KEY] = params
@@ -164,7 +167,11 @@ def render_courseware(request, lti_params):
     user = request.user
     course = get_course_with_access(user, 'load', course_key)
     staff = has_access(request.user, 'staff', course)
-    instance, _ = get_module_by_usage_id(request, str(course_key), str(usage_key))
+    instance, _dummy = get_module_by_usage_id(
+        request,
+        unicode(course_key),
+        unicode(usage_key)
+    )
 
     fragment = instance.render('student_view', context=request.GET)
 
@@ -188,15 +195,7 @@ def parse_course_and_usage_keys(course_id, usage_id):
     Convert course and usage ID strings into key objects. Return a tuple of
     (course_key, usage_key), or (None, None) if the translation fails.
     """
-    try:
-        course_key = CourseKey.from_string(course_id)
-    except InvalidKeyError:
-        return None, None
-    if not course_key:
-        return None, None
-    try:
-        usage_id = unquote_slashes(usage_id)
-        usage_key = UsageKey.from_string(usage_id).map_into_course(course_key)
-    except InvalidKeyError:
-        return None, None
+    course_key = CourseKey.from_string(course_id)
+    usage_id = unquote_slashes(usage_id)
+    usage_key = UsageKey.from_string(usage_id).map_into_course(course_key)
     return course_key, usage_key
