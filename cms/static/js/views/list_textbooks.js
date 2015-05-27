@@ -31,12 +31,13 @@ define(["js/views/baseview", "jquery", "js/views/edit_textbook", "js/views/show_
             "click .new-button": "addOne"
         },
         addOne: function(e) {
+            var $sectionEl, $inputEl;
             if(e && e.preventDefault) { e.preventDefault(); }
             this.collection.add([{editing: true}]); // (render() call triggered here)
             // find the outer 'section' tag for the newly added textbook
             $sectionEl = this.$el.find('section:last');
             // scroll to put this at top of viewport
-            ViewUtils.setScrollOffset($sectionEl, 0);            
+            ViewUtils.setScrollOffset($sectionEl, 0);
             // find the first input element in this section
             $inputEl = $sectionEl.find('input:first');
             // activate the text box (so user can go ahead and start typing straight away)
