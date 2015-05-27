@@ -3,7 +3,6 @@ Tests for signal handling in commerce djangoapp.
 """
 from django.test import TestCase
 from django.test.utils import override_settings
-from urlparse import urlparse
 
 import mock
 from opaque_keys.edx.keys import CourseKey
@@ -11,15 +10,15 @@ from student.models import UNENROLL_DONE
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
 from commerce.signals import refund_seat, send_refund_notification
-from commerce.tests import TEST_API_URL, TEST_API_SIGNING_KEY
+from commerce.tests import TEST_PUBLIC_URL_ROOT, TEST_API_URL, TEST_API_SIGNING_KEY
 from commerce.tests.mocks import mock_create_refund
 
 
-# TODO: this is temporary.  See the corresponding TODO in signals.send_refund_notification
-TEST_BASE_URL = '://'.join(urlparse(TEST_API_URL)[:2])
-
-
-@override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
+@override_settings(
+    ECOMMERCE_PUBLIC_URL_ROOT=TEST_PUBLIC_URL_ROOT,
+    ECOMMERCE_API_URL=TEST_API_URL,
+    ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY,
+)
 class TestRefundSignal(TestCase):
     """
     Exercises logic triggered by the UNENROLL_DONE signal.
@@ -42,7 +41,11 @@ class TestRefundSignal(TestCase):
         """
         UNENROLL_DONE.send(sender=None, course_enrollment=self.course_enrollment, skip_refund=skip_refund)
 
-    @override_settings(ECOMMERCE_API_URL=None, ECOMMERCE_API_SIGNING_KEY=None)
+    @override_settings(
+        ECOMMERCE_PUBLIC_URL_ROOT=None,
+        ECOMMERCE_API_URL=None,
+        ECOMMERCE_API_SIGNING_KEY=None,
+    )
     def test_no_service(self):
         """
         Ensure that the receiver quietly bypasses attempts to initiate
@@ -185,14 +188,15 @@ class TestRefundSignal(TestCase):
         )
         text_body = mock_email_class.call_args[0][1]
         # check for a URL for each refund
-        for exp in [r'{0}/dashboard/refunds/{1}/'.format(TEST_BASE_URL, refund_id) for refund_id in refund_ids]:
+        for exp in [r'{0}/dashboard/refunds/{1}/'.format(TEST_PUBLIC_URL_ROOT, refund_id)
+                    for refund_id in refund_ids]:
             self.assertRegexpMatches(text_body, exp)
 
         # check HTML content
         self.assertEqual(mock_message.attach_alternative.call_args[0], (mock.ANY, "text/html"))
         html_body = mock_message.attach_alternative.call_args[0][0]
         # check for a link to each refund
-        for exp in [r'a href="{0}/dashboard/refunds/{1}/"'.format(TEST_BASE_URL, refund_id)
+        for exp in [r'a href="{0}/dashboard/refunds/{1}/"'.format(TEST_PUBLIC_URL_ROOT, refund_id)
                     for refund_id in refund_ids]:
             self.assertRegexpMatches(html_body, exp)
 
