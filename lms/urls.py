@@ -260,10 +260,6 @@ if settings.COURSEWARE_ENABLED:
             'courseware.module_render.xblock_resource',
             name='xblock_resource_url'),
 
-        url(r'api/xblock/v1/xblock/{usage_key_string}$'.format(usage_key_string=settings.USAGE_KEY_PATTERN),
-            'courseware.views.render_chromeless_xblock',
-            name='chromeless_xblock'),
-
         # Software Licenses
 
         # TODO: for now, this is the endpoint of an ajax replay
@@ -432,6 +428,13 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/{}/edxnotes'.format(settings.COURSE_ID_PATTERN),
             include('edxnotes.urls'), name="edxnotes_endpoints"),
     )
+
+    if settings.FEATURES.get('ENABLE_USER_COURSE_STRUCTURE_API'):
+        urlpatterns += (
+            url(r'api/xblock/v1/xblock/{usage_key_string}$'.format(usage_key_string=settings.USAGE_KEY_PATTERN),
+                'courseware.views.render_xblock',
+                name='render_xblock'),
+        )
 
     # allow course staff to change to student view of courseware
     if settings.FEATURES.get('ENABLE_MASQUERADE'):

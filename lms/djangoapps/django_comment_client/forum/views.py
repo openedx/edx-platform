@@ -172,7 +172,7 @@ def inline_discussion(request, course_key, discussion_id):
     """
     nr_transaction = newrelic.agent.current_transaction()
 
-    course = get_course_with_access(request.user, 'load_forum', course_key)
+    course = get_course_with_access(request.user, 'load', course_key, check_enrollment=True)
     cc_user = cc.User.from_django_user(request.user)
     user_info = cc_user.to_dict()
 
@@ -207,7 +207,7 @@ def forum_form_discussion(request, course_key):
     """
     nr_transaction = newrelic.agent.current_transaction()
 
-    course = get_course_with_access(request.user, 'load_forum', course_key, check_if_enrolled=True)
+    course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
     course_settings = make_course_settings(course, request.user)
 
     user = cc.User.from_django_user(request.user)
@@ -274,7 +274,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
     """
     nr_transaction = newrelic.agent.current_transaction()
 
-    course = get_course_with_access(request.user, 'load_forum', course_key)
+    course = get_course_with_access(request.user, 'load', course_key, check_enrollment=True)
     course_settings = make_course_settings(course, request.user)
     cc_user = cc.User.from_django_user(request.user)
     user_info = cc_user.to_dict()
@@ -377,7 +377,7 @@ def user_profile(request, course_key, user_id):
     nr_transaction = newrelic.agent.current_transaction()
 
     #TODO: Allow sorting?
-    course = get_course_with_access(request.user, 'load_forum', course_key)
+    course = get_course_with_access(request.user, 'load', course_key, check_enrollment=True)
     try:
         query_params = {
             'page': request.GET.get('page', 1),
@@ -440,7 +440,7 @@ def followed_threads(request, course_key, user_id):
 
     nr_transaction = newrelic.agent.current_transaction()
 
-    course = get_course_with_access(request.user, 'load_forum', course_key)
+    course = get_course_with_access(request.user, 'load', course_key, check_enrollment=True)
     try:
         profiled_user = cc.User(id=user_id, course_id=course_key)
 

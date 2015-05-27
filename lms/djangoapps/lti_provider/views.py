@@ -9,12 +9,10 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 
-from courseware.access import has_access
-from courseware.courses import get_course_with_access
-from courseware.module_render import get_module_by_usage_id
-from edxmako.shortcuts import render_to_response
+from courseware.module_render import render_chromeless_module
 from lti_provider.signature_validator import SignatureValidator
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from xmodule.modulestore.django import modulestore
 
 # LTI launch parameters that must be present for a successful launch
 REQUIRED_PARAMETERS = [
@@ -154,26 +152,11 @@ def render_courseware(request, lti_params):
     :return: an HttpResponse object that contains the template and necessary
     context to render the courseware.
     """
-    usage_id = lti_params['usage_id']
-    course_id = lti_params['course_id']
-    course_key = CourseKey.from_string(course_id)
-    user = request.user
-    course = get_course_with_access(user, 'load', course_key)
-    staff = has_access(request.user, 'staff', course)
-    instance, _ = get_module_by_usage_id(request, course_id, usage_id)
+    usage_key_string = lti_params['usage_id']
+    course_key_string = lti_params['course_id']
 
-    fragment = instance.render('student_view', context=request.GET)
+    course_key = CourseKey.from_string(course_key_string)
+    usage_key = UsageKey.from_string(usage_key_string)
+    usage_key = usage_key.replace(course_key=modulestore().fill_in_run(course_key))
 
-    context = {
-        'fragment': fragment,
-        'course': course,
-        'disable_accordion': True,
-        'allow_iframing': True,
-        'disable_header': True,
-        'disable_footer': True,
-        'disable_tabs': True,
-        'staff_access': staff,
-        'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://your_xqa_server.com'),
-    }
-
-    return render_to_response('courseware/courseware.html', context)
+    return render_chromeless_module(request, usage_key)

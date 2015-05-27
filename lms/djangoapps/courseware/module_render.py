@@ -25,11 +25,13 @@ from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
 from django.test.client import RequestFactory
 from django.views.decorators.csrf import csrf_exempt
+from edxmako.shortcuts import render_to_response
 
 import newrelic.agent
 
 from capa.xqueue_interface import XQueueInterface
 from courseware.access import has_access, get_user_role
+from courseware.courses import get_course_with_access
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache, DjangoKeyValueStore
 from courseware.models import SCORE_CHANGED
@@ -46,8 +48,6 @@ from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
 from student.models import anonymous_id_for_user, user_by_anonymous_id
 from student.roles import CourseBetaTesterRole
 from xblock.core import XBlock
-from xblock.fields import Scope
-from xblock.runtime import KvsFieldData, KeyValueStore
 from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
@@ -72,7 +72,6 @@ from xblock_django.user_service import DjangoXBlockUserService
 from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from util import milestones_helpers
-from util.module_utils import yield_dynamic_descriptor_descendents
 from verify_student.services import ReverificationService
 
 from .field_overrides import OverrideFieldData
@@ -1031,3 +1030,32 @@ def _check_files_limits(files):
                 return msg
 
     return None
+
+
+def render_chromeless_module(request, usage_key):
+    """
+    """
+    course_key = usage_key.course_key
+
+    # verify the user has access to the course, including enrollment check
+    course = get_course_with_access(request.user, 'load', course_key, check_enrollment=True)
+
+    # get the block
+    block, _ = get_module_by_usage_id(request, unicode(course_key), unicode(usage_key))
+
+    # verify the user has access to the block
+    if not has_access(request.user, 'load', block, course_key=course_key):
+        raise Http404("Module not found.")
+
+    context = {
+        'fragment': block.render('student_view', context=request.GET),
+        'course': course,
+        'disable_accordion': True,
+        'allow_iframing': True,
+        'disable_header': True,
+        'disable_footer': True,
+        'disable_tabs': True,
+        'staff_access': has_access(request.user, 'staff', course),
+        'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://your_xqa_server.com'),
+    }
+    return render_to_response('courseware/courseware.html', context)

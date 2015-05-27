@@ -57,7 +57,7 @@ from courseware.module_render import (
     toc_for_course,
     get_module_for_descriptor,
     get_module,
-    get_module_by_usage_id,
+    render_chromeless_module,
 )
 from courseware.models import StudentModule, StudentModuleHistory
 from courseware.url_helpers import get_redirect_url
@@ -1366,7 +1366,8 @@ def generate_user_cert(request, course_id):
 
 
 def _track_successful_certificate_generation(user_id, course_id):  # pylint: disable=invalid-name
-    """Track an successfully certificate generation event.
+    """
+    Track a successful certificate generation event.
 
     Arguments:
         user_id (str): The ID of the user generting the certificate.
@@ -1394,38 +1395,11 @@ def _track_successful_certificate_generation(user_id, course_id):  # pylint: dis
         )
 
 
-def render_chromeless_xblock(request, usage_key_string):
+@require_GET
+def render_xblock(request, usage_key_string):
     """
-    Renders a chromeless html page of an xblock
+    Renders a chromeless html page of an xblock.
     """
     usage_key = UsageKey.from_string(usage_key_string)
     usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
-    course_key = usage_key.course_key
-    course_id = unicode(course_key)
-
-    course = get_course_with_access(request.user, 'load', usage_key.course_key)
-    staff = has_access(request.user, 'staff', course)
-
-    if not CourseEnrollment.is_enrolled(request.user, usage_key.course_key) and not staff:
-        return "TODO Decide what to return on fail"
-
-    block, _ = get_module_by_usage_id(request, course_id, usage_key_string)
-
-    if not has_access(request.user, 'load', block, course_key=course_key):
-        return "TODO Decide what to return on fail"
-
-    fragment = block.render('student_view', context=request.GET)
-
-    context = {
-        'fragment': fragment,
-        'course': course,
-        'disable_accordion': True,
-        'allow_iframing': True,
-        'disable_header': True,
-        'disable_footer': True,
-        'disable_tabs': True,
-        'staff_access': staff,
-        'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://example.com/xqa'),
-    }
-
-    return render_to_response('courseware/courseware.html', context)
+    return render_chromeless_module(request, usage_key)
