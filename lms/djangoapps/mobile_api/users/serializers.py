@@ -9,13 +9,12 @@ from student.models import CourseEnrollment, User
 from certificates.models import certificate_status_for_student, CertificateStatuses
 
 
-class CourseField(serializers.RelatedField):
-    """Custom field to wrap a CourseDescriptor object. Read-only."""
+class CourseOverviewField(serializers.RelatedField):
+    """Custom field to wrap a CourseOverviewDescriptor object. Read-only."""
 
-    def to_native(self, course):
-        # TODO me: change course -> course_overview
+    def to_native(self, course_overview):
 
-        course_id = unicode(course.id)
+        course_id = unicode(course_overview.id)
         request = self.context.get('request', None)
         if request:
             video_outline_url = reverse(
@@ -40,14 +39,14 @@ class CourseField(serializers.RelatedField):
 
         return {
             "id": course_id,
-            "name": course.display_name,
-            "number": course.display_number_with_default,
-            "org": course.display_org_with_default,
-            "start": course.start,
-            "end": course.end,
-            "course_image": course_image_url(course),
+            "name": course_overview.display_name,
+            "number": course_overview.display_number_with_default,
+            "org": course_overview.display_org_with_default,
+            "start": course_overview.start,
+            "end": course_overview.end,
+            "course_image": course_image_url(course_overview),
             "social_urls": {
-                "facebook": course.facebook_url,
+                "facebook": course_overview.facebook_url,
             },
             "latest_updates": {
                 "video": None
@@ -55,7 +54,7 @@ class CourseField(serializers.RelatedField):
             "video_outline": video_outline_url,
             "course_updates": course_updates_url,
             "course_handouts": course_handouts_url,
-            "subscription_id": course.clean_id(padding_char='_'),
+            "subscription_id": course_overview.clean_id(padding_char='_'),
         }
 
 
@@ -63,7 +62,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
     """
     Serializes CourseEnrollment models
     """
-    course = CourseField()
+    course_overview = CourseOverviewField()
     certificate = serializers.SerializerMethodField('get_certificate')
 
     def get_certificate(self, model):
@@ -78,7 +77,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
 
     class Meta(object):  # pylint: disable=missing-docstring
         model = CourseEnrollment
-        fields = ('created', 'mode', 'is_active', 'course', 'certificate')
+        fields = ('created', 'mode', 'is_active', 'course_overview', 'certificate')
         lookup_field = 'username'
 
 

@@ -43,6 +43,7 @@ from util.milestones_helpers import (
     get_pre_requisite_courses_not_completed,
     any_unfulfilled_milestones,
 )
+from openedx.core.djangoapps.content.course_overview.models import CourseOverviewDescriptor
 
 import dogstats_wrapper as dog_stats_api
 
@@ -98,6 +99,9 @@ def has_access(user, action, obj, course_key=None):
     if isinstance(obj, CourseDescriptor):
         return _has_access_course_desc(user, action, obj)
 
+    if isinstance(obj, CourseOverviewDescriptor):
+        return _has_access_course_desc(user, action, obj)
+
     if isinstance(obj, ErrorDescriptor):
         return _has_access_error_desc(user, action, obj, course_key)
 
@@ -125,6 +129,7 @@ def has_access(user, action, obj, course_key=None):
 
 # ================ Implementation helpers ================================
 def _has_access_course_desc(user, action, course):
+    # TODO: note that course could be a CourseOverviewDescriptor
     """
     Check if user has access to a course descriptor.
 
@@ -648,8 +653,8 @@ def _has_staff_access_to_descriptor(user, descriptor, course_key):
     return _has_staff_access_to_location(user, descriptor.location, course_key)
 
 
-def is_mobile_available_for_user(user, course):
-    # TODO me: see who uses this, and possibly change course -> course_overview
+def is_mobile_available_for_user(user, course_overview):
+    # TODO me: correctly document that course_overview could be type CourseDescriptor OR CourseOverviewDescriptor
     """
     Returns whether the given course is mobile_available for the given user.
     Checks:
@@ -657,9 +662,9 @@ def is_mobile_available_for_user(user, course):
         Beta User and staff access overrides the mobile_available flag
     """
     return (
-        course.mobile_available or
-        auth.has_access(user, CourseBetaTesterRole(course.id)) or
-        _has_staff_access_to_descriptor(user, course, course.id)
+        course_overview.mobile_available or
+        auth.has_access(user, CourseBetaTesterRole(course_overview.id)) or
+        _has_staff_access_to_descriptor(user, course_overview, course_overview.id)
     )
 
 

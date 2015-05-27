@@ -24,9 +24,6 @@ custom_fields = [
 for s in custom_fields:
     add_introspection_rules([], ["openedx.core.djangoapps.content.course_overviews.models." + s])
 
-
-# TODO me: make sure all these fields work...
-
 class UserPartitionListCacheField(TextField):
     def __init__(self, *args, **kwargs):
         super(UserPartitionListCacheField, self).__init__(*args, **kwargs)
