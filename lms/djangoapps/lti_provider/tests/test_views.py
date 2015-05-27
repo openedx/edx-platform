@@ -8,6 +8,7 @@ from mock import patch, MagicMock
 
 from lti_provider import views
 from lti_provider.signature_validator import SignatureValidator
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from student.tests.factories import UserFactory
 
 
@@ -22,10 +23,11 @@ LTI_DEFAULT_PARAMS = {
     'oauth_nonce': u'OAuth Nonce',
 }
 
-
+COURSE_KEY = CourseKey.from_string('some/course/id')
+USAGE_KEY = UsageKey.from_string('i4x://some/course/problem/uuid').map_into_course(COURSE_KEY)
 COURSE_PARAMS = {
-    'course_id': 'CourseID',
-    'usage_id': 'UsageID'
+    'course_key': COURSE_KEY,
+    'usage_key': USAGE_KEY
 }
 
 
@@ -72,7 +74,7 @@ class LtiLaunchTest(TestCase):
         Verifies that the LTI launch succeeds when passed a valid request.
         """
         request = build_launch_request()
-        views.lti_launch(request, COURSE_PARAMS['course_id'], COURSE_PARAMS['usage_id'])
+        views.lti_launch(request, unicode(COURSE_KEY), unicode(USAGE_KEY))
         render.assert_called_with(request, ALL_PARAMS)
 
     def launch_with_missing_parameter(self, missing_param):
@@ -112,10 +114,10 @@ class LtiLaunchTest(TestCase):
         properly stored in the session
         """
         request = build_launch_request()
-        views.lti_launch(request, COURSE_PARAMS['course_id'], COURSE_PARAMS['usage_id'])
+        views.lti_launch(request, unicode(COURSE_KEY), unicode(USAGE_KEY))
         session = request.session[views.LTI_SESSION_KEY]
-        self.assertEqual(session['course_id'], 'CourseID', 'Course ID not set in the session')
-        self.assertEqual(session['usage_id'], 'UsageID', 'Usage ID not set in the session')
+        self.assertEqual(session['course_key'], COURSE_KEY, 'Course key not set in the session')
+        self.assertEqual(session['usage_key'], USAGE_KEY, 'Usage key not set in the session')
         for key in views.REQUIRED_PARAMETERS:
             self.assertEqual(session[key], request.POST[key], key + ' not set in the session')
 
@@ -126,7 +128,7 @@ class LtiLaunchTest(TestCase):
         URL
         """
         request = build_launch_request(False)
-        response = views.lti_launch(request, None, None)
+        response = views.lti_launch(request, unicode(COURSE_KEY), unicode(USAGE_KEY))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], '/accounts/login?next=/lti_provider/lti_run')
 
@@ -138,6 +140,7 @@ class LtiLaunchTest(TestCase):
         SignatureValidator.verify = MagicMock(return_value=False)
         request = build_launch_request()
         response = views.lti_launch(request, None, None)
+        self.assertEqual(response.status_code, 403)
         self.assertEqual(response.status_code, 403)
 
 
@@ -170,7 +173,7 @@ class LtiRunTest(TestCase):
         Verifies that the lti_run view returns a Forbidden status if the session
         is missing any of the required LTI parameters or course information.
         """
-        extra_keys = ['course_id', 'usage_id']
+        extra_keys = ['course_key', 'usage_key']
         for key in views.REQUIRED_PARAMETERS + extra_keys:
             request = build_run_request()
             del request.session[views.LTI_SESSION_KEY][key]
@@ -208,7 +211,6 @@ class RenderCoursewareTest(TestCase):
         self.module_mock = self.setup_patch('lti_provider.views.get_module_by_usage_id', (self.module_instance, None))
         self.access_mock = self.setup_patch('lti_provider.views.has_access', 'StaffAccess')
         self.course_mock = self.setup_patch('lti_provider.views.get_course_with_access', 'CourseWithAccess')
-        self.key_mock = self.setup_patch('lti_provider.views.CourseKey.from_string', 'CourseKey')
 
     def setup_patch(self, function_name, return_value):
         """
@@ -228,21 +230,13 @@ class RenderCoursewareTest(TestCase):
         response = views.render_courseware(request, ALL_PARAMS.copy())
         self.assertEqual(response, 'Rendered page')
 
-    def test_course_key(self):
-        """
-        Verify that the correct course key is requested
-        """
-        request = build_run_request()
-        views.render_courseware(request, ALL_PARAMS.copy())
-        self.key_mock.assert_called_with(ALL_PARAMS['course_id'])
-
     def test_course_with_access(self):
         """
         Verify that get_course_with_access is called with the right parameters
         """
         request = build_run_request()
         views.render_courseware(request, ALL_PARAMS.copy())
-        self.course_mock.assert_called_with(request.user, 'load', 'CourseKey')
+        self.course_mock.assert_called_with(request.user, 'load', COURSE_KEY)
 
     def test_has_access(self):
         """
@@ -258,7 +252,7 @@ class RenderCoursewareTest(TestCase):
         """
         request = build_run_request()
         views.render_courseware(request, ALL_PARAMS.copy())
-        self.module_mock.assert_called_with(request, ALL_PARAMS['course_id'], ALL_PARAMS['usage_id'])
+        self.module_mock.assert_called_with(request, unicode(COURSE_KEY), unicode(USAGE_KEY))
 
     def test_render(self):
         """
@@ -278,7 +272,7 @@ class RenderCoursewareTest(TestCase):
             'disable_footer': True,
             'disable_tabs': True,
             'staff_access': 'StaffAccess',
-            'xqa_server': 'http://your_xqa_server.com',
+            'xqa_server': 'http://example.com/xqa',
         }
         request = build_run_request()
         views.render_courseware(request, ALL_PARAMS.copy())

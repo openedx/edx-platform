@@ -1,5 +1,12 @@
 """
 Database models for the LTI provider feature.
+
+This app uses migrations. If you make changes to this model, be sure to create
+an appropriate migration file and check it in at the same time as your model
+changes. To do that,
+
+1. Go to the edx-platform dir
+2. ./manage.py lms schemamigration lti_provider --auto "description" --settings=devstack
 """
 from django.db import models
 from django.dispatch import receiver
@@ -13,8 +20,9 @@ class LtiConsumer(models.Model):
     specific settings, such as the OAuth key/secret pair and any LTI fields
     that must be persisted.
     """
-    key = models.CharField(max_length=32, unique=True, db_index=True)
-    secret = models.CharField(max_length=32, unique=True)
+    consumer_name = models.CharField(max_length=255)
+    consumer_key = models.CharField(max_length=32, unique=True, db_index=True)
+    consumer_secret = models.CharField(max_length=32, unique=True)
 
 
 @receiver(SCORE_CHANGED)
