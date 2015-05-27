@@ -226,6 +226,12 @@ class ImportMixin(object):
         """
         return self.q(css='.wrapper-status').visible
 
+    def is_timestamp_visible(self):
+        """
+        Checks if the UTC timestamp of the last successfull import is visible
+        """
+        return self.q(css='.item-progresspoint-success-date').visible
+
     def wait_for_filename_error(self):
         """
         Wait for the upload field to display an error.

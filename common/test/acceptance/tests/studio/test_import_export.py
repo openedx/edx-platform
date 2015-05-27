@@ -183,6 +183,21 @@ class ImportTestMixin(object):
         self.import_page.upload_tarball(self.tarball_name)
         self.import_page.wait_for_upload()
 
+    def test_successful_import_timestamp(self):
+        """
+        Scenario: I perform a course / library import
+            On import success, the page displays its UTC timestamp previously not visible
+            And if I refresh the page, the timestamp is still displayed
+        """
+        self.assertFalse(self.import_page.is_timestamp_visible())
+        self.import_page.upload_tarball(self.tarball_name)
+        self.import_page.wait_for_upload()
+        self.assertTrue(self.import_page.is_timestamp_visible())
+
+        self.import_page.visit()
+        self.import_page.wait_for_tasks(completed=True)
+        self.assertTrue(self.import_page.is_timestamp_visible())
+
     def test_landing_url(self):
         """
         Scenario: When uploading a library or course, a link appears for me to view the changes.
