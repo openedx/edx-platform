@@ -73,10 +73,14 @@ from django.utils.translation import ungettext
         </div>
         <div class="data-input">
           ## Translators: "Registration for:" is followed by a course name
-          <h3>${_('Registration for:')}
-            <span class="pull-right">${_('Course Dates:')}</span>
+          <h3 class="course-title-info" id="course-title">
+            <span class="course-registration-title">${_('Registration for:')}</span>
+            <span class="course-display-name">${ course.display_name }</span>
           </h3>
-          <h1>${ course.display_name }</h1><span class="pull-right">${course.start_datetime_text()} -  ${course.end_datetime_text()}</span>
+          <p class="course-meta-info" aria-describedby="course-title">
+            <span class="course-dates-title">${_('Course Dates:')}</span>
+            <span class="course-display-dates clearfix">${ course.start_datetime_text() } - ${ course.end_datetime_text() }</span>
+          </p>
           <hr>
           <div class="three-col">
               <div class="col-1">
@@ -100,19 +104,29 @@ from django.utils.translation import ungettext
                   % endif
               </div>
               <div class="col-2">
-                <div class="numbers-row">
-                  <label for="students">${_('Students:')}</label>
+                <div class="numbers-row" aria-live="polite">
+                  <label for="field_${item.id}">${_('Students:')}</label>
                   <div class="counter">
-                      <input maxlength="3" title="${_('Input quantity and press enter.')}" max="999" type="text" name="students" value="${item.qty}" id="${item.id}" data-unit-cost="${item.unit_cost}" data-qty="${item.qty}">
+                      <input maxlength="3" title="${_('Input quantity and press enter.')}" max="999" type="text" name="students" value="${item.qty}" id="field_${item.id}" data-unit-cost="${item.unit_cost}" data-qty="${item.qty}" aria-describedby="students-${item.id}">
                   </div>
-                  <button class="inc button"><i class="icon fa fa-caret-up" aria-hidden="true"><span>+</span></i></button><button class="dec button"><i class="icon fa fa-caret-down"></i></button>
+                  <button class="inc button">
+                    <i class="icon fa fa-caret-up" aria-hidden="true"><span>+</span></i>
+                    <span class="sr">Increase</span>
+                  </button>
+                  <button class="dec button">
+                    <i class="icon fa fa-caret-down"></i>
+                    <span class="sr">Decrease</span>
+                  </button>
                       <!--<a name="updateBtn" class="updateBtn hidden" id="updateBtn-${item.id}" href="#">update</a>-->
-                  <span class="error-text hidden" id="students-${item.id}" aria-hidden="true"></span>
+                  <span class="error-text hidden" id="students-${item.id}"></span>
               </div>
                 </div>
 
               <div class="col-3">
-                 <button href="#" class="btn-remove" data-item-id="${item.id}"><i class="icon fa fa-times-circle" aria-hidden="true"></i></button>
+                 <button href="#" class="btn-remove" data-item-id="${item.id}">
+                  <i class="icon fa fa-times-circle" aria-hidden="true"></i>
+                  <span class="sr">Remove</span>
+                </button>
               </div>
           </div>
         </div>
@@ -124,10 +138,11 @@ from django.utils.translation import ungettext
 
             <div class="code-text">
             % if not discount_applied:
-              <div class="code-input">
+              <div class="code-input" aria-live="polite">
+                <label for="input_code" class="sr">Discount or activation code</label>
                 <input type="text" placeholder="${_('discount or activation code')}" id="input_code">
                 <button type="submit" class="blue" id="submit-code">${_('Apply')}</button>
-                <span class="error-text hidden" id="code" ></span>
+                <span class="error-text hidden" id="code"></span>
               </div>
             % else:
               <div class="code-applied">
@@ -149,31 +164,37 @@ from django.utils.translation import ungettext
             <div class="col-2 relative">
                % if order_type == 'business':
                   <div name="billing">
-                      <button type="submit" name="billing-details">${_('Billing Details')}<i class="icon fa fa-caret-right" aria-hidden="true"></i></button>
-                        <p>
-                            ${_('After this purchase is complete, a receipt is generated with relative billing details and registration codes for students.')}
-                        </p>
+                      <button type="submit" name="billing-details" aria-describedby="billing_business_helper_text">
+                        ${_('Billing Details')}
+                        <i class="icon fa fa-caret-right" aria-hidden="true"></i>
+                      </button>
+                      <p id="billing_business_helper_text">
+                          ${_('After this purchase is complete, a receipt is generated with relative billing details and registration codes for students.')}
+                      </p>
                   </div>
                    <div name="payment" class="hidden">
-                    <div id="processor_form">
+                    <div id="processor_form" aria-describedby="payment_business_helper_text">
                       ${form_html}
                     </div>
-                    <p>
+                    <p id="payment_business_helper_text">
                         ${_('After this purchase is complete, {username} will be enrolled in this course.').format(username=u'<br/><b>{username}</b>'.format(username=order.user.username))}
                     </p>
                   </div>
                % else:
-                  <div name="payment">
+                  <div name="payment" aria-describedby="payment_helper_text">
                     ${form_html}
-                    <p>
+                    <p id="payment_helper_text">
                         ${_('After this purchase is complete, {username} will be enrolled in this course.').format(username=u'<br/><b>{username}</b>'.format(username=order.user.username))}
                     </p>
                   </div>
                   <div name="billing" class="hidden">
-                      <button type="submit" name="billing-details">${_('Billing Details')}<i class="icon fa fa-caret-right" aria-hidden="true"></i></button>
-                        <p>
-                            ${_('After this purchase is complete, a receipt is generated with relative billing details and registration codes for students.')}
-                        </p>
+                      <button type="submit" name="billing-details" aria-describedby="billing_helper_text">
+                        ${_('Billing Details')}
+                        <i class="icon fa fa-caret-right" aria-hidden="true"></i>
+                      </button>
+                      <p id="billing_helper_text">
+                          ${_('After this purchase is complete, a receipt is generated with relative billing details and registration codes for students.')}
+                      </p>
                   </div>
                %endif
             </div>
