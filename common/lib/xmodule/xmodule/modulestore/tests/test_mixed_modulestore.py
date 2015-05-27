@@ -357,8 +357,8 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     # Draft:
     #    problem: One lookup to locate an item that exists
     #    fake: one w/ wildcard version
-    # split has one lookup for the course and then one for the course items
-    @ddt.data(('draft', [1, 1], 0), ('split', [2, 2], 0))
+    # split has one lookup for the course and then one for the course items (cached)
+    @ddt.data(('draft', [1, 1], 0), ('split', [2, 1], 0))
     @ddt.unpack
     def test_has_item(self, default_ms, max_find, max_send):
         self.initdb(default_ms)
@@ -384,9 +384,9 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #   problem: find draft item, find all items pertinent to inheritance computation, find parent
     #   non-existent problem: find draft, find published
     # split:
-    #   problem: active_versions, structure
+    #   problem: active_versions, structure (cached)
     #   non-existent problem: ditto
-    @ddt.data(('draft', [3, 2], 0), ('split', [2, 2], 0))
+    @ddt.data(('draft', [3, 2], 0), ('split', [2, 1], 0))
     @ddt.unpack
     def test_get_item(self, default_ms, max_find, max_send):
         self.initdb(default_ms)
@@ -440,9 +440,9 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
     # draft: get draft, get ancestors up to course (2-6), compute inheritance
     #    sends: update problem and then each ancestor up to course (edit info)
-    # split: active_versions, definitions (calculator field), structures
+    # split: active_versions, definitions (calculator field), structures (cached)
     #  2 sends to update index & structure (note, it would also be definition if a content field changed)
-    @ddt.data(('draft', 7, 5), ('split', 3, 2))
+    @ddt.data(('draft', 7, 5), ('split', 2, 2))
     @ddt.unpack
     def test_update_item(self, default_ms, max_find, max_send):
         """
@@ -741,9 +741,9 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #             inheritance items, draft item, draft child, inheritance
     #    sends: delete draft vertical and update parent
     # Split:
-    #    queries: active_versions, draft and published structures, definition (unnecessary)
+    #    queries: active_versions, draft and published structures (cached), definition (unnecessary)
     #    sends: update published (why?), draft, and active_versions
-    @ddt.data(('draft', 9, 2), ('split', 2, 2))
+    @ddt.data(('draft', 9, 2), ('split', 1, 2))
     @ddt.unpack
     def test_delete_private_vertical(self, default_ms, max_find, max_send):
         """
@@ -794,7 +794,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #   find: find parent (definition.children) 2x, find draft item, get inheritance items
     #   send: one delete query for specific item
     # Split:
-    #   find: active_version & structure
+    #   find: active_version & structure (cached)
     #   send: update structure and active_versions
     @ddt.data(('draft', 4, 1), ('split', 2, 2))
     @ddt.unpack
@@ -1095,8 +1095,8 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #    7-8. get sequential, compute inheritance
     #    8-9. get vertical, compute inheritance
     #    10-11. get other vertical_x1b (why?) and compute inheritance
-    # Split: active_versions & structure
-    @ddt.data(('draft', [12, 3], 0), ('split', [2, 2], 0))
+    # Split: active_versions & structure (cached)
+    @ddt.data(('draft', [12, 3], 0), ('split', [2, 1], 0))
     @ddt.unpack
     def test_path_to_location(self, default_ms, num_finds, num_sends):
         """
@@ -1444,11 +1444,11 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #      1. delete all of the published nodes in subtree
     #      2. insert vertical as published (deleted in step 1) w/ the deleted problems as children
     #      3-6. insert the 3 problems and 1 html as published
-    # Split: active_versions, 2 structures (pre & post published?)
+    # Split: active_versions, 2 structures (pre & post published?) (cached)
     # Sends:
     #    - insert structure
     #    - write index entry
-    @ddt.data(('draft', 2, 6), ('split', 3, 2))
+    @ddt.data(('draft', 2, 6), ('split', 1, 2))
     @ddt.unpack
     def test_unpublish(self, default_ms, max_find, max_send):
         """
