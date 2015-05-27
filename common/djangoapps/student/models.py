@@ -48,6 +48,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import CourseKey
 from functools import total_ordering
+from openedx.core.djangoapps.content import course_overviews
 
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
@@ -749,8 +750,6 @@ class CourseEnrollment(models.Model):
     scattered across our views.
     """
 
-    # TODO me: make sure changing course -> course_overview doesn't break everything
-
     MODEL_TAGS = ['course_id', 'is_active', 'mode']
 
     user = models.ForeignKey(User)
@@ -1267,11 +1266,15 @@ class CourseEnrollment(models.Model):
     def username(self):
         return self.user.username
 
-    # TODO me: change this to course_overview
-    # TODO me: make this cache return value in RAM
     @property
     def course(self):
         return modulestore().get_course(self.course_id)
+
+    @property
+    def course_overview(self):
+        if not hasattr(self, '_course_overview'):
+            self._course_overview = course_overviews.get_course_overview(self.course_id)
+        return self._course_overview
 
     def is_verified_enrollment(self):
         """
