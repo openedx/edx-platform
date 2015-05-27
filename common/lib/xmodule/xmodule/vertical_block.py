@@ -52,6 +52,9 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
             'items': contents,
             'xblock_context': context,
             'bookmarked': child_context['bookmarked'],
+            'item_id': unicode(self.location),
+            'username': child_context['username'],
+            'bookmark_api_url': child_context['bookmarks_api_url']
         }))
         return fragment
 

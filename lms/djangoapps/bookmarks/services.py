@@ -4,6 +4,7 @@ Bookmarks service.
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -20,6 +21,7 @@ class BookmarksService(object):
     def __init__(self, user, **kwargs):
         super(BookmarksService, self).__init__(**kwargs)
         self._user = user
+        self.API_URL = reverse('bookmarks',)
 
     def bookmarks(self, course_key):
         """

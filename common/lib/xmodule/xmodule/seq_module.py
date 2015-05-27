@@ -48,6 +48,7 @@ class SequenceFields(object):
         scope=Scope.content,
     )
 
+@XBlock.needs("user")
 @XBlock.needs("bookmarks")
 class SequenceModule(SequenceFields, XModule):
     ''' Layout module which lays out content in a temporal sequence
@@ -111,12 +112,21 @@ class SequenceModule(SequenceFields, XModule):
         contents = []
 
         fragment = Fragment()
+        bookmarks_service = self.runtime.service(self, "bookmarks")
+        users_service = self.runtime.service(self, "user")
 
         for child in self.get_display_items():
-            is_bookmarked = self.runtime.service(self, "bookmarks").is_bookmarked(usage_key=child.scope_ids.usage_id)
-            progress = child.get_progress()
+            is_bookmarked = bookmarks_service.is_bookmarked(usage_key=child.scope_ids.usage_id)
+            bookmarks_api_url = bookmarks_service.API_URL
+            current_username = users_service.get_current_user().opt_attrs['edx-platform.username']
+
             context = {} if not context else context
             context["bookmarked"] = is_bookmarked
+            context["username"] = current_username
+            context["bookmarks_api_url"] = bookmarks_api_url
+
+            progress = child.get_progress()
+
             rendered_child = child.render(STUDENT_VIEW, context)
             fragment.add_frag_resources(rendered_child)
 

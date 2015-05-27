@@ -1,9 +1,8 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%page args="is_bookmarked" />
+<%page args="is_bookmarked, item_id, bookmark_api_url, username" />
 
 <div class="bookmark-button-wrapper">
-    <button class="btn bookmark-button ${"bookmarked" if is_bookmarked else "un-bookmarked"}" data-id="">
-        <i class="fa fa-fw ${"fa-bookmark" if is_bookmarked else "fa-bookmark-o"} bookmark-icon"></i>
+    <button class="btn bookmark-button ${"bookmarked" if is_bookmarked else "un-bookmarked"}" data-id="${item_id}" data-url="${bookmark_api_url}" data-username="${username}">
         ${_("Bookmark")}
     </button>
 </div>

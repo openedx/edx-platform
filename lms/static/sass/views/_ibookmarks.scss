@@ -1,0 +1,50 @@
+i.bookmarked {
+  top: -3px;
+  position: absolute;
+  left: 10px;
+}
+
+.bookmark-button-wrapper {
+  text-align: right;
+  margin-bottom: 10px;
+}
+
+@mixin base-style($border-color, $content-color) {
+  background: none;
+  border: 1px solid $border-color;
+  border-radius: ($baseline/4);
+  color: $content-color;
+
+  &:focus, &:active {
+    box-shadow: none;
+  }
+}
+
+@mixin icon-style($content, $color) {
+  &:before {
+    content: $content;
+    font-family: FontAwesome;
+    color: $color;
+  }
+}
+
+@mixin hover-style($border-color, $content-color, $icon-content) {
+  &:hover {
+    background: none;
+    border: 1px solid $border-color;
+    color: $content-color;
+    @include icon-style($icon-content, $content-color);
+  }
+}
+
+.bookmark-button.bookmarked {
+  @include base-style($m-blue, $link-color);
+  @include icon-style("\f02e", $link-color);
+  @include hover-style($light-gray, $black, "\f097");
+}
+
+.bookmark-button.un-bookmarked {
+  @include base-style($light-gray, $black);
+  @include icon-style("\f097", $black);
+  @include hover-style($m-blue, $m-blue, "\f02e");
+}

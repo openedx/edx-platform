@@ -1,5 +1,6 @@
 
-<%include file='bookmark_button.html' args="is_bookmarked=bookmarked"/>
+<%include file='bookmark_button.html' args="is_bookmarked=bookmarked, item_id=item_id, bookmark_api_url=bookmark_api_url, username=username"/>
+
 <div class="vert-mod">
 % for idx, item in enumerate(items):
   <div class="vert vert-${idx}" data-id="${item['id']}">
