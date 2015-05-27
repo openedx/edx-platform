@@ -4,6 +4,7 @@ import warnings
 
 from lxml import etree
 
+from xblock.core import XBlock
 from xblock.fields import Integer, Scope, Boolean
 from xblock.fragment import Fragment
 from pkg_resources import resource_string
@@ -47,7 +48,7 @@ class SequenceFields(object):
         scope=Scope.content,
     )
 
-
+@XBlock.needs("bookmarks")
 class SequenceModule(SequenceFields, XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
@@ -112,7 +113,10 @@ class SequenceModule(SequenceFields, XModule):
         fragment = Fragment()
 
         for child in self.get_display_items():
+            is_bookmarked = self.runtime.service(self, "bookmarks").is_bookmarked(usage_key=child.scope_ids.usage_id)
             progress = child.get_progress()
+            context = {} if not context else context
+            context["bookmarked"] = is_bookmarked
             rendered_child = child.render(STUDENT_VIEW, context)
             fragment.add_frag_resources(rendered_child)
 
@@ -125,7 +129,7 @@ class SequenceModule(SequenceFields, XModule):
                 'progress_detail': Progress.to_js_detail_str(progress),
                 'type': child.get_icon_class(),
                 'id': child.scope_ids.usage_id.to_deprecated_string(),
-                'bookmarked': self.runtime.service(self, "bookmarks").is_bookmarked(usage_key=child.scope_ids.usage_id),
+                'bookmarked': is_bookmarked,
             }
             if childinfo['title'] == '':
                 childinfo['title'] = child.display_name_with_default
