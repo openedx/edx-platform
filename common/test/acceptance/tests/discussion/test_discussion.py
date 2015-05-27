@@ -582,6 +582,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
 
     def setUp(self):
         super(InlineDiscussionTest, self).setUp()
+        self.thread_ids = []
         self.discussion_id = "test_discussion_{}".format(uuid4().hex)
         self.additional_discussion_id = "test_discussion_{}".format(uuid4().hex)
         self.course_fix = CourseFixture(**self.course_info).add_children(
@@ -615,6 +616,38 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.assertEqual(self.discussion_page.get_num_displayed_threads(), 1)
         self.thread_page = InlineDiscussionThreadPage(self.browser, thread_id)  # pylint: disable=attribute-defined-outside-init
         self.thread_page.expand()
+
+    def setup_multiple_inline_threads(self, thread_count):
+        """
+        Set up multiple treads on the page by passing 'thread_count'
+        """
+        threads = []
+        for i in range(thread_count):
+            thread_id = "test_thread_{}_{}".format(i, uuid4().hex)
+            threads.append(
+                Thread(id=thread_id, commentable_id=self.discussion_id),
+            )
+            self.thread_ids.append(thread_id)
+        thread_fixture = MultipleThreadFixture(threads)
+        thread_fixture.add_response(
+            Response(id="response1"),
+            [Comment(id="comment1", user_id="other"), Comment(id="comment2", user_id=self.user_id)],
+            threads[0]
+        )
+        thread_fixture.push()
+
+    def test_page_while_expanding_inline_discussion(self):
+        """
+        Tests for the Inline Discussion page with multiple treads. Page should not focus 'thread-wrapper'
+        after loading responses.
+        """
+        self.setup_multiple_inline_threads(thread_count=3)
+        self.discussion_page.expand_discussion()
+        thread_page = InlineDiscussionThreadPage(self.browser, self.thread_ids[0])
+        thread_page.expand()
+
+        # Check if 'thread-wrapper' is focused after expanding thread
+        self.assertFalse(thread_page.check_if_selector_is_focused(selector='.thread-wrapper'))
 
     def test_initial_render(self):
         self.assertFalse(self.discussion_page.is_discussion_expanded())
