@@ -4,10 +4,12 @@ Tests for bookmark views.
 
 import ddt
 import json
+import urllib
 from django.core.urlresolvers import reverse
 from rest_framework.test import APIClient
 
 from student.tests.factories import UserFactory
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -42,42 +44,45 @@ class BookmarksViewTestsMixin(ModuleStoreTestCase):
         """
         Creates the bookmarks test data.
         """
-        self.course = CourseFactory.create(display_name='An Introduction to API Testing')
-        self.course_id = unicode(self.course.id)
+        with self.store.default_store(ModuleStoreEnum.Type.split):
 
-        chapter_1 = ItemFactory.create(
-            parent_location=self.course.location, category='chapter', display_name='Week 1'
-        )
-        sequential_1 = ItemFactory.create(
-            parent_location=chapter_1.location, category='sequential', display_name='Lesson 1'
-        )
-        self.vertical_1 = ItemFactory.create(
-            parent_location=sequential_1.location, category='vertical', display_name='Subsection 1'
-        )
-        self.bookmark_1 = BookmarkFactory.create(
-            user=self.user,
-            course_key=self.course_id,
-            usage_key=self.vertical_1.location,
-            display_name=self.vertical_1.display_name
-        )
-        chapter_2 = ItemFactory.create(
-            parent_location=self.course.location, category='chapter', display_name='Week 2'
-        )
-        sequential_2 = ItemFactory.create(
-            parent_location=chapter_2.location, category='sequential', display_name='Lesson 2'
-        )
-        vertical_2 = ItemFactory.create(
-            parent_location=sequential_2.location, category='vertical', display_name='Subsection 2'
-        )
-        self.vertical_3 = ItemFactory.create(
-            parent_location=sequential_2.location, category='vertical', display_name='Subsection 3'
-        )
-        self.bookmark_2 = BookmarkFactory.create(
-            user=self.user,
-            course_key=self.course_id,
-            usage_key=vertical_2.location,
-            display_name=vertical_2.display_name
-        )
+            self.course = CourseFactory.create()
+            self.course_id = unicode(self.course.id)
+
+            chapter_1 = ItemFactory.create(
+                parent_location=self.course.location, category='chapter', display_name='Week 1'
+            )
+            sequential_1 = ItemFactory.create(
+                parent_location=chapter_1.location, category='sequential', display_name='Lesson 1'
+            )
+            self.vertical_1 = ItemFactory.create(
+                parent_location=sequential_1.location, category='vertical', display_name='Subsection 1'
+            )
+            self.bookmark_1 = BookmarkFactory.create(
+                user=self.user,
+                course_key=self.course_id,
+                usage_key=self.vertical_1.location,
+                display_name=self.vertical_1.display_name
+            )
+            chapter_2 = ItemFactory.create(
+                parent_location=self.course.location, category='chapter', display_name='Week 2'
+            )
+            sequential_2 = ItemFactory.create(
+                parent_location=chapter_2.location, category='sequential', display_name='Lesson 2'
+            )
+            vertical_2 = ItemFactory.create(
+                parent_location=sequential_2.location, category='vertical', display_name='Subsection 2'
+            )
+            self.vertical_3 = ItemFactory.create(
+                parent_location=sequential_2.location, category='vertical', display_name='Subsection 3'
+            )
+            self.bookmark_2 = BookmarkFactory.create(
+                user=self.user,
+                course_key=self.course_id,
+                usage_key=vertical_2.location,
+                display_name=vertical_2.display_name
+            )
+
         # Other Course
         self.other_course = CourseFactory.create(display_name='An Introduction to API Testing 2')
         other_chapter = ItemFactory.create(
@@ -155,7 +160,7 @@ class BookmarksListViewTests(BookmarksViewTestsMixin):
         response = self.send_get(
             client=self.client,
             url=reverse('bookmarks'),
-            query_parameters=query_params.format(self.course_id)
+            query_parameters=query_params.format(urllib.quote(self.course_id))
         )
 
         bookmarks = response.data['results']
@@ -172,7 +177,7 @@ class BookmarksListViewTests(BookmarksViewTestsMixin):
         """
         Test that requesting bookmarks for a course return results with pagination 200 code.
         """
-        query_parameters = 'course_id={}&page_size=1'.format(self.course_id)
+        query_parameters = 'course_id={}&page_size=1'.format(urllib.quote(self.course_id))
         response = self.send_get(client=self.client, url=reverse('bookmarks'), query_parameters=query_parameters)
 
         bookmarks = response.data['results']
@@ -401,7 +406,7 @@ class BookmarksDetailViewTests(BookmarksViewTestsMixin):
         """
         Test that delete bookmark returns 204 status code with success.
         """
-        query_parameters = 'course_id={}'.format(self.course_id)
+        query_parameters = 'course_id={}'.format(urllib.quote(self.course_id))
         response = self.send_get(client=self.client, url=reverse('bookmarks'), query_parameters=query_parameters)
         data = response.data
         bookmarks = data['results']
