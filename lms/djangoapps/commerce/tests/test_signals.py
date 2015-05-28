@@ -4,6 +4,8 @@ Tests for signal handling in commerce djangoapp.
 from django.test import TestCase
 from django.test.utils import override_settings
 
+from course_modes.models import CourseMode
+import ddt
 import mock
 from opaque_keys.edx.keys import CourseKey
 from student.models import UNENROLL_DONE
@@ -14,6 +16,7 @@ from commerce.tests import TEST_PUBLIC_URL_ROOT, TEST_API_URL, TEST_API_SIGNING_
 from commerce.tests.mocks import mock_create_refund
 
 
+@ddt.ddt
 @override_settings(
     ECOMMERCE_PUBLIC_URL_ROOT=TEST_PUBLIC_URL_ROOT,
     ECOMMERCE_API_URL=TEST_API_URL,
@@ -31,6 +34,7 @@ class TestRefundSignal(TestCase):
         self.course_enrollment = CourseEnrollmentFactory(
             user=self.student,
             course_id=CourseKey.from_string('course-v1:org+course+run'),
+            mode=CourseMode.VERIFIED,
         )
         self.course_enrollment.refundable = mock.Mock(return_value=True)
 
@@ -111,7 +115,7 @@ class TestRefundSignal(TestCase):
         Ensure that expected authorization issues are logged as warnings.
         """
         with mock_create_refund(status=403):
-            refund_seat(self.course_enrollment, None)
+            refund_seat(self.course_enrollment, UserFactory())
             self.assertTrue(mock_log_warning.called)
 
     @mock.patch('commerce.signals.log.exception')
@@ -125,14 +129,14 @@ class TestRefundSignal(TestCase):
             self.assertTrue(mock_log_exception.called)
 
     @mock.patch('commerce.signals.send_refund_notification')
-    def test_notification(self, mock_send_notificaton):
+    def test_notification(self, mock_send_notification):
         """
         Ensure the notification function is triggered when refunds are
         initiated
         """
         with mock_create_refund(status=200, response=[1, 2, 3]):
             self.send_signal()
-            self.assertTrue(mock_send_notificaton.called)
+            self.assertTrue(mock_send_notification.called)
 
     @mock.patch('commerce.signals.send_refund_notification')
     def test_notification_no_refund(self, mock_send_notification):
@@ -141,6 +145,27 @@ class TestRefundSignal(TestCase):
         initiated
         """
         with mock_create_refund(status=200, response=[]):
+            self.send_signal()
+            self.assertFalse(mock_send_notification.called)
+
+    @mock.patch('commerce.signals.send_refund_notification')
+    @ddt.data(
+        CourseMode.HONOR,
+        CourseMode.PROFESSIONAL,
+        CourseMode.AUDIT,
+        CourseMode.NO_ID_PROFESSIONAL_MODE,
+        CourseMode.CREDIT_MODE,
+    )
+    def test_notification_not_verified(self, mode, mock_send_notification):
+        """
+        Ensure the notification function is NOT triggered when the
+        unenrollment is for any mode other than verified (i.e. any mode other
+        than one for which refunds are presently supported).  See the
+        TODO associated with XCOM-371 in the signals module in the commerce
+        package for more information.
+        """
+        self.course_enrollment.mode = mode
+        with mock_create_refund(status=200, response=[1, 2, 3]):
             self.send_signal()
             self.assertFalse(mock_send_notification.called)
 
