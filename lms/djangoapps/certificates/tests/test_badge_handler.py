@@ -155,7 +155,7 @@ class BadgeHandlerTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         self.assertTrue(BadgeHandler.badges['edxcourse_testtest_run_honor_fc5519b'])
 
     @patch('requests.post')
-    def test_create_assertion(self, post):
+    def test_evidence_event(self, post):
         result = {
             'json': {'id': 'http://www.example.com/example'},
             'image': 'http://www.example.com/example.png',
@@ -174,7 +174,10 @@ class BadgeHandlerTestCase(ModuleStoreTestCase, EventTrackingTestCase):
             'edxcourse_testtest_run_honor_fc5519b/assertions'
         )
         self.check_headers(kwargs['headers'])
-        self.assertEqual(kwargs['data'], {'email': 'example@example.com'})
+        self.assertEqual(kwargs['data'], {
+            'email': 'example@example.com',
+            'evidence': 'https://edx.org/user/2/course/edX/course_test/test_run?evidence_visit=1'
+        })
         badge = BadgeAssertion.objects.get(user=self.user, course_id=self.course.location.course_key)
         self.assertEqual(badge.data, result)
         self.assertEqual(badge.image_url, 'http://www.example.com/example.png')
