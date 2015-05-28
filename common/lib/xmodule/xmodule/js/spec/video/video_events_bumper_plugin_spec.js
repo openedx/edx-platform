@@ -119,7 +119,7 @@
                 host_component_id: 'id',
                 bumper_id: 'xmodule/include/fixtures/test.mp4',
                 code: 'html5',
-                current_time: 10,
+                currentTime: 10,
                 duration: 20
             });
         });
@@ -130,7 +130,7 @@
                 host_component_id: 'id',
                 bumper_id: 'xmodule/include/fixtures/test.mp4',
                 code: 'html5',
-                current_time: 10,
+                currentTime: 10,
                 duration: 20
             });
         });
