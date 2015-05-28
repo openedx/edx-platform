@@ -75,13 +75,11 @@ def collect_course_forums_data(course_id):
             "{0}-{1}-{2}".format(result['_id']['year'], result['_id']['month'], result['_id']['day']),
             result['_id']['type'],
             result['posts'],
-            result['up_votes'],
-            result['down_votes'],
-            result['net_points'],
+            result['votes'],
         ]
         for result in results
     ]
-    header = ['Date', 'Type', 'Number', 'Up Votes', 'Down Votes', 'Net Points']
+    header = ['Date', 'Activity Type', 'Number New', 'Votes']
     return header, parsed_results
 
 
@@ -151,9 +149,7 @@ def generate_course_forums_query(course_id, query_type, parent_id_check=None):
                 'type': '$type',
             },
             'posts': {"$sum": 1},
-            'net_points': {'$sum': '$votes.point'},
-            'up_votes': {'$sum': '$votes.up_count'},
-            'down_votes': {'$sum': '$votes.down_count'},
+            'votes': {'$sum': '$votes.up_count'},
         }},
         # order of the sort is important so we use SON
         {'$sort': SON([('_id.year', 1), ('_id.month', 1), ('_id.day', 1)])},
