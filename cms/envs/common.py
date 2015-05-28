@@ -960,3 +960,13 @@ XBLOCK_SETTINGS = {
         "licensing_enabled": FEATURES.get("LICENSING", False)
     }
 }
+
+################################ Settings for Credit Course Requirements ################################
+# Initial delay used for retrying tasks.
+# Additional retries use longer delays.
+# Value is in seconds.
+CREDIT_TASK_DEFAULT_RETRY_DELAY = 30
+
+# Maximum number of retries per task for errors that are not related
+# to throttling.
+CREDIT_TASK_MAX_RETRIES = 5
