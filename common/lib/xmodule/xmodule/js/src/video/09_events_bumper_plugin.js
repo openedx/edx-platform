@@ -16,7 +16,7 @@ define('video/09_events_bumper_plugin.js', [], function() {
         }
 
         _.bindAll(this, 'onReady', 'onPlay', 'onEnded', 'onShowLanguageMenu', 'onHideLanguageMenu', 'onSkip',
-            'onShowCaptions', 'onHideCaptions', 'destroy');
+            'onShowCaptions', 'onHideCaptions', 'destroy', 'onWaiting', 'onPause');
         this.state = state;
         this.options = _.extend({}, options);
         this.state.videoEventsBumperPlugin = this;
@@ -37,6 +37,7 @@ define('video/09_events_bumper_plugin.js', [], function() {
             this.events = {
                 'ready': this.onReady,
                 'play': this.onPlay,
+                'pause': this.onPause,
                 'ended stop': this.onEnded,
                 'skip': this.onSkip,
                 'language_menu:show': this.onShowLanguageMenu,
@@ -50,10 +51,19 @@ define('video/09_events_bumper_plugin.js', [], function() {
 
         bindHandlers: function() {
             this.state.el.on(this.events);
+            this.state.el.find('video').on('waiting', this.onWaiting);
         },
 
         onReady: function () {
             this.log('edx.video.bumper.loaded');
+        },
+
+        onWaiting: function () {
+            this.log('edx.video.bumper.waited', {currentTime: this.getCurrentTime()});
+        },
+
+        onPause: function () {
+            this.log('edx.video.bumper.paused', {currentTime: this.getCurrentTime()});
         },
 
         onPlay: function () {
@@ -79,11 +89,11 @@ define('video/09_events_bumper_plugin.js', [], function() {
         },
 
         onShowCaptions: function () {
-            this.log('edx.video.bumper.transcript.shown', {current_time: this.getCurrentTime()});
+            this.log('edx.video.bumper.transcript.shown', {currentTime: this.getCurrentTime()});
         },
 
         onHideCaptions: function () {
-            this.log('edx.video.bumper.transcript.hidden', {current_time: this.getCurrentTime()});
+            this.log('edx.video.bumper.transcript.hidden', {currentTime: this.getCurrentTime()});
         },
 
         getCurrentTime: function () {
