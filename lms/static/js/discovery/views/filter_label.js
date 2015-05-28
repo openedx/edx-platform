@@ -4,7 +4,7 @@ define([
     'jquery',
     'underscore',
     'backbone',
-    'gettext',
+    'gettext'
 ], function ($, _, Backbone, gettext) {
     'use strict';
 
@@ -15,21 +15,17 @@ define([
         className: 'active-filter',
 
         initialize: function () {
-            this.tpl = _.template($(this.templateId).html());
-            this.listenTo(this.model, 'destroy', this.remove);
+            this.tpl = _.template($('#filter-tpl').html());
+            this.listenTo(this.model, 'remove', this.remove);
+            this.listenTo(this.model, 'change', this.render);
         },
 
         render: function () {
-            this.className = this.model.get('type');
-            var data = this.model.attributes;
+            var data = _.clone(this.model.attributes);
             data.name = data.name || data.query;
+            this.className = data.type;
             this.$el.html(this.tpl(data));
             return this;
-        },
-
-        remove: function() {
-            this.stopListening();
-            this.$el.remove();
         }
 
     });

@@ -13,7 +13,9 @@ define({
         }
     },
     language: {
-        en: 'English',
-        hr: 'Croatian'
+        terms: {
+            en: 'English',
+            hr: 'Croatian'
+        }
     }
 });

@@ -316,7 +316,7 @@ $facet-background-color: #007db8;
     background: $blue;
     position: absolute;
     top: ($baseline*0.7); // same as padding rule for .discovery-submit
-  } 
+  }
 }
 
 // +Filters and Facets - Search
@@ -326,11 +326,24 @@ $facet-background-color: #007db8;
   .filters {
     @include clearfix();
     margin-top: ($baseline/2);
-    border-top: 2px solid $courseware-button-border-color;
-    border-bottom: 2px solid $courseware-button-border-color;
     width: 100%;
     height: auto;
     max-height: ($baseline*10);
+    overflow: hidden;
+
+    &.animate {
+      @include transition(max-height 0.3s);
+    }
+
+    &.slide-up {
+      max-height: 0;
+    }
+
+    .filters-inner {
+      @include clearfix();
+      border-top: 2px solid $courseware-button-border-color;
+      border-bottom: 2px solid $courseware-button-border-color;
+    }
 
     ul {
       @include padding-left(0);
@@ -426,29 +439,34 @@ $facet-background-color: #007db8;
     .header-search-facets, .header-facet {
       @extend %t-title6;
       @extend %t-strong;
-      padding: ($baseline/2);
       margin: 0;
+      padding: ($baseline/2);
       color: $facet-text-color;
       text-transform: none;
     }
 
     .header-facet {
-      margin: 0 ($baseline/2);
-      padding: ($baseline/2) 0;
-    }
-
-    .search-facets-lists section {
       border-top: 1px solid $gray-l4;
     }
 
     .facet-list {
       @extend %ui-no-list;
       @include clearfix();
-      padding-bottom: ($baseline/2); 
+      padding-bottom: ($baseline/2);
 
       &.collapse {
-        max-height: ($baseline*14);
+        max-height: ($baseline*1.5*9) - ($baseline/2);
+        overflow: hidden;
       }
+
+      li {
+        @include clearfix();
+        position: relative;
+        clear: both;
+        padding: 0;
+        height: ($baseline*1.5);
+      }
+
     }
 
     .facet-option {
@@ -463,19 +481,13 @@ $facet-background-color: #007db8;
       width: 100%;
       color: $facet-text-color;
 
-      li {
-        @include clearfix();
-        position: relative;
-        clear: both;
-        padding: 0;
-        height: ($baseline*1.5);
-      }
-
       .count {
         @include right($baseline*0.6);
         @include box-sizing(border-box);
         @include transition(all 0.2s ease-out);
         position: absolute;
+        width: ($baseline*2);
+        text-align: right;
       }
 
       //STATE: hover, focus
@@ -488,6 +500,27 @@ $facet-background-color: #007db8;
           color: $white;
         }
       }
+
+      &.selected,
+      &.selected:hover,
+      &.selected:focus {
+        background: $gray-l4;
+        color: $facet-text-color;
+
+        .count {
+          color: $gray-l4;
+        }
+
+        .count:before {
+          content: '\f00d'; // fa-times
+          width: ($baseline*2);
+          position: absolute;
+          left: ($baseline*0.75);
+          font-family: FontAwesome;
+          color: $gray-l1;
+          text-align: center;
+        }
+      }
     }
 
     .toggle {
@@ -496,6 +529,7 @@ $facet-background-color: #007db8;
       button {
         @extend %t-icon6;
         @extend %t-strong;
+        padding: ($baseline/4) ($baseline/2);
         color: $facet-background-color;
       }
     }
