@@ -81,19 +81,19 @@ class CourseOverviewDescriptor(django.db.models.Model):
     modulestore_type = CharField(max_length=5)  # 'split', 'mongo', or 'xml'
     _location_str = CharField(max_length=255)
 
-    # Analogous to fields from: lms.djangoapps.lms_xblock.mixin.LmsBlockMixin
+    # Analogous to fields from: lms_xblock.mixin.LmsBlockMixin
     ispublic = NullBooleanField()
 
-    # Analogous to fields from common.lib.xmodule.xmodule.modulestore.inheritance.InheritanceMixin
+    # Analogous to fields from xmodule.modulestore.inheritance.InheritanceMixin
     static_asset_path = TextField(default="")
 
-    # Analogous to fields from BOTH lms.djangoapps.lms_xblock.mixin.LmsBlockMixin
-    #                           and common.lib.xmodule.xmodule.modulestore.inheritance.InheritanceMixin
+    # Analogous to fields from BOTH lms_xblock.mixin.LmsBlockMixin
+    #                           and xmodule.modulestore.inheritance.InheritanceMixin
     user_partitions = UserPartitionListField(null=True, default="[]")
     visible_to_staff_only = BooleanField(default=False)
     group_access = GroupAccessDictField(null=True, default="{}")
 
-    # Analogous to fields from: common.lib.xmodule.xmodule.course_module.CourseFields
+    # Analogous to fields from: xmodule.course_module.CourseFields
     enrollment_start = DateField(null=True)
     enrollment_end = DateField(null=True)
     start = DateField(default=DEFAULT_START_DATE, null=True)
@@ -168,7 +168,7 @@ class CourseOverviewDescriptor(django.db.models.Model):
     @property
     def merged_group_access(self):
         """
-        (Mimics method from lms.djangoapps.lms_xblock.mixin.LmsBlockMixin, but can be simplified because for courses,
+        (Mimics method from lms_xblock.mixin.LmsBlockMixin, but can be simplified because for courses,
         self.get_parent() is None)
         """
         return self.group_access or {}
@@ -178,7 +178,7 @@ class CourseOverviewDescriptor(django.db.models.Model):
         Returns the user partition with the specified id.  Raises
         `NoSuchUserPartitionError` if the lookup fails.
 
-        (Copied directly from lms.djangoapps.lms_xblock.mixin.LmsBlockMixin)
+        (Copied directly from lms_xblock.mixin.LmsBlockMixin)
         """
         for user_partition in self.user_partitions:
             if user_partition.id == user_partition_id:
@@ -192,7 +192,7 @@ class CourseOverviewDescriptor(django.db.models.Model):
 
         In the database, we store this course's usage key in a string _location_str. Here we parse it into a UsageKey
         object and the return it.
-        (Mimics method from common.lib.xmodule.xmodule.x_module.XModuleMixin)
+        (Mimics method from xmodule.x_module.XModuleMixin)
         """
         if not hasattr(self, '_location'):
             self._location = UsageKey.from_string(self._location_str).map_into_course(self.id)
@@ -201,7 +201,7 @@ class CourseOverviewDescriptor(django.db.models.Model):
     @property
     def url_name(self):
         """
-        (Copied directly from common.lib.xmodule.xmodule.x_module.XModuleMixin)
+        (Copied directly from xmodule.x_module.XModuleMixin)
         """
         return self.location.name
 
@@ -211,7 +211,7 @@ class CourseOverviewDescriptor(django.db.models.Model):
         Return a display name for the module: use display_name if defined in
         metadata, otherwise convert the url name.
 
-        (Copied directly from common.lib.xmodule.xmodule.x_module.XModuleMixin)
+        (Copied directly from xmodule.x_module.XModuleMixin)
         """
         name = self.display_name
         if name is None:
@@ -224,7 +224,7 @@ class CourseOverviewDescriptor(django.db.models.Model):
         """
         Return True if it is acceptable to show the student a certificate download link
 
-        (Copied directly from common.lib.xmodule.xmodule.course_module.CourseDescriptor)
+        (Copied directly from xmodule.course_module.CourseDescriptor)
         """
         show_early = self.certificates_display_behavior in ('early_with_info', 'early_no_info') \
             or self.certificates_show_before_end
@@ -235,7 +235,7 @@ class CourseOverviewDescriptor(django.db.models.Model):
         Returns True if the current time is after the specified course end date.
         Returns False if there is no end date specified.
 
-        (Copied directly from common.lib.xmodule.xmodule.course_module.CourseDescriptor)
+        (Copied directly from xmodule.course_module.CourseDescriptor)
         """
         if self.end is None:
             return False
@@ -244,7 +244,7 @@ class CourseOverviewDescriptor(django.db.models.Model):
 
     def has_started(self):
         """
-        (Copied directly from common.lib.xmodule.xmodule.course_module.CourseDescriptor)
+        (Copied directly from xmodule.course_module.CourseDescriptor)
         """
         return datetime.now(UTC()) > self.start
 
@@ -253,7 +253,7 @@ class CourseOverviewDescriptor(django.db.models.Model):
         Returns the desired text corresponding the course's start date and time in UTC.  Prefers .advertised_start,
         then falls back to .start
 
-        (Copied directly from common.lib.xmodule.xmodule.course_module.CourseDescriptor)
+        (Copied directly from xmodule.course_module.CourseDescriptor)
         """
         _ = ugettext
         strftime = strftime_localized
@@ -292,7 +292,7 @@ class CourseOverviewDescriptor(django.db.models.Model):
         Checks if the start date set for the course is still default, i.e. .start has not been modified,
         and .advertised_start has not been set.
 
-        (Copied directly from common.lib.xmodule.xmodule.course_module.CourseDescriptor)
+        (Copied directly from xmodule.course_module.CourseDescriptor)
         """
         return self.advertised_start is None and self.start == CourseFields.start.default
 
@@ -302,7 +302,7 @@ class CourseOverviewDescriptor(django.db.models.Model):
 
         If the course does not have an end date set (course.end is None), an empty string will be returned.
 
-        (Copied from common.lib.xmodule.xmodule.course_module.CourseDescriptor, and modified to not use the XBlock
+        (Copied from xmodule.course_module.CourseDescriptor, and modified to not use the XBlock
          runtime)
         """
         if self.end is None:
@@ -314,7 +314,7 @@ class CourseOverviewDescriptor(django.db.models.Model):
     @property
     def number(self):
         """
-        (Copied directly from common.lib.xmodule.xmodule.course_module.CourseDescriptor)
+        (Copied directly from xmodule.course_module.CourseDescriptor)
         """
         return self.location.course
 
@@ -323,7 +323,7 @@ class CourseOverviewDescriptor(django.db.models.Model):
         """
         Return a display course number if it has been specified, otherwise return the 'course' that is in the location
 
-        (Copied directly from common.lib.xmodule.xmodule.course_module.CourseDescriptor)
+        (Copied directly from xmodule.course_module.CourseDescriptor)
         """
         if self.display_coursenumber:
             return self.display_coursenumber
@@ -333,7 +333,7 @@ class CourseOverviewDescriptor(django.db.models.Model):
     @property
     def org(self):
         """
-        (Copied directly from common.lib.xmodule.xmodule.course_module.CourseDescriptor)
+        (Copied directly from xmodule.course_module.CourseDescriptor)
         """
         return self.location.org
 
@@ -342,7 +342,7 @@ class CourseOverviewDescriptor(django.db.models.Model):
         """
         Return a display organization if it has been specified, otherwise return the 'org' that is in the location
 
-        (Copied directly from common.lib.xmodule.xmodule.course_module.CourseDescriptor)
+        (Copied directly from xmodule.course_module.CourseDescriptor)
         """
         if self.display_organization:
             return self.display_organization
@@ -354,7 +354,7 @@ class CourseOverviewDescriptor(django.db.models.Model):
         Returns a unique deterministic base32-encoded ID for the course.
         The optional padding_char parameter allows you to override the "=" character used for padding.
 
-        (Copied directly from common.lib.xmodule.xmodule.course_module.CourseDescriptor)
+        (Copied directly from xmodule.course_module.CourseDescriptor)
         """
         return "course_{}".format(
             b32encode(unicode(self.location.course_key)).replace('=', padding_char)

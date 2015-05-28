@@ -11,7 +11,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_CLOSED_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from student.models import CourseEnrollment
-
 from .helpers import LoginEnrollmentTestCase
 
 

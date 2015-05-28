@@ -22,7 +22,8 @@ from courseware.access import has_access
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
 from student.models import CourseEnrollment
-import branding
+from course import branding
+from content.course_overviews.models import CourseOverviewDescriptor
 
 from opaque_keys.edx.keys import UsageKey
 
@@ -114,9 +115,12 @@ def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=
 
 
 def course_image_url(course):
-    """Try to look up the image url for the course.  If it's not found,
-    log an error and return the dead link"""
-    if course.static_asset_path or modulestore().get_modulestore_type(course.id) == ModuleStoreEnum.Type.xml:
+    """Try to look up the image url for the course. If it's not found, log an error and return the dead link.
+
+    course: either a CourseDesriptor or CourseOverviewDescriptor
+    """
+    modulestore_type = course.modulestore_type if isinstance(course, CourseOverviewDescriptor) else modulestore().get_modulestore_type(course.id)
+    if course.static_asset_path or modulestore_type == ModuleStoreEnum.Type.xml:
         # If we are a static course with the course_image attribute
         # set different than the default, return that path so that
         # courses can use custom course image paths, otherwise just
@@ -132,28 +136,6 @@ def course_image_url(course):
         url = ''
     else:
         loc = StaticContent.compute_location(course.id, course.course_image)
-        url = StaticContent.serialize_asset_key_with_slash(loc)
-    return url
-
-def course_overview_image_url(course_ovr):
-    # TODO me: document course_overview_image_url
-    if course_ovr.static_asset_path or course_ovr.modulestore_type == ModuleStoreEnum.Type.xml:
-        # If we are a static course with the course_image attribute
-        # set different than the default, return that path so that
-        # courses can use custom course image paths, otherwise just
-        # return the default static path.
-        # TODO me: find out what 'data_dir' is and if we need it as a field in CourseOverviewDescriptor
-        url = '/static/' + (course_ovr.static_asset_path or getattr(course_ovr, 'data_dir', ''))
-        if hasattr(course_ovr, 'course_image') and course_ovr.course_image != course_ovr.fields['course_image'].default:
-            url += '/' + course_ovr.course_image
-        else:
-            url += '/images/course_image.jpg'
-    elif course_ovr.course_image == '':
-        # if course_image is empty the url will be blank as location
-        # of the course_image does not exist
-        url = ''
-    else:
-        loc = StaticContent.compute_location(course_ovr.id, course_ovr.course_image)
         url = StaticContent.serialize_asset_key_with_slash(loc)
     return url
 
