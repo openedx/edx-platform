@@ -14,9 +14,7 @@ function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView) {
     var CertificateDetailsView = BaseView.extend({
         tagName: 'div',
         events: {
-            'click .edit': 'editCertificate',
-            'click .show-details': 'showDetails',
-            'click .hide-details': 'hideDetails'
+            'click .edit': 'editCertificate'
         },
 
         className: function () {
@@ -39,18 +37,6 @@ function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView) {
             // Flip the model into 'editing' mode
             if (event && event.preventDefault) { event.preventDefault(); }
             this.model.set('editing', true);
-        },
-
-        showDetails: function(event) {
-            // Expand the detail view for this item/model
-            if (event && event.preventDefault) { event.preventDefault(); }
-            this.render(true);
-        },
-
-        hideDetails: function(event) {
-            // Collapse the detail view for this item/model
-            if (event && event.preventDefault) { event.preventDefault(); }
-            this.render(false);
         },
 
         render: function(showDetails) {

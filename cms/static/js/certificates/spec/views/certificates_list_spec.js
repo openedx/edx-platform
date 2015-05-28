@@ -9,20 +9,22 @@ define([
     'js/certificates/views/certificate_editor',
     'js/certificates/views/certificate_item',
     'js/certificates/views/certificates_list',
+    'js/certificates/views/certificate_preview',
     'js/views/feedback_notification',
     'js/common_helpers/ajax_helpers',
     'js/common_helpers/template_helpers',
     'js/certificates/spec/custom_matchers'
 ],
 function(_, Course, CertificatesCollection, CertificateModel, CertificateDetailsView, CertificateEditorView,
-         CertificateItemView, CertificatesListView, Notification, AjaxHelpers, TemplateHelpers, CustomMatchers) {
+         CertificateItemView, CertificatesListView, CertificatePreview,  Notification, AjaxHelpers, TemplateHelpers,
+         CustomMatchers) {
     'use strict';
 
     var SELECTORS = {
         itemView: '.certificates-list-item',
+        itemEditView: '.certificate-edit',
         noContent: '.no-content',
         newCertificateButton: '.new-button'
-
     };
 
     beforeEach(function() {
@@ -34,7 +36,10 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
             num: 'course_num',
             revision: 'course_rev'
         });
-
+        window.certWebPreview = new CertificatePreview({
+            course_modes: ['honor', 'test'],
+            certificate_web_view_url: '/users/1/courses/orgX/009/2016'
+        });
     });
 
     afterEach(function() {
@@ -86,6 +91,13 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 expect(this.view.$el).toContainText(emptyMessage);
                 expect(this.view.$(SELECTORS.itemView)).not.toExist();
             });
+
+            it('should open in edit mode if model has editing attribute', function() {
+                this.model.set({editing: true})
+                this.collection.add(this.model);
+                expect(this.view.$(SELECTORS.itemEditView)).toExist();
+            });
+
         });
     });
 });
