@@ -179,6 +179,7 @@ $facet-background-color: #007db8;
 
   .wrapper-search-context {
     @include outer-container;
+    @include rtl() { $layout-direction: "RTL"; }
 
     .search-status-label {
       @extend %t-title4;
@@ -230,9 +231,9 @@ $facet-background-color: #007db8;
     @extend %t-copy-sub1;
     @extend %t-demi-strong;
     @include border-radius(3px);
+    @include padding-right(55px);
     width: 100%;
     border: 2px solid $gray-l3;
-    padding-right: 55px;
     height: $course-search-input-height;
     color: $black;
     font-style: normal;
@@ -250,8 +251,8 @@ $facet-background-color: #007db8;
     @extend %t-icon3;
     @extend %t-strong;
     @include margin-left(-2px);
+    @include right(0);
     position: absolute;
-    right: 0;
     border: 2px solid $m-blue-d1;
     border-radius: ($baseline*0.1);
     box-shadow: none;
