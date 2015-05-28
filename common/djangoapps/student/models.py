@@ -48,7 +48,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import CourseKey
 from functools import total_ordering
-from openedx.core.djangoapps.content import course_overviews
+from content import course_overviews
 
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
