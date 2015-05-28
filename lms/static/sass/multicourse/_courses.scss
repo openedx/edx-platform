@@ -1,29 +1,29 @@
-// lms - views - course discovery 
+// lms - views - course discovery
 // ====================
 
-// Table of Contents 
+// Table of Contents
 // * +Imports - Search
 // * +Variables - Search
 // * +Layout - Courses Container
 // * +Header - Course Search
-// * +Search Input 
+// * +Search Input
 // * +Filters - Search
 // * +Facets - Sidebar - Search
 // * +All Other Styles
 
 
 // +Imports - Search
-// ==================== 
+// ====================
 @import '../base/grid-settings';
 @import 'neat/neat'; // lib - Neat
 
 // +Variables - Search
-// ==================== 
+// ====================
 $facet-text-color: #3d3e3f;
 $facet-background-color: #007db8;
 
 // +Layout - Courses Container
-// ==================== 
+// ====================
 .find-courses, .university-profile {
 
   .discovery-button:not(:disabled) {
@@ -88,7 +88,7 @@ $facet-background-color: #007db8;
 }
 
 // +Hero - Home Header
-// ==================== 
+// ====================
 .find-courses, .university-profile {
 
   header.search {
@@ -173,37 +173,66 @@ $facet-background-color: #007db8;
   }
 }
 
-// +Search Input 
-// ==================== 
+// +Search Input
+// ====================
 .find-courses {
 
   .wrapper-search-context {
-    @include clearfix();
+    @include outer-container;
 
     .search-status-label {
       @extend %t-title4;
-      @include line-height(50);
-      display: inline-block;
-      width: flex-grid(9);
+      @include span-columns(9);
+      min-height: $course-search-input-height;
+
+      @include media($bp-tiny) {
+        @include span-columns(4);
+      }
+
+      @include media($bp-small) {
+        @include span-columns(4);
+      }
+
+      @include media($bp-medium) {
+        @include span-columns(4);
+      }
+
+      @include media($bp-large) {
+        @include span-columns(8);
+      }
 
     }
 
     .wrapper-search-input {
-      display: inline-block;
-      width: flex-grid(3);
-      vertical-align: top;
-      margin-left: 24px;
+      @include span-columns(3);
+      position: relative;
+
+      @include media($bp-tiny) {
+        @include span-columns(3);
+      }
+
+      @include media($bp-small) {
+        @include span-columns(3);
+      }
+
+      @include media($bp-medium) {
+        @include span-columns(4);
+      }
+
+      @include media($bp-large) {
+        @include span-columns(4);
+      }
     }
   }
-  
+
   .discovery-input {
     @extend %ui-depth1;
     @extend %t-copy-sub1;
     @extend %t-demi-strong;
-    @include border-radius(0);
-    @include border-top-left-radius(3px);
-    @include border-bottom-left-radius(3px);
+    @include border-radius(3px);
+    width: 100%;
     border: 2px solid $gray-l3;
+    padding-right: 55px;
     height: $course-search-input-height;
     color: $black;
     font-style: normal;
@@ -221,7 +250,8 @@ $facet-background-color: #007db8;
     @extend %t-icon3;
     @extend %t-strong;
     @include margin-left(-2px);
-    position: relative;
+    position: absolute;
+    right: 0;
     border: 2px solid $m-blue-d1;
     border-radius: ($baseline*0.1);
     box-shadow: none;
@@ -239,7 +269,7 @@ $facet-background-color: #007db8;
 }
 
 // +Filters - Search
-// ==================== 
+// ====================
 .find-courses {
 
   .filters {
@@ -294,7 +324,7 @@ $facet-background-color: #007db8;
 }
 
 // +Facets - Sidebar - Search
-// ==================== 
+// ====================
 .find-courses .search-facets {
   @include fill-parent();
   @include omega();
@@ -352,7 +382,7 @@ $facet-background-color: #007db8;
     color: $facet-text-color;
     text-transform: none;
   }
-  
+
   .header-search-facets {
     @extend %t-title6;
   }
@@ -468,7 +498,7 @@ $facet-background-color: #007db8;
 }
 
 // +All Other Styles
-// ==================== 
+// ====================
 .find-courses, .university-profile {
   background: $course-profile-bg;
   padding-bottom: ($baseline*3);
