@@ -554,7 +554,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             """
             self.database = MongoProxy(
                 pymongo.database.Database(
-                    pymongo.MongoReplicaSetClient(
+                    pymongo.MongoClient(
                         host=host,
                         port=port,
                         tz_aware=tz_aware,

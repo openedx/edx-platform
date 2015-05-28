@@ -78,7 +78,7 @@ class TestMongoModuleStoreBase(unittest.TestCase):
 
     @classmethod
     def setupClass(cls):
-        cls.connection = pymongo.MongoReplicaSetClient(
+        cls.connection = pymongo.MongoClient(
             host=HOST,
             port=PORT,
             tz_aware=True,

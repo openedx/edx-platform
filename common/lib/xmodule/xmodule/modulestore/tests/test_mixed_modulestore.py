@@ -140,7 +140,7 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
         self.ignore_asset_key('thumbnail_location')
 
         self.options = getattr(self, 'options', self.OPTIONS)
-        self.connection = pymongo.MongoReplicaSetClient(
+        self.connection = pymongo.MongoClient(
             host=self.HOST,
             port=self.PORT,
             tz_aware=True,
