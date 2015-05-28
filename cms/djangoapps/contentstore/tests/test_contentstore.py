@@ -1101,6 +1101,17 @@ class ContentStoreTest(ContentStoreTestCase):
         self.assertFalse(instructor_role.has_user(self.user))
         self.assertEqual(len(instructor_role.users_with_role()), 0)
 
+    def test_create_course_after_delete(self):
+        """
+        Test that course creation works after deleting a course with the same URL
+        """
+        test_course_data = self.assert_created_course()
+        course_id = _get_course_id(self.store, test_course_data)
+
+        delete_course_and_groups(course_id, self.user.id)
+
+        self.assert_created_course()
+
     def test_create_course_duplicate_course(self):
         """Test new course creation - error path"""
         self.client.ajax_post('/course/', self.course_data)
