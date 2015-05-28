@@ -12,7 +12,7 @@
 
   if self.is_non_microsite_theme():
     course_index_overlay_text = _("Explore free courses from {university_name}.").format(university_name="Stanford University")
-    logo_file = static.url('themes/stanford/images/seal.png')
+    logo_file = settings.STATIC_URL + 'themes/stanford/images/seal.png'
     logo_alt_text = "Stanford Seal Logo"
 
   else:
