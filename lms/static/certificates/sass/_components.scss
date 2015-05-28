@@ -587,49 +587,37 @@
         top: spacing-vertical(large);
         background: palette(grayscale, white);
         z-index: z-index(very-front);
-        border-top: 10px solid palette(primary, light);
-        padding-right: 2em;
-        padding-left: 2em;
+        border-top: rem(10) solid palette(primary, light);
+        padding-right: spacing-horizontal(large);
+        padding-left: spacing-horizontal(large);
         overflow-x: hidden;
 
         .close {
             position: absolute;
-            right: 1em;
-            top: 1em;
-            font-weight: bold;
+            right: spacing-horizontal(mid-small);
+            top: spacing-vertical(small);
+            font-weight: font-weight(bold);
             cursor: pointer;
         }
 
         .badges-steps {
-            @extend %reset-lists;
             display: table;
-
-            .step {
-                counter-increment: step-counter;
-                margin-bottom: spacing-vertical(medium);
-                display: table-row;
-
-                &:before {
-                    content: counter(step-counter);
-                    padding-right: spacing-horizontal(large);
-                    margin-left: spacing-horizontal(small);
-                    font-size: 110%;
-                    color: palette(grayscale, black);
-                    font-weight: font-weight(bold);
-                    display: table-cell;
-                }
-            }
         }
 
         .image-container{
             // Lines the image up with the content of the above list.
-            padding-left: 2.75em;
-            padding-top: spacing-vertical(medium);
+            @include ltr {
+                @include padding-left(2em);
+            }
+            @include rtl {
+                @include padding-right(1em);
+                float: right;
+            }
         }
 
         .backpack-logo {
             @include float(right);
-            margin-left: spacing-horizontal(small);
+            @include margin-left(spacing-horizontal(small));
         }
     }
 }
@@ -637,7 +625,7 @@
 .modal-hr {
     background-color: palette(grayscale, light);
     border: none;
-    height: 2px;
+    height: rem(2);
     width: 100%;
     display: block;
 }
