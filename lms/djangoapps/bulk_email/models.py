@@ -43,6 +43,8 @@ class Email(models.Model):
     text_message = models.TextField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+    # fake new field for testing                                                                                                                                                
+    fake_field = models.CharField(max_length=24, default="", blank=True)
 
     class Meta(object):  # pylint: disable=missing-docstring
         abstract = True
