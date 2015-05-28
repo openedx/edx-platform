@@ -447,10 +447,11 @@ def register_user(request, extra_context=None):
     if third_party_auth.is_enabled() and pipeline.running(request):
         running_pipeline = pipeline.get(request)
         current_provider = provider.Registry.get_from_pipeline(running_pipeline)
-        overrides = current_provider.get_register_form_data(running_pipeline.get('kwargs'))
-        overrides['running_pipeline'] = running_pipeline
-        overrides['selected_provider'] = current_provider.name
-        context.update(overrides)
+        if current_provider is not None:
+            overrides = current_provider.get_register_form_data(running_pipeline.get('kwargs'))
+            overrides['running_pipeline'] = running_pipeline
+            overrides['selected_provider'] = current_provider.name
+            context.update(overrides)
 
     return render_to_response('register.html', context)
 

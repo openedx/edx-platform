@@ -187,7 +187,7 @@ def _third_party_auth_context(request, redirect_to):
     }
 
     if third_party_auth.is_enabled():
-        for enabled in third_party_auth.provider.Registry.enabled():
+        for enabled in third_party_auth.provider.Registry.accepting_logins():
             info = {
                 "id": enabled.provider_id,
                 "name": enabled.name,
@@ -208,12 +208,14 @@ def _third_party_auth_context(request, redirect_to):
         running_pipeline = pipeline.get(request)
         if running_pipeline is not None:
             current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
-            context["currentProvider"] = current_provider.name
-            context["finishAuthUrl"] = pipeline.get_complete_url(current_provider.backend_name)
 
-            if current_provider.skip_registration_form:
-                # As a reliable way of "skipping" the registration form, we just submit it automatically
-                context["autoSubmitRegForm"] = True
+            if current_provider is not None:
+                context["currentProvider"] = current_provider.name
+                context["finishAuthUrl"] = pipeline.get_complete_url(current_provider.backend_name)
+
+                if current_provider.skip_registration_form:
+                    # As a reliable way of "skipping" the registration form, we just submit it automatically
+                    context["autoSubmitRegForm"] = True
 
         # Check for any error messages we may want to display:
         for msg in messages.get_messages(request):
@@ -396,13 +398,14 @@ def account_settings_context(request):
             'name': state.provider.name,  # The name of the provider e.g. Facebook
             'connected': state.has_account,  # Whether the user's edX account is connected with the provider.
             # If the user is not connected, they should be directed to this page to authenticate
-            # with the particular provider.
+            # with the particular provider, as long as the provider supports initiating a login.
             'connect_url': pipeline.get_login_url(
                 state.provider.provider_id,
                 pipeline.AUTH_ENTRY_ACCOUNT_SETTINGS,
                 # The url the user should be directed to after the auth process has completed.
                 redirect_url=reverse('account_settings'),
             ),
+            'accepts_logins': state.provider.accepts_logins,
             # If the user is connected, sending a POST request to this url removes the connection
             # information for this provider from their edX account.
             'disconnect_url': pipeline.get_disconnect_url(state.provider.provider_id, state.association_id),
