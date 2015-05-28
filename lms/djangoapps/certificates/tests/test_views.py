@@ -13,12 +13,14 @@ from django.test.client import Client
 from django.test.utils import override_settings
 
 from opaque_keys.edx.locator import CourseLocator
+from openedx.core.lib.tests.assertions.events import assert_event_matches
 from student.tests.factories import UserFactory
+from track.tests import EventTrackingTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from certificates.utils import get_certificate_url
 
-from certificates.models import ExampleCertificateSet, ExampleCertificate, GeneratedCertificate
+from certificates.models import ExampleCertificateSet, ExampleCertificate, GeneratedCertificate, BadgeAssertion
 from certificates.tests.factories import CertificateHtmlViewConfigurationFactory
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
@@ -171,7 +173,7 @@ class UpdateExampleCertificateViewTest(TestCase):
 
 
 @attr('shard_1')
-class CertificatesViewsTests(ModuleStoreTestCase):
+class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
     """
     Tests for the manual refund page
     """
@@ -374,3 +376,36 @@ class CertificatesViewsTests(ModuleStoreTestCase):
         )
         response = self.client.get(test_url)
         self.assertIn('invalid', response.content)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_event_sent(self):
+        test_url = get_certificate_url(user_id=self.user.id, course_id=self.course_id) + '?evidence_visit=1'
+        self.recreate_tracker()
+        assertion = BadgeAssertion(
+            user=self.user, course_id=self.course_id, mode='honor',
+            data={
+                'image': 'http://www.example.com/image.png',
+                'json': {'id': 'http://www.example.com/assertion.json'},
+                'issuer': 'http://www.example.com/issuer.json',
+
+            }
+        )
+        assertion.save()
+        response = self.client.get(test_url)
+        self.assertEqual(response.status_code, 200)
+        assert_event_matches(
+            {
+                'name': 'edx.badges.assertion.evidence_visit',
+                'data': {
+                    'course_id': 'testorg/run1/refundable_course',
+                    # pylint: disable=no-member
+                    'assertion_id': assertion.id,
+                    'assertion_json_url': 'http://www.example.com/assertion.json',
+                    'assertion_image_url': 'http://www.example.com/image.png',
+                    'user_id': self.user.id,
+                    'issuer': 'http://www.example.com/issuer.json',
+                    'enrollment_mode': 'honor',
+                },
+            },
+            self.get_event()
+        )

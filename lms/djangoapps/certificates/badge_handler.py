@@ -127,6 +127,13 @@ class BadgeHandler(object):
         else:
             return u"{start_date}".format(start_date=course.start.date())
 
+    def site_prefix(self):
+        """
+        Get the prefix for the site URL-- protocol and server name.
+        """
+        scheme = u"https" if settings.HTTPS == "on" else u"http"
+        return u'{}://{}'.format(scheme, settings.SITE_NAME)
+
     def create_badge(self, mode):
         """
         Create the badge spec for a course's mode.
@@ -142,10 +149,9 @@ class BadgeHandler(object):
             )
         files = {'image': (image.name, image, content_type)}
         about_path = reverse('about_course', kwargs={'course_id': unicode(self.course_key)})
-        scheme = u"https" if settings.HTTPS == "on" else u"http"
         data = {
             'name': self.badge_name_field(course, mode),
-            'criteria': u'{}://{}{}'.format(scheme, settings.SITE_NAME, about_path),
+            'criteria': u'{}{}'.format(self.site_prefix(), about_path),
             'slug': self.course_slug(mode),
             'description': self.badge_description(course)
         }
@@ -157,7 +163,12 @@ class BadgeHandler(object):
         Register an assertion with the Badgr server for a particular user in a particular course mode for
         this course.
         """
-        data = {'email': user.email}
+        data = {
+            'email': user.email,
+            'evidence': self.site_prefix() + reverse(
+                'cert_html_view', kwargs={'user_id': user.id, 'course_id': unicode(self.course_key)}
+            ) + '?evidence_visit=1'
+        }
         response = requests.post(self.assertion_url(mode), headers=self.get_headers(), data=data)
         self.log_if_raised(response, data)
         assertion, __ = BadgeAssertion.objects.get_or_create(course_id=self.course_key, user=user)

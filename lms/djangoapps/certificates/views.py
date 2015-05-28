@@ -1,5 +1,6 @@
 """URL handlers related to certificate handling by LMS"""
 from datetime import datetime
+from eventtracking import tracker
 import dogstats_wrapper as dog_stats_api
 import json
 import logging
@@ -443,6 +444,28 @@ def render_html_view(request, user_id, course_id):
 
     except (User.DoesNotExist, GeneratedCertificate.DoesNotExist, InvalidKeyError, CourseDoesNotExist):
         return render_to_response(invalid_template_path, context)
+
+    if 'evidence_visit' in request.GET:
+        try:
+            badge = BadgeAssertion.objects.get(user=user, course_id=course_key)
+            tracker.emit(
+                'edx.badges.assertion.evidence_visit',
+                {
+                    'user_id': user.id,
+                    'course_id': unicode(course_key),
+                    'enrollment_mode': badge.mode,
+                    'assertion_id': badge.id,
+                    'assertion_image_url': badge.data['image'],
+                    'assertion_json_url': badge.data['json']['id'],
+                    'issuer': badge.data['issuer'],
+                }
+            )
+        except BadgeAssertion.DoesNotExist:
+            logger.warn(
+                "Could not find badge for %s on course %s.",
+                user.id,
+                course_key,
+            )
 
     context['course_id'] = course_id
 
