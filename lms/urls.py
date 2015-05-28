@@ -260,6 +260,10 @@ if settings.COURSEWARE_ENABLED:
             'courseware.module_render.xblock_resource',
             name='xblock_resource_url'),
 
+        url(r'api/xblock/v1/xblock/{usage_key_string}$'.format(usage_key_string=settings.USAGE_KEY_PATTERN),
+            'courseware.views.render_chromeless_xblock',
+            name='chromeless_xblock'),
+
         # Software Licenses
 
         # TODO: for now, this is the endpoint of an ajax replay
