@@ -441,6 +441,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
                     self.assertEqual(row[column_header], expected_cell_content)
 
 
+@ddt.ddt
 class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
     """
     Test that the problem CSV generation works.
@@ -510,14 +511,14 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
 
     @patch('instructor_task.tasks_helper._get_current_task')
     @patch('instructor_task.tasks_helper.iterate_grades_for')
-    def test_grading_failure(self, mock_iterate_grades_for, _mock_current_task):
+    @ddt.data(u'Cannöt grade student', '')
+    def test_grading_failure(self, error_message, mock_iterate_grades_for, _mock_current_task):
         """
         Test that any grading errors are properly reported in the progress
         dict and uploaded to the report store.
         """
         # mock an error response from `iterate_grades_for`
         student = self.create_student(u'username', u'student@example.com')
-        error_message = u'Cannöt grade student'
         mock_iterate_grades_for.return_value = [
             (student, {}, error_message)
         ]
@@ -531,7 +532,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                 u'Student ID': unicode(student.id),
                 u'Email': student.email,
                 u'Username': student.username,
-                u'error_msg': error_message
+                u'error_msg': error_message if error_message else "Unknown error"
             }
         ])
 

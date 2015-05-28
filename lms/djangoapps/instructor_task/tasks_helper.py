@@ -798,8 +798,11 @@ def upload_problem_grade_report(_xmodule_instance_args, _entry_id, course_id, _t
         student_fields = [getattr(student, field_name) for field_name in header_row]
         task_progress.attempted += 1
 
-        if err_msg:
+        if 'percent' not in gradeset or 'raw_scores' not in gradeset:
             # There was an error grading this student.
+            # Generally there will be a non-empty err_msg, but that is not always the case.
+            if not err_msg:
+                err_msg = u"Unknown error"
             error_rows.append(student_fields + [err_msg])
             task_progress.failed += 1
             continue
