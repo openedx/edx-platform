@@ -1254,6 +1254,7 @@ PIPELINE_CSS = {
     'style-vendor': {
         'source_filenames': [
             'css/vendor/font-awesome.css',
+            'css/vendor/office365.css',
             'css/vendor/jquery.qtip.min.css',
             'css/vendor/responsive-carousel/responsive-carousel.css',
             'css/vendor/responsive-carousel/responsive-carousel.slide.css',

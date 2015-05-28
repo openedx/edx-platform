@@ -133,9 +133,9 @@
                     fields: _.map(authData.providers, function(provider) {
                         return {
                             'view': new AccountSettingsFieldViews.AuthFieldView({
-                                title: provider.name,
+                                title: provider.uiname,
                                 screenReaderTitle: interpolate_text(
-                                    gettext("Connect your {accountName} account"), {accountName: provider['name']}
+                                    gettext("Connect your {accountName} account"), {accountName: provider['uiname']}
                                 ),
                                 valueAttribute: 'auth-' + provider.name.toLowerCase(),
                                 helpMessage: '',

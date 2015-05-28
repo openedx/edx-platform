@@ -438,6 +438,7 @@ PIPELINE_CSS = {
     'style-vendor': {
         'source_filenames': [
             'css/vendor/normalize.css',
+            'css/vendor/office365.css',
             'css/vendor/font-awesome.css',
             'css/vendor/html5-input-polyfills/number-polyfill.css',
             'js/vendor/CodeMirror/codemirror.css',
