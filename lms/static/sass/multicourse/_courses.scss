@@ -253,6 +253,7 @@ $facet-background-color: #007db8;
     @include margin-left(-2px);
     @include right(0);
     position: absolute;
+    top: 0;
     border: 2px solid $m-blue-d1;
     border-radius: ($baseline*0.1);
     box-shadow: none;
