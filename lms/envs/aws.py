@@ -505,5 +505,3 @@ PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM = ENV_TOKENS.get(
     'PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM', PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM
 )
 
-import newrelic.agent
-newrelic.agent.initialize('/var/tmp/newrelic-cms.ini')
