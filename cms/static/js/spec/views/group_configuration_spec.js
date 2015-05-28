@@ -100,28 +100,14 @@ define([
         expect(view.$(detailsView)).toExist();
         expect(view.$(editView)).not.toExist();
     };
-    var clickDeleteItem = function (that, promptSpy, promptText) {
-        that.view.$('.delete').click();
-        ViewHelpers.verifyPromptShowing(promptSpy, promptText);
-        ViewHelpers.confirmPrompt(promptSpy);
-        ViewHelpers.verifyPromptHidden(promptSpy);
-    };
-    var patchAndVerifyRequest = function (requests, url, notificationSpy) {
-        // Backbone.emulateHTTP is enabled in our system, so setting this
-        // option  will fake PUT, PATCH and DELETE requests with a HTTP POST,
-        // setting the X-HTTP-Method-Override header with the true method.
-        AjaxHelpers.expectJsonRequest(requests, 'POST', url);
-        expect(_.last(requests).requestHeaders['X-HTTP-Method-Override']).toBe('DELETE');
-        ViewHelpers.verifyNotificationShowing(notificationSpy, /Deleting/);
-    };
     var assertAndDeleteItemError = function (that, url, promptText) {
         var requests = AjaxHelpers.requests(that),
             promptSpy = ViewHelpers.createPromptSpy(),
             notificationSpy = ViewHelpers.createNotificationSpy();
 
-        clickDeleteItem(that, promptSpy, promptText);
+        ViewHelpers.clickDeleteItem(that, promptSpy, promptText);
 
-        patchAndVerifyRequest(requests, url, notificationSpy);
+        ViewHelpers.patchAndVerifyRequest(requests, url, notificationSpy);
 
         AjaxHelpers.respondWithNoContent(requests);
         ViewHelpers.verifyNotificationHidden(notificationSpy);
@@ -132,24 +118,12 @@ define([
             promptSpy = ViewHelpers.createPromptSpy(),
             notificationSpy = ViewHelpers.createNotificationSpy();
 
-        clickDeleteItem(that, promptSpy, promptText);
-        patchAndVerifyRequest(requests, url, notificationSpy);
+        ViewHelpers.clickDeleteItem(that, promptSpy, promptText);
+        ViewHelpers.patchAndVerifyRequest(requests, url, notificationSpy);
 
         AjaxHelpers.respondWithError(requests);
         ViewHelpers.verifyNotificationShowing(notificationSpy, /Deleting/);
         expect($(listItemView)).toExist();
-    };
-    var submitAndVerifyFormSuccess = function (view, requests, notificationSpy) {
-        view.$('form').submit();
-        ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
-        requests[0].respond(200);
-        ViewHelpers.verifyNotificationHidden(notificationSpy);
-    };
-    var submitAndVerifyFormError = function (view, requests, notificationSpy) {
-        view.$('form').submit();
-        ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
-        AjaxHelpers.respondWithError(requests);
-        ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
     };
     var assertCannotDeleteUsed = function (that, toolTipText, warningText){
         setUsageInfo(that.model);
@@ -405,7 +379,7 @@ define([
                 inputDescription: 'New Description'
             });
 
-            submitAndVerifyFormSuccess(this.view, requests, notificationSpy);
+            ViewHelpers.submitAndVerifyFormSuccess(this.view, requests, notificationSpy);
 
             expect(this.model).toBeCorrectValuesInModel({
                 name: 'New Configuration',
@@ -423,7 +397,7 @@ define([
                 notificationSpy = ViewHelpers.createNotificationSpy();
 
             setValuesToInputs(this.view, { inputName: 'New Configuration' });
-            submitAndVerifyFormError(this.view, requests, notificationSpy);
+            ViewHelpers.submitAndVerifyFormError(this.view, requests, notificationSpy);
         });
 
         it('does not save on cancel', function() {
@@ -978,7 +952,7 @@ define([
             this.view.$('.action-add').click();
             this.view.$(SELECTORS.inputName).val('New Content Group');
 
-            submitAndVerifyFormSuccess(this.view, requests, notificationSpy);
+            ViewHelpers.submitAndVerifyFormSuccess(this.view, requests, notificationSpy);
 
             expect(this.model).toBeCorrectValuesInModel({
                 name: 'New Content Group'
@@ -991,7 +965,7 @@ define([
                 notificationSpy = ViewHelpers.createNotificationSpy();
             this.view.$(SELECTORS.inputName).val('New Content Group')
 
-            submitAndVerifyFormError(this.view, requests, notificationSpy)
+            ViewHelpers.submitAndVerifyFormError(this.view, requests, notificationSpy)
         });
 
         it('does not save on cancel', function() {
