@@ -238,7 +238,7 @@ define([
             var data = this.item.model.attributes;
             this.item.render();
             expect(this.item.$el).toContainHtml(data.content.display_name);
-            expect(this.item.$el).toContain('a[href="/courses/' + data.course + '/info"]');
+            expect(this.item.$el).toContain('a[href="/courses/' + data.course + '/about"]');
             expect(this.item.$el).toContain('img[src="' + data.image_url + '"]');
             expect(this.item.$el.find('.course-name')).toContainHtml(data.org);
             expect(this.item.$el.find('.course-name')).toContainHtml(data.content.number);

@@ -57,28 +57,28 @@
 
 <section class="find-courses">
   <section class="courses-container">
-
     % if course_discovery_enabled:
     <div id="discovery-form" role="search" aria-label="course" class="wrapper-search-context">
+      <div id="discovery-message" class="search-status-label"></div>
       <form class="wrapper-search-input">
-        <input class="discovery-input" placeholder="${_('Search for a course')}" type="text"/><!-- removes spacing
-        --><button type="submit" class="button postfix discovery-submit" aria-label="${_('Search')}">
+        <input class="discovery-input" placeholder="${_('Search for a course')}" type="text"/>
+        <button type="submit" class="button postfix discovery-submit" aria-label="${_('Search')}">
           <i class="icon fa fa-search" aria-hidden="true"></i>
+          <div aria-live="polite" aria-relevant="all">
+            <div id="loading-indicator" class="loading-spinner hidden">
+              <i class="icon fa fa-spinner fa-spin"></i>
+              <span class="sr">${_('Loading')}</span>
+            </div>
+          </div>
         </button>
       </form>
-      <div id="discovery-message" class="search-status-label"></div>
-      <div aria-live="polite" aria-relevant="all">
-        <div id="loading-indicator" class="hidden">
-          <i class="icon fa fa-spinner fa-spin"></i> ${_('Loading')}
-        </div>
-      </div>
     </div>
 
     <div id="filter-bar" class="filters hide-phone">
     </div>
     % endif
 
-    <section class="courses${'' if course_discovery_enabled else ' no-course-discovery'}">
+    <section class="courses ${'' if course_discovery_enabled else ' no-course-discovery'}" role="region" aria-label="${_('List of Courses')}">
       <ul class="courses-listing">
         %for course in courses:
         <li class="courses-listing-item">

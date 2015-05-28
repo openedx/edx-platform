@@ -20,7 +20,6 @@ $course-search-input-height: ($button-size);
     background-image: $homepage-bg-image;
     box-shadow: 0 1px 0 0 $course-header-bg, inset 0 -1px 5px 0 $shadow-l1;
     overflow: hidden;
-    margin-top: $header_image_margin;
     padding: 0;
     width: flex-grid(12);
 
@@ -110,6 +109,7 @@ $course-search-input-height: ($button-size);
           height: $course-search-input-height;
           color: $black;
           font-style: normal;
+          font-weight: normal;
 
           // STATE: focus
           &:focus {

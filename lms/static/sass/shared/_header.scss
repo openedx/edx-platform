@@ -3,7 +3,7 @@
 
 header.global {
   @extend %ui-depth1;
-  border-bottom: 4px solid $courseware-border-bottom-color;
+  border-bottom: 1px solid $gray-l1;
   box-shadow: 0 1px 5px 0 $shadow-l1;
   background: $header-bg;
   position: relative;
@@ -286,7 +286,7 @@ header.global {
       a {
         display:block;
         padding: ($baseline/4);
-        color: $lighter-base-font-color;
+        color: $link-color;
         font-weight: 600;
 
         &:hover, &:focus, &:active {

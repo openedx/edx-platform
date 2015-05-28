@@ -359,10 +359,10 @@ FEATURES = {
     'MODE_CREATION_FOR_TESTING': False,
 
     # Courseware search feature
-    'ENABLE_COURSEWARE_SEARCH': True,
+    'ENABLE_COURSEWARE_SEARCH': False,
 
     # Dashboard search feature
-    'ENABLE_DASHBOARD_SEARCH': True,
+    'ENABLE_DASHBOARD_SEARCH': False,
 
     # log all information from cybersource callbacks
     'LOG_POSTPAY_CALLBACKS': True,
@@ -389,7 +389,7 @@ FEATURES = {
     },
 
     # Course discovery feature
-    'ENABLE_COURSE_DISCOVERY': True,
+    'ENABLE_COURSE_DISCOVERY': False,
 
     # Software secure fake page feature flag
     'ENABLE_SOFTWARE_SECURE_FAKE': False,

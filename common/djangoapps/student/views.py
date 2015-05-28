@@ -972,9 +972,9 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
                       platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.name
                 )
                 + "<br/><br/>" +
-                _("If you don't have an {platform_name} account yet, click <strong>Register</strong> at the top of the page.").format(
-                    platform_name=settings.PLATFORM_NAME
-                ),
+                _("If you don't have an {platform_name} account yet, "
+                  "click <strong>Register</strong> at the top of the page.").format(
+                      platform_name=settings.PLATFORM_NAME),
                 content_type="text/plain",
                 status=403
             )

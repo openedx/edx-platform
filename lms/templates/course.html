@@ -13,14 +13,14 @@ from courseware.courses import course_image_url, get_course_about_section
         <div class="learn-more" aria-hidden=true>${_("LEARN MORE")}</div>
       </div>
     </header>
-    <section class="course-info" aria-hidden=true>
+    <div class="course-info" aria-hidden="true">
       <h2 class="course-name">
         <span class="course-organization">${get_course_about_section(course, 'university')}</span>
         <span class="course-code">${course.display_number_with_default}</span>
         <span class="course-title">${get_course_about_section(course, 'title')}</span>
       </h2>
       <div class="course-date" aria-hidden="true">${_("Starts")}: ${course.start_datetime_text()}</div>
-    </section>
+    </div>
     <div class="sr">
       <ul>
       <li>${get_course_about_section(course, 'university')}</li>
