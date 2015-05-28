@@ -255,6 +255,15 @@ DATABASES = AUTH_TOKENS['DATABASES']
 MODULESTORE = convert_module_store_setting_if_needed(AUTH_TOKENS.get('MODULESTORE', MODULESTORE))
 CONTENTSTORE = AUTH_TOKENS['CONTENTSTORE']
 DOC_STORE_CONFIG = AUTH_TOKENS['DOC_STORE_CONFIG']
+
+try:
+    from pymongo import ReadPreference
+except ImportError:
+    pass
+else:
+    if 'read_preference' in DOC_STORE_CONFIG:
+        DOC_STORE_CONFIG = getattr(ReadPreference, DOC_STORE_CONFIG['read_preference'])
+
 # Datadog for events!
 DATADOG = AUTH_TOKENS.get("DATADOG", {})
 DATADOG.update(ENV_TOKENS.get("DATADOG", {}))

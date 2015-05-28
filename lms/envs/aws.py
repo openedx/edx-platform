@@ -403,6 +403,15 @@ XQUEUE_INTERFACE = AUTH_TOKENS['XQUEUE_INTERFACE']
 MODULESTORE = convert_module_store_setting_if_needed(AUTH_TOKENS.get('MODULESTORE', MODULESTORE))
 CONTENTSTORE = AUTH_TOKENS.get('CONTENTSTORE', CONTENTSTORE)
 DOC_STORE_CONFIG = AUTH_TOKENS.get('DOC_STORE_CONFIG', DOC_STORE_CONFIG)
+
+try:
+    from pymongo import ReadPreference
+except ImportError:
+    pass
+else:
+    if 'read_preference' in DOC_STORE_CONFIG:
+        DOC_STORE_CONFIG = getattr(ReadPreference, DOC_STORE_CONFIG['read_preference'])
+
 MONGODB_LOG = AUTH_TOKENS.get('MONGODB_LOG', {})
 
 OPEN_ENDED_GRADING_INTERFACE = AUTH_TOKENS.get('OPEN_ENDED_GRADING_INTERFACE',

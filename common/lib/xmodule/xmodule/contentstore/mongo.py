@@ -27,7 +27,7 @@ class MongoContentStore(ContentStore):
         """
         logging.debug('Using MongoDB for static content serving at host={0} port={1} db={2}'.format(host, port, db))
         _db = pymongo.database.Database(
-            pymongo.MongoClient(
+            pymongo.MongoReplicaSetClient(
                 host=host,
                 port=port,
                 document_class=dict,
