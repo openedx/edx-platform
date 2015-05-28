@@ -43,6 +43,7 @@ from xmodule.modulestore.modulestore_settings import update_module_store_setting
 from xmodule.mixin import LicenseMixin
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
+# TODO me: remove this along with anything else starting in kdbg_
 kdbg_ENABLE_PYINSTRUMENT = True
 
 ################################### FEATURES ###################################

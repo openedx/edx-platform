@@ -12,6 +12,6 @@ class CourseOverviewTests(TestCase):
     def test_model(self):
         course_ids = ['edX+DemoX+split-rerun']
         for course_id in course_ids:
-            # TODO me: figure out why this doesn't work
+            # note: this doesn't work for some reason
             overview = get_course_overview(CourseKey.from_string(course_id))
             print overview

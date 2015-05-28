@@ -92,8 +92,6 @@ def has_access(user, action, obj, course_key=None):
     if not user:
         user = AnonymousUser()
 
-    # TODO me: add CourseOverviewFields case
-
     # delegate the work to type-specific functions.
     # (start with more specific types, then get more general)
     if isinstance(obj, CourseDescriptor):
@@ -238,7 +236,7 @@ def _has_access_course_desc(user, action, course):
                 DEPRECATION_VSCOMPAT_EVENT,
                 tags=(
                     "location:has_access_course_desc_see_exists",
-                    u"course:{}".format(course),  # TODO me: figure out if this will cause problem with CourseOverviewFields
+                    u"course:{}".format(course),  # TODO me: figure out if this will cause problem with CourseOverviewDescriptor
                 )
             )
 
