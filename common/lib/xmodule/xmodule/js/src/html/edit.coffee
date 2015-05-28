@@ -105,7 +105,9 @@ class @HTMLEditingDescriptor
         setup: @setupTinyMCE,
         # Cannot get access to tinyMCE Editor instance (for focusing) until after it is rendered.
         # The tinyMCE callback passes in the editor as a parameter.
-        init_instance_callback: @initInstanceCallback
+        init_instance_callback: @initInstanceCallback,
+
+        browser_spellcheck: true
       })
       tinymce.addI18n('en', {
         ###

@@ -38,6 +38,8 @@ describe 'HTMLEditingDescriptor', ->
 
       @descriptor.initInstanceCallback(visualEditorStub)
       expect(visualEditorStub.getContent()).toEqual('text /c4x/foo/bar/asset/image.jpg')
+    it 'Enables spellcheck', ->
+      expect($('.html-editor iframe')[0].contentDocument.body.spellcheck).toBe(true)
   describe 'Raw HTML Editor', ->
     beforeEach ->
       loadFixtures 'html-editor-raw.html'
