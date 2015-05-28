@@ -206,11 +206,6 @@
         padding: ($baseline/2) $baseline;
       }
 
-      .disableClick {
-        @extend %ui-disabled;
-        color: $gray-l1;
-      }
-
       .tip {
         @extend %t-copy-sub2;
         @include transition(color, 0.15s, ease-in-out);
@@ -481,6 +476,27 @@
       @extend %t-title4;
       @extend %t-strong;
       margin-bottom: ($baseline/2);
+    }
+  }
+
+  .disableClick {
+    @extend %ui-disabled;
+    color: $gray-l1;
+  }
+
+  .certificate-activation {
+    float: right;
+    margin-bottom: 10px;
+
+    .active-state {
+      @extend %btn-primary-blue;
+      padding: ($baseline/4) $baseline;
+    }
+
+    .de-active-state {
+      @extend %btn-secondary-gray;
+      @extend .disableClick;
+      padding: ($baseline/4) $baseline;
     }
   }
 

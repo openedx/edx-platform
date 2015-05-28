@@ -7,16 +7,18 @@ define([
     'gettext',
     'js/views/baseview',
     'js/certificates/models/signatory',
-    'js/certificates/views/signatory_details'
+    'js/certificates/views/signatory_details',
+    'js/views/utils/view_utils'
 ],
-function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView) {
+function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView, ViewUtils) {
     'use strict';
     var CertificateDetailsView = BaseView.extend({
         tagName: 'div',
         events: {
             'click .edit': 'editCertificate',
             'click .show-details': 'showDetails',
-            'click .hide-details': 'hideDetails'
+            'click .hide-details': 'hideDetails',
+            'click .activate-cert, .deactivate-cert': "handleCertificateActivation"
         },
 
         className: function () {
@@ -32,7 +34,41 @@ function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView) {
             // Set up the initial state of the attributes set for this model instance
             this.showDetails = true;
             this.template = this.loadTemplate('certificate-details');
-            this.listenTo(this.model, 'change', this.render);
+            //this.listenTo(this.model, 'change', this.render);
+        },
+
+        handleCertificateActivation: function(event) {
+            var msg = null;
+            switch (event.currentTarget.id) {
+                case 'activate-certificate':
+                    this.model.set('is_active', true);
+                    msg = 'Activating';
+                    break;
+                case 'deactivate-certificate':
+                    this.model.set('is_active', false);
+                    msg = 'Deactivating';
+                    break;
+                default:
+                    break;
+            }
+
+            if(msg) {
+                ViewUtils.runOperationShowingMessage(
+                    gettext(msg),
+                    function () {
+                        var dfd = $.Deferred();
+                        var actionableModel = this.model;
+                        actionableModel.save({wait:true}, {
+                            success: function () {
+                                actionableModel.setOriginalAttributes();
+                                $("button.activate-cert").toggleClass("active-state de-active-state");
+                                $("button.deactivate-cert").toggleClass("active-state de-active-state");
+                                dfd.resolve();
+                            }.bind(this)
+                        });
+                        return dfd;
+                    }.bind(this));
+            }
         },
 
         editCertificate: function(event) {
