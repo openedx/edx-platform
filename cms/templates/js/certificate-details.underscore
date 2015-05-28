@@ -27,6 +27,10 @@
          </header>
          <div class="signatory-details-list"></div>
     <% } %>
+    <div class="certificate-activation">
+        <button id="activate-certificate" class="activate-cert <% if(!is_active) { %> active-state <% } else { %>de-active-state <% } %>"><span><%= gettext("Activate") %></span></button>
+        <button id="deactivate-certificate" class="deactivate-cert <% if(is_active) { %> active-state <% } else { %>de-active-state <% } %>"><span><%= gettext("De-Activate") %></span></button>
+    </div>
    </ol>
 
     <ul class="actions certificate-actions">
