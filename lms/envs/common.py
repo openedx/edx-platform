@@ -43,7 +43,7 @@ from xmodule.modulestore.modulestore_settings import update_module_store_setting
 from xmodule.mixin import LicenseMixin
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
-DEBUG__ENABLE_PYINSTRUMENT = True
+kdbg_ENABLE_PYINSTRUMENT = True
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
@@ -1186,7 +1186,7 @@ MIDDLEWARE_CLASSES = (
     'microsite_configuration.middleware.MicrositeSessionCookieDomainMiddleware',
 )
 
-if DEBUG__ENABLE_PYINSTRUMENT:
+if kdbg_ENABLE_PYINSTRUMENT:
     MIDDLEWARE_CLASSES += ('pyinstrument.middleware.ProfilerMiddleware',)
     PYINSTRUMENT_USE_SIGNAL = False
 
