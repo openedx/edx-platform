@@ -164,7 +164,7 @@ def _update_enrollment(enrollment, is_active=None, mode=None):
     return CourseEnrollmentSerializer(enrollment).data  # pylint: disable=no-member
 
 
-def get_course_enrollment_info(course_id, include_expired):
+def get_course_enrollment_info(course_id, include_expired=False):
     """Returns all course enrollment information for the given course.
 
     Based on the course id, return all related course information..

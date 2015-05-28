@@ -45,7 +45,7 @@ class CourseField(serializers.RelatedField):
 
     """
 
-    def to_native(self, course, include_expired):
+    def to_native(self, course, include_expired=False):
         course_id = unicode(course.id)
         course_modes = \
             ModeSerializer(CourseMode.modes_for_course(course.id,

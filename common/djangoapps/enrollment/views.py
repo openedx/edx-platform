@@ -76,7 +76,7 @@ class EnrollmentUserThrottle(UserRateThrottle, ApiKeyPermissionMixIn):
             or super(EnrollmentUserThrottle,
                      self).allow_request(request, view)
 
-
+@can_disable_rate_limit
 class EnrollmentView(APIView, ApiKeyPermissionMixIn):
 
     """
@@ -175,7 +175,7 @@ class EnrollmentView(APIView, ApiKeyPermissionMixIn):
                             data={'message': u"An error occurred while retrieving enrollments for user '{username}' in course '{course_id}'".format(username=username,
                             course_id=course_id)})
 
-
+@can_disable_rate_limit
 class EnrollmentCourseDetailView(APIView):
 
     """
@@ -244,7 +244,7 @@ class EnrollmentCourseDetailView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST,
                             data={'message': u"No course found for course ID '{course_id}'".format(course_id=course_id)})
 
-
+@can_disable_rate_limit
 class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
 
     """
