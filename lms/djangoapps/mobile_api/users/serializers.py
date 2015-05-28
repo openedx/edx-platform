@@ -62,6 +62,7 @@ class CourseOverviewField(serializers.RelatedField):
             "course_handouts": course_handouts_url,
             "course_about": course_about_url,
             "subscription_id": course_overview.clean_id(padding_char='_'),
+            "kdbg_cache_hit": course_overview.kdbg_cache_hit,
         }
 
 
