@@ -177,6 +177,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             {
                 'title': 'Connected Accounts',
                 'fields': [
+                    'Dummy',
                     'Facebook',
                     'Google',
                 ]
@@ -211,7 +212,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
 
         for new_value in new_valid_values:
             self.assertEqual(self.account_settings_page.value_for_text_field(field_id, new_value), new_value)
-            self.account_settings_page.wait_for_messsage(field_id, success_message)
+            self.account_settings_page.wait_for_message(field_id, success_message)
             if assert_after_reload:
                 self.browser.refresh()
                 self.assertEqual(self.account_settings_page.value_for_text_field(field_id), new_value)
@@ -227,7 +228,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
 
         for new_value in new_values:
             self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id, new_value), new_value)
-            self.account_settings_page.wait_for_messsage(field_id, success_message)
+            self.account_settings_page.wait_for_message(field_id, success_message)
             if reloads_on_save:
                 self.account_settings_page.wait_for_loading_indicator()
             else:
@@ -242,7 +243,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         self.assertEqual(self.account_settings_page.title_for_field(field_id), title)
         self.assertEqual(self.account_settings_page.link_title_for_link_field(field_id), link_title)
         self.account_settings_page.click_on_link_in_link_field(field_id)
-        self.account_settings_page.wait_for_messsage(field_id, success_message)
+        self.account_settings_page.wait_for_message(field_id, success_message)
 
     def test_username_field(self):
         """

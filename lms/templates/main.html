@@ -171,18 +171,7 @@ from branding import api as branding_api
 </html>
 
 <%def name="login_query()">${
-  u"?course_id={0}&enrollment_action={1}{course_mode}{email_opt_in}".format(
-    urlquote_plus(course_id),
-    urlquote_plus(enrollment_action),
-    course_mode=(
-      u"&course_mode=" + urlquote_plus(course_mode)
-      if course_mode else ""
-    ),
-    email_opt_in=(
-      u"&email_opt_in=" + urlquote_plus(email_opt_in)
-      if email_opt_in else ""
-    )
-  ) if course_id and enrollment_action else ""
+  u"?next={0}".format(urlquote_plus(login_redirect_url)) if login_redirect_url else ""
 }</%def>
 
 <!-- Performance beacon for onload times -->

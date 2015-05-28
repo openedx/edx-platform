@@ -89,7 +89,7 @@ class AccessTokenExchangeForm(ScopeMixin, OAuthForm):
 
         user = None
         try:
-            user = backend.do_auth(self.cleaned_data.get("access_token"))
+            user = backend.do_auth(self.cleaned_data.get("access_token"), allow_inactive_user=True)
         except (HTTPError, AuthException):
             pass
         if user and isinstance(user, User):

@@ -675,19 +675,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # social auth.
         self.assert_social_auth_does_not_exist_for_user(created_user, strategy)
 
-        # Since the user's account is not yet active, we should be redirected to /login
-        self.assert_redirect_to_login_looks_correct(
-            actions.do_complete(
-                request.backend, social_views._do_login, request.user, None,  # pylint: disable=protected-access
-                redirect_field_name=auth.REDIRECT_FIELD_NAME
-            )
-        )
-
-        # Activate the user's account
-        strategy.request.user.is_active = True
-        strategy.request.user.save()
-
-        # Try again.  This time, we should be redirected back to the complete page, setting
+        # We should be redirected back to the complete page, setting
         # the "logged in" cookie for the marketing site.
         self.assert_logged_in_cookie_redirect(actions.do_complete(
             request.backend, social_views._do_login, request.user, None,  # pylint: disable=protected-access
@@ -696,12 +684,9 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
 
         # Set the cookie and try again
         self.set_logged_in_cookie(request)
-
-        # Pick the pipeline back up. This will create the account association
-        # and send the user to the dashboard, where the association will be
-        # displayed.
         self.assert_redirect_to_dashboard_looks_correct(
             actions.do_complete(strategy.request.backend, social_views._do_login, user=created_user))
+        # Now the user has been redirected to the dashboard. Their third party account should now be linked.
         self.assert_social_auth_exists_for_user(created_user, strategy)
         self.assert_account_settings_context_looks_correct(account_settings_context(request), created_user, linked=True)
 

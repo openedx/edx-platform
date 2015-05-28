@@ -11,6 +11,7 @@ var edx = edx || {};
     return new edx.student.account.AccessView({
         mode: container.data('initial-mode'),
         thirdPartyAuth: container.data('third-party-auth'),
+        nextUrl: container.data('next-url'),
         platformName: container.data('platform-name'),
         loginFormDesc: container.data('login-form-desc'),
         registrationFormDesc: container.data('registration-form-desc'),

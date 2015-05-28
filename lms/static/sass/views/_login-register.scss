@@ -515,3 +515,26 @@ $sm-btn-linkedin: #0077b5;
         }
     }
 }
+
+.finish-auth {
+    @include box-sizing(border-box);
+    @include outer-container;
+    $grid-columns: 12;
+    background: $white;
+    min-height: 100%;
+    width: 100%;
+
+    .finish-auth-inner {
+        @include box-sizing(border-box);
+        max-width: 650px;
+        margin: 1em auto;
+    }
+
+    #finish-auth-status {
+        padding-top: 30px; // Make room for the absolutely positioned loading animation
+    }
+
+    #finish-auth-status li:last-child {
+        font-weight: bold;
+    }
+}

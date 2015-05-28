@@ -1556,6 +1556,10 @@ PIPELINE_JS = {
     'certificates_wv': {
         'source_filenames': certificates_web_view_js,
         'output_filename': 'js/certificates/web_view.js'
+    },
+    'utility': {
+        'source_filenames': ['js/src/utility.js'],
+        'output_filename': 'js/utility.js'
     }
 }
 

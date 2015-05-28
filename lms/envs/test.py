@@ -247,6 +247,8 @@ THIRD_PARTY_AUTH = {
     },
 }
 
+FEATURES['ENABLE_DUMMY_THIRD_PARTY_AUTH_PROVIDER'] = True
+
 ################################## OPENID #####################################
 FEATURES['AUTH_USE_OPENID'] = True
 FEATURES['AUTH_USE_OPENID_PROVIDER'] = True

@@ -278,24 +278,6 @@ class LoginTest(TestCase):
         self.assertIsNone(response_content["redirect_url"])
         self._assert_response(response, success=True)
 
-    def test_change_enrollment_200_redirect(self):
-        """
-        Tests that "redirect_url" is the content of the HttpResponse returned
-        by change_enrollment, if there is content
-        """
-        # add this post param to trigger a call to change_enrollment
-        extra_post_params = {"enrollment_action": "enroll"}
-        with patch('student.views.change_enrollment') as mock_change_enrollment:
-            mock_change_enrollment.return_value = HttpResponse("in/nature/there/is/nothing/melancholy")
-            response, _ = self._login_response(
-                'test@edx.org',
-                'test_password',
-                extra_post_params=extra_post_params,
-            )
-        response_content = json.loads(response.content)
-        self.assertEqual(response_content["redirect_url"], "in/nature/there/is/nothing/melancholy")
-        self._assert_response(response, success=True)
-
     def _login_response(self, email, password, patched_audit_log='student.views.AUDIT_LOG', extra_post_params=None):
         ''' Post the login info '''
         post_params = {'email': email, 'password': password}
