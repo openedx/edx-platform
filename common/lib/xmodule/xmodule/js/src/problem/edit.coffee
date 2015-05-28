@@ -201,8 +201,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 #
   @markdownToXml: (markdown)->
     toXml = `function (markdown) {
-      // Translators: This is the title of the text explaining a problem
-      var explanation_title = gettext("Explanation");
       var xml = markdown,
           i, splits, scriptFlag;
 
@@ -350,15 +348,14 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       });
 
       // replace explanations
-
       xml = xml.replace(/\[explanation\]\n?([^\]]*)\[\/?explanation\]/gmi, function(match, p1) {
-          var selectString = '<solution>\n<div class="detailed-solution">\n' + explanation_title + '\n\n' + p1 + '\n</div>\n</solution>';
+          var selectString = '<solution>\n<div class="detailed-solution">\nExplanation\n\n' + p1 + '\n</div>\n</solution>';
 
           return selectString;
       });
-
+      
       // replace labels
-      // looks for >>arbitrary text<< and inserts it into the label attribute of the input type directly below the text.
+      // looks for >>arbitrary text<< and inserts it into the label attribute of the input type directly below the text. 
       var split = xml.split('\n');
       var new_xml = [];
       var line, i, curlabel, prevlabel = '';
