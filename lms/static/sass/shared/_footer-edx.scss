@@ -14,10 +14,13 @@ $edx-footer-bg-color: rgb(252,252,252);
 // sites so the scope has to be aggressive to override default
 // CMS styles
 footer#footer-edx-v3 {
-  @include outer-container;
-  @include box-sizing(border-box);
   background: $edx-footer-bg-color;
   padding: 20px;
+
+  .footer-content-wrapper {
+    @include outer-container;
+    @include box-sizing(border-box);
+  }
 
   p {
     @include font-size(14);
@@ -35,6 +38,11 @@ footer#footer-edx-v3 {
 
       &:last-of-type {
         @include margin-right(0);
+      }
+
+      &:hover,
+      &:focus {
+        border: none;
       }
     }
   }
@@ -59,8 +67,8 @@ footer#footer-edx-v3 {
   }
 
   .openedx-link {
+    @include margin(10px, 0, 30px, -8px);
     width: 141px;
-    margin-bottom: 30px;
 
     a {
       display: inline-block;
@@ -82,10 +90,10 @@ footer#footer-edx-v3 {
 
   a.sm-link {
     @include float(left);
-    @include margin(0, 0, 10px, 12px);
+    @include margin(0, 0, 10px, 7px);
     @include font-size(28);
     @include line-height(28);
-    width: 30px;
+    width: 35px;
     height: 30px;
     line-height: 1;
     position: relative;
@@ -97,8 +105,10 @@ footer#footer-edx-v3 {
       @include margin-left(0);
     }
 
-    &:hover {
+    &:hover,
+    &:focus {
       opacity: 0.7;
+      border: none;
     }
 
     .icon {
