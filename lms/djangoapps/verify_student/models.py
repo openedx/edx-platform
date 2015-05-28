@@ -154,6 +154,7 @@ class PhotoVerification(StatusModel):
     # Indicates whether or not a user wants to see the verification status
     # displayed on their dash.  Right now, only relevant for allowing students
     # to "dismiss" a failed midcourse reverification message
+    # TODO: This field is deprecated.
     display = models.BooleanField(db_index=True, default=True)
 
     ######################## Fields Set When Submitting ########################
@@ -196,26 +197,23 @@ class PhotoVerification(StatusModel):
         return datetime.now(pytz.UTC) - timedelta(days=days_good_for)
 
     @classmethod
-    def user_is_verified(cls, user, earliest_allowed_date=None, window=None):
+    def user_is_verified(cls, user, earliest_allowed_date=None):
         """
         Return whether or not a user has satisfactorily proved their identity.
         Depending on the policy, this can expire after some period of time, so
         a user might have to renew periodically.
 
-        If window=None, then this will check for the user's *initial* verification.
-        If window is set to anything else, it will check for the reverification
-        associated with that window.
+        This will check for the user's *initial* verification.
         """
         return cls.objects.filter(
             user=user,
             status="approved",
             created_at__gte=(earliest_allowed_date
-                             or cls._earliest_allowed_date()),
-            window=window
+                             or cls._earliest_allowed_date())
         ).exists()
 
     @classmethod
-    def verification_valid_or_pending(cls, user, earliest_allowed_date=None, window=None, queryset=None):
+    def verification_valid_or_pending(cls, user, earliest_allowed_date=None, queryset=None):
         """
         Check whether the user has a complete verification attempt that is
         or *might* be good. This means that it's approved, been submitted,
@@ -223,15 +221,12 @@ class PhotoVerification(StatusModel):
         being submitted.
         It's basically any situation in which the user has signed off on
         the contents of the attempt, and we have not yet received a denial.
+        This will check for the user's *initial* verification.
 
         Arguments:
             user:
             earliest_allowed_date: earliest allowed date given in the
                 settings
-            window: If window=None, this will check for the user's
-                *initial* verification.
-                If window is anything else, this will check for the
-                reverification associated with that window.
             queryset: If a queryset is provided, that will be used instead
                 of hitting the database.
 
@@ -239,9 +234,9 @@ class PhotoVerification(StatusModel):
             queryset: queryset of 'PhotoVerification' sorted by 'created_at' in
             descending order.
         """
-        valid_statuses = ['submitted', 'approved']
-        if not window:
-            valid_statuses.append('must_retry')
+
+        valid_statuses = ['submitted', 'approved', 'must_retry']
+
         if queryset is None:
             queryset = cls.objects.filter(user=user)
 
@@ -250,39 +245,37 @@ class PhotoVerification(StatusModel):
             created_at__gte=(
                 earliest_allowed_date
                 or cls._earliest_allowed_date()
-            ),
-            window=window,
+            )
         ).order_by('-created_at')
 
     @classmethod
-    def user_has_valid_or_pending(cls, user, earliest_allowed_date=None, window=None, queryset=None):
+    def user_has_valid_or_pending(cls, user, earliest_allowed_date=None, queryset=None):
         """
         Check whether the user has an active or pending verification attempt
 
         Returns:
             bool: True or False according to existence of valid verifications
         """
-        return cls.verification_valid_or_pending(user, earliest_allowed_date, window, queryset).exists()
+        return cls.verification_valid_or_pending(user, earliest_allowed_date, queryset).exists()
 
     @classmethod
-    def active_for_user(cls, user, window=None):
+    def active_for_user(cls, user):
         """
         Return the most recent PhotoVerification that is marked ready (i.e. the
         user has said they're set, but we haven't submitted anything yet).
 
-        If window=None, this checks for the original verification.  If window is set to
-        anything else, this will check for the reverification associated with that window.
+        This checks for the original verification.
         """
         # This should only be one at the most, but just in case we create more
         # by mistake, we'll grab the most recently created one.
-        active_attempts = cls.objects.filter(user=user, status='ready', window=window).order_by('-created_at')
+        active_attempts = cls.objects.filter(user=user, status='ready').order_by('-created_at')
         if active_attempts:
             return active_attempts[0]
         else:
             return None
 
     @classmethod
-    def user_status(cls, user, window=None):
+    def user_status(cls, user):
         """
         Returns the status of the user based on their past verification attempts
 
@@ -292,16 +285,15 @@ class PhotoVerification(StatusModel):
         If the verification process is still ongoing, returns 'pending'
         If the verification has been denied and the user must resubmit photos, returns 'must_reverify'
 
-        If window=None, this checks initial verifications
-        If window is set, this checks for the reverification associated with that window
+        This checks initial verifications
         """
         status = 'none'
         error_msg = ''
 
-        if cls.user_is_verified(user, window=window):
+        if cls.user_is_verified(user):
             status = 'approved'
 
-        elif cls.user_has_valid_or_pending(user, window=window):
+        elif cls.user_has_valid_or_pending(user):
             # user_has_valid_or_pending does include 'approved', but if we are
             # here, we know that the attempt is still pending
             status = 'pending'
@@ -310,17 +302,12 @@ class PhotoVerification(StatusModel):
             # we need to check the most recent attempt to see if we need to ask them to do
             # a retry
             try:
-                attempts = cls.objects.filter(user=user, window=window).order_by('-updated_at')
+                attempts = cls.objects.filter(user=user).order_by('-updated_at')
                 attempt = attempts[0]
             except IndexError:
-
-                # If no verification exists for a *midcourse* reverification, then that just
-                # means the student still needs to reverify.  For *original* verifications,
                 # we return 'none'
-                if(window):
-                    return('must_reverify', error_msg)
-                else:
-                    return ('none', error_msg)
+
+                return ('none', error_msg)
 
             if attempt.created_at < cls._earliest_allowed_date():
                 return (
@@ -329,12 +316,9 @@ class PhotoVerification(StatusModel):
                 )
 
             # If someone is denied their original verification attempt, they can try to reverify.
-            # However, if a midcourse reverification is denied, that denial is permanent.
             if attempt.status == 'denied':
-                if window is None:
-                    status = 'must_reverify'
-                else:
-                    status = 'denied'
+                status = 'must_reverify'
+
             if attempt.error_msg:
                 error_msg = attempt.parsed_error_msg()
 
@@ -562,28 +546,6 @@ class PhotoVerification(StatusModel):
         self.status = "must_retry"
         self.save()
 
-    @classmethod
-    def display_off(cls, user_id):
-        """
-        Find all failed PhotoVerifications for a user, and sets those verifications' `display`
-        property to false, so the notification banner can be switched off.
-        """
-        user = User.objects.get(id=user_id)
-        cls.objects.filter(user=user, status="denied").exclude(window=None).update(display=False)
-
-    @classmethod
-    def display_status(cls, user, window):
-        """
-        Finds the `display` property for the PhotoVerification associated with
-        (user, window). Default is True
-        """
-        attempts = cls.objects.filter(user=user, window=window).order_by('-updated_at')
-        try:
-            attempt = attempts[0]
-            return attempt.display
-        except IndexError:
-            return True
-
 
 class SoftwareSecurePhotoVerification(PhotoVerification):
     """
@@ -624,44 +586,15 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
     IMAGE_LINK_DURATION = 5 * 60 * 60 * 24  # 5 days in seconds
 
-    window = models.ForeignKey(MidcourseReverificationWindow, db_index=True, null=True)
-
-    @classmethod
-    def user_is_reverified_for_all(cls, course_id, user):
-        """
-        Checks to see if the student has successfully reverified for all of the
-        mandatory re-verification windows associated with a course.
-
-        This is used primarily by the certificate generation code... if the user is
-        not re-verified for all windows, then they cannot receive a certificate.
-        """
-        all_windows = MidcourseReverificationWindow.objects.filter(course_id=course_id)
-        # if there are no windows for a course, then return True right off
-        if (not all_windows.exists()):
-            return True
-
-        for window in all_windows:
-            try:
-                # The status of the most recent reverification for each window must be "approved"
-                # for a student to count as completely reverified
-                attempts = cls.objects.filter(user=user, window=window).order_by('-updated_at')
-                attempt = attempts[0]
-                if attempt.status != "approved":
-                    return False
-            except Exception:  # pylint: disable=broad-except
-                log.exception(
-                    u"An error occurred while checking re-verification for user '{user_id}'".format(user_id=user)
-                )
-                return False
-
-        return True
+    # This field has been deprecated and will be removed in a future release.
+    window = models.ForeignKey(MidcourseReverificationWindow, db_index=True, null=True)   # TODO(ECOM-1494):Remove this.
 
     @classmethod
     def original_verification(cls, user):
         """
         Returns the most current SoftwareSecurePhotoVerification object associated with the user.
         """
-        query = cls.objects.filter(user=user, window=None).order_by('-updated_at')
+        query = cls.objects.filter(user=user).order_by('-updated_at')
         return query[0]
 
     @classmethod
@@ -672,7 +605,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         Return:
             SoftwareSecurePhotoVerification (object)
         """
-        init_verification = cls.objects.filter(user=user, status__in=["submitted", "approved"], window=None)
+        init_verification = cls.objects.filter(user=user, status__in=["submitted", "approved"])
         return init_verification.latest('created_at') if init_verification.exists() else None
 
     @status_before_must_be("created")
@@ -950,11 +883,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         if not user_is_verified:
             return 'Not ID Verified'
         else:
-            user_is_re_verified = cls.user_is_reverified_for_all(course_id, user)
-            if not user_is_re_verified:
-                return 'ID Verification Expired'
-            else:
-                return 'ID Verified'
+            return 'ID Verified'
 
 
 class VerificationCheckpoint(models.Model):

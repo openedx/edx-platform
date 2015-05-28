@@ -7,7 +7,6 @@ from mock import patch
 from pytz import UTC
 from django.core.urlresolvers import reverse
 from django.conf import settings
-from reverification.tests.factories import MidcourseReverificationWindowFactory
 
 from student.helpers import (
     VERIFY_STATUS_NEED_TO_VERIFY,
@@ -260,13 +259,11 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
             mode="verified"
         )
 
-        window = MidcourseReverificationWindowFactory(course_id=course2.id)
         # The student has an approved verification
         attempt2 = SoftwareSecurePhotoVerification.objects.create(user=self.user)
         attempt2.mark_ready()
         attempt2.submit()
         attempt2.approve()
-        attempt2.window = window
         attempt2.save()
 
         # Mark the attemp2 as approved so its date will appear on dasboard.

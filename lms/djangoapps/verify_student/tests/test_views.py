@@ -48,7 +48,6 @@ from verify_student.models import (
     SoftwareSecurePhotoVerification, VerificationCheckpoint,
     InCourseReverificationConfiguration, VerificationStatus
 )
-from reverification.tests.factories import MidcourseReverificationWindowFactory
 from util.date_utils import get_default_time_display
 
 
@@ -1508,32 +1507,6 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertIn('Result Unknown not understood', response.content)
 
     @mock.patch('verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
-    def test_reverification(self):
-        """
-         Test software secure result for reverification window.
-        """
-        data = {
-            "EdX-ID": self.receipt_id,
-            "Result": "PASS",
-            "Reason": "",
-            "MessageType": "You have been verified."
-        }
-        window = MidcourseReverificationWindowFactory(course_id=self.course_id)
-        self.attempt.window = window
-        self.attempt.save()
-        json_data = json.dumps(data)
-        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course_id).count(), 0)
-        response = self.client.post(
-            reverse('verify_student_results_callback'),
-            data=json_data,
-            content_type='application/json',
-            HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing',
-            HTTP_DATE='testdate'
-        )
-        self.assertEquals(response.content, 'OK!')
-        self.assertIsNotNone(CourseEnrollment.objects.get(course_id=self.course_id))
-
-    @mock.patch('verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
     def test_in_course_reverify_disabled(self):
         """
         Test for verification passed.
@@ -1695,154 +1668,6 @@ class TestReverifyView(ModuleStoreTestCase):
         ((template, context), _kwargs) = render_mock.call_args  # pylint: disable=unpacking-non-sequence
         self.assertIn('photo_reverification', template)
         self.assertTrue(context['error'])
-
-
-class TestMidCourseReverifyView(ModuleStoreTestCase):
-    """
-    Tests for the midcourse reverification views.
-    """
-    def setUp(self):
-        super(TestMidCourseReverifyView, self).setUp()
-
-        self.user = UserFactory.create(username="rusty", password="test")
-        self.client.login(username="rusty", password="test")
-        self.course_key = SlashSeparatedCourseKey("Robot", "999", "Test_Course")
-        CourseFactory.create(org='Robot', number='999', display_name='Test Course')
-
-        patcher = patch('student.models.tracker')
-        self.mock_tracker = patcher.start()
-        self.addCleanup(patcher.stop)
-
-    @patch('verify_student.views.render_to_response', render_mock)
-    def test_midcourse_reverify_get(self):
-        url = reverse('verify_student_midcourse_reverify',
-                      kwargs={"course_id": self.course_key.to_deprecated_string()})
-        response = self.client.get(url)
-
-        self.mock_tracker.emit.assert_any_call(  # pylint: disable=maybe-no-member
-            'edx.course.enrollment.mode_changed',
-            {
-                'user_id': self.user.id,
-                'course_id': self.course_key.to_deprecated_string(),
-                'mode': "verified",
-            }
-        )
-
-        # Check that user entering the reverify flow was logged, and that it was the last call
-        self.mock_tracker.emit.assert_called_with(  # pylint: disable=maybe-no-member
-            'edx.course.enrollment.reverify.started',
-            {
-                'user_id': self.user.id,
-                'course_id': self.course_key.to_deprecated_string(),
-                'mode': "verified",
-            }
-        )
-
-        self.assertTrue(self.mock_tracker.emit.call_count, 2)  # pylint: disable=no-member
-
-        self.mock_tracker.emit.reset_mock()  # pylint: disable=no-member
-
-        self.assertEquals(response.status_code, 200)
-        ((_template, context), _kwargs) = render_mock.call_args  # pylint: disable=unpacking-non-sequence
-        self.assertFalse(context['error'])
-
-    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
-    def test_midcourse_reverify_post_success(self):
-        window = MidcourseReverificationWindowFactory(course_id=self.course_key)
-        url = reverse('verify_student_midcourse_reverify', kwargs={'course_id': self.course_key.to_deprecated_string()})
-
-        response = self.client.post(url, {'face_image': ','})
-
-        self.mock_tracker.emit.assert_any_call(  # pylint: disable=maybe-no-member
-            'edx.course.enrollment.mode_changed',
-            {
-                'user_id': self.user.id,
-                'course_id': self.course_key.to_deprecated_string(),
-                'mode': "verified",
-            }
-        )
-
-        # Check that submission event was logged, and that it was the last call
-        self.mock_tracker.emit.assert_called_with(  # pylint: disable=maybe-no-member
-            'edx.course.enrollment.reverify.submitted',
-            {
-                'user_id': self.user.id,
-                'course_id': self.course_key.to_deprecated_string(),
-                'mode': "verified",
-            }
-        )
-
-        self.assertTrue(self.mock_tracker.emit.call_count, 2)  # pylint: disable=no-member
-
-        self.mock_tracker.emit.reset_mock()  # pylint: disable=no-member
-
-        self.assertEquals(response.status_code, 302)
-        try:
-            verification_attempt = SoftwareSecurePhotoVerification.objects.get(user=self.user, window=window)
-            self.assertIsNotNone(verification_attempt)
-        except ObjectDoesNotExist:
-            self.fail('No verification object generated')
-
-    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
-    def test_midcourse_reverify_post_failure_expired_window(self):
-        window = MidcourseReverificationWindowFactory(
-            course_id=self.course_key,
-            start_date=datetime.now(pytz.UTC) - timedelta(days=100),
-            end_date=datetime.now(pytz.UTC) - timedelta(days=50),
-        )
-        url = reverse('verify_student_midcourse_reverify', kwargs={'course_id': self.course_key.to_deprecated_string()})
-        response = self.client.post(url, {'face_image': ','})
-        self.assertEquals(response.status_code, 302)
-        with self.assertRaises(ObjectDoesNotExist):
-            SoftwareSecurePhotoVerification.objects.get(user=self.user, window=window)
-
-    @patch('verify_student.views.render_to_response', render_mock)
-    def test_midcourse_reverify_dash(self):
-        url = reverse('verify_student_midcourse_reverify_dash')
-        response = self.client.get(url)
-        # not enrolled in any courses
-        self.assertEquals(response.status_code, 200)
-
-        enrollment = CourseEnrollment.get_or_create_enrollment(self.user, self.course_key)
-        enrollment.update_enrollment(mode="verified", is_active=True)
-        MidcourseReverificationWindowFactory(course_id=self.course_key)
-        response = self.client.get(url)
-        # enrolled in a verified course, and the window is open
-        self.assertEquals(response.status_code, 200)
-
-    @patch('verify_student.views.render_to_response', render_mock)
-    def test_midcourse_reverify_invalid_course_id(self):
-        # if course id is invalid return 400
-        invalid_course_key = CourseLocator('edx', 'not', 'valid')
-        url = reverse('verify_student_midcourse_reverify', kwargs={'course_id': unicode(invalid_course_key)})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
-
-
-class TestReverificationBanner(ModuleStoreTestCase):
-    """
-    Tests for toggling the "midcourse reverification failed" banner off.
-    """
-
-    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
-    def setUp(self):
-        super(TestReverificationBanner, self).setUp()
-
-        self.user = UserFactory.create(username="rusty", password="test")
-        self.client.login(username="rusty", password="test")
-        self.course_id = 'Robot/999/Test_Course'
-        CourseFactory.create(org='Robot', number='999', display_name=u'Test Course é')
-        self.window = MidcourseReverificationWindowFactory(course_id=self.course_id)
-        url = reverse('verify_student_midcourse_reverify', kwargs={'course_id': self.course_id})
-        self.client.post(url, {'face_image': ','})
-        photo_verification = SoftwareSecurePhotoVerification.objects.get(user=self.user, window=self.window)
-        photo_verification.status = 'denied'
-        photo_verification.save()
-
-    def test_banner_display_off(self):
-        self.client.post(reverse('verify_student_toggle_failed_banner_off'))
-        photo_verification = SoftwareSecurePhotoVerification.objects.get(user=self.user, window=self.window)
-        self.assertFalse(photo_verification.display)
 
 
 class TestInCourseReverifyView(ModuleStoreTestCase):
