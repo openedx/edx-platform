@@ -199,7 +199,7 @@ def _has_access_course_desc(user, action, course):
         else:
             reg_method_ok = True  # if not using this access check, it's always OK.
 
-        now = datetime.now(UTC())
+        now = datetime.now(pytz.UTC)
         start = course.enrollment_start or datetime.min.replace(tzinfo=pytz.UTC)
         end = course.enrollment_end or datetime.max.replace(tzinfo=pytz.UTC)
 
@@ -391,7 +391,6 @@ def _has_group_access(descriptor, user, course_key):
     # all checks passed.
     return True
 
-
 def _has_access_descriptor(user, action, descriptor, course_key=None):
     """
     Check if user has access to this descriptor.
@@ -427,7 +426,8 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
 
         # Check start date
         if 'detached' not in descriptor._class_tags and descriptor.start is not None:
-            now = datetime.now(UTC())
+            now = datetime.now(pytz.UTC)
+            logging.debug("Can load: {}".format(descriptor.location))
             effective_start = _adjust_start_date_for_beta_testers(
                 user,
                 descriptor,
