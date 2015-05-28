@@ -189,13 +189,11 @@ def render_courseware(request, lti_params):
         'disable_accordion': True,
         'allow_iframing': True,
         'disable_header': True,
-        'disable_footer': True,
-        'disable_tabs': True,
         'staff_access': staff,
         'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://example.com/xqa'),
     }
 
-    return render_to_response('courseware/courseware.html', context)
+    return render_to_response('courseware/courseware-chromeless.html', context)
 
 
 def parse_course_and_usage_keys(course_id, usage_id):
