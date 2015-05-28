@@ -16,7 +16,6 @@ var edx = edx || {};
 
         defaults: {
             courseKey: '',
-            checkpointName: '',
             faceImage: '',
             usageId: ''
         },
@@ -28,9 +27,8 @@ var edx = edx || {};
                     face_image: model.get( 'faceImage' )
                 },
                 url = _.str.sprintf(
-                    '/verify_student/reverify/%(courseKey)s/%(checkpointName)s/%(usageId)s/', {
+                    '/verify_student/reverify/%(courseKey)s/%(usageId)s/', {
                         courseKey: model.get('courseKey'),
-                        checkpointName: model.get('checkpointName'),
                         usageId: model.get('usageId')
                     }
                 );
