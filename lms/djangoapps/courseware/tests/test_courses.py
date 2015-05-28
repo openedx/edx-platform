@@ -86,19 +86,12 @@ class ImageTestCaseMixin(ModuleStoreTestCase):
 
     def test_course_image_url(self, course, expected_url):
         """
-        Test that we get the expected URL when calling course_image_url on:
+        Test that we get the expected URL when calling course_image_url on both:
           (1) the CourseDescriptor itself
-          (2) a CourseOverviewDescriptor created new from the CourseDescriptor
-          (3) a CourseOverviewDescriptor loaded from the cache
-              (see content.course_overview documentation for more detail)
+          (2) a CourseOverviewDescriptor corresponding the course
         """
-        overview_newly_created = CourseOverviewDescriptor.create_from_course(course)
-
-        _ = get_course_overview(course.id)  # calling this function once ensures that the next call will be a cache hit
-        overview_from_cache = get_course_overview(course.id)
-
-        descriptors_to_test = [course, overview_newly_created, overview_from_cache]
-        for descriptor in descriptors_to_test:
+        course_overview = get_course_overview(course.id)
+        for descriptor in [course, course_overview]:
             self.assertEquals(course_image_url(descriptor), expected_url)
 
 @attr('shard_1')
