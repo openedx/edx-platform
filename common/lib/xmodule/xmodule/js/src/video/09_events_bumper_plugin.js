@@ -79,11 +79,11 @@ define('video/09_events_bumper_plugin.js', [], function() {
         },
 
         onShowCaptions: function () {
-            this.log('edx.video.bumper.transcript.shown', {current_time: this.getCurrentTime()});
+            this.log('edx.video.bumper.transcript.shown', {currentTime: this.getCurrentTime()});
         },
 
         onHideCaptions: function () {
-            this.log('edx.video.bumper.transcript.hidden', {current_time: this.getCurrentTime()});
+            this.log('edx.video.bumper.transcript.hidden', {currentTime: this.getCurrentTime()});
         },
 
         getCurrentTime: function () {
