@@ -37,6 +37,7 @@ define(['backbone', 'course_discovery_meanings'], function(Backbone, meanings) {
 
         dispatcher.listenTo(collection, 'search', function () {
             if (collection.length > 0) {
+                form.showFoundMessage(collection.totalCount);
                 results.render();
             }
             else {
