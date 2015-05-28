@@ -23,23 +23,9 @@ define(['jquery'], function($) {
                 }.bind(this));
             },
 
-            toHaveDefaultNames: function (values) {
-                // Assert the value being tested matches provided values
-                var actualValues = $.map(this.actual, function (item) {
-                    return $(item).val();
-                });
-
-                return _.isEqual(actualValues, values);
-            },
-
             toBeInstanceOf: function(expected) {
                 // Assert the type of the value being tested matches the provided type
                 return this.actual instanceof expected;
-            },
-
-            toBeEmpty: function() {
-                // Assert the value being tested contains no information
-                return this.actual.length === 0;
             }
         });
     };
