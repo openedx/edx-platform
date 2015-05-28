@@ -74,7 +74,10 @@
         }
 
         .action {
-            margin-bottom: spacing-vertical(x-small);
+            // TO-DO: remove the following 2 rules and uncomment original margin bottom once LinkedIn Add to Profile button styling is updated
+            margin-bottom: 0;
+            padding: 0.425rem 0.625rem;
+            //margin-bottom: spacing-vertical(x-small);
 
             &:last-child {
                 margin-bottom: 0;

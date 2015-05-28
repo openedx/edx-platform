@@ -22,11 +22,13 @@ from certificates.models import (
     CertificateHtmlViewConfiguration
 )
 from certificates.queue import XQueueCertInterface
+from certificates.utils import get_certificate_url
 from edxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from student.models import LinkedInAddToProfileConfiguration
 from util.json_request import JsonResponse, JsonResponseBadRequest
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 
@@ -270,19 +272,38 @@ def get_certificate_description(mode, certificate_type, platform_name):
     return certificate_type_description
 
 
-def update_certificate_context(context, course, user, mode, verify_uuid, modified_date):
+def _update_certificate_context(context, course, user, user_certificate):
     """
-    update the certificate context
+    Build up the certificate web view context using the provided values
+    (Helper method to keep the view clean)
     """
     # Populate dynamic output values using the course/certificate data loaded above
     user_fullname = user.profile.name
     platform_name = context.get('platform_name')
     certificate_type = context.get('certificate_type')
+
+    context['username'] = user.username
+    context['accomplishment_user_id'] = user.id
     context['accomplishment_copy_name'] = user_fullname
     context['accomplishment_copy_username'] = user.username
     context['accomplishment_copy_course_org'] = course.org
     context['accomplishment_copy_course_name'] = course.display_name
     context['logo_alt'] = platform_name
+
+    # Override the defaults with any mode-specific static values
+    context['certificate_id_number'] = user_certificate.verify_uuid
+    context['certificate_verify_url'] = "{prefix}{uuid}{suffix}".format(
+        prefix=context.get('certificate_verify_url_prefix'),
+        uuid=user_certificate.verify_uuid,
+        suffix=context.get('certificate_verify_url_suffix')
+    )
+
+    # Translators:  The format of the date includes the full name of the month
+    context['certificate_date_issued'] = _('{month} {day}, {year}').format(
+        month=user_certificate.modified_date.strftime("%B"),
+        day=user_certificate.modified_date.day,
+        year=user_certificate.modified_date.year
+    )
 
     accd_course_org_html = '<span class="detail--xuniversity">{partner_name}</span>'.format(partner_name=course.org)
     accd_platform_name_html = '<span class="detail--company">{platform_name}</span>'.format(platform_name=platform_name)
@@ -398,24 +419,24 @@ def update_certificate_context(context, course, user, mode, verify_uuid, modifie
         certificate_type=context.get("certificate_type")
     )
 
-    certificate_type_description = get_certificate_description(mode, certificate_type, platform_name)
+    certificate_type_description = get_certificate_description(user_certificate.mode, certificate_type, platform_name)
     if certificate_type_description:
         context['certificate_type_description'] = certificate_type_description
 
-    # Override the defaults with any mode-specific static values
-    context['certificate_id_number'] = verify_uuid
-    context['certificate_verify_url'] = "{prefix}{uuid}{suffix}".format(
-        prefix=context.get('certificate_verify_url_prefix'),
-        uuid=verify_uuid,
-        suffix=context.get('certificate_verify_url_suffix')
-    )
-
-    # Translators:  The format of the date includes the full name of the month
-    context['certificate_date_issued'] = _('{month} {day}, {year}').format(
-        month=modified_date.strftime("%B"),
-        day=modified_date.day,
-        year=modified_date.year
-    )
+    # If enabled, show the LinkedIn "add to profile" button
+    # Clicking this button sends the user to LinkedIn where they
+    # can add the certificate information to their profile.
+    linkedin_config = LinkedInAddToProfileConfiguration.current()
+    if linkedin_config.enabled:
+        context['linked_in_url'] = linkedin_config.add_to_profile_url(
+            course.id,
+            course.display_name,
+            user_certificate.mode,
+            get_certificate_url(
+                user_id=user.id,
+                course_id=course.id.to_deprecated_string()
+            )
+        )
 
 
 # pylint: disable=too-many-statements, bad-continuation, unused-argument
@@ -424,26 +445,26 @@ def render_html_view(request, user_id, course_id):
     This public view generates an HTML representation of the specified student's certificate
     If a certificate is not available, we display a "Sorry!" screen instead
     """
-    context = {}
-    uuid = unicode(uuid4().hex)
-    date = datetime.now().date()
-    context['platform_name'] = settings.PLATFORM_NAME
 
+    # Create the view context and bootstrap with Django settings and passed-in values
+    context = {}
+    context['platform_name'] = settings.PLATFORM_NAME
+    context['course_id'] = course_id
+
+    # Update the view context with the default ConfigurationModel settings
     configuration = CertificateHtmlViewConfiguration.get_config()
     context.update(configuration.get('default', {}))
-
-    active_certificate = None
-    invalid_template_path = 'certificates/invalid.html'
 
     # Translators:  This text is bound to the HTML 'title' element of the page and appears
     # in the browser title bar when a requested certificate is not found or recognized
     context['document_title'] = _("Invalid Certificate")
-    context['accomplishment_user_id'] = user_id
+    invalid_template_path = 'certificates/invalid.html'
 
-    # Feature Flag check
+    # Kick the user back to the "Invalid" screen if the feature is disabled
     if not settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
         return render_to_response(invalid_template_path, context)
 
+    # Load the core building blocks for the view context
     try:
         course_key = CourseKey.from_string(course_id)
         user = User.objects.get(id=user_id)
@@ -452,50 +473,50 @@ def render_html_view(request, user_id, course_id):
         if not course:
             raise CourseDoesNotExist
 
-    except (User.DoesNotExist, InvalidKeyError, CourseDoesNotExist):
-        return render_to_response(invalid_template_path, context)
-
-    try:
-        certificate = GeneratedCertificate.objects.get(
+        # Attempt to load the user's generated certificate data
+        user_certificate = GeneratedCertificate.objects.get(
             user=user,
             course_id=course_key
         )
-        context.update(configuration.get(certificate.mode, {}))
-        mode = certificate.mode
-        uuid = certificate.verify_uuid
-        date = certificate.modified_date
 
+    # If there's no generated certificate data for this user, we need to see if we're in 'preview' mode...
+    # If we are, we'll need to create a mock version of the user_certificate container for previewing
     except GeneratedCertificate.DoesNotExist:
         if request.GET.get('preview', None):
-            mode = request.GET.get('preview')
+            user_certificate = {
+                'mode': request.GET.get('preview'),
+                'verify_uuid': unicode(uuid4().hex),
+                'modified_date': datetime.now().date()
+            }
         else:
             return render_to_response(invalid_template_path, context)
 
-    context['course_id'] = course_id
-    context['username'] = user.username
+    # For any other expected exceptions, kick the user back to the "Invalid" screen
+    except (InvalidKeyError, CourseDoesNotExist, User.DoesNotExist):
+        return render_to_response(invalid_template_path, context)
 
+    # Okay, now we have all of the pieces, time to put everything together
+
+    # Append/Override the existing view context values with any mode-specific ConfigurationModel values
+    context.update(configuration.get(user_certificate.mode, {}))
+
+    # Append/Override the existing view context values with request-time values
+    _update_certificate_context(context, course, user, user_certificate)
+
+    # Append/Override the existing view context values with any course-specific static values from Advanced Settings
+    context.update(course.cert_html_view_overrides)
+
+    # Append the active certificate configuration for this course to the view context
     if course.certificates:
         # iterate the list of certificates in the descriptor.
         for cert in course.certificates['certificates']:
             #TODO : course certificates will have a flag 'active_cert', it requires to be implement in backbone model.
             # on the basis of this flag , we will get active certificate from the list.
             # currently we are assuming the first certificate in the list as an active certificate.
-            active_certificate = cert
+            context['certificate_data'] = cert
             break
 
     # Override further with any course-specific static values
     context.update(course.cert_html_view_overrides)
-
-    update_certificate_context(
-        context=context,
-        course=course,
-        user=user,
-        mode=mode,
-        verify_uuid=uuid,
-        modified_date=date
-    )
-
-    if active_certificate:
-        context['certificate_data'] = active_certificate
 
     return render_to_response("certificates/valid.html", context)
