@@ -47,6 +47,15 @@ define(['jquery', 'backbone'], function ($, Backbone) {
             this.$loadingIndicator.addClass('hidden');
         },
 
+        showFoundMessage: function (count) {
+            var msg = ngettext(
+                'Viewing %s course',
+                'Viewing %s courses',
+                count
+            );
+            this.$message.html(interpolate(msg, [count]));
+        },
+
         showNotFoundMessage: function (term) {
             var msg = interpolate(
                 gettext('We couldn\'t find any results for "%s".'),
