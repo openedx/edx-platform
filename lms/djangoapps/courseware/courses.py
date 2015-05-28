@@ -148,7 +148,7 @@ def course_overview_image_url(course_ovr):
         # set different than the default, return that path so that
         # courses can use custom course image paths, otherwise just
         # return the default static path.
-        # TODO me: find out what 'data_dir' is and if we need it as a field in CourseOverviewFields
+        # TODO me: find out what 'data_dir' is and if we need it as a field in CourseOverviewDescriptor
         url = '/static/' + (course_ovr.static_asset_path or getattr(course_ovr, 'data_dir', ''))
         if hasattr(course_ovr, 'course_image') and course_ovr.course_image != course_ovr.fields['course_image'].default:
             url += '/' + course_ovr.course_image

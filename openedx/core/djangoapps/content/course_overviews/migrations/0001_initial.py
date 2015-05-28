@@ -8,16 +8,16 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'CourseOverviewFields'
-        db.create_table('course_overviews_courseoverviewfields', (
+        # Adding model 'CourseOverviewDescriptor'
+        db.create_table('course_overviews_courseoverviewdescriptor', (
             ('id', self.gf('xmodule_django.models.CourseKeyField')(max_length=255, primary_key=True, db_index=True)),
             ('modulestore_type', self.gf('django.db.models.fields.CharField')(max_length=5)),
             ('_location_str', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('user_partitions', self.gf('openedx.core.djangoapps.content.course_overviews.models.UserPartitionListField')(null=True)),
-            ('static_asset_path', self.gf('django.db.models.fields.TextField')(default='')),
             ('ispublic', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
+            ('static_asset_path', self.gf('django.db.models.fields.TextField')(default='')),
+            ('user_partitions', self.gf('openedx.core.djangoapps.content.course_overviews.models.UserPartitionListField')(default='[]', null=True)),
             ('visible_to_staff_only', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('group_access', self.gf('openedx.core.djangoapps.content.course_overviews.models.GroupAccessDictField')(null=True)),
+            ('group_access', self.gf('openedx.core.djangoapps.content.course_overviews.models.GroupAccessDictField')(default='{}', null=True)),
             ('enrollment_start', self.gf('django.db.models.fields.DateField')(null=True)),
             ('enrollment_end', self.gf('django.db.models.fields.DateField')(null=True)),
             ('start', self.gf('django.db.models.fields.DateField')(default=datetime.datetime(2029, 12, 31, 0, 0), null=True)),
@@ -40,30 +40,17 @@ class Migration(SchemaMigration):
             ('catalog_visibility', self.gf('django.db.models.fields.TextField')(default='both', null=True)),
             ('social_sharing_url', self.gf('django.db.models.fields.TextField')(default=None, null=True)),
         ))
-        db.send_create_signal('course_overviews', ['CourseOverviewFields'])
-
-        # Adding model 'CourseOverviewDescriptor'
-        db.create_table('course_overviews_courseoverviewdescriptor', (
-            ('courseoverviewfields_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['course_overviews.CourseOverviewFields'], unique=True, primary_key=True)),
-        ))
         db.send_create_signal('course_overviews', ['CourseOverviewDescriptor'])
 
 
     def backwards(self, orm):
-        # Deleting model 'CourseOverviewFields'
-        db.delete_table('course_overviews_courseoverviewfields')
-
         # Deleting model 'CourseOverviewDescriptor'
         db.delete_table('course_overviews_courseoverviewdescriptor')
 
 
     models = {
         'course_overviews.courseoverviewdescriptor': {
-            'Meta': {'object_name': 'CourseOverviewDescriptor', '_ormbases': ['course_overviews.CourseOverviewFields']},
-            'courseoverviewfields_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['course_overviews.CourseOverviewFields']", 'unique': 'True', 'primary_key': 'True'})
-        },
-        'course_overviews.courseoverviewfields': {
-            'Meta': {'object_name': 'CourseOverviewFields'},
+            'Meta': {'object_name': 'CourseOverviewDescriptor'},
             '_location_str': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'advertised_start': ('django.db.models.fields.TextField', [], {'null': 'True'}),
             'catalog_visibility': ('django.db.models.fields.TextField', [], {'default': "'both'", 'null': 'True'}),
@@ -81,7 +68,7 @@ class Migration(SchemaMigration):
             'enrollment_end': ('django.db.models.fields.DateField', [], {'null': 'True'}),
             'enrollment_start': ('django.db.models.fields.DateField', [], {'null': 'True'}),
             'facebook_url': ('django.db.models.fields.TextField', [], {'default': 'None', 'null': 'True'}),
-            'group_access': ('openedx.core.djangoapps.content.course_overviews.models.GroupAccessDictField', [], {'null': 'True'}),
+            'group_access': ('openedx.core.djangoapps.content.course_overviews.models.GroupAccessDictField', [], {'default': "'{}'", 'null': 'True'}),
             'id': ('xmodule_django.models.CourseKeyField', [], {'max_length': '255', 'primary_key': 'True', 'db_index': 'True'}),
             'invitation_only': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'ispublic': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
@@ -91,7 +78,7 @@ class Migration(SchemaMigration):
             'social_sharing_url': ('django.db.models.fields.TextField', [], {'default': 'None', 'null': 'True'}),
             'start': ('django.db.models.fields.DateField', [], {'default': 'datetime.datetime(2029, 12, 31, 0, 0)', 'null': 'True'}),
             'static_asset_path': ('django.db.models.fields.TextField', [], {'default': "''"}),
-            'user_partitions': ('openedx.core.djangoapps.content.course_overviews.models.UserPartitionListField', [], {'null': 'True'}),
+            'user_partitions': ('openedx.core.djangoapps.content.course_overviews.models.UserPartitionListField', [], {'default': "'[]'", 'null': 'True'}),
             'visible_to_staff_only': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
         }
     }
