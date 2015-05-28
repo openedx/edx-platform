@@ -74,7 +74,7 @@ function($, _, Backbone, gettext, ListItemEditorView, SignatoryModel, SignatoryE
                 });
                 self.$('div.signatory-edit-list').append($(signatory_view.render()));
             });
-            this.toggleAddSignatoryButtonState();
+            this.disableAddSignatoryButton();
             return this;
         },
 
@@ -84,13 +84,10 @@ function($, _, Backbone, gettext, ListItemEditorView, SignatoryModel, SignatoryE
             this.render();
         },
 
-        toggleAddSignatoryButtonState: function() {
+        disableAddSignatoryButton: function() {
             // Disable the 'Add Signatory' link if the constraint has been met.
             if(this.$(".signatory-edit-list > div.signatory-edit").length >= MAX_SIGNATORIES_LIMIT) {
                 this.$(".action-add-signatory").addClass("disableClick");
-            }
-            else if ($(".action-add-signatory").hasClass('disableClick')) {
-                this.$(".action-add-signatory").removeClass("disableClick");
             }
         },
 

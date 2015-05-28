@@ -440,15 +440,10 @@ class DeleteAssetTestCase(AssetsTestCase):
         # First, upload something.
         self.asset_name = 'delete_test'
         self.asset = self.get_sample_asset(self.asset_name)
-        self.image_asset = self.get_sample_asset(self.asset_name, asset_type="image")
 
         response = self.client.post(self.url, {"name": self.asset_name, "file": self.asset})
         self.assertEquals(response.status_code, 200)
         self.uploaded_url = json.loads(response.content)['asset']['url']
-
-        response = self.client.post(self.url, {"name": self.asset_name, "file": self.image_asset})
-        self.assertEquals(response.status_code, 200)
-        self.uploaded_image_url = json.loads(response.content)['asset']['url']
 
         self.asset_location = AssetLocation.from_deprecated_string(self.uploaded_url)
         self.content = contentstore().find(self.asset_location)
@@ -462,10 +457,32 @@ class DeleteAssetTestCase(AssetsTestCase):
 
     def test_delete_image_type_asset(self):
         """ Tests deletion of image type asset """
-        test_url = reverse_course_url(
-            'assets_handler', self.course.id, kwargs={'asset_key_string': unicode(self.uploaded_image_url)})
-        resp = self.client.delete(test_url, HTTP_ACCEPT="application/json")
-        self.assertEquals(resp.status_code, 204)
+        image_asset = self.get_sample_asset(self.asset_name, asset_type="image")
+        thumbnail_image_asset = self.get_sample_asset('delete_test_thumbnail', asset_type="image")
+
+        # upload image
+        response = self.client.post(self.url, {"name": "delete_image_test", "file": image_asset})
+        self.assertEquals(response.status_code, 200)
+        uploaded_image_url = json.loads(response.content)['asset']['url']
+
+        # upload image thumbnail
+        response = self.client.post(self.url, {"name": "delete_image_thumb_test", "file": thumbnail_image_asset})
+        self.assertEquals(response.status_code, 200)
+        thumbnail_url = json.loads(response.content)['asset']['url']
+        thumbnail_location = StaticContent.get_location_from_path(thumbnail_url)
+
+        image_asset_location = AssetLocation.from_deprecated_string(uploaded_image_url)
+        content = contentstore().find(image_asset_location)
+        content.thumbnail_location = thumbnail_location
+        contentstore().save(content)
+
+        with mock.patch('opaque_keys.edx.locator.CourseLocator.make_asset_key') as mock_asset_key:
+            mock_asset_key.return_value = thumbnail_location
+
+            test_url = reverse_course_url(
+                'assets_handler', self.course.id, kwargs={'asset_key_string': unicode(uploaded_image_url)})
+            resp = self.client.delete(test_url, HTTP_ACCEPT="application/json")
+            self.assertEquals(resp.status_code, 204)
 
     def test_delete_asset_with_invalid_asset(self):
         """ Tests the sad path :( """

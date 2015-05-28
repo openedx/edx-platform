@@ -1,8 +1,9 @@
 /**
  * Provides helper methods for invoking Studio modal windows in Jasmine tests.
  */
-define(["jquery", "js/views/feedback_notification", "js/views/feedback_prompt", "js/common_helpers/template_helpers"],
-    function($, NotificationView, Prompt, TemplateHelpers) {
+define(["jquery", "js/views/feedback_notification", "js/views/feedback_prompt", 'js/common_helpers/ajax_helpers',
+    "js/common_helpers/template_helpers"],
+    function($, NotificationView, Prompt, AjaxHelpers, TemplateHelpers) {
         var installViewTemplates, createFeedbackSpy, verifyFeedbackShowing,
             verifyFeedbackHidden, createNotificationSpy, verifyNotificationShowing,
             verifyNotificationHidden, createPromptSpy, confirmPrompt, inlineEdit, verifyInlineEditChange,
@@ -96,9 +97,9 @@ define(["jquery", "js/views/feedback_notification", "js/views/feedback_prompt", 
 
         clickDeleteItem = function (that, promptSpy, promptText) {
             that.view.$('.delete').click();
-            ViewHelpers.verifyPromptShowing(promptSpy, promptText);
-            ViewHelpers.confirmPrompt(promptSpy);
-            ViewHelpers.verifyPromptHidden(promptSpy);
+            verifyPromptShowing(promptSpy, promptText);
+            confirmPrompt(promptSpy);
+            verifyPromptHidden(promptSpy);
         };
 
         patchAndVerifyRequest = function (requests, url, notificationSpy) {
@@ -107,21 +108,21 @@ define(["jquery", "js/views/feedback_notification", "js/views/feedback_prompt", 
             // setting the X-HTTP-Method-Override header with the true method.
             AjaxHelpers.expectJsonRequest(requests, 'POST', url);
             expect(_.last(requests).requestHeaders['X-HTTP-Method-Override']).toBe('DELETE');
-            ViewHelpers.verifyNotificationShowing(notificationSpy, /Deleting/);
+            verifyNotificationShowing(notificationSpy, /Deleting/);
         };
 
         submitAndVerifyFormSuccess = function (view, requests, notificationSpy) {
             view.$('form').submit();
-            ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
-            requests[0].respond(200);
-            ViewHelpers.verifyNotificationHidden(notificationSpy);
+            verifyNotificationShowing(notificationSpy, /Saving/);
+            AjaxHelpers.respondWithJson(requests, {});
+            verifyNotificationHidden(notificationSpy);
         };
 
         submitAndVerifyFormError = function (view, requests, notificationSpy) {
             view.$('form').submit();
-            ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
+            verifyNotificationShowing(notificationSpy, /Saving/);
             AjaxHelpers.respondWithError(requests);
-            ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
+            verifyNotificationShowing(notificationSpy, /Saving/);
         };
 
         return {
@@ -136,6 +137,10 @@ define(["jquery", "js/views/feedback_notification", "js/views/feedback_prompt", 
             'inlineEdit': inlineEdit,
             'verifyInlineEditChange': verifyInlineEditChange,
             'installMockAnalytics': installMockAnalytics,
-            'removeMockAnalytics': removeMockAnalytics
+            'removeMockAnalytics': removeMockAnalytics,
+            'clickDeleteItem': clickDeleteItem,
+            'patchAndVerifyRequest': patchAndVerifyRequest,
+            'submitAndVerifyFormSuccess': submitAndVerifyFormSuccess,
+            'submitAndVerifyFormError': submitAndVerifyFormError
         };
     });

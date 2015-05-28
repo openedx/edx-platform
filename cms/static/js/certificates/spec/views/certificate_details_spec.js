@@ -6,6 +6,7 @@ define([
     'js/certificates/collections/certificates',
     'js/certificates/models/certificate',
     'js/certificates/views/certificate_details',
+    'js/certificates/views/certificate_preview',
     'js/views/feedback_notification',
     'js/common_helpers/ajax_helpers',
     'js/common_helpers/template_helpers',
@@ -13,7 +14,7 @@ define([
     'js/spec_helpers/validation_helpers',
     'js/certificates/spec/custom_matchers'
 ],
-function(_, Course, CertificatesCollection, CertificateModel, CertificateDetailsView,
+function(_, Course, CertificatesCollection, CertificateModel, CertificateDetailsView, CertificatePreview,
          Notification, AjaxHelpers, TemplateHelpers, ViewHelpers, ValidationHelpers, CustomMatchers) {
     'use strict';
 
@@ -50,6 +51,10 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
             num: 'course_num',
             revision: 'course_rev'
         });
+        window.certWebPreview = new CertificatePreview({
+            course_modes: ['honor', 'test'],
+            certificate_web_view_url: '/users/1/courses/orgX/009/2016'
+        });
     });
 
     afterEach(function() {
@@ -61,6 +66,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
             _.each(values, function (value, selector) {
                 if (SELECTORS[selector]) {
                     view.$(SELECTORS[selector]).val(value);
+                    view.$(SELECTORS[selector]).trigger('change');
                 }
             });
         };
@@ -150,7 +156,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
 
             it('displays certificate signatories details', function(){
                 this.view.$('.show-details').click();
-                expect(this.view.$(SELECTORS.signatory_name_value)).toContainText('Name of the signatory');
+                expect(this.view.$(SELECTORS.signatory_name_value)).toContainText(/^[A-Za-z\s]{10,40}/);
                 expect(this.view.$(SELECTORS.signatory_title_value)).toContainText('Title of the signatory');
                 expect(this.view.$(SELECTORS.signatory_organization_value)).toContainText('Organization of the signatory');
             });
@@ -173,17 +179,15 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 setValuesToInputs(this.view, {
                     inputSignatoryName: 'New Signatory Test Name'
                 });
-                this.view.$(SELECTORS.inputSignatoryName).trigger('change');
 
                 setValuesToInputs(this.view, {
                     inputSignatoryTitle: 'New Signatory Test Title'
                 });
-                this.view.$(SELECTORS.inputSignatoryTitle).trigger('change');
 
                 setValuesToInputs(this.view, {
                     inputSignatoryOrganization: 'New Signatory Test Organization'
                 });
-                this.view.$(SELECTORS.inputSignatoryOrganization).trigger('change');
+
                 this.view.$(SELECTORS.signatory_panel_save).click();
 
                 ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
@@ -194,8 +198,24 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 expect(this.view.$(SELECTORS.signatory_title_value)).toContainText('New Signatory Test Title');
                 expect(this.view.$(SELECTORS.signatory_organization_value)).toContainText('New Signatory Test Organization');
             });
+            it('should not allow invalid data when saving changes made during in-line signatory editing', function() {
+                this.view.$(SELECTORS.edit_signatory).click();
 
+                setValuesToInputs(this.view, {
+                    inputSignatoryName: 'New Signatory Test Name'
+                });
 
+                setValuesToInputs(this.view, {
+                    inputSignatoryTitle: 'New Signatory Test Title longer than 40 characters in length'
+                });
+
+                setValuesToInputs(this.view, {
+                    inputSignatoryOrganization: 'New Signatory Test Organization'
+                });
+
+                this.view.$(SELECTORS.signatory_panel_save).click();
+                expect(this.view.$(SELECTORS.inputSignatoryTitle).parent()).toHaveClass('error');
+            });
         });
     });
 });
