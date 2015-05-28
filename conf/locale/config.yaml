@@ -86,7 +86,7 @@ locales:
 dummy_locales:
     - eo
     - fake2
-    - en@rtl
+    - rtl  # Fake testing language for Arabic
 
 # Directories we don't search for strings.
 ignore_dirs:
