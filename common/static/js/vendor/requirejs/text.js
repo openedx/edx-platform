@@ -8,7 +8,10 @@
   define, window, process, Packages,
   java, location, Components, FileUtils */
 
-define(['module'], function (module) {
+// Added by edX: we namespace requirejs and its associated functions.
+var namespaced_define = window.define !== undefined ? define : RequireJS.define;
+
+namespaced_define(['module'], function (module) {
     'use strict';
 
     var text, fs, Cc, Ci, xpcIsWindows,
@@ -207,7 +210,7 @@ define(['module'], function (module) {
             if (buildMap.hasOwnProperty(moduleName)) {
                 var content = text.jsEscape(buildMap[moduleName]);
                 write.asModule(pluginName + "!" + moduleName,
-                               "define(function () { return '" +
+                               "namespaced_define(function () { return '" +
                                    content +
                                "';});\n");
             }
