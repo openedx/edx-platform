@@ -552,6 +552,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             """
             Create & open the connection, authenticate, and provide pointers to the collection
             """
+            # Remove the replicaSet parameter.
+            kwargs.pop('replicaSet', None)
+
             self.database = MongoProxy(
                 pymongo.database.Database(
                     pymongo.MongoClient(

@@ -20,6 +20,8 @@ if not settings.configured:
 from django.core.cache import get_cache, InvalidCacheBackendError
 import django.dispatch
 import django.utils
+
+from pymongo import ReadPreference
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.draft_and_published import BranchSettingMixin
 from xmodule.modulestore.mixed import MixedModuleStore
@@ -155,6 +157,9 @@ def create_modulestore_instance(
         xb_user_service = DjangoXBlockUserService(get_current_user())
     else:
         xb_user_service = None
+
+    if 'read_preference' in doc_store_config:
+        doc_store_config['read_preference'] = getattr(ReadPreference, doc_store_config['read_preference'])
 
     return class_(
         contentstore=content_store,

@@ -81,16 +81,19 @@ class MongoConnection(object):
         """
         Create & open the connection, authenticate, and provide pointers to the collections
         """
+        if kwargs.get('replicaSet') is None:
+            kwargs.pop('replicaSet', None)
+            mongo_class = pymongo.MongoClient
+        else:
+            mongo_class = pymongo.MongoReplicaSetClient
+        _client = mongo_class(
+            host=host,
+            port=port,
+            tz_aware=tz_aware,
+            **kwargs
+        )
         self.database = MongoProxy(
-            pymongo.database.Database(
-                pymongo.MongoClient(
-                    host=host,
-                    port=port,
-                    tz_aware=tz_aware,
-                    **kwargs
-                ),
-                db
-            ),
+            pymongo.database.Database(_client, db),
             wait_time=retry_wait_time
         )
 
