@@ -1,14 +1,9 @@
-## Note: This Sass infrastructure is repeated in application-extend1 and application-extend2, but needed in order to address an IE9 rule limit within CSS - http://blogs.msdn.com/b/ieinternals/archive/2011/05/14/10164546.aspx
-
-// lms - css application architecture
-// ====================
+// Footer for OpenEdX (right-to-left)
+// ==================================
 
 // libs and resets *do not edit*
 @import 'bourbon/bourbon'; // lib - bourbon
-@import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
-
-// BASE  *default edX offerings*
-// ====================
+@import 'vendor/bi-app/bi-app-rtl'; // set the layout for right to left languages
 
 // base - utilities
 @import 'base/variables';
@@ -27,19 +22,14 @@
   @import '${env.get('THEME_NAME')}';
 % endif
 
-// base - assets
-@import 'base/font_face';
-
-footer#footer-edx-v3 {
+footer#footer-openedx {
+    @import 'base/reset';
     @import 'base/extends';
-
-    // base - starter
     @import 'base/base';
-
 }
 
 // base - elements
 @import 'elements/typography';
 
 // shared - platform
-@import 'shared/footer-edx';
+@import 'shared/footer';

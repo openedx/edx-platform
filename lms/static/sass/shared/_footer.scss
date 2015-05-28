@@ -10,7 +10,7 @@
   background: $footer-bg;
   clear: both;
 
-  footer {
+  footer#footer-openedx {
     @include clearfix();
     @include box-sizing(border-box);
     max-width: grid-width(12);
@@ -286,6 +286,8 @@ $edx-footer-bg-color: rgb(252,252,252);
   }
 }
 
+// TODO (ECOM-1339): Remove the "new" (v2) footer once the v3 footer
+// is permanently enabled.
 .edx-footer-new {
   background: $edx-footer-bg-color;
 

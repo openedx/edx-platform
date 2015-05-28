@@ -1,11 +1,13 @@
 ## coding=utf-8
 <%namespace name='static' file='static_content.html'/>
 <%!
+from django.core.urlresolvers import reverse
 from django.utils.http import urlquote_plus
 from django.utils.translation import ugettext as _
 from django.utils.translation import get_language_bidi
 from microsite_configuration import microsite
 from microsite_configuration import page_title_breadcrumbs
+from branding import api as branding_api
 
 dir_rtl = 'rtl' if get_language_bidi() else 'ltr'
 %>
@@ -145,17 +147,18 @@ dir_rtl = 'rtl' if get_language_bidi() else 'ltr'
     % if not disable_footer:
         <%block name="footer">
           ## Can be overridden by child templates wanting to hide the footer.
-          <%
-            if theme_enabled() and not is_microsite():
-              footer_file = 'theme-footer.html'
-            elif settings.FEATURES.get('IS_EDX_DOMAIN', False) and  settings.FEATURES.get('ENABLE_FOOTER_V3', True) and not is_microsite():
-              footer_file = microsite.get_template_path('footer-edx-v3.html')
-            elif settings.FEATURES.get('IS_EDX_DOMAIN', False) and not is_microsite():
-              footer_file = microsite.get_template_path('footer-edx-v2.html')
-            else:
-              footer_file = microsite.get_template_path('footer.html')
-          %>
-          <%include file="${footer_file}" />
+          % if theme_enabled() and not is_microsite():
+            <%include file="theme-footer.html" />
+          % elif settings.FEATURES.get('IS_EDX_DOMAIN', False) and not is_microsite():
+            ## TODO (ECOM-1339): Remove this check to permanently enable the V3 footer.
+            % if branding_api.is_enabled():
+              <%include file="footer-edx-v3.html" />
+            % else:
+              <%include file="footer-edx-v2.html" />
+            % endif
+          % else:
+            <%include file="${microsite.get_template_path('footer.html')}" />
+          % endif
         </%block>
     % endif
 
@@ -167,6 +170,7 @@ dir_rtl = 'rtl' if get_language_bidi() else 'ltr'
   % endif
 
   <%block name="js_extra"/>
+  <script type="text/javascript" src="${static.url('js/vendor/noreferrer.js')}" charset="utf-8"></script>
 </body>
 </html>
 

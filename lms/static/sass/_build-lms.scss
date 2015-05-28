@@ -21,7 +21,7 @@
 @import 'shared/fields';
 @import 'shared/forms';
 @import 'shared/footer';
-@import 'shared/footer-edx'; // Replaces most of the footer partial. Will update footer to remove edx specific styles once feature flag removed.
+@import 'shared/footer-edx';
 @import 'shared/header';
 @import 'shared/course_object';
 @import 'shared/course_filter';
