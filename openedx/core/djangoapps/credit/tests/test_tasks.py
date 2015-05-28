@@ -9,7 +9,7 @@ from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.djangoapps.credit.signals import listen_for_course_publish
 from xmodule.modulestore.django import SignalHandler
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class TestTaskExecution(ModuleStoreTestCase):
@@ -25,6 +25,18 @@ class TestTaskExecution(ModuleStoreTestCase):
         Used as a side effect when mocking `verify_student.ssencrypt.has_valid_signature`.
         """
         raise InvalidCreditRequirements
+
+    def add_icrv_xblock(self):
+        """ Create the 'edx-reverification-block' in course tree """
+
+        section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
+        subsection = ItemFactory.create(parent=section, category='sequential', display_name='Test Subsection')
+        vertical = ItemFactory.create(parent=subsection, category='vertical', display_name='Test Unit')
+        reverification = ItemFactory.create(
+            parent=vertical,
+            category='edx-reverification-block',
+            display_name='Test Verification Block'
+        )
 
     def setUp(self):
         super(TestTaskExecution, self).setUp()
@@ -56,6 +68,20 @@ class TestTaskExecution(ModuleStoreTestCase):
 
         requirements = get_credit_requirements(self.course.id)
         self.assertEqual(len(requirements), 1)
+
+    def test_task_adding_icrv_requirements(self):
+        """
+        Make sure that the receiver correctly fires off the task when
+        invoked by signal
+        """
+        self.add_credit_course(self.course.id)
+        self.add_icrv_xblock()
+        requirements = get_credit_requirements(self.course.id)
+        self.assertEqual(len(requirements), 0)
+        listen_for_course_publish(self, self.course.id)
+
+        requirements = get_credit_requirements(self.course.id)
+        self.assertEqual(len(requirements), 2)
 
     @mock.patch(
         'openedx.core.djangoapps.credit.tasks.set_credit_requirements',
