@@ -42,38 +42,62 @@ class CommandTest(TestCase):
         self.command.stdout = mock.Mock()
         self.command.stderr = mock.Mock()
 
-    def set_up_default_mocks(self, patched_get_courses):
+    def set_up_default_mocks(self, patched_get_course):
         """ Sets up default mocks passed via class decorator """
-        patched_get_courses.return_value = CourseLocator("edX", "demoX", "now")
+        patched_get_course.return_value = CourseLocator("edX", "demoX", "now")
 
     # pylint:disable=unused-argument
-    def test_handle_given_no_arguments_raises_command_error(self, patched_get_courses):
+    def test_handle_given_no_arguments_raises_command_error(self, patched_get_course):
         """ Tests that raises error if invoked with no arguments """
         with self.assertRaises(CommandError):
             self.command.handle()
 
     # pylint:disable=unused-argument
-    def test_handle_given_more_than_two_args_raises_command_error(self, patched_get_courses):
+    def test_handle_given_more_than_two_args_raises_command_error(self, patched_get_course):
         """ Tests that raises error if invoked with too many arguments """
         with self.assertRaises(CommandError):
             self.command.handle(1, 2, 3)
 
-    def test_handle_given_invalid_course_key_raises_invalid_key_error(self, patched_get_courses):
+    def test_handle_given_invalid_course_key_raises_invalid_key_error(self, patched_get_course):
         """ Tests that invalid key errors are propagated """
-        patched_get_courses.return_value = None
+        patched_get_course.return_value = None
         with self.assertRaises(InvalidKeyError):
             self.command.handle("I'm invalid key")
 
-    def test_handle_given_missing_course_raises_command_error(self, patched_get_courses):
+    def test_handle_given_missing_course_raises_command_error(self, patched_get_course):
         """ Tests that raises command error if missing course key was provided """
-        patched_get_courses.return_value = None
+        patched_get_course.return_value = None
         with self.assertRaises(CommandError):
             self.command.handle("edX/demoX/now")
 
+    # pylint: disable=unused-argument
+    def test_all_option(self, patched_get_course):
+        """ Tests that the 'all' option does run the dump command for all courses """
+        self.command.dump_one = mock.Mock()
+        self.command.get_all_courses = mock.Mock()
+        course_list = [mock.Mock() for __ in range(0, 3)]
+        locator_list = [
+            CourseLocator(org="edX", course="demoX", run="now"),
+            CourseLocator(org="Sandbox", course="Sandbox", run="Sandbox"),
+            CourseLocator(org="Test", course="Testy", run="Testify"),
+        ]
+        for index, course in enumerate(course_list):
+            course.location.course_key = locator_list[index]
+        self.command.get_all_courses.return_value = course_list
+        self.command.handle("test_dir", all=True, dummy='test')
+        calls = self.command.dump_one.call_args_list
+        self.assertEqual(len(calls), 3)
+        self.assertEqual(calls[0][0][0], 'course-v1:edX+demoX+now')
+        self.assertEqual(calls[1][0][0], 'course-v1:Sandbox+Sandbox+Sandbox')
+        self.assertEqual(calls[2][0][0], 'course-v1:Test+Testy+Testify')
+        self.assertIn('test_dir/social_stats_course-v1edXdemoXnow', calls[0][0][1])
+        self.assertIn('test_dir/social_stats_course-v1SandboxSandboxSandbox', calls[1][0][1])
+        self.assertIn('test_dir/social_stats_course-v1TestTestyTestify', calls[2][0][1])
+
     @ddt.data("edX/demoX/now", "otherX/CourseX/later")
-    def test_handle_writes_to_correct_location_when_output_file_not_specified(self, course_key, patched_get_courses):
+    def test_handle_writes_to_correct_location_when_output_file_not_specified(self, course_key, patched_get_course):
         """ Tests that when no explicit filename is given data is exported to default location """
-        self.set_up_default_mocks(patched_get_courses)
+        self.set_up_default_mocks(patched_get_course)
         expected_filename = utils.format_filename(
             "social_stats_{course}_{date:%Y_%m_%d_%H_%M_%S}.csv".format(course=course_key, date=datetime.utcnow())
         )
@@ -85,9 +109,9 @@ class CommandTest(TestCase):
             patched_open.assert_called_with(expected_filename, 'wb')
 
     @ddt.data("test.csv", "other_file.csv")
-    def test_handle_writes_to_correct_location_when_output_file_is_specified(self, location, patched_get_courses):
+    def test_handle_writes_to_correct_location_when_output_file_is_specified(self, location, patched_get_course):
         """ Tests that when explicit filename is given data is exported to chosen location """
-        self.set_up_default_mocks(patched_get_courses)
+        self.set_up_default_mocks(patched_get_course)
         patched_open = mock.mock_open()
         with mock.patch("{}.open".format(_target_module), patched_open, create=True), \
                 mock.patch(_target_module + ".Extractor.extract") as patched_extractor:
@@ -95,9 +119,9 @@ class CommandTest(TestCase):
             self.command.handle("irrelevant/course/key", location)
             patched_open.assert_called_with(location, 'wb')
 
-    def test_handle_creates_correct_exporter(self, patched_get_courses):
+    def test_handle_creates_correct_exporter(self, patched_get_course):
         """ Tests that creates correct exporter """
-        self.set_up_default_mocks(patched_get_courses)
+        self.set_up_default_mocks(patched_get_course)
         patched_open = mock.mock_open()
         with mock.patch("{}.open".format(_target_module), patched_open, create=True), \
                 mock.patch(_target_module + ".Extractor.extract") as patched_extractor, \
@@ -112,9 +136,9 @@ class CommandTest(TestCase):
         {"1": {"num_threads": 12}},
         {"1": {"num_threads": 14, "num_comments": 7}}
     )
-    def test_handle_exports_correct_data(self, extracted, patched_get_courses):
+    def test_handle_exports_correct_data(self, extracted, patched_get_course):
         """ Tests that invokes export with correct data """
-        self.set_up_default_mocks(patched_get_courses)
+        self.set_up_default_mocks(patched_get_course)
         patched_open = mock.mock_open()
         with mock.patch("{}.open".format(_target_module), patched_open, create=True), \
                 mock.patch(_target_module + ".Extractor.extract") as patched_extractor, \
@@ -126,10 +150,10 @@ class CommandTest(TestCase):
     @ddt.unpack
     @ddt.data(*_std_parameters_list)
     def test_handle_passes_correct_parameters_to_extractor(
-        self, course_key, end_date, thread_type, patched_get_courses
+        self, course_key, end_date, thread_type, patched_get_course
     ):
         """ Tests that when no explicit filename is given data is exported to default location """
-        self.set_up_default_mocks(patched_get_courses)
+        self.set_up_default_mocks(patched_get_course)
         patched_open = mock.mock_open()
         with mock.patch("{}.open".format(_target_module), patched_open, create=True), \
                 mock.patch(_target_module + ".Extractor.extract") as patched_extractor:

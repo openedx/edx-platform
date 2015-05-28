@@ -5,6 +5,8 @@ from datetime import datetime
 from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
+import os
+from path import path
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -15,6 +17,7 @@ from student.models import CourseEnrollment
 
 from lms.lib.comment_client.user import User
 import django_comment_client.utils as utils
+from xmodule.modulestore.django import modulestore
 
 
 class DiscussionExportFields(object):
@@ -39,15 +42,18 @@ class Command(BaseCommand):
 
     Usage:
         ./manage.py lms export_discussion_participation course_key [dest_file] [OPTIONS]
+        ./manage.py lms export_discussion_participation [dest_directory] --all [OPTIONS]
 
         * course_key - target course key (e.g. edX/DemoX/T1)
         * dest_file - location of destination file (created if missing, overwritten if exists)
+        * dest_directory - location to store all dumped files to. Will dump into the current directory otherwise.
 
     OPTIONS:
 
         * thread-type - one of {discussion, question}. Filters discussion participation stats by discussion thread type.
         * end-date - date time in iso8601 format (YYYY-MM-DD hh:mm:ss). Filters discussion participation stats
           by creation date: no threads/comments/replies created *after* this date is included in calculation
+        * all - Dump all social stats at once into a particular directory.
 
     Examples:
 
@@ -65,6 +71,7 @@ class Command(BaseCommand):
     """
     THREAD_TYPE_PARAMETER = 'thread_type'
     END_DATE_PARAMETER = 'end_date'
+    ALL_PARAMETER = 'all'
 
     args = "<course_id> <output_file_location>"
 
@@ -86,6 +93,12 @@ class Command(BaseCommand):
             default=None,
             help='Include threads, comments and replies created before the supplied date (iso8601 format)'
         ),
+        make_option(
+            '--all',
+            action='store_true',
+            dest=ALL_PARAMETER,
+            default=False,
+        )
     )
 
     def _get_filter_string_representation(self, options):
@@ -103,8 +116,34 @@ class Command(BaseCommand):
             "social_stats_{course}_{date:%Y_%m_%d_%H_%M_%S}.csv".format(course=course_key, date=datetime.utcnow())
         )
 
-    def handle(self, *args, **options):
-        """ Executes command """
+    @staticmethod
+    def get_all_courses():
+        """
+        Gets all courses. Made into a separate function because patch isn't cooperating.
+        """
+        return modulestore().get_courses()
+
+    def dump_all(self, *args, **options):
+        if len(args) > 1:
+            raise CommandError("May not specify course and destination root directory with the --all option.")
+        args = list(args)
+        try:
+            dir_name = path(args.pop())
+        except IndexError:
+            dir_name = path('social_stats')
+
+        if not os.path.exists(dir_name):
+            os.makedirs(dir_name)
+
+        for course in self.get_all_courses():
+            raw_course_key = unicode(course.location.course_key)
+            args = [
+                raw_course_key,
+                dir_name / self.get_default_file_location(raw_course_key)
+            ]
+            self.dump_one(*args, **options)
+
+    def dump_one(self, *args, **options):
         if not args:
             raise CommandError("Course id not specified")
         if len(args) > 2:
@@ -139,8 +178,14 @@ class Command(BaseCommand):
         with open(output_file_location, 'wb') as output_stream:
             Exporter(output_stream).export(data)
 
-        self.stdout.write("Success!\n")
+    def handle(self, *args, **options):
+        """ Executes command """
+        if options.get(self.ALL_PARAMETER, False):
+            self.dump_all(*args, **options)
+        else:
+            self.dump_one(*args, **options)
 
+        self.stdout.write("Success!\n")
 
 class Extractor(object):
     """ Extracts discussion participation data from db and cs_comments_service """
