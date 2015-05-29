@@ -457,7 +457,7 @@ FEATURES['ENABLE_EDXNOTES'] = True
 FEATURES['ENABLE_TEAMS'] = True
 
 # Add milestones to Installed apps for testing
-INSTALLED_APPS += ('milestones', )
+INSTALLED_APPS += ('milestones', 'openedx.core.djangoapps.call_stack_manager')
 
 # Enable courseware search for tests
 FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
