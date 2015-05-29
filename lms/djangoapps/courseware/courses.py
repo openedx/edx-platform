@@ -22,8 +22,8 @@ from courseware.access import has_access
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
 from student.models import CourseEnrollment
-from course import branding
-from content.course_overviews.models import CourseOverviewDescriptor
+import branding
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverviewDescriptor
 
 from opaque_keys.edx.keys import UsageKey
 
