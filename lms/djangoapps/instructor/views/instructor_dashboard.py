@@ -205,6 +205,7 @@ def _section_e_commerce(course, access, paid_mode, coupons_enabled, reports_enab
         'list_financial_report_downloads_url': reverse('list_financial_report_downloads',
                                                        kwargs={'course_id': unicode(course_key)}),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': unicode(course_key)}),
+        'look_up_registration_code': reverse('look_up_registration_code', kwargs={'course_id': unicode(course_key)}),
         'coupons': coupons,
         'sales_admin': access['sales_admin'],
         'coupons_enabled': coupons_enabled,

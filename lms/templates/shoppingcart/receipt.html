@@ -84,6 +84,8 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
             <td>
               % if reg_code_info['is_redeemed']:
                 <span class="red"></M>${_("Used")}</span>
+              % elif not reg_code_info['is_valid']:
+                <span class="red"></M>${_("Invalid")}</span>
               % else:
                 <span class="green"></M>${_("Available")}</span>
               % endif
