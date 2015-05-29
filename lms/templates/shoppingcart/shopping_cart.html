@@ -137,7 +137,7 @@ from django.utils.translation import ungettext
             % endif
                 <span class="pull-right">${_('TOTAL:')}
                   <b id="total-amount" data-amount="${'{price:0.2f}'.format(price=amount)}">
-                    ## Translators: currency_symbol l is a symbol indicating type of currency, ex "$". currency_abbr is
+                    ## Translators: currency_symbol is a symbol indicating type of currency, ex "$". currency_abbr is
                     ## an abbreviation for the currency, ex "USD". This string would look like this when all variables are in:
                     ## "$500.00 USD"
                     ${_("{currency_symbol}{price} {currency_abbr}").format(currency_symbol=currency_symbol, price="{0:0.2f}".format(amount), currency_abbr=currency.upper())}
