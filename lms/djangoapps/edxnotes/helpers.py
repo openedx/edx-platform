@@ -139,13 +139,14 @@ def preprocess_collection(user, course, collection):
     cache = {}
     with store.bulk_operations(course.id):
         for model in collection:
-            model.update({
+            update = {
                 u"text": sanitize_html(model["text"]),
                 u"quote": sanitize_html(model["quote"]),
                 u"updated": dateutil_parse(model["updated"]),
-            })
+            }
             if "tags" in model:
-                model.update({u"tags": [sanitize_html(tag) for tag in model["tags"]]})
+                update[u"tags"] = [sanitize_html(tag) for tag in model["tags"]]
+            model.update(update)
             usage_id = model["usage_id"]
             if usage_id in cache:
                 model.update(cache[usage_id])
