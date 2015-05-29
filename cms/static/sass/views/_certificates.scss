@@ -14,12 +14,12 @@
 
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
-    float: left;
+    @include float(left);
   }
 
   .content-primary {
+    @include margin-right(flex-gutter());
     width: flex-grid(9, 12);
-    margin-right: flex-gutter();
 
     .notice-moduledisabled {
       @extend %ui-well;
@@ -83,21 +83,21 @@
       }
 
       &.collection-info-inline {
+        @include margin(($baseline/4), 0, ($baseline/2), $baseline);
         display: table;
         width: 70%;
-        margin: ($baseline/4) 0 ($baseline/2) $baseline;
 
         li {
           @include box-sizing(border-box);
+          @include margin-right(1%);
           display: table-cell;
-          margin-right: 1%;
           padding: ($baseline/4) 0;
         }
       }
     }
 
     .collection-items {
-      margin-left: $baseline;
+      @include margin-left($baseline);
       margin-bottom: ($baseline*0.75);
 
       .item {
@@ -111,12 +111,12 @@
         }
 
         .name {
+          @include margin-right(5%);
           overflow: hidden;
           text-overflow: ellipsis;
           display: inline-block;
           vertical-align: middle;
           width: 75%;
-          margin-right: 5%;
         }
       }
     }
@@ -125,15 +125,15 @@
 
       .actions {
         @include transition(opacity .15s .25s ease-in-out);
+        @include right($baseline);
         position: absolute;
         top: $baseline;
-        right: $baseline;
         opacity: 0.0;
 
         .action {
+          @include margin-right($baseline/4);
           display: inline-block;
           vertical-align: middle;
-          margin-right: ($baseline/4);
 
           .edit {
             @extend %ui-btn-non-blue;
@@ -157,12 +157,12 @@
 
     .collection-references {
       @extend %t-copy-sub1;
+      @include padding($baseline, ($baseline*1.5), $baseline, ($baseline*2.5));
       box-shadow: 0 2px 2px 0 $shadow inset;
-      padding: $baseline ($baseline*1.5) $baseline ($baseline*2.5);
       color: $gray-l1;
 
       .usage {
-        margin-left: $baseline;
+        @include margin-left($baseline);
 
         .usage-unit {
           padding: ($baseline/4) 0;
@@ -172,12 +172,12 @@
           }
 
           .fa-warning {
-            margin: ($baseline/4) ($baseline/2) 0 ($baseline*1.5);
+            @include margin(($baseline/4), ($baseline/2), 0, ($baseline*1.5));
             color: $orange;
           }
 
           .fa-times-circle {
-            margin: ($baseline/4) ($baseline/2) 0 ($baseline*1.5);
+            @include margin(($baseline/4), ($baseline/2), 0, ($baseline*1.5));
             color: $red-l2;
           }
         }
@@ -230,7 +230,7 @@
       }
 
       .field {
-        margin: 0 0 ($baseline*0.75) 0;
+        @include margin(0, 0, ($baseline*0.75), 0);
 
         &:last-child {
           @extend %wipe-last-child;
@@ -243,7 +243,7 @@
           }
 
           label:after {
-            margin-left: ($baseline/4);
+            @include margin-left($baseline/4);
             content: "*";
           }
         }
@@ -259,7 +259,7 @@
         label {
           @extend %t-copy-sub1;
           @include transition(color, 0.15s, ease-in-out);
-          margin: 0 0 ($baseline/4) 0;
+          @include margin(0, 0, ($baseline/4), 0);
 
           &.is-focused {
             color: $blue;
@@ -318,14 +318,14 @@
           width: flex-grid(12,12);
 
           .org-logo-upload-input-wrapper {
-            float: left;
+            @include float(left);
+            @include margin-right(flex-gutter());
             width: flex-grid(7,12);
-            margin-right: flex-gutter();
           }
 
           .action-upload-org-logo {
             @extend %ui-btn-flat-outline;
-            float: right;
+            @include float(right);
             width: flex-grid(4,12);
             margin-top: ($baseline/4);
             padding: ($baseline/2) $baseline;
@@ -362,7 +362,7 @@
         @extend %t-strong;
 
         &:after {
-          margin-left: ($baseline/4);
+          @include margin-left($baseline/4);
           content: "*";
         }
       }
@@ -370,8 +370,8 @@
       .field.add-collection-name {
 
         label {
-          width: 50%;
           @extend %t-title5;
+          width: 50%;
           display: inline-block;
           vertical-align: bottom;
         }
@@ -398,10 +398,10 @@
         background: $gray-l6;
 
         .action {
-          margin-right: ($baseline/4);
+          @include margin-right($baseline/4);
 
           &:last-child {
-            margin-right: 0;
+            @include margin-right(0);
           }
         }
 
@@ -416,7 +416,7 @@
         }
 
         .wrapper-delete-button {
-          float: right;
+          @include float(right);
           padding: ($baseline/4) ($baseline/2);
 
           .is-disabled {
@@ -427,7 +427,7 @@
 
       .copy {
         @extend %t-copy-sub2;
-        margin: ($baseline) 0 ($baseline/2) 0;
+        @include margin(($baseline), 0, ($baseline/2), 0);
         color: $gray;
 
         strong {
@@ -487,7 +487,7 @@
   .certificate-edit {
 
     .add-collection-name label {
-      padding-right: 5%;
+      @include padding-right(5%);
       overflow: hidden;
       text-overflow: ellipsis;
       vertical-align: bottom;
@@ -502,7 +502,7 @@
       .field {
         display: inline-block;
         vertical-align: middle;
-        margin: 0 3% 0 0;
+        @include margin(0, 3%, 0, 0);
       }
 
       .group-allocation {
@@ -552,11 +552,10 @@
 
     .signatory-panel-header {
       @extend %t-strong;
+      @include border-radius(3px, 3px, 0, 0);
       background-color: $gray-l5;
       padding: ($baseline/2) ($baseline*0.75);
       border-bottom: 1px solid $gray-l5;
-      border-top-left-radius: 3px;
-      border-top-right-radius: 3px;
     }
 
     .signatory-panel-body {
@@ -568,7 +567,7 @@
     }
 
     .signatory-panel-edit {
-      float:right;
+      @include float(right);
       padding: 8px;
       position: inherit;
     }
@@ -578,7 +577,7 @@
 
     // TO-DO: remove icon styling, use save / cancel pattern for Studio
     .signatory-panel-close, .signatory-panel-save, .signatory-panel-delete {
-      float:right;
+      @include float(right);
       padding:10px;
     }
 
@@ -604,7 +603,7 @@
         }
 
         label:after {
-          margin-left: ($baseline/4);
+          @include margin-left($baseline/4);
           content: "*";
         }
       }
@@ -683,14 +682,14 @@
         width: flex-grid(12,12);
 
         .signature-upload-input-wrapper {
-          float: left;
+          @include float(left);
+          @include margin-right(flex-gutter());
           width: flex-grid(7,12);
-          margin-right: flex-gutter();
         }
 
         .action-upload-signature {
           @extend %ui-btn-flat-outline;
-          float: right;
+          @include float(right);
           width: flex-grid(4,12);
           margin-top: ($baseline/4);
           padding: ($baseline/2) $baseline;
