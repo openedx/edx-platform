@@ -22,23 +22,28 @@ class Migration(DataMigration):
                 "logo_url": "http://www.edx.org"
             },
             "honor": {
-                "certificate_type": "Honor Code",
+                "certificate_type": "honor",
+                "certificate_title": "Honor Certificate",
                 "document_body_class_append": "is-honorcode"
             },
             "verified": {
-                "certificate_type": "Verified",
+                "certificate_type": "verified",
+                "certificate_title": "Verified Certificate",
                 "document_body_class_append": "is-idverified"
             },
             "xseries": {
-                "certificate_type": "XSeries",
+                "certificate_type": "xseries",
+                "certificate_title": "XSeries Certificate",
                 "document_body_class_append": "is-xseries"
             },
             "base": {
                 "certificate_type": "base",
+                "certificate_title": "Certificate of Achievement",
                 "document_body_class_append": "is-base"
             },
             "distinguished": {
                 "certificate_type": "distinguished",
+                "certificate_title": "Distinguished Certificate of Achievement",
                 "document_body_class_append": "is-distinguished"
             }
         }"""
