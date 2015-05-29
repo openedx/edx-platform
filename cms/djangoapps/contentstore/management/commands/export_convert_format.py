@@ -7,6 +7,7 @@ Sample invocation: ./manage.py export_convert_format mycourse.tar.gz ~/newformat
 import os
 from path import path
 from django.core.management.base import BaseCommand, CommandError
+from django.conf import settings
 
 from tempfile import mkdtemp
 import tarfile
@@ -32,8 +33,8 @@ class Command(BaseCommand):
         output_path = args[1]
 
         # Create temp directories to extract the source and create the target archive.
-        temp_source_dir = mkdtemp()
-        temp_target_dir = mkdtemp()
+        temp_source_dir = mkdtemp(dir=settings.DATA_DIR)
+        temp_target_dir = mkdtemp(dir=settings.DATA_DIR)
         try:
             extract_source(source_archive, temp_source_dir)
 
