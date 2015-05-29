@@ -19,7 +19,7 @@ if certificate_data and certificate_data.get('course_title', ''):
                     <img class="src" src="/static/certificates/images/ico-distinguished.svg" alt="">
                 </span>
 
-                <span class="accomplishment-type-label hd-4">Distinguished Certificate of Achievement</span>
+                <span class="accomplishment-type-label hd-4">${certificate_title}</span>
             </div>
 
             <div class="accomplishment-statement">
@@ -34,9 +34,9 @@ if certificate_data and certificate_data.get('course_title', ''):
                     </span>
                 </p>
 
-                <p class="accomplishment-statement-detail copy copy-lead">a course of study offered by BerkleeX, an online learning initiative of Berklee College of Music through edX.</p>
+                <p class="accomplishment-statement-detail copy copy-lead">${accomplishment_copy_course_description}</p>
             </div>
-
+            % if mode != 'base':
             <div class="accomplishment-signatories">
                 <h3 class="accomplishment-signatories-title hd-6 sr-only">Noted by</h3>
 
@@ -58,7 +58,7 @@ if certificate_data and certificate_data.get('course_title', ''):
                     </ul>
                 </div>
             </div>
-
+            % endif
             <div class="accomplishment-orgs">
                 <h3 class="accomplishment-orgs-title hd-6 sr-only">Supported by the following organizations</h3>
 
