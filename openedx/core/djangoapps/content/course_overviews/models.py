@@ -359,3 +359,8 @@ class CourseOverviewDescriptor(django.db.models.Model):
         return "course_{}".format(
             b32encode(unicode(self.location.course_key)).replace('=', padding_char)
         )
+
+    @property
+    def fields(self):
+        # TODO me: document this and see if it works
+        return {f.name: f for f in self._meta.fields}
