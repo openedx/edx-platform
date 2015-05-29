@@ -908,40 +908,47 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix):
     if error_msg:
         return JsonResponse(object={'success': error_msg}, status=413)
 
-    instance, tracking_context = get_module_by_usage_id(request, course_id, usage_id)
-
-    # Name the transaction so that we can view XBlock handlers separately in
-    # New Relic. The suffix is necessary for XModule handlers because the
-    # "handler" in those cases is always just "xmodule_handler".
-    nr_tx_name = "{}.{}".format(instance.__class__.__name__, handler)
-    nr_tx_name += "/{}".format(suffix) if suffix else ""
-    newrelic.agent.set_transaction_name(nr_tx_name, group="Python/XBlock/Handler")
-
-    tracking_context_name = 'module_callback_handler'
-    req = django_to_webob_request(request)
+    # Make a CourseKey from the course_id, raising a 404 upon parse error.
     try:
-        with tracker.get_tracker().context(tracking_context_name, tracking_context):
-            resp = instance.handle(handler, req, suffix)
-
-    except NoSuchHandlerError:
-        log.exception("XBlock %s attempted to access missing handler %r", instance, handler)
+        course_key = CourseKey.from_string(course_id)
+    except InvalidKeyError:
         raise Http404
 
-    # If we can't find the module, respond with a 404
-    except NotFoundError:
-        log.exception("Module indicating to user that request doesn't exist")
-        raise Http404
+    with modulestore().bulk_operations(course_key):
+        instance, tracking_context = get_module_by_usage_id(request, course_id, usage_id)
 
-    # For XModule-specific errors, we log the error and respond with an error message
-    except ProcessingError as err:
-        log.warning("Module encountered an error while processing AJAX call",
-                    exc_info=True)
-        return JsonResponse(object={'success': err.args[0]}, status=200)
+        # Name the transaction so that we can view XBlock handlers separately in
+        # New Relic. The suffix is necessary for XModule handlers because the
+        # "handler" in those cases is always just "xmodule_handler".
+        nr_tx_name = "{}.{}".format(instance.__class__.__name__, handler)
+        nr_tx_name += "/{}".format(suffix) if suffix else ""
+        newrelic.agent.set_transaction_name(nr_tx_name, group="Python/XBlock/Handler")
 
-    # If any other error occurred, re-raise it to trigger a 500 response
-    except Exception:
-        log.exception("error executing xblock handler")
-        raise
+        tracking_context_name = 'module_callback_handler'
+        req = django_to_webob_request(request)
+        try:
+            with tracker.get_tracker().context(tracking_context_name, tracking_context):
+                resp = instance.handle(handler, req, suffix)
+
+        except NoSuchHandlerError:
+            log.exception("XBlock %s attempted to access missing handler %r", instance, handler)
+            raise Http404
+
+        # If we can't find the module, respond with a 404
+        except NotFoundError:
+            log.exception("Module indicating to user that request doesn't exist")
+            raise Http404
+
+        # For XModule-specific errors, we log the error and respond with an error message
+        except ProcessingError as err:
+            log.warning("Module encountered an error while processing AJAX call",
+                        exc_info=True)
+            return JsonResponse(object={'success': err.args[0]}, status=200)
+
+        # If any other error occurred, re-raise it to trigger a 500 response
+        except Exception:
+            log.exception("error executing xblock handler")
+            raise
 
     return webob_to_django_response(resp)
 
