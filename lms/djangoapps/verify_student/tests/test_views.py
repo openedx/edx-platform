@@ -2206,19 +2206,15 @@ class TestEmailMessageWithCustomICRVBlock(ModuleStoreTestCase):
             )
 
             self.assertIn(
-                "We could not verify your identity for the {assessment} "
-                "assessment in the {course_name} course.".format(
+                "We could not verify your identity for the {assessment} assessment "
+                "in the {course_name} course. You have used "
+                "{used_attempts} out of {allowed_attempts} attempts to "
+                "verify your identity, and verification is no longer "
+                "possible".format(
                     course_name=self.course.display_name_with_default,
-                    assessment=self.assessment
-                ),
-                body
-            )
-
-            self.assertIn(
-                "This assessment closed on {due_date}, "
-                "and verification is no longer "
-                "possible.".format(
-                    due_date=get_default_time_display(self.due_date)
+                    assessment=self.assessment,
+                    used_attempts=1,
+                    allowed_attempts=self.allowed_attempts
                 ),
                 body
             )
@@ -2322,28 +2318,6 @@ class TestEmailMessageWithDefaultICRVBlock(ModuleStoreTestCase):
                 assessment=self.assessment,
                 used_attempts=1,
                 allowed_attempts=1
-            ),
-            body
-        )
-
-    def test_denied_email_message_with_no_due_date(self):
-
-        VerificationStatus.add_verification_status(
-            checkpoint=self.check_point,
-            user=self.user,
-            status='denied',
-            location_id=self.reverification_location
-        )
-
-        __, body = _compose_message_reverification_email(
-            self.course.id, self.user.id, "midterm", self.attempt, "denied", True
-        )
-
-        self.assertIn(
-            "We could not verify your identity for the {assessment} "
-            "assessment in the {course_name} course.".format(
-                course_name=self.course.display_name_with_default,
-                assessment=self.assessment
             ),
             body
         )
