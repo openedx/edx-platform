@@ -35,8 +35,10 @@ from util.bad_request_rate_limiter import BadRequestRateLimiter
 logger = logging.getLogger(__name__)
 
 
-# pylint: disable=missing-docstring
 class CourseDoesNotExist(Exception):
+    """
+    This exception is raised in the case where None is returned from the modulestore
+    """
     pass
 
 
@@ -272,6 +274,7 @@ def get_certificate_description(mode, certificate_type, platform_name):
     return certificate_type_description
 
 
+# pylint: disable=bad-continuation
 def _update_certificate_context(context, course, user, user_certificate):
     """
     Build up the certificate web view context using the provided values
@@ -434,7 +437,7 @@ def _update_certificate_context(context, course, user, user_certificate):
             )
         )
 
-# pylint: disable=too-many-statements, bad-continuation, unused-argument
+
 def render_html_view(request, user_id, course_id):
     """
     This public view generates an HTML representation of the specified student's certificate
