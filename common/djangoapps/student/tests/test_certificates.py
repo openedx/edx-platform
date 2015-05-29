@@ -12,7 +12,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
-from certificates.utils import get_certificate_url  # pylint: disable=import-error
+from certificates.api import get_certificate_url  # pylint: disable=import-error
 
 # pylint: disable=no-member
 

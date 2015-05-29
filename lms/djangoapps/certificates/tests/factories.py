@@ -1,5 +1,7 @@
 from factory.django import DjangoModelFactory
 
+from student.models import LinkedInAddToProfileConfiguration
+
 from certificates.models import (
     GeneratedCertificate, CertificateStatuses, CertificateHtmlViewConfiguration, CertificateWhitelist
 )
@@ -54,3 +56,12 @@ class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):
                 "document_body_class_append": "is-xseries"
             }
         }"""
+
+
+class LinkedInAddToProfileConfigurationFactory(DjangoModelFactory):
+
+    FACTORY_FOR = LinkedInAddToProfileConfiguration
+
+    enabled = True
+    company_identifier = "0_0dPSPyS070e0HsE9HNz_13_d11_"
+    trk_partner_name = 'unittest'
