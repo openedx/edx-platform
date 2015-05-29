@@ -36,15 +36,13 @@
 
                 it('add caption control to video player', function () {
                     state = jasmine.initializePlayer();
-                    expect($('.video')).toContain('a.hide-subtitles');
+                    expect($('.video')).toContain('.hide-subtitles');
                 });
 
                 it('add ARIA attributes to caption control', function () {
                     state = jasmine.initializePlayer();
-                    var captionControl = $('a.hide-subtitles');
+                    var captionControl = $('.hide-subtitles');
                     expect(captionControl).toHaveAttrs({
-                        'role': 'button',
-                        'title': 'Turn off captions',
                         'aria-disabled': 'false'
                     });
                 });
@@ -151,11 +149,11 @@
                             langCodes = _.keys(transcripts),
                             langLabels = _.values(transcripts);
 
-                        expect($('.langs-list')).toExist();
-                        expect($('.langs-list')).toHandle('click');
+                        expect($('.language-button')).toExist();
+                        expect($('.language-button')).toHandle('click');
 
 
-                        $('.langs-list li').each(function(index) {
+                        $('#language_menu li').each(function(index) {
                             var code = $(this).data('lang-code'),
                                 link = $(this).find('a'),
                                 label = link.text();
@@ -168,7 +166,7 @@
                     it('when clicking on link with new language', function () {
                         state = jasmine.initializePlayer();
                         var Caption = state.videoCaption,
-                            link = $('.langs-list li[data-lang-code="de"] a');
+                            link = $('#language_menu li[data-lang-code="de"] a');
 
                         spyOn(Caption, 'fetchCaption');
                         spyOn(state.storage, 'setItem');
@@ -180,13 +178,13 @@
                         expect(state.lang).toBe('de');
                         expect(state.storage.setItem)
                             .toHaveBeenCalledWith('language', 'de');
-                        expect($('.langs-list li.is-active').length).toBe(1);
+                        expect($('#language_menu li.is-active').length).toBe(1);
                     });
 
                     it('when clicking on link with current language', function () {
                         state = jasmine.initializePlayer();
                         var Caption = state.videoCaption,
-                            link = $('.langs-list li[data-lang-code="en"] a');
+                            link = $('#language_menu li[data-lang-code="en"] a');
 
                         spyOn(Caption, 'fetchCaption');
                         spyOn(state.storage, 'setItem');
@@ -198,15 +196,15 @@
                         expect(state.lang).toBe('en');
                         expect(state.storage.setItem)
                             .not.toHaveBeenCalledWith('language', 'en');
-                        expect($('.langs-list li.is-active').length).toBe(1);
+                        expect($('#language_menu li.is-active').length).toBe(1);
                     });
 
                     it('open the language toggle on hover', function () {
                         state = jasmine.initializePlayer();
-                        $('.lang').mouseenter();
-                        expect($('.lang')).toHaveClass('is-opened');
-                        $('.lang').mouseleave();
-                        expect($('.lang')).not.toHaveClass('is-opened');
+                        $('.language-button').mouseenter();
+                        expect($('#language_menu')).toHaveClass('is-opened');
+                        $('.language-button').mouseleave();
+                        expect($('#language_menu')).not.toHaveClass('is-opened');
                     });
                 });
 
@@ -216,9 +214,9 @@
                             'transcriptLanguages': {"en": "English"}
                         });
 
-                        expect($('.langs-list')).not.toExist();
-                        expect($('.lang')).not.toHandle('mouseenter');
-                        expect($('.lang')).not.toHandle('mouseleave');
+                        expect($('#language_menu')).not.toExist();
+                        expect($('.language-button')).not.toHandle('mouseenter');
+                        expect($('.language-button')).not.toHandle('mouseleave');
                     });
                 });
             });
@@ -1067,8 +1065,8 @@
                 });
 
                 it('changes ARIA attribute of caption control', function () {
-                    expect($('a.hide-subtitles'))
-                        .toHaveAttr('title', 'Turn on captions');
+                    expect($('.hide-subtitles'))
+                        .toHaveAttr('title', 'Turn off the transcript');
                 });
             });
 
@@ -1093,8 +1091,8 @@
                 });
 
                 it('changes ARIA attribute of caption control', function () {
-                    expect($('a.hide-subtitles'))
-                        .toHaveAttr('title', 'Turn off captions');
+                    expect($('.hide-subtitles'))
+                        .toHaveAttr('title', 'Turn on the transcript');
                 });
 
                 // Test turned off due to flakiness (11/25/13)
