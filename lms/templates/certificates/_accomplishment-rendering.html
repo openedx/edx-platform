@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='../static_content.html'/>
 <%
 accomplishment_course_title =  accomplishment_copy_course_name
@@ -65,13 +66,13 @@ if certificate_data and certificate_data.get('course_title', ''):
                 <ul class="wrapper-orgs list-orgs list-orgs-4+">
                     <li class="wrapper-organization">
                         <div class="organization organization-edX">
-                            <img class="organization-logo" src="${static.url('/static/certificates/images/logo-edx.svg')}" alt="open edX">
+                            <img class="organization-logo" src="${static.url('/static/certificates/images/logo-edx.svg')}" alt="${platform_name}">
                         </div>
                     </li>
                     % if certificate_data and certificate_data.get('org_logo_path', ''):
                     <li class="wrapper-organization">
                         <div class="organization organization-harvardX">
-                            <img class="organization-logo" src="${static.url(certificate_data['org_logo_path'])}" alt="Organization Name">
+                            <img class="organization-logo" src="${static.url(certificate_data['org_logo_path'])}" alt="${platform_name}">
                         </div>
                     </li>
                     % endif
@@ -82,7 +83,7 @@ if certificate_data and certificate_data.get('course_title', ''):
 
     <div class="wrapper-accomplishment-metadata">
         <div class="accomplishment-metadata">
-            <h2 class="accomplishment-metadata-title hd-6">${_("More about ${accomplishment_copy_name}'s accomplishment")}</h2>
+            <h2 class="accomplishment-metadata-title hd-6">${accomplishment_copy_more_about}</h2>
 
             <div class="wrapper-metadata">
                 <dl class="metadata accomplishment-recipient">

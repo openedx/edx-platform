@@ -16,10 +16,13 @@ from opaque_keys.edx.locator import CourseLocator
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from certificates.utils import get_certificate_url
 
+from certificates.api import get_certificate_url
 from certificates.models import ExampleCertificateSet, ExampleCertificate, GeneratedCertificate
-from certificates.tests.factories import CertificateHtmlViewConfigurationFactory
+from certificates.tests.factories import (
+    CertificateHtmlViewConfigurationFactory,
+    LinkedInAddToProfileConfigurationFactory
+)
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -204,6 +207,7 @@ class CertificatesViewsTests(ModuleStoreTestCase):
             name=self.user.profile.name,
         )
         CertificateHtmlViewConfigurationFactory.create()
+        LinkedInAddToProfileConfigurationFactory.create()
 
     def _add_course_certificates(self, count=1, signatory_count=0):
         """
@@ -215,7 +219,7 @@ class CertificatesViewsTests(ModuleStoreTestCase):
                 'title': 'Signatory_Title ' + str(i),
                 'organization': 'Signatory_Organization ' + str(i),
                 'signature_image_path': '/static/certificates/images/demo-sig{}.png'.format(i),
-                'id': i
+                'id': i,
             } for i in xrange(0, signatory_count)
 
         ]
@@ -228,7 +232,8 @@ class CertificatesViewsTests(ModuleStoreTestCase):
                 'course_title': 'course_title_' + str(i),
                 'org_logo_path': '/t4x/orgX/testX/asset/org-logo-{}.png'.format(i),
                 'signatories': signatories,
-                'version': 1
+                'version': 1,
+                'is_active': True
             } for i in xrange(0, count)
         ]
 
@@ -240,8 +245,9 @@ class CertificatesViewsTests(ModuleStoreTestCase):
     def test_render_html_view_valid_certificate(self):
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=self.course.id.to_deprecated_string()  # pylint: disable=no-member
+            course_id=unicode(self.course.id)  # pylint: disable=no-member
         )
+        self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url)
         self.assertIn(str(self.cert.verify_uuid), response.content)
 
@@ -285,7 +291,8 @@ class CertificatesViewsTests(ModuleStoreTestCase):
                 'name': 'Name 0',
                 'description': 'Description 0',
                 'signatories': [],
-                'version': 1
+                'version': 1,
+                'is_active':True
             }
         ]
         self.course.certificates = {'certificates': test_certificates}
@@ -306,7 +313,8 @@ class CertificatesViewsTests(ModuleStoreTestCase):
                 'id': 0,
                 'name': 'Certificate Name 0',
                 'signatories': [],
-                'version': 1
+                'version': 1,
+                'is_active': True
             }
         ]
         self.course.certificates = {'certificates': test_certificates}
@@ -365,7 +373,7 @@ class CertificatesViewsTests(ModuleStoreTestCase):
         self.assertIn('invalid', response.content)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_render_html_view_invalid_certificate(self):
+    def test_render_html_view_invalid_user_certificate(self):
         self.cert.delete()
         self.assertEqual(len(GeneratedCertificate.objects.all()), 0)
         test_url = get_certificate_url(
@@ -387,3 +395,12 @@ class CertificatesViewsTests(ModuleStoreTestCase):
         response = self.client.get(test_url + '?preview=honor')
         self.assertNotIn(self.course.display_name, response.content)
         self.assertIn('course_title_0', response.content)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_render_html_view_invalid_certificate_configuration(self):
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)  # pylint: disable=no-member
+        )
+        response = self.client.get(test_url)
+        self.assertIn("Invalid Certificate", response.content)

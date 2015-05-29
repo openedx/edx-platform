@@ -1,9 +1,10 @@
+<%! from django.utils.translation import ugettext as _ %>
 <section class="about-item about-edx">
-    <h2 class="about-edx-title hd-4">${_("About edX")}</h2>
+    <h2 class="about-edx-title hd-4">${company_about_title}</h2>
 
     <div class="about-edx-copy copy copy-meta">
-        <p>${_("EdX offers interactive online classes and MOOCs from the world’s best universities, including MIT, Harvard, Berkeley, University of Texas, and many others. EdX is a non-profit online initiative created by founding partners Harvard and MIT.")}</p>
+        <p>${company_about_description}</p>
 
-        <a class="action" href="http://www.edx.org/about-us">${_("Learn More")}</a>
+        <a class="action" href="${company_about_url}">${company_about_urltext}</a>
     </div>
 </section>

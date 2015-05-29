@@ -14,6 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from capa.xqueue_interface import XQUEUE_METRIC_NAME
+from certificates.api import get_active_web_certificate, get_certificate_url
 from certificates.models import (
     certificate_status_for_student,
     CertificateStatuses,
@@ -22,7 +23,6 @@ from certificates.models import (
     CertificateHtmlViewConfiguration
 )
 from certificates.queue import XQueueCertInterface
-from certificates.utils import get_certificate_url
 from edxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
@@ -319,6 +319,11 @@ def _update_certificate_context(context, course, user, user_certificate):
         platform_name=accd_platform_name_html
     )
 
+    # Translators: Accomplishments describe the awards/certifications obtained by students on this platform
+    context['accomplishment_copy_about'] = _('About {platform_name} Accomplishments').format(
+        platform_name=platform_name
+    )
+
     context['accomplishment_more_title'] = _("More Information About {user_name}'s Certificate:").format(
         user_name=user_fullname
     )
@@ -437,6 +442,21 @@ def _update_certificate_context(context, course, user, user_certificate):
             )
         )
 
+    # Translators: This line is displayed to a user who has completed a course and achieved a certification
+    context['accomplishment_banner_opening'] = _("{fullname}, you've earned a certificate!").format(
+        fullname=user_fullname
+    )
+
+    # Translators: This line congratulates the user and instructs them to share their accomplishment on social networks
+    context['accomplishment_banner_congrats'] = _("Congratulations! This page summarizes all of the details of what "
+                                                  "you've accomplished. Show it off to family, friends, and colleagues "
+                                                  "in your social and professional networks.")
+
+    # Translators: This line leads the reader to understand more about the certificate that a student has been awarded
+    context['accomplishment_copy_more_about'] = _("More about {fullname}'s accomplishment").format(
+        fullname=user_fullname
+    )
+
 
 def render_html_view(request, user_id, course_id):
     """
@@ -495,6 +515,14 @@ def render_html_view(request, user_id, course_id):
 
     # Okay, now we have all of the pieces, time to put everything together
 
+    # Get the active certificate configuration for this course
+    # If we do not have an active certificate, we'll need to send the user to the "Invalid" screen
+    active_configuration = get_active_web_certificate(course)
+    if active_configuration is None and request.GET.get('preview') is None:
+        return render_to_response(invalid_template_path, context)
+    else:
+        context['certificate_data'] = active_configuration
+
     # Append/Override the existing view context values with any mode-specific ConfigurationModel values
     context.update(configuration.get(user_certificate.mode, {}))
 
@@ -503,16 +531,6 @@ def render_html_view(request, user_id, course_id):
 
     # Append/Override the existing view context values with any course-specific static values from Advanced Settings
     context.update(course.cert_html_view_overrides)
-
-    # Append the active certificate configuration for this course to the view context
-    if course.certificates:
-        # iterate the list of certificates in the descriptor.
-        for cert in course.certificates['certificates']:
-            #TODO : course certificates will have a flag 'active_cert', it requires to be implement in backbone model.
-            # on the basis of this flag , we will get active certificate from the list.
-            # currently we are assuming the first certificate in the list as an active certificate.
-            context['certificate_data'] = cert
-            break
 
     # Override further with any course-specific static values
     context.update(course.cert_html_view_overrides)

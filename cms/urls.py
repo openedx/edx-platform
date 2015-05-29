@@ -118,6 +118,8 @@ urlpatterns += patterns(
         settings.COURSE_KEY_PATTERN), 'certificates.signatory_detail_handler'),
     url(r'^certificates/{}/(?P<certificate_id>\d+)?$'.format(settings.COURSE_KEY_PATTERN),
         'certificates.certificates_detail_handler'),
+    url(r'^certificates/activation/{}/'.format(settings.COURSE_KEY_PATTERN),
+        'certificates.certificate_activation_handler'),
 
     url(r'^api/val/v0/', include('edxval.urls')),
 )
