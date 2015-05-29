@@ -9,21 +9,22 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         # Adding model 'CourseAllowUnenroll'
-        db.create_table('student_courseallowunenroll', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('course_id', self.gf('xmodule_django.models.CourseKeyField')(max_length=255, db_index=True)),
-        ))
-        db.send_create_signal('student', ['CourseAllowUnenroll'])
+        pass
+        ## db.create_table('student_courseallowunenroll', (
+        ##     ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+        ##     ('course_id', self.gf('xmodule_django.models.CourseKeyField')(max_length=255, db_index=True)),
+        ## ))
+        ## db.send_create_signal('student', ['CourseAllowUnenroll'])
 
-        # Adding unique constraint on 'CourseAllowUnenroll', fields ['course_id']
-        db.create_unique('student_courseallowunenroll', ['course_id'])
+        ## # Adding unique constraint on 'CourseAllowUnenroll', fields ['course_id']
+        ## db.create_unique('student_courseallowunenroll', ['course_id'])
 
     def backwards(self, orm):
         # Removing unique constraint on 'CourseAllowUnenroll', fields ['course_id']
-        db.delete_unique('student_courseallowunenroll', ['course_id'])
-
-        # Deleting model 'CourseAllowUnenroll'
-        db.delete_table('student_courseallowunenroll')
+        ## db.delete_unique('student_courseallowunenroll', ['course_id'])
+        pass
+        ## # Deleting model 'CourseAllowUnenroll'
+        ## db.delete_table('student_courseallowunenroll')
 
     models = {
         'auth.group': {
