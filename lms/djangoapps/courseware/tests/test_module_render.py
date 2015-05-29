@@ -794,16 +794,19 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         self.assertTrue(url.startswith('/static/toy_course_dir/'))
         self.course.static_asset_path = ""
 
+    @override_settings(DEFAULT_COURSE_ABOUT_IMAGE_URL='test.png')
+    @override_settings(STATIC_URL='static/')
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_course_image_for_split_course(self, store):
         """
-        for split courses if course_image is empty then course_image_url will be blank
+        for split courses if course_image is empty then course_image_url will be
+        the default image url defined in settings
         """
         self.course = CourseFactory.create(default_store=store)
         self.course.course_image = ''
 
         url = course_image_url(self.course)
-        self.assertEqual('', url)
+        self.assertEqual('static/test.png', url)
 
     def test_get_course_info_section(self):
         self.course.static_asset_path = "toy_course_dir"
