@@ -1,5 +1,5 @@
 <ul class="active-filters facet-list">
 </ul>
 <span>
-    <a id="clear-all-filters" class="clear-filters flt-right" href="#"><%= gettext('CLEAR ALL') %></a>
+    <button id="clear-all-filters" class="clear-filters flt-right discovery-button"><%= gettext('CLEAR ALL') %></button>
 </span>

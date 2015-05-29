@@ -8,6 +8,24 @@ $facet-background-color: #007db8;
   background: $course-profile-bg;
   padding-bottom: ($baseline*3);
 
+  .discovery-button:not(:disabled) {
+    @extend %t-action2;
+    outline: 0 none;
+    box-shadow:none;
+    border: 0;
+    background: none;
+    padding: 0 ($baseline*0.6);
+    text-align: left;
+    text-decoration: none;
+    text-shadow: none;
+    text-transform: none;
+
+    //STATE: hover
+    &::hover {
+      background: none;
+    }
+  }
+
   .courses-container {
 
     #discovery-form {
@@ -213,7 +231,7 @@ $facet-background-color: #007db8;
       background: $courseware-button-border-color;
       width: auto;
 
-      a {
+      .facet-option {
         @extend %t-strong;
         color: $gray-d2;
         text-decoration: none;
@@ -317,16 +335,15 @@ $facet-background-color: #007db8;
       padding: ($baseline/2) 0;
     }
 
-    a {
+    .facet-option {
       @include float(left);
       @include box-sizing(border-box);
       @include line-height(18.92);
       @include transition(all $tmg-f2 ease-out 0s);
+      @extend %t-action3;
       opacity: 1;
-      padding: 0 ($baseline*0.6);
       width: 100%;
       overflow: hidden;
-      text-decoration: none;
       text-overflow: ellipsis;
       white-space: nowrap;
       color: $facet-text-color;
@@ -375,14 +392,8 @@ $facet-background-color: #007db8;
           text-decoration: none;
 
           .count,
-          a {
+          .facet-option {
             color: $white;
-
-            //STATE: visited
-            &:visited {
-              color: $white;
-              text-decoration: none;
-            }
           }
         }
       }
@@ -395,7 +406,7 @@ $facet-background-color: #007db8;
     .toggle {
       @include clearfix();
 
-      a {
+      button {
         @extend %t-icon6;
         @extend %t-strong;
         color: $facet-background-color;

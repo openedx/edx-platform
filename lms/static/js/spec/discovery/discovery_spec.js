@@ -347,7 +347,7 @@ define([
             this.filterBar.addFilter(SEARCH_FILTER);
             var clearAll = this.filterBar.$el.find('#clear-all-filters');
             expect(clearAll).toBeVisible();
-            var filter = this.filterBar.$el.find('li a');
+            var filter = this.filterBar.$el.find('li .discovery-button');
             filter.trigger('click');
             expect(this.filterBar.clearFilter).toHaveBeenCalled();
             expect(this.onClear).toHaveBeenCalled();
@@ -355,13 +355,13 @@ define([
 
         it('view changes query filter', function () {
             this.filterBar.addFilter(SEARCH_FILTER);
-            var filter = $(this.filterBar.$el.find('li a')[0]);
+            var filter = $(this.filterBar.$el.find('li .discovery-button')[0]);
             expect(filter.text().trim()).toBe(SEARCH_FILTER.query);
             // Have to explicitly remove model because events not dispatched
             var model = this.filterBar.collection.findWhere(SEARCH_FILTER);
             model.cleanModelView();
             this.filterBar.changeQueryFilter(SEARCH_FILTER.query + '2');
-            filter = $(this.filterBar.$el.find('li a')[0]);
+            filter = $(this.filterBar.$el.find('li .discovery-button')[0]);
             expect(filter.text().trim()).toBe(SEARCH_FILTER.query + '2');
         });
 

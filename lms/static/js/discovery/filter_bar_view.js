@@ -21,7 +21,7 @@ define([
 
         events: {
             'click #clear-all-filters': 'clearAll',
-            'click li a': 'clearFilter'
+            'click li .discovery-button': 'clearFilter'
         },
 
         initialize: function () {
