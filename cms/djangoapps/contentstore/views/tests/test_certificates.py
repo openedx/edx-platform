@@ -85,7 +85,8 @@ class HelperMethods(object):
                 'description': 'Description ' + str(i),
                 'org_logo_path': '/c4x/test/CSS101/asset/org_logo{}.png'.format(i),
                 'signatories': signatories,
-                'version': CERTIFICATE_SCHEMA_VERSION
+                'version': CERTIFICATE_SCHEMA_VERSION,
+                'is_active': False
             } for i in xrange(0, count)
         ]
         self._create_fake_images([certificate['org_logo_path'] for certificate in certificates])
@@ -490,3 +491,47 @@ class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 404)
+
+    def test_certificate_activation_success(self):
+        """
+        Activate and Deactivate the course certificate
+        """
+        test_url = reverse_course_url('certificates.certificate_activation_handler', self.course.id)
+        self._add_course_certificates(count=1, signatory_count=2)
+
+        is_active = True
+        for i in range(2):
+            if i == 1:
+                is_active = not is_active
+            response = self.client.post(
+                test_url,
+                data=json.dumps({"is_active": is_active}),
+                content_type="application/json",
+                HTTP_ACCEPT="application/json",
+                HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+            )
+            self.assertEquals(response.status_code, 200)
+            course = self.store.get_course(self.course.id)
+            certificates = course.certificates['certificates']
+            self.assertEqual(certificates[0].get('is_active'), is_active)
+
+    def test_certificate_activation_failure(self):
+        """
+        Certificate activation should fail when user has not read access to course then permission denied exception
+        should raised.
+        """
+        test_url = reverse_course_url('certificates.certificate_activation_handler', self.course.id)
+        test_user_client, test_user = self.create_non_staff_authed_user_client()
+        CourseEnrollment.enroll(test_user, self.course.id)
+        self._add_course_certificates(count=1, signatory_count=2)
+        response = test_user_client.post(
+            test_url,
+            data=json.dumps({"is_active": True}),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEquals(response.status_code, 403)
+        course = self.store.get_course(self.course.id)
+        certificates = course.certificates['certificates']
+        self.assertEqual(certificates[0].get('is_active'), False)

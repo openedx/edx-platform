@@ -269,6 +269,37 @@ class Certificate(object):
 
 
 @login_required
+@require_http_methods(("POST",))
+@ensure_csrf_cookie
+def certificate_activation_handler(request, course_key_string):
+    """
+    A handler for Certificate Activation/Deactivation
+
+    POST
+        json: is_active. update the activation state of certificate
+    """
+    course_key = CourseKey.from_string(course_key_string)
+    store = modulestore()
+    try:
+        course = _get_course_and_check_access(course_key, request.user)
+    except PermissionDenied:
+        msg = _('PermissionDenied: Failed in authenticating {user}').format(user=request.user)
+        return JsonResponse({"error": msg}, status=403)
+
+    data = json.loads(request.body)
+    is_active = data.get('is_active', False)
+    certificates = CertificateManager.get_certificates(course)
+
+    # for certificate activation/deactivation, we are assuming one certificate in certificates collection.
+    for certificate in certificates:
+        certificate['is_active'] = is_active
+        break
+
+    store.update_item(course, request.user.id)
+    return HttpResponse(status=200)
+
+
+@login_required
 @require_http_methods(("GET", "POST"))
 @ensure_csrf_cookie
 def certificates_list_handler(request, course_key_string):
@@ -293,6 +324,10 @@ def certificates_list_handler(request, course_key_string):
             certificate_url = reverse_course_url('certificates.certificates_list_handler', course_key)
             course_outline_url = reverse_course_url('course_handler', course_key)
             upload_asset_url = reverse_course_url('assets_handler', course_key)
+            activation_handler_url = reverse_course_url(
+                handler_name='certificates.certificate_activation_handler',
+                course_key=course_key
+            )
             course_modes = [mode.slug for mode in CourseMode.modes_for_course(course.id)]
             certificate_web_view_url = get_lms_link_for_certificate_web_view(
                 user_id=request.user.id,
@@ -300,8 +335,14 @@ def certificates_list_handler(request, course_key_string):
                 mode=course_modes[0]  # CourseMode.modes_for_course returns default mode 'honor' if doesn't find anyone.
             )
             certificates = None
+            is_active = False
             if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
                 certificates = CertificateManager.get_certificates(course)
+                # we are assuming only one certificate in certificates collection.
+                for certificate in certificates:
+                    is_active = certificate.get('is_active', False)
+                    break
+
             return render_to_response('certificates.html', {
                 'context_course': course,
                 'certificate_url': certificate_url,
@@ -309,7 +350,9 @@ def certificates_list_handler(request, course_key_string):
                 'upload_asset_url': upload_asset_url,
                 'certificates': json.dumps(certificates),
                 'course_modes': course_modes,
-                'certificate_web_view_url': certificate_web_view_url
+                'certificate_web_view_url': certificate_web_view_url,
+                'is_active': is_active,
+                'certificate_activation_handler_url': activation_handler_url
             })
         elif "application/json" in request.META.get('HTTP_ACCEPT'):
             # Retrieve the list of certificates for the specified course

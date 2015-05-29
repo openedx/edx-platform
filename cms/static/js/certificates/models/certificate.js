@@ -21,7 +21,8 @@ function (_, str, Backbone, BackboneRelational, BackboneAssociations, gettext, C
             description: 'Description of the certificate',
             course_title: 'Title of the course',
             org_logo_path: '',
-            version: 1
+            version: 1,
+            is_active: false
         },
 
         // Certificate child collection/model mappings (backbone-relational)
