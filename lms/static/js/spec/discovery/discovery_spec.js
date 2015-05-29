@@ -417,15 +417,30 @@ define([
 
         it('view triggers addFilter event if facet is clicked', function () {
             this.searchFacetView.delegateEvents();
-            var $facetLink = this.searchFacetView.$el.find('li a[data-value="edX1"]');
+            var $facetLink = this.searchFacetView.$el.find('li [data-value="edX1"]');
             var $facet = $facetLink.parent('li');
             $facet.trigger('click');
             expect(this.onAddFilter).toHaveBeenCalledWith(
                 {
                     type: $facet.data('facet'),
-                    query: $facetLink.data('value')
+                    query: $facetLink.data('value'),
+                    name : $facetLink.data('text')
                 }
             );
+        });
+
+        it('re-render facets on second click', function () {
+            // First search
+            this.searchFacetView.delegateEvents();
+            this.searchFacetView.renderFacets(JSON_RESPONSE.facets);
+            expect(this.searchFacetView.facetViews.length).toBe(2);
+            // Setup spy
+            var customView = this.searchFacetView.facetViews[0];
+            spyOn(customView, 'remove').andCallThrough();
+            // Second search
+            this.searchFacetView.renderFacets(JSON_RESPONSE.facets);
+            expect(this.searchFacetView.facetViews.length).toBe(2);
+            expect(customView.remove).toHaveBeenCalled();
         });
 
     });
@@ -483,6 +498,7 @@ define([
                 'templates/discovery/search_facets_list',
                 'templates/discovery/more_less_links'
             ]);
+
             this.app = new App(
                 Collection,
                 DiscoveryForm,
@@ -523,8 +539,7 @@ define([
             $('.discovery-submit').trigger('click');
             AjaxHelpers.respondWithJson(requests, {});
             expect($('#discovery-message')).not.toBeEmpty();
-            expect($('.courses-listing').toBeEmpty();
-            expect($('.courses-listing .course-title')).toContainHtml('title');
+            expect($('.courses-listing')).toBeEmpty();
         });
 
         it('displays error message', function () {
@@ -534,7 +549,6 @@ define([
             AjaxHelpers.respondWithError(requests, 404);
             expect($('#discovery-message')).not.toBeEmpty();
             expect($('.courses-listing')).toBeEmpty();
-            expect($('.courses-listing .course-title')).toContainHtml('title');
         });
 
         it('check filters and bar removed on clear all', function () {
@@ -556,8 +570,22 @@ define([
             AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
             expect($('.active-filter').length).toBe(1);
             var $filter = $('.active-filter');
-            $filter.find('a').trigger('click');
+            $filter.find('.discovery-button').trigger('click');
             expect($('.active-filter').length).toBe(0);
+        });
+
+        it('filter results by named facet', function () {
+            var requests = AjaxHelpers.requests(this);
+            $('.discovery-input').val('test');
+            $('.discovery-submit').trigger('click');
+            AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
+            expect($('.active-filter').length).toBe(1);
+            var $facetLink = $('.search-facets li [data-value="edX1"]');
+            var $facet = $facetLink.parent('li');
+            $facet.trigger('click');
+            expect($('.active-filter').length).toBe(2);
+            expect($('.active-filter [data-value="edX1"]').length).toBe(1);
+            expect($('.active-filter [data-value="edX1"]').text().trim()).toBe("edX_1");
         });
 
     });

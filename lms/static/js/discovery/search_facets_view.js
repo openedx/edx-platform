@@ -100,9 +100,10 @@ define([
         renderFacets: function(facets) {
             var self = this;
             // Remove old facets
-            $.each(this.facetViews, function(key, facets) {
-                facets.remove();
+            $.each(this.facetViews, function(key, facetsList) {
+                facetsList.remove();
             });
+            self.facetViews = [];
             // Render new facets
             $.each(facets, function(name, stats) {
                 var facetsView = new FacetsView();

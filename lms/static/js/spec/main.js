@@ -95,7 +95,9 @@
             'js/student_profile/views/learner_profile_view': 'js/student_profile/views/learner_profile_view',
 
             // edxnotes
-            'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min'
+            'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min',
+
+            'course_discovery_meanings': 'js/spec/discovery/course_discovery_meanings'
         },
         shim: {
             'gettext': {
