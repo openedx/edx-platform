@@ -648,7 +648,17 @@ class MatlabTest(unittest.TestCase):
         output = self.the_input.get_html()
         self.assertEqual(
             etree.tostring(output),
-            """<div>{\'status\': Status(\'queued\'), \'button_enabled\': True, \'rows\': \'10\', \'queue_len\': \'3\', \'mode\': \'\', \'cols\': \'80\', \'STATIC_URL\': \'/dummy-static/\', \'linenumbers\': \'true\', \'queue_msg\': \'\', \'value\': \'print "good evening"\', \'msg\': u\'Submitted. As soon as a response is returned, this message will be replaced by that feedback.\', \'matlab_editor_js\': \'/dummy-static/js/vendor/CodeMirror/octave.js\', \'hidden\': \'\', \'id\': \'prob_1_2\', \'tabsize\': 4}</div>"""
+            textwrap.dedent("""
+            <div>{\'status\': Status(\'queued\'), \'button_enabled\': True,
+            \'rows\': \'10\', \'queue_len\': \'3\', \'mode\': \'\',
+            \'cols\': \'80\', \'STATIC_URL\': \'/dummy-static/\',
+            \'linenumbers\': \'true\', \'queue_msg\': \'\',
+            \'value\': \'print "good evening"\',
+            \'msg\': u\'Submitted. As soon as a response is returned,
+            this message will be replaced by that feedback.\',
+            \'matlab_editor_js\': \'/dummy-static/js/vendor/CodeMirror/octave.js\',
+            \'hidden\': \'\', \'id\': \'prob_1_2\', \'tabsize\': 4}</div>
+            """).replace('\n', ' ').strip()
         )
 
         # test html, that is correct HTML5 html, but is not parsable by XML parser.
