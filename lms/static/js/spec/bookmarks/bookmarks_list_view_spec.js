@@ -1,7 +1,7 @@
-define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
-        'js/bookmarks/views/bookmarks_list_button'
+define(['backbone', 'jquery', 'underscore', 'logger', 'js/common_helpers/ajax_helpers',
+        'js/common_helpers/template_helpers', 'js/bookmarks/views/bookmarks_list_button'
        ],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, BookmarksListButtonView) {
+    function (Backbone, $, _, Logger, AjaxHelpers, TemplateHelpers, BookmarksListButtonView) {
         'use strict';
 
         describe("lms.courseware.bookmarks", function () {
@@ -17,14 +17,14 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                         'templates/bookmarks/bookmarks_list'
                     ]
                 );
-
-                bookmarksButtonView = new BookmarksListButtonView();
-
+                spyOn(Logger, 'log').andReturn($.Deferred().resolve());
                 this.addMatchers({
                    toHaveBeenCalledWithUrl: function (expectedUrl) {
                        return expectedUrl === this.actual.argsForCall[0][0].target.pathname;
                    }
                 });
+
+                bookmarksButtonView = new BookmarksListButtonView();
             });
 
             var createBookmarksData = function (count) {
@@ -39,6 +39,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                         created: new Date().toISOString(),
                         course_id: 'COURSE_ID',
                         usage_id: 'UNIT_USAGE_ID_' + i,
+                        block_type: 'vertical',
                         path: [
                             {display_name: 'SECTION_DISAPLAY_NAME', usage_id: 'SECTION_USAGE_ID'},
                             {display_name: 'SUBSECTION_DISAPLAY_NAME', usage_id: 'SUBSECTION_USAGE_ID'}
@@ -68,17 +69,21 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                 expect(bookmarks.length, results.length);
 
-                for(var b = 0; b < results.length; b++) {
-                    courseId = results[b].course_id;
-                    usageId = results[b].usage_id;
+                for(var bookmark_index = 0; bookmark_index < results.length; bookmark_index++) {
+                    courseId = results[bookmark_index].course_id;
+                    usageId = results[bookmark_index].usage_id;
 
-                    expect(bookmarks[b]).toHaveAttr('href', createBookmarkUrl(courseId, usageId));
+                    expect(bookmarks[bookmark_index]).toHaveAttr('href', createBookmarkUrl(courseId, usageId));
 
-                    expect($(bookmarks[b]).find('.list-item-breadcrumbtrail').html().trim()).
-                        toBe(breadcrumbTrail(results[b].path, results[b].display_name));
+                    expect($(bookmarks[bookmark_index]).data('bookmarkId')).toBe(bookmark_index);
+                    expect($(bookmarks[bookmark_index]).data('componentType')).toBe('vertical');
+                    expect($(bookmarks[bookmark_index]).data('usageId')).toBe(usageId);
 
-                    expect($(bookmarks[b]).find('.list-item-date').text().trim()).
-                        toBe('Bookmarked on ' + view.humanFriendlyDate(results[b].created));
+                    expect($(bookmarks[bookmark_index]).find('.list-item-breadcrumbtrail').html().trim()).
+                        toBe(breadcrumbTrail(results[bookmark_index].path, results[bookmark_index].display_name));
+
+                    expect($(bookmarks[bookmark_index]).find('.list-item-date').text().trim()).
+                        toBe('Bookmarked on ' + view.humanFriendlyDate(results[bookmark_index].created));
                 }
             };
 

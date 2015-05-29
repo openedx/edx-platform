@@ -11,7 +11,7 @@ class BookmarkSerializer(serializers.ModelSerializer):
     """
     Serializer for the Bookmark model.
     """
-    id = serializers.SerializerMethodField('resource_id')  # pylint: disable=invalid-name
+    id = serializers.Field(source='resource_id')  # pylint: disable=invalid-name
     course_id = serializers.Field(source='course_key')
     usage_id = serializers.Field(source='usage_key')
     block_type = serializers.Field(source='usage_key.block_type')
@@ -44,9 +44,3 @@ class BookmarkSerializer(serializers.ModelSerializer):
             'path',
             'created',
         )
-
-    def resource_id(self, bookmark):
-        """
-        Return the REST resource id: {username,usage_id}.
-        """
-        return "{0},{1}".format(bookmark.user.username, bookmark.usage_key)
