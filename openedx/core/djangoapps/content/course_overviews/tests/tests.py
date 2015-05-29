@@ -9,8 +9,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore import ModuleStoreEnum
 
-from . import get_course_overview
-from courseware.tests.tests import LoginEnrollmentTestCase
+from content.course_overviews import get_course_overview
+from courseware.tests.helpers import LoginEnrollmentTestCase
 
 # TODO me: finish this
 
