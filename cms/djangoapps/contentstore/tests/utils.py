@@ -11,15 +11,16 @@ from django.contrib.auth.models import User
 from django.test.client import Client
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 
-from contentstore.utils import reverse_url
-from student.models import Registration
+from contentstore.utils import reverse_url  # pylint: disable=import-error
+from student.models import Registration  # pylint: disable=import-error
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -67,7 +68,7 @@ class AjaxEnabledTestClient(Client):
         return self.get(path, data or {}, follow, HTTP_ACCEPT="application/json", **extra)
 
 
-class CourseTestCase(ModuleStoreTestCase):
+class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
     """
     Base class for Studio tests that require a logged in user and a course.
     Also provides helper methods for manipulating and verifying the course.
@@ -99,26 +100,6 @@ class CourseTestCase(ModuleStoreTestCase):
             client.login(username=nonstaff.username, password=password)
         nonstaff.is_authenticated = lambda: authenticate
         return client, nonstaff
-
-    def populate_course(self, branching=2):
-        """
-        Add k chapters, k^2 sections, k^3 verticals, k^4 problems to self.course (where k = branching)
-        """
-        user_id = self.user.id
-        self.populated_usage_keys = {}
-
-        def descend(parent, stack):
-            if not stack:
-                return
-
-            xblock_type = stack[0]
-            for _ in range(branching):
-                child = ItemFactory.create(category=xblock_type, parent_location=parent.location, user_id=user_id)
-                print child.location
-                self.populated_usage_keys.setdefault(xblock_type, []).append(child.location)
-                descend(child, stack[1:])
-
-        descend(self.course, ['chapter', 'sequential', 'vertical', 'problem'])
 
     def reload_course(self):
         """
