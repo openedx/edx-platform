@@ -666,43 +666,18 @@ hr.divider {
   }
 }
 
-// +JS Dependent
-// ==================== 
-body.js {
-
-  // lean/simple modal window
-  .content-modal {
-    @include border-bottom-radius(2px);
-    @include box-sizing(border-box);
-    box-shadow: 0 2px 4px $shadow-d1;
-    position: relative;
-    display: none;
-    width: 700px;
-    overflow: hidden;
-    border: 1px solid $gray-d1;
-    padding: ($baseline);
-    background: $white;
-
-    .action-modal-close {
-      @include transition(top $tmg-f3 ease-in-out 0s);
-      @include border-bottom-radius(3px);
-      position: absolute;
-      top: -3px;
-      right: $baseline;
-      padding: ($baseline/4) ($baseline/2) 0 ($baseline/2);
-      background: $gray-l3;
-      text-align: center;
-
-      .label {
-        @extend %cont-text-sr;
-      }
-
-      .icon {
-        @extend %t-action1;
-        color: $white;
-      }
-    }
-  }
+// lean/simple modal window
+.content-modal {
+  @include border-bottom-radius(2px);
+  @include box-sizing(border-box);
+  box-shadow: 0 2px 4px $shadow-d1;
+  position: relative;
+  display: none;
+  width: 700px;
+  overflow: hidden;
+  border: 1px solid $gray-d1;
+  padding: ($baseline);
+  background: $white;
 
   .action-modal-close {
     @include transition(top $tmg-f3 ease-in-out 0s);
@@ -718,7 +693,7 @@ body.js {
       @extend %cont-text-sr;
     }
 
-    [class^="icon-"] {
+    .icon {
       @extend %t-action1;
       color: $white;
     }
@@ -764,4 +739,3 @@ body.js {
     }
   }
 }
-

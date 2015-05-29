@@ -249,11 +249,11 @@
           padding-top:  ($baseline/2);
   
           .action-primary {
-            @include blue-button();
+            @extend %btn-primary-blue;
             @extend %t-action3;
             font-weight: 600;
 
-            [class^="icon-"] {
+            .icon {
               @extend %t-icon5;
               display: inline-block;
               vertical-align: middle;
