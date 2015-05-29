@@ -2,7 +2,7 @@
 Signal handling functions for use with external commerce service.
 """
 import logging
-from urlparse import urlparse
+from urlparse import urljoin
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
@@ -39,7 +39,7 @@ def handle_unenroll_done(sender, course_enrollment=None, skip_refund=False, **kw
             # trapping the Exception and logging an error.
             log.exception(
                 "Unexpected exception while attempting to initiate refund for user [%s], course [%s]",
-                course_enrollment.user,
+                course_enrollment.user.id,
                 course_enrollment.course_id,
             )
 
@@ -90,7 +90,7 @@ def refund_seat(course_enrollment, request_user):
             # support the case of a non-superusers initiating a refund on
             # behalf of another user.
             log.warning("User [%s] was not authorized to initiate a refund for user [%s] "
-                        "upon unenrollment from course [%s]", request_user, unenrolled_user, course_key_str)
+                        "upon unenrollment from course [%s]", request_user.id, unenrolled_user.id, course_key_str)
             return []
         else:
             # no other error is anticipated, so re-raise the Exception
@@ -104,11 +104,27 @@ def refund_seat(course_enrollment, request_user):
             course_key_str,
             refund_ids,
         )
-        try:
-            send_refund_notification(course_enrollment, refund_ids)
-        except:  # pylint: disable=bare-except
-            # don't break, just log a warning
-            log.warning("Could not send email notification for refund.", exc_info=True)
+
+        # XCOM-371: this is a temporary measure to suppress refund-related email
+        # notifications to students and support@) for free enrollments.  This
+        # condition should be removed when the CourseEnrollment.refundable() logic
+        # is updated to be more correct, or when we implement better handling (and
+        # notifications) in Otto for handling reversal of $0 transactions.
+        if course_enrollment.mode != 'verified':
+            # 'verified' is the only enrollment mode that should presently
+            # result in opening a refund request.
+            log.info(
+                "Skipping refund email notification for non-verified mode for user [%s], course [%s], mode: [%s]",
+                course_enrollment.user.id,
+                course_enrollment.course_id,
+                course_enrollment.mode,
+            )
+        else:
+            try:
+                send_refund_notification(course_enrollment, refund_ids)
+            except:  # pylint: disable=bare-except
+                # don't break, just log a warning
+                log.warning("Could not send email notification for refund.", exc_info=True)
     else:
         # no refundable orders were found.
         log.debug("No refund opened for user [%s], course [%s]", unenrolled_user.id, course_key_str)
@@ -131,14 +147,14 @@ def send_refund_notification(course_enrollment, refund_ids):
     for_user = course_enrollment.user
     subject = _("[Refund] User-Requested Refund")
     message = _(
-        "A refund request has been initiated for {username} ({email}). To process this request, please visit the link(s) below."  # pylint: disable=line-too-long
+        "A refund request has been initiated for {username} ({email}). "
+        "To process this request, please visit the link(s) below."
     ).format(username=for_user.username, email=for_user.email)
 
-    # TODO: this manipulation of API url is temporary, pending the introduction
-    # of separate configuration items for the service's base url and api path.
-    ecommerce_url = '://'.join(urlparse(settings.ECOMMERCE_API_URL)[:2])
-
-    refund_urls = ["{}/dashboard/refunds/{}/".format(ecommerce_url, refund_id) for refund_id in refund_ids]
+    refund_urls = [
+        urljoin(settings.ECOMMERCE_PUBLIC_URL_ROOT, '/dashboard/refunds/{}/'.format(refund_id))
+        for refund_id in refund_ids
+    ]
     text_body = '\r\n'.join([message] + refund_urls + [''])
     refund_links = ['<a href="{0}">{0}</a>'.format(url) for url in refund_urls]
     html_body = '<p>{}</p>'.format('<br>'.join([message] + refund_links))

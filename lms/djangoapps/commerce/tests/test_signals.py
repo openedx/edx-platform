@@ -3,23 +3,25 @@ Tests for signal handling in commerce djangoapp.
 """
 from django.test import TestCase
 from django.test.utils import override_settings
-from urlparse import urlparse
 
+from course_modes.models import CourseMode
+import ddt
 import mock
 from opaque_keys.edx.keys import CourseKey
 from student.models import UNENROLL_DONE
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
 from commerce.signals import refund_seat, send_refund_notification
-from commerce.tests import TEST_API_URL, TEST_API_SIGNING_KEY
+from commerce.tests import TEST_PUBLIC_URL_ROOT, TEST_API_URL, TEST_API_SIGNING_KEY
 from commerce.tests.mocks import mock_create_refund
 
 
-# TODO: this is temporary.  See the corresponding TODO in signals.send_refund_notification
-TEST_BASE_URL = '://'.join(urlparse(TEST_API_URL)[:2])
-
-
-@override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
+@ddt.ddt
+@override_settings(
+    ECOMMERCE_PUBLIC_URL_ROOT=TEST_PUBLIC_URL_ROOT,
+    ECOMMERCE_API_URL=TEST_API_URL,
+    ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY,
+)
 class TestRefundSignal(TestCase):
     """
     Exercises logic triggered by the UNENROLL_DONE signal.
@@ -32,6 +34,7 @@ class TestRefundSignal(TestCase):
         self.course_enrollment = CourseEnrollmentFactory(
             user=self.student,
             course_id=CourseKey.from_string('course-v1:org+course+run'),
+            mode=CourseMode.VERIFIED,
         )
         self.course_enrollment.refundable = mock.Mock(return_value=True)
 
@@ -42,7 +45,11 @@ class TestRefundSignal(TestCase):
         """
         UNENROLL_DONE.send(sender=None, course_enrollment=self.course_enrollment, skip_refund=skip_refund)
 
-    @override_settings(ECOMMERCE_API_URL=None, ECOMMERCE_API_SIGNING_KEY=None)
+    @override_settings(
+        ECOMMERCE_PUBLIC_URL_ROOT=None,
+        ECOMMERCE_API_URL=None,
+        ECOMMERCE_API_SIGNING_KEY=None,
+    )
     def test_no_service(self):
         """
         Ensure that the receiver quietly bypasses attempts to initiate
@@ -108,7 +115,7 @@ class TestRefundSignal(TestCase):
         Ensure that expected authorization issues are logged as warnings.
         """
         with mock_create_refund(status=403):
-            refund_seat(self.course_enrollment, None)
+            refund_seat(self.course_enrollment, UserFactory())
             self.assertTrue(mock_log_warning.called)
 
     @mock.patch('commerce.signals.log.exception')
@@ -122,14 +129,14 @@ class TestRefundSignal(TestCase):
             self.assertTrue(mock_log_exception.called)
 
     @mock.patch('commerce.signals.send_refund_notification')
-    def test_notification(self, mock_send_notificaton):
+    def test_notification(self, mock_send_notification):
         """
         Ensure the notification function is triggered when refunds are
         initiated
         """
         with mock_create_refund(status=200, response=[1, 2, 3]):
             self.send_signal()
-            self.assertTrue(mock_send_notificaton.called)
+            self.assertTrue(mock_send_notification.called)
 
     @mock.patch('commerce.signals.send_refund_notification')
     def test_notification_no_refund(self, mock_send_notification):
@@ -138,6 +145,27 @@ class TestRefundSignal(TestCase):
         initiated
         """
         with mock_create_refund(status=200, response=[]):
+            self.send_signal()
+            self.assertFalse(mock_send_notification.called)
+
+    @mock.patch('commerce.signals.send_refund_notification')
+    @ddt.data(
+        CourseMode.HONOR,
+        CourseMode.PROFESSIONAL,
+        CourseMode.AUDIT,
+        CourseMode.NO_ID_PROFESSIONAL_MODE,
+        CourseMode.CREDIT_MODE,
+    )
+    def test_notification_not_verified(self, mode, mock_send_notification):
+        """
+        Ensure the notification function is NOT triggered when the
+        unenrollment is for any mode other than verified (i.e. any mode other
+        than one for which refunds are presently supported).  See the
+        TODO associated with XCOM-371 in the signals module in the commerce
+        package for more information.
+        """
+        self.course_enrollment.mode = mode
+        with mock_create_refund(status=200, response=[1, 2, 3]):
             self.send_signal()
             self.assertFalse(mock_send_notification.called)
 
@@ -185,14 +213,15 @@ class TestRefundSignal(TestCase):
         )
         text_body = mock_email_class.call_args[0][1]
         # check for a URL for each refund
-        for exp in [r'{0}/dashboard/refunds/{1}/'.format(TEST_BASE_URL, refund_id) for refund_id in refund_ids]:
+        for exp in [r'{0}/dashboard/refunds/{1}/'.format(TEST_PUBLIC_URL_ROOT, refund_id)
+                    for refund_id in refund_ids]:
             self.assertRegexpMatches(text_body, exp)
 
         # check HTML content
         self.assertEqual(mock_message.attach_alternative.call_args[0], (mock.ANY, "text/html"))
         html_body = mock_message.attach_alternative.call_args[0][0]
         # check for a link to each refund
-        for exp in [r'a href="{0}/dashboard/refunds/{1}/"'.format(TEST_BASE_URL, refund_id)
+        for exp in [r'a href="{0}/dashboard/refunds/{1}/"'.format(TEST_PUBLIC_URL_ROOT, refund_id)
                     for refund_id in refund_ids]:
             self.assertRegexpMatches(html_body, exp)
 
