@@ -126,7 +126,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         self.context = {'id': '1',
                         'choices': choices,
                         'status': Status('correct'),
-                        'question_label': 'test',
+                        'question_label': '',
                         'label': 'test',
                         'input_type': 'checkbox',
                         'name_array_suffix': '1',
@@ -343,8 +343,8 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
 
     def test_label(self):
         xml = self.render_to_xml(self.context)
-        xpath = "//fieldset/legend"
-        self.assert_has_text(xml, xpath, self.context['question_label'])
+        xpath = "//fieldset[@aria-label='%s']" % self.context['label']
+        self.assert_has_xpath(xml, xpath, self.context)
 
 
 class TextlineTemplateTest(TemplateTestCase):
