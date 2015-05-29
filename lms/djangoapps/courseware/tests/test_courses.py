@@ -81,22 +81,22 @@ class ModuleStoreBranchSettingTest(ModuleStoreTestCase):
         self.assertEqual(_get_modulestore_branch_setting(), 'fake_default_branch')
 
 
-class ImageTestCaseMixin(ModuleStoreTestCase):
-    """Tests for course image URLs"""
+class CourseImageTestCaseMixin(ModuleStoreTestCase):
+    """Utilities for testing for course image URLs"""
 
-    def test_course_image_url(self, course, expected_url):
+    def check_course_image_url(self, course, expected_url):
         """
         Test that we get the expected URL when calling course_image_url on both:
           (1) the CourseDescriptor itself
           (2) a CourseOverviewDescriptor corresponding the course
         """
+        self.assertEquals(course_image_url(course), expected_url)
         course_overview = get_course_overview(course.id)
-        for descriptor in [course, course_overview]:
-            self.assertEquals(course_image_url(descriptor), expected_url)
+        self.assertEquals(course_image_url(course_overview), expected_url)
 
 @attr('shard_1')
 @override_settings(CMS_BASE=CMS_BASE_TEST)
-class MongoCourseImageTestCase(ImageTestCaseMixin):
+class MongoCourseImageTestCase(CourseImageTestCaseMixin):
     """Tests for course image URLs when using a mongo modulestore."""
 
     def test_get_image_url(self):
@@ -107,7 +107,7 @@ class MongoCourseImageTestCase(ImageTestCaseMixin):
     def test_non_ascii_image_name(self):
         # Verify that non-ascii image names are cleaned
         course = CourseFactory.create(course_image=u'before_\N{SNOWMAN}_after.jpg')
-        self.test_course_image_url(
+        self.check_course_image_url(
             course_image_url(course),
             '/c4x/{org}/{course}/asset/before___after.jpg'.format(
                 org=course.location.org,
@@ -118,7 +118,7 @@ class MongoCourseImageTestCase(ImageTestCaseMixin):
     def test_spaces_in_image_name(self):
         # Verify that image names with spaces in them are cleaned
         course = CourseFactory.create(course_image=u'before after.jpg')
-        self.test_course_image_url(
+        self.check_course_image_url(
             course_image_url(course),
             '/c4x/{org}/{course}/asset/before_after.jpg'.format(
                 org=course.location.org,
@@ -132,7 +132,7 @@ class MongoCourseImageTestCase(ImageTestCaseMixin):
         being set that we get the right course_image url.
         """
         course = CourseFactory.create(static_asset_path="foo")
-        self.test_course_image_url(
+        self.check_course_image_url(
             course_image_url(course),
             '/static/foo/images/course_image.jpg'
         )
@@ -144,28 +144,28 @@ class MongoCourseImageTestCase(ImageTestCaseMixin):
         """
         course = CourseFactory.create(course_image=u'things_stuff.jpg',
                                       static_asset_path="foo")
-        self.test_course_image_url(
+        self.check_course_image_url(
             course_image_url(course),
             '/static/foo/things_stuff.jpg'
         )
 
 
 @attr('shard_1')
-class XmlCourseImageTestCase(XModuleXmlImportTest, ImageTestCaseMixin):
+class XmlCourseImageTestCase(XModuleXmlImportTest, CourseImageTestCaseMixin):
     """Tests for course image URLs when using an xml modulestore."""
 
     def test_get_image_url(self):
         """Test image URL formatting."""
         course = self.process_xml(xml.CourseFactory.build())
-        self.test_course_image_url(course_image_url(course), '/static/xml_test_course/images/course_image.jpg')
+        self.check_course_image_url(course_image_url(course), '/static/xml_test_course/images/course_image.jpg')
 
     def test_non_ascii_image_name(self):
         course = self.process_xml(xml.CourseFactory.build(course_image=u'before_\N{SNOWMAN}_after.jpg'))
-        self.test_course_image_url(course_image_url(course), u'/static/xml_test_course/before_\N{SNOWMAN}_after.jpg')
+        self.check_course_image_url(course_image_url(course), u'/static/xml_test_course/before_\N{SNOWMAN}_after.jpg')
 
     def test_spaces_in_image_name(self):
         course = self.process_xml(xml.CourseFactory.build(course_image=u'before after.jpg'))
-        self.test_course_image_url(course_image_url(course), u'/static/xml_test_course/before after.jpg')
+        self.check_course_image_url(course_image_url(course), u'/static/xml_test_course/before after.jpg')
 
 
 @attr('shard_1')
