@@ -283,6 +283,7 @@ def _update_certificate_context(context, course, user, user_certificate):
     certificate_type = context.get('certificate_type')
 
     context['username'] = user.username
+    context['course_mode'] = user_certificate.mode
     context['accomplishment_user_id'] = user.id
     context['accomplishment_copy_name'] = user_fullname
     context['accomplishment_copy_username'] = user.username
@@ -339,11 +340,6 @@ def _update_certificate_context(context, course, user, user_certificate):
         platform_name=platform_name,
         tos_url=context.get('company_tos_url'),
         verified_cert_url=context.get('company_verified_certificate_url')
-    )
-
-    # Translators:  Certificate Types correspond to the different enrollment options available for a given course
-    context['certificate_type_title'] = _('{certificate_type} Certificate').format(
-        certificate_type=context.get('certificate_type')
     )
 
     context['certificate_verify_title'] = _("How {platform_name} Validates Student Certificates").format(
@@ -438,7 +434,6 @@ def _update_certificate_context(context, course, user, user_certificate):
             )
         )
 
-
 # pylint: disable=too-many-statements, bad-continuation, unused-argument
 def render_html_view(request, user_id, course_id):
     """
@@ -483,11 +478,11 @@ def render_html_view(request, user_id, course_id):
     # If we are, we'll need to create a mock version of the user_certificate container for previewing
     except GeneratedCertificate.DoesNotExist:
         if request.GET.get('preview', None):
-            user_certificate = {
-                'mode': request.GET.get('preview'),
-                'verify_uuid': unicode(uuid4().hex),
-                'modified_date': datetime.now().date()
-            }
+            user_certificate = GeneratedCertificate(
+                mode=request.GET.get('preview'),
+                verify_uuid=unicode(uuid4().hex),
+                modified_date=datetime.now().date()
+            )
         else:
             return render_to_response(invalid_template_path, context)
 
