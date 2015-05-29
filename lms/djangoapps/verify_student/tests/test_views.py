@@ -3,11 +3,11 @@
 Tests of verify_student views.
 """
 import json
-from opaque_keys.edx.keys import UsageKey
 import urllib
 from datetime import timedelta, datetime
 from uuid import uuid4
 
+from courseware.url_helpers import get_redirect_url
 from django.test.utils import override_settings
 import mock
 from mock import patch, Mock, ANY
@@ -29,8 +29,8 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import check_mongo_calls
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
-from courseware.url_helpers import get_redirect_url
 from microsite_configuration import microsite
+from opaque_keys.edx.keys import UsageKey
 
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from commerce.tests import TEST_PAYMENT_DATA, TEST_API_URL, TEST_API_SIGNING_KEY
@@ -2153,6 +2153,14 @@ class TestEmailMessageWithCustomICRVBlock(ModuleStoreTestCase):
             body
         )
 
+        self.assertIn(
+            "You must verify your identity before the assessment "
+            "closes on {due_date}".format(
+                due_date=get_default_time_display(self.due_date)
+            ),
+            body
+        )
+
         reverify_link = "https://{}{}".format(
             microsite.get_value('SITE_NAME', 'localhost'), self.re_verification_link
         )
@@ -2167,7 +2175,10 @@ class TestEmailMessageWithCustomICRVBlock(ModuleStoreTestCase):
 
         self.assertIn("Re-verification Status", subject)
 
-    def test_denied_email_message_with_valid_due_date_and_no_attempts_allowed(self):
+    def test_denied_email_message_with_due_date_and_no_attempts(self):
+        """ Denied email message if due date is still open but user has no
+            attempts available.
+        """
 
         VerificationStatus.add_verification_status(
             checkpoint=self.check_point,
