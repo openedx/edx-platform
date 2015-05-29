@@ -74,8 +74,10 @@
         </button>
       </form>
       <div id="discovery-message"></div>
-      <div id="loading-indicator" class="hidden">
-        <i class="icon fa fa-spinner fa-spin"></i> ${_('Loading')}
+      <div aria-live="polite" aria-relevant="all">
+        <div id="loading-indicator" class="hidden">
+          <i class="icon fa fa-spinner fa-spin"></i> ${_('Loading')}
+        </div>
       </div>
     </div>
 
