@@ -673,6 +673,7 @@ class CourseFields(object):
     ## Course level Certificate Name overrides.
     cert_name_short = String(
         help=_(
+            "Use this setting only when generating PDF certificates. "
             "Between quotation marks, enter the short name of the course to use on the certificate that "
             "students receive when they complete the course."
         ),
@@ -682,6 +683,7 @@ class CourseFields(object):
     )
     cert_name_long = String(
         help=_(
+            "Use this setting only when generating PDF certificates. "
             "Between quotation marks, enter the long name of the course to use on the certificate that students "
             "receive when they complete the course."
         ),
