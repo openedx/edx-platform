@@ -29,8 +29,8 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTO
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.tests.xml import factories as xml
 from xmodule.tests.xml import XModuleXmlImportTest
-from content.course_overviews import get_course_overview
-from content.course_overviews.models import CourseOverviewDescriptor
+from openedx.core.djangoapps.content.course_overviews import get_course_overview
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverviewDescriptor
 
 CMS_BASE_TEST = 'testcms'
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
