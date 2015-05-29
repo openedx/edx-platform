@@ -28,6 +28,8 @@ git+https://github.com/mfogel/django-settings-context-processor.git@b758c3930862
 git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b
 # The officially released version of django-debug-toolbar-mongo doesn't support DJDT 1.x. This commit does.
 git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c4aee6e76b9abe61cc808
+# custom opaque-key implementations for ccx
+-e git+https://github.com/jazkarta/ccx-keys.git@e6b03704b1bb97c1d2f31301ecb4e3a687c536ea#egg=ccx-keys
 
 # Our libraries:
 -e git+https://github.com/edx/XBlock.git@e1831fa86bff778ffe1308e00d8ed51b26f7c047#egg=XBlock
