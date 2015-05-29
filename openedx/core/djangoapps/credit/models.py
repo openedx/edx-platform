@@ -9,6 +9,7 @@ successful completion of a course on EdX
 import logging
 
 from django.db import models
+from django.core.validators import RegexValidator
 from simple_history.models import HistoricalRecords
 
 
@@ -29,10 +30,53 @@ class CreditProvider(TimeStampedModel):
     get credit for course. Eligibility duration will be use to set duration
     for which credit eligible message appears on dashboard.
     """
+    provider_id = models.CharField(
+        max_length=255,
+        unique=True,
+        validators=[
+            RegexValidator(
+                regex=r"^[a-z,A-Z,0-9,\-]+$",
+                message="Only alphanumeric characters and hyphens (-) are allowed",
+                code="invalid_provider_id",
+            )
+        ],
+        help_text=ugettext_lazy(
+            "Unique identifier for this credit provider. "
+            "Only alphanumeric characters and hyphens (-) are allowed. "
+            "The identifier is case-sensitive."
+        )
+    )
 
-    provider_id = models.CharField(max_length=255, db_index=True, unique=True)
-    display_name = models.CharField(max_length=255)
-    provider_url = models.URLField(max_length=255, unique=True, default="")
+    active = models.BooleanField(
+        default=True,
+        help_text=ugettext_lazy("Whether the credit provider is currently enabled.")
+    )
+
+    display_name = models.CharField(
+        max_length=255,
+        help_text=ugettext_lazy("Name of the credit provider displayed to users")
+    )
+
+    enable_integration = models.BooleanField(
+        default=False,
+        help_text=ugettext_lazy(
+            "When true, automatically notify the credit provider "
+            "when a user requests credit. "
+            "In order for this to work, a shared secret key MUST be configured "
+            "for the credit provider in secure auth settings."
+        )
+    )
+
+    provider_url = models.URLField(
+        default="",
+        help_text=ugettext_lazy(
+            "URL of the credit provider.  If automatic integration is "
+            "enabled, this will the the end-point that we POST to "
+            "to notify the provider of a credit request.  Otherwise, the "
+            "user will be shown a link to this URL, so the user can "
+            "request credit from the provider directly."
+        )
+    )
 
     # Default is one year
     DEFAULT_ELIGIBILITY_DURATION = 31556970
@@ -41,7 +85,6 @@ class CreditProvider(TimeStampedModel):
         help_text=ugettext_lazy(u"Number of seconds to show eligibility message"),
         default=DEFAULT_ELIGIBILITY_DURATION
     )
-    active = models.BooleanField(default=True)
 
 
 class CreditCourse(models.Model):
