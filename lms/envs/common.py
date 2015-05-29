@@ -44,7 +44,7 @@ from xmodule.mixin import LicenseMixin
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
 # TODO me: remove this along with anything else starting in kdbg_
-kdbg_ENABLE_PYINSTRUMENT = True
+kdbg_ENABLE_PYINSTRUMENT = False
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.

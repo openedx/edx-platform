@@ -34,12 +34,10 @@ def get_course_overview(course_id):
     try:
         course_overview = CourseOverviewDescriptor.objects.get(id=course_id)
         # Cache hit!
-        course_overview.kdbg_cache_hit = True
     except CourseOverviewDescriptor.DoesNotExist:
         # Cache miss; load entire course and create a CourseOverviewDescriptor from it
         course = modulestore().get_course(course_id)
         if course:
             course_overview = CourseOverviewDescriptor.create_from_course(course)
             course_overview.save()
-            course_overview.kdbg_cache_hit = False
     return course_overview

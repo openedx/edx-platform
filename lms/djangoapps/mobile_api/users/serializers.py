@@ -62,7 +62,6 @@ class CourseOverviewField(serializers.RelatedField):
             "course_handouts": course_handouts_url,
             "course_about": course_about_url,
             "subscription_id": course_overview.clean_id(padding_char='_'),
-            "kdbg_cache_hit": course_overview.kdbg_cache_hit,
         }
 
 
@@ -70,7 +69,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
     """
     Serializes CourseEnrollment models
     """
-    course_overview = CourseOverviewField()
+    course = CourseOverviewField()
     certificate = serializers.SerializerMethodField('get_certificate')
 
     def get_certificate(self, model):
@@ -85,7 +84,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
 
     class Meta(object):  # pylint: disable=missing-docstring
         model = CourseEnrollment
-        fields = ('created', 'mode', 'is_active', 'course_overview', 'certificate')
+        fields = ('created', 'mode', 'is_active', 'course', 'certificate')
         lookup_field = 'username'
 
 
