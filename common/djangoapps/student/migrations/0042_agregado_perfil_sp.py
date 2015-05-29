@@ -9,29 +9,31 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         # Adding field 'UserProfile.grado_ocupacional'
-        db.add_column('auth_userprofile', 'grado_ocupacional',
-                      self.gf('django.db.models.fields.CharField')(default='none', max_length=64, null=True, blank=True),
-                      keep_default=False)
+        pass
+#        db.add_column('auth_userprofile', 'grado_ocupacional',
+#                      self.gf('django.db.models.fields.CharField')(default='none', max_length=64, null=True, blank=True),
+#                      keep_default=False)
 
         # Adding field 'UserProfile.institucion'
-        db.add_column('auth_userprofile', 'institucion',
-                      self.gf('django.db.models.fields.CharField')(default='NINGUNO', max_length=128, null=True, blank=True),
-                      keep_default=False)
+#        db.add_column('auth_userprofile', 'institucion',
+#                      self.gf('django.db.models.fields.CharField')(default='NINGUNO', max_length=128, null=True, blank=True),
+#                      keep_default=False)
 
 
         # Changing field 'UserProfile.cedula'
-        db.alter_column('auth_userprofile', 'cedula', self.gf('django.db.models.fields.CharField')(max_length=132, null=True))
+#        db.alter_column('auth_userprofile', 'cedula', self.gf('django.db.models.fields.CharField')(max_length=132, null=True))
 
     def backwards(self, orm):
         # Deleting field 'UserProfile.grado_ocupacional'
-        db.delete_column('auth_userprofile', 'grado_ocupacional')
+        pass
+        ## db.delete_column('auth_userprofile', 'grado_ocupacional')
 
-        # Deleting field 'UserProfile.institucion'
-        db.delete_column('auth_userprofile', 'institucion')
+        ## # Deleting field 'UserProfile.institucion'
+        ## db.delete_column('auth_userprofile', 'institucion')
 
 
-        # Changing field 'UserProfile.cedula'
-        db.alter_column('auth_userprofile', 'cedula', self.gf('django.db.models.fields.CharField')(max_length=32, null=True))
+        ## # Changing field 'UserProfile.cedula'
+        ## db.alter_column('auth_userprofile', 'cedula', self.gf('django.db.models.fields.CharField')(max_length=32, null=True))
 
     models = {
         'auth.group': {
