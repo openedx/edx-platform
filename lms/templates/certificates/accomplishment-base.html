@@ -8,6 +8,7 @@
 from django.utils.translation import get_language_bidi
 dir_rtl = 'rtl' if get_language_bidi() else 'ltr'
 document_body_class = document_body_class_append if document_body_class_append else ''
+course_mode_class = course_mode if course_mode else ''
 %>
 
 <!DOCTYPE html>
@@ -22,7 +23,7 @@ document_body_class = document_body_class_append if document_body_class_append e
     <%static:css group='style-certificates'/>
 </head>
 
-<body class="layout-accomplishment view-valid-accomplishment ${dir_rtl} ${document_body_class} certificate certificate-${course_mode}" data-view="valid-accomplishment">
+<body class="layout-accomplishment view-valid-accomplishment ${dir_rtl} ${document_body_class} certificate certificate-${course_mode_class}" data-view="valid-accomplishment">
 
     <div class="wrapper-view" dir="${dir_rtl}">
 
