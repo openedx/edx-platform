@@ -74,7 +74,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-05-26 15:28+0000\n"
+"POT-Creation-Date: 2015-05-29 19:11+0000\n"
 "PO-Revision-Date: 2015-05-18 19:41+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
@@ -1696,11 +1696,6 @@ msgstr ""
 "\n"
 "هل تود الانتقال إلى المحرِّر المتقدِّم وتحويل هذه المشكلة إلى ملف XML؟ "
 
-#. Translators: This is the title of the text explaining a problem
-#: common/lib/xmodule/xmodule/js/src/problem/edit.js
-msgid "Explanation"
-msgstr ""
-
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 msgid ""
 "Sequence error! Cannot navigate to %(tab_name)s in the current "
@@ -2422,24 +2417,13 @@ msgid "Error retrieving grading configuration."
 msgstr "نأسف لحدوث خطأ في استرجاع طريقة ضبط إعدادات التقييم."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/ecommerce.js
 msgid "Error generating grades. Please try again."
 msgstr "نأسف لحدوث خطأ في استحداث الدرجات. يُرجى إعادة المحاولة."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating problem grade report. Please try again."
 msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-msgid "File Name"
-msgstr "اسم الملف"
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-msgid ""
-"Links are generated on demand and expire within 5 minutes due to the "
-"sensitive nature of student information."
-msgstr ""
-"يجري استحداث الروابط عند الطلب وينتهي مفعولها في غضون 5 دقائق نظرًا لحساسية "
-"معلومات الطالب."
 
 #: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
 msgid "Unavailable metric display."
@@ -3011,6 +2995,18 @@ msgstr "الرسالة:"
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "No tasks currently running."
 msgstr "لا توجد مهام جارية حاليًّا."
+
+#: lms/static/coffee/src/instructor_dashboard/util.js
+msgid "File Name"
+msgstr "اسم الملف"
+
+#: lms/static/coffee/src/instructor_dashboard/util.js
+msgid ""
+"Links are generated on demand and expire within 5 minutes due to the "
+"sensitive nature of student information."
+msgstr ""
+"يجري استحداث الروابط عند الطلب وينتهي مفعولها في غضون 5 دقائق نظرًا لحساسية "
+"معلومات الطالب."
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Grades saved.  Fetching the next submission to grade."

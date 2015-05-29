@@ -88,7 +88,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-05-26 15:28+0000\n"
+"POT-Creation-Date: 2015-05-29 19:11+0000\n"
 "PO-Revision-Date: 2015-05-23 14:13+0000\n"
 "Last-Translator: Cristian Salamea <ovnicraft@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
@@ -1689,11 +1689,6 @@ msgstr ""
 "\n"
 "¿Desea pasar al Editor avanzado y convertir el problema a formato XML?"
 
-#. Translators: This is the title of the text explaining a problem
-#: common/lib/xmodule/xmodule/js/src/problem/edit.js
-msgid "Explanation"
-msgstr "Explicación"
-
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 msgid ""
 "Sequence error! Cannot navigate to %(tab_name)s in the current "
@@ -2371,6 +2366,7 @@ msgid "Error retrieving grading configuration."
 msgstr "Error al obtener la configuración de calificaciones."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/ecommerce.js
 msgid "Error generating grades. Please try again."
 msgstr "Error al generar las calificaciones. Por favor inténtelo nuevamente."
 
@@ -2378,19 +2374,6 @@ msgstr "Error al generar las calificaciones. Por favor inténtelo nuevamente."
 msgid "Error generating problem grade report. Please try again."
 msgstr ""
 "Error al generar el reporte de calificaciones. Por favor intente nuevamente."
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-msgid "File Name"
-msgstr "Nombre de archivo"
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-msgid ""
-"Links are generated on demand and expire within 5 minutes due to the "
-"sensitive nature of student information."
-msgstr ""
-"Los vínculos se generan por demanda y expiran en los siguientes 5 minutos "
-"dado a la naturaleza sensible de la información de calificaciones de "
-"estudiantes."
 
 #: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
 msgid "Unavailable metric display."
@@ -3000,6 +2983,19 @@ msgstr "Mensaje:"
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "No tasks currently running."
 msgstr "No hay tareas corriendo en el momento."
+
+#: lms/static/coffee/src/instructor_dashboard/util.js
+msgid "File Name"
+msgstr "Nombre de archivo"
+
+#: lms/static/coffee/src/instructor_dashboard/util.js
+msgid ""
+"Links are generated on demand and expire within 5 minutes due to the "
+"sensitive nature of student information."
+msgstr ""
+"Los vínculos se generan por demanda y expiran en los siguientes 5 minutos "
+"dado a la naturaleza sensible de la información de calificaciones de "
+"estudiantes."
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Grades saved.  Fetching the next submission to grade."
