@@ -59,8 +59,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-05-26 15:30+0000\n"
-"PO-Revision-Date: 2015-04-26 15:16+0000\n"
+"POT-Creation-Date: 2015-05-29 19:13+0000\n"
+"PO-Revision-Date: 2015-05-28 20:00+0000\n"
 "Last-Translator: Nadav Stark <nadav@yeda.org.il>\n"
 "Language-Team: Hebrew (http://www.transifex.com/projects/p/edx-platform/language/he/)\n"
 "MIME-Version: 1.0\n"
@@ -195,7 +195,7 @@ msgstr ""
 msgid "You're enrolled as an honor code student"
 msgstr ""
 
-#: common/djangoapps/course_modes/models.py
+#: common/djangoapps/course_modes/models.py lms/djangoapps/branding/api.py
 #: openedx/core/djangoapps/user_api/views.py
 #: lms/templates/static_templates/honor.html
 msgid "Honor Code"
@@ -247,6 +247,7 @@ msgid "Community TA"
 msgstr ""
 
 #: common/djangoapps/django_comment_common/models.py
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 #: lms/templates/courseware/course_navigation.html
 msgid "Student"
 msgstr ""
@@ -2572,9 +2573,9 @@ msgstr ""
 msgid "Both"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/course_module.py
-#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
-#: lms/templates/footer.html lms/templates/static_templates/about.html
+#: common/lib/xmodule/xmodule/course_module.py lms/djangoapps/branding/api.py
+#: lms/templates/footer-edx-v2.html lms/templates/footer.html
+#: lms/templates/static_templates/about.html
 msgid "About"
 msgstr ""
 
@@ -2647,6 +2648,7 @@ msgstr ""
 #. Translators: TBD stands for 'To Be Determined' and is used when a course
 #. does not yet have an announced start date.
 #: common/lib/xmodule/xmodule/course_module.py
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "TBD"
 msgstr ""
 
@@ -4050,6 +4052,72 @@ msgstr ""
 msgid "Copyright"
 msgstr ""
 
+#: lms/djangoapps/branding/api.py
+msgid ""
+"© {org_name}.  All rights reserved except where noted.  EdX, Open edX and "
+"the edX and Open EdX logos are registered trademarks or trademarks of edX "
+"Inc."
+msgstr ""
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: 'Open edX' is a brand, please keep this untranslated.
+#. See http://openedx.org for more information.
+#: lms/djangoapps/branding/api.py cms/templates/widgets/footer.html
+#: lms/templates/footer-edx-v2.html
+msgid "Powered by Open edX"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py lms/templates/static_templates/blog.html
+msgid "Blog"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py lms/templates/footer-edx-v2.html
+msgid "News"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "FAQs"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py lms/templates/footer-edx-v2.html
+#: lms/templates/static_templates/contact.html
+msgid "Contact"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py lms/templates/static_templates/jobs.html
+msgid "Jobs"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py lms/templates/static_templates/donate.html
+msgid "Donate"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Sitemap"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Terms of Service & Honor Code"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views.py
+#: cms/templates/widgets/footer.html lms/templates/footer-edx-v2.html
+#: lms/templates/static_templates/privacy.html
+msgid "Privacy Policy"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Accessibility Policy"
+msgstr ""
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This is a legal document users must agree to
+#. in order to register a new account.
+#: lms/djangoapps/branding/api.py openedx/core/djangoapps/user_api/views.py
+#: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
+msgid "Terms of Service"
+msgstr ""
+
 #: lms/djangoapps/ccx/views.py
 msgid "You must be a CCX Coach to access this view."
 msgstr ""
@@ -4202,13 +4270,7 @@ msgstr ""
 msgid "Contact {platform_name}"
 msgstr ""
 
-#: lms/djangoapps/certificates/views.py cms/templates/widgets/footer.html
-#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
-#: lms/templates/footer.html lms/templates/static_templates/privacy.html
-msgid "Privacy Policy"
-msgstr ""
-
-#: lms/djangoapps/certificates/views.py lms/templates/footer-edx-v3.html
+#: lms/djangoapps/certificates/views.py
 msgid "Terms of Service &amp; Honor Code"
 msgstr ""
 
@@ -4284,7 +4346,8 @@ msgstr ""
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/tools.py lms/templates/dashboard.html
+#: lms/djangoapps/instructor/views/tools.py
+#: lms/djangoapps/instructor_task/tasks_helper.py lms/templates/dashboard.html
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Username"
@@ -4768,9 +4831,39 @@ msgstr ""
 msgid "No endpoint was provided for EdxNotes."
 msgstr ""
 
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+msgid "Edx Staff"
+msgstr ""
+
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Course Staff"
+msgstr ""
+
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+#: lms/templates/courseware/course_navigation.html
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Staff"
+msgstr ""
+
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+msgid "Used Registration Code"
+msgstr ""
+
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+msgid "Credit Card - Individual"
+msgstr ""
+
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+msgid "Manually Enrolled"
+msgstr ""
+
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+msgid "Data Integrity Error"
+msgstr ""
+
 #: lms/djangoapps/instructor/tests/test_api.py
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
-#: lms/templates/verify_student/midcourse_reverify_dash.html
 msgid "Complete"
 msgstr ""
 
@@ -4847,6 +4940,7 @@ msgid "The registration codes for invoice {0} have been re-activated."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "User ID"
 msgstr ""
 
@@ -4866,6 +4960,7 @@ msgid "Email"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Language"
 msgstr ""
 
@@ -4881,21 +4976,25 @@ msgstr ""
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's gender.
 #: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor_task/tasks_helper.py
 #: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
 #: lms/templates/signup_modal.html
 msgid "Gender"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor_task/tasks_helper.py
 #: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Level of Education"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py lms/templates/register.html
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor_task/tasks_helper.py lms/templates/register.html
 msgid "Mailing Address"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Goals"
 msgstr ""
 
@@ -4922,6 +5021,19 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The file must contain a 'username' column, an 'email' column, or both."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Your detailed enrollment report is being generated! You can view the status "
+"of the generation task in the 'Pending Instructor Tasks' section."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"A detailed enrollment report generation task is already in progress. Check "
+"the 'Pending Instructor Tasks' table for the status of the task. When "
+"completed, the report will be available for download in the table below."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -5239,7 +5351,8 @@ msgid "ID"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/tools.py cms/templates/register.html
+#: lms/djangoapps/instructor/views/tools.py
+#: lms/djangoapps/instructor_task/tasks_helper.py cms/templates/register.html
 #: lms/templates/register-shib.html lms/templates/register.html
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: lms/templates/verify_student/_modal_editname.html
@@ -5357,10 +5470,99 @@ msgstr ""
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
+#: lms/djangoapps/instructor_task/tasks.py
+msgid "generating_enrollment_report"
+msgstr ""
+
+#. Translators: This is a past-tense verb that is inserted into task progress
+#. messages as {action}.
 #. An example of such a message is: "Progress: {action} {succeeded} of
 #. {attempted} so far"
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "cohorted"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/tasks_helper.py
+msgid "First Name"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/tasks_helper.py
+msgid "Last Name"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/templates/shoppingcart/receipt.html
+msgid "Company Name"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/templates/discussion/_underscore_templates.html wiki/forms.py
+msgid "Title"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/tasks_helper.py lms/templates/register.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid "Year of Birth"
+msgstr ""
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the city in which they live.
+#: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/receipt.html
+msgid "City"
+msgstr ""
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the country in which the user lives.
+#: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/receipt.html
+msgid "Country"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/tasks_helper.py
+msgid "Enrollment Date"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/tasks_helper.py
+msgid "Currently Enrolled"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/tasks_helper.py
+msgid "Enrollment Source"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/tasks_helper.py
+msgid "Enrollment Role"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/tasks_helper.py
+msgid "List Price"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/tasks_helper.py
+msgid "Payment Amount"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/tasks_helper.py
+msgid "Coupon Codes Used"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/tasks_helper.py
+msgid "Registration Code Used"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/tasks_helper.py
+msgid "Payment Status"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/tasks_helper.py
+msgid "Transaction Reference Number"
 msgstr ""
 
 #: lms/djangoapps/instructor_task/views.py
@@ -6508,7 +6710,6 @@ msgid "Payment confirmation"
 msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
-#: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
 msgid "Take photo"
 msgstr ""
@@ -7362,24 +7563,6 @@ msgstr ""
 msgid "Tell us why you're interested in {platform_name}"
 msgstr ""
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the city in which they live.
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/receipt.html
-msgid "City"
-msgstr ""
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the country in which the user lives.
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/receipt.html
-msgid "Country"
-msgstr ""
-
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Please select your Country."
 msgstr ""
@@ -7397,14 +7580,6 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_api/views.py
 msgid "You must agree to the {platform_name} {terms_of_service}."
-msgstr ""
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This is a legal document users must agree to
-#. in order to register a new account.
-#: openedx/core/djangoapps/user_api/views.py cms/templates/widgets/footer.html
-#: lms/templates/footer.html lms/templates/static_templates/tos.html
-msgid "Terms of Service"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
@@ -7743,11 +7918,9 @@ msgstr ""
 msgid "Ready"
 msgstr ""
 
-#. #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the status for a video that the servers have failed to
 #. process
 #: cms/djangoapps/contentstore/views/videos.py
-#: lms/templates/verify_student/midcourse_reverify_dash.html
 msgid "Failed"
 msgstr ""
 
@@ -7789,7 +7962,6 @@ msgstr ""
 #. duration is determined.
 #: cms/djangoapps/contentstore/views/videos.py cms/templates/index.html
 #: lms/templates/dashboard/_dashboard_status_verification.html
-#: lms/templates/verify_student/midcourse_reverify_dash.html
 msgid "Pending"
 msgstr ""
 
@@ -7873,11 +8045,6 @@ msgstr ""
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
 msgid "Course Number"
 msgstr "מספר הקורס"
-
-#: cms/templates/course_outline.html cms/templates/index.html
-#: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
-msgid "Dismiss"
-msgstr ""
 
 #: cms/templates/group_configurations.html cms/templates/manage_users.html
 #: cms/templates/manage_users_lib.html cms/templates/settings.html
@@ -7982,13 +8149,6 @@ msgstr ""
 #: cms/templates/registration/activation_complete.html
 #: lms/templates/registration/activation_complete.html
 msgid "Visit your {link_start}dashboard{link_end} to see your courses."
-msgstr ""
-
-#. Translators: 'Open edX' is a brand, please keep this untranslated. See
-#. http://openedx.org for more information.
-#: cms/templates/widgets/footer.html lms/templates/footer-edx-v2.html
-#: lms/templates/footer-edx-v3.html lms/templates/footer.html
-msgid "Powered by Open edX"
 msgstr ""
 
 #: cms/templates/widgets/header.html lms/templates/courseware/courseware.html
@@ -8331,7 +8491,7 @@ msgstr ""
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
-#: lms/templates/footer-edx-v2.html lms/templates/footer.html
+#: lms/templates/footer-edx-v2.html
 msgid ""
 "EdX, Open edX, and the edX and Open edX logos are registered trademarks or "
 "trademarks of {link_start}edX Inc.{link_end}"
@@ -8351,18 +8511,7 @@ msgstr ""
 msgid "10/22/2014"
 msgstr ""
 
-#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
-#: lms/templates/footer.html
-msgid "News"
-msgstr ""
-
-#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
-#: lms/templates/footer.html lms/templates/static_templates/contact.html
-msgid "Contact"
-msgstr ""
-
-#: lms/templates/footer-edx-v2.html lms/templates/footer.html
-#: lms/templates/static_templates/faq.html
+#: lms/templates/footer-edx-v2.html lms/templates/static_templates/faq.html
 msgid "FAQ"
 msgstr ""
 
@@ -8386,11 +8535,11 @@ msgstr ""
 msgid "Mobile Apps"
 msgstr ""
 
-#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
+#: lms/templates/footer-edx-v2.html
 msgid "Apple app on Apple Store"
 msgstr ""
 
-#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
+#: lms/templates/footer-edx-v2.html
 msgid "Android app on Google Play"
 msgstr ""
 
@@ -8398,39 +8547,8 @@ msgstr ""
 msgid "Page Footer"
 msgstr ""
 
-#: lms/templates/footer-edx-v3.html lms/templates/static_templates/blog.html
-msgid "Blog"
-msgstr ""
-
-#: lms/templates/footer-edx-v3.html
-msgid "FAQs"
-msgstr ""
-
-#: lms/templates/footer-edx-v3.html lms/templates/footer.html
-#: lms/templates/static_templates/jobs.html
-msgid "Jobs"
-msgstr ""
-
-#: lms/templates/footer-edx-v3.html lms/templates/static_templates/donate.html
-msgid "Donate"
-msgstr ""
-
-#: lms/templates/footer-edx-v3.html
-msgid "Sitemap"
-msgstr ""
-
 #: lms/templates/footer-edx-v3.html lms/templates/footer.html
 msgid "Legal"
-msgstr ""
-
-#: lms/templates/footer-edx-v3.html
-msgid "Website Accessibility Policy"
-msgstr ""
-
-#: lms/templates/footer.html
-msgid ""
-"{tos_link_start}Terms of Service{tos_link_end} and {honor_link_start}Honor "
-"Code{honor_link_end}"
 msgstr ""
 
 #: lms/templates/forgot_password_modal.html
@@ -9141,11 +9259,6 @@ msgid "Highest Level of Education Completed"
 msgstr ""
 
 #: lms/templates/register.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
-msgid "Year of Birth"
-msgstr ""
-
-#: lms/templates/register.html
 msgid "Please share with us your reasons for registering with {platform_name}"
 msgstr ""
 
@@ -9618,6 +9731,10 @@ msgid "Open Calculator"
 msgstr ""
 
 #: lms/templates/calculator/toggle_calculator.html
+msgid "Calculator Input"
+msgstr ""
+
+#: lms/templates/calculator/toggle_calculator.html
 msgid "Calculator Input Field"
 msgstr ""
 
@@ -9767,7 +9884,7 @@ msgid "Calculate"
 msgstr ""
 
 #: lms/templates/calculator/toggle_calculator.html
-msgid "Calculator Output Field"
+msgid "Calculator Output"
 msgstr ""
 
 #: lms/templates/ccx/_dashboard_ccx_listing.html
@@ -10321,11 +10438,6 @@ msgid "View this course as:"
 msgstr ""
 
 #: lms/templates/courseware/course_navigation.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Staff"
-msgstr ""
-
-#: lms/templates/courseware/course_navigation.html
 msgid "Student in {content_group}"
 msgstr ""
 
@@ -10684,6 +10796,7 @@ msgstr ""
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Pending Instructor Tasks"
@@ -11107,62 +11220,6 @@ msgstr ""
 msgid "edit"
 msgstr ""
 
-#: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
-#: lms/templates/verify_student/prompt_midcourse_reverify.html
-msgid "You need to re-verify to continue"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
-msgid ""
-"People change, and each year we ask you to re-verify your identity for our "
-"verified certificates. Take a minute now to help us renew your identity."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
-msgid "{course_name}: Re-verify by {date}"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
-msgid "Notification Actions"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
-msgid ""
-"To continue in the ID Verified track in {course_name}, you need to re-verify"
-" your identity by {date}."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
-msgid "Your re-verification failed"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
-msgid ""
-"Your re-verification for {course_name} failed and you are no longer eligible"
-" for a Verified Certificate.  If you think this is in error, please contact "
-"us at {email}."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_reverification_sidebar.html
-msgid "Re-verification now open for:"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_reverification_sidebar.html
-msgid "Re-verify now:"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_reverification_sidebar.html
-msgid "Pending:"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_reverification_sidebar.html
-msgid "Denied:"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_reverification_sidebar.html
-msgid "Approved:"
-msgstr ""
-
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "ID Verification Status"
 msgstr ""
@@ -11358,10 +11415,6 @@ msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Edit post title"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html wiki/forms.py
-msgid "Title"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
@@ -12597,6 +12650,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "The status for any active tasks appears in a table below."
 msgstr ""
@@ -12626,6 +12680,7 @@ msgid "Get Student Anonymized IDs CSV"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Reports"
 msgstr ""
 
@@ -12678,10 +12733,12 @@ msgid "Generate Problem Grade Report"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Reports Available for Download"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid ""
 "The reports listed below are available for download. A link to every report "
 "remains available on this page, identified by the UTC date and time of "
@@ -12700,6 +12757,7 @@ msgstr ""
 #. Translators: a table of URL links to report files appears after this
 #. sentence.
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid ""
 "<b>Note</b>: To keep student data secure, you cannot save or email these "
 "links for direct access. Copies of links expire within 5 minutes."
@@ -12794,6 +12852,10 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Resubmit Invoice"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Download Enrollment Report"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -13221,10 +13283,6 @@ msgid ""
 "Staff cannot modify staff or beta tester lists. To modify these lists, "
 "contact your instructor and ask them to add you as an instructor for staff "
 "and beta lists, or a discussion admin for discussion management."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Course Staff"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -14074,7 +14132,7 @@ msgid "Billed To Details"
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "Company Name"
+msgid "N/A"
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
@@ -14265,7 +14323,7 @@ msgstr ""
 msgid "TOTAL:"
 msgstr ""
 
-#. Translators: currency_symbol l is a symbol indicating type of currency, ex
+#. Translators: currency_symbol is a symbol indicating type of currency, ex
 #. "$". currency_abbr is
 #. an abbreviation for the currency, ex "USD". This string would look like
 #. this
@@ -14568,282 +14626,6 @@ msgstr ""
 msgid "Re-Verify for {course_name}"
 msgstr ""
 
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-msgid "Re-Verify"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-msgid "No Webcam Detected"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"You don't seem to have a webcam connected. Double-check that your webcam is "
-"connected and working to continue."
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-msgid "No Flash Detected"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"You don't seem to have Flash installed. {a_start} Get Flash {a_end} to "
-"continue your registration."
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Error submitting your images"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Oops! Something went wrong. Please confirm your details and try again."
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Re-Take Your Photo"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-msgid ""
-"Use your webcam to take a picture of your face so we can match it with your "
-"original verification."
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"Don't see your picture? Make sure to allow your browser to use your camera "
-"when it asks for permission."
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Retake"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Looks good"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Tips on taking a successful photo"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Make sure your face is well-lit"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Be sure your entire face is inside the frame"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Can we match the photo you took with the one on your ID?"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"Once in position, use the camera button {btn_icon} to capture your picture"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Use the checkmark button {btn_icon} once you are happy with the photo"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Common Questions"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Why do you need my photo?"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"As part of the verification process, we need your photo to confirm that you "
-"are you."
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-msgid "What do you do with this picture?"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-msgid "We only use it to verify your identity.  It is not displayed anywhere."
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Check Your Name"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-msgid ""
-"Make sure your full name on your {platform_name} account ({full_name}) "
-"matches the ID you originally submitted. We will also use this as the name "
-"on your certificate."
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Edit your name"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Verification"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-msgid ""
-"Once you verify your photo looks good and your name is correct, you can "
-"finish your re-verification and return to your course.  <strong>Note: You "
-"will not have another chance to re-verify.</strong>"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-msgid "Yes! You can confirm my identity with this information."
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-msgid "Submit photos &amp; re-verify"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_reverification_confirmation.html
-#: lms/templates/verify_student/reverification_confirmation.html
-msgid "Re-Verification Submission Confirmation"
-msgstr ""
-
-#. Translators: 'Credentials' refer to photographs the user has taken to
-#. verify
-#. their identity.
-#: lms/templates/verify_student/midcourse_reverification_confirmation.html
-#: lms/templates/verify_student/reverification_confirmation.html
-msgid "Your Credentials Have Been Updated"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_reverification_confirmation.html
-msgid ""
-"We have received your re-verification details and submitted them for review."
-" Your dashboard will show the notification status once the review is "
-"complete."
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_reverification_confirmation.html
-msgid ""
-"Please note: The professor may ask you to re-verify again at other key "
-"points in the course."
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_reverification_confirmation.html
-msgid "Complete your other re-verifications"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_reverification_confirmation.html
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid "Return to where you left off"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid "Reverification Status"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid "You are in the ID Verified track"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid "You currently need to re-verify for the following courses:"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid "Re-verify by {date}"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid "Re-verify for {course_number}"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid "You currently need to re-verify for the following course:"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid "You have no re-verifications at present."
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid "The status of your submitted re-verifications:"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid "Don't want to re-verify right now?"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid "Why do I need to re-verify?"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid ""
-"At key points in a course, the professor will ask you to re-verify your "
-"identity by submitting a new photo of your face. We will send the new photo "
-"to be matched up with the photo of the original ID you submitted when you "
-"signed up for the course. If you are taking multiple courses, you may need "
-"to re-verify multiple times, once for every important point in each course "
-"you are taking as a verified student."
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid "What will I need to re-verify?"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid ""
-"Because you are just confirming that you are still you, the only thing you "
-"will need to do to re-verify is to <b>submit a new photo of your face with "
-"your webcam</b>. The process is quick and you will be brought back to where "
-"you left off so you can keep on learning."
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid ""
-"If you changed your name during the semester and it no longer matches the "
-"original ID you submitted, you will need to re-edit your name to match as "
-"well."
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid "What if I have trouble with my re-verification?"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid ""
-"Because of the short time that re-verification is open, you <strong>will not"
-" be able to correct a failed verification</strong>. If you think there was "
-"an error in the review, please contact us at {email}"
-msgstr ""
-
 #: lms/templates/verify_student/missed_verification_deadline.html
 msgid "Verification Deadline Has Passed"
 msgstr ""
@@ -14872,6 +14654,34 @@ msgstr ""
 
 #: lms/templates/verify_student/photo_reverification.html
 msgid "Re-Verification"
+msgstr ""
+
+#: lms/templates/verify_student/photo_reverification.html
+msgid "No Webcam Detected"
+msgstr ""
+
+#: lms/templates/verify_student/photo_reverification.html
+msgid ""
+"You don't seem to have a webcam connected. Double-check that your webcam is "
+"connected and working to continue."
+msgstr ""
+
+#: lms/templates/verify_student/photo_reverification.html
+msgid "No Flash Detected"
+msgstr ""
+
+#: lms/templates/verify_student/photo_reverification.html
+msgid ""
+"You don't seem to have Flash installed. {a_start} Get Flash {a_end} to "
+"continue your registration."
+msgstr ""
+
+#: lms/templates/verify_student/photo_reverification.html
+msgid "Error submitting your images"
+msgstr ""
+
+#: lms/templates/verify_student/photo_reverification.html
+msgid "Oops! Something went wrong. Please confirm your details and try again."
 msgstr ""
 
 #: lms/templates/verify_student/photo_reverification.html
@@ -14909,9 +14719,78 @@ msgid "Re-Take ID Photo"
 msgstr ""
 
 #: lms/templates/verify_student/photo_reverification.html
+msgid "Re-Take Your Photo"
+msgstr ""
+
+#: lms/templates/verify_student/photo_reverification.html
 msgid ""
 "Use your webcam to take a picture of your face so we can match it with the "
 "picture on your ID."
+msgstr ""
+
+#: lms/templates/verify_student/photo_reverification.html
+msgid ""
+"Don't see your picture? Make sure to allow your browser to use your camera "
+"when it asks for permission."
+msgstr ""
+
+#: lms/templates/verify_student/photo_reverification.html
+msgid "Retake"
+msgstr ""
+
+#: lms/templates/verify_student/photo_reverification.html
+msgid "Looks good"
+msgstr ""
+
+#: lms/templates/verify_student/photo_reverification.html
+msgid "Tips on taking a successful photo"
+msgstr ""
+
+#: lms/templates/verify_student/photo_reverification.html
+msgid "Make sure your face is well-lit"
+msgstr ""
+
+#: lms/templates/verify_student/photo_reverification.html
+msgid "Be sure your entire face is inside the frame"
+msgstr ""
+
+#: lms/templates/verify_student/photo_reverification.html
+msgid "Can we match the photo you took with the one on your ID?"
+msgstr ""
+
+#: lms/templates/verify_student/photo_reverification.html
+msgid ""
+"Once in position, use the camera button {btn_icon} to capture your picture"
+msgstr ""
+
+#: lms/templates/verify_student/photo_reverification.html
+msgid "Use the checkmark button {btn_icon} once you are happy with the photo"
+msgstr ""
+
+#: lms/templates/verify_student/photo_reverification.html
+msgid "Common Questions"
+msgstr ""
+
+#: lms/templates/verify_student/photo_reverification.html
+msgid "Why do you need my photo?"
+msgstr ""
+
+#: lms/templates/verify_student/photo_reverification.html
+msgid ""
+"As part of the verification process, we need your photo to confirm that you "
+"are you."
+msgstr ""
+
+#: lms/templates/verify_student/photo_reverification.html
+msgid "What do you do with this picture?"
+msgstr ""
+
+#: lms/templates/verify_student/photo_reverification.html
+msgid "We only use it to verify your identity.  It is not displayed anywhere."
+msgstr ""
+
+#: lms/templates/verify_student/photo_reverification.html
+msgid "Verification"
 msgstr ""
 
 #: lms/templates/verify_student/photo_reverification.html
@@ -15036,9 +14915,17 @@ msgid "Retake Your Photos"
 msgstr ""
 
 #: lms/templates/verify_student/photo_reverification.html
+msgid "Check Your Name"
+msgstr ""
+
+#: lms/templates/verify_student/photo_reverification.html
 msgid ""
 "Make sure your full name on your {platform_name} account ({full_name}) "
 "matches your ID. We will also use this as the name on your certificate."
+msgstr ""
+
+#: lms/templates/verify_student/photo_reverification.html
+msgid "Edit your name"
 msgstr ""
 
 #: lms/templates/verify_student/photo_reverification.html
@@ -15052,9 +14939,21 @@ msgid "Yes! My details all match."
 msgstr ""
 
 #: lms/templates/verify_student/prompt_midcourse_reverify.html
+msgid "You need to re-verify to continue"
+msgstr ""
+
+#: lms/templates/verify_student/prompt_midcourse_reverify.html
 msgid ""
 "To continue in the ID Verified track in {course}, you need to re-verify your"
 " identity by {date}.  Go to URL."
+msgstr ""
+
+#: lms/templates/verify_student/reverification_confirmation.html
+msgid "Re-Verification Submission Confirmation"
+msgstr ""
+
+#: lms/templates/verify_student/reverification_confirmation.html
+msgid "Your Credentials Have Been Updated"
 msgstr ""
 
 #: lms/templates/verify_student/reverification_confirmation.html
@@ -15574,6 +15473,10 @@ msgid ""
 "sure to review and reset all dates, including the Course Start Date; set up "
 "the course team; review course updates and other assets for dated material; "
 "and seed the discussions and wiki."
+msgstr ""
+
+#: cms/templates/course_outline.html cms/templates/index.html
+msgid "Dismiss"
 msgstr ""
 
 #: cms/templates/course_outline.html
