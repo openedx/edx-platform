@@ -4,6 +4,7 @@ HTTP end-points for the Bookmarks API.
 For more information, see:
 https://openedx.atlassian.net/wiki/display/TNL/Bookmarks+API
 """
+from eventtracking import tracker
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -165,6 +166,31 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
             course_key = None
 
         return api.get_bookmarks(user=self.request.user, course_key=course_key, serialized=False)
+
+    def paginate_queryset(self, queryset, page_size=None):
+        """ Override GenericAPIView.paginate_queryset for the purpose of eventing """
+        page = super(BookmarksListView, self).paginate_queryset(queryset, page_size)
+
+        course_id = self.request.QUERY_PARAMS.get('course_id')
+        if course_id:
+            try:
+                CourseKey.from_string(course_id)
+            except InvalidKeyError:
+                return page
+
+        event_data = {
+            'list_type': 'all_courses',
+            'bookmarks_count': page.paginator.count,
+            'page_size': self.get_paginate_by(),
+            'page_number': page.number,
+        }
+        if course_id is not None:
+            event_data['list_type'] = 'per_course'
+            event_data['course_id'] = course_id
+
+        tracker.emit('edx.bookmark.listed', event_data)
+
+        return page
 
     def post(self, request):
         """

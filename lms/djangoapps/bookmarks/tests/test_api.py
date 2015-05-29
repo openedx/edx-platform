@@ -8,6 +8,8 @@ from opaque_keys.edx.keys import UsageKey
 
 from student.tests.factories import UserFactory
 
+from util.testing import EventTestMixin
+
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -17,7 +19,23 @@ from .. import api, DEFAULT_FIELDS, OPTIONAL_FIELDS
 from ..models import Bookmark
 
 
-class BookmarksAPITests(ModuleStoreTestCase):
+class BookmarkApiEventTestMixin(EventTestMixin):
+    """ Mixin for verifying that bookmark api events were emitted during a test. """
+    def setUp(self):  # pylint: disable=arguments-differ
+        super(BookmarkApiEventTestMixin, self).setUp('lms.djangoapps.bookmarks.api.tracker')
+
+    def assert_bookmark_event_emitted(self, event_name, course_id, bookmark_id, usage_key):
+        """ Assert that an event has been emitted. """
+        self.assert_event_emitted(
+            event_name,
+            course_id=course_id,
+            bookmark_id=bookmark_id,
+            component_type=usage_key.category,
+            component_usage_id=unicode(usage_key),
+        )
+
+
+class BookmarksAPITests(BookmarkApiEventTestMixin, ModuleStoreTestCase):
     """
     These tests cover the parts of the API methods.
     """
@@ -67,6 +85,8 @@ class BookmarksAPITests(ModuleStoreTestCase):
             display_name=self.vertical_2.display_name
         )
         self.all_fields = DEFAULT_FIELDS + OPTIONAL_FIELDS
+
+        self.reset_tracker()
 
     def assert_bookmark_response(self, response_data, bookmark, optional_fields=False):
         """
@@ -137,7 +157,14 @@ class BookmarksAPITests(ModuleStoreTestCase):
         """
         self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 1)
 
-        api.create_bookmark(user=self.user, usage_key=self.vertical_1.location)
+        bookmark_data = api.create_bookmark(user=self.user, usage_key=self.vertical_1.location)
+
+        self.assert_bookmark_event_emitted(
+            'edx.bookmark.added',
+            self.course_id,
+            bookmark_data['id'],
+            self.vertical_1.location
+        )
 
         self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 2)
 
@@ -148,11 +175,22 @@ class BookmarksAPITests(ModuleStoreTestCase):
         self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 1)
         bookmark_data = api.create_bookmark(user=self.user, usage_key=self.vertical_1.location)
 
+        self.assert_bookmark_event_emitted(
+            'edx.bookmark.added',
+            self.course_id,
+            bookmark_data['id'],
+            self.vertical_1.location
+        )
+
         self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 2)
+
+        self.reset_tracker()
 
         bookmark_data_2 = api.create_bookmark(user=self.user, usage_key=self.vertical_1.location)
         self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 2)
         self.assertEqual(bookmark_data, bookmark_data_2)
+
+        self.assert_no_events_were_emitted()
 
     def test_create_bookmark_raises_error(self):
         """
@@ -161,6 +199,8 @@ class BookmarksAPITests(ModuleStoreTestCase):
         with self.assertRaises(ItemNotFoundError):
             api.create_bookmark(user=self.user, usage_key=UsageKey.from_string('i4x://brb/100/html/340ef1771a0940'))
 
+        self.assert_no_events_were_emitted()
+
     def test_delete_bookmark(self):
         """
         Verifies that delete_bookmark removes bookmark as expected.
@@ -168,6 +208,13 @@ class BookmarksAPITests(ModuleStoreTestCase):
         self.assertEqual(len(api.get_bookmarks(user=self.user)), 2)
 
         api.delete_bookmark(user=self.user, usage_key=self.vertical.location)
+
+        self.assert_bookmark_event_emitted(
+            'edx.bookmark.removed',
+            self.course_id,
+            self.bookmark.resource_id,
+            self.vertical.location
+        )
 
         bookmarks_data = api.get_bookmarks(user=self.user)
         self.assertEqual(len(bookmarks_data), 1)
@@ -179,3 +226,5 @@ class BookmarksAPITests(ModuleStoreTestCase):
         """
         with self.assertRaises(ObjectDoesNotExist):
             api.delete_bookmark(user=self.other_user, usage_key=self.vertical.location)
+
+        self.assert_no_events_were_emitted()
