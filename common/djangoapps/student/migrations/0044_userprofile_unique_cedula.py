@@ -9,12 +9,14 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         # Adding unique constraint on 'UserProfile', fields ['cedula']
-        db.create_unique('auth_userprofile', ['cedula'])
+        pass
+#        db.create_unique('auth_userprofile', ['cedula'])
 
 
     def backwards(self, orm):
         # Removing unique constraint on 'UserProfile', fields ['cedula']
-        db.delete_unique('auth_userprofile', ['cedula'])
+        pass
+#        db.delete_unique('auth_userprofile', ['cedula'])
 
 
     models = {
