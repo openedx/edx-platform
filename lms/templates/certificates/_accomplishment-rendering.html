@@ -38,7 +38,7 @@ if certificate_data and certificate_data.get('course_title', ''):
             </div>
             % if mode != 'base':
             <div class="accomplishment-signatories">
-                <h3 class="accomplishment-signatories-title hd-6 sr-only">Noted by</h3>
+                <h3 class="accomplishment-signatories-title hd-6 sr-only">${_("Noted by")}</h3>
 
                 <div class="wrapper-signatories">
                     <ul class="list-signatories">
@@ -60,7 +60,7 @@ if certificate_data and certificate_data.get('course_title', ''):
             </div>
             % endif
             <div class="accomplishment-orgs">
-                <h3 class="accomplishment-orgs-title hd-6 sr-only">Supported by the following organizations</h3>
+                <h3 class="accomplishment-orgs-title hd-6 sr-only">${_("Supported by the following organizations")}</h3>
 
                 <ul class="wrapper-orgs list-orgs list-orgs-4+">
                     <li class="wrapper-organization">
@@ -82,7 +82,7 @@ if certificate_data and certificate_data.get('course_title', ''):
 
     <div class="wrapper-accomplishment-metadata">
         <div class="accomplishment-metadata">
-            <h2 class="accomplishment-metadata-title hd-6">More about ${accomplishment_copy_name}'s accomplishment</h2>
+            <h2 class="accomplishment-metadata-title hd-6">${_("More about ${accomplishment_copy_name}'s accomplishment")}</h2>
 
             <div class="wrapper-metadata">
                 <dl class="metadata accomplishment-recipient">
