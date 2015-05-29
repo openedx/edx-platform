@@ -3,7 +3,7 @@
     id="<%= 'course-uility' + utilityIndex %>">
     <header>
         <h3 class="utility-title title-2 is-selectable" title="Collapse/Expand this utility">
-            <i class="icon-caret-down ui-toggle-expansion"></i>
+            <i class="fa fa-caret-down ui-toggle-expansion"></i>
             <%= utilityShortDescription %></h3>
     </header>
 

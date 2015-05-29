@@ -48,8 +48,7 @@ from contentstore.utils import reverse_usage_url
         </li>
       </ul>
     </div>
-  </div>
-  %endif
+  </div>  %endif
 </%block>
 
 <%block name="content">
@@ -71,7 +70,7 @@ from contentstore.utils import reverse_usage_url
                 %if reindex_link:
                     <li class="nav-item">
                         <a href="${reindex_link}" class="button button-reindex" data-category="reindex" title="${_('Reindex current course')}">
-                            <i class="icon-arrow-right"></i>${_('Reindex')}
+                            <i class="fa fa-arrow-right"></i>${_('Reindex')}
                         </a>
                     </li>
                 %endif
