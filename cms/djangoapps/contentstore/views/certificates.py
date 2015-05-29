@@ -224,6 +224,7 @@ class CertificateManager(object):
             if int(cert['id']) == int(certificate_id):
                 certificate = course.certificates['certificates'][index]
                 # Remove any signatory assets prior to dropping the entire cert record from the course
+                _delete_asset(course.id, certificate['org_logo_path'])
                 for sig_index, signatory in enumerate(certificate.get('signatories')):  # pylint: disable=unused-variable
                     _delete_asset(course.id, signatory['signature_image_path'])
                 # Now drop the certificate record
