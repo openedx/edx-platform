@@ -66,7 +66,7 @@ class BookmarkModelTest(ModuleStoreTestCase):
         Tests creation of bookmark.
         """
         bookmark_data = self.get_bookmark_data(self.vertical)
-        bookmark_object = Bookmark.create(bookmark_data)
+        bookmark_object, __ = Bookmark.create(bookmark_data)
         self.assert_valid_bookmark(bookmark_object, bookmark_data)
 
     def test_get_path(self):
