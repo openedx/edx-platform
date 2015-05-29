@@ -7,12 +7,14 @@ import json
 import mock
 
 from opaque_keys.edx.keys import AssetKey
+from opaque_keys.edx.locations import AssetLocation
 
 from contentstore.utils import reverse_course_url
 from contentstore.views.certificates import CERTIFICATE_SCHEMA_VERSION
 from contentstore.tests.utils import CourseTestCase
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
+from xmodule.exceptions import NotFoundError
 from student.models import CourseEnrollment
 from contentstore.views.certificates import CertificateManager
 from django.test.utils import override_settings
@@ -44,7 +46,7 @@ class HelperMethods(object):
     """
     Mixin that provides useful methods for certificate configuration tests.
     """
-    def _create_fake_signature_images(self, asset_keys):
+    def _create_fake_images(self, asset_keys):
         """
         Creates fake image files for a list of asset_keys.
         """
@@ -74,18 +76,19 @@ class HelperMethods(object):
             if len(signatories) > 2 and idx == len(signatories) - 1:
                 continue
             else:
-                self._create_fake_signature_images([signatory['signature_image_path']])
+                self._create_fake_images([signatory['signature_image_path']])
 
         certificates = [
             {
                 'id': i,
                 'name': 'Name ' + str(i),
                 'description': 'Description ' + str(i),
+                'org_logo_path': '/c4x/test/CSS101/asset/org_logo{}.png'.format(i),
                 'signatories': signatories,
                 'version': CERTIFICATE_SCHEMA_VERSION
             } for i in xrange(0, count)
         ]
-
+        self._create_fake_images([certificate['org_logo_path'] for certificate in certificates])
         self.course.certificates = {'certificates': certificates}
         self.save_course()
 
@@ -400,6 +403,11 @@ class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase
         Delete certificate
         """
         self._add_course_certificates(count=2, signatory_count=1)
+        certificates = self.course.certificates['certificates']
+        org_logo_url = certificates[1]['org_logo_path']
+        image_asset_location = AssetLocation.from_deprecated_string(org_logo_url)
+        content = contentstore().find(image_asset_location)
+        self.assertIsNotNone(content)
         response = self.client.delete(
             self._url(cid=1),
             content_type="application/json",
@@ -411,6 +419,8 @@ class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase
         # Verify that certificates are properly updated in the course.
         certificates = self.course.certificates['certificates']
         self.assertEqual(len(certificates), 1)
+        # make sure certificate org logo is deleted too
+        self.assertRaises(NotFoundError, contentstore().find, image_asset_location)
         self.assertEqual(certificates[0].get('name'), 'Name 0')
         self.assertEqual(certificates[0].get('description'), 'Description 0')
 
@@ -432,6 +442,11 @@ class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase
         Delete an existing certificate signatory
         """
         self._add_course_certificates(count=2, signatory_count=3)
+        certificates = self.course.certificates['certificates']
+        signatory = certificates[1].get("signatories")[1]
+        image_asset_location = AssetLocation.from_deprecated_string(signatory['signature_image_path'])
+        content = contentstore().find(image_asset_location)
+        self.assertIsNotNone(content)
         test_url = '{}/signatories/1'.format(self._url(cid=1))
         response = self.client.delete(
             test_url,
@@ -445,6 +460,8 @@ class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase
         # Verify that certificates are properly updated in the course.
         certificates = self.course.certificates['certificates']
         self.assertEqual(len(certificates[1].get("signatories")), 2)
+        # make sure signatory signature image is deleted too
+        self.assertRaises(NotFoundError, contentstore().find, image_asset_location)
 
     def test_deleting_signatory_without_signature(self):
         """
