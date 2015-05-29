@@ -44,6 +44,17 @@ class BookmarksTestMixin(EventsTestMixin, UniqueCourseTest):
             ]
         self.course_fixture.add_children(*xblocks).install()
 
+    def verify_event_data(self, event_type, event_data):
+        """
+        Verify emitted event data.
+
+        Arguments:
+            event_type: expected event type
+            event_data: expected event data
+        """
+        actual_events = self.wait_for_events(event_filter={'event_type': event_type}, number_of_matches=1)
+        self.assert_events_match(event_data, actual_events)
+
 
 class BookmarksTest(BookmarksTestMixin):
     """
@@ -213,13 +224,6 @@ class BookmarksTest(BookmarksTestMixin):
         When I click on bookmarked link
         Then I can navigate to correct bookmarked unit
         """
-        # NOTE: We are checking the order of bookmarked units at API
-        # We are unable to check the order here because we are bookmarking
-        # the units by sending POSTs to API, And the time(created) between
-        # the bookmarked units is in milliseconds. These milliseconds are
-        # discarded by the current version of MySQL we are using due to the
-        # lack of support. Due to which order of bookmarked units will be
-        # incorrect.
         self._test_setup()
         self._bookmark_units(2)
 
@@ -230,9 +234,10 @@ class BookmarksTest(BookmarksTestMixin):
 
         bookmarked_breadcrumbs = self.bookmarks_page.breadcrumbs()
 
-        # Verify bookmarked breadcrumbs
+        # Verify bookmarked breadcrumbs and bookmarks order (most recently bookmarked unit should come first)
         breadcrumbs = self._breadcrumb(2)
-        self.assertItemsEqual(bookmarked_breadcrumbs, breadcrumbs)
+        breadcrumbs.reverse()
+        self.assertEqual(bookmarked_breadcrumbs, breadcrumbs)
 
         # get usage ids for units
         xblocks = self.course_fixture.get_nested_xblocks(category="vertical")
@@ -289,3 +294,32 @@ class BookmarksTest(BookmarksTestMixin):
         self.bookmarks_page.click_bookmarks_button()
         self.assertTrue(self.bookmarks_page.results_present())
         self.assertEqual(self.bookmarks_page.count(), 11)
+
+    def test_bookmarked_unit_accessed_event(self):
+        """
+        Scenario: Bookmark events are emitted with correct data when we access/visit a bookmarked unit.
+
+        Given that I am a registered user
+        And I visit my courseware page
+        And I have bookmarked a unit
+        When I click on bookmarked unit
+        Then `edx.course.bookmark.accessed` event is emitted
+        """
+        self._test_setup(num_chapters=1)
+        self.reset_event_tracking()
+
+        # create expected event data
+        xblocks = self.course_fixture.get_nested_xblocks(category="vertical")
+        event_data = [
+            {
+                'event': {
+                    'bookmark_id': '{},{}'.format(self.USERNAME, xblocks[0].locator),
+                    'component_type': xblocks[0].category,
+                    'component_usage_id': xblocks[0].locator,
+                }
+            }
+        ]
+        self._bookmark_unit(0)
+        self.bookmarks_page.click_bookmarks_button()
+        self.bookmarks_page.click_bookmarked_block(0)
+        self.verify_event_data('edx.bookmark.accessed', event_data)
