@@ -9,6 +9,8 @@ successful completion of a course on EdX
 import logging
 
 from django.db import models
+from simple_history.models import HistoricalRecords
+
 
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
@@ -19,6 +21,29 @@ from django.utils.translation import ugettext_lazy
 log = logging.getLogger(__name__)
 
 
+class CreditProvider(TimeStampedModel):
+    """This model represents an institution that can grant credit for a course.
+
+    Each provider is identified by unique ID (e.g., 'ASU'). CreditProvider also
+    includes a `url` where the student will be sent when he/she will try to
+    get credit for course. Eligibility duration will be use to set duration
+    for which credit eligible message appears on dashboard.
+    """
+
+    provider_id = models.CharField(max_length=255, db_index=True, unique=True)
+    display_name = models.CharField(max_length=255)
+    provider_url = models.URLField(max_length=255, unique=True, default="")
+
+    # Default is one year
+    DEFAULT_ELIGIBILITY_DURATION = 31556970
+
+    eligibility_duration = models.PositiveIntegerField(
+        help_text=ugettext_lazy(u"Number of seconds to show eligibility message"),
+        default=DEFAULT_ELIGIBILITY_DURATION
+    )
+    active = models.BooleanField(default=True)
+
+
 class CreditCourse(models.Model):
     """
     Model for tracking a credit course.
@@ -26,6 +51,7 @@ class CreditCourse(models.Model):
 
     course_key = CourseKeyField(max_length=255, db_index=True, unique=True)
     enabled = models.BooleanField(default=False)
+    providers = models.ManyToManyField(CreditProvider)
 
     @classmethod
     def is_credit_course(cls, course_key):
@@ -55,26 +81,9 @@ class CreditCourse(models.Model):
         return cls.objects.get(course_key=course_key, enabled=True)
 
 
-class CreditProvider(TimeStampedModel):
-    """This model represents an institution that can grant credit for a course.
-
-    Each provider is identified by unique ID (e.g., 'ASU'). CreditProvider also
-    includes a `url` where the student will be sent when he/she will try to
-    get credit for course. Eligibility duration will be use to set duration
-    for which credit eligible message appears on dashboard.
-    """
-
-    provider_id = models.CharField(max_length=255, db_index=True, unique=True)
-    display_name = models.CharField(max_length=255)
-    provider_url = models.URLField(max_length=255, unique=True)
-    eligibility_duration = models.PositiveIntegerField(
-        help_text=ugettext_lazy(u"Number of seconds to show eligibility message")
-    )
-    active = models.BooleanField(default=True)
-
-
 class CreditRequirement(TimeStampedModel):
-    """This model represents a credit requirement.
+    """
+    This model represents a credit requirement.
 
     Each requirement is uniquely identified by its 'namespace' and
     'name' fields.
@@ -89,7 +98,7 @@ class CreditRequirement(TimeStampedModel):
     course = models.ForeignKey(CreditCourse, related_name="credit_requirements")
     namespace = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
-    display_name = models.CharField(max_length=255)
+    display_name = models.CharField(max_length=255, default="")
     criteria = JSONField()
     active = models.BooleanField(default=True)
 
@@ -101,7 +110,8 @@ class CreditRequirement(TimeStampedModel):
 
     @classmethod
     def add_or_update_course_requirement(cls, credit_course, requirement):
-        """Add requirement to a given course.
+        """
+        Add requirement to a given course.
 
         Args:
             credit_course(CreditCourse): The identifier for credit course
@@ -127,7 +137,8 @@ class CreditRequirement(TimeStampedModel):
 
     @classmethod
     def get_course_requirements(cls, course_key, namespace=None):
-        """Get credit requirements of a given course.
+        """
+        Get credit requirements of a given course.
 
         Args:
             course_key(CourseKey): The identifier for a course
@@ -143,7 +154,8 @@ class CreditRequirement(TimeStampedModel):
 
     @classmethod
     def disable_credit_requirements(cls, requirement_ids):
-        """Mark the given requirements inactive.
+        """
+        Mark the given requirements inactive.
 
         Args:
             requirement_ids(list): List of ids
@@ -155,7 +167,8 @@ class CreditRequirement(TimeStampedModel):
 
 
 class CreditRequirementStatus(TimeStampedModel):
-    """This model represents the status of each requirement.
+    """
+    This model represents the status of each requirement.
 
     For a particular credit requirement, a user can either:
     1) Have satisfied the requirement (example: approved in-course reverification)
@@ -176,7 +189,7 @@ class CreditRequirementStatus(TimeStampedModel):
 
     username = models.CharField(max_length=255, db_index=True)
     requirement = models.ForeignKey(CreditRequirement, related_name="statuses")
-    status = models.CharField(choices=REQUIREMENT_STATUS_CHOICES, max_length=32)
+    status = models.CharField(max_length=32, choices=REQUIREMENT_STATUS_CHOICES)
 
     # Include additional information about why the user satisfied or failed
     # the requirement.  This is specific to the type of requirement.
@@ -185,9 +198,13 @@ class CreditRequirementStatus(TimeStampedModel):
     # the grade to users later and to send the information to credit providers.
     reason = JSONField(default={})
 
+    class Meta(object):  # pylint: disable=missing-docstring
+        get_latest_by = "created"
+
 
 class CreditEligibility(TimeStampedModel):
-    """A record of a user's eligibility for credit from a specific credit
+    """
+    A record of a user's eligibility for credit from a specific credit
     provider for a specific course.
     """
 
@@ -195,8 +212,87 @@ class CreditEligibility(TimeStampedModel):
     course = models.ForeignKey(CreditCourse, related_name="eligibilities")
     provider = models.ForeignKey(CreditProvider, related_name="eligibilities")
 
-    class Meta(object):
-        """
-        Model metadata.
-        """
+    class Meta(object):  # pylint: disable=missing-docstring
         unique_together = ('username', 'course')
+
+
+class CreditRequest(TimeStampedModel):
+    """
+    A request for credit from a particular credit provider.
+
+    When a user initiates a request for credit, a CreditRequest record will be created.
+    Each CreditRequest is assigned a unique identifier so we can find it when the request
+    is approved by the provider.  The CreditRequest record stores the parameters to be sent
+    at the time the request is made.  If the user re-issues the request
+    (perhaps because the user did not finish filling in forms on the credit provider's site),
+    the request record will be updated, but the UUID will remain the same.
+    """
+
+    uuid = models.CharField(max_length=32, unique=True, db_index=True)
+    username = models.CharField(max_length=255, db_index=True)
+    course = models.ForeignKey(CreditCourse, related_name="credit_requests")
+    provider = models.ForeignKey(CreditProvider, related_name="credit_requests")
+    timestamp = models.DateTimeField(auto_now_add=True)
+    parameters = JSONField()
+
+    REQUEST_STATUS_PENDING = "pending"
+    REQUEST_STATUS_APPROVED = "approved"
+    REQUEST_STATUS_REJECTED = "rejected"
+
+    REQUEST_STATUS_CHOICES = (
+        (REQUEST_STATUS_PENDING, "Pending"),
+        (REQUEST_STATUS_APPROVED, "Approved"),
+        (REQUEST_STATUS_REJECTED, "Rejected"),
+    )
+    status = models.CharField(
+        max_length=255,
+        choices=REQUEST_STATUS_CHOICES,
+        default=REQUEST_STATUS_PENDING
+    )
+
+    history = HistoricalRecords()
+
+    @classmethod
+    def credit_requests_for_user(cls, username):
+        """
+        Retrieve all credit requests for a user.
+
+        Arguments:
+            username (unicode): The username of the user.
+
+        Returns: list
+
+        Example Usage:
+        >>> CreditRequest.credit_requests_for_user("bob")
+        [
+            {
+                "uuid": "557168d0f7664fe59097106c67c3f847",
+                "timestamp": "2015-05-04T20:57:57.987119+00:00",
+                "course_key": "course-v1:HogwartsX+Potions101+1T2015",
+                "provider": {
+                    "id": "HogwartsX",
+                    "display_name": "Hogwarts School of Witchcraft and Wizardry",
+                },
+                "status": "pending"  # or "approved" or "rejected"
+            }
+        ]
+
+        """
+        return [
+            {
+                "uuid": request.uuid,
+                "timestamp": request.modified,
+                "course_key": request.course.course_key,
+                "provider": {
+                    "id": request.provider.provider_id,
+                    "display_name": request.provider.display_name
+                },
+                "status": request.status
+            }
+            for request in cls.objects.select_related('course', 'provider').filter(username=username)
+        ]
+
+    class Meta(object):  # pylint: disable=missing-docstring
+        # Enforce the constraint that each user can have exactly one outstanding
+        # request to a given provider.  Multiple requests use the same UUID.
+        unique_together = ('username', 'course', 'provider')
