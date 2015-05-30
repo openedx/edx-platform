@@ -227,77 +227,77 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
 #           expect($inputEl.find(':focus').length).toEqual(1)
             expect(jQuery.fn.focus).toHaveBeenCalledOnJQueryObject($inputEl)
 
-    describe "ListTextbooks", ->
-        noTextbooksTpl = readFixtures("no-textbooks.underscore")
+    # describe "ListTextbooks", ->
+    #     noTextbooksTpl = readFixtures("no-textbooks.underscore")
 
-        beforeEach ->
-            setFixtures($("<script>", {id: "no-textbooks-tpl", type: "text/template"}).text(noTextbooksTpl))
-            appendSetFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(feedbackTpl))
-            @showSpies = spyOnConstructor("ShowTextbook", ["render"])
-            @showSpies.render.andReturn(@showSpies) # equivalent of `return this`
-            showEl = $("<li>")
-            @showSpies.$el = showEl
-            @showSpies.el = showEl.get(0)
-            @editSpies = spyOnConstructor("EditTextbook", ["render"])
-            editEl = $("<li>")
-            @editSpies.render.andReturn(@editSpies)
-            @editSpies.$el = editEl
-            @editSpies.el= editEl.get(0)
+    #     beforeEach ->
+    #         setFixtures($("<script>", {id: "no-textbooks-tpl", type: "text/template"}).text(noTextbooksTpl))
+    #         appendSetFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(feedbackTpl))
+    #         @showSpies = spyOnConstructor("ShowTextbook", ["render"])
+    #         @showSpies.render.andReturn(@showSpies) # equivalent of `return this`
+    #         showEl = $("<li>")
+    #         @showSpies.$el = showEl
+    #         @showSpies.el = showEl.get(0)
+    #         @editSpies = spyOnConstructor("EditTextbook", ["render"])
+    #         editEl = $("<li>")
+    #         @editSpies.render.andReturn(@editSpies)
+    #         @editSpies.$el = editEl
+    #         @editSpies.el= editEl.get(0)
 
-            @collection = new TextbookSet
-            @view = new ListTextbooks({collection: @collection})
-            @view.render()
+    #         @collection = new TextbookSet
+    #         @view = new ListTextbooks({collection: @collection})
+    #         @view.render()
 
-        it "should render the empty template if there are no textbooks", ->
-            expect(@view.$el).toContainText("You haven't added any textbooks to this course yet")
-            expect(@view.$el).toContain(".new-button")
-            expect(@showSpies.constructor).not.toHaveBeenCalled()
-            expect(@editSpies.constructor).not.toHaveBeenCalled()
+    #     it "should render the empty template if there are no textbooks", ->
+    #         expect(@view.$el).toContainText("You haven't added any textbooks to this course yet")
+    #         expect(@view.$el).toContain(".new-button")
+    #         expect(@showSpies.constructor).not.toHaveBeenCalled()
+    #         expect(@editSpies.constructor).not.toHaveBeenCalled()
 
-        it "should render ShowTextbook views by default if no textbook is being edited", ->
-            # add three empty textbooks to the collection
-            @collection.add([{}, {}, {}])
-            # reset spies due to re-rendering on collection modification
-            @showSpies.constructor.reset()
-            @editSpies.constructor.reset()
-            # render once and test
-            @view.render()
+    #     it "should render ShowTextbook views by default if no textbook is being edited", ->
+    #         # add three empty textbooks to the collection
+    #         @collection.add([{}, {}, {}])
+    #         # reset spies due to re-rendering on collection modification
+    #         @showSpies.constructor.reset()
+    #         @editSpies.constructor.reset()
+    #         # render once and test
+    #         @view.render()
 
-            expect(@view.$el).not.toContainText(
-                "You haven't added any textbooks to this course yet")
-            expect(@showSpies.constructor).toHaveBeenCalled()
-            expect(@showSpies.constructor.calls.length).toEqual(3);
-            expect(@editSpies.constructor).not.toHaveBeenCalled()
+    #         expect(@view.$el).not.toContainText(
+    #             "You haven't added any textbooks to this course yet")
+    #         expect(@showSpies.constructor).toHaveBeenCalled()
+    #         expect(@showSpies.constructor.calls.length).toEqual(3);
+    #         expect(@editSpies.constructor).not.toHaveBeenCalled()
 
-        it "should render an EditTextbook view for a textbook being edited", ->
-            # add three empty textbooks to the collection: the first and third
-            # should be shown, and the second should be edited
-            @collection.add([{editing: false}, {editing: true}, {editing: false}])
-            editing = @collection.at(1)
-            expect(editing.get("editing")).toBeTruthy()
-            # reset spies
-            @showSpies.constructor.reset()
-            @editSpies.constructor.reset()
-            # render once and test
-            @view.render()
+    #     it "should render an EditTextbook view for a textbook being edited", ->
+    #         # add three empty textbooks to the collection: the first and third
+    #         # should be shown, and the second should be edited
+    #         @collection.add([{editing: false}, {editing: true}, {editing: false}])
+    #         editing = @collection.at(1)
+    #         expect(editing.get("editing")).toBeTruthy()
+    #         # reset spies
+    #         @showSpies.constructor.reset()
+    #         @editSpies.constructor.reset()
+    #         # render once and test
+    #         @view.render()
 
-            expect(@showSpies.constructor).toHaveBeenCalled()
-            expect(@showSpies.constructor.calls.length).toEqual(2)
-            expect(@showSpies.constructor).not.toHaveBeenCalledWith({model: editing})
-            expect(@editSpies.constructor).toHaveBeenCalled()
-            expect(@editSpies.constructor.calls.length).toEqual(1)
-            expect(@editSpies.constructor).toHaveBeenCalledWith({model: editing})
+    #         expect(@showSpies.constructor).toHaveBeenCalled()
+    #         expect(@showSpies.constructor.calls.length).toEqual(2)
+    #         expect(@showSpies.constructor).not.toHaveBeenCalledWith({model: editing})
+    #         expect(@editSpies.constructor).toHaveBeenCalled()
+    #         expect(@editSpies.constructor.calls.length).toEqual(1)
+    #         expect(@editSpies.constructor).toHaveBeenCalledWith({model: editing})
 
-        it "should add a new textbook when the new-button is clicked", ->
-            # reset spies
-            @showSpies.constructor.reset()
-            @editSpies.constructor.reset()
-            # test
-            @view.$(".new-button").click()
+    #     it "should add a new textbook when the new-button is clicked", ->
+    #         # reset spies
+    #         @showSpies.constructor.reset()
+    #         @editSpies.constructor.reset()
+    #         # test
+    #         @view.$(".new-button").click()
 
-            expect(@collection.length).toEqual(1)
-            expect(@view.$el).toContain(@editSpies.$el)
-            expect(@view.$el).not.toContain(@showSpies.$el)
+    #         expect(@collection.length).toEqual(1)
+    #         expect(@view.$el).toContain(@editSpies.$el)
+    #         expect(@view.$el).not.toContain(@showSpies.$el)
 
 
     describe "EditChapter", ->
@@ -330,15 +330,15 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
             expect(@collection.length).toEqual(0)
             expect(@view.remove).toHaveBeenCalled()
 
-        it "can open an upload dialog", ->
-            uploadSpies = spyOnConstructor("UploadDialog", ["show", "el"])
-            uploadSpies.show.andReturn(uploadSpies)
+        # it "can open an upload dialog", ->
+        #     uploadSpies = spyOnConstructor("UploadDialog", ["show", "el"])
+        #     uploadSpies.show.andReturn(uploadSpies)
 
-            @view.render().$(".action-upload").click()
-            ctorOptions = uploadSpies.constructor.mostRecentCall.args[0]
-            expect(ctorOptions.model.get('title')).toMatch(/abcde/)
-            expect(typeof ctorOptions.onSuccess).toBe('function')
-            expect(uploadSpies.show).toHaveBeenCalled()
+        #     @view.render().$(".action-upload").click()
+        #     ctorOptions = uploadSpies.constructor.mostRecentCall.args[0]
+        #     expect(ctorOptions.model.get('title')).toMatch(/abcde/)
+        #     expect(typeof ctorOptions.onSuccess).toBe('function')
+        #     expect(uploadSpies.show).toHaveBeenCalled()
 
         # Disabling because this test does not close the modal dialog. This can cause
         # tests that run after it to fail (see STUD-1963).
