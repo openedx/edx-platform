@@ -387,11 +387,7 @@ $facet-background-color: #007db8;
 
   .header-search-facets {
     @extend %t-title6;
-  }
-
-  section {
-    @extend %t-title6;
-    margin: 0 ($baseline/2);
+    //margin: 0 ($baseline/2);
   }
 
   .header-facet {
@@ -399,33 +395,7 @@ $facet-background-color: #007db8;
     margin: 0 ($baseline/2) ($baseline/2) ($baseline/2);
     color: $facet-text-color;
     font-family: $sans-serif;
-  }
-
-  section {
-    margin: 0;
-    padding: ($baseline/2) 0;
-  }
-
-  a {
-    @include float(left);
-    @include box-sizing(border-box);
-    @include line-height(18.92);
-    @include transition(all $tmg-f2 ease-out 0s);
-    opacity: 1;
-    padding: 0 ($baseline*0.6);
-    width: 100%;
-    overflow: hidden;
-    text-decoration: none;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    color: $facet-text-color;
-
-    //STATE: hover, visited
-    &:hover,
-    &:visited {
-      color: $facet-text-color;
-      text-decoration: none;
-    }
+    //padding: ($baseline/2) 0;
   }
 
   .facet-option {
@@ -456,6 +426,10 @@ $facet-background-color: #007db8;
       height: ($baseline*1.5);
       overflow: hidden;
 
+      .count, .facet-option {
+        color: $white;
+      }
+
       .count {
         @include right($baseline*0.6);
         @include box-sizing(border-box);
@@ -469,32 +443,21 @@ $facet-background-color: #007db8;
         background: $facet-background-color;
         color: $white;
         text-decoration: none;
-
-        .count,
-        a {
-          color: $white;
-
-          .count,
-          .facet-option {
-            color: $white;
-          }
-        }
       }
     }
   }
 
-  .search-facets-lists section {
+  .search-facets-lists, section {
     border-top: 1px solid $courseware-button-border-color;
   }
 
   .toggle {
     @include clearfix();
 
-      button {
-        @extend %t-icon6;
-        @extend %t-strong;
-        color: $facet-background-color;
-      }
+    button {
+      @extend %t-icon6;
+      @extend %t-strong;
+      color: $facet-background-color;
     }
   }
 }
