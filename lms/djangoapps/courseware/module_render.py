@@ -52,7 +52,7 @@ from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from opaque_keys.edx.keys import UsageKey, CourseKey
+from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore, ModuleI18nService
@@ -417,18 +417,23 @@ def get_module_system_for_user(user, field_data_cache,
         """
         user_id = event.get('user_id', user.id)
 
-        grade = event.get('value')
-        max_grade = event.get('max_value')
-
-        field_data_cache.set_score(
-            user_id,
-            descriptor.location,
-            grade,
-            max_grade,
+        # Construct the key for the module
+        key = KeyValueStore.Key(
+            scope=Scope.user_state,
+            user_id=user_id,
+            block_scope_id=descriptor.location,
+            field_name='grade'
         )
 
+        student_module = field_data_cache.find_or_create(key)
+        # Update the grades
+        student_module.grade = event.get('value')
+        student_module.max_grade = event.get('max_value')
+        # Save all changes to the underlying KeyValueStore
+        student_module.save()
+
         # Bin score into range and increment stats
-        score_bucket = get_score_bucket(grade, max_grade)
+        score_bucket = get_score_bucket(student_module.grade, student_module.max_grade)
 
         tags = [
             u"org:{}".format(course_id.org),
@@ -728,23 +733,23 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     return descriptor
 
 
-def load_single_xblock(request, user_id, course_id, usage_key_string):
+def find_target_student_module(request, user_id, course_id, mod_id):
     """
-    Load a single XBlock identified by usage_key_string.
+    Retrieve target StudentModule
     """
-    usage_key = UsageKey.from_string(usage_key_string)
-    course_key = CourseKey.from_string(course_id)
-    usage_key = usage_key.map_into_course(course_key)
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    usage_key = course_id.make_usage_key_from_deprecated_string(mod_id)
     user = User.objects.get(id=user_id)
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-        course_key,
+        course_id,
         user,
         modulestore().get_item(usage_key),
         depth=0,
+        select_for_update=True
     )
     instance = get_module(user, request, usage_key, field_data_cache, grade_bucket_type='xqueue')
     if instance is None:
-        msg = "No module {0} for user {1}--access denied?".format(usage_key_string, user)
+        msg = "No module {0} for user {1}--access denied?".format(mod_id, user)
         log.debug(msg)
         raise Http404
     return instance
@@ -768,7 +773,7 @@ def xqueue_callback(request, course_id, userid, mod_id, dispatch):
     if not isinstance(header, dict) or 'lms_key' not in header:
         raise Http404
 
-    instance = load_single_xblock(request, userid, course_id, mod_id)
+    instance = find_target_student_module(request, userid, course_id, mod_id)
 
     # Transfer 'queuekey' from xqueue response header to the data.
     # This is required to use the interface defined by 'handle_ajax'
