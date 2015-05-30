@@ -141,7 +141,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         Then 10 are displayed.
         """
         self.assertEqual(len(self.lib_page.xblocks), 0)
-        for _ in range(0, 10):
+        for _ in range(10):
             add_component(self.lib_page, "problem", "Multiple Choice")
         self.assertEqual(len(self.lib_page.xblocks), 10)
         add_component(self.lib_page, "problem", "Multiple Choice")

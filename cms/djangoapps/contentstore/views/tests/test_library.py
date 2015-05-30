@@ -51,7 +51,7 @@ class UnitTestLibraries(ModuleStoreTestCase):
         Test that we can GET /library/ to list all libraries visible to the current user.
         """
         # Create some more libraries
-        libraries = [LibraryFactory.create() for _ in range(0, 3)]
+        libraries = [LibraryFactory.create() for _ in range(3)]
         lib_dict = dict([(lib.location.library_key, lib) for lib in libraries])
 
         response = self.client.get_json(LIBRARY_REST_URL)

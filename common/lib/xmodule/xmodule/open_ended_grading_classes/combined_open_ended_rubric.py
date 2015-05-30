@@ -59,9 +59,9 @@ class CombinedOpenEndedRubric(object):
         try:
             rubric_categories = self.extract_categories(rubric_xml)
             if score_list and len(score_list) == len(rubric_categories):
-                for i in xrange(0, len(rubric_categories)):
+                for i in xrange(len(rubric_categories)):
                     category = rubric_categories[i]
-                    for j in xrange(0, len(category['options'])):
+                    for j in xrange(len(category['options'])):
                         if score_list[i] == j:
                             rubric_categories[i]['options'][j]['selected'] = True
             rubric_scores = [cat['score'] for cat in rubric_categories]
@@ -315,23 +315,22 @@ class CombinedOpenEndedRubric(object):
         score_lists = []
         score_type_list = []
         feedback_type_list = []
-        for i in xrange(0, len(scores)):
+        for i in xrange(len(scores)):
             score_cont_list = scores[i]
-            for j in xrange(0, len(score_cont_list)):
+            for j in xrange(len(score_cont_list)):
                 score_list = score_cont_list[j]
                 score_lists.append(score_list)
                 score_type_list.append(score_types[i][j])
                 feedback_type_list.append(feedback_types[i][j])
 
         score_list_len = len(score_lists[0])
-        for i in xrange(0, len(score_lists)):
-            score_list = score_lists[i]
+        for score_list in score_lists:
             if len(score_list) != score_list_len:
                 return success, ""
 
         score_tuples = []
-        for i in xrange(0, len(score_lists)):
-            for j in xrange(0, len(score_lists[i])):
+        for i in xrange(len(score_lists)):
+            for j in xrange(len(score_lists[i])):
                 tuple = [1, j, score_lists[i][j], [], []]
                 score_tuples, tup_ind = CombinedOpenEndedRubric.check_for_tuple_matches(score_tuples, tuple)
                 score_tuples[tup_ind][0] += 1
@@ -353,9 +352,9 @@ class CombinedOpenEndedRubric(object):
         category = tuple[1]
         score = tuple[2]
         tup_ind = -1
-        for t in xrange(0, len(tuples)):
-            if tuples[t][1] == category and tuples[t][2] == score:
-                tup_ind = t
+        for ind in xrange(len(tuples)):
+            if tuples[ind][1] == category and tuples[ind][2] == score:
+                tup_ind = ind
                 break
 
         if tup_ind == -1:

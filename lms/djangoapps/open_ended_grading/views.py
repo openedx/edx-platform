@@ -247,7 +247,7 @@ def combined_notifications(request, course_id):
     notification_tuples = open_ended_notifications.NOTIFICATION_TYPES
 
     notification_list = []
-    for response_num in xrange(0, len(notification_tuples)):
+    for response_num in xrange(len(notification_tuples)):
         tag = notification_tuples[response_num][0]
         if tag in response:
             url_name = notification_tuples[response_num][1]

@@ -55,11 +55,11 @@ class FakeEmail(FakeInfo):
         super(FakeEmail, self).__init__()
         self.id = unicode(email_id)  # pylint: disable=invalid-name
         # Select a random data for create field
-        year = random.choice(range(1950, 2000))
-        month = random.choice(range(1, 12))
-        day = random.choice(range(1, 28))
-        hour = random.choice(range(0, 23))
-        minute = random.choice(range(0, 59))
+        year = random.randint(1950, 2000)
+        month = random.randint(1, 12)
+        day = random.randint(1, 28)
+        hour = random.randint(0, 23)
+        minute = random.randint(0, 59)
         self.created = datetime.datetime(year, month, day, hour, minute, tzinfo=utc)
 
 

@@ -58,7 +58,7 @@ COURSE_CHILD_STRUCTURE = {
 def create_children(store, parent, category, load_factor):
     """ create load_factor children within the given parent; recursively call to insert children when appropriate """
     created_count = 0
-    for child_index in range(0, load_factor):
+    for child_index in range(load_factor):
         child_object = ItemFactory.create(
             parent_location=parent.location,
             category=category,

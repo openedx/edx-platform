@@ -553,14 +553,14 @@ class AnnotationInputTemplateTest(TemplateTestCase):
             {'id': id_num,
              'choice': 'correct',
              'description': '<p>Unescaped <b>HTML {0}</b></p>'.format(id_num)}
-            for id_num in range(0, 5)]
+            for id_num in range(5)]
 
         xml = self.render_to_xml(self.context)
 
         # Expect that each option description is visible
         # with unescaped HTML.
         # Since the HTML is unescaped, we can traverse the XML tree
-        for id_num in range(0, 5):
+        for id_num in range(5):
             xpath = "//span[@data-id='{0}']/p/b".format(id_num)
             self.assert_has_text(xml, xpath, 'HTML {0}'.format(id_num), exact=False)
 
@@ -689,7 +689,7 @@ class OptionInputTemplateTest(TemplateTestCase):
 
         # Create options 0-4, and select option 2
         self.context['options'] = [(id_num, '<b>Option {0}</b>'.format(id_num))
-                                   for id_num in range(0, 5)]
+                                   for id_num in range(5)]
         self.context['value'] = 2
 
         xml = self.render_to_xml(self.context)
@@ -701,7 +701,7 @@ class OptionInputTemplateTest(TemplateTestCase):
         # Should have each of the options, with the correct description
         # The description HTML should NOT be escaped
         # (that's why we descend into the <b> tag)
-        for id_num in range(0, 5):
+        for id_num in range(5):
             xpath = "//option[@value='{0}']/b".format(id_num)
             self.assert_has_text(xml, xpath, 'Option {0}'.format(id_num))
 
