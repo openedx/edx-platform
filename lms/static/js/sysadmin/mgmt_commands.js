@@ -62,12 +62,12 @@
                     'required': true
                 },
                 {
-                    'argument': 'grade',
+                    'argument': 'grade_value',
                     'display_name': gettext('grade'),
                     'required': false
                 },
                 {
-                    'argument': 'template',
+                    'argument': 'template_file',
                     'display_name': gettext('template'),
                     'required': false
                 },
