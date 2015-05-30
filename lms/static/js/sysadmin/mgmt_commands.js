@@ -88,14 +88,19 @@
     }
 
     function submitForm(event){
+
+        var form = $('#command-form');
+        var form_data = form.clone();
+        form_data.find('input:not([required])').filter(function() {
+            return $(this).val() === '';
+        }).remove();
         var button = $(event.target);
         button.prop('disabled',true);
-        var form = $('#command-form');
 
         $.ajax({
             url: '/sysadmin/mgmt_commands/',
             type: 'POST',
-            data: form.serialize(),
+            data: form_data.serialize(),
             dataType: 'json',
             success: function(data) {
 
@@ -129,11 +134,13 @@
         $inputRow.addClass('form-actions')
         var label = $(document.createElement('label'));
         label.html(arg.display_name);
+        var input = $(document.createElement('input'));
+
         if (arg.required){
-            label.append('<span>*</span>')
+            label.append('*');
+            input.prop('required', true);
         }
 
-        var input = $(document.createElement('input'));
 
         if (type == 'kwarg'){
 
