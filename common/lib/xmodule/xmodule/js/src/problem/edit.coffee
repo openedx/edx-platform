@@ -368,9 +368,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&apos;');
-          line = line.replace(/>>/g, '<legend>');
-          line = line.replace(/<+$/g, '</legend>');
-          line = line.replace(/<</g, '');
+          line = line.replace(/>>|<</g, '');
         } else if (line.match(/<\w+response/) && didinput && curlabel == prevlabel) {
           // reset label to prevent gobbling up previous one (if multiple questions)
           curlabel = '';
