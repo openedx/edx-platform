@@ -30,6 +30,7 @@ load-plugins = edx_lint.pylint
 [MESSAGES CONTROL]
 disable = 
 	locally-disabled,
+	locally-enabled,
 	too-few-public-methods,
 	bad-builtin,
 	star-args,
@@ -150,4 +151,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = Exception
 
-# 05a77c494ca87a2939bd5db9ef4988ea248c417e
+# 0f5810dfd8c52cdd91c425550319ae6040a8fe3e
