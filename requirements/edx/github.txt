@@ -44,7 +44,7 @@ git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c
 -e git+https://github.com/edx/i18n-tools.git@3478455a2cc59a734432264e409b8eade1e4b167#egg=i18n-tools
 -e git+https://github.com/edx/edx-oauth2-provider.git@0.5.1#egg=oauth2-provider
 -e git+https://github.com/edx/edx-val.git@b1e11c9af3233bc06a17acbb33179f46d43c3b87#egg=edx-val
--e git+https://github.com/pmitros/RecommenderXBlock.git@e1697b648bc347a65fc24265501355375ff739a2#egg=recommender-xblock
+-e git+https://github.com/pmitros/RecommenderXBlock.git@518234bc354edbfc2651b9e534ddb54f96080779#egg=recommender-xblock
 -e git+https://github.com/edx/edx-milestones.git@547f2250ee49e73ce8d7ff4e78ecf1b049892510#egg=edx-milestones
 -e git+https://github.com/edx/edx-search.git@ae459ead41962c656ce794619f58cdae46eb7896#egg=edx-search
 git+https://github.com/edx/edx-lint.git@8bf82a32ecb8598c415413df66f5232ab8d974e9#egg=edx_lint==0.2.1
