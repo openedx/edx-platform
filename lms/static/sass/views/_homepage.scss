@@ -16,7 +16,7 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
       @extend %ui-no-list;
 
       .courses-listing-item {
-        margin: ($baseline*0.75) 0 ($baseline*1.5) 0;
+        margin: 0 0 ($baseline*1.5) 0;
         max-height: $course-card-height;
       }
     }

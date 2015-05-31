@@ -49,10 +49,10 @@ $facet-background-color: #007db8;
 
     .courses {
       @include rtl() { $layout-direction: "RTL"; }
-      @include span-columns(9);
+      @include fill-parent();
 
       @include media($bp-medium) {
-        @include span-columns(4);
+        @include span-columns(8);
       }
 
       @include media($bp-large) {
@@ -65,11 +65,11 @@ $facet-background-color: #007db8;
 
       .courses-listing .courses-listing-item {
         @include fill-parent();
-        margin: ($baseline*0.75) 0 ($baseline*1.5) 0;
+        margin: 0 0 ($baseline*1.5) 0;
         max-height: $course-card-height;
 
         @include media($bp-medium) {
-          @include span-columns(8); // 4 of 8
+          @include span-columns(4); // 4 of 8
           @include omega(1n);
         }
 
@@ -182,16 +182,18 @@ $facet-background-color: #007db8;
     @include rtl() { $layout-direction: "RTL"; }
 
     .search-status-label {
-      @extend %t-title4;
+      @extend %t-title3;
       @include span-columns(9);
       min-height: $course-search-input-height;
 
       @include media($bp-tiny) {
-        @include span-columns(4);
+        @include fill-parent();
+        @include font-size(20);
       }
 
       @include media($bp-small) {
         @include span-columns(4);
+        @include font-size(20);
       }
 
       @include media($bp-medium) {
@@ -209,11 +211,11 @@ $facet-background-color: #007db8;
       position: relative;
 
       @include media($bp-tiny) {
-        @include span-columns(3);
+        @include fill-parent();
       }
 
       @include media($bp-small) {
-        @include span-columns(3);
+        @include span-columns(4);
       }
 
       @include media($bp-medium) {
@@ -242,7 +244,7 @@ $facet-background-color: #007db8;
     &:focus {
       @extend %no-outline;
       box-shadow: none;
-      border-color: $m-blue-d1;
+      border-color: $blue-d2;
     }
   }
 
@@ -254,10 +256,10 @@ $facet-background-color: #007db8;
     @include right(0);
     position: absolute;
     top: 0;
-    border: 2px solid $m-blue-d1;
+    border: 2px solid $blue-d2;
     border-radius: ($baseline*0.1);
     box-shadow: none;
-    background: $m-blue-d5;
+    background: $blue;
     padding: 0 ($baseline*0.7);
     height: $course-search-input-height;
     color: $white;
@@ -265,9 +267,16 @@ $facet-background-color: #007db8;
 
     //STATE: hover, focus
     &:hover, &:focus {
-      background: $m-blue-l1;
+      background: $blue-d1;
     }
   }
+
+  .loading-spinner {
+    @include transition(all $tmg-f1 ease-out 0s);
+    background: $blue;
+    position: absolute;
+    top: ($baseline*0.7); // same as padding rule for .discovery-submit
+  } 
 }
 
 // +Filters - Search
@@ -315,7 +324,7 @@ $facet-background-color: #007db8;
       margin: ($baseline/2);
       width: auto;
       text-align: center;
-      color: $m-blue-d1;
+      color: $blue-d1;
     }
 
     .flt-right {
@@ -341,15 +350,15 @@ $facet-background-color: #007db8;
   max-height: ($baseline*100);
 
   @include media($bp-tiny) {
-    @include span-columns(4);
+    @include fill-parent();
   }
 
   @include media($bp-small) {
-    @include span-columns(3);
+    @include span-columns(4);
   }
 
   @include media($bp-medium) {
-    @include span-columns(4);
+    @include span-columns(8);
   }
 
   @include media($bp-large) {
@@ -378,37 +387,38 @@ $facet-background-color: #007db8;
     content: "";
   }
 
-  .header-search-facets, section {
+  .header-search-facets, .header-facet {
+    @extend %t-title6;
     padding: ($baseline/2);
     margin: 0;
     color: $facet-text-color;
     text-transform: none;
   }
 
-  .header-search-facets {
-    @extend %t-title6;
-    //margin: 0 ($baseline/2);
+  .header-facet {
+    margin: 0 ($baseline/2);
+    padding: ($baseline/2) 0;
   }
 
-  .header-facet {
-    @extend %t-title6;
-    margin: 0 ($baseline/2) ($baseline/2) ($baseline/2);
-    color: $facet-text-color;
-    font-family: $sans-serif;
-    //padding: ($baseline/2) 0;
+  .search-facets-lists section {
+    border-top: 1px solid $courseware-button-border-color;
+  }
+
+  .facet-list {
+    @extend %ui-no-list;
+    padding-bottom: ($baseline/2); 
   }
 
   .facet-option {
-    @include float(left);
-    @include box-sizing(border-box);
+    //@include float(left);
     @include line-height(18.92);
     @include transition(all $tmg-f2 ease-out 0s);
+    @include clearfix();
     @extend %t-action3;
+    @extend %text-truncated;
+    border-radius: 0px;
     opacity: 1;
     width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
     color: $facet-text-color;
 
     &.collapse {
@@ -417,38 +427,30 @@ $facet-background-color: #007db8;
 
     li {
       @include clearfix();
-      @include line-height(18.92);
-      @extend %t-icon6;
       position: relative;
       clear: both;
-      border-top: 1px solid $white;
       padding: 0;
       height: ($baseline*1.5);
-      overflow: hidden;
+    }
 
-      .count, .facet-option {
-        color: $white;
-      }
+    .count {
+      @include right($baseline*0.6);
+      @include box-sizing(border-box);
+      @include transition(all 0.2s ease-out);
+      @include line-height(18.92);
+      position: absolute;
+    }
+
+    //STATE: hover
+    &:hover {
+      background: $facet-background-color;
+      color: $white;
+      text-decoration: none;
 
       .count {
-        @include right($baseline*0.6);
-        @include box-sizing(border-box);
-        @include transition(all 0.2s ease-out);
-        @include line-height(18.92);
-        position: absolute;
-      }
-
-      //STATE: hover
-      &:hover {
-        background: $facet-background-color;
         color: $white;
-        text-decoration: none;
       }
     }
-  }
-
-  .search-facets-lists, section {
-    border-top: 1px solid $courseware-button-border-color;
   }
 
   .toggle {
