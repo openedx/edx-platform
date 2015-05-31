@@ -88,7 +88,11 @@ class InheritanceMixin(XBlockMixin):
     )
     showanswer = String(
         display_name=_("Show Answer"),
-        help=_("Specify when the Show Answer button appears for each problem. Valid values are \"always\", \"answered\", \"attempted\", \"closed\", \"finished\", \"past_due\", and \"never\"."),
+        help=_(
+            'Specify when the Show Answer button appears for each problem. '
+            'Valid values are "always", "answered", "attempted", "closed", '
+            '"finished", "past_due", "correct_or_past_due", and "never".'
+        ),
         scope=Scope.settings,
         default="finished",
     )
