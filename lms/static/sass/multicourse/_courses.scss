@@ -28,12 +28,12 @@ $facet-background-color: #007db8;
 
   .discovery-button:not(:disabled) {
     @extend %t-action2;
+    @include text-align(left);
     outline: 0 none;
     box-shadow:none;
     border: 0;
     background: none;
     padding: 0 ($baseline*0.6);
-    text-align: left;
     text-decoration: none;
     text-shadow: none;
     text-transform: none;
@@ -45,7 +45,7 @@ $facet-background-color: #007db8;
   }
 
   .courses-container {
-    padding: ($baseline*3) ($baseline/2) 0 ($baseline/2);
+    @include padding(($baseline*3), ($baseline/2), 0, ($baseline/2));
 
     .courses {
       @include rtl() { $layout-direction: "RTL"; }
@@ -130,20 +130,20 @@ $facet-background-color: #007db8;
         }
 
         .logo {
-          display: inline-block;
           @include border-right(1px solid $light-gray);
-          height: 80px;
           @include margin-right(30px);
           @include padding-right(30px);
+          display: inline-block;
+          height: 80px;
           position: relative;
           vertical-align: middle;
 
           &::after {
+            @include right(0px);
             content: "";
             display: block;
             height: 80px;
             position: absolute;
-            right: 0px;
             top: 0px;
           }
 
@@ -208,6 +208,7 @@ $facet-background-color: #007db8;
 
     .wrapper-search-input {
       @include span-columns(3);
+      @extend %ui-depth0;
       position: relative;
 
       @include media($bp-tiny) {
@@ -406,11 +407,12 @@ $facet-background-color: #007db8;
 
   .facet-list {
     @extend %ui-no-list;
+    @include clearfix();
     padding-bottom: ($baseline/2); 
   }
 
   .facet-option {
-    //@include float(left);
+    @include float(left);
     @include line-height(18.92);
     @include transition(all $tmg-f2 ease-out 0s);
     @include clearfix();
@@ -435,10 +437,10 @@ $facet-background-color: #007db8;
 
     .count {
       @include right($baseline*0.6);
+      @include float(right);
       @include box-sizing(border-box);
       @include transition(all 0.2s ease-out);
       @include line-height(18.92);
-      position: absolute;
     }
 
     //STATE: hover
