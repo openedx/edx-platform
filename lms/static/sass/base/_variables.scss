@@ -82,6 +82,27 @@ $gray-d2: shade($gray,40%); // #4c4c4c
 $gray-d3: shade($gray,60%); // #323232
 $gray-d4: shade($gray,80%); // #191919
 
+$cms-blue: rgb(0, 159, 230); // NOTE - eventually, this set of blues should be synced with CMS.  
+$blue-l1: tint($cms-blue,20%);
+$blue-l2: tint($cms-blue,40%);
+$blue-l3: tint($cms-blue,60%);
+$blue-l4: tint($cms-blue,80%);
+$blue-l5: tint($cms-blue,90%);
+$blue-d1: shade($cms-blue,20%);
+$blue-d2: shade($cms-blue,40%);
+$blue-d3: shade($cms-blue,60%);
+$blue-d4: shade($cms-blue,80%);
+$blue-s1: saturate($cms-blue,15%);
+$blue-s2: saturate($cms-blue,30%);
+$blue-s3: saturate($cms-blue,45%);
+$blue-u1: desaturate($cms-blue,15%);
+$blue-u2: desaturate($cms-blue,30%);
+$blue-u3: desaturate($cms-blue,45%);
+$blue-t0: rgba($cms-blue, 0.125);
+$blue-t1: rgba($cms-blue, 0.25);
+$blue-t2: rgba($cms-blue, 0.50);
+$blue-t3: rgba($cms-blue, 0.75);
+
 $pink: rgb(182,37,103); // #b72567;
 $pink-l1: tint($pink,20%);
 $pink-l2: tint($pink,40%);
@@ -133,16 +154,23 @@ $green-u1: desaturate($green,15%);
 $green-u2: desaturate($green,30%);
 $green-u3: desaturate($green,45%);
 
+// ====================
+
 // COLORS: social platforms
 $twitter-blue: #55ACEE;
 $facebook-blue: #3B5998;
 $linkedin-blue: #0077B5;
 
+// ====================
+
 // TODO: both blue and yellow variables differ from CMS rgb value, need to confirm change to CMS variable is ok in current platform uses before switching.
 $blue: rgb(0, 120, 176);
 $yellow: rgb(255, 252, 221);
 
+// ====================
+
 // COLORS: old variables
+// DEPRECATED: use colors in lists above 
 $error-red: rgb(253, 87, 87);
 $danger-red: rgb(212, 64, 64);
 $light-gray: rgb(221, 221, 221);
@@ -152,13 +180,15 @@ $sidebar-color: rgb(246, 246, 246);
 $outer-border-color: rgb(170, 170, 170);
 $light-gray: rgb(221,221,221); // #dddddd
 
+// ====================
+
 // used by descriptor css
+// DEPRECATED: use colors in lists above 
 $lightGrey: rgb(237,241,245); // #edf1f5
 $darkGrey: rgb(136,145,161); // #8891a1
 $lightGrey1: $gray-l3;
-$blue-d1: shade($blue,20%);
-$blue-d2: shade($blue,40%);
-$blue-d4: shade($blue,80%);
+
+// ====================
 
 // edx.org marketing site variables
 $m-gray: rgb(138,140,143); // #8A8C8F

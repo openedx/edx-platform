@@ -289,7 +289,7 @@ header.global {
       a {
         display:block;
         padding: ($baseline/4);
-        color: $lighter-base-font-color;
+        color: $link-color;
         font-weight: 600;
 
         &:hover, &:focus, &:active {
@@ -302,7 +302,7 @@ header.global {
 
         a {
           text-decoration: none;
-          color: $link-color;
+          color: $lighter-base-font-color;
         }
       }
     }
