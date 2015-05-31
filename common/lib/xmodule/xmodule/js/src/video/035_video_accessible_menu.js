@@ -10,7 +10,7 @@ function () {
     return function (state) {
         var dfd = $.Deferred();
 
-        if (state.el.find('li.video-tracks') === 0) {
+        if (state.el.find('.video-tracks') === 0) {
             dfd.resolve();
             return dfd.promise();
         }
@@ -60,15 +60,16 @@ function () {
         // the template HTML. In the future accessible menu plugin, everything
         // inside <div class='menu-container'></div> will be generated in this
         // file.
-        var container = state.el.find('li.video-tracks>div.a11y-menu-container'),
-            button = container.children('a.a11y-menu-button'),
-            menuList = container.children('ol.a11y-menu-list'),
-            menuItems = menuList.children('li.a11y-menu-item'),
-            menuItemsLinks = menuItems.children('a.a11y-menu-item-link'),
+        var container = state.el.find('li.video-tracks>.wrapper-more-actions'),
+            downloadLink = container.parent().find('.download-link'),
+            button = container.children('.button-more.has-dropdown'),
+            menuList = container.children('.dropdown-menu'),
+            menuItems = menuList.children('.dropdown-item'),
+            menuItemsLinks = menuItems.children('.action'),
             value = (function (val, activeElement) {
                 return val || activeElement.find('a').data('value') || 'srt';
-            }(state.videoAccessibleMenu.value, menuItems.filter('.active'))),
-            msg = '.' + value;
+            }(state.videoAccessibleMenu.value, menuItems.filter('.is-active'))),
+            transcript_filetype = '.' + value;
 
         $.extend(state.videoAccessibleMenu, {
             container: container,
@@ -80,7 +81,7 @@ function () {
 
         if (value) {
             state.videoAccessibleMenu.setValue(value);
-            button.text(gettext(msg));
+            downloadLink.text(outputButtonText(transcript_filetype));
         }
     }
 
@@ -88,15 +89,13 @@ function () {
         var menu = state.videoAccessibleMenu;
 
         menu.button.attr({
-            'role': 'button',
             'aria-disabled': 'false'
         });
 
-        menu.menuList.attr('role', 'menu');
+        menu.menuList.attr('menu');
 
         menu.menuItemsLinks.each(function(){
             $(this).attr({
-                'role': 'menuitem',
                 'aria-disabled': 'false'
             });
         });
@@ -123,8 +122,13 @@ function () {
         // element to have clicks close the menu when they happen
         // outside of it. We namespace the click event to easily remove it (and
         // only it) in _closeMenu.
-        menu.container.addClass('open');
-        menu.button.text('...');
+        menu.menuList
+            .addClass('is-visible')
+            .removeClass('is-hidden')
+                .focus();
+        menu.button
+            .addClass('is-active')
+                .attr('aria-expanded', 'true');
         if (!without_handler) {
             $(window).on('click.currentMenu', _closeMenuHandler.bind(menu));
         }
@@ -132,12 +136,19 @@ function () {
         // @TODO: onOpen callback
     }
 
+    function _focusOnFirst(menu) {
+        menu.find('.dropdown-item:first .action').focus();
+    }
+
     function _closeMenu(menu, without_handler) {
-        // Remove the previously added clickHandler from window element.
         var msg = '.' + menu.value;
 
-        menu.container.removeClass('open');
-        menu.button.text(gettext(msg));
+        menu.menuList
+            .removeClass('is-visible')
+            .addClass('is-hidden');
+        menu.button
+            .removeClass('is-active')
+                .attr('aria-expanded', 'false');
         if (!without_handler) {
             $(window).off('click.currentMenu');
         }
@@ -161,7 +172,7 @@ function () {
     }
 
     function _toggleMenuHandler(event) {
-        if (this.container.hasClass('open')) {
+        if (this.container.hasClass('is-visible')) {
             _closeMenu(this, true);
         } else {
             _openMenu(this, true);
@@ -187,7 +198,7 @@ function () {
             target = $(event.currentTarget),
             index;
 
-        if (target.is('a.a11y-menu-item-link')) {
+        if (target.is('.action')) {
 
             index = target.parent().index();
 
@@ -196,8 +207,7 @@ function () {
                 case KEY.UP:
                     _previousMenuItemLink(this.menuItemsLinks, index).focus();
                     break;
-                // Scroll down  menu, wrapping at the bottom. Keep menu
-                // open.
+                // Scroll down  menu, wrapping at the bottom. Keep menu open.
                 case KEY.DOWN:
                     _nextMenuItemLink(this.menuItemsLinks, index).focus();
                     break;
@@ -209,8 +219,7 @@ function () {
                     // will give focus to Play/Pause button and tabbing
                     // forward to Volume button.
                     break;
-                // Close menu, give focus to button and change
-                // file type.
+                // Close menu, give focus to button and change file type.
                 case KEY.ENTER:
                 case KEY.SPACE:
                     this.button.focus();
@@ -224,8 +233,14 @@ function () {
                     break;
             }
             return false;
-        }
-        else {
+
+        } else if (target.is('.has-dropdown')) {
+            if (KEY.DOWN == keyCode) {
+                _focusOnFirst(this);
+            }
+            return false;
+        } else {
+
             switch(keyCode) {
                 // Open menu and focus on last element of list above it.
                 case KEY.ENTER:
@@ -239,8 +254,7 @@ function () {
                     _closeMenu(this);
                     break;
             }
-            // We do not stop propagation and default behavior on a TAB
-            // keypress.
+            // We do not stop propagation and default behavior on a TAB keypress.
             return event.keyCode === KEY.TAB;
         }
     }
@@ -265,16 +279,18 @@ function () {
 
         // Attach various events handlers to menu container.
         menu.container.on({
-            'mouseenter': _openMenuHandler.bind(menu),
-            'mouseleave': _closeMenuHandler.bind(menu),
             'click': _toggleMenuHandler.bind(menu),
             'keydown': _keyDownHandler.bind(menu)
         });
 
         // Attach click and keydown event handlers to individual menu items.
         menu.menuItems
-            .on('click', 'a.a11y-menu-item-link', _clickHandler.bind(menu))
-            .on('keydown', 'a.a11y-menu-item-link', _keyDownHandler.bind(menu));
+            .on('click', '.action', _clickHandler.bind(menu))
+            .on('keydown', '.action', _keyDownHandler.bind(menu));
+
+        $(document).on({
+            'click': _closeMenuHandler.bind(menu)
+        });
     }
 
     function setValue(value) {
@@ -282,10 +298,10 @@ function () {
 
         menu.value = value;
         menu.menuItems
-            .removeClass('active')
+            .removeClass('is-active')
             .find("a[data-value='" + value + "']")
             .parent()
-            .addClass('active');
+            .addClass('is-active');
     }
 
     // ***************************************************************
@@ -295,12 +311,22 @@ function () {
     // them available and sets up their context is makeFunctionsPublic().
     // ***************************************************************
 
+    function outputButtonText(fileType) {
+        return interpolate(gettext('Download transcript (%(fileType)s)?'), { fileType: fileType }, true);
+    }
+
     function changeFileType(event) {
-        var fileType = $(event.currentTarget).data('value');
+        var fileType = $(event.currentTarget).data('value'),
+            button = $('.download-link'),
+            wrapper = $('.video-download-button');
 
         this.videoAccessibleMenu.setValue(fileType);
         this.saveState(true, {'transcript_download_format': fileType});
         this.storage.setItem('transcript_download_format', fileType);
+
+        wrapper.find(button)
+            .text(outputButtonText(fileType))
+            .focus();
     }
 
 });

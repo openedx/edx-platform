@@ -357,8 +357,8 @@
         display: block;
         @include float(right);
         width: flex-grid(8);
-        padding: 0;
         margin-top: ($baseline/2);
+        padding: 0;
       }
 
       .course-actions {
@@ -366,18 +366,9 @@
         // UI: course item actions
         .action {
           @include box-sizing(border-box);
-          @include margin-right($baseline/2);
-          @include float(right);
-          min-width: ($baseline*2);
-          color: $gray-l1;
-          border-radius: 3px;
-          padding: 12px;
-          border: 1px solid $white;
-          text-align: center;
 
           &:hover, &:focus {
             color: $gray-d3;
-            border: 1px solid $gray-l4;
           }
 
           // STATE: is-disabled
@@ -393,87 +384,6 @@
           // TYPE: twitter share
           &.action-twitter {
             color: $twitter-blue;
-          }
-        }
-
-        // UI: general actions dropdown layout
-        .wrapper-action-more {
-          display: inline-block;
-          position: relative;
-          @include float(right);
-
-          .actions-dropdown {
-            @extend %ui-no-list;
-            @extend %ui-depth1;
-            display: none;
-            position: absolute;
-            top: ($baseline*2);
-            right: 19px;
-            pointer-events: none;
-            min-width: ($baseline*7);
-
-            &.is-visible {
-              display: block;
-              pointer-events: auto;
-            }
-
-            .actions-dropdown-list {
-              @extend %ui-no-list;
-              @include box-sizing(border-box);
-              display: table;
-              box-shadow: 0 1px 1px $shadow-l1;
-              position: relative;
-              width: 100%;
-              border-radius: 3px;
-              margin: ($baseline/4) 0 0 0;
-              border: 1px solid $gray-l3;
-              padding: ($baseline/4) ($baseline/2);
-              background: $white;
-
-              // ui triangle/nub
-              &:after,
-              &:before {
-                bottom: 100%;
-                right: 6px;
-                border: solid transparent;
-                content: " ";
-                height: 0;
-                width: 0;
-                position: absolute;
-                pointer-events: none;
-              }
-
-              &:after {
-                border-color: $transparent;
-                border-bottom-color: $white;
-                border-width: 6px;
-                @include margin-right(1px);
-              }
-
-              &:before {
-                border-color: $transparent;
-                border-bottom-color: $gray-l3;
-                border-width: 7px;
-              }
-            }
-
-            .actions-item {
-              @extend %t-title7;
-              display: block;
-              margin: 0;
-
-              &.is-hidden {
-                display: none;
-              }
-
-              .action {
-                @include margin-right(0);
-
-                &:hover, &:focus {
-                  border: 1px solid transparent;
-                 }
-              }
-            }
           }
         }
       }
@@ -1294,4 +1204,3 @@ a.fade-cover{
     }
   }
 }
-

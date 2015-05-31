@@ -1241,8 +1241,8 @@ instructor_dash_js = (
 student_account_js = [
     'js/utils/rwd_header.js',
     'js/utils/edx.utils.validate.js',
+    'js/utils/dropdown.js',
     'js/form.ext.js',
-    'js/my_courses_dropdown.js',
     'js/toggle_login_modal.js',
     'js/sticky_filter.js',
     'js/query-params.js',
@@ -1268,7 +1268,6 @@ student_profile_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/student_pro
 
 verify_student_js = [
     'js/form.ext.js',
-    'js/my_courses_dropdown.js',
     'js/toggle_login_modal.js',
     'js/sticky_filter.js',
     'js/query-params.js',
@@ -1276,6 +1275,7 @@ verify_student_js = [
     'js/src/accessibility_tools.js',
     'js/src/ie_shim.js',
     'js/src/string_utils.js',
+    'js/utils/dropdown.js',
     'js/verify_student/models/verification_model.js',
     'js/verify_student/views/error_view.js',
     'js/verify_student/views/image_input_view.js',
@@ -1299,6 +1299,7 @@ reverify_js = [
     'js/verify_student/models/reverification_model.js',
     'js/verify_student/views/incourse_reverify_view.js',
     'js/verify_student/incourse_reverify.js',
+    'js/utils/dropdown.js',
 ]
 
 ccx_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/ccx/**/*.js'))
@@ -1422,7 +1423,7 @@ PIPELINE_JS = {
         # Application will contain all paths not in courseware_only_js
         'source_filenames': ['js/xblock/core.js'] + sorted(common_js) + sorted(project_js) + [
             'js/form.ext.js',
-            'js/my_courses_dropdown.js',
+            'js/utils/dropdown.js',
             'js/toggle_login_modal.js',
             'js/sticky_filter.js',
             'js/query-params.js',

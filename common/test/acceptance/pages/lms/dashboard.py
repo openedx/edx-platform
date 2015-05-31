@@ -166,7 +166,7 @@ class DashboardPage(PageObject):
         """
         Click username dropdown.
         """
-        self.q(css='.dropdown').first.click()
+        self.q(css='.has-dropdown').first.click()
 
     @property
     def username_dropdown_link_text(self):
