@@ -175,16 +175,21 @@ class CourseFields(object):
         help=_('Enter the passports for course LTI tools in the following format: "id:client_key:client_secret".'),
         scope=Scope.settings
     )
-    textbooks = TextbookList(help="List of pairs of (title, url) for textbooks used in this course",
-                             default=[], scope=Scope.content)
+    textbooks = TextbookList(
+        help=_("List of pairs of (title, url) for textbooks used in this course"),
+        default=[],
+        scope=Scope.content
+    )
 
-    wiki_slug = String(help="Slug that points to the wiki for this course", scope=Scope.content)
-    enrollment_start = Date(help="Date that enrollment for this class is opened", scope=Scope.settings)
-    enrollment_end = Date(help="Date that enrollment for this class is closed", scope=Scope.settings)
-    start = Date(help="Start time when this module is visible",
-                 default=DEFAULT_START_DATE,
-                 scope=Scope.settings)
-    end = Date(help="Date that this class ends", scope=Scope.settings)
+    wiki_slug = String(help=_("Slug that points to the wiki for this course"), scope=Scope.content)
+    enrollment_start = Date(help=_("Date that enrollment for this class is opened"), scope=Scope.settings)
+    enrollment_end = Date(help=_("Date that enrollment for this class is closed"), scope=Scope.settings)
+    start = Date(
+        help=_("Start time when this module is visible"),
+        default=DEFAULT_START_DATE,
+        scope=Scope.settings
+    )
+    end = Date(help=_("Date that this class ends"), scope=Scope.settings)
     cosmetic_display_price = Integer(
         display_name=_("Cosmetic Course Display Price"),
         help=_(
@@ -208,7 +213,7 @@ class CourseFields(object):
         scope=Scope.settings
     )
     grading_policy = Dict(
-        help="Grading policy definition for this class",
+        help=_("Grading policy definition for this class"),
         default={
             "GRADER": [
                 {
