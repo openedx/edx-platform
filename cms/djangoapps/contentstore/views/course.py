@@ -693,6 +693,9 @@ def create_new_course_in_store(store, user, org, number, run, fields):
     definition_data = {'wiki_slug': wiki_slug}
     fields.update(definition_data)
 
+    # Set default language from settings
+    fields.update({'language': getattr(settings, 'DEFAULT_COURSE_LANGUAGE', 'en')})
+
     with modulestore().default_store(store):
         # Creating the course raises DuplicateCourseError if an existing course with this org/name is found
         new_course = modulestore().create_course(
@@ -868,6 +871,7 @@ def settings_handler(request, course_key_string):
                 'short_description_editable': short_description_editable,
                 'upload_asset_url': upload_asset_url,
                 'course_handler_url': reverse_course_url('course_handler', course_key),
+                'language_options': settings.ALL_LANGUAGES,
             }
             if prerequisite_course_enabled:
                 courses, in_process_course_actions = get_courses_accessible_to_user(request)

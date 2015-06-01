@@ -30,7 +30,8 @@ define([
                 pre_requisite_courses : [],
                 entrance_exam_enabled : '',
                 entrance_exam_minimum_score_pct: '50',
-                license: null
+                license: null,
+                language: ''
             },
             mockSettingsPage = readFixtures('mock/mock-settings-page.underscore');
 
@@ -154,5 +155,28 @@ define([
             );
             AjaxHelpers.respondWithJson(requests, expectedJson);
         });
+
+        it('should save language as part of course details', function(){
+            var requests = AjaxHelpers.requests(this);
+            var expectedJson = $.extend(true, {}, modelData, {
+                language: 'en',
+            });
+            $('#course-language').val('en').trigger('change');
+            expect(this.model.get('language')).toEqual('en');
+            this.view.saveView();
+            AjaxHelpers.expectJsonRequest(
+                requests, 'POST', urlRoot, expectedJson
+            );
+        });
+
+        it('should not error if about_page_editable is False', function(){
+            var requests = AjaxHelpers.requests(this);
+            // if about_page_editable is false, there is no section.course_details
+            $('.course_details').remove();
+            expect(this.model.get('language')).toEqual('');
+            this.view.saveView();
+            AjaxHelpers.expectJsonRequest(requests, 'POST', urlRoot, modelData);
+        });
+
     });
 });

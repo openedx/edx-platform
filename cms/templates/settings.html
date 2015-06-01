@@ -199,6 +199,28 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
           </div>
           % endif
         </section>
+
+        % if about_page_editable:
+        <section class="group-settings course_details">
+          <header>
+            <h2 class="title-2">${_('Course Details')}</h2>
+            <span class="tip">${_('Provide useful information about your course')}</span>
+          </header>
+          <ol class="list-input">
+            <li class="field" id="field-course-language">
+              <label for="course-language">${_("Course Language")}</label>
+              <select id="course-language">
+                <option value="" selected> - </option>
+                % for lang, label in language_options:
+                  <option value="${lang}">${label}</option>
+                % endfor
+              </select>
+              <span class="tip tip-stacked">${_("Identify the course language here. This is used to assist users find courses that are taught in a specific language.")}</span>
+            </li>
+          </ol>
+        </section>
+        % endif
+
         <hr class="divide" />
             <section class="group-settings marketing">
               <header>

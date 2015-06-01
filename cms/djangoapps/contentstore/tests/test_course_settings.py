@@ -50,6 +50,7 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertIsNone(details.syllabus, "syllabus somehow initialized" + str(details.syllabus))
         self.assertIsNone(details.intro_video, "intro_video somehow initialized" + str(details.intro_video))
         self.assertIsNone(details.effort, "effort somehow initialized" + str(details.effort))
+        self.assertIsNone(details.language, "language somehow initialized" + str(details.language))
 
     def test_encoder(self):
         details = CourseDetails.fetch(self.course.id)
@@ -62,6 +63,7 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertIsNone(jsondetails['syllabus'], "syllabus somehow initialized")
         self.assertIsNone(jsondetails['intro_video'], "intro_video somehow initialized")
         self.assertIsNone(jsondetails['effort'], "effort somehow initialized")
+        self.assertIsNone(jsondetails['language'], "language somehow initialized")
 
     def test_ooc_encoder(self):
         """
@@ -115,6 +117,11 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertEqual(
             CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).course_image_name,
             jsondetails.course_image_name
+        )
+        jsondetails.language = "hr"
+        self.assertEqual(
+            CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).language,
+            jsondetails.language
         )
 
     @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
@@ -316,6 +323,7 @@ class CourseDetailsViewTest(CourseTestCase):
         self.alter_field(url, details, 'intro_video', "intro_video")
         self.alter_field(url, details, 'effort', "effort")
         self.alter_field(url, details, 'course_image_name', "course_image_name")
+        self.alter_field(url, details, 'language', "en")
 
     def compare_details_with_encoding(self, encoded, details, context):
         """
@@ -330,6 +338,7 @@ class CourseDetailsViewTest(CourseTestCase):
         self.assertEqual(details['intro_video'], encoded.get('intro_video', None), context + " intro_video not ==")
         self.assertEqual(details['effort'], encoded['effort'], context + " efforts not ==")
         self.assertEqual(details['course_image_name'], encoded['course_image_name'], context + " images not ==")
+        self.assertEqual(details['language'], encoded['language'], context + " languages not ==")
 
     def compare_date_fields(self, details, encoded, context, field):
         """
