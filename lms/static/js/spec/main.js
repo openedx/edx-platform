@@ -63,6 +63,7 @@
             'js/verify_student/photocapture': 'js/verify_student/photocapture',
             'js/staff_debug_actions': 'js/staff_debug_actions',
             'js/vendor/jquery.qubit': 'js/vendor/jquery.qubit',
+            'js/utils/dropdown': 'js/utils/dropdown',
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
             'js/models/notification': 'js/models/notification',
@@ -629,7 +630,8 @@
         'lms/include/js/spec/edxnotes/plugins/caret_navigation_spec.js',
         'lms/include/js/spec/edxnotes/collections/notes_spec.js',
         'lms/include/js/spec/search/search_spec.js',
-        'lms/include/js/spec/discovery/discovery_spec.js'
+        'lms/include/js/spec/discovery/discovery_spec.js',
+        'lms/include/js/spec/utils/dropdown_spec.js'
     ]);
 
 }).call(this, requirejs, define);

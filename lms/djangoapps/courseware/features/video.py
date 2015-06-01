@@ -44,14 +44,14 @@ VIDEO_BUTTONS = {
     'play': '.video_control.play',
     'pause': '.video_control.pause',
     'fullscreen': '.add-fullscreen',
-    'download_transcript': '.video-tracks > a',
+    'download_transcript': '.video-tracks .download-link',
     'quality': '.quality-control',
 }
 
 VIDEO_MENUS = {
     'language': '.lang .menu',
     'speed': '.speed .menu',
-    'download_transcript': '.video-tracks .a11y-menu-list',
+    'download_transcript': '.video-tracks .dropdown-menu',
 }
 
 coursenum = 'test_course'
@@ -599,7 +599,7 @@ def i_can_download_transcript(_step, format, text):
 
 @step('I select the transcript format "([^"]*)"$')
 def select_transcript_format(_step, format):
-    button_selector = '.video-tracks .a11y-menu-button'
+    button_selector = '.video-tracks .button-more.has-dropdown'
     menu_selector = VIDEO_MENUS['download_transcript']
 
     button = world.css_find(button_selector).first
@@ -607,8 +607,7 @@ def select_transcript_format(_step, format):
     height = button._element.location_once_scrolled_into_view['y']
     world.browser.driver.execute_script("window.scrollTo(0, {});".format(height))
 
-    button.mouse_over()
-    assert world.css_has_text(button_selector, '...', strip=True)
+    button.click()
 
     menu_items = world.css_find(menu_selector + ' a')
     for item in menu_items:
@@ -619,8 +618,8 @@ def select_transcript_format(_step, format):
 
     world.browser.driver.execute_script("window.scrollTo(0, 0);")
 
-    assert world.css_find(menu_selector + ' .active a')[0]['data-value'] == format
-    assert world.css_has_text(button_selector, '.' + format, strip=True)
+    assert world.css_find(menu_selector + ' .is-active a')[0]['data-value'] == format
+    assert world.css_has_text(button_selector, '.' + format, strip=False)
 
 
 @step('video (.*) show the captions$')
