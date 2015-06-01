@@ -578,6 +578,7 @@
     define([
         // Run the LMS tests
         'lms/include/teams/js/spec/teams_factory_spec.js',
+        'lms/include/js/spec/components/header/header_spec.js',
         'lms/include/js/spec/photocapture_spec.js',
         'lms/include/js/spec/staff_debug_actions_spec.js',
         'lms/include/js/spec/views/notification_spec.js',
