@@ -109,6 +109,7 @@ from student.helpers import (
     auth_pipeline_urls, set_logged_in_cookie,
     check_verify_status_by_course
 )
+from student.models import anonymous_id_for_user
 from xmodule.error_module import ErrorDescriptor
 from shoppingcart.models import DonationConfiguration, CourseRegistrationCode
 
@@ -1733,11 +1734,21 @@ def auto_auth(request):
 
     # Provide the user with a valid CSRF token
     # then return a 200 response
-    success_msg = u"{} user {} ({}) with password {} and user_id {}".format(
-        u"Logged in" if login_when_done else "Created",
-        username, email, password, user.id
-    )
-    response = HttpResponse(success_msg)
+    if request.META.get('HTTP_ACCEPT') == 'application/json':
+        response = JsonResponse({
+            'created_status': u"Logged in" if login_when_done else "Created",
+            'username': username,
+            'email': email,
+            'password': password,
+            'user_id': user.id,  # pylint: disable=no-member
+            'anonymous_id': anonymous_id_for_user(user, None),
+        })
+    else:
+        success_msg = u"{} user {} ({}) with password {} and user_id {}".format(
+            u"Logged in" if login_when_done else "Created",
+            username, email, password, user.id  # pylint: disable=no-member
+        )
+        response = HttpResponse(success_msg)
     response.set_cookie('csrftoken', csrf(request)['csrf_token'])
     return response
 
