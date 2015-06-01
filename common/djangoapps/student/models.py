@@ -50,7 +50,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import CourseKey
 from functools import total_ordering
-from openedx.core.djangoapps.content import course_overviews
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverviewDescriptor
 
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
@@ -1313,7 +1313,7 @@ class CourseEnrollment(models.Model):
     @property
     def course_overview(self):
         if not hasattr(self, '_course_overview'):
-            self._course_overview = course_overviews.get_course_overview(self.course_id)
+            self._course_overview = CourseOverviewDescriptor.get_from_id(self.course_id)
         return self._course_overview
 
     def is_verified_enrollment(self):

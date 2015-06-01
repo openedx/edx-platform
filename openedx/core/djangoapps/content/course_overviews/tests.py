@@ -9,7 +9,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore import ModuleStoreEnum
 
-from openedx.core.djangoapps.content.course_overviews import get_course_overview
+from .models import CourseOverviewDescriptor
 from courseware.tests.helpers import LoginEnrollmentTestCase
 
 # TODO me: finish this
@@ -36,8 +36,8 @@ class CourseOverviewDescriptorTests(ModuleStoreTestCase, LoginEnrollmentTestCase
         # Load the CourseOverviewDescriptor from the cache twice. The first load will be a cache miss (because the cache
         # is empty) so the course will be newly created with CourseOverviewDescriptor.create_from_course. The second
         # load will be a cache hit, so the course will be loaded from the cache.
-        course_overview_cache_miss = get_course_overview(course.id)
-        course_overview_cache_hit = get_course_overview(course.id)
+        course_overview_cache_miss = CourseOverviewDescriptor.get_from_id(course.id)
+        course_overview_cache_hit = CourseOverviewDescriptor.get_from_id(course.id)
 
         # Test if all fields (other than a couple special ones) are equal between the three descriptors
         fields_to_test = [
@@ -111,7 +111,7 @@ class CourseOverviewDescriptorTests(ModuleStoreTestCase, LoginEnrollmentTestCase
             },
             {}
         ],
-        [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.xml],
+        [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split],
         [True, False]
     ))
     @ddt.unpack
@@ -120,7 +120,7 @@ class CourseOverviewDescriptorTests(ModuleStoreTestCase, LoginEnrollmentTestCase
             course="test_course",
             org="edX",
             default_store=modulestore_type,
-            *course_kwargs
+            **course_kwargs
         )
         self.setup_user()
         if is_user_enrolled:
