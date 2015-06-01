@@ -1185,10 +1185,15 @@ class RegistrationCodeRedemption(models.Model):
         Returns RegistrationCodeRedemption object if registration code
         has been used during the course enrollment else Returns None.
         """
-        try:
-            return cls.objects.get(course_enrollment=course_enrollment)
-        except RegistrationCodeRedemption.DoesNotExist:
-            return None
+        # theoretically there could be more than one (e.g. someone self-unenrolls
+        # then re-enrolls with a different regcode)
+        reg_codes = cls.objects.filter(course_enrollment=course_enrollment).order_by('-redeemed_at')
+        if reg_codes:
+            # return the first one. In all normal use cases of registration codes
+            # the user will only have one
+            return reg_codes[0]
+
+        return None
 
     @classmethod
     def is_registration_code_redeemed(cls, course_reg_code):

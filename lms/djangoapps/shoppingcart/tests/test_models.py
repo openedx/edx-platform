@@ -27,7 +27,8 @@ from shoppingcart.models import (
     Order, OrderItem, CertificateItem,
     InvalidCartItem, CourseRegistrationCode, PaidCourseRegistration, CourseRegCodeItem,
     Donation, OrderItemSubclassPK,
-    Invoice, CourseRegistrationCodeInvoiceItem, InvoiceTransaction, InvoiceHistory
+    Invoice, CourseRegistrationCodeInvoiceItem, InvoiceTransaction, InvoiceHistory,
+    RegistrationCodeRedemption
 )
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
@@ -469,6 +470,60 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_key))
         # check that the registration codes are generated against the order
         self.assertEqual(len(CourseRegistrationCode.objects.filter(order=self.cart)), item.qty)
+
+    def test_regcode_redemptions(self):
+        """
+        Asserts the data model around RegistrationCodeRedemption
+        """
+        self.cart.order_type = 'business'
+        self.cart.save()
+        CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2)
+        self.cart.purchase()
+
+        reg_code = CourseRegistrationCode.objects.filter(order=self.cart)[0]
+
+        enrollment = CourseEnrollment.enroll(self.user, self.course_key)
+
+        redemption = RegistrationCodeRedemption(
+            registration_code=reg_code,
+            redeemed_by=self.user,
+            course_enrollment=enrollment
+        )
+        redemption.save()
+
+        test_redemption = RegistrationCodeRedemption.registration_code_used_for_enrollment(enrollment)
+
+        self.assertEqual(test_redemption.id, redemption.id)  # pylint: disable=no-member
+
+    def test_regcode_multi_redemptions(self):
+        """
+        Asserts the data model around RegistrationCodeRedemption and
+        what happens when we do multiple redemptions by same user
+        """
+        self.cart.order_type = 'business'
+        self.cart.save()
+        CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2)
+        self.cart.purchase()
+
+        reg_codes = CourseRegistrationCode.objects.filter(order=self.cart)
+
+        self.assertEqual(len(reg_codes), 2)
+
+        enrollment = CourseEnrollment.enroll(self.user, self.course_key)
+
+        ids = []
+        for reg_code in reg_codes:
+            redemption = RegistrationCodeRedemption(
+                registration_code=reg_code,
+                redeemed_by=self.user,
+                course_enrollment=enrollment
+            )
+            redemption.save()
+            ids.append(redemption.id)  # pylint: disable=no-member
+
+        test_redemption = RegistrationCodeRedemption.registration_code_used_for_enrollment(enrollment)
+
+        self.assertIn(test_redemption.id, ids)  # pylint: disable=no-member
 
     def test_add_with_default_mode(self):
         """
