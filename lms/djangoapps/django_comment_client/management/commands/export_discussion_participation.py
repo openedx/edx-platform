@@ -53,6 +53,9 @@ class Command(BaseCommand):
         * thread-type - one of {discussion, question}. Filters discussion participation stats by discussion thread type.
         * end-date - date time in iso8601 format (YYYY-MM-DD hh:mm:ss). Filters discussion participation stats
           by creation date: no threads/comments/replies created *after* this date is included in calculation
+
+    FLAGS:
+        * cohorted_only - only dump cohorted inline discussion threads
         * all - Dump all social stats at once into a particular directory.
 
     Examples:
@@ -68,10 +71,13 @@ class Command(BaseCommand):
     * `./manage.py lms export_discussion_participation <course_key> --end-date=<iso8601 datetime>
         --thread-type=[discussion|question]` - exports discussion participation stats for a course for
         threads/comments/replies created before specified date, including only threads of specified type
+    * `./manage.py lms export_discussion_participation <course_key> --cohorted_only` - exports only cohorted discussion
+        participation stats for a course; output is written to default location (same folder, auto-generated file name)
     """
     THREAD_TYPE_PARAMETER = 'thread_type'
     END_DATE_PARAMETER = 'end_date'
     ALL_PARAMETER = 'all'
+    COHORTED_ONLY_PARAMETER = 'cohorted_only'
 
     args = "<course_id> <output_file_location>"
 
@@ -97,6 +103,12 @@ class Command(BaseCommand):
             '--all',
             action='store_true',
             dest=ALL_PARAMETER,
+            default=False,
+        ),
+        make_option(
+            '--cohorted_only',
+            action='store_true',
+            dest=COHORTED_ONLY_PARAMETER,
             default=False,
         )
     )
@@ -164,12 +176,22 @@ class Command(BaseCommand):
         if not course:
             raise CommandError("Invalid course id: {}".format(course_key))
 
+        target_discussion_ids = None
+        if options.get(self.COHORTED_ONLY_PARAMETER, False):
+            cohorted_discussions = course.cohort_config.get('cohorted_inline_discussions', None)
+            if not cohorted_discussions:
+                raise CommandError("Only cohorted discussions are marked for export, "
+                                   "but no cohorted discussions found for the course")
+            else:
+                target_discussion_ids = cohorted_discussions
+
         raw_end_date = options.get(self.END_DATE_PARAMETER, None)
         end_date = dateutil.parser.parse(raw_end_date) if raw_end_date else None
         data = Extractor().extract(
             course_key,
             end_date=end_date,
-            thread_type=(options.get(self.THREAD_TYPE_PARAMETER, None))
+            thread_type=(options.get(self.THREAD_TYPE_PARAMETER, None)),
+            thread_ids=target_discussion_ids,
         )
 
         filter_str = self._get_filter_string_representation(options)
@@ -210,11 +232,13 @@ class Extractor(object):
         users = CourseEnrollment.users_enrolled_in(course_key)
         return {user.id: user for user in users}
 
-    def _get_social_stats(self, course_key, end_date=None, thread_type=None):
+    def _get_social_stats(self, course_key, end_date=None, thread_type=None, thread_ids=None):
         """ Gets social stats for course with specified filter parameters """
         return {
             int(user_id): data for user_id, data
-            in User.all_social_stats(str(course_key), end_date=end_date, thread_type=thread_type).iteritems()
+            in User.all_social_stats(
+                str(course_key), end_date=end_date, thread_type=thread_type, thread_ids=thread_ids
+            ).iteritems()
         }
 
     def _merge_user_data_and_social_stats(self, userdata, social_stats):
@@ -232,13 +256,14 @@ class Extractor(object):
             result.append(utils.merge_dict(user_record, stats))
         return result
 
-    def extract(self, course_key, end_date=None, thread_type=None):
+    def extract(self, course_key, end_date=None, thread_type=None, thread_ids=None):
         """ Extracts and merges data according to course key and filter parameters """
         users = self._get_users(course_key)
         social_stats = self._get_social_stats(
             course_key,
             end_date=end_date,
-            thread_type=thread_type
+            thread_type=thread_type,
+            thread_ids=thread_ids
         )
         return self._merge_user_data_and_social_stats(users, social_stats)
 
