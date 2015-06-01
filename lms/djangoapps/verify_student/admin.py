@@ -14,7 +14,7 @@ class SoftwareSecurePhotoVerificationAdmin(admin.ModelAdmin):
     """
     list_display = ('id', 'user', 'status', 'receipt_id', 'submitted_at', 'updated_at')
     exclude = ('window',)   # TODO: Remove after deleting this field from the model.
-    raw_id_fields = ('user',)
+    raw_id_fields = ('user', 'reviewing_user')
     search_fields = (
         'receipt_id',
     )
