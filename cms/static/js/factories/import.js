@@ -143,7 +143,10 @@ define([
                 submitBtn.show();
                 $('.progress').show();
             } else {
-                $('.error-block').html(gettext('File format not supported. Please upload a file with a <code>tar.gz</code> extension.')).show();
+                var msg = gettext('File format not supported. Please upload a file with a {file_extension} extension.')
+                    .replace('{file_extension}', '<code>tar.gz</code>');
+
+                $('.error-block').html(msg).show();
             }
         };
 
