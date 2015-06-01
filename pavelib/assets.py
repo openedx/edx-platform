@@ -37,11 +37,13 @@ if edxapp_env.env_tokens.get("THEME_DIR", False):
     lms_sass = theme_dir / "lms" / "static" / "sass"
     lms_css = theme_dir / "lms" / "static" / "css"
     if lms_sass.isdir():
-        SASS_DIRS[lms_sass] = lms_css if lms_css.isdir() else None
+        lms_css.mkdir_p()
+        SASS_DIRS[lms_sass] = lms_css
     studio_sass = theme_dir / "studio" / "static" / "sass"
     studio_css = theme_dir / "studio" / "static" / "css"
     if studio_sass.isdir():
-        SASS_DIRS[studio_sass] = studio_css if studio_css.isdir() else None
+        studio_css.mkdir_p()
+        SASS_DIRS[studio_sass] = studio_css
 
 
 class CoffeeScriptWatcher(PatternMatchingEventHandler):
