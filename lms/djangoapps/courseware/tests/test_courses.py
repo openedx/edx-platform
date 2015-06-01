@@ -29,7 +29,6 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTO
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.tests.xml import factories as xml
 from xmodule.tests.xml import XModuleXmlImportTest
-from openedx.core.djangoapps.content.course_overviews import get_course_overview
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverviewDescriptor
 
 CMS_BASE_TEST = 'testcms'
@@ -91,7 +90,7 @@ class CourseImageTestCaseMixin(ModuleStoreTestCase):
           (2) a CourseOverviewDescriptor corresponding the course
         """
         self.assertEquals(course_image_url(course), expected_url)
-        course_overview = get_course_overview(course.id)
+        course_overview = CourseOverviewDescriptor.get_from_id(course.id)
         self.assertEquals(course_image_url(course_overview), expected_url)
 
 @attr('shard_1')

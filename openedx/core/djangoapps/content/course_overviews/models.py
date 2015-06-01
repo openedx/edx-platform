@@ -6,15 +6,17 @@ import django.db.models
 from django.db.models.fields import *
 from django.utils.timezone import UTC
 from django.utils.translation import ugettext
+from opaque_keys.edx.locator import UsageKey
 
-from xmodule_django.models import CourseKeyField, UsageKeyField
-from xmodule.modulestore.django import modulestore
+from xmodule_django.models import CourseKeyField
 from xmodule.partitions.partitions import NoSuchUserPartitionError
 from xmodule.course_module import CourseFields
 from xmodule.fields import Date
 from xmodule.modulestore.inheritance import UserPartition
 from xmodule.course_module import DEFAULT_START_DATE, CATALOG_VISIBILITY_CATALOG_AND_ABOUT
-from opaque_keys.edx.locator import BlockUsageLocator, UsageKey
+from xmodule.modulestore.django import modulestore
+
+
 
 class UserPartitionListField(TextField):
     """Special field for storing a list of UserPartition objects as a string."""
@@ -67,6 +69,8 @@ FULLY_QUALIFIED_MODULE = "openedx.core.djangoapps.content.course_overviews.model
 for field_class in custom_field_classes:
     add_introspection_rules([], [FULLY_QUALIFIED_MODULE + "." + field_class.__name__])
 
+
+
 class CourseOverviewDescriptor(django.db.models.Model):
     """Model that represents a smaller, less-detailed version of CourseDescriptor. See __init__.py for more detail.
 
@@ -76,45 +80,24 @@ class CourseOverviewDescriptor(django.db.models.Model):
     class should not become part of any inheritance hierarchy that intended to last.
     """
 
-    # Fields specific to this class
-    id = CourseKeyField(db_index=True, primary_key=True, max_length=255)
-    modulestore_type = CharField(max_length=5)  # 'split', 'mongo', or 'xml'
-    _location_str = CharField(max_length=255)
+    @staticmethod
+    def get_from_id(course_id):
+        """Return the CourseOverviewDescriptor for a given course ID.
 
-    # Analogous to fields from: lms_xblock.mixin.LmsBlockMixin
-    ispublic = NullBooleanField()
-
-    # Analogous to fields from xmodule.modulestore.inheritance.InheritanceMixin
-    static_asset_path = TextField(default="")
-
-    # Analogous to fields from BOTH lms_xblock.mixin.LmsBlockMixin
-    #                           and xmodule.modulestore.inheritance.InheritanceMixin
-    user_partitions = UserPartitionListField(null=True, default="[]")
-    visible_to_staff_only = BooleanField(default=False)
-    group_access = GroupAccessDictField(null=True, default="{}")
-
-    # Analogous to fields from: xmodule.course_module.CourseFields
-    enrollment_start = DateField(null=True)
-    enrollment_end = DateField(null=True)
-    start = DateField(default=DEFAULT_START_DATE, null=True)
-    end = DateField(null=True)
-    advertised_start = TextField(null=True)
-    pre_requisite_courses = CourseIdListField(null=True)
-    end_of_course_survey_url = TextField(null=True)
-    display_name = TextField(default="Empty", null=True)
-    mobile_available = BooleanField(default=False)
-    facebook_url = TextField(default=None, null=True)
-    enrollment_domain = TextField(null=True)
-    certificates_show_before_end = BooleanField(default=False)
-    certificates_display_behavior = TextField(default="end", null=True)
-    course_image = TextField(default="images_course_image.jpg", null=True)
-    cert_name_short = TextField(default="", null=True)
-    cert_name_long = TextField(default="", null=True)
-    display_organization = TextField(null=True)
-    display_coursenumber = TextField(null=True)
-    invitation_only = BooleanField(default=False)
-    catalog_visibility = TextField(default=CATALOG_VISIBILITY_CATALOG_AND_ABOUT, null=True)
-    social_sharing_url = TextField(default=None, null=True)
+        First, we try to load the CourseOverviewDescriptor the database. If it doesn't exist, we load the entire course from
+        modulestore, create a CourseOverviewDescriptor from it, and then save it to the database for future use.
+        """
+        course_overview = None
+        try:
+            course_overview = CourseOverviewDescriptor.objects.get(id=course_id)
+            # Cache hit!
+        except CourseOverviewDescriptor.DoesNotExist:
+            # Cache miss; load entire course and create a CourseOverviewDescriptor from it
+            course = modulestore().get_course(course_id)
+            if course:
+                course_overview = CourseOverviewDescriptor.create_from_course(course)
+                course_overview.save()
+        return course_overview
 
     @staticmethod
     def create_from_course(course):
@@ -164,6 +147,46 @@ class CourseOverviewDescriptor(django.db.models.Model):
             cert_name_short=course.cert_name_short,
             cert_name_long=course.cert_name_long
         )
+
+    # Fields specific to this class
+    id = CourseKeyField(db_index=True, primary_key=True, max_length=255)
+    modulestore_type = CharField(max_length=5)  # 'split', 'mongo', or 'xml'
+    _location_str = CharField(max_length=255)
+
+    # Analogous to fields from: lms_xblock.mixin.LmsBlockMixin
+    ispublic = NullBooleanField()
+
+    # Analogous to fields from xmodule.modulestore.inheritance.InheritanceMixin
+    static_asset_path = TextField(default="")
+
+    # Analogous to fields from BOTH lms_xblock.mixin.LmsBlockMixin
+    #                           and xmodule.modulestore.inheritance.InheritanceMixin
+    user_partitions = UserPartitionListField(null=True, default="[]")
+    visible_to_staff_only = BooleanField(default=False)
+    group_access = GroupAccessDictField(null=True, default="{}")
+
+    # Analogous to fields from: xmodule.course_module.CourseFields
+    enrollment_start = DateField(null=True)
+    enrollment_end = DateField(null=True)
+    start = DateField(default=DEFAULT_START_DATE, null=True)
+    end = DateField(null=True)
+    advertised_start = TextField(null=True)
+    pre_requisite_courses = CourseIdListField(null=True)
+    end_of_course_survey_url = TextField(null=True)
+    display_name = TextField(default="Empty", null=True)
+    mobile_available = BooleanField(default=False)
+    facebook_url = TextField(default=None, null=True)
+    enrollment_domain = TextField(null=True)
+    certificates_show_before_end = BooleanField(default=False)
+    certificates_display_behavior = TextField(default="end", null=True)
+    course_image = TextField(default="images_course_image.jpg", null=True)
+    cert_name_short = TextField(default="", null=True)
+    cert_name_long = TextField(default="", null=True)
+    display_organization = TextField(null=True)
+    display_coursenumber = TextField(null=True)
+    invitation_only = BooleanField(default=False)
+    catalog_visibility = TextField(default=CATALOG_VISIBILITY_CATALOG_AND_ABOUT, null=True)
+    social_sharing_url = TextField(default=None, null=True)
 
     @property
     def merged_group_access(self):

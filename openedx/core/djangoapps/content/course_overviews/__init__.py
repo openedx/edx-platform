@@ -18,26 +18,5 @@ actual module stores. Whenever a course is modified in Studio, we "invalidate th
 CourseOverviewDescriptor (see signals.py).
 """
 
-from xmodule.modulestore.django import modulestore
-
-from .models import CourseOverviewDescriptor
 # importing signals is necessary to activate signal handler
 import signals  # pylint: disable=unused-import
-
-def get_course_overview(course_id):
-    """Return the CourseOverviewDescriptor for a given course ID.
-
-    First, we try to load the CourseOverviewDescriptor the database. If it doesn't exist, we load the entire course from
-    modulestore, create a CourseOverviewDescriptor from it, and then save it to the database for future use.
-    """
-    course_overview = None
-    try:
-        course_overview = CourseOverviewDescriptor.objects.get(id=course_id)
-        # Cache hit!
-    except CourseOverviewDescriptor.DoesNotExist:
-        # Cache miss; load entire course and create a CourseOverviewDescriptor from it
-        course = modulestore().get_course(course_id)
-        if course:
-            course_overview = CourseOverviewDescriptor.create_from_course(course)
-            course_overview.save()
-    return course_overview

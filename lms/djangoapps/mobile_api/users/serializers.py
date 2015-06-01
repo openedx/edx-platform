@@ -69,7 +69,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
     """
     Serializes CourseEnrollment models
     """
-    course_overview = CourseOverviewField()
+    course = CourseOverviewField(source="course_overview")
     certificate = serializers.SerializerMethodField('get_certificate')
 
     def get_certificate(self, model):
@@ -84,7 +84,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
 
     class Meta(object):  # pylint: disable=missing-docstring
         model = CourseEnrollment
-        fields = ('created', 'mode', 'is_active', 'course_overview', 'certificate')
+        fields = ('created', 'mode', 'is_active', 'course', 'certificate')
         lookup_field = 'username'
 
 
