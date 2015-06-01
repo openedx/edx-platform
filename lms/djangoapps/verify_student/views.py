@@ -859,7 +859,7 @@ def submit_photos_for_verification(request):
 
 
 def _compose_message_reverification_email(
-        course_key, user_id, relates_assessment, photo_verification, status, is_secure
+        course_key, user_id, relates_assessment, photo_verification, status, request
 ):  # pylint: disable=invalid-name
     """ Composes subject and message for email
 
@@ -892,8 +892,8 @@ def _compose_message_reverification_email(
         reverification_block = modulestore().get_item(usage_key)
         # Allowed attempts is 1 if not set on verification block
         allowed_attempts = 1 if reverification_block.attempts == 0 else reverification_block.attempts
-        user_attempts = VerificationStatus.get_user_attempts(user_id, course_key, relates_assessment, location_id)
-        left_attempts = allowed_attempts - user_attempts
+        used_attempts = VerificationStatus.get_user_attempts(user_id, course_key, relates_assessment, location_id)
+        left_attempts = allowed_attempts - used_attempts
         is_attempt_allowed = left_attempts > 0
         verification_open = True
         if reverification_block.due:
@@ -903,9 +903,11 @@ def _compose_message_reverification_email(
         context["is_attempt_allowed"] = is_attempt_allowed
         context["verification_open"] = verification_open
         context["due_date"] = get_default_time_display(reverification_block.due)
-        context["is_secure"] = is_secure
-        context["site"] = microsite.get_value('SITE_NAME', 'localhost')
-        context['platform_name'] = microsite.get_value('platform_name', settings.PLATFORM_NAME),
+
+        context["platform_name"] = microsite.get_value('platform_name', settings.PLATFORM_NAME)
+        context["support_link"] = microsite.get_value('email_from_address', settings.CONTACT_EMAIL)
+        context["allowed_attempts"] = allowed_attempts
+        context["used_attempts"] = used_attempts
 
         re_verification_link = reverse(
             'verify_student_incourse_reverify',
@@ -915,7 +917,10 @@ def _compose_message_reverification_email(
                 unicode(location_id)
             )
         )
-        context["reverify_link"] = re_verification_link
+
+        context["course_link"] = request.build_absolute_uri(redirect_url)
+        context["reverify_link"] = request.build_absolute_uri(re_verification_link)
+
         message = render_to_string('emails/reverification_processed.txt', context)
         log.info(
             "Sending email to User_Id=%s. Attempts left for this user are %s. "
@@ -1032,7 +1037,7 @@ def results_callback(request):
             relates_assessment = checkpoints[0].checkpoint_name
 
             subject, message = _compose_message_reverification_email(
-                course_key, user_id, relates_assessment, attempt, status, request.is_secure()
+                course_key, user_id, relates_assessment, attempt, status, request
             )
 
             _send_email(user_id, subject, message)
