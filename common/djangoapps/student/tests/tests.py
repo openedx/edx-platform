@@ -440,6 +440,7 @@ class DashboardTest(ModuleStoreTestCase):
         self.assertNotContains(response, response_url)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
     def test_linked_in_add_to_profile_btn_with_certificate(self):
         # If user has a certificate with valid linked-in config then Add Certificate to LinkedIn button
         # should be visible. and it has URL value with valid parameters.
