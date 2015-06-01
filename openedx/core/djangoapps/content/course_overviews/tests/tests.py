@@ -9,18 +9,19 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore import ModuleStoreEnum
 
-from content.course_overviews import get_course_overview
+from openedx.core.djangoapps.content.course_overviews import get_course_overview
 from courseware.tests.helpers import LoginEnrollmentTestCase
 
 # TODO me: finish this
 
+@ddt.ddt
 class CourseOverviewDescriptorTests(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """Tests for CourseOverviewDescriptor model"""
 
     TODAY = datetime.datetime.now()
     YESTERDAY = TODAY - datetime.timedelta(days=1)
-    TOMORROW = TODAY + datetime.timedleta(days=1)
-    NEXT_MONTH = TODAY + datetime.timedleta(days=30)
+    TOMORROW = TODAY + datetime.timedelta(days=1)
+    NEXT_MONTH = TODAY + datetime.timedelta(days=30)
 
     def check_course_equals_course_overview(self, course):
         """Tests that a CourseDescriptor and its corresponding CourseOverviewDescriptor behave the same.
@@ -100,21 +101,20 @@ class CourseOverviewDescriptorTests(ModuleStoreTestCase, LoginEnrollmentTestCase
             self.assertEqual(course_value, cache_miss_value)
             self.assertEqual(cache_miss_value, cache_hit_value)
 
-    @ddt.data(
-        itertools.product(
-            [
-                {
-                    "static_asset_path": "/my/cool/path",
-                    "display_name": "Test Course",
-                    "start": YESTERDAY,
-                    "end": TOMORROW
-                },
-                {}
-            ],
-            [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.xml],
-            [True, False]
-        )
-    )
+    @ddt.data(*itertools.product(
+        [
+            {
+                "static_asset_path": "/my/cool/path",
+                "display_name": "Test Course",
+                "start": YESTERDAY,
+                "end": TOMORROW
+            },
+            {}
+        ],
+        [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.xml],
+        [True, False]
+    ))
+    @ddt.unpack
     def test_course_overvewiew_behavior(self, course_kwargs, modulestore_type, is_user_enrolled):
         course = CourseFactory.create(
             course="test_course",
