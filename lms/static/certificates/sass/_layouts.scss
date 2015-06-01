@@ -73,18 +73,23 @@
             margin-bottom: spacing-vertical(small);
         }
 
-        .action {
-            // TO-DO: remove the following 2 rules and uncomment original margin bottom once LinkedIn Add to Profile button styling is updated
-            margin-bottom: 0;
-            padding: 0.425rem 0.625rem;
-            //margin-bottom: spacing-vertical(x-small);
+        .message-actions .action {
+            display: block;
+            margin: 0 auto spacing-vertical(small) auto;
 
             &:last-child {
                 margin-bottom: 0;
             }
 
             @include susy-breakpoint($bp-medium, $susy) {
+                display: inline-block;
+                vertical-align: middle;
                 margin-bottom: 0;
+                margin-right: spacing-horizontal(mid-small);
+
+                &:last-child {
+                    margin-right: 0;
+                }
             }
         }
     }
@@ -220,7 +225,7 @@
             max-width: 80%;
             position: absolute;
             top: 50%;
-            left: 50%;
+            @include left(50%);
             transform: translate(-50%, -50%);
         }
     }
