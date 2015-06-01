@@ -17,6 +17,7 @@ from discussion_api.api import (
     get_comment_list,
     get_course_topics,
     get_thread_list,
+    update_thread,
 )
 from discussion_api.forms import CommentListGetForm, ThreadListGetForm
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
@@ -67,7 +68,8 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
     """
     **Use Cases**
 
-        Retrieve the list of threads for a course or post a new thread.
+        Retrieve the list of threads for a course, post a new thread, or modify
+        an existing thread.
 
     **Example Requests**:
 
@@ -81,6 +83,9 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
           "title": "Title text",
           "body": "Body text"
         }
+
+        PATCH /api/discussion/v1/threads/thread_id
+        {"raw_body": "Edited text"}
 
     **GET Parameters**:
 
@@ -109,16 +114,21 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         * following (optional): A boolean indicating whether the user should
             follow the thread upon its creation; defaults to false
 
+    **PATCH Parameters**:
+
+        topic_id, type, title, and raw_body are accepted with the same meaning
+        as in a POST request
+
     **GET Response Values**:
 
         * results: The list of threads; each item in the list has the same
-            fields as the POST response below
+            fields as the POST/PATCH response below
 
         * next: The URL of the next page (or null if first page)
 
         * previous: The URL of the previous page (or null if last page)
 
-    **POST response values**:
+    **POST/PATCH response values**:
 
         * id: The id of the thread
 
@@ -148,6 +158,8 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
             the thread
 
     """
+    lookup_field = "thread_id"
+
     def list(self, request):
         """
         Implements the GET method for the list endpoint as described in the
@@ -172,6 +184,13 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         class docstring.
         """
         return Response(create_thread(request, request.DATA))
+
+    def partial_update(self, request, thread_id):
+        """
+        Implements the PATCH method for the instance endpoint as described in
+        the class docstring.
+        """
+        return Response(update_thread(request, thread_id, request.DATA))
 
 
 class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):

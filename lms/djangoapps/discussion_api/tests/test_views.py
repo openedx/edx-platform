@@ -11,6 +11,8 @@ from pytz import UTC
 
 from django.core.urlresolvers import reverse
 
+from rest_framework.test import APIClient
+
 from discussion_api.tests.utils import CommentsServiceMockMixin, make_minimal_cs_thread
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
@@ -25,6 +27,8 @@ class DiscussionAPIViewTestMixin(CommentsServiceMockMixin, UrlResetMixin):
     in the test client, utility functions, and a test case for unauthenticated
     requests. Subclasses must set self.url in their setUp methods.
     """
+    client_class = APIClient
+
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(DiscussionAPIViewTestMixin, self).setUp()
@@ -288,6 +292,101 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         )
         expected_response_data = {
             "field_errors": {"course_id": {"developer_message": "This field is required."}}
+        }
+        self.assertEqual(response.status_code, 400)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data, expected_response_data)
+
+
+@httpretty.activate
+class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
+    """Tests for ThreadViewSet partial_update"""
+    def setUp(self):
+        super(ThreadViewSetPartialUpdateTest, self).setUp()
+        self.url = reverse("thread-detail", kwargs={"thread_id": "test_thread"})
+
+    def test_basic(self):
+        self.register_get_user_response(self.user)
+        cs_thread = make_minimal_cs_thread({
+            "id": "test_thread",
+            "course_id": unicode(self.course.id),
+            "commentable_id": "original_topic",
+            "username": self.user.username,
+            "user_id": str(self.user.id),
+            "created_at": "2015-05-29T00:00:00Z",
+            "updated_at": "2015-05-29T00:00:00Z",
+            "thread_type": "discussion",
+            "title": "Original Title",
+            "body": "Original body",
+        })
+        self.register_get_thread_response(cs_thread)
+        self.register_put_thread_response(cs_thread)
+        request_data = {"raw_body": "Edited body"}
+        expected_response_data = {
+            "id": "test_thread",
+            "course_id": unicode(self.course.id),
+            "topic_id": "original_topic",
+            "group_id": None,
+            "group_name": None,
+            "author": self.user.username,
+            "author_label": None,
+            "created_at": "2015-05-29T00:00:00Z",
+            "updated_at": "2015-05-29T00:00:00Z",
+            "type": "discussion",
+            "title": "Original Title",
+            "raw_body": "Edited body",
+            "pinned": False,
+            "closed": False,
+            "following": False,
+            "abuse_flagged": False,
+            "voted": False,
+            "vote_count": 0,
+            "comment_count": 0,
+            "unread_comment_count": 0,
+            "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
+            "endorsed_comment_list_url": None,
+            "non_endorsed_comment_list_url": None,
+        }
+        response = self.client.patch(  # pylint: disable=no-member
+            self.url,
+            json.dumps(request_data),
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data, expected_response_data)
+        self.assertEqual(
+            httpretty.last_request().parsed_body,
+            {
+                "course_id": [unicode(self.course.id)],
+                "commentable_id": ["original_topic"],
+                "thread_type": ["discussion"],
+                "title": ["Original Title"],
+                "body": ["Edited body"],
+                "user_id": [str(self.user.id)],
+                "anonymous": ["False"],
+                "anonymous_to_peers": ["False"],
+                "closed": ["False"],
+                "pinned": ["False"],
+            }
+        )
+
+    def test_error(self):
+        self.register_get_user_response(self.user)
+        cs_thread = make_minimal_cs_thread({
+            "id": "test_thread",
+            "course_id": unicode(self.course.id),
+            "user_id": str(self.user.id),
+        })
+        self.register_get_thread_response(cs_thread)
+        request_data = {"title": ""}
+        response = self.client.patch(  # pylint: disable=no-member
+            self.url,
+            json.dumps(request_data),
+            content_type="application/json"
+        )
+        expected_response_data = {
+            "field_errors": {"title": {"developer_message": "This field is required."}}
         }
         self.assertEqual(response.status_code, 400)
         response_data = json.loads(response.content)

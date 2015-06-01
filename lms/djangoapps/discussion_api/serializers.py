@@ -21,6 +21,7 @@ from lms.lib.comment_client.thread import Thread
 from lms.lib.comment_client.user import User as CommentClientUser
 from lms.lib.comment_client.utils import CommentClientRequestError
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_names
+from openedx.core.lib.api.fields import NonEmptyCharField
 
 
 def get_context(course, request, thread=None, parent_id=None):
@@ -44,15 +45,16 @@ def get_context(course, request, thread=None, parent_id=None):
     }
     requester = request.user
     return {
-        # For now, the only groups are cohorts
+        "course": course,
         "request": request,
+        "thread": thread,
+        "parent_id": parent_id,
+        # For now, the only groups are cohorts
         "group_ids_to_names": get_cohort_names(course),
         "is_requester_privileged": requester.id in staff_user_ids or requester.id in ta_user_ids,
         "staff_user_ids": staff_user_ids,
         "ta_user_ids": ta_user_ids,
         "cc_requester": CommentClientUser.from_django_user(requester).retrieve(),
-        "thread": thread,
-        "parent_id": parent_id,
     }
 
 
@@ -63,7 +65,7 @@ class _ContentSerializer(serializers.Serializer):
     author_label = serializers.SerializerMethodField("get_author_label")
     created_at = serializers.CharField(read_only=True)
     updated_at = serializers.CharField(read_only=True)
-    raw_body = serializers.CharField(source="body")
+    raw_body = NonEmptyCharField(source="body")
     abuse_flagged = serializers.SerializerMethodField("get_abuse_flagged")
     voted = serializers.SerializerMethodField("get_voted")
     vote_count = serializers.SerializerMethodField("get_vote_count")
@@ -138,14 +140,14 @@ class ThreadSerializer(_ContentSerializer):
     at introspection and Thread's __getattr__.
     """
     course_id = serializers.CharField()
-    topic_id = serializers.CharField(source="commentable_id")
+    topic_id = NonEmptyCharField(source="commentable_id")
     group_id = serializers.IntegerField(read_only=True)
     group_name = serializers.SerializerMethodField("get_group_name")
     type_ = serializers.ChoiceField(
         source="thread_type",
         choices=[(val, val) for val in ["discussion", "question"]]
     )
-    title = serializers.CharField()
+    title = NonEmptyCharField()
     pinned = serializers.BooleanField(read_only=True)
     closed = serializers.BooleanField(read_only=True)
     following = serializers.SerializerMethodField("get_following")
@@ -198,10 +200,19 @@ class ThreadSerializer(_ContentSerializer):
         """Returns the URL to retrieve the thread's non-endorsed comments."""
         return self.get_comment_list_url(obj, endorsed=False)
 
+    def validate_course_id(self, attrs, _source):
+        """Ensure that course_id is not edited in an update operation."""
+        if self.object:
+            raise ValidationError("This field is not allowed in an update.")
+        return attrs
+
     def restore_object(self, attrs, instance=None):
         if instance:
-            raise ValueError("ThreadSerializer cannot be used for updates.")
-        return Thread(user_id=self.context["cc_requester"]["id"], **attrs)
+            for key, val in attrs.items():
+                instance[key] = val
+            return instance
+        else:
+            return Thread(user_id=self.context["cc_requester"]["id"], **attrs)
 
 
 class CommentSerializer(_ContentSerializer):
