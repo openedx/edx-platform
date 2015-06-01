@@ -139,9 +139,9 @@ class User(models.Model):
         return get_user_social_stats(self.id, self.course_id, end_date=end_date)
 
     @classmethod
-    def all_social_stats(cls, course_id, end_date=None, thread_type=None):
+    def all_social_stats(cls, course_id, end_date=None, thread_type=None, thread_ids=None):
         """ Get social stats for all users participating in a course """
-        return get_user_social_stats('*', course_id, end_date=end_date, thread_type=thread_type)
+        return get_user_social_stats('*', course_id, end_date=end_date, thread_type=thread_type, thread_ids=thread_ids)
 
     def _retrieve(self, *args, **kwargs):
         url = self.url(action='get', params=self.attributes)
@@ -191,7 +191,7 @@ def get_user_social_stats(user_id, course_id, end_date=None, thread_type=None, t
         params.update({'thread_ids': ",".join(thread_ids)})
 
     response = perform_request(
-        'get',
+        'post',
         url,
         params
     )
