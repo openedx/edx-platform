@@ -187,8 +187,8 @@
         &.item-progresspoint-success {
 
           .item-progresspoint-success-date {
+            @include margin-left($baseline/4);
             display: none;
-            margin-left: 5px;
           }
 
           &.is-complete {

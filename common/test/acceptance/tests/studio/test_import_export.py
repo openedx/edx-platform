@@ -184,11 +184,13 @@ class ImportTestMixin(object):
         self.import_page.upload_tarball(self.tarball_name)
         self.import_page.wait_for_upload()
 
-    def test_import_timestamp_value(self):
+    def test_import_timestamp(self):
         """
         Scenario: I perform a course / library import
-            On import success, the page displays a UTC timestamp
+            On import success, the page displays a UTC timestamp previously not visible
+            And if I refresh the page, the timestamp is still displayed
         """
+        self.assertFalse(self.import_page.is_timestamp_visible())
         self.import_page.upload_tarball(self.tarball_name)
         self.import_page.wait_for_upload()
 
@@ -198,17 +200,6 @@ class ImportTestMixin(object):
         self.assertTrue(self.import_page.is_timestamp_visible())
         self.assertEqual(utc_now.strftime('%m/%d/%Y'), import_date)
         self.assertEqual(utc_now.strftime('%H:%M'), import_time)
-
-    def test_import_timestamp_visibility(self):
-        """
-        Scenario: I perform a course / library import
-            On import success, the page displays a timestamp previously not visible
-            And if I refresh the page, the timestamp is still displayed
-        """
-        self.assertFalse(self.import_page.is_timestamp_visible())
-        self.import_page.upload_tarball(self.tarball_name)
-        self.import_page.wait_for_upload()
-        self.assertTrue(self.import_page.is_timestamp_visible())
 
         self.import_page.visit()
         self.import_page.wait_for_tasks(completed=True)
