@@ -4,6 +4,7 @@
 accomplishment_course_title =  accomplishment_copy_course_name
 if certificate_data and certificate_data.get('course_title', ''):
     accomplishment_course_title =  certificate_data.get('course_title', '')
+course_mode_class = course_mode if course_mode else ''
 %>
 
 <article class="accomplishment accomplishment-main">
@@ -17,7 +18,7 @@ if certificate_data and certificate_data.get('course_title', ''):
 
             <div class="accomplishment-type">
                 <span class="accomplishment-type-symbol">
-                    <img class="src" src="/static/certificates/images/ico-distinguished.svg" alt="">
+                    <img class="src" src="/static/certificates/images/ico-${course_mode_class}.svg" alt="">
                 </span>
 
                 <span class="accomplishment-type-label hd-4">${certificate_title}</span>
