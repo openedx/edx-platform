@@ -209,7 +209,7 @@ class CertificatesViewsTests(ModuleStoreTestCase):
         CertificateHtmlViewConfigurationFactory.create()
         LinkedInAddToProfileConfigurationFactory.create()
 
-    def _add_course_certificates(self, count=1, signatory_count=0):
+    def _add_course_certificates(self, count=1, signatory_count=0, is_active=True):
         """
         Create certificate for the course.
         """
@@ -233,7 +233,7 @@ class CertificatesViewsTests(ModuleStoreTestCase):
                 'org_logo_path': '/t4x/orgX/testX/asset/org-logo-{}.png'.format(i),
                 'signatories': signatories,
                 'version': 1,
-                'is_active': True
+                'is_active': is_active
             } for i in xrange(0, count)
         ]
 
@@ -385,6 +385,10 @@ class CertificatesViewsTests(ModuleStoreTestCase):
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_with_preview_mode(self):
+        """
+        test certificate web view should render properly along with its signatories information when accessing it in
+        preview mode. Either the certificate is marked active or not.
+        """
         self.cert.delete()
         self.assertEqual(len(GeneratedCertificate.objects.all()), 0)
         self._add_course_certificates(count=1, signatory_count=2)
@@ -395,6 +399,14 @@ class CertificatesViewsTests(ModuleStoreTestCase):
         response = self.client.get(test_url + '?preview=honor')
         self.assertNotIn(self.course.display_name, response.content)
         self.assertIn('course_title_0', response.content)
+        self.assertIn('Signatory_Title 0', response.content)
+
+        # mark certificate inactive but accessing in preview mode.
+        self._add_course_certificates(count=1, signatory_count=2, is_active=False)
+        response = self.client.get(test_url + '?preview=honor')
+        self.assertNotIn(self.course.display_name, response.content)
+        self.assertIn('course_title_0', response.content)
+        self.assertIn('Signatory_Title 0', response.content)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_invalid_certificate_configuration(self):

@@ -202,13 +202,13 @@ def get_certificate_url(user_id, course_id):
     return url
 
 
-def get_active_web_certificate(course):
+def get_active_web_certificate(course, is_preview_mode=None):
     """
-    Retrieves the active web certificate configuration for the specifed course
+    Retrieves the active web certificate configuration for the specified course
     """
     certificates = getattr(course, 'certificates', '{}')
     configurations = certificates.get('certificates', [])
     for config in configurations:
-        if config.get('is_active'):
+        if config.get('is_active') or is_preview_mode:
             return config
     return None
