@@ -14,7 +14,7 @@ from mock import patch, Mock, ANY
 from django.utils import timezone
 import pytz
 import ddt
-from django.test.client import Client
+from django.test.client import Client, RequestFactory
 from django.test import TestCase
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -2111,15 +2111,13 @@ class TestEmailMessageWithCustomICRVBlock(ModuleStoreTestCase):
         location_id = VerificationStatus.get_location_id(self.attempt)
         usage_key = UsageKey.from_string(location_id)
         redirect_url = get_redirect_url(self.course_key, usage_key.replace(course_key=self.course_key))
-        self.course_link = "https://{site}{courseware_url}".format(
-            site=microsite.get_value('SITE_NAME', 'localhost'),
-            courseware_url=redirect_url
-        )
+        self.request = RequestFactory().get('/url')
+        self.course_link = self.request.build_absolute_uri(redirect_url)
 
     def test_approved_email_message(self):
 
         subject, body = _compose_message_reverification_email(
-            self.course.id, self.user.id, "midterm", self.attempt, "approved", True
+            self.course.id, self.user.id, "midterm", self.attempt, "approved", self.request
         )
 
         self.assertIn(
@@ -2137,7 +2135,7 @@ class TestEmailMessageWithCustomICRVBlock(ModuleStoreTestCase):
     def test_denied_email_message_with_valid_due_date_and_attempts_allowed(self):
 
         subject, body = _compose_message_reverification_email(
-            self.course.id, self.user.id, "midterm", self.attempt, "denied", True
+            self.course.id, self.user.id, "midterm", self.attempt, "denied", self.request
         )
 
         self.assertIn(
@@ -2161,9 +2159,7 @@ class TestEmailMessageWithCustomICRVBlock(ModuleStoreTestCase):
             body
         )
 
-        reverify_link = "https://{}{}".format(
-            microsite.get_value('SITE_NAME', 'localhost'), self.re_verification_link
-        )
+        reverify_link = self.request.build_absolute_uri(self.re_verification_link)
 
         self.assertIn(
             "To try to verify your identity again, select the following "
@@ -2188,7 +2184,7 @@ class TestEmailMessageWithCustomICRVBlock(ModuleStoreTestCase):
         )
 
         __, body = _compose_message_reverification_email(
-            self.course.id, self.user.id, "midterm", self.attempt, "denied", True
+            self.course.id, self.user.id, "midterm", self.attempt, "denied", self.request
         )
 
         self.assertIn(
@@ -2213,7 +2209,7 @@ class TestEmailMessageWithCustomICRVBlock(ModuleStoreTestCase):
         return_value = datetime(2016, 1, 1, tzinfo=timezone.utc)
         with patch.object(timezone, 'now', return_value=return_value):
             __, body = _compose_message_reverification_email(
-                self.course.id, self.user.id, "midterm", self.attempt, "denied", True
+                self.course.id, self.user.id, "midterm", self.attempt, "denied", self.request
             )
 
             self.assertIn(
@@ -2305,6 +2301,7 @@ class TestEmailMessageWithDefaultICRVBlock(ModuleStoreTestCase):
         )
         self.check_point.add_verification_attempt(SoftwareSecurePhotoVerification.objects.create(user=self.user))
         self.attempt = SoftwareSecurePhotoVerification.objects.filter(user=self.user)
+        self.request = RequestFactory().get('/url')
 
     def test_denied_email_message_with_no_attempt_allowed(self):
 
@@ -2316,7 +2313,7 @@ class TestEmailMessageWithDefaultICRVBlock(ModuleStoreTestCase):
         )
 
         __, body = _compose_message_reverification_email(
-            self.course.id, self.user.id, "midterm", self.attempt, "denied", True
+            self.course.id, self.user.id, "midterm", self.attempt, "denied", self.request
         )
 
         self.assertIn(
