@@ -123,7 +123,7 @@ def get_opt_course_with_access(user, action, course_key):
 def course_image_url(course):
     """Try to look up the image url for the course. If it's not found, log an error and return the dead link.
 
-    course: either a CourseDesriptor or CourseOverviewDescriptor
+    course: either a CourseDescriptor or CourseOverviewDescriptor
     """
     modulestore_type = course.modulestore_type if isinstance(course, CourseOverviewDescriptor) else modulestore().get_modulestore_type(course.id)
     if course.static_asset_path or modulestore_type == ModuleStoreEnum.Type.xml:

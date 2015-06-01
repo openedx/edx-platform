@@ -102,13 +102,13 @@ class MongoCourseImageTestCase(CourseImageTestCaseMixin):
     def test_get_image_url(self):
         """Test image URL formatting."""
         course = CourseFactory.create(org='edX', course='999')
-        self.test_course_image_url(course_image_url(course), '/c4x/edX/999/asset/{0}'.format(course.course_image))
+        self.check_course_image_url(course, '/c4x/edX/999/asset/{0}'.format(course.course_image))
 
     def test_non_ascii_image_name(self):
         # Verify that non-ascii image names are cleaned
         course = CourseFactory.create(course_image=u'before_\N{SNOWMAN}_after.jpg')
         self.check_course_image_url(
-            course_image_url(course),
+            course,
             '/c4x/{org}/{course}/asset/before___after.jpg'.format(
                 org=course.location.org,
                 course=course.location.course
@@ -119,7 +119,7 @@ class MongoCourseImageTestCase(CourseImageTestCaseMixin):
         # Verify that image names with spaces in them are cleaned
         course = CourseFactory.create(course_image=u'before after.jpg')
         self.check_course_image_url(
-            course_image_url(course),
+            course,
             '/c4x/{org}/{course}/asset/before_after.jpg'.format(
                 org=course.location.org,
                 course=course.location.course
@@ -133,7 +133,7 @@ class MongoCourseImageTestCase(CourseImageTestCaseMixin):
         """
         course = CourseFactory.create(static_asset_path="foo")
         self.check_course_image_url(
-            course_image_url(course),
+            course,
             '/static/foo/images/course_image.jpg'
         )
 
@@ -145,7 +145,7 @@ class MongoCourseImageTestCase(CourseImageTestCaseMixin):
         course = CourseFactory.create(course_image=u'things_stuff.jpg',
                                       static_asset_path="foo")
         self.check_course_image_url(
-            course_image_url(course),
+            course,
             '/static/foo/things_stuff.jpg'
         )
 
