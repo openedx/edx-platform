@@ -95,7 +95,9 @@
             'js/student_profile/views/learner_profile_view': 'js/student_profile/views/learner_profile_view',
 
             // edxnotes
-            'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min'
+            'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min',
+
+            'course_discovery_meanings': 'js/spec/discovery/course_discovery_meanings'
         },
         shim: {
             'gettext': {
@@ -626,7 +628,8 @@
         'lms/include/js/spec/edxnotes/plugins/scroller_spec.js',
         'lms/include/js/spec/edxnotes/plugins/caret_navigation_spec.js',
         'lms/include/js/spec/edxnotes/collections/notes_spec.js',
-        'lms/include/js/spec/search/search_spec.js'
+        'lms/include/js/spec/search/search_spec.js',
+        'lms/include/js/spec/discovery/discovery_spec.js'
     ]);
 
 }).call(this, requirejs, define);

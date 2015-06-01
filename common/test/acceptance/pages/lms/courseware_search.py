@@ -33,7 +33,7 @@ class CoursewareSearchPage(CoursePage):
 
     def search_for_term(self, text):
         """
-        Search and return results
+        Fill input and do search
         """
         self.enter_search_term(text)
         self.search()

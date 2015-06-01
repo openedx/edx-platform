@@ -1303,6 +1303,8 @@ reverify_js = [
 
 ccx_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/ccx/**/*.js'))
 
+discovery_js = ['js/discovery/main.js']
+
 
 PIPELINE_CSS = {
     'style-vendor': {
@@ -1504,7 +1506,11 @@ PIPELINE_JS = {
     },
     'footer_edx': {
         'source_filenames': ['js/footer-edx.js'],
-        'output_filename': 'js/footer-edx.js',
+        'output_filename': 'js/footer-edx.js'
+    },
+    'discovery': {
+        'source_filenames': discovery_js,
+        'output_filename': 'js/discovery.js'
     }
 }
 

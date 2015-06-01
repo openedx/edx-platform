@@ -133,6 +133,22 @@ FEATURES['CERTIFICATES_HTML_VIEW'] = True
 
 
 ########################## Course Discovery #######################
+from django.utils.translation import ugettext as _
+LANGUAGE_MAP = {'terms': {lang: display for lang, display in ALL_LANGUAGES}, 'name': _('Language')}
+COURSE_DISCOVERY_MEANINGS = {
+    'org': {
+        'name': _('Organization'),
+    },
+    'modes': {
+        'name': _('Course Type'),
+        'terms': {
+            'honor': _('Honor'),
+            'verified': _('Verified'),
+        },
+    },
+    'language': LANGUAGE_MAP,
+}
+
 FEATURES['ENABLE_COURSE_DISCOVERY'] = True
 FEATURES['COURSES_ARE_BROWSEABLE'] = True
 HOMEPAGE_COURSE_MAX = 9
