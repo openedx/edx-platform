@@ -138,9 +138,9 @@ class User(models.Model):
         return get_user_social_stats(self.id, self.course_id, end_date=end_date)
 
     @classmethod
-    def all_social_stats(cls, course_id, end_date=None, thread_type=None):
+    def all_social_stats(cls, course_id, end_date=None, thread_type=None, thread_ids=None):
         """ Get social stats for all users participating in a course """
-        return get_user_social_stats('*', course_id, end_date=end_date, thread_type=thread_type)
+        return get_user_social_stats('*', course_id, end_date=end_date, thread_type=thread_type, thread_ids=thread_ids)
 
     def _retrieve(self, *args, **kwargs):
         url = self.url(action='get', params=self.attributes)
@@ -175,7 +175,7 @@ class User(models.Model):
         self._update_from_response(response)
 
 
-def get_user_social_stats(user_id, course_id, end_date=None, thread_type=None):
+def get_user_social_stats(user_id, course_id, end_date=None, thread_type=None, thread_ids=None):
     """ Queries cs_comments_service for social_stats """
     if not course_id:
         raise CommentClientRequestError("Must provide course_id when retrieving social stats for the user")
@@ -186,9 +186,11 @@ def get_user_social_stats(user_id, course_id, end_date=None, thread_type=None):
         params.update({'end_date': end_date.isoformat()})
     if thread_type:
         params.update({'thread_type': thread_type})
+    if thread_ids:
+        params.update({'thread_ids': ",".join(thread_ids)})
 
     response = perform_request(
-        'get',
+        'post',
         url,
         params
     )
