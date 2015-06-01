@@ -19,11 +19,13 @@ from datetime import datetime
 _target_module = "django_comment_client.management.commands.export_discussion_participation"
 
 _std_parameters_list = (
-    (CourseLocator(org="edX", course="demoX", run="now"), None, None),
-    (CourseLocator(org="otherX", course="courseX", run="later"), datetime(2015, 2, 12), None),
-    (CourseLocator(org="NotAX", course="NotADemo", run="anyyear"), None, 'discussion'),
-    (CourseLocator(org="YeaAX", course="YesADemo", run="anyday"), None, 'question'),
-    (CourseLocator(org="WhatX", course="WhatADemo", run="last_year"), datetime(2014, 3, 17), 'question')
+    (CourseLocator(org="edX", course="demoX", run="now"), None, None, None),
+    (CourseLocator(org="otherX", course="courseX", run="later"), datetime(2015, 2, 12), None, None),
+    (CourseLocator(org="NotAX", course="NotADemo", run="anyyear"), None, 'discussion', None),
+    (CourseLocator(org="YeaAX", course="YesADemo", run="anyday"), None, 'question', None),
+    (CourseLocator(org="WhatX", course="WhatADemo", run="last_year"), datetime(2014, 3, 17), 'question', None),
+    (CourseLocator(org="WhatX", course="WhatADemo", run="last_year"), datetime(2014, 3, 17), None, ['123']),
+    (CourseLocator(org="WhatX", course="WhatADemo", run="last_year"), datetime(2014, 3, 17), 'question', ['1', '2']),
 )
 # pylint: enable=invalid-name
 
@@ -44,7 +46,7 @@ class CommandTest(TestCase):
 
     def set_up_default_mocks(self, patched_get_course):
         """ Sets up default mocks passed via class decorator """
-        patched_get_course.return_value = CourseLocator("edX", "demoX", "now")
+        patched_get_course.return_value = mock.Mock(spec=CourseLocator)
 
     # pylint:disable=unused-argument
     def test_handle_given_no_arguments_raises_command_error(self, patched_get_course):
@@ -150,10 +152,14 @@ class CommandTest(TestCase):
     @ddt.unpack
     @ddt.data(*_std_parameters_list)
     def test_handle_passes_correct_parameters_to_extractor(
-        self, course_key, end_date, thread_type, patched_get_course
+        self, course_key, end_date, thread_type, cohorted_thread_ids, patched_get_course
     ):
         """ Tests that when no explicit filename is given data is exported to default location """
         self.set_up_default_mocks(patched_get_course)
+        if cohorted_thread_ids:
+            type(patched_get_course.return_value).cohort_config = mock.PropertyMock(
+                return_value={'cohorted_inline_discussions': cohorted_thread_ids}
+            )
         patched_open = mock.mock_open()
         with mock.patch("{}.open".format(_target_module), patched_open, create=True), \
                 mock.patch(_target_module + ".Extractor.extract") as patched_extractor:
@@ -161,9 +167,12 @@ class CommandTest(TestCase):
             self.command.handle(
                 str(course_key),
                 end_date=end_date.isoformat() if end_date else end_date,
-                thread_type=thread_type
+                thread_type=thread_type,
+                cohorted_only=True if cohorted_thread_ids else False
             )
-            patched_extractor.assert_called_with(course_key, end_date=end_date, thread_type=thread_type)
+            patched_extractor.assert_called_with(
+                course_key, end_date=end_date, thread_type=thread_type, thread_ids=cohorted_thread_ids
+            )
 
 
 def _make_user_mock(user_id, username="", email="", first_name="", last_name=""):
@@ -221,15 +230,17 @@ class ExtractorTest(TestCase):
 
     @ddt.unpack
     @ddt.data(*_std_parameters_list)
-    def test_extract_invokes_correct_data_extraction_methods(self, course_key, end_date, thread_type):
+    def test_extract_invokes_correct_data_extraction_methods(self, course_key, end_date, thread_type, thread_ids):
         """ Tests that correct underlying extractors are called with proper arguments """
         with mock.patch(_target_module + '.CourseEnrollment.users_enrolled_in') as patched_users_enrolled_in, \
                 mock.patch(_target_module + ".User.all_social_stats") as patched_all_social_stats:
-            self.extractor.extract(course_key, end_date=end_date, thread_type=thread_type)
+            self.extractor.extract(course_key, end_date=end_date, thread_type=thread_type, thread_ids=thread_ids)
             patched_users_enrolled_in.return_value = []
             patched_users_enrolled_in.patched_all_social_stats = {}
             patched_users_enrolled_in.assert_called_with(course_key)
-            patched_all_social_stats.assert_called_with(str(course_key), end_date=end_date, thread_type=thread_type)
+            patched_all_social_stats.assert_called_with(
+                str(course_key), end_date=end_date, thread_type=thread_type, thread_ids=thread_ids
+            )
 
     @ddt.unpack
     @ddt.data(
