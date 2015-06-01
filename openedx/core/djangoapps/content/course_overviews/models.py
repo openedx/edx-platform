@@ -69,6 +69,8 @@ FULLY_QUALIFIED_MODULE = "openedx.core.djangoapps.content.course_overviews.model
 for field_class in custom_field_classes:
     add_introspection_rules([], [FULLY_QUALIFIED_MODULE + "." + field_class.__name__])
 
+def to_json_or_empty_string(val):
+    return json.dumps(val) if val else ''
 
 
 class CourseOverviewDescriptor(django.db.models.Model):
@@ -119,18 +121,18 @@ class CourseOverviewDescriptor(django.db.models.Model):
         return CourseOverviewDescriptor(
             id=course.id,
             modulestore_type=modulestore_type,
-            user_partitions=course.user_partitions,
+            _user_partitions_json=json.dumps(course.user_partitions) if course.user_partitions else '',
             static_asset_path=course.static_asset_path,
             ispublic=course.ispublic,
             visible_to_staff_only=course.visible_to_staff_only,
-            group_access=course.group_access,
+            _group_access=json.dumps(course.group_access) if course.group_access else '',
             _location_str=unicode(course.location),
             enrollment_start=course.enrollment_start,
             enrollment_end=course.enrollment_end,
             start=course.start,
             end=course.end,
             advertised_start=course.advertised_start,
-            pre_requisite_courses=course.pre_requisite_courses,
+            _pre_requisite_courses_str=json.dumps(course.pre_requisite_courses) if course.pre_requisite_courses else '',
             end_of_course_survey_url=course.end_of_course_survey_url,
             display_name=course.display_name,
             mobile_available=course.mobile_available,
@@ -151,19 +153,21 @@ class CourseOverviewDescriptor(django.db.models.Model):
     # Fields specific to this class
     id = CourseKeyField(db_index=True, primary_key=True, max_length=255)
     modulestore_type = CharField(max_length=5)  # 'split', 'mongo', or 'xml'
-    _location_str = CharField(max_length=255)
 
     # Analogous to fields from: lms_xblock.mixin.LmsBlockMixin
     ispublic = NullBooleanField()
 
+    # Analogous to fields from: xmodule.x_module.XModuleMixin
+    _location_str = CharField(max_length=255)
+
     # Analogous to fields from xmodule.modulestore.inheritance.InheritanceMixin
-    static_asset_path = TextField(default="")
+    static_asset_path = TextField(default="", null=True)
 
     # Analogous to fields from BOTH lms_xblock.mixin.LmsBlockMixin
     #                           and xmodule.modulestore.inheritance.InheritanceMixin
-    user_partitions = UserPartitionListField(null=True, default="[]")
+    _user_partitions_json = TextField(default="[]")
     visible_to_staff_only = BooleanField(default=False)
-    group_access = GroupAccessDictField(null=True, default="{}")
+    _group_access_json = TextField(default="{}")
 
     # Analogous to fields from: xmodule.course_module.CourseFields
     enrollment_start = DateField(null=True)
@@ -171,7 +175,7 @@ class CourseOverviewDescriptor(django.db.models.Model):
     start = DateField(default=DEFAULT_START_DATE, null=True)
     end = DateField(null=True)
     advertised_start = TextField(null=True)
-    pre_requisite_courses = CourseIdListField(null=True)
+    _pre_requisite_courses_json = TextField(default='')
     end_of_course_survey_url = TextField(null=True)
     display_name = TextField(default="Empty", null=True)
     mobile_available = BooleanField(default=False)
@@ -276,7 +280,7 @@ class CourseOverviewDescriptor(django.db.models.Model):
         Returns the desired text corresponding the course's start date and time in UTC.  Prefers .advertised_start,
         then falls back to .start
 
-        (Copied directly from xmodule.course_module.CourseDescriptor)
+        (Copied and modified from xmodule.course_module.CourseDescriptor)
         """
         _ = ugettext
         strftime = strftime_localized
@@ -325,7 +329,7 @@ class CourseOverviewDescriptor(django.db.models.Model):
 
         If the course does not have an end date set (course.end is None), an empty string will be returned.
 
-        (Copied from xmodule.course_module.CourseDescriptor, and modified to not use the XBlock
+        (Copied and modified from xmodule.course_module.CourseDescriptor, and modified to not use the XBlock
          runtime)
         """
         if self.end is None:
