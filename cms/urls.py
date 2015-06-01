@@ -50,7 +50,6 @@ urlpatterns = patterns(
     url(r'^heartbeat$', include('heartbeat.urls')),
 
     url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
-    url(r'^lang_pref/', include('lang_pref.urls')),
 )
 
 # User creation and updating views
