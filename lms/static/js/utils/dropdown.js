@@ -71,10 +71,9 @@ var edx = edx || {},
                 dropdown.opts.page.on('keydown', function(e) {
                     var keyCode = e.keyCode,
                         focused = $(e.currentTarget.activeElement),
-                        items, menu, 
-                        keyArray = [13, 38, 40];
+                        items, menu;
 
-                    if ($.inArray(keyCode, keyArray)) {
+                    if (keyCode == 13 || keyCode == 38 || keyCode == 40) {
                         // Prevent default behavior if one of our trigger keys
                         e.preventDefault();
                     }
