@@ -46,9 +46,9 @@ var edx = edx || {},
 
             handlerIsAction: function(key, menu, focused, e) {
 
-                if (key === 38) { // UP
+                if (key === 40) { // UP
                     dropdown.previousMenuItemLink(focused, menu);
-                } else if (key === 40) { // DOWN
+                } else if (key === 38) { // DOWN
                     dropdown.nextMenuItemLink(focused, menu);
                 }
             },
