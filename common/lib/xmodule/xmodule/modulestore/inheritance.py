@@ -153,6 +153,18 @@ class InheritanceMixin(XBlockMixin):
         default=True,
         scope=Scope.settings
     )
+    video_bumper = Dict(
+        display_name=_("Video Pre-Roll"),
+        help=_(
+            """Identify a video, 5-10 seconds in length, to play before course videos. Enter the video ID from"""
+            """ the Video Uploads page and one or more transcript files in the following format:"""
+            """ {"video_id": "ID", "transcripts": {"language": "/static/filename.srt"}}."""
+            """ For example, an entry for a video with two transcripts looks like this:"""
+            """ {"video_id": "77cef264-d6f5-4cf2-ad9d-0178ab8c77be","""
+            """ "transcripts": {"en": "/static/DemoX-D01_1.srt", "uk": "/static/DemoX-D01_1_uk.srt"}}"""
+        ),
+        scope=Scope.settings
+    )
 
     reset_key = "DEFAULT_SHOW_RESET_BUTTON"
     default_reset_button = getattr(settings, reset_key) if hasattr(settings, reset_key) else False
