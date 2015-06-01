@@ -177,8 +177,9 @@ function () {
             }
         };
 
-        var resetDelta = function () {
-            delta['height'] = delta['width'] = 0;
+        var cleanDelta = function () {
+            delta['height'] = 0;
+            delta['width'] = 0;
 
             return module;
         };
@@ -199,23 +200,12 @@ function () {
             return module;
         };
 
-        var destroy = function () {
-            var data = getData();
-            data.element.css({
-                'height': '', 'width': '', 'top': '', 'left': ''
-            });
-            removeCallbacks();
-            resetDelta();
-            mode = null;
-        };
-
         initialize.apply(module, arguments);
 
         return $.extend(true, module, {
             align: align,
             alignByWidthOnly: alignByWidthOnly,
             alignByHeightOnly: alignByHeightOnly,
-            destroy: destroy,
             setParams: initialize,
             setMode: setMode,
             setElement: setElement,
@@ -228,7 +218,7 @@ function () {
             delta: {
                 add: addDelta,
                 substract: substractDelta,
-                reset: resetDelta
+                reset: cleanDelta
             }
         });
     };

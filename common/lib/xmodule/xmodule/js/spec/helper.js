@@ -206,9 +206,6 @@
             },
             toBeInArray: function (array) {
                 return $.inArray(this.actual, array) > -1;
-            },
-            toBeFocused: function () {
-                return $(this.actual)[0] === $(this.actual)[0].ownerDocument.activeElement;
             }
         });
 
@@ -242,11 +239,12 @@
             loadFixtures('video_all.html');
         }
 
-        // If `params` is an object, assign its properties as data attributes
+        // If `params` is an object, assign it's properties as data attributes
         // to the main video DIV element.
         if (_.isObject(params)) {
-            var metadata = _.extend($('#video_id').data('metadata'), params);
-            $('#video_id').data('metadata', metadata);
+            $('#example')
+                .find('#video_id')
+                .data(params);
         }
 
         jasmine.stubRequests();

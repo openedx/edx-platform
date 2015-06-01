@@ -17,10 +17,6 @@ function() {
             return new VolumeControl(state, i18n);
         }
 
-        _.bindAll(this, 'keyDownHandler', 'updateVolumeSilently',
-            'onVolumeChangeHandler', 'openMenu', 'closeMenu',
-            'toggleMuteHandler', 'keyDownButtonHandler', 'destroy'
-        );
         this.state = state;
         this.state.videoVolumeControl = this;
         this.i18n = i18n;
@@ -37,55 +33,17 @@ function() {
         /** Step to increase/decrease volume level via keyboard. */
         step: 20,
 
-        template: [
-            '<div class="volume">',
-                '<a href="#" role="button" aria-disabled="false" title="',
-                    gettext('Volume'), '" aria-label="',
-                    gettext('Click on this button to mute or unmute this video or press UP or DOWN buttons to increase or decrease volume level.'),
-                    '"></a>',
-                '<div role="presentation" class="volume-slider-container">',
-                    '<div class="volume-slider"></div>',
-                '</div>',
-            '</div>'
-        ].join(''),
-
-        destroy: function () {
-            this.volumeSlider.slider('destroy');
-            this.state.el.find('iframe').removeAttr('tabindex');
-            this.a11y.destroy();
-            this.cookie = this.a11y = null;
-            this.closeMenu();
-
-            this.state.el
-                .off('play.volume')
-                .off({
-                    'keydown': this.keyDownHandler,
-                    'volumechange': this.onVolumeChangeHandler
-                });
-            this.el.off({
-                'mouseenter': this.openMenu,
-                'mouseleave': this.closeMenu
-            });
-            this.button.off({
-                'mousedown': this.toggleMuteHandler,
-                'keydown': this.keyDownButtonHandler,
-                'focus': this.openMenu,
-                'blur': this.closeMenu
-            });
-            this.el.remove();
-            delete this.state.videoVolumeControl;
-        },
-
         /** Initializes the module. */
         initialize: function() {
             var volume;
 
+            this.el = this.state.el.find('.volume');
+
             if (this.state.isTouch) {
                 // iOS doesn't support volume change
+                this.el.remove();
                 return false;
             }
-
-            this.el = $(this.template);
             // Youtube iframe react on key buttons and has his own handlers.
             // So, we disallow focusing on iframe.
             this.state.el.find('iframe').attr('tabindex', -1);
@@ -122,28 +80,26 @@ function() {
             // Therefore, we do not need redundant focusing on slider in TAB
             // order.
             container.find('a').attr('tabindex', -1);
-            this.state.el.find('.secondary-controls').append(this.el);
         },
 
         /** Bind any necessary function callbacks to DOM events. */
         bindHandlers: function() {
             this.state.el.on({
-                'keydown': this.keyDownHandler,
-                'play.volume': _.once(this.updateVolumeSilently),
-                'volumechange': this.onVolumeChangeHandler
+                'keydown': this.keyDownHandler.bind(this),
+                'play': _.once(this.updateVolumeSilently.bind(this)),
+                'volumechange': this.onVolumeChangeHandler.bind(this)
             });
             this.el.on({
-                'mouseenter': this.openMenu,
-                'mouseleave': this.closeMenu
+                'mouseenter': this.openMenu.bind(this),
+                'mouseleave': this.closeMenu.bind(this)
             });
             this.button.on({
                 'click': false,
-                'mousedown': this.toggleMuteHandler,
-                'keydown': this.keyDownButtonHandler,
-                'focus': this.openMenu,
-                'blur': this.closeMenu
+                'mousedown': this.toggleMuteHandler.bind(this),
+                'keydown': this.keyDownButtonHandler.bind(this),
+                'focus': this.openMenu.bind(this),
+                'blur': this.closeMenu.bind(this)
             });
-            this.state.el.on('destroy', this.destroy);
         },
 
         /**
@@ -387,10 +343,6 @@ function() {
     };
 
     Accessibility.prototype = {
-        destroy: function () {
-            this.liveRegion.remove();
-        },
-
         /** Initializes the module. */
         initialize: function() {
             this.liveRegion = $('<div />', {
