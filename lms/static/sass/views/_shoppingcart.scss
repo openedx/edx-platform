@@ -284,11 +284,6 @@ $light-border: 1px solid $gray-l5;
     .image {
       @include float(left);
       width: ($baseline*11);
-
-      img {
-        width: 100%;
-        height: 100%;
-      }
     }
 
     .data-input {
@@ -985,6 +980,13 @@ $light-border: 1px solid $gray-l5;
         }
       }
     }
+  }
+}
+
+.course-image, .image {
+  .item-image {
+    width: 100%;
+    height: 100%;
   }
 }
 
