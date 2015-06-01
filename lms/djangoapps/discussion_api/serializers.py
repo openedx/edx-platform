@@ -5,6 +5,7 @@ from urllib import urlencode
 from urlparse import urlunparse
 
 from django.contrib.auth.models import User as DjangoUser
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 
 from rest_framework import serializers
@@ -15,12 +16,14 @@ from django_comment_common.models import (
     FORUM_ROLE_MODERATOR,
     Role,
 )
+from lms.lib.comment_client.comment import Comment
 from lms.lib.comment_client.thread import Thread
 from lms.lib.comment_client.user import User as CommentClientUser
+from lms.lib.comment_client.utils import CommentClientRequestError
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_names
 
 
-def get_context(course, request, thread=None):
+def get_context(course, request, thread=None, parent_id=None):
     """
     Returns a context appropriate for use with ThreadSerializer or
     (if thread is provided) CommentSerializer.
@@ -49,6 +52,7 @@ def get_context(course, request, thread=None):
         "ta_user_ids": ta_user_ids,
         "cc_requester": CommentClientUser.from_django_user(requester).retrieve(),
         "thread": thread,
+        "parent_id": parent_id,
     }
 
 
@@ -204,13 +208,16 @@ class CommentSerializer(_ContentSerializer):
     """
     A serializer for comment data.
 
+    Because it is not a field in the underlying data, parent_id must be provided
+    in the context for both serialization and deserialization.
+
     N.B. This should not be used with a comment_client Comment object that has
     not had retrieve() called, because of the interaction between DRF's attempts
     at introspection and Comment's __getattr__.
     """
     thread_id = serializers.CharField()
     parent_id = serializers.SerializerMethodField("get_parent_id")
-    endorsed = serializers.BooleanField()
+    endorsed = serializers.BooleanField(read_only=True)
     endorsed_by = serializers.SerializerMethodField("get_endorsed_by")
     endorsed_by_label = serializers.SerializerMethodField("get_endorsed_by_label")
     endorsed_at = serializers.SerializerMethodField("get_endorsed_at")
@@ -218,7 +225,7 @@ class CommentSerializer(_ContentSerializer):
 
     def get_parent_id(self, _obj):
         """Returns the comment's parent's id (taken from the context)."""
-        return self.context.get("parent_id")
+        return self.context["parent_id"]
 
     def get_endorsed_by(self, obj):
         """
@@ -257,4 +264,35 @@ class CommentSerializer(_ContentSerializer):
         """Returns the list of the comment's children, serialized."""
         child_context = dict(self.context)
         child_context["parent_id"] = obj["id"]
-        return [CommentSerializer(child, context=child_context).data for child in obj["children"]]
+        return [
+            CommentSerializer(child, context=child_context).data
+            for child in obj.get("children", [])
+        ]
+
+    def validate(self, attrs):
+        """
+        Ensure that parent_id identifies a comment that is actually in the
+        thread identified by thread_id.
+        """
+        parent_id = self.context["parent_id"]
+        if parent_id:
+            parent = None
+            try:
+                parent = Comment(id=parent_id).retrieve()
+            except CommentClientRequestError:
+                pass
+            if not (parent and parent["thread_id"] == attrs["thread_id"]):
+                raise ValidationError(
+                    "parent_id does not identify a comment in the thread identified by thread_id."
+                )
+        return attrs
+
+    def restore_object(self, attrs, instance=None):
+        if instance:  # pragma: no cover
+            raise ValueError("CommentSerializer cannot be used for updates.")
+        return Comment(
+            course_id=self.context["thread"]["course_id"],
+            parent_id=self.context["parent_id"],
+            user_id=self.context["cc_requester"]["id"],
+            **attrs
+        )

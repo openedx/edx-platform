@@ -32,10 +32,10 @@ class Comment(models.Model):
 
     @classmethod
     def url_for_comments(cls, params={}):
-        if params.get('thread_id'):
-            return _url_for_thread_comments(params['thread_id'])
-        else:
+        if params.get('parent_id'):
             return _url_for_comment(params['parent_id'])
+        else:
+            return _url_for_thread_comments(params['thread_id'])
 
     @classmethod
     def url(cls, action, params={}):

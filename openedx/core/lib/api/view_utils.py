@@ -40,7 +40,11 @@ class DeveloperErrorViewMixin(object):
         if hasattr(validation_error, "message_dict"):
             response_obj = {}
             message_dict = dict(validation_error.message_dict)
-            non_field_error_list = message_dict.pop(NON_FIELD_ERRORS, None)
+            # Extract both Django form and DRF serializer non-field errors
+            non_field_error_list = (
+                message_dict.pop(NON_FIELD_ERRORS, []) +
+                message_dict.pop("non_field_errors", [])
+            )
             if non_field_error_list:
                 response_obj["developer_message"] = non_field_error_list[0]
             if message_dict:

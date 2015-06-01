@@ -440,3 +440,106 @@ class ThreadSerializerDeserializationTest(CommentsServiceMockMixin, UrlResetMixi
         data["type"] = "invalid_type"
         serializer = ThreadSerializer(data=data)
         self.assertFalse(serializer.is_valid())
+
+
+@ddt.ddt
+class CommentSerializerDeserializationTest(CommentsServiceMockMixin, ModuleStoreTestCase):
+    """Tests for ThreadSerializer deserialization."""
+    def setUp(self):
+        super(CommentSerializerDeserializationTest, self).setUp()
+        httpretty.reset()
+        httpretty.enable()
+        self.addCleanup(httpretty.disable)
+        self.course = CourseFactory.create()
+        self.user = UserFactory.create()
+        self.register_get_user_response(self.user)
+        self.request = RequestFactory().get("/dummy")
+        self.request.user = self.user
+        self.minimal_data = {
+            "thread_id": "test_thread",
+            "raw_body": "Test body",
+        }
+
+    def save_and_reserialize(self, data, parent_id=None):
+        """
+        Create a serializer with the given data, ensure that it is valid, save
+        the result, and return the full comment data from the serializer.
+        """
+        context = get_context(
+            self.course,
+            self.request,
+            make_minimal_cs_thread({"course_id": unicode(self.course.id)}),
+            parent_id
+        )
+        serializer = CommentSerializer(data=data, context=context)
+        self.assertTrue(serializer.is_valid())
+        serializer.save()
+        return serializer.data
+
+    @ddt.data(None, "test_parent")
+    def test_success(self, parent_id):
+        if parent_id:
+            self.register_get_comment_response({"thread_id": "test_thread", "id": parent_id})
+        self.register_post_comment_response(
+            {"id": "test_comment"},
+            thread_id=(None if parent_id else "test_thread"),
+            parent_id=parent_id
+        )
+        saved = self.save_and_reserialize(self.minimal_data, parent_id=parent_id)
+        expected_url = (
+            "/api/v1/comments/{}".format(parent_id) if parent_id else
+            "/api/v1/threads/test_thread/comments"
+        )
+        self.assertEqual(urlparse(httpretty.last_request().path).path, expected_url)
+        self.assertEqual(
+            httpretty.last_request().parsed_body,
+            {
+                "course_id": [unicode(self.course.id)],
+                "body": ["Test body"],
+                "user_id": [str(self.user.id)],
+            }
+        )
+        self.assertEqual(saved["id"], "test_comment")
+        self.assertEqual(saved["parent_id"], parent_id)
+
+    def test_parent_id_nonexistent(self):
+        self.register_get_comment_error_response("bad_parent", 404)
+        context = get_context(self.course, self.request, make_minimal_cs_thread(), "bad_parent")
+        serializer = CommentSerializer(data=self.minimal_data, context=context)
+        self.assertFalse(serializer.is_valid())
+        self.assertEqual(
+            serializer.errors,
+            {
+                "non_field_errors": [
+                    "parent_id does not identify a comment in the thread identified by thread_id."
+                ]
+            }
+        )
+
+    def test_parent_id_wrong_thread(self):
+        self.register_get_comment_response({"thread_id": "different_thread", "id": "test_parent"})
+        context = get_context(self.course, self.request, make_minimal_cs_thread(), "test_parent")
+        serializer = CommentSerializer(data=self.minimal_data, context=context)
+        self.assertFalse(serializer.is_valid())
+        self.assertEqual(
+            serializer.errors,
+            {
+                "non_field_errors": [
+                    "parent_id does not identify a comment in the thread identified by thread_id."
+                ]
+            }
+        )
+
+    def test_missing_field(self):
+        for field in self.minimal_data:
+            data = self.minimal_data.copy()
+            data.pop(field)
+            serializer = CommentSerializer(
+                data=data,
+                context=get_context(self.course, self.request, make_minimal_cs_thread())
+            )
+            self.assertFalse(serializer.is_valid())
+            self.assertEqual(
+                serializer.errors,
+                {field: ["This field is required."]}
+            )

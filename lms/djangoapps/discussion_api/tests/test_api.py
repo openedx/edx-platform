@@ -17,7 +17,13 @@ from django.test.client import RequestFactory
 from opaque_keys.edx.locator import CourseLocator
 
 from courseware.tests.factories import BetaTesterFactory, StaffFactory
-from discussion_api.api import create_thread, get_comment_list, get_course_topics, get_thread_list
+from discussion_api.api import (
+    create_comment,
+    create_thread,
+    get_comment_list,
+    get_course_topics,
+    get_thread_list,
+)
 from discussion_api.tests.utils import (
     CommentsServiceMockMixin,
     make_minimal_cs_comment,
@@ -1116,3 +1122,144 @@ class CreateThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestC
         data["type"] = "invalid_type"
         with self.assertRaises(ValidationError):
             create_thread(self.request, data)
+
+
+@ddt.ddt
+class CreateCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestCase):
+    """Tests for create_comment"""
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super(CreateCommentTest, self).setUp()
+        httpretty.reset()
+        httpretty.enable()
+        self.addCleanup(httpretty.disable)
+        self.user = UserFactory.create()
+        self.register_get_user_response(self.user)
+        self.request = RequestFactory().get("/test_path")
+        self.request.user = self.user
+        self.course = CourseFactory.create()
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
+        self.register_get_thread_response(
+            make_minimal_cs_thread({
+                "id": "test_thread",
+                "course_id": unicode(self.course.id),
+                "commentable_id": "test_topic",
+            })
+        )
+        self.minimal_data = {
+            "thread_id": "test_thread",
+            "raw_body": "Test body",
+        }
+
+    @ddt.data(None, "test_parent")
+    @mock.patch("eventtracking.tracker.emit")
+    def test_success(self, parent_id, mock_emit):
+        if parent_id:
+            self.register_get_comment_response({"id": parent_id, "thread_id": "test_thread"})
+        self.register_post_comment_response(
+            {
+                "id": "test_comment",
+                "thread_id": "test_thread",
+                "username": self.user.username,
+                "created_at": "2015-05-27T00:00:00Z",
+                "updated_at": "2015-05-27T00:00:00Z",
+            },
+            thread_id=(None if parent_id else "test_thread"),
+            parent_id=parent_id
+        )
+        data = self.minimal_data.copy()
+        if parent_id:
+            data["parent_id"] = parent_id
+        actual = create_comment(self.request, data)
+        expected = {
+            "id": "test_comment",
+            "thread_id": "test_thread",
+            "parent_id": parent_id,
+            "author": self.user.username,
+            "author_label": None,
+            "created_at": "2015-05-27T00:00:00Z",
+            "updated_at": "2015-05-27T00:00:00Z",
+            "raw_body": "Test body",
+            "endorsed": False,
+            "endorsed_by": None,
+            "endorsed_by_label": None,
+            "endorsed_at": None,
+            "abuse_flagged": False,
+            "voted": False,
+            "vote_count": 0,
+            "children": [],
+        }
+        self.assertEqual(actual, expected)
+        expected_url = (
+            "/api/v1/comments/{}".format(parent_id) if parent_id else
+            "/api/v1/threads/test_thread/comments"
+        )
+        self.assertEqual(
+            urlparse(httpretty.last_request().path).path,
+            expected_url
+        )
+        self.assertEqual(
+            httpretty.last_request().parsed_body,
+            {
+                "course_id": [unicode(self.course.id)],
+                "body": ["Test body"],
+                "user_id": [str(self.user.id)]
+            }
+        )
+        expected_event_name = (
+            "edx.forum.comment.created" if parent_id else
+            "edx.forum.response.created"
+        )
+        expected_event_data = {
+            "discussion": {"id": "test_thread"},
+            "commentable_id": "test_topic",
+            "options": {"followed": False},
+            "id": "test_comment",
+            "truncated": False,
+            "body": "Test body",
+            "url": "",
+            "user_forums_roles": [FORUM_ROLE_STUDENT],
+            "user_course_roles": [],
+        }
+        if parent_id:
+            expected_event_data["response"] = {"id": parent_id}
+        actual_event_name, actual_event_data = mock_emit.call_args[0]
+        self.assertEqual(actual_event_name, expected_event_name)
+        self.assertEqual(actual_event_data, expected_event_data)
+
+    def test_thread_id_missing(self):
+        with self.assertRaises(ValidationError) as assertion:
+            create_comment(self.request, {})
+        self.assertEqual(assertion.exception.message_dict, {"thread_id": ["This field is required."]})
+
+    def test_thread_id_not_found(self):
+        self.register_get_thread_error_response("test_thread", 404)
+        with self.assertRaises(ValidationError) as assertion:
+            create_comment(self.request, self.minimal_data)
+        self.assertEqual(assertion.exception.message_dict, {"thread_id": ["Invalid value."]})
+
+    def test_nonexistent_course(self):
+        self.register_get_thread_response(
+            make_minimal_cs_thread({"id": "test_thread", "course_id": "non/existent/course"})
+        )
+        with self.assertRaises(ValidationError) as assertion:
+            create_comment(self.request, self.minimal_data)
+        self.assertEqual(assertion.exception.message_dict, {"thread_id": ["Invalid value."]})
+
+    def test_not_enrolled(self):
+        self.request.user = UserFactory.create()
+        with self.assertRaises(ValidationError) as assertion:
+            create_comment(self.request, self.minimal_data)
+        self.assertEqual(assertion.exception.message_dict, {"thread_id": ["Invalid value."]})
+
+    def test_discussions_disabled(self):
+        _remove_discussion_tab(self.course, self.user.id)
+        with self.assertRaises(ValidationError) as assertion:
+            create_comment(self.request, self.minimal_data)
+        self.assertEqual(assertion.exception.message_dict, {"thread_id": ["Invalid value."]})
+
+    def test_invalid_field(self):
+        data = self.minimal_data.copy()
+        del data["raw_body"]
+        with self.assertRaises(ValidationError):
+            create_comment(self.request, data)

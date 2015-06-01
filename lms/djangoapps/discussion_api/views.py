@@ -11,7 +11,13 @@ from rest_framework.viewsets import ViewSet
 
 from opaque_keys.edx.locator import CourseLocator
 
-from discussion_api.api import create_thread, get_comment_list, get_course_topics, get_thread_list
+from discussion_api.api import (
+    create_comment,
+    create_thread,
+    get_comment_list,
+    get_course_topics,
+    get_thread_list,
+)
 from discussion_api.forms import CommentListGetForm, ThreadListGetForm
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 
@@ -173,6 +179,12 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
         GET /api/discussion/v1/comments/?thread_id=0123456789abcdef01234567
 
+        POST /api/discussion/v1/comments/
+        {
+            "thread_id": "0123456789abcdef01234567",
+            "raw_body": "Body text"
+        }
+
     **GET Parameters**:
 
         * thread_id (required): The thread to retrieve comments for
@@ -185,55 +197,67 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
         * page_size: The number of items per page (default is 10, max is 100)
 
-    **Response Values**:
+    **POST Parameters**:
 
-        * results: The list of comments. Each item in the list includes:
+        * thread_id (required): The thread to post the comment in
 
-            * id: The id of the comment
+        * parent_id: The parent comment of the new comment. Can be null or
+          omitted for a comment that should be directly under the thread
 
-            * thread_id: The id of the comment's thread
+        * raw_body: The comment's raw body text
 
-            * parent_id: The id of the comment's parent
+    **GET Response Values**:
 
-            * author: The username of the comment's author, or None if the
-              comment is anonymous
-
-            * author_label: A label indicating whether the author has a special
-              role in the course, either "staff" for moderators and
-              administrators or "community_ta" for community TAs
-
-            * created_at: The ISO 8601 timestamp for the creation of the comment
-
-            * updated_at: The ISO 8601 timestamp for the last modification of
-                the comment, which may not have been an update of the body
-
-            * raw_body: The comment's raw body text without any rendering applied
-
-            * endorsed: Boolean indicating whether the comment has been endorsed
-                (by a privileged user or, for a question thread, the thread
-                author)
-
-            * endorsed_by: The username of the endorsing user, if available
-
-            * endorsed_by_label: A label indicating whether the endorsing user
-                has a special role in the course (see author_label)
-
-            * endorsed_at: The ISO 8601 timestamp for the endorsement, if
-                available
-
-            * abuse_flagged: Boolean indicating whether the requesting user has
-              flagged the comment for abuse
-
-            * voted: Boolean indicating whether the requesting user has voted
-              for the comment
-
-            * vote_count: The number of votes for the comment
-
-            * children: The list of child comments (with the same format)
+        * results: The list of comments; each item in the list has the same
+            fields as the POST response below
 
         * next: The URL of the next page (or null if first page)
 
         * previous: The URL of the previous page (or null if last page)
+
+    **POST Response Values**:
+
+        * id: The id of the comment
+
+        * thread_id: The id of the comment's thread
+
+        * parent_id: The id of the comment's parent
+
+        * author: The username of the comment's author, or None if the
+          comment is anonymous
+
+        * author_label: A label indicating whether the author has a special
+          role in the course, either "staff" for moderators and
+          administrators or "community_ta" for community TAs
+
+        * created_at: The ISO 8601 timestamp for the creation of the comment
+
+        * updated_at: The ISO 8601 timestamp for the last modification of
+            the comment, which may not have been an update of the body
+
+        * raw_body: The comment's raw body text without any rendering applied
+
+        * endorsed: Boolean indicating whether the comment has been endorsed
+            (by a privileged user or, for a question thread, the thread
+            author)
+
+        * endorsed_by: The username of the endorsing user, if available
+
+        * endorsed_by_label: A label indicating whether the endorsing user
+            has a special role in the course (see author_label)
+
+        * endorsed_at: The ISO 8601 timestamp for the endorsement, if
+            available
+
+        * abuse_flagged: Boolean indicating whether the requesting user has
+          flagged the comment for abuse
+
+        * voted: Boolean indicating whether the requesting user has voted
+          for the comment
+
+        * vote_count: The number of votes for the comment
+
+        * children: The list of child comments (with the same format)
     """
     def list(self, request):
         """
@@ -252,3 +276,10 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
                 form.cleaned_data["page_size"]
             )
         )
+
+    def create(self, request):
+        """
+        Implements the POST method for the list endpoint as described in the
+        class docstring.
+        """
+        return Response(create_comment(request, request.DATA))
