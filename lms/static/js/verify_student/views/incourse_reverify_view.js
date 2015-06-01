@@ -26,14 +26,12 @@
 
             this.errorModel = obj.errorModel || null;
             this.courseKey = obj.courseKey || null;
-            this.checkpointName = obj.checkpointName || null;
             this.platformName = obj.platformName || null;
             this.usageId = obj.usageId || null;
 
 
             this.model = new edx.verify_student.ReverificationModel({
                 courseKey: this.courseKey,
-                checkpointName: this.checkpointName,
                 usageId: this.usageId
             });
 
@@ -47,7 +45,6 @@
                 $( this.templateId ).html(),
                 {
                     courseKey: this.courseKey,
-                    checkpointName: this.checkpointName,
                     platformName: this.platformName
                 }
             );

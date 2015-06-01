@@ -20,7 +20,6 @@
 
     return new edx.verify_student.InCourseReverifyView({
         courseKey: el.data('course-key'),
-        checkpointName: el.data('checkpoint-name'),
         platformName: el.data('platform-name'),
         usageId: el.data('usage-id'),
         errorModel: errorView.model
