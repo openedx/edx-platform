@@ -37,9 +37,21 @@ class CertificateDisplayTest(ModuleStoreTestCase):
         self.update_course(self.course, self.user.username)
 
     @ddt.data('verified', 'professional')
+    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
     def test_display_verified_certificate(self, enrollment_mode):
         self._create_certificate(enrollment_mode)
         self._check_can_download_certificate()
+
+    @ddt.data('verified', 'honor')
+    @override_settings(CERT_NAME_SHORT='Test_Certificate')
+    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
+    def test_display_download_certificate_button(self, enrollment_mode):
+        """
+        Tests if CERTIFICATES_HTML_VIEW is True and there is no active certificate configuration available
+        then any of the Download certificate button should not be visible.
+        """
+        self._create_certificate(enrollment_mode)
+        self._check_can_not_download_certificate()
 
     @ddt.data('verified')
     @override_settings(CERT_NAME_SHORT='Test_Certificate')
@@ -56,6 +68,7 @@ class CertificateDisplayTest(ModuleStoreTestCase):
                 'id': 0,
                 'name': 'Test Name',
                 'description': 'Test Description',
+                'is_active': True,
                 'signatories': [],
                 'version': 1
             }
@@ -85,3 +98,13 @@ class CertificateDisplayTest(ModuleStoreTestCase):
         response = self.client.get(reverse('dashboard'))
         self.assertContains(response, u'Download Your ID Verified')
         self.assertContains(response, self.DOWNLOAD_URL)
+
+    def _check_can_not_download_certificate(self):
+        """
+        Make sure response does not have any of the download certificate buttons
+        """
+        response = self.client.get(reverse('dashboard'))
+        self.assertNotContains(response, u'View Test_Certificate')
+        self.assertNotContains(response, u'Download Your Test_Certificate (PDF)')
+        self.assertNotContains(response, u'Download Test_Certificate (PDF)')
+        self.assertNotContains(response, self.DOWNLOAD_URL)
