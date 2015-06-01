@@ -1,6 +1,6 @@
 // Jasmine Test Suite: Certifiate Details View
 
-define([
+define([ // jshint ignore:line
     'underscore',
     'js/models/course',
     'js/certificates/collections/certificates',
@@ -90,7 +90,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 model: this.model
             });
             appendSetFixtures(this.view.render().el);
-            CustomMatchers(this);
+            CustomMatchers(this); // jshint ignore:line
         });
 
         describe('The Certificate Details view', function() {
@@ -115,7 +115,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
             });
 
             it('should have empty certificate collection if there is an error parsing certifcate JSON', function () {
-                var CERTIFICATE_INVALID_JSON = '[{"course_title": Test certificate course title override, "signatories":"[]"}]';
+                var CERTIFICATE_INVALID_JSON = '[{"course_title": Test certificate course title override, "signatories":"[]"}]'; // jshint ignore:line
                 var collection_length = this.collection.length;
                 this.collection.parse(CERTIFICATE_INVALID_JSON);
                 //collection length should remain the same since we have error parsing JSON
@@ -158,7 +158,9 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 this.view.$('.show-details').click();
                 expect(this.view.$(SELECTORS.signatory_name_value)).toContainText(/^[A-Za-z\s]{10,40}/);
                 expect(this.view.$(SELECTORS.signatory_title_value)).toContainText('Title of the signatory');
-                expect(this.view.$(SELECTORS.signatory_organization_value)).toContainText('Organization of the signatory');
+                expect(
+                    this.view.$(SELECTORS.signatory_organization_value)
+                ).toContainText('Organization of the signatory');
             });
 
             it('supports in-line editing of signatory information', function() {
@@ -196,7 +198,9 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
 
                 expect(this.view.$(SELECTORS.signatory_name_value)).toContainText('New Signatory Test Name');
                 expect(this.view.$(SELECTORS.signatory_title_value)).toContainText('New Signatory Test Title');
-                expect(this.view.$(SELECTORS.signatory_organization_value)).toContainText('New Signatory Test Organization');
+                expect(
+                    this.view.$(SELECTORS.signatory_organization_value)
+                ).toContainText('New Signatory Test Organization');
             });
             it('should not allow invalid data when saving changes made during in-line signatory editing', function() {
                 this.view.$(SELECTORS.edit_signatory).click();

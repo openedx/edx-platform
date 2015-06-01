@@ -1,4 +1,7 @@
-define(['underscore'], function(_) {
+define([ // jshint ignore:line
+],
+function() {
+    'use strict';
     var getLocationHash;
     /**
      * Helper method that returns url hash.

@@ -2,13 +2,14 @@
 // User can preview the certificate web layout/styles. 'Preview Certificate' button will open a new tab in LMS for
 // the selected course mode from the drop down.
 
-define([
+define([ // jshint ignore:line
     'underscore',
+    'gettext',
     'js/views/baseview',
     'js/views/utils/view_utils',
     'js/views/feedback_notification'
 ],
-function(_, BaseView, ViewUtils, NotificationView) {
+function(_, gettext, BaseView, ViewUtils, NotificationView) {
     'use strict';
     var CertificateWebPreview = BaseView.extend({
         el: $(".preview-certificate"),
@@ -34,7 +35,7 @@ function(_, BaseView, ViewUtils, NotificationView) {
             return this;
         },
 
-        toggleCertificateActivation: function(event) {
+        toggleCertificateActivation: function() {
             var msg = "Activating";
             if(this.is_active) {
                 msg = "Deactivating";
@@ -52,7 +53,7 @@ function(_, BaseView, ViewUtils, NotificationView) {
                 data: JSON.stringify({
                     is_active: !this.is_active
                 }),
-                beforeSend: function( xhr ) {
+                beforeSend: function() {
                     notification.show();
                 },
                 success: function(){

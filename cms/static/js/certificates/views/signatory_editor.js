@@ -1,6 +1,6 @@
 // Backbone Application View: Signatory Editor
 
-define([
+define([ // jshint ignore:line
     'jquery',
     'underscore',
     'backbone',
@@ -12,7 +12,8 @@ define([
     'js/models/uploads',
     'js/views/uploads'
 ],
-function ($, _, Backbone, gettext, TemplateUtils, ViewUtils, PromptView, NotificationView, FileUploadModel, FileUploadDialog) {
+function ($, _, Backbone, gettext,
+          TemplateUtils, ViewUtils, PromptView, NotificationView, FileUploadModel, FileUploadDialog) {
     'use strict';
     var SignatoryEditorView = Backbone.View.extend({
         tagName: 'div',
@@ -121,7 +122,6 @@ function ($, _, Backbone, gettext, TemplateUtils, ViewUtils, PromptView, Notific
         deleteItem: function(event) {
             // Remove the specified model from the collection
             if (event && event.preventDefault) { event.preventDefault(); }
-            var certificate = this.model.get('certificate');
             var model = this.model;
             var self = this;
             var titleText = gettext('Delete "<%= signatoryName %>" from the list of signatories?');
@@ -143,7 +143,7 @@ function ($, _, Backbone, gettext, TemplateUtils, ViewUtils, PromptView, Notific
                                 deleting.show();
                                 model.destroy({
                                     wait: true,
-                                    success: function (model, response) {
+                                    success: function (model) {
                                         deleting.hide();
                                         self.eventAgg.trigger("onSignatoryRemoved", model);
                                     }

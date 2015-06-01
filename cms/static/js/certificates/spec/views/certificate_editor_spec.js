@@ -1,6 +1,6 @@
 // Jasmine Test Suite: Certifiate Editor View
 
-define([
+define([ // jshint ignore:line
     'underscore',
     'js/models/course',
     'js/certificates/models/certificate',
@@ -125,14 +125,20 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 model: this.model
             });
             appendSetFixtures(this.view.render().el);
-            CustomMatchers(this);
+            CustomMatchers(this); // jshint ignore:line
         });
 
         describe('Basic', function () {
             beforeEach(function(){
-                appendSetFixtures($("<script>", { id: "basic-modal-tpl", type: "text/template" }).text(basicModalTpl));
-                appendSetFixtures($("<script>", { id: "modal-button-tpl", type: "text/template" }).text(modalButtonTpl));
-                appendSetFixtures($("<script>", { id: "upload-dialog-tpl", type: "text/template" }).text(uploadDialogTpl));
+                appendSetFixtures(
+                    $("<script>", { id: "basic-modal-tpl", type: "text/template" }).text(basicModalTpl)
+                );
+                appendSetFixtures(
+                    $("<script>", { id: "modal-button-tpl", type: "text/template" }).text(modalButtonTpl)
+                );
+                appendSetFixtures(
+                    $("<script>", { id: "upload-dialog-tpl", type: "text/template" }).text(uploadDialogTpl)
+                );
             });
 
             afterEach(function(){
@@ -140,8 +146,8 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
             });
 
             it('can render properly', function() {
-                expect(this.view.$("[name='certificate-name']").val()).toBe('Test Name')
-                expect(this.view.$("[name='certificate-description']").val()).toBe('Test Description')
+                expect(this.view.$("[name='certificate-name']").val()).toBe('Test Name');
+                expect(this.view.$("[name='certificate-description']").val()).toBe('Test Description');
                 expect(this.view.$('.action-delete')).toExist();
             });
 
@@ -165,9 +171,9 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
             it('does not hide saving message if failure', function() {
                 var requests = AjaxHelpers.requests(this),
                     notificationSpy = ViewHelpers.createNotificationSpy();
-                this.view.$(SELECTORS.inputCertificateName).val('New Test Name')
-                this.view.$(SELECTORS.inputCertificateDescription).val('New Test Description')
-                ViewHelpers.submitAndVerifyFormError(this.view, requests, notificationSpy)
+                this.view.$(SELECTORS.inputCertificateName).val('New Test Name');
+                this.view.$(SELECTORS.inputCertificateDescription).val('New Test Description');
+                ViewHelpers.submitAndVerifyFormError(this.view, requests, notificationSpy);
             });
 
             it('does not save on cancel', function() {

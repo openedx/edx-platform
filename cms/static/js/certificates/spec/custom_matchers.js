@@ -1,7 +1,7 @@
 // Custom matcher library for Jasmine test assertions
 // http://tobyho.com/2012/01/30/write-a-jasmine-matcher/
 
-define(['jquery'], function($) {
+define(['jquery'], function($) { // jshint ignore:line
     'use strict';
     return function (that) {
         that.addMatchers({

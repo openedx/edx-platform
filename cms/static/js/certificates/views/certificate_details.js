@@ -1,6 +1,6 @@
 // Backbone Application View: Certificate Details
 
-define([
+define([ // jshint ignore:line
     'jquery',
     'underscore',
     'underscore.string',

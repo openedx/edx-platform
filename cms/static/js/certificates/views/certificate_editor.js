@@ -1,6 +1,6 @@
 // Backbone Application View: Certificate Editor
 
-define([
+define([ // jshint ignore:line
     'jquery',
     'underscore',
     'backbone',
@@ -11,7 +11,8 @@ define([
     'js/models/uploads',
     'js/views/uploads'
 ],
-function($, _, Backbone, gettext, ListItemEditorView, SignatoryModel, SignatoryEditorView, FileUploadModel, FileUploadDialog) {
+function($, _, Backbone, gettext,
+         ListItemEditorView, SignatoryModel, SignatoryEditorView, FileUploadModel, FileUploadDialog) {
     'use strict';
     var MAX_SIGNATORIES_LIMIT = 4;
     var CertificateEditorView = ListItemEditorView.extend({
@@ -51,13 +52,14 @@ function($, _, Backbone, gettext, ListItemEditorView, SignatoryModel, SignatoryE
             this.template = this.loadTemplate('certificate-editor');
         },
 
-        onSignatoryRemoved: function(model) {
+        onSignatoryRemoved: function() {
             // Event handler for model deletions
             this.model.setOriginalAttributes();
             this.render();
         },
 
-        clearErrorMessage: function(model) {
+        clearErrorMessage: function() {
+            // Hides away the error message displayed during field validations
             this.$('.certificate-edit-error').remove();
         },
 
@@ -80,7 +82,7 @@ function($, _, Backbone, gettext, ListItemEditorView, SignatoryModel, SignatoryE
 
         addSignatory: function() {
             // Append a new signatory to the certificate model's signatories collection
-            var signatory = new SignatoryModel({certificate: this.getSaveableModel()});
+            var signatory = new SignatoryModel({certificate: this.getSaveableModel()}); // jshint ignore:line
             this.render();
         },
 

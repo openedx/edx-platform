@@ -1,10 +1,9 @@
 // Backbone.js Application Collection: Certificates
 
-define([
+define([ // jshint ignore:line
     'backbone',
     'gettext',
     'js/certificates/models/certificate'
-
 ],
 function(Backbone, gettext, Certificate) {
     'use strict';
@@ -47,7 +46,7 @@ function(Backbone, gettext, Certificate) {
 
         onModelRemoved: function () {
             // remove the certificate web preview UI.
-            if(window.certWebPreview && this.length == 0) {
+            if(window.certWebPreview && this.length === 0) {
                 window.certWebPreview.remove();
             }
             this.toggleAddNewItemButtonState();
@@ -71,7 +70,9 @@ function(Backbone, gettext, Certificate) {
             var modelArray = this.certificate_array(certificatesJson);
 
             for (var i in modelArray) {
-                this.push(modelArray[i]);
+                if (modelArray.hasOwnProperty(i)) {
+                    this.push(modelArray[i]);
+                }
             }
             return this.models;
         }

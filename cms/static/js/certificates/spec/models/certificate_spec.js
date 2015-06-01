@@ -1,6 +1,6 @@
 // Jasmine Test Suite: Certifiate Model
 
-define([
+define([ // jshint ignore:line
     'js/certificates/models/certificate',
     'js/certificates/collections/certificates'
 ],

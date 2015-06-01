@@ -1,7 +1,6 @@
 // Backbone Application View:  Signatory Details
 
-
-define([
+define([ // jshint ignore:line
     'jquery',
     'underscore',
     'underscore.string',
@@ -61,7 +60,7 @@ function ($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Sign
             if (event && event.preventDefault) { event.preventDefault(); }
             var certificate = this.model.get('certificate');
             if (!certificate.isValid()){
-                return
+                return;
             }
             var self = this;
             ViewUtils.runOperationShowingMessage(

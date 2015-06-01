@@ -1,6 +1,6 @@
 // Backbone.js Application Model: Certificate
 
-define([
+define([ // jshint ignore:line
     'underscore',
     'underscore.string',
     'backbone',
@@ -11,7 +11,8 @@ define([
     'js/certificates/models/signatory',
     'js/certificates/collections/signatories'
 ],
-function (_, str, Backbone, BackboneRelational, BackboneAssociations, gettext, CoffeeSrcMain, SignatoryModel, SignatoryCollection) {
+function (_, str, Backbone, BackboneRelational, BackboneAssociations, gettext, CoffeeSrcMain,
+          SignatoryModel, SignatoryCollection) {
     'use strict';
     _.str = str;
     var Certificate = Backbone.RelationalModel.extend({
@@ -42,7 +43,7 @@ function (_, str, Backbone, BackboneRelational, BackboneAssociations, gettext, C
             this.canBeEmpty = options && options.canBeEmpty;
             if(options.add) {
                 // Ensure at least one child Signatory model is defined for any new Certificate model
-                attributes['signatories'] = new SignatoryModel({certificate: this});
+                attributes.signatories = new SignatoryModel({certificate: this});
             }
             this.setOriginalAttributes();
             return this;

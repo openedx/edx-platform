@@ -1,6 +1,6 @@
 // Jasmine Test Suite: Certificate List View
 
-define([
+define([ // jshint ignore:line
     'underscore',
     'js/models/course',
     'js/certificates/collections/certificates',
@@ -65,13 +65,13 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 collection: this.collection
             });
             appendSetFixtures(this.view.render().el);
-            CustomMatchers(this);
+            CustomMatchers(this); // jshint ignore:line
         });
 
         describe('empty template', function () {
             it('should be rendered if no certificates', function() {
                 expect(this.view.$(SELECTORS.noContent)).toExist();
-                expect(this.view.$(SELECTORS.noContent)).toContainText(emptyMessage);;
+                expect(this.view.$(SELECTORS.noContent)).toContainText(emptyMessage);
                 expect(this.view.$(SELECTORS.newCertificateButton)).toExist();
                 expect(this.view.$(SELECTORS.itemView)).not.toExist();
             });
@@ -93,7 +93,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
             });
 
             it('should open in edit mode if model has editing attribute', function() {
-                this.model.set({editing: true})
+                this.model.set({editing: true});
                 this.collection.add(this.model);
                 expect(this.view.$(SELECTORS.itemEditView)).toExist();
             });

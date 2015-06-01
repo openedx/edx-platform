@@ -1,6 +1,6 @@
 // Backbone.js Application Collection: Certificate Signatories
 
-define([
+define([ // jshint ignore:line
     'backbone',
     'js/certificates/models/signatory'
 ],
