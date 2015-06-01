@@ -35,16 +35,13 @@ from enrollment.errors import CourseNotFoundError, \
 from student.models import User
 
 
-class EnrollmentCrossDomainSessionAuth(SessionAuthenticationAllowInactiveUser,
-    SessionAuthenticationCrossDomainCsrf):
-
+class EnrollmentCrossDomainSessionAuth(SessionAuthenticationAllowInactiveUser, SessionAuthenticationCrossDomainCsrf):
     """Session authentication that allows inactive users and cross-domain requests. """
 
     pass
 
 
 class ApiKeyPermissionMixIn(object):
-
     """
     This mixin is used to provide a convenience function for doing individual permission checks
     for the presence of API keys.
@@ -75,6 +72,7 @@ class EnrollmentUserThrottle(UserRateThrottle, ApiKeyPermissionMixIn):
         return self.has_api_key_permissions(request) \
             or super(EnrollmentUserThrottle,
                      self).allow_request(request, view)
+
 
 @can_disable_rate_limit
 class EnrollmentView(APIView, ApiKeyPermissionMixIn):
@@ -130,14 +128,8 @@ class EnrollmentView(APIView, ApiKeyPermissionMixIn):
 
     # Since the course about page on the marketing site uses this API to auto-enroll users,
     # we need to support cross-domain CSRF.
-
     @method_decorator(ensure_csrf_cookie_cross_domain)
-    def get(
-        self,
-        request,
-        course_id=None,
-        username=None,
-        ):
+    def get(self, request, course_id=None, username=None):
         """Create, read, or update enrollment information for a user.
 
         HTTP Endpoint for all CRUD operations for a user course enrollment. Allows creation, reading, and
@@ -161,19 +153,21 @@ class EnrollmentView(APIView, ApiKeyPermissionMixIn):
 
         if request.user.username != username \
             and not self.has_api_key_permissions(request) \
-            and not request.user.is_superuser:
+                and not request.user.is_superuser:
 
             # Return a 404 instead of a 403 (Unauthorized). If one user is looking up
             # other users, do not let them deduce the existence of an enrollment.
-
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         try:
             return Response(api.get_enrollment(username, course_id))
         except CourseEnrollmentError:
+            msg = u"An error occurred while retrieving enrollments for user '{username}' in course '{course_id}'"
             return Response(status=status.HTTP_400_BAD_REQUEST,
-                            data={'message': u"An error occurred while retrieving enrollments for user '{username}' in course '{course_id}'".format(username=username,
-                            course_id=course_id)})
+                            data={
+                                'message': msg.format(username=username, course_id=course_id)
+                            })
+
 
 @can_disable_rate_limit
 class EnrollmentCourseDetailView(APIView):
@@ -241,8 +235,10 @@ class EnrollmentCourseDetailView(APIView):
             return Response(api.get_course_enrollment_details(course_id,
                             request.GET.get('include_expired', '')))
         except CourseNotFoundError:
+            msg = u"No course found for course ID '{course_id}'"
             return Response(status=status.HTTP_400_BAD_REQUEST,
-                            data={'message': u"No course found for course ID '{course_id}'".format(course_id=course_id)})
+                            data={'message': msg.format(course_id=course_id)})
+
 
 @can_disable_rate_limit
 class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
@@ -331,24 +327,21 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
     # Since the course about page on the marketing site
     # uses this API to auto-enroll users, we need to support
     # cross-domain CSRF.
-
     @method_decorator(ensure_csrf_cookie_cross_domain)
     def get(self, request):
         """Gets a list of all course enrollments for the currently logged in user."""
 
         username = request.GET.get('user', request.user.username)
-        if request.user.username != username \
-            and not self.has_api_key_permissions(request):
-
+        if request.user.username != username and not self.has_api_key_permissions(request):
             # Return a 404 instead of a 403 (Unauthorized). If one user is looking up
             # other users, do not let them deduce the existence of an enrollment.
-
             return Response(status=status.HTTP_404_NOT_FOUND)
         try:
             return Response(api.get_enrollments(username))
         except CourseEnrollmentError:
+            msg = u"An error occurred while retrieving enrollments for user '{username}'"
             return Response(status=status.HTTP_400_BAD_REQUEST,
-                            data={'message': u"An error occurred while retrieving enrollments for user '{username}'".format(username=username)})
+                            data={'message': msg.format(username=username)})
 
     def post(self, request):
         """Enrolls the currently logged-in user in a course.
@@ -358,46 +351,42 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         """
 
         # Get the User, Course ID, and Mode from the request.
-
         username = request.DATA.get('user', request.user.username)
-        course_id = request.DATA.get('course_details',
-                {}).get('course_id')
+        course_id = request.DATA.get('course_details', {}).get('course_id')
 
         if not course_id:
             return Response(status=status.HTTP_400_BAD_REQUEST,
-                            data={'message': u'Course ID must be specified to create a new enrollment.'
-                            })
+                            data={'message': u'Course ID must be specified to create a new enrollment.'})
 
         try:
             course_id = CourseKey.from_string(course_id)
         except InvalidKeyError:
+            msg = u"No course '{course_id}' found for enrollment"
             return Response(status=status.HTTP_400_BAD_REQUEST,
-                            data={'message': u"No course '{course_id}' found for enrollment".format(course_id=course_id)})
+                            data={'message': msg.format(course_id=course_id)})
 
         mode = request.DATA.get('mode', CourseMode.HONOR)
 
         has_api_key_permissions = self.has_api_key_permissions(request)
 
         # Check that the user specified is either the same user, or this is a server-to-server request.
-
         if not username:
             username = request.user.username
         if username != request.user.username \
-            and not has_api_key_permissions:
+                and not has_api_key_permissions:
 
             # Return a 404 instead of a 403 (Unauthorized). If one user is looking up
             # other users, do not let them deduce the existence of an enrollment.
-
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         if mode != CourseMode.HONOR and not has_api_key_permissions:
+            msg = u'User does not have permission to create enrollment with mode [{mode}].'
             return Response(status=status.HTTP_403_FORBIDDEN,
-                            data={'message': u'User does not have permission to create enrollment with mode [{mode}].'.format(mode=mode)})
+                            data={'message': msg.format(mode=mode)})
 
         try:
 
             # Lookup the user, instead of using request.user, since request.user may not match the username POSTed.
-
             user = User.objects.get(username=username)
         except ObjectDoesNotExist:
             return Response(status=status.HTTP_406_NOT_ACCEPTABLE,
@@ -406,37 +395,33 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         # Check whether any country access rules block the user from enrollment
         # We do this at the view level (rather than the Python API level)
         # because this check requires information about the HTTP request.
-
-        redirect_url = embargo_api.redirect_if_blocked(course_id,
-                user=user, ip_address=get_ip(request), url=request.path)
+        redirect_url = embargo_api.redirect_if_blocked(
+            course_id,
+            user=user,
+            ip_address=get_ip(request),
+            url=request.path
+        )
         if redirect_url:
+            msg = u"Users from this location cannot access the course '{course_id}'."
             return Response(status=status.HTTP_403_FORBIDDEN,
-                            data={'message': u"Users from this location cannot access the course '{course_id}'.".format(course_id=course_id),
-                            'user_message_url': request.build_absolute_uri(redirect_url)})
+                            data={'message': msg.format(course_id=course_id),
+                                  'user_message_url': request.build_absolute_uri(redirect_url)})
 
         try:
             is_active = request.DATA.get('is_active')
 
             # Check if the requested activation status is None or a Boolean
-
-            if is_active is not None and not isinstance(is_active,
-                    bool):
+            if is_active is not None and not isinstance(is_active, bool):
+                msg = u"'{value}' is an invalid enrollment activation status."
                 return Response(status=status.HTTP_400_BAD_REQUEST,
-                                data={'message': u"'{value}' is an invalid enrollment activation status.".format(value=is_active)})
+                                data={'message': msg.format(value=is_active)})
 
-            enrollment = api.get_enrollment(username,
-                    unicode(course_id))
-            if has_api_key_permissions and enrollment \
-                and enrollment['mode'] != mode:
-                response = api.update_enrollment(username,
-                        unicode(course_id), mode=mode,
-                        is_active=is_active)
+            enrollment = api.get_enrollment(username, unicode(course_id))
+            if has_api_key_permissions and enrollment and enrollment['mode'] != mode:
+                response = api.update_enrollment(username, unicode(course_id), mode=mode, is_active=is_active)
             else:
-
                 # Will reactivate inactive enrollments.
-
-                response = api.add_enrollment(username,
-                        unicode(course_id), mode=mode)
+                response = api.add_enrollment(username, unicode(course_id), mode=mode)
 
             email_opt_in = request.DATA.get('email_opt_in', None)
             if email_opt_in is not None:
@@ -445,19 +430,26 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
 
             return Response(response)
         except CourseModeNotFoundError, error:
+            msg = u"The course mode '{mode}' is not available for course '{course_id}'."
             return Response(status=status.HTTP_400_BAD_REQUEST,
-                            data={'message': u"The course mode '{mode}' is not available for course '{course_id}'.".format(mode='honor'
-                            , course_id=course_id),
-                            'course_details': error.data})
+                            data={
+                                'message': msg.format(mode='honor', course_id=course_id),
+                                'course_details': error.data
+                            })
         except CourseNotFoundError:
+            msg = u"No course '{course_id}' found for enrollment"
             return Response(status=status.HTTP_400_BAD_REQUEST,
-                            data={'message': u"No course '{course_id}' found for enrollment".format(course_id=course_id)})
+                            data={'message': msg.format(course_id=course_id)})
         except CourseEnrollmentExistsError, error:
 
             return Response(data=error.enrollment)
         except CourseEnrollmentError:
+            msg = (
+                u"An error occurred while creating the new course enrollment for user "
+                "{username}' in course '{course_id}'"
+            )
             return Response(status=status.HTTP_400_BAD_REQUEST,
-                            data={'message': u"An error occurred while creating the new course enrollment for user '{username}' in course '{course_id}'".format(username=username,
-                            course_id=course_id)})
-
-
+                            data={
+                                'message': msg.format(username=username,
+                                                      course_id=course_id)
+                            })

@@ -177,7 +177,7 @@ class CourseMode(models.Model):
 
         Keyword Arguments:
             include_expired (bool): If True, expired course modes will be included
-            in the returned JSON data. If False, these modes will be omitted. 
+            in the returned JSON data. If False, these modes will be omitted.
 
             only_selectable (bool): If True, include only modes that are shown
                 to users on the track selection page.  (Currently, "credit" modes
@@ -189,9 +189,9 @@ class CourseMode(models.Model):
 
         """
         now = datetime.now(pytz.UTC)
-        
+
         found_course_modes = cls.objects.filter(course_id=course_id)
-        
+
         # Filter out expired course modes if include_expired is not set
         if not include_expired:
             found_course_modes = found_course_modes.filter(

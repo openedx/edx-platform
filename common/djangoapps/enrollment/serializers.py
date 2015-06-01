@@ -16,7 +16,6 @@ log = logging.getLogger(__name__)
 
 
 class StringListField(serializers.CharField):
-
     """Custom Serializer for turning a comma delimited string into a list.
 
     This field is designed to take a string such as "1,2,3" and turn it into an actual list
@@ -37,7 +36,6 @@ class StringListField(serializers.CharField):
 
 
 class CourseField(serializers.RelatedField):
-
     """Read-Only representation of course enrollment information.
 
     Aggregates course information from the CourseDescriptor as well as the Course Modes configured
@@ -45,11 +43,13 @@ class CourseField(serializers.RelatedField):
 
     """
 
-    def to_native(self, course, include_expired=False):
+    def to_native(self, course, **kwargs):
         course_id = unicode(course.id)
-        course_modes = \
-            ModeSerializer(CourseMode.modes_for_course(course.id,
-                           include_expired, only_selectable=False)).data  # pylint: disable=no-member
+        course_modes = ModeSerializer(
+            CourseMode.modes_for_course(
+                course.id,
+                kwargs.get('include_expired', False),
+                only_selectable=False)).data  # pylint: disable=no-member
 
         return {
             'course_id': course_id,
@@ -59,7 +59,7 @@ class CourseField(serializers.RelatedField):
             'course_end': course.end,
             'invite_only': course.invitation_only,
             'course_modes': course_modes,
-            }
+        }
 
 
 class CourseEnrollmentSerializer(serializers.ModelSerializer):
@@ -92,9 +92,12 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
 
     def get_course_details(self, model):
         if model.course is None:
-            msg = \
-                u"Course '{0}' does not exist (maybe deleted), in which User (user_id: '{1}') is enrolled.".format(model.course_id,
-                    model.user.id)
+            msg = (
+                u"Course '{0}' does not exist (maybe deleted), in which User (user_id: '{1}') is enrolled."
+            ).format(
+                model.course_id,
+                model.user.id
+            )
             log.warning(msg)
             return None
 
@@ -106,7 +109,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
 
         return model.username
 
-    class Meta:  # pylint: disable=missing-docstring
+    class Meta(object):  # pylint: disable=missing-docstring
 
         model = CourseEnrollment
         fields = ('created', 'mode', 'is_active', 'course_details',
@@ -132,5 +135,3 @@ class ModeSerializer(serializers.Serializer):
     expiration_datetime = serializers.DateTimeField()
     description = serializers.CharField()
     sku = serializers.CharField()
-
-

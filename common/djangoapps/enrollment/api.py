@@ -135,12 +135,7 @@ def get_enrollment(user_id, course_id):
     return _data_api().get_course_enrollment(user_id, course_id)
 
 
-def add_enrollment(
-    user_id,
-    course_id,
-    mode='honor',
-    is_active=True,
-    ):
+def add_enrollment(user_id, course_id, mode='honor', is_active=True):
     """Enrolls a user in a course.
 
     Enrolls a user in a course. If the mode is not specified, this will default to 'honor'.
@@ -187,8 +182,7 @@ def add_enrollment(
     """
 
     _validate_course_mode(course_id, mode)
-    return _data_api().create_course_enrollment(user_id, course_id,
-            mode, is_active)
+    return _data_api().create_course_enrollment(user_id, course_id, mode, is_active)
 
 
 def update_enrollment(user_id, course_id, mode=None, is_active=None):
@@ -238,12 +232,18 @@ def update_enrollment(user_id, course_id, mode=None, is_active=None):
 
     if mode is not None:
         _validate_course_mode(course_id, mode)
-    enrollment = _data_api().update_course_enrollment(user_id,
-            course_id, mode=mode, is_active=is_active)
+
+    enrollment = _data_api().update_course_enrollment(
+        user_id,
+        course_id,
+        mode=mode,
+        is_active=is_active
+    )
+
     if enrollment is None:
         msg = \
             u'Course Enrollment not found for user {user} in course {course}'.format(user=user_id,
-                course=course_id)
+                                                                                     course=course_id)
         log.warn(msg)
         raise errors.EnrollmentNotFoundError(msg)
     return enrollment
@@ -256,10 +256,10 @@ def get_course_enrollment_details(course_id, include_expired=False):
 
     Args:
         course_id (str): The Course to get enrollment information for.
-        
+
         include_expired (bool): Boolean denoting whether expired course modes
         should be included in the returned JSON data.
-        
+
     Returns:
         A serializable dictionary of course enrollment information.
 
@@ -287,7 +287,7 @@ def get_course_enrollment_details(course_id, include_expired=False):
         }
 
     """
-    
+
     cache_key = \
         u'enrollment.course.details.{course_id}.{include_expired}'.format(
             course_id=course_id,
@@ -301,8 +301,7 @@ def get_course_enrollment_details(course_id, include_expired=False):
 
         # The cache backend could raise an exception (for example, memcache keys that contain spaces)
 
-        log.exception(u'Error occurred while retrieving course enrollment details from the cache'
-                      )
+        log.exception(u'Error occurred while retrieving course enrollment details from the cache')
 
     if cached_enrollment_data:
         log.info(u'Get enrollment data for course %s (cached)',
@@ -314,16 +313,14 @@ def get_course_enrollment_details(course_id, include_expired=False):
 
     try:
         cache_time_out = getattr(settings,
-                                 'ENROLLMENT_COURSE_DETAILS_CACHE_TIMEOUT'
-                                 , 60)
+                                 'ENROLLMENT_COURSE_DETAILS_CACHE_TIMEOUT',
+                                 60)
         cache.set(cache_key, course_enrollment_details, cache_time_out)
     except Exception:
         # Catch any unexpected errors during caching.
 
-        log.exception(u'Error occurred while caching course enrollment details for course %s'
-                      , course_id)
-        raise errors.CourseEnrollmentError(u'An unexpected error occurred while retrieving course enrollment details.'
-                )
+        log.exception(u'Error occurred while caching course enrollment details for course %s', course_id)
+        raise errors.CourseEnrollmentError(u'An unexpected error occurred while retrieving course enrollment details.')
 
     log.info(u'Get enrollment data for course %s', course_id)
     return course_enrollment_details
@@ -350,18 +347,19 @@ def _validate_course_mode(course_id, mode):
         CourseModeNotFound: raised if the course mode is not found.
     """
 
-    course_enrollment_info = \
-        _data_api().get_course_enrollment_info(course_id)
+    course_enrollment_info = _data_api().get_course_enrollment_info(course_id)
     course_modes = course_enrollment_info['course_modes']
     available_modes = [m['slug'] for m in course_modes]
     if mode not in available_modes:
-        msg = \
-            u"Specified course mode '{mode}' unavailable for course {course_id}.  Available modes were: {available}".format(mode=mode,
-                course_id=course_id,
-                available=', '.join(available_modes))
+        msg = u"Specified course mode '{mode}' unavailable for course {course_id}.  Available modes were: {available}"
+        msg = msg.format(
+            mode=mode,
+            course_id=course_id,
+            available=', '.join(available_modes)
+        )
         log.warn(msg)
         raise errors.CourseModeNotFoundError(msg,
-                course_enrollment_info)
+                                             course_enrollment_info)
 
 
 def _data_api():
@@ -382,5 +380,3 @@ def _data_api():
     except (ImportError, ValueError):
         log.exception(u"Could not load module at '{path}'".format(path=api_path))
         raise errors.EnrollmentApiLoadError(api_path)
-
-

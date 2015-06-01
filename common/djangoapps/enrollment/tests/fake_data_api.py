@@ -46,7 +46,7 @@ def update_course_enrollment(student_id, course_id, mode=None, is_active=None):
     return enrollment
 
 
-def get_course_enrollment_info(course_id ,include_expired=False):
+def get_course_enrollment_info(course_id, include_expired=False):
     """Stubbed out Enrollment data request."""
     return _get_fake_course_info(course_id)
 

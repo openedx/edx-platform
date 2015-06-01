@@ -74,7 +74,7 @@ class EnrollmentTestMixin(object):
             extra['HTTP_X_EDX_API_KEY'] = self.API_KEY
 
         url = reverse('courseenrollments')
-        
+
         response = self.client.post(url, json.dumps(data), content_type='application/json', **extra)
         self.assertEqual(response.status_code, expected_status)
 
@@ -442,7 +442,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
             mode_slug=CourseMode.HONOR,
             mode_display_name=CourseMode.HONOR,
         )
-        
+
         for attempt in xrange(self.rate_limit + 10):
             expected_status = status.HTTP_429_TOO_MANY_REQUESTS if attempt >= self.rate_limit else status.HTTP_200_OK
             self.assert_enrollment_status(expected_status=expected_status)
