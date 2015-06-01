@@ -118,14 +118,14 @@
     .message-actions .action {
         display: inline-block;
         vertical-align: middle;
-        margin-right: spacing-horizontal(small);
+        @include margin-right(spacing-horizontal(small));
 
         &:last-child {
-            margin-right: 0;
+            @include margin-right(0);
         }
 
         .icon {
-            margin-right: spacing-horizontal(x-small);
+            @include margin-right(spacing-horizontal(x-small));
         }
 
         // CASE mozilla open badges logo
@@ -360,7 +360,7 @@
     .recipient-img {
         @extend %img-cropped;
         width: rem(100);
-        margin-right: spacing-horizontal(small);
+        @include margin-right(spacing-horizontal(small));
 
         .src {
             max-height: 100%;
