@@ -1611,6 +1611,9 @@ INSTALLED_APPS = (
     'survey',
 
     'lms.djangoapps.lms_xblock',
+
+    #Accredible,
+    'accredible_certificate',
 )
 
 ######################### MARKETING SITE ###############################
