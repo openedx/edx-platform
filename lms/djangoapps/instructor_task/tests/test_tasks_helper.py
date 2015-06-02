@@ -367,7 +367,7 @@ class TestInstructorStudentForumsReport(TestReportMixin, InstructorTaskCourseTes
         start_time = datetime.now(UTC)
         mock_time.now.return_value = start_time
 
-        test_header = ['Username', 'Posts', 'Points']
+        test_header = ['Username', 'Posts', 'Votes']
         test_rows = [['row1_field1', 'row1_field2', 'row1_field3'], ['row2_field1', 'row2_field2', 'row2_field3']]
 
         with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
