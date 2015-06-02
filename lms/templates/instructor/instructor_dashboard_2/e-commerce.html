@@ -131,25 +131,25 @@ import pytz
       %endif
       %if section_data['coupons_enabled']:
       <div class="wrap">
-         <h2>${_("Discount Code List")}</h2>
+         <h2>${_("Coupon Code List")}</h2>
          <div>
 
-            <span class="csv_tip">${_("Download a .csv file of all discount codes for this course.")}
-                <input class="add blue-button" type="button" name="download-coupon-codes-csv" value="${_("Download Discount Codes")}" data-endpoint="${ section_data['download_coupon_codes_url'] }" data-csv="true">
+            <span class="csv_tip">${_("Download a .csv file of all coupon codes for this course.")}
+                <input class="add blue-button" type="button" name="download-coupon-codes-csv" value="${_("Download Coupon Codes")}" data-endpoint="${ section_data['download_coupon_codes_url'] }" data-csv="true">
             </span>
 
-            <span class="tip">${_("Discount Codes")} <a id="add_coupon_link" href="#add-coupon-modal" rel="leanModal"
-               class="add blue-button">+ ${_("Add Discount Code")}</a></span>
+            <span class="tip">${_("Coupon Codes")} <a id="add_coupon_link" href="#add-coupon-modal" rel="leanModal"
+               class="add blue-button">+ ${_("Add Coupon Code")}</a></span>
             <div class="wrapper-content wrapper">
                <section class="content">
                   %if len(section_data['coupons']):
                   <table class="coupons-table">
                      <thead>
                         <tr class="coupons-headings">
-                           <th class="c_code">${_("Discount Code")}</th>
+                           <th class="c_code">${_("Coupon Code")}</th>
                            <th class="c_dsc">${_("Description")}</th>
                            <th class="c_expiry">${_("Expiration Date")}</th>
-                           <th class="c_discount">${_("Discount (%)")}</th>
+                           <th class="c_discount">${_("Coupon (%)")}</th>
                            <th class="c_count">${_("Number Redeemed")}</th>
                            <th class="c_action">${_("Actions")}</th>
                         </tr>
@@ -536,7 +536,7 @@ import pytz
        if (code === '') {
          $("#add_coupon_button").removeAttr('disabled');
          $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-         $('#add_coupon_form #coupon_form_error').text("${_('Enter a discount code.')}");
+         $('#add_coupon_form #coupon_form_error').text("${_('Enter a coupon code.')}");
          return false;
        }
        if (parseInt(coupon_discount) > 100) {
