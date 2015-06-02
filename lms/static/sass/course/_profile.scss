@@ -208,6 +208,9 @@
           > i {
             padding: 4px;
           }
+          > span{
+            color: inherit;
+          }
         }
         > .requirement-container{
           padding: lh();

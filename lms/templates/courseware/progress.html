@@ -32,6 +32,7 @@ from django.utils.http import urlquote_plus
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.stack.js')}"></script>
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.symbol.js')}"></script>
 <script type="text/javascript" src="${static.url('js/courseware/certificates_api.js')}"></script>
+<script type="text/javascript" src="${static.url('js/courseware/credit_progress.js')}"></script>
 <script>
   ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph", not course.no_grade, not course.no_grade)}
 </script>
@@ -118,7 +119,6 @@ from django.utils.http import urlquote_plus
                     <span>You have not yet met the requirements for credit</span>
                 %endif
                 <button class="credit-help"><i class="fa fa-question"></i></button><br>
-                <button class="detail-collapse"><i class="fa fa-caret-down"></i>Expand for details</button>
                 <div class="requirement-container is-hidden">
                     %for requirement in credit_course['requirements']:
                         <div class="requirement">
@@ -141,6 +141,7 @@ from django.utils.http import urlquote_plus
                         </div>
                     %endfor
                  </div>
+                <button class="detail-collapse"><i class="fa fa-caret-down"></i><span>Expand for details</span></button>
             </div>
         </div>
       %endif
