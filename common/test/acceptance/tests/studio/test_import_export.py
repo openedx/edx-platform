@@ -3,6 +3,7 @@ Acceptance tests for the Import and Export pages
 """
 from abc import abstractmethod
 from bok_choy.promise import EmptyPromise
+from datetime import datetime
 from .base_studio_test import StudioLibraryTest, StudioCourseTest
 from ...fixtures.course import XBlockFixtureDesc
 from ...pages.studio.import_export import ExportLibraryPage, ExportCoursePage, ImportLibraryPage, ImportCoursePage
@@ -182,6 +183,27 @@ class ImportTestMixin(object):
         """
         self.import_page.upload_tarball(self.tarball_name)
         self.import_page.wait_for_upload()
+
+    def test_import_timestamp(self):
+        """
+        Scenario: I perform a course / library import
+            On import success, the page displays a UTC timestamp previously not visible
+            And if I refresh the page, the timestamp is still displayed
+        """
+        self.assertFalse(self.import_page.is_timestamp_visible())
+        self.import_page.upload_tarball(self.tarball_name)
+        self.import_page.wait_for_upload()
+
+        utc_now = datetime.utcnow()
+        import_date, import_time = self.import_page.timestamp
+
+        self.assertTrue(self.import_page.is_timestamp_visible())
+        self.assertEqual(utc_now.strftime('%m/%d/%Y'), import_date)
+        self.assertEqual(utc_now.strftime('%H:%M'), import_time)
+
+        self.import_page.visit()
+        self.import_page.wait_for_tasks(completed=True)
+        self.assertTrue(self.import_page.is_timestamp_visible())
 
     def test_landing_url(self):
         """

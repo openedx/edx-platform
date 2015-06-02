@@ -3,6 +3,7 @@ Import/Export pages.
 """
 from bok_choy.promise import EmptyPromise
 import os
+import re
 import requests
 from .utils import click_css
 from .library import LibraryPage
@@ -118,6 +119,16 @@ class ImportMixin(object):
 
     url_path = "import"
 
+    @property
+    def timestamp(self):
+        """
+        The timestamp is displayed on the page as "(MM/DD/YYYY at HH:mm)"
+        It parses the timestamp and returns a (date, time) tuple
+        """
+        string = self.q(css='.item-progresspoint-success-date').text[0]
+
+        return re.match(r'\(([^ ]+).+?(\d{2}:\d{2})', string).groups()
+
     def is_browser_on_page(self):
         """
         Verify this is the export page
@@ -225,6 +236,12 @@ class ImportMixin(object):
         Tell us whether it's currently visible.
         """
         return self.q(css='.wrapper-status').visible
+
+    def is_timestamp_visible(self):
+        """
+        Checks if the UTC timestamp of the last successfull import is visible
+        """
+        return self.q(css='.item-progresspoint-success-date').visible
 
     def wait_for_filename_error(self):
         """
