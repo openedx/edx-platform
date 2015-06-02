@@ -73,12 +73,12 @@ class ResponseXMLFactory(object):
         question.text = question_text
 
         # Add the response(s)
-        for i in range(0, int(num_responses)):
+        for __ in range(int(num_responses)):
             response_element = self.create_response_element(**kwargs)
             root.append(response_element)
 
             # Add input elements
-            for j in range(0, int(num_inputs)):
+            for __ in range(int(num_inputs)):
                 input_element = self.create_input_element(**kwargs)
                 if not (None == input_element):
                     response_element.append(input_element)

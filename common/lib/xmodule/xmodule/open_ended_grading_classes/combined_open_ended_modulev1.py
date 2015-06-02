@@ -665,8 +665,8 @@ class CombinedOpenEndedV1Module(object):
             last_post_assessment = task.latest_post_assessment(self.system, short_feedback=False, join_feedback=False)
             if isinstance(last_post_assessment, list):
                 eval_list = []
-                for i in xrange(0, len(last_post_assessment)):
-                    eval_list.append(task.format_feedback_with_evaluation(self.system, last_post_assessment[i]))
+                for assess in last_post_assessment:
+                    eval_list.append(task.format_feedback_with_evaluation(self.system, assess))
                 last_post_evaluation = "".join(eval_list)
             else:
                 last_post_evaluation = task.format_feedback_with_evaluation(self.system, last_post_assessment)
@@ -1017,7 +1017,7 @@ class CombinedOpenEndedV1Module(object):
         ugettext = self.system.service(self, "i18n").ugettext
         status_list = []
         current_task_human_name = ""
-        for i in xrange(0, len(self.task_xml)):
+        for i in xrange(len(self.task_xml)):
             human_task_name = self.extract_human_name_from_task(self.task_xml[i])
             human_task_name = ugettext(human_task_name)    # pylint: disable=translation-of-non-string
             # Extract the name of the current task for screen readers.
@@ -1080,16 +1080,16 @@ class CombinedOpenEndedV1Module(object):
         if self.is_scored:
             # Finds the maximum score of all student attempts and keeps it.
             score_mat = []
-            for i in xrange(0, len(self.task_states)):
+            for i in xrange(len(self.task_states)):
                 # For each task, extract all student scores on that task (each attempt for each task)
                 last_response = self.get_last_response(i)
                 score = last_response.get('all_scores', None)
                 if score is not None:
                     # Convert none scores and weight scores properly
-                    for z in xrange(0, len(score)):
-                        if score[z] is None:
-                            score[z] = 0
-                        score[z] *= float(weight)
+                    for j in xrange(len(score)):
+                        if score[j] is None:
+                            score[j] = 0
+                        score[j] *= float(weight)
                     score_mat.append(score)
 
             if len(score_mat) > 0:
@@ -1219,7 +1219,7 @@ class CombinedOpenEndedV1Descriptor(object):
 
         def parse_task(k):
             """Assumes that xml_object has child k"""
-            return [stringify_children(xml_object.xpath(k)[i]) for i in xrange(0, len(xml_object.xpath(k)))]
+            return [stringify_children(xml_object.xpath(k)[i]) for i in xrange(len(xml_object.xpath(k)))]
 
         def parse(k):
             """Assumes that xml_object has child k"""

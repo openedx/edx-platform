@@ -273,11 +273,11 @@ class TestCourseListing(ModuleStoreTestCase):
         num_courses_to_create = 3
         courses = [
             self._create_course_with_access_groups(CourseLocator('Org', 'CreatedCourse' + str(num), 'Run'), self.user)
-            for num in range(0, num_courses_to_create)
+            for num in range(num_courses_to_create)
         ]
         courses_in_progress = [
             self._create_course_with_access_groups(CourseLocator('Org', 'InProgressCourse' + str(num), 'Run'), self.user)
-            for num in range(0, num_courses_to_create)
+            for num in range(num_courses_to_create)
         ]
 
         # simulate initiation of course actions

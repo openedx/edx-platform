@@ -124,7 +124,7 @@ class HelperMethods(object):
                 i, 'Name ' + str(i), 'Description ' + str(i),
                 [Group(0, 'Group A'), Group(1, 'Group B'), Group(2, 'Group C')],
                 scheme=None, scheme_id=scheme_id
-            ) for i in xrange(0, count)
+            ) for i in xrange(count)
         ]
         self.course.user_partitions = partitions
         self.save_course()
