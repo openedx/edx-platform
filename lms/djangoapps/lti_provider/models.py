@@ -25,6 +25,11 @@ class LtiConsumer(models.Model):
     consumer_secret = models.CharField(max_length=32, unique=True)
 
 
+class LtiUser(models.Model):
+    lti_user_id = models.CharField(max_length=255, unique=True, db_index=True)
+    edx_user_id = models.CharField(max_length=30, unique=True)
+
+
 @receiver(SCORE_CHANGED)
 def score_changed_handler(sender, **kwargs):  # pylint: disable=unused-argument
     """
