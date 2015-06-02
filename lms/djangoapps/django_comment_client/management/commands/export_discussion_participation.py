@@ -5,6 +5,8 @@ from datetime import datetime
 from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
+import os
+from path import path
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -15,6 +17,7 @@ from student.models import CourseEnrollment
 
 from lms.lib.comment_client.user import User
 import django_comment_client.utils as utils
+from xmodule.modulestore.django import modulestore
 
 
 class DiscussionExportFields(object):
@@ -39,15 +42,21 @@ class Command(BaseCommand):
 
     Usage:
         ./manage.py lms export_discussion_participation course_key [dest_file] [OPTIONS]
+        ./manage.py lms export_discussion_participation [dest_directory] --all [OPTIONS]
 
         * course_key - target course key (e.g. edX/DemoX/T1)
         * dest_file - location of destination file (created if missing, overwritten if exists)
+        * dest_directory - location to store all dumped files to. Will dump into the current directory otherwise.
 
     OPTIONS:
 
         * thread-type - one of {discussion, question}. Filters discussion participation stats by discussion thread type.
         * end-date - date time in iso8601 format (YYYY-MM-DD hh:mm:ss). Filters discussion participation stats
           by creation date: no threads/comments/replies created *after* this date is included in calculation
+
+    FLAGS:
+        * cohorted_only - only dump cohorted inline discussion threads
+        * all - Dump all social stats at once into a particular directory.
 
     Examples:
 
@@ -62,9 +71,13 @@ class Command(BaseCommand):
     * `./manage.py lms export_discussion_participation <course_key> --end-date=<iso8601 datetime>
         --thread-type=[discussion|question]` - exports discussion participation stats for a course for
         threads/comments/replies created before specified date, including only threads of specified type
+    * `./manage.py lms export_discussion_participation <course_key> --cohorted_only` - exports only cohorted discussion
+        participation stats for a course; output is written to default location (same folder, auto-generated file name)
     """
     THREAD_TYPE_PARAMETER = 'thread_type'
     END_DATE_PARAMETER = 'end_date'
+    ALL_PARAMETER = 'all'
+    COHORTED_ONLY_PARAMETER = 'cohorted_only'
 
     args = "<course_id> <output_file_location>"
 
@@ -86,6 +99,18 @@ class Command(BaseCommand):
             default=None,
             help='Include threads, comments and replies created before the supplied date (iso8601 format)'
         ),
+        make_option(
+            '--all',
+            action='store_true',
+            dest=ALL_PARAMETER,
+            default=False,
+        ),
+        make_option(
+            '--cohorted_only',
+            action='store_true',
+            dest=COHORTED_ONLY_PARAMETER,
+            default=False,
+        )
     )
 
     def _get_filter_string_representation(self, options):
@@ -103,8 +128,34 @@ class Command(BaseCommand):
             "social_stats_{course}_{date:%Y_%m_%d_%H_%M_%S}.csv".format(course=course_key, date=datetime.utcnow())
         )
 
-    def handle(self, *args, **options):
-        """ Executes command """
+    @staticmethod
+    def get_all_courses():
+        """
+        Gets all courses. Made into a separate function because patch isn't cooperating.
+        """
+        return modulestore().get_courses()
+
+    def dump_all(self, *args, **options):
+        if len(args) > 1:
+            raise CommandError("May not specify course and destination root directory with the --all option.")
+        args = list(args)
+        try:
+            dir_name = path(args.pop())
+        except IndexError:
+            dir_name = path('social_stats')
+
+        if not os.path.exists(dir_name):
+            os.makedirs(dir_name)
+
+        for course in self.get_all_courses():
+            raw_course_key = unicode(course.location.course_key)
+            args = [
+                raw_course_key,
+                dir_name / self.get_default_file_location(raw_course_key)
+            ]
+            self.dump_one(*args, **options)
+
+    def dump_one(self, *args, **options):
         if not args:
             raise CommandError("Course id not specified")
         if len(args) > 2:
@@ -125,12 +176,22 @@ class Command(BaseCommand):
         if not course:
             raise CommandError("Invalid course id: {}".format(course_key))
 
+        target_discussion_ids = None
+        if options.get(self.COHORTED_ONLY_PARAMETER, False):
+            cohorted_discussions = course.cohort_config.get('cohorted_inline_discussions', None)
+            if not cohorted_discussions:
+                raise CommandError("Only cohorted discussions are marked for export, "
+                                   "but no cohorted discussions found for the course")
+            else:
+                target_discussion_ids = cohorted_discussions
+
         raw_end_date = options.get(self.END_DATE_PARAMETER, None)
         end_date = dateutil.parser.parse(raw_end_date) if raw_end_date else None
         data = Extractor().extract(
             course_key,
             end_date=end_date,
-            thread_type=(options.get(self.THREAD_TYPE_PARAMETER, None))
+            thread_type=(options.get(self.THREAD_TYPE_PARAMETER, None)),
+            thread_ids=target_discussion_ids,
         )
 
         filter_str = self._get_filter_string_representation(options)
@@ -139,8 +200,14 @@ class Command(BaseCommand):
         with open(output_file_location, 'wb') as output_stream:
             Exporter(output_stream).export(data)
 
-        self.stdout.write("Success!\n")
+    def handle(self, *args, **options):
+        """ Executes command """
+        if options.get(self.ALL_PARAMETER, False):
+            self.dump_all(*args, **options)
+        else:
+            self.dump_one(*args, **options)
 
+        self.stdout.write("Success!\n")
 
 class Extractor(object):
     """ Extracts discussion participation data from db and cs_comments_service """
@@ -165,11 +232,13 @@ class Extractor(object):
         users = CourseEnrollment.users_enrolled_in(course_key)
         return {user.id: user for user in users}
 
-    def _get_social_stats(self, course_key, end_date=None, thread_type=None):
+    def _get_social_stats(self, course_key, end_date=None, thread_type=None, thread_ids=None):
         """ Gets social stats for course with specified filter parameters """
         return {
             int(user_id): data for user_id, data
-            in User.all_social_stats(str(course_key), end_date=end_date, thread_type=thread_type).iteritems()
+            in User.all_social_stats(
+                str(course_key), end_date=end_date, thread_type=thread_type, thread_ids=thread_ids
+            ).iteritems()
         }
 
     def _merge_user_data_and_social_stats(self, userdata, social_stats):
@@ -187,13 +256,14 @@ class Extractor(object):
             result.append(utils.merge_dict(user_record, stats))
         return result
 
-    def extract(self, course_key, end_date=None, thread_type=None):
+    def extract(self, course_key, end_date=None, thread_type=None, thread_ids=None):
         """ Extracts and merges data according to course key and filter parameters """
         users = self._get_users(course_key)
         social_stats = self._get_social_stats(
             course_key,
             end_date=end_date,
-            thread_type=thread_type
+            thread_type=thread_type,
+            thread_ids=thread_ids
         )
         return self._merge_user_data_and_social_stats(users, social_stats)
 
