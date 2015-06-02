@@ -14,8 +14,8 @@
 
 define(
 'video/01_initialize.js',
-['video/03_video_player.js', 'video/00_i18n.js'],
-function (VideoPlayer, i18n) {
+['video/03_video_player.js', 'video/00_video_storage.js', 'video/00_i18n.js'],
+function (VideoPlayer, VideoStorage, i18n) {
     /**
      * @function
      *
@@ -71,6 +71,7 @@ function (VideoPlayer, i18n) {
         isYoutubeType: isYoutubeType,
         parseSpeed: parseSpeed,
         parseYoutubeStreams: parseYoutubeStreams,
+        saveState: saveState,
         setPlayerMode: setPlayerMode,
         setSpeed: setSpeed,
         speedToString: speedToString,
@@ -144,7 +145,9 @@ function (VideoPlayer, i18n) {
                     _youtubeApiDeferred.resolve();
                 }
 
-                window.YT.ready(onYTApiReady);
+                window.YT.ready(function () {
+                    onYTApiReady();
+                });
             } else {
                 // There is only one global variable window.onYouTubeIframeAPIReady which
                 // is supposed to be a function that will be called by the YouTube API
@@ -188,7 +191,9 @@ function (VideoPlayer, i18n) {
                 // Attach a callback to our Deferred object to be called once the
                 // YouTube API loads.
                 window.onYouTubeIframeAPIReady.done(function () {
-                    window.YT.ready(onYTApiReady);
+                    window.YT.ready(function () {
+                        onYTApiReady();
+                    });
                 });
             }
         } else {
@@ -207,13 +212,18 @@ function (VideoPlayer, i18n) {
             // callback, which will set `state.youtubeApiAvailable` to `true`.
             // If something goes wrong at this stage, `state.youtubeApiAvailable` is
             // `false`.
-            if (!state.youtubeIsAvailable) {
-                console.log('[Video info]: YouTube API is not available.');
-            }
-            state.el.trigger('youtube_availability', [state.youtubeIsAvailable]);
+            _reportToServer(state, state.youtubeApiAvailable);
         }, state.config.ytTestTimeout);
 
         $.getScript(document.location.protocol + '//' + state.config.ytApiUrl);
+    }
+
+    function _reportToServer(state, youtubeIsAvailable) {
+        if (!youtubeIsAvailable) {
+            console.log('[Video info]: YouTube API is not available.');
+        }
+
+        state.saveState(true, { youtube_is_available: youtubeIsAvailable });
     }
 
     // function _configureCaptions(state)
@@ -286,7 +296,8 @@ function (VideoPlayer, i18n) {
 
         state.videoType = 'html5';
 
-        if (!_.keys(state.config.transcriptLanguages).length) {
+        if (!state.config.sub || !state.config.sub.length) {
+            state.config.sub = '';
             state.config.showCaptions = false;
         }
         state.setSpeed(state.speed);
@@ -317,9 +328,8 @@ function (VideoPlayer, i18n) {
     function _initializeModules(state, i18n) {
         var dfd = $.Deferred(),
             modulesList = $.map(state.modules, function(module) {
-                var options = state.options[module.moduleName] || {};
-                if (_.isFunction(module)) {
-                    return module(state, i18n, options);
+                if ($.isFunction(module)) {
+                    return module(state, i18n);
                 } else if ($.isPlainObject(module)) {
                     return module;
                 }
@@ -378,6 +388,7 @@ function (VideoPlayer, i18n) {
                     },
                     'startTime': function (value) {
                         value = parseInt(value, 10);
+
                         if (!isFinite(value) || value < 0) {
                             return 0;
                         }
@@ -396,13 +407,6 @@ function (VideoPlayer, i18n) {
                 },
                 config = {};
 
-            data = _.extend({
-                startTime: 0,
-                endTime: null,
-                sub: '',
-                streams: ''
-            }, data);
-
             $.each(data, function(option, value) {
                 // Extract option that is in `extractKeys`.
                 if ($.inArray(option, extractKeys) !== -1) {
@@ -416,7 +420,7 @@ function (VideoPlayer, i18n) {
 
                 // Pre-process data.
                 if (conversions[option]) {
-                    if (_.isFunction(conversions[option])) {
+                    if ($.isFunction(conversions[option])) {
                         value = conversions[option].call(this, value);
                     } else {
                         throw new TypeError(option + ' is not a function.');
@@ -459,11 +463,12 @@ function (VideoPlayer, i18n) {
 
     function initialize(element) {
         var self = this,
-            el = this.el,
-            id = this.id,
+            el = $(element).find('.video'),
             container = el.find('.video-wrapper'),
+            id = el.attr('id').replace(/video_/, ''),
             __dfd__ = $.Deferred(),
-            isTouch = onTouchBasedDevice() || '';
+            isTouch = onTouchBasedDevice() || '',
+            storage = VideoStorage('VideoState', id);
 
         if (isTouch) {
             el.addClass('is-touch');
@@ -471,18 +476,23 @@ function (VideoPlayer, i18n) {
 
         $.extend(this, {
             __dfd__: __dfd__,
+            el: el,
             container: container,
+            id: id,
             isFullScreen: false,
-            isTouch: isTouch
+            isTouch: isTouch,
+            storage: storage
         });
 
-        console.log('[Video info]: Initializing video with id "%s".', id);
+        console.log(
+            '[Video info]: Initializing video with id "' + id + '".'
+        );
 
         // We store all settings passed to us by the server in one place. These
         // are "read only", so don't modify them. All variable content lives in
         // 'state' object.
         // jQuery .data() return object with keys in lower camelCase format.
-        this.config = $.extend({}, _getConfiguration(this.metadata, this.storage), {
+        this.config = $.extend({}, _getConfiguration(el.data(), storage), {
             element: element,
             fadeOutTimeout:     1400,
             captionsFreezeTime: 10000,
@@ -592,18 +602,26 @@ function (VideoPlayer, i18n) {
     //         true: Parsing of YouTube video IDs went OK, and we can proceed
     //             onwards to play YouTube videos.
     function parseYoutubeStreams(youtubeStreams) {
-        if (_.isUndefined(youtubeStreams) || !youtubeStreams.length) {
+        var _this;
+
+        if (
+            typeof youtubeStreams === 'undefined' ||
+            youtubeStreams.length === 0
+        ) {
             return false;
         }
 
+        _this = this;
         this.videos = {};
 
-        _.each(youtubeStreams.split(/,/), function (video) {
+        $.each(youtubeStreams.split(/,/), function (index, video) {
             var speed;
+
             video = video.split(/:/);
-            speed = this.speedToString(video[0]);
-            this.videos[speed] = video[1];
-        }, this);
+            speed = _this.speedToString(video[0]);
+
+            _this.videos[speed] = video[1];
+        });
 
         return _.isString(this.videos['1.0']);
     }
@@ -615,21 +633,23 @@ function (VideoPlayer, i18n) {
     //     example the length of the video can be determined from the meta
     //     data.
     function fetchMetadata() {
-        var self = this,
+        var _this = this,
             metadataXHRs = [];
 
         this.metadata = {};
 
-        metadataXHRs = _.map(this.videos, function (url, speed) {
-            return self.getVideoMetadata(url, function (data) {
+        $.each(this.videos, function (speed, url) {
+            var xhr = _this.getVideoMetadata(url, function (data) {
                 if (data.data) {
-                    self.metadata[data.data.id] = data.data;
+                    _this.metadata[data.data.id] = data.data;
                 }
             });
+
+            metadataXHRs.push(xhr);
         });
 
         $.when.apply(this, metadataXHRs).done(function () {
-            self.el.trigger('metadata_received');
+            _this.el.trigger('metadata_received');
 
             // Not only do we trigger the "metadata_received" event, we also
             // set a flag to notify that metadata has been received. This
@@ -637,7 +657,7 @@ function (VideoPlayer, i18n) {
             // to know that metadata has been received. This is important in
             // cases when some code will subscribe to the "metadata_received"
             // event after it has been triggered.
-            self.youtubeMetadataReceived = true;
+            _this.youtubeMetadataReceived = true;
 
         });
     }
@@ -646,21 +666,23 @@ function (VideoPlayer, i18n) {
     //
     //     Create a separate array of available speeds.
     function parseSpeed() {
-        this.speeds = _.keys(this.videos).sort();
+        this.speeds = ($.map(this.videos, function (url, speed) {
+            return speed;
+        })).sort();
     }
 
-    function setSpeed(newSpeed) {
+    function setSpeed(newSpeed, updateStorage) {
         // Possible speeds for each player type.
         // HTML5 =          [0.75, 1, 1.25, 1.5]
         // Youtube Flash =  [0.75, 1, 1.25, 1.5]
         // Youtube HTML5 =  [0.25, 0.5, 1, 1.5, 2]
         var map = {
-            '0.25': '0.75', // Youtube HTML5 -> HTML5 or Youtube Flash
-            '0.50': '0.75', // Youtube HTML5 -> HTML5 or Youtube Flash
-            '0.75': '0.50', // HTML5 or Youtube Flash -> Youtube HTML5
-            '1.25': '1.50', // HTML5 or Youtube Flash -> Youtube HTML5
-            '2.0': '1.50'   // Youtube HTML5 -> HTML5 or Youtube Flash
-        };
+                '0.25': '0.75', // Youtube HTML5 -> HTML5 or Youtube Flash
+                '0.50': '0.75', // Youtube HTML5 -> HTML5 or Youtube Flash
+                '0.75': '0.50', // HTML5 or Youtube Flash -> Youtube HTML5
+                '1.25': '1.50', // HTML5 or Youtube Flash -> Youtube HTML5
+                '2.0': '1.50'   // Youtube HTML5 -> HTML5 or Youtube Flash
+            };
 
         if (_.contains(this.speeds, newSpeed)) {
             this.speed = newSpeed;
@@ -668,21 +690,57 @@ function (VideoPlayer, i18n) {
             newSpeed = map[newSpeed];
             this.speed = _.contains(this.speeds, newSpeed) ? newSpeed : '1.0';
         }
+
+        if (updateStorage) {
+            this.storage.setItem('speed', this.speed, true);
+            this.storage.setItem('general_speed', this.speed);
+        }
     }
 
     function getVideoMetadata(url, callback) {
-        if (!(_.isString(url))) {
+        var successHandler, xhr;
+
+        if (typeof url !== 'string') {
             url = this.videos['1.0'] || '';
         }
-
-        return $.ajax({
+        successHandler = ($.isFunction(callback)) ? callback : null;
+        xhr = $.ajax({
             url: [
                 document.location.protocol, '//', this.config.ytTestUrl, url,
                 '?v=2&alt=jsonc'
             ].join(''),
             dataType: 'jsonp',
             timeout: this.config.ytTestTimeout,
-            success: _.isFunction(callback) ? callback : null
+            success: successHandler
+        });
+
+        return xhr;
+    }
+
+    function saveState(async, data) {
+
+        if (!($.isPlainObject(data))) {
+            data = {
+                saved_video_position: this.videoPlayer.currentTime
+            };
+        }
+
+        if (data.speed) {
+            this.storage.setItem('speed', data.speed, true);
+        }
+
+        if (data.hasOwnProperty('saved_video_position')) {
+            this.storage.setItem('savedVideoPosition', data.saved_video_position, true);
+
+            data.saved_video_position = Time.formatFull(data.saved_video_position);
+        }
+
+        $.ajax({
+            url: this.config.saveStateUrl,
+            type: 'POST',
+            async: async ? true : false,
+            dataType: 'json',
+            data: data,
         });
     }
 

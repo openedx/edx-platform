@@ -22,7 +22,7 @@ $a11y--blue-s1: saturate($blue,15%);
   }
 
   .a11y-menu-list {
-    @extend %ui-depth3;
+    @extend %ui-depth1;
     top: 100%;
     margin: 0;
     padding: 0;

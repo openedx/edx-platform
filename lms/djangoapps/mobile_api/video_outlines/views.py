@@ -119,8 +119,7 @@ class VideoTranscripts(generics.RetrieveAPIView):
         )
         try:
             video_descriptor = modulestore().get_item(usage_key)
-            transcripts = video_descriptor.get_transcripts_info()
-            content, filename, mimetype = video_descriptor.get_transcript(transcripts, lang=lang)
+            content, filename, mimetype = video_descriptor.get_transcript(lang=lang)
         except (NotFoundError, ValueError, KeyError):
             raise Http404(u"Transcript not found for {}, lang: {}".format(block_id, lang))
 

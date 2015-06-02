@@ -1,13 +1,12 @@
 (function (undefined) {
     describe('VideoQualityControl', function () {
-        var state, qualityControl, videoPlayer, player;
+        var state, qualityControl, qualityControlEl, videoPlayer, player;
 
         afterEach(function () {
             $('source').remove();
             if (state.storage) {
                 state.storage.clear();
             }
-            state.videoPlayer.destroy();
         });
 
         describe('constructor, YouTube mode', function () {
@@ -106,11 +105,6 @@
                  expect(qualityControl.el).toHaveClass('active');
             });
 
-            it('can destroy itself', function () {
-                state.videoQualityControl.destroy();
-                expect(state.videoQualityControl).toBeUndefined();
-                expect($('.quality-control')).not.toExist();
-            });
         });
 
         describe('constructor, HTML5 mode', function () {

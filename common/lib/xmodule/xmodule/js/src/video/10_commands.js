@@ -1,8 +1,11 @@
 (function(define) {
 'use strict';
+// VideoCommands module.
 define('video/10_commands.js', [], function() {
     var VideoCommands, Command, playCommand, pauseCommand, togglePlaybackCommand,
-        toggleMuteCommand, toggleFullScreenCommand, setSpeedCommand, skipCommand;
+        muteCommand, unmuteCommand, toggleMuteCommand, toggleFullScreenCommand,
+        setSpeedCommand;
+
     /**
      * Video commands module.
      * @exports video/10_commands.js
@@ -16,7 +19,6 @@ define('video/10_commands.js', [], function() {
             return new VideoCommands(state, i18n);
         }
 
-        _.bindAll(this, 'destroy');
         this.state = state;
         this.state.videoCommands = this;
         this.i18n = i18n;
@@ -27,15 +29,9 @@ define('video/10_commands.js', [], function() {
     };
 
     VideoCommands.prototype = {
-        destroy: function () {
-            this.state.el.off('destroy', this.destroy);
-            delete this.state.videoCommands;
-        },
-
         /** Initializes the module. */
         initialize: function() {
             this.commands = this.getCommands();
-            this.state.el.on('destroy', this.destroy);
         },
 
         execute: function (command) {
@@ -52,8 +48,7 @@ define('video/10_commands.js', [], function() {
             var commands = {},
                 commandsList = [
                     playCommand, pauseCommand, togglePlaybackCommand,
-                    toggleMuteCommand, toggleFullScreenCommand, setSpeedCommand,
-                    skipCommand
+                    toggleMuteCommand, toggleFullScreenCommand, setSpeedCommand
                 ];
 
             _.each(commandsList, function(command) {
@@ -78,7 +73,7 @@ define('video/10_commands.js', [], function() {
     });
 
     togglePlaybackCommand = new Command('togglePlayback', function (state) {
-        if (state.videoPlayer.isPlaying()) {
+        if (state.videoControl.isPlaying) {
             pauseCommand.execute(state);
         } else {
             playCommand.execute(state);
@@ -90,19 +85,11 @@ define('video/10_commands.js', [], function() {
     });
 
     toggleFullScreenCommand = new Command('toggleFullScreen', function (state) {
-        state.videoFullScreen.toggle();
+        state.videoControl.toggleFullScreen();
     });
 
     setSpeedCommand = new Command('speed', function (state, speed) {
         state.videoSpeedControl.setSpeed(state.speedToString(speed));
-    });
-
-    skipCommand = new Command('skip', function (state, doNotShowAgain) {
-        if (doNotShowAgain) {
-            state.videoBumper.skipAndDoNotShowAgain();
-        } else {
-            state.videoBumper.skip();
-        }
     });
 
     return VideoCommands;

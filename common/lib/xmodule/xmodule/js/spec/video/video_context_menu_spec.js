@@ -68,7 +68,6 @@
             $('source').remove();
             _.result(state.storage, 'clear');
             _.result($('video').data('contextmenu'), 'destroy');
-            _.result(state.videoPlayer, 'destroy');
         });
 
         describe('constructor', function () {
@@ -220,13 +219,12 @@
 
             it('mouse left/right-clicking behaves as expected on play/pause menu item', function () {
                 var menuItem = menuItems.first();
-                spyOn(state.videoPlayer, 'isPlaying');
                 spyOn(state.videoPlayer, 'play').andCallFake(function () {
-                    state.videoPlayer.isPlaying.andReturn(true);
+                    state.videoControl.isPlaying = true;
                     state.el.trigger('play');
                 });
                 spyOn(state.videoPlayer, 'pause').andCallFake(function () {
-                    state.videoPlayer.isPlaying.andReturn(false);
+                    state.videoControl.isPlaying = false;
                     state.el.trigger('pause');
                 });
                 // Left-click on play

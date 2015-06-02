@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 # pylint: disable=abstract-method
 """Video is ungraded Xmodule for support video content.
@@ -38,8 +37,7 @@ from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_fie
 from xmodule.exceptions import NotFoundError
 
 from .transcripts_utils import VideoTranscriptsMixin
-from .video_utils import create_youtube_string, get_video_from_cdn, get_poster
-from .bumper_utils import bumperize
+from .video_utils import create_youtube_string, get_video_from_cdn
 from .video_xfields import VideoFields
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 
@@ -119,21 +117,11 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             resource_string(module, 'js/src/video/03_video_player.js'),
             resource_string(module, 'js/src/video/035_video_accessible_menu.js'),
             resource_string(module, 'js/src/video/04_video_control.js'),
-            resource_string(module, 'js/src/video/04_video_full_screen.js'),
             resource_string(module, 'js/src/video/05_video_quality_control.js'),
             resource_string(module, 'js/src/video/06_video_progress_slider.js'),
             resource_string(module, 'js/src/video/07_video_volume_control.js'),
             resource_string(module, 'js/src/video/08_video_speed_control.js'),
             resource_string(module, 'js/src/video/09_video_caption.js'),
-            resource_string(module, 'js/src/video/09_play_placeholder.js'),
-            resource_string(module, 'js/src/video/09_play_pause_control.js'),
-            resource_string(module, 'js/src/video/09_play_skip_control.js'),
-            resource_string(module, 'js/src/video/09_skip_control.js'),
-            resource_string(module, 'js/src/video/09_bumper.js'),
-            resource_string(module, 'js/src/video/09_save_state_plugin.js'),
-            resource_string(module, 'js/src/video/09_events_plugin.js'),
-            resource_string(module, 'js/src/video/09_events_bumper_plugin.js'),
-            resource_string(module, 'js/src/video/09_poster.js'),
             resource_string(module, 'js/src/video/095_video_context_menu.js'),
             resource_string(module, 'js/src/video/10_commands.js'),
             resource_string(module, 'js/src/video/10_main.js')
@@ -145,13 +133,9 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
     ]}
     js_module_name = "Video"
 
-    def get_transcripts_for_student(self, transcripts):
+    def get_transcripts_for_student(self):
         """Return transcript information necessary for rendering the XModule student view.
         This is more or less a direct extraction from `get_html`.
-
-        Args:
-            transcripts (dict): A dict with all transcripts and a sub.
-
         Returns:
             Tuple of (track_url, transcript_language, sorted_languages)
             track_url -> subtitle download url
@@ -159,27 +143,31 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             sorted_languages -> dictionary of available transcript languages
         """
         track_url = None
-        sub, other_lang = transcripts["sub"], transcripts["transcripts"]
         if self.download_track:
             if self.track:
                 track_url = self.track
-            elif sub or other_lang:
+            elif self.sub or self.transcripts:
                 track_url = self.runtime.handler_url(self, 'transcript', 'download').rstrip('/?')
 
-        transcript_language = self.get_default_transcript_language(transcripts)
+        if not self.transcripts:
+            transcript_language = u'en'
+            languages = {'en': 'English'}
+        else:
+            transcript_language = self.get_default_transcript_language()
 
-        native_languages = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
-        languages = {
-            lang: native_languages.get(lang, display)
-            for lang, display in settings.ALL_LANGUAGES
-            if lang in other_lang
-        }
-        if not other_lang or (other_lang and sub):
-            languages['en'] = 'English'
+            native_languages = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
+            languages = {
+                lang: native_languages.get(lang, display)
+                for lang, display in settings.ALL_LANGUAGES
+                if lang in self.transcripts
+            }
+
+            if self.sub:
+                languages['en'] = 'English'
 
         # OrderedDict for easy testing of rendered context in tests
         sorted_languages = sorted(languages.items(), key=itemgetter(1))
-        if 'table' in other_lang:
+        if 'table' in self.transcripts:
             sorted_languages.insert(0, ('table', 'Table of Contents'))
 
         sorted_languages = OrderedDict(sorted_languages)
@@ -245,7 +233,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             elif self.html5_sources:
                 download_video_link = self.html5_sources[0]
 
-        track_url, transcript_language, sorted_languages = self.get_transcripts_for_student(self.get_transcripts_info())
+        track_url, transcript_language, sorted_languages = self.get_transcripts_for_student()
 
         # CDN_VIDEO_URLS is only to be used here and will be deleted
         # TODO(ali@edx.org): Delete this after the CDN experiment has completed.
@@ -262,73 +250,42 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             cdn_eval = False
             cdn_exp_group = None
 
-        self.youtube_streams = youtube_streams or create_youtube_string(self)  # pylint: disable=W0201
-        metadata = {
-            'saveStateUrl': self.system.ajax_url + '/save_user_state',
+        return self.system.render_template('video.html', {
+            'ajax_url': self.system.ajax_url + '/save_user_state',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
-            'streams': self.youtube_streams,
-            'sub': self.sub,
-            'sources': sources,
-
-            # This won't work when we move to data that
-            # isn't on the filesystem
-            'captionDataDir': getattr(self, 'data_dir', None),
-
-            'showCaptions': json.dumps(self.show_captions),
-            'generalSpeed': self.global_speed,
-            'speed': self.speed,
-            'savedVideoPosition': self.saved_video_position.total_seconds(),
-            'start': self.start_time.total_seconds(),
-            'end': self.end_time.total_seconds(),
-            'transcriptLanguage': transcript_language,
-            'transcriptLanguages': sorted_languages,
-
-            # TODO: Later on the value 1500 should be taken from some global
-            # configuration setting field.
-            'ytTestTimeout': 1500,
-
-            'ytApiUrl': settings.YOUTUBE['API'],
-            'ytTestUrl': settings.YOUTUBE['TEST_URL'],
-            'transcriptTranslationUrl': self.runtime.handler_url(
-                self, 'transcript', 'translation/__lang__'
-            ).rstrip('/?'),
-            'transcriptAvailableTranslationsUrl': self.runtime.handler_url(
-                self, 'transcript', 'available_translations'
-            ).rstrip('/?'),
-
-            ## For now, the option "data-autohide-html5" is hard coded. This option
-            ## either enables or disables autohiding of controls and captions on mouse
-            ## inactivity. If set to true, controls and captions will autohide for
-            ## HTML5 sources (non-YouTube) after a period of mouse inactivity over the
-            ## whole video. When the mouse moves (or a key is pressed while any part of
-            ## the video player is focused), the captions and controls will be shown
-            ## once again.
-            ##
-            ## There is no option in the "Advanced Editor" to set this option. However,
-            ## this option will have an effect if changed to "True". The code on
-            ## front-end exists.
-            'autohideHtml5': False
-        }
-
-        bumperize(self)
-
-        context = {
-            'bumper_metadata': json.dumps(self.bumper['metadata']),  # pylint: disable=E1101
-            'metadata': json.dumps(OrderedDict(metadata)),
-            'poster': json.dumps(get_poster(self)),
             'branding_info': branding_info,
             'cdn_eval': cdn_eval,
             'cdn_exp_group': cdn_exp_group,
-            'id': self.location.html_id(),
+            # This won't work when we move to data that
+            # isn't on the filesystem
+            'data_dir': getattr(self, 'data_dir', None),
             'display_name': self.display_name_with_default,
+            'end': self.end_time.total_seconds(),
             'handout': self.handout,
+            'id': self.location.html_id(),
+            'show_captions': json.dumps(self.show_captions),
             'download_video_link': download_video_link,
+            'sources': json.dumps(sources),
+            'speed': json.dumps(self.speed),
+            'general_speed': self.global_speed,
+            'saved_video_position': self.saved_video_position.total_seconds(),
+            'start': self.start_time.total_seconds(),
+            'sub': self.sub,
             'track': track_url,
+            'youtube_streams': youtube_streams or create_youtube_string(self),
+            # TODO: Later on the value 1500 should be taken from some global
+            # configuration setting field.
+            'yt_test_timeout': 1500,
+            'yt_api_url': settings.YOUTUBE['API'],
+            'yt_test_url': settings.YOUTUBE['TEST_URL'],
             'transcript_download_format': transcript_download_format,
             'transcript_download_formats_list': self.descriptor.fields['transcript_download_format'].values,
+            'transcript_language': transcript_language,
+            'transcript_languages': json.dumps(sorted_languages),
+            'transcript_translation_url': self.runtime.handler_url(self, 'transcript', 'translation').rstrip('/?'),
+            'transcript_available_translations_url': self.runtime.handler_url(self, 'transcript', 'available_translations').rstrip('/?'),
             'license': getattr(self, "license", None),
-        }
-        return self.system.render_template('video.html', context)
+        })
 
 
 @XBlock.wants("settings")
@@ -713,10 +670,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         def _update_transcript_for_index(language=None):
             """ Find video transcript - if not found, don't update index """
             try:
-                transcripts = self.get_transcripts_info()
-                transcript = self.get_transcript(
-                    transcripts, transcript_format='txt', lang=language
-                )[0].replace("\n", " ")
+                transcript = self.get_transcript(transcript_format='txt', lang=language)[0].replace("\n", " ")
                 transcript_index_name = "transcript_{}".format(language if language else self.transcript_language)
                 video_body.update({transcript_index_name: transcript})
             except NotFoundError:
