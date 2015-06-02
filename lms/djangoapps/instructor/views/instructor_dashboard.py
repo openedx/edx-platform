@@ -74,6 +74,7 @@ def instructor_dashboard_2(request, course_id):
     sections = [
         _section_course_info(course, access),
         _section_membership(course, access),
+        _section_queries(course, access),
         _section_cohort_management(course, access),
         _section_student_admin(course, access),
         _section_data_download(course, access),
@@ -368,6 +369,28 @@ def _is_small_course(course_key):
     if max_enrollment_for_buttons is not None:
         is_small_course = enrollment_count <= max_enrollment_for_buttons
     return is_small_course
+
+
+def _section_queries(course, access):
+    """ Provide data for the corresponding dashboard section """
+    course_key = course.id
+    section_data = {
+        'section_key': 'queries',
+        'section_display_name': _('Queries'),
+        'access': access,
+        'list_course_sections': reverse('list_course_sections', kwargs={'course_id': unicode(course_key)}),
+        'list_course_problems': reverse('list_course_problems', kwargs={'course_id': unicode(course_key)}),
+        'get_all_students': reverse('get_all_students', kwargs={'course_id': unicode(course_key)}),
+        'get_single_query': reverse('get_single_query', kwargs={'course_id': unicode(course_key)}),
+        'save_query': reverse('save_query', kwargs={'course_id': unicode(course_key)}),
+        'get_saved_queries': reverse('get_saved_queries', kwargs={'course_id': unicode(course_key)}),
+        'save_group_name': reverse('save_group_name', kwargs={'course_id': unicode(course_key)}),
+        'get_temp_queries': reverse('get_temp_queries', kwargs={'course_id': unicode(course_key)}),
+        'delete_saved_query': reverse("delete_saved_query", kwargs={'course_id': unicode(course_key)}),
+        'delete_temp_query': reverse("delete_temp_query", kwargs={'course_id': unicode(course_key)}),
+        'delete_temp_query_batch': reverse("delete_temp_query_batch", kwargs={'course_id': unicode(course_key)}),
+    }
+    return section_data
 
 
 def _section_student_admin(course, access):
