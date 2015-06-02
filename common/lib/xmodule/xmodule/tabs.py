@@ -758,7 +758,7 @@ class CcxCoachTab(CourseTab):
         the user is one.
         """
         user_is_coach = False
-        if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
+        if settings.FEATURES.get('CUSTOM_COURSES_EDX', False) and course.enable_ccx:
             from opaque_keys.edx.locations import SlashSeparatedCourseKey
             from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
             from ccx.overrides import get_current_request  # pylint: disable=import-error

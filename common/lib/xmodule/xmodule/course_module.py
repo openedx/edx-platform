@@ -386,6 +386,21 @@ class CourseFields(object):
         ),
         scope=Scope.settings
     )
+    enable_ccx = Boolean(
+        # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content. CCX Coach is
+        # a role created by a course Instructor to enable a person (the "Coach") to manage the custom course for
+        # his students.
+        display_name=_("Enable CCX"),
+        # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content. CCX Coach is
+        # a role created by a course Instructor to enable a person (the "Coach") to manage the custom course for
+        # his students.
+        help=_(
+            "Allow course instructors to assign CCX Coach roles, and allow coaches to manage Custom Courses on edX."
+            " When false, Custom Courses cannot be created, but existing Custom Courses will be preserved."
+        ),
+        default=False,
+        scope=Scope.settings
+    )
     allow_anonymous = Boolean(
         display_name=_("Allow Anonymous Discussion Posts"),
         help=_("Enter true or false. If true, students can create discussion posts that are anonymous to all users."),

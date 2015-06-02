@@ -1,6 +1,7 @@
 """
 Unit tests for instructor_dashboard.py.
 """
+import ddt
 from mock import patch
 
 from django.conf import settings
@@ -16,6 +17,7 @@ from course_modes.models import CourseMode
 from student.roles import CourseFinanceAdminRole
 
 
+@ddt.ddt
 class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Tests for the instructor dashboard (not legacy).
@@ -179,3 +181,29 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         total_amount = single_purchase_total + bulk_purchase_total
         response = self.client.get(self.url)
         self.assertIn('{currency}{amount}'.format(currency='$', amount=total_amount), response.content)
+
+    @ddt.data(
+        (True, True, True),
+        (True, False, False),
+        (True, None, False),
+        (False, True, False),
+        (False, False, False),
+        (False, None, False),
+    )
+    @ddt.unpack
+    def test_ccx_coaches_option_on_admin_list_management_instructor(
+            self, ccx_feature_flag, enable_ccx, expected_result
+    ):
+        """
+        Test whether the "CCX Coaches" option is visible or hidden depending on the value of course.enable_ccx.
+        """
+        with patch.dict(settings.FEATURES, {'CUSTOM_COURSES_EDX': ccx_feature_flag}):
+            self.course.enable_ccx = enable_ccx
+            self.store.update_item(self.course, self.instructor.id)
+
+            response = self.client.get(self.url)
+
+            self.assertEquals(
+                expected_result,
+                'CCX Coaches are able to create their own Custom Courses based on this course' in response.content
+            )

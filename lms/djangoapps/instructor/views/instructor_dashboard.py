@@ -324,10 +324,12 @@ def _section_course_info(course, access):
 def _section_membership(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
+    ccx_enabled = settings.FEATURES.get('CUSTOM_COURSES_EDX', False) and course.enable_ccx
     section_data = {
         'section_key': 'membership',
         'section_display_name': _('Membership'),
         'access': access,
+        'ccx_is_enabled': ccx_enabled,
         'enroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': unicode(course_key)}),
         'unenroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': unicode(course_key)}),
         'upload_student_csv_button_url': reverse('register_and_enroll_students', kwargs={'course_id': unicode(course_key)}),
