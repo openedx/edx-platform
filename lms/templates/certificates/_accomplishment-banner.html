@@ -8,11 +8,13 @@
             <div class="wrapper-copy-and-actions">
                 <p class="message-copy copy copy-base emphasized">${accomplishment_banner_congrats}</p>
                 <div class="message-actions">
+                %if badge:
                     <p class="sr-only">${_("Share on:")}</p>
                     <button class="action action-share-mozillaopenbadges btn btn-overlay btn-small">
                         <img class="icon icon-mozillaopenbadges" src="/static/certificates/images/ico-mozillaopenbadges.png" alt="Mozilla Open Badges Backpack">
                         ${_("Add to Mozilla Backpack")}
                     </button>
+                %endif
                     <p class="sr-only">Take this with you:</p>
                     <button class="action action-print btn btn-overlay btn-small" id="action-print-view">
                         <i class="icon fa fa-print" aria-hidden="true"></i>

@@ -12,6 +12,7 @@ from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from course_modes.models import CourseMode
+from track.tests import EventTrackingTestCase
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_CLOSED_MODULESTORE
 
 from student.models import CourseEnrollment
@@ -34,7 +35,7 @@ SHIB_ERROR_STR = "The currently logged-in user account does not have permission 
 
 
 @attr('shard_1')
-class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, EventTrackingTestCase):
     """
     Tests about xblock.
     """
