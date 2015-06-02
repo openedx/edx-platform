@@ -6,6 +6,7 @@ DEFAULT_FIELDS = [
     'id',
     'course_id',
     'usage_id',
+    'block_type',
     'created',
 ]
 
