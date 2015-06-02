@@ -176,12 +176,12 @@ class DashboardPage(PageObject):
 
     def click_account_settings_link(self):
         """
-        Click on `Account Settings` link.
+        Click on `Account` link.
         """
-        self.q(css='.dropdown-menu li a').first.click()
+        self.q(css='.dropdown-menu li a').nth(1).click()
 
     def click_my_profile_link(self):
         """
-        Click on `My Profile` link.
+        Click on `Profile` link.
         """
-        self.q(css='.dropdown-menu li a').nth(1).click()
+        self.q(css='.dropdown-menu li a').nth(2).click()
