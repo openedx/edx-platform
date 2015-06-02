@@ -54,7 +54,7 @@ def url_class(is_active):
 <nav class="${active_page} wrapper-course-material" aria-label="${_('Course Material')}">
   <div class="course-material">
     <ol class="course-tabs">
-      % for tab in get_course_tab_list(course, user):
+      % for tab in get_course_tab_list(request, course):
         <%
             tab_is_active = (tab.tab_id == active_page) or (tab.tab_id == default_tab)
             tab_image = notification_image_for_tab(tab, user, course)

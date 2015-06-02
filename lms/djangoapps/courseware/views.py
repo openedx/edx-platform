@@ -51,13 +51,14 @@ from courseware.models import StudentModule, StudentModuleHistory
 from course_modes.models import CourseMode
 
 from open_ended_grading import open_ended_notifications
+from open_ended_grading.views import StaffGradingTab, PeerGradingTab, OpenEndedGradingTab
 from student.models import UserTestGroup, CourseEnrollment
 from student.views import is_course_blocked
 from util.cache import cache, cache_if_anonymous
 from xblock.fragment import Fragment
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
-from xmodule.tabs import CourseTabList, StaffGradingTab, PeerGradingTab, OpenEndedGradingTab
+from xmodule.tabs import CourseTabList
 from xmodule.x_module import STUDENT_VIEW
 import shoppingcart
 from shoppingcart.models import CourseRegistrationCode
@@ -741,8 +742,6 @@ def static_tab(request, course_id, tab_slug):
         'tab_contents': contents,
     })
 
-# TODO arjun: remove when custom tabs in place, see courseware/syllabus.py
-
 
 @ensure_csrf_cookie
 @ensure_valid_course_key
@@ -1136,13 +1135,13 @@ def notification_image_for_tab(course_tab, user, course):
     """
 
     tab_notification_handlers = {
-        StaffGradingTab.type: open_ended_notifications.staff_grading_notifications,
-        PeerGradingTab.type: open_ended_notifications.peer_grading_notifications,
-        OpenEndedGradingTab.type: open_ended_notifications.combined_notifications
+        StaffGradingTab.name: open_ended_notifications.staff_grading_notifications,
+        PeerGradingTab.name: open_ended_notifications.peer_grading_notifications,
+        OpenEndedGradingTab.name: open_ended_notifications.combined_notifications
     }
 
-    if course_tab.type in tab_notification_handlers:
-        notifications = tab_notification_handlers[course_tab.type](course, user)
+    if course_tab.name in tab_notification_handlers:
+        notifications = tab_notification_handlers[course_tab.name](course, user)
         if notifications and notifications['pending_grading']:
             return notifications['img_path']
 

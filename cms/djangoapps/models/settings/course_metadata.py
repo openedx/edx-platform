@@ -154,7 +154,8 @@ class CourseMetadata(object):
         """
         Validate the values in the json dict (validated by xblock fields from_json method)
 
-        If all fields validate, go ahead and update those values in the database.
+        If all fields validate, go ahead and update those values on the object and return it without
+        persisting it to the DB.
         If not, return the error objects list.
 
         Returns:
@@ -183,19 +184,19 @@ class CourseMetadata(object):
 
         # If did validate, go ahead and update the metadata
         if did_validate:
-            updated_data = cls.update_from_dict(key_values, descriptor, user)
+            updated_data = cls.update_from_dict(key_values, descriptor, user, save=False)
 
         return did_validate, errors, updated_data
 
     @classmethod
-    def update_from_dict(cls, key_values, descriptor, user):
+    def update_from_dict(cls, key_values, descriptor, user, save=True):
         """
-        Update metadata descriptor in modulestore from key_values.
+        Update metadata descriptor from key_values. Saves to modulestore if save is true.
         """
         for key, value in key_values.iteritems():
             setattr(descriptor, key, value)
 
-        if len(key_values):
+        if save and len(key_values):
             modulestore().update_item(descriptor, user.id)
 
         return cls.fetch(descriptor)

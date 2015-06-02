@@ -6,6 +6,7 @@ import jwt
 from mock import patch, MagicMock
 from unittest import skipUnless
 from datetime import datetime
+
 from edxmako.shortcuts import render_to_string
 from edxnotes import helpers
 from edxnotes.decorators import edxnotes
@@ -13,23 +14,25 @@ from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
+from django.test.client import RequestFactory
 from oauth2_provider.tests.factories import ClientFactory
 from provider.oauth2.models import Client
-from xmodule.tabs import EdxNotesTab
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+from xmodule.tabs import CourseTab
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
-from student.tests.factories import UserFactory
+from courseware.tabs import get_course_tab_list
+from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
 
 def enable_edxnotes_for_the_course(course, user_id):
     """
     Enable EdxNotes for the course.
     """
-    course.tabs.append(EdxNotesTab())
+    course.tabs.append(CourseTab.load("edxnotes"))
     modulestore().update_item(course, user_id)
 
 
@@ -795,6 +798,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         super(EdxNotesViewsTest, self).setUp()
         self.course = CourseFactory.create(edxnotes=True)
         self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
         self.client.login(username=self.user.username, password="edx")
         self.notes_page_url = reverse("edxnotes", args=[unicode(self.course.id)])
         self.search_url = reverse("search_notes", args=[unicode(self.course.id)])
@@ -807,6 +811,27 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         """
         field_data_cache = FieldDataCache([self.course], self.course.id, self.user)
         return get_module_for_descriptor(self.user, MagicMock(), self.course, field_data_cache, self.course.id)
+
+    def test_edxnotes_tab(self):
+        """
+        Tests that edxnotes tab is shown only when the feature is enabled.
+        """
+        def has_notes_tab(user, course):
+            """Returns true if the "Notes" tab is shown."""
+            request = RequestFactory().request()
+            request.user = user
+            tabs = get_course_tab_list(request, course)
+            return len([tab for tab in tabs if tab.type == 'edxnotes']) == 1
+
+        self.assertFalse(has_notes_tab(self.user, self.course))
+        enable_edxnotes_for_the_course(self.course, self.user.id)
+        # disable course.edxnotes
+        self.course.edxnotes = False
+        self.assertFalse(has_notes_tab(self.user, self.course))
+
+        # reenable course.edxnotes
+        self.course.edxnotes = True
+        self.assertTrue(has_notes_tab(self.user, self.course))
 
     # pylint: disable=unused-argument
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})

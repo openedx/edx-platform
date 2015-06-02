@@ -8,10 +8,12 @@ import logging
 import xml.sax.saxutils as saxutils
 
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.http import Http404, HttpResponseBadRequest
+from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET
 import newrelic.agent
 
@@ -23,8 +25,10 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     get_course_cohorts,
     is_commentable_cohorted
 )
+from courseware.tabs import EnrolledCourseViewType
 from courseware.access import has_access
 from xmodule.modulestore.django import modulestore
+from ccx.overrides import get_current_ccx
 
 from django_comment_client.permissions import cached_has_permission
 from django_comment_client.utils import (
@@ -43,6 +47,27 @@ THREADS_PER_PAGE = 20
 INLINE_THREADS_PER_PAGE = 20
 PAGES_NEARBY_DELTA = 2
 log = logging.getLogger("edx.discussions")
+
+
+class DiscussionCourseViewType(EnrolledCourseViewType):
+    """
+    A tab for the cs_comments_service forums.
+    """
+
+    name = 'discussion'
+    title = _('Discussion')
+    priority = None
+    view_name = 'django_comment_client.forum.views.forum_form_discussion'
+
+    @classmethod
+    def is_enabled(cls, course, user=None):
+        if not super(DiscussionCourseViewType, cls).is_enabled(course, user):
+            return False
+
+        if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
+            if get_current_ccx():
+                return False
+        return settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE')
 
 
 def _attr_safe_json(obj):
