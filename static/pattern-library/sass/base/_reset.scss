@@ -1,0 +1,115 @@
+// ------------------------------
+// edX Pattern Library: Reset
+
+// About: Sass partial for resetting and setting base elements.
+
+// #GLOBAL:     Global overrides and resets
+// #BASE:       Base overrides and resets
+// #FORMS:      Form-focused overrides and resets
+// #ACTIONS:    links, buttons, controls overrides and resets
+// #MEDIA:      images, video, mutlmedia overrides and resets
+// #UTILITIES:  layout and use case utilities
+
+
+// ----------------------------
+// #GLOBAL
+// ----------------------------
+* {
+    box-sizing: border-box;
+}
+
+// ----------------------------
+// #BASE
+// ----------------------------
+html, body {
+
+}
+
+audio,
+canvas,
+iframe,
+img,
+svg,
+video {
+    vertical-align: middle;
+}
+
+body {
+    @include font-smoothing(on);
+    color: $text-base-color;
+    background: $view-bg;
+    font-size: font-size(base);
+    font-family: $font-family-sans-serif;
+}
+
+p,
+ol,
+ul,
+dl {
+    margin: 0 0 spacing-vertical(small) 0;
+}
+
+// ----------------------------
+// #FORMS
+// ----------------------------
+fieldset {
+    margin: 0;
+    border: 0;
+    padding: 0;
+}
+
+textarea {
+    resize: vertical;
+}
+
+// ----------------------------
+// #ACTIONS
+// ----------------------------
+a,
+.link {
+    @extend %link;
+}
+
+// ----------------------------
+// #MEDIA
+// ----------------------------
+figure {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+
+    img {
+        display: block;
+    }
+
+    figcaption {
+
+    }
+}
+
+// images
+.img,
+picture {
+    max-width: 100%;
+    margin: 0;
+}
+
+pre {
+    font-family: $font-family-monospace;
+    margin: 0;
+}
+
+// ----------------------------
+// #UTILITIES
+// ----------------------------
+.sr-only {
+    @extend %a11y-hide;
+}
+
+.bg-replace {
+    @extend %a11y-hide-image-text;
+}
+
+[class^='wrapper'] {
+    @extend %wrapper;
+}

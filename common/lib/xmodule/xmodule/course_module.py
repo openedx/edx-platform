@@ -673,6 +673,7 @@ class CourseFields(object):
     ## Course level Certificate Name overrides.
     cert_name_short = String(
         help=_(
+            "Use this setting only when generating PDF certificates. "
             "Between quotation marks, enter the short name of the course to use on the certificate that "
             "students receive when they complete the course."
         ),
@@ -682,6 +683,7 @@ class CourseFields(object):
     )
     cert_name_long = String(
         help=_(
+            "Use this setting only when generating PDF certificates. "
             "Between quotation marks, enter the long name of the course to use on the certificate that students "
             "receive when they complete the course."
         ),
@@ -694,6 +696,15 @@ class CourseFields(object):
         display_name=_("Certificate Web/HTML View Overrides"),
         # Translators: These overrides allow for an alternative configuration of the certificate web view
         help=_("Enter course-specific overrides for the Web/HTML template parameters here (JSON format)"),
+        scope=Scope.settings,
+    )
+
+    # Specific certificate information managed via Studio (should eventually fold other cert settings into this)
+    certificates = Dict(
+        # Translators: This field is the container for course-specific certifcate configuration values
+        display_name=_("Certificate Configuration"),
+        # Translators: These overrides allow for an alternative configuration of the certificate web view
+        help=_("Enter course-specific configuration information here (JSON format)"),
         scope=Scope.settings,
     )
 

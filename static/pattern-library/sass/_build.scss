@@ -1,0 +1,42 @@
+// ------------------------------
+// edX Patern Library Elements: Shared Build Compile
+
+// About: Sass compile for the edX Patern Library Elements that are shared between LTR and RTL UI. Configuration and vendor specific imports happen before this shared set of imports are compiled in the main-*.scss files.
+
+// ------------------------------
+// #UTILITIES
+// ------------------------------
+@import 'utilities/functions';
+@import 'utilities/variables';
+@import 'utilities/mixins';
+@import 'utilities/helpers';
+
+// ------------------------------
+// #BASE
+// ------------------------------
+@import 'base/normalize';
+@import 'base/reset';
+@import 'base/typography';
+
+// ------------------------------
+// #COMPONENTS
+// ------------------------------
+@import 'components/headings';
+@import 'components/copy';
+@import 'components/colors';
+@import 'components/buttons';
+
+// ------------------------------
+// #LAYOUTS
+// ------------------------------
+// TBD
+
+// ------------------------------
+// #VIEWS
+// ------------------------------
+// TBD
+
+// ------------------------------
+// #SHAME
+// ------------------------------
+// TBD

@@ -1,0 +1,33 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='../static_content.html'/>
+
+<div class="wrapper-banner wrapper-banner-user">
+    <section class="banner banner-user">
+        <div class="message message-block message-notice">
+            <h2 class="message-title hd-5 emphasized">${accomplishment_banner_opening}</h2>
+            <div class="wrapper-copy-and-actions">
+                <p class="message-copy copy copy-base emphasized">${accomplishment_banner_congrats}</p>
+                <div class="message-actions">
+                    <p class="sr-only">${_("Share on:")}</p>
+                    <button class="action action-share-mozillaopenbadges btn btn-overlay btn-small">
+                        <img class="icon icon-mozillaopenbadges" src="/static/certificates/images/ico-mozillaopenbadges.png" alt="Mozilla Open Badges Backpack">
+                        ${_("Add to Mozilla Backpack")}
+                    </button>
+                    <p class="sr-only">Take this with you:</p>
+                    <button class="action action-print btn btn-overlay btn-small" id="action-print-view">
+                        <i class="icon fa fa-print" aria-hidden="true"></i>
+                        ${_("Print Certificate")}
+                    </button>
+                    <a class="action-linkedin-profile" target="_blank" href="${linked_in_url}"
+                        title="${_('Add Certificate to LinkedIn Profile')}"
+                        data-course-id="${course_id}"
+                        data-certificate-mode="${mode}">
+                        <img class="action-linkedin-profile-img"
+                            src="${static.url('images/linkedin_add_to_profile.png')}"
+                            alt="${_('Share on LinkedIn')}" />
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

@@ -60,6 +60,7 @@ from student.forms import AccountCreationForm, PasswordResetFormNoActive
 
 from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow
 from certificates.models import CertificateStatuses, certificate_status_for_student
+from certificates.api import get_certificate_url, get_active_web_certificate  # pylint: disable=import-error
 from dark_lang.models import DarkLangConfig
 
 from xmodule.modulestore.django import modulestore
@@ -304,7 +305,19 @@ def _cert_info(user, course, cert_status, course_mode):
         status_dict['show_survey_button'] = False
 
     if status == 'ready':
-        if 'download_url' not in cert_status:
+        # showing the certificate web view button if certificate is ready state and feature flags are enabled.
+        if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
+            if get_active_web_certificate(course) is not None:
+                status_dict.update({
+                    'show_cert_web_view': True,
+                    'cert_web_view_url': u'{url}'.format(
+                        url=get_certificate_url(user_id=user.id, course_id=unicode(course.id))
+                    )
+                })
+            else:
+                # don't show download certificate button if we don't have an active certificate for course
+                status_dict['show_download_url'] = False
+        elif 'download_url' not in cert_status:
             log.warning(
                 u"User %s has a downloadable cert for %s, but no download url",
                 user.username,
