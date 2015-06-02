@@ -32,6 +32,9 @@ class Command(BaseCommand):
 
         print("Exporting course id = {0} to {1}".format(course_key, output_path))
 
+        if not output_path.endswith('/'):
+            output_path += '/'
+
         root_dir = os.path.dirname(output_path)
         course_dir = os.path.splitext(os.path.basename(output_path))[0]
 
