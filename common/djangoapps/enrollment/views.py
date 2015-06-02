@@ -232,8 +232,7 @@ class EnrollmentCourseDetailView(APIView):
         """
 
         try:
-            return Response(api.get_course_enrollment_details(course_id,
-                            request.GET.get('include_expired', '')))
+            return Response(api.get_course_enrollment_details(course_id, request.GET.get('include_expired', '')))
         except CourseNotFoundError:
             msg = u"No course found for course ID '{course_id}'"
             return Response(status=status.HTTP_400_BAD_REQUEST,
