@@ -135,15 +135,35 @@ class CreditRequirement(TimeStampedModel):
 
 
 class CreditRequirementStatus(TimeStampedModel):
-    """This model represents the status of each requirement."""
+    """This model represents the status of each requirement.
+
+    For a particular credit requirement, a user can either:
+    1) Have satisfied the requirement (example: approved in-course reverification)
+    2) Have failed the requirement (example: denied in-course reverification)
+    3) Neither satisfied nor failed (example: the user hasn't yet attempted in-course reverification).
+
+    Cases (1) and (2) are represented by having a CreditRequirementStatus with
+    the status set to "satisfied" or "failed", respectively.
+
+    In case (3), no CreditRequirementStatus record will exist for the requirement and user.
+
+    """
 
     REQUIREMENT_STATUS_CHOICES = (
         ("satisfied", "satisfied"),
+        ("failed", "failed"),
     )
 
     username = models.CharField(max_length=255, db_index=True)
     requirement = models.ForeignKey(CreditRequirement, related_name="statuses")
     status = models.CharField(choices=REQUIREMENT_STATUS_CHOICES, max_length=32)
+
+    # Include additional information about why the user satisfied or failed
+    # the requirement.  This is specific to the type of requirement.
+    # For example, the minimum grade requirement might record the user's
+    # final grade when the user completes the course.  This allows us to display
+    # the grade to users later and to send the information to credit providers.
+    reason = JSONField(default={})
 
 
 class CreditEligibility(TimeStampedModel):
