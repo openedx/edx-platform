@@ -1970,36 +1970,6 @@ def reactivation_email_for_user(user):
     return JsonResponse({"success": True})
 
 
-# TODO: delete this method and redirect unit tests to validate_new_email and do_email_change_request
-# after accounts page work is done.
-@ensure_csrf_cookie
-def change_email_request(request):
-    """ AJAX call from the profile page. User wants a new e-mail.
-    """
-    ## Make sure it checks for existing e-mail conflicts
-    if not request.user.is_authenticated():
-        raise Http404
-
-    user = request.user
-
-    if not user.check_password(request.POST['password']):
-        return JsonResponse({
-            "success": False,
-            "error": _('Invalid password'),
-        })  # TODO: this should be status code 400  # pylint: disable=fixme
-
-    new_email = request.POST['new_email']
-    try:
-        validate_new_email(request.user, new_email)
-        do_email_change_request(request.user, new_email)
-    except ValueError as err:
-        return JsonResponse({
-            "success": False,
-            "error": err.message,
-        })
-    return JsonResponse({"success": True})
-
-
 def validate_new_email(user, new_email):
     """
     Given a new email for a user, does some basic verification of the new address If any issues are encountered
