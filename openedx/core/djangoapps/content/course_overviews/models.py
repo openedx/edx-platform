@@ -276,7 +276,7 @@ class CourseOverviewDescriptor(django.db.models.Model):
         Returns the desired text corresponding the course's start date and time in UTC.  Prefers .advertised_start,
         then falls back to .start
 
-        (Copied directly from xmodule.course_module.CourseDescriptor)
+        (Copied from xmodule.course_module.CourseDescriptor and modified to not use the xBlock runtime)
         """
         _ = ugettext
         strftime = strftime_localized
@@ -325,8 +325,7 @@ class CourseOverviewDescriptor(django.db.models.Model):
 
         If the course does not have an end date set (course.end is None), an empty string will be returned.
 
-        (Copied from xmodule.course_module.CourseDescriptor, and modified to not use the XBlock
-         runtime)
+        (Copied from xmodule.course_module.CourseDescriptor and modified to not use the xBlock runtime)
         """
         if self.end is None:
             return ''
