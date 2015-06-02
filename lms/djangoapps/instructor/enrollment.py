@@ -100,7 +100,7 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
         representing state before and after the action.
     """
     previous_state = EmailEnrollmentState(course_id, student_email)
-
+    enrollment_obj = None
     if previous_state.user:
         # if the student is currently unenrolled, don't enroll them in their
         # previous mode
@@ -108,7 +108,7 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
         if previous_state.enrollment:
             course_mode = previous_state.mode
 
-        CourseEnrollment.enroll_by_email(student_email, course_id, course_mode)
+        enrollment_obj = CourseEnrollment.enroll_by_email(student_email, course_id, course_mode)
         if email_students:
             email_params['message'] = 'enrolled_enroll'
             email_params['email_address'] = student_email
@@ -125,7 +125,7 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
 
     after_state = EmailEnrollmentState(course_id, student_email)
 
-    return previous_state, after_state
+    return previous_state, after_state, enrollment_obj
 
 
 def unenroll_email(course_id, student_email, email_students=False, email_params=None, language=None):
@@ -141,7 +141,6 @@ def unenroll_email(course_id, student_email, email_students=False, email_params=
         representing state before and after the action.
     """
     previous_state = EmailEnrollmentState(course_id, student_email)
-
     if previous_state.enrollment:
         CourseEnrollment.unenroll_by_email(student_email, course_id)
         if email_students:

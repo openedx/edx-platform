@@ -42,7 +42,7 @@ class TestInstructorAPIEnrollmentEmailLocalization(ModuleStoreTestCase):
         Update the current student enrollment status.
         """
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        args = {'identifiers': student_email, 'email_students': 'true', 'action': action}
+        args = {'identifiers': student_email, 'email_students': 'true', 'action': action, 'reason': 'testing'}
         response = self.client.post(url, args)
         return response
 

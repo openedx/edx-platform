@@ -71,9 +71,11 @@ def instructor_dashboard_2(request, course_id):
     if not access['staff']:
         raise Http404()
 
+    is_white_label = CourseMode.is_white_label(course_key)
+
     sections = [
         _section_course_info(course, access),
-        _section_membership(course, access),
+        _section_membership(course, access, is_white_label),
         _section_cohort_management(course, access),
         _section_student_admin(course, access),
         _section_data_download(course, access),
@@ -91,8 +93,6 @@ def instructor_dashboard_2(request, course_id):
             u"one paid course mode to enable eCommerce options.",
             unicode(course_key), len(paid_modes)
         )
-
-    is_white_label = CourseMode.is_white_label(course_key)
 
     if (settings.FEATURES.get('INDIVIDUAL_DUE_DATES') and access['instructor']):
         sections.insert(3, _section_extensions(course))
@@ -321,7 +321,7 @@ def _section_course_info(course, access):
     return section_data
 
 
-def _section_membership(course, access):
+def _section_membership(course, access, is_white_label):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
     ccx_enabled = settings.FEATURES.get('CUSTOM_COURSES_EDX', False) and course.enable_ccx
@@ -330,6 +330,7 @@ def _section_membership(course, access):
         'section_display_name': _('Membership'),
         'access': access,
         'ccx_is_enabled': ccx_enabled,
+        'is_white_label': is_white_label,
         'enroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': unicode(course_key)}),
         'unenroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': unicode(course_key)}),
         'upload_student_csv_button_url': reverse('register_and_enroll_students', kwargs={'course_id': unicode(course_key)}),
