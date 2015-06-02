@@ -269,11 +269,9 @@ class RenderCoursewareTest(TestCase):
             'disable_accordion': True,
             'allow_iframing': True,
             'disable_header': True,
-            'disable_footer': True,
-            'disable_tabs': True,
             'staff_access': 'StaffAccess',
             'xqa_server': 'http://example.com/xqa',
         }
         request = build_run_request()
         views.render_courseware(request, ALL_PARAMS.copy())
-        self.render_mock.assert_called_with('courseware/courseware.html', expected_context)
+        self.render_mock.assert_called_with('courseware/courseware-chromeless.html', expected_context)
