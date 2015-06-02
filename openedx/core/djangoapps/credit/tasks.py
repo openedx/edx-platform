@@ -136,13 +136,13 @@ def _is_credit_requirement(xblock):
             if not callable(getattr(xblock, "get_credit_requirement_namespace", None)):
                 is_credit_requirement = False
                 LOGGER.error(
-                    "XBlock %v is marked as a credit requirement but does not "
-                    "implement get_credit_requirement_namespace()", xblock
+                    "XBlock %s is marked as a credit requirement but does not "
+                    "implement get_credit_requirement_namespace()", unicode(xblock)
                 )
             if not callable(getattr(xblock, "get_credit_requirement_name", None)):
                 is_credit_requirement = False
                 LOGGER.error(
-                    "XBlock %v is marked as a credit requirement but does not "
-                    "implement get_credit_requirement_name()", xblock
+                    "XBlock %s is marked as a credit requirement but does not "
+                    "implement get_credit_requirement_name()", unicode(xblock)
                 )
     return is_credit_requirement

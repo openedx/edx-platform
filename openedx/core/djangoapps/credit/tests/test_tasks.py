@@ -32,7 +32,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
         subsection = ItemFactory.create(parent=section, category='sequential', display_name='Test Subsection')
         vertical = ItemFactory.create(parent=subsection, category='vertical', display_name='Test Unit')
-        reverification = ItemFactory.create(
+        ItemFactory.create(
             parent=vertical,
             category='edx-reverification-block',
             display_name='Test Verification Block'
