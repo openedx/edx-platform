@@ -14,6 +14,7 @@ class BookmarkSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField('resource_id')  # pylint: disable=invalid-name
     course_id = serializers.Field(source='course_key')
     usage_id = serializers.Field(source='usage_key')
+    block_type = serializers.Field(source='usage_key.block_type')
     path = serializers.Field(source='path')
 
     def __init__(self, *args, **kwargs):
@@ -38,6 +39,7 @@ class BookmarkSerializer(serializers.ModelSerializer):
             'id',
             'course_id',
             'usage_id',
+            'block_type',
             'display_name',
             'path',
             'created',
