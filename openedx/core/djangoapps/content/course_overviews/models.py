@@ -5,10 +5,8 @@ from base64 import b32encode
 import django.db.models
 from django.db.models.fields import *
 from django.utils.timezone import UTC
-from django.utils.translation import ugettext
-from opaque_keys.edx.locator import UsageKey
 
-from xmodule_django.models import CourseKeyField
+from xmodule_django.models import CourseKeyField, UsageKeyField
 from xmodule.partitions.partitions import NoSuchUserPartitionError
 from xmodule.course_module import CourseFields
 from xmodule.fields import Date
@@ -16,46 +14,68 @@ from xmodule.modulestore.inheritance import UserPartition
 from xmodule.course_module import DEFAULT_START_DATE, CATALOG_VISIBILITY_CATALOG_AND_ABOUT
 from xmodule.modulestore.django import modulestore
 
-
-
 class UserPartitionListField(TextField):
     """Special field for storing a list of UserPartition objects as a string."""
+    __metaclass__ = django.db.models.SubfieldBase
+
     def __init__(self, *args, **kwargs):
         super(UserPartitionListField, self).__init__(*args, **kwargs)
 
-    def to_representation(self, obj):
+    def get_prep_value(self, obj):
         """Returns a serialized version of obj, to be stored in a TextField (overriden from django.db.models.Field)"""
         strings = [user_partition.to_json() for user_partition in obj]
         return json.dumps(strings)
 
-    def to_internal_value(self, data):
+    def to_python(self, data):
         """Deserializes data into the Python representation of this field (overriden from django.db.models.Field)"""
-        strings = json.loads(data)
-        return [UserPartition.from_json(s) for s in strings]
+        if data is None:
+            return None
+        else:
+            items = data if isinstance(data, list) else json.loads(data)
+            return [
+                item if isinstance(item, UserPartition) else UserPartition.from_json(item)
+                for item in items
+            ]
 
 class GroupAccessDictField(TextField):
+    """Special field for storing a GroupAccessDict object as a string."""
+    __metaclass__ = django.db.models.SubfieldBase
+
     def __init__(self, *args, **kwargs):
         super(GroupAccessDictField, self).__init__(*args, **kwargs)
 
-    def to_representation(self, obj):
+    def get_prep_value(self, obj):
         """Returns a serialized version of obj, to be stored in a TextField (overriden from django.db.models.Field)"""
         return json.dumps(obj)
 
-    def to_internal_value(self, data):
+    def to_python(self, data):
         """Deserializes data into the Python representation of this field (overriden from django.db.models.Field)"""
-        return json.loads(data)
+        if data is None:
+            return None
+        elif isinstance(data, dict):
+            return data
+        else:
+            return json.loads(data)
 
 class CourseIdListField(TextField):
+    """Special field for storing a list of CourseKey objects as a string."""
+    __metaclass__ = django.db.models.SubfieldBase
+
     def __init__(self, *args, **kwargs):
         super(CourseIdListField, self).__init__(*args, **kwargs)
 
-    def to_representation(self, obj):
+    def get_prep_value(self, obj):
         """Returns a serialized version of obj, to be stored in a TextField (overriden from django.db.models.Field)"""
         return json.dumps(obj)
 
-    def to_internal_value(self, data):
+    def to_python(self, data):
         """Deserializes data into the Python representation of this field (overriden from django.db.models.Field)"""
-        return json.loads(data)
+        if data is None:
+            return None
+        elif isinstance(data, list):
+            return data
+        else:
+            return json.loads(data)
 
 # South requires us to specify "introspection rules" (or, our case, the lack thereof) for each of our custom fields
 # in order for it to generate migrations.
@@ -102,15 +122,15 @@ class CourseOverviewDescriptor(django.db.models.Model):
     @staticmethod
     def create_from_course(course):
         """Returns a CourseOverviewDescriptor from the given CourseDescriptor."""
-
         # TODO: when we upgrade to 1.8, delete old code and uncomment new code
+
         modulestore_type = modulestore().get_modulestore_type(course.id)
 
         # Newer, better way of building return value (should work in Django >=1.8, but has NOT yet been tested)
         '''
-        res = CourseOverviewDescriptor(modulestore_type=modulestore_type, _location_str=unicode(course.location)
+        res = CourseOverviewDescriptor(modulestore_type=modulestore_type, _location=course.location)
         for field in CourseOverviewDescriptor._meta.get_fields(include_parents=False):
-            if not field.name in ['modulestore_type', '_location_str']:
+            if field.name in ['modulestore_type', '_location']:
                 setattr(res, field.name, getattr(course, field.name))
         return res
         '''
@@ -124,7 +144,7 @@ class CourseOverviewDescriptor(django.db.models.Model):
             ispublic=course.ispublic,
             visible_to_staff_only=course.visible_to_staff_only,
             group_access=course.group_access,
-            _location_str=unicode(course.location),
+            _location=course.location,
             enrollment_start=course.enrollment_start,
             enrollment_end=course.enrollment_end,
             start=course.start,
@@ -151,7 +171,7 @@ class CourseOverviewDescriptor(django.db.models.Model):
     # Fields specific to this class
     id = CourseKeyField(db_index=True, primary_key=True, max_length=255)
     modulestore_type = CharField(max_length=5)  # 'split', 'mongo', or 'xml'
-    _location_str = CharField(max_length=255)
+    _location = UsageKeyField(max_length=255)
 
     # Analogous to fields from: lms_xblock.mixin.LmsBlockMixin
     ispublic = NullBooleanField()
@@ -166,10 +186,10 @@ class CourseOverviewDescriptor(django.db.models.Model):
     group_access = GroupAccessDictField(null=True, default="{}")
 
     # Analogous to fields from: xmodule.course_module.CourseFields
-    enrollment_start = DateField(null=True)
-    enrollment_end = DateField(null=True)
-    start = DateField(default=DEFAULT_START_DATE, null=True)
-    end = DateField(null=True)
+    enrollment_start = DateTimeField(null=True)
+    enrollment_end = DateTimeField(null=True)
+    start = DateTimeField(default=DEFAULT_START_DATE, null=True)
+    end = DateTimeField(null=True)
     advertised_start = TextField(null=True)
     pre_requisite_courses = CourseIdListField(null=True)
     end_of_course_survey_url = TextField(null=True)
@@ -213,13 +233,13 @@ class CourseOverviewDescriptor(django.db.models.Model):
     def location(self):
         """Returns the UsageKey of this course.
 
-        In the database, we store this course's usage key in a string _location_str. Here we parse it into a UsageKey
-        object and the return it.
+        UsageKeyField has a strange behavior where it fails to parse the "run" of a course out of the serialized
+        form of a Mongo UsageKey. This property is a wrapper around _location attribute that fixes the problem
+        by calling map_into_course, which restores the run attribute.
+
         (Mimics method from xmodule.x_module.XModuleMixin)
         """
-        if not hasattr(self, '_location'):
-            self._location = UsageKey.from_string(self._location_str).map_into_course(self.id)
-        return self._location
+        return self._location.map_into_course(self.id)
 
     @property
     def url_name(self):
