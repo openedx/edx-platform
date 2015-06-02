@@ -58,6 +58,7 @@ from util.json_request import JsonResponse
 from util.date_utils import get_default_time_display
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
+from staticfiles.storage import staticfiles_storage
 
 
 log = logging.getLogger(__name__)
@@ -407,6 +408,7 @@ class PayAndVerifyView(View):
             ),
             'already_verified': already_verified,
             'verification_good_until': verification_good_until,
+            'capture_sound': staticfiles_storage.url("audio/camera_capture.wav"),
         }
         return render_to_response("verify_student/pay_and_verify.html", context)
 
@@ -1170,7 +1172,8 @@ class InCourseReverifyView(View):
             'course_name': course.display_name_with_default,
             'checkpoint_name': checkpoint.checkpoint_name,
             'platform_name': settings.PLATFORM_NAME,
-            'usage_id': usage_id
+            'usage_id': usage_id,
+            'capture_sound': staticfiles_storage.url("audio/camera_capture.wav"),
         }
         return render_to_response("verify_student/incourse_reverify.html", context)
 

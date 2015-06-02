@@ -212,10 +212,15 @@
         },
 
         initialize: function( obj ) {
+            this.mainContainer = $('#pay-and-verify-container');
+            if (!this.mainContainer){
+                this.mainContainer = $('#incourse-reverify-container');
+            }
             this.submitButton = obj.submitButton || "";
             this.modelAttribute = obj.modelAttribute || "";
             this.errorModel = obj.errorModel || null;
             this.backend = this.backends[obj.backendName] || obj.backend;
+            this.captureSoundPath =  this.mainContainer.data('capture-sound');
 
             this.backend.initialize({
                 wrapper: "#camera",
@@ -254,11 +259,12 @@
             $resetBtn.on( 'click', _.bind( this.reset, this ) );
             $captureBtn.on( 'click', _.bind( this.capture, this ) );
 
-            $resetBtn.on( 'keyup', _.bind( this.reset_by_enter, this ) );
-            $captureBtn.on( 'keyup', _.bind( this.capture_by_enter, this ) );
+            $resetBtn.on( 'keyup', _.bind( this.resetByEnter, this ) );
 
             // Show the capture button
             $captureBtn.removeClass('is-hidden');
+            $( "#webcam_capture_button", this.el ).removeClass('is-hidden');
+            $( "#webcam_capture_sound", this.el ).attr('src', this.captureSoundPath);
 
             return this;
         },
@@ -276,14 +282,11 @@
             // Go back to the initial button state
             $( "#webcam_reset_button", this.el ).addClass('is-hidden');
             $( "#webcam_capture_button", this.el ).removeClass('is-hidden');
+            $( this.submitButton ).attr('title', '');
         },
 
-        capture_by_enter: function(event){
-            if(event.keyCode == key.enter){
-                this.capture();
-            }
-        },
-        reset_by_enter: function(event){
+
+        resetByEnter: function(event){
             if(event.keyCode == key.enter){
                 this.reset();
             }
@@ -306,6 +309,8 @@
 
                 // Enable the submit button
                 this.setSubmitButtonEnabled( true );
+                this.setSubmitButtonFocused();
+                this.captureSound();
             }
         },
 
@@ -334,6 +339,16 @@
                 .toggleClass( 'is-disabled', !isEnabled )
                 .prop( 'disabled', !isEnabled )
                 .attr('aria-disabled', !isEnabled);
+        },
+
+        captureSound: function(){
+            $( '#webcam_capture_sound' )[0].play();
+        },
+
+        setSubmitButtonFocused: function(){
+            $( this.submitButton )
+                .trigger('focus')
+                .attr('title', gettext( 'Photo Captured successfully.'));
         },
 
         isMobileDevice: function() {

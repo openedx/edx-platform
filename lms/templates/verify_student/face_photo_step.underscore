@@ -57,12 +57,13 @@
 
     <% if ( nextStepTitle ) { %>
     <nav class="nav-wizard" id="face_next_button_nav">
-      <a id="next_step_button" class="next action-primary is-disabled right" aria-hidden="true" aria-disabled="true" title="Next">
+      <button id="next_step_button" class="next action-primary is-disabled right" aria-disabled="true" title="Next">
+      <span class="sr" id="photo_message"></span>
         <%- _.sprintf(
           gettext( "Next: %(nextStepTitle)s" ),
           { nextStepTitle: nextStepTitle }
         ) %>
-      </a>
+      </button>
     </nav>
 
     <% } %>
