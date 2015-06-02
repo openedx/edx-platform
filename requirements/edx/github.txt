@@ -37,7 +37,7 @@ git+https://github.com/mitocw/django-cas.git@60a5b8e5a62e63e0d5d224a87f0b489201a
 # This portion of requirements.txt is now maintained only for the Stanford fork, i.e. we should update as necessary
 # Third Party XBlocks
 -e git+https://github.com/edx-solutions/xblock-ooyala.git@32d52edaa820dbdbf846d8a84f6bccbf0b9c8218#egg=xblock_ooyala_player-master
--e git+https://github.com/Stanford-Online/DoneXBlock.git@972d5e54a0422e9c6d822473c9bad14f16484d0f#egg=done-xblock
+-e git+https://github.com/Stanford-Online/DoneXBlock.git@0a38297377c262313b4677ec44deb9fac4db5afb#egg=done-xblock
 -e git+https://github.com/openlearninginitiative/xblock-submit-and-compare.git@f89d3debd58003a5bfedfbaad06072ec2082259d#egg=xblock-submit-and-compare
 -e git+https://github.com/mckinseyacademy/xblock-poll.git@09e8feda40fdf77bd19b830b497ff969891e11af#egg=xblock-poll
 -e git+https://github.com/Stanford-Online/xblock-mufi.git@ee853b8a7668a87c27d13d55c0d149a04b8657b8#egg=xblock_mufi-master
