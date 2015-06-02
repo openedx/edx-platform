@@ -1,7 +1,9 @@
 <%inherit file="/main.html" />
-<%! from django.core.urlresolvers import reverse %>
-<%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='/static_content.html'/>
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+%>
 
 <%block name="headextra">
   <%static:css group='style-course'/>
@@ -55,7 +57,7 @@ textarea {
     <h2 class="instructor-nav">
 	  <a href="${reverse('sysadmin')}" class="${modeflag.get('users')}">${_('Users')}</a>
       <a href="${reverse('sysadmin_courses')}" class="${modeflag.get('courses')}">${_('Courses')}</a>
-      <a href="${reverse('sysadmin_staffing')}" class="${modeflag.get('staffing')}">${_('Staffing and Enrollment')}</a> 
+      <a href="${reverse('sysadmin_staffing')}" class="${modeflag.get('staffing')}">${_('Staffing and Enrollment')}</a>
       ## Translators: refers to http://git-scm.com/docs/git-log
       <a href="${reverse('gitlogs')}">${_('Git Logs')}</a>
     </h2>

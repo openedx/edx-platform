@@ -1,11 +1,11 @@
-<%!
-from django.utils.translation import ugettext as _
-%>
 <%inherit file="../main.html" />
 <%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.conf import settings
+from microsite_configuration import microsite
+%>
 <%block name="pagetitle">${_("Shopping cart")}</%block>
-<%! from django.conf import settings %>
-<%! from microsite_configuration import microsite %>
 <%block name="headextra">
     <script type="text/javascript" src="${static.url('js/shoppingcart/shoppingcart.js')}"></script>
 </%block>

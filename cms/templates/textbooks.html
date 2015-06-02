@@ -1,8 +1,10 @@
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "textbooks" %></%def>
 <%namespace name='static' file='static_content.html'/>
-<%! import json %>
-<%! from django.utils.translation import ugettext as _ %>
+<%!
+import json
+from django.utils.translation import ugettext as _
+%>
 
 <%block name="title">${_("Textbooks")}</%block>
 <%block name="bodyclass">is-signedin course view-textbooks</%block>

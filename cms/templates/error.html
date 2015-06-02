@@ -1,6 +1,9 @@
-<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
-<%! from django.core.urlresolvers import reverse %>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from django.conf import settings
+%>
 <%block name="bodyclass">error</%block>
 <%block name="title">
   % if error == '404':
@@ -11,8 +14,6 @@
 </%block>
 
 <%!
-from django.conf import settings
-
 if settings.TENDER_DOMAIN:
   help_link_start = '<a href="http://{domain}/discussion/new" class="show-tender" title="{title}">'.format(
     domain=settings.TENDER_DOMAIN,

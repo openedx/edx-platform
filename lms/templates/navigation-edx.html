@@ -5,14 +5,14 @@
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
+from microsite_configuration import microsite
+from microsite_configuration.templatetags.microsite import platform_name
+
 # App that handles subdomain specific branding
 import branding
 # app that handles site status messages
 from status.status import get_site_status_msg
 %>
-
-<%! from microsite_configuration import microsite %>
-<%! from microsite_configuration.templatetags.microsite import platform_name %>
 
 ## Provide a hook for themes to inject branding on top.
 <%block name="navigation_top" />

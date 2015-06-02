@@ -1,8 +1,9 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django.core.urlresolvers import reverse %>
-
 <%inherit file="../main.html" />
 <%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
 
 <%block name="bodyclass">register verification-process is-not-verified step-photos</%block>
 <%block name="pagetitle">${_("Re-Verification")}</%block>
