@@ -1045,6 +1045,36 @@ def _progress(request, course_key, student_id):
     # checking certificate generation configuration
     show_generate_cert_btn = certs_api.cert_generation_enabled(course_key)
 
+    requirements = [
+        {
+            'name': 'In Course Reverification 1',
+            'is_achieved': True,
+            'status': 'submitted',
+        },
+        {
+            'name': 'In Course Reverification 2',
+            'is_achieved': False,
+        },
+        {
+            'name': 'In Course Reverification 1',
+            'is_achieved': True,
+            'status': 'failed'
+        },
+        {
+            'name': 'In Course Reverification 1',
+            'is_achieved': True,
+            'status': 'passed',
+            'date': '15/5/2015'
+        }
+    ]
+
+    credit_course = {
+        'show_eligibility_table': True,
+        'eligibility_status': "eligible",
+        'requirements': requirements
+
+    }
+
     context = {
         'course': course,
         'courseware_summary': courseware_summary,
@@ -1053,7 +1083,8 @@ def _progress(request, course_key, student_id):
         'staff_access': staff_access,
         'student': student,
         'passed': is_course_passed(course, grade_summary),
-        'show_generate_cert_btn': show_generate_cert_btn
+        'show_generate_cert_btn': show_generate_cert_btn,
+        'credit_course': credit_course
     }
 
     if show_generate_cert_btn:

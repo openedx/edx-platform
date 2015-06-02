@@ -102,6 +102,49 @@ from django.utils.http import urlquote_plus
         <div class="grade-detail-graph" id="grade-detail-graph" aria-hidden="true"></div>
       %endif
 
+      %if credit_course['show_eligibility_table']:
+        <div class="credit-eligibility">
+            <div class="credit-eligibility-container">
+                <div class="eligibility-heading">
+                    <h2>Eligibility Requirements for credit</h2>
+                </div>
+                %if credit_course['eligibility_status'] == 'not eligible':
+                    <span class="eligibility_msg">username, You are no longer eligible for this course</span>
+                %elif credit_course['eligibility_status'] == 'eligible':
+                    <span class="eligibility_msg">username, You have met the requirements for the credit. Please
+                        <a href="#">Check your dashboard</a> for purchase.
+                    </span>
+                %elif credit_course['eligibility_status'] == 'partial eligible':
+                    <span>You have not yet met the requirements for credit</span>
+                %endif
+                <button class="credit-help"><i class="fa fa-question"></i></button><br>
+                <button class="detail-collapse"><i class="fa fa-caret-down"></i>Expand for details</button>
+                <div class="requirement-container is-hidden">
+                    %for requirement in credit_course['requirements']:
+                        <div class="requirement">
+                            <div class="requirement-name">${requirement['name']}</div>
+                            <div class="requirement-status">
+                                %if requirement['is_achieved']:
+                                    %if requirement['status'] == 'submitted':
+                                        <span class="requirement-submitted">Verification Submitted</span>
+                                    %elif requirement['status'] == 'failed':
+                                        <img src="${static.url('images/incorrect-icon.png')}">
+                                        <span>Verification Failed</span>
+                                    %elif requirement['status'] == 'passed':
+                                        <img src="${static.url('images/correct-icon.png')}">
+                                        <span>Verified ${requirement['date']}</span>
+                                    %endif
+                                %else:
+                                    <span class="not-achieve">Not yet achieved</span>
+                                %endif
+                            </div>
+                        </div>
+                    %endfor
+                 </div>
+            </div>
+        </div>
+      %endif
+
       <div class="chapters">
         %for chapter in courseware_summary:
         %if not chapter['display_name'] == "hidden":
