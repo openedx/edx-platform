@@ -244,6 +244,19 @@ class CreditRequirementStatus(TimeStampedModel):
     class Meta(object):  # pylint: disable=missing-docstring
         get_latest_by = "created"
 
+    @classmethod
+    def get_statuses(cls, requirements, username):
+        """ Get credit requirement statuses of given requirement and username
+
+        Args:
+            requirement(CreditRequirement): The identifier for a requirement
+            username(str): username of the user
+
+        Returns:
+            Queryset 'CreditRequirementStatus' objects
+        """
+        return cls.objects.filter(requirement__in=requirements, username=username)
+
 
 class CreditEligibility(TimeStampedModel):
     """
@@ -257,6 +270,19 @@ class CreditEligibility(TimeStampedModel):
 
     class Meta(object):  # pylint: disable=missing-docstring
         unique_together = ('username', 'course')
+
+    @classmethod
+    def is_user_eligible_for_credit(cls, course_key, username):
+        """Check if the given user is eligible for the provided credit course
+
+        Args:
+            course_key(CourseKey): The course identifier
+            username(str): The username of the user
+
+        Returns:
+            Bool True if the user eligible for credit course else False
+        """
+        return cls.objects.filter(course__course_key=course_key, username=username).exists()
 
 
 class CreditRequest(TimeStampedModel):
@@ -321,6 +347,7 @@ class CreditRequest(TimeStampedModel):
         ]
 
         """
+
         return [
             {
                 "uuid": request.uuid,
