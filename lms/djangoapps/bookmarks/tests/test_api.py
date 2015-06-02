@@ -75,6 +75,7 @@ class BookmarksAPITests(ModuleStoreTestCase):
         self.assertEqual(response_data['id'], '%s,%s' % (self.user.username, unicode(bookmark.usage_key)))
         self.assertEqual(response_data['course_id'], unicode(bookmark.course_key))
         self.assertEqual(response_data['usage_id'], unicode(bookmark.usage_key))
+        self.assertEqual(response_data['block_type'], unicode(bookmark.usage_key.block_type))
         self.assertIsNotNone(response_data['created'])
 
         if optional_fields:
