@@ -428,6 +428,12 @@ if settings.COURSEWARE_ENABLED:
         url(r'^api/branding/v1/', include('branding.api_urls')),
     )
 
+    if settings.FEATURES["ENABLE_TEAMS"]:
+        # Teams endpoints
+        urlpatterns += (
+            url(r'^courses/{}/teams'.format(settings.COURSE_ID_PATTERN), include('teams.urls'), name="teams_endpoints"),
+        )
+
     # allow course staff to change to student view of courseware
     if settings.FEATURES.get('ENABLE_MASQUERADE'):
         urlpatterns += (
@@ -633,6 +639,17 @@ if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
         url(r'^certificates/user/(?P<user_id>[^/]*)/course/{course_id}'.format(course_id=settings.COURSE_ID_PATTERN),
             'certificates.views.render_html_view', name='cert_html_view'),
     )
+
+BADGE_SHARE_TRACKER_URL = url(
+    r'^certificates/badge_share_tracker/{}/(?P<network>[^/]+)/(?P<student_username>[^/]+)/$'.format(
+        settings.COURSE_ID_PATTERN
+    ),
+    'certificates.views.track_share_redirect',
+    name='badge_share_tracker'
+)
+
+if settings.FEATURES.get('ENABLE_OPENBADGES', False):
+    urlpatterns += (BADGE_SHARE_TRACKER_URL,)
 
 # XDomain proxy
 urlpatterns += (

@@ -31,7 +31,10 @@ import urllib
 import decimal
 from student import auth
 from student.roles import GlobalStaff, CourseSalesAdminRole, CourseFinanceAdminRole
-from util.file import store_uploaded_file, course_and_time_based_filename_generator, FileValidationException, UniversalNewlineIterator
+from util.file import (
+    store_uploaded_file, course_and_time_based_filename_generator,
+    FileValidationException, UniversalNewlineIterator
+)
 from util.json_request import JsonResponse
 from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 
@@ -59,7 +62,10 @@ from shoppingcart.models import (
 )
 from student.models import (
     CourseEnrollment, unique_id_for_user, anonymous_id_for_user,
-    UserProfile, Registration, EntranceExamConfiguration
+    UserProfile, Registration, EntranceExamConfiguration,
+    ManualEnrollmentAudit, UNENROLLED_TO_ALLOWEDTOENROLL, ALLOWEDTOENROLL_TO_ENROLLED,
+    ENROLLED_TO_ENROLLED, ENROLLED_TO_UNENROLLED, UNENROLLED_TO_ENROLLED,
+    UNENROLLED_TO_UNENROLLED, ALLOWEDTOENROLL_TO_UNENROLLED, DEFAULT_TRANSITION_STATE
 )
 import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
@@ -413,7 +419,11 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
 
                     # make sure user is enrolled in course
                     if not CourseEnrollment.is_enrolled(user, course_id):
-                        CourseEnrollment.enroll(user, course_id)
+                        enrollment_obj = CourseEnrollment.enroll(user, course_id)
+                        reason = 'Enrolling via csv upload'
+                        ManualEnrollmentAudit.create_manual_enrollment_audit(
+                            request.user, email, UNENROLLED_TO_ENROLLED, reason, enrollment_obj
+                        )
                         log.info(
                             u'user %s enrolled in the course %s',
                             username,
@@ -427,7 +437,11 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
                     password = generate_unique_password(generated_passwords)
 
                     try:
-                        create_and_enroll_user(email, username, name, country, password, course_id)
+                        enrollment_obj = create_and_enroll_user(email, username, name, country, password, course_id)
+                        reason = 'Enrolling via csv upload'
+                        ManualEnrollmentAudit.create_manual_enrollment_audit(
+                            request.user, email, UNENROLLED_TO_ENROLLED, reason, enrollment_obj
+                        )
                     except IntegrityError:
                         row_errors.append({
                             'username': username, 'email': email, 'response': _('Username {user} already exists.').format(user=username)})
@@ -496,7 +510,7 @@ def create_and_enroll_user(email, username, name, country, password, course_id):
     profile.save()
 
     # try to enroll the user in this course
-    CourseEnrollment.enroll(user, course_id)
+    return CourseEnrollment.enroll(user, course_id)
 
 
 @ensure_csrf_cookie
@@ -546,6 +560,18 @@ def students_update_enrollment(request, course_id):
     identifiers = _split_input_list(identifiers_raw)
     auto_enroll = request.POST.get('auto_enroll') in ['true', 'True', True]
     email_students = request.POST.get('email_students') in ['true', 'True', True]
+    is_white_label = CourseMode.is_white_label(course_id)
+    reason = request.POST.get('reason')
+    if is_white_label:
+        if not reason:
+            return JsonResponse(
+                {
+                    'action': action,
+                    'results': [{'error': True}],
+                    'auto_enroll': auto_enroll,
+                }, status=400)
+    enrollment_obj = None
+    state_transition = DEFAULT_TRANSITION_STATE
 
     email_params = {}
     if email_students:
@@ -571,15 +597,44 @@ def students_update_enrollment(request, course_id):
             # validity (obviously, cannot check if email actually /exists/,
             # simply that it is plausibly valid)
             validate_email(email)  # Raises ValidationError if invalid
-
             if action == 'enroll':
-                before, after = enroll_email(
+                before, after, enrollment_obj = enroll_email(
                     course_id, email, auto_enroll, email_students, email_params, language=language
                 )
+                before_enrollment = before.to_dict()['enrollment']
+                before_user_registered = before.to_dict()['user']
+                before_allowed = before.to_dict()['allowed']
+                after_enrollment = after.to_dict()['enrollment']
+                after_allowed = after.to_dict()['allowed']
+
+                if before_user_registered:
+                    if after_enrollment:
+                        if before_enrollment:
+                            state_transition = ENROLLED_TO_ENROLLED
+                        else:
+                            if before_allowed:
+                                state_transition = ALLOWEDTOENROLL_TO_ENROLLED
+                            else:
+                                state_transition = UNENROLLED_TO_ENROLLED
+                else:
+                    if after_allowed:
+                        state_transition = UNENROLLED_TO_ALLOWEDTOENROLL
+
             elif action == 'unenroll':
                 before, after = unenroll_email(
                     course_id, email, email_students, email_params, language=language
                 )
+                before_enrollment = before.to_dict()['enrollment']
+                before_allowed = before.to_dict()['allowed']
+
+                if before_enrollment:
+                    state_transition = ENROLLED_TO_UNENROLLED
+                else:
+                    if before_allowed:
+                        state_transition = ALLOWEDTOENROLL_TO_UNENROLLED
+                    else:
+                        state_transition = UNENROLLED_TO_UNENROLLED
+
             else:
                 return HttpResponseBadRequest(strip_tags(
                     "Unrecognized action '{}'".format(action)
@@ -604,6 +659,9 @@ def students_update_enrollment(request, course_id):
             })
 
         else:
+            ManualEnrollmentAudit.create_manual_enrollment_audit(
+                request.user, email, state_transition, reason, enrollment_obj
+            )
             results.append({
                 'identifier': identifier,
                 'before': before.to_dict(),

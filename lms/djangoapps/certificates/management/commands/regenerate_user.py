@@ -10,6 +10,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 from certificates.queue import XQueueCertInterface
+from certificates.models import BadgeAssertion
 
 
 LOGGER = logging.getLogger(__name__)
@@ -115,6 +116,13 @@ class Command(BaseCommand):
                 forced_grade=options['grade_value'],
                 template_file=options['template_file']
             )
+
+            try:
+                badge = BadgeAssertion.objects.get(user=student, course_id=course_id)
+                badge.delete()
+                LOGGER.info(u"Cleared badge for student %s.", student.id)
+            except BadgeAssertion.DoesNotExist:
+                pass
 
             LOGGER.info(
                 (

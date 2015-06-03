@@ -55,7 +55,7 @@ from student.models import (
     PendingEmailChange, CourseEnrollment, unique_id_for_user,
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
     create_comments_service_user, PasswordHistory, UserSignupSource,
-    DashboardConfiguration, LinkedInAddToProfileConfiguration)
+    DashboardConfiguration, LinkedInAddToProfileConfiguration, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED)
 from student.forms import AccountCreationForm, PasswordResetFormNoActive
 
 from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow
@@ -1783,7 +1783,16 @@ def activate_account(request, key):
             ceas = CourseEnrollmentAllowed.objects.filter(email=student[0].email)
             for cea in ceas:
                 if cea.auto_enroll:
-                    CourseEnrollment.enroll(student[0], cea.course_id)
+                    enrollment = CourseEnrollment.enroll(student[0], cea.course_id)
+                    manual_enrollment_audit = ManualEnrollmentAudit.get_manual_enrollment_by_email(student[0].email)
+                    if manual_enrollment_audit is not None:
+                        # get the enrolled by user and reason from the ManualEnrollmentAudit table.
+                        # then create a new ManualEnrollmentAudit table entry for the same email
+                        # different transition state.
+                        ManualEnrollmentAudit.create_manual_enrollment_audit(
+                            manual_enrollment_audit.enrolled_by, student[0].email, ALLOWEDTOENROLL_TO_ENROLLED,
+                            manual_enrollment_audit.reason, enrollment
+                        )
 
             # enroll student in any pending CCXs he/she may have if auto_enroll flag is set
             if settings.FEATURES.get('CUSTOM_COURSES_EDX'):

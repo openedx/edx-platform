@@ -6,9 +6,9 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from mock import patch, MagicMock
 
-from lti_provider import views
+from lti_provider import views, models
 from lti_provider.signature_validator import SignatureValidator
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 from student.tests.factories import UserFactory
 
 
@@ -23,8 +23,15 @@ LTI_DEFAULT_PARAMS = {
     'oauth_nonce': u'OAuth Nonce',
 }
 
-COURSE_KEY = CourseKey.from_string('some/course/id')
-USAGE_KEY = UsageKey.from_string('i4x://some/course/problem/uuid').map_into_course(COURSE_KEY)
+LTI_OPTIONAL_PARAMS = {
+    'lis_result_sourcedid': u'result sourcedid',
+    'lis_outcome_service_url': u'outcome service URL',
+    'tool_consumer_instance_guid': u'consumer instance guid'
+}
+
+COURSE_KEY = CourseLocator(org='some_org', course='some_course', run='some_run')
+USAGE_KEY = BlockUsageLocator(course_key=COURSE_KEY, block_type='problem', block_id='block_id')
+
 COURSE_PARAMS = {
     'course_key': COURSE_KEY,
     'usage_key': USAGE_KEY
@@ -67,6 +74,12 @@ class LtiLaunchTest(TestCase):
         super(LtiLaunchTest, self).setUp()
         # Always accept the OAuth signature
         SignatureValidator.verify = MagicMock(return_value=True)
+        self.consumer = models.LtiConsumer(
+            consumer_name='consumer',
+            consumer_key=LTI_DEFAULT_PARAMS['oauth_consumer_key'],
+            consumer_secret='secret'
+        )
+        self.consumer.save()
 
     @patch('lti_provider.views.render_courseware')
     def test_valid_launch(self, render):
@@ -76,6 +89,20 @@ class LtiLaunchTest(TestCase):
         request = build_launch_request()
         views.lti_launch(request, unicode(COURSE_KEY), unicode(USAGE_KEY))
         render.assert_called_with(request, ALL_PARAMS)
+
+    @patch('lti_provider.views.render_courseware')
+    @patch('lti_provider.views.store_outcome_parameters')
+    def test_outcome_service_registered(self, store_params, _render):
+        """
+        Verifies that the LTI launch succeeds when passed a valid request.
+        """
+        request = build_launch_request()
+        views.lti_launch(
+            request,
+            unicode(COURSE_PARAMS['course_key']),
+            unicode(COURSE_PARAMS['usage_key'])
+        )
+        store_params.assert_called_with(ALL_PARAMS, request.user, self.consumer)
 
     def launch_with_missing_parameter(self, missing_param):
         """
@@ -121,6 +148,33 @@ class LtiLaunchTest(TestCase):
         for key in views.REQUIRED_PARAMETERS:
             self.assertEqual(session[key], request.POST[key], key + ' not set in the session')
 
+    @patch('lti_provider.views.lti_run')
+    def test_optional_parameters_in_session(self, _run):
+        """
+        Verifies that the outcome-related optional LTI parameters are properly
+        stored in the session
+        """
+        request = build_launch_request()
+        request.POST.update(LTI_OPTIONAL_PARAMS)
+        views.lti_launch(
+            request,
+            unicode(COURSE_PARAMS['course_key']),
+            unicode(COURSE_PARAMS['usage_key'])
+        )
+        session = request.session[views.LTI_SESSION_KEY]
+        self.assertEqual(
+            session['lis_result_sourcedid'], u'result sourcedid',
+            'Result sourcedid not set in the session'
+        )
+        self.assertEqual(
+            session['lis_outcome_service_url'], u'outcome service URL',
+            'Outcome service URL not set in the session'
+        )
+        self.assertEqual(
+            session['tool_consumer_instance_guid'], u'consumer instance guid',
+            'Consumer instance GUID not set in the session'
+        )
+
     def test_redirect_for_non_authenticated_user(self):
         """
         Verifies that if the lti_launch view is called by an unauthenticated
@@ -148,6 +202,15 @@ class LtiRunTest(TestCase):
     """
     Tests for the lti_run view
     """
+
+    def setUp(self):
+        super(LtiRunTest, self).setUp()
+        consumer = models.LtiConsumer(
+            consumer_name='consumer',
+            consumer_key=LTI_DEFAULT_PARAMS['oauth_consumer_key'],
+            consumer_secret='secret'
+        )
+        consumer.save()
 
     @patch('lti_provider.views.render_courseware')
     def test_valid_launch(self, render):

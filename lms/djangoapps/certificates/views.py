@@ -1,12 +1,14 @@
 """URL handlers related to certificate handling by LMS"""
 from datetime import datetime
 from uuid import uuid4
+from django.shortcuts import redirect, get_object_or_404
+from opaque_keys.edx.locator import CourseLocator
+from eventtracking import tracker
 import dogstats_wrapper as dog_stats_api
 import json
 import logging
 
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse, Http404, HttpResponseForbidden
 from django.utils.translation import ugettext as _
@@ -20,10 +22,11 @@ from certificates.models import (
     CertificateStatuses,
     GeneratedCertificate,
     ExampleCertificate,
-    CertificateHtmlViewConfiguration
-)
+    CertificateHtmlViewConfiguration,
+    BadgeAssertion)
 from certificates.queue import XQueueCertInterface
 from edxmako.shortcuts import render_to_response
+from util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -293,6 +296,11 @@ def _update_certificate_context(context, course, user, user_certificate):
     context['accomplishment_copy_course_org'] = course.org
     context['accomplishment_copy_course_name'] = course.display_name
     context['logo_alt'] = platform_name
+    try:
+        badge = BadgeAssertion.objects.get(user=user, course_id=course.location.course_key)
+    except BadgeAssertion.DoesNotExist:
+        badge = None
+    context['badge'] = badge
 
     # Override the defaults with any mode-specific static values
     context['certificate_id_number'] = user_certificate.verify_uuid
@@ -513,6 +521,29 @@ def render_html_view(request, user_id, course_id):
     except (InvalidKeyError, CourseDoesNotExist, User.DoesNotExist):
         return render_to_response(invalid_template_path, context)
 
+    if 'evidence_visit' in request.GET:
+        print "Event request found!"
+        try:
+            badge = BadgeAssertion.objects.get(user=user, course_id=course_key)
+            tracker.emit(
+                'edx.badges.assertion.evidence_visit',
+                {
+                    'user_id': user.id,
+                    'course_id': unicode(course_key),
+                    'enrollment_mode': badge.mode,
+                    'assertion_id': badge.id,
+                    'assertion_image_url': badge.data['image'],
+                    'assertion_json_url': badge.data['json']['id'],
+                    'issuer': badge.data['issuer'],
+                }
+            )
+        except BadgeAssertion.DoesNotExist:
+            logger.warn(
+                "Could not find badge for %s on course %s.",
+                user.id,
+                course_key,
+            )
+
     # Okay, now we have all of the pieces, time to put everything together
 
     # Get the active certificate configuration for this course
@@ -536,3 +567,25 @@ def render_html_view(request, user_id, course_id):
     context.update(course.cert_html_view_overrides)
 
     return render_to_response("certificates/valid.html", context)
+
+
+@ensure_valid_course_key
+def track_share_redirect(request__unused, course_id, network, student_username):
+    """
+    Tracks when a user downloads a badge for sharing.
+    """
+    course_id = CourseLocator.from_string(course_id)
+    assertion = get_object_or_404(BadgeAssertion, user__username=student_username, course_id=course_id)
+    tracker.emit(
+        'edx.badges.assertion.shared', {
+            'course_id': unicode(course_id),
+            'social_network': network,
+            'assertion_id': assertion.id,
+            'assertion_json_url': assertion.data['json']['id'],
+            'assertion_image_url': assertion.image_url,
+            'user_id': assertion.user.id,
+            'enrollment_mode': assertion.mode,
+            'issuer': assertion.data['issuer'],
+        }
+    )
+    return redirect(assertion.image_url)

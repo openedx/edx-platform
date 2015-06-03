@@ -952,10 +952,20 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
     Tests indexing of content groups on course modules using mongo modulestore.
     """
     MODULESTORE = TEST_DATA_MONGO_MODULESTORE
+    INDEX_NAME = CoursewareSearchIndexer.INDEX_NAME
 
     def setUp(self):
         super(GroupConfigurationSearchMongo, self).setUp()
 
+        self._setup_course_with_content()
+        self._setup_split_test_module()
+        self._setup_content_groups()
+        self.reload_course()
+
+    def _setup_course_with_content(self):
+        """
+        Set up course with html content in it.
+        """
         self.chapter = ItemFactory.create(
             parent_location=self.course.location,
             category='chapter',
@@ -964,6 +974,7 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
             publish_item=True,
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
+
         self.sequential = ItemFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
@@ -972,6 +983,16 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
             publish_item=True,
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
+
+        self.sequential2 = ItemFactory.create(
+            parent_location=self.chapter.location,
+            category='sequential',
+            display_name="Lesson 2",
+            modulestore=self.store,
+            publish_item=True,
+            start=datetime(2015, 3, 1, tzinfo=UTC),
+        )
+
         self.vertical = ItemFactory.create(
             parent_location=self.sequential.location,
             category='vertical',
@@ -985,6 +1006,15 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
             parent_location=self.sequential.location,
             category='vertical',
             display_name='Subsection 2',
+            modulestore=self.store,
+            publish_item=True,
+            start=datetime(2015, 4, 1, tzinfo=UTC),
+        )
+
+        self.vertical3 = ItemFactory.create(
+            parent_location=self.sequential2.location,
+            category='vertical',
+            display_name='Subsection 3',
             modulestore=self.store,
             publish_item=True,
             start=datetime(2015, 4, 1, tzinfo=UTC),
@@ -1018,7 +1048,75 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
         )
         self.html_unit3.parent = self.vertical2
 
-        groups_list = {
+    def _setup_split_test_module(self):
+        """
+        Set up split test module.
+        """
+        c0_url = self.course.id.make_usage_key("vertical", "condition_0_vertical")
+        c1_url = self.course.id.make_usage_key("vertical", "condition_1_vertical")
+        c2_url = self.course.id.make_usage_key("vertical", "condition_2_vertical")
+
+        self.split_test_unit = ItemFactory.create(
+            parent_location=self.vertical3.location,
+            category='split_test',
+            user_partition_id=0,
+            display_name="Test Content Experiment 1",
+            group_id_to_child={"2": c0_url, "3": c1_url, "4": c2_url}
+        )
+
+        self.condition_0_vertical = ItemFactory.create(
+            parent_location=self.split_test_unit.location,
+            category="vertical",
+            display_name="Group ID 2",
+            location=c0_url,
+        )
+        self.condition_0_vertical.parent = self.vertical3
+
+        self.condition_1_vertical = ItemFactory.create(
+            parent_location=self.split_test_unit.location,
+            category="vertical",
+            display_name="Group ID 3",
+            location=c1_url,
+        )
+        self.condition_1_vertical.parent = self.vertical3
+
+        self.condition_2_vertical = ItemFactory.create(
+            parent_location=self.split_test_unit.location,
+            category="vertical",
+            display_name="Group ID 4",
+            location=c2_url,
+        )
+        self.condition_2_vertical.parent = self.vertical3
+
+        self.html_unit4 = ItemFactory.create(
+            parent_location=self.condition_0_vertical.location,
+            category="html",
+            display_name="Split A",
+            publish_item=True,
+        )
+        self.html_unit4.parent = self.condition_0_vertical
+
+        self.html_unit5 = ItemFactory.create(
+            parent_location=self.condition_1_vertical.location,
+            category="html",
+            display_name="Split B",
+            publish_item=True,
+        )
+        self.html_unit5.parent = self.condition_1_vertical
+
+        self.html_unit6 = ItemFactory.create(
+            parent_location=self.condition_2_vertical.location,
+            category="html",
+            display_name="Split C",
+            publish_item=True,
+        )
+        self.html_unit6.parent = self.condition_2_vertical
+
+    def _setup_content_groups(self):
+        """
+        Set up cohort and experiment content groups.
+        """
+        cohort_groups_list = {
             u'id': 666,
             u'name': u'Test name',
             u'scheme': u'cohort',
@@ -1029,18 +1127,33 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
                 {u'id': 1, u'name': u'Group B', u'version': 1, u'usage': []},
             ],
         }
+        experiment_groups_list = {
+            u'id': 0,
+            u'name': u'Experiment aware partition',
+            u'scheme': u'random',
+            u'description': u'Experiment aware description',
+            u'version': UserPartition.VERSION,
+            u'groups': [
+                {u'id': 2, u'name': u'Group A', u'version': 1, u'usage': []},
+                {u'id': 3, u'name': u'Group B', u'version': 1, u'usage': []},
+                {u'id': 4, u'name': u'Group C', u'version': 1, u'usage': []}
+            ],
+        }
 
         self.client.put(
             self._group_conf_url(cid=666),
-            data=json.dumps(groups_list),
+            data=json.dumps(cohort_groups_list),
             content_type="application/json",
             HTTP_ACCEPT="application/json",
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-
-        self.reload_course()
-
-    INDEX_NAME = CoursewareSearchIndexer.INDEX_NAME
+        self.client.put(
+            self._group_conf_url(cid=0),
+            data=json.dumps(experiment_groups_list),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
 
     def _group_conf_url(self, cid=-1):
         """
@@ -1072,6 +1185,52 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
                 'org': self.course.org,
                 'content_groups': content_groups,
                 'start_date': datetime(2015, 4, 1, 0, 0, tzinfo=tzutc())
+            }
+        )
+
+    def _html_experiment_group_result(self, html_unit, content_groups):
+        """
+        Return call object with arguments and content group for html_unit.
+        """
+        return call(
+            'courseware_content',
+            {
+                'course_name': unicode(self.course.display_name),
+                'id': unicode(html_unit.location),
+                'content': {'html_content': '', 'display_name': unicode(html_unit.display_name)},
+                'course': unicode(self.course.id),
+                'location': [
+                    unicode(self.chapter.display_name),
+                    unicode(self.sequential2.display_name),
+                    unicode(self.vertical3.display_name)
+                ],
+                'content_type': 'Text',
+                'org': self.course.org,
+                'content_groups': content_groups,
+                'start_date': datetime(2015, 4, 1, 0, 0, tzinfo=tzutc())
+            }
+        )
+
+    def _vertical_experiment_group_result(self, vertical, content_groups):
+        """
+        Return call object with arguments and content group for split_test vertical.
+        """
+        return call(
+            'courseware_content',
+            {
+                'start_date': datetime(2015, 4, 1, 0, 0, tzinfo=tzutc()),
+                'content': {'display_name': unicode(vertical.display_name)},
+                'course': unicode(self.course.id),
+                'location': [
+                    unicode(self.chapter.display_name),
+                    unicode(self.sequential2.display_name),
+                    unicode(vertical.parent.display_name)
+                ],
+                'content_type': 'Sequence',
+                'content_groups': content_groups,
+                'id': unicode(vertical.location),
+                'course_name': unicode(self.course.display_name),
+                'org': self.course.org
             }
         )
 
@@ -1107,9 +1266,9 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
 
         # Only published modules should be in the index
         added_to_index = self.reindex_course(self.store)
-        self.assertEqual(added_to_index, 7)
+        self.assertEqual(added_to_index, 16)
         response = self.searcher.search(field_dictionary={"course": unicode(self.course.id)})
-        self.assertEqual(response["total"], 8)
+        self.assertEqual(response["total"], 23)
 
         group_access_content = {'group_access': {666: [1]}}
 
@@ -1119,11 +1278,52 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
         )
 
         self.publish_item(self.store, self.html_unit1.location)
+        self.publish_item(self.store, self.split_test_unit.location)
 
         with patch(settings.SEARCH_ENGINE + '.index') as mock_index:
             self.reindex_course(self.store)
             self.assertTrue(mock_index.called)
             self.assertIn(self._html_group_result(self.html_unit1, [1]), mock_index.mock_calls)
+            self.assertIn(self._html_experiment_group_result(self.html_unit4, [unicode(2)]), mock_index.mock_calls)
+            self.assertIn(self._html_experiment_group_result(self.html_unit5, [unicode(3)]), mock_index.mock_calls)
+            self.assertIn(self._html_experiment_group_result(self.html_unit6, [unicode(4)]), mock_index.mock_calls)
+            self.assertNotIn(self._html_experiment_group_result(self.html_unit6, [unicode(5)]), mock_index.mock_calls)
+            self.assertIn(
+                self._vertical_experiment_group_result(self.condition_0_vertical, [unicode(2)]),
+                mock_index.mock_calls
+            )
+            self.assertNotIn(
+                self._vertical_experiment_group_result(self.condition_1_vertical, [unicode(2)]),
+                mock_index.mock_calls
+            )
+            self.assertNotIn(
+                self._vertical_experiment_group_result(self.condition_2_vertical, [unicode(2)]),
+                mock_index.mock_calls
+            )
+            self.assertNotIn(
+                self._vertical_experiment_group_result(self.condition_0_vertical, [unicode(3)]),
+                mock_index.mock_calls
+            )
+            self.assertIn(
+                self._vertical_experiment_group_result(self.condition_1_vertical, [unicode(3)]),
+                mock_index.mock_calls
+            )
+            self.assertNotIn(
+                self._vertical_experiment_group_result(self.condition_2_vertical, [unicode(3)]),
+                mock_index.mock_calls
+            )
+            self.assertNotIn(
+                self._vertical_experiment_group_result(self.condition_0_vertical, [unicode(4)]),
+                mock_index.mock_calls
+            )
+            self.assertNotIn(
+                self._vertical_experiment_group_result(self.condition_1_vertical, [unicode(4)]),
+                mock_index.mock_calls
+            )
+            self.assertIn(
+                self._vertical_experiment_group_result(self.condition_2_vertical, [unicode(4)]),
+                mock_index.mock_calls
+            )
             mock_index.reset_mock()
 
     def test_content_group_not_assigned(self):

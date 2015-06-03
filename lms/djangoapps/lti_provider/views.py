@@ -14,6 +14,8 @@ from courseware.access import has_access
 from courseware.courses import get_course_with_access
 from courseware.module_render import get_module_by_usage_id
 from edxmako.shortcuts import render_to_response
+from lti_provider.outcomes import store_outcome_parameters
+from lti_provider.models import LtiConsumer
 from lti_provider.signature_validator import SignatureValidator
 from lms_xblock.runtime import unquote_slashes
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -27,6 +29,11 @@ REQUIRED_PARAMETERS = [
     'roles', 'context_id', 'oauth_version', 'oauth_consumer_key',
     'oauth_signature', 'oauth_signature_method', 'oauth_timestamp',
     'oauth_nonce'
+]
+
+OPTIONAL_PARAMETERS = [
+    'lis_result_sourcedid', 'lis_outcome_service_url',
+    'tool_consumer_instance_guid'
 ]
 
 LTI_SESSION_KEY = 'lti_provider_parameters'
@@ -61,12 +68,17 @@ def lti_launch(request, course_id, usage_id):
         return HttpResponseForbidden()
 
     # Check the OAuth signature on the message
-    if not SignatureValidator().verify(request):
+    try:
+        if not SignatureValidator().verify(request):
+            return HttpResponseForbidden()
+    except LtiConsumer.DoesNotExist:
         return HttpResponseForbidden()
 
     params = get_required_parameters(request.POST)
     if not params:
         return HttpResponseBadRequest()
+    params.update(get_optional_parameters(request.POST))
+
     # Store the course, and usage ID in the session to prevent privilege
     # escalation if a staff member in one course tries to access material in
     # another.
@@ -118,6 +130,15 @@ def lti_run(request):
     # Remove the parameters from the session to prevent replay
     del request.session[LTI_SESSION_KEY]
 
+    # Store any parameters required by the outcome service in order to report
+    # scores back later. We know that the consumer exists, since the record was
+    # used earlier to verify the oauth signature.
+    lti_consumer = LtiConsumer.get_or_supplement(
+        params.get('tool_consumer_instance_guid', None),
+        params['oauth_consumer_key']
+    )
+    store_outcome_parameters(params, request.user, lti_consumer)
+
     return render_courseware(request, params)
 
 
@@ -143,6 +164,19 @@ def get_required_parameters(dictionary, additional_params=None):
     return params
 
 
+def get_optional_parameters(dictionary):
+    """
+    Extract all optional LTI parameters from a dictionary. This method does not
+    fail if any parameters are missing.
+
+    :param dictionary: A dictionary containing zero or more optional parameters.
+    :return: A new dictionary containing all optional parameters from the
+        original dictionary, or an empty dictionary if no optional parameters
+        were present.
+    """
+    return {key: dictionary[key] for key in OPTIONAL_PARAMETERS if key in dictionary}
+
+
 def restore_params_from_session(request):
     """
     Fetch the parameters that were stored in the session by an LTI launch, and
@@ -157,7 +191,10 @@ def restore_params_from_session(request):
         return None
     session_params = request.session[LTI_SESSION_KEY]
     additional_params = ['course_key', 'usage_key']
-    return get_required_parameters(session_params, additional_params)
+    for key in REQUIRED_PARAMETERS + additional_params:
+        if key not in session_params:
+            return None
+    return session_params
 
 
 def render_courseware(request, lti_params):

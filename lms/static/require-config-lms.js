@@ -46,6 +46,7 @@
         paths: {
             "annotator_1.2.9": "js/vendor/edxnotes/annotator-full.min",
             "date": "js/vendor/date",
+            "text": 'js/vendor/requirejs/text',
             "backbone": "js/vendor/backbone-min",
             "backbone-super": "js/vendor/backbone-super",
             "underscore.string": "js/vendor/underscore.string.min",
@@ -67,7 +68,7 @@
             "osda": 'js/vendor/ova/OpenSeaDragonAnnotation',
             "ova": 'js/vendor/ova/ova',
             "catch": 'js/vendor/ova/catch/js/catch',
-            "handlebars": 'js/vendor/ova/catch/js/handlebars-1.1.2',
+            "handlebars": 'js/vendor/ova/catch/js/handlebars-1.1.2'
             // end of files needed by OVA
         },
         shim: {
@@ -89,7 +90,7 @@
                 exports: "Backbone"
             },
             "backbone-super": {
-                deps: ["backbone"],
+                deps: ["backbone"]
             },
             "logger": {
                 exports: "Logger"
@@ -147,7 +148,7 @@
                     "grouping-annotator", "diacritic-annotator", "openseadragon", "jquery-Watch", "catch", "handlebars",
                     "URI"
                 ]
-            },
+            }
             // End of needed by OVA
         }
     };

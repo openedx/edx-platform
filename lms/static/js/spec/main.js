@@ -25,6 +25,7 @@
             'jquery.url': 'xmodule_js/common_static/js/vendor/url.min',
             'datepair': 'xmodule_js/common_static/js/vendor/timepicker/datepair',
             'date': 'xmodule_js/common_static/js/vendor/date',
+            'text': 'xmodule_js/common_static/js/vendor/requirejs/text',
             'underscore': 'xmodule_js/common_static/js/vendor/underscore-min',
             'underscore.string': 'xmodule_js/common_static/js/vendor/underscore.string.min',
             'backbone': 'xmodule_js/common_static/js/vendor/backbone-min',
@@ -576,6 +577,7 @@
     // TODO: why do these need 'lms/include' at the front but the CMS equivalent logic doesn't?
     define([
         // Run the LMS tests
+        'lms/include/teams/js/spec/teams_factory_spec.js',
         'lms/include/js/spec/photocapture_spec.js',
         'lms/include/js/spec/staff_debug_actions_spec.js',
         'lms/include/js/spec/views/notification_spec.js',
