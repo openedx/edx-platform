@@ -5,6 +5,7 @@ from base64 import b32encode
 import django.db.models
 from django.db.models.fields import *
 from django.utils.timezone import UTC
+from django.utils.translation import ugettext
 
 from xmodule_django.models import CourseKeyField, UsageKeyField
 from xmodule.partitions.partitions import NoSuchUserPartitionError
@@ -13,6 +14,8 @@ from xmodule.fields import Date
 from xmodule.modulestore.inheritance import UserPartition
 from xmodule.course_module import DEFAULT_START_DATE, CATALOG_VISIBILITY_CATALOG_AND_ABOUT
 from xmodule.modulestore.django import modulestore
+
+# TODO me: Fix docstrings
 
 class UserPartitionListField(TextField):
     """Special field for storing a list of UserPartition objects as a string."""
@@ -223,6 +226,7 @@ class CourseOverviewDescriptor(django.db.models.Model):
 
         (Copied directly from lms_xblock.mixin.LmsBlockMixin)
         """
+        # TODO me: probably remove this
         for user_partition in self.user_partitions:
             if user_partition.id == user_partition_id:
                 return user_partition
