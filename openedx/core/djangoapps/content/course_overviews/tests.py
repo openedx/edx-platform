@@ -3,7 +3,6 @@ Tests for content.course_overviews package
 """
 
 import datetime
-from dateutil.tz import tzutc
 import ddt
 import itertools
 
