@@ -17,6 +17,7 @@ from discussion_api.api import (
     get_comment_list,
     get_course_topics,
     get_thread_list,
+    update_comment,
     update_thread,
 )
 from discussion_api.forms import CommentListGetForm, ThreadListGetForm
@@ -283,6 +284,8 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
         * children: The list of child comments (with the same format)
     """
+    lookup_field = "comment_id"
+
     def list(self, request):
         """
         Implements the GET method for the list endpoint as described in the
@@ -307,3 +310,10 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         class docstring.
         """
         return Response(create_comment(request, request.DATA))
+
+    def partial_update(self, request, comment_id):
+        """
+        Implements the PATCH method for the instance endpoint as described in
+        the class docstring.
+        """
+        return Response(update_comment(request, comment_id, request.DATA))
