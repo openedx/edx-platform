@@ -62,9 +62,10 @@ class LmsSearchResultProcessor(SearchResultProcessor):
 
     def should_remove(self, user):
         """ Test to see if this result should be removed due to access restriction """
-        return not has_access(
+        user_has_access = has_access(
             user,
             "load",
             self.get_item(self.get_usage_key()),
             self.get_course_key()
         )
+        return not user_has_access
