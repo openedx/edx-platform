@@ -9,6 +9,8 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.http import Http404
 
+from rest_framework.exceptions import PermissionDenied
+
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
 
@@ -70,6 +72,19 @@ def _get_thread_and_context(request, thread_id, parent_id=None, retrieve_kwargs=
         # params are validated at a higher level, so the only possible request
         # error is if the thread doesn't exist
         raise Http404
+
+
+def _is_user_author_or_privileged(cc_thread, context):
+    """
+    Check if the user is the author of a thread or a privileged user.
+
+    Returns:
+        Boolean
+    """
+    return (
+        context["is_requester_privileged"] or
+        context["cc_requester"]["id"] == cc_thread["user_id"]
+    )
 
 
 def get_thread_list_url(request, course_key, topic_id_list):
@@ -383,8 +398,7 @@ def _get_thread_editable_fields(cc_thread, context):
     """
     Get the list of editable fields for the given thread in the given context
     """
-    is_author = context["cc_requester"]["id"] == cc_thread["user_id"]
-    if context["is_requester_privileged"] or is_author:
+    if _is_user_author_or_privileged(cc_thread, context):
         return _THREAD_EDITABLE_BY_AUTHOR
     else:
         return _THREAD_EDITABLE_BY_ANY
@@ -427,3 +441,26 @@ def update_thread(request, thread_id, update_data):
     api_thread = serializer.data
     _do_extra_thread_actions(api_thread, cc_thread, update_data.keys(), actions_form, context)
     return api_thread
+
+
+def delete_thread(request, thread_id):
+    """
+    Delete a thread.
+
+    Parameters:
+
+        request: The django request object used for build_absolute_uri and
+          determining the requesting user.
+
+        thread_id: The id for the thread to delete
+
+    Raises:
+
+        PermissionDenied: if user does not have permission to delete thread
+
+    """
+    cc_thread, context = _get_thread_and_context(request, thread_id)
+    if _is_user_author_or_privileged(cc_thread, context):
+        cc_thread.delete()
+    else:
+        raise PermissionDenied

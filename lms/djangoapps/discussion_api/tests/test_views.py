@@ -394,6 +394,39 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
 
 
 @httpretty.activate
+class ThreadViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
+    """Tests for ThreadViewSet delete"""
+    def setUp(self):
+        super(ThreadViewSetDeleteTest, self).setUp()
+        self.url = reverse("thread-detail", kwargs={"thread_id": "test_thread"})
+        self.thread_id = "test_thread"
+
+    def test_basic(self):
+        self.register_get_user_response(self.user)
+        cs_thread = make_minimal_cs_thread({
+            "id": self.thread_id,
+            "course_id": unicode(self.course.id),
+            "username": self.user.username,
+            "user_id": str(self.user.id),
+        })
+        self.register_get_thread_response(cs_thread)
+        self.register_delete_thread_response(self.thread_id)
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.content, "")
+        self.assertEqual(
+            urlparse(httpretty.last_request().path).path,
+            "/api/v1/threads/{}".format(self.thread_id)
+        )
+        self.assertEqual(httpretty.last_request().method, "DELETE")
+
+    def test_delete_nonexistent_thread(self):
+        self.register_get_thread_error_response(self.thread_id, 404)
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, 404)
+
+
+@httpretty.activate
 class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CommentViewSet list"""
     def setUp(self):
