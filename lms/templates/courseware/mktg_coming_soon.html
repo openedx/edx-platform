@@ -1,11 +1,10 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%!
-  from django.core.urlresolvers import reverse
-  from courseware.courses import course_image_url, get_course_about_section
-%>
 <%namespace name='static' file='../static_content.html'/>
-
 <%inherit file="../mktg_iframe.html" />
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from courseware.courses import course_image_url, get_course_about_section
+%>
 
 <%block name="pagetitle">${_("About {course_id}").format(course_id=course_id) | h}</%block>
 

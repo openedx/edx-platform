@@ -2,11 +2,12 @@
 ## We are no longer supporting this file or accepting changes into it.    ##
 ## Please see lms/templates/instructor for instructor dashboard templates ##
 
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django.core.urlresolvers import reverse %>
-
 <%inherit file="../main.html" />
 <%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
 
 <%block name="pagetitle">${_("Legacy Instructor Dashboard")}</%block>
 <%block name="nav_skip">#instructor-dashboard-content</%block>

@@ -1,6 +1,8 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django_comment_client.permissions import has_permission %>
 <%include file="_underscore_templates.html" />
+<%!
+from django.utils.translation import ugettext as _
+from django_comment_client.permissions import has_permission
+%>
 
 <div class="discussion-module" data-discussion-id="${discussion_id | h}">
     <a class="discussion-show control-button" href="javascript:void(0)" data-discussion-id="${discussion_id | h}" role="button"><span class="show-hide-discussion-icon"></span><span class="button-text">${_("Show Discussion")}</span></a>

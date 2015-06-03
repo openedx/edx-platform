@@ -1,6 +1,8 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%! from datetime import datetime, timedelta %>
-<%! import pytz %>
+<%!
+from django.utils.translation import ugettext as _
+from datetime import datetime, timedelta
+import pytz
+%>
 <%page args="section_data"/>
 <%include file="add_coupon_modal.html" args="section_data=section_data" />
 <%include file="edit_coupon_modal.html" args="section_data=section_data" />

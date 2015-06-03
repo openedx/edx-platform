@@ -1,10 +1,12 @@
-<%!
-    from django.utils.translation import ugettext as _
-    from django.core.urlresolvers import reverse
-%>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
-
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from util.date_utils import get_time_display
+from django.conf import settings
+from django.utils.http import urlquote_plus
+%>
 
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
@@ -16,16 +18,6 @@
 
 <%block name="pagetitle">${_("{course_number} Progress").format(course_number=course.display_number_with_default) | h}</%block>
 <%block name="nav_skip">#course-info-progress</%block>
-
-<%!
-    from django.core.urlresolvers import reverse
-%>
-
-<%!
-from util.date_utils import get_time_display
-from django.conf import settings
-from django.utils.http import urlquote_plus
-%>
 
 <%block name="js_extra">
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>

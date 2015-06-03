@@ -1,7 +1,9 @@
 <%inherit file="main.html" />
 
-<%! from django.core.urlresolvers import reverse %>
-<%! from django.utils.translation import ugettext as _ %>
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+%>
 
 <h2>${_("Manage student accounts")}</h2>
 <form action="${reverse('disable_account_ajax')}" method="post" data-remote="true" class="manage-accounts-form">

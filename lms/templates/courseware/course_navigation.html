@@ -1,5 +1,12 @@
 ## mako
-<%! from django.utils.translation import ugettext as _ %>
+<%!
+from django.utils.translation import ugettext as _
+from courseware.tabs import get_course_tab_list
+from courseware.views import notification_image_for_tab
+from django.core.urlresolvers import reverse
+from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
+from student.models import CourseEnrollment
+%>
 <%page args="active_page=None" />
 
 <%
@@ -12,11 +19,6 @@ def url_class(is_active):
     return "active"
   return ""
 %>
-<%! from courseware.tabs import get_course_tab_list %>
-<%! from courseware.views import notification_image_for_tab %>
-<%! from django.core.urlresolvers import reverse %>
-<%! from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition %>
-<%! from student.models import CourseEnrollment %>
 <%
   cohorted_user_partition = get_cohorted_user_partition(course.id)
   show_preview_menu = staff_access and active_page in ['courseware', 'info']
