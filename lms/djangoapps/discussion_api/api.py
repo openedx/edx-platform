@@ -270,13 +270,20 @@ def _do_extra_thread_actions(api_thread, cc_thread, request_fields, actions_form
     Perform any necessary additional actions related to thread creation or
     update that require a separate comments service request.
     """
-    form_following = actions_form.cleaned_data["following"]
-    if "following" in request_fields and form_following != api_thread["following"]:
-        if form_following:
-            context["cc_requester"].follow(cc_thread)
-        else:
-            context["cc_requester"].unfollow(cc_thread)
-        api_thread["following"] = form_following
+    for field, form_value in actions_form.cleaned_data.items():
+        if field in request_fields and form_value != api_thread[field]:
+            api_thread[field] = form_value
+            if field == "following":
+                if form_value:
+                    context["cc_requester"].follow(cc_thread)
+                else:
+                    context["cc_requester"].unfollow(cc_thread)
+            else:
+                assert field == "voted"
+                if form_value:
+                    context["cc_requester"].vote(cc_thread, "up")
+                else:
+                    context["cc_requester"].unvote(cc_thread)
 
 
 def create_thread(request, thread_data):
@@ -368,7 +375,7 @@ def create_comment(request, comment_data):
     return serializer.data
 
 
-_THREAD_EDITABLE_BY_ANY = {"following"}
+_THREAD_EDITABLE_BY_ANY = {"following", "voted"}
 _THREAD_EDITABLE_BY_AUTHOR = {"topic_id", "type", "title", "raw_body"} | _THREAD_EDITABLE_BY_ANY
 
 

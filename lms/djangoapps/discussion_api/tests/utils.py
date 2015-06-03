@@ -160,6 +160,19 @@ class CommentsServiceMockMixin(object):
                 status=200
             )
 
+    def register_thread_votes_response(self, thread_id):
+        """
+        Register a mock response for PUT and DELETE on the CS thread votes
+        endpoint
+        """
+        for method in [httpretty.PUT, httpretty.DELETE]:
+            httpretty.register_uri(
+                method,
+                "http://localhost:4567/api/v1/threads/{}/votes".format(thread_id),
+                body=json.dumps({}),  # body is unused
+                status=200
+            )
+
     def assert_query_params_equal(self, httpretty_request, expected_params):
         """
         Assert that the given mock request had the expected query parameters
