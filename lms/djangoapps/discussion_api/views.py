@@ -60,7 +60,7 @@ class CourseTopicsView(_ViewMixin, DeveloperErrorViewMixin, APIView):
     def get(self, request, course_id):
         """Implements the GET method as described in the class docstring."""
         course_key = CourseLocator.from_string(course_id)
-        return Response(get_course_topics(course_key, request.user))
+        return Response(get_course_topics(request, course_key))
 
 
 class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
@@ -89,6 +89,10 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         * page: The (1-indexed) page to retrieve (default is 1)
 
         * page_size: The number of items per page (default is 10, max is 100)
+
+        * topic_id: The id of the topic to retrieve the threads. There can be
+            multiple topic_id queries to retrieve threads from multiple topics
+            at once.
 
     **POST Parameters**:
 
@@ -157,7 +161,8 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
                 request,
                 form.cleaned_data["course_id"],
                 form.cleaned_data["page"],
-                form.cleaned_data["page_size"]
+                form.cleaned_data["page_size"],
+                form.cleaned_data["topic_id"],
             )
         )
 

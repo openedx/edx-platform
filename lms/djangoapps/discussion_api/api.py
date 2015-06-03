@@ -1,8 +1,13 @@
 """
 Discussion API internal interface
 """
+from urllib import urlencode
+from urlparse import urlunparse
+
 from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
 from django.http import Http404
+
 
 from collections import defaultdict
 
@@ -38,7 +43,16 @@ def _get_course_or_404(course_key, user):
     return course
 
 
-def get_course_topics(course_key, user):
+def get_thread_list_url(request, course_key, topic_id_list):
+    """
+    Returns the URL for the thread_list_url field, given a list of topic_ids
+    """
+    path = reverse("thread-list")
+    query_list = [("course_id", unicode(course_key))] + [("topic_id", topic_id) for topic_id in topic_id_list]
+    return request.build_absolute_uri(urlunparse(("", "", path, "", urlencode(query_list), "")))
+
+
+def get_course_topics(request, course_key):
     """
     Return the course topic listing for the given course and user.
 
@@ -59,22 +73,33 @@ def get_course_topics(course_key, user):
         """
         return module.sort_key or module.discussion_target
 
-    course = _get_course_or_404(course_key, user)
-    discussion_modules = get_accessible_discussion_modules(course, user)
+    course = _get_course_or_404(course_key, request.user)
+    discussion_modules = get_accessible_discussion_modules(course, request.user)
     modules_by_category = defaultdict(list)
     for module in discussion_modules:
         modules_by_category[module.discussion_category].append(module)
+
+    def get_sorted_modules(category):
+        """Returns key sorted modules by category"""
+        return sorted(modules_by_category[category], key=get_module_sort_key)
+
     courseware_topics = [
         {
             "id": None,
             "name": category,
+            "thread_list_url": get_thread_list_url(
+                request,
+                course_key,
+                [item.discussion_id for item in get_sorted_modules(category)]
+            ),
             "children": [
                 {
                     "id": module.discussion_id,
                     "name": module.discussion_target,
+                    "thread_list_url": get_thread_list_url(request, course_key, [module.discussion_id]),
                     "children": [],
                 }
-                for module in sorted(modules_by_category[category], key=get_module_sort_key)
+                for module in get_sorted_modules(category)
             ],
         }
         for category in sorted(modules_by_category.keys())
@@ -84,6 +109,7 @@ def get_course_topics(course_key, user):
         {
             "id": entry["id"],
             "name": name,
+            "thread_list_url": get_thread_list_url(request, course_key, [entry["id"]]),
             "children": [],
         }
         for name, entry in sorted(
@@ -98,7 +124,7 @@ def get_course_topics(course_key, user):
     }
 
 
-def get_thread_list(request, course_key, page, page_size):
+def get_thread_list(request, course_key, page, page_size, topic_id_list=None):
     """
     Return the list of all discussion threads pertaining to the given course
 
@@ -108,6 +134,7 @@ def get_thread_list(request, course_key, page, page_size):
     course_key: The key of the course to get discussion threads for
     page: The page number (1-indexed) to retrieve
     page_size: The number of threads to retrieve per page
+    topic_id_list: The list of topic_ids to get the discussion threads for
 
     Returns:
 
@@ -116,6 +143,7 @@ def get_thread_list(request, course_key, page, page_size):
     """
     course = _get_course_or_404(course_key, request.user)
     context = get_context(course, request)
+    topic_ids_csv = ",".join(topic_id_list) if topic_id_list else None
     threads, result_page, num_pages, _ = Thread.search({
         "course_id": unicode(course.id),
         "group_id": (
@@ -126,6 +154,7 @@ def get_thread_list(request, course_key, page, page_size):
         "sort_order": "desc",
         "page": page,
         "per_page": page_size,
+        "commentable_ids": topic_ids_csv,
     })
     # The comments service returns the last page of results if the requested
     # page is beyond the last page, but we want be consistent with DRF's general
