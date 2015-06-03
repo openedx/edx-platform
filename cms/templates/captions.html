@@ -41,15 +41,20 @@
         <div class="window-contents">
           <table class="legend-table">
             <tr>
-              <td><i class="fa fa-check-circle fa-lg green"></i></td>
+              <td><i class="fa fa-check-circle fa-2x green"></i></td>
               <td>Local captions are up to date</td>
             </tr>
             <tr>
-              <td><i class="fa fa-clock-o fa-large yellow"></i></td>
+                <td>
+                    <span class="fa-stack">
+                        <i class="fa fa-circle fa-stack-2x yellow"></i>
+                        <i class="fa fa-clock-o fa-stack-2x"></i>
+                    </span>
+                </td>
               <td>Local captions are out of date but remote captions are available</td>
             </tr>
             <tr>
-              <td><i class="fa fa-exclamation-circle fa-lg red"></i></td>
+              <td><i class="fa fa-exclamation-circle fa-2x red"></i></td>
               <td>Local captions are out of date but remote captions are unavailable</td>
             </tr>
             <tr>
@@ -72,7 +77,7 @@
             <tr>
               <td>
                 <span class="fa-stack red">
-                  <i class="fa fa-folder-o fa-stack-2x"></i>
+                  <i class="fa fa-folder fa-stack-2x"></i>
                   <i class="fa fa-exclamation-circle fa-stack-1x fa-inverse"></i>
                 </span>
               </td>
@@ -204,7 +209,7 @@ var captionUtils = {
       itemStatus = 'green';
     } else if (data.command == 'replace' || data.command == 'import') {
       // if local copy exists and is not up to date
-      icon ='<i class="fa fa-clock-o yellow fa-kg"></i>';
+      icon ='<i class="fa fa-clock-o yellow fa-lg"></i>';
       itemStatus = 'yellow';
     } else {
       // if local copy does not exist
@@ -213,7 +218,7 @@ var captionUtils = {
     }
 
     if(data.is_youtube_mode) {
-      $('li.courseware-unit[data-locator="' + data.location + '"] .popup .platform').removeClass().addClass('fa fa-youtube-square fa-lg');
+      $('li.courseware-unit[data-locator="' + data.location + '"] .popup i.platform').removeClass('fa-html5').addClass('fa-youtube-square');
       var youtubeLocalSpan = $('li.courseware-unit[data-locator="' + data.location + '"] .popup span.local');
       var youtubeLocalIcon = $(youtubeLocalSpan).find('i.local');
       if (data.youtube_local) {

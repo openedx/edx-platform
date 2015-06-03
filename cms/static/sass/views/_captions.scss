@@ -36,7 +36,7 @@
     }
 
     .yellow {
-      background: $yellow;
+      color: $yellow;
     }
   }
 
@@ -58,22 +58,24 @@
   }
 
   .sortable-unit-list {
-    .green {
-      background: $green-l5;
-    }
 
-    .red {
-      background: $red-l5;
-    }
-
-    .yellow {
-      background: $yellow-l5;
-    }
 
     .courseware-unit {
       @include font-size(13);
       @include clearfix();
       margin: -1px 0 0 0;
+
+      &.green {
+        background: $green-l5;
+      }
+
+      &.red {
+        background: $red-l5;
+      }
+
+      &.yellow {
+        background: $yellow-l5;
+      }
 
       .section-item {
         @include transition(background $tmg-avg ease-in-out 0);
@@ -92,10 +94,6 @@
           color: $red;
         }
 
-        .yellow {
-          background: $yellow;
-        }
-
         &:hover {
           background: $blue-l5;
           .popup {
@@ -107,7 +105,7 @@
           position: absolute;
           height: 25px;
           top: 3px;
-          width: 105px;
+          width: 115px;
           background: rgba(255,255,255, .75);
           border: 1px solid #aaa;
           border-radius: 3px;
