@@ -1,7 +1,11 @@
-""" Tests for credit course api """
+"""
+Tests for credit course api.
+"""
+
 import ddt
 
 from opaque_keys.edx.keys import CourseKey
+
 from openedx.core.djangoapps.credit.api import (
     get_credit_requirements, set_credit_requirements, _get_requirements_to_disable
 )
@@ -12,7 +16,9 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 @ddt.ddt
 class ApiTestCases(ModuleStoreTestCase):
-    """ Tests for credit course api """
+    """
+    Tests for credit course api.
+    """
 
     def setUp(self, **kwargs):
         super(ApiTestCases, self).setUp()
@@ -39,6 +45,7 @@ class ApiTestCases(ModuleStoreTestCase):
             {
                 "namespace": "grade",
                 "name": "grade",
+                "display_name": "Grade"
             }
         ]
     )
@@ -48,25 +55,34 @@ class ApiTestCases(ModuleStoreTestCase):
             set_credit_requirements(self.course_key, requirements)
 
     def test_set_credit_requirements_invalid_course(self):
+        """Test that 'InvalidCreditCourse' exception is raise if we try to
+        set credit requirements for a non credit course.
+        """
         requirements = [
             {
                 "namespace": "grade",
                 "name": "grade",
+                "display_name": "Grade",
                 "criteria": {}
             }
         ]
         with self.assertRaises(InvalidCreditCourse):
             set_credit_requirements(self.course_key, requirements)
+
         self.add_credit_course(enabled=False)
         with self.assertRaises(InvalidCreditCourse):
             set_credit_requirements(self.course_key, requirements)
 
     def test_set_get_credit_requirements(self):
+        """Test that if same requirement is added multiple times
+        then it is added only one time and update for next all iterations.
+        """
         self.add_credit_course()
         requirements = [
             {
                 "namespace": "grade",
                 "name": "grade",
+                "display_name": "Grade",
                 "criteria": {
                     "min_grade": 0.8
                 }
@@ -74,13 +90,18 @@ class ApiTestCases(ModuleStoreTestCase):
             {
                 "namespace": "grade",
                 "name": "grade",
+                "display_name": "Grade",
                 "criteria": {
-                    "min_grade": 0.8
+                    "min_grade": 0.9
                 }
             }
         ]
         set_credit_requirements(self.course_key, requirements)
         self.assertEqual(len(get_credit_requirements(self.course_key)), 1)
+
+        # now verify that the saved requirement has values of last requirement
+        # from all same requirements
+        self.assertEqual(get_credit_requirements(self.course_key)[0], requirements[1])
 
     def test_disable_credit_requirements(self):
         self.add_credit_course()
@@ -88,13 +109,7 @@ class ApiTestCases(ModuleStoreTestCase):
             {
                 "namespace": "grade",
                 "name": "grade",
-                "criteria": {
-                    "min_grade": 0.8
-                }
-            },
-            {
-                "namespace": "grade",
-                "name": "grade",
+                "display_name": "Grade",
                 "criteria": {
                     "min_grade": 0.8
                 }
@@ -106,12 +121,14 @@ class ApiTestCases(ModuleStoreTestCase):
         requirements = [
             {
                 "namespace": "reverification",
-                "name": "midterm",
+                "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
+                "display_name": "Assessment 1",
                 "criteria": {}
             }
         ]
         set_credit_requirements(self.course_key, requirements)
         self.assertEqual(len(get_credit_requirements(self.course_key)), 1)
+
         grade_req = CreditRequirement.objects.filter(namespace="grade", name="grade")
         self.assertEqual(len(grade_req), 1)
         self.assertEqual(grade_req[0].active, False)
@@ -122,13 +139,7 @@ class ApiTestCases(ModuleStoreTestCase):
             {
                 "namespace": "grade",
                 "name": "grade",
-                "criteria": {
-                    "min_grade": 0.8
-                }
-            },
-            {
-                "namespace": "grade",
-                "name": "grade",
+                "display_name": "Grade",
                 "criteria": {
                     "min_grade": 0.8
                 }
@@ -142,7 +153,8 @@ class ApiTestCases(ModuleStoreTestCase):
         requirements = [
             {
                 "namespace": "reverification",
-                "name": "midterm",
+                "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
+                "display_name": "Assessment 1",
                 "criteria": {}
             }
         ]
@@ -154,13 +166,15 @@ class ApiTestCases(ModuleStoreTestCase):
             {
                 "namespace": "grade",
                 "name": "grade",
+                "display_name": "Grade",
                 "criteria": {
                     "min_grade": 0.8
                 }
             },
             {
                 "namespace": "reverification",
-                "name": "midterm",
+                "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
+                "display_name": "Assessment 1",
                 "criteria": {}
             }
         ]
@@ -168,8 +182,9 @@ class ApiTestCases(ModuleStoreTestCase):
         self.assertEqual(len(requirements_to_disabled), 0)
 
     def add_credit_course(self, enabled=True):
-        """ Mark the course as a credit """
-
+        """
+        Mark the course as a credit.
+        """
         credit_course = CreditCourse(course_key=self.course_key, enabled=enabled)
         credit_course.save()
         return credit_course

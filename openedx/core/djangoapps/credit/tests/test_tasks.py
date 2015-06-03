@@ -1,4 +1,6 @@
-""" Tests for credit course tasks """
+"""
+Tests for credit course tasks.
+"""
 
 import mock
 from datetime import datetime
@@ -13,16 +15,17 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class TestTaskExecution(ModuleStoreTestCase):
-    """
-    Set of tests to ensure that the task code will do the right thing when
-    executed directly. The test course gets created without the listeners
-    being present, which allows us to ensure that when the listener is
-    executed, it is done as expected.
+    """Set of tests to ensure that the task code will do the right thing when
+    executed directly.
+
+    The test course gets created without the listeners being present, which
+    allows us to ensure that when the listener is executed, it is done as
+    expected.
     """
 
     def mocked_set_credit_requirements(course_key, requirements):  # pylint: disable=no-self-argument, unused-argument
-        """
-        Used as a side effect when mocking `verify_student.ssencrypt.has_valid_signature`.
+        """Used as a side effect when mocking method credit api method
+        'set_credit_requirements'.
         """
         raise InvalidCreditRequirements
 
@@ -46,8 +49,7 @@ class TestTaskExecution(ModuleStoreTestCase):
 
     def test_task_adding_requirements_invalid_course(self):
         """
-        Make sure that the receiver correctly fires off the task when
-        invoked by signal
+        Test that credit requirements cannot be added for non credit course.
         """
         requirements = get_credit_requirements(self.course.id)
         self.assertEqual(len(requirements), 0)
@@ -57,9 +59,10 @@ class TestTaskExecution(ModuleStoreTestCase):
         self.assertEqual(len(requirements), 0)
 
     def test_task_adding_requirements(self):
-        """
+        """Test that credit requirements are added properly for credit course.
+
         Make sure that the receiver correctly fires off the task when
-        invoked by signal
+        invoked by signal.
         """
         self.add_credit_course(self.course.id)
         requirements = get_credit_requirements(self.course.id)
@@ -70,9 +73,8 @@ class TestTaskExecution(ModuleStoreTestCase):
         self.assertEqual(len(requirements), 1)
 
     def test_task_adding_icrv_requirements(self):
-        """
-        Make sure that the receiver correctly fires off the task when
-        invoked by signal
+        """Make sure that the receiver correctly fires off the task when
+        invoked by signal.
         """
         self.add_credit_course(self.course.id)
         self.add_icrv_xblock()
@@ -90,7 +92,9 @@ class TestTaskExecution(ModuleStoreTestCase):
         )
     )
     def test_retry(self):
-        """
+        """Test that adding credit requirements is retried when
+        'InvalidCreditRequirements' exception is raised.
+
         Make sure that the receiver correctly fires off the task when
         invoked by signal
         """
@@ -103,10 +107,10 @@ class TestTaskExecution(ModuleStoreTestCase):
         self.assertEqual(len(requirements), 0)
 
     def add_credit_course(self, course_key):
-        """ Add the course as a credit
+        """Add the course as a credit.
 
         Args:
-            course_key(CourseKey): identifier for the course
+            course_key(CourseKey): Identifier for the course
 
         Returns:
             CreditCourse object added
