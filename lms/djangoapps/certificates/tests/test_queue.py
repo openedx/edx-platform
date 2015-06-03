@@ -54,6 +54,17 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
         actual_header = json.loads(kwargs['header'])
         self.assertIn('https://edx.org/update_certificate?key=', actual_header['lms_callback_url'])
 
+    def test_no_create_action_in_queue_for_html_view_certs(self):
+        """
+        Tests there is no certificate create message in the queue if generate_pdf is False
+        """
+        with patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75})):
+            with patch.object(XQueueInterface, 'send_to_queue') as mock_send:
+                self.xqueue.add_cert(self.user, self.course.id, generate_pdf=False)
+
+        # Verify that add_cert method does not add message to queue
+        self.assertFalse(mock_send.called)
+
 
 @attr('shard_1')
 @override_settings(CERT_QUEUE='certificates')

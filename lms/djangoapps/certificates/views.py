@@ -16,7 +16,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from capa.xqueue_interface import XQUEUE_METRIC_NAME
-from certificates.api import get_active_web_certificate, get_certificate_url
+from certificates.api import get_active_web_certificate, get_certificate_url, generate_user_certificates
 from certificates.models import (
     certificate_status_for_student,
     CertificateStatuses,
@@ -56,7 +56,6 @@ def request_certificate(request):
     """
     if request.method == "POST":
         if request.user.is_authenticated():
-            xqci = XQueueCertInterface()
             username = request.user.username
             student = User.objects.get(username=username)
             course_key = SlashSeparatedCourseKey.from_deprecated_string(request.POST.get('course_id'))
@@ -66,7 +65,7 @@ def request_certificate(request):
             if status in [CertificateStatuses.unavailable, CertificateStatuses.notpassing, CertificateStatuses.error]:
                 log_msg = u'Grading and certification requested for user %s in course %s via /request_certificate call'
                 logger.info(log_msg, username, course_key)
-                status = xqci.add_cert(student, course_key, course=course)
+                status = generate_user_certificates(student, course_key, course=course)
             return HttpResponse(json.dumps({'add_status': status}), mimetype='application/json')
         return HttpResponse(json.dumps({'add_status': 'ERRORANONYMOUSUSER'}), mimetype='application/json')
 
