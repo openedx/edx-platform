@@ -56,5 +56,5 @@ git+https://github.com/edx/edx-lint.git@8bf82a32ecb8598c415413df66f5232ab8d974e9
 -e git+https://github.com/edx/edx-reverification-block.git@1b7902db20bcefe7bd0109f866f830deaaf8d7f7#egg=edx-reverification-block
 
 # Third Party XBlocks
--e git+https://github.com/mitodl/edx-sga@bf7914c591eaab1ce424b1f47696f3c31c02e4f9#egg=edx-sga
+-e git+https://github.com/mitodl/edx-sga@7e308cf676b6f41493d9cf7864296bc1c089b36b#egg=edx-sga
 -e git+https://github.com/Stanford-Online/xblock-grademe.git@v0.1.0#egg=grademebutton
