@@ -35,7 +35,7 @@ def start_servers(default_store):
         cmd = (
             "DEFAULT_STORE={default_store} "
             "coverage run --rcfile={coveragerc} -m "
-            "manage {service} --settings bok_choy runserver "
+            "manage --contracts {service} --settings bok_choy runserver "
             "{address} --traceback --noreload".format(
                 default_store=default_store,
                 coveragerc=Env.BOK_CHOY_COVERAGERC,
