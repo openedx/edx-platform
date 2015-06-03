@@ -149,6 +149,9 @@
 
       </ul>
     </section>
+    % if self.dashboard_extra_file:
+        <%include file='${self.dashboard_extra_file}' />
+    % endif
   </section>
 </section>
 
