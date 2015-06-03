@@ -57,7 +57,7 @@ class ThreadListGetForm(_PaginationForm):
             raise ValidationError("'{}' is not a valid course id".format(value))
 
 
-class ThreadCreateExtrasForm(Form):
+class ThreadActionsForm(Form):
     """
     A form to handle fields in thread creation that require separate
     interactions with the comments service.
