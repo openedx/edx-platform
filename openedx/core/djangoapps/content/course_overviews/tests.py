@@ -8,6 +8,7 @@ from django.test import TestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore import ModuleStoreEnum
+from django.utils import timezone
 
 from .models import CourseOverviewDescriptor
 from courseware.tests.helpers import LoginEnrollmentTestCase
@@ -18,7 +19,7 @@ from courseware.tests.helpers import LoginEnrollmentTestCase
 class CourseOverviewDescriptorTests(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """Tests for CourseOverviewDescriptor model"""
 
-    TODAY = datetime.datetime.now()
+    TODAY = timezone.now()
     YESTERDAY = TODAY - datetime.timedelta(days=1)
     TOMORROW = TODAY + datetime.timedelta(days=1)
     NEXT_MONTH = TODAY + datetime.timedelta(days=30)
@@ -52,7 +53,7 @@ class CourseOverviewDescriptorTests(ModuleStoreTestCase, LoginEnrollmentTestCase
             'start',
             'end',
             'advertised_start',
-            'pre_requesite_courses',
+            'pre_requisite_courses',
             'end_of_course_survey_url',
             'display_name',
             'mobile_available',
@@ -66,7 +67,7 @@ class CourseOverviewDescriptorTests(ModuleStoreTestCase, LoginEnrollmentTestCase
             'display_organization',
             'display_coursenumber',
             'invitation_only',
-            'catalog_visiblity',
+            'catalog_visibility',
             'social_sharing_url',
             'merged_group_access',
             'location',
@@ -86,7 +87,6 @@ class CourseOverviewDescriptorTests(ModuleStoreTestCase, LoginEnrollmentTestCase
 
         # Test if return values all methods are equal between the three descriptors
         methods_to_test = [
-            '_get_user_partition',
             'may_certify',
             'has_ended',
             'has_started',
