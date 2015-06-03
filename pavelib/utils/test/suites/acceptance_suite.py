@@ -37,7 +37,8 @@ class AcceptanceTest(TestSuite):
         report_args = "--with-xunit --xunit-file {}".format(report_file)
 
         cmd = (
-            "DEFAULT_STORE={default_store} ./manage.py {system} --settings acceptance harvest --traceback "
+            "DEFAULT_STORE={default_store} ./manage.py --contracts {system} "
+            "--settings acceptance harvest --traceback "
             "--debug-mode --verbosity {verbosity} {pdb}{report_args} {extra_args}".format(
                 default_store=self.default_store,
                 system=self.system,
