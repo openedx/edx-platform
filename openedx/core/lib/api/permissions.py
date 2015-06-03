@@ -2,6 +2,8 @@ from django.conf import settings
 from rest_framework import permissions
 from django.http import Http404
 
+from student.roles import CourseStaffRole
+
 
 class ApiKeyHeaderPermission(permissions.BasePermission):
     def has_permission(self, request, view):
@@ -74,3 +76,13 @@ class IsUserInUrlOrStaff(IsUserInUrl):
             return True
 
         return super(IsUserInUrlOrStaff, self).has_permission(request, view)
+
+
+class IsStaffOrReadOnly(permissions.BasePermission):
+    """Permission that checks to see if the user is global or course
+    staff, permitting only read-only access if they are not.
+    """
+    def has_object_permission(self, request, view, obj):
+        return (request.user.is_staff or
+                CourseStaffRole(obj.course_id).has_user(request.user) or
+                request.method in permissions.SAFE_METHODS)

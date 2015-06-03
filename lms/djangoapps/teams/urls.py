@@ -1,11 +1,10 @@
-"""
-URLs for teams.
-"""
-from django.conf.urls import patterns, url
-from teams.views import TeamsDashboardView
+"""Defines the URL routes for this app."""
 
+from django.conf.urls import patterns, url
+
+from .views import TeamsDashboardView
 
 urlpatterns = patterns(
-    "teams.views",
-    url(r"^/$", TeamsDashboardView.as_view(), name="teams_dashboard"),
+    'teams.views',
+    url(r"^/$", TeamsDashboardView.as_view(), name="teams_dashboard")
 )

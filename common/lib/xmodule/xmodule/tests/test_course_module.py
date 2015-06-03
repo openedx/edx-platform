@@ -303,9 +303,9 @@ class TeamsConfigurationTestCase(unittest.TestCase):
         """ Make a sample topic dictionary. """
         next_num = self.count.next()
         topic_id = "topic_id_{}".format(next_num)
-        display_name = "Display Name {}".format(next_num)
+        name = "Name {}".format(next_num)
         description = "Description {}".format(next_num)
-        return {"display_name": display_name, "description": description, "id": topic_id}
+        return {"name": name, "description": description, "id": topic_id}
 
     def test_teams_enabled_new_course(self):
         # Make sure we can detect when no teams exist.
