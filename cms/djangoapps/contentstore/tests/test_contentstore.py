@@ -1844,6 +1844,42 @@ class RerunCourseTest(ContentStoreTestCase):
             self.assertTrue(rerun_state.message.endswith("traceback"))
             self.assertEqual(len(rerun_state.message), CourseRerunState.MAX_MESSAGE_LENGTH)
 
+    def test_rerun_course_wiki_slug(self):
+        """
+        Test that unique wiki_slug is assigned to rerun course.
+        """
+        course_data = {
+            'org': 'edX',
+            'number': '123',
+            'display_name': 'Rerun Course',
+            'run': '2013'
+        }
+
+        source_wiki_slug = '{0}.{1}.{2}'.format(course_data['org'], course_data['number'], course_data['run'])
+
+        source_course_key = _get_course_id(self.store, course_data)
+        _create_course(self, source_course_key, course_data)
+        source_course = self.store.get_course(source_course_key)
+
+        # Verify created course's wiki_slug.
+        self.assertEquals(source_course.wiki_slug, source_wiki_slug)
+
+        destination_course_data = course_data
+        destination_course_data['run'] = '2013_Rerun'
+
+        destination_course_key = self.post_rerun_request(
+            source_course.id, destination_course_data=destination_course_data
+        )
+        self.verify_rerun_course(source_course.id, destination_course_key, destination_course_data['display_name'])
+        destination_course = self.store.get_course(destination_course_key)
+
+        destination_wiki_slug = '{0}.{1}.{2}'.format(
+            destination_course.id.org, destination_course.id.course, destination_course.id.run
+        )
+
+        # Verify rerun course's wiki_slug.
+        self.assertEquals(destination_course.wiki_slug, destination_wiki_slug)
+
 
 class ContentLicenseTest(ContentStoreTestCase):
     """
