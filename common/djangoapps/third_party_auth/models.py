@@ -63,10 +63,10 @@ class ProviderConfig(ConfigurationModel):
     Abstract Base Class for configuring a third_party_auth provider
     """
     icon_class = models.CharField(
-        max_length=50, default='fa-signin',
+        max_length=50, default='fa-sign-in',
         help_text=(
             'The Font Awesome (or custom) icon class to use on the login button for this provider. '
-            'Examples: fa-google-plus, fa-facebook, fa-linkedin, fa-signin, fa-university'
+            'Examples: fa-google-plus, fa-facebook, fa-linkedin, fa-sign-in, fa-university'
         ))
     name = models.CharField(max_length=50, blank=False, help_text="Name of this provider (shown to users)")
     prefix = None  # used for provider_id. Set to a string value in subclass
