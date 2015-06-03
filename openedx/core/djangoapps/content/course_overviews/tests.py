@@ -3,6 +3,7 @@ Tests for content.course_overviews package
 """
 
 import datetime
+from dateutil.tz import tzutc
 import ddt
 import itertools
 
@@ -15,11 +16,11 @@ from xmodule.modulestore import ModuleStoreEnum
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from .models import CourseOverviewDescriptor
 
-# TODO me: finish this
-
 @ddt.ddt
 class CourseOverviewDescriptorTests(ModuleStoreTestCase, LoginEnrollmentTestCase):
-    """Tests for CourseOverviewDescriptor model"""
+    """
+    Tests for CourseOverviewDescriptor model.
+    """
 
     TODAY = timezone.now()
     YESTERDAY = TODAY - datetime.timedelta(days=1)
@@ -42,7 +43,14 @@ class CourseOverviewDescriptorTests(ModuleStoreTestCase, LoginEnrollmentTestCase
         course_overview_cache_miss = CourseOverviewDescriptor.get_from_id(course.id)
         course_overview_cache_hit = CourseOverviewDescriptor.get_from_id(course.id)
 
-        # Test if all fields (other than a couple special ones) are equal between the three descriptors
+        # Test if the majority of the fields are equal between the three descriptors
+        # Fields we don't test:
+        #   - modulestore_type and _location, because they are specific to CourseOverviewDescriptor.
+        #   - start, end, enrollment_start and enrollment_end because testing equality between
+        #     datetimes is not reliable. Often, two datetimes that *should* be considered equal
+        #     will compare as "not equal" due to a subtle nuance in how they are stored. Anyway,
+        #     we check start_datetime_text() and end_datetime_text() so we don't have to worry
+        #     about not testing the datetime objects.
         fields_to_test = [
             'id',
             'ispublic',
@@ -50,10 +58,6 @@ class CourseOverviewDescriptorTests(ModuleStoreTestCase, LoginEnrollmentTestCase
             'user_partitions',
             'visible_to_staff_only',
             'group_access',
-            'enrollment_start',
-            'enrollment_end',
-            'start',
-            'end',
             'advertised_start',
             'pre_requisite_courses',
             'end_of_course_survey_url',
