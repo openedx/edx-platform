@@ -13,12 +13,13 @@ from django.utils.translation import ugettext
 
 from xmodule_django.models import CourseKeyField, UsageKeyField
 from xmodule.course_module import CourseFields, DEFAULT_START_DATE, CATALOG_VISIBILITY_CATALOG_AND_ABOUT
-from xmodule.fields import Date
 from xmodule.modulestore.inheritance import UserPartition
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import NoSuchUserPartitionError
 
-# TODO me: Fix docstrings and style
+# Note: this import must come after import django.db.models.fields import *,
+# else datetime doesn't get imported (not entirely sure why this is)
+from datetime import datetime
 
 class UserPartitionListField(TextField):
     """
@@ -382,6 +383,7 @@ class CourseOverviewDescriptor(django.db.models.Model):
         """
         (Copied directly from xmodule.course_module.CourseDescriptor)
         """
+
         return datetime.now(UTC()) > self.start
 
     def start_datetime_text(self, format_string="SHORT_DATE"):
