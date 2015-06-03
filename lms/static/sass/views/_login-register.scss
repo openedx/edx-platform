@@ -339,8 +339,8 @@ $sm-btn-linkedin: #0077b5;
     .action-primary {
         @extend %btn-primary-blue;
         width: 100%;
-        height: ($baseline*2);
-        margin-top: 1em; // Breathing room above (CR)
+        margin-top: 1em;
+        padding: ($baseline/2);
         text-transform: none;
         font-weight: 600;
         letter-spacing: normal;
@@ -375,6 +375,8 @@ $sm-btn-linkedin: #0077b5;
 
         &:hover,
         &:focus {
+            background-image: none;
+
             .icon {
                 height: 32px;
                 line-height: 32px;

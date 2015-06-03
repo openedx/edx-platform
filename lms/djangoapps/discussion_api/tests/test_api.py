@@ -3,7 +3,8 @@ Tests for Discussion API internal interface
 """
 from datetime import datetime, timedelta
 import itertools
-from urlparse import urlparse
+from urlparse import urlparse, urlunparse
+from urllib import urlencode
 
 import ddt
 import httpretty
@@ -57,9 +58,10 @@ def _remove_discussion_tab(course, user_id):
 
 
 @mock.patch.dict("django.conf.settings.FEATURES", {"DISABLE_START_DATES": False})
-class GetCourseTopicsTest(ModuleStoreTestCase):
+class GetCourseTopicsTest(UrlResetMixin, ModuleStoreTestCase):
     """Test for get_course_topics"""
 
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(GetCourseTopicsTest, self).setUp()
         self.maxDiff = None  # pylint: disable=invalid-name
@@ -81,6 +83,8 @@ class GetCourseTopicsTest(ModuleStoreTestCase):
             days_early_for_beta=3
         )
         self.user = UserFactory.create()
+        self.request = RequestFactory().get("/dummy")
+        self.request.user = self.user
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
 
     def make_discussion_module(self, topic_id, category, subcategory, **kwargs):
@@ -94,34 +98,46 @@ class GetCourseTopicsTest(ModuleStoreTestCase):
             **kwargs
         )
 
-    def get_course_topics(self, user=None):
+    def get_thread_list_url(self, topic_id_list):
+        """
+        Returns the URL for the thread_list_url field, given a list of topic_ids
+        """
+        path = "http://testserver/api/discussion/v1/threads/"
+        query_list = [("course_id", unicode(self.course.id))] + [("topic_id", topic_id) for topic_id in topic_id_list]
+        return urlunparse(("", "", path, "", urlencode(query_list), ""))
+
+    def get_course_topics(self):
         """
         Get course topics for self.course, using the given user or self.user if
         not provided, and generating absolute URIs with a test scheme/host.
         """
-        return get_course_topics(self.course.id, user or self.user)
+        return get_course_topics(self.request, self.course.id)
 
     def make_expected_tree(self, topic_id, name, children=None):
         """
         Build an expected result tree given a topic id, display name, and
         children
         """
+        topic_id_list = [topic_id] if topic_id else [child["id"] for child in children]
         children = children or []
         node = {
             "id": topic_id,
             "name": name,
             "children": children,
+            "thread_list_url": self.get_thread_list_url(topic_id_list)
         }
+
         return node
 
     def test_nonexistent_course(self):
         with self.assertRaises(Http404):
-            get_course_topics(CourseLocator.from_string("non/existent/course"), self.user)
+            get_course_topics(self.request, CourseLocator.from_string("non/existent/course"))
 
     def test_not_enrolled(self):
         unenrolled_user = UserFactory.create()
+        self.request.user = unenrolled_user
         with self.assertRaises(Http404):
-            get_course_topics(self.course.id, unenrolled_user)
+            self.get_course_topics()
 
     def test_discussions_disabled(self):
         _remove_discussion_tab(self.course, self.user.id)
@@ -310,8 +326,8 @@ class GetCourseTopicsTest(ModuleStoreTestCase):
             ],
         }
         self.assertEqual(student_actual, student_expected)
-
-        beta_actual = self.get_course_topics(beta_tester)
+        self.request.user = beta_tester
+        beta_actual = self.get_course_topics()
         beta_expected = {
             "courseware_topics": [
                 self.make_expected_tree(
@@ -334,7 +350,8 @@ class GetCourseTopicsTest(ModuleStoreTestCase):
         }
         self.assertEqual(beta_actual, beta_expected)
 
-        staff_actual = self.get_course_topics(staff)
+        self.request.user = staff
+        staff_actual = self.get_course_topics()
         staff_expected = {
             "courseware_topics": [
                 self.make_expected_tree(
@@ -381,14 +398,14 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
         self.author = UserFactory.create()
         self.cohort = CohortFactory.create(course_id=self.course.id)
 
-    def get_thread_list(self, threads, page=1, page_size=1, num_pages=1, course=None):
+    def get_thread_list(self, threads, page=1, page_size=1, num_pages=1, course=None, topic_id_list=None):
         """
         Register the appropriate comments service response, then call
         get_thread_list and return the result.
         """
         course = course or self.course
         self.register_get_threads_response(threads, page, num_pages)
-        ret = get_thread_list(self.request, course.id, page, page_size)
+        ret = get_thread_list(self.request, course.id, page, page_size, topic_id_list)
         return ret
 
     def test_nonexistent_course(self):
@@ -414,6 +431,19 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
                 "previous": None,
             }
         )
+
+    def test_get_threads_by_topic_id(self):
+        self.get_thread_list([], topic_id_list=["topic_x", "topic_meow"])
+        self.assertEqual(urlparse(httpretty.last_request().path).path, "/api/v1/threads")
+        self.assert_last_query_params({
+            "course_id": [unicode(self.course.id)],
+            "sort_key": ["date"],
+            "sort_order": ["desc"],
+            "page": ["1"],
+            "per_page": ["1"],
+            "recursive": ["False"],
+            "commentable_ids": ["topic_x,topic_meow"]
+        })
 
     def test_basic_query_params(self):
         self.get_thread_list([], page=6, page_size=14)

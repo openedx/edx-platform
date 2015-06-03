@@ -1,8 +1,10 @@
 ## mako
 ## TODO (ECOM-1339): Delete this template once the V3 footer is enabled
-<%! from django.core.urlresolvers import reverse %>
-<%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='static_content.html'/>
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+%>
 ## WARNING: These files are specific to edx.org and are not used in installations outside of that domain. Open edX users will want to use the file "footer.html" for any changes or overrides.
 <div class="wrapper wrapper-footer edx-footer edx-footer-new">
   <footer id="footer-global" class="footer-global" role="contentinfo" aria-label="Footer">

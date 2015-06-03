@@ -10,6 +10,8 @@ from student.models import User, UserProfile, Registration
 from student import views as student_views
 from util.model_utils import emit_setting_changed_event
 
+from openedx.core.lib.api.view_utils import add_serializer_errors
+
 from ..errors import (
     AccountUpdateError, AccountValidationError, AccountUsernameInvalid, AccountPasswordInvalid,
     AccountEmailInvalid, AccountUserAlreadyExists,
@@ -170,7 +172,7 @@ def update_account_settings(requesting_user, update, username=None):
     legacy_profile_serializer = AccountLegacyProfileSerializer(existing_user_profile, data=update)
 
     for serializer in user_serializer, legacy_profile_serializer:
-        field_errors = _add_serializer_errors(update, serializer, field_errors)
+        field_errors = add_serializer_errors(serializer, update, field_errors)
 
     # If the user asked to change email, validate it.
     if changing_email:
@@ -248,27 +250,6 @@ def _get_user_and_profile(username):
         raise UserNotFound()
 
     return existing_user, existing_user_profile
-
-
-def _add_serializer_errors(update, serializer, field_errors):
-    """
-    Helper method that adds any validation errors that are present in the serializer to
-    the supplied field_errors dict.
-    """
-    if not serializer.is_valid():
-        errors = serializer.errors
-        for key, error in errors.iteritems():
-            field_value = update[key]
-            field_errors[key] = {
-                "developer_message": u"Value '{field_value}' is not valid for field '{field_name}': {error}".format(
-                    field_value=field_value, field_name=key, error=error
-                ),
-                "user_message": _(u"This value is invalid.").format(
-                    field_value=field_value, field_name=key
-                ),
-            }
-
-    return field_errors
 
 
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])

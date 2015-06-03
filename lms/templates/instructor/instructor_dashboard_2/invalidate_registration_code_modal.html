@@ -1,0 +1,42 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+<%page args="section_data"/>
+<section id="invalidate_registration_code_modal" class="modal" role="dialog" tabindex="-1" aria-label="${_('Enrollment Code Status')}">
+  <div class="inner-wrapper">
+    <button class="close-modal">
+      <i class="icon fa fa-remove"></i>
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_('Close')}
+      </span>
+    </button>
+
+    <div id="regcode-content">
+      <header>
+        <h2>${_("Enrollment Code Status")}</h2>
+      </header>
+
+      <div class="instructions">
+        <p>
+          ${_("Change the status of an enrollment code.")}</p>
+      </div>
+      <form id="set_regcode_status_form">
+        <div id="regcode_status_form_error" class="modal-form-error"></div>
+        <div class="success-msgs" id="regcode_status_form_success"></div>
+        <fieldset class="group group-form group-form-requiredinformation">
+          <legend class="is-hidden">${_("Required Information")}</legend>
+
+          <ol class="list-input">
+            <li class="field required text" id="set-course-mode-modal-field-price">
+              <label for="regcode_code">${_("Enrollment Code")}</label>
+              <input class="field" id="regcode_code" type="text" name="regcode_code" placeholder="Enter an Enrollment Code" aria-required="true">
+            </li>
+          </ol>
+        </fieldset>
+        <div class="submit">
+          <input name="submit" type="button" id="lookup_regcode" data-endpoint="${section_data['look_up_registration_code']}" value="${_('Find Enrollment Code')}"/>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

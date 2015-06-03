@@ -32,7 +32,7 @@ SALE_ORDER_FEATURES = ('id', 'company_name', 'company_contact_name', 'company_co
                        'bill_to_country', 'order_type',)
 
 AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES
-COURSE_REGISTRATION_FEATURES = ('code', 'course_id', 'created_by', 'created_at')
+COURSE_REGISTRATION_FEATURES = ('code', 'course_id', 'created_by', 'created_at', 'is_valid')
 COUPON_FEATURES = ('code', 'course_id', 'percentage_discount', 'description', 'expiration_date', 'is_active')
 
 

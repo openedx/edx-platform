@@ -1,11 +1,12 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django.template import RequestContext %>
-<%! import third_party_auth %>
-<%! from third_party_auth import pipeline %>
-<%! from microsite_configuration import microsite %>
-
+<%inherit file="main.html" />
+<%namespace name='static' file='static_content.html'/>
 <%!
-  from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+from django.template import RequestContext
+import third_party_auth
+from third_party_auth import pipeline
+from microsite_configuration import microsite
+from django.core.urlresolvers import reverse
 %>
 
 <%
@@ -13,9 +14,6 @@
   cert_name_long = settings.CERT_NAME_LONG
 %>
 
-<%inherit file="main.html" />
-
-<%namespace name='static' file='static_content.html'/>
 
 <%block name="pagetitle">${_("Dashboard")}</%block>
 <%block name="bodyclass">view-dashboard is-authenticated</%block>

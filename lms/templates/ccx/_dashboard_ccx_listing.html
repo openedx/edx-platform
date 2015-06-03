@@ -1,9 +1,9 @@
 <%page args="ccx, membership, course, show_courseware_link, is_course_blocked" />
 
-<%! from django.utils.translation import ugettext as _ %>
 <%!
-  from django.core.urlresolvers import reverse
-  from courseware.courses import course_image_url, get_course_about_section
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from courseware.courses import course_image_url, get_course_about_section
 %>
 <%
   ccx_switch_target = reverse('switch_active_ccx', args=[course.id.to_deprecated_string(), ccx.id])

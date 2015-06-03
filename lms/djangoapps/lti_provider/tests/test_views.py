@@ -257,6 +257,17 @@ class LtiRunTest(TestCase):
         views.lti_run(request)
         self.assertNotIn(views.LTI_SESSION_KEY, request.session)
 
+    @patch('lti_provider.views.render_courseware')
+    def test_lti_consumer_record_supplemented_with_guid(self, _render):
+        request = build_run_request()
+        request.session[views.LTI_SESSION_KEY]['tool_consumer_instance_guid'] = 'instance_guid'
+        with self.assertNumQueries(4):
+            views.lti_run(request)
+        consumer = models.LtiConsumer.objects.get(
+            consumer_key=LTI_DEFAULT_PARAMS['oauth_consumer_key']
+        )
+        self.assertEqual(consumer.instance_guid, 'instance_guid')
+
 
 class RenderCoursewareTest(TestCase):
     """

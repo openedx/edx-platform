@@ -2,10 +2,29 @@
 Discussion API forms
 """
 from django.core.exceptions import ValidationError
-from django.forms import BooleanField, CharField, Form, IntegerField, NullBooleanField
+from django.forms import (
+    BooleanField,
+    CharField,
+    Field,
+    Form,
+    IntegerField,
+    MultipleHiddenInput,
+    NullBooleanField,
+)
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseLocator
+
+
+class TopicIdField(Field):
+    """
+    Field for a list of topic_ids
+    """
+    widget = MultipleHiddenInput
+
+    def validate(self, value):
+        if value and "" in value:
+            raise ValidationError("This field cannot be empty.")
 
 
 class _PaginationForm(Form):
@@ -27,6 +46,7 @@ class ThreadListGetForm(_PaginationForm):
     A form to validate query parameters in the thread list retrieval endpoint
     """
     course_id = CharField()
+    topic_id = TopicIdField(required=False)
 
     def clean_course_id(self):
         """Validate course_id"""

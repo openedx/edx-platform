@@ -287,17 +287,14 @@ def get_reg_code_validity(registration_code, request, limiter):
     except CourseRegistrationCode.DoesNotExist:
         reg_code_is_valid = False
     else:
-        reg_code_is_valid = True
-        try:
-            RegistrationCodeRedemption.objects.get(registration_code__code=registration_code)
-        except RegistrationCodeRedemption.DoesNotExist:
-            reg_code_already_redeemed = False
+        if course_registration.is_valid:
+            reg_code_is_valid = True
         else:
-            reg_code_already_redeemed = True
-
+            reg_code_is_valid = False
+        reg_code_already_redeemed = RegistrationCodeRedemption.is_registration_code_redeemed(registration_code)
     if not reg_code_is_valid:
         # tick the rate limiter counter
-        AUDIT_LOG.info("Redemption of a non existing RegistrationCode {code}".format(code=registration_code))
+        AUDIT_LOG.info("Redemption of a invalid RegistrationCode %s", registration_code)
         limiter.tick_bad_request_counter(request)
         raise Http404()
 
@@ -430,15 +427,24 @@ def _is_enrollment_code_an_update(course, user, redemption_code):
 def use_registration_code(course_reg, user):
     """
     This method utilize course registration code.
+    If the registration code is invalid, it returns an error.
     If the registration code is already redeemed, it returns an error.
     Else, it identifies and removes the applicable OrderItem from the Order
     and redirects the user to the Registration code redemption page.
     """
-    if RegistrationCodeRedemption.is_registration_code_redeemed(course_reg):
-        log.warning(u"Registration code '%s' already used", course_reg.code)
+    if not course_reg.is_valid:
+        log.warning(u"The enrollment code (%s) is no longer valid.", course_reg.code)
         return HttpResponseBadRequest(
-            _("Oops! The code '{registration_code}' you entered is either invalid or expired").format(
-                registration_code=course_reg.code
+            _("This enrollment code ({enrollment_code}) is no longer valid.").format(
+                enrollment_code=course_reg.code
+            )
+        )
+
+    if RegistrationCodeRedemption.is_registration_code_redeemed(course_reg.code):
+        log.warning(u"This enrollment code ({%s}) has already been used.", course_reg.code)
+        return HttpResponseBadRequest(
+            _("This enrollment code ({enrollment_code}) is not valid.").format(
+                enrollment_code=course_reg.code
             )
         )
     try:
@@ -893,6 +899,7 @@ def _show_receipt_html(request, order):
                     'course_name': course.display_name,
                     'redemption_url': reverse('register_code_redemption', args=[course_registration_code.code]),
                     'code': course_registration_code.code,
+                    'is_valid': course_registration_code.is_valid,
                     'is_redeemed': RegistrationCodeRedemption.objects.filter(
                         registration_code=course_registration_code).exists(),
                 })

@@ -1,7 +1,9 @@
-<%! import json %>
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django.core.urlresolvers import reverse %>
 <%inherit file="base.html" />
+<%!
+import json
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
 <%def name="online_help_token()"><% return "team_course" %></%def>
 <%block name="title">${_("Course Team Settings")}</%block>
 <%block name="bodyclass">is-signedin course users view-team</%block>
