@@ -16,6 +16,24 @@ def get_visible_courses():
     if not getattr(settings, 'DISPLAY_COURSE_TILES', False):
         return []
 
+    filtered_by_db = TileConfiguration.objects.filter(
+        enabled=True,
+    ).values('course_id').order_by('-change_date')
+    if filtered_by_db:
+        filtered_by_db_ids = [
+            course['course_id']
+            for course in filtered_by_db
+        ]
+        filtered_by_db_keys = frozenset([
+            SlashSeparatedCourseKey.from_string(course)
+            for course in filtered_by_db_ids
+        ])
+        return [
+            course
+            for course in courses
+            if course.id in filtered_by_db_keys
+        ]
+
     filtered_by_org = microsite.get_value('course_org_filter')
 
     _courses = modulestore().get_courses(org=filtered_by_org)
