@@ -1,17 +1,19 @@
-"""Tests for content.course_overviews package"""
+"""
+Tests for content.course_overviews package
+"""
 
+import datetime
 import ddt
 import itertools
-import datetime
 
-from django.test import TestCase
+from django.utils import timezone
+
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore import ModuleStoreEnum
-from django.utils import timezone
 
-from .models import CourseOverviewDescriptor
 from courseware.tests.helpers import LoginEnrollmentTestCase
+from .models import CourseOverviewDescriptor
 
 # TODO me: finish this
 
@@ -25,13 +27,13 @@ class CourseOverviewDescriptorTests(ModuleStoreTestCase, LoginEnrollmentTestCase
     NEXT_MONTH = TODAY + datetime.timedelta(days=30)
 
     def check_course_equals_course_overview(self, course):
-        """Tests that a CourseDescriptor and its corresponding CourseOverviewDescriptor behave the same.
+        """Checks if a CourseDescriptor behaves the same as its CourseOverviewDescriptor.
 
-        Specifically, given a course, test that all important attributes and methods return the same value when
-        called on each of the following:
+        Specifically, given a course, test that all important attributes and
+        methods return the same value when called on each of the following:
          - the CourseDescriptor itself
-         - a CourseOverviewDescriptor that was newly created (the result of a cache miss)
-         - a CourseOverviewDescriptor that was loaded from the MySQL database (the result of cache hit)
+         - a CourseOverviewDescriptor that was newly created from it
+         - a CourseOverviewDescriptor that was loaded from the MySQL database
         """
 
         # Load the CourseOverviewDescriptor from the cache twice. The first load will be a cache miss (because the cache
@@ -116,6 +118,14 @@ class CourseOverviewDescriptorTests(ModuleStoreTestCase, LoginEnrollmentTestCase
     ))
     @ddt.unpack
     def test_course_overvewiew_behavior(self, course_kwargs, modulestore_type, is_user_enrolled):
+        """Tests if CourseOverviews and CourseOverviewDescriptors behave the same
+        by comparing pairs of them given a variety of scenarios.
+
+        Args:
+            course_kwargs (dict): kwargs to be passed to course constructor
+            modulestore_type (ModuleStoreEnum.Type)
+            is_user_enrolled (bool)
+        """
         course = CourseFactory.create(
             course="test_course",
             org="edX",
@@ -126,7 +136,3 @@ class CourseOverviewDescriptorTests(ModuleStoreTestCase, LoginEnrollmentTestCase
         if is_user_enrolled:
             self.enroll(course, verify=True)
         self.check_course_equals_course_overview(course)
-
-class MobileApiCourseOverviewTests(TestCase):
-    """Tests to make sure the parts of the mobile API that have been changed to use this package still work right"""
-    pass

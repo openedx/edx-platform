@@ -1,6 +1,10 @@
+"""
+Field and model declarations for course_overviews.
+"""
+
+from base64 import b32encode
 import json
 from util.date_utils import strftime_localized
-from base64 import b32encode
 
 import django.db.models
 from django.db.models.fields import *
@@ -8,29 +12,47 @@ from django.utils.timezone import UTC
 from django.utils.translation import ugettext
 
 from xmodule_django.models import CourseKeyField, UsageKeyField
-from xmodule.partitions.partitions import NoSuchUserPartitionError
-from xmodule.course_module import CourseFields
+from xmodule.course_module import CourseFields, DEFAULT_START_DATE, CATALOG_VISIBILITY_CATALOG_AND_ABOUT
 from xmodule.fields import Date
 from xmodule.modulestore.inheritance import UserPartition
-from xmodule.course_module import DEFAULT_START_DATE, CATALOG_VISIBILITY_CATALOG_AND_ABOUT
 from xmodule.modulestore.django import modulestore
+from xmodule.partitions.partitions import NoSuchUserPartitionError
 
-# TODO me: Fix docstrings
+# TODO me: Fix docstrings and style
 
 class UserPartitionListField(TextField):
-    """Special field for storing a list of UserPartition objects as a string."""
+    """
+    Special field for storing a list of UserPartition objects as a string.
+    """
     __metaclass__ = django.db.models.SubfieldBase
 
     def __init__(self, *args, **kwargs):
         super(UserPartitionListField, self).__init__(*args, **kwargs)
 
     def get_prep_value(self, obj):
-        """Returns a serialized version of obj, to be stored in a TextField (overriden from django.db.models.Field)"""
+        """Converts field from Python value to string to be stored in database
+        (overridden from django.db.models.Field).
+
+        Arguments:
+            obj (UserPartitionListField): instance to be converted
+
+        Returns:
+            str: a serialized version of obj, to be stored in a TextField
+        """
         strings = [user_partition.to_json() for user_partition in obj]
         return json.dumps(strings)
 
     def to_python(self, data):
-        """Deserializes data into the Python representation of this field (overriden from django.db.models.Field)"""
+        """Prepares value of field to be used as a Python object (overridden
+        from django.db.models.Field).
+
+        Arguments:
+            data (str|UserPatitionListField): serialized string or instance of
+                this class to be converted
+
+        Returns:
+            UserPartitionListField: the Python value of the field
+        """
         if data is None:
             return None
         else:
@@ -41,18 +63,37 @@ class UserPartitionListField(TextField):
             ]
 
 class GroupAccessDictField(TextField):
-    """Special field for storing a GroupAccessDict object as a string."""
+    """
+    Special field for storing a list of GroupAccessDict objects as a string.
+    """
     __metaclass__ = django.db.models.SubfieldBase
 
     def __init__(self, *args, **kwargs):
         super(GroupAccessDictField, self).__init__(*args, **kwargs)
 
     def get_prep_value(self, obj):
-        """Returns a serialized version of obj, to be stored in a TextField (overriden from django.db.models.Field)"""
+        """Converts field from Python value to string to be stored in database
+        (overridden from django.db.models.Field).
+
+        Arguments:
+            obj (GroupAccessDictField): instance to be converted
+
+        Returns:
+            str: a serialized version of obj, to be stored in a TextField
+        """
         return json.dumps(obj)
 
     def to_python(self, data):
-        """Deserializes data into the Python representation of this field (overriden from django.db.models.Field)"""
+        """Prepares value of field to be used as a Python object (overridden
+        from django.db.models.Field).
+
+        Arguments:
+            data (str|GroupAccessDictField): serialized string or instance of
+                this class to be converted
+
+        Returns:
+            GroupAccessDictField: the Python value of the field
+        """
         if data is None:
             return None
         elif isinstance(data, dict):
@@ -61,18 +102,37 @@ class GroupAccessDictField(TextField):
             return json.loads(data)
 
 class CourseIdListField(TextField):
-    """Special field for storing a list of CourseKey objects as a string."""
+    """
+    Special field for storing a list of CourseKey objects as a string.
+    """
     __metaclass__ = django.db.models.SubfieldBase
 
     def __init__(self, *args, **kwargs):
         super(CourseIdListField, self).__init__(*args, **kwargs)
 
     def get_prep_value(self, obj):
-        """Returns a serialized version of obj, to be stored in a TextField (overriden from django.db.models.Field)"""
+        """Converts field from Python value to string to be stored in database
+        (overridden from django.db.models.Field).
+
+        Arguments:
+            obj (CourseIdListField): instance to be converted
+
+        Returns:
+            str: a serialized version of obj, to be stored in a TextField
+        """
         return json.dumps(obj)
 
     def to_python(self, data):
-        """Deserializes data into the Python representation of this field (overriden from django.db.models.Field)"""
+        """Prepares value of field to be used as a Python object (overridden
+        from django.db.models.Field).
+
+        Arguments:
+            data (str|CourseIdListField): serialized string or instance of
+                this class to be converted
+
+        Returns:
+            CourseIdListField: the Python value of the field
+        """
         if data is None:
             return None
         elif isinstance(data, list):
@@ -95,20 +155,31 @@ for field_class in custom_field_classes:
 
 
 class CourseOverviewDescriptor(django.db.models.Model):
-    """Model that represents a smaller, less-detailed version of CourseDescriptor. See __init__.py for more detail.
+    """Model that represents a smaller, less-detailed version of CourseDescriptor.
+    See __init__.py for more details.
 
-    In order to mimic the behavior of the CourseDescriptor object, most of the fields and methods below have been
-    directly copied (sorry...) from CourseDescriptor or its parents (CourseFields, XModuleMixin, etc.). This is poor
-    design practice, and is only being done because this entire app is intended to be temporary. Accordingly, this
-    class should not become part of any inheritance hierarchy that intended to last.
+    In order to mimic the behavior of the CourseDescriptor object, most of the
+    fields and methods below have been directly copied (sorry...) from
+    CourseDescriptor or its parents (CourseFields, XModuleMixin, etc.).
+    This is poor design practice, and is only being done because this entire
+    app is intended to be temporary. Accordingly, this class should not become
+    part of any inheritance hierarchy that intended to last.
     """
 
     @staticmethod
     def get_from_id(course_id):
-        """Return the CourseOverviewDescriptor for a given course ID.
+        """Load a CourseOverviewDescriptor for a given course ID.
 
-        First, we try to load the CourseOverviewDescriptor the database. If it doesn't exist, we load the entire course from
-        modulestore, create a CourseOverviewDescriptor from it, and then save it to the database for future use.
+        First, we try to load the CourseOverviewDescriptor the database. If it
+        doesn't exist, we load the entire course from modulestore, create a
+        CourseOverviewDescriptor from it, and then save it to the database for
+        future use.
+
+        Args:
+            course_id (CourseKey): the ID of the course overview to be loaded
+
+        Returns:
+            CourseOverviewDescriptor: overview of the requested course
         """
         course_overview = None
         try:
@@ -124,7 +195,17 @@ class CourseOverviewDescriptor(django.db.models.Model):
 
     @staticmethod
     def create_from_course(course):
-        """Returns a CourseOverviewDescriptor from the given CourseDescriptor."""
+        """Creates a CourseOverviewDescriptor object out of a CourseDescriptor.
+
+        Does not touch the database, simply constructs and returns an overview
+        from the given course.
+
+        Args:
+            course (CourseDescriptor): any course descriptor object
+
+        Returns:
+            CourseOverviewDescriptor: an overview of the given course
+        """
         # TODO: when we upgrade to 1.8, delete old code and uncomment new code
 
         modulestore_type = modulestore().get_modulestore_type(course.id)
@@ -211,17 +292,24 @@ class CourseOverviewDescriptor(django.db.models.Model):
     catalog_visibility = TextField(default=CATALOG_VISIBILITY_CATALOG_AND_ABOUT, null=True)
     social_sharing_url = TextField(default=None, null=True)
 
+    def __repr__(self):
+        """
+        Returns a simple string representation of this object
+        (useful for debugging)
+        """
+        return self.__class__.__name__ + '(location=' + self.location.to_string + ')'
+
     @property
     def merged_group_access(self):
         """
-        (Mimics method from lms_xblock.mixin.LmsBlockMixin, but can be simplified because for courses,
-        self.get_parent() is None)
+        (Mimics method from lms_xblock.mixin.LmsBlockMixin, but can be
+        simplified because for courses, self.get_parent() is None)
         """
         return self.group_access or {}
 
     def _get_user_partition(self, user_partition_id):
         """
-        Returns the user partition with the specified id.  Raises
+        Returns the user partition with the specified id.Raises
         `NoSuchUserPartitionError` if the lookup fails.
 
         (Copied directly from lms_xblock.mixin.LmsBlockMixin)
@@ -237,8 +325,9 @@ class CourseOverviewDescriptor(django.db.models.Model):
     def location(self):
         """Returns the UsageKey of this course.
 
-        UsageKeyField has a strange behavior where it fails to parse the "run" of a course out of the serialized
-        form of a Mongo UsageKey. This property is a wrapper around _location attribute that fixes the problem
+        UsageKeyField has a strange behavior where it fails to parse the "run"
+        of a course out of the serialized form of a Mongo UsageKey. This
+        property is a wrapper around _location attribute that fixes the problem
         by calling map_into_course, which restores the run attribute.
 
         (Mimics method from xmodule.x_module.XModuleMixin)
@@ -300,7 +389,8 @@ class CourseOverviewDescriptor(django.db.models.Model):
         Returns the desired text corresponding the course's start date and time in UTC.  Prefers .advertised_start,
         then falls back to .start
 
-        (Copied from xmodule.course_module.CourseDescriptor and modified to not use the xBlock runtime)
+        (Copied from xmodule.course_module.CourseDescriptor and modified to not
+         use the xBlock runtime)
         """
         _ = ugettext
         strftime = strftime_localized
@@ -349,7 +439,8 @@ class CourseOverviewDescriptor(django.db.models.Model):
 
         If the course does not have an end date set (course.end is None), an empty string will be returned.
 
-        (Copied from xmodule.course_module.CourseDescriptor and modified to not use the xBlock runtime)
+        (Copied from xmodule.course_module.CourseDescriptor and modified to not
+        use the xBlock runtime)
         """
         if self.end is None:
             return ''
