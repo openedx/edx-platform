@@ -1,6 +1,8 @@
 """
 Tests for the EdxNotes app.
 """
+from contextlib import contextmanager
+import ddt
 import json
 import jwt
 from mock import patch, MagicMock
@@ -15,6 +17,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
 from django.test.client import RequestFactory
+from django.test.utils import override_settings
 from oauth2_provider.tests.factories import ClientFactory
 from provider.oauth2.models import Client
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -76,7 +79,7 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         self.problem = TestProblem(self.course)
 
     @patch.dict("django.conf.settings.FEATURES", {'ENABLE_EDXNOTES': True})
-    @patch("edxnotes.decorators.get_endpoint")
+    @patch("edxnotes.decorators.get_public_endpoint")
     @patch("edxnotes.decorators.get_token_url")
     @patch("edxnotes.decorators.get_id_token")
     @patch("edxnotes.decorators.generate_uid")
@@ -141,6 +144,7 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
 
 
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
+@ddt.ddt
 class EdxNotesHelpersTest(ModuleStoreTestCase):
     """
     Tests for EdxNotes helpers.
@@ -232,29 +236,44 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                             {"type": "bar"}]
         self.assertTrue(helpers.is_feature_enabled(self.course))
 
-    def test_get_endpoint(self):
+    @ddt.data(
+        helpers.get_public_endpoint,
+        helpers.get_internal_endpoint,
+    )
+    def test_get_endpoints(self, get_endpoint_function):
         """
-        Tests that storage_url method returns appropriate values.
+        Test that the get_public_endpoint and get_internal_endpoint functions
+        return appropriate values.
         """
+        @contextmanager
+        def patch_edxnotes_api_settings(url):
+            """
+            Convenience function for patching both EDXNOTES_PUBLIC_API and
+            EDXNOTES_INTERNAL_API.
+            """
+            with override_settings(EDXNOTES_PUBLIC_API=url):
+                with override_settings(EDXNOTES_INTERNAL_API=url):
+                    yield
+
         # url ends with "/"
-        with patch.dict("django.conf.settings.EDXNOTES_INTERFACE", {"url": "http://example.com/"}):
-            self.assertEqual("http://example.com/", helpers.get_endpoint())
+        with patch_edxnotes_api_settings("http://example.com/"):
+            self.assertEqual("http://example.com/", get_endpoint_function())
 
         # url doesn't have "/" at the end
-        with patch.dict("django.conf.settings.EDXNOTES_INTERFACE", {"url": "http://example.com"}):
-            self.assertEqual("http://example.com/", helpers.get_endpoint())
+        with patch_edxnotes_api_settings("http://example.com"):
+            self.assertEqual("http://example.com/", get_endpoint_function())
 
         # url with path that starts with "/"
-        with patch.dict("django.conf.settings.EDXNOTES_INTERFACE", {"url": "http://example.com"}):
-            self.assertEqual("http://example.com/some_path/", helpers.get_endpoint("/some_path"))
+        with patch_edxnotes_api_settings("http://example.com"):
+            self.assertEqual("http://example.com/some_path/", get_endpoint_function("/some_path"))
 
         # url with path without "/"
-        with patch.dict("django.conf.settings.EDXNOTES_INTERFACE", {"url": "http://example.com"}):
-            self.assertEqual("http://example.com/some_path/", helpers.get_endpoint("some_path/"))
+        with patch_edxnotes_api_settings("http://example.com"):
+            self.assertEqual("http://example.com/some_path/", get_endpoint_function("some_path/"))
 
         # url is not configured
-        with patch.dict("django.conf.settings.EDXNOTES_INTERFACE", {"url": None}):
-            self.assertRaises(ImproperlyConfigured, helpers.get_endpoint)
+        with patch_edxnotes_api_settings(None):
+            self.assertRaises(ImproperlyConfigured, get_endpoint_function)
 
     @patch("edxnotes.helpers.requests.get")
     def test_get_notes_correct_data(self, mock_get):
@@ -669,7 +688,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             helpers.get_module_context(self.course, self.chapter_2)
         )
 
-    @patch.dict("django.conf.settings.EDXNOTES_INTERFACE", {"url": "http://example.com"})
+    @override_settings(EDXNOTES_PUBLIC_API="http://example.com")
+    @override_settings(EDXNOTES_INTERNAL_API="http://example.com")
     @patch("edxnotes.helpers.anonymous_id_for_user")
     @patch("edxnotes.helpers.get_id_token")
     @patch("edxnotes.helpers.requests.get")
@@ -697,7 +717,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             }
         )
 
-    @patch.dict("django.conf.settings.EDXNOTES_INTERFACE", {"url": "http://example.com"})
+    @override_settings(EDXNOTES_PUBLIC_API="http://example.com")
+    @override_settings(EDXNOTES_INTERNAL_API="http://example.com")
     @patch("edxnotes.helpers.anonymous_id_for_user")
     @patch("edxnotes.helpers.get_id_token")
     @patch("edxnotes.helpers.requests.get")

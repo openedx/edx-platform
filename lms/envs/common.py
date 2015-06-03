@@ -1038,9 +1038,8 @@ MOCK_STAFF_GRADING = False
 ################################# EdxNotes config  #########################
 
 # Configure the LMS to use our stub EdxNotes implementation
-EDXNOTES_INTERFACE = {
-    'url': 'http://localhost:8120/api/v1',
-}
+EDXNOTES_PUBLIC_API = 'http://localhost:8120/api/v1'
+EDXNOTES_INTERNAL_API = 'http://localhost:8120/api/v1'
 
 ########################## Parental controls config  #######################
 

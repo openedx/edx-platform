@@ -71,7 +71,8 @@ XQUEUE_INTERFACE['url'] = 'http://localhost:8040'
 OPEN_ENDED_GRADING_INTERFACE['url'] = 'http://localhost:8041/'
 
 # Configure the LMS to use our stub EdxNotes implementation
-EDXNOTES_INTERFACE['url'] = 'http://localhost:8042/api/v1'
+EDXNOTES_PUBLIC_API = 'http://localhost:8042/api/v1'
+EDXNOTES_INTERNAL_API = 'http://localhost:8042/api/v1'
 
 # Enable django-pipeline and staticfiles
 STATIC_ROOT = (TEST_ROOT / "staticfiles").abspath()
