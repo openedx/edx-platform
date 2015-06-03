@@ -278,6 +278,8 @@ $honorcode-color-lvl2: tint($honorcode-color-lvl1, 33%);
 $audit-color-lvl1: $light-gray;
 $audit-color-lvl2: tint($audit-color-lvl1, 33%);
 
+// STATE: credit
+$credit-color-base: rgb(244,195,0); // accessible with black text
 
 // ====================
 
