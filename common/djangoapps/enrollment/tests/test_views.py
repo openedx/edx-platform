@@ -74,6 +74,7 @@ class EnrollmentTestMixin(object):
             extra['HTTP_X_EDX_API_KEY'] = self.API_KEY
 
         url = reverse('courseenrollments')
+
         response = self.client.post(url, json.dumps(data), content_type='application/json', **extra)
         self.assertEqual(response.status_code, expected_status)
 

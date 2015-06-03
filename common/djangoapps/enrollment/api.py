@@ -3,6 +3,7 @@ Enrollment API for creating, updating, and deleting enrollments. Also provides a
 course level, such as available course modes.
 
 """
+
 from django.utils import importlib
 import logging
 from django.core.cache import cache
@@ -84,6 +85,7 @@ def get_enrollments(user_id):
         ]
 
     """
+
     return _data_api().get_course_enrollments(user_id)
 
 
@@ -129,6 +131,7 @@ def get_enrollment(user_id, course_id):
         }
 
     """
+
     return _data_api().get_course_enrollment(user_id, course_id)
 
 
@@ -177,6 +180,7 @@ def add_enrollment(user_id, course_id, mode='honor', is_active=True):
             }
         }
     """
+
     _validate_course_mode(course_id, mode)
     return _data_api().create_course_enrollment(user_id, course_id, mode, is_active)
 
@@ -225,23 +229,36 @@ def update_enrollment(user_id, course_id, mode=None, is_active=None):
         }
 
     """
+
     if mode is not None:
         _validate_course_mode(course_id, mode)
-    enrollment = _data_api().update_course_enrollment(user_id, course_id, mode=mode, is_active=is_active)
+
+    enrollment = _data_api().update_course_enrollment(
+        user_id,
+        course_id,
+        mode=mode,
+        is_active=is_active
+    )
+
     if enrollment is None:
-        msg = u"Course Enrollment not found for user {user} in course {course}".format(user=user_id, course=course_id)
+        msg = \
+            u'Course Enrollment not found for user {user} in course {course}'.format(user=user_id,
+                                                                                     course=course_id)
         log.warn(msg)
         raise errors.EnrollmentNotFoundError(msg)
     return enrollment
 
 
-def get_course_enrollment_details(course_id):
+def get_course_enrollment_details(course_id, include_expired=False):
     """Get the course modes for course. Also get enrollment start and end date, invite only, etc.
 
     Given a course_id, return a serializable dictionary of properties describing course enrollment information.
 
     Args:
         course_id (str): The Course to get enrollment information for.
+
+        include_expired (bool): Boolean denoting whether expired course modes
+        should be included in the returned JSON data.
 
     Returns:
         A serializable dictionary of course enrollment information.
@@ -270,30 +287,42 @@ def get_course_enrollment_details(course_id):
         }
 
     """
-    cache_key = u"enrollment.course.details.{course_id}".format(course_id=course_id)
+
+    cache_key = \
+        u'enrollment.course.details.{course_id}.{include_expired}'.format(
+            course_id=course_id,
+            include_expired=include_expired
+        )
 
     cached_enrollment_data = None
     try:
         cached_enrollment_data = cache.get(cache_key)
     except Exception:
+
         # The cache backend could raise an exception (for example, memcache keys that contain spaces)
-        log.exception(u"Error occurred while retrieving course enrollment details from the cache")
+
+        log.exception(u'Error occurred while retrieving course enrollment details from the cache')
 
     if cached_enrollment_data:
-        log.info(u"Get enrollment data for course %s (cached)", course_id)
+        log.info(u'Get enrollment data for course %s (cached)',
+                 course_id)
         return cached_enrollment_data
 
-    course_enrollment_details = _data_api().get_course_enrollment_info(course_id)
+    course_enrollment_details = \
+        _data_api().get_course_enrollment_info(course_id, include_expired)
 
     try:
-        cache_time_out = getattr(settings, 'ENROLLMENT_COURSE_DETAILS_CACHE_TIMEOUT', 60)
+        cache_time_out = getattr(settings,
+                                 'ENROLLMENT_COURSE_DETAILS_CACHE_TIMEOUT',
+                                 60)
         cache.set(cache_key, course_enrollment_details, cache_time_out)
     except Exception:
         # Catch any unexpected errors during caching.
-        log.exception(u"Error occurred while caching course enrollment details for course %s", course_id)
-        raise errors.CourseEnrollmentError(u"An unexpected error occurred while retrieving course enrollment details.")
 
-    log.info(u"Get enrollment data for course %s", course_id)
+        log.exception(u'Error occurred while caching course enrollment details for course %s', course_id)
+        raise errors.CourseEnrollmentError(u'An unexpected error occurred while retrieving course enrollment details.')
+
+    log.info(u'Get enrollment data for course %s', course_id)
     return course_enrollment_details
 
 
@@ -317,20 +346,20 @@ def _validate_course_mode(course_id, mode):
     Raises:
         CourseModeNotFound: raised if the course mode is not found.
     """
+
     course_enrollment_info = _data_api().get_course_enrollment_info(course_id)
-    course_modes = course_enrollment_info["course_modes"]
+    course_modes = course_enrollment_info['course_modes']
     available_modes = [m['slug'] for m in course_modes]
     if mode not in available_modes:
-        msg = (
-            u"Specified course mode '{mode}' unavailable for course {course_id}.  "
-            u"Available modes were: {available}"
-        ).format(
+        msg = u"Specified course mode '{mode}' unavailable for course {course_id}.  Available modes were: {available}"
+        msg = msg.format(
             mode=mode,
             course_id=course_id,
-            available=", ".join(available_modes)
+            available=', '.join(available_modes)
         )
         log.warn(msg)
-        raise errors.CourseModeNotFoundError(msg, course_enrollment_info)
+        raise errors.CourseModeNotFoundError(msg,
+                                             course_enrollment_info)
 
 
 def _data_api():
@@ -338,10 +367,13 @@ def _data_api():
     This relies on Django settings to find the appropriate data API.
 
     """
+
     # We retrieve the settings in-line here (rather than using the
     # top-level constant), so that @override_settings will work
     # in the test suite.
-    api_path = getattr(settings, "ENROLLMENT_DATA_API", DEFAULT_DATA_API)
+
+    api_path = getattr(settings, 'ENROLLMENT_DATA_API',
+                       DEFAULT_DATA_API)
 
     try:
         return importlib.import_module(api_path)

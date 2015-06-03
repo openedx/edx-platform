@@ -166,7 +166,7 @@ class CourseMode(models.Model):
         return [mode.to_tuple() for mode in found_course_modes]
 
     @classmethod
-    def modes_for_course(cls, course_id, only_selectable=True):
+    def modes_for_course(cls, course_id, include_expired=False, only_selectable=True):
         """
         Returns a list of the non-expired modes for a given course id
 
@@ -176,6 +176,9 @@ class CourseMode(models.Model):
             course_id (CourseKey): Search for course modes for this course.
 
         Keyword Arguments:
+            include_expired (bool): If True, expired course modes will be included
+            in the returned JSON data. If False, these modes will be omitted.
+
             only_selectable (bool): If True, include only modes that are shown
                 to users on the track selection page.  (Currently, "credit" modes
                 aren't available to users until they complete the course, so
@@ -186,9 +189,14 @@ class CourseMode(models.Model):
 
         """
         now = datetime.now(pytz.UTC)
-        found_course_modes = cls.objects.filter(
-            Q(course_id=course_id) & (Q(expiration_datetime__isnull=True) | Q(expiration_datetime__gte=now))
-        )
+
+        found_course_modes = cls.objects.filter(course_id=course_id)
+
+        # Filter out expired course modes if include_expired is not set
+        if not include_expired:
+            found_course_modes = found_course_modes.filter(
+                Q(expiration_datetime__isnull=True) | Q(expiration_datetime__gte=now)
+            )
 
         # Credit course modes are currently not shown on the track selection page;
         # they're available only when students complete a course.  For this reason,
