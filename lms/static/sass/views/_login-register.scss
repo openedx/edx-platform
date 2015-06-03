@@ -375,6 +375,8 @@ $sm-btn-linkedin: #0077b5;
 
         &:hover,
         &:focus {
+            background-image: none;
+
             .icon {
                 height: 32px;
                 line-height: 32px;
