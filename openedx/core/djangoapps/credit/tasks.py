@@ -1,4 +1,6 @@
-""" This file contains celery tasks for credit course views """
+"""
+This file contains celery tasks for credit course views.
+"""
 
 from django.conf import settings
 
@@ -55,20 +57,20 @@ def _get_course_credit_requirements(course):
         List of minimum_grade_credit and ICRV requirements
 
     """
-    icrv_requirements = _get_credit_course_requirement_xblocks(course)
+    credit_xblock_requirements = _get_credit_course_requirement_xblocks(course)
     min_grade_requirement = _get_min_grade_requirement(course)
-    credit_requirements = icrv_requirements + min_grade_requirement
+    credit_requirements = credit_xblock_requirements + min_grade_requirement
     return credit_requirements
 
 
 def _get_min_grade_requirement(course):
-    """Returns the list of minimum_grade_credit requirements for the given course.
+    """Get list of 'minimum_grade_credit' requirement for the given course.
 
     Args:
         course(Course): The course object
 
     Raises:
-        AttributeError if the course has not minimum_grade_credit attribute
+        AttributeError if the course has not 'minimum_grade_credit' attribute
 
     Returns:
         The list of minimum_grade_credit requirements
@@ -80,6 +82,7 @@ def _get_min_grade_requirement(course):
             {
                 "namespace": "grade",
                 "name": "grade",
+                "display_name": "Grade",
                 "criteria": {
                     "min_grade": getattr(course, "minimum_grade_credit")
                 }
@@ -91,7 +94,7 @@ def _get_min_grade_requirement(course):
 
 
 def _get_credit_course_requirement_xblocks(course):  # pylint: disable=invalid-name
-    """Generates a course structure dictionary for the specified course.
+    """Generate a course structure dictionary for the specified course.
 
     Args:
         course(Course): The course object
@@ -109,23 +112,25 @@ def _get_credit_course_requirement_xblocks(course):  # pylint: disable=invalid-n
             block = {
                 "namespace": curr_block.get_credit_requirement_namespace(),
                 "name": curr_block.get_credit_requirement_name(),
+                "display_name": curr_block.get_credit_requirement_display_name(),
                 "criteria": ""
             }
             requirements_blocks.append(block)
 
-        # Add this blocks children to the stack so that we can traverse them as well.
+        # Add the children of current block to the stack so that we can
+        # traverse them as well.
         blocks_stack.extend(children)
     return requirements_blocks
 
 
 def _is_credit_requirement(xblock):
-    """Check if the given xblock is a credit requirement.
+    """Check if the given XBlock is a credit requirement.
 
     Args:
-        xblock(XBlock): The given xblock object
+        xblock(XBlock): The given XBlock object
 
     Returns:
-        True if xblock is a credit requirement else False
+        True if XBlock is a credit requirement else False
 
     """
     is_credit_requirement = False

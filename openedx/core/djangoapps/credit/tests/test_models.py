@@ -1,15 +1,20 @@
-""" Tests for credit course models """
+"""
+Tests for credit course models.
+"""
 
 import ddt
 
 from opaque_keys.edx.keys import CourseKey
+
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditRequirement
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 @ddt.ddt
 class ModelTestCases(ModuleStoreTestCase):
-    """ Tests for credit course models """
+    """
+    Tests for credit course models.
+    """
 
     def setUp(self, **kwargs):
         super(ModelTestCases, self).setUp()
@@ -28,6 +33,7 @@ class ModelTestCases(ModuleStoreTestCase):
         requirement = {
             "namespace": "grade",
             "name": "grade",
+            "display_name": "Grade",
             "criteria": {
                 "min_grade": 0.8
             }
@@ -43,6 +49,7 @@ class ModelTestCases(ModuleStoreTestCase):
         requirement = {
             "namespace": "grade",
             "name": "grade",
+            "display_name": "Grade",
             "criteria": {
                 "min_grade": 0.8
             }
@@ -52,9 +59,10 @@ class ModelTestCases(ModuleStoreTestCase):
         self.assertEqual(created, True)
 
         requirement = {
-            "namespace": "icrv",
-            "name": "midterm",
-            "criteria": ""
+            "namespace": "reverification",
+            "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
+            "display_name": "Assessment 1",
+            "criteria": {}
         }
         credit_req, created = CreditRequirement.add_or_update_course_requirement(credit_course, requirement)
         self.assertEqual(credit_course, credit_req.course)
@@ -62,6 +70,7 @@ class ModelTestCases(ModuleStoreTestCase):
 
         requirements = CreditRequirement.get_course_requirements(self.course_key)
         self.assertEqual(len(requirements), 2)
+
         requirements = CreditRequirement.get_course_requirements(self.course_key, namespace="grade")
         self.assertEqual(len(requirements), 1)
 

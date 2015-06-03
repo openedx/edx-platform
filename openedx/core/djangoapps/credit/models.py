@@ -19,14 +19,16 @@ log = logging.getLogger(__name__)
 
 
 class CreditCourse(models.Model):
-    """Model for tracking a credit course."""
+    """
+    Model for tracking a credit course.
+    """
 
     course_key = CourseKeyField(max_length=255, db_index=True, unique=True)
     enabled = models.BooleanField(default=False)
 
     @classmethod
     def is_credit_course(cls, course_key):
-        """ Check that given course is credit or not
+        """Check that given course is credit or not.
 
         Args:
             course_key(CourseKey): The course identifier
@@ -38,7 +40,7 @@ class CreditCourse(models.Model):
 
     @classmethod
     def get_credit_course(cls, course_key):
-        """ Get the credit course if exists for the given course_key
+        """Get the credit course if exists for the given 'course_key'.
 
         Args:
             course_key(CourseKey): The course identifier
@@ -65,28 +67,36 @@ class CreditProvider(TimeStampedModel):
 class CreditRequirement(TimeStampedModel):
     """This model represents a credit requirement.
 
-    Each requirement is uniquely identified by a `namespace` and a `name`. CreditRequirements
-    also include a `criteria` dictionary, the format of which varies by the type of requirement.
-    The criteria dictionary provides additional information clients may need to determine
-    whether a user has satisfied the requirement.
+    Each requirement is uniquely identified by its 'namespace' and
+    'name' fields.
+    The 'name' field stores the unique name or location (in case of XBlock)
+    for a requirement, which serves as the unique identifier for that
+    requirement.
+    The 'display_name' field stores the display name of the requirement.
+    The 'criteria' field dictionary provides additional information, clients
+    may need to determine whether a user has satisfied the requirement.
     """
 
     course = models.ForeignKey(CreditCourse, related_name="credit_requirements")
     namespace = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
+    display_name = models.CharField(max_length=255)
     criteria = JSONField()
     active = models.BooleanField(default=True)
 
     class Meta(object):
-        """Model metadata"""
+        """
+        Model metadata.
+        """
         unique_together = ('namespace', 'name', 'course')
 
     @classmethod
     def add_or_update_course_requirement(cls, credit_course, requirement):
-        """ Add requirement to a given course
+        """Add requirement to a given course.
+
         Args:
-            credit_course(CreditCourse): The identifier for credit course course
-            requirement(dict): requirement dict to be added
+            credit_course(CreditCourse): The identifier for credit course
+            requirement(dict): Requirement dict to be added
 
         Returns:
             (CreditRequirement, created) tuple
@@ -96,6 +106,7 @@ class CreditRequirement(TimeStampedModel):
             course=credit_course,
             namespace=requirement["namespace"],
             name=requirement["name"],
+            display_name=requirement["display_name"],
             defaults={"criteria": requirement["criteria"], "active": True}
         )
         if not created:
@@ -107,11 +118,11 @@ class CreditRequirement(TimeStampedModel):
 
     @classmethod
     def get_course_requirements(cls, course_key, namespace=None):
-        """ Get credit requirements of a given course
+        """Get credit requirements of a given course.
 
         Args:
             course_key(CourseKey): The identifier for a course
-            namespace(str): namespace of credit course requirements
+            namespace(str): Namespace of credit course requirements
 
         Returns:
             QuerySet of CreditRequirement model
@@ -123,7 +134,7 @@ class CreditRequirement(TimeStampedModel):
 
     @classmethod
     def disable_credit_requirements(cls, requirement_ids):
-        """ Mark the given requirements inactive
+        """Mark the given requirements inactive.
 
         Args:
             requirement_ids(list): List of ids
@@ -176,5 +187,7 @@ class CreditEligibility(TimeStampedModel):
     provider = models.ForeignKey(CreditProvider, related_name="eligibilities")
 
     class Meta(object):
-        """Model metadata"""
+        """
+        Model metadata.
+        """
         unique_together = ('username', 'course')
