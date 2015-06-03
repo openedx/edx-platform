@@ -62,7 +62,6 @@ class LtiConsumer(models.Model):
         if not consumer:
             consumer = LtiConsumer.objects.get(
                 consumer_key=consumer_key,
-                instance_guid=instance_guid if instance_guid else None
             )
 
         # Add the instance_guid field to the model if it's not there already.
