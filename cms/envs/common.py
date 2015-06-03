@@ -156,7 +156,7 @@ FEATURES = {
     'ENABLE_LIBRARY_INDEX': False,
 
     # Enable course reruns, which will always use the split modulestore
-    'ALLOW_COURSE_RERUNS': True,
+    'ALLOW_COURSE_RERUNS': False,
 
     # Social Media Sharing on Student Dashboard
     'DASHBOARD_SHARE_SETTINGS': {
