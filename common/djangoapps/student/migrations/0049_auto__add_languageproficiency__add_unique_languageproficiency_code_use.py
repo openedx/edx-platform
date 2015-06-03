@@ -167,7 +167,7 @@ class Migration(SchemaMigration):
         'student.userprofile': {
             'Meta': {'object_name': 'UserProfile', 'db_table': "'auth_userprofile'"},
             'allow_certificate': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'bio': ('django.db.models.fields.CharField', [], {'db_index': 'False', 'null': 'True', 'blank': 'True'}),
+            'bio': ('django.db.models.fields.CharField', [], {'max_length': '3000', 'db_index': 'False', 'null': 'True', 'blank': 'True'}),
             'city': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'country': ('django_countries.fields.CountryField', [], {'max_length': '2', 'null': 'True', 'blank': 'True'}),
             'courseware': ('django.db.models.fields.CharField', [], {'default': "'course.xml'", 'max_length': '255', 'blank': 'True'}),
