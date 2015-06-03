@@ -136,6 +136,7 @@ class BasketsView(APIView):
             return InternalRequestErrorResponse(ex.message)
 
 
+@csrf_exempt
 @cache_page(1800)
 def checkout_cancel(_request):
     """ Checkout/payment cancellation view. """
