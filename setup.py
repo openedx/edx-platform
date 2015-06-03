@@ -33,6 +33,7 @@ setup(
             "progress = lms.djangoapps.courseware.tabs:ProgressCourseViewType",
             "static_tab = lms.djangoapps.courseware.tabs:StaticCourseViewType",
             "syllabus = lms.djangoapps.courseware.tabs:SyllabusCourseViewType",
+            "teams = lms.djangoapps.teams.plugins:TeamsCourseViewType",
             "textbooks = lms.djangoapps.courseware.tabs:TextbookCourseViews",
             "wiki = lms.djangoapps.course_wiki.tab:WikiCourseViewType",
 
