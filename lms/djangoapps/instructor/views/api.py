@@ -1253,7 +1253,7 @@ def registration_codes_csv(file_name, codes_list, csv_type=None):
     # csv headers
     query_features = [
         'code', 'redeem_code_url', 'course_id', 'company_name', 'created_by',
-        'redeemed_by', 'invoice_id', 'purchaser', 'customer_reference_number', 'internal_reference'
+        'redeemed_by', 'invoice_id', 'purchaser', 'customer_reference_number', 'internal_reference', 'is_valid'
     ]
 
     registration_codes = instructor_analytics.basic.course_registration_features(query_features, codes_list, csv_type)

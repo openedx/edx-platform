@@ -1624,7 +1624,8 @@ input[name="subject"] {
       width: 930px;
     }
   // coupon edit and add modals
-  #add-coupon-modal, #edit-coupon-modal, #set-course-mode-price-modal, #registration_code_generation_modal{
+  #add-coupon-modal, #invalidate_registration_code_modal, #edit-coupon-modal,
+  #set-course-mode-price-modal, #registration_code_generation_modal{
     .inner-wrapper {
       background: $white;
     }
@@ -1639,7 +1640,7 @@ input[name="subject"] {
     @include margin-left(-325px);
     border-radius: 2px;
     input[type="button"]#update_coupon_button, input[type="button"]#add_coupon_button,
-    input[type="button"]#set_course_button {
+    input[type="button"]#set_course_button, input[type="button"]#lookup_regcode {
       @include button(simple, $blue);
       @extend .button-reset;
       display: block;
@@ -1687,6 +1688,25 @@ input[name="subject"] {
       }
       li:last-child{
         margin-bottom: 0px !important;
+      }
+    }
+    table.tb_registration_code_status{
+      margin-top: $baseline;
+      color: #555;
+      thead {
+        font-size: 14px;
+        tr th:last-child {
+          text-align: center;
+        }
+      }
+      tbody {
+        font-size: 14px;
+        tr td:last-child {
+          text-align: center;
+          a:first-child{
+            margin-right: 10px;
+          }
+        }
       }
     }
     form#generate_codes ol.list-input{
@@ -1763,7 +1783,7 @@ input[name="subject"] {
           height: 40px;
           border-radius: 3px;
         }
-    #coupon-content, #course-content, #registration-content {
+    #coupon-content, #course-content, #registration-content, #regcode-content {
       padding: $baseline;
       header {
         margin: 0;

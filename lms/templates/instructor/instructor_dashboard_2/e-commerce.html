@@ -8,16 +8,20 @@ import pytz
 <%include file="edit_coupon_modal.html" args="section_data=section_data" />
 <%include file="set_course_mode_price_modal.html" args="section_data=section_data" />
 <%include file="generate_registarion_codes_modal.html" args="section_data=section_data" />
+<%include file="invalidate_registration_code_modal.html" args="section_data=section_data" />
 <div class="ecommerce-wrapper">
    <h3 class="error-msgs" id="error-msg"></h3>
    <div id = "accordion">
       <div class="wrap">
-         <h2>${_('Registration Codes')}</h2>
+         <h2>${_('Enrollment Codes')}</h2>
          <div>
             %if section_data['sales_admin']:
             <span class="code_tip">
                 <p>${_('Create one or more pre-paid course enrollment codes. Students can use these codes to enroll in the course.')}</p>
                 <a id="registration_code_generation_link" href="#reg_code_generation_modal" class="add blue-button">${_('Create Enrollment Codes')}</a>
+                <p></p>
+                <p>${_('Cancel, restore, or mark an enrollment code as unused.')}</p>
+                <a id="query_registration_code_link" href="#invalidate_registration_code_modal" rel="leanModal" class="add blue-button">${_('Change Enrollment Code Status')}</a>
             </span>
             %endif
             <p>${_('Download a .csv file of all enrollment codes for this course')}</p>
@@ -466,6 +470,9 @@ import pytz
      $('#course_price_link').click(function () {
        reset_input_fields();
      });
+     $('#query_registration_code_link').click(function () {
+       reset_input_fields();
+     });
      $('#add_coupon_link').click(function () {
        reset_input_fields();
      });
@@ -581,6 +588,8 @@ import pytz
        $("#edit-coupon-modal").attr("aria-hidden", "true");
        $(".edit-right").focus();
        $("#set-course-mode-price-modal").attr("aria-hidden", "true");
+       $("#invalidate_registration_code_modal").attr("aria-hidden", "true");
+
        $("#registration_code_generation_modal").attr("aria-hidden", "true");
        $("#add_coupon_button").removeAttr('disabled');
        $("#set_course_button").removeAttr('disabled');
@@ -604,10 +613,11 @@ import pytz
      $("#edit-coupon-modal .close-modal").click(onModalClose);
      $('#registration_code_generation_modal .close-modal').click(onModalClose);
      $("#set-course-mode-price-modal .close-modal").click(reset_input_fields);
+     $("#invalidate_registration_code_modal .close-modal").click(reset_input_fields);
 
 
      // Hitting the ESC key will exit the modal
-     $("#add-coupon-modal, #edit-coupon-modal, #set-course-mode-price-modal, #registration_code_generation_modal").on("keydown", function (e) {
+     $("#add-coupon-modal, #edit-coupon-modal, #set-course-mode-price-modal, #invalidate_registration_code_modal, #registration_code_generation_modal").on("keydown", function (e) {
        var keyCode = e.keyCode || e.which;
        // 27 is the ESC key
        if (keyCode === 27) {
@@ -615,14 +625,20 @@ import pytz
          $("#add-coupon-modal .close-modal").click();
          $("#set-course-mode-price-modal .close-modal").click();
          $("#edit-coupon-modal .close-modal").click();
+         $("#invalidate_registration_code_modal .close-modal").click();
+
          $('#registration_code_generation_modal .close-modal').click();
        }
      });
    });
    var reset_input_fields = function () {
      $('#error-msg').val('');
-     $('#error-msg').hide()
+     $('#error-msg').hide();
      $('#add_coupon_form #coupon_form_error').attr('style', 'display: none');
+     $("form#set_regcode_status_form").next().remove();
+     $('#set_regcode_status_form #regcode_status_form_error').attr('style', 'display: none');
+     $('#set_regcode_status_form #regcode_status_form_success').attr('style', 'display: none');
+     $('#set_regcode_status_form input#lookup_regcode').removeAttr('disabled');
      $('#set_price_form #course_form_error').attr('style', 'display: none');
      $('#generate_codes #registration_code_form_error').attr('style', 'display: none');
      $('#add_coupon_form #coupon_form_error').text();
@@ -631,6 +647,7 @@ import pytz
      $('input#coupon_discount').val('');
      $('textarea#coupon_description').val('');
      $('input[name="company_name"]').val('');
+     $('input[name="regcode_code"]').val('');
      $('input[name="total_registration_codes"]').val('');
      $('input[name="address_line_1"]').val('');
      $('input[name="address_line_2"]').val('');
