@@ -102,6 +102,26 @@ class TestFooter(TestCase):
         # Copyright
         self.assertIn("copyright", json_data)
 
+    def test_absolute_urls_with_cdn(self):
+        self._set_feature_flag(True)
+
+        # Ordinarily, we'd use `override_settings()` to override STATIC_URL,
+        # which is what the staticfiles storage backend is using to construct the URL.
+        # Unfortunately, other parts of the system are caching this value on module
+        # load, which can cause other tests to fail.  To ensure that this change
+        # doesn't affect other tests, we patch the `url()` method directly instead.
+        cdn_url = "http://cdn.example.com/static/image.png"
+        with mock.patch('branding.api.staticfiles_storage.url', return_value=cdn_url):
+            resp = self._get_footer()
+
+        self.assertEqual(resp.status_code, 200)
+        json_data = json.loads(resp.content)
+
+        self.assertEqual(json_data["logo_image"], cdn_url)
+
+        for link in json_data["mobile_links"]:
+            self.assertEqual(link["url"], cdn_url)
+
     @ddt.data(
         ("en", "registered trademarks"),
         ("eo", u"régïstéréd trädémärks"),  # Dummy language string
