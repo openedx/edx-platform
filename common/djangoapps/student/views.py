@@ -57,7 +57,7 @@ from student.models import (
     DashboardConfiguration, LinkedInAddToProfileConfiguration, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED)
 from student.forms import AccountCreationForm, PasswordResetFormNoActive
 
-from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow
+from verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
 from certificates.models import CertificateStatuses, certificate_status_for_student
 from certificates.api import get_certificate_url, get_active_web_certificate  # pylint: disable=import-error
 from dark_lang.models import DarkLangConfig
