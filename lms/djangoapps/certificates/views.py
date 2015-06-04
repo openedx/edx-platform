@@ -553,8 +553,9 @@ def render_html_view(request, user_id, course_id):
 
     # Get the active certificate configuration for this course
     # If we do not have an active certificate, we'll need to send the user to the "Invalid" screen
+    # Passing in the 'preview' parameter, if specified, will return a configuration, if defined
     active_configuration = get_active_web_certificate(course, request.GET.get('preview'))
-    if active_configuration is None and request.GET.get('preview') is None:
+    if active_configuration is None:
         return render_to_response(invalid_template_path, context)
     else:
         context['certificate_data'] = active_configuration
@@ -566,9 +567,6 @@ def render_html_view(request, user_id, course_id):
     _update_certificate_context(context, course, user, user_certificate)
 
     # Append/Override the existing view context values with any course-specific static values from Advanced Settings
-    context.update(course.cert_html_view_overrides)
-
-    # Override further with any course-specific static values
     context.update(course.cert_html_view_overrides)
 
     # FINALLY, generate and send the output the client

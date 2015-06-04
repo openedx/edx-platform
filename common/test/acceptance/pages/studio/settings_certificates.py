@@ -299,9 +299,11 @@ class Certificate(object):
         Delete the certificate
         """
         self.wait_for_certificate_delete_button()
+
         self.find_css('.actions .delete').first.click()
         self.page.wait_for_confirmation_prompt()
-        self.find_css('.action-primary').first.click()
+        self.page.q(css='a.button.action-primary').first.click()
+        self.page.q(css='a.button.action-primary').first.click()
         self.page.wait_for_ajax()
 
 
