@@ -91,6 +91,7 @@ fixture_paths:
     - templates/student_profile
     - templates/verify_student
     - templates/file-upload.underscore
+    - templates/components/header
     - js/fixtures/edxnotes
     - js/fixtures/search
     - templates/search

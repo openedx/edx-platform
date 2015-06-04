@@ -6,7 +6,7 @@ define(["jquery", "teams/js/teams_tab_factory"],
             var teamsTab;
 
             beforeEach(function() {
-                setFixtures("<div class='team-tab-content'></div>");
+                setFixtures('<section class="teams-content"></section>');
                 teamsTab = new TeamsTabFactory();
             });
 
@@ -14,6 +14,9 @@ define(["jquery", "teams/js/teams_tab_factory"],
                 expect($("body").text()).toContain("This is the new Teams tab");
             });
 
+            it("displays a header", function() {
+                expect($("body").html()).toContain("Course teams are organized");
+            });
         });
     }
 );

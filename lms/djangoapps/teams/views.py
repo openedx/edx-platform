@@ -1,6 +1,7 @@
 """HTTP endpoints for the Teams API."""
 
 from django.shortcuts import render_to_response
+from opaque_keys.edx.keys import CourseKey
 from courseware.courses import get_course_with_access, has_access
 from django.http import Http404
 from django.conf import settings
