@@ -7,7 +7,7 @@ if certificate_data and certificate_data.get('course_title', ''):
 course_mode_class = course_mode if course_mode else ''
 %>
 
-<article class="accomplishment accomplishment-main">
+<main class="accomplishment accomplishment-main">
 
     <div class="wrapper-accomplishment-rendering">
         <div class="accomplishment-rendering">
@@ -42,7 +42,7 @@ course_mode_class = course_mode if course_mode else ''
 
                 % if mode != 'base':
                 <div class="accomplishment-signatories">
-                    <h3 class="accomplishment-signatories-title hd-6 sr-only">${_("Noted by")}</h3>
+                    <h3 class="accomplishment-signatories-title sr-only">${_("Noted by")}</h3>
 
                     <div class="wrapper-signatories">
                         <div class="list-signatories">
@@ -66,7 +66,7 @@ course_mode_class = course_mode if course_mode else ''
             </div>
 
             <div class="accomplishment-orgs">
-                <h3 class="accomplishment-orgs-title hd-6 sr-only">${_("Supported by the following organizations")}</h3>
+                <h3 class="accomplishment-orgs-title sr-only">${_("Supported by the following organizations")}</h3>
 
                 <ul class="wrapper-orgs list-orgs">
                     <li class="wrapper-organization">
@@ -116,4 +116,4 @@ course_mode_class = course_mode if course_mode else ''
         </div>
     </div>
 
-</article>
+</main>
