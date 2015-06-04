@@ -1,0 +1,39 @@
+<%namespace name='static' file='/static_content.html'/>
+<html>
+<head>
+    <title>Fake Page to Update the minimum grade course requirement status</title>
+    <style>
+        .margin{
+            padding-top: 10px;
+        }
+        .error{
+            color: red;
+        }
+        .success{
+            color: green;
+        }
+    </style>
+</head>
+<body>
+<p>Fake Credit Eligibility
+<div>
+% if error:
+    <div class="margin error">${ error }</div>
+% endif
+%if status:
+    <div class="margin success">Status added.</div>
+% endif
+
+<form class="margin" method="post">
+    Course ID:&nbsp;<input type="text" id="txt_coursekey" name="txt_coursekey">
+
+    <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+    <div class="margin">
+      <button class="action action-primary" type="submit">Save</button>
+    </div>
+</form>
+</div>
+
+
+</body>
+</html>
