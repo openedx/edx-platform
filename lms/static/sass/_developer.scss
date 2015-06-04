@@ -69,3 +69,10 @@
     @include margin-left( ($baseline/2) );
   }
 }
+
+// teams temporary
+.view-teams {
+  .global-new, #global-navigation {
+    display: none;
+  }
+}
