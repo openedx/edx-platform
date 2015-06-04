@@ -4,7 +4,7 @@
 @import 'neat/neat'; // lib - Neat
 
 
-$edx-footer-link-color: rgb(0, 158, 231);
+$edx-footer-link-color: $link-color;
 $edx-footer-bg-color: rgb(252,252,252);
 
 
@@ -16,6 +16,7 @@ $edx-footer-bg-color: rgb(252,252,252);
 footer#footer-edx-v3 {
   background: $edx-footer-bg-color;
   padding: 20px;
+  border-top: 1px solid $courseware-button-border-color;
 
   .footer-content-wrapper {
     @include outer-container;
@@ -90,7 +91,7 @@ footer#footer-edx-v3 {
 
   a.sm-link {
     @include float(left);
-    @include margin(0, 0, 10px, 7px);
+    @include margin(0, 0, 10px, 10px);
     @include font-size(28);
     @include line-height(28);
     width: 35px;
@@ -99,7 +100,7 @@ footer#footer-edx-v3 {
     position: relative;
     display: inline;
     background: none;
-    text-align: center;
+    text-align: left;
 
     &:first-of-type {
       @include margin-left(0);
