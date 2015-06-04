@@ -157,9 +157,8 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         module = render.get_module(
             self.mock_user,
             mock_request,
-            self.location,
+            self.course_key.make_usage_key('chapter', 'Overview'),
             field_data_cache,
-            self.toy_course.id,
         )
         self.assertTrue(module.xmodule_runtime.send_users_emailaddr_with_coderesponse)
         self.assertEqual(module.xmodule_runtime.deanonymized_user_email, self.mock_user.email)
@@ -179,9 +178,8 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         module = render.get_module(
             self.mock_user,
             mock_request,
-            self.location,
+            self.course_key.make_usage_key('chapter', 'Overview'),
             field_data_cache,
-            self.toy_course.id,
         )
         self.assertFalse(hasattr(module.xmodule_runtime, 'send_users_emailaddr_with_coderesponse'))
         self.assertFalse(hasattr(module.xmodule_runtime, 'deanonymized_user_email'))
