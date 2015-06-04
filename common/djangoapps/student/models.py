@@ -32,6 +32,7 @@ from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models, IntegrityError
 from django.db.models import Count
 from django.db.models.signals import pre_save, post_save
+from django.forms.models import model_to_dict
 from django.dispatch import receiver, Signal
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_noop
@@ -337,6 +338,23 @@ class UserProfile(models.Model):
         if date is None:
             date = datetime.now(UTC)
         return date.year - year_of_birth <= age_limit    # pylint: disable=maybe-no-member
+
+
+def get_profile_dict_for_user(user_id):
+    """
+    Returns a dict of the user profile. This is useful for cases where we have to provide
+    profile services to other code bases as part of a Dependency Injection approach
+    """
+
+    profile = {}
+
+    # this should always exist, but just in case...
+    if UserProfile.objects.filter(id=user_id).exists():
+        profile_obj = UserProfile.objects.get(id=user_id)
+
+        profile = model_to_dict(profile_obj)
+
+    return profile
 
 
 @receiver(pre_save, sender=UserProfile)
