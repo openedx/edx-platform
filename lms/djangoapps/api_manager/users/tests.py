@@ -405,6 +405,40 @@ class UsersApiTests(ModuleStoreTestCase):
         self.assertEqual(response.data['is_active'], False)
         self.assertIsNotNone(response.data['created'])
 
+    def test_user_detail_invalid_email(self):
+        test_uri = '{}/{}'.format(self.users_base_uri, self.user.id)
+        data = {
+            'email': 'fail'
+        }
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('Invalid email address', response.content)
+
+    def test_user_detail_duplicate_email(self):
+        user2 = UserFactory()
+        test_uri = '{}/{}'.format(self.users_base_uri, self.user.id)
+        test_uri2 = '{}/{}'.format(self.users_base_uri, user2.id)
+        data = {
+            'email': self.test_email
+        }
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 200)
+        response = self.do_post(test_uri2, data)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('A user with that email address already exists.', response.content)
+
+    def test_user_detail_email_updated(self):
+        test_uri = '{}/{}'.format(self.users_base_uri, self.user.id)
+        new_email = 'test@example.com'
+        data = {
+            'email': new_email
+        }
+        self.assertNotEqual(self.user.email, new_email)
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 200)
+        self.user = User.objects.get(id=self.user.id)
+        self.assertEqual(self.user.email, new_email)
+
     def test_user_detail_post_duplicate_username(self):
         """
         Create two users, then pass the same first username in request in order to update username of second user.
@@ -1413,6 +1447,8 @@ class UsersApiTests(ModuleStoreTestCase):
             response.data['level_of_education'], data["level_of_education"])
         self.assertEqual(
             str(response.data['year_of_birth']), data["year_of_birth"])
+        # This one's technically on the user model itself, but can be updated.
+        self.assertEqual(response.data['email'], data['email'])
 
     def test_user_organizations_list(self):
         user_id = self.user.id
