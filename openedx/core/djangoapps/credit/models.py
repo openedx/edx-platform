@@ -18,11 +18,25 @@ from xmodule_django.models import CourseKeyField
 log = logging.getLogger(__name__)
 
 
+class CreditProvider(TimeStampedModel):
+    """This model represents an institution that can grant credit for a course.
+
+    Each provider is identified by unique ID (e.g., 'ASU').
+    """
+
+    provider_id = models.CharField(max_length=255, db_index=True, unique=True)
+    display_name = models.CharField(max_length=255)
+
+
 class CreditCourse(models.Model):
     """Model for tracking a credit course."""
 
     course_key = CourseKeyField(max_length=255, db_index=True, unique=True)
     enabled = models.BooleanField(default=False)
+    providers = models.ManyToManyField(CreditProvider)
+
+    def get_providers(self):
+        return self.providers.all()
 
     @classmethod
     def is_credit_course(cls, course_key):
@@ -173,8 +187,11 @@ class CreditEligibility(TimeStampedModel):
 
     username = models.CharField(max_length=255, db_index=True)
     course = models.ForeignKey(CreditCourse, related_name="eligibilities")
-    provider = models.ForeignKey(CreditProvider, related_name="eligibilities")
 
     class Meta(object):
         """Model metadata"""
         unique_together = ('username', 'course')
+
+    @classmethod
+    def get_user_eligibility(cls, username):
+        return cls.objects.filter(username=username)

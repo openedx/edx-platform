@@ -1,7 +1,7 @@
 """ Contains the APIs for course credit requirements """
 
 from .exceptions import InvalidCreditRequirements
-from .models import CreditCourse, CreditRequirement
+from .models import CreditCourse, CreditRequirement, CreditEligibility
 from openedx.core.djangoapps.credit.exceptions import InvalidCreditCourse
 
 
@@ -163,3 +163,22 @@ def _validate_requirements(requirements):
                 )
             )
     return invalid_requirements
+
+
+def get_credit_eligibility(username):
+    eligibilities = CreditEligibility.get_user_eligibility(username)
+    user_eligibilities = {}
+    for eligibility in eligibilities:
+        user_eligibilities[unicode(eligibility.course.course_key)] = {
+            "is_eligible": True,
+            "created_at": eligibility.created,
+            "providers": [
+                {
+                    "id": provider.provider_id,
+                    "display_name": provider.display_name
+                }
+                for provider in eligibility.course.get_providers()
+            ]
+        }
+
+    return user_eligibilities
