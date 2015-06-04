@@ -635,6 +635,14 @@ def _create_or_rerun_course(request):
         if display_name is not None:
             fields['display_name'] = display_name
 
+        # Set a unique wiki_slug for newly created courses. To maintain active wiki_slugs for
+        # existing xml courses this cannot be changed in CourseDescriptor.
+        # # TODO get rid of defining wiki slug in this org/course/run specific way and reconcile
+        # w/ xmodule.course_module.CourseDescriptor.__init__
+        wiki_slug = u"{0}.{1}.{2}".format(org, course, run)
+        definition_data = {'wiki_slug': wiki_slug}
+        fields.update(definition_data)
+
         if 'source_course_key' in request.json:
             return _rerun_course(request, org, course, run, fields)
         else:
@@ -679,13 +687,6 @@ def create_new_course_in_store(store, user, org, number, run, fields):
     Create course in store w/ handling instructor enrollment, permissions, and defaulting the wiki slug.
     Separated out b/c command line course creation uses this as well as the web interface.
     """
-    # Set a unique wiki_slug for newly created courses. To maintain active wiki_slugs for
-    # existing xml courses this cannot be changed in CourseDescriptor.
-    # # TODO get rid of defining wiki slug in this org/course/run specific way and reconcile
-    # w/ xmodule.course_module.CourseDescriptor.__init__
-    wiki_slug = u"{0}.{1}.{2}".format(org, number, run)
-    definition_data = {'wiki_slug': wiki_slug}
-    fields.update(definition_data)
 
     # Set default language from settings
     fields.update({'language': getattr(settings, 'DEFAULT_COURSE_LANGUAGE', 'en')})
