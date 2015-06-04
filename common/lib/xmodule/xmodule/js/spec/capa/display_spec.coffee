@@ -323,7 +323,7 @@ describe 'Problem', ->
   <div><p></p><span><section id="choicetextinput_1_2_1" class="choicetextinput">
 
 <form class="choicetextgroup capa_inputtype" id="inputtype_1_2_1">
-  <div class="indicator_container">
+  <div class="indicator-container">
     <span class="unanswered" style="display:inline-block;" id="status_1_2_1"></span>
   </div>
   <fieldset>

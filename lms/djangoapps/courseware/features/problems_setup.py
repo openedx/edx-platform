@@ -84,7 +84,7 @@ PROBLEM_DICT = {
             'answer': 'correct string'},
         'correct': ['div.correct'],
         'incorrect': ['div.incorrect'],
-        'unanswered': ['div.unanswered']},
+        'unanswered': ['div.unanswered', 'div.unsubmitted']},
 
     'numerical': {
         'factory': NumericalResponseXMLFactory(),
@@ -95,7 +95,7 @@ PROBLEM_DICT = {
             'math_display': True},
         'correct': ['div.correct'],
         'incorrect': ['div.incorrect'],
-        'unanswered': ['div.unanswered']},
+        'unanswered': ['div.unanswered', 'div.unsubmitted']},
 
     'formula': {
         'factory': FormulaResponseXMLFactory(),
@@ -108,7 +108,7 @@ PROBLEM_DICT = {
             'answer': 'x^2+2*x+y'},
         'correct': ['div.correct'],
         'incorrect': ['div.incorrect'],
-        'unanswered': ['div.unanswered']},
+        'unanswered': ['div.unanswered', 'div.unsubmitted']},
 
     'script': {
         'factory': CustomResponseXMLFactory(),
@@ -129,7 +129,7 @@ PROBLEM_DICT = {
             """)},
         'correct': ['div.correct'],
         'incorrect': ['div.incorrect'],
-        'unanswered': ['div.unanswered']},
+        'unanswered': ['div.unanswered', 'div.unsubmitted']},
 
     'code': {
         'factory': CodeResponseXMLFactory(),

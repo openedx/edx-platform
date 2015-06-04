@@ -30,7 +30,7 @@
       <span class="status" 
          %if status != 'unsubmitted':
          %endif
-         aria-describedby="input_${id}" data-tooltip="This is ${status.display_name}.">
+         aria-describedby="input_${id}" data-tooltip="${status.display_tooltip}">
         <span class="sr">
           %if value:
             ${value|h}

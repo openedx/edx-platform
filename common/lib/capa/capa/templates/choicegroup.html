@@ -39,11 +39,9 @@
         % endfor
         <span id="answer_${id}"></span>
     </fieldset>
-    <div class="indicator_container">
+    <div class="indicator-container">
         % if input_type == 'checkbox' or not value:
-            <span class="status ${status.classname if show_correctness != 'never' else 'unanswered'}"
-                id="status_${id}"
-                aria-describedby="inputtype_${id}" data-tooltip="This is ${status.display_name}.">
+            <span class="status ${status.classname if show_correctness != 'never' else 'unanswered'}" id="status_${id}" aria-describedby="inputtype_${id}" data-tooltip="${status.display_tooltip}">
                 <span class="sr">
                     %for choice_id, choice_description in choices:
                         % if choice_id in value:

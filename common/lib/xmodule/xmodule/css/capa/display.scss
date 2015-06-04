@@ -114,6 +114,7 @@ iframe[seamless]{
 
 div.problem-progress {
   @include padding-left($baseline/4);
+  @extend %t-ultralight;
   display: inline-block;
   color: $gray-d1;
   font-weight: 100;
@@ -151,11 +152,11 @@ div.problem {
       @include box-sizing(border-box);
       display: inline-block;
       clear: both;
-      width: 100%;
+      margin-bottom: ($baseline/2);
       border: 2px solid $gray-l4;
       border-radius: 3px;
-      margin-bottom: ($baseline/2);
       padding: ($baseline/2);
+      width: 100%;
 
       &.choicegroup_correct {
         @include status-icon($correct, "\f00c");
@@ -182,7 +183,7 @@ div.problem {
       }
     }
 
-    .indicator_container {
+    .indicator-container {
       display: inline-block;
       min-height: 1px;
       width: 25px;
@@ -209,11 +210,11 @@ div.problem {
 // Summary status indicators shown after the input area 
 div.problem { 
 
-  .indicator_container {
+  .indicator-container {
 
     .status {
-      width: 20px;
-      height: 20px;
+      width: $baseline;
+      height: $baseline;
 
       // CASE: correct answer
       &.correct {
@@ -232,8 +233,6 @@ div.problem {
 
       // CASE: processing
       &.processing {
-        // add once spinner is rotated through animations
-        //@include status-icon($gray-d1, "\f110", 0);
       }
     }
   }
@@ -287,7 +286,7 @@ div.problem {
     }
   }
 
-  // known classes using this div: .indicator_container, moved to section above
+  // known classes using this div: .indicator-container, moved to section above
   div {
 
     // TO-DO: Styling used by advanced capa problem types. Should be synced up to use .status class
@@ -297,7 +296,7 @@ div.problem {
       }
 
       &.status {
-        @include margin(8px, 0, 0, $baseline/2);
+        @include margin(8px, 0, 0, ($baseline/2));
         text-indent: 100%;
         white-space: nowrap;
         overflow: hidden;
@@ -329,7 +328,7 @@ div.problem {
       }
 
       input {
-        border-color: green;
+        border-color: $correct;
       }
     }
 
@@ -355,7 +354,7 @@ div.problem {
       }
 
       input {
-        border-color: red;
+        border-color: $incorrect;
       }
     }
 
@@ -369,7 +368,7 @@ div.problem {
       }
 
       input {
-        border-color: red;
+        border-color: $incorrect;
       }
     }
 
@@ -384,9 +383,9 @@ div.problem {
       margin-bottom: 0;
 
       &:before {
+        @extend %t-strong;
         display: inline;
         content: "Answer: ";
-        font-weight: bold;
 
       }
       &:empty {
@@ -596,7 +595,8 @@ div.problem {
   }
 
   dl dt {
-    font-weight: bold;
+    @extend %t-strong;
+
   }
 
   dl dd {
@@ -642,8 +642,8 @@ div.problem {
     }
 
     th {
+      @extend %t-strong;
       text-align: left;
-      font-weight: bold;
     }
 
     td {
@@ -706,16 +706,16 @@ div.problem {
       @include box-sizing(border-box);
       border: 2px solid $gray-l4;
       border-radius: 3px;
-      height: 46px;
       min-width: 160px;
+      height: 46px;
     }
 
     > .incorrect, .correct, .unanswered {
 
       .status {
         display: inline-block;
-        background: none;
         margin-top: ($baseline/2);
+        background: none;
       }
     }
 
@@ -769,7 +769,7 @@ div.problem {
       @include margin-right($baseline/2);
     }
 
-    .indicator_container {
+    .indicator-container {
       display: inline-block;
 
       .status.correct:after, .status.incorrect:after {
@@ -844,8 +844,8 @@ div.problem .action {
     margin-bottom: ($baseline/2);
     height: ($baseline*2);
     vertical-align: middle;
-    font-weight: 600;
     text-transform: uppercase;
+    font-weight: 600;
   }
 
   .save {
@@ -866,9 +866,9 @@ div.problem .action {
     // border-radius: 3px;
     // padding: 8px 12px;
     // margin-top: ($baseline/2);
+    @include margin-left($baseline/2);
     display: inline-block;
     margin-top: 8px;
-    @include margin-left($baseline/2);
     color: $gray-d1;
     font-style: italic;
     -webkit-font-smoothing: antialiased;
@@ -909,9 +909,9 @@ div.problem {
   
   .detailed-solution {
     > p:first-child {
+      @extend %t-strong;
       color: #aaa;
       text-transform: uppercase;
-      font-weight: bold;
       font-style: normal;
       font-size: 0.9em;
     }
@@ -923,9 +923,9 @@ div.problem {
 
   .detailed-targeted-feedback {
     > p:first-child {
-      color: red;
+       @extend %t-strong;
+      color: $incorrect;
       text-transform: uppercase;
-      font-weight: bold;
       font-style: normal;
       font-size: 0.9em;
     }
@@ -937,9 +937,9 @@ div.problem {
 
   .detailed-targeted-feedback-correct {
     > p:first-child {
-      color: green;
+       @extend %t-strong;
+      color: $correct;
       text-transform: uppercase;
-      font-weight: bold;
       font-style: normal;
       font-size: 0.9em;
     }
@@ -980,11 +980,11 @@ div.problem {
     border: 1px solid $gray-l3;
 
     h3 {
+      @extend %t-strong;
       padding: 9px;
       border-bottom: 1px solid #e3e3e3;
       background: #eee;
       text-shadow: 0 1px 0 $white;
-      font-weight: bold;
       font-size: em(16);
     }
 
@@ -1021,9 +1021,9 @@ div.problem {
       margin-bottom: 12px;
 
       h3 {
+        @extend %t-strong;
         color: #aaa;
         text-transform: uppercase;
-        font-weight: bold;
         font-style: normal;
         font-size: 0.9em;
       }
@@ -1080,7 +1080,7 @@ div.problem {
       }
 
       .shortform {
-        font-weight: bold;
+        @extend %t-strong;
       }
 
       .longform {
@@ -1223,9 +1223,9 @@ div.problem {
     border-radius: 1em;
 
     .annotation-header {
+      @extend %t-strong;
       padding: .5em 1em;
       border-bottom: 1px solid $gray-l3;
-      font-weight: bold;
     }
 
     .annotation-body { padding: .5em 1em; }
@@ -1306,10 +1306,10 @@ div.problem {
       pre { background-color: $gray-l3; color: $black; }
 
       &:before {
+        @extend %t-strong;
         display: block;
         content: "debug input value";
         text-transform: uppercase;
-        font-weight: bold;
         font-size: 1.5em;
       }
     }
@@ -1330,7 +1330,7 @@ div.problem {
       @extend label.choicegroup_correct;
 
       input[type="text"] {
-        border-color: green;
+        border-color: $correct;
       }
     }
 

@@ -432,8 +432,8 @@
 // * +Icon - Font-Awesome  - Extend
 // ==================== 
 %use-font-awesome {
+  display: inline-block;
   font-family: FontAwesome;
   -webkit-font-smoothing: antialiased;
-  display: inline-block;
   speak: none;
 }
