@@ -57,9 +57,6 @@ from django.conf import settings
     % if save_button:
     <button class="save" data-value="${_('Save')}">${_('Save')}<span class="sr"> ${_("your answer")}</span></button>
     % endif
-    % if check_button:
-    <input class="check ${ check_button }" type="button" data-checking="${ check_button_checking }" value="${ check_button }" />
-    % endif
     % if exceeded_time_limit:
     <p class="exceeded-time-limit-message">
       ${_("Deadline has passed, you can no longer submit.")}
