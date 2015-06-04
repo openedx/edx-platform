@@ -20,14 +20,14 @@ from pytz import UTC
 
 from courseware.courses import get_course_by_id
 from courseware.tests.factories import StudentModuleFactory
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE, TEST_DATA_XML_MODULESTORE
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, xml_store_config
 
 from instructor_task.tasks_helper import (
+    cohort_students_and_upload,
     upload_grades_csv,
     upload_students_csv,
     push_student_responses_to_s3,
@@ -42,8 +42,6 @@ TEST_COURSE_ORG = 'edx'
 TEST_COURSE_NAME = 'test_course'
 TEST_COURSE_NUMBER = '1.23x'
 from instructor_task.models import ReportStore
-from xmodule.modulestore.tests.factories import CourseFactory
-from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from xmodule.partitions.partitions import Group, UserPartition
 
@@ -52,10 +50,11 @@ from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from instructor_task.models import ReportStore
-from instructor_task.tasks_helper import cohort_students_and_upload, upload_grades_csv, upload_students_csv
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin
 from django.conf import settings
-from django.test.utils import override_settings
+
+TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
+TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR, source_dirs=['unicode_graded'])
 
 
 @ddt.ddt

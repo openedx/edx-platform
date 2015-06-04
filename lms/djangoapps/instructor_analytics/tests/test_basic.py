@@ -2,13 +2,11 @@
 Tests for instructor.basic
 """
 
-from django.test.utils import override_settings
-
 from courseware.courses import get_course
 from courseware.tests.factories import StudentModuleFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_GRADED_MODULESTORE
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import Location
 
 import json
 from student.models import CourseEnrollment
@@ -373,13 +371,9 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
             )
 
 
-class TestStudentSubmissionsAnalyticsBasic(ModuleStoreTestCase):
+class TestStudentResponsesAnalyticsBasic(ModuleStoreTestCase):
     """ Test basic student responses analytics function. """
-    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
-
-    def load_course(self, course_id):
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-        self.course = get_course(course_key)
+    MODULESTORE = TEST_DATA_MIXED_GRADED_MODULESTORE
 
     def create_student(self):
         self.student = UserFactory()
@@ -393,13 +387,13 @@ class TestStudentSubmissionsAnalyticsBasic(ModuleStoreTestCase):
         self.assertEqual(datarows, [])
 
     def test_full_course_no_students(self):
-        self.load_course('edX/simple/2012_Fall')
+        self.course = get_course(CourseKey.from_string('edX/graded/2012_Fall'))
 
         datarows = list(student_responses(self.course))
         self.assertEqual(datarows, [])
 
     def test_invalid_module_state(self):
-        self.load_course('edX/graded/2012_Fall')
+        self.course = get_course(CourseKey.from_string('edX/graded/2012_Fall'))
         self.problem_location = Location("edX", "graded", "2012_Fall", "problem", "H1P2")
 
         self.create_student()
