@@ -125,7 +125,7 @@ def coffeescript_files():
     """
     return find command for paths containing coffee files
     """
-    dirs = " ".join([Env.REPO_ROOT / coffee_dir for coffee_dir in COFFEE_DIRS])
+    dirs = " ".join(Env.REPO_ROOT / coffee_dir for coffee_dir in COFFEE_DIRS)
     return cmd('find', dirs, '-type f', '-name \"*.coffee\"')
 
 
