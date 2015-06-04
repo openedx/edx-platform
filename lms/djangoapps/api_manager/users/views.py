@@ -469,6 +469,25 @@ class UsersDetail(SecureAPIView):
         if is_staff is not None:
             existing_user.is_staff = is_staff
             response_data['is_staff'] = existing_user.is_staff
+        email = request.DATA.get('email')
+        if email is not None:
+            email_fail = False
+            try:
+                validate_email(email)
+            except ValidationError:
+                email_fail = True
+                response_data['message'] = _('Invalid email address {}.').format(repr(email))
+            if email != existing_user.email:
+                try:
+                    # Email addresses need to be unique in the LMS, though Django doesn't enforce it directly.
+                    User.objects.get(email=email)
+                    email_fail = True
+                    response_data['message'] = _('A user with that email address already exists.')
+                except ObjectDoesNotExist:
+                    pass
+            if email_fail:
+                return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+            existing_user.email = email
         existing_user.save()
 
         username = request.DATA.get('username', None)
