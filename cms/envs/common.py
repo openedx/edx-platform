@@ -155,9 +155,6 @@ FEATURES = {
     # Enable course reruns, which will always use the split modulestore
     'ALLOW_COURSE_RERUNS': True,
 
-    # Certificates Web/HTML Views
-    'CERTIFICATES_HTML_VIEW': False,
-
     # Social Media Sharing on Student Dashboard
     'DASHBOARD_SHARE_SETTINGS': {
         # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in lms/envs/common.py
@@ -172,6 +169,9 @@ FEATURES = {
 
     # How many seconds to show the bumper again, default is 7 days:
     'SHOW_BUMPER_PERIODICITY': 7 * 24 * 3600,
+
+    # Enable Web/HTML Certificates -- be sure to also set in LMS configuration
+    'CERTIFICATES_HTML_VIEW': False,
 
 }
 

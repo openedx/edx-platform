@@ -372,9 +372,6 @@ FEATURES = {
     # Toggle platform-wide course licensing
     'LICENSING': False,
 
-    # Certificates Web/HTML Views
-    'CERTIFICATES_HTML_VIEW': False,
-
     # Social Media Sharing on Student Dashboard
     'DASHBOARD_SHARE_SETTINGS': {
         # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in cms/envs/common.py
@@ -398,6 +395,9 @@ FEATURES = {
 
     # How many seconds to show the bumper again, default is 7 days:
     'SHOW_BUMPER_PERIODICITY': 7 * 24 * 3600,
+
+    # Enable Web/HTML Certificates -- be sure to also set in CMS configuration
+    'CERTIFICATES_HTML_VIEW': False,
 
     # Enable OpenBadge support. See the BADGR_* settings later in this file.
     'ENABLE_OPENBADGES': False,
