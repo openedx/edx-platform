@@ -46,6 +46,9 @@ class CourseMetadata(object):
         'language',
         'certificates',
         'minimum_grade_credit',
+        'default_time_limit_mins',
+        'is_proctored_enabled',
+        'is_time_limited',
     ]
 
     @classmethod

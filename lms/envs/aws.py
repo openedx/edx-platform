@@ -679,7 +679,16 @@ if FEATURES.get('ENABLE_LTI_PROVIDER'):
 ##################### Credit Provider help link ####################
 CREDIT_HELP_LINK_URL = ENV_TOKENS.get('CREDIT_HELP_LINK_URL', CREDIT_HELP_LINK_URL)
 
-
 #### JWT configuration ####
 JWT_ISSUER = ENV_TOKENS.get('JWT_ISSUER', JWT_ISSUER)
 JWT_EXPIRATION = ENV_TOKENS.get('JWT_EXPIRATION', JWT_EXPIRATION)
+
+################# PROCTORING CONFIGURATION ##################
+
+PROCTORING_BACKEND_PROVIDER = AUTH_TOKENS.get("PROCTORING_BACKEND_PROVIDER", PROCTORING_BACKEND_PROVIDER)
+PROCTORING_SETTINGS = ENV_TOKENS.get("PROCTORING_SETTINGS", PROCTORING_SETTINGS)
+if not FEATURES.get('ENABLE_PROCTORED_EXAMS', False):
+    # If feature is turned off then let's make sure the supporting JS
+    # is not in the PIPELINE_JS
+    if 'proctoring' in PIPELINE_JS:
+        del PIPELINE_JS['proctoring']
