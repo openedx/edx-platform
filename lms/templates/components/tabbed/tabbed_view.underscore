@@ -1,0 +1,5 @@
+<div class="page-content">
+    <nav class="page-content-nav" role="tablist"></nav>
+    <div class="sr-is-focusable" tabindex="-1"></div>
+    <div class="page-content-main"></div>
+</div>

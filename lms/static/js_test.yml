@@ -92,10 +92,10 @@ fixture_paths:
     - templates/verify_student
     - templates/file-upload.underscore
     - templates/components/header
+    - templates/components/tabbed
     - js/fixtures/edxnotes
     - js/fixtures/search
     - templates/search
-    - teams/templates
     - templates/discovery
 
 requirejs:
