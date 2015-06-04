@@ -92,6 +92,10 @@ urlpatterns = (
 
     # Profile Images API endpoints
     url(r'^api/profile_images/', include('openedx.core.djangoapps.profile_images.urls')),
+
+    # Video Abstraction Layer used to allow video teams to manage video assets
+    # independently of courseware. https://github.com/edx/edx-val
+    url(r'^api/val/v0/', include('edxval.urls')),
 )
 
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
@@ -115,9 +119,6 @@ else:
 if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
     urlpatterns += (
         url(r'^api/mobile/v0.5/', include('mobile_api.urls')),
-        # Video Abstraction Layer used to allow video teams to manage video assets
-        # independently of courseware. https://github.com/edx/edx-val
-        url(r'^api/val/v0/', include('edxval.urls')),
     )
 
 # if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
