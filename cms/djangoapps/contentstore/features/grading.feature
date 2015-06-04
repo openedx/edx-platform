@@ -14,6 +14,14 @@ Feature: CMS.Course Grading
         When I add "6" new grades
         Then I see I now have "5" grades
 
+    Scenario: When user removes a grade the remaining grades should be consistent
+      Given I have opened a new course in Studio
+      And I am viewing the grading settings
+      When I add "2" new grade
+      Then Grade list has "ABCF" grades
+      And I delete a grade
+      Then Grade list has "ABF" grades
+
     # Cannot reliably make the delete button appear so using javascript instead
     Scenario: Users can delete grading ranges
         Given I have opened a new course in Studio
