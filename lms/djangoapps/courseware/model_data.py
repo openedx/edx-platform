@@ -544,7 +544,7 @@ class UserStateSummaryCache(DjangoOrmFieldCache):
         with them.
 
         Arguments:
-            fields (list of str): Field names to return values for
+            fields (list of :class:`~Field`): Fields to return values for
             xblocks (list of :class:`~XBlock`): XBlocks to load fields for
             aside_types (list of str): Asides to load field for (which annotate the supplied
                 xblocks).
