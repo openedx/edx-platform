@@ -295,7 +295,6 @@ def _update_certificate_context(context, course, user, user_certificate):
     context['accomplishment_copy_username'] = user.username
     context['accomplishment_copy_course_org'] = course.org
     context['accomplishment_copy_course_name'] = course.display_name
-    context['logo_alt'] = platform_name
     try:
         badge = BadgeAssertion.objects.get(user=user, course_id=course.location.course_key)
     except BadgeAssertion.DoesNotExist:
@@ -389,20 +388,8 @@ def _update_certificate_context(context, course, user, user_certificate):
 
     context['company_contact_urltext'] = _("Contact {platform_name}").format(platform_name=platform_name)
 
-    context['company_privacy_urltext'] = _("Privacy Policy")
-
-    context['company_tos_urltext'] = _("Terms of Service &amp; Honor Code")
-
     # Translators:  This text appears near the top of the certficate and describes the guarantee provided by edX
     context['document_banner'] = _("{platform_name} acknowledges the following student accomplishment").format(
-        platform_name=platform_name
-    )
-
-    context['logo_subtitle'] = _("Certificate Validation")
-
-    # Translators:  This is the copyright line which appears at the bottom of the certificate page/screen
-    context['copyright_text'] = _('&copy; {year} {platform_name}. All rights reserved.').format(
-        year=datetime.now().year,
         platform_name=platform_name
     )
 
@@ -472,7 +459,7 @@ def render_html_view(request, user_id, course_id):
     If a certificate is not available, we display a "Sorry!" screen instead
     """
 
-    # Create the view context and bootstrap with Django settings and passed-in values
+    # Create the initial view context, bootstrapping with Django settings and passed-in values
     context = {}
     context['platform_name'] = settings.PLATFORM_NAME
     context['course_id'] = course_id
@@ -481,9 +468,27 @@ def render_html_view(request, user_id, course_id):
     configuration = CertificateHtmlViewConfiguration.get_config()
     context.update(configuration.get('default', {}))
 
+    # Translators:  'All rights reserved' is a legal term used in copyrighting to protect published content
+    reserved = _("All rights reserved")
+    context['copyright_text'] = '&copy; {year} {platform_name}. {reserved}.'.format(
+        year=settings.COPYRIGHT_YEAR,
+        platform_name=settings.PLATFORM_NAME,
+        reserved=reserved
+    )
+
     # Translators:  This text is bound to the HTML 'title' element of the page and appears
     # in the browser title bar when a requested certificate is not found or recognized
     context['document_title'] = _("Invalid Certificate")
+
+    # Translators: The &amp; characters represent an ampersand character and can be ignored
+    context['company_tos_urltext'] = _("Terms of Service &amp; Honor Code")
+
+    # Translators: A 'Privacy Policy' is a legal document/statement describing a website's use of personal information
+    context['company_privacy_urltext'] = _("Privacy Policy")
+
+    # Translators: This line appears as a byline to a header image and describes the purpose of the page
+    context['logo_subtitle'] = _("Certificate Validation")
+    context['logo_alt'] = settings.PLATFORM_NAME
     invalid_template_path = 'certificates/invalid.html'
 
     # Kick the user back to the "Invalid" screen if the feature is disabled
@@ -521,8 +526,8 @@ def render_html_view(request, user_id, course_id):
     except (InvalidKeyError, CourseDoesNotExist, User.DoesNotExist):
         return render_to_response(invalid_template_path, context)
 
+    # Badge Request Event Tracking Logic
     if 'evidence_visit' in request.GET:
-        print "Event request found!"
         try:
             badge = BadgeAssertion.objects.get(user=user, course_id=course_key)
             tracker.emit(
@@ -566,6 +571,7 @@ def render_html_view(request, user_id, course_id):
     # Override further with any course-specific static values
     context.update(course.cert_html_view_overrides)
 
+    # FINALLY, generate and send the output the client
     return render_to_response("certificates/valid.html", context)
 
 

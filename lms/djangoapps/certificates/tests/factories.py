@@ -51,6 +51,7 @@ class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):
             "default": {
                 "accomplishment_class_append": "accomplishment-certificate",
                 "platform_name": "edX",
+                "company_about_url": "http://www.edx.org/about-us",
                 "company_privacy_url": "http://www.edx.org/edx-privacy-policy",
                 "company_tos_url": "http://www.edx.org/edx-terms-service",
                 "company_verified_certificate_url": "http://www.edx.org/verified-certificate",
