@@ -1380,6 +1380,19 @@ class CourseEnrollmentAllowed(models.Model):
     def __unicode__(self):
         return "[CourseEnrollmentAllowed] %s: %s (%s)" % (self.email, self.course_id, self.created)
 
+    @classmethod
+    def may_enroll_and_unenrolled(cls, course_id):
+        """
+        Return QuerySet of students who are allowed to enroll in a course.
+
+        Result excludes students who have already enrolled in the
+        course.
+
+        `course_id` identifies the course for which to compute the QuerySet.
+        """
+        enrolled = CourseEnrollment.objects.users_enrolled_in(course_id=course_id).values_list('email', flat=True)
+        return CourseEnrollmentAllowed.objects.filter(course_id=course_id).exclude(email__in=enrolled)
+
 
 @total_ordering
 class CourseAccessRole(models.Model):

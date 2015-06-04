@@ -15,6 +15,7 @@ from django.core.urlresolvers import reverse
 import xmodule.graders as xmgraders
 from django.core.exceptions import ObjectDoesNotExist
 from microsite_configuration import microsite
+from student.models import CourseEnrollmentAllowed
 
 
 STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')
@@ -207,6 +208,31 @@ def enrolled_students_features(course_key, features):
         return student_dict
 
     return [extract_student(student, features) for student in students]
+
+
+def list_may_enroll(course_key, features):
+    """
+    Return info about students who may enroll in a course as a dict.
+
+    list_may_enroll(course_key, ['email'])
+    would return [
+        {'email': 'email1'}
+        {'email': 'email2'}
+        {'email': 'email3'}
+    ]
+
+    Note that result does not include students who may enroll and have
+    already done so.
+    """
+    may_enroll_and_unenrolled = CourseEnrollmentAllowed.may_enroll_and_unenrolled(course_key)
+
+    def extract_student(student, features):
+        """
+        Build dict containing information about a single student.
+        """
+        return dict((feature, getattr(student, feature)) for feature in features)
+
+    return [extract_student(student, features) for student in may_enroll_and_unenrolled]
 
 
 def coupon_codes_features(features, coupons_list):

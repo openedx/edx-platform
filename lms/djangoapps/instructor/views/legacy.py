@@ -307,12 +307,6 @@ def instructor_dashboard(request, course_id):
     #----------------------------------------
     # enrollment
 
-    elif action == 'List students who may enroll but may not have yet signed up':
-        ceaset = CourseEnrollmentAllowed.objects.filter(course_id=course_key)
-        datatable = {'header': ['StudentEmail']}
-        datatable['data'] = [[x.email] for x in ceaset]
-        datatable['title'] = action
-
     elif action == 'Enroll multiple students':
 
         is_shib_course = uses_shib(course)

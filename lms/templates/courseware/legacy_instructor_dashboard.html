@@ -330,8 +330,14 @@ function goto( mode)
     </div>
     % endif
 
-    <input type="submit" name="action" value="List enrolled students" class="${'is-disabled' if disable_buttons else ''}" aria-disabled="${'true' if disable_buttons else 'false'}">
-    <input type="submit" name="action" value="List students who may enroll but may not have yet signed up" class="${'is-disabled' if disable_buttons else ''}" aria-disabled="${'true' if disable_buttons else 'false'}" >
+    <p class="is-deprecated">
+      ${_("To download a CSV file containing profile information for students who are enrolled in this course, visit the Data Download section of the Instructor Dashboard.")}
+    </p>
+
+    <p class="is-deprecated">
+      ${_("To download a list of students who may enroll in this course but have not yet signed up for it, visit the Data Download section of the Instructor Dashboard.")}
+    </p>
+
     <hr width="40%" style="align:left">
 
   %if settings.FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:
