@@ -364,7 +364,7 @@ def _index_bulk_op(request, course_key, chapter, section, position):
         try:
             int(position)
         except ValueError:
-            raise Http404("Position {} is not an integer!".format(position))
+            raise Http404(u"Position {} is not an integer!".format(position))
 
     user = request.user
     course = get_course_with_access(user, 'load', course_key, depth=2)
