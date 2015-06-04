@@ -170,6 +170,9 @@ FEATURES = {
     # Show video bumper in Studio
     'ENABLE_VIDEO_BUMPER': False,
 
+    # Timed Proctored Exams
+    'ENABLE_PROCTORED_EXAMS': False,
+
     # How many seconds to show the bumper again, default is 7 days:
     'SHOW_BUMPER_PERIODICITY': 7 * 24 * 3600,
 
