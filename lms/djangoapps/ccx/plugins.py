@@ -5,16 +5,16 @@ Registers the CCX feature for the edX platform.
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
-from openedx.core.djangoapps.course_views.course_views import CourseViewType
+from xmodule.tabs import CourseTab
 from student.roles import CourseCcxCoachRole
 
 
-class CcxCourseViewType(CourseViewType):
+class CcxCourseTab(CourseTab):
     """
-    The representation of the CCX course view type.
+    The representation of the CCX course tab
     """
 
-    name = "ccx_coach"
+    type = "ccx_coach"
     title = _("CCX Coach")
     view_name = "ccx_coach_dashboard"
     is_dynamic = True    # The CCX view is dynamically added to the set of tabs when it is enabled

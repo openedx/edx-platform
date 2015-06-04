@@ -25,7 +25,7 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     get_course_cohorts,
     is_commentable_cohorted
 )
-from courseware.tabs import EnrolledCourseViewType
+from courseware.tabs import EnrolledTab
 from courseware.access import has_access
 from xmodule.modulestore.django import modulestore
 from ccx.overrides import get_current_ccx
@@ -49,19 +49,19 @@ PAGES_NEARBY_DELTA = 2
 log = logging.getLogger("edx.discussions")
 
 
-class DiscussionCourseViewType(EnrolledCourseViewType):
+class DiscussionTab(EnrolledTab):
     """
     A tab for the cs_comments_service forums.
     """
 
-    name = 'discussion'
+    type = 'discussion'
     title = _('Discussion')
     priority = None
     view_name = 'django_comment_client.forum.views.forum_form_discussion'
 
     @classmethod
     def is_enabled(cls, course, user=None):
-        if not super(DiscussionCourseViewType, cls).is_enabled(course, user):
+        if not super(DiscussionTab, cls).is_enabled(course, user):
             return False
 
         if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):

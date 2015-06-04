@@ -11,8 +11,8 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.courses import get_course_by_id
 from courseware.tabs import (
-    get_course_tab_list, CoursewareViewType, CourseInfoViewType, ProgressCourseViewType,
-    StaticCourseViewType, ExternalDiscussionCourseViewType, ExternalLinkCourseViewType
+    get_course_tab_list, CoursewareTab, CourseInfoTab, ProgressTab,
+    ExternalDiscussionCourseTab, ExternalLinkCourseTab
 )
 from courseware.tests.helpers import get_request_for_user, LoginEnrollmentTestCase
 from courseware.tests.factories import InstructorFactory, StaffFactory
@@ -85,7 +85,7 @@ class TabTestCase(ModuleStoreTestCase):
             Can be 'None' if the given tab class does not have any keys to validate.
         """
         # create tab
-        tab = tab_class.create_tab(tab_dict=dict_tab)
+        tab = tab_class(tab_dict=dict_tab)
 
         # name is as expected
         self.assertEqual(tab.name, expected_name)
@@ -475,17 +475,17 @@ class TabListTestCase(TabTestCase):
         # invalid tabs
         self.invalid_tabs = [
             # less than 2 tabs
-            [{'type': CoursewareViewType.name}],
+            [{'type': CoursewareTab.type}],
             # missing course_info
-            [{'type': CoursewareViewType.name}, {'type': 'discussion', 'name': 'fake_name'}],
+            [{'type': CoursewareTab.type}, {'type': 'discussion', 'name': 'fake_name'}],
             # incorrect order
-            [{'type': CourseInfoViewType.name, 'name': 'fake_name'}, {'type': CoursewareViewType.name}],
+            [{'type': CourseInfoTab.type, 'name': 'fake_name'}, {'type': CoursewareTab.type}],
         ]
 
         # tab types that should appear only once
         unique_tab_types = [
-            CoursewareViewType.name,
-            CourseInfoViewType.name,
+            CoursewareTab.type,
+            CourseInfoTab.type,
             'textbooks',
             'pdf_textbooks',
             'html_textbooks',
@@ -493,8 +493,8 @@ class TabListTestCase(TabTestCase):
 
         for unique_tab_type in unique_tab_types:
             self.invalid_tabs.append([
-                {'type': CoursewareViewType.name},
-                {'type': CourseInfoViewType.name, 'name': 'fake_name'},
+                {'type': CoursewareTab.type},
+                {'type': CourseInfoTab.type, 'name': 'fake_name'},
                 # add the unique tab multiple times
                 {'type': unique_tab_type},
                 {'type': unique_tab_type},
@@ -502,26 +502,27 @@ class TabListTestCase(TabTestCase):
 
         # valid tabs
         self.valid_tabs = [
-            # empty list
+            # any empty list is valid because a default list of tabs will be
+            # generated to replace the empty list.
             [],
             # all valid tabs
             [
-                {'type': CoursewareViewType.name},
-                {'type': CourseInfoViewType.name, 'name': 'fake_name'},
+                {'type': CoursewareTab.type},
+                {'type': CourseInfoTab.type, 'name': 'fake_name'},
                 {'type': 'discussion', 'name': 'fake_name'},
-                {'type': ExternalLinkCourseViewType.name, 'name': 'fake_name', 'link': 'fake_link'},
+                {'type': ExternalLinkCourseTab.type, 'name': 'fake_name', 'link': 'fake_link'},
                 {'type': 'textbooks'},
                 {'type': 'pdf_textbooks'},
                 {'type': 'html_textbooks'},
-                {'type': ProgressCourseViewType.name, 'name': 'fake_name'},
-                {'type': StaticCourseViewType.name, 'name': 'fake_name', 'url_slug': 'schlug'},
+                {'type': ProgressTab.type, 'name': 'fake_name'},
+                {'type': xmodule_tabs.StaticTab.type, 'name': 'fake_name', 'url_slug': 'schlug'},
                 {'type': 'syllabus'},
             ],
             # with external discussion
             [
-                {'type': CoursewareViewType.name},
-                {'type': CourseInfoViewType.name, 'name': 'fake_name'},
-                {'type': ExternalDiscussionCourseViewType.name, 'name': 'fake_name', 'link': 'fake_link'}
+                {'type': CoursewareTab.type},
+                {'type': CourseInfoTab.type, 'name': 'fake_name'},
+                {'type': ExternalDiscussionCourseTab.type, 'name': 'fake_name', 'link': 'fake_link'}
             ],
         ]
 
@@ -550,8 +551,8 @@ class ValidateTabsTestCase(TabListTestCase):
         tab_list = xmodule_tabs.CourseTabList()
         self.assertEquals(
             len(tab_list.from_json([
-                {'type': CoursewareViewType.name},
-                {'type': CourseInfoViewType.name, 'name': 'fake_name'},
+                {'type': CoursewareTab.type},
+                {'type': CourseInfoTab.type, 'name': 'fake_name'},
                 {'type': 'no_such_type'}
             ])),
             2
@@ -660,10 +661,10 @@ class ProgressTestCase(TabTestCase):
     def check_progress_tab(self):
         """Helper function for verifying the progress tab."""
         return self.check_tab(
-            tab_class=ProgressCourseViewType,
-            dict_tab={'type': ProgressCourseViewType.name, 'name': 'same'},
+            tab_class=ProgressTab,
+            dict_tab={'type': ProgressTab.type, 'name': 'same'},
             expected_link=self.reverse('progress', args=[self.course.id.to_deprecated_string()]),
-            expected_tab_id=ProgressCourseViewType.name,
+            expected_tab_id=ProgressTab.type,
             invalid_dict_tab=None,
         )
 
@@ -692,8 +693,8 @@ class StaticTabTestCase(TabTestCase):
         url_slug = 'schmug'
 
         tab = self.check_tab(
-            tab_class=StaticCourseViewType,
-            dict_tab={'type': StaticCourseViewType.name, 'name': 'same', 'url_slug': url_slug},
+            tab_class=xmodule_tabs.StaticTab,
+            dict_tab={'type': xmodule_tabs.StaticTab.type, 'name': 'same', 'url_slug': url_slug},
             expected_link=self.reverse('static_tab', args=[self.course.id.to_deprecated_string(), url_slug]),
             expected_tab_id='static_tab_schmug',
             invalid_dict_tab=self.fake_dict_tab,

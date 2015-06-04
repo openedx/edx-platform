@@ -1135,9 +1135,9 @@ def notification_image_for_tab(course_tab, user, course):
     """
 
     tab_notification_handlers = {
-        StaffGradingTab.name: open_ended_notifications.staff_grading_notifications,
-        PeerGradingTab.name: open_ended_notifications.peer_grading_notifications,
-        OpenEndedGradingTab.name: open_ended_notifications.combined_notifications
+        StaffGradingTab.type: open_ended_notifications.staff_grading_notifications,
+        PeerGradingTab.type: open_ended_notifications.peer_grading_notifications,
+        OpenEndedGradingTab.type: open_ended_notifications.combined_notifications
     }
 
     if course_tab.name in tab_notification_handlers:

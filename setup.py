@@ -6,7 +6,7 @@ from setuptools import setup
 
 setup(
     name="Open edX",
-    version="0.3",
+    version="0.4",
     install_requires=["distribute"],
     requires=[],
     # NOTE: These are not the names we should be installing.  This tree should
@@ -18,24 +18,24 @@ setup(
         "cms",
     ],
     entry_points={
-        "openedx.course_view_type": [
-            "ccx = lms.djangoapps.ccx.plugins:CcxCourseViewType",
-            "courseware = lms.djangoapps.courseware.tabs:CoursewareViewType",
-            "course_info = lms.djangoapps.courseware.tabs:CourseInfoViewType",
-            "discussion = lms.djangoapps.django_comment_client.forum.views:DiscussionCourseViewType",
-            "edxnotes = lms.djangoapps.edxnotes.plugins:EdxNotesCourseViewType",
-            "external_discussion = lms.djangoapps.courseware.tabs:ExternalDiscussionCourseViewType",
-            "external_link = lms.djangoapps.courseware.tabs:ExternalLinkCourseViewType",
-            "html_textbooks = lms.djangoapps.courseware.tabs:HtmlTextbookCourseViews",
-            "instructor = lms.djangoapps.instructor.views.instructor_dashboard:InstructorDashboardViewType",
-            "notes = lms.djangoapps.notes.views:NotesCourseViewType",
-            "pdf_textbooks = lms.djangoapps.courseware.tabs:PDFTextbookCourseViews",
-            "progress = lms.djangoapps.courseware.tabs:ProgressCourseViewType",
-            "static_tab = lms.djangoapps.courseware.tabs:StaticCourseViewType",
-            "syllabus = lms.djangoapps.courseware.tabs:SyllabusCourseViewType",
-            "teams = lms.djangoapps.teams.plugins:TeamsCourseViewType",
-            "textbooks = lms.djangoapps.courseware.tabs:TextbookCourseViews",
-            "wiki = lms.djangoapps.course_wiki.tab:WikiCourseViewType",
+        "openedx.course_tab": [
+            "ccx = lms.djangoapps.ccx.plugins:CcxCourseTab",
+            "courseware = lms.djangoapps.courseware.tabs:CoursewareTab",
+            "course_info = lms.djangoapps.courseware.tabs:CourseInfoTab",
+            "discussion = lms.djangoapps.django_comment_client.forum.views:DiscussionTab",
+            "edxnotes = lms.djangoapps.edxnotes.plugins:EdxNotesTab",
+            "external_discussion = lms.djangoapps.courseware.tabs:ExternalDiscussionCourseTab",
+            "external_link = lms.djangoapps.courseware.tabs:ExternalLinkCourseTab",
+            "html_textbooks = lms.djangoapps.courseware.tabs:HtmlTextbookTabs",
+            "instructor = lms.djangoapps.instructor.views.instructor_dashboard:InstructorDashboardTab",
+            "notes = lms.djangoapps.notes.views:NotesTab",
+            "pdf_textbooks = lms.djangoapps.courseware.tabs:PDFTextbookTabs",
+            "progress = lms.djangoapps.courseware.tabs:ProgressTab",
+            "static_tab = xmodule.tabs:StaticTab",
+            "syllabus = lms.djangoapps.courseware.tabs:SyllabusTab",
+            "teams = lms.djangoapps.teams.plugins:TeamsTab",
+            "textbooks = lms.djangoapps.courseware.tabs:TextbookTabs",
+            "wiki = lms.djangoapps.course_wiki.tab:WikiTab",
 
             # ORA 1 tabs (deprecated)
             "peer_grading = lms.djangoapps.open_ended_grading.views:PeerGradingTab",

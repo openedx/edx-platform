@@ -7,12 +7,12 @@ from django.utils.translation import ugettext as _
 
 from courseware.access import has_access
 from courseware.entrance_exams import user_must_complete_entrance_exam
-from openedx.core.djangoapps.course_views.course_views import CourseViewTypeManager, CourseViewType, StaticTab
+from openedx.core.lib.course_tabs import CourseTabPluginManager
 from student.models import CourseEnrollment
 from xmodule.tabs import CourseTab, CourseTabList, key_checker
 
 
-class EnrolledCourseViewType(CourseViewType):
+class EnrolledTab(CourseTab):
     """
     A base class for any view types that require a user to be enrolled.
     """
@@ -23,22 +23,22 @@ class EnrolledCourseViewType(CourseViewType):
         return CourseEnrollment.is_enrolled(user, course.id) or has_access(user, 'staff', course, course.id)
 
 
-class CoursewareViewType(EnrolledCourseViewType):
+class CoursewareTab(EnrolledTab):
     """
     The main courseware view.
     """
-    name = 'courseware'
+    type = 'courseware'
     title = _('Courseware')
     priority = 10
     view_name = 'courseware'
     is_movable = False
 
 
-class CourseInfoViewType(CourseViewType):
+class CourseInfoTab(CourseTab):
     """
     The course info view.
     """
-    name = 'course_info'
+    type = 'course_info'
     title = _('Course Info')
     priority = 20
     view_name = 'info'
@@ -50,27 +50,28 @@ class CourseInfoViewType(CourseViewType):
         return True
 
 
-class SyllabusCourseViewType(EnrolledCourseViewType):
+class SyllabusTab(EnrolledTab):
     """
     A tab for the course syllabus.
     """
-    name = 'syllabus'
+    type = 'syllabus'
     title = _('Syllabus')
     priority = 30
     view_name = 'syllabus'
+    allow_multiple = True
 
     @classmethod
     def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
-        if not super(SyllabusCourseViewType, cls).is_enabled(course, user=user):
+        if not super(SyllabusTab, cls).is_enabled(course, user=user):
             return False
         return getattr(course, 'syllabus_present', False)
 
 
-class ProgressCourseViewType(EnrolledCourseViewType):
+class ProgressTab(EnrolledTab):
     """
     The course progress view.
     """
-    name = 'progress'
+    type = 'progress'
     title = _('Progress')
     priority = 40
     view_name = 'progress'
@@ -78,12 +79,12 @@ class ProgressCourseViewType(EnrolledCourseViewType):
 
     @classmethod
     def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
-        if not super(ProgressCourseViewType, cls).is_enabled(course, user=user):
+        if not super(ProgressTab, cls).is_enabled(course, user=user):
             return False
         return not course.hide_progress_tab
 
 
-class TextbookCourseViewsBase(CourseViewType):
+class TextbookTabsBase(CourseTab):
     """
     Abstract class for textbook collection tabs classes.
     """
@@ -104,17 +105,17 @@ class TextbookCourseViewsBase(CourseViewType):
         raise NotImplementedError()
 
 
-class TextbookCourseViews(TextbookCourseViewsBase):
+class TextbookTabs(TextbookTabsBase):
     """
     A tab representing the collection of all textbook tabs.
     """
-    name = 'textbooks'
+    type = 'textbooks'
     priority = None
     view_name = 'book'
 
     @classmethod
     def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
-        parent_is_enabled = super(TextbookCourseViews, cls).is_enabled(course, user)
+        parent_is_enabled = super(TextbookTabs, cls).is_enabled(course, user)
         return settings.FEATURES.get('ENABLE_TEXTBOOK') and parent_is_enabled
 
     @classmethod
@@ -128,11 +129,11 @@ class TextbookCourseViews(TextbookCourseViewsBase):
             )
 
 
-class PDFTextbookCourseViews(TextbookCourseViewsBase):
+class PDFTextbookTabs(TextbookTabsBase):
     """
     A tab representing the collection of all PDF textbook tabs.
     """
-    name = 'pdf_textbooks'
+    type = 'pdf_textbooks'
     priority = None
     view_name = 'pdf_book'
 
@@ -147,11 +148,11 @@ class PDFTextbookCourseViews(TextbookCourseViewsBase):
             )
 
 
-class HtmlTextbookCourseViews(TextbookCourseViewsBase):
+class HtmlTextbookTabs(TextbookTabsBase):
     """
     A tab representing the collection of all Html textbook tabs.
     """
-    name = 'html_textbooks'
+    type = 'html_textbooks'
     priority = None
     view_name = 'html_book'
 
@@ -164,89 +165,6 @@ class HtmlTextbookCourseViews(TextbookCourseViewsBase):
                 view_name=cls.view_name,
                 index=index
             )
-
-
-class StaticCourseViewType(CourseViewType):
-    """
-    The view type that shows a static tab.
-    """
-    name = 'static_tab'
-    is_default = False    # A static tab is never added to a course by default
-    allow_multiple = True
-
-    @classmethod
-    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
-        """
-        Static tabs are viewable to everyone, even anonymous users.
-        """
-        return True
-
-    @classmethod
-    def validate(cls, tab_dict, raise_error=True):
-        """
-        Ensures that the specified tab_dict is valid.
-        """
-        return (super(StaticCourseViewType, cls).validate(tab_dict, raise_error)
-                and key_checker(['name', 'url_slug'])(tab_dict, raise_error))
-
-    @classmethod
-    def create_tab(cls, tab_dict):
-        """
-        Returns the tab that will be shown to represent an instance of a view.
-        """
-        return StaticTab(tab_dict)
-
-
-class ExternalDiscussionCourseViewType(EnrolledCourseViewType):
-    """
-    A course view links to an external discussion service.
-    """
-
-    name = 'external_discussion'
-    # Translators: 'Discussion' refers to the tab in the courseware that leads to the discussion forums
-    title = _('Discussion')
-    priority = None
-
-    @classmethod
-    def create_tab(cls, tab_dict):
-        """
-        Returns the tab that will be shown to represent an instance of a view.
-        """
-        return LinkTab(tab_dict, cls.title)
-
-    @classmethod
-    def validate(cls, tab_dict, raise_error=True):
-        """ Validate that the tab_dict for this course view has the necessary information to render. """
-        return (super(ExternalDiscussionCourseViewType, cls).validate(tab_dict, raise_error) and
-                key_checker(['link'])(tab_dict, raise_error))
-
-    @classmethod
-    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
-        if not super(ExternalDiscussionCourseViewType, cls).is_enabled(course, user=user):
-            return False
-        return course.discussion_link
-
-
-class ExternalLinkCourseViewType(EnrolledCourseViewType):
-    """
-    A course view containing an external link.
-    """
-    name = 'external_link'
-    priority = None
-    is_default = False    # An external link tab is not added to a course by default
-
-    @classmethod
-    def create_tab(cls, tab_dict):
-        """
-        Returns the tab that will be shown to represent an instance of a view.
-        """
-        return LinkTab(tab_dict)
-
-    @classmethod
-    def validate(cls, tab_dict, raise_error=True):
-        """ Validate that the tab_dict for this course view has the necessary information to render. """
-        return (super(ExternalLinkCourseViewType, cls).validate(tab_dict, raise_error) and
-                key_checker(['link', 'name'])(tab_dict, raise_error))
 
 
 class LinkTab(CourseTab):
@@ -264,11 +182,9 @@ class LinkTab(CourseTab):
 
         self.type = tab_dict['type']
 
-        super(LinkTab, self).__init__(
-            name=tab_dict['name'] if tab_dict else name,
-            tab_id=None,
-            link_func=link_value_func,
-        )
+        tab_dict['link_func'] = link_value_func
+
+        super(LinkTab, self).__init__(tab_dict)
 
     def __getitem__(self, key):
         if key == 'link':
@@ -292,6 +208,49 @@ class LinkTab(CourseTab):
             return False
         return self.link_value == other.get('link')
 
+    @classmethod
+    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+        return True
+
+
+class ExternalDiscussionCourseTab(LinkTab):
+    """
+    A course tab that links to an external discussion service.
+    """
+
+    type = 'external_discussion'
+    # Translators: 'Discussion' refers to the tab in the courseware that leads to the discussion forums
+    title = _('Discussion')
+    priority = None
+
+    @classmethod
+    def validate(cls, tab_dict, raise_error=True):
+        """ Validate that the tab_dict for this course tab has the necessary information to render. """
+        return (super(ExternalDiscussionCourseTab, cls).validate(tab_dict, raise_error) and
+                key_checker(['link'])(tab_dict, raise_error))
+
+    @classmethod
+    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+        if not super(ExternalDiscussionCourseTab, cls).is_enabled(course, user=user):
+            return False
+        return course.discussion_link
+
+
+class ExternalLinkCourseTab(LinkTab):
+    """
+    A course tab containing an external link.
+    """
+    type = 'external_link'
+    priority = None
+    is_default = False    # An external link tab is not added to a course by default
+    allow_multiple = True
+
+    @classmethod
+    def validate(cls, tab_dict, raise_error=True):
+        """ Validate that the tab_dict for this course tab has the necessary information to render. """
+        return (super(ExternalLinkCourseTab, cls).validate(tab_dict, raise_error) and
+                key_checker(['link', 'name'])(tab_dict, raise_error))
+
 
 class SingleTextbookTab(CourseTab):
     """
@@ -308,7 +267,11 @@ class SingleTextbookTab(CourseTab):
             """ Constructs a link for textbooks from a view name, a course, and an index. """
             return reverse_func(view_name, args=[unicode(course.id), index])
 
-        super(SingleTextbookTab, self).__init__(name, tab_id, link_func)
+        tab_dict = dict()
+        tab_dict['name'] = name
+        tab_dict['tab_id'] = tab_id
+        tab_dict['link_func'] = link_func
+        super(SingleTextbookTab, self).__init__(tab_dict)
 
     def to_json(self):
         raise NotImplementedError('SingleTextbookTab should not be serialized.')
@@ -347,9 +310,9 @@ def _get_dynamic_tabs(course, user):
     instead added dynamically based upon the user's role.
     """
     dynamic_tabs = list()
-    for tab_type in CourseViewTypeManager.get_course_view_types():
+    for tab_type in CourseTabPluginManager.get_tab_types():
         if getattr(tab_type, "is_dynamic", False):
-            tab = tab_type.create_tab(dict())
+            tab = tab_type(dict())
             if tab.is_enabled(course, user=user):
                 dynamic_tabs.append(tab)
     dynamic_tabs.sort(key=lambda dynamic_tab: dynamic_tab.name)

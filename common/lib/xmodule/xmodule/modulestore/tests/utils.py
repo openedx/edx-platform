@@ -54,6 +54,14 @@ def create_modulestore_instance(
     )
 
 
+def mock_tab_from_json(tab_dict):
+    """
+    Mocks out the CourseTab.from_json to just return the tab_dict itself so that we don't have to deal
+    with plugin errors.
+    """
+    return tab_dict
+
+
 class LocationMixin(XBlockMixin):
     """
     Adds a `location` property to an :class:`XBlock` so it is more compatible

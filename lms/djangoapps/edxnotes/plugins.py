@@ -4,15 +4,15 @@ Registers the "edX Notes" feature for the edX platform.
 
 from django.utils.translation import ugettext as _
 
-from courseware.tabs import EnrolledCourseViewType
+from courseware.tabs import EnrolledTab
 
 
-class EdxNotesCourseViewType(EnrolledCourseViewType):
+class EdxNotesTab(EnrolledTab):
     """
-    The representation of the edX Notes course view type.
+    The representation of the edX Notes course tab type.
     """
 
-    name = "edxnotes"
+    type = "edxnotes"
     title = _("Notes")
     view_name = "edxnotes"
 
@@ -25,6 +25,6 @@ class EdxNotesCourseViewType(EnrolledCourseViewType):
             settings (dict): a dict of configuration settings
             user (User): the user interacting with the course
         """
-        if not super(EdxNotesCourseViewType, cls).is_enabled(course, user=user):
+        if not super(EdxNotesTab, cls).is_enabled(course, user=user):
             return False
         return course.edxnotes

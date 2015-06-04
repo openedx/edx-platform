@@ -4,11 +4,10 @@ from django.views.decorators.cache import cache_control
 from edxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 
-from openedx.core.djangoapps.course_views.course_views import CourseViewType
 
 from courseware.courses import get_course_with_access
 from courseware.access import has_access
-from courseware.tabs import EnrolledCourseViewType
+from courseware.tabs import EnrolledTab
 
 from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
 import json
@@ -66,11 +65,11 @@ ALERT_DICT = {
 }
 
 
-class StaffGradingTab(CourseViewType):
+class StaffGradingTab(EnrolledTab):
     """
     A tab for staff grading.
     """
-    name = 'staff_grading'
+    type = 'staff_grading'
     title = _("Staff grading")
     view_name = "staff_grading"
 
@@ -81,11 +80,11 @@ class StaffGradingTab(CourseViewType):
         return "combinedopenended" in course.advanced_modules
 
 
-class PeerGradingTab(EnrolledCourseViewType):
+class PeerGradingTab(EnrolledTab):
     """
     A tab for peer grading.
     """
-    name = 'peer_grading'
+    type = 'peer_grading'
     # Translators: "Peer grading" appears on a tab that allows
     # students to view open-ended problems that require grading
     title = _("Peer grading")
@@ -98,11 +97,11 @@ class PeerGradingTab(EnrolledCourseViewType):
         return "combinedopenended" in course.advanced_modules
 
 
-class OpenEndedGradingTab(EnrolledCourseViewType):
+class OpenEndedGradingTab(EnrolledTab):
     """
     A tab for open ended grading.
     """
-    name = 'open_ended'
+    type = 'open_ended'
     # Translators: "Open Ended Panel" appears on a tab that, when clicked, opens up a panel that
     # displays information about open-ended problems that a user has submitted or needs to grade
     title = _("Open Ended Panel")
