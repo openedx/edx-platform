@@ -479,7 +479,7 @@ class UserStateCache(object):
             kvs_key.field_name in self._cache[cache_key]
         )
 
-    @contract(user_id=int, usage_key=UsageKey, score="number|None", max_score="number|None")
+    # @contract(user_id=int, usage_key=UsageKey, score="number|None", max_score="number|None")
     def set_score(self, user_id, usage_key, score, max_score):
         """
         UNSUPPORTED METHOD
@@ -920,7 +920,7 @@ class FieldDataCache(object):
 
         return self.cache[key.scope].has(key)
 
-    @contract(user_id=int, usage_key=UsageKey, score="number|None", max_score="number|None")
+    # @contract(user_id=int, usage_key=UsageKey, score="number|None", max_score="number|None")
     def set_score(self, user_id, usage_key, score, max_score):
         """
         UNSUPPORTED METHOD
