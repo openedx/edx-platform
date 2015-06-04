@@ -7,6 +7,29 @@ import re
 import httpretty
 
 
+def _get_thread_callback(thread_data):
+    """
+    Get a callback function that will return POST/PUT data overridden by
+    response_overrides.
+    """
+    def callback(request, _uri, headers):
+        """
+        Simulate the thread creation or update endpoint by returning the provided
+        data along with the data from response_overrides and dummy values for any
+        additional required fields.
+        """
+        response_data = make_minimal_cs_thread(thread_data)
+        for key, val_list in request.parsed_body.items():
+            val = val_list[0]
+            if key in ["anonymous", "anonymous_to_peers", "closed", "pinned"]:
+                response_data[key] = val == "True"
+            else:
+                response_data[key] = val
+        return (200, headers, json.dumps(response_data))
+
+    return callback
+
+
 class CommentsServiceMockMixin(object):
     """Mixin with utility methods for mocking the comments service"""
     def register_get_threads_response(self, threads, page, num_pages):
@@ -22,23 +45,23 @@ class CommentsServiceMockMixin(object):
             status=200
         )
 
-    def register_post_thread_response(self, response_overrides):
+    def register_post_thread_response(self, thread_data):
         """Register a mock response for POST on the CS commentable endpoint"""
-        def callback(request, _uri, headers):
-            """
-            Simulate the thread creation endpoint by returning the provided data
-            along with the data from response_overrides.
-            """
-            response_data = make_minimal_cs_thread(
-                {key: val[0] for key, val in request.parsed_body.items()}
-            )
-            response_data.update(response_overrides)
-            return (200, headers, json.dumps(response_data))
-
         httpretty.register_uri(
             httpretty.POST,
             re.compile(r"http://localhost:4567/api/v1/(\w+)/threads"),
-            body=callback
+            body=_get_thread_callback(thread_data)
+        )
+
+    def register_put_thread_response(self, thread_data):
+        """
+        Register a mock response for PUT on the CS endpoint for the given
+        thread_id.
+        """
+        httpretty.register_uri(
+            httpretty.PUT,
+            "http://localhost:4567/api/v1/threads/{}".format(thread_data["id"]),
+            body=_get_thread_callback(thread_data)
         )
 
     def register_get_thread_error_response(self, thread_id, status_code):

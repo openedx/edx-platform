@@ -15,6 +15,8 @@ from django.core.exceptions import ValidationError
 from django.http import Http404
 from django.test.client import RequestFactory
 
+from rest_framework.exceptions import PermissionDenied
+
 from opaque_keys.edx.locator import CourseLocator
 
 from courseware.tests.factories import BetaTesterFactory, StaffFactory
@@ -24,6 +26,7 @@ from discussion_api.api import (
     get_comment_list,
     get_course_topics,
     get_thread_list,
+    update_thread,
 )
 from discussion_api.tests.utils import (
     CommentsServiceMockMixin,
@@ -685,18 +688,32 @@ class GetCommentListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 FORUM_ROLE_STUDENT,
             ],
             [True, False],
+            [True, False],
             ["no_group", "match_group", "different_group"],
         )
     )
     @ddt.unpack
-    def test_group_access(self, role_name, course_is_cohorted, thread_group_state):
-        cohort_course = CourseFactory.create(cohort_config={"cohorted": course_is_cohorted})
+    def test_group_access(
+            self,
+            role_name,
+            course_is_cohorted,
+            topic_is_cohorted,
+            thread_group_state
+    ):
+        cohort_course = CourseFactory.create(
+            discussion_topics={"Test Topic": {"id": "test_topic"}},
+            cohort_config={
+                "cohorted": course_is_cohorted,
+                "cohorted_discussions": ["test_topic"] if topic_is_cohorted else [],
+            }
+        )
         CourseEnrollmentFactory.create(user=self.user, course_id=cohort_course.id)
         cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.user])
         role = Role.objects.create(name=role_name, course_id=cohort_course.id)
         role.users = [self.user]
         thread = self.make_minimal_cs_thread({
             "course_id": unicode(cohort_course.id),
+            "commentable_id": "test_topic",
             "group_id": (
                 None if thread_group_state == "no_group" else
                 cohort.id if thread_group_state == "match_group" else
@@ -706,6 +723,7 @@ class GetCommentListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
         expected_error = (
             role_name == FORUM_ROLE_STUDENT and
             course_is_cohorted and
+            topic_is_cohorted and
             thread_group_state == "different_group"
         )
         try:
@@ -1287,8 +1305,224 @@ class CreateCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
             create_comment(self.request, self.minimal_data)
         self.assertEqual(assertion.exception.message_dict, {"thread_id": ["Invalid value."]})
 
+    @ddt.data(
+        *itertools.product(
+            [
+                FORUM_ROLE_ADMINISTRATOR,
+                FORUM_ROLE_MODERATOR,
+                FORUM_ROLE_COMMUNITY_TA,
+                FORUM_ROLE_STUDENT,
+            ],
+            [True, False],
+            ["no_group", "match_group", "different_group"],
+        )
+    )
+    @ddt.unpack
+    def test_group_access(self, role_name, course_is_cohorted, thread_group_state):
+        cohort_course = CourseFactory.create(cohort_config={"cohorted": course_is_cohorted})
+        CourseEnrollmentFactory.create(user=self.user, course_id=cohort_course.id)
+        cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.user])
+        role = Role.objects.create(name=role_name, course_id=cohort_course.id)
+        role.users = [self.user]
+        self.register_get_thread_response(make_minimal_cs_thread({
+            "id": "cohort_thread",
+            "course_id": unicode(cohort_course.id),
+            "group_id": (
+                None if thread_group_state == "no_group" else
+                cohort.id if thread_group_state == "match_group" else
+                cohort.id + 1
+            ),
+        }))
+        self.register_post_comment_response({}, thread_id="cohort_thread")
+        data = self.minimal_data.copy()
+        data["thread_id"] = "cohort_thread"
+        expected_error = (
+            role_name == FORUM_ROLE_STUDENT and
+            course_is_cohorted and
+            thread_group_state == "different_group"
+        )
+        try:
+            create_comment(self.request, data)
+            self.assertFalse(expected_error)
+        except ValidationError as err:
+            self.assertTrue(expected_error)
+            self.assertEqual(
+                err.message_dict,
+                {"thread_id": ["Invalid value."]}
+            )
+
     def test_invalid_field(self):
         data = self.minimal_data.copy()
         del data["raw_body"]
         with self.assertRaises(ValidationError):
             create_comment(self.request, data)
+
+
+@ddt.ddt
+class UpdateThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestCase):
+    """Tests for update_thread"""
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super(UpdateThreadTest, self).setUp()
+        httpretty.reset()
+        httpretty.enable()
+        self.addCleanup(httpretty.disable)
+        self.user = UserFactory.create()
+        self.register_get_user_response(self.user)
+        self.request = RequestFactory().get("/test_path")
+        self.request.user = self.user
+        self.course = CourseFactory.create()
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
+
+    def register_thread(self, overrides=None):
+        """
+        Make a thread with appropriate data overridden by the overrides
+        parameter and register mock responses for both GET and PUT on its
+        endpoint.
+        """
+        cs_data = make_minimal_cs_thread({
+            "id": "test_thread",
+            "course_id": unicode(self.course.id),
+            "commentable_id": "original_topic",
+            "username": self.user.username,
+            "user_id": str(self.user.id),
+            "created_at": "2015-05-29T00:00:00Z",
+            "updated_at": "2015-05-29T00:00:00Z",
+            "type": "discussion",
+            "title": "Original Title",
+            "body": "Original body",
+        })
+        cs_data.update(overrides or {})
+        self.register_get_thread_response(cs_data)
+        self.register_put_thread_response(cs_data)
+
+    def test_basic(self):
+        self.register_thread()
+        actual = update_thread(self.request, "test_thread", {"raw_body": "Edited body"})
+        expected = {
+            "id": "test_thread",
+            "course_id": unicode(self.course.id),
+            "topic_id": "original_topic",
+            "group_id": None,
+            "group_name": None,
+            "author": self.user.username,
+            "author_label": None,
+            "created_at": "2015-05-29T00:00:00Z",
+            "updated_at": "2015-05-29T00:00:00Z",
+            "type": "discussion",
+            "title": "Original Title",
+            "raw_body": "Edited body",
+            "pinned": False,
+            "closed": False,
+            "following": False,
+            "abuse_flagged": False,
+            "voted": False,
+            "vote_count": 0,
+            "comment_count": 0,
+            "unread_comment_count": 0,
+            "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
+            "endorsed_comment_list_url": None,
+            "non_endorsed_comment_list_url": None,
+        }
+        self.assertEqual(actual, expected)
+        self.assertEqual(
+            httpretty.last_request().parsed_body,
+            {
+                "course_id": [unicode(self.course.id)],
+                "commentable_id": ["original_topic"],
+                "thread_type": ["discussion"],
+                "title": ["Original Title"],
+                "body": ["Edited body"],
+                "user_id": [str(self.user.id)],
+                "anonymous": ["False"],
+                "anonymous_to_peers": ["False"],
+                "closed": ["False"],
+                "pinned": ["False"],
+            }
+        )
+
+    def test_nonexistent_thread(self):
+        self.register_get_thread_error_response("test_thread", 404)
+        with self.assertRaises(Http404):
+            update_thread(self.request, "test_thread", {})
+
+    def test_nonexistent_course(self):
+        self.register_thread({"course_id": "non/existent/course"})
+        with self.assertRaises(Http404):
+            update_thread(self.request, "test_thread", {})
+
+    def test_unenrolled(self):
+        self.register_thread()
+        self.request.user = UserFactory.create()
+        with self.assertRaises(Http404):
+            update_thread(self.request, "test_thread", {})
+
+    def test_discussions_disabled(self):
+        _remove_discussion_tab(self.course, self.user.id)
+        self.register_thread()
+        with self.assertRaises(Http404):
+            update_thread(self.request, "test_thread", {})
+
+    @ddt.data(
+        *itertools.product(
+            [
+                FORUM_ROLE_ADMINISTRATOR,
+                FORUM_ROLE_MODERATOR,
+                FORUM_ROLE_COMMUNITY_TA,
+                FORUM_ROLE_STUDENT,
+            ],
+            [True, False],
+            ["no_group", "match_group", "different_group"],
+        )
+    )
+    @ddt.unpack
+    def test_group_access(self, role_name, course_is_cohorted, thread_group_state):
+        cohort_course = CourseFactory.create(cohort_config={"cohorted": course_is_cohorted})
+        CourseEnrollmentFactory.create(user=self.user, course_id=cohort_course.id)
+        cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.user])
+        role = Role.objects.create(name=role_name, course_id=cohort_course.id)
+        role.users = [self.user]
+        self.register_thread({
+            "course_id": unicode(cohort_course.id),
+            "group_id": (
+                None if thread_group_state == "no_group" else
+                cohort.id if thread_group_state == "match_group" else
+                cohort.id + 1
+            ),
+        })
+        expected_error = (
+            role_name == FORUM_ROLE_STUDENT and
+            course_is_cohorted and
+            thread_group_state == "different_group"
+        )
+        try:
+            update_thread(self.request, "test_thread", {})
+            self.assertFalse(expected_error)
+        except Http404:
+            self.assertTrue(expected_error)
+
+    @ddt.data(
+        FORUM_ROLE_ADMINISTRATOR,
+        FORUM_ROLE_MODERATOR,
+        FORUM_ROLE_COMMUNITY_TA,
+        FORUM_ROLE_STUDENT,
+    )
+    def test_non_author_access(self, role_name):
+        role = Role.objects.create(name=role_name, course_id=self.course.id)
+        role.users = [self.user]
+        self.register_thread({"user_id": str(self.user.id + 1)})
+        expected_error = role_name == FORUM_ROLE_STUDENT
+        try:
+            update_thread(self.request, "test_thread", {})
+            self.assertFalse(expected_error)
+        except PermissionDenied:
+            self.assertTrue(expected_error)
+
+    def test_invalid_field(self):
+        self.register_thread()
+        with self.assertRaises(ValidationError) as assertion:
+            update_thread(self.request, "test_thread", {"raw_body": ""})
+        self.assertEqual(
+            assertion.exception.message_dict,
+            {"raw_body": ["This field is required."]}
+        )
