@@ -9,13 +9,11 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.http import Http404
 
-from rest_framework.exceptions import PermissionDenied
-
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
 
 from courseware.courses import get_course_with_access
-from discussion_api.forms import ThreadCreateExtrasForm
+from discussion_api.forms import ThreadActionsForm
 from discussion_api.pagination import get_paginated_data
 from discussion_api.serializers import CommentSerializer, ThreadSerializer, get_context
 from django_comment_client.base.views import (
@@ -267,6 +265,20 @@ def get_comment_list(request, thread_id, endorsed, page, page_size):
     return get_paginated_data(request, results, page, num_pages)
 
 
+def _do_extra_thread_actions(api_thread, cc_thread, request_fields, actions_form, context):
+    """
+    Perform any necessary additional actions related to thread creation or
+    update that require a separate comments service request.
+    """
+    form_following = actions_form.cleaned_data["following"]
+    if "following" in request_fields and form_following != api_thread["following"]:
+        if form_following:
+            context["cc_requester"].follow(cc_thread)
+        else:
+            context["cc_requester"].unfollow(cc_thread)
+        api_thread["following"] = form_following
+
+
 def create_thread(request, thread_data):
     """
     Create a thread.
@@ -294,27 +306,24 @@ def create_thread(request, thread_data):
 
     context = get_context(course, request)
     serializer = ThreadSerializer(data=thread_data, context=context)
-    extras_form = ThreadCreateExtrasForm(thread_data)
-    if not (serializer.is_valid() and extras_form.is_valid()):
-        raise ValidationError(dict(serializer.errors.items() + extras_form.errors.items()))
+    actions_form = ThreadActionsForm(thread_data)
+    if not (serializer.is_valid() and actions_form.is_valid()):
+        raise ValidationError(dict(serializer.errors.items() + actions_form.errors.items()))
     serializer.save()
 
-    thread = serializer.object
-    ret = serializer.data
-    following = extras_form.cleaned_data["following"]
-    if following:
-        context["cc_requester"].follow(thread)
-        ret["following"] = True
+    cc_thread = serializer.object
+    api_thread = serializer.data
+    _do_extra_thread_actions(api_thread, cc_thread, thread_data.keys(), actions_form, context)
 
     track_forum_event(
         request,
         THREAD_CREATED_EVENT_NAME,
         course,
-        thread,
-        get_thread_created_event_data(thread, followed=following)
+        cc_thread,
+        get_thread_created_event_data(cc_thread, followed=actions_form.cleaned_data["following"])
     )
 
-    return ret
+    return api_thread
 
 
 def create_comment(request, comment_data):
@@ -359,6 +368,21 @@ def create_comment(request, comment_data):
     return serializer.data
 
 
+_THREAD_EDITABLE_BY_ANY = {"following"}
+_THREAD_EDITABLE_BY_AUTHOR = {"topic_id", "type", "title", "raw_body"} | _THREAD_EDITABLE_BY_ANY
+
+
+def _get_thread_editable_fields(cc_thread, context):
+    """
+    Get the list of editable fields for the given thread in the given context
+    """
+    is_author = context["cc_requester"]["id"] == cc_thread["user_id"]
+    if context["is_requester_privileged"] or is_author:
+        return _THREAD_EDITABLE_BY_AUTHOR
+    else:
+        return _THREAD_EDITABLE_BY_ANY
+
+
 def update_thread(request, thread_id, update_data):
     """
     Update a thread.
@@ -378,11 +402,21 @@ def update_thread(request, thread_id, update_data):
         detail.
     """
     cc_thread, context = _get_thread_and_context(request, thread_id)
-    is_author = str(request.user.id) == cc_thread["user_id"]
-    if not (context["is_requester_privileged"] or is_author):
-        raise PermissionDenied()
+    editable_fields = _get_thread_editable_fields(cc_thread, context)
+    non_editable_errors = {
+        field: ["This field is not editable."]
+        for field in update_data.keys()
+        if field not in editable_fields
+    }
+    if non_editable_errors:
+        raise ValidationError(non_editable_errors)
     serializer = ThreadSerializer(cc_thread, data=update_data, partial=True, context=context)
-    if not serializer.is_valid():
-        raise ValidationError(serializer.errors)
-    serializer.save()
-    return serializer.data
+    actions_form = ThreadActionsForm(update_data)
+    if not (serializer.is_valid() and actions_form.is_valid()):
+        raise ValidationError(dict(serializer.errors.items() + actions_form.errors.items()))
+    # Only save thread object if some of the edited fields are in the thread data, not extra actions
+    if set(update_data) - set(actions_form.fields):
+        serializer.save()
+    api_thread = serializer.data
+    _do_extra_thread_actions(api_thread, cc_thread, update_data.keys(), actions_form, context)
+    return api_thread

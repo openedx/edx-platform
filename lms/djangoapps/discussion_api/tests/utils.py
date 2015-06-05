@@ -149,14 +149,16 @@ class CommentsServiceMockMixin(object):
 
     def register_subscription_response(self, user):
         """
-        Register a mock response for POST on the CS user subscription endpoint
+        Register a mock response for POST and DELETE on the CS user subscription
+        endpoint
         """
-        httpretty.register_uri(
-            httpretty.POST,
-            "http://localhost:4567/api/v1/users/{id}/subscriptions".format(id=user.id),
-            body=json.dumps({}),  # body is unused
-            status=200
-        )
+        for method in [httpretty.POST, httpretty.DELETE]:
+            httpretty.register_uri(
+                method,
+                "http://localhost:4567/api/v1/users/{id}/subscriptions".format(id=user.id),
+                body=json.dumps({}),  # body is unused
+                status=200
+            )
 
     def assert_query_params_equal(self, httpretty_request, expected_params):
         """

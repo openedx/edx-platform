@@ -3,7 +3,7 @@ Tests for Discussion API internal interface
 """
 from datetime import datetime, timedelta
 import itertools
-from urlparse import urlparse, urlunparse
+from urlparse import parse_qs, urlparse, urlunparse
 from urllib import urlencode
 
 import ddt
@@ -14,8 +14,6 @@ from pytz import UTC
 from django.core.exceptions import ValidationError
 from django.http import Http404
 from django.test.client import RequestFactory
-
-from rest_framework.exceptions import PermissionDenied
 
 from opaque_keys.edx.locator import CourseLocator
 
@@ -1132,6 +1130,7 @@ class CreateThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestC
             urlparse(cs_request.path).path,
             "/api/v1/users/{}/subscriptions".format(self.user.id)
         )
+        self.assertEqual(cs_request.method, "POST")
         self.assertEqual(
             cs_request.parsed_body,
             {"source_type": ["thread"], "source_id": ["test_id"]}
@@ -1396,6 +1395,15 @@ class UpdateThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestC
         self.register_get_thread_response(cs_data)
         self.register_put_thread_response(cs_data)
 
+    def test_empty(self):
+        """Check that an empty update does not make any modifying requests."""
+        # Ensure that the default following value of False is not applied implicitly
+        self.register_get_user_response(self.user, subscribed_thread_ids=["test_thread"])
+        self.register_thread()
+        update_thread(self.request, "test_thread", {})
+        for request in httpretty.httpretty.latest_requests:
+            self.assertEqual(request.method, "GET")
+
     def test_basic(self):
         self.register_thread()
         actual = update_thread(self.request, "test_thread", {"raw_body": "Edited body"})
@@ -1507,16 +1515,61 @@ class UpdateThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestC
         FORUM_ROLE_COMMUNITY_TA,
         FORUM_ROLE_STUDENT,
     )
-    def test_non_author_access(self, role_name):
+    def test_author_only_fields(self, role_name):
         role = Role.objects.create(name=role_name, course_id=self.course.id)
         role.users = [self.user]
         self.register_thread({"user_id": str(self.user.id + 1)})
+        data = {field: "edited" for field in ["topic_id", "title", "raw_body"]}
+        data["type"] = "question"
         expected_error = role_name == FORUM_ROLE_STUDENT
         try:
-            update_thread(self.request, "test_thread", {})
+            update_thread(self.request, "test_thread", data)
             self.assertFalse(expected_error)
-        except PermissionDenied:
+        except ValidationError as err:
             self.assertTrue(expected_error)
+            self.assertEqual(
+                err.message_dict,
+                {field: ["This field is not editable."] for field in data.keys()}
+            )
+
+    @ddt.data(*itertools.product([True, False], [True, False]))
+    @ddt.unpack
+    def test_following(self, old_following, new_following):
+        """
+        Test attempts to edit the "following" field.
+
+        old_following indicates whether the thread should be followed at the
+        start of the test. new_following indicates the value for the "following"
+        field in the update. If old_following and new_following are the same, no
+        update should be made. Otherwise, a subscription should be POSTed or
+        DELETEd according to the new_following value.
+        """
+        if old_following:
+            self.register_get_user_response(self.user, subscribed_thread_ids=["test_thread"])
+        self.register_subscription_response(self.user)
+        self.register_thread()
+        data = {"following": new_following}
+        result = update_thread(self.request, "test_thread", data)
+        self.assertEqual(result["following"], new_following)
+        last_request_path = urlparse(httpretty.last_request().path).path
+        subscription_url = "/api/v1/users/{}/subscriptions".format(self.user.id)
+        if old_following == new_following:
+            self.assertNotEqual(last_request_path, subscription_url)
+        else:
+            self.assertEqual(last_request_path, subscription_url)
+            self.assertEqual(
+                httpretty.last_request().method,
+                "POST" if new_following else "DELETE"
+            )
+            request_data = (
+                httpretty.last_request().parsed_body if new_following else
+                parse_qs(urlparse(httpretty.last_request().path).query)
+            )
+            request_data.pop("request_id", None)
+            self.assertEqual(
+                request_data,
+                {"source_type": ["thread"], "source_id": ["test_thread"]}
+            )
 
     def test_invalid_field(self):
         self.register_thread()
