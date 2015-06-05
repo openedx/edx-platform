@@ -12,9 +12,11 @@ the SessionMiddleware.
 """
 from django.conf import settings
 
-from django.utils.translation.trans_real import parse_accept_lang_header
-
 from dark_lang.models import DarkLangConfig
+
+# TODO re-import this once we're on Django 1.5 or greater. [PLAT-671]
+# from django.utils.translation.trans_real import parse_accept_lang_header
+from django_locale.trans_real import parse_accept_lang_header
 
 
 def dark_parse_accept_lang_header(accept):
