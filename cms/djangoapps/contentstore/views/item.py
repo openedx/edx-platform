@@ -807,6 +807,9 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     # defining the default value 'True' for delete, drag and add new child actions in xblock_actions for each xblock.
     xblock_actions = {'deletable': True, 'draggable': True, 'childAddable': True}
     explanatory_message = None
+    enable_proctored_exams = False
+    if xblock.category == 'course' and settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False):
+        enable_proctored_exams = getattr(xblock, "enable_proctored_exams", False)
     # is_entrance_exam is inherited metadata.
     if xblock.category == 'chapter' and getattr(xblock, "is_entrance_exam", None):
         # Entrance exam section should not be deletable, draggable and not have 'New Subsection' button.
@@ -843,7 +846,14 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "course_graders": json.dumps([grader.get('type') for grader in graders]),
         "has_changes": has_changes,
         "actions": xblock_actions,
-        "explanatory_message": explanatory_message
+        "enable_proctored_exams": enable_proctored_exams,
+        "explanatory_message": explanatory_message,
+        'is_proctored_enabled': xblock.is_proctored_enabled if xblock.category == 'sequential' else False,
+        'is_time_limited': xblock.is_time_limited if xblock.category == 'sequential' else False,
+        'default_time_limit_mins': getattr(
+            xblock,
+            'default_time_limit_mins', '00:00'
+        ) if xblock.category == 'sequential' else '00:00'
     }
 
     # Entrance exam subsection should be hidden. in_entrance_exam is inherited metadata, all children will have it.
