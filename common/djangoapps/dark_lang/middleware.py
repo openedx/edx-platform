@@ -126,7 +126,4 @@ class DarkLangMiddleware(object):
         if not preview_lang:
             return
 
-        if preview_lang in self.released_langs:
-            return
-
         request.session['django_language'] = preview_lang
