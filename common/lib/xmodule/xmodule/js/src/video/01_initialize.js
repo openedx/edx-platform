@@ -75,7 +75,8 @@ function (VideoPlayer, i18n) {
         setSpeed: setSpeed,
         speedToString: speedToString,
         trigger: trigger,
-        youtubeId: youtubeId
+        youtubeId: youtubeId,
+        isYoutubeAvailable: isYoutubeAvailable
     },
 
         _youtubeApiDeferred = null,
@@ -517,17 +518,12 @@ function (VideoPlayer, i18n) {
             _renderElements(this);
         } else {
             if (!this.youtubeXhr) {
-                this.youtubeXhr = this.getVideoMetadata();
+                this.youtubeXhr = this.isYoutubeAvailable();
             }
 
             this.youtubeXhr
-                .always(function (json, status) {
-                    var err = $.isPlainObject(json.error) ||
-                                (
-                                    status !== 'success' &&
-                                    status !== 'notmodified'
-                                );
-                    if (err) {
+                .always(function (resp, status) {
+                    if (status !== 'success') {
                         console.log(
                             '[Video info]: YouTube returned an error for ' +
                             'video with id "' + id + '".'
@@ -622,8 +618,9 @@ function (VideoPlayer, i18n) {
 
         metadataXHRs = _.map(this.videos, function (url, speed) {
             return self.getVideoMetadata(url, function (data) {
-                if (data.data) {
-                    self.metadata[data.data.id] = data.data;
+                if (data.items) {
+                    var metaDataItem = data.items[0];
+                    self.metadata[metaDataItem.id] = metaDataItem.contentDetails;
                 }
             });
         });
@@ -674,15 +671,20 @@ function (VideoPlayer, i18n) {
         if (!(_.isString(url))) {
             url = this.videos['1.0'] || '';
         }
-
+        // Todo, its working but not clean.
         return $.ajax({
-            url: [
-                document.location.protocol, '//', this.config.ytTestUrl, url,
-                '?v=2&alt=jsonc'
-            ].join(''),
-            dataType: 'jsonp',
+            url: ['https:', '//', 'www.googleapis.com/youtube/v3/videos?id=', url,
+                '&part=contentDetails&key=AIzaSyD4Nl2sPF86nAty2TWM5hdMoKJTmqxMZoc&referrer=*.edx.org/*'].join(''),
             timeout: this.config.ytTestTimeout,
             success: _.isFunction(callback) ? callback : null
+        });
+    }
+
+    function isYoutubeAvailable() {
+        // Todo, it's not working yet.
+        return $.ajax({
+            url: [document.location.protocol, '//', 'www.youtube.com/favicon.ico'].join(''),
+            timeout: this.config.ytTestTimeout
         });
     }
 
@@ -696,10 +698,26 @@ function (VideoPlayer, i18n) {
 
     function getDuration() {
         try {
-            return this.metadata[this.youtubeId()].duration;
+            return convertISO8601ToSeconds(this.metadata[this.youtubeId()].duration);
         } catch (err) {
             return _.result(this.metadata[this.youtubeId('1.0')], 'duration') || 0;
         }
+    }
+
+    function convertISO8601ToSeconds(input) {
+
+        var reptms = /^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/;
+        var hours = 0, minutes = 0, seconds = 0, totalseconds;
+
+        if (reptms.test(input)) {
+            var matches = reptms.exec(input);
+            if (matches[1]) hours = Number(matches[1]);
+            if (matches[2]) minutes = Number(matches[2]);
+            if (matches[3]) seconds = Number(matches[3]);
+            totalseconds = hours * 3600  + minutes * 60 + seconds;
+        }
+
+        return (totalseconds);
     }
 
     /**
