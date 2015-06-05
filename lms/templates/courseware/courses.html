@@ -32,9 +32,17 @@
   course_discovery_enabled = settings.FEATURES.get('ENABLE_COURSE_DISCOVERY')
   if self.stanford_theme_enabled():
     course_index_overlay_text = _("Explore free courses from {university_name}.").format(university_name="Stanford University")
+    logo_file = static.url('themes/stanford/images/seal.png')
+    logo_alt_text = "Stanford Seal Logo"
 
   else:
     course_index_overlay_text = microsite.get_value('course_index_overlay_text', _("Explore courses from {platform_name}.").format(platform_name=platform_name))
+
+    logo_file = microsite.get_value(
+      'course_index_overlay_logo_file',
+      settings.STATIC_URL + 'images/logo-large.png',
+    )
+    logo_alt_text = _("{platform_name} Logo").format(platform_name=platform_name)
 %>
 
 <section class="find-courses">
@@ -43,8 +51,7 @@
     <div class="inner-wrapper main-search">
       <hgroup>
         <div class="logo">
-          <img src="${static.url('images/logo-large.png')}"
-               alt="${_("{platform_name} Logo").format(platform_name=platform_name)}" />
+          <img src="${logo_file}" alt="${logo_alt_text}" />
         </div>
         <h2>${course_index_overlay_text}</h2>
       </hgroup>
