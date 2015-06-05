@@ -464,7 +464,6 @@
         }
       }
     }
-
     // CASE: content group has been removed
     .field-visibility-content-group.was-removed {
 
@@ -519,9 +518,14 @@
   .wrapper-modal-window-bulkpublish-subsection,
   .wrapper-modal-window-bulkpublish-unit,
   .course-outline-modal {
-
+    .exam-time-list-fields {
+      margin-bottom: ($baseline/2);
+    }
     .list-fields {
-
+      .field-message {
+        color: $gray;
+        font-size: ($baseline/2);
+      }
       .field {
         display: inline-block;
         vertical-align: top;
@@ -625,7 +629,7 @@
     }
 
     // UI: staff lock section
-    .edit-staff-lock {
+    .edit-staff-lock, .edit-settings-timed-examination{
 
       .checkbox-cosmetic .input-checkbox {
         @extend %cont-text-sr;
