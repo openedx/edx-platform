@@ -144,9 +144,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-05-29 19:11+0000\n"
-"PO-Revision-Date: 2015-05-26 13:32+0000\n"
-"Last-Translator: Cleomir Waiczyk <w.cleomir@gmail.com>\n"
+"POT-Creation-Date: 2015-06-05 17:34+0000\n"
+"PO-Revision-Date: 2015-06-05 17:38+0000\n"
+"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/edx-platform/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -157,6 +157,7 @@ msgstr ""
 
 #: cms/static/coffee/src/views/tabs.js
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
+#: cms/static/js/certificates/views/signatory_details.js
 #: cms/static/js/models/section.js cms/static/js/utils/drag_and_drop.js
 #: cms/static/js/views/asset.js cms/static/js/views/container.js
 #: cms/static/js/views/course_info_handout.js
@@ -181,8 +182,10 @@ msgstr "OK"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: cms/static/coffee/src/views/tabs.js cms/static/js/factories/export.js
-#: cms/static/js/views/asset.js cms/static/js/views/course_info_update.js
+#: cms/static/coffee/src/views/tabs.js
+#: cms/static/js/certificates/views/signatory_editor.js
+#: cms/static/js/factories/export.js cms/static/js/views/asset.js
+#: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/show_textbook.js cms/static/js/views/validation.js
 #: cms/static/js/views/modals/base_modal.js
@@ -196,18 +199,19 @@ msgstr "Cancelar"
 msgid "This link will open in a new browser window/tab"
 msgstr "Este link será aberto em uma nova janela/guia do navegador"
 
-#. Translators: This is the status of an active video upload
-#: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
-#: lms/static/js/views/fields.js
-msgid "Uploading"
-msgstr ""
-
+#: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/asset.js cms/static/js/views/list_item.js
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/show_textbook.js
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Delete"
 msgstr "Apagar"
+
+#. Translators: This is the status of an active video upload
+#: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
+#: lms/static/js/views/fields.js
+msgid "Uploading"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -625,9 +629,11 @@ msgstr ""
 msgid "Code block"
 msgstr ""
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Code"
 msgstr ""
 
@@ -1524,9 +1530,12 @@ msgstr ""
 "A URL que você inseriu parece ser um link externo. Deseja adicionar o "
 "prefixo obrigatório http://?"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/signatory-details.underscore
+#: cms/templates/js/signatory-editor.underscore
 msgid "Title"
 msgstr ""
 
@@ -1692,12 +1701,12 @@ msgstr ""
 "SequenceModule atual. Por favor, entre em contato com a equipe do curso."
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+#: common/lib/xmodule/xmodule/js/src/video/09_play_pause_control.js
+#: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
 msgid "Play"
 msgstr "Reproduzir"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Pause"
 msgstr "Pausar"
 
@@ -1710,20 +1719,22 @@ msgid "Unmute"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_full_screen.js
 msgid "Exit full browser"
 msgstr "Sair da tela cheia do navegador"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_full_screen.js
 msgid "Fill browser"
 msgstr "Tela cheia"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid "Speed"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Volume"
 msgstr "Volume"
 
@@ -1777,17 +1788,13 @@ msgstr ""
 msgid "Try using a different browser, such as Google Chrome."
 msgstr "Tente usar um navegador diferente, como o Google Chrome."
 
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Video slider"
-msgstr "Barra deslizante do vídeo"
+#: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
+msgid "HD off"
+msgstr "Alta definição desativada"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "HD on"
 msgstr "Alta definição ativada"
-
-#: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
-msgid "HD off"
-msgstr "Alta definição desativada"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video position"
@@ -1815,6 +1822,38 @@ msgid_plural "%(value)s seconds"
 msgstr[0] "%(value)s segundo"
 msgstr[1] "%(value)s segundos"
 
+#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
+msgid ""
+"Click on this button to mute or unmute this video or press UP or DOWN "
+"buttons to increase or decrease volume level."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
+msgid "Speeds"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
+msgid "Skip"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/09_poster.js
+msgid "Play video"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/09_skip_control.js
+msgid "Do not show again"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "Turn off captions"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid ""
+"Activating an item in this group will spool the video to the corresponding "
+"time point. To skip transcript, go to previous item."
+msgstr ""
+
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Caption will be displayed when "
 msgstr "A legenda será exibida quando"
@@ -1822,10 +1861,6 @@ msgstr "A legenda será exibida quando"
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on captions"
 msgstr "Ativar legendas"
-
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "Turn off captions"
-msgstr ""
 
 #: common/lib/xmodule/xmodule/public/js/library_content_edit.js
 msgid "Updating with latest library content"
@@ -2291,6 +2326,16 @@ msgstr "Responder"
 msgid "Tags:"
 msgstr "Marcações:"
 
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"Course teams are organized into topics created by course instructors. Try to"
+" join others in an existing team before you decide to create a new team!"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Teams"
+msgstr ""
+
 #: lms/static/coffee/src/calculator.js
 msgid "Open Calculator"
 msgstr "Abrir calculadora"
@@ -2316,6 +2361,10 @@ msgstr "Carregando"
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error getting student list."
 msgstr "Ocorreu um erro ao obter a lista de alunos."
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Error generating list of students who may enroll. Please try again."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error retrieving grading configuration."
@@ -2459,6 +2508,10 @@ msgid "Could not find users associated with the following identifiers:"
 msgstr ""
 "Não foi possível localizar usuários associados aos seguintes "
 "identificadores:"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Reason field should not be left blank."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
@@ -3155,6 +3208,15 @@ msgstr ""
 msgid "An error occurred. Please try again later."
 msgstr ""
 
+#: lms/static/js/discovery/form.js
+msgid "We couldn't find any results for \"%s\"."
+msgstr ""
+
+#: lms/static/js/discovery/form.js
+#: lms/templates/search/search_error.underscore
+msgid "There was an error, try searching again."
+msgstr ""
+
 #: lms/static/js/edxnotes/plugins/accessibility.js
 msgid "Focus grabber"
 msgstr ""
@@ -3338,6 +3400,22 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Prevent students from generating certificates in this course?"
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/ecommerce.js
+msgid "Enter the enrollment code."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/ecommerce.js
+msgid "Cancel enrollment code"
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/ecommerce.js
+msgid "Restore enrollment code"
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/ecommerce.js
+msgid "Mark enrollment code as unused"
 msgstr ""
 
 #: lms/static/js/search/base/views/search_results_view.js
@@ -3674,6 +3752,10 @@ msgid "Double-check that your webcam is connected and working to continue."
 msgstr ""
 
 #: lms/static/js/verify_student/views/webcam_photo_view.js
+msgid "Photo Captured successfully."
+msgstr ""
+
+#: lms/static/js/verify_student/views/webcam_photo_view.js
 msgid "No Flash Detected"
 msgstr ""
 
@@ -3810,6 +3892,7 @@ msgid ""
 msgstr ""
 
 #: cms/static/coffee/src/views/tabs.js
+#: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/course_info_update.js cms/static/js/views/list_item.js
 #: cms/static/js/views/show_textbook.js
 #: cms/static/js/views/utils/xblock_utils.js
@@ -3823,6 +3906,72 @@ msgstr ""
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
 msgstr "Este link irá abrir em uma janela modal"
+
+#: cms/static/js/certificates/collections/certificates.js
+msgid "Could not parse certificate JSON. %(message)s"
+msgstr ""
+
+#: cms/static/js/certificates/models/certificate.js
+msgid "Certificate name is required."
+msgstr ""
+
+#: cms/static/js/certificates/models/certificate.js
+msgid "Signatory field(s) has invalid data."
+msgstr ""
+
+#: cms/static/js/certificates/models/signatory.js
+msgid "Signatory name should not be more than 40 characters long."
+msgstr ""
+
+#: cms/static/js/certificates/models/signatory.js
+msgid "Signatory title should span over maximum of 2 lines."
+msgstr ""
+
+#: cms/static/js/certificates/models/signatory.js
+msgid "Signatory title should have maximum of 40 characters per line."
+msgstr ""
+
+#: cms/static/js/certificates/models/signatory.js
+msgid "Signatory organization should not be more than 40 characters long."
+msgstr ""
+
+#: cms/static/js/certificates/views/certificate_editor.js
+msgid "Upload organization logo."
+msgstr ""
+
+#: cms/static/js/certificates/views/certificate_editor.js
+msgid "Maximum logo height should be 125px."
+msgstr ""
+
+#. Translators: This field pertains to the custom label for a certificate.
+#. Translators: this refers to a collection of certificates.
+#: cms/static/js/certificates/views/certificate_item.js
+#: cms/static/js/certificates/views/certificates_list.js
+msgid "certificate"
+msgstr ""
+
+#. Translators: This line refers to the initial state of the form when no data
+#. has been inserted
+#: cms/static/js/certificates/views/certificates_list.js
+msgid "You have not created any certificates yet."
+msgstr ""
+
+#: cms/static/js/certificates/views/signatory_editor.js
+msgid "Delete \"<%= signatoryName %>\" from the list of signatories?"
+msgstr ""
+
+#: cms/static/js/certificates/views/signatory_editor.js
+#: cms/static/js/views/course_info_update.js
+msgid "This action cannot be undone."
+msgstr ""
+
+#: cms/static/js/certificates/views/signatory_editor.js
+msgid "Upload signature image."
+msgstr ""
+
+#: cms/static/js/certificates/views/signatory_editor.js
+msgid "Image must be 450px X 150px transparent PNG."
+msgstr ""
 
 #: cms/static/js/collections/group.js
 msgid "Group %s"
@@ -3906,12 +4055,17 @@ msgid "There was an error while verifying the file you submitted."
 msgstr ""
 
 #: cms/static/js/factories/import.js
+msgid "Choose new file"
+msgstr ""
+
+#: cms/static/js/factories/import.js
 msgid "Your import has failed."
 msgstr ""
 
-#: cms/static/js/factories/import.js cms/static/js/views/import.js
-#: cms/static/js/views/import.js.c
-msgid "Choose new file"
+#: cms/static/js/factories/import.js
+msgid ""
+"File format not supported. Please upload a file with a {file_extension} "
+"extension."
 msgstr ""
 
 #: cms/static/js/factories/manage_users.js
@@ -4179,10 +4333,6 @@ msgstr ""
 msgid "Are you sure you want to delete this update?"
 msgstr ""
 
-#: cms/static/js/views/course_info_update.js
-msgid "This action cannot be undone."
-msgstr ""
-
 #: cms/static/js/views/course_rerun.js
 msgid "Create Re-run"
 msgstr ""
@@ -4226,17 +4376,15 @@ msgid "You have not created any group configurations yet."
 msgstr ""
 
 #: cms/static/js/views/import.js
+msgid "Your import is in progress; navigating away will abort it."
+msgstr ""
+
+#: cms/static/js/views/import.js
 msgid "Error importing course"
 msgstr ""
 
 #: cms/static/js/views/import.js
 msgid "There was an error with the upload"
-msgstr ""
-
-#: cms/static/js/views/import.js
-msgid ""
-"File format not supported. Please upload a file with a <code>tar.gz</code> "
-"extension."
 msgstr ""
 
 #: cms/static/js/views/license.js cms/templates/js/license-selector.underscore
@@ -4748,6 +4896,12 @@ msgstr ""
 msgid "Incorrect url format."
 msgstr ""
 
+#: cms/templates/js/asset-library.underscore
+#: cms/templates/js/basic-modal.underscore
+#: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
+msgid "Actions"
+msgstr ""
+
 #: cms/templates/js/previous-video-upload-list.underscore
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
@@ -4887,6 +5041,34 @@ msgstr ""
 
 #: lms/templates/dashboard/donation.underscore
 msgid "Donate"
+msgstr ""
+
+#: lms/templates/discovery/filter_bar.underscore
+msgid "CLEAR ALL"
+msgstr ""
+
+#: lms/templates/discovery/more_less_links.underscore
+msgid "MORE..."
+msgstr ""
+
+#: lms/templates/discovery/more_less_links.underscore
+msgid "LESS..."
+msgstr ""
+
+#: lms/templates/discovery/result_item.underscore
+msgid "LEARN MORE"
+msgstr ""
+
+#: lms/templates/discovery/result_item.underscore
+msgid "gettext("
+msgstr ""
+
+#: lms/templates/discovery/result_item.underscore
+msgid "Starts"
+msgstr ""
+
+#: lms/templates/discovery/search_facets_list.underscore
+msgid "Refine your search"
 msgstr ""
 
 #: lms/templates/edxnotes/note-item.underscore
@@ -5116,6 +5298,14 @@ msgid ""
 "%(link_start)s the Data Download page. %(link_end)s"
 msgstr ""
 
+#: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
+msgid "Used"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
+msgid "Valid"
+msgstr ""
+
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
 msgid "Load next %(num_items)s result"
@@ -5130,10 +5320,6 @@ msgstr ""
 
 #: lms/templates/search/dashboard_search_results.underscore
 msgid "Back to Dashboard"
-msgstr ""
-
-#: lms/templates/search/search_error.underscore
-msgid "There was an error, try searching again."
 msgstr ""
 
 #: lms/templates/student_account/account.underscore
@@ -5715,11 +5901,6 @@ msgid "URL"
 msgstr ""
 
 #: cms/templates/js/asset-library.underscore
-#: cms/templates/js/basic-modal.underscore
-msgid "Actions"
-msgstr ""
-
-#: cms/templates/js/asset-library.underscore
 msgid "You haven't added any assets to this course yet."
 msgstr ""
 
@@ -5759,6 +5940,99 @@ msgstr ""
 msgid "Lock/unlock file"
 msgstr ""
 
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/content-group-details.underscore
+#: cms/templates/js/group-configuration-details.underscore
+msgid "ID"
+msgstr ""
+
+#: cms/templates/js/certificate-details.underscore
+msgid "Certificate Details"
+msgstr ""
+
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
+msgid "Course Title Override"
+msgstr ""
+
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
+msgid "Certificate Signatories"
+msgstr ""
+
+#: cms/templates/js/certificate-editor.underscore
+#: cms/templates/js/content-group-editor.underscore
+#: cms/templates/js/edit-textbook.underscore
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "error.message"
+msgstr ""
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "Certificate Information"
+msgstr ""
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "Certificate Name"
+msgstr ""
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "Name of the certificate"
+msgstr ""
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "Description of the certificate"
+msgstr ""
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "Course title"
+msgstr ""
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "Title of the course"
+msgstr ""
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "Organization Logo"
+msgstr ""
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "Path to organization logo"
+msgstr ""
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "Maximum logo height 125px, width variable"
+msgstr ""
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "Add Signatory"
+msgstr ""
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "(Up to 4 signatories are allowed for a certificate)"
+msgstr ""
+
+#: cms/templates/js/certificate-editor.underscore
+#: cms/templates/js/content-group-editor.underscore
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "Create"
+msgstr ""
+
+#: cms/templates/js/certificate-web-preview.underscore
+msgid "Choose mode"
+msgstr ""
+
+#: cms/templates/js/certificate-web-preview.underscore
+msgid "Preview Certificate"
+msgstr ""
+
+#: cms/templates/js/certificate-web-preview.underscore
+msgid "Activate"
+msgstr ""
+
+#: cms/templates/js/certificate-web-preview.underscore
+msgid "Deactivate"
+msgstr ""
+
 #: cms/templates/js/checklist.underscore
 msgid "{number}{pct_sign} of checklists completed"
 msgstr ""
@@ -5778,23 +6052,12 @@ msgid ""
 msgstr ""
 
 #: cms/templates/js/content-group-details.underscore
-#: cms/templates/js/group-configuration-details.underscore
-msgid "ID"
-msgstr ""
-
-#: cms/templates/js/content-group-details.underscore
 #: cms/templates/js/content-group-editor.underscore
 msgid "Cannot delete when in use by a unit"
 msgstr ""
 
 #: cms/templates/js/content-group-details.underscore
 msgid "This content group is used in:"
-msgstr ""
-
-#: cms/templates/js/content-group-editor.underscore
-#: cms/templates/js/edit-textbook.underscore
-#: cms/templates/js/group-configuration-editor.underscore
-msgid "error.message"
 msgstr ""
 
 #: cms/templates/js/content-group-editor.underscore
@@ -5811,11 +6074,6 @@ msgstr ""
 
 #: cms/templates/js/content-group-editor.underscore
 msgid "This content group is used in one or more units."
-msgstr ""
-
-#: cms/templates/js/content-group-editor.underscore
-#: cms/templates/js/group-configuration-editor.underscore
-msgid "Create"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore
@@ -6297,6 +6555,47 @@ msgstr ""
 
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
+msgstr ""
+
+#: cms/templates/js/signatory-details.underscore
+#: cms/templates/js/signatory-editor.underscore
+msgid "Organization"
+msgstr ""
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Certificate Signatory Configuration"
+msgstr ""
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Name of the signatory"
+msgstr ""
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Maximum 40 characters"
+msgstr ""
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Title of the signatory"
+msgstr ""
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "2 Lines, 40 characters each"
+msgstr ""
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Organization of the signatory"
+msgstr ""
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Signature Image"
+msgstr ""
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Path to Signature Image"
+msgstr ""
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Image must be 450px X 150px transparent PNG"
 msgstr ""
 
 #: cms/templates/js/staff-lock-editor.underscore
