@@ -228,8 +228,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     title: 'About me',
                     valueAttribute: 'bio',
                     helpMessage: 'Wicked is good',
-                    placeholderValue: "Tell other edX learners a little about yourself: where you live, " +
-                        "what your interests are, why you’re taking courses on edX, or what you hope to learn.",
+                    placeholderValue: "Tell other learners a little about yourself: where you live, " +
+                        "what your interests are, why you’re taking courses, or what you hope to learn.",
                     editable: 'never'
                 });
 
@@ -257,8 +257,8 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     title: 'About me',
                     valueAttribute: 'bio',
                     helpMessage: 'Wicked is good',
-                    placeholderValue: "Tell other edX learners a little about yourself: where you live, " +
-                        "what your interests are, why you’re taking courses on edX, or what you hope to learn.",
+                    placeholderValue: "Tell other learners a little about yourself: where you live, " +
+                        "what your interests are, why you’re taking courses, or what you hope to learn.",
                     editable: 'toggle'
 
                 });
