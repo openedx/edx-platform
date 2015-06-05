@@ -4,7 +4,7 @@ define(['backbone', 'jquery', 'underscore', 'logger', 'js/common_helpers/ajax_he
     function (Backbone, $, _, Logger, AjaxHelpers, TemplateHelpers, BookmarksListButtonView) {
         'use strict';
 
-        describe("lms.courseware.bookmarks", function () {
+        xdescribe("lms.courseware.bookmarks", function () {
 
             var bookmarksButtonView;
             var BOOKMARKS_API_URL = '/api/bookmarks/v1/bookmarks/';
