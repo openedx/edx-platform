@@ -63,6 +63,8 @@
             'js/verify_student/photocapture': 'js/verify_student/photocapture',
             'js/staff_debug_actions': 'js/staff_debug_actions',
             'js/vendor/jquery.qubit': 'js/vendor/jquery.qubit',
+            // TODO fix the path to moment in order to run the tests.
+            //'moment': 'xmodule_js/common_static/js/vendor/moment-with-locales',
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
             'js/models/notification': 'js/models/notification',
@@ -93,6 +95,13 @@
             'js/student_profile/views/learner_profile_fields': 'js/student_profile/views/learner_profile_fields',
             'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory',
             'js/student_profile/views/learner_profile_view': 'js/student_profile/views/learner_profile_view',
+
+            'js/bookmarks/collections/bookmarks': 'js/bookmarks/collections/bookmarks',
+            'js/bookmarks/models/bookmark': 'js/bookmarks/models/bookmark',
+            'js/bookmarks/views/bookmarks_list_button': 'js/bookmarks/views/bookmarks_list_button',
+            'js/bookmarks/views/bookmarks_list': 'js/bookmarks/views/bookmarks_list',
+            'js/bookmarks/views/bookmark_button': 'js/bookmarks/views/bookmark_button',
+            'js/views/message': 'js/views/message',
 
             // edxnotes
             'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min',
@@ -629,7 +638,9 @@
         'lms/include/js/spec/edxnotes/plugins/caret_navigation_spec.js',
         'lms/include/js/spec/edxnotes/collections/notes_spec.js',
         'lms/include/js/spec/search/search_spec.js',
-        'lms/include/js/spec/discovery/discovery_spec.js'
+        'lms/include/js/spec/discovery/discovery_spec.js',
+        'lms/include/js/spec/bookmarks/bookmarks_list_view_spec.js',
+        'lms/include/js/spec/bookmarks/bookmark_button_view_spec.js'
     ]);
 
 }).call(this, requirejs, define);

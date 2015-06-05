@@ -37,6 +37,7 @@ from courseware.entrance_exams import (
     get_entrance_exam_score,
     user_must_complete_entrance_exam
 )
+from lms.djangoapps.bookmarks.services import BookmarksService
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, unquote_slashes, quote_slashes
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
@@ -640,7 +641,8 @@ def get_module_system_for_user(user, field_data_cache,
             'fs': xblock.reference.plugins.FSService(),
             'field-data': field_data,
             'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
-            "reverification": ReverificationService()
+            'reverification': ReverificationService(),
+            'bookmarks': BookmarksService(user=user),
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
