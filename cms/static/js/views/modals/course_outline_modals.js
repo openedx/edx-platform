@@ -281,7 +281,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             return {
                 metadata: {
                     'enable_exam_time': this.isExamTimeEnable(),
-                    'enable_exam_proctoring': this.isExamProctoringEnable(),
+                    'enable_proctored_exams': this.isExamProctoringEnable(),
                     'exam_time_limit': this.getExamTimeLimit()
                 }
             };
