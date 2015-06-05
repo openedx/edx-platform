@@ -656,6 +656,27 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, ModuleStore
                 {field: ["This field is required."]}
             )
 
+    def test_create_endorsed(self):
+        # TODO: The comments service doesn't populate the endorsement field on
+        # comment creation, so this is sadly realistic
+        self.register_post_comment_response({}, thread_id="test_thread")
+        data = self.minimal_data.copy()
+        data["endorsed"] = True
+        saved = self.save_and_reserialize(data)
+        self.assertEqual(
+            httpretty.last_request().parsed_body,
+            {
+                "course_id": [unicode(self.course.id)],
+                "body": ["Test body"],
+                "user_id": [str(self.user.id)],
+                "endorsed": ["True"],
+            }
+        )
+        self.assertTrue(saved["endorsed"])
+        self.assertIsNone(saved["endorsed_by"])
+        self.assertIsNone(saved["endorsed_by_label"])
+        self.assertIsNone(saved["endorsed_at"])
+
     def test_update_empty(self):
         self.register_put_comment_response(self.existing_comment.attributes)
         self.save_and_reserialize({}, instance=self.existing_comment)
@@ -672,8 +693,13 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, ModuleStore
         )
 
     def test_update_all(self):
-        self.register_put_comment_response(self.existing_comment.attributes)
-        data = {"raw_body": "Edited body"}
+        cs_response_data = self.existing_comment.attributes.copy()
+        cs_response_data["endorsement"] = {
+            "user_id": str(self.user.id),
+            "time": "2015-06-05T00:00:00Z",
+        }
+        self.register_put_comment_response(cs_response_data)
+        data = {"raw_body": "Edited body", "endorsed": True}
         saved = self.save_and_reserialize(data, instance=self.existing_comment)
         self.assertEqual(
             httpretty.last_request().parsed_body,
@@ -683,10 +709,14 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, ModuleStore
                 "user_id": [str(self.user.id)],
                 "anonymous": ["False"],
                 "anonymous_to_peers": ["False"],
-                "endorsed": ["False"],
+                "endorsed": ["True"],
+                "endorsement_user_id": [str(self.user.id)],
             }
         )
-        self.assertEqual(saved["raw_body"], data["raw_body"])
+        for key in data:
+            self.assertEqual(saved[key], data[key])
+        self.assertEqual(saved["endorsed_by"], self.user.username)
+        self.assertEqual(saved["endorsed_at"], "2015-06-05T00:00:00Z")
 
     def test_update_empty_raw_body(self):
         serializer = CommentSerializer(

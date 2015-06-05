@@ -1787,22 +1787,67 @@ class UpdateCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
         except Http404:
             self.assertTrue(expected_error)
 
-    @ddt.data(
-        FORUM_ROLE_ADMINISTRATOR,
-        FORUM_ROLE_MODERATOR,
-        FORUM_ROLE_COMMUNITY_TA,
-        FORUM_ROLE_STUDENT,
-    )
-    def test_role_access(self, role_name):
+    @ddt.data(*itertools.product(
+        [
+            FORUM_ROLE_ADMINISTRATOR,
+            FORUM_ROLE_MODERATOR,
+            FORUM_ROLE_COMMUNITY_TA,
+            FORUM_ROLE_STUDENT,
+        ],
+        [True, False],
+        [True, False],
+    ))
+    @ddt.unpack
+    def test_raw_body_access(self, role_name, is_thread_author, is_comment_author):
         role = Role.objects.create(name=role_name, course_id=self.course.id)
         role.users = [self.user]
-        self.register_comment({"user_id": str(self.user.id + 1)})
-        expected_error = role_name == FORUM_ROLE_STUDENT
+        self.register_comment(
+            {"user_id": str(self.user.id if is_comment_author else (self.user.id + 1))},
+            thread_overrides={
+                "user_id": str(self.user.id if is_thread_author else (self.user.id + 1))
+            }
+        )
+        expected_error = role_name == FORUM_ROLE_STUDENT and not is_comment_author
         try:
             update_comment(self.request, "test_comment", {"raw_body": "edited"})
             self.assertFalse(expected_error)
-        except PermissionDenied:
+        except ValidationError as err:
             self.assertTrue(expected_error)
+            self.assertEqual(
+                err.message_dict,
+                {"raw_body": ["This field is not editable."]}
+            )
+
+    @ddt.data(*itertools.product(
+        [
+            FORUM_ROLE_ADMINISTRATOR,
+            FORUM_ROLE_MODERATOR,
+            FORUM_ROLE_COMMUNITY_TA,
+            FORUM_ROLE_STUDENT,
+        ],
+        [True, False],
+        [True, False],
+    ))
+    @ddt.unpack
+    def test_endorsed_access(self, role_name, is_thread_author, is_comment_author):
+        role = Role.objects.create(name=role_name, course_id=self.course.id)
+        role.users = [self.user]
+        self.register_comment(
+            {"user_id": str(self.user.id if is_comment_author else (self.user.id + 1))},
+            thread_overrides={
+                "user_id": str(self.user.id if is_thread_author else (self.user.id + 1))
+            }
+        )
+        expected_error = role_name == FORUM_ROLE_STUDENT and not is_thread_author
+        try:
+            update_comment(self.request, "test_comment", {"endorsed": True})
+            self.assertFalse(expected_error)
+        except ValidationError as err:
+            self.assertTrue(expected_error)
+            self.assertEqual(
+                err.message_dict,
+                {"endorsed": ["This field is not editable."]}
+            )
 
 
 @ddt.ddt
