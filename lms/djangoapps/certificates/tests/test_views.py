@@ -180,7 +180,7 @@ class UpdateExampleCertificateViewTest(TestCase):
 @attr('shard_1')
 class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
     """
-    Tests for the manual refund page
+    Tests for the certificates web/html views
     """
     def setUp(self):
         super(CertificatesViewsTests, self).setUp()
@@ -421,6 +421,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         response = self.client.get(test_url)
         self.assertIn("Invalid Certificate", response.content)
 
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_evidence_event_sent(self):
         test_url = get_certificate_url(user_id=self.user.id, course_id=self.course_id) + '?evidence_visit=1'
         self.recreate_tracker()

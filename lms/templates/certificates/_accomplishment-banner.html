@@ -20,14 +20,16 @@
                         <i class="icon fa fa-print" aria-hidden="true"></i>
                         ${_("Print Certificate")}
                     </button>
+                %if linked_in_url:
                     <a class="action-linkedin-profile" target="_blank" href="${linked_in_url}"
                         title="${_('Add Certificate to LinkedIn Profile')}"
                         data-course-id="${course_id}"
-                        data-certificate-mode="${mode}">
+                        data-certificate-mode="${course_mode}">
                         <img class="action-linkedin-profile-img"
                             src="${static.url('images/linkedin_add_to_profile.png')}"
                             alt="${_('Share on LinkedIn')}" />
                     </a>
+                %endif
                 </div>
             </div>
         </div>
