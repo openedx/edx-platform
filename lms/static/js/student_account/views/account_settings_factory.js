@@ -29,7 +29,7 @@
                                 model: userAccountModel,
                                 title: gettext('Username'),
                                 valueAttribute: 'username',
-                                helpMessage: gettext('The name that identifies you on the edX site. You cannot change your username.')
+                                helpMessage: gettext('The name that identifies you on this site. You cannot change your username.')
                             })
                         },
                         {
@@ -37,7 +37,7 @@
                                 model: userAccountModel,
                                 title: gettext('Full Name'),
                                 valueAttribute: 'name',
-                                helpMessage: gettext('The name that appears on your edX certificates. Other learners never see your full name.')
+                                helpMessage: gettext('The name that appears on your Statements of Accomplishment. Other learners never see your full name.')
                             })
                         },
                         {
@@ -45,7 +45,7 @@
                                 model: userAccountModel,
                                 title: gettext('Email Address'),
                                 valueAttribute: 'email',
-                                helpMessage: gettext('The email address you use to sign in to edX. Communications from edX and your courses are sent to this address.')
+                                helpMessage: gettext('The email address you use to sign in to this site. Communications from us and your courses are sent to this address.')
                             })
                         },
                         {
@@ -68,7 +68,7 @@
                                 required: true,
                                 refreshPageOnSave: true,
                                 helpMessage:
-                                    gettext('The language used for the edX site. The site is currently available in a limited number of languages.'),
+                                    gettext('The language used for this site. The site is currently available in a limited number of languages.'),
                                 options: fieldsData.language.options
                             })
                         },

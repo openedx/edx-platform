@@ -93,7 +93,7 @@ define(['underscore'], function(_) {
 
         if (othersProfile) {
             expect($('.profile-private--message').text())
-                .toBe('This edX learner is currently sharing a limited profile.');
+                .toBe('This learner is currently sharing a limited profile.');
         } else {
             expect($('.profile-private--message').text()).toBe('You are currently sharing a limited profile.');
         }

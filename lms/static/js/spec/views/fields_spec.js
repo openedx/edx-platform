@@ -41,7 +41,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     var fieldData = FieldViewsSpecHelpers.createFieldData(fieldViewClass, {
                         title: 'Username',
                         valueAttribute: 'username',
-                        helpMessage: 'The username that you use to sign in to edX.'
+                        helpMessage: 'The username that you use to sign in to this site.'
                     });
 
                     var view = new fieldViewClass(fieldData).render();
@@ -56,7 +56,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     var fieldData = FieldViewsSpecHelpers.createFieldData(fieldViewClass, {
                         title: 'Username',
                         valueAttribute: 'username',
-                        helpMessage: 'The username that you use to sign in to edX.'
+                        helpMessage: 'The username that you use to sign in to this site.'
                     });
 
                     var view = new fieldViewClass(fieldData).render();
@@ -92,7 +92,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                 var fieldData = FieldViewsSpecHelpers.createFieldData(FieldViews.ReadonlyFieldView, {
                     title: 'Username',
                     valueAttribute: 'username',
-                    helpMessage: 'The username that you use to sign in to edX.'
+                    helpMessage: 'The username that you use to sign in to this site.'
                 });
                 var view = new FieldViews.ReadonlyFieldView(fieldData).render();
 
