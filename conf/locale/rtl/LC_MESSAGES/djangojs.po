@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-05-29 19:22+0000\n"
-"PO-Revision-Date: 2015-05-29 19:23:56.964169\n"
+"POT-Creation-Date: 2015-06-05 17:44+0000\n"
+"PO-Revision-Date: 2015-06-05 17:46:20.007078\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -39,6 +39,7 @@ msgstr ""
 
 #: cms/static/coffee/src/views/tabs.js
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
+#: cms/static/js/certificates/views/signatory_details.js
 #: cms/static/js/models/section.js cms/static/js/utils/drag_and_drop.js
 #: cms/static/js/views/asset.js cms/static/js/views/container.js
 #: cms/static/js/views/course_info_handout.js
@@ -64,8 +65,10 @@ msgstr "خن"
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: cms/static/coffee/src/views/tabs.js cms/static/js/factories/export.js
-#: cms/static/js/views/asset.js cms/static/js/views/course_info_update.js
+#: cms/static/coffee/src/views/tabs.js
+#: cms/static/js/certificates/views/signatory_editor.js
+#: cms/static/js/factories/export.js cms/static/js/views/asset.js
+#: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/show_textbook.js cms/static/js/views/validation.js
 #: cms/static/js/views/modals/base_modal.js
@@ -74,6 +77,7 @@ msgstr "خن"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
+#: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/course_info_update.underscore
@@ -90,16 +94,13 @@ msgstr "ذشرذثم"
 msgid "This link will open in a new browser window/tab"
 msgstr "فاهس مهرن صهمم خحثر هر ش رثص زقخصسثق صهريخص/فشز"
 
-#. Translators: This is the status of an active video upload
-#: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
-#: lms/static/js/views/fields.js
-msgid "Uploading"
-msgstr "عحمخشيهرل"
-
+#: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/asset.js cms/static/js/views/list_item.js
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/show_textbook.js
 #: common/static/js/vendor/ova/catch/js/catch.js
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/content-group-details.underscore
 #: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/course-outline.underscore
@@ -107,9 +108,16 @@ msgstr "عحمخشيهرل"
 #: cms/templates/js/group-configuration-details.underscore
 #: cms/templates/js/group-configuration-editor.underscore
 #: cms/templates/js/show-textbook.underscore
+#: cms/templates/js/signatory-editor.underscore
 #: cms/templates/js/xblock-outline.underscore
 msgid "Delete"
 msgstr "يثمثفث"
+
+#. Translators: This is the status of an active video upload
+#: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
+#: lms/static/js/views/fields.js
+msgid "Uploading"
+msgstr "عحمخشيهرل"
 
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -118,6 +126,8 @@ msgstr "يثمثفث"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/previous-video-upload-list.underscore
+#: cms/templates/js/signatory-details.underscore
+#: cms/templates/js/signatory-editor.underscore
 msgid "Name"
 msgstr "رشوث"
 
@@ -159,11 +169,13 @@ msgstr "ثققخق"
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/modals/base_modal.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/group-configuration-editor.underscore
 #: cms/templates/js/section-name-edit.underscore
+#: cms/templates/js/signatory-editor.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
@@ -176,6 +188,7 @@ msgstr "سشدث"
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/modals/edit_xblock.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/signatory-editor.underscore
 #: common/templates/js/image-modal.underscore
 msgid "Close"
 msgstr "ذمخسث"
@@ -543,9 +556,11 @@ msgstr "ذمثشق بخقوشففهرل"
 msgid "Code block"
 msgstr "ذخيث زمخذن"
 
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Code"
 msgstr "ذخيث"
 
@@ -655,6 +670,7 @@ msgstr "يثمثفث فشزمث"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/group-configuration-editor.underscore
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -696,10 +712,12 @@ msgstr "ثيهف افوم"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/js/vendor/ova/catch/js/catch.js
+#: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/content-group-details.underscore
 #: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/group-configuration-details.underscore
 #: cms/templates/js/show-textbook.underscore
+#: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
 msgid "Edit"
 msgstr "ثيهف"
@@ -1458,9 +1476,12 @@ msgstr ""
 "فاث عقم غخع ثرفثقثي سثثوس فخ زث شر ثطفثقرشم مهرن. يخ غخع صشرف فخ شيي فاث "
 "قثضعهقثي اففح:// حقثبهط?"
 
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/signatory-details.underscore
+#: cms/templates/js/signatory-editor.underscore
 msgid "Title"
 msgstr "فهفمث"
 
@@ -1632,12 +1653,12 @@ msgstr ""
 "سثضعثرذثوخيعمث. حمثشسث ذخرفشذف فاث ذخعقسث سفشبب."
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+#: common/lib/xmodule/xmodule/js/src/video/09_play_pause_control.js
+#: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
 msgid "Play"
 msgstr "حمشغ"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Pause"
 msgstr "حشعسث"
 
@@ -1650,20 +1671,22 @@ msgid "Unmute"
 msgstr "عروعفث"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_full_screen.js
 msgid "Exit full browser"
 msgstr "ثطهف بعمم زقخصسثق"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_full_screen.js
 msgid "Fill browser"
 msgstr "بهمم زقخصسثق"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid "Speed"
 msgstr "سحثثي"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Volume"
 msgstr "دخمعوث"
 
@@ -1716,17 +1739,13 @@ msgstr "فاهس زقخصسثق ذشررخف حمشغ .وح4, .خلل, خق .ص�
 msgid "Try using a different browser, such as Google Chrome."
 msgstr "فقغ عسهرل ش يهببثقثرف زقخصسثق, سعذا شس لخخلمث ذاقخوث."
 
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Video slider"
-msgstr "دهيثخ سمهيثق"
+#: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
+msgid "HD off"
+msgstr "اي خبب"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "HD on"
 msgstr "اي خر"
-
-#: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
-msgid "HD off"
-msgstr "اي خبب"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video position"
@@ -1754,6 +1773,42 @@ msgid_plural "%(value)s seconds"
 msgstr[0] "%(value)s سثذخري"
 msgstr[1] "%(value)s سثذخريس"
 
+#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
+msgid ""
+"Click on this button to mute or unmute this video or press UP or DOWN "
+"buttons to increase or decrease volume level."
+msgstr ""
+"ذمهذن خر فاهس زعففخر فخ وعفث خق عروعفث فاهس دهيثخ خق حقثسس عح خق يخصر "
+"زعففخرس فخ هرذقثشسث خق يثذقثشسث دخمعوث مثدثم."
+
+#: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
+msgid "Speeds"
+msgstr "سحثثيس"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
+msgid "Skip"
+msgstr "سنهح"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_poster.js
+msgid "Play video"
+msgstr "حمشغ دهيثخ"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_skip_control.js
+msgid "Do not show again"
+msgstr "يخ رخف ساخص شلشهر"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "Turn off captions"
+msgstr "فعقر خبب ذشحفهخرس"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid ""
+"Activating an item in this group will spool the video to the corresponding "
+"time point. To skip transcript, go to previous item."
+msgstr ""
+"شذفهدشفهرل شر هفثو هر فاهس لقخعح صهمم سحخخم فاث دهيثخ فخ فاث ذخققثسحخريهرل "
+"فهوث حخهرف. فخ سنهح فقشرسذقهحف, لخ فخ حقثدهخعس هفثو."
+
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Caption will be displayed when "
 msgstr "ذشحفهخر صهمم زث يهسحمشغثي صاثر "
@@ -1761,10 +1816,6 @@ msgstr "ذشحفهخر صهمم زث يهسحمشغثي صاثر "
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on captions"
 msgstr "فعقر خر ذشحفهخرس"
-
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "Turn off captions"
-msgstr "فعقر خبب ذشحفهخرس"
 
 #: common/lib/xmodule/xmodule/public/js/library_content_edit.js
 msgid "Updating with latest library content"
@@ -2238,6 +2289,18 @@ msgstr "قثحمغ"
 msgid "Tags:"
 msgstr "فشلس:"
 
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"Course teams are organized into topics created by course instructors. Try to"
+" join others in an existing team before you decide to create a new team!"
+msgstr ""
+"ذخعقسث فثشوس شقث خقلشرهظثي هرفخ فخحهذس ذقثشفثي زغ ذخعقسث هرسفقعذفخقس. فقغ فخ"
+" تخهر خفاثقس هر شر ثطهسفهرل فثشو زثبخقث غخع يثذهيث فخ ذقثشفث ش رثص فثشو!"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Teams"
+msgstr "فثشوس"
+
 #: lms/static/coffee/src/calculator.js
 msgid "Open Calculator"
 msgstr "خحثر ذشمذعمشفخق"
@@ -2263,6 +2326,10 @@ msgstr "مخشيهرل"
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error getting student list."
 msgstr "ثققخق لثففهرل سفعيثرف مهسف."
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Error generating list of students who may enroll. Please try again."
+msgstr "ثققخق لثرثقشفهرل مهسف خب سفعيثرفس صاخ وشغ ثرقخمم. حمثشسث فقغ شلشهر."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error retrieving grading configuration."
@@ -2399,6 +2466,10 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Could not find users associated with the following identifiers:"
 msgstr "ذخعمي رخف بهري عسثقس شسسخذهشفثي صهفا فاث بخممخصهرل هيثرفهبهثقس:"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Reason field should not be left blank."
+msgstr "قثشسخر بهثمي ساخعمي رخف زث مثبف زمشرن."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
@@ -3105,6 +3176,15 @@ msgstr "غخعق يخرشفهخر ذخعمي رخف زث سعزوهففثي."
 msgid "An error occurred. Please try again later."
 msgstr "شر ثققخق خذذعققثي. حمثشسث فقغ شلشهر مشفثق."
 
+#: lms/static/js/discovery/form.js
+msgid "We couldn't find any results for \"%s\"."
+msgstr "صث ذخعمير'ف بهري شرغ قثسعمفس بخق \"%س\"."
+
+#: lms/static/js/discovery/form.js
+#: lms/templates/search/search_error.underscore
+msgid "There was an error, try searching again."
+msgstr "فاثقث صشس شر ثققخق, فقغ سثشقذاهرل شلشهر."
+
 #: lms/static/js/edxnotes/plugins/accessibility.js
 msgid "Focus grabber"
 msgstr "بخذعس لقشززثق"
@@ -3295,6 +3375,22 @@ msgstr "شممخص سفعيثرفس فخ لثرثقشفث ذثقفهبهذشفث
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Prevent students from generating certificates in this course?"
 msgstr "حقثدثرف سفعيثرفس بقخو لثرثقشفهرل ذثقفهبهذشفثس هر فاهس ذخعقسث?"
+
+#: lms/static/js/instructor_dashboard/ecommerce.js
+msgid "Enter the enrollment code."
+msgstr "ثرفثق فاث ثرقخمموثرف ذخيث."
+
+#: lms/static/js/instructor_dashboard/ecommerce.js
+msgid "Cancel enrollment code"
+msgstr "ذشرذثم ثرقخمموثرف ذخيث"
+
+#: lms/static/js/instructor_dashboard/ecommerce.js
+msgid "Restore enrollment code"
+msgstr "قثسفخقث ثرقخمموثرف ذخيث"
+
+#: lms/static/js/instructor_dashboard/ecommerce.js
+msgid "Mark enrollment code as unused"
+msgstr "وشقن ثرقخمموثرف ذخيث شس عرعسثي"
 
 #: lms/static/js/search/base/views/search_results_view.js
 msgid "%s result"
@@ -3652,6 +3748,10 @@ msgid "Double-check that your webcam is connected and working to continue."
 msgstr "يخعزمث-ذاثذن فاشف غخعق صثزذشو هس ذخررثذفثي شري صخقنهرل فخ ذخرفهرعث."
 
 #: lms/static/js/verify_student/views/webcam_photo_view.js
+msgid "Photo Captured successfully."
+msgstr "حاخفخ ذشحفعقثي سعذذثسسبعممغ."
+
+#: lms/static/js/verify_student/views/webcam_photo_view.js
 msgid "No Flash Detected"
 msgstr "رخ بمشسا يثفثذفثي"
 
@@ -3797,6 +3897,7 @@ msgstr ""
 "شقث غخع سعقث غخع صشرف فخ يثمثفث فاهس حشلث? فاهس شذفهخر ذشررخف زث عريخرث."
 
 #: cms/static/coffee/src/views/tabs.js
+#: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/course_info_update.js cms/static/js/views/list_item.js
 #: cms/static/js/views/show_textbook.js
 #: cms/static/js/views/utils/xblock_utils.js
@@ -3810,6 +3911,72 @@ msgstr "خحثرشسسثسسوثرف سشدث ثققخق"
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
 msgstr "فاهس مهرن صهمم خحثر هر ش وخيشم صهريخص"
+
+#: cms/static/js/certificates/collections/certificates.js
+msgid "Could not parse certificate JSON. %(message)s"
+msgstr "ذخعمي رخف حشقسث ذثقفهبهذشفث تسخر. %(message)s"
+
+#: cms/static/js/certificates/models/certificate.js
+msgid "Certificate name is required."
+msgstr "ذثقفهبهذشفث رشوث هس قثضعهقثي."
+
+#: cms/static/js/certificates/models/certificate.js
+msgid "Signatory field(s) has invalid data."
+msgstr "سهلرشفخقغ بهثمي(س) اشس هردشمهي يشفش."
+
+#: cms/static/js/certificates/models/signatory.js
+msgid "Signatory name should not be more than 40 characters long."
+msgstr "سهلرشفخقغ رشوث ساخعمي رخف زث وخقث فاشر 40 ذاشقشذفثقس مخرل."
+
+#: cms/static/js/certificates/models/signatory.js
+msgid "Signatory title should span over maximum of 2 lines."
+msgstr "سهلرشفخقغ فهفمث ساخعمي سحشر خدثق وشطهوعو خب 2 مهرثس."
+
+#: cms/static/js/certificates/models/signatory.js
+msgid "Signatory title should have maximum of 40 characters per line."
+msgstr "سهلرشفخقغ فهفمث ساخعمي اشدث وشطهوعو خب 40 ذاشقشذفثقس حثق مهرث."
+
+#: cms/static/js/certificates/models/signatory.js
+msgid "Signatory organization should not be more than 40 characters long."
+msgstr "سهلرشفخقغ خقلشرهظشفهخر ساخعمي رخف زث وخقث فاشر 40 ذاشقشذفثقس مخرل."
+
+#: cms/static/js/certificates/views/certificate_editor.js
+msgid "Upload organization logo."
+msgstr "عحمخشي خقلشرهظشفهخر مخلخ."
+
+#: cms/static/js/certificates/views/certificate_editor.js
+msgid "Maximum logo height should be 125px."
+msgstr "وشطهوعو مخلخ اثهلاف ساخعمي زث 125حط."
+
+#. Translators: This field pertains to the custom label for a certificate.
+#. Translators: this refers to a collection of certificates.
+#: cms/static/js/certificates/views/certificate_item.js
+#: cms/static/js/certificates/views/certificates_list.js
+msgid "certificate"
+msgstr "ذثقفهبهذشفث"
+
+#. Translators: This line refers to the initial state of the form when no data
+#. has been inserted
+#: cms/static/js/certificates/views/certificates_list.js
+msgid "You have not created any certificates yet."
+msgstr "غخع اشدث رخف ذقثشفثي شرغ ذثقفهبهذشفثس غثف."
+
+#: cms/static/js/certificates/views/signatory_editor.js
+msgid "Delete \"<%= signatoryName %>\" from the list of signatories?"
+msgstr "يثمثفث \"<%= signatoryName %>\" بقخو فاث مهسف خب سهلرشفخقهثس?"
+
+#: cms/static/js/certificates/views/signatory_editor.js
+#: cms/static/js/views/course_info_update.js
+msgid "This action cannot be undone."
+msgstr "فاهس شذفهخر ذشررخف زث عريخرث."
+
+#: cms/static/js/certificates/views/signatory_editor.js
+msgid "Upload signature image."
+msgstr "عحمخشي سهلرشفعقث هوشلث."
+
+#: cms/static/js/certificates/views/signatory_editor.js
+msgid "Image must be 450px X 150px transparent PNG."
+msgstr "هوشلث وعسف زث 450حط ط 150حط فقشرسحشقثرف حرل."
 
 #: cms/static/js/collections/group.js
 msgid "Group %s"
@@ -3903,13 +4070,20 @@ msgid "There was an error while verifying the file you submitted."
 msgstr "فاثقث صشس شر ثققخق صاهمث دثقهبغهرل فاث بهمث غخع سعزوهففثي."
 
 #: cms/static/js/factories/import.js
+msgid "Choose new file"
+msgstr "ذاخخسث رثص بهمث"
+
+#: cms/static/js/factories/import.js
 msgid "Your import has failed."
 msgstr "غخعق هوحخقف اشس بشهمثي."
 
-#: cms/static/js/factories/import.js cms/static/js/views/import.js
-#: cms/static/js/views/import.js.c
-msgid "Choose new file"
-msgstr "ذاخخسث رثص بهمث"
+#: cms/static/js/factories/import.js
+msgid ""
+"File format not supported. Please upload a file with a {file_extension} "
+"extension."
+msgstr ""
+"بهمث بخقوشف رخف سعححخقفثي. حمثشسث عحمخشي ش بهمث صهفا ش {file_extension} "
+"ثطفثرسهخر."
 
 #: cms/static/js/factories/manage_users.js
 msgid "Already a course team member"
@@ -4184,10 +4358,6 @@ msgstr "غخع اشدث رخف ذقثشفثي شرغ ذخرفثرف لقخعحس
 msgid "Are you sure you want to delete this update?"
 msgstr "شقث غخع سعقث غخع صشرف فخ يثمثفث فاهس عحيشفث?"
 
-#: cms/static/js/views/course_info_update.js
-msgid "This action cannot be undone."
-msgstr "فاهس شذفهخر ذشررخف زث عريخرث."
-
 #: cms/static/js/views/course_rerun.js
 msgid "Create Re-run"
 msgstr "ذقثشفث قث-قعر"
@@ -4233,20 +4403,16 @@ msgid "You have not created any group configurations yet."
 msgstr "غخع اشدث رخف ذقثشفثي شرغ لقخعح ذخربهلعقشفهخرس غثف."
 
 #: cms/static/js/views/import.js
+msgid "Your import is in progress; navigating away will abort it."
+msgstr "غخعق هوحخقف هس هر حقخلقثسس; رشدهلشفهرل شصشغ صهمم شزخقف هف."
+
+#: cms/static/js/views/import.js
 msgid "Error importing course"
 msgstr "ثققخق هوحخقفهرل ذخعقسث"
 
 #: cms/static/js/views/import.js
 msgid "There was an error with the upload"
 msgstr "فاثقث صشس شر ثققخق صهفا فاث عحمخشي"
-
-#: cms/static/js/views/import.js
-msgid ""
-"File format not supported. Please upload a file with a <code>tar.gz</code> "
-"extension."
-msgstr ""
-"بهمث بخقوشف رخف سعححخقفثي. حمثشسث عحمخشي ش بهمث صهفا ش <code>فشق.لظ</code> "
-"ثطفثرسهخر."
 
 #: cms/static/js/views/license.js cms/templates/js/license-selector.underscore
 msgid "All Rights Reserved"
@@ -4797,6 +4963,12 @@ msgstr "مهرنس ساخعمي زث عرهضعث."
 msgid "Incorrect url format."
 msgstr "هرذخققثذف عقم بخقوشف."
 
+#: cms/templates/js/asset-library.underscore
+#: cms/templates/js/basic-modal.underscore
+#: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
+msgid "Actions"
+msgstr "شذفهخرس"
+
 #: cms/templates/js/previous-video-upload-list.underscore
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
@@ -4942,6 +5114,34 @@ msgstr "دثقهبغ رخص"
 #: lms/templates/dashboard/donation.underscore
 msgid "Donate"
 msgstr "يخرشفث"
+
+#: lms/templates/discovery/filter_bar.underscore
+msgid "CLEAR ALL"
+msgstr "ذمثشق شمم"
+
+#: lms/templates/discovery/more_less_links.underscore
+msgid "MORE..."
+msgstr "وخقث..."
+
+#: lms/templates/discovery/more_less_links.underscore
+msgid "LESS..."
+msgstr "مثسس..."
+
+#: lms/templates/discovery/result_item.underscore
+msgid "LEARN MORE"
+msgstr "مثشقر وخقث"
+
+#: lms/templates/discovery/result_item.underscore
+msgid "gettext("
+msgstr "لثففثطف("
+
+#: lms/templates/discovery/result_item.underscore
+msgid "Starts"
+msgstr "سفشقفس"
+
+#: lms/templates/discovery/search_facets_list.underscore
+msgid "Refine your search"
+msgstr "قثبهرث غخعق سثشقذا"
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Highlighted text"
@@ -5184,6 +5384,14 @@ msgstr ""
 "بهمث, يخصرمخشي ذخعقسث حقخبهمث هربخقوشفهخر خق ذخاخقف قثسعمفس خر "
 "%(link_start)s فاث يشفش يخصرمخشي حشلث. %(link_end)s"
 
+#: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
+msgid "Used"
+msgstr "عسثي"
+
+#: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
+msgid "Valid"
+msgstr "دشمهي"
+
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
 msgid "Load next %(num_items)s result"
@@ -5199,10 +5407,6 @@ msgstr "سخققغ, رخ قثسعمفس صثقث بخعري."
 #: lms/templates/search/dashboard_search_results.underscore
 msgid "Back to Dashboard"
 msgstr "زشذن فخ يشسازخشقي"
-
-#: lms/templates/search/search_error.underscore
-msgid "There was an error, try searching again."
-msgstr "فاثقث صشس شر ثققخق, فقغ سثشقذاهرل شلشهر."
 
 #: lms/templates/student_account/account.underscore
 msgid "New Address"
@@ -5844,11 +6048,6 @@ msgid "URL"
 msgstr "عقم"
 
 #: cms/templates/js/asset-library.underscore
-#: cms/templates/js/basic-modal.underscore
-msgid "Actions"
-msgstr "شذفهخرس"
-
-#: cms/templates/js/asset-library.underscore
 msgid "You haven't added any assets to this course yet."
 msgstr "غخع اشدثر'ف شييثي شرغ شسسثفس فخ فاهس ذخعقسث غثف."
 
@@ -5888,6 +6087,99 @@ msgstr "مخذن فاهس شسسثف"
 msgid "Lock/unlock file"
 msgstr "مخذن/عرمخذن بهمث"
 
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/content-group-details.underscore
+#: cms/templates/js/group-configuration-details.underscore
+msgid "ID"
+msgstr "هي"
+
+#: cms/templates/js/certificate-details.underscore
+msgid "Certificate Details"
+msgstr "ذثقفهبهذشفث يثفشهمس"
+
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
+msgid "Course Title Override"
+msgstr "ذخعقسث فهفمث خدثققهيث"
+
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
+msgid "Certificate Signatories"
+msgstr "ذثقفهبهذشفث سهلرشفخقهثس"
+
+#: cms/templates/js/certificate-editor.underscore
+#: cms/templates/js/content-group-editor.underscore
+#: cms/templates/js/edit-textbook.underscore
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "error.message"
+msgstr "ثققخق.وثسسشلث"
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "Certificate Information"
+msgstr "ذثقفهبهذشفث هربخقوشفهخر"
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "Certificate Name"
+msgstr "ذثقفهبهذشفث رشوث"
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "Name of the certificate"
+msgstr "رشوث خب فاث ذثقفهبهذشفث"
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "Description of the certificate"
+msgstr "يثسذقهحفهخر خب فاث ذثقفهبهذشفث"
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "Course title"
+msgstr "ذخعقسث فهفمث"
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "Title of the course"
+msgstr "فهفمث خب فاث ذخعقسث"
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "Organization Logo"
+msgstr "خقلشرهظشفهخر مخلخ"
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "Path to organization logo"
+msgstr "حشفا فخ خقلشرهظشفهخر مخلخ"
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "Maximum logo height 125px, width variable"
+msgstr "وشطهوعو مخلخ اثهلاف 125حط, صهيفا دشقهشزمث"
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "Add Signatory"
+msgstr "شيي سهلرشفخقغ"
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "(Up to 4 signatories are allowed for a certificate)"
+msgstr "(عح فخ 4 سهلرشفخقهثس شقث شممخصثي بخق ش ذثقفهبهذشفث)"
+
+#: cms/templates/js/certificate-editor.underscore
+#: cms/templates/js/content-group-editor.underscore
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "Create"
+msgstr "ذقثشفث"
+
+#: cms/templates/js/certificate-web-preview.underscore
+msgid "Choose mode"
+msgstr "ذاخخسث وخيث"
+
+#: cms/templates/js/certificate-web-preview.underscore
+msgid "Preview Certificate"
+msgstr "حقثدهثص ذثقفهبهذشفث"
+
+#: cms/templates/js/certificate-web-preview.underscore
+msgid "Activate"
+msgstr "شذفهدشفث"
+
+#: cms/templates/js/certificate-web-preview.underscore
+msgid "Deactivate"
+msgstr "يثشذفهدشفث"
+
 #: cms/templates/js/checklist.underscore
 msgid "{number}{pct_sign} of checklists completed"
 msgstr "{number}{pct_sign} خب ذاثذنمهسفس ذخوحمثفثي"
@@ -5909,11 +6201,6 @@ msgstr ""
 "ذاشرلثس غخع صهمم ذاشرلث فاث سفعيثرف ثطحثقهثرذث."
 
 #: cms/templates/js/content-group-details.underscore
-#: cms/templates/js/group-configuration-details.underscore
-msgid "ID"
-msgstr "هي"
-
-#: cms/templates/js/content-group-details.underscore
 #: cms/templates/js/content-group-editor.underscore
 msgid "Cannot delete when in use by a unit"
 msgstr "ذشررخف يثمثفث صاثر هر عسث زغ ش عرهف"
@@ -5921,12 +6208,6 @@ msgstr "ذشررخف يثمثفث صاثر هر عسث زغ ش عرهف"
 #: cms/templates/js/content-group-details.underscore
 msgid "This content group is used in:"
 msgstr "فاهس ذخرفثرف لقخعح هس عسثي هر:"
-
-#: cms/templates/js/content-group-editor.underscore
-#: cms/templates/js/edit-textbook.underscore
-#: cms/templates/js/group-configuration-editor.underscore
-msgid "error.message"
-msgstr "ثققخق.وثسسشلث"
 
 #: cms/templates/js/content-group-editor.underscore
 msgid "Content Group Name"
@@ -5943,11 +6224,6 @@ msgstr "فاهس هس فاث رشوث خب فاث لقخعح"
 #: cms/templates/js/content-group-editor.underscore
 msgid "This content group is used in one or more units."
 msgstr "فاهس ذخرفثرف لقخعح هس عسثي هر خرث خق وخقث عرهفس."
-
-#: cms/templates/js/content-group-editor.underscore
-#: cms/templates/js/group-configuration-editor.underscore
-msgid "Create"
-msgstr "ذقثشفث"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Contains staff only content"
@@ -6440,6 +6716,47 @@ msgstr "ذمثشق قثمثشسث يشفث/فهوث"
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
 msgstr "دهثص مهدث"
+
+#: cms/templates/js/signatory-details.underscore
+#: cms/templates/js/signatory-editor.underscore
+msgid "Organization"
+msgstr "خقلشرهظشفهخر"
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Certificate Signatory Configuration"
+msgstr "ذثقفهبهذشفث سهلرشفخقغ ذخربهلعقشفهخر"
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Name of the signatory"
+msgstr "رشوث خب فاث سهلرشفخقغ"
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Maximum 40 characters"
+msgstr "وشطهوعو 40 ذاشقشذفثقس"
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Title of the signatory"
+msgstr "فهفمث خب فاث سهلرشفخقغ"
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "2 Lines, 40 characters each"
+msgstr "2 مهرثس, 40 ذاشقشذفثقس ثشذا"
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Organization of the signatory"
+msgstr "خقلشرهظشفهخر خب فاث سهلرشفخقغ"
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Signature Image"
+msgstr "سهلرشفعقث هوشلث"
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Path to Signature Image"
+msgstr "حشفا فخ سهلرشفعقث هوشلث"
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Image must be 450px X 150px transparent PNG"
+msgstr "هوشلث وعسف زث 450حط ط 150حط فقشرسحشقثرف حرل"
 
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "Student Visibility"
