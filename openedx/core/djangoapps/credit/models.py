@@ -13,6 +13,7 @@ from django.db import models
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
 from xmodule_django.models import CourseKeyField
+from django.utils.translation import ugettext_lazy
 
 
 log = logging.getLogger(__name__)
@@ -57,11 +58,19 @@ class CreditCourse(models.Model):
 class CreditProvider(TimeStampedModel):
     """This model represents an institution that can grant credit for a course.
 
-    Each provider is identified by unique ID (e.g., 'ASU').
+    Each provider is identified by unique ID (e.g., 'ASU'). CreditProvider also
+    includes a `url` where the student will be sent when he/she will try to
+    get credit for course. Eligibility duration will be use to set duration
+    for which credit eligible message appears on dashboard.
     """
 
     provider_id = models.CharField(max_length=255, db_index=True, unique=True)
     display_name = models.CharField(max_length=255)
+    provider_url = models.URLField(max_length=255, unique=True)
+    eligibility_duration = models.PositiveIntegerField(
+        help_text=ugettext_lazy(u"Number of seconds to show eligibility message")
+    )
+    active = models.BooleanField(default=True)
 
 
 class CreditRequirement(TimeStampedModel):
