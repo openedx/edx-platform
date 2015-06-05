@@ -124,7 +124,7 @@ from notification_prefs.views import enable_notifications
 
 # Note that this lives in openedx, so this dependency should be refactored.
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
-from openedx.core.djangoapps.credit.api import get_credit_eligibility
+from openedx.core.djangoapps.credit.api import get_credit_eligibility, get_purchased_credit_courses
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -525,6 +525,7 @@ def dashboard(request):
     enrolled_courses_dict = dict()
     for course, __ in course_enrollment_pairs:
         enrolled_courses_dict[unicode(course.id)] = course
+
     credit_messages = _create_credit_availability_message(user.username, enrolled_courses_dict)
 
     course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
@@ -702,57 +703,33 @@ def _create_recent_enrollment_message(course_enrollment_pairs, course_modes):
 
 
 def _create_credit_availability_message(username, enrolled_courses_dict):
-    """Builds a credit availability message
+    """Builds a dict of credit availability for courses.
 
-    Constructs a new message template based on student is eligible for
-    the credit in any course.
+    Construct a for courses user has completed and has not purchased credit
+    from the credit provider yet.
 
     Args:
+        username (str): Username of the user.
         course_enrollment_pairs (list): A list of tuples containing courses, and the associated enrollment information.
-        course_modes (dict): Mapping of course ID's to course mode dictionaries.
 
     Returns:
-        A string representing the HTML message output from the message template.
-        None if the student is not eligible for any credit or has earned credit
-        for the previous course.
+        A dict of courses user is eligible for credit.
 
     """
     user_eligibitlites = get_credit_eligibility(username=username)
+    user_purchased_credit = get_purchased_credit_courses(username=username)
 
     eligibility_messages = {}
     for course_id, eligibility in user_eligibitlites.iteritems():
-        eligibility_messages[course_id] = {
-            "course_id": course_id,
-            "course_name": enrolled_courses_dict[course_id].display_name,
-            "is_eligible": True,
-            "providers": eligibility["providers"]
-        }
+        if course_id not in user_purchased_credit:
+            eligibility_messages[course_id] = {
+                "course_id": course_id,
+                "course_name": enrolled_courses_dict[course_id].display_name,
+                "is_eligible": True,
+                "providers": eligibility["providers"]
+            }
 
     return eligibility_messages
-
-    # platform_name = microsite.get_value('platform_name', settings.PLATFORM_NAME)
-    #
-    # if user_eligibitlites:
-    #     eligibility_messages = []
-    #     try:
-    #         for course_id, eligibility in user_eligibitlites.iteritems():
-    #             eligibility_messages.append(
-    #                 {
-    #                     "course_id": course_id,
-    #                     "course_name": enrolled_courses_dict[course_id].display_name,
-    #                     "is_eligible": True,
-    #                     "providers": eligibility["providers"]
-    #                 }
-    #             )
-    #
-    #         platform_name = microsite.get_value('platform_name', settings.PLATFORM_NAME)
-    #
-    #         return render_to_string(
-    #             'enrollment/course_credit_message.html',
-    #             {'course_credit_messages': eligibility_messages, 'platform_name': platform_name}
-    #         )
-    #     except Exception as exp:
-    #         print(exp)
 
 
 def _get_recently_enrolled_courses(course_enrollment_pairs):

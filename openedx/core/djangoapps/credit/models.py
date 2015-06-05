@@ -35,9 +35,6 @@ class CreditCourse(models.Model):
     enabled = models.BooleanField(default=False)
     providers = models.ManyToManyField(CreditProvider)
 
-    def get_providers(self):
-        return self.providers.all()
-
     @classmethod
     def is_credit_course(cls, course_key):
         """ Check that given course is credit or not
@@ -194,4 +191,4 @@ class CreditEligibility(TimeStampedModel):
 
     @classmethod
     def get_user_eligibility(cls, username):
-        return cls.objects.filter(username=username)
+        return cls.objects.filter(username=username).select_related('course').prefetch_related('course__providers')

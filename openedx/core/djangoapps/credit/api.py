@@ -177,8 +177,23 @@ def get_credit_eligibility(username):
                     "id": provider.provider_id,
                     "display_name": provider.display_name
                 }
-                for provider in eligibility.course.get_providers()
+                for provider in eligibility.course.providers.all()
             ]
         }
 
     return user_eligibilities
+
+
+def get_purchased_credit_courses(username):
+    """
+    Returns the purchased credit courses.
+
+    Args:
+        username(str): Username of the student
+
+    Returns:
+        A dict of courses user has purchased from the credit provider after completion
+
+    """
+    # TODO: How to track the purchased courses. It requires Will's work for credit provider integration
+    return {}
