@@ -115,6 +115,13 @@ class BadgeHandlerTestCase(ModuleStoreTestCase, EventTrackingTestCase):
             }
         )
 
+    def test_self_paced_description(self):
+        """
+        Verify that a badge created for a course with no end date gets a different description.
+        """
+        self.course.end = None
+        self.assertEqual(BadgeHandler.badge_description(self.course, 'honor'), 'Completed the course "Badged" (honor)')
+
     def test_ensure_badge_created_cache(self):
         """
         Make sure ensure_badge_created doesn't call create_badge if we know the badge is already there.

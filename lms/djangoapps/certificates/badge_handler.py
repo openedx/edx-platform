@@ -117,7 +117,7 @@ class BadgeHandler(object):
             )
         else:
             return _(u'Completed the course "{course_name}" ({course_mode})').format(
-                start_date=course.display_name,
+                course_name=course.display_name,
                 course_mode=mode,
             )
 
