@@ -47,7 +47,7 @@ from .entrance_exams import (
     user_must_complete_entrance_exam,
     user_has_passed_entrance_exam
 )
-from courseware.models import StudentModule, StudentModuleHistory
+from courseware.user_state_client import DjangoXBlockUserStateClient
 from course_modes.models import CourseMode
 
 from open_ended_grading import open_ended_notifications
@@ -1095,34 +1095,18 @@ def submission_history(request, course_id, student_username, location):
     if (student_username != request.user.username) and (not staff_access):
         raise PermissionDenied
 
+    user_state_client = DjangoXBlockUserStateClient()
     try:
-        student = User.objects.get(username=student_username)
-        student_module = StudentModule.objects.get(
-            course_id=course_key,
-            module_state_key=usage_key,
-            student_id=student.id
-        )
-    except User.DoesNotExist:
-        return HttpResponse(escape(_(u'User {username} does not exist.').format(username=student_username)))
-    except StudentModule.DoesNotExist:
+        history_entries = user_state_client.get_history(student_username, usage_key)
+    except DjangoXBlockUserStateClient.DoesNotExist:
         return HttpResponse(escape(_(u'User {username} has never accessed problem {location}').format(
             username=student_username,
             location=location
         )))
-    history_entries = StudentModuleHistory.objects.filter(
-        student_module=student_module
-    ).order_by('-id')
-
-    # If no history records exist, let's force a save to get history started.
-    if not history_entries:
-        student_module.save()
-        history_entries = StudentModuleHistory.objects.filter(
-            student_module=student_module
-        ).order_by('-id')
 
     context = {
         'history_entries': history_entries,
-        'username': student.username,
+        'username': student_username,
         'location': location,
         'course_id': course_key.to_deprecated_string()
     }

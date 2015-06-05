@@ -11,9 +11,10 @@ try:
 except ImportError:
     import json
 
+from django.contrib.auth.models import User
 from xblock.fields import Scope, ScopeBase
 from xblock_user_state.interface import XBlockUserStateClient
-from courseware.models import StudentModule
+from courseware.models import StudentModule, StudentModuleHistory
 from contracts import contract, new_contract
 from opaque_keys.edx.keys import UsageKey
 
@@ -215,9 +216,10 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         # that were queried in get_many) so that if the score has
         # been changed by some other piece of the code, we don't overwrite
         # that score.
+        user = User.objects.get(username=username)
         for usage_key, state in block_keys_to_state.items():
             student_module, created = StudentModule.objects.get_or_create(
-                student=self.user,
+                student=user,
                 course_id=usage_key.course_key,
                 module_state_key=usage_key,
                 defaults={
@@ -303,12 +305,42 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             for field in json.loads(student_module.state):
                 yield (usage_key, field, student_module.modified)
 
+    @contract(username="basestring", block_key=UsageKey, scope=ScopeBase)
     def get_history(self, username, block_key, scope=Scope.user_state):
-        """We don't guarantee that history for many blocks will be fast."""
+        """
+        Retrieve history of state changes for a given block for a given
+        student.  We don't guarantee that history for many blocks will be fast.
+
+        Arguments:
+            username: The name of the user whose history should be retrieved
+            block_key (UsageKey): The UsageKey identifying which xblock state to update.
+            scope (Scope): The scope to load data from
+        """
+
         assert self.user.username == username
         if scope != Scope.user_state:
             raise ValueError("Only Scope.user_state is supported")
-        raise NotImplementedError()
+        student_modules = list(
+            student_module
+            for student_module, usage_id
+            in self._get_student_modules(username, [block_key])
+        )
+        if len(student_modules) == 0:
+            raise self.DoesNotExist()
+
+        history_entries = StudentModuleHistory.objects.filter(
+            student_module__in=student_modules
+        ).order_by('-id')
+
+        # If no history records exist, let's force a save to get history started.
+        if not history_entries:
+            for student_module in student_modules:
+                student_module.save()
+            history_entries = StudentModuleHistory.objects.filter(
+                student_module__in=student_modules
+            ).order_by('-id')
+
+        return history_entries
 
     def iter_all_for_block(self, block_key, scope=Scope.user_state, batch_size=None):
         """
