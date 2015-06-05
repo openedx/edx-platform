@@ -45,9 +45,7 @@
                 required: true,
                 editable: 'always',
                 showMessages: false,
-                title: interpolate_text(
-                    gettext('{platform_name} learners can see my:'), {platform_name: options.platform_name}
-                ),
+                title: gettext('learners can see my:'),
                 valueAttribute: "account_privacy",
                 options: [
                     ['private', gettext('Limited Profile')],
