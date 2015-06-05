@@ -1,7 +1,7 @@
 ;(function (define, undefined) {
     'use strict';
-    define(['gettext', 'jquery', 'underscore', 'backbone', 'moment'],
-        function (gettext, $, _, Backbone, _moment) {
+    define(['gettext', 'jquery', 'underscore', 'backbone', 'logger', 'moment'],
+        function (gettext, $, _, Backbone, Logger, _moment) {
 
         var moment = _moment || window.moment;
 
@@ -15,6 +15,8 @@
 
             errorMessage: gettext('An error has occurred. Please try again.'),
             loadingMessage: gettext('Loading'),
+
+            PAGE_SIZE: 500,
 
             events : {
                 'click .bookmarks-results-list-item': 'visitBookmark'
@@ -48,7 +50,7 @@
 
                 this.collection.fetch({
                     reset: true,
-                    data: {course_id: this.courseId, fields: 'display_name,path'}
+                    data: {course_id: this.courseId, page_size: this.PAGE_SIZE, fields: 'display_name,path'}
                 }).done(function () {
                     view.hideLoadingMessage();
                     view.render();
@@ -60,7 +62,20 @@
             },
 
             visitBookmark: function (event) {
-                window.location = event.target.pathname;
+                var bookmarkedComponent = $(event.currentTarget);
+                var bookmark_id = bookmarkedComponent.data('bookmarkId');
+                var component_usage_id = bookmarkedComponent.data('usageId');
+                var component_type = bookmarkedComponent.data('componentType');
+                Logger.log(
+                    'edx.bookmark.accessed',
+                    {
+                       bookmark_id: bookmark_id,
+                       component_type: component_type,
+                       component_usage_id: component_usage_id
+                    }
+                ).always(function () {
+                    window.location.href = event.currentTarget.pathname;
+                });
             },
 
             /**
