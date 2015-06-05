@@ -71,7 +71,7 @@ class SequenceFields(object):
         display_name=_("Time Student Started"),
         help=_("The time the user has started the time limited content."),
         default=None,
-        scope=Scope.user,
+        scope=Scope.user_state,  # pylint: disable=no-member
     )
 
     student_time_limit_mins = Integer(
@@ -82,7 +82,7 @@ class SequenceFields(object):
             "default_time_limit_mins to allow for special accommodations."
         ),
         default=None,
-        scope=Scope.user,
+        scope=Scope.user_state,  # pylint: disable=no-member
     )
 
     is_proctored_enabled = Boolean(
