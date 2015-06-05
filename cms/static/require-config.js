@@ -28,7 +28,7 @@ require.config({
         "datepair": "js/vendor/timepicker/datepair",
         "date": "js/vendor/date",
         "text": 'js/vendor/requirejs/text',
-        "moment": "js/vendor/moment.min",
+        "moment": "js/vendor/moment-with-locales.min",
         "underscore": "js/vendor/underscore-min",
         "underscore.string": "js/vendor/underscore.string.min",
         "backbone": "js/vendor/backbone-min",
