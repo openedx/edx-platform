@@ -8,13 +8,11 @@ import logging
 import mimetypes
 
 import static_replace
-import xblock.reference.plugins
 
 from collections import OrderedDict
 from functools import partial
 from requests.auth import HTTPBasicAuth
 import dogstats_wrapper as dog_stats_api
-from opaque_keys import InvalidKeyError
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -37,42 +35,42 @@ from courseware.entrance_exams import (
     get_entrance_exam_score,
     user_must_complete_entrance_exam
 )
+from edxmako.shortcuts import render_to_string
+from eventtracking import tracker
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, unquote_slashes, quote_slashes
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
-from edxmako.shortcuts import render_to_string
-from eventtracking import tracker
-from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
-from student.models import anonymous_id_for_user, user_by_anonymous_id
-from student.roles import CourseBetaTesterRole
-from xblock.core import XBlock
-from xblock.fields import Scope
-from xblock.runtime import KvsFieldData, KeyValueStore
-from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
-from xblock.django.request import django_to_webob_request, webob_to_django_response
-from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
-from xmodule.exceptions import NotFoundError, ProcessingError
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.django import modulestore, ModuleI18nService
-from xmodule.modulestore.exceptions import ItemNotFoundError
 from openedx.core.lib.xblock_utils import (
     replace_course_urls,
     replace_jump_to_id_urls,
     replace_static_urls,
     add_staff_markup,
     wrap_xblock,
-    request_token
+    request_token as xblock_request_token,
 )
+from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
+from student.models import anonymous_id_for_user, user_by_anonymous_id
+from student.roles import CourseBetaTesterRole
+from xblock.core import XBlock
+from xblock.django.request import django_to_webob_request, webob_to_django_response
+from xblock_django.user_service import DjangoXBlockUserService
+from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
+from xblock.reference.plugins import FSService
+from xblock.runtime import KvsFieldData
+from xmodule.contentstore.django import contentstore
+from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
+from xmodule.exceptions import NotFoundError, ProcessingError
+from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.lti_module import LTIModule
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import XModuleDescriptor
 from xmodule.mixin import wrap_with_license
-from xblock_django.user_service import DjangoXBlockUserService
 from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from util import milestones_helpers
-from util.module_utils import yield_dynamic_descriptor_descendents
 from verify_student.services import ReverificationService
 
 from .field_overrides import OverrideFieldData
@@ -255,9 +253,11 @@ def get_xqueue_callback_url_prefix(request):
 
 def get_module_for_descriptor(user, request, descriptor, field_data_cache, course_key,
                               position=None, wrap_xmodule_display=True, grade_bucket_type=None,
-                              static_asset_path=''):
+                              static_asset_path='', disable_staff_debug_info=False):
     """
     Implements get_module, extracting out the request-specific functionality.
+
+    disable_staff_debug_info : If this is True, exclude staff debug information in the rendering of the module.
 
     See get_module() docstring for further details.
     """
@@ -278,15 +278,16 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
         grade_bucket_type=grade_bucket_type,
         static_asset_path=static_asset_path,
         user_location=user_location,
-        request_token=request_token(request),
+        request_token=xblock_request_token(request),
+        disable_staff_debug_info=disable_staff_debug_info,
     )
 
 
-def get_module_system_for_user(user, field_data_cache,
+def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disable=too-many-statements
                                # Arguments preceding this comment have user binding, those following don't
                                descriptor, course_id, track_function, xqueue_callback_url_prefix,
                                request_token, position=None, wrap_xmodule_display=True, grade_bucket_type=None,
-                               static_asset_path='', user_location=None):
+                               static_asset_path='', user_location=None, disable_staff_debug_info=False):
     """
     Helper function that returns a module system and student_data bound to a user and a descriptor.
 
@@ -309,7 +310,9 @@ def get_module_system_for_user(user, field_data_cache,
     student_data = KvsFieldData(DjangoKeyValueStore(field_data_cache))
 
     def make_xqueue_callback(dispatch='score_update'):
-        # Fully qualified callback URL for external queueing system
+        """
+        Returns fully qualified callback URL for external queueing system
+        """
         relative_xqueue_callback_url = reverse(
             'xqueue_callback',
             kwargs=dict(
@@ -573,7 +576,7 @@ def get_module_system_for_user(user, field_data_cache,
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
         if has_access(user, 'staff', descriptor, course_id):
             has_instructor_access = has_access(user, 'instructor', descriptor, course_id)
-            block_wrappers.append(partial(add_staff_markup, user, has_instructor_access))
+            block_wrappers.append(partial(add_staff_markup, user, has_instructor_access, disable_staff_debug_info))
 
     # These modules store data using the anonymous_student_id as a key.
     # To prevent loss of data, we will continue to provide old modules with
@@ -637,7 +640,7 @@ def get_module_system_for_user(user, field_data_cache,
         get_real_user=user_by_anonymous_id,
         services={
             'i18n': ModuleI18nService(),
-            'fs': xblock.reference.plugins.FSService(),
+            'fs': FSService(),
             'field-data': field_data,
             'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
             "reverification": ReverificationService()
@@ -681,7 +684,7 @@ def get_module_system_for_user(user, field_data_cache,
 def get_module_for_descriptor_internal(user, descriptor, field_data_cache, course_id,  # pylint: disable=invalid-name
                                        track_function, xqueue_callback_url_prefix, request_token,
                                        position=None, wrap_xmodule_display=True, grade_bucket_type=None,
-                                       static_asset_path='', user_location=None):
+                                       static_asset_path='', user_location=None, disable_staff_debug_info=False):
     """
     Actually implement get_module, without requiring a request.
 
@@ -703,7 +706,8 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         grade_bucket_type=grade_bucket_type,
         static_asset_path=static_asset_path,
         user_location=user_location,
-        request_token=request_token
+        request_token=request_token,
+        disable_staff_debug_info=disable_staff_debug_info,
     )
 
     descriptor.bind_for_student(
@@ -836,7 +840,7 @@ def xblock_resource(request, block_type, uri):  # pylint: disable=unused-argumen
     return HttpResponse(content, mimetype=mimetype)
 
 
-def get_module_by_usage_id(request, course_id, usage_id):
+def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_info=False):
     """
     Gets a module instance based on its `usage_id` in a course, for a given request/user
 
@@ -880,7 +884,14 @@ def get_module_by_usage_id(request, course_id, usage_id):
         descriptor
     )
     setup_masquerade(request, course_id, has_access(user, 'staff', descriptor, course_id))
-    instance = get_module(user, request, usage_key, field_data_cache, grade_bucket_type='ajax')
+    instance = get_module_for_descriptor(
+        user,
+        request,
+        descriptor,
+        field_data_cache,
+        usage_key.course_key,
+        disable_staff_debug_info=disable_staff_debug_info
+    )
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
         # and load something they shouldn't have access to.

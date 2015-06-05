@@ -450,6 +450,15 @@ if settings.COURSEWARE_ENABLED:
             url(r'^courses/{}/teams'.format(settings.COURSE_ID_PATTERN), include('teams.urls'), name="teams_endpoints"),
         )
 
+    if settings.FEATURES.get('ENABLE_RENDER_XBLOCK_API'):
+        # TODO (MA-789) This endpoint path still needs to be approved by the arch council.
+        # Until then, keep the version at v0.
+        urlpatterns += (
+            url(r'api/xblock/v0/xblock/{usage_key_string}$'.format(usage_key_string=settings.USAGE_KEY_PATTERN),
+                'courseware.views.render_xblock',
+                name='render_xblock'),
+        )
+
     # allow course staff to change to student view of courseware
     if settings.FEATURES.get('ENABLE_MASQUERADE'):
         urlpatterns += (

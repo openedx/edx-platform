@@ -37,7 +37,7 @@ def _get_course_or_404(course_key, user):
     the user cannot access forums for the course, or the discussion tab is
     disabled for the course.
     """
-    course = get_course_with_access(user, 'load_forum', course_key)
+    course = get_course_with_access(user, 'load', course_key, check_if_enrolled=True)
     if not any([tab.type == 'discussion' for tab in course.tabs]):
         raise Http404
     return course

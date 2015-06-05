@@ -21,7 +21,7 @@ def url_class(is_active):
 %>
 <%
   cohorted_user_partition = get_cohorted_user_partition(course.id)
-  show_preview_menu = staff_access and active_page in ['courseware', 'info']
+  show_preview_menu = not disable_preview_menu and staff_access and active_page in ['courseware', 'info']
   is_student_masquerade = masquerade and masquerade.role == 'student'
   masquerade_group_id = masquerade.group_id if masquerade else None
 %>

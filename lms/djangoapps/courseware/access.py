@@ -1,7 +1,14 @@
 """
 This file contains (or should), all access control logic for the courseware.
 Ideally, it will be the only place that needs to know about any special settings
-like DISABLE_START_DATES
+like DISABLE_START_DATES.
+
+Note: The access control logic in this file does NOT check for enrollment in
+  a course.  It is expected that higher layers check for enrollment so we
+  don't have to hit the enrollments table on every module load.
+
+  If enrollment is to be checked, use get_course_with_access in courseware.courses.
+  It is a wrapper around has_access that additionally checks for enrollment.
 """
 import logging
 from datetime import datetime, timedelta
@@ -27,7 +34,7 @@ from xmodule.util.django import get_current_request_hostname
 from external_auth.models import ExternalAuthMap
 from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
 from student import auth
-from student.models import CourseEnrollment, CourseEnrollmentAllowed
+from student.models import CourseEnrollmentAllowed
 from student.roles import (
     GlobalStaff, CourseStaffRole, CourseInstructorRole,
     OrgStaffRole, OrgInstructorRole, CourseBetaTesterRole
@@ -140,18 +147,6 @@ def _has_access_course_desc(user, action, course):
         # delegate to generic descriptor check to check start dates
         return _has_access_descriptor(user, 'load', course, course.id)
 
-    def can_load_forum():
-        """
-        Can this user access the forums in this course?
-        """
-        return (
-            can_load() and
-            (
-                CourseEnrollment.is_enrolled(user, course.id) or
-                _has_staff_access_to_descriptor(user, course, course.id)
-            )
-        )
-
     def can_load_mobile():
         """
         Can this user access this course from a mobile device?
@@ -164,12 +159,8 @@ def _has_access_course_desc(user, action, course):
             (
                 # either is a staff user or
                 _has_staff_access_to_descriptor(user, course, course.id) or
-                (
-                    # check enrollment
-                    CourseEnrollment.is_enrolled(user, course.id) and
-                    # check for unfulfilled milestones
-                    not any_unfulfilled_milestones(course.id, user.id)
-                )
+                # check for unfulfilled milestones
+                not any_unfulfilled_milestones(course.id, user.id)
             )
         )
 
@@ -294,7 +285,6 @@ def _has_access_course_desc(user, action, course):
     checkers = {
         'load': can_load,
         'view_courseware_with_prerequisites': can_view_courseware_with_prerequisites,
-        'load_forum': can_load_forum,
         'load_mobile': can_load_mobile,
         'enroll': can_enroll,
         'see_exists': see_exists,

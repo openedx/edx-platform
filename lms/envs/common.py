@@ -321,6 +321,7 @@ FEATURES = {
     # ENABLE_OAUTH2_PROVIDER to True
     'ENABLE_MOBILE_REST_API': False,
     'ENABLE_MOBILE_SOCIAL_FACEBOOK_FEATURES': False,
+    'ENABLE_RENDER_XBLOCK_API': False,
 
     # Enable the combined login/registration form
     'ENABLE_COMBINED_LOGIN_REGISTRATION': False,

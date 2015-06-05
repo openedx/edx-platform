@@ -720,7 +720,7 @@ def users(request, course_id):
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     try:
-        course = get_course_with_access(request.user, 'load_forum', course_key)
+        get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
     except Http404:
         # course didn't exist, or requesting user does not have access to it.
         return JsonError(status=404)

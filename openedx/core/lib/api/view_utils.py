@@ -90,7 +90,8 @@ def view_course_access(depth=0, access_action='load', check_for_milestones=False
                         request.user,
                         access_action,
                         course_id,
-                        depth=depth
+                        depth=depth,
+                        check_if_enrolled=True,
                     )
                 except Http404:
                     # any_unfulfilled_milestones called a second time since has_access returns a bool
