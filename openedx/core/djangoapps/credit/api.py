@@ -26,12 +26,14 @@ from .exceptions import (
 )
 from .models import (
     CreditCourse,
+    CreditProvider,
     CreditRequirement,
     CreditRequirementStatus,
     CreditRequest,
     CreditEligibility,
 )
 from .signature import signature, get_shared_secret_key
+
 
 log = logging.getLogger(__name__)
 
@@ -211,14 +213,13 @@ def create_credit_request(course_key, provider_id, username):
 
     """
     try:
-        user_eligibility = CreditEligibility.objects.select_related('course', 'provider').get(
+        user_eligibility = CreditEligibility.objects.select_related('course').get(
             username=username,
-            course__course_key=course_key,
-            provider__provider_id=provider_id
+            course__course_key=course_key
         )
         credit_course = user_eligibility.course
-        credit_provider = user_eligibility.provider
-    except CreditEligibility.DoesNotExist:
+        credit_provider = credit_course.providers.get(provider_id=provider_id)
+    except (CreditEligibility.DoesNotExist, CreditProvider.DoesNotExist):
         log.warning(u'User tried to initiate a request for credit, but the user is not eligible for credit')
         raise UserIsNotEligible
 
@@ -614,3 +615,132 @@ def is_credit_course(course_key):
         return False
 
     return CreditCourse.is_credit_course(course_key=course_key)
+
+
+def get_credit_request_status(username, course_key):
+    """Get the credit request status.
+
+    This function returns the status of credit request of user for given course.
+    It returns the latest request status for the any credit provider.
+    The valid status are 'pending', 'approved' or 'rejected'.
+
+    Args:
+        username(str): The username of user
+        course_key(CourseKey): The course locator key
+
+    Returns:
+        A dictionary of credit request user has made if any
+
+    """
+    credit_request = CreditRequest.get_user_request_status(username, course_key)
+    if credit_request:
+        credit_status = {
+            "uuid": credit_request.uuid,
+            "timestamp": credit_request.modified,
+            "course_key": credit_request.course.course_key,
+            "provider": {
+                "id": credit_request.provider.provider_id,
+                "display_name": credit_request.provider.display_name
+            },
+            "status": credit_request.status
+        }
+    else:
+        credit_status = {}
+    return credit_status
+
+
+def _get_duration_and_providers(credit_course):
+    """Returns the credit providers and eligibility durations.
+
+    The eligibility_duration is the max of the credit duration of
+    all the credit providers of given course.
+
+    Args:
+        credit_course(CreditCourse): The CreditCourse object
+
+    Returns:
+        Tuple of eligibility_duration and credit providers of given course
+
+    """
+    providers = credit_course.providers.all()
+    seconds_good_for_display = 0
+    providers_list = []
+    for provider in providers:
+        providers_list.append(
+            {
+                "id": provider.provider_id,
+                "display_name": provider.display_name,
+                "eligibility_duration": provider.eligibility_duration,
+                "provider_url": provider.provider_url
+            }
+        )
+        eligibility_duration = int(provider.eligibility_duration) if provider.eligibility_duration else 0
+        seconds_good_for_display = max(eligibility_duration, seconds_good_for_display)
+
+    return seconds_good_for_display, providers_list
+
+
+def get_credit_eligibility(username):
+    """
+    Returns the all the eligibility the user has meet.
+
+    Args:
+        username(str): The username of user
+
+    Example:
+        >> get_credit_eligibility('Aamir'):
+            {
+                "edX/DemoX/Demo_Course": {
+                    "created_at": "2015-12-21",
+                    "providers": [
+                        "id": 12,
+                        "display_name": "Arizona State University",
+                        "eligibility_duration": 60,
+                        "provider_url": "http://arizona/provideere/link"
+                    ],
+                    "seconds_good_for_display": 90
+                }
+            }
+
+    Returns:
+        A dict of eligibilities
+    """
+    eligibilities = CreditEligibility.get_user_eligibility(username)
+    user_credit_requests = get_credit_requests_for_user(username)
+    request_dict = {}
+    # Change the list to dict for iteration
+    for request in user_credit_requests:
+        request_dict[unicode(request["course_key"])] = request
+    user_eligibilities = {}
+    for eligibility in eligibilities:
+        course_key = eligibility.course.course_key
+        duration, providers_list = _get_duration_and_providers(eligibility.course)
+        user_eligibilities[unicode(course_key)] = {
+            "created_at": eligibility.created,
+            "seconds_good_for_display": duration,
+            "providers": providers_list,
+        }
+
+        # Default status is requirements_meet
+        user_eligibilities[unicode(course_key)]["status"] = "requirements_meet"
+        # If there is some request user has made for this eligibility then update the status
+        if unicode(course_key) in request_dict:
+            user_eligibilities[unicode(course_key)]["status"] = request_dict[unicode(course_key)]["status"]
+            user_eligibilities[unicode(course_key)]["provider"] = request_dict[unicode(course_key)]["provider"]
+
+    return user_eligibilities
+
+
+def get_purchased_credit_courses(username):  # pylint: disable=unused-argument
+    """
+    Returns the purchased credit courses.
+
+    Args:
+        username(str): Username of the student
+
+    Returns:
+        A dict of courses user has purchased from the credit provider after completion
+
+    """
+    # TODO: How to track the purchased courses. It requires Will's work for credit provider integration
+    return {}

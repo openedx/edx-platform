@@ -7,8 +7,10 @@ import uuid
 import time
 import json
 import warnings
+from datetime import timedelta
 from collections import defaultdict
 from pytz import UTC
+from requests import HTTPError
 from ipware.ip import get_ip
 
 from django.conf import settings
@@ -25,21 +27,19 @@ from django.db import IntegrityError, transaction
 from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
                          HttpResponseServerError, Http404)
 from django.shortcuts import redirect
+from django.utils import timezone
 from django.utils.translation import ungettext
 from django.utils.http import cookie_date, base36_to_int
 from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_POST, require_GET
-
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
 from django.template.response import TemplateResponse
 
 from ratelimitbackend.exceptions import RateLimitException
 
-from requests import HTTPError
 
 from social.apps.django_app import utils as social_utils
 from social.backends import oauth as social_oauth
@@ -123,13 +123,12 @@ from notification_prefs.views import enable_notifications
 
 # Note that this lives in openedx, so this dependency should be refactored.
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
+from openedx.core.djangoapps.credit.api import get_credit_eligibility, get_purchased_credit_courses
 
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
-
 ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')  # pylint: disable=invalid-name
-
 SETTING_CHANGE_INITIATED = 'edx.user.settings.change_initiated'
 
 
@@ -523,6 +522,13 @@ def dashboard(request):
         course_enrollment_pairs, course_modes_by_course
     )
 
+    # Retrieve the course modes for each course
+    enrolled_courses_dict = {}
+    for course, __ in course_enrollment_pairs:
+        enrolled_courses_dict[unicode(course.id)] = course
+
+    credit_messages = _create_credit_availability_message(enrolled_courses_dict, user)
+
     course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
 
     message = ""
@@ -628,6 +634,7 @@ def dashboard(request):
 
     context = {
         'enrollment_message': enrollment_message,
+        'credit_messages': credit_messages,
         'course_enrollment_pairs': course_enrollment_pairs,
         'course_optouts': course_optouts,
         'message': message,
@@ -690,6 +697,47 @@ def _create_recent_enrollment_message(course_enrollment_pairs, course_modes):
             'enrollment/course_enrollment_message.html',
             {'course_enrollment_messages': messages, 'platform_name': platform_name}
         )
+
+
+def _create_credit_availability_message(enrolled_courses_dict, user):  # pylint: disable=invalid-name
+    """Builds a dict of credit availability for courses.
+
+    Construct a for courses user has completed and has not purchased credit
+    from the credit provider yet.
+
+    Args:
+        course_enrollment_pairs (list): A list of tuples containing courses, and the associated enrollment information.
+        user (User): User object.
+
+    Returns:
+        A dict of courses user is eligible for credit.
+
+    """
+    user_eligibilities = get_credit_eligibility(user.username)
+    user_purchased_credit = get_purchased_credit_courses(user.username)
+
+    eligibility_messages = {}
+    for course_id, eligibility in user_eligibilities.iteritems():
+        if course_id not in user_purchased_credit:
+            duration = eligibility["seconds_good_for_display"]
+            curr_time = timezone.now()
+            validity_till = eligibility["created_at"] + timedelta(seconds=duration)
+            if validity_till > curr_time:
+                diff = validity_till - curr_time
+                urgent = diff.days <= 30
+                eligibility_messages[course_id] = {
+                    "user_id": user.id,
+                    "course_id": course_id,
+                    "course_name": enrolled_courses_dict[course_id].display_name,
+                    "providers": eligibility["providers"],
+                    "status": eligibility["status"],
+                    "provider": eligibility.get("provider"),
+                    "urgent": urgent,
+                    "user_full_name": user.get_full_name(),
+                    "expiry": validity_till
+                }
+
+    return eligibility_messages
 
 
 def _get_recently_enrolled_courses(course_enrollment_pairs):

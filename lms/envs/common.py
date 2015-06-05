@@ -1339,6 +1339,12 @@ certificates_web_view_js = [
     'js/src/logger.js',
 ]
 
+credit_web_view_js = [
+    'js/vendor/jquery.min.js',
+    'js/vendor/jquery.cookie.js',
+    'js/src/logger.js',
+]
+
 PIPELINE_CSS = {
     'style-vendor': {
         'source_filenames': [
@@ -1578,6 +1584,10 @@ PIPELINE_JS = {
     'utility': {
         'source_filenames': ['js/src/utility.js'],
         'output_filename': 'js/utility.js'
+    },
+    'credit_wv': {
+        'source_filenames': credit_web_view_js,
+        'output_filename': 'js/credit/web_view.js'
     }
 }
 

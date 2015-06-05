@@ -307,10 +307,22 @@ class CreditEligibility(TimeStampedModel):
     """
     username = models.CharField(max_length=255, db_index=True)
     course = models.ForeignKey(CreditCourse, related_name="eligibilities")
-    provider = models.ForeignKey(CreditProvider, related_name="eligibilities")
 
     class Meta(object):  # pylint: disable=missing-docstring
         unique_together = ('username', 'course')
+
+    @classmethod
+    def get_user_eligibility(cls, username):
+        """Returns the eligibilities of given user.
+
+        Args:
+            username(str): Username of the user
+
+        Returns:
+            CreditEligibility queryset for the user
+
+        """
+        return cls.objects.filter(username=username).select_related('course').prefetch_related('course__providers')
 
     @classmethod
     def is_user_eligible_for_credit(cls, course_key, username):
@@ -361,6 +373,12 @@ class CreditRequest(TimeStampedModel):
 
     history = HistoricalRecords()
 
+    class Meta(object):  # pylint: disable=missing-docstring
+        # Enforce the constraint that each user can have exactly one outstanding
+        # request to a given provider.  Multiple requests use the same UUID.
+        unique_together = ('username', 'course', 'provider')
+        get_latest_by = 'created'
+
     @classmethod
     def credit_requests_for_user(cls, username):
         """
@@ -402,7 +420,21 @@ class CreditRequest(TimeStampedModel):
             for request in cls.objects.select_related('course', 'provider').filter(username=username)
         ]
 
-    class Meta(object):  # pylint: disable=missing-docstring
-        # Enforce the constraint that each user can have exactly one outstanding
-        # request to a given provider.  Multiple requests use the same UUID.
-        unique_together = ('username', 'course', 'provider')
+    @classmethod
+    def get_user_request_status(cls, username, course_key):
+        """Returns the latest credit request of user against the given course.
+
+        Args:
+            username(str): The username of requesting user
+            course_key(CourseKey): The course identifier
+
+        Returns:
+            CreditRequest if any otherwise None
+
+        """
+        try:
+            return cls.objects.filter(
+                username=username, course__course_key=course_key
+            ).select_related('course', 'provider').latest()
+        except cls.DoesNotExist:
+            return None

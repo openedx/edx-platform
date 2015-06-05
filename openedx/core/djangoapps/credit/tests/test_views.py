@@ -99,7 +99,6 @@ class CreditProviderViewTests(UrlResetMixin, TestCase):
         CreditEligibility.objects.create(
             username=self.USERNAME,
             course=credit_course,
-            provider=credit_provider,
         )
 
     def test_credit_request_and_response(self):
