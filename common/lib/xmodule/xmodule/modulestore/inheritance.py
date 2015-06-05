@@ -159,7 +159,7 @@ class InheritanceMixin(XBlockMixin):
         default='',
         scope=Scope.settings
     )
-    enable_exam_proctoring = Boolean(
+    enable_proctored_exams = Boolean(
         display_name=_("Enable Proctoring for Course Exam."),
         help=_("Enter true or false. If true, course exam will be proctored."),
         default=False,
