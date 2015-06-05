@@ -40,6 +40,8 @@ require.config({
         "jquery.immediateDescendents": "coffee/src/jquery.immediateDescendents",
         "datepair": "js/vendor/timepicker/datepair",
         "date": "js/vendor/date",
+        "text": 'js/vendor/requirejs/text',
+        "moment": "js/vendor/moment-with-locales.min",
         "moment": "js/vendor/moment.min",
         "moment-with-locales": "js/vendor/moment-with-locales.min",
         "text": 'js/vendor/requirejs/text',
