@@ -13,7 +13,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 ) {
     'use strict';
     var CourseOutlineXBlockModal, SettingsXBlockModal, PublishXBlockModal, AbstractEditor, BaseDateEditor,
-        ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, StaffLockEditor;
+        ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, StaffLockEditor, TimedExaminationPreference;
 
     CourseOutlineXBlockModal = BaseModal.extend({
         events : {
@@ -222,7 +222,6 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             };
         }
     });
-
     ReleaseDateEditor = BaseDateEditor.extend({
         fieldName: 'start',
         templateName: 'release-date-editor',
@@ -257,7 +256,37 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             };
         }
     });
+    TimedExaminationPreference = AbstractEditor.extend({
+        templateName: 'timed-examination-preference',
+        className: 'edit-settings-timed-examination',
 
+        afterRender: function () {
+            AbstractEditor.prototype.afterRender.call(this);
+            this.$('input.time').timepicker({
+                'timeFormat' : 'H:i',
+                'forceRoundTime': true
+            });
+        },
+
+        isExamTimeEnable: function () {
+            return this.$('#id_timed_examination').is(':checked');
+        },
+        getExamTimeLimit: function () {
+            return this.$('#id_time_limit').val();
+        },
+        isExamProctoringEnable: function () {
+            return this.$('#id_exam_proctoring').is(':checked');
+        },
+        getRequestData: function () {
+            return {
+                metadata: {
+                    'enable_exam_time': this.isExamTimeEnable(),
+                    'enable_exam_proctoring': this.isExamProctoringEnable(),
+                    'exam_time_limit': this.getExamTimeLimit()
+                }
+            };
+        }
+    });
     GradingEditor = AbstractEditor.extend({
         templateName: 'grading-editor',
         className: 'edit-settings-grading',
@@ -358,7 +387,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             if (xblockInfo.isChapter()) {
                 editors = [ReleaseDateEditor, StaffLockEditor];
             } else if (xblockInfo.isSequential()) {
-                editors = [ReleaseDateEditor, GradingEditor, DueDateEditor, StaffLockEditor];
+                editors = [ReleaseDateEditor, GradingEditor, DueDateEditor, StaffLockEditor,
+                    TimedExaminationPreference];
             } else if (xblockInfo.isVertical()) {
                 editors = [StaffLockEditor];
             }
