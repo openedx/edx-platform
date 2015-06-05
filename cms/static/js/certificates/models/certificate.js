@@ -18,10 +18,15 @@ function (_, str, Backbone, BackboneRelational, BackboneAssociations, gettext, C
     var Certificate = Backbone.RelationalModel.extend({
         idAttribute: "id",
         defaults: {
+            // Metadata fields currently displayed in web forms
+            course_title: '',
+            org_logo_path: '',
+
+            // Metadata fields not currently displayed in web forms
             name: 'Name of the certificate',
             description: 'Description of the certificate',
-            course_title: 'Title of the course',
-            org_logo_path: '',
+
+            // Internal-use only, not displayed in web forms
             version: 1,
             is_active: false
         },
