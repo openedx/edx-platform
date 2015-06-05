@@ -86,6 +86,7 @@ class BlockOutline(object):
             if curr_block.has_children:
                 children = get_dynamic_descriptor_children(
                     curr_block,
+                    self.request.user.id,
                     create_module,
                     usage_key_filter=parent_or_requested_block_type
                 )

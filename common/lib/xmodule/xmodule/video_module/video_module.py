@@ -755,7 +755,8 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         Returns a JSON representation of the student_view of this XModule.
         The contract of the JSON content is between the caller and the particular XModule.
         """
-        # Honor only_on_web
+        # If the "only_on_web" field is set on this video, do not return the rest of the video's data
+        # in this json view, since this video is to be accessed only through its web view."
         if self.only_on_web:
             return {"only_on_web": True}
 
