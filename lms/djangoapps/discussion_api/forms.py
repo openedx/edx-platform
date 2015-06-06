@@ -63,6 +63,7 @@ class ThreadActionsForm(Form):
     interactions with the comments service.
     """
     following = BooleanField(required=False)
+    voted = BooleanField(required=False)
 
 
 class CommentListGetForm(_PaginationForm):
