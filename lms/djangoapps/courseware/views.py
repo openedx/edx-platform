@@ -24,7 +24,7 @@ from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
 from certificates import api as certs_api
 from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
-from django_future.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.db import transaction
 from markupsafe import escape

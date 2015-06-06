@@ -22,7 +22,7 @@ from django.core.validators import validate_email
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
-from django_future.csrf import ensure_csrf_cookie  # pylint: disable=import-error
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 

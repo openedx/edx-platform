@@ -25,7 +25,7 @@ import json
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django_future.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods

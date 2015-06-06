@@ -20,7 +20,7 @@ from StringIO import StringIO
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-from django_future.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail

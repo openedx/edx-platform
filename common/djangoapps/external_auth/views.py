@@ -34,7 +34,7 @@ try:
     from django.views.decorators.csrf import csrf_exempt
 except ImportError:
     from django.contrib.csrf.middleware import csrf_exempt
-from django_future.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 import django_openid_auth.views as openid_views
 from django_openid_auth import auth as openid_auth

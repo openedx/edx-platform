@@ -18,9 +18,9 @@ from django.core.files.temp import NamedTemporaryFile
 from django.core.servers.basehttp import FileWrapper
 from django.http import HttpResponse, HttpResponseNotFound
 from django.utils.translation import ugettext as _
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods, require_GET
 
-from django_future.csrf import ensure_csrf_cookie
 import dogstats_wrapper as dog_stats_api
 from edxmako.shortcuts import render_to_response
 from xmodule.contentstore.django import contentstore

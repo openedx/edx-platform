@@ -5,7 +5,7 @@ from util.json_request import JsonResponse
 from django.http import HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
-from django_future.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 from django.http import HttpResponseNotFound
 from django.core.exceptions import PermissionDenied

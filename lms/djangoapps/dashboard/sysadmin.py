@@ -25,7 +25,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
 from django.views.generic.base import TemplateView
 from django.views.decorators.http import condition
-from django_future.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 import mongoengine
 from path import path
