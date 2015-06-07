@@ -466,7 +466,7 @@ def generate_email(start_ref, end_ref, release_date=None):
 
         https://openedx.atlassian.net/wiki/display/ENG/{date}+Release
 
-        The staging server is: https://www.stage.edx.org
+        The staging server is: https://stage.edx.org
 
         Note that you are responsible for verifying any pull requests that you
         merged, whether you wrote the code or not. (If you didn't write the code,
