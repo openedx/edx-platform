@@ -1,11 +1,11 @@
 """
 Acceptance tests for the Import and Export pages
 """
-from flaky import flaky
-
 from abc import abstractmethod
 from bok_choy.promise import EmptyPromise
 from datetime import datetime
+from flaky import flaky
+
 from .base_studio_test import StudioLibraryTest, StudioCourseTest
 from ...fixtures.course import XBlockFixtureDesc
 from ...pages.studio.import_export import ExportLibraryPage, ExportCoursePage, ImportLibraryPage, ImportCoursePage
