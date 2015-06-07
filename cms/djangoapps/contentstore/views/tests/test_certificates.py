@@ -6,6 +6,9 @@ Group Configuration Tests.
 import json
 import mock
 
+from django.conf import settings
+from django.test.utils import override_settings
+
 from opaque_keys.edx.keys import AssetKey
 from opaque_keys.edx.locations import AssetLocation
 
@@ -19,6 +22,9 @@ from student.models import CourseEnrollment
 from contentstore.views.certificates import CertificateManager
 from django.test.utils import override_settings
 from contentstore.utils import get_lms_link_for_certificate_web_view
+
+FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
+FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 
 CERTIFICATE_JSON = {
     u'name': u'Test certificate',
@@ -185,6 +191,7 @@ class CertificatesBaseTestCase(object):
 
 
 # pylint: disable=no-member
+@override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
 class CertificatesListHandlerTestCase(CourseTestCase, CertificatesBaseTestCase, HelperMethods):
     """
     Test cases for certificates_list_handler.
@@ -323,6 +330,7 @@ class CertificatesListHandlerTestCase(CourseTestCase, CertificatesBaseTestCase, 
             self.assertNotEqual(new_certificate.get('id'), prev_certificate.get('id'))
 
 
+@override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
 class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase, HelperMethods):
     """
     Test cases for CertificatesDetailHandlerTestCase.

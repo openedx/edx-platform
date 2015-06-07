@@ -1,5 +1,6 @@
 <%namespace name='static' file='../static_content.html'/>
 <%!
+  from django.conf import settings
   from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
   from contentstore.context_processors import doc_url
@@ -35,8 +36,12 @@
             grading_url = reverse('contentstore.views.grading_handler', kwargs={'course_key_string': unicode(course_key)})
             advanced_settings_url = reverse('contentstore.views.advanced_settings_handler', kwargs={'course_key_string': unicode(course_key)})
             tabs_url = reverse('contentstore.views.tabs_handler', kwargs={'course_key_string': unicode(course_key)})
-            certificates_url = reverse('contentstore.views.certificates.certificates_list_handler', kwargs={'course_key_string': unicode(course_key)})
       %>
+      % if settings.FEATURES.get("CERTIFICATES_HTML_VIEW") and context_course:
+        <%
+          certificates_url = reverse('contentstore.views.certificates.certificates_list_handler', kwargs={'course_key_string': unicode(course_key)})
+        %>
+      % endif
       <h2 class="info-course">
         <span class="sr">${_("Current Course:")}</span>
         <a class="course-link" href="${index_url}">

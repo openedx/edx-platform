@@ -6,7 +6,10 @@ from io import BytesIO
 from pytz import UTC
 from PIL import Image
 import json
+
 from django.conf import settings
+from django.test.utils import override_settings
+
 from contentstore.tests.utils import CourseTestCase
 from contentstore.views import assets
 from contentstore.utils import reverse_course_url
@@ -28,7 +31,11 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 MAX_FILE_SIZE = settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB * 1000 ** 2
 
+FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
+FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 
+
+@override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
 class AssetsTestCase(CourseTestCase):
     """
     Parent class for all asset tests.
