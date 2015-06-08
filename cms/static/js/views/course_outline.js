@@ -143,6 +143,7 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                 var modal = CourseOutlineModalsFactory.getModal('edit', this.model, {
                     onSave: this.refresh.bind(this),
                     parentInfo: this.parentInfo,
+                    is_exams_proctored: this.parentView.parentView.model.get('is_exams_proctored'),
                     xblockType: XBlockViewUtils.getXBlockType(
                         this.model.get('category'), this.parentView.model, true
                     )

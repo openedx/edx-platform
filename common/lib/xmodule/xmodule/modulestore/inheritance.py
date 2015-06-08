@@ -153,25 +153,6 @@ class InheritanceMixin(XBlockMixin):
         default=True,
         scope=Scope.settings
     )
-    enable_exam_time = Boolean(
-        display_name=_("Enable Time for Course Exams"),
-        help=_("Enter true or false. If true, course exam time will be noted."),
-        default='',
-        scope=Scope.settings
-    )
-    enable_proctored_exams = Boolean(
-        display_name=_("Enable Proctoring for Course Exam."),
-        help=_("Enter true or false. If true, course exam will be proctored."),
-        default=False,
-        scope=Scope.settings
-    )
-    exam_time_limit = String(
-        display_name=_("Course Exam Time Limit"),
-        help=_("Set the time for the course exam."),
-        scope=Scope.settings,
-        default=''
-
-    )
     video_bumper = Dict(
         display_name=_("Video Pre-Roll"),
         help=_(
