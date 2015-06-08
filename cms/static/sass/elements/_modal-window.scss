@@ -464,6 +464,9 @@
         }
       }
     }
+    .list-fields {
+
+    }
 
     // CASE: content group has been removed
     .field-visibility-content-group.was-removed {
@@ -625,7 +628,7 @@
     }
 
     // UI: staff lock section
-    .edit-staff-lock {
+    .edit-staff-lock, .edit-settings-timed-examination{
 
       .checkbox-cosmetic .input-checkbox {
         @extend %cont-text-sr;
