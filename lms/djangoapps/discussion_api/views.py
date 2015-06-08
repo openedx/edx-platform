@@ -14,6 +14,7 @@ from opaque_keys.edx.locator import CourseLocator
 from discussion_api.api import (
     create_comment,
     create_thread,
+    delete_thread,
     get_comment_list,
     get_course_topics,
     get_thread_list,
@@ -69,7 +70,7 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
     **Use Cases**
 
         Retrieve the list of threads for a course, post a new thread, or modify
-        an existing thread.
+        or delete an existing thread.
 
     **Example Requests**:
 
@@ -86,6 +87,8 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
         PATCH /api/discussion/v1/threads/thread_id
         {"raw_body": "Edited text"}
+
+        DELETE /api/discussion/v1/threads/thread_id
 
     **GET Parameters**:
 
@@ -157,6 +160,10 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
             that were created or updated since the last time the user read
             the thread
 
+    **DELETE response values:
+
+        No content is returned for a DELETE request
+
     """
     lookup_field = "thread_id"
 
@@ -191,6 +198,14 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         the class docstring.
         """
         return Response(update_thread(request, thread_id, request.DATA))
+
+    def destroy(self, request, thread_id):
+        """
+        Implements the DELETE method for the instance endpoint as described in
+        the class docstring
+        """
+        delete_thread(request, thread_id)
+        return Response(status=204)
 
 
 class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):

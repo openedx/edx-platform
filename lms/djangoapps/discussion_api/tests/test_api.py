@@ -15,12 +15,15 @@ from django.core.exceptions import ValidationError
 from django.http import Http404
 from django.test.client import RequestFactory
 
+from rest_framework.exceptions import PermissionDenied
+
 from opaque_keys.edx.locator import CourseLocator
 
 from courseware.tests.factories import BetaTesterFactory, StaffFactory
 from discussion_api.api import (
     create_comment,
     create_thread,
+    delete_thread,
     get_comment_list,
     get_course_topics,
     get_thread_list,
@@ -1474,7 +1477,7 @@ class UpdateThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestC
         with self.assertRaises(Http404):
             update_thread(self.request, "test_thread", {})
 
-    def test_unenrolled(self):
+    def test_not_enrolled(self):
         self.register_thread()
         self.request.user = UserFactory.create()
         with self.assertRaises(Http404):
@@ -1633,3 +1636,130 @@ class UpdateThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestC
             assertion.exception.message_dict,
             {"raw_body": ["This field is required."]}
         )
+
+
+@ddt.ddt
+class DeleteThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestCase):
+    """Tests for delete_thread"""
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super(DeleteThreadTest, self).setUp()
+        httpretty.reset()
+        httpretty.enable()
+        self.addCleanup(httpretty.disable)
+        self.user = UserFactory.create()
+        self.register_get_user_response(self.user)
+        self.request = RequestFactory().get("/test_path")
+        self.request.user = self.user
+        self.course = CourseFactory.create()
+        self.thread_id = "test_thread"
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
+
+    def register_thread(self, overrides=None):
+        """
+        Make a thread with appropriate data overridden by the overrides
+        parameter and register mock responses for both GET and DELETE on its
+        endpoint.
+        """
+        cs_data = make_minimal_cs_thread({
+            "id": self.thread_id,
+            "course_id": unicode(self.course.id),
+            "user_id": str(self.user.id),
+        })
+        cs_data.update(overrides or {})
+        self.register_get_thread_response(cs_data)
+        self.register_delete_thread_response(cs_data["id"])
+
+    def test_basic(self):
+        self.register_thread()
+        self.assertIsNone(delete_thread(self.request, self.thread_id))
+        self.assertEqual(
+            urlparse(httpretty.last_request().path).path,
+            "/api/v1/threads/{}".format(self.thread_id)
+        )
+        self.assertEqual(httpretty.last_request().method, "DELETE")
+
+    def test_thread_id_not_found(self):
+        self.register_get_thread_error_response("missing_thread", 404)
+        with self.assertRaises(Http404):
+            delete_thread(self.request, "missing_thread")
+
+    def test_nonexistent_course(self):
+        self.register_thread({"course_id": "non/existent/course"})
+        with self.assertRaises(Http404):
+            delete_thread(self.request, self.thread_id)
+
+    def test_not_enrolled(self):
+        self.register_thread()
+        self.request.user = UserFactory.create()
+        with self.assertRaises(Http404):
+            delete_thread(self.request, self.thread_id)
+
+    def test_discussions_disabled(self):
+        self.register_thread()
+        _remove_discussion_tab(self.course, self.user.id)
+        with self.assertRaises(Http404):
+            delete_thread(self.request, self.thread_id)
+
+    @ddt.data(
+        FORUM_ROLE_ADMINISTRATOR,
+        FORUM_ROLE_MODERATOR,
+        FORUM_ROLE_COMMUNITY_TA,
+        FORUM_ROLE_STUDENT,
+    )
+    def test_non_author_delete_allowed(self, role_name):
+        role = Role.objects.create(name=role_name, course_id=self.course.id)
+        role.users = [self.user]
+        self.register_thread({"user_id": str(self.user.id + 1)})
+        expected_error = role_name == FORUM_ROLE_STUDENT
+        try:
+            delete_thread(self.request, "test_thread")
+            self.assertFalse(expected_error)
+        except PermissionDenied:
+            self.assertTrue(expected_error)
+
+    @ddt.data(
+        *itertools.product(
+            [
+                FORUM_ROLE_ADMINISTRATOR,
+                FORUM_ROLE_MODERATOR,
+                FORUM_ROLE_COMMUNITY_TA,
+                FORUM_ROLE_STUDENT,
+            ],
+            [True, False],
+            ["no_group", "match_group", "different_group"],
+        )
+    )
+    @ddt.unpack
+    def test_group_access(self, role_name, course_is_cohorted, thread_group_state):
+        """
+        Tests group access for deleting a thread
+
+        All privileged roles are able to delete a thread. A student role can
+        only delete a thread if,
+        the student role is the author and the thread is not in a cohort,
+        the student role is the author and the thread is in the author's cohort.
+        """
+        cohort_course = CourseFactory.create(cohort_config={"cohorted": course_is_cohorted})
+        CourseEnrollmentFactory.create(user=self.user, course_id=cohort_course.id)
+        cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.user])
+        role = Role.objects.create(name=role_name, course_id=cohort_course.id)
+        role.users = [self.user]
+        self.register_thread({
+            "course_id": unicode(cohort_course.id),
+            "group_id": (
+                None if thread_group_state == "no_group" else
+                cohort.id if thread_group_state == "match_group" else
+                cohort.id + 1
+            ),
+        })
+        expected_error = (
+            role_name == FORUM_ROLE_STUDENT and
+            course_is_cohorted and
+            thread_group_state == "different_group"
+        )
+        try:
+            delete_thread(self.request, "test_thread")
+            self.assertFalse(expected_error)
+        except Http404:
+            self.assertTrue(expected_error)
