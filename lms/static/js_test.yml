@@ -93,11 +93,13 @@ fixture_paths:
     - templates/file-upload.underscore
     - templates/components/header
     - templates/components/tabbed
+    - templates/components/card
     - js/fixtures/edxnotes
     - js/fixtures/search
     - templates/search
     - templates/discovery
     - common/templates
+    - teams/templates
 
 requirejs:
   paths:

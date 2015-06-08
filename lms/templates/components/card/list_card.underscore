@@ -1,0 +1,13 @@
+<div class="card-core-wrapper">
+    <div class="card-core">
+        <h3 class="card-title"><%- title %></h3>
+        <p class="card-description"><%- description %></p>
+    </div>
+    <div class="card-actions">
+        <a class="action <%= action_class %>" href="<%= action_url %>"><%= action_content %></a>
+    </div>
+</div>
+<div class="card-meta-wrapper">
+    <div class="card-meta-details">
+    </div>
+</div>
