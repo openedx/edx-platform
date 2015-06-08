@@ -1,6 +1,7 @@
 """
 Tests for signal handling in commerce djangoapp.
 """
+from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase
 from django.test.utils import override_settings
 
@@ -108,6 +109,12 @@ class TestRefundSignal(TestCase):
         self.send_signal()
         self.assertTrue(mock_refund_seat.called)
         self.assertEqual(mock_refund_seat.call_args[0], (self.course_enrollment, self.requester))
+
+        # HTTP user is another server (AnonymousUser): do not try to initiate a refund at all.
+        mock_get_request_user.return_value = AnonymousUser()
+        mock_refund_seat.reset_mock()
+        self.send_signal()
+        self.assertFalse(mock_refund_seat.called)
 
     @mock.patch('commerce.signals.log.warning')
     def test_not_authorized_warning(self, mock_log_warning):
