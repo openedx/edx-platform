@@ -5,34 +5,34 @@ from unittest import TestCase
 
 import xmodule.tabs as xmodule_tabs
 
-from openedx.core.djangoapps.course_views.course_views import CourseViewTypeManager
+from openedx.core.lib.course_tabs import CourseTabPluginManager
 
 
-class CourseViewTypeManagerTestCase(TestCase):
-    """Test cases for CourseViewTypeManager class"""
+class CourseTabPluginManagerTestCase(TestCase):
+    """Test cases for CourseTabPluginManager class"""
 
-    @patch('openedx.core.djangoapps.course_views.course_views.CourseViewTypeManager.get_available_plugins')
-    def test_get_course_view_types(self, get_available_plugins):
+    @patch('openedx.core.lib.course_tabs.CourseTabPluginManager.get_available_plugins')
+    def test_get_tab_types(self, get_available_plugins):
         """
         Verify that get_course_view_types sorts appropriately
         """
-        def create_mock_plugin(name, priority):
+        def create_mock_plugin(tab_type, priority):
             """ Create a mock plugin with the specified name and priority. """
             mock_plugin = Mock()
-            mock_plugin.name = name
+            mock_plugin.type = tab_type
             mock_plugin.priority = priority
             return mock_plugin
         mock_plugins = {
-            "Last": create_mock_plugin(name="Last", priority=None),
-            "Duplicate1": create_mock_plugin(name="Duplicate", priority=None),
-            "Duplicate2": create_mock_plugin(name="Duplicate", priority=None),
-            "First": create_mock_plugin(name="First", priority=1),
-            "Second": create_mock_plugin(name="Second", priority=1),
-            "Third": create_mock_plugin(name="Third", priority=3),
+            "Last": create_mock_plugin(tab_type="Last", priority=None),
+            "Duplicate1": create_mock_plugin(tab_type="Duplicate", priority=None),
+            "Duplicate2": create_mock_plugin(tab_type="Duplicate", priority=None),
+            "First": create_mock_plugin(tab_type="First", priority=1),
+            "Second": create_mock_plugin(tab_type="Second", priority=1),
+            "Third": create_mock_plugin(tab_type="Third", priority=3),
         }
         get_available_plugins.return_value = mock_plugins
         self.assertEqual(
-            [plugin.name for plugin in CourseViewTypeManager.get_course_view_types()],
+            [plugin.type for plugin in CourseTabPluginManager.get_tab_types()],
             ["First", "Second", "Third", "Duplicate", "Duplicate", "Last"]
         )
 

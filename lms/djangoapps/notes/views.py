@@ -9,7 +9,7 @@ from django.http import Http404
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from courseware.courses import get_course_with_access
-from courseware.tabs import EnrolledCourseViewType
+from courseware.tabs import EnrolledTab
 from notes.models import Note
 from notes.utils import notes_enabled_for_course
 from xmodule.annotator_token import retrieve_token
@@ -40,16 +40,16 @@ def notes(request, course_id):
     return render_to_response('notes.html', context)
 
 
-class NotesCourseViewType(EnrolledCourseViewType):
+class NotesTab(EnrolledTab):
     """
     A tab for the course notes.
     """
-    name = 'notes'
+    type = 'notes'
     title = _("My Notes")
     view_name = "notes"
 
     @classmethod
     def is_enabled(cls, course, user=None):
-        if not super(NotesCourseViewType, cls).is_enabled(course, user):
+        if not super(NotesTab, cls).is_enabled(course, user):
             return False
         return settings.FEATURES.get('ENABLE_STUDENT_NOTES') and "notes" in course.advanced_modules

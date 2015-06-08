@@ -23,7 +23,7 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.tabs import CourseTab
-from openedx.core.djangoapps.course_views.course_views import CourseViewTypeManager
+from openedx.core.lib.course_tabs import CourseTabPluginManager
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
 from opaque_keys import InvalidKeyError
@@ -998,7 +998,7 @@ def _refresh_course_tabs(request, course_module):
         Adds or removes a course tab based upon whether it is enabled.
         """
         tab_panel = {
-            "type": tab_type.name,
+            "type": tab_type.type,
             "name": tab_type.title,
         }
         has_tab = tab_panel in tabs
@@ -1010,7 +1010,7 @@ def _refresh_course_tabs(request, course_module):
     course_tabs = copy.copy(course_module.tabs)
 
     # Additionally update any tabs that are provided by non-dynamic course views
-    for tab_type in CourseViewTypeManager.get_course_view_types():
+    for tab_type in CourseTabPluginManager.get_tab_types():
         if not tab_type.is_dynamic and tab_type.is_default:
             tab_enabled = tab_type.is_enabled(course_module, user=request.user)
             update_tab(course_tabs, tab_type, tab_enabled)

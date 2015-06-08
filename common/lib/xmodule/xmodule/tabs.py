@@ -28,11 +28,17 @@ class CourseTab(object):
     # subclass, shared by all instances of the subclass.
     type = ''
 
+    # The title of the tab, which should be internationalized
+    title = None
+
     # Class property that specifies whether the tab can be hidden for a particular course
     is_hideable = False
 
     # Class property that specifies whether the tab is hidden for a particular course
     is_hidden = False
+
+    # The relative priority of this view that affects the ordering (lower numbers shown first)
+    priority = None
 
     # Class property that specifies whether the tab can be moved within a course's list of tabs
     is_movable = True
@@ -40,42 +46,41 @@ class CourseTab(object):
     # Class property that specifies whether the tab is a collection of other tabs
     is_collection = False
 
-    def __init__(self, name, tab_id, link_func):
+    # True if this tab is dynamically added to the list of tabs
+    is_dynamic = False
+
+    # True if this tab is a default for the course (when enabled)
+    is_default = True
+
+    # True if this tab can be included more than once for a course.
+    allow_multiple = False
+
+    # If there is a single view associated with this tab, this is the name of it
+    view_name = None
+
+    def __init__(self, tab_dict):
         """
         Initializes class members with values passed in by subclasses.
 
         Args:
-            name: The name of the tab
-
-            tab_id: Intended to be a unique id for this tab, although it is currently not enforced
-            within this module.  It is used by the UI to determine which page is active.
-
-            link_func: A function that computes the link for the tab,
-            given the course and a reverse-url function as input parameters
+            tab_dict (dict) - a dictionary of parameters used to build the tab.
         """
 
-        self.name = name
+        self.name = tab_dict.get('name', self.title)
+        self.tab_id = tab_dict.get('tab_id', getattr(self, 'tab_id', self.type))
+        self.link_func = tab_dict.get('link_func', link_reverse_func(self.view_name))
 
-        self.tab_id = tab_id
+        self.is_hidden = tab_dict.get('is_hidden', False)
 
-        self.link_func = link_func
-
-    def is_enabled(self, course, user=None):  # pylint: disable=unused-argument
-        """
-        Determines whether the tab is enabled for the given course and a particular user.
-        This method is to be overridden by subclasses when applicable.  The base class
-        implementation always returns True.
+    @classmethod
+    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+        """Returns true if this course tab is enabled in the course.
 
         Args:
-            course: An xModule CourseDescriptor
-
-            user: An optional user for whom the tab will be displayed. If none,
-                then the code should assume a staff user or an author.
-
-        Returns:
-            A boolean value to indicate whether this instance of the tab is enabled.
+            course (CourseDescriptor): the course using the feature
+            user (User): an optional user interacting with the course (defaults to None)
         """
-        return True
+        raise NotImplementedError()
 
     def get(self, key, default=None):
         """
@@ -98,6 +103,8 @@ class CourseTab(object):
             return self.type
         elif key == 'tab_id':
             return self.tab_id
+        elif key == 'is_hidden':
+            return self.is_hidden
         else:
             raise KeyError('Key {0} not present in tab {1}'.format(key, self.to_json()))
 
@@ -112,6 +119,8 @@ class CourseTab(object):
             self.name = value
         elif key == 'tab_id':
             self.tab_id = value
+        elif key == 'is_hidden':
+            self.is_hidden = value
         else:
             raise KeyError('Key {0} cannot be set in tab {1}'.format(key, self.to_json()))
 
@@ -129,8 +138,10 @@ class CourseTab(object):
         # allow tabs without names; if a name is required, its presence was checked in the validator.
         name_is_eq = (other.get('name') is None or self.name == other['name'])
 
+        is_hidden_eq = self.is_hidden == other.get('is_hidden', False)
+
         # only compare the persisted/serialized members: 'type' and 'name'
-        return self.type == other.get('type') and name_is_eq
+        return self.type == other.get('type') and name_is_eq and is_hidden_eq
 
     def __ne__(self, other):
         """
@@ -170,7 +181,10 @@ class CourseTab(object):
         Returns:
             a dictionary with keys for the properties of the CourseTab object.
         """
-        return {'type': self.type, 'name': self.name}
+        to_json_val = {'type': self.type, 'name': self.name}
+        if self.is_hidden:
+            to_json_val.update({'is_hidden': True})
+        return to_json_val
 
     @staticmethod
     def from_json(tab_dict):
@@ -191,22 +205,88 @@ class CourseTab(object):
             InvalidTabsException if the given tab doesn't have the right keys.
         """
         # TODO: don't import openedx capabilities from common
-        from openedx.core.djangoapps.course_views.course_views import CourseViewTypeManager
+        from openedx.core.lib.course_tabs import CourseTabPluginManager
         tab_type_name = tab_dict.get('type')
         if tab_type_name is None:
             log.error('No type included in tab_dict: %r', tab_dict)
             return None
         try:
-            tab_type = CourseViewTypeManager.get_plugin(tab_type_name)
+            tab_type = CourseTabPluginManager.get_plugin(tab_type_name)
         except PluginError:
             log.exception(
                 "Unknown tab type %r Known types: %r.",
                 tab_type_name,
-                CourseViewTypeManager.get_course_view_types()
+                CourseTabPluginManager.get_tab_types()
             )
             return None
+
         tab_type.validate(tab_dict)
-        return tab_type.create_tab(tab_dict=tab_dict)
+        return tab_type(tab_dict=tab_dict)
+
+
+class StaticTab(CourseTab):
+    """
+    A custom tab.
+    """
+    type = 'static_tab'
+    is_default = False  # A static tab is never added to a course by default
+    allow_multiple = True
+
+    def __init__(self, tab_dict=None, name=None, url_slug=None):
+        def link_func(course, reverse_func):
+            """ Returns a url for a given course and reverse function. """
+            return reverse_func(self.type, args=[course.id.to_deprecated_string(), self.url_slug])
+
+        self.url_slug = tab_dict.get('url_slug') if tab_dict else url_slug
+
+        if tab_dict is None:
+            tab_dict = dict()
+
+        if name is not None:
+            tab_dict['name'] = name
+
+        tab_dict['link_func'] = link_func
+        tab_dict['tab_id'] = 'static_tab_{0}'.format(self.url_slug)
+
+        super(StaticTab, self).__init__(tab_dict)
+
+    @classmethod
+    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+        """
+        Static tabs are viewable to everyone, even anonymous users.
+        """
+        return True
+
+    @classmethod
+    def validate(cls, tab_dict, raise_error=True):
+        """
+        Ensures that the specified tab_dict is valid.
+        """
+        return (super(StaticTab, cls).validate(tab_dict, raise_error)
+                and key_checker(['name', 'url_slug'])(tab_dict, raise_error))
+
+    def __getitem__(self, key):
+        if key == 'url_slug':
+            return self.url_slug
+        else:
+            return super(StaticTab, self).__getitem__(key)
+
+    def __setitem__(self, key, value):
+        if key == 'url_slug':
+            self.url_slug = value
+        else:
+            super(StaticTab, self).__setitem__(key, value)
+
+    def to_json(self):
+        """ Return a dictionary representation of this tab. """
+        to_json_val = super(StaticTab, self).to_json()
+        to_json_val.update({'url_slug': self.url_slug})
+        return to_json_val
+
+    def __eq__(self, other):
+        if not super(StaticTab, self).__eq__(other):
+            return False
+        return self.url_slug == other.get('url_slug')
 
 
 class CourseTabList(List):
@@ -338,10 +418,10 @@ class CourseTabList(List):
 
         # the following tabs should appear only once
         # TODO: don't import openedx capabilities from common
-        from openedx.core.djangoapps.course_views.course_views import CourseViewTypeManager
-        for course_view_type in CourseViewTypeManager.get_course_view_types():
-            if not course_view_type.allow_multiple:
-                cls._validate_num_tabs_of_type(tabs, course_view_type.name, 1)
+        from openedx.core.lib.course_tabs import CourseTabPluginManager
+        for tab_type in CourseTabPluginManager.get_tab_types():
+            if not tab_type.allow_multiple:
+                cls._validate_num_tabs_of_type(tabs, tab_type.type, 1)
 
     @staticmethod
     def _validate_num_tabs_of_type(tabs, tab_type, max_num):
@@ -409,6 +489,16 @@ def key_checker(expected_keys):
             return False
 
     return check
+
+
+def link_reverse_func(reverse_name):
+    """
+    Returns a function that takes in a course and reverse_url_func,
+    and calls the reverse_url_func with the given reverse_name and course's ID.
+
+    This is used to generate the url for a CourseTab without having access to Django's reverse function.
+    """
+    return lambda course, reverse_url_func: reverse_url_func(reverse_name, args=[course.id.to_deprecated_string()])
 
 
 def need_name(dictionary, raise_error=True):

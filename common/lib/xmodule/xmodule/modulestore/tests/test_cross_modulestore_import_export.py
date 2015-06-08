@@ -21,6 +21,7 @@ from tempfile import mkdtemp
 
 import ddt
 from nose.plugins.attrib import attr
+from mock import patch
 
 from xmodule.tests import CourseComparisonTest
 from xmodule.modulestore.mongo.base import ModuleStoreEnum
@@ -31,6 +32,7 @@ from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.split_mongo.split_draft import DraftVersioningModuleStore
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from xmodule.modulestore.tests.utils import mock_tab_from_json
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.partitions.tests.test_partitions import PartitionTestCase
 from xmodule.x_module import XModuleMixin
@@ -365,6 +367,7 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
         self.export_dir = mkdtemp()
         self.addCleanup(rmtree, self.export_dir, ignore_errors=True)
 
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     @ddt.data(*itertools.product(
         MODULESTORE_SETUPS,
         MODULESTORE_SETUPS,
@@ -373,7 +376,10 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
         COURSE_DATA_NAMES,
     ))
     @ddt.unpack
-    def test_round_trip(self, source_builder, dest_builder, source_content_builder, dest_content_builder, course_data_name):
+    def test_round_trip(
+            self, source_builder, dest_builder, source_content_builder,
+            dest_content_builder, course_data_name, _mock_tab_from_json
+    ):
         # Construct the contentstore for storing the first import
         with source_content_builder.build() as source_content:
             # Construct the modulestore for storing the first import (using the previously created contentstore)

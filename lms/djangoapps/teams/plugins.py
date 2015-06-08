@@ -3,16 +3,16 @@ Definition of the course team feature.
 """
 
 from django.utils.translation import ugettext as _
-from courseware.tabs import EnrolledCourseViewType
+from courseware.tabs import EnrolledTab
 from .views import is_feature_enabled
 
 
-class TeamsCourseViewType(EnrolledCourseViewType):
+class TeamsTab(EnrolledTab):
     """
     The representation of the course teams view type.
     """
 
-    name = "teams"
+    type = "teams"
     title = _("Teams")
     view_name = "teams_dashboard"
 
@@ -24,7 +24,7 @@ class TeamsCourseViewType(EnrolledCourseViewType):
             course (CourseDescriptor): the course using the feature
             user (User): the user interacting with the course
         """
-        if not super(TeamsCourseViewType, cls).is_enabled(course, user=user):
+        if not super(TeamsTab, cls).is_enabled(course, user=user):
             return False
 
         return is_feature_enabled(course)

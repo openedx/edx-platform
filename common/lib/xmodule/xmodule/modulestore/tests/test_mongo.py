@@ -17,6 +17,7 @@ from uuid import uuid4
 from datetime import datetime
 from pytz import UTC
 import unittest
+from mock import patch
 from xblock.core import XBlock
 
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
@@ -41,7 +42,7 @@ from git.test.lib.asserts import assert_not_none
 from xmodule.x_module import XModuleMixin
 from xmodule.modulestore.mongo.base import as_draft
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
-from xmodule.modulestore.tests.utils import LocationMixin
+from xmodule.modulestore.tests.utils import LocationMixin, mock_tab_from_json
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import InheritanceMixin
@@ -129,36 +130,38 @@ class TestMongoModuleStoreBase(unittest.TestCase):
             xblock_mixins=(EditInfoMixin, InheritanceMixin, LocationMixin, XModuleMixin)
 
         )
-        import_course_from_xml(
-            draft_store,
-            999,
-            DATA_DIR,
-            cls.courses,
-            static_content_store=content_store
-        )
 
-        # also test a course with no importing of static content
-        import_course_from_xml(
-            draft_store,
-            999,
-            DATA_DIR,
-            ['test_import_course'],
-            static_content_store=content_store,
-            do_import_static=False,
-            verbose=True
-        )
+        with patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json):
+            import_course_from_xml(
+                draft_store,
+                999,
+                DATA_DIR,
+                cls.courses,
+                static_content_store=content_store
+            )
 
-        # also import a course under a different course_id (especially ORG)
-        import_course_from_xml(
-            draft_store,
-            999,
-            DATA_DIR,
-            ['test_import_course'],
-            static_content_store=content_store,
-            do_import_static=False,
-            verbose=True,
-            target_id=SlashSeparatedCourseKey('guestx', 'foo', 'bar')
-        )
+            # also test a course with no importing of static content
+            import_course_from_xml(
+                draft_store,
+                999,
+                DATA_DIR,
+                ['test_import_course'],
+                static_content_store=content_store,
+                do_import_static=False,
+                verbose=True
+            )
+
+            # also import a course under a different course_id (especially ORG)
+            import_course_from_xml(
+                draft_store,
+                999,
+                DATA_DIR,
+                ['test_import_course'],
+                static_content_store=content_store,
+                do_import_static=False,
+                verbose=True,
+                target_id=SlashSeparatedCourseKey('guestx', 'foo', 'bar')
+            )
 
         return content_store, draft_store
 
@@ -203,7 +206,8 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         )
         assert_equals(store.get_modulestore_type(''), ModuleStoreEnum.Type.mongo)
 
-    def test_get_courses(self):
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_get_courses(self, _from_json):
         '''Make sure the course objects loaded properly'''
         courses = self.draft_store.get_courses()
 
@@ -241,7 +245,8 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
             assert_false(self.draft_store.has_course(mix_cased))
             assert_true(self.draft_store.has_course(mix_cased, ignore_case=True))
 
-    def test_get_org_courses(self):
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_get_org_courses(self, _from_json):
         """
         Make sure that we can query for a filtered list of courses for a given ORG
         """
@@ -437,7 +442,8 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
             {'displayname': 'hello'}
         )
 
-    def test_get_courses_for_wiki(self):
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_get_courses_for_wiki(self, _from_json):
         """
         Test the get_courses_for_wiki method
         """
@@ -552,7 +558,8 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         check_xblock_fields()
         check_mongo_fields()
 
-    def test_export_course_image(self):
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_export_course_image(self, _from_json):
         """
         Test to make sure that we have a course image in the contentstore,
         then export it to ensure it gets copied to both file locations.
@@ -571,7 +578,8 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         finally:
             shutil.rmtree(root_dir)
 
-    def test_export_course_image_nondefault(self):
+    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    def test_export_course_image_nondefault(self, _from_json):
         """
         Make sure that if a non-default image path is specified that we
         don't export it to the static default location

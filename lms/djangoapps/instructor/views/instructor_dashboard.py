@@ -26,6 +26,7 @@ from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from openedx.core.lib.xblock_utils import wrap_xblock
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore.django import modulestore
+from xmodule.tabs import CourseTab
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from courseware.access import has_access
@@ -38,7 +39,6 @@ from course_modes.models import CourseMode, CourseModesArchive
 from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
 from certificates.models import CertificateGenerationConfiguration
 from certificates import api as certs_api
-from openedx.core.djangoapps.course_views.course_views import CourseViewType
 
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 from .tools import get_units_with_due_date, title_or_url, bulk_email_is_enabled_for_course
@@ -47,12 +47,12 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 log = logging.getLogger(__name__)
 
 
-class InstructorDashboardViewType(CourseViewType):
+class InstructorDashboardTab(CourseTab):
     """
     Defines the Instructor Dashboard view type that is shown as a course tab.
     """
 
-    name = "instructor"
+    type = "instructor"
     title = _('Instructor')
     view_name = "instructor_dashboard"
     is_dynamic = True    # The "Instructor" tab is instead dynamically added when it is enabled
