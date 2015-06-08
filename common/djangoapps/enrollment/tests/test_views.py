@@ -476,6 +476,40 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
         self.assertTrue(is_active)
         self.assertEqual(course_mode, 'professional')
 
+    def test_enrollment_includes_expired_verified(self):
+        """With the right API key, request that expired course verifications are still returned. """
+        # Create a honor mode for a course.
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug=CourseMode.HONOR,
+            mode_display_name=CourseMode.HONOR,
+        )
+
+        # Create a verified mode for a course.
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug=CourseMode.VERIFIED,
+            mode_display_name=CourseMode.VERIFIED,
+            expiration_datetime='1970-01-01 05:00:00'
+        )
+
+        # Passes the include_expired parameter to the API call
+        v_response = self.client.get(
+            reverse('courseenrollmentdetails', kwargs={"course_id": unicode(self.course.id)}), {'include_expired': True}
+        )
+        v_data = json.loads(v_response.content)
+
+        # Ensure that both course modes are returned
+        self.assertEqual(len(v_data['course_modes']), 2)
+
+        # Omits the include_expired parameter from the API call
+        h_response = self.client.get(reverse('courseenrollmentdetails', kwargs={"course_id": unicode(self.course.id)}))
+        h_data = json.loads(h_response.content)
+
+        # Ensure that only one course mode is returned and that it is honor
+        self.assertEqual(len(h_data['course_modes']), 1)
+        self.assertEqual(h_data['course_modes'][0]['slug'], CourseMode.HONOR)
+
     def test_update_enrollment_with_mode(self):
         """With the right API key, update an existing enrollment with a new mode. """
         # Create an honor and verified mode for a course. This allows an update.

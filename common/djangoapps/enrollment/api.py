@@ -235,13 +235,16 @@ def update_enrollment(user_id, course_id, mode=None, is_active=None):
     return enrollment
 
 
-def get_course_enrollment_details(course_id):
+def get_course_enrollment_details(course_id, include_expired=False):
     """Get the course modes for course. Also get enrollment start and end date, invite only, etc.
 
     Given a course_id, return a serializable dictionary of properties describing course enrollment information.
 
     Args:
         course_id (str): The Course to get enrollment information for.
+
+        include_expired (bool): Boolean denoting whether expired course modes
+        should be included in the returned JSON data.
 
     Returns:
         A serializable dictionary of course enrollment information.
@@ -270,8 +273,10 @@ def get_course_enrollment_details(course_id):
         }
 
     """
-    cache_key = u"enrollment.course.details.{course_id}".format(course_id=course_id)
-
+    cache_key = u'enrollment.course.details.{course_id}.{include_expired}'.format(
+        course_id=course_id,
+        include_expired=include_expired
+    )
     cached_enrollment_data = None
     try:
         cached_enrollment_data = cache.get(cache_key)
@@ -283,7 +288,7 @@ def get_course_enrollment_details(course_id):
         log.info(u"Get enrollment data for course %s (cached)", course_id)
         return cached_enrollment_data
 
-    course_enrollment_details = _data_api().get_course_enrollment_info(course_id)
+    course_enrollment_details = _data_api().get_course_enrollment_info(course_id, include_expired)
 
     try:
         cache_time_out = getattr(settings, 'ENROLLMENT_COURSE_DETAILS_CACHE_TIMEOUT', 60)
