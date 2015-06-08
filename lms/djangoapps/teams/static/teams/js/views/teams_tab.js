@@ -6,8 +6,8 @@
             'gettext',
             'js/components/header/views/header',
             'js/components/header/models/header',
-            'text!teams/templates/teams-tab.underscore'],
-           function (Backbone, _, gettext, HeaderView, HeaderModel, teamsTabTemplate) {
+            'js/components/tabbed/views/tabbed_view'],
+           function (Backbone, _, gettext, HeaderView, HeaderModel, TabbedView) {
                var TeamTabView = Backbone.View.extend({
                    initialize: function() {
                        this.headerModel = new HeaderModel({
@@ -17,12 +17,35 @@
                        this.headerView = new HeaderView({
                            model: this.headerModel
                        });
+                       // TODO replace this with actual views!
+                       var TempTabView = Backbone.View.extend({
+                           initialize: function (options) {
+                               this.text = options.text;
+                           },
+
+                           render: function () {
+                               this.$el.text(this.text)
+                           }
+                       });
+                       this.tabbedView = new TabbedView({
+                           tabs: [{
+                               title: gettext('My Teams'),
+                               url: 'teams',
+                               view: new TempTabView({text: 'This is the new Teams tab.'})
+                           }, {
+                               title: gettext('Browse'),
+                               url: 'browse',
+                               view: new TempTabView({text: 'Browse team topics here.'})
+                           }]
+                       });
+                       Backbone.history.start();
                    },
 
                    render: function() {
-                       this.$el.html(_.template(teamsTabTemplate, {}));
-                       this.$el.prepend(this.headerView.$el);
+                       this.$el.append(this.headerView.$el);
                        this.headerView.render();
+                       this.$el.append(this.tabbedView.$el);
+                       this.tabbedView.render();
                    }
                });
 

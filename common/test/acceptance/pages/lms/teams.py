@@ -18,4 +18,4 @@ class TeamsPage(CoursePage):
 
     def get_body_text(self):
         """ Returns the current dummy text. This will be changed once there is more content on the page. """
-        return self.q(css='.teams-text').text[0]
+        return self.q(css='.page-content-main').text[0]
