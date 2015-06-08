@@ -11,7 +11,7 @@ import json
 import re
 
 from django.http import HttpResponse, Http404
-from django_future.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 from edxmako.shortcuts import render_to_response, render_to_string
 

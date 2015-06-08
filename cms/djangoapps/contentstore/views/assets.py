@@ -5,9 +5,8 @@ import json
 
 from django.http import HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_http_methods
-from django_future.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_http_methods, require_POST
 from django.conf import settings
 
 from edxmako.shortcuts import render_to_response

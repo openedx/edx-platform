@@ -30,7 +30,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import Location
 from opaque_keys.edx.keys import CourseKey
 
-from django_future.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie
 from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
 from contentstore.course_group_config import (
     GroupConfiguration,

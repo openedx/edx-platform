@@ -12,7 +12,7 @@ import re
 import time
 import requests
 from django.conf import settings
-from django_future.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 from django.views.decorators.cache import cache_control
 from django.core.exceptions import ValidationError, PermissionDenied

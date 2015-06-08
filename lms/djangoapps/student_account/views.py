@@ -15,7 +15,7 @@ from django.http import HttpRequest
 from django_countries import countries
 from django.core.urlresolvers import reverse, resolve
 from django.utils.translation import ugettext as _
-from django_future.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 
 from lang_pref.api import released_languages

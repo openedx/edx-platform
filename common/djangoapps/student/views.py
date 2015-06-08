@@ -26,11 +26,10 @@ from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbi
                          HttpResponseServerError, Http404)
 from django.shortcuts import redirect
 from django.utils.translation import ungettext
-from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date, base36_to_int
 from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.cache import never_cache
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_POST, require_GET
 
 from django.db.models.signals import post_save
