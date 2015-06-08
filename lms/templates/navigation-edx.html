@@ -10,31 +10,10 @@ from microsite_configuration.templatetags.microsite import platform_name
 
 # App that handles subdomain specific branding
 import branding
-# app that handles site status messages
-from status.status import get_site_status_msg
 %>
 
 ## Provide a hook for themes to inject branding on top.
 <%block name="navigation_top" />
-
-<%block>
-<%
-try:
-    course_id = course.id.to_deprecated_string()
-except:
-    # can't figure out a better way to get at a possibly-defined course var
-    course_id = None
-site_status_msg = get_site_status_msg(course_id)
-%>
-% if site_status_msg:
-<div class="site-status">
-  <div class="inner-wrapper">
-    <span class="white-error-icon"></span>
-    <p>${site_status_msg}</p>
-  </div>
-</div>
-% endif
-</%block>
 
 <header class="${"global slim" if course and not disable_courseware_header else "global-new"}" aria-label="Main" role="banner">
   <div class="${'rwd ' if responsive else ''}wrapper-header nav-container">
