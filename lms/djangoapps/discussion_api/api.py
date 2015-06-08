@@ -41,7 +41,7 @@ def _get_course_or_404(course_key, user):
     return course
 
 
-def _get_thread_and_context(request, thread_id, parent_id=None, retrieve_kwargs=None):
+def _get_thread_and_context(request, thread_id, retrieve_kwargs=None):
     """
     Retrieve the given thread and build a serializer context for it, returning
     both. This function also enforces access control for the thread (checking
@@ -56,7 +56,7 @@ def _get_thread_and_context(request, thread_id, parent_id=None, retrieve_kwargs=
         cc_thread = Thread(id=thread_id).retrieve(**retrieve_kwargs)
         course_key = CourseKey.from_string(cc_thread["course_id"])
         course = _get_course_or_404(course_key, request.user)
-        context = get_context(course, request, cc_thread, parent_id)
+        context = get_context(course, request, cc_thread)
         if (
                 not context["is_requester_privileged"] and
                 cc_thread["group_id"] and
@@ -350,11 +350,10 @@ def create_comment(request, comment_data):
         detail.
     """
     thread_id = comment_data.get("thread_id")
-    parent_id = comment_data.get("parent_id")
     if not thread_id:
         raise ValidationError({"thread_id": ["This field is required."]})
     try:
-        cc_thread, context = _get_thread_and_context(request, thread_id, parent_id)
+        cc_thread, context = _get_thread_and_context(request, thread_id)
     except Http404:
         raise ValidationError({"thread_id": ["Invalid value."]})
 

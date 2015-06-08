@@ -84,7 +84,7 @@ class CommentsServiceMockMixin(object):
             status=200
         )
 
-    def register_post_comment_response(self, response_overrides, thread_id=None, parent_id=None):
+    def register_post_comment_response(self, response_overrides, thread_id, parent_id=None):
         """
         Register a mock response for POST on the CS comments endpoint for the
         given thread or parent; exactly one of thread_id and parent_id must be
@@ -99,14 +99,16 @@ class CommentsServiceMockMixin(object):
                 {key: val[0] for key, val in request.parsed_body.items()}
             )
             response_data.update(response_overrides or {})
+            # thread_id and parent_id are not included in request payload but
+            # are returned by the comments service
+            response_data["thread_id"] = thread_id
+            response_data["parent_id"] = parent_id
             return (200, headers, json.dumps(response_data))
 
-        if thread_id and not parent_id:
-            url = "http://localhost:4567/api/v1/threads/{}/comments".format(thread_id)
-        elif parent_id and not thread_id:
+        if parent_id:
             url = "http://localhost:4567/api/v1/comments/{}".format(parent_id)
-        else:  # pragma: no cover
-            raise ValueError("Exactly one of thread_id and parent_id must be provided.")
+        else:
+            url = "http://localhost:4567/api/v1/threads/{}/comments".format(thread_id)
 
         httpretty.register_uri(httpretty.POST, url, body=callback)
 
@@ -228,6 +230,7 @@ def make_minimal_cs_comment(overrides=None):
     ret = {
         "id": "dummy",
         "thread_id": "dummy",
+        "parent_id": None,
         "user_id": "0",
         "username": "dummy",
         "anonymous": False,
