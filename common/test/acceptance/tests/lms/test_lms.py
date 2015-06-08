@@ -116,7 +116,7 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         self.login_page.visit().password_reset(email=email)
 
         # Expect that we're shown a success message
-        self.assertIn("PASSWORD RESET EMAIL SENT", self.login_page.wait_for_success())
+        self.assertIn("Password Reset Email Sent", self.login_page.wait_for_success())
 
     def test_password_reset_failure(self):
         # Navigate to the password reset form
