@@ -1,24 +1,28 @@
 <form>
     <h3 class="modal-section-title"><%= gettext('Timed Examination') %></h3>
     <div class="modal-section-content has-actions">
-        <ul class="list-fields list-input">
-            <li class="field field-checkbox checkbox-cosmetic">
-                <input type="checkbox" id="id_timed_examination" name="timed_examination" class="input input-checkbox" />
-                <label for="id_timed_examination" class="label">
-                  <i class="icon fa fa-check-square-o input-checkbox-checked"></i>
-                  <i class="icon fa fa-square-o input-checkbox-unchecked"></i>
-                  <%= gettext('Is Timed Examination') %>
-                </label>
-            </li>
-        </ul>
-        <ul class="list-fields list-input time-limit">
-            <li class="field field-text field-time-limit field-release-time">
-                <label for="id_time_limit" class="label"><%= gettext('Time Limit:') %></label>
-                <input type="text" id="id_time_limit" name="time_limit"
-                  value=""
-                  placeholder="HH:MM" class="time_limit release-time time input input-text" autocomplete="off" />
-            </li>
-        </ul>
+        <div>
+            <ul class="list-fields list-input">
+                <li class="field field-checkbox checkbox-cosmetic">
+                    <input type="checkbox" id="id_timed_examination" name="timed_examination" class="input input-checkbox" />
+                    <label for="id_timed_examination" class="label">
+                      <i class="icon fa fa-check-square-o input-checkbox-checked"></i>
+                      <i class="icon fa fa-square-o input-checkbox-unchecked"></i>
+                      <%= gettext('Is Timed Examination') %>
+                    </label>
+                </li>
+            </ul>
+        </div>
+        <div>
+            <ul class="list-fields list-input time-limit">
+                <li class="field field-text field-time-limit field-release-time">
+                    <label for="id_time_limit" class="label"><%= gettext('Time Limit:') %></label>
+                    <input type="text" id="id_time_limit" name="time_limit"
+                      value=""
+                      placeholder="HH:MM" class="time_limit release-time time input input-text" autocomplete="off" />
+                </li>
+            </ul>
+        </div>
         <ul class="list-fields list-input">
             <li class="field field-checkbox checkbox-cosmetic">
                 <input type="checkbox" id="id_exam_proctoring" name="exam_proctoring" class="input input-checkbox" />
