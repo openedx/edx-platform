@@ -69,9 +69,9 @@ class TestEmailEnrollmentState(ModuleStoreTestCase):
         """verify behavior for non-user email address
         """
         ee_state = self.create_one(email='nobody@nowhere.com')
-        for attr in ['user', 'member', 'full_name', 'in_ccx']:
-            value = getattr(ee_state, attr, 'missing attribute')
-            self.assertFalse(value, "{}: {}".format(value, attr))
+        for attribute in ['user', 'member', 'full_name', 'in_ccx']:
+            value = getattr(ee_state, attribute, 'missing attribute')
+            self.assertFalse(value, "{}: {}".format(value, attribute))
 
     def test_enrollment_state_for_non_member_user(self):
         """verify behavior for email address of user who is not a ccx memeber
@@ -89,10 +89,10 @@ class TestEmailEnrollmentState(ModuleStoreTestCase):
         self.create_user()
         self.register_user_in_ccx()
         ee_state = self.create_one()
-        for attr in ['user', 'in_ccx']:
+        for attribute in ['user', 'in_ccx']:
             self.assertTrue(
-                getattr(ee_state, attr, False),
-                "attribute {} is missing or False".format(attr)
+                getattr(ee_state, attribute, False),
+                "attribute {} is missing or False".format(attribute)
             )
         self.assertEqual(ee_state.member, self.user)
         self.assertEqual(ee_state.full_name, self.user.profile.name)

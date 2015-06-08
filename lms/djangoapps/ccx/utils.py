@@ -262,6 +262,17 @@ def get_ccx_membership_triplets(user, course_org_filter, org_filter_out_set):
                 elif course.location.org in org_filter_out_set:
                     continue
 
+                # If, somehow, we've got a ccx that has been created for a
+                # course with a deprecated ID, we must filter it out. Emit a
+                # warning to the log so we can clean up.
+                if course.location.deprecated:
+                    log.warning(
+                        "CCX {} exists for course {} with deprecated id".format(
+                            ccx, ccx.course_id
+                        )
+                    )
+                    continue
+
                 yield (ccx, membership, course)
             else:
                 log.error("User {0} enrolled in {2} course {1}".format(  # pylint: disable=logging-format-interpolation

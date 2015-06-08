@@ -110,9 +110,10 @@ def has_access(user, action, obj, course_key=None):
     if isinstance(obj, XBlock):
         return _has_access_descriptor(user, action, obj, course_key)
 
+    if isinstance(obj, CCXLocator):
+        return _has_access_ccx_key(user, action, obj)
+
     if isinstance(obj, CourseKey):
-        if isinstance(obj, CCXLocator):
-            obj = obj.to_course_locator()
         return _has_access_course_key(user, action, obj)
 
     if isinstance(obj, UsageKey):
@@ -492,6 +493,10 @@ def _has_access_course_key(user, action, course_key):
     }
 
     return _dispatch(checkers, action, user, course_key)
+
+def _has_access_ccx_key(user, action, ccx_key):
+    course_key = ccx_key.to_course_locator()
+    return _has_access_course_key(user, action, course_key)
 
 
 def _has_access_string(user, action, perm):

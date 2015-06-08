@@ -612,7 +612,6 @@ ECOMMERCE_API_TIMEOUT = ENV_TOKENS.get('ECOMMERCE_API_TIMEOUT', ECOMMERCE_API_TI
 ##### Custom Courses for EdX #####
 if FEATURES.get('CUSTOM_COURSES_EDX'):
     INSTALLED_APPS += ('ccx',)
-    MIDDLEWARE_CLASSES += ('ccx.overrides.CcxMiddleware',)
     FIELD_OVERRIDE_PROVIDERS += (
         'ccx.overrides.CustomCoursesForEdxOverrideProvider',
     )

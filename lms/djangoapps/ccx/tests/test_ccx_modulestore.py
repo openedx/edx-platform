@@ -48,23 +48,17 @@ class TestCCXModulestoreWrapper(ModuleStoreTestCase):
             2010, 7, 7, 0, 0, tzinfo=pytz.UTC)
         chapters = [ItemFactory.create(start=start, parent=course)
                     for _ in xrange(2)]
-        sequentials = flatten([
-            [
-                ItemFactory.create(parent=chapter) for _ in xrange(2)
-            ] for chapter in chapters
-        ])
-        verticals = flatten([
-            [
-                ItemFactory.create(
-                    due=due, parent=sequential, graded=True, format='Homework'
-                ) for _ in xrange(2)
-            ] for sequential in sequentials
-        ])
-        blocks = flatten([  # pylint: disable=unused-variable
-            [
-                ItemFactory.create(parent=vertical) for _ in xrange(2)
-            ] for vertical in verticals
-        ])
+        sequentials = [
+            ItemFactory.create(parent=c) for _ in xrange(2) for c in chapters
+        ]
+        verticals = [
+            ItemFactory.create(
+                due=due, parent=s, graded=True, format='Homework'
+            ) for _ in xrange(2) for s in sequentials
+        ]
+        blocks = [
+            ItemFactory.create(parent=v) for _ in xrange(2) for v in verticals
+        ]
 
         self.ccx = ccx = CustomCourseForEdX(
             course_id=course.id,

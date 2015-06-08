@@ -33,6 +33,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.modulestore.xml import XMLModuleStore
+from ccx.modulestore import CCXModulestoreWrapper
 
 
 TEST_MONGODB_LOG = {
@@ -315,8 +316,12 @@ class TestSysadmin(SysadminBaseTestCase):
         # Create git loaded course
         response = self._add_edx4edx()
 
-        def_ms = modulestore()
-        self.assertIn('xml', str(def_ms.__class__))
+        def_ms = check_ms = modulestore()
+        # if the modulestore is wrapped by CCX, unwrap it for testing purposes
+        if isinstance(check_ms, CCXModulestoreWrapper):
+            check_ms = check_ms._modulestore
+
+        self.assertIn('xml', str(check_ms.__class__))
         course = def_ms.courses.get('{0}/edx4edx_lite'.format(
             os.path.abspath(settings.DATA_DIR)), None)
         self.assertIsNotNone(course)

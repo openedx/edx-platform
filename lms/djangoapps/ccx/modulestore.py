@@ -10,35 +10,21 @@ returned from the modulestore will have their keys updated to be the CCX
 version that was passed in.
 """
 from contextlib import contextmanager
+from functools import partial
 from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
-
-
-def ccx_locator_to_course_locator(ccx_locator):
-    return CourseLocator(
-        org=ccx_locator.org,
-        course=ccx_locator.course,
-        run=ccx_locator.run,
-        branch=ccx_locator.branch,
-        version_guid=ccx_locator.version_guid,
-    )
 
 
 def strip_ccx(val):
     retval = val
     ccx_id = None
-    if hasattr(retval, 'ccx'):
-        if isinstance(retval, CCXLocator):
-            ccx_id = retval.ccx
-            retval = ccx_locator_to_course_locator(retval)
-        elif isinstance(object, CCXBlockUsageLocator):
-            ccx_locator = retval.course_key
-            ccx_id = ccx_locator.ccx
-            course_locator = ccx_locator_to_course_locator(ccx_locator)
-            retval = BlockUsageLocator(
-                course_locator, retval.block_type, retval.block_id
-            )
-    if hasattr(retval, 'location'):
+    if isinstance(retval, CCXLocator):
+        ccx_id = retval.ccx
+        retval = retval.to_course_locator()
+    elif isinstance(object, CCXBlockUsageLocator):
+        ccx_id = retval.course_key.ccx
+        retval = retval.to_block_locator()
+    elif hasattr(retval, 'location'):
         retval.location, ccx_id = strip_ccx(retval.location)
     return retval, ccx_id
 
@@ -56,7 +42,9 @@ def restore_ccx(val, ccx_id):
     return val
 
 
-def restore_ccx_collection(field_value, ccx_id):
+def restore_ccx_collection(field_value, ccx_id=None):
+    if ccx_id is None:
+        return field_value
     if isinstance(field_value, list):
         field_value = [restore_ccx(fv, ccx_id) for fv in field_value]
     elif isinstance(field_value, dict):
@@ -65,6 +53,12 @@ def restore_ccx_collection(field_value, ccx_id):
     else:
         field_value = restore_ccx(field_value, ccx_id)
     return field_value
+
+
+@contextmanager
+def remove_ccx(to_strip):
+    stripped, ccx = strip_ccx(to_strip)
+    yield stripped, partial(restore_ccx_collection, ccx_id=ccx)
 
 
 class CCXModulestoreWrapper(object):
@@ -78,11 +72,10 @@ class CCXModulestoreWrapper(object):
         return getattr(self._modulestore, name)
 
     def _clean_locator_for_mapping(self, locator):
-        locator, ccx = strip_ccx(locator)
-        retval = self._modulestore._clean_locator_for_mapping(locator)
-        if ccx:
-            retval = restore_ccx_collection(retval, ccx)
-        return retval
+        with remove_ccx(locator) as stripped:
+            locator, restore = stripped
+            retval = self._modulestore._clean_locator_for_mapping(locator)
+            return restore(retval)
 
     def _get_modulestore_for_courselike(self, locator=None):
         if locator is not None:
@@ -94,11 +87,10 @@ class CCXModulestoreWrapper(object):
         Some course_keys are used without runs. This function calls the corresponding
         fill_in_run function on the appropriate modulestore.
         """
-        course_key, ccx = strip_ccx(course_key)
-        retval = self._modulestore.fill_in_run(course_key)
-        if ccx:
-            retval = restore_ccx_collection(retval, ccx)
-        return retval
+        with remove_ccx(course_key) as stripped:
+            course_key, restore = stripped
+            retval = self._modulestore.fill_in_run(course_key)
+            return restore(retval)
 
     def has_item(self, usage_key, **kwargs):
         """
@@ -111,35 +103,32 @@ class CCXModulestoreWrapper(object):
         """
         see parent doc
         """
-        usage_key, ccx = strip_ccx(usage_key)
-        retval = self._modulestore.get_item(usage_key, depth, **kwargs)
-        if ccx:
-            retval = restore_ccx_collection(retval, ccx)
-        return retval
+        with remove_ccx(usage_key) as stripped:
+            usage_key, restore = stripped
+            retval = self._modulestore.get_item(usage_key, depth, **kwargs)
+            return restore(retval)
 
     def get_items(self, course_key, **kwargs):
-        course_key, ccx = strip_ccx(course_key)
-        retval = self._modulestore.get_items(course_key, **kwargs)
-        if ccx:
-            retval = restore_ccx_collection(retval, ccx)
-        return retval
+        with remove_ccx(course_key) as stripped:
+            course_key, restore = stripped
+            retval = self._modulestore.get_items(course_key, **kwargs)
+            return restore(retval)
 
     def get_course(self, course_key, depth=0, **kwargs):
-        # from nose.tools import set_trace; set_trace()
-        course_key, ccx = strip_ccx(course_key)
-        retval = self._modulestore.get_course(course_key, depth=depth, **kwargs)
-        if ccx:
-            retval = restore_ccx_collection(retval, ccx)
-        return retval
+        with remove_ccx(course_key) as stripped:
+            course_key, restore = stripped
+            retval = self._modulestore.get_course(
+                course_key, depth=depth, **kwargs
+            )
+            return restore(retval)
 
     def has_course(self, course_id, ignore_case=False, **kwargs):
-        course_id, ccx = strip_ccx(course_id)
-        retval = self._modulestore.has_course(
-            course_id, ignore_case=ignore_case, **kwargs
-        )
-        if ccx:
-            retval = restore_ccx_collection(retval, ccx)
-        return retval
+        with remove_ccx(course_id) as stripped:
+            course_id, restore = stripped
+            retval = self._modulestore.has_course(
+                course_id, ignore_case=ignore_case, **kwargs
+            )
+            return restore(retval)
 
     def delete_course(self, course_key, user_id):
         """
@@ -149,32 +138,28 @@ class CCXModulestoreWrapper(object):
         return self._modulestore.delete_course(course_key, user_id)
 
     def get_parent_location(self, location, **kwargs):
-        location, ccx = strip_ccx(location)
-        retval = self._modulestore.get_parent_location(location, **kwargs)
-        if ccx:
-            retval = restore_ccx_collection(retval, ccx)
-        return retval
+        with remove_ccx(location) as stripped:
+            location, restore = stripped
+            retval = self._modulestore.get_parent_location(location, **kwargs)
+            return restore(retval)
 
     def get_block_original_usage(self, usage_key):
-        usage_key, ccx = strip_ccx(usage_key)
-        orig_key, version = self._modulestore.get_block_original_usage(usage_key)
-        if orig_key and ccx:
-            orig_key = restore_ccx_collection(orig_key, ccx)
-        return orig_key, version
+        with remove_ccx(usage_key) as stripped:
+            usage_key, restore = stripped
+            orig_key, version = self._modulestore.get_block_original_usage(usage_key)
+            return restore(orig_key), version
 
     def get_modulestore_type(self, course_id):
-        course_id, ccx = strip_ccx(course_id)
-        retval = self._modulestore.get_modulestore_type(course_id)
-        if ccx:
-            retval = restore_ccx_collection(retval, ccx)
-        return retval
+        with remove_ccx(course_id) as stripped:
+            course_id, restore = stripped
+            retval = self._modulestore.get_modulestore_type(course_id)
+            return restore(retval)
 
     def get_orphans(self, course_key, **kwargs):
-        course_key, ccx = strip_ccx(course_key)
-        retval = self._modulestore.get_orphans(course_key, **kwargs)
-        if ccx:
-            retval = restore_ccx_collection(retval, ccx)
-        return retval
+        with remove_ccx(course_key) as stripped:
+            course_key, restore = stripped
+            retval = self._modulestore.get_orphans(course_key, **kwargs)
+            return restore(retval)
 
     def clone_course(self, source_course_id, dest_course_id, user_id, fields=None, **kwargs):
         source_course_id, source_ccx = strip_ccx(source_course_id)
@@ -187,109 +172,94 @@ class CCXModulestoreWrapper(object):
         return retval
 
     def create_item(self, user_id, course_key, block_type, block_id=None, fields=None, **kwargs):
-        course_key, ccx = strip_ccx(course_key)
-        retval = self._modulestore.create_item(
-            user_id, course_key, block_type, block_id=block_id, fields=fields, **kwargs
-        )
-        if ccx:
-            retval = restore_ccx_collection(retval, ccx)
-        return retval
+        with remove_ccx(course_key) as stripped:
+            course_key, restore = stripped
+            retval = self._modulestore.create_item(
+                user_id, course_key, block_type, block_id=block_id, fields=fields, **kwargs
+            )
+            return restore(retval)
 
     def create_child(self, user_id, parent_usage_key, block_type, block_id=None, fields=None, **kwargs):
-        parent_usage_key, ccx = strip_ccx(parent_usage_key)
-        retval = self._modulestore.create_child(
-            user_id, parent_usage_key, block_type, block_id=block_id, fields=fields, **kwargs
-        )
-        if ccx:
-            retval = restore_ccx_collection(retval, ccx)
-        return retval
+        with remove_ccx(parent_usage_key) as stripped:
+            parent_usage_key, restore = stripped
+            retval = self._modulestore.create_child(
+                user_id, parent_usage_key, block_type, block_id=block_id, fields=fields, **kwargs
+            )
+            return restore(retval)
 
     def import_xblock(self, user_id, course_key, block_type, block_id, fields=None, runtime=None, **kwargs):
-        course_key, ccx = strip_ccx(course_key)
-        retval = self._modulestore.import_xblock(
-            user_id, course_key, block_type, block_id, fields=fields, runtime=runtime, **kwargs
-        )
-        if ccx:
-            retval = restore_ccx_collection(retval, ccx)
-        return retval
+        with remove_ccx(course_key) as stripped:
+            course_key, restore = stripped
+            retval = self._modulestore.import_xblock(
+                user_id, course_key, block_type, block_id, fields=fields, runtime=runtime, **kwargs
+            )
+            return restore(retval)
 
     def copy_from_template(self, source_keys, dest_key, user_id, **kwargs):
-        dest_key, ccx = strip_ccx(dest_key)
-        retval = self._modulestore.copy_from_template(
-            source_keys, dest_key, user_id, **kwargs
-        )
-        if ccx:
-            retval = restore_ccx_collection(retval, ccx)
-        return retval
+        with remove_ccx(dest_key) as stripped:
+            dest_key, restore = stripped
+            retval = self._modulestore.copy_from_template(
+                source_keys, dest_key, user_id, **kwargs
+            )
+            return restore(retval)
 
     def update_item(self, xblock, user_id, allow_not_found=False, **kwargs):
-        xblock, ccx = strip_ccx(xblock)
-        retval = self._modulestore.update_item(
-            xblock, user_id, allow_not_found=allow_not_found, **kwargs
-        )
-        if ccx:
-            retval = restore_ccx_collection(retval, ccx)
-        return retval
+        with remove_ccx(xblock) as stripped:
+            xblock, restore = stripped
+            retval = self._modulestore.update_item(
+                xblock, user_id, allow_not_found=allow_not_found, **kwargs
+            )
+            return restore(retval)
 
     def delete_item(self, location, user_id, **kwargs):
-        location, ccx = strip_ccx(location)
-        retval = self._modulestore.delete_item(location, user_id, **kwargs)
-        if ccx:
-            retval = restore_ccx_collection(retval, ccx)
-        return retval
+        with remove_ccx(location) as stripped:
+            location, restore = stripped
+            retval = self._modulestore.delete_item(location, user_id, **kwargs)
+            return restore(retval)
 
     def revert_to_published(self, location, user_id):
-        location, ccx = strip_ccx(location)
-        retval = self._modulestore.revert_to_published(location, user_id)
-        if ccx:
-            retval = restore_ccx_collection(retval, ccx)
-        return retval
+        with remove_ccx(location) as stripped:
+            location, restore = stripped
+            retval = self._modulestore.revert_to_published(location, user_id)
+            return restore(retval)
 
     def create_xblock(self, runtime, course_key, block_type, block_id=None, fields=None, **kwargs):
-        course_key, ccx = strip_ccx(course_key)
-        retval = self._modulestore.create_xblock(
-            runtime, course_key, block_type, block_id=block_id, fields=fields, **kwargs
-        )
-        if ccx:
-            retval = restore_ccx_collection(retval, ccx)
-        return retval
+        with remove_ccx(course_key) as stripped:
+            course_key, restore = stripped
+            retval = self._modulestore.create_xblock(
+                runtime, course_key, block_type, block_id=block_id, fields=fields, **kwargs
+            )
+            return restore(retval)
 
     def has_published_version(self, xblock):
-        xblock.scope_ids.usage_id.course_key, ccx = strip_ccx(
-            xblock.scope_ids.usage_id.course_key
-        )
-        retval = self._modulestore.has_published_version(xblock)
-        if ccx:
-            retval = restore_ccx_collection(retval, ccx)
-        return retval
+        with remove_ccx(xblock) as stripped:
+            xblock, restore = stripped
+            retval = self._modulestore.has_published_version(xblock)
+            return restore(retval)
 
     def publish(self, location, user_id, **kwargs):
-        location, ccx = strip_ccx(location)
-        retval = self._modulestore.publish(location, user_id, **kwargs)
-        if ccx:
-            retval = restore_ccx_collection(retval, ccx)
-        return retval
+        with remove_ccx(location) as stripped:
+            location, restore = stripped
+            retval = self._modulestore.publish(location, user_id, **kwargs)
+            return restore(retval)
 
     def unpublish(self, location, user_id, **kwargs):
-        location, ccx = strip_ccx(location)
-        retval = self._modulestore.unpublish(location, user_id, **kwargs)
-        if ccx:
-            retval = restore_ccx_collection(retval, ccx)
-        return retval
+        with remove_ccx(location) as stripped:
+            location, restore = stripped
+            retval = self._modulestore.unpublish(location, user_id, **kwargs)
+            return restore(retval)
 
     def convert_to_draft(self, location, user_id):
-        location, ccx = strip_ccx(location)
-        retval = self._modulestore.convert_to_draft(location, user_id)
-        if ccx:
-            retval = restore_ccx_collection(retval, ccx)
-        return retval
+        with remove_ccx(location) as stripped:
+            location, restore = stripped
+            retval = self._modulestore.convert_to_draft(location, user_id)
+            return restore(retval)
 
     def has_changes(self, xblock):
-        xblock.location, ccx = strip_ccx(xblock.location)
-        retval = self._modulestore.has_changes(xblock)
-        if ccx:
-            retval = restore_ccx_collection(retval, ccx)
-        return retval
+        with remove_ccx(xblock) as stripped:
+            xblock, restore = stripped
+            retval = self._modulestore.has_changes(xblock)
+            return restore(retval)
 
     def check_supports(self, course_key, method):
         course_key, _ = strip_ccx(course_key)

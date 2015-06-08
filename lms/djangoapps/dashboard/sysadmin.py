@@ -43,6 +43,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml import XMLModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from ccx.modulestore import CCXModulestoreWrapper
 
 
 log = logging.getLogger(__name__)
@@ -59,9 +60,13 @@ class SysadminDashboardView(TemplateView):
         modulestore_type and return msg
         """
 
-        self.def_ms = modulestore()
+        self.def_ms = check_ms = modulestore()
+        # if the modulestore is wrapped by CCX, unwrap it for checking purposes
+        if isinstance(check_ms, CCXModulestoreWrapper):
+            check_ms = check_ms._modulestore
+
         self.is_using_mongo = True
-        if isinstance(self.def_ms, XMLModuleStore):
+        if isinstance(check_ms, XMLModuleStore):
             self.is_using_mongo = False
         self.msg = u''
         self.datatable = []

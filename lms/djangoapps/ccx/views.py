@@ -18,6 +18,7 @@ from django.http import (
     HttpResponseForbidden,
     HttpResponseRedirect,
 )
+from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.http import Http404
@@ -74,8 +75,6 @@ def coach_dashboard(view):
         course_key = CourseKey.from_string(course_id)
         ccx = None
         if isinstance(course_key, CCXLocator):
-            # is there a security leak here in not checking that this user is
-            # the coach for this ccx?
             ccx_id = course_key.ccx
             ccx = CustomCourseForEdX.objects.get(pk=ccx_id)
             course_key = ccx.course_id
@@ -86,6 +85,15 @@ def coach_dashboard(view):
                 _('You must be a CCX Coach to access this view.'))
 
         course = get_course_by_id(course_key, depth=None)
+
+        # if there is a ccx, we must validate that it is the ccx for this coach
+        if ccx is not None:
+            coach_ccx = get_ccx_for_coach(course, request.user)
+            if coach_ccx is None or coach_ccx.id != ccx.id:
+                return HttpResponseForbidden(
+                    _('You must be the coach for this ccx to access this view')
+                )
+
         return view(request, course, ccx)
     return wrapper
 
@@ -140,6 +148,17 @@ def create_ccx(request, course, ccx=None):
     Create a new CCX
     """
     name = request.POST.get('name')
+
+    # prevent CCX objects from being created for deprecated course ids.
+    if course.id.deprecated:
+        messages.error(_(
+            "You cannot create a CCX from a course using a deprecated id. "
+            "Please create a rerun of this course in the studio to allow "
+            "this action.")
+        )
+        url = reverse('ccx_coach_dashboard', kwargs={'course_id', course.id})
+        return redirect(url)
+
     ccx = CustomCourseForEdX(
         course_id=course.id,
         coach=request.user,
