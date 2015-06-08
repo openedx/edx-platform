@@ -9,6 +9,8 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.http import Http404
 
+from rest_framework.exceptions import PermissionDenied
+
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
 
@@ -24,6 +26,7 @@ from django_comment_client.base.views import (
     track_forum_event,
 )
 from django_comment_client.utils import get_accessible_discussion_modules
+from lms.lib.comment_client.comment import Comment
 from lms.lib.comment_client.thread import Thread
 from lms.lib.comment_client.utils import CommentClientRequestError
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id, is_commentable_cohorted
@@ -69,6 +72,19 @@ def _get_thread_and_context(request, thread_id, parent_id=None, retrieve_kwargs=
     except CommentClientRequestError:
         # params are validated at a higher level, so the only possible request
         # error is if the thread doesn't exist
+        raise Http404
+
+
+def _get_comment_and_context(request, comment_id):
+    try:
+        cc_comment = Comment(id=comment_id).retrieve()
+        cc_thread, context = _get_thread_and_context(
+            request,
+            cc_comment["thread_id"],
+            cc_comment["parent_id"]
+        )
+        return cc_comment, context
+    except CommentClientRequestError:
         raise Http404
 
 
@@ -427,3 +443,58 @@ def update_thread(request, thread_id, update_data):
     api_thread = serializer.data
     _do_extra_thread_actions(api_thread, cc_thread, update_data.keys(), actions_form, context)
     return api_thread
+
+
+def update_comment(request, comment_id, update_data):
+    """
+    Update a comment.
+
+    Parameters:
+
+        request: The django request object used for build_absolute_uri and
+          determining the requesting user.
+
+        comment_id: The id for the comment to update.
+
+        update_data: The data to update in the comment.
+
+    Returns:
+
+        The updated comment; see discussion_api.views.CommentViewSet for more
+        detail.
+    """
+    cc_comment, context = _get_comment_and_context(request, comment_id)
+    is_author = context["cc_requester"]["id"] == cc_comment["user_id"]
+    if not (context["is_requester_privileged"] or is_author):
+        raise PermissionDenied()
+    serializer = CommentSerializer(cc_comment, data=update_data, partial=True, context=context)
+    if not serializer.is_valid():
+        raise ValidationError(serializer.errors)
+    # Only save comment object if the comment is actually modified
+    if update_data:
+        serializer.save()
+    return serializer.data
+
+
+def delete_comment(request, comment_id):
+    """
+    Delete a comment.
+
+    Parameters:
+
+        request: The django request object used for build_absolute_uri and
+          determining the requesting user.
+
+        comment_id: The id for the comment to delete
+
+    Raises:
+
+        PermissionDenied: if user does not have permission to delete thread
+
+    """
+    cc_comment, context = _get_comment_and_context(request, comment_id)
+    # TODO Lets rebase when I merge my othe PR so I won't get this error things
+    # if _is_user_author_or_privileged(cc_thread, context):
+    cc_comment.delete()
+    # else:
+    #     raise PermissionDenied

@@ -13,7 +13,11 @@ from django.core.urlresolvers import reverse
 
 from rest_framework.test import APIClient
 
-from discussion_api.tests.utils import CommentsServiceMockMixin, make_minimal_cs_thread
+from discussion_api.tests.utils import (
+    CommentsServiceMockMixin,
+    make_minimal_cs_comment,
+    make_minimal_cs_thread,
+)
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -601,3 +605,128 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assertEqual(response.status_code, 400)
         response_data = json.loads(response.content)
         self.assertEqual(response_data, expected_response_data)
+
+
+@httpretty.activate
+class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
+    """Tests for CommentViewSet partial_update"""
+    def setUp(self):
+        super(CommentViewSetPartialUpdateTest, self).setUp()
+        self.url = reverse("comment-detail", kwargs={"comment_id": "test_comment"})
+
+    def test_basic(self):
+        self.register_get_user_response(self.user)
+        cs_thread = make_minimal_cs_thread({
+            "id": "test_thread",
+            "course_id": unicode(self.course.id),
+        })
+        self.register_get_thread_response(cs_thread)
+        cs_comment = make_minimal_cs_comment({
+            "id": "test_comment",
+            "course_id": cs_thread["course_id"],
+            "thread_id": cs_thread["id"],
+            "username": self.user.username,
+            "user_id": str(self.user.id),
+            "created_at": "2015-06-03T00:00:00Z",
+            "updated_at": "2015-06-03T00:00:00Z",
+            "body": "Original body",
+        })
+        self.register_get_comment_response(cs_comment)
+        self.register_put_comment_response(cs_comment)
+        request_data = {"raw_body": "Edited body"}
+        expected_response_data = {
+            "id": "test_comment",
+            "thread_id": "test_thread",
+            "parent_id": None,  # TODO: we can't get this without retrieving from the thread :-(
+            "author": self.user.username,
+            "author_label": None,
+            "created_at": "2015-06-03T00:00:00Z",
+            "updated_at": "2015-06-03T00:00:00Z",
+            "raw_body": "Edited body",
+            "endorsed": False,
+            "endorsed_by": None,
+            "endorsed_by_label": None,
+            "endorsed_at": None,
+            "abuse_flagged": False,
+            "voted": False,
+            "vote_count": 0,
+            "children": [],
+        }
+        response = self.client.patch(  # pylint: disable=no-member
+            self.url,
+            json.dumps(request_data),
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data, expected_response_data)
+        self.assertEqual(
+            httpretty.last_request().parsed_body,
+            {
+                "body": ["Edited body"],
+                "course_id": [unicode(self.course.id)],
+                "user_id": [str(self.user.id)],
+                "anonymous": ["False"],
+                "anonymous_to_peers": ["False"],
+                "endorsed": ["False"],
+            }
+        )
+
+    def test_error(self):
+        self.register_get_user_response(self.user)
+        cs_thread = make_minimal_cs_thread({
+            "id": "test_thread",
+            "course_id": unicode(self.course.id),
+        })
+        self.register_get_thread_response(cs_thread)
+        cs_comment = make_minimal_cs_comment({
+            "id": "test_comment",
+            "thread_id": cs_thread["id"],
+            "user_id": str(self.user.id),
+        })
+        self.register_get_comment_response(cs_comment)
+        request_data = {"raw_body": ""}
+        response = self.client.patch(  # pylint: disable=no-member
+            self.url,
+            json.dumps(request_data),
+            content_type="application/json"
+        )
+        expected_response_data = {
+            "field_errors": {"raw_body": {"developer_message": "This field is required."}}
+        }
+        self.assertEqual(response.status_code, 400)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data, expected_response_data)
+
+
+ @httpretty.activate
+class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
+    """Tests for ThreadViewSet delete"""
+    def setUp(self):
+        super(CommentViewSetDeleteTest, self).setUp()
+        self.url = reverse("comment-detail", kwargs={"comment_id": "test_comment"})
+        self.thread_id = "test_thread"
+
+    def test_basic(self):
+        self.register_get_user_response(self.user)
+        cs_thread = make_minimal_cs_thread({
+            "id": self.thread_id,
+            "course_id": unicode(self.course.id),
+            "username": self.user.username,
+            "user_id": str(self.user.id),
+        })
+        self.register_get_thread_response(cs_thread)
+        self.register_delete_thread_response(self.thread_id)
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.content, "")
+        self.assertEqual(
+            urlparse(httpretty.last_request().path).path,
+            "/api/v1/threads/{}".format(self.thread_id)
+        )
+        self.assertEqual(httpretty.last_request().method, "DELETE")
+
+    def test_delete_nonexistent_thread(self):
+        self.register_get_thread_error_response(self.thread_id, 404)
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, 404)
