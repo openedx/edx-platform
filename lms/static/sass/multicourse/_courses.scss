@@ -41,38 +41,78 @@ $facet-background-color: #007db8;
 
     .courses {
       @include rtl() { $layout-direction: "RTL"; }
-      @include span-columns(9);
-
-      @include media($bp-medium) {
-        @include span-columns(4);
-      }
-
-      @include media($bp-large) {
-        @include span-columns(8);
-      }
-
-      @include media($bp-huge) {
-        @include span-columns(9);
-      }
 
       .courses-listing .courses-listing-item {
         @include fill-parent();
         margin: ($baseline*0.75) 0 ($baseline*1.5) 0;
         max-height: $course-card-height;
+      }
+
+      /* Style grid settings if course discovery turned on */
+      &:not(.no-course-discovery) {
+        @include span-columns(9);
 
         @include media($bp-medium) {
-          @include span-columns(8); // 4 of 8
-          @include omega(1n);
+          @include span-columns(4);
         }
 
         @include media($bp-large) {
-          @include span-columns(6); // 6 of 12
-          @include omega(2n);
+          @include span-columns(8);
         }
 
         @include media($bp-huge) {
-          @include span-columns(4); // 4 of 12
-          @include omega(3n);
+          @include span-columns(9);
+        }
+
+        .courses-listing .courses-listing-item {
+          @include media($bp-medium) {
+            @include span-columns(8); // 4 of 8
+            @include omega(1n);
+          }
+
+          @include media($bp-large) {
+            @include span-columns(6); // 6 of 12
+            @include omega(2n);
+          }
+
+          @include media($bp-huge) {
+            @include span-columns(4); // 4 of 12
+            @include omega(3n);
+          }
+        }
+      }
+
+      /* Style grid settings if course discovery turned off */
+      &.no-course-discovery{
+        @include span-columns(12);
+
+        @include media($bp-medium) {
+          @include span-columns(8);
+        }
+
+        @include media($bp-large) {
+          @include span-columns(12);
+        }
+
+        @include media($bp-huge) {
+          @include span-columns(12);
+        }
+
+        .courses-listing .courses-listing-item {
+          @include media($bp-medium) {
+            @include span-columns(4); // 4 of 8
+            @include omega(2n);
+          }
+
+          @include media($bp-large) {
+            @include span-columns(4); // 4 of 12
+            @include omega(3n);
+          }
+
+          @include media($bp-huge) {
+            @include span-columns(3); // 3 of 12
+            @include omega(4n);
+          }
         }
       }
     }
