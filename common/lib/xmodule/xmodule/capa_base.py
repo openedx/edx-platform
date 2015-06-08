@@ -333,9 +333,9 @@ class CapaMixin(CapaFields):
         )
 
         ### @jbau 2-21-14 edx-west HACK for deanonymized email HERE ###
-        if hasattr(self.runtime, 'send_users_emailaddr_with_coderesponse'):
+        if getattr(self.runtime, 'send_users_emailaddr_with_coderesponse', False) is True:
             capa_system.send_users_emailaddr_with_coderesponse = self.runtime.send_users_emailaddr_with_coderesponse
-        if hasattr(self.runtime, 'deanonymized_user_email'):
+        if isinstance(getattr(self.runtime, 'deanonymized_user_email', False), basestring):
             capa_system.deanonymized_user_email = self.runtime.deanonymized_user_email
         ###############################################################
 
