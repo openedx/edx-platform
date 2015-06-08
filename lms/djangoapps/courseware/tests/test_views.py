@@ -816,6 +816,85 @@ class ProgressPageTests(ModuleStoreTestCase):
         resp = views.progress(self.request, course_id=unicode(self.course.id))
         self.assertNotContains(resp, 'Request Certificate')
 
+    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
+    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [],
+                                                         'grade_breakdown': []}))
+    def test_view_certificate_link(self):
+        """
+        If certificate web view is enabled then certificate web view button should appear for user who certificate is
+        available/generated
+        """
+        GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable,
+            download_url="http://www.example.com/certificate.pdf",
+            mode='honor'
+        )
+
+        # Enable the feature, but do not enable it for this course
+        CertificateGenerationConfiguration(enabled=True).save()
+
+        # Enable certificate generation for this course
+        certs_api.set_cert_generation_enabled(self.course.id, True)
+
+        #course certificate configurations
+        certificates = [
+            {
+                'id': 1,
+                'name': 'Name 1',
+                'description': 'Description 1',
+                'course_title': 'course_title_1',
+                'org_logo_path': '/t4x/orgX/testX/asset/org-logo-1.png',
+                'signatories': [],
+                'version': 1,
+                'is_active': True
+            }
+        ]
+
+        self.course.certificates = {'certificates': certificates}
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
+
+        resp = views.progress(self.request, course_id=unicode(self.course.id))
+        self.assertContains(resp, u"View Certificate")
+        self.assertContains(resp, u"You can now view your certificate")
+        self.assertContains(resp, certs_api.get_certificate_url(user_id=self.user.id, course_id=self.course.id))
+
+        # when course certificate is not active
+        certificates[0]['is_active'] = False
+        self.store.update_item(self.course, self.user.id)
+
+        resp = views.progress(self.request, course_id=unicode(self.course.id))
+        self.assertNotContains(resp, u"View Your Certificate")
+        self.assertNotContains(resp, u"You can now view your certificate")
+        self.assertContains(resp, u"We're creating your certificate.")
+
+    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
+    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [],
+                                                         'grade_breakdown': []}))
+    def test_view_certificate_link_hidden(self):
+        """
+        If certificate web view is disabled then certificate web view button should not appear for user who certificate
+        is available/generated
+        """
+        GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable,
+            download_url="http://www.example.com/certificate.pdf",
+            mode='honor'
+        )
+
+        # Enable the feature, but do not enable it for this course
+        CertificateGenerationConfiguration(enabled=True).save()
+
+        # Enable certificate generation for this course
+        certs_api.set_cert_generation_enabled(self.course.id, True)
+
+        resp = views.progress(self.request, course_id=unicode(self.course.id))
+        self.assertContains(resp, u"Download Your Certificate")
+
 
 @attr('shard_1')
 class VerifyCourseKeyDecoratorTests(TestCase):
