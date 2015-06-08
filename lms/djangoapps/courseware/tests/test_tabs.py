@@ -510,6 +510,7 @@ class TabListTestCase(TabTestCase):
                 {'type': CourseInfoViewType.name, 'name': 'fake_name'},
                 {'type': 'discussion', 'name': 'fake_name'},
                 {'type': ExternalLinkCourseViewType.name, 'name': 'fake_name', 'link': 'fake_link'},
+                {'type': ExternalLinkCourseViewType.name, 'name': 'fake_name', 'link': 'fake_link'},
                 {'type': 'textbooks'},
                 {'type': 'pdf_textbooks'},
                 {'type': 'html_textbooks'},

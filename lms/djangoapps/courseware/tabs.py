@@ -234,6 +234,7 @@ class ExternalLinkCourseViewType(EnrolledCourseViewType):
     name = 'external_link'
     priority = None
     is_default = False    # An external link tab is not added to a course by default
+    allow_multiple = True
 
     @classmethod
     def create_tab(cls, tab_dict):
