@@ -439,7 +439,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         self.assertEqual(response.status_code, 200)
         assert_event_matches(
             {
-                'name': 'edx.badges.assertion.evidence_visit',
+                'name': 'edx.badge.assertion.evidence_visited',
                 'data': {
                     'course_id': 'testorg/run1/refundable_course',
                     # pylint: disable=no-member
@@ -491,7 +491,7 @@ class TrackShareRedirectTest(ModuleStoreTestCase, EventTrackingTestCase):
         self.assertEqual(response['Location'], 'http://www.example.com/image.png')
         assert_event_matches(
             {
-                'name': 'edx.badges.assertion.shared',
+                'name': 'edx.badge.assertion.shared',
                 'data': {
                     'course_id': 'testorg/run1/trackable_course',
                     'social_network': 'social_network',

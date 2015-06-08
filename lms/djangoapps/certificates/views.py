@@ -531,7 +531,7 @@ def render_html_view(request, user_id, course_id):
         try:
             badge = BadgeAssertion.objects.get(user=user, course_id=course_key)
             tracker.emit(
-                'edx.badges.assertion.evidence_visit',
+                'edx.badge.assertion.evidence_visited',
                 {
                     'user_id': user.id,
                     'course_id': unicode(course_key),
@@ -581,7 +581,7 @@ def track_share_redirect(request__unused, course_id, network, student_username):
     course_id = CourseLocator.from_string(course_id)
     assertion = get_object_or_404(BadgeAssertion, user__username=student_username, course_id=course_id)
     tracker.emit(
-        'edx.badges.assertion.shared', {
+        'edx.badge.assertion.shared', {
             'course_id': unicode(course_id),
             'social_network': network,
             'assertion_id': assertion.id,

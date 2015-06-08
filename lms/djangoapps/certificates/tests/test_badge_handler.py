@@ -190,7 +190,7 @@ class BadgeHandlerTestCase(ModuleStoreTestCase, EventTrackingTestCase):
             'evidence': 'https://edx.org/certificates/user/2/course/edX/course_test/test_run?evidence_visit=1'
         })
         assert_event_matches({
-            'name': 'edx.badges.assertion.created',
+            'name': 'edx.badge.assertion.created',
             'data': {
                 'user_id': self.user.id,
                 'course_id': unicode(self.course.location.course_key),
