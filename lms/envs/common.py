@@ -1339,16 +1339,16 @@ PIPELINE_CSS = {
         'output_filename': 'css/lms-style-vendor-tinymce-skin.css',
     },
     'style-main': {
+        # this is unnecessary and can be removed
         'source_filenames': [
-            'sass/lms-main.css',
-            'css/edx-cc.css',
+            'css/lms-main.css',
         ],
         'output_filename': 'css/lms-main.css',
     },
     'style-main-rtl': {
+        # this is unnecessary and can be removed
         'source_filenames': [
-            'sass/lms-main-rtl.css',
-            'css/edx-cc.css',
+            'css/lms-main-rtl.css',
         ],
         'output_filename': 'css/lms-main-rtl.css',
     },
@@ -1362,7 +1362,7 @@ PIPELINE_CSS = {
     },
     'style-course': {
         'source_filenames': [
-            'sass/lms-course.css',
+            'css/lms-course.css',
             'xmodule/modules.css',
         ],
         'output_filename': 'css/lms-course.css',
